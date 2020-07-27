@@ -100,10 +100,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
                         self.handleSaveError({
                             showNotifications: args.showNotifications,
                             softRedirect: args.softRedirect,
-                            err: err,
-                            rebindCallback: function () {
-                                rebindCallback.apply(self, [args.content, err.data]);
-                            }
+                            err: err
                         });
 
                         //update editor state to what is current

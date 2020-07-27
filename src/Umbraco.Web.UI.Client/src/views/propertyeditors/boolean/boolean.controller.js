@@ -7,8 +7,13 @@ function booleanEditorController($scope, angularHelper) {
     // Maybe sometime later we can make it support "Yes/No" or "On/Off" as well similar to ng-true-value and ng-false-value in Angular.
     var config = {
         truevalue: "1",
-        falsevalue: "0"
+        falsevalue: "0",
+        showLabels: false
     };
+
+    if ($scope.model.config && $scope.model.config.showLabels && Object.toBoolean($scope.model.config.showLabels)) {
+        config.showLabels = true;
+    }
 
     // Map the user config
     Utilities.extend(config, $scope.model.config);
