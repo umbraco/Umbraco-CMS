@@ -10,21 +10,16 @@ function onlyDigits($parse) {
         restrict: "A",
         require: "ngModel",
         link: function (scope, elem, attrs, ctrl) {
-
             var allowOnlyDigits = scope.$eval(attrs.onlyDigits);
 
             if (allowOnlyDigits) {
-                ctrl.$parsers.push(function (input) {
-                    if (input === undefined || input === null) return '';
-                    var inputAsStr = input.toString();
-                    var transformedInput = inputAsStr.replace(/\D/g, '');
-                    if (transformedInput !== inputAsStr) {
-                        ctrl.$setViewValue(transformedInput);
-                        ctrl.$render();
-                    }
-                    return transformedInput;
-                });
+                ctrl.$validators["pattern"] = validatePattern;
             }
+
+            function validatePattern(modelValue, viewValue) {
+                var value = modelValue || viewValue;
+                return /^[0-9]*$/.test(value);
+            }            
         }
     };
 }
