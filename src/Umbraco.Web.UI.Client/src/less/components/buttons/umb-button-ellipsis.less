@@ -15,6 +15,7 @@
         justify-content: center;
     }
 
+    .umb-button-ellipsis__content-app,
     .umb-tour-is-visible .umb-tree &,
     &:hover,
     &:focus{
@@ -30,7 +31,7 @@
         }
     }
 
-    &__umb-button-ellipsis__content {
+    &__content {
         display: flex;
         flex-wrap: wrap;
     }
@@ -38,6 +39,10 @@
     &__icon {
         color: inherit;
         flex-basis: 100%;
+
+        .umb-button-ellipsis__content-app & {
+            margin: 0 0 7px
+        }
     }
 
     &__text {
@@ -45,5 +50,13 @@
         font-size: 12px;
         line-height: 1em;
         flex-basis: 100%;
+
+        .umb-button-ellipsis__content-app & {
+            position: absolute;
+            right: 0;
+            left: 0;
+            bottom: 13px;
+            margin: 0 auto;
+        }
     }
 }
