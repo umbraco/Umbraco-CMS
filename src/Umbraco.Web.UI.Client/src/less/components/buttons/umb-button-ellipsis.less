@@ -9,6 +9,10 @@
     opacity: 0.8;
     transition: opacity .3s ease-out;
 
+    &--absolute {
+        position: absolute;
+    }
+
     &.show-text {
         display: flex;
         flex-wrap: wrap;
@@ -33,6 +37,10 @@
     &__icon {
         color: inherit;
         flex-basis: 100%;
+
+        .umb-button-ellipsis--small & {
+            font-size: 8px;
+        }
     }
 
     &__text {
