@@ -19,6 +19,7 @@
         vm.openUserPicker = openUserPicker;
         vm.removeSelectedItem = removeSelectedItem;
         vm.clearStartNode = clearStartNode;
+        vm.allowRemoveSection = allowRemoveSection;
         vm.allowRemoveUserFromGroup = allowRemoveUserFromGroup;
         vm.save = save;
         vm.openGranularPermissionsPicker = openGranularPermissionsPicker;
@@ -271,6 +272,17 @@
 
             editorService.nodePermissions(vm.nodePermissions);
 
+        }
+
+        function allowRemoveSection(section, user) {
+            
+            // Don't allow to remove super user (id = -1) from sections
+            var sections = ["content", "media", "settings", "users", "members"];
+            if (sections.includes(section.alias) && user.id === -1) {
+                return false;
+            }
+
+            return true;
         }
 
         function allowRemoveUserFromGroup(user, userGroup) {

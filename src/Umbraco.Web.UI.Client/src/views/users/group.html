@@ -31,12 +31,13 @@
                                 <umb-box-content class="block-form">
 
                                     <umb-control-group style="margin-bottom: 20px;" label="@main_sections" description="@user_sectionsHelp">
+
                                         <umb-node-preview
                                             style="max-width: 100%;"
                                             ng-repeat="section in vm.userGroup.sections"
                                             icon="section.icon"
                                             name="section.name"
-                                            allow-remove="true"
+                                            allow-remove="vm.allowRemoveSection(section, user)"
                                             on-remove="vm.removeSelectedItem($index, vm.userGroup.sections)">
                                         </umb-node-preview>
 
@@ -49,6 +50,7 @@
                                     </umb-control-group>
 
                                     <umb-control-group style="margin-bottom: 20px;" label="@user_startnode" description="@user_startnodehelp">
+
                                         <umb-node-preview
                                             ng-if="vm.userGroup.contentStartNode.id"
                                             style="max-width: 100%;"
@@ -59,7 +61,6 @@
                                             on-edit="vm.openContentPicker()"
                                             on-remove="vm.clearStartNode('content')">
                                         </umb-node-preview>
-
 
                                         <button type="button"
                                                 ng-if="!vm.userGroup.contentStartNode"
@@ -120,10 +121,10 @@
                                             icon="node.icon"
                                             name="node.name"
                                             permissions="node.allowedPermissions"
-                                            allow-remove="true"
-                                            on-remove="vm.removeSelectedItem($index, vm.userGroup.assignedPermissions)"
                                             allow-edit="true"
-                                            on-edit="vm.setPermissionsForNode(node)">
+                                            allow-remove="true"
+                                            on-edit="vm.setPermissionsForNode(node)"
+                                            on-remove="vm.removeSelectedItem($index, vm.userGroup.assignedPermissions)">
                                         </umb-node-preview>
 
                                         <button type="button"
@@ -149,7 +150,7 @@
                                         ng-repeat="user in vm.userGroup.users"
                                         name="user.name"
                                         avatars="user.avatars"
-                                        allow-remove="true"
+                                        allow-remove="vm.allowRemoveUserFromGroup(user, vm.userGroup)"
                                         on-remove="vm.removeSelectedItem($index, vm.userGroup.users)">
                                     </umb-user-preview>
 
