@@ -115,6 +115,17 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             entity.ResetDirtyProperties();
         }
 
+        public IMemberGroup Get(Guid uniqueId)
+        {
+            var sql = GetBaseQuery(false);
+            //sql.Where(GetBaseWhereClause(), new { uniqueId = uniqueId });
+            sql.Where("umbracoNode.uniqueId = @uniqueId)", new { uniqueId = uniqueId.ToString() });
+
+            var dto = Database.Fetch<NodeDto>(SqlSyntax.SelectTop(sql, 1)).FirstOrDefault();
+
+            return dto == null ? null : MemberGroupFactory.BuildEntity(dto);
+        }
+
         public IMemberGroup GetByName(string name)
         {
             return IsolatedCache.GetCacheItem<IMemberGroup>(

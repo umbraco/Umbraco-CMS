@@ -1,10 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
     public interface IMemberGroupRepository : IReadWriteQueryRepository<int, IMemberGroup>
     {
+        IMemberGroup Get(Guid uniqueId);
+
         /// <summary>
         /// Gets a member group by it's name
         /// </summary>
