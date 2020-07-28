@@ -1,5 +1,17 @@
-
+/**
+ * @ngdoc directive
+ * @name umbraco.directives.directive:valServerMatch
+ * @restrict A
+ * @description A custom validator applied to a form/ng-form within an umbProperty that validates server side validation data 
+ * contained within the serverValidationManager. The data can be matched on "exact", "prefix", "suffix" or "contains" matches against 
+ * a property validation key. The attribute value can be in multiple value types:
+ * - STRING = The property validation key to have an exact match on. If matched, then the form will have a valServerMatch validator applied.
+ * - OBJECT = A dictionary where the key is the match type: "contains", "prefix", "suffix" and the value is either:
+ *     - ARRAY = A list of property validation keys to match on. If any are matched then the form will have a valServerMatch validator applied.
+ *     - OBJECT = A dictionary where the key is the validator error name applied to the form and the value is the STRING of the property validation key to match on
+**/
 function valServerMatch(serverValidationManager) {
+
     return {
         require: ['form', '^^umbProperty', '?^^umbVariantContent'],
         restrict: "A",
@@ -40,48 +52,63 @@ function valServerMatch(serverValidationManager) {
             
             var unsubscribe = [];
 
-            //subscribe to the server validation changes
-            function serverValidationManagerCallback(isValid, propertyErrors, allErrors) {
-                if (!isValid) {
-                    formCtrl.$setValidity('valServerMatch', false);                    
+            function bindCallback(validationKey, matchVal, matchType) {
+
+                if (Utilities.isString(matchVal)) {
+                    matchVal = [matchVal]; // normalize to an array since the value can also natively be an array
                 }
-                else {
-                    formCtrl.$setValidity('valServerMatch', true);                    
-                }
+
+                // match for each string in the array
+                matchVal.forEach(m => {
+                    unsubscribe.push(serverValidationManager.subscribe(
+                        m,
+                        currentCulture,
+                        "",
+                        // the callback
+                        function (isValid, propertyErrors, allErrors) {
+                            if (!isValid) {
+                                formCtrl.$setValidity(validationKey, false);
+                            }
+                            else {
+                                formCtrl.$setValidity(validationKey, true);
+                            }
+                        },
+                        currentSegment,
+                        matchType ? { matchType: matchType } : null // specify the match type
+                    ));
+                });
+
             }
 
             if (Utilities.isObject(scope.valServerMatch)) {
                 var allowedKeys = ["contains", "prefix", "suffix"];
-                Object.keys(scope.valServerMatch).forEach(k => {
-                    if (allowedKeys.indexOf(k) === -1) {
+                Object.keys(scope.valServerMatch).forEach(matchType => {
+                    if (allowedKeys.indexOf(matchType) === -1) {
                         throw "valServerMatch dictionary keys must be one of " + allowedKeys.join();
                     }
 
-                    var matchVal = scope.valServerMatch[k];
-                    if (Utilities.isString(matchVal)) {
-                        matchVal = [matchVal]; // change to an array since the value can also natively be an array
-                    }
+                    var matchVal = scope.valServerMatch[matchType];
 
-                    // match for each string in the array
-                    matchVal.forEach(m => {
-                        unsubscribe.push(serverValidationManager.subscribe(
-                            m,
-                            currentCulture,
-                            "",
-                            serverValidationManagerCallback,
-                            currentSegment,
-                            { matchType: k } // specify the match type
-                        ));
-                    })
+                    if (Utilities.isObject(matchVal)) {
+
+                        // as an object, the key will be the validation error instead of the default "valServerMatch"
+                        Object.keys(matchVal).forEach(valKey => {
+
+                            // matchVal[valKey] can be an ARRAY or a STRING
+                            bindCallback(valKey, matchVal[valKey], matchType);
+                        });
+                    }
+                    else {
+
+                        // matchVal can be an ARRAY or a STRING
+                        bindCallback("valServerMatch", matchVal, matchType);
+                    }
                 });
             }
             else if (Utilities.isString(scope.valServerMatch)) {
-                unsubscribe.push(serverValidationManager.subscribe(
-                    scope.valServerMatch,
-                    currentCulture,
-                    "",
-                    serverValidationManagerCallback,
-                    currentSegment));
+
+                // a STRING match which will be an exact match on the string supplied as the property validation key
+                bindCallback("valServerMatch", scope.valServerMatch, null);
             }
             else {
                 throw "valServerMatch value must be a string or a dictionary";

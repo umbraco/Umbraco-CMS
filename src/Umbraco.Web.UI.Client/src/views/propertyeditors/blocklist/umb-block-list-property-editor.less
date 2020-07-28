@@ -23,13 +23,17 @@
     > .umb-block-list__block--actions {
         opacity: 0;
         transition: opacity 120ms;
+
+        .--error {
+            color: @formErrorBorder !important;
+        }
     }
 
     &:hover,
     &:focus,
     &:focus-within,
     &.--active {
-        
+
         > .umb-block-list__block--actions {
             opacity: 1;
         }

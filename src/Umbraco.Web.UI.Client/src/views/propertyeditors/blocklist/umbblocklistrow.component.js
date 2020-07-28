@@ -18,6 +18,9 @@
                 blockEditorApi: "<",
                 layout: "<",
                 index: "<"
+            },
+            require: {
+                valFormManager: "^^valFormManager"
             }
         }
     );
