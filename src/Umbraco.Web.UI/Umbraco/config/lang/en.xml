@@ -2312,6 +2312,7 @@ To manage your website, simply open the Umbraco back office and start adding con
   </area>
   <area alias="propertyActions">
     <key alias="tooltipForPropertyActionsMenu">Open Property Actions</key>
+    <key alias="tooltipForPropertyActionsMenuClose">Close Property Actions</key>
   </area>
   <area alias="nuCache">
     <key alias="wait">Wait</key>
