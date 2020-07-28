@@ -274,7 +274,7 @@
         }
 
         function clearSelection() {
-            angular.forEach(vm.users, function (user) {
+            vm.users.forEach(function (user) {
                 user.selected = false;
             });
             vm.selection = [];
@@ -305,7 +305,7 @@
             vm.disableUserButtonState = "busy";
             usersResource.disableUsers(vm.selection).then(function (data) {
                 // update userState
-                angular.forEach(vm.selection, function (userId) {
+                vm.selection.forEach(function (userId) {
                     var user = getUserFromArrayById(userId, vm.users);
                     if (user) {
                         user.userState = 1;
@@ -326,7 +326,7 @@
             vm.enableUserButtonState = "busy";
             usersResource.enableUsers(vm.selection).then(function (data) {
                 // update userState
-                angular.forEach(vm.selection, function (userId) {
+                vm.selection.forEach(function (userId) {
                     var user = getUserFromArrayById(userId, vm.users);
                     if (user) {
                         user.userState = 0;
@@ -345,7 +345,7 @@
             vm.unlockUserButtonState = "busy";
             usersResource.unlockUsers(vm.selection).then(function (data) {
                 // update userState
-                angular.forEach(vm.selection, function (userId) {
+                vm.selection.forEach(function (userId) {
                     var user = getUserFromArrayById(userId, vm.users);
                     if (user) {
                         user.userState = 0;
@@ -423,14 +423,14 @@
         function selectAll() {
             if (areAllSelected()) {
                 vm.selection = [];
-                angular.forEach(vm.users, function (user) {
+                vm.users.forEach(function (user) {
                     user.selected = false;
                 });
             } else {
                 // clear selection so we don't add the same user twice
                 vm.selection = [];
                 // select all users
-                angular.forEach(vm.users, function (user) {
+                vm.users.forEach(function (user) {
                     // prevent the current user to be selected
                     if (!user.isCurrentUser) {
                         user.selected = true;
@@ -470,7 +470,7 @@
         function getFilterName(array) {
             var name = vm.labels.all;
             var found = false;
-            angular.forEach(array, function (item) {
+            array.forEach(function (item) {
                 if (item.selected) {
                     if (!found) {
                         name = item.name
@@ -491,7 +491,7 @@
 
             //If the selection is "ALL" then we need to unselect everything else since this is an 'odd' filter
             if (userState.key === "All") {
-                angular.forEach(vm.userStatesFilter, function (i) {
+                vm.userStatesFilter.forEach(function (i) {
                     i.selected = false;
                 });
                 //we can't unselect All
@@ -500,7 +500,7 @@
                 vm.usersOptions.userStates = [];
             }
             else {
-                angular.forEach(vm.userStatesFilter, function (i) {
+                vm.userStatesFilter.forEach(function (i) {
                     if (i.key === "All") {
                         i.selected = false;
                     }
@@ -715,13 +715,13 @@
         }
 
         function setUserDisplayState(users) {
-            angular.forEach(users, function (user) {
+            users.forEach(function (user) {
                 user.userDisplayState = usersHelper.getUserStateFromValue(user.userState);
             });
         }
 
         function formatDates(users) {
-            angular.forEach(users, function (user) {
+            users.forEach(function (user) {
                 if (user.lastLoginDate) {
                     var dateVal;
                     var serverOffset = Umbraco.Sys.ServerVariables.application.serverTimeOffset;
@@ -752,7 +752,7 @@
 
             var firstSelectedUserGroups;
 
-            angular.forEach(users, function (user) {
+            users.forEach(function (user) {
 
                 if (!user.selected) {
                     return;
