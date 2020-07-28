@@ -6,6 +6,11 @@ namespace Umbraco.Core.Persistence.Repositories
 {
     public interface IMemberGroupRepository : IReadWriteQueryRepository<int, IMemberGroup>
     {
+        /// <summary>
+        /// Gets a member group by it's uniqueId
+        /// </summary>
+        /// <param name="uniqueId"></param>
+        /// <returns></returns>
         IMemberGroup Get(Guid uniqueId);
 
         /// <summary>
