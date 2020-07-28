@@ -2,7 +2,9 @@
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Web.Razor.Parser.SyntaxTree;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -59,6 +61,7 @@ namespace Umbraco.Web.PropertyEditors
                 _logger = logger;
                 _blockEditorValues = new BlockEditorValues(new BlockListEditorDataConverter(), contentTypeService, _logger);
                 Validators.Add(new BlockEditorValidator(_blockEditorValues, propertyEditors, dataTypeService, textService));
+                Validators.Add(new MinMaxValidator(_blockEditorValues, textService));
             }
 
             public IEnumerable<UmbracoEntityReference> GetReferences(object value)
@@ -219,6 +222,41 @@ namespace Umbraco.Web.PropertyEditors
             }
 
             #endregion
+        }
+
+        /// <summary>
+        /// Validates the min/max of the block editor
+        /// </summary>
+        private class MinMaxValidator : IValueValidator
+        {
+            private readonly BlockEditorValues _blockEditorValues;
+            private readonly ILocalizedTextService _textService;
+
+            public MinMaxValidator(BlockEditorValues blockEditorValues, ILocalizedTextService textService)
+            {
+                _blockEditorValues = blockEditorValues;
+                _textService = textService;
+            }
+
+            public IEnumerable<ValidationResult> Validate(object value, string valueType, object dataTypeConfiguration)
+            {
+                var blockConfig = (BlockListConfiguration)dataTypeConfiguration;
+                var blockEditorData = _blockEditorValues.DeserializeAndClean(value);
+                if ((blockEditorData == null && blockConfig?.ValidationLimit?.Min > 0)
+                    || (blockEditorData != null && blockEditorData.Layout.Count() < blockConfig?.ValidationLimit?.Min))
+                {
+                    yield return new ValidationResult(
+                        _textService.Localize("validation/entriesShort", new[] { blockConfig.ValidationLimit.Min.ToString(), (blockConfig.ValidationLimit.Min - blockEditorData.Layout.Count()).ToString() }),
+                        new[] { "minCount" });
+                }
+
+                if (blockEditorData != null && blockEditorData.Layout.Count() > blockConfig?.ValidationLimit?.Max)
+                {
+                    yield return new ValidationResult(
+                        _textService.Localize("validation/entriesExceed", new[] { blockConfig.ValidationLimit.Max.ToString(), (blockEditorData.Layout.Count() - blockConfig.ValidationLimit.Max).ToString() }),
+                        new[] { "maxCount" });
+                }
+            }
         }
 
         internal class BlockEditorValidator : ComplexEditorValidator
