@@ -19,6 +19,7 @@
         vm.openUserPicker = openUserPicker;
         vm.removeSelectedItem = removeSelectedItem;
         vm.clearStartNode = clearStartNode;
+        vm.allowRemoveUserFromGroup = allowRemoveUserFromGroup;
         vm.save = save;
         vm.openGranularPermissionsPicker = openGranularPermissionsPicker;
         vm.setPermissionsForNode = setPermissionsForNode;
@@ -270,6 +271,16 @@
 
             editorService.nodePermissions(vm.nodePermissions);
 
+        }
+
+        function allowRemoveUserFromGroup(user, userGroup) {
+
+            // Don't allow to remove super user (id = -1) from admin group
+            if (user.id === -1 && userGroup.alias === "admin") {
+                return false;
+            }
+
+            return true;
         }
 
         function removeSelectedItem(index, selection) {

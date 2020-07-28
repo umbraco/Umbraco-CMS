@@ -37,8 +37,8 @@
         vm.deleteNonLoggedInUser = deleteNonLoggedInUser;
         vm.changeAvatar = changeAvatar;
         vm.clearAvatar = clearAvatar;
+        vm.allowRemoveUserFromGroup = allowRemoveUserFromGroup;
         vm.save = save;
-
         vm.changePassword = changePassword;
         vm.toggleChangePassword = toggleChangePassword;
 
@@ -343,6 +343,16 @@
             if (!found) {
                 selection.push(item);
             }
+        }
+
+        function allowRemoveUserFromGroup(user, userGroup) {
+
+            // Don't allow to remove super user (id = -1) from admin group
+            if (user.id === -1 && userGroup.alias === "admin") {
+                return false;
+            }
+
+            return true;
         }
 
         function removeSelectedItem(index, selection) {

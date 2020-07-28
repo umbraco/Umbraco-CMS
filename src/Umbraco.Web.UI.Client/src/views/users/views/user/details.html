@@ -71,7 +71,7 @@
                                             sections="userGroup.sections"
                                             content-start-node="userGroup.contentStartNode"
                                             media-start-node="userGroup.mediaStartNode"
-                                            allow-remove="true"
+                                            allow-remove="model.allowRemoveUserFromGroup(model.user, userGroup)"
                                             on-remove="model.removeSelectedItem($index, model.user.userGroups)">
                     </umb-user-group-preview>
 
