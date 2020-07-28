@@ -119,7 +119,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             var sql = GetBaseQuery(false);
             //sql.Where(GetBaseWhereClause(), new { uniqueId = uniqueId });
-            sql.Where("umbracoNode.uniqueId = @uniqueId)", new { uniqueId = uniqueId.ToString() });
+            sql.Where("umbracoNode.uniqueId = @uniqueId", new { uniqueId });
 
             var dto = Database.Fetch<NodeDto>(SqlSyntax.SelectTop(sql, 1)).FirstOrDefault();
 
