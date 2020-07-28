@@ -141,21 +141,21 @@
     // item__more, appears when there is not enough room for the visible items.
     // --------------------------------
 
-    &-more__icon {
-        margin-bottom: 10px;
+    &-more {
+        .umb-button-ellipsis {
+            opacity: 1;
 
-        i {
-            height: 5px;
-            width: 5px;
-            border-radius: 50%;
-            background: @ui-active-type; // fallback if browser doesnt support currentColor
-            background: currentColor;
-            display: inline-block;
-            margin: 0 5px 0 0;
-        }
-
-        i:last-of-type {
-            margin-right: 0;
+            .umb-button-ellipsis__icon {
+                margin-top: 4px;
+                margin-bottom: 6px;
+                flex: none;
+                display: block;
+            }
+        
+            .umb-button-ellipsis__text {
+                flex: none;
+                display: block;
+            }
         }
     }
 
