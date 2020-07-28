@@ -52,8 +52,8 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             using (_proflog.DebugDuration<BlockListPropertyValueConverter>($"ConvertPropertyToBlockList ({propertyType.DataType.Id})"))
             {
                 var configuration = propertyType.DataType.ConfigurationAs<BlockListConfiguration>();
-                var contentTypes = configuration.Blocks;
-                var contentElementTypeMap = contentTypes.ToDictionary(x => x.ContentElementTypeKey);
+                var blockConfigMap = configuration.Blocks.ToDictionary(x => x.ContentElementTypeKey);
+                var validSettingElementTypes = blockConfigMap.Values.Select(x => x.SettingsElementTypeKey).Where(x => x.HasValue).Distinct().ToList();
 
                 var contentPublishedElements = new Dictionary<Guid, IPublishedElement>();
                 var settingsPublishedElements = new Dictionary<Guid, IPublishedElement>();
@@ -71,6 +71,8 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 // convert the content data
                 foreach (var data in converted.BlockValue.ContentData)
                 {
+                    if (!blockConfigMap.ContainsKey(data.ContentTypeKey)) continue;
+
                     var element = _blockConverter.ConvertToElement(data, referenceCacheLevel, preview);
                     if (element == null) continue;
                     contentPublishedElements[element.Key] = element;
@@ -78,6 +80,8 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 // convert the settings data
                 foreach (var data in converted.BlockValue.SettingsData)
                 {
+                    if (!validSettingElementTypes.Contains(data.ContentTypeKey)) continue;
+
                     var element = _blockConverter.ConvertToElement(data, referenceCacheLevel, preview);
                     if (element == null) continue;
                     settingsPublishedElements[element.Key] = element;
@@ -96,12 +100,13 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                     // get the setting reference
                     IPublishedElement settingsData = null;
                     var settingGuidUdi = layoutItem.SettingsUdi != null ? (GuidUdi)layoutItem.SettingsUdi : null;
-                    if (settingGuidUdi != null) settingsPublishedElements.TryGetValue(settingGuidUdi.Guid, out settingsData);
+                    if (settingGuidUdi != null)
+                        settingsPublishedElements.TryGetValue(settingGuidUdi.Guid, out settingsData);
 
                     if (!contentData.ContentType.TryGetKey(out var contentTypeKey))
                         throw new InvalidOperationException("The content type was not of type " + typeof(IPublishedContentType2));
 
-                    if (!contentElementTypeMap.TryGetValue(contentTypeKey, out var blockConfig))
+                    if (!blockConfigMap.TryGetValue(contentTypeKey, out var blockConfig))
                         continue;
 
                     // this can happen if they have a settings type, save content, remove the settings type, and display the front-end page before saving the content again
