@@ -1,9 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Linq;
-using System;
 using System.Collections.Generic;
-using static Umbraco.Core.Models.Blocks.BlockEditorData;
 
 namespace Umbraco.Core.Models.Blocks
 {
@@ -20,19 +18,18 @@ namespace Umbraco.Core.Models.Blocks
             _propertyEditorAlias = propertyEditorAlias;
         }
 
-        public BlockEditorData Convert(string json)
+        public BlockEditorData Deserialize(string json)
         {
             var value = JsonConvert.DeserializeObject<BlockValue>(json);
 
             if (value.Layout == null)
                 return BlockEditorData.Empty;
 
-            if (!value.Layout.TryGetValue(_propertyEditorAlias, out var layout))
-                return BlockEditorData.Empty;
+            var references = value.Layout.TryGetValue(_propertyEditorAlias, out var layout)
+                ? GetBlockReferences(layout)
+                : Enumerable.Empty<ContentAndSettingsReference>();
 
-            var references = GetBlockReferences(layout);
-            var blocks = value.Data.ToList();
-            return new BlockEditorData(layout, references, blocks);
+            return new BlockEditorData(_propertyEditorAlias, references, value);
         }
 
         /// <summary>
@@ -40,7 +37,7 @@ namespace Umbraco.Core.Models.Blocks
         /// </summary>
         /// <param name="jsonLayout"></param>
         /// <returns></returns>
-        protected abstract IReadOnlyList<Udi> GetBlockReferences(JToken jsonLayout);
+        protected abstract IEnumerable<ContentAndSettingsReference> GetBlockReferences(JToken jsonLayout);
 
     }
 }

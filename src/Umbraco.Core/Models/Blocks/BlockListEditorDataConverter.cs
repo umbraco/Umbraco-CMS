@@ -13,10 +13,10 @@ namespace Umbraco.Core.Models.Blocks
         {
         }
 
-        protected override IReadOnlyList<Udi> GetBlockReferences(JToken jsonLayout)
+        protected override IEnumerable<ContentAndSettingsReference> GetBlockReferences(JToken jsonLayout)
         {
             var blockListLayout = jsonLayout.ToObject<IEnumerable<BlockListLayoutItem>>();
-            return blockListLayout.Select(x => x.Udi).ToList();
+            return blockListLayout.Select(x => new ContentAndSettingsReference(x.ContentUdi, x.SettingsUdi)).ToList();
         }
     }
 }

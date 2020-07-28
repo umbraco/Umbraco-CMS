@@ -133,13 +133,20 @@ namespace Umbraco.Web.PropertyEditors
 
             #endregion
 
-            
+
 
             #region Convert database // editor
 
             // note: there is NO variant support here
 
-            // TODO: What does this do?
+            /// <summary>
+            /// Ensure that sub-editor values are translated through their ToEditor methods
+            /// </summary>
+            /// <param name="property"></param>
+            /// <param name="dataTypeService"></param>
+            /// <param name="culture"></param>
+            /// <param name="segment"></param>
+            /// <returns></returns>
             public override object ToEditor(Property property, IDataTypeService dataTypeService, string culture = null, string segment = null)
             {
                 var val = property.GetValue(culture, segment);
@@ -186,11 +193,16 @@ namespace Umbraco.Web.PropertyEditors
                     }
                 }
 
-                // return json
+                // return the object, there's a native json converter for this so it will serialize correctly
                 return rows;
             }
 
-            // TODO: What does this do?
+            /// <summary>
+            /// Ensure that sub-editor values are translated through their FromEditor methods
+            /// </summary>
+            /// <param name="editorValue"></param>
+            /// <param name="currentValue"></param>
+            /// <returns></returns>
             public override object FromEditor(ContentPropertyData editorValue, object currentValue)
             {
                 if (editorValue.Value == null || string.IsNullOrWhiteSpace(editorValue.Value.ToString()))

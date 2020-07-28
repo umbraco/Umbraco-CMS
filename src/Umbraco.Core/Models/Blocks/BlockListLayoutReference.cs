@@ -8,34 +8,44 @@ namespace Umbraco.Core.Models.Blocks
     /// Represents a layout item for the Block List editor
     /// </summary>
     [DataContract(Name = "blockListLayout", Namespace = "")]
-    public class BlockListLayoutReference : IBlockElement<IPublishedElement>
+    public class BlockListLayoutReference : IBlockReference<IPublishedElement>
     {
-        public BlockListLayoutReference(Udi udi, IPublishedElement data, IPublishedElement settings)
+        public BlockListLayoutReference(Udi contentUdi, IPublishedElement content, Udi settingsUdi, IPublishedElement settings)
         {
-            Udi = udi ?? throw new ArgumentNullException(nameof(udi));
-            Data = data ?? throw new ArgumentNullException(nameof(data));
+            ContentUdi = contentUdi ?? throw new ArgumentNullException(nameof(contentUdi));            
+            Content = content ?? throw new ArgumentNullException(nameof(content));
             Settings = settings; // can be null
+            SettingsUdi = settingsUdi; // can be null
         }
 
         /// <summary>
-        /// The Id of the data item
+        /// The Id of the content data item
         /// </summary>
-        [DataMember(Name = "udi")]
-        public Udi Udi { get; }
+        [DataMember(Name = "contentUdi")]
+        public Udi ContentUdi { get; }
 
         /// <summary>
-        /// The settings for the layout item
+        /// The Id of the settings data item
         /// </summary>
-        [DataMember(Name = "settings")]
-        public IPublishedElement Settings { get; }
+        [DataMember(Name = "settingsUdi")]
+        public Udi SettingsUdi { get; }
 
         /// <summary>
-        /// The data item referenced
+        /// The content data item referenced
         /// </summary>
         /// <remarks>
         /// This is ignored from serialization since it is just a reference to the actual data element
         /// </remarks>
         [IgnoreDataMember]
-        public IPublishedElement Data { get; }
+        public IPublishedElement Content { get; }
+
+        /// <summary>
+        /// The settings data item referenced
+        /// </summary>
+        /// <remarks>
+        /// This is ignored from serialization since it is just a reference to the actual data element
+        /// </remarks>
+        [IgnoreDataMember]
+        public IPublishedElement Settings { get; }
     }
 }

@@ -10,8 +10,14 @@ namespace Umbraco.Core.Models.Blocks
     [DataContract(Name = "blockList", Namespace = "")]
     public class BlockListModel : BlockEditorModel
     {
-        public BlockListModel(IEnumerable<IPublishedElement> data, IEnumerable<BlockListLayoutReference> layout)
-            : base(data)
+        public static BlockListModel Empty { get; } = new BlockListModel();
+
+        private BlockListModel()
+        {
+        }
+
+        public BlockListModel(IEnumerable<IPublishedElement> contentData, IEnumerable<IPublishedElement> settingsData, IEnumerable<BlockListLayoutReference> layout)
+            : base(contentData, settingsData)
         {
             Layout = layout;
         }
@@ -20,7 +26,7 @@ namespace Umbraco.Core.Models.Blocks
         /// The layout items of the Block List editor
         /// </summary>
         [DataMember(Name = "layout")]
-        public IEnumerable<BlockListLayoutReference> Layout { get; }
+        public IEnumerable<BlockListLayoutReference> Layout { get; } = new List<BlockListLayoutReference>();
 
         
     }

@@ -11,6 +11,7 @@ using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using static Umbraco.Core.Models.Blocks.BlockEditorData;
+using static Umbraco.Core.Models.Blocks.BlockItemData;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -63,8 +64,12 @@ namespace Umbraco.Web.PropertyEditors
                 var rawJson = value == null ? string.Empty : value is string str ? str : value.ToString();
 
                 var result = new List<UmbracoEntityReference>();
+                var blockEditorData = _blockEditorValues.DeserializeAndClean(rawJson);
+                if (blockEditorData == null)
+                    return Enumerable.Empty<UmbracoEntityReference>();
 
-                foreach (var row in _blockEditorValues.GetPropertyValues(rawJson))
+                // TODO: What about Settings?
+                foreach (var row in blockEditorData.BlockValue.ContentData)
                 {
                     foreach (var prop in row.PropertyValues)
                     {
@@ -83,6 +88,132 @@ namespace Umbraco.Web.PropertyEditors
 
                 return result;
             }
+
+            #region Convert database // editor
+
+            // note: there is NO variant support here
+
+            /// <summary>
+            /// Ensure that sub-editor values are translated through their ToEditor methods
+            /// </summary>
+            /// <param name="property"></param>
+            /// <param name="dataTypeService"></param>
+            /// <param name="culture"></param>
+            /// <param name="segment"></param>
+            /// <returns></returns>
+            public override object ToEditor(Property property, IDataTypeService dataTypeService, string culture = null, string segment = null)
+            {
+                var val = property.GetValue(culture, segment);
+
+                BlockEditorData blockEditorData;
+                try
+                {
+                    blockEditorData = _blockEditorValues.DeserializeAndClean(val);
+                }
+                catch (JsonSerializationException)
+                {
+                    // if this occurs it means the data is invalid, shouldn't happen but has happened if we change the data format.
+                    return string.Empty;
+                }
+
+                if (blockEditorData == null || blockEditorData.BlockValue.ContentData.Count == 0)
+                    return string.Empty;
+
+                foreach (var row in blockEditorData.BlockValue.ContentData)
+                {
+                    foreach (var prop in row.PropertyValues)
+                    {
+                        try
+                        {
+                            // create a temp property with the value
+                            // - force it to be culture invariant as the block editor can't handle culture variant element properties
+                            prop.Value.PropertyType.Variations = ContentVariation.Nothing;
+                            var tempProp = new Property(prop.Value.PropertyType);
+
+                            tempProp.SetValue(prop.Value.Value);
+
+                            // convert that temp property, and store the converted value
+                            var propEditor = _propertyEditors[prop.Value.PropertyType.PropertyEditorAlias];
+                            if (propEditor == null)
+                            {
+                                // NOTE: This logic was borrowed from Nested Content and I'm unsure why it exists.
+                                // if the property editor doesn't exist I think everything will break anyways?
+                                // update the raw value since this is what will get serialized out
+                                row.RawPropertyValues[prop.Key] = tempProp.GetValue()?.ToString();
+                                continue;
+                            }
+
+                            var tempConfig = dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId).Configuration;
+                            var valEditor = propEditor.GetValueEditor(tempConfig);
+                            var convValue = valEditor.ToEditor(tempProp, dataTypeService);
+
+                            // update the raw value since this is what will get serialized out
+                            row.RawPropertyValues[prop.Key] = convValue;
+                        }
+                        catch (InvalidOperationException)
+                        {
+                            // deal with weird situations by ignoring them (no comment)
+                            row.PropertyValues.Remove(prop.Key);
+                        }
+                    }
+                }
+
+                // return json convertable object
+                return blockEditorData.BlockValue;
+            }
+
+            /// <summary>
+            /// Ensure that sub-editor values are translated through their FromEditor methods
+            /// </summary>
+            /// <param name="editorValue"></param>
+            /// <param name="currentValue"></param>
+            /// <returns></returns>
+            public override object FromEditor(ContentPropertyData editorValue, object currentValue)
+            {
+                if (editorValue.Value == null || string.IsNullOrWhiteSpace(editorValue.Value.ToString()))
+                    return null;
+
+                BlockEditorData blockEditorData;
+                try
+                {
+                    blockEditorData = _blockEditorValues.DeserializeAndClean(editorValue.Value);
+                }
+                catch (JsonSerializationException)
+                {
+                    // if this occurs it means the data is invalid, shouldn't happen but has happened if we change the data format.
+                    return string.Empty;
+                }
+
+                if (blockEditorData == null || blockEditorData.BlockValue.ContentData.Count == 0)
+                    return string.Empty;
+
+                foreach (var row in blockEditorData.BlockValue.ContentData)
+                {
+                    foreach (var prop in row.PropertyValues)
+                    {
+                        // Fetch the property types prevalue
+                        var propConfiguration = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId).Configuration;
+
+                        // Lookup the property editor
+                        var propEditor = _propertyEditors[prop.Value.PropertyType.PropertyEditorAlias];
+                        if (propEditor == null) continue;
+
+                        // Create a fake content property data object
+                        var contentPropData = new ContentPropertyData(prop.Value.Value, propConfiguration);
+
+                        // Get the property editor to do it's conversion
+                        var newValue = propEditor.GetValueEditor().FromEditor(contentPropData, prop.Value.Value);
+
+                        // update the raw value since this is what will get serialized out
+                        row.RawPropertyValues[prop.Key] = newValue;
+                    }
+                }
+
+                // return json
+                return JsonConvert.SerializeObject(blockEditorData.BlockValue);
+            }
+
+            #endregion
         }
 
         internal class BlockEditorValidator : ComplexEditorValidator
@@ -96,19 +227,26 @@ namespace Umbraco.Web.PropertyEditors
 
             protected override IEnumerable<ElementTypeValidationModel> GetElementTypeValidation(object value)
             {
-                foreach (var row in _blockEditorValues.GetPropertyValues(value))
+                var blockEditorData = _blockEditorValues.DeserializeAndClean(value);
+                if (blockEditorData != null)
                 {
-                    var elementValidation = new ElementTypeValidationModel(row.ContentTypeAlias, row.Id);
-                    foreach (var prop in row.PropertyValues)
+                    foreach (var row in blockEditorData.BlockValue.ContentData)
                     {
-                        elementValidation.AddPropertyTypeValidation(
-                            new PropertyTypeValidationModel(prop.Value.PropertyType, prop.Value.Value));
+                        var elementValidation = new ElementTypeValidationModel(row.ContentTypeAlias, row.Key);
+                        foreach (var prop in row.PropertyValues)
+                        {
+                            elementValidation.AddPropertyTypeValidation(
+                                new PropertyTypeValidationModel(prop.Value.PropertyType, prop.Value.Value));
+                        }
+                        yield return elementValidation;
                     }
-                    yield return elementValidation;
                 }
             }
         }
 
+        /// <summary>
+        /// Used to deserialize json values and clean up any values based on the existence of element types and layout structure
+        /// </summary>
         internal class BlockEditorValues
         {
             private readonly Lazy<Dictionary<Guid, IContentType>> _contentTypes;
@@ -126,81 +264,77 @@ namespace Umbraco.Web.PropertyEditors
                 return contentType;
             }
 
-            public IReadOnlyList<BlockValue> GetPropertyValues(object propertyValue)
+            public BlockEditorData DeserializeAndClean(object propertyValue)
             {
                 if (propertyValue == null || string.IsNullOrWhiteSpace(propertyValue.ToString()))
-                    return new List<BlockValue>();
+                    return null;
 
-                var converted = _dataConverter.Convert(propertyValue.ToString());
+                var blockEditorData = _dataConverter.Deserialize(propertyValue.ToString());
 
-                if (converted.Blocks.Count == 0)
-                    return new List<BlockValue>();
-
-                var contentTypePropertyTypes = new Dictionary<string, Dictionary<string, PropertyType>>();
-                var result = new List<BlockValue>();
-
-                foreach(var block in converted.Blocks)
+                if (blockEditorData.BlockValue.ContentData.Count == 0)
                 {
-                    var contentType = GetElementType(block);
-                    if (contentType == null)
-                        continue;
-
-                    // get the prop types for this content type but keep a dictionary of found ones so we don't have to keep re-looking and re-creating
-                    // objects on each iteration.
-                    if (!contentTypePropertyTypes.TryGetValue(contentType.Alias, out var propertyTypes))
-                        propertyTypes = contentTypePropertyTypes[contentType.Alias] = contentType.CompositionPropertyTypes.ToDictionary(x => x.Alias, x => x);
-
-                    var propValues = new Dictionary<string, BlockPropertyValue>();
-
-                    // find any keys that are not real property types and remove them
-                    foreach (var prop in block.RawPropertyValues.ToList())
-                    {
-                        // doesn't exist so remove it
-                        if (!propertyTypes.TryGetValue(prop.Key, out var propType))
-                        {
-                            block.RawPropertyValues.Remove(prop.Key);
-                        }
-                        else
-                        {
-                            // set the value to include the resolved property type
-                            propValues[prop.Key] = new BlockPropertyValue
-                            {
-                                PropertyType = propType,
-                                Value = prop.Value
-                            };
-                        }
-                    }
-
-                    result.Add(new BlockValue
-                    {
-                        ContentTypeAlias = contentType.Alias,
-                        PropertyValues = propValues,
-                        Id = ((GuidUdi)block.Udi).Guid
-                    });
+                    // if there's no content ensure there's no settings too
+                    blockEditorData.BlockValue.SettingsData.Clear();
+                    return null;
                 }
 
-                return result;
+                var contentTypePropertyTypes = new Dictionary<string, Dictionary<string, PropertyType>>();
+
+                // filter out any content that isn't referenced in the layout references
+                foreach(var block in blockEditorData.BlockValue.ContentData.Where(x => blockEditorData.References.Any(r => r.ContentUdi == x.Udi)))
+                {
+                    ResolveBlockItemData(block, contentTypePropertyTypes);
+                }
+                // filter out any settings that isn't referenced in the layout references
+                foreach (var block in blockEditorData.BlockValue.SettingsData.Where(x => blockEditorData.References.Any(r => r.SettingsUdi == x.Udi)))
+                {
+                    ResolveBlockItemData(block, contentTypePropertyTypes);
+                }
+
+                // remove blocks that couldn't be resolved
+                blockEditorData.BlockValue.ContentData.RemoveAll(x => x.ContentTypeAlias.IsNullOrWhiteSpace());
+                blockEditorData.BlockValue.SettingsData.RemoveAll(x => x.ContentTypeAlias.IsNullOrWhiteSpace());
+
+                return blockEditorData;
             }
 
-            /// <summary>
-            /// Used during deserialization to populate the property value/property type of a nested content row property
-            /// </summary>
-            internal class BlockPropertyValue
+            private bool ResolveBlockItemData(BlockItemData block, Dictionary<string, Dictionary<string, PropertyType>> contentTypePropertyTypes)
             {
-                public object Value { get; set; }
-                public PropertyType PropertyType { get; set; }
-            }
+                var contentType = GetElementType(block);
+                if (contentType == null)
+                    return false;
 
-            /// <summary>
-            /// Used during deserialization to populate the content type alias and property values of a block
-            /// </summary>
-            internal class BlockValue
-            {
-                public Guid Id { get; set; }
-                public string ContentTypeAlias { get; set; }
-                public IDictionary<string, BlockPropertyValue> PropertyValues { get; set; } = new Dictionary<string, BlockPropertyValue>();
-            }
+                // get the prop types for this content type but keep a dictionary of found ones so we don't have to keep re-looking and re-creating
+                // objects on each iteration.
+                if (!contentTypePropertyTypes.TryGetValue(contentType.Alias, out var propertyTypes))
+                    propertyTypes = contentTypePropertyTypes[contentType.Alias] = contentType.CompositionPropertyTypes.ToDictionary(x => x.Alias, x => x);
 
+                var propValues = new Dictionary<string, BlockPropertyValue>();
+
+                // find any keys that are not real property types and remove them
+                foreach (var prop in block.RawPropertyValues.ToList())
+                {
+                    // doesn't exist so remove it
+                    if (!propertyTypes.TryGetValue(prop.Key, out var propType))
+                    {
+                        block.RawPropertyValues.Remove(prop.Key);
+                    }
+                    else
+                    {
+                        // set the value to include the resolved property type
+                        propValues[prop.Key] = new BlockPropertyValue
+                        {
+                            PropertyType = propType,
+                            Value = prop.Value
+                        };
+                    }
+                }
+
+                block.ContentTypeAlias = contentType.Alias;
+                block.PropertyValues = propValues;
+
+                return true;
+            }
         }
 
         #endregion

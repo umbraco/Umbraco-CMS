@@ -18,10 +18,14 @@ namespace Umbraco.Tests.PropertyEditors
     [TestFixture]
     public class BlockListPropertyValueConverterTests
     {
-        private readonly Guid Key1 = Guid.NewGuid();
-        private readonly Guid Key2 = Guid.NewGuid();
-        private readonly string Alias1 = "Test1";
-        private readonly string Alias2 = "Test2";
+        private readonly Guid ContentKey1 = Guid.NewGuid();
+        private readonly Guid ContentKey2 = Guid.NewGuid();
+        private const string ContentAlias1 = "Test1";
+        private const string ContentAlias2 = "Test2";
+        private readonly Guid SettingKey1 = Guid.NewGuid();
+        private readonly Guid SettingKey2 = Guid.NewGuid();
+        private const string SettingAlias1 = "Setting1";
+        private const string SettingAlias2 = "Setting2";
 
         /// <summary>
         /// Setup mocks for IPublishedSnapshotAccessor
@@ -31,15 +35,25 @@ namespace Umbraco.Tests.PropertyEditors
         {
             var test1ContentType = Mock.Of<IPublishedContentType2>(x =>
                 x.IsElement == true
-                && x.Key == Key1
-                && x.Alias == Alias1);
+                && x.Key == ContentKey1
+                && x.Alias == ContentAlias1);
             var test2ContentType = Mock.Of<IPublishedContentType2>(x =>
                 x.IsElement == true
-                && x.Key == Key2
-                && x.Alias == Alias2);
+                && x.Key == ContentKey2
+                && x.Alias == ContentAlias2);
+            var test3ContentType = Mock.Of<IPublishedContentType2>(x =>
+                x.IsElement == true
+                && x.Key == SettingKey1
+                && x.Alias == SettingAlias1);
+            var test4ContentType = Mock.Of<IPublishedContentType2>(x =>
+                x.IsElement == true
+                && x.Key == SettingKey2
+                && x.Alias == SettingAlias2);
             var contentCache = new Mock<IPublishedContentCache2>();
-            contentCache.Setup(x => x.GetContentType(Key1)).Returns(test1ContentType);
-            contentCache.Setup(x => x.GetContentType(Key2)).Returns(test2ContentType);
+            contentCache.Setup(x => x.GetContentType(ContentKey1)).Returns(test1ContentType);
+            contentCache.Setup(x => x.GetContentType(ContentKey2)).Returns(test2ContentType);
+            contentCache.Setup(x => x.GetContentType(SettingKey1)).Returns(test3ContentType);
+            contentCache.Setup(x => x.GetContentType(SettingKey2)).Returns(test4ContentType);
             var publishedSnapshot = Mock.Of<IPublishedSnapshot>(x => x.Content == contentCache.Object);
             var publishedSnapshotAccessor = Mock.Of<IPublishedSnapshotAccessor>(x => x.PublishedSnapshot == publishedSnapshot);
             return publishedSnapshotAccessor;
@@ -60,11 +74,13 @@ namespace Umbraco.Tests.PropertyEditors
             Blocks = new[] {
                     new BlockListConfiguration.BlockConfiguration
                     {
-                        Key = Key1
+                        ContentElementTypeKey = ContentKey1,
+                        SettingsElementTypeKey = SettingKey2
                     },
                     new BlockListConfiguration.BlockConfiguration
                     {
-                        Key = Key2
+                        ContentElementTypeKey = ContentKey2,
+                        SettingsElementTypeKey = SettingKey1
                     }
                 }
         };
@@ -74,7 +90,7 @@ namespace Umbraco.Tests.PropertyEditors
             Blocks = new[] {
                     new BlockListConfiguration.BlockConfiguration
                     {
-                        Key = Key1
+                        ContentElementTypeKey = ContentKey1
                     }
                 }
         };
@@ -138,14 +154,14 @@ namespace Umbraco.Tests.PropertyEditors
             var converted = editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as BlockListModel;
 
             Assert.IsNotNull(converted);
-            Assert.AreEqual(0, converted.Data.Count());
+            Assert.AreEqual(0, converted.ContentData.Count());
             Assert.AreEqual(0, converted.Layout.Count());
 
             json = string.Empty;
             converted = editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as BlockListModel;
 
             Assert.IsNotNull(converted);
-            Assert.AreEqual(0, converted.Data.Count());
+            Assert.AreEqual(0, converted.ContentData.Count());
             Assert.AreEqual(0, converted.Layout.Count());            
         }
 
@@ -161,7 +177,7 @@ namespace Umbraco.Tests.PropertyEditors
             var converted = editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as BlockListModel;
 
             Assert.IsNotNull(converted);
-            Assert.AreEqual(0, converted.Data.Count());
+            Assert.AreEqual(0, converted.ContentData.Count());
             Assert.AreEqual(0, converted.Layout.Count());
 
             json = @"{
@@ -170,7 +186,7 @@ data: []}";
             converted = editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as BlockListModel;
 
             Assert.IsNotNull(converted);
-            Assert.AreEqual(0, converted.Data.Count());
+            Assert.AreEqual(0, converted.ContentData.Count());
             Assert.AreEqual(0, converted.Layout.Count());
 
             // Even though there is a layout, there is no data, so the conversion will result in zero elements in total
@@ -179,18 +195,17 @@ data: []}";
     layout: {
         '" + Constants.PropertyEditors.Aliases.BlockList + @"': [
             {
-                'udi': 'umb://element/e7dba547615b4e9ab4ab2a7674845bc9',
-                'settings': {}
+                'contentUdi': 'umb://element/e7dba547615b4e9ab4ab2a7674845bc9'
             }
         ]
     },
-    data: []
+    contentData: []
 }";
             
             converted = editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as BlockListModel;
 
             Assert.IsNotNull(converted);
-            Assert.AreEqual(0, converted.Data.Count());
+            Assert.AreEqual(0, converted.ContentData.Count());
             Assert.AreEqual(0, converted.Layout.Count());
 
             // Even though there is a layout and data, the data is invalid (missing required keys) so the conversion will result in zero elements in total
@@ -199,12 +214,11 @@ data: []}";
     layout: {
         '" + Constants.PropertyEditors.Aliases.BlockList + @"': [
             {
-                'udi': 'umb://element/e7dba547615b4e9ab4ab2a7674845bc9',
-                'settings': {}
+                'contentUdi': 'umb://element/e7dba547615b4e9ab4ab2a7674845bc9'
             }
         ]
     },
-        data: [
+        contentData: [
         {
             'udi': 'umb://element/e7dba547615b4e9ab4ab2a7674845bc9'
         }
@@ -214,7 +228,7 @@ data: []}";
             converted = editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as BlockListModel;
 
             Assert.IsNotNull(converted);
-            Assert.AreEqual(0, converted.Data.Count());
+            Assert.AreEqual(0, converted.ContentData.Count());
             Assert.AreEqual(0, converted.Layout.Count());
 
             // Everthing is ok except the udi reference in the layout doesn't match the data so it will be empty
@@ -223,14 +237,13 @@ data: []}";
     layout: {
         '" + Constants.PropertyEditors.Aliases.BlockList + @"': [
             {
-                'udi': 'umb://element/1304E1DDAC87439684FE8A399231CB3D',
-                'settings': {}
+                'contentUdi': 'umb://element/1304E1DDAC87439684FE8A399231CB3D'
             }
         ]
     },
-        data: [
+        contentData: [
         {
-            'contentTypeKey': '" + Key1 + @"',
+            'contentTypeKey': '" + ContentKey1 + @"',
             'key': '1304E1DD-0000-4396-84FE-8A399231CB3D'
         }
     ]
@@ -239,7 +252,7 @@ data: []}";
             converted = editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as BlockListModel;
 
             Assert.IsNotNull(converted);
-            Assert.AreEqual(1, converted.Data.Count());
+            Assert.AreEqual(1, converted.ContentData.Count());
             Assert.AreEqual(0, converted.Layout.Count());
         }
 
@@ -256,14 +269,13 @@ data: []}";
     layout: {
         '" + Constants.PropertyEditors.Aliases.BlockList + @"': [
             {
-                'udi': 'umb://element/1304E1DDAC87439684FE8A399231CB3D',
-                'settings': {}
+                'contentUdi': 'umb://element/1304E1DDAC87439684FE8A399231CB3D'
             }
         ]
     },
-        data: [
+        contentData: [
         {
-            'contentTypeKey': '" + Key1 + @"',
+            'contentTypeKey': '" + ContentKey1 + @"',
             'udi': 'umb://element/1304E1DDAC87439684FE8A399231CB3D'
         }
     ]
@@ -271,14 +283,14 @@ data: []}";
             var converted = editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as BlockListModel;
 
             Assert.IsNotNull(converted);
-            Assert.AreEqual(1, converted.Data.Count());
-            var item0 = converted.Data.ElementAt(0);
+            Assert.AreEqual(1, converted.ContentData.Count());
+            var item0 = converted.ContentData.ElementAt(0);
             Assert.AreEqual(Guid.Parse("1304E1DD-AC87-4396-84FE-8A399231CB3D"), item0.Key);
             Assert.AreEqual("Test1", item0.ContentType.Alias);
             Assert.AreEqual(1, converted.Layout.Count());
             var layout0 = converted.Layout.ElementAt(0);
             Assert.IsNull(layout0.Settings);
-            Assert.AreEqual(Udi.Parse("umb://element/1304E1DDAC87439684FE8A399231CB3D"), layout0.Udi);
+            Assert.AreEqual(Udi.Parse("umb://element/1304E1DDAC87439684FE8A399231CB3D"), layout0.ContentUdi);
         }
 
         [Test]
@@ -294,44 +306,142 @@ data: []}";
     layout: {
         '" + Constants.PropertyEditors.Aliases.BlockList + @"': [
             {
-                'udi': 'umb://element/1304E1DDAC87439684FE8A399231CB3D',
-                'settings': {}
+                'contentUdi': 'umb://element/1304E1DDAC87439684FE8A399231CB3D',
+                'settingsUdi': 'umb://element/1F613E26CE274898908A561437AF5100'
             },
             {
-                'udi': 'umb://element/0A4A416E547D464FABCC6F345C17809A',
-                'settings': {}
+                'contentUdi': 'umb://element/0A4A416E547D464FABCC6F345C17809A',
+                'settingsUdi': 'umb://element/63027539B0DB45E7B70459762D4E83DD'
             }
         ]
     },
-        data: [
+    contentData: [
         {
-            'contentTypeKey': '" + Key1 + @"',
+            'contentTypeKey': '" + ContentKey1 + @"',
             'udi': 'umb://element/1304E1DDAC87439684FE8A399231CB3D'
         },
         {
-            'contentTypeKey': '" + Key2 + @"',
+            'contentTypeKey': '" + ContentKey2 + @"',
             'udi': 'umb://element/E05A034704424AB3A520E048E6197E79'
         },
         {
-            'contentTypeKey': '" + Key2 + @"',
+            'contentTypeKey': '" + ContentKey2 + @"',
             'udi': 'umb://element/0A4A416E547D464FABCC6F345C17809A'
         }
-    ]
+    ],
+    settingsData: [
+        {
+            'contentTypeKey': '" + SettingKey1 + @"',
+            'udi': 'umb://element/63027539B0DB45E7B70459762D4E83DD'
+        },
+        {
+            'contentTypeKey': '" + SettingKey2 + @"',
+            'udi': 'umb://element/1F613E26CE274898908A561437AF5100'
+        },
+        {
+            'contentTypeKey': '" + SettingKey2 + @"',
+            'udi': 'umb://element/BCF4BA3DA40C496C93EC58FAC85F18B9'
+        }
+    ],
 }";
 
             var converted = editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as BlockListModel;
 
             Assert.IsNotNull(converted);
-            Assert.AreEqual(3, converted.Data.Count());
+            Assert.AreEqual(3, converted.ContentData.Count());
+            Assert.AreEqual(3, converted.SettingsData.Count());
             Assert.AreEqual(2, converted.Layout.Count());
 
             var item0 = converted.Layout.ElementAt(0);
-            Assert.AreEqual(Guid.Parse("1304E1DD-AC87-4396-84FE-8A399231CB3D"), item0.Data.Key);
-            Assert.AreEqual("Test1", item0.Data.ContentType.Alias);
+            Assert.AreEqual(Guid.Parse("1304E1DD-AC87-4396-84FE-8A399231CB3D"), item0.Content.Key);
+            Assert.AreEqual("Test1", item0.Content.ContentType.Alias);
+            Assert.AreEqual(Guid.Parse("1F613E26CE274898908A561437AF5100"), item0.Settings.Key);
+            Assert.AreEqual("Setting2", item0.Settings.ContentType.Alias);
 
             var item1 = converted.Layout.ElementAt(1);
-            Assert.AreEqual(Guid.Parse("0A4A416E-547D-464F-ABCC-6F345C17809A"), item1.Data.Key);
-            Assert.AreEqual("Test2", item1.Data.ContentType.Alias);
+            Assert.AreEqual(Guid.Parse("0A4A416E-547D-464F-ABCC-6F345C17809A"), item1.Content.Key);
+            Assert.AreEqual("Test2", item1.Content.ContentType.Alias);
+            Assert.AreEqual(Guid.Parse("63027539B0DB45E7B70459762D4E83DD"), item1.Settings.Key);
+            Assert.AreEqual("Setting1", item1.Settings.ContentType.Alias);
+
+        }
+
+        [Test]
+        public void Data_Item_Removed_If_Removed_From_Config()
+        {
+            var editor = CreateConverter();
+
+            // The data below expects that ContentKey1 + ContentKey2 + SettingsKey1 + SettingsKey2 exist but only ContentKey2 exists so
+            // the data should all be filtered.
+            var config = new BlockListConfiguration
+            {
+                Blocks = new[] {
+                    new BlockListConfiguration.BlockConfiguration
+                    {
+                        ContentElementTypeKey = ContentKey2,
+                        SettingsElementTypeKey = null
+                    }
+                }
+            };
+
+            var propertyType = GetPropertyType(config);
+            var publishedElement = Mock.Of<IPublishedElement>();
+
+            var json = @"
+{
+    layout: {
+        '" + Constants.PropertyEditors.Aliases.BlockList + @"': [
+            {
+                'contentUdi': 'umb://element/1304E1DDAC87439684FE8A399231CB3D',
+                'settingsUdi': 'umb://element/1F613E26CE274898908A561437AF5100'
+            },
+            {
+                'contentUdi': 'umb://element/0A4A416E547D464FABCC6F345C17809A',
+                'settingsUdi': 'umb://element/63027539B0DB45E7B70459762D4E83DD'
+            }
+        ]
+    },
+    contentData: [
+        {
+            'contentTypeKey': '" + ContentKey1 + @"',
+            'udi': 'umb://element/1304E1DDAC87439684FE8A399231CB3D'
+        },
+        {
+            'contentTypeKey': '" + ContentKey2 + @"',
+            'udi': 'umb://element/E05A034704424AB3A520E048E6197E79'
+        },
+        {
+            'contentTypeKey': '" + ContentKey2 + @"',
+            'udi': 'umb://element/0A4A416E547D464FABCC6F345C17809A'
+        }
+    ],
+    settingsData: [
+        {
+            'contentTypeKey': '" + SettingKey1 + @"',
+            'udi': 'umb://element/63027539B0DB45E7B70459762D4E83DD'
+        },
+        {
+            'contentTypeKey': '" + SettingKey2 + @"',
+            'udi': 'umb://element/1F613E26CE274898908A561437AF5100'
+        },
+        {
+            'contentTypeKey': '" + SettingKey2 + @"',
+            'udi': 'umb://element/BCF4BA3DA40C496C93EC58FAC85F18B9'
+        }
+    ],
+}";
+
+            var converted = editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as BlockListModel;
+
+            Assert.IsNotNull(converted);
+            Assert.AreEqual(2, converted.ContentData.Count());
+            Assert.AreEqual(0, converted.SettingsData.Count());
+            Assert.AreEqual(1, converted.Layout.Count());
+
+            var item0 = converted.Layout.ElementAt(0);
+            Assert.AreEqual(Guid.Parse("0A4A416E-547D-464F-ABCC-6F345C17809A"), item0.Content.Key);
+            Assert.AreEqual("Test2", item0.Content.ContentType.Alias);
+            Assert.IsNull(item0.Settings);
 
         }
 

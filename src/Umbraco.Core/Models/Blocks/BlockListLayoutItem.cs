@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
 using Umbraco.Core.Serialization;
-using static Umbraco.Core.Models.Blocks.BlockEditorData;
 
 namespace Umbraco.Core.Models.Blocks
 {
@@ -9,11 +8,12 @@ namespace Umbraco.Core.Models.Blocks
     /// </summary>
     public class BlockListLayoutItem
     {
-        [JsonProperty("settings")]
-        public BlockItemData Settings { get; set; }
-
-        [JsonProperty("udi")]
+        [JsonProperty("contentUdi", Required = Required.Always)]
         [JsonConverter(typeof(UdiJsonConverter))]
-        public Udi Udi { get; set; }
+        public Udi ContentUdi { get; set; }
+
+        [JsonProperty("settingsUdi")]
+        [JsonConverter(typeof(UdiJsonConverter))]
+        public Udi SettingsUdi { get; set; }
     }
 }

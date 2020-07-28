@@ -24,7 +24,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         }
 
         public IPublishedElement ConvertToElement(
-            BlockEditorData.BlockItemData data,
+            BlockItemData data,
             PropertyCacheLevel referenceCacheLevel, bool preview)
         {
             // hack! we need to cast, we have no choice beacuse we cannot make breaking changes.
