@@ -7,6 +7,10 @@ namespace Umbraco.Web.PropertyEditors.Validation
     /// <summary>
     /// A collection of <see cref="ComplexEditorPropertyTypeValidationResult"/> for an element type within complex editor represented by an Element Type
     /// </summary>
+    /// <remarks>
+    /// For a more indepth explanation of how server side validation works with the angular app, see this GitHub PR: 
+    /// https://github.com/umbraco/Umbraco-CMS/pull/8339
+    /// </remarks>
     public class ComplexEditorElementTypeValidationResult : ValidationResult
     {
         public ComplexEditorElementTypeValidationResult(string elementTypeAlias, Guid blockId)

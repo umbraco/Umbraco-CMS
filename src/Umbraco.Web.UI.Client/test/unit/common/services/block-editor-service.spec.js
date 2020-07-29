@@ -5,24 +5,34 @@
     var settingsKey = "2AF42343-C8A2-400D-BA43-4818C2B3CDC5";
     var settingsUdi = "umb://element/2AF42343C8A2400DBA434818C2B3CDC5";
 
-    var blockEditorService, contentResource, $rootScope, $scope;
+    var blockEditorService, contentResource, $rootScope, $scope, $q, localizationService, $timeout;
 
     beforeEach(module('umbraco.services'));
     beforeEach(module('umbraco.resources'));
     beforeEach(module('umbraco.mocks'));
     beforeEach(module('umbraco'));
-
-    beforeEach(inject(function ($injector, mocksUtils, _$rootScope_) {
+    
+    beforeEach(inject(function ($injector, mocksUtils, _$rootScope_, _$q_, _$timeout_) {
 
         mocksUtils.disableAuth();
 
         $rootScope = _$rootScope_;
         $scope = $rootScope.$new();
+        $q = _$q_;
+        $timeout = _$timeout_;
 
         contentResource = $injector.get("contentResource");
         spyOn(contentResource, "getScaffoldByKey").and.callFake(
             function () {
-                return Promise.resolve(mocksUtils.getMockVariantContent(1234, contentKey, contentUdi))
+                var scaffold = mocksUtils.getMockVariantContent(1234, contentKey, contentUdi);
+                return $q.resolve(scaffold);
+            }
+        );
+        // this seems to be required because of the poor promise implementation in localizationService (see TODO in that service)
+        localizationService = $injector.get("localizationService");
+        spyOn(localizationService, "localize").and.callFake(
+            function () {
+                return $q.resolve("Localized test text");
             }
         );
 
@@ -101,13 +111,19 @@
         it('load provides data for itemPicker', function (done) {
             var modelObject = blockEditorService.createModelObject({}, "Umbraco.TestBlockEditor", [blockConfigurationMock], $scope, $scope);
 
-            modelObject.load().then(() => {
-                var itemPickerOptions = modelObject.getAvailableBlocksForBlockPicker();
-                expect(itemPickerOptions.length).toBe(1);
-                expect(itemPickerOptions[0].blockConfigModel.contentTypeKey).toBe(blockConfigurationMock.contentTypeKey);
-                done();
+            modelObject.load().then(() => {                
+                try {
+                    var itemPickerOptions = modelObject.getAvailableBlocksForBlockPicker();
+                    expect(itemPickerOptions.length).toBe(1);
+                    expect(itemPickerOptions[0].blockConfigModel.contentTypeKey).toBe(blockConfigurationMock.contentTypeKey);
+                    done();
+                } catch (e) {
+                    done.fail(e);
+                }
             });
 
+            $rootScope.$digest();
+            $timeout.flush();
         });
 
         it('getLayoutEntry has values', function (done) {
@@ -117,16 +133,22 @@
 
             modelObject.load().then(() => {
 
-                var layout = modelObject.getLayout();
+                try {
+                    var layout = modelObject.getLayout();
 
-                expect(layout).not.toBeUndefined();
-                expect(layout.length).toBe(1);
-                expect(layout[0]).toBe(propertyModelMock.layout["Umbraco.TestBlockEditor"][0]);
-                expect(layout[0].udi).toBe(propertyModelMock.layout["Umbraco.TestBlockEditor"][0].udi);
+                    expect(layout).not.toBeUndefined();
+                    expect(layout.length).toBe(1);
+                    expect(layout[0]).toBe(propertyModelMock.layout["Umbraco.TestBlockEditor"][0]);
+                    expect(layout[0].udi).toBe(propertyModelMock.layout["Umbraco.TestBlockEditor"][0].udi);
 
-                done();
+                    done();
+                } catch (e) {
+                    done.fail(e);
+                }
             });
 
+            $rootScope.$digest();
+            $timeout.flush();
         });
 
         it('getBlockObject has values', function (done) {
@@ -151,6 +173,8 @@
                 }
             });
 
+            $rootScope.$digest();
+            $timeout.flush();
         });
 
 
@@ -169,17 +193,22 @@
 
                     blockObject.content.variants[0].tabs[0].properties[0].value = "anotherTestValue";
 
-                    $rootScope.$digest();// invoke angularJS Store.
+                    // invoke angularJS Store.
+                    $timeout(function () {
+                        expect(blockObject.data).toEqual(propertyModel.contentData[0]);
+                        expect(blockObject.data.testproperty).toBe("anotherTestValue");
+                        expect(propertyModel.contentData[0].testproperty).toBe("anotherTestValue");
 
-                    expect(blockObject.data).toEqual(propertyModel.contentData[0]);
-                    expect(blockObject.data.testproperty).toBe("anotherTestValue");
-                    expect(propertyModel.contentData[0].testproperty).toBe("anotherTestValue");
+                        done();
+                    });
 
-                    done();
                 } catch (e) {
                     done.fail(e);
                 }
             });
+
+            $rootScope.$digest();
+            $timeout.flush();
 
         });
 
@@ -204,17 +233,22 @@
                     blockObject.content.variants[0].tabs[0].properties[0].value.list[0] = "AA";
                     blockObject.content.variants[0].tabs[0].properties[0].value.list.push("D");
 
-                    $rootScope.$digest();// invoke angularJS Store.
+                    // invoke angularJS Store.
+                    $timeout(function () {
+                        expect(propertyModel.contentData[0].testproperty.list[0]).toBe("AA");
+                        expect(propertyModel.contentData[0].testproperty.list.length).toBe(4);
 
-                    expect(propertyModel.contentData[0].testproperty.list[0]).toBe("AA");
-                    expect(propertyModel.contentData[0].testproperty.list.length).toBe(4);
+                        done();
+                    });
 
-                    done();
+                    
                 } catch (e) {
                     done.fail(e);
-                }
+                }                
             });
 
+            $rootScope.$digest();
+            $timeout.flush();
         });
 
         it('layout is referencing layout of propertyModel', function (done) {
@@ -236,6 +270,8 @@
                 done();
             });
 
+            $rootScope.$digest();
+            $timeout.flush();
         });
 
         it('removeDataAndDestroyModel removes data', function (done) {
@@ -270,6 +306,9 @@
                     done.fail(e);
                 }
             });
+
+            $rootScope.$digest();
+            $timeout.flush();
         });
 
         it('getBlockObject of block with settings has values', function (done) {
@@ -291,6 +330,8 @@
                 done();
             });
 
+            $rootScope.$digest();
+            $timeout.flush();
         });
 
 
@@ -309,21 +350,23 @@
                 blockObject.content.variants[0].tabs[0].properties[0].value = "anotherTestValue";
                 blockObject.settings.variants[0].tabs[0].properties[0].value = "anotherTestValueForSettings";
 
-                $rootScope.$digest();// invoke angularJS Store.
+                // invoke angularJS Store.
+                $timeout(function () {
+                    expect(blockObject.data).toEqual(propertyModel.contentData[0]);
+                    expect(blockObject.data.testproperty).toBe("anotherTestValue");
+                    expect(propertyModel.contentData[0].testproperty).toBe("anotherTestValue");
 
-                expect(blockObject.data).toEqual(propertyModel.contentData[0]);
-                expect(blockObject.data.testproperty).toBe("anotherTestValue");
-                expect(propertyModel.contentData[0].testproperty).toBe("anotherTestValue");
+                    expect(blockObject.settingsData).toEqual(propertyModel.settingsData[0]);
+                    expect(blockObject.settingsData.testproperty).toBe("anotherTestValueForSettings");
+                    expect(propertyModel.settingsData[0].testproperty).toBe("anotherTestValueForSettings");
 
-                expect(blockObject.settingsData).toEqual(propertyModel.settingsData[0]);
-                expect(blockObject.settingsData.testproperty).toBe("anotherTestValueForSettings");
-                expect(propertyModel.settingsData[0].testproperty).toBe("anotherTestValueForSettings");
-
-                //
-
-                done();
+                    done();
+                });
+                
             });
 
+            $rootScope.$digest();
+            $timeout.flush();
         });
 
 
@@ -352,20 +395,25 @@
                     blockObject.settings.variants[0].tabs[0].properties[0].value.list[0] = "settingsValue";
                     blockObject.settings.variants[0].tabs[0].properties[0].value.list.push("settingsNewValue");
 
-                    $rootScope.$digest();// invoke angularJS Store.
+                    // invoke angularJS Store.
+                    $timeout(function () {
+                        expect(propertyModel.contentData[0].testproperty.list[0]).toBe("AA");
+                        expect(propertyModel.contentData[0].testproperty.list.length).toBe(4);
 
-                    expect(propertyModel.contentData[0].testproperty.list[0]).toBe("AA");
-                    expect(propertyModel.contentData[0].testproperty.list.length).toBe(4);
+                        expect(propertyModel.settingsData[0].testproperty.list[0]).toBe("settingsValue");
+                        expect(propertyModel.settingsData[0].testproperty.list.length).toBe(4);
 
-                    expect(propertyModel.settingsData[0].testproperty.list[0]).toBe("settingsValue");
-                    expect(propertyModel.settingsData[0].testproperty.list.length).toBe(4);
+                        done();
+                    });
 
-                    done();
+                    
                 } catch (e) {
                     done.fail(e);
                 }
             });
 
+            $rootScope.$digest();
+            $timeout.flush();
         });
 
 

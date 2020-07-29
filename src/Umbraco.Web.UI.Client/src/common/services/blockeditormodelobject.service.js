@@ -14,7 +14,7 @@
     'use strict';
 
 
-    function blockEditorModelObjectFactory($interpolate, udiService, contentResource) {
+    function blockEditorModelObjectFactory($interpolate, $q, udiService, contentResource, localizationService) {
 
         /**
          * Simple mapping from property model content entry to editing model,
@@ -162,6 +162,7 @@
                 }
             }
         }
+
         /**
          * Used to create a prop watcher for the settings in the property editor data model.
          */
@@ -200,6 +201,29 @@
             }
         }
 
+        function createDataEntry(elementTypeKey, dataItems) {
+            var data = {
+                contentTypeKey: elementTypeKey,
+                udi: udiService.create("element")
+            };
+            dataItems.push(data);
+            return data.udi;
+        }
+
+        function getDataByUdi(udi, dataItems) {
+            return dataItems.find(entry => entry.udi === udi) || null;
+        }
+
+        /**
+         * Set the udi and key property for the content item
+         * @param {any} contentData
+         * @param {any} udi
+         */
+        function ensureUdiAndKey(contentData, udi) {
+            contentData.udi = udi;
+            // Change the content.key to the GUID part of the udi, else it's just random which we don't want, it must be consistent
+            contentData.key = udiService.getKey(udi);
+        }
 
         /**
          * Used to highlight unsupported properties for the user, changes unsupported properties into a unsupported-property.
@@ -209,7 +233,15 @@
             "Umbraco.UploadField",
             "Umbraco.ImageCropper"
         ];
-        function replaceUnsupportedProperties(scaffold) {
+
+
+        /**
+         * Formats the content apps and ensures unsupported property's have the notsupported view (returns a promise)
+         * @param {any} scaffold
+         */
+        function formatScaffoldData(scaffold) {
+
+            // deal with not supported props
             scaffold.variants.forEach((variant) => {
                 variant.tabs.forEach((tab) => {
                     tab.properties.forEach((property) => {
@@ -219,7 +251,42 @@
                     });
                 });
             });
-            return scaffold;
+
+            // could be empty in tests
+            if (!scaffold.apps) {
+                console.warn("No content apps found in scaffold");
+                return $q.resolve(scaffold);
+            }
+
+            // replace view of content app
+
+            var contentApp = scaffold.apps.find(entry => entry.alias === "umbContent");
+            if (contentApp) {
+                contentApp.view = "views/common/infiniteeditors/blockeditor/blockeditor.content.html";
+            }
+
+            // remove info app
+            var infoAppIndex = scaffold.apps.findIndex(entry => entry.alias === "umbInfo");
+            if (infoAppIndex >= 0) {
+                scaffold.apps.splice(infoAppIndex, 1);
+            }
+
+            // add the settings app
+            return localizationService.localize("blockEditor_tabBlockSettings").then(
+                function (settingsName) {
+
+                    var settingsTab = {
+                        "name": settingsName,
+                        "alias": "settings",
+                        "icon": "icon-settings",
+                        "view": "views/common/infiniteeditors/blockeditor/blockeditor.settings.html",
+                        "hasError": false
+                    };
+                    scaffold.apps.push(settingsTab);
+
+                    return scaffold;
+                }
+            );
         }
 
         /**
@@ -320,16 +387,24 @@
                 // removing duplicates.
                 scaffoldKeys = scaffoldKeys.filter((value, index, self) => self.indexOf(value) === index);
 
-                scaffoldKeys.forEach((contentTypeKey => {
+                var self = this;
+
+                scaffoldKeys.forEach(contentTypeKey => {
                     tasks.push(contentResource.getScaffoldByKey(-20, contentTypeKey).then(scaffold => {
-                        // this.scaffolds might not exists anymore, this happens if this instance has been destroyed before the load is complete.
-                        if (this.scaffolds) {
-                            this.scaffolds.push(replaceUnsupportedProperties(scaffold));
+                        // self.scaffolds might not exists anymore, this happens if this instance has been destroyed before the load is complete.
+                        if (self.scaffolds) {
+                            return formatScaffoldData(scaffold).then(s => {
+                                self.scaffolds.push(s);
+                                return s;
+                            });
+                        }
+                        else {
+                            return $q.resolve(scaffold);
                         }
                     }));
-                }));
+                });
 
-                return Promise.all(tasks);
+                return $q.all(tasks);
             },
 
             /**
@@ -415,12 +490,12 @@
              */
             getBlockObject: function (layoutEntry) {
 
-                var udi = layoutEntry.contentUdi;
+                var contentUdi = layoutEntry.contentUdi;
 
-                var dataModel = this._getDataByUdi(udi);
+                var dataModel = getDataByUdi(contentUdi, this.value.contentData);
 
                 if (dataModel === null) {
-                    console.error("Couldn't find content model of " + udi)
+                    console.error("Couldn't find content model of " + contentUdi)
                     return null;
                 }
 
@@ -428,12 +503,12 @@
                 var contentScaffold;
 
                 if (blockConfiguration === null) {
-                    console.error("The block entry of " + udi + " is not being initialized because its contentTypeKey is not allowed for this PropertyEditor");
+                    console.error("The block entry of " + contentUdi + " is not being initialized because its contentTypeKey is not allowed for this PropertyEditor");
                 }
                 else {
                     contentScaffold = this.getScaffoldFromKey(blockConfiguration.contentTypeKey);
                     if (contentScaffold === null) {
-                        console.error("The block entry of " + udi + " is not begin initialized cause its Element Type was not loaded.");
+                        console.error("The block entry of " + contentUdi + " is not begin initialized cause its Element Type was not loaded.");
                     }
                 }
 
@@ -470,9 +545,7 @@
 
                 // make basics from scaffold
                 blockObject.content = Utilities.copy(contentScaffold);
-                blockObject.content.udi = udi;
-                // Change the content.key to the GUID part of the udi, else it's just random which we don't want, it should be consistent
-                blockObject.content.key = udiService.getKey(udi);
+                ensureUdiAndKey(blockObject.content, contentUdi);
 
                 mapToElementModel(blockObject.content, dataModel);
 
@@ -486,12 +559,12 @@
 
                         if (!layoutEntry.settingsUdi) {
                             // if this block does not have settings data, then create it. This could happen because settings model has been added later than this content was created.
-                            layoutEntry.settingsUdi = this._createSettingsEntry(blockConfiguration.settingsElementTypeKey);
+                            layoutEntry.settingsUdi = createDataEntry(blockConfiguration.settingsElementTypeKey, this.value.settingsData);
                         }
 
                         var settingsUdi = layoutEntry.settingsUdi;
 
-                        var settingsData = this._getSettingsByUdi(settingsUdi);
+                        var settingsData = getDataByUdi(settingsUdi, this.value.settingsData);
                         if (settingsData === null) {
                             console.error("Couldnt find content settings data of " + settingsUdi)
                             return null;
@@ -501,7 +574,8 @@
 
                         // make basics from scaffold
                         blockObject.settings = Utilities.copy(settingsScaffold);
-                        blockObject.settings.udi = settingsUdi;
+                        ensureUdiAndKey(blockObject.settings, settingsUdi);
+
                         mapToElementModel(blockObject.settings, settingsData);
                     }
                 }
@@ -628,11 +702,11 @@
                 }
 
                 var entry = {
-                    contentUdi: this._createDataEntry(contentTypeKey)
+                    contentUdi: createDataEntry(contentTypeKey, this.value.contentData)
                 }
 
                 if (blockConfiguration.settingsElementTypeKey != null) {
-                    entry.settingsUdi = this._createSettingsEntry(blockConfiguration.settingsElementTypeKey)
+                    entry.settingsUdi = createDataEntry(blockConfiguration.settingsElementTypeKey, this.value.settingsData)
                 }
 
                 return entry;
@@ -656,7 +730,7 @@
                     return null;
                 }
 
-                var dataModel = this._getDataByUdi(layoutEntry.udi);
+                var dataModel = getDataByUdi(layoutEntry.udi, this.value.contentData);
                 if (dataModel === null) {
                     return null;
                 }
@@ -679,22 +753,6 @@
                 }
             },
 
-            // private
-            // TODO: Then this can just be a method in the outer scope
-            _createDataEntry: function (elementTypeKey) {
-                var content = {
-                    contentTypeKey: elementTypeKey,
-                    udi: udiService.create("element")
-                };
-                this.value.contentData.push(content);
-                return content.udi;
-            },
-            // private
-            // TODO: Then this can just be a method in the outer scope
-            _getDataByUdi: function (udi) {
-                return this.value.contentData.find(entry => entry.udi === udi) || null;
-            },
-
             /**
              * @ngdoc method
              * @name removeDataByUdi
@@ -708,23 +766,6 @@
                 if (index !== -1) {
                     this.value.contentData.splice(index, 1);
                 }
-            },
-
-            // private
-            // TODO: Then this can just be a method in the outer scope
-            _createSettingsEntry: function (elementTypeKey) {
-                var settings = {
-                    contentTypeKey: elementTypeKey,
-                    udi: udiService.create("element")
-                };
-                this.value.settingsData.push(settings);
-                return settings.udi;
-            },
-
-            // private
-            // TODO: Then this can just be a method in the outer scope
-            _getSettingsByUdi: function (udi) {
-                return this.value.settingsData.find(entry => entry.udi === udi) || null;
             },
 
             /**
