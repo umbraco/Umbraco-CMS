@@ -64,12 +64,10 @@
                                 </button>
 
                                 <!-- Saved Searches -->
-                                <a class="umb-variant-switcher__toggle ng-scope" href="" ng-click="vm.dropdownOpen = !vm.dropdownOpen">
-                                    <span class="ng-binding">
-                                        <localize key="logViewer_savedSearches">Saved Searches</localize>
-                                    </span>
-                                    <umb-icon icon="icon-navigation-down" class="umb-variant-switcher__expand icon-navigation-down" ng-class="{'icon-navigation-down': !vm.dropdownOpen, 'icon-navigation-up': vm.dropdownOpen}">&nbsp;</umb-icon>
-                                </a>
+                                <button type="button" class="umb-variant-switcher__toggle" ng-click="vm.dropdownOpen = !vm.dropdownOpen">
+                                    <localize key="logViewer_savedSearches">Saved Searches</localize>
+                                    <umb-icon icon="{{vm.dropdownOpen ? 'icon-navigation-up' : 'icon-navigation-down'}}" class="umb-variant-switcher__expand {{vm.dropdownOpen ? 'icon-navigation-up' : 'icon-navigation-down'}}"></umb-icon>
+                                </button>
 
                                 <!-- Saved Searches Dropdown -->
                                 <umb-dropdown ng-if="vm.dropdownOpen" class="saved-searches" on-close="vm.dropdownOpen = false" umb-keyboard-list>
