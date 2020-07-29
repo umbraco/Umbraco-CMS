@@ -18,7 +18,6 @@
 
    <button data-element="button-group-toggle"
       type="button"
-      prevent-default
       class="btn btn-{{buttonStyle}} dropdown-toggle umb-button-group__toggle umb-button--{{size}}"
       ng-if="subButtons.length > 0"
       ng-click="toggleDropdown()"
@@ -42,8 +41,7 @@
             data-element="{{subButton.alias ? 'button-' + subButton.alias : 'button-group-secondary-' + $index }}"
             type="button" ng-click="executeMenuItem(subButton)"
             hotkey="{{subButton.hotKey}}"
-            hotkey-when-hidden="{{subButton.hotKeyWhenHidden}}"
-            prevent-default>
+            hotkey-when-hidden="{{subButton.hotKeyWhenHidden}}">
                <localize key="{{subButton.labelKey}}">{{subButton.labelKey}}</localize>
                <span ng-if="subButton.addEllipsis === 'true'">...</span>
          </button>
