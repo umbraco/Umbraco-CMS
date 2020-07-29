@@ -14,7 +14,7 @@
     'use strict';
 
 
-    function blockEditorModelObjectFactory($interpolate, udiService, contentResource, localizationService) {
+    function blockEditorModelObjectFactory($interpolate, $q, udiService, contentResource, localizationService) {
 
         /**
          * Simple mapping from property model content entry to editing model,
@@ -219,7 +219,7 @@
          * @param {any} contentData
          * @param {any} udi
          */
-        function ensureUdiAndKey(contentData, udi) {            
+        function ensureUdiAndKey(contentData, udi) {
             contentData.udi = udi;
             // Change the content.key to the GUID part of the udi, else it's just random which we don't want, it must be consistent
             contentData.key = udiService.getKey(udi);
@@ -236,7 +236,7 @@
 
 
         /**
-         * Formats the content apps and ensures unsupported property's have the notsupported view
+         * Formats the content apps and ensures unsupported property's have the notsupported view (returns a promise)
          * @param {any} scaffold
          */
         function formatScaffoldData(scaffold) {
@@ -252,10 +252,17 @@
                 });
             });
 
+            // could be empty in tests
+            if (!scaffold.apps) {
+                console.warn("No content apps found in scaffold");
+                return $q.resolve(scaffold);
+            }
+
             // replace view of content app
+
             var contentApp = scaffold.apps.find(entry => entry.alias === "umbContent");
             if (contentApp) {
-                contentApp.view = "views/common/infiniteeditors/blockeditor/blockeditor.content.html";                
+                contentApp.view = "views/common/infiniteeditors/blockeditor/blockeditor.content.html";
             }
 
             // remove info app
@@ -267,6 +274,7 @@
             // add the settings app
             return localizationService.localize("blockEditor_tabBlockSettings").then(
                 function (settingsName) {
+
                     var settingsTab = {
                         "name": settingsName,
                         "alias": "settings",
@@ -379,19 +387,24 @@
                 // removing duplicates.
                 scaffoldKeys = scaffoldKeys.filter((value, index, self) => self.indexOf(value) === index);
 
-                scaffoldKeys.forEach((contentTypeKey => {
+                var self = this;
+
+                scaffoldKeys.forEach(contentTypeKey => {
                     tasks.push(contentResource.getScaffoldByKey(-20, contentTypeKey).then(scaffold => {
-                        // this.scaffolds might not exists anymore, this happens if this instance has been destroyed before the load is complete.
-                        if (this.scaffolds) {
-                            return formatScaffoldData(scaffold).then(s => this.scaffolds.push(s));
+                        // self.scaffolds might not exists anymore, this happens if this instance has been destroyed before the load is complete.
+                        if (self.scaffolds) {
+                            return formatScaffoldData(scaffold).then(s => {
+                                self.scaffolds.push(s);
+                                return s;
+                            });
                         }
                         else {
-                            return Promise.resolve();
+                            return $q.resolve(scaffold);
                         }
                     }));
-                }));
+                });
 
-                return Promise.all(tasks);
+                return $q.all(tasks);
             },
 
             /**
