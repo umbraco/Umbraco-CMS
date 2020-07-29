@@ -100,7 +100,7 @@
                     <umb-load-indicator ng-if="vm.logsLoading"></umb-load-indicator>
 
                     <!-- Empty states -->
-                    <umb-empty-state ng-if="vm.logItems.totalItems === 0" position="center">
+                    <umb-empty-state ng-if="vm.logItems.totalItems === 0 && !vm.logsLoading" position="center">
                         <localize key="general_searchNoResult">Sorry, we can not find what you are looking for.</localize>
                     </umb-empty-state>
 
