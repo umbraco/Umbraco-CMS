@@ -32,7 +32,7 @@ This format is only used in the iconpicker.html
 (function () {
     "use strict";
 
-    function UmbIconDirective($http, $sce, iconHelper) {
+    function UmbIconDirective(iconHelper) {
 
         var directive = {
             replace: true,
