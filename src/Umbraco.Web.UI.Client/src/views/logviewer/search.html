@@ -74,11 +74,15 @@
                                 <!-- Saved Searches Dropdown -->
                                 <umb-dropdown ng-if="vm.dropdownOpen" class="saved-searches" on-close="vm.dropdownOpen = false" umb-keyboard-list>
                                     <umb-dropdown-item class="umb-variant-switcher__item" ng-class="{'umb-variant-switcher_item--current': variant.active}" ng-repeat="search in vm.searches">
-                                        <a href="" class="umb-variant-switcher__name-wrapper" ng-click="vm.selectSearch(search)" prevent-default>
+                                        <button type="button" class="umb-variant-switcher__name-wrapper" ng-click="vm.selectSearch(search)">
                                             <span class="umb-variant-switcher__name">{{search.name}}</span>
                                             <span>{{ search.query }}</span>
-                                        </a>
-                                        <a href=""><span><i class="icon icon-trash text-error" localize="title" title="@logViewer_deleteThisSearch" ng-click="vm.deleteSavedSearch(search)"></i></span></a>
+                                        </button>
+                                        <button type="button" ng-click="vm.deleteSavedSearch(search)" localize="title" title="@logViewer_deleteThisSearch">
+                                            <span>
+                                                <i class="icon icon-trash text-error"></i>
+                                            </span>
+                                        </button>
                                     </umb-dropdown-item>
                                 </umb-dropdown>
                             </div>
