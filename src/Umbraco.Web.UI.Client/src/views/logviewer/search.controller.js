@@ -16,11 +16,11 @@
         vm.logLevels = [
             {
                 name: 'Verbose',
-                logTypeColor: ''
+                logTypeColor: 'gray'
             },
             {
                 name: 'Debug',
-                logTypeColor: 'gray'
+                logTypeColor: 'info'
             },
             {
                 name: 'Information',
@@ -28,15 +28,15 @@
             },
             {
                 name: 'Warning',
-                logTypeColor: 'primary'
-            },
-            {
-                name: 'Error',
                 logTypeColor: 'warning'
             },
             {
-                name: 'Fatal',
+                name: 'Error',
                 logTypeColor: 'danger'
+            },
+            {
+                name: 'Fatal',
+                logTypeColor: 'dark'
             }
         ];
 

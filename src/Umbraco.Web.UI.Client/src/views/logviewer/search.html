@@ -23,13 +23,11 @@
 
                         <!-- Log Level filter -->
                         <div class="flex log-viewer-filter" style="position: relative;">
-                            <button
-                                type="button"
-                                class="btn-link dropdown-toggle flex mb2 filter-toggle"
-                                ng-click="vm.page.showLevelFilter = !vm.page.showLevelFilter"
-                                aria-haspopup="true"
-                                aria-expanded="{{vm.page.showLevelFilter === undefined ? false : vm.page.showLevelFilter}}"
-                                >
+                            <button type="button"
+                                    class="btn-link dropdown-toggle flex mb2 filter-toggle"
+                                    ng-click="vm.page.showLevelFilter = !vm.page.showLevelFilter"
+                                    aria-haspopup="true"
+                                    aria-expanded="{{vm.page.showLevelFilter === undefined ? false : vm.page.showLevelFilter}}">
                                 <span>
                                     <localize key="logViewer_logLevels">Log Levels</localize>:
                                 </span>
