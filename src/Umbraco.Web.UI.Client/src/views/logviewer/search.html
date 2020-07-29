@@ -54,11 +54,11 @@
                                 <input class="form-control search-input" type="text" ng-model="vm.logOptions.filterExpression" placeholder="Search logs..." />
 
                                 <!-- Save Search & Clear Search icon buttons -->
-                                <button class="save-search btn-reset" type="button" ng-show="vm.checkForSavedSearch()" ng-click="vm.addToSavedSearches()">
+                                <button type="button" class="save-search btn-reset" ng-show="vm.checkForSavedSearch()" ng-click="vm.addToSavedSearches()">
                                     <umb-icon icon="icon-rate" class="icon-rate" aria-hidden="true"></umb-icon>
                                     <localize class="sr-only" key="logViewer_saveSearch">Save Search</localize>
                                 </button>
-                                <button class="filter-search btn-reset" ng-show="vm.logOptions.filterExpression" ng-click="vm.resetSearch()">
+                                <button type="button" class="filter-search btn-reset" ng-show="vm.logOptions.filterExpression" ng-click="vm.resetSearch()">
                                     <umb-icon icon="icon-wrong" class="icon-wrong" aria-hidden="true"></umb-icon>
                                     <localize class="sr-only" key="logViewer_filterSearch">Filter Search</localize>
                                 </button>
@@ -76,15 +76,14 @@
                                     <umb-dropdown-item class="umb-variant-switcher__item" ng-class="{'umb-variant-switcher_item--current': variant.active}" ng-repeat="search in vm.searches">
                                         <button type="button" class="umb-variant-switcher__name-wrapper" ng-click="vm.selectSearch(search)">
                                             <span class="umb-variant-switcher__name">{{search.name}}</span>
-                                            <span>{{ search.query }}</span>
+                                            <span>{{search.query}}</span>
                                         </button>
-                                        <button type="button" ng-click="vm.deleteSavedSearch(search)" localize="title" title="@logViewer_deleteThisSearch">
-                                            <span>
-                                                <i class="icon icon-trash text-error"></i>
-                                            </span>
+                                        <button type="button" class="btn-reset" style="width: auto;" ng-click="vm.deleteSavedSearch(search)" localize="title" title="@logViewer_deleteThisSearch">
+                                            <umb-icon icon="icon-trash" class="icon-trash text-error"></umb-icon>
                                         </button>
                                     </umb-dropdown-item>
                                 </umb-dropdown>
+
                             </div>
 
                             <!-- Search Button -->
