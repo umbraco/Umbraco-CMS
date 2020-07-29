@@ -14,7 +14,7 @@
         hotkey="{{vm.shortcut}}"
         hotkey-when-hidden="{{vm.shortcutWhenHidden}}">
         <span class="umb-button__content" ng-class="{'-hidden': vm.innerState !== 'init'}">
-            <i ng-if="vm.icon" class="{{vm.icon}} umb-button__icon" aria-hidden="true"></i>
+            <umb-icon icon="{{vm.icon}}" class="{{vm.icon}} umb-button__icon" ng-if="vm.icon"></umb-icon>
             {{vm.buttonLabel}}
             <span ng-if="vm.showCaret" class="umb-button__caret caret" aria-hidden="true"></span>
         </span>
@@ -30,10 +30,9 @@
         ng-disabled="vm.disabled"
         umb-auto-focus="{{vm.autoFocus && !vm.disabled ? 'true' : 'false'}}"
         aria-haspopup="{{vm.hasPopup}}"
-        aria-expanded="{{vm.isExpanded}}"
-        >
+        aria-expanded="{{vm.isExpanded}}">
         <span class="umb-button__content" ng-class="{'-hidden': vm.innerState !== 'init'}">
-            <i ng-if="vm.icon" class="{{vm.icon}} umb-button__icon" aria-hidden="true"></i>
+            <umb-icon icon="{{vm.icon}}" class="{{vm.icon}} umb-button__icon" ng-if="vm.icon"></umb-icon>
             {{vm.buttonLabel}}
             <span ng-if="vm.showCaret" class="umb-button__caret caret" aria-hidden="true"></span>
         </span>
@@ -48,11 +47,10 @@
         ng-disabled="vm.disabled"
         umb-auto-focus="{{vm.autoFocus && !vm.disabled ? 'true' : 'false'}}">
         <span class="umb-button__content" ng-class="{'-hidden': vm.innerState !== 'init'}">
-            <i ng-if="vm.icon" class="{{vm.icon}} umb-button__icon" aria-hidden="true"></i>
+            <umb-icon icon="{{vm.icon}}" class="{{vm.icon}} umb-button__icon" ng-if="vm.icon"></umb-icon>
             {{vm.buttonLabel}}
             <span ng-if="vm.showCaret" class="umb-button__caret caret" aria-hidden="true"></span>
         </span>
     </button>
-
 
 </div>
