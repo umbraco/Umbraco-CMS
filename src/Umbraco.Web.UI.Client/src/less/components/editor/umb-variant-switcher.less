@@ -87,6 +87,11 @@ button.umb-variant-switcher__toggle {
         }
     }
 }
+
+.umb-variant-switcher__item.--not-allowed:not(.--current) .umb-variant-switcher__name-wrapper:hover {
+    cursor: default;
+}
+
 .umb-variant-switcher__item.--state-notCreated:not(.--active) {
     .umb-variant-switcher__name-wrapper::before {
         content: "+";
@@ -247,6 +252,8 @@ button.umb-variant-switcher__toggle {
 	cursor: pointer;
     background-color: transparent;
     border: none;
+	padding-top: 6px !important;
+    padding-bottom: 6px !important;
 }
 
 .dropdown-menu>li {
