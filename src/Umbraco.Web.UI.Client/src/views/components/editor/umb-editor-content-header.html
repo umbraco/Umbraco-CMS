@@ -91,9 +91,9 @@
         </div>
 
         <div ng-if="splitViewOpen">
-            <a class="umb-editor-header__close-split-view" href="" ng-click="closeSplitView()">
-                <i class="icon-delete"></i>
-            </a>
+            <button type="button" class="btn-reset umb-editor-header__close-split-view" ng-click="closeSplitView()">
+                <umb-icon icon="icon-delete" class="icon-delete"></umb-icon>
+            </button>
         </div>
 
         <div ng-if="editor.variantApps && splitViewOpen !== true">
