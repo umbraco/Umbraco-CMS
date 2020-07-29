@@ -507,8 +507,6 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
     function init() {
         
         userService.getCurrentUser().then(function (user) {
-            console.log("user", user);
-
             switch (entityType) {
                 case "Document":
                     var hasAccessToContent = user.allowedSections.indexOf("content") !== -1;
