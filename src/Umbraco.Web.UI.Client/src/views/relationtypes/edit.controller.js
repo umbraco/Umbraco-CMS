@@ -102,7 +102,7 @@ function RelationTypeEditController($scope, $routeParams, relationTypeResource, 
     function formatDates(relations) {
         if (relations) {
             userService.getCurrentUser().then(function (currentUser) {
-                angular.forEach(relations, function (relation) {
+                relations.forEach(function (relation) {
                     relation.timestampFormatted = dateHelper.getLocalDate(relation.createDate, currentUser.locale, 'LLL');
                 });
             });
