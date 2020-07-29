@@ -79,19 +79,16 @@ namespace Umbraco.Web.Editors
 
             try
             {
-                return AppCaches.RuntimeCache.GetCacheItem($"{iconName}_{iconPath}", () =>
+                var svgContent = File.ReadAllText(iconPath);
+                var sanitizedString = sanitizer.Sanitize(svgContent);
+
+                var svg = new IconModel
                 {
-                    var svgContent = File.ReadAllText(iconPath);
-                    var sanitizedString = sanitizer.Sanitize(svgContent);
+                    Name = iconName,
+                    SvgString = sanitizedString
+                };
 
-                    var svg = new IconModel
-                    {
-                        Name = iconName,
-                        SvgString = sanitizedString
-                    };
-
-                    return svg;
-                }, new TimeSpan(0, 5, 0));
+                return svg;
             }
             catch (Exception ex)
             {
