@@ -54,12 +54,12 @@
                                 <input class="form-control search-input" type="text" ng-model="vm.logOptions.filterExpression" placeholder="Search logs..." />
 
                                 <!-- Save Search & Clear Search icon buttons -->
-                                <button type="button" class="save-search btn-reset" ng-show="vm.checkForSavedSearch()" ng-click="vm.addToSavedSearches()">
-                                    <umb-icon icon="icon-rate" class="icon-rate" aria-hidden="true"></umb-icon>
+                                <button type="button" class="btn-reset save-search" ng-show="vm.checkForSavedSearch()" ng-click="vm.addToSavedSearches()">
+                                    <umb-icon icon="icon-rate" class="icon-rate"></umb-icon>
                                     <localize class="sr-only" key="logViewer_saveSearch">Save Search</localize>
                                 </button>
-                                <button type="button" class="filter-search btn-reset" ng-show="vm.logOptions.filterExpression" ng-click="vm.resetSearch()">
-                                    <umb-icon icon="icon-wrong" class="icon-wrong" aria-hidden="true"></umb-icon>
+                                <button type="button" class="btn-reset filter-search" ng-show="vm.logOptions.filterExpression" ng-click="vm.resetSearch()">
+                                    <umb-icon icon="icon-wrong" class="icon-wrong"></umb-icon>
                                     <localize class="sr-only" key="logViewer_filterSearch">Filter Search</localize>
                                 </button>
 
