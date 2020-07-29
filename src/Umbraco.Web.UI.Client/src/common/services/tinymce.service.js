@@ -1367,6 +1367,9 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             //    throw "args.model.value is required";
             //}
 
+            // force TinyMCE to load plugins/themes from minified files (see http://archive.tinymce.com/wiki.php/api4:property.tinymce.suffix.static)
+            args.editor.suffix = ".min";
+
             var unwatch = null;
 
             //Starts a watch on the model value so that we can update TinyMCE if the model changes behind the scenes or from the server
