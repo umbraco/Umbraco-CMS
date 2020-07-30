@@ -314,9 +314,9 @@
             ];
 
             localizationService.localizeMany(labelKeys).then(values => {
-                overlay.title = values[0];
+                overlay.title = values[2];
                 overlay.subtitle = values[1];
-                overlay.submitButtonLabel = values[0];
+                overlay.submitButtonLabel = values[2];
                 overlay.closeButtonLabel = values[0];
 
                 overlayService.open(overlay);
