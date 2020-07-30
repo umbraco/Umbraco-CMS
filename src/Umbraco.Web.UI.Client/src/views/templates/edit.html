@@ -30,12 +30,11 @@
 
                                 <div ng-class="{'btn-group': vm.template.masterTemplateAlias}" style="margin-right: 10px;">
 
-                                    <button
-                                        data-element="button-masterTemplate"
-                                        type="button"
-                                        class="btn umb-button--xs"
-                                        ng-click="vm.openMasterTemplateOverlay()"
-                                        style="font-size: 14px;">
+                                    <button type="button"
+                                            data-element="button-masterTemplate"
+                                            class="btn umb-button--xs"
+                                            ng-click="vm.openMasterTemplateOverlay()"
+                                            style="font-size: 14px;">
                                         <span class="bold"><localize key="template_mastertemplate">Master template</localize>:</span>
                                         <span style="margin-left: 5px;">
                                             <span ng-if="vm.template.masterTemplateAlias">{{ vm.getMasterTemplateName(vm.template.masterTemplateAlias, vm.templates) }}</span>
