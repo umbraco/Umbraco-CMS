@@ -415,7 +415,6 @@ angular.module("umbraco")
                         preSelectImages();
                         $scope.loading = false;
 
-                        console.log("CHILDREN = " + $scope.images.length);
                     });
             }
 

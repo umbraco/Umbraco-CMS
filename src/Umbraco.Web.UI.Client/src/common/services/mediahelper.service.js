@@ -24,7 +24,7 @@ function mediaHelper(umbRequestHelper, $log) {
                     mediaEntity.isFolder = mediaEntity.image ? false : true;
                 }
                 else {
-                    mediaEntity.isFolder = mediaEntity.metaData.ContentTypeAlias === "Folder";
+                    mediaEntity.isFolder = mediaEntity.metaData.ContentTypeAlias && mediaEntity.metaData.ContentTypeAlias.toLowerCase() === "folder";
                 }
             }
         },

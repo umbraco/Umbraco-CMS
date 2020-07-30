@@ -162,12 +162,13 @@ Use this directive to generate a thumbnail grid of media items.
 
                 if (!item.isFolder) {
 
-                    // handle entity
                     if (item.image) {
+                        // handle entity
                         item.thumbnail = mediaHelper.resolveFileFromEntity(item, true);
-                        item.extension = mediaHelper.getFileExtension(item.image);
+                        item.extension = mediaHelper.getFileExtension(item.image);                        
+                    }
+                    else {
                         // handle full media object
-                    } else {
                         item.thumbnail = mediaHelper.resolveFile(item, true);
                         item.image = mediaHelper.resolveFile(item, false);
 
