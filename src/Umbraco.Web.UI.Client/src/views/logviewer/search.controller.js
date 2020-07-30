@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function LogViewerSearchController($location, logViewerResource, overlayService) {
+    function LogViewerSearchController($location, logViewerResource, overlayService, localizationService) {
 
         var vm = this;
 
@@ -255,9 +255,8 @@
 
         function addToSavedSearches(){
 
-            var overlay = {
+            const overlay = {
                 title: "Save Search",
-                subtitle: "Enter a friendly name for your search query",
                 closeButtonLabel: "Cancel",
                 submitButtonLabel: "Save Search",
                 disableSubmitButton: true,
@@ -271,23 +270,32 @@
                         overlayService.close();
                     });
                 },
-                close: function() {
-                    overlayService.close();
-                }
+                close: () => editorService.close()
             };
 
-            overlayService.open(overlay);
+            var labelKeys = [
+                "general_cancel",
+                "logViewer_saveSearch",
+                "logViewer_saveSearchDescription"
+            ];
+
+            localizationService.localizeMany(labelKeys).then(values => {
+                overlay.title = values[1];
+                overlay.subtitle = values[2],
+                overlay.submitButtonLabel = values[1],
+                overlay.closeButtonLabel = values[0],
+
+                overlayService.open(overlay);
+            });
         }
 
         function deleteSavedSearch(searchItem) {
 
-            var overlay = {
+            const overlay = {
                 title: "Delete Saved Search",
-                subtitle: "Are you sure you wish to delete?",
                 closeButtonLabel: "Cancel",
                 submitButtonLabel: "Delete Saved Search",
                 submitButtonStyle: "danger",
-                view: "default",
                 submit: function (model) {
                     //Resource call with two params (name & query)
                     //API that opens the JSON and adds it to the bottom
@@ -296,12 +304,23 @@
                         overlayService.close();
                     });
                 },
-                close: function() {
-                    overlayService.close();
-                }
+                close: () => editorService.close()
             };
 
-            overlayService.open(overlay);
+            var labelKeys = [
+                "general_cancel",
+                "defaultdialogs_confirmdelete",
+                "logViewer_deleteSavedSearch"
+            ];
+
+            localizationService.localizeMany(labelKeys).then(values => {
+                overlay.title = values[0];
+                overlay.subtitle = values[1];
+                overlay.submitButtonLabel = values[0];
+                overlay.closeButtonLabel = values[0];
+
+                overlayService.open(overlay);
+            });
         }
 
         function back() {
@@ -309,7 +328,6 @@
         }
 
         init();
-
     }
 
     angular.module("umbraco").controller("Umbraco.Editors.LogViewer.SearchController", LogViewerSearchController);
