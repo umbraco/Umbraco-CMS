@@ -43,9 +43,7 @@ angular.module('umbraco.services')
                 }
 
                 return entityResource.search(args.term, "Member", args.searchFrom).then(function (data) {
-                    _.each(data, function (item) {
-                        searchResultFormatter.configureMemberResult(item);
-                    });
+                    data.forEach(item => searchResultFormatter.configureMemberResult(item));
                     return data;
                 });
             },
@@ -68,9 +66,7 @@ angular.module('umbraco.services')
                 }
 
                 return entityResource.search(args.term, "Document", args.searchFrom, args.canceler, args.dataTypeKey).then(function (data) {
-                    _.each(data, function (item) {
-                        searchResultFormatter.configureContentResult(item);
-                    });
+                    data.forEach(item => searchResultFormatter.configureContentResult(item));
                     return data;
                 });
             },
@@ -93,9 +89,7 @@ angular.module('umbraco.services')
                 }
 
                 return entityResource.search(args.term, "Media", args.searchFrom, args.canceler, args.dataTypeKey).then(function (data) {
-                    _.each(data, function (item) {
-                        searchResultFormatter.configureMediaResult(item);
-                    });
+                    data.forEach(item => searchResultFormatter.configureMediaResult(item));
                     return data;
                 });
             },
@@ -119,7 +113,7 @@ angular.module('umbraco.services')
 
                 return entityResource.searchAll(args.term, args.canceler).then(function (data) {
 
-                    _.each(data, function (resultByType) {
+                    data.forEach(resultByType => {
 
                         //we need to format the search result data to include things like the subtitle, urls, etc...
                         // this is done with registered angular services as part of the SearchableTreeAttribute, if that
@@ -140,7 +134,7 @@ angular.module('umbraco.services')
                             }
                         }
                         //now apply the formatter for each result
-                        _.each(resultByType.results, function (item) {
+                        resultByType.results.forEach(item => {
                             formatterMethod.apply(this, [item, resultByType.treeAlias, resultByType.appAlias]);
                         });
 
@@ -148,12 +142,10 @@ angular.module('umbraco.services')
 
                     return data;
                 });
-
             },
 
             // TODO: This doesn't do anything!
             setCurrent: function (sectionAlias) {
-
                 var currentSection = sectionAlias;
             }
         };
