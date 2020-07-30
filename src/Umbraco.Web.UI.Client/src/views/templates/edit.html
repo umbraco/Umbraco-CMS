@@ -41,9 +41,12 @@
                                         </span>
                                     </button>
 
-                                    <a ng-if="vm.template.masterTemplateAlias" ng-click="vm.removeMasterTemplate()" class="btn umb-button--xs dropdown-toggle umb-button-group__toggle">
+                                    <button type="button"
+                                            class="btn umb-button__button umb-button--xs dropdown-toggle umb-button-group__toggle"
+                                            ng-if="vm.template.masterTemplateAlias"
+                                            ng-click="vm.removeMasterTemplate()">
                                         <umb-icon icon="icon-wrong" class="icon icon-wrong"></umb-icon>
-                                    </a>
+                                    </button>
 
                                 </div>
 
