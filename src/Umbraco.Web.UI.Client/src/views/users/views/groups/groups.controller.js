@@ -123,7 +123,7 @@
         }
 
         function clearSelection() {
-            angular.forEach(vm.userGroups, function (userGroup) {
+            vm.userGroups.forEach(function (userGroup) {
                 userGroup.selected = false;
             });
             vm.selection = [];
