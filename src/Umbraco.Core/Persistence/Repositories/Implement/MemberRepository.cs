@@ -25,6 +25,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         private readonly IMemberTypeRepository _memberTypeRepository;
         private readonly ITagRepository _tagRepository;
         private readonly IMemberGroupRepository _memberGroupRepository;
+        private readonly IRepositoryCachePolicy<IMember, string> _memberByUsernameCachePolicy;
 
         public MemberRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger,
             IMemberTypeRepository memberTypeRepository, IMemberGroupRepository memberGroupRepository, ITagRepository tagRepository, ILanguageRepository languageRepository, IRelationRepository relationRepository, IRelationTypeRepository relationTypeRepository,
@@ -34,6 +35,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             _memberTypeRepository = memberTypeRepository ?? throw new ArgumentNullException(nameof(memberTypeRepository));
             _tagRepository = tagRepository ?? throw new ArgumentNullException(nameof(tagRepository));
             _memberGroupRepository = memberGroupRepository;
+
+            _memberByUsernameCachePolicy = new DefaultRepositoryCachePolicy<IMember, string>(GlobalIsolatedCache, ScopeAccessor, DefaultOptions);
         }
 
         protected override MemberRepository This => this;
@@ -569,20 +572,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 ordering);
         }
 
-        private string _pagedResultsByQueryWhere;
-
-        private string GetPagedResultsByQueryWhere()
-        {
-            if (_pagedResultsByQueryWhere == null)
-                _pagedResultsByQueryWhere = " AND ("
-                    + $"({SqlSyntax.GetQuotedTableName("umbracoNode")}.{SqlSyntax.GetQuotedColumnName("text")} LIKE @0)"
-                    + " OR "
-                    + $"({SqlSyntax.GetQuotedTableName("cmsMember")}.{SqlSyntax.GetQuotedColumnName("LoginName")} LIKE @0)"
-                    + ")";
-
-            return _pagedResultsByQueryWhere;
-        }
-
         protected override string ApplySystemOrdering(ref Sql<ISqlContext> sql, Ordering ordering)
         {
             if (ordering.OrderBy.InvariantEquals("email"))
@@ -671,6 +660,23 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // reset dirty initial properties (U4-1946)
             member.ResetDirtyProperties(false);
             return member;
+        }
+
+        public IMember GetByUsername(string username)
+        {
+            return _memberByUsernameCachePolicy.Get(username, PerformGetByUsername, PerformGetAllByUsername);
+        }
+
+        private IMember PerformGetByUsername(string username)
+        {
+            var query = Query<IMember>().Where(x => x.Username.Equals(username));
+            return PerformGetByQuery(query).FirstOrDefault();
+        }
+
+        private IEnumerable<IMember> PerformGetAllByUsername(params string[] usernames)
+        {
+            var query = Query<IMember>().WhereIn(x => x.Username, usernames);
+            return PerformGetByQuery(query);
         }
     }
 }

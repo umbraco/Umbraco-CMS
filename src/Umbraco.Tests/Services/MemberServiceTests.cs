@@ -49,6 +49,20 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void Can_Get_By_Username()
+        {
+            var now = DateTime.Now;
+            var memberType = ServiceContext.MemberTypeService.Get("member");
+            IMember member = new Member("xname", "xemail", "xusername", "xrawpassword", memberType, true);
+            ServiceContext.MemberService.Save(member);
+
+            var member2 = ServiceContext.MemberService.GetByUsername(member.Username);
+
+            Assert.IsNotNull(member2);
+            Assert.AreEqual(member.Email, member2.Email);
+        }
+
+        [Test]
         public void Can_Set_Last_Login_Date()
         {
             var now = DateTime.Now;

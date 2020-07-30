@@ -7,6 +7,8 @@ namespace Umbraco.Core.Persistence.Repositories
 {
     public interface IMemberRepository : IContentRepository<int, IMember>
     {
+        IMember GetByUsername(string username);
+
         /// <summary>
         /// Finds members in a given role
         /// </summary>

@@ -350,7 +350,14 @@ namespace Umbraco.Web.Security.Providers
             {
                 // when upgrading from 7.2 to 7.3 trying to save will throw
                 if (UmbracoVersion.Current >= new Version(7, 3, 0, 0))
-                    MemberService.SetLastLogin(username, DateTime.Now);
+                {
+                    var now = DateTime.Now;
+                    // update the database data directly instead of a full member save which requires DB locks
+                    MemberService.SetLastLogin(username, now);
+                    member.LastLoginDate = now;
+                    member.UpdateDate = now;
+                }
+                    
             }
 
             return ConvertToMembershipUser(member);
