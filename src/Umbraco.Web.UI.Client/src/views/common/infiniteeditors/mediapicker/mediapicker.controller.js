@@ -22,7 +22,6 @@ angular.module("umbraco")
             vm.clickHandler = clickHandler;
             vm.clickItemName = clickItemName;
             vm.gotoFolder = gotoFolder;
-            vm.shouldShowUrl = shouldShowUrl;
             vm.toggleListView = toggleListView;
             vm.selectLayout = selectLayout;
             vm.showMediaList = false;
@@ -239,19 +238,6 @@ angular.module("umbraco")
                 localStorageService.set("umbLastOpenedMediaNodeId", folder.id);
 
                 return getChildren(folder.id);
-            }
-
-            function shouldShowUrl() {
-                if (!$scope.model.target) {
-                    return false;
-                }
-                if ($scope.model.target.id) {
-                    return false;
-                }
-                if ($scope.model.target.url && $scope.model.target.url.toLower().indexOf("blob:") === 0) {
-                    return false;
-                }
-                return true;
             }
             
             function toggleListView() {

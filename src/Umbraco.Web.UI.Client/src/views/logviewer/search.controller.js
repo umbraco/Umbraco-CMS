@@ -16,11 +16,11 @@
         vm.logLevels = [
             {
                 name: 'Verbose',
-                logTypeColor: ''
+                logTypeColor: 'gray'
             },
             {
                 name: 'Debug',
-                logTypeColor: 'gray'
+                logTypeColor: 'info'
             },
             {
                 name: 'Information',
@@ -28,15 +28,15 @@
             },
             {
                 name: 'Warning',
-                logTypeColor: 'primary'
-            },
-            {
-                name: 'Error',
                 logTypeColor: 'warning'
             },
             {
-                name: 'Fatal',
+                name: 'Error',
                 logTypeColor: 'danger'
+            },
+            {
+                name: 'Fatal',
+                logTypeColor: 'dark'
             }
         ];
 
@@ -181,7 +181,7 @@
         function getFilterName(array) {
             var name = "All";
             var found = false;
-            angular.forEach(array, function (item) {
+            array.forEach(function (item) {
                 if (item.selected) {
                     if (!found) {
                         name = item.name
