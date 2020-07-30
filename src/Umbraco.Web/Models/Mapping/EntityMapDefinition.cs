@@ -186,7 +186,7 @@ namespace Umbraco.Web.Models.Mapping
                 target.Name = source.Values.ContainsKey($"nodeName_{culture}") ? source.Values[$"nodeName_{culture}"] : target.Name;
             }
 
-            if (source.Values.TryGetValue(UmbracoExamineIndex.UmbracoFileFieldName, out var umbracoFile))
+            if (source.Values.TryGetValue(UmbracoExamineIndex.UmbracoFileFieldName, out var umbracoFile) && umbracoFile.IsNullOrWhiteSpace() == false)
             {
                 if (umbracoFile != null)
                 {
