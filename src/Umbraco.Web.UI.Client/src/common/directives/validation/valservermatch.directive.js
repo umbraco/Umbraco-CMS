@@ -49,7 +49,7 @@ function valServerMatch(serverValidationManager) {
 
             // if we have reached this part, and there is no culture, then lets fallback to invariant. To get the validation feedback for invariant language.
             currentCulture = currentCulture || "invariant";
-            
+
             var unsubscribe = [];
 
             function bindCallback(validationKey, matchVal, matchType) {
