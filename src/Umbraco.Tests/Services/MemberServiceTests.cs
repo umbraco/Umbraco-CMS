@@ -49,6 +49,28 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void Can_Set_Last_Login_Date()
+        {
+            var now = DateTime.Now;
+            var memberType = ServiceContext.MemberTypeService.Get("member");
+            IMember member = new Member("xname", "xemail", "xusername", "xrawpassword", memberType, true)
+            {
+                LastLoginDate = now,
+                UpdateDate = now
+            };
+            ServiceContext.MemberService.Save(member);
+
+            var newDate = now.AddDays(10);
+            ServiceContext.MemberService.SetLastLogin(member.Username, newDate);
+
+            //re-get
+            member = ServiceContext.MemberService.GetById(member.Id);
+
+            Assert.That(member.LastLoginDate, Is.EqualTo(newDate).Within(1).Seconds);
+            Assert.That(member.UpdateDate, Is.EqualTo(newDate).Within(1).Seconds);
+        }
+
+        [Test]
         public void Can_Create_Member_With_Properties()
         {
             var memberType = ServiceContext.MemberTypeService.Get("member");

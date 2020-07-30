@@ -348,15 +348,9 @@ namespace Umbraco.Web.Security.Providers
 
             if (userIsOnline)
             {
-                member.LastLoginDate = DateTime.Now;
-                member.UpdateDate = DateTime.Now;
-                //don't raise events for this! It just sets the member dates, if we do raise events this will
-                // cause all distributed cache to execute - which will clear out some caches we don't want.
-                // http://issues.umbraco.org/issue/U4-3451
-
                 // when upgrading from 7.2 to 7.3 trying to save will throw
                 if (UmbracoVersion.Current >= new Version(7, 3, 0, 0))
-                    MemberService.Save(member, false);
+                    MemberService.SetLastLogin(username, DateTime.Now);
             }
 
             return ConvertToMembershipUser(member);

@@ -505,6 +505,47 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return Database.ExecuteScalar<int>(fullSql);
         }
 
+        /// <inheritdoc />
+        public void SetLastLogin(string username, DateTime date)
+        {
+            // Update the cms property value for the member
+
+            var sqlSelectTemplateProperty = SqlContext.Templates.Get("Umbraco.Core.MemberRepository.SetLastLogin1", s => s
+                .Select<PropertyDataDto>(x => x.Id)
+                .From<PropertyDataDto>()
+                .InnerJoin<PropertyTypeDto>().On<PropertyTypeDto, PropertyDataDto>((l, r) => l.Id == r.PropertyTypeId)
+                .InnerJoin<ContentVersionDto>().On<ContentVersionDto, PropertyDataDto>((l, r) => l.Id == r.VersionId)
+                .InnerJoin<NodeDto>().On<NodeDto, ContentVersionDto>((l, r) => l.NodeId == r.NodeId)
+                .InnerJoin<MemberDto>().On<MemberDto, NodeDto>((l, r) => l.NodeId == r.NodeId)
+                .Where<NodeDto>(x => x.NodeObjectType == SqlTemplate.Arg<Guid>("nodeObjectType"))
+                .Where<PropertyTypeDto>(x => x.Alias == SqlTemplate.Arg<string>("propertyTypeAlias"))
+                .Where<MemberDto>(x => x.LoginName == SqlTemplate.Arg<string>("username")));
+            var sqlSelectProperty = sqlSelectTemplateProperty.Sql(Constants.ObjectTypes.Member, Constants.Conventions.Member.LastLoginDate, username);
+
+            var update = Sql()
+                .Update<PropertyDataDto>(u => u
+                    .Set(x => x.DateValue, date))
+                .WhereIn<PropertyDataDto>(x => x.Id, sqlSelectProperty);
+
+            Database.Execute(update);
+
+            // Update the umbracoContentVersion value for the member
+
+            var sqlSelectTemplateVersion = SqlContext.Templates.Get("Umbraco.Core.MemberRepository.SetLastLogin2", s => s
+               .Select<ContentVersionDto>(x => x.Id)
+               .From<ContentVersionDto>()               
+               .InnerJoin<NodeDto>().On<NodeDto, ContentVersionDto>((l, r) => l.NodeId == r.NodeId)
+               .InnerJoin<MemberDto>().On<MemberDto, NodeDto>((l, r) => l.NodeId == r.NodeId)
+               .Where<NodeDto>(x => x.NodeObjectType == SqlTemplate.Arg<Guid>("nodeObjectType"))
+               .Where<MemberDto>(x => x.LoginName == SqlTemplate.Arg<string>("username")));
+            var sqlSelectVersion = sqlSelectTemplateVersion.Sql(Constants.ObjectTypes.Member, username);
+
+            Database.Execute(Sql()
+                .Update<ContentVersionDto>(u => u
+                    .Set(x => x.VersionDate, date))
+                .WhereIn<ContentVersionDto>(x => x.Id, sqlSelectVersion));
+        }
+
         /// <summary>
         /// Gets paged member results.
         /// </summary>
