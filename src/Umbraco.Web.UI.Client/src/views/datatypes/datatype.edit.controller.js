@@ -10,7 +10,11 @@ function DataTypeEditController($scope, $routeParams, appState, navigationServic
     
     var evts = [];
     var vm = this;
-    
+
+    vm.header = {};
+    vm.header.editorfor = "visuallyHiddenTexts_newDataType";
+    vm.header.setPageTitle = true;
+
     //setup scope vars
     vm.page = {};
     vm.page.loading = false;

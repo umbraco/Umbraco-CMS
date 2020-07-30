@@ -26,6 +26,7 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.Editors.Filters;
+using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
@@ -174,6 +175,33 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
             var result = Mapper.Map<IUser, UserDisplay>(user);
+            return result;
+        }
+
+        /// <summary>
+        /// Get users by integer ids
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        [OutgoingEditorModelEvent]
+        [AdminUsersAuthorize]
+        public IEnumerable<UserDisplay> GetByIds([FromJsonPath]int[] ids)
+        {
+            if (ids == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            if (ids.Length == 0)
+                return Enumerable.Empty<UserDisplay>();
+
+            var users = Services.UserService.GetUsersById(ids);
+            if (users == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            var result = Mapper.MapEnumerable<IUser, UserDisplay>(users);
             return result;
         }
 
@@ -549,29 +577,7 @@ namespace Umbraco.Web.Editors
             if (Current.Configs.Settings().Security.UsernameIsEmail && found.Username == found.Email && userSave.Username != userSave.Email)
             {
                 userSave.Username = userSave.Email;
-            }
-
-            if (userSave.ChangePassword != null)
-            {
-                var passwordChanger = new PasswordChanger(Logger, Services.UserService, UmbracoContext.HttpContext);
-
-                //this will change the password and raise appropriate events
-                var passwordChangeResult = await passwordChanger.ChangePasswordWithIdentityAsync(Security.CurrentUser, found, userSave.ChangePassword, UserManager);
-                if (passwordChangeResult.Success)
-                {
-                    //need to re-get the user
-                    found = Services.UserService.GetUserById(intId.Result);
-                }
-                else
-                {
-                    hasErrors = true;
-
-                    foreach (var memberName in passwordChangeResult.Result.ChangeError.MemberNames)
-                    {
-                        ModelState.AddModelError(memberName, passwordChangeResult.Result.ChangeError.ErrorMessage);
-                    }
-                }
-            }
+            }          
 
             if (hasErrors)
                 throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
@@ -586,6 +592,51 @@ namespace Umbraco.Web.Editors
             display.AddSuccessNotification(Services.TextService.Localize("speechBubbles/operationSavedHeader"), Services.TextService.Localize("speechBubbles/editUserSaved"));
             return display;
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="changingPasswordModel"></param>
+        /// <returns></returns>
+        public async Task<ModelWithNotifications<string>> PostChangePassword(ChangingPasswordModel changingPasswordModel)
+        {
+            changingPasswordModel = changingPasswordModel ?? throw new ArgumentNullException(nameof(changingPasswordModel));            
+
+            if (ModelState.IsValid == false)
+            {
+                throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
+            }
+
+            var intId = changingPasswordModel.Id.TryConvertTo<int>();
+            if (intId.Success == false)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            var found = Services.UserService.GetUserById(intId.Result);
+            if (found == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            var passwordChanger = new PasswordChanger(Logger, Services.UserService, UmbracoContext.HttpContext);
+            var passwordChangeResult = await passwordChanger.ChangePasswordWithIdentityAsync(Security.CurrentUser, found, changingPasswordModel, UserManager);
+
+            if (passwordChangeResult.Success)
+            {
+                var result = new ModelWithNotifications<string>(passwordChangeResult.Result.ResetPassword);
+                result.AddSuccessNotification(Services.TextService.Localize("general/success"), Services.TextService.Localize("user/passwordChangedGeneric"));
+                return result;
+            }
+
+            foreach (var memberName in passwordChangeResult.Result.ChangeError.MemberNames)
+            {
+                ModelState.AddModelError(memberName, passwordChangeResult.Result.ChangeError.ErrorMessage);
+            }
+
+            throw new HttpResponseException(Request.CreateValidationErrorResponse(ModelState));
+        }
+
 
         /// <summary>
         /// Disables the users with the given user ids

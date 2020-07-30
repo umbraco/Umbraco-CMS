@@ -12,7 +12,7 @@
             onClose: "&"
         }
     };
-    
+
     function umbSearchController($timeout, backdropService, searchService, focusService) {
 
         var vm = this;
@@ -25,7 +25,7 @@
         vm.handleKeyDown = handleKeyDown;
         vm.closeSearch = closeSearch;
         vm.focusSearch = focusSearch;
-        
+
         //we need to capture the focus before this element is initialized.
         vm.focusBeforeOpening = focusService.getLastKnownFocus();
 
@@ -66,8 +66,8 @@
          */
         function focusSearch() {
             vm.searchHasFocus = false;
-            $timeout(function(){
-                vm.searchHasFocus  = true;
+            $timeout(function () {
+                vm.searchHasFocus = true;
             });
         }
 
@@ -76,14 +76,14 @@
          * @param {object} event
          */
         function handleKeyDown(event) {
-            
+
             // esc
-            if(event.keyCode === 27) {
+            if (event.keyCode === 27) {
                 event.stopPropagation();
                 event.preventDefault();
-                
+
                 closeSearch();
-                return;            
+                return;
             }
 
             // up/down (navigate search results)
@@ -132,7 +132,7 @@
                 }
 
                 $timeout(function () {
-                    var resultElementLink = angular.element(".umb-search-item[active-result='true'] .umb-search-result__link");
+                    var resultElementLink = $(".umb-search-item[active-result='true'] .umb-search-result__link");
                     resultElementLink[0].focus();
                 });
             }
@@ -142,10 +142,10 @@
          * Used to proxy a callback
          */
         function closeSearch() {
-            if(vm.focusBeforeOpening) {
+            if (vm.focusBeforeOpening) {
                 vm.focusBeforeOpening.focus();
             }
-            if(vm.onClose) {
+            if (vm.onClose) {
                 vm.onClose();
             }
         }
@@ -155,12 +155,13 @@
          * @param {string} searchQuery
          */
         function search(searchQuery) {
-            if(searchQuery.length > 0) {
-                var search = {"term": searchQuery};
-                searchService.searchAll(search).then(function(result){
+            if (searchQuery.length > 0) {
+                var search = { "term": searchQuery };
+                searchService.searchAll(search).then(function (result) {
                     //result is a dictionary of group Title and it's results
                     var filtered = {};
-                    _.each(result, function (value, key) {
+                    Object.keys(result).forEach(key => {
+                        let value = result[key];
                         if (value.results.length > 0) {
                             filtered[key] = value;
                         }

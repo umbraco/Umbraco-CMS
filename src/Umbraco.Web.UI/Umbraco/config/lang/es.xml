@@ -124,7 +124,7 @@
     <key alias="saveAndPublish">Guardar y publicar</key>
     <key alias="saveToPublish">Guardar y enviar para aprobación</key>
     <key alias="saveListView">Guardar vista de lista</key>
-    <key alias="showPage">Previsualizar</key>
+    <key alias="saveAndPreview">Previsualizar</key>
     <key alias="showPageDisabled">La previsualización está deshabilitada porque no hay ninguna plantilla asignada</key>
     <key alias="styleChoose">Elegir estilo</key>
     <key alias="styleShow">Mostrar estilos</key>

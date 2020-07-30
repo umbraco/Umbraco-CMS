@@ -30,7 +30,7 @@ function authResource($q, $http, umbRequestHelper, angularHelper) {
           umbRequestHelper.getApiUrl(
             "authenticationApiBaseUrl",
             "PostSend2FACode"),
-          angular.toJson(provider)),
+          Utilities.toJson(provider)),
         'Could not send code');
     },
 

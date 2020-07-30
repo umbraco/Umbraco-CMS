@@ -8,21 +8,6 @@
     position: relative;
 }
 
-.umb-button__button:focus {
-    outline: none;
-    .tabbing-active &:after {
-        content: '';
-        position: absolute;
-        z-index: 10000;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        border-radius: 3px;
-        box-shadow: 0 0 2px @blueMid, inset 0 0 2px 1px @blueMid;
-    }
-}
-
 .umb-button__content {
    opacity: 1;
    transition: opacity 0.25s ease;
@@ -44,6 +29,11 @@
 .umb-button .umb-button__caret {
    margin-top: 0;
    margin-left: 5px;
+}
+
+.umb-button__button[disabled] .umb-button__caret {
+    border-top-color: @gray-7;
+    border-bottom-color: @gray-7;
 }
 
 .umb-button__progress {

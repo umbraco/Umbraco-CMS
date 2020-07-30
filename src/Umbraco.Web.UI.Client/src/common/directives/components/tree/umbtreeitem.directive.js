@@ -18,7 +18,7 @@
    </example>
  */
 angular.module("umbraco.directives")
-    .directive('umbTreeItem', function(treeService, $timeout, localizationService, eventsService, appState) {
+    .directive('umbTreeItem', function(treeService, $timeout, localizationService, eventsService, appState, navigationService) {
     return {
         restrict: 'E',
         replace: true,
@@ -70,9 +70,7 @@ angular.module("umbraco.directives")
                 
                 var css = [];                
                 if (node.cssClasses) {
-                    _.each(node.cssClasses, function(c) {
-                        css.push(c);
-                    });
+                    node.cssClasses.forEach(c => css.push(c));
                 }
                 if (node.selected) {
                     css.push("umb-tree-node-checked");

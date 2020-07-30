@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using Umbraco.Core;
 using Umbraco.Core.Services;
 using Umbraco.Web.Actions;
+using System.Threading;
 
 namespace Umbraco.Web.Models.Trees
 {
@@ -28,12 +29,15 @@ namespace Umbraco.Web.Models.Trees
             Name = name;
         }
 
-
         public MenuItem(string alias, ILocalizedTextService textService)
             : this()
         {
+            var values = textService.GetAllStoredValues(Thread.CurrentThread.CurrentUICulture);
+            values.TryGetValue($"visuallyHiddenTexts/{alias}_description", out var textDescription);
+
             Alias = alias;
             Name = textService.Localize($"actions/{Alias}");
+            TextDescription = textDescription;
         }
 
         /// <summary>
@@ -73,6 +77,9 @@ namespace Umbraco.Web.Models.Trees
         [DataMember(Name = "alias", IsRequired = true)]
         [Required]
         public string Alias { get; set; }
+
+        [DataMember(Name = "textDescription")]
+        public string TextDescription { get; set; }
 
         /// <summary>
         /// Ensures a menu separator will exist before this menu item

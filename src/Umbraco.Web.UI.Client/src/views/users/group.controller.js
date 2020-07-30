@@ -6,7 +6,7 @@
         var vm = this;
         var contentPickerOpen = false;
 
-        vm.page = {};        
+        vm.page = {};
         vm.page.rootIcon = "icon-folder";
         vm.userGroup = {};
         vm.labels = {};
@@ -63,9 +63,9 @@
                 });
             } else {
                 // get user group
-               userGroupsResource.getUserGroup($routeParams.id).then(function (userGroup) {
-                   vm.userGroup = userGroup;
-                   formatGranularPermissionSelection();
+                userGroupsResource.getUserGroup($routeParams.id).then(function (userGroup) {
+                    vm.userGroup = userGroup;
+                    formatGranularPermissionSelection();
                     setSectionIcon(vm.userGroup.sections);
                     makeBreadcrumbs();
                     vm.loading = false;
@@ -101,7 +101,7 @@
 
         function openSectionPicker() {
             var currentSelection = [];
-            angular.copy(vm.userGroup.sections, currentSelection);
+            Utilities.copy(vm.userGroup.sections, currentSelection);
             var sectionPicker = {
                 selection: currentSelection,
                 submit: function (model) {
@@ -166,7 +166,7 @@
 
         function openUserPicker() {
             var currentSelection = [];
-            angular.copy(vm.userGroup.users, currentSelection);
+            Utilities.copy(vm.userGroup.users, currentSelection);
             var userPicker = {
                 selection: currentSelection,
                 submit: function (model) {
@@ -185,7 +185,7 @@
          * however the list to display the permissions isn't via the dictionary way so we need to format it
          */
         function formatGranularPermissionSelection() {
-            angular.forEach(vm.userGroup.assignedPermissions, function (node) {
+            vm.userGroup.assignedPermissions.forEach(function (node) {
                 formatGranularPermissionSelectionForNode(node);
             });
         }
@@ -193,8 +193,8 @@
         function formatGranularPermissionSelectionForNode(node) {
             //the dictionary is assigned via node.permissions we will reformat to node.allowedPermissions
             node.allowedPermissions = [];
-            angular.forEach(node.permissions, function (permissions, key) {
-                angular.forEach(permissions, function (p) {
+            Object.values(node.permissions).forEach(function (permissions) {
+                permissions.forEach(function (p) {
                     if (p.checked) {
                         node.allowedPermissions.push(p);
                     }
@@ -212,8 +212,8 @@
                     if (model.selection) {
                         var node = model.selection[0];
                         //check if this is already in our selection
-                        var found = _.find(vm.userGroup.assignedPermissions, function(i) {
-                            return i.id === node.id; 
+                        var found = _.find(vm.userGroup.assignedPermissions, function (i) {
+                            return i.id === node.id;
                         });
                         node = found ? found : node;
                         setPermissionsForNode(node);
@@ -231,7 +231,7 @@
 
             //clone the current defaults to pass to the model
             if (!node.permissions) {
-                node.permissions = angular.copy(vm.userGroup.defaultPermissions);    
+                node.permissions = Utilities.copy(vm.userGroup.defaultPermissions);
             }
 
             vm.nodePermissions = {
@@ -257,7 +257,7 @@
 
                     editorService.close();
 
-                    if(contentPickerOpen) {
+                    if (contentPickerOpen) {
                         editorService.close();
                         contentPickerOpen = false;
                     }
@@ -299,7 +299,7 @@
         }
 
         function setSectionIcon(sections) {
-            angular.forEach(sections, function (section) {
+            sections.forEach(function (section) {
                 section.icon = "icon-section";
             });
         }

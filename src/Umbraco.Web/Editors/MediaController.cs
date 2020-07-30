@@ -36,6 +36,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.ContentApps;
 using Umbraco.Web.Editors.Binders;
 using Umbraco.Web.Editors.Filters;
+using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Web.Editors
 {
@@ -125,15 +126,15 @@ namespace Umbraco.Web.Editors
         [EnsureUserPermissionForMedia("id")]
         public MediaItemDisplay GetById(int id)
         {
-            var foundContent = GetObjectFromRequest(() => Services.MediaService.GetById(id));
+            var foundMedia = GetObjectFromRequest(() => Services.MediaService.GetById(id));
 
-            if (foundContent == null)
+            if (foundMedia == null)
             {
                 HandleContentNotFound(id);
                 //HandleContentNotFound will throw an exception
                 return null;
             }
-            return Mapper.Map<MediaItemDisplay>(foundContent);
+            return Mapper.Map<MediaItemDisplay>(foundMedia);
         }
 
         /// <summary>
@@ -145,15 +146,15 @@ namespace Umbraco.Web.Editors
         [EnsureUserPermissionForMedia("id")]
         public MediaItemDisplay GetById(Guid id)
         {
-            var foundContent = GetObjectFromRequest(() => Services.MediaService.GetById(id));
+            var foundMedia = GetObjectFromRequest(() => Services.MediaService.GetById(id));
 
-            if (foundContent == null)
+            if (foundMedia == null)
             {
                 HandleContentNotFound(id);
                 //HandleContentNotFound will throw an exception
                 return null;
             }
-            return Mapper.Map<MediaItemDisplay>(foundContent);
+            return Mapper.Map<MediaItemDisplay>(foundMedia);
         }
 
         /// <summary>
@@ -773,10 +774,13 @@ namespace Umbraco.Web.Editors
             var total = long.MaxValue;
             while (page * pageSize < total)
             {
-                var children = Services.MediaService.GetPagedChildren(mediaId, page, pageSize, out total,
+                var children = Services.MediaService.GetPagedChildren(mediaId, page++, pageSize, out total,
                     SqlContext.Query<IMedia>().Where(x => x.Name == nameToFind));
-                foreach (var c in children)
-                    return c; //return first one if any are found
+                var match = children.FirstOrDefault(c => c.ContentType.Alias == contentTypeAlias);
+                if (match != null)
+                {
+                    return match;
+                }
             }
             return null;
         }
@@ -942,6 +946,32 @@ namespace Umbraco.Web.Editors
                     : user.HasPathAccess(media, entityService);
 
             return hasPathAccess;
+        }
+
+        public PagedResult<EntityBasic> GetPagedReferences(int id, string entityType, int pageNumber = 1, int pageSize = 100)
+        {
+            if (pageNumber <= 0 || pageSize <= 0)
+            {
+                throw new NotSupportedException("Both pageNumber and pageSize must be greater than zero");
+            }
+
+            var objectType = ObjectTypes.GetUmbracoObjectType(entityType);
+            var udiType = ObjectTypes.GetUdiType(objectType);
+
+            var relations = Services.RelationService.GetPagedParentEntitiesByChildId(id, pageNumber - 1, pageSize, out var totalRecords, objectType);
+
+            return new PagedResult<EntityBasic>(totalRecords, pageNumber, pageSize)
+            {
+                Items = relations.Cast<ContentEntitySlim>().Select(rel => new EntityBasic
+                {
+                    Id = rel.Id,
+                    Key = rel.Key,
+                    Udi = Udi.Create(udiType, rel.Key),
+                    Icon = rel.ContentTypeIcon,
+                    Name = rel.Name,
+                    Alias = rel.ContentTypeAlias
+                })
+            };
         }
     }
 }
