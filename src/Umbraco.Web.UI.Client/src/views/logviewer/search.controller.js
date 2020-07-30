@@ -270,7 +270,7 @@
                         overlayService.close();
                     });
                 },
-                close: () => editorService.close()
+                close: () => overlayService.close()
             };
 
             var labelKeys = [
@@ -304,7 +304,7 @@
                         overlayService.close();
                     });
                 },
-                close: () => editorService.close()
+                close: () => overlayService.close()
             };
 
             var labelKeys = [
