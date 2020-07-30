@@ -32,7 +32,7 @@ This format is only used in the iconpicker.html
 (function () {
     "use strict";
 
-    function UmbIconDirective($http, $sce, iconHelper) {
+    function UmbIconDirective(iconHelper) {
 
         var directive = {
             replace: true,
@@ -44,7 +44,7 @@ This format is only used in the iconpicker.html
             },
 
             link: function (scope) {
-                if (scope.svgString === undefined) {
+                if (scope.svgString === undefined && scope.svgString !== null && scope.icon !== undefined && scope.icon !== null) {
                     var icon = scope.icon.split(" ")[0]; // Ensure that only the first part of the icon is used as sometimes the color is added too, e.g. see umbeditorheader.directive scope.openIconPicker
 
                     _requestIcon(icon);
@@ -61,10 +61,15 @@ This format is only used in the iconpicker.html
                 });
 
                 function _requestIcon(icon) {
+                    // Reset svg string before requesting new icon.
+                    scope.svgString = null;
+
                     iconHelper.getIcon(icon)
-                        .then(icon => {
-                            if (icon !== null && icon.svgString !== undefined) {
-                                scope.svgString = icon.svgString;
+                        .then(data => {
+                            if (data !== null && data.svgString !== undefined) {
+                                // Watch source SVG string
+                                //icon.svgString.$$unwrapTrustedValue();
+                                scope.svgString = data.svgString;
                             }
                         });
                 }
