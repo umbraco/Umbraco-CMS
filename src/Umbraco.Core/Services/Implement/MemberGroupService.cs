@@ -74,7 +74,7 @@ namespace Umbraco.Core.Services.Implement
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                return _memberGroupRepository.GetMany().FirstOrDefault(x => x.Key == id);
+                return _memberGroupRepository.Get(id);
             }
         }
 
