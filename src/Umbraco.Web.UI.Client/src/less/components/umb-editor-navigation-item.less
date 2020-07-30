@@ -101,6 +101,10 @@
             height: 12px;
             min-width: 12px;
         }
+        &.--error-badge {
+            display: none;
+            font-weight: 900;
+        }
     }
 
     &-text {
@@ -191,4 +195,8 @@
     &::before {
         background-color: @red;
     }
+    .badge.--error-badge {
+        display: block;
+    }
+
 }
