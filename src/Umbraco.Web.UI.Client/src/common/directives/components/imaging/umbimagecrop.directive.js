@@ -292,7 +292,7 @@ angular.module("umbraco.directives")
                         }
                     });
 
-                    var throttledResizing = _.throttle(function () {
+                    var throttledResizing = Utilities.throttle(() => {
                         resizeImageToScale(scope.dimensions.scale.current);
                         calculateCropBox();
                     }, 15);

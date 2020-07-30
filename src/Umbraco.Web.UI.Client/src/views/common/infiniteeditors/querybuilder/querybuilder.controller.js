@@ -198,15 +198,12 @@
             }
         }
 
-        var throttledFunc = _.throttle(function() {
-
-                templateQueryResource.postTemplateQuery(vm.query)
-                    .then(function(response) {
-                        $scope.model.result = response;
-                    });
-
-            },
-            200);
+        var throttledFunc = Utilities.throttle(() => {
+            templateQueryResource.postTemplateQuery(vm.query)
+                .then(function (response) {
+                    $scope.model.result = response;
+                });
+        }, 200);
 
         localizationService.localizeMany([
                 "template_allContent", "template_websiteRoot", "template_ascending", "template_descending"

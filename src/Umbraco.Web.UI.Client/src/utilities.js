@@ -82,7 +82,8 @@
           val = '$SCOPE';
         }      
         return val;
-      }
+    }
+
     /**
      * Equivalent to angular.toJson
      */
@@ -114,6 +115,17 @@
         return obj;
     }
 
+    const throttle = (func, timeFrame) => {
+        var lastTime = 0;
+        return function () {
+            var now = new Date();
+            if (now - lastTime >= timeFrame) {
+                func();
+                lastTime = now;
+            }
+        };
+    }
+
     let _utilities = {
         noop: noop,
         copy: copy,
@@ -128,7 +140,8 @@
         isObject: isObject,
         fromJson: fromJson,
         toJson: toJson,
-        forEach: forEach
+        forEach: forEach,
+        throttle: throttle
     };
 
     if (typeof (window.Utilities) === 'undefined') {
