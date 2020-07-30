@@ -19,7 +19,7 @@
 
             function onInit() {
                 // List of elements that can be focusable within the focus lock
-                var focusableElementsSelector = 'a[href]:not([disabled]), button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled])';
+                var focusableElementsSelector = 'a[href]:not([disabled]):not(.ng-hide), button:not([disabled]):not(.ng-hide), textarea:not([disabled]):not(.ng-hide), input:not([disabled]):not(.ng-hide), select:not([disabled]):not(.ng-hide)';
                 var bodyElement = document.querySelector('body');
                 
                 $timeout(function() {
