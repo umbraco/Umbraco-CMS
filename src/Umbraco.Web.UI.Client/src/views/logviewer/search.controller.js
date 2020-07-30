@@ -181,7 +181,7 @@
         function getFilterName(array) {
             var name = "All";
             var found = false;
-            angular.forEach(array, function (item) {
+            array.forEach(function (item) {
                 if (item.selected) {
                     if (!found) {
                         name = item.name
