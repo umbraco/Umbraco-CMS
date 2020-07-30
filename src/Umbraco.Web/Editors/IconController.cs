@@ -90,9 +90,8 @@ namespace Umbraco.Web.Editors
 
                 return svg;
             }
-            catch (Exception ex)
+            catch
             {
-                Logger.Error<IconController>(ex, $"Could not load {iconName}.svg");
                 return null;
             }
         }
