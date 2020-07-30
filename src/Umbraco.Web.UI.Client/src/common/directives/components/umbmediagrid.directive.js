@@ -82,7 +82,7 @@ Use this directive to generate a thumbnail grid of media items.
 
 **/
 
-(function() {
+(function () {
     'use strict';
 
     function MediaGridDirective($filter, mediaHelper) {
@@ -120,7 +120,7 @@ Use this directive to generate a thumbnail grid of media items.
                     setOriginalSize(item, itemMaxHeight);
 
                     // remove non images when onlyImages is set to true
-                    if(scope.onlyImages === "true" && !item.isFolder && !item.thumbnail){
+                    if (scope.onlyImages === "true" && item.isFolder === true) {
                         scope.items.splice(i, 1);
                         i--;
                     }
@@ -130,7 +130,7 @@ Use this directive to generate a thumbnail grid of media items.
                     // Make sure that includeSubFolder is not undefined since the directive is used
                     // in contexts where it should not be used. Currently only used when we trigger
                     // a media picker
-                    if(scope.includeSubFolders !== undefined){
+                    if (scope.includeSubFolders !== undefined) {
                         if (scope.includeSubFolders !== 'true') {
                             if (item.parentId !== parseInt(scope.currentFolderId)) {
                                 scope.items.splice(i, 1);
@@ -150,20 +150,23 @@ Use this directive to generate a thumbnail grid of media items.
             function setItemData(item) {
 
                 // check if item is a folder
-                if(item.image) {
-                    // if is has an image path, it is not a folder
-                    item.isFolder = false;
-                } else {
-                    item.isFolder = !mediaHelper.hasFilePropertyType(item);
+                if (item.isFolder === undefined) {
+                    if (item.image) {
+                        // if is has an image path, it is not a folder
+                        item.isFolder = false;
+                    }
+                    else {
+                        item.isFolder = !mediaHelper.hasFilePropertyType(item);
+                    }
                 }
 
                 if (!item.isFolder) {
 
                     // handle entity
-                    if(item.image) {
+                    if (item.image) {
                         item.thumbnail = mediaHelper.resolveFileFromEntity(item, true);
                         item.extension = mediaHelper.getFileExtension(item.image);
-                    // handle full media object
+                        // handle full media object
                     } else {
                         item.thumbnail = mediaHelper.resolveFile(item, true);
                         item.image = mediaHelper.resolveFile(item, false);
@@ -195,7 +198,7 @@ Use this directive to generate a thumbnail grid of media items.
                 item.height = itemDefaultHeight;
                 item.aspectRatio = 1;
 
-                var widthProp = _.find(item.properties, function(v) {
+                var widthProp = _.find(item.properties, function (v) {
                     return (v.alias === "umbracoWidth");
                 });
 
@@ -206,7 +209,7 @@ Use this directive to generate a thumbnail grid of media items.
                     }
                 }
 
-                var heightProp = _.find(item.properties, function(v) {
+                var heightProp = _.find(item.properties, function (v) {
                     return (v.alias === "umbracoHeight");
                 });
 
@@ -275,33 +278,33 @@ Use this directive to generate a thumbnail grid of media items.
 
             }
 
-            scope.clickItem = function(item, $event, $index) {
+            scope.clickItem = function (item, $event, $index) {
                 if (scope.onClick) {
                     scope.onClick(item, $event, $index);
                     $event.stopPropagation();
                 }
             };
 
-            scope.clickItemName = function(item, $event, $index) {
+            scope.clickItemName = function (item, $event, $index) {
                 if (scope.onClickName) {
                     scope.onClickName(item, $event, $index);
                     $event.stopPropagation();
                 }
             };
 
-            scope.hoverItemDetails = function(item, $event, hover) {
+            scope.hoverItemDetails = function (item, $event, hover) {
                 if (scope.onDetailsHover) {
                     scope.onDetailsHover(item, $event, hover);
                 }
             };
 
-            var unbindItemsWatcher = scope.$watch('items', function(newValue, oldValue) {
+            var unbindItemsWatcher = scope.$watch('items', function (newValue, oldValue) {
                 if (angular.isArray(newValue)) {
                     activate();
                 }
             });
 
-            scope.$on('$destroy', function() {
+            scope.$on('$destroy', function () {
                 unbindItemsWatcher();
             });
 

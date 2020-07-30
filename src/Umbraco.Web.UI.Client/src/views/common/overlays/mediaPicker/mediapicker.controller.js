@@ -357,10 +357,13 @@ angular.module("umbraco")
                         // update image data to work with image grid
                         angular.forEach(data.items,
                             function (mediaItem) {
+
                                 // set thumbnail and src
-                                mediaItem.thumbnail = mediaHelper.resolveFileFromEntity(mediaItem, true);
-                                mediaItem.image = mediaHelper.resolveFileFromEntity(mediaItem, false);
+                                mediaHelper.formatMediaEntityData(mediaItem);
+                                
                                 // set properties to match a media object
+                                // TODO: This will never work because this data does not exist on a media entity, only it's full object and we are returning entities here
+                                //      This must be left over from when we returned property data.
                                 mediaItem.properties = [];
                                 if (mediaItem.metaData) {
                                     if (mediaItem.metaData.umbracoWidth && mediaItem.metaData.umbracoHeight) {
@@ -403,16 +406,16 @@ angular.module("umbraco")
                     .then(function (data) {
 
                         for (var i = 0; i < data.length; i++) {
-                            if (data[i].metaData.MediaPath !== null) {
-                                data[i].thumbnail = mediaHelper.resolveFileFromEntity(data[i], true);
-                                data[i].image = mediaHelper.resolveFileFromEntity(data[i], false);
-                            }
+                            mediaHelper.formatMediaEntityData(data[i]);
                         }
+
                         $scope.searchOptions.filter = "";
                         $scope.images = data ? data : [];
                         // set already selected images to selected
                         preSelectImages();
                         $scope.loading = false;
+
+                        console.log("CHILDREN = " + $scope.images.length);
                     });
             }
 

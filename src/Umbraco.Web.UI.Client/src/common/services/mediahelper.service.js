@@ -5,10 +5,30 @@
 **/
 function mediaHelper(umbRequestHelper, $log) {
 
-    //container of fileresolvers
+    // container of fileresolvers, file resolvers are only useful for full media object representations (i.e. content based), they are
+    // not used for entity (light weight) based media objects (i.e. resolved from the entity resource).
     var _mediaFileResolvers = {};
 
     return {
+
+        /**
+         * Used when retreiving a media item from the entity resource to format it's data so that it contains the properties that
+         * other services and views are expecting. 
+         * @param {any} entity
+         */
+        formatMediaEntityData: function (mediaEntity) {
+            if (mediaEntity && mediaEntity.metaData) {
+                if (mediaEntity.metaData.MediaPath) {
+                    mediaEntity.thumbnail = this.resolveFileFromEntity(mediaEntity, true);
+                    mediaEntity.image = this.resolveFileFromEntity(mediaEntity, false);
+                    mediaEntity.isFolder = mediaEntity.image ? false : true;
+                }
+                else {
+                    mediaEntity.isFolder = mediaEntity.metaData.ContentTypeAlias === "Folder";
+                }
+            }
+        },
+
         /**
          * @ngdoc function
          * @name umbraco.services.mediaHelper#getImagePropertyValue

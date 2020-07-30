@@ -82,11 +82,8 @@ angular.module("umbraco")
                 //mediaResource.rootMedia()
                 entityResource.getChildren(folder.id, "Media")
                     .then(function(data) {
-                        for (i=0;i<data.length;i++){
-                            if(data[i].metaData.MediaPath){
-                                data[i].thumbnail = mediaHelper.resolveFileFromEntity(data[i], true);
-                                data[i].image = mediaHelper.resolveFileFromEntity(data[i], false);
-                            }
+                        for (i = 0; i < data.length; i++) {
+                            mediaHelper.formatMediaEntityData(data[i]);
                         }
                         $scope.searchTerm = "";
                         $scope.images = data ? data : [];
