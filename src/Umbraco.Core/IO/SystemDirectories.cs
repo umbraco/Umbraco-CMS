@@ -11,6 +11,8 @@ namespace Umbraco.Core.IO
 
         public static string Data => "~/App_Data";
 
+        public static string LogFiles => Data + "/Logs";
+
         public static string TempData => Data + "/TEMP";
 
         public static string TempFileUploads => TempData + "/FileUploads";
@@ -29,13 +31,13 @@ namespace Umbraco.Core.IO
 
         public static string MacroPartials => MvcViews + "/MacroPartials/";
 
-        public static string Media => IOHelper.ReturnPath("umbracoMediaPath", "~/media");
+        public static string Media => IOHelper.ReturnPath(Constants.AppSettings.MediaPath, "~/media");
 
-        public static string Scripts => IOHelper.ReturnPath("umbracoScriptsPath", "~/scripts");
+        public static string Scripts => IOHelper.ReturnPath(Constants.AppSettings.ScriptsPath, "~/scripts");
 
-        public static string Css => IOHelper.ReturnPath("umbracoCssPath", "~/css");
+        public static string Css => IOHelper.ReturnPath(Constants.AppSettings.CssPath, "~/css");
 
-        public static string Umbraco => IOHelper.ReturnPath("umbracoPath", "~/umbraco");
+        public static string Umbraco => IOHelper.ReturnPath(Constants.AppSettings.Path, "~/umbraco");
 
         public static string Packages => Data + "/packages";
 

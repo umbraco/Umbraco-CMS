@@ -1,18 +1,18 @@
 (function() {
     'use strict';
 
-    function PermissionsController($scope, mediaTypeResource, iconHelper, contentTypeHelper, localizationService, overlayService) {
+    function PermissionsController($scope, $timeout, mediaTypeResource, iconHelper, contentTypeHelper, localizationService, overlayService) {
 
         /* ----------- SCOPE VARIABLES ----------- */
 
         var vm = this;
-        var childNodeSelectorOverlayTitle = "";
 
         vm.mediaTypes = [];
         vm.selectedChildren = [];
 
         vm.addChild = addChild;
         vm.removeChild = removeChild;
+        vm.sortChildren = sortChildren;
         vm.toggle = toggle;
 
         /* ---------- INIT ---------- */
@@ -20,10 +20,6 @@
         init();
 
         function init() {
-
-            localizationService.localize("contentTypeEditor_chooseChildNode").then(function(value){
-                childNodeSelectorOverlayTitle = value;
-            });
 
             mediaTypeResource.getAll().then(function(mediaTypes){
 
@@ -43,23 +39,29 @@
         }
 
         function addChild($event) {
-            var childNodeSelectorOverlay = {
+            
+            var dialog = {
                 view: "itempicker",
-                title: childNodeSelectorOverlayTitle,
                 availableItems: vm.mediaTypes,
                 selectedItems: vm.selectedChildren,
                 position: "target",
                 event: $event,
-                submit: function(model) {
-                    vm.selectedChildren.push(model.selectedItem);
-                    $scope.model.allowedContentTypes.push(model.selectedItem.id);
+                submit: function (model) {
+                    if (model.selectedItem) {
+                        vm.selectedChildren.push(model.selectedItem);
+                        $scope.model.allowedContentTypes.push(model.selectedItem.id);
+                    }
                     overlayService.close();
                 },
                 close: function() {
                     overlayService.close();
                 }
             };
-            overlayService.open(childNodeSelectorOverlay);
+
+            localizationService.localize("contentTypeEditor_chooseChildNode").then(value => {
+                dialog.title = value;
+                overlayService.open(dialog);
+            });
         }
 
         function removeChild(selectedChild, index) {
@@ -69,6 +71,13 @@
            // remove from content type model
            var selectedChildIndex = $scope.model.allowedContentTypes.indexOf(selectedChild.id);
            $scope.model.allowedContentTypes.splice(selectedChildIndex, 1);
+        }
+
+        function sortChildren() {
+            // we need to wait until the next digest cycle for vm.selectedChildren to be updated
+            $timeout(function () {
+                $scope.model.allowedContentTypes = _.pluck(vm.selectedChildren, "id");
+            });
         }
 
         /**

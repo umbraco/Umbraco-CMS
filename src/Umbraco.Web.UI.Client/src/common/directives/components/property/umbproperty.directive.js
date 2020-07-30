@@ -17,12 +17,14 @@ angular.module("umbraco.directives")
             templateUrl: 'views/components/property/umb-property.html',
             link: function (scope) {
 
-                scope.propertyActions = [];
-
-                userService.getCurrentUser().then(function (u) {
-                    var isAdmin = u.userGroups.indexOf('admin') !== -1;
-                    scope.propertyAlias = (Umbraco.Sys.ServerVariables.isDebuggingEnabled === true || isAdmin) ? scope.property.alias : null;
-                });
+                scope.controlLabelTitle = null;
+                if(Umbraco.Sys.ServerVariables.isDebuggingEnabled) {
+                    userService.getCurrentUser().then(function (u) {
+                        if(u.allowedSections.indexOf("settings") !== -1 ? true : false) {
+                            scope.controlLabelTitle = scope.property.alias;
+                        }
+                    });
+                }
             },
             //Define a controller for this directive to expose APIs to other directives
             controller: function ($scope) {
@@ -36,6 +38,7 @@ angular.module("umbraco.directives")
                     $scope.property.propertyErrorMessage = errorMsg;
                 };
 
+                $scope.propertyActions = [];
                 self.setPropertyActions = function(actions) {
                     $scope.propertyActions = actions;
                 };

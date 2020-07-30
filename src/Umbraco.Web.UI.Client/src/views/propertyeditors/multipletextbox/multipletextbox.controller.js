@@ -17,7 +17,7 @@
         $scope.model.value = [];
     }
 
-    //add any fields that there isn't values for
+    // Add any fields that there isn't values for
     if ($scope.model.config.min > 0) {
         for (var i = 0; i < $scope.model.config.min; i++) {
             if ((i + 1) > $scope.model.value.length) {
@@ -37,7 +37,7 @@
                 if ($scope.model.config.max <= 0 && txtBoxValue.value || $scope.model.value.length < $scope.model.config.max && txtBoxValue.value) {
                     var newItemIndex = index + 1;
                     $scope.model.value.splice(newItemIndex, 0, { value: "" });
-                    //Focus on the newly added value
+                    // Focus on the newly added value
                     $scope.model.value[newItemIndex].hasFocus = true;
                 }
                 break;
@@ -47,7 +47,7 @@
                     var remainder = [];
 
                     // Used to require an extra hit on backspace for the field to be removed
-                    if(txtBoxValue.value === "") {
+                    if (txtBoxValue.value === "") {
                         backspaceHits++;
                     } else {
                         backspaceHits = 0;
@@ -64,11 +64,11 @@
 
                         var prevItemIndex = index - 1;
 
-                        //Set focus back on false as the directive only watches for true
-                        if(prevItemIndex >= 0) {
+                        // Set focus back on false as the directive only watches for true
+                        if (prevItemIndex >= 0) {
                             $scope.model.value[prevItemIndex].hasFocus = false;
                             $timeout(function () {
-                                //Focus on the previous value
+                                // Focus on the previous value
                                 $scope.model.value[prevItemIndex].hasFocus = true;
                             });
                         }
@@ -81,12 +81,13 @@
             default:
         }
         validate();
-    }
+    };
 
     $scope.add = function () {
         if ($scope.model.config.max <= 0 || $scope.model.value.length < $scope.model.config.max) {
             $scope.model.value.push({ value: "" });
-            // focus new value
+
+            // Focus new value
             var newItemIndex = $scope.model.value.length - 1;
             $scope.model.value[newItemIndex].hasFocus = true;
         }
@@ -106,7 +107,7 @@
         $scope.model.value = remainder;
     };
 
-    $scope.showPrompt = function (idx, item){
+    $scope.showPrompt = function (idx, item) {
 
         var i = $scope.model.value.indexOf(item);
 
@@ -114,11 +115,11 @@
         if (i === idx) {
             $scope.promptIsVisible = i;
         }
-    }
+    };
 
-    $scope.hidePrompt = function(){
+    $scope.hidePrompt = function () {
         $scope.promptIsVisible = "-1";
-    }
+    };
 
     function validate() {
         if ($scope.multipleTextboxForm) {
@@ -126,10 +127,22 @@
             $scope.multipleTextboxForm.mandatory.$setValidity("minCount", !invalid);
         }
     }
+
     $timeout(function () {
         validate();
     });
-    
+
+    // We always need to ensure we dont submit anything broken
+    var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
+        
+        // Filter to items with values
+        $scope.model.value = $scope.model.value.filter(el => el.value.trim() !== "") || [];
+    });
+
+    // When the scope is destroyed we need to unsubscribe
+    $scope.$on('$destroy', function () {
+        unsubscribe();
+    });
 }
 
 angular.module("umbraco").controller("Umbraco.PropertyEditors.MultipleTextBoxController", MultipleTextBoxController);

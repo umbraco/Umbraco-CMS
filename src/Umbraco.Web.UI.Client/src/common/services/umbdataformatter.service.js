@@ -64,7 +64,7 @@
                 var saveModel = _.pick(displayModel,
                     'compositeContentTypes', 'isContainer', 'allowAsRoot', 'allowedTemplates', 'allowedContentTypes',
                     'alias', 'description', 'thumbnail', 'name', 'id', 'icon', 'trashed',
-                    'key', 'parentId', 'alias', 'path', 'allowCultureVariant', 'isElement');
+                    'key', 'parentId', 'alias', 'path', 'allowCultureVariant', 'allowSegmentVariant', 'isElement');
 
                 // TODO: Map these
                 saveModel.allowedTemplates = _.map(displayModel.allowedTemplates, function (t) { return t.alias; });
@@ -83,7 +83,7 @@
                     });
 
                     var saveProperties = _.map(realProperties, function (p) {
-                        var saveProperty = _.pick(p, 'id', 'alias', 'description', 'validation', 'label', 'sortOrder', 'dataTypeId', 'groupId', 'memberCanEdit', 'showOnMemberProfile', 'isSensitiveData', 'allowCultureVariant');
+                        var saveProperty = _.pick(p, 'id', 'alias', 'description', 'validation', 'label', 'sortOrder', 'dataTypeId', 'groupId', 'memberCanEdit', 'showOnMemberProfile', 'isSensitiveData', 'allowCultureVariant', 'allowSegmentVariant');
                         return saveProperty;
                     });
 
@@ -152,14 +152,13 @@
             formatUserPostData: function (displayModel) {
 
                 //create the save model from the display model
-                var saveModel = _.pick(displayModel, 'id', 'parentId', 'name', 'username', 'culture', 'email', 'startContentIds', 'startMediaIds', 'userGroups', 'message', 'changePassword');
-                saveModel.changePassword = this.formatChangePasswordModel(saveModel.changePassword);
+                var saveModel = _.pick(displayModel, 'id', 'parentId', 'name', 'username', 'culture', 'email', 'startContentIds', 'startMediaIds', 'userGroups', 'message');
 
                 //make sure the userGroups are just a string array
                 var currGroups = saveModel.userGroups;
                 var formattedGroups = [];
                 for (var i = 0; i < currGroups.length; i++) {
-                    if (!angular.isString(currGroups[i])) {
+                    if (!Utilities.isString(currGroups[i])) {
                         formattedGroups.push(currGroups[i].alias);
                     }
                     else {
@@ -230,7 +229,7 @@
                 var currSections = saveModel.sections;
                 var formattedSections = [];
                 for (var i = 0; i < currSections.length; i++) {
-                    if (!angular.isString(currSections[i])) {
+                    if (!Utilities.isString(currSections[i])) {
                         formattedSections.push(currSections[i].alias);
                     }
                     else {
@@ -243,7 +242,7 @@
                 var currUsers = saveModel.users;
                 var formattedUsers = [];
                 for (var j = 0; j < currUsers.length; j++) {
-                    if (!angular.isNumber(currUsers[j])) {
+                    if (!Utilities.isNumber(currUsers[j])) {
                         formattedUsers.push(currUsers[j].id);
                     }
                     else {
@@ -368,6 +367,7 @@
                             name: v.name || "", //if its null/empty,we must pass up an empty string else we get json converter errors
                             properties: getContentProperties(v.tabs),
                             culture: v.language ? v.language.culture : null,
+                            segment: v.segment,
                             publish: v.publish,
                             save: v.save,
                             releaseDate: v.releaseDate,
@@ -394,38 +394,59 @@
              */
             formatContentGetData: function(displayModel) {
 
-                //We need to check for invariant properties among the variant variants.
-                //When we detect this, we want to make sure that the property object instance is the
-                //same reference object between all variants instead of a copy (which it will be when
-                //return from the JSON structure).
+                // We need to check for invariant properties among the variant variants,
+                // as the value of an invariant property is shared between different variants.
+                // A property can be culture invariant, segment invariant, or both.
+                // When we detect this, we want to make sure that the property object instance is the
+                // same reference object between all variants instead of a copy (which it will be when
+                // return from the JSON structure).
 
                 if (displayModel.variants && displayModel.variants.length > 1) {
+                    // Collect all invariant properties from the variants that are either the
+                    // default language variant or the default segment variant.
+                    var defaultVariants = _.filter(displayModel.variants, function (variant) {                      
+                        var isDefaultLanguage = variant.language && variant.language.isDefault;
+                        var isDefaultSegment = variant.segment == null;
 
-                    var invariantProperties = [];
-
-                    //collect all invariant properties on the first first variant
-                    var firstVariant = displayModel.variants[0];
-                    _.each(firstVariant.tabs, function(tab, tabIndex) {
-                        _.each(tab.properties, function (property, propIndex) {
-                            //in theory if there's more than 1 variant, that means they would all have a language
-                            //but we'll do our safety checks anyways here
-                            if (firstVariant.language && !property.culture) {
-                                invariantProperties.push({
-                                    tabIndex: tabIndex,
-                                    propIndex: propIndex,
-                                    property: property
-                                });
-                            }
-                        });
+                        return isDefaultLanguage || isDefaultSegment;
                     });
 
+                    if (defaultVariants.length > 0) {
+                        _.each(defaultVariants, function (defaultVariant) {
+                            var invariantProps = [];
 
-                    //now assign this same invariant property instance to the same index of the other variants property array
-                    for (var j = 1; j < displayModel.variants.length; j++) {
-                        var variant = displayModel.variants[j];
+                            _.each(defaultVariant.tabs, function (tab, tabIndex) {
+                                _.each(tab.properties, function (property, propIndex) {
+                                    // culture == null -> property is culture invariant
+                                    // segment == null -> property is *possibly* segment invariant
+                                    if (!property.culture || !property.segment) {
+                                        invariantProps.push({
+                                            tabIndex: tabIndex,
+                                            propIndex: propIndex,
+                                            property: property
+                                        });
+                                    }
+                                });
+                            });
 
-                        _.each(invariantProperties, function (invProp) {
-                            variant.tabs[invProp.tabIndex].properties[invProp.propIndex] = invProp.property;
+                            var otherVariants = _.filter(displayModel.variants, function (variant) {
+                                return variant !== defaultVariant;
+                            });
+
+                            // now assign this same invariant property instance to the same index of the other variants property array                            
+                            _.each(otherVariants, function (variant) {
+                                _.each(invariantProps, function (invProp) {
+                                    var tab = variant.tabs[invProp.tabIndex];
+                                    var prop = tab.properties[invProp.propIndex];
+
+                                    var inheritsCulture = prop.culture === invProp.property.culture && prop.segment == null && invProp.property.segment == null;
+                                    var inheritsSegment = prop.segment === invProp.property.segment && !prop.culture;
+
+                                    if (inheritsCulture || inheritsSegment) {
+                                        tab.properties[invProp.propIndex] = invProp.property;
+                                    }
+                                });
+                            });
                         });
                     }
                 }

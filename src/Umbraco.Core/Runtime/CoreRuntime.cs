@@ -147,7 +147,7 @@ namespace Umbraco.Core.Runtime
                 // TODO: remove this in netcore, this is purely backwards compat hacks with the empty ctor
                 if (MainDom == null)
                 {
-                    MainDom = new MainDom(Logger);
+                    MainDom = new MainDom(Logger, new MainDomSemaphoreLock(Logger));
                 }
                 
 
@@ -170,8 +170,14 @@ namespace Umbraco.Core.Runtime
 
                 // get composers, and compose
                 var composerTypes = ResolveComposerTypes(typeLoader);
-                composition.WithCollectionBuilder<ComponentCollectionBuilder>();
-                var composers = new Composers(composition, composerTypes, ProfilingLogger);
+
+                IEnumerable<Attribute> enableDisableAttributes;
+                using (ProfilingLogger.DebugDuration<CoreRuntime>("Scanning enable/disable composer attributes"))
+                {
+                    enableDisableAttributes = typeLoader.GetAssemblyAttributes(typeof(EnableComposerAttribute), typeof(DisableComposerAttribute));
+                }   
+
+                var composers = new Composers(composition, composerTypes, enableDisableAttributes, ProfilingLogger);
                 composers.Compose();
 
                 // create the factory

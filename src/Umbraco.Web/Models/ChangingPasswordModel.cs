@@ -49,5 +49,11 @@ namespace Umbraco.Web.Models
         /// </summary>
         [DataMember(Name = "generatedPassword")]
         public string GeneratedPassword { get; set; }
+
+        /// <summary>
+        /// The id of the user - required to allow changing password without the entire UserSave model
+        /// </summary>
+        [DataMember(Name = "id")]
+        public int Id { get; set; }
     }
 }

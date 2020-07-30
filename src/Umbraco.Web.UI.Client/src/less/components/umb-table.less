@@ -34,7 +34,11 @@
     text-decoration: none;
     padding: 0;
     margin-left: 1px;
+    body:not(.tabbing-active) & {
+        outline: 0;
+    }
 }
+
 
 input.umb-table__input {
     margin: 0 auto;
@@ -47,6 +51,8 @@ input.umb-table__input {
 .umb-table-head {
     font-size: 14px;
     font-weight: bold;
+
+    color: @ui-disabled-type;
 }
 
 .umb-table-head__link {
@@ -68,10 +74,12 @@ input.umb-table__input {
 
 .umb-table-head__link.sortable {
     cursor: pointer;
+    color: @ui-action-discreet-type;
     &:hover {
-        text-decoration: none;
-        color: @black;
+        color: @ui-action-discreet-type-hover;
     }
+
+    outline-offset: 1px;
 }
 
 .umb-table-thead__icon {
@@ -129,6 +137,9 @@ input.umb-table__input {
         &::before {
             opacity:.66;
         }
+        .umb-table-body__checkicon {
+            color: @ui-selected-border;
+        }
     }
 }
 
@@ -141,21 +152,19 @@ input.umb-table__input {
 }
 
 .umb-table-body__link {
+    position: relative;
     color: @ui-option-type;
     font-size: 14px;
     font-weight: bold;
     text-decoration: none;
 
-    &:hover, &:focus {
+    &:hover {
         color: @ui-option-type-hover;
         text-decoration: underline;
-        outline: none;
     }
 }
 
-.umb-table-body__icon,
-.umb-table-body__icon[class^="icon-"],
-.umb-table-body__icon[class*=" icon-"] {
+.umb-table-body .umb-table-body__icon {
     margin: 0 auto;
     font-size: 20px;
     line-height: 20px;
@@ -164,13 +173,11 @@ input.umb-table__input {
     text-decoration: none;
 }
 
-.umb-table-body__checkicon,
-.umb-table-body__checkicon[class^="icon-"],
-.umb-table-body__checkicon[class*=" icon-"] {
+.umb-table-body .umb-table-body__icon.umb-table-body__checkicon {
     display: none;
     font-size: 18px;
     line-height: 20px;
-    color: @green;
+    color: @ui-selected-border;
 }
 
 .umb-table-body .umb-table__name {
@@ -179,7 +186,8 @@ input.umb-table__input {
     font-weight: bold;
     a {
         color: @ui-option-type;
-        &:hover, &:focus {
+        outline-offset: 1px;
+        &:hover {
             color: @ui-option-type-hover;
             text-decoration: underline;
         }
@@ -210,15 +218,15 @@ input.umb-table__input {
 }
 
 // Show checkmark when checked, hide file icon
-.umb-table-row.-selected {
-    
-    .umb-table-body__fileicon {
-        display: none;
-    }
-    .umb-table-body__checkicon {
-        display: inline-block;
-    }
-    
+.umb-table-body .umb-table-row.-selected {
+    .umb-table-body__icon {
+        &.umb-table-body__fileicon {
+            display: none;
+        }
+        &.umb-table-body__checkicon {
+            display: inline-block;
+        }
+    }    
 }
 
 // Table Row Styles
@@ -249,8 +257,8 @@ input.umb-table__input {
     flex-flow: row nowrap;
     flex: 1 1 5%;
     position: relative;
-    margin: auto 14px;
-    padding: 6px 2px;
+    margin: auto 0;
+    padding: 6px 16px;
     text-align: left;
     overflow:hidden;
 }
@@ -268,8 +276,8 @@ input.umb-table__input {
 
 .umb-table-cell:first-of-type:not(.not-fixed) {
     flex: 0 0 25px;
-    margin: 0 0 0 15px;
-    padding: 15px 0;
+    margin: 0;
+    padding: 15px 0 15px 15px;
 }
 
 .umb-table-cell--auto-width {

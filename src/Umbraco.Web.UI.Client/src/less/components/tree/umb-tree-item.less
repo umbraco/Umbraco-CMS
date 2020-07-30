@@ -4,21 +4,22 @@
     width: auto;
     margin-top:1px;
 
-    .umb-tree-item__label {
-        user-select: none;
-    }
-
     &:hover .umb-tree-item__arrow {
         visibility: visible;
         cursor: pointer
     }
 }
 
+.umb-tree-item__label {
+    user-select: none;
+}
+
 .umb-tree-item__arrow {
     position: relative;
     margin-left: -16px;
-    width: 16px;
-    height: 16px;
+    margin-right: 4px;
+    width: 12px;
+    height: 12px;
     visibility: hidden;
     text-decoration: none;
     font-size: 12px;
@@ -90,18 +91,6 @@
     // override small icon color. TODO => check usage
     &:before {
         color: @blue;
-    }
-
-    .umb-options {
-
-        &:hover i {
-            opacity: .7;
-        }
-
-        i {
-            background: @ui-active-type;
-            transition: opacity 120ms ease;
-        }
     }
 
     a,

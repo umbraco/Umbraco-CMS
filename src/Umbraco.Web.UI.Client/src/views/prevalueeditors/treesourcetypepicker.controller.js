@@ -7,7 +7,6 @@ function TreeSourceTypePickerController($scope, contentTypeResource, mediaTypeRe
 
     var allItemTypes = null;
     var currentItemType = null;
-    var initialLoad = true;
 
     function init() {
         vm.loading = true;
@@ -86,13 +85,12 @@ function TreeSourceTypePickerController($scope, contentTypeResource, mediaTypeRe
     }
 
     eventsService.on("treeSourceChanged", function (e, args) {
-        currentItemType = args.value;
         // reset the model value if we changed node type (but not on the initial load)
-        if (!initialLoad) {
+        if (!!currentItemType && currentItemType !== args.value) {
             vm.itemTypes = [];
             updateModel();
         }
-        initialLoad = false;
+        currentItemType = args.value;
         init();
     });
 }

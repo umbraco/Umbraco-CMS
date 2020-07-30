@@ -25,7 +25,6 @@ namespace Umbraco.Web.Cache
 
         public static readonly Guid UniqueId = Guid.Parse("3E0F95D8-0BE5-44B8-8394-2B8750B62654");
         private readonly IPublishedSnapshotService _publishedSnapshotService;
-        private readonly IDomainService _domainService;
 
         public override Guid RefresherUniqueId => UniqueId;
 

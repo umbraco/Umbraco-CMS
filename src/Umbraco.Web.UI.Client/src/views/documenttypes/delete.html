@@ -11,7 +11,7 @@
             <div ng-switch-when="container">
                 <umb-confirm
                     on-confirm="performContainerDelete"
-                    on-cancel="cancel">
+                    on-cancel="cancel" confirm-button-style="danger">
                 </umb-confirm>
             </div>
 
@@ -31,7 +31,7 @@
                 <umb-checkbox model="confirmed" text="{{labels.deleteConfirm}}">
                 </umb-checkbox>
 
-                <umb-confirm ng-if="confirmed" on-confirm="performDelete" on-cancel="cancel">
+                <umb-confirm ng-if="confirmed" on-confirm="performDelete" on-cancel="cancel" confirm-button-style="danger">
                 </umb-confirm>
             </div>
         </ng-switch>
