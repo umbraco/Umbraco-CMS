@@ -61,12 +61,15 @@ This format is only used in the iconpicker.html
                 });
 
                 function _requestIcon(icon) {
+                    // Reset svg string before requesting new icon.
+                    scope.svgString = null;
+
                     iconHelper.getIcon(icon)
-                        .then(icon => {
-                            if (icon !== null && icon.svgString !== undefined) {
+                        .then(data => {
+                            if (data !== null && data.svgString !== undefined) {
                                 // Watch source SVG string
                                 //icon.svgString.$$unwrapTrustedValue();
-                                scope.svgString = icon.svgString;
+                                scope.svgString = data.svgString;
                             }
                         });
                 }
