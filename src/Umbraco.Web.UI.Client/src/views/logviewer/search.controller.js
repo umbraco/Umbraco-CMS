@@ -265,7 +265,7 @@
                 submit: function (model) {
                     //Resource call with two params (name & query)
                     //API that opens the JSON and adds it to the bottom
-                    logViewerResource.postSavedSearch(model.name, model.query).then(function(data){
+                    logViewerResource.postSavedSearch(model.queryName, model.query).then(function(data){
                         vm.searches = data;
                         overlayService.close();
                     });
