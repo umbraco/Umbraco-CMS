@@ -398,14 +398,15 @@ input.umb-group-builder__group-title-input:disabled:hover {
     padding: 0 4px;
     display: flex;
     border-radius: 3px;
-}
+    align-items: center;
 
-.umb-group-builder__property-tag:first-child {
-    margin-left: 0;
-}
+    &:first-child {
+        margin-left: 0;
+    }
 
-.umb-group-builder__property-tag.-white {
-    background-color: @white;
+    &.-white {
+        background-color: @white;
+    }
 }
 
 .umb-group-builder__property-tag-icon {
