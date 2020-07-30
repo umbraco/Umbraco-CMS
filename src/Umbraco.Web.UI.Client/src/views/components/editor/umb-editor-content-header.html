@@ -56,8 +56,7 @@
                             ng-class="{'--current': entry.variant === editor.content, '--active': entry.variant.active && vm.dropdownOpen, '--error': entry.variant.active !== true && entry.variant.hasError, '--state-notCreated':entry.variant.state==='NotCreated' && entry.variant.name == null, '--state-draft':entry.variant.state==='Draft' || (entry.variant.state==='NotCreated' && entry.variant.name != null)}"
                         >
                             <button type="button" ng-if="entry.subVariants && entry.subVariants.length > 0" class="umb-variant-switcher__item-expand-button umb-outline" ng-click="entry.open = !entry.open">
-                                <i class="icon icon-navigation-down" ng-if="entry.open"></i>
-                                <i class="icon icon-navigation-right" ng-if="!entry.open"></i>
+                                <i class="icon {{entry.open ? 'icon-navigation-down' : 'icon-navigation-right'}}"></i>
                             </button>
                             <button type="button" class="umb-variant-switcher__name-wrapper umb-outline" ng-click="selectVariant($event, entry.variant)">
                                 <span class="umb-variant-switcher__name" ng-bind="entry.variant.displayName"></span>
@@ -91,9 +90,9 @@
         </div>
 
         <div ng-if="splitViewOpen">
-            <a class="umb-editor-header__close-split-view" href="" ng-click="closeSplitView()">
-                <i class="icon-delete"></i>
-            </a>
+            <button type="button" class="btn-reset umb-editor-header__close-split-view" ng-click="closeSplitView()">
+                <umb-icon icon="icon-delete" class="icon-delete"></umb-icon>
+            </button>
         </div>
 
         <div ng-if="editor.variantApps && splitViewOpen !== true">

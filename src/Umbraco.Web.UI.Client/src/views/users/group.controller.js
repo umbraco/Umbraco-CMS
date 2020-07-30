@@ -185,7 +185,7 @@
          * however the list to display the permissions isn't via the dictionary way so we need to format it
          */
         function formatGranularPermissionSelection() {
-            angular.forEach(vm.userGroup.assignedPermissions, function (node) {
+            vm.userGroup.assignedPermissions.forEach(function (node) {
                 formatGranularPermissionSelectionForNode(node);
             });
         }
@@ -193,8 +193,8 @@
         function formatGranularPermissionSelectionForNode(node) {
             //the dictionary is assigned via node.permissions we will reformat to node.allowedPermissions
             node.allowedPermissions = [];
-            angular.forEach(node.permissions, function (permissions, key) {
-                angular.forEach(permissions, function (p) {
+            Object.values(node.permissions).forEach(function (permissions) {
+                permissions.forEach(function (p) {
                     if (p.checked) {
                         node.allowedPermissions.push(p);
                     }
@@ -299,7 +299,7 @@
         }
 
         function setSectionIcon(sections) {
-            angular.forEach(sections, function (section) {
+            sections.forEach(function (section) {
                 section.icon = "icon-section";
             });
         }

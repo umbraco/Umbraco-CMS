@@ -35,18 +35,24 @@ span[class*=" icon-"] {
     }
 }
 
-i[class^="icon-"],
-i[class*=" icon-"],
+[class^="icon-"],
+[class*=" icon-"],
 button.icon-trash {
-  font-family: icomoon;
-  font-weight: normal;
-  font-style: normal;
-  text-decoration: inherit;
-  -webkit-font-smoothing: antialiased;
+    font-family: 'icomoon';
+    speak: none;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+
+    /* Better Font Rendering =========== */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
-i[class^="icon-"]:before,
-i[class*=" icon-"]:before,
+[class^="icon-"]:before,
+[class*=" icon-"]:before,
 button.icon-trash {
     text-decoration: inherit;
     display: inline-block;
