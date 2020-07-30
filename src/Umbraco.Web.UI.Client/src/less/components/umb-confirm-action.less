@@ -21,16 +21,15 @@
 
     .umb_confirm-action__overlay-action {
         margin-bottom: 5px;
-    }
 
-    .umb_confirm-action__overlay-action.-confirm {
-        order: 1;
-    }
+        &.-confirm {
+            order: 2;
+        }
 
-    .umb_confirm-action__overlay-action.-cancel {
-        order: 2;
+        &.-cancel {
+            order: 1;
+        }
     }
-
 }
 
 .umb_confirm-action__overlay.-right {
@@ -43,14 +42,14 @@
 
     .umb_confirm-action__overlay-action {
         margin-left: 5px;
-    }
 
-    .umb_confirm-action__overlay-action.-confirm {
-        order: 2;
-    }
+        &.-confirm {
+            order: 2;
+        }
 
-    .umb_confirm-action__overlay-action.-cancel {
-        order: 1;
+        &.-cancel {
+            order: 1;
+        }
     }
 }
 
@@ -64,14 +63,13 @@
 
     .umb_confirm-action__overlay-action {
         margin-top: 5px;
-    }
 
-    .umb_confirm-action__overlay-action.-confirm {
-        order: 2;
-    }
-
-    .umb_confirm-action__overlay-action.-cancel {
-        order: 1;
+        &.-confirm {
+            order: 2;
+        }
+        &.-cancel {
+            order: 1;
+        }
     }
 }
 
@@ -98,39 +96,39 @@
 
 // BUTTONS
 .umb_confirm-action__overlay-action {
-  width: 20px;
-  height: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: @white;
-  border-radius: 40px;
-  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
-  font-size: 18px;
-  cursor: pointer;
-}
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: @white;
+    border-radius: 40px;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+    font-size: 18px;
+    cursor: pointer;
+    user-select: none;
 
-.umb_confirm-action__overlay-action:hover {
-  text-decoration: none;
-  color: @white;
-}
+    &:hover {
+        text-decoration: none;
+        color: @white;
+    }
 
-// confirm button
-.umb_confirm-action__overlay-action.-confirm {
-  background: @white;
-  color: @green !important;
-}
+    // confirm button
+    &.-confirm {
+        background: @white;
+        color: @green !important;
 
-.umb_confirm-action__overlay-action.-confirm:hover {
-    color: @green !important;
-}
+        &:hover {
+            color: @green !important;
+        }
+    }
+    // cancel button
+    &.-cancel {
+        background: @white;
+        color: @red !important;
 
-// cancel button
-.umb_confirm-action__overlay-action.-cancel {
-  background: @white;
-  color: @red !important;
-}
-
-.umb_confirm-action__overlay-action.-cancel:hover {
-    color: @red !important;
+        &:hover {
+            color: @red !important;
+        }
+    }
 }
