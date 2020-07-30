@@ -79,7 +79,7 @@ function treeSearchBox(localizationService, searchService, $q) {
                 }
             }
 
-            scope.$watch("term", _.debounce(function(newVal, oldVal) {
+            scope.$watch("term", Utilities.debounce((newVal, oldVal) => {
                 scope.$apply(function() {
                     if (newVal !== null && newVal !== undefined && newVal !== oldVal) {
                         performSearch();

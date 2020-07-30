@@ -452,7 +452,7 @@
             }
         }
 
-        var search = _.debounce(function () {
+        var search = Utilities.debounce(() => {
             $scope.$apply(function () {
                 vm.usersOptions.pageNumber = 1;
                 getUsers();

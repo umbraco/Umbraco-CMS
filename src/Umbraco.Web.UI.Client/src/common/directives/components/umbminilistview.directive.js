@@ -190,7 +190,7 @@
                 searchMiniListView(miniListView);
             };
 
-            var searchMiniListView = _.debounce(function (miniListView) {
+            var searchMiniListView = Utilities.debounce((miniListView) => {
                 scope.$apply(function () {
                     getChildrenForMiniListView(miniListView);
                 });

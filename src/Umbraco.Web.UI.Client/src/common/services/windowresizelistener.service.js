@@ -14,7 +14,7 @@ function windowResizeListener($rootScope) {
     var WinReszier = (function () {
         var registered = [];
         var inited = false;        
-        var resize = _.debounce(function(ev) {
+        var resize = Utilities.debounce(() => {
             notify();
         }, 100);
         var notify = function () {

@@ -195,7 +195,7 @@
             //vm.center.top = (offsetY + 10) / scope.dimensions.height;
         };
 
-        var lazyEndEvent = _.debounce(function () {
+        var lazyEndEvent = Utilities.debounce(() => {
             $scope.$apply(function () {
                 $scope.$emit("imageFocalPointStop");
             });

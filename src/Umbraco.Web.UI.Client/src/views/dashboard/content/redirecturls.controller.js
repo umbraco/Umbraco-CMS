@@ -190,7 +190,7 @@
             });
         }
 
-        var filterDebounced = _.debounce(function(e) {
+        var filterDebounced = Utilities.debounce(() => {
 
             $scope.$apply(function() {
 

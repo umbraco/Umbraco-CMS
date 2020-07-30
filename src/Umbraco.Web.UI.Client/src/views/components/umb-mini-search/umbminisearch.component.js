@@ -19,7 +19,7 @@
         
         var vm = this;
         
-        var searchDelay = _.debounce(function () {
+        var searchDelay = Utilities.debounce(() => {
             $scope.$apply(function () {
                 if (vm.onSearch) {
                     vm.onSearch();

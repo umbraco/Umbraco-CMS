@@ -398,7 +398,7 @@ angular.module("umbraco")
                 });
             };
 
-            var debounceSearchMedia = _.debounce(function () {
+            var debounceSearchMedia = Utilities.debounce(() => {
                 $scope.$apply(function () {
                     if (vm.searchOptions.filter) {
                         searchMedia();

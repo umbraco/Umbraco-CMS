@@ -87,7 +87,7 @@
             users.length = 0;
         }
 
-        var search = _.debounce(function () {
+        var search = Utilities.debounce(() => {
             $scope.$apply(function () {
                 getUsers();
             });

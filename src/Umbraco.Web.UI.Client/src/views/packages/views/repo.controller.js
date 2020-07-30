@@ -288,7 +288,7 @@
         }
 
 
-        var searchDebounced = _.debounce(function (e) {
+        var searchDebounced = Utilities.debounce(() => {
 
             $scope.$apply(function () {
 
