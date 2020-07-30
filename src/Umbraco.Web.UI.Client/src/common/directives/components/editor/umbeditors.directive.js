@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    function EditorsDirective($timeout, eventsService) {
+    function EditorsDirective($timeout, eventsService, focusLockService) {
 
         function link(scope, el, attr, ctrl) {
 
@@ -27,6 +27,9 @@
                     if(isLeftColumnAbove){
                         $(sectionId).removeClass(aboveBackDropCssClass);
                     }
+
+                    // Add the inert attribute
+                    focusLockService.addInertAttribute();
                 }
                 
                 $timeout(() => {
@@ -54,6 +57,9 @@
                     }
 
                     isLeftColumnAbove = false;
+
+                    // Remove the inert attribute
+                    focusLockService.removeInertAttribute();
                 }
             }
             
