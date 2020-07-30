@@ -31,7 +31,7 @@ function serverValidationManager($timeout) {
     // - segment
     // The object also contains:
     // - errorMsg
-    var items = [];
+    var errorMsgItems = [];
 
     var defaultMatchOptions = {
         matchType: null
@@ -43,7 +43,7 @@ function serverValidationManager($timeout) {
         callback.apply(instance, [
                 isValid,               // pass in a value indicating it is invalid
                 errorsForCallback,     // pass in the errors for this item
-                items,                 // pass in all errors in total
+                errorMsgItems,         // pass in all errors in total
                 culture,               // pass the culture that we are listing for.
                 segment                // pass the segment that we are listing for.
             ]
@@ -62,8 +62,8 @@ function serverValidationManager($timeout) {
     function notify() {
 
         $timeout(function () {
-            for (var i = 0; i < items.length; i++) {
-                var item = items[i];
+            for (var i = 0; i < errorMsgItems.length; i++) {
+                var item = errorMsgItems[i];
             }
             notifyCallbacks();
         });
@@ -75,7 +75,7 @@ function serverValidationManager($timeout) {
         }
 
         //find errors for this field name
-        return _.filter(items, function (item) {
+        return _.filter(errorMsgItems, function (item) {
             return (item.propertyAlias === null && item.culture === "invariant" && item.fieldName === fieldName);
         });
     }
@@ -100,28 +100,42 @@ function serverValidationManager($timeout) {
         }
 
         //find all errors for this property
-        return _.filter(items, function (item) {
+        return _.filter(errorMsgItems, function (errMsgItem) {
 
-            if (!item.propertyAlias) {
+            if (!errMsgItem.propertyAlias) {
                 return false;
             }
 
-            var matchProp = item.propertyAlias === propertyAlias
-                ? true
-                : options.matchType === "prefix"
-                    ? item.propertyAlias.startsWith(propertyAlias + '/')
-                    : options.matchType === "suffix"
-                        ? item.propertyAlias.endsWith('/' + propertyAlias)
-                        : options.matchType === "contains"
-                            ? item.propertyAlias.includes('/' + propertyAlias + '/')
-                            : false;
+            var matchProp = matchErrMsgItemProperty(errMsgItem, propertyAlias, options);
 
             return matchProp
-                && item.culture === culture
-                && item.segment === segment
+                && errMsgItem.culture === culture
+                && errMsgItem.segment === segment
                 // ignore field matching if match options are used
-                && (options.matchType || (item.fieldName === fieldName || (fieldName === undefined || fieldName === "")));
+                && (options.matchType || (errMsgItem.fieldName === fieldName || (fieldName === undefined || fieldName === "")));
         });
+    }
+
+    /**
+     * Returns true if the error message item's data matches the property validation key with a match type provided by the options
+     * @param {any} errMsgItem The error message item
+     * @param {any} propertyValidationKey The property validation key) 
+     * @param {any} options The match type options
+     */
+    function matchErrMsgItemProperty(errMsgItem, propertyValidationKey, options) {
+        if (errMsgItem.propertyAlias === propertyValidationKey) {
+            return true;
+        }
+        if (options.matchType === "prefix" && errMsgItem.propertyAlias.startsWith(propertyValidationKey + '/')) {
+            return true;
+        }
+        if (options.matchType === "suffix" && errMsgItem.propertyAlias.endsWith('/' + propertyValidationKey)) {
+            return true;
+        }
+        if (options.matchType === "contains" && errMsgItem.propertyAlias.includes('/' + propertyValidationKey + '/')) {
+            return true;
+        }
+        return false;
     }
 
     function getVariantErrors(culture, segment) {
@@ -134,7 +148,7 @@ function serverValidationManager($timeout) {
         }
         
         //find all errors for this property
-        return _.filter(items, function (item) {
+        return _.filter(errorMsgItems, function (item) {
             return (item.culture === culture && item.segment === segment);
         });
     }
@@ -164,7 +178,7 @@ function serverValidationManager($timeout) {
     function notifyCallbacks() {
 
         // nothing to call
-        if (items.length === 0) {
+        if (errorMsgItems.length === 0) {
             return;
         }
 
@@ -243,15 +257,7 @@ function serverValidationManager($timeout) {
                 cb.options = defaultMatchOptions;
             }
 
-            var matchProp = cb.propertyAlias === propertyAlias
-                ? true
-                : cb.options.matchType === "prefix"
-                    ? propertyAlias.startsWith(cb.propertyAlias + '/')
-                    : cb.options.matchType === "suffix"
-                        ? propertyAlias.endsWith('/' + cb.propertyAlias)
-                        : cb.options.matchType === "contains"
-                            ? propertyAlias.includes('/' + cb.propertyAlias + '/')
-                            : false;
+            var matchProp = matchCallbackItemProperty(cb, propertyAlias);
 
             //returns any callback that have been registered directly against the field and for only the property
             return matchProp
@@ -261,6 +267,27 @@ function serverValidationManager($timeout) {
                 && (cb.options.matchType || (cb.fieldName === fieldName || (cb.fieldName === undefined || cb.fieldName === "")));
         });
         return found;
+    }
+
+    /**
+     * Returns true if the callback item's data and match options matches the property validation key 
+     * @param {any} cb
+     * @param {any} propertyValidationKey
+     */
+    function matchCallbackItemProperty(cb, propertyValidationKey) {
+        if (cb.propertyAlias === propertyValidationKey) {
+            return true;
+        }
+        if (cb.options.matchType === "prefix" && propertyValidationKey.startsWith(cb.propertyAlias + '/')) {
+            return true;
+        }
+        if (cb.options.matchType === "suffix" && propertyValidationKey.endsWith('/' + cb.propertyAlias)) {
+            return true;
+        }
+        if (cb.options.matchType === "contains" && propertyValidationKey.includes('/' + cb.propertyAlias + '/')) {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -313,7 +340,7 @@ function serverValidationManager($timeout) {
 
         //only add the item if it doesn't exist                
         if (!hasFieldError(fieldName)) {
-            items.push({
+            errorMsgItems.push({
                 propertyAlias: null,
                 culture: "invariant",
                 segment: null,
@@ -379,7 +406,7 @@ function serverValidationManager($timeout) {
 
         //only add the item if it doesn't exist                
         if (!hasPropertyError(propertyAlias, culture, fieldName, segment)) {
-            items.push({
+            errorMsgItems.push({
                 propertyAlias: propertyAlias,
                 culture: culture,
                 segment: segment,
@@ -409,7 +436,7 @@ function serverValidationManager($timeout) {
             segment = null;
         }
 
-        var err = _.find(items, function (item) {
+        var err = _.find(errorMsgItems, function (item) {
             //return true if the property alias matches and if an empty field name is specified or the field name matches
             return (item.propertyAlias === propertyAlias && item.culture === culture && item.segment === segment && (item.fieldName === fieldName || (fieldName === undefined || fieldName === "")));
         });
@@ -426,7 +453,7 @@ function serverValidationManager($timeout) {
      * Checks if a content field has an error
      */
     function hasFieldError(fieldName) {
-        var err = _.find(items, function (item) {
+        var err = _.find(errorMsgItems, function (item) {
             //return true if the property alias matches and if an empty field name is specified or the field name matches
             return (item.propertyAlias === null && item.culture === "invariant" && item.segment === null && item.fieldName === fieldName);
         });
@@ -559,7 +586,7 @@ function serverValidationManager($timeout) {
      * Clears all errors
      */
     function clear() {
-        items = [];
+        errorMsgItems = [];
     }
 
     var instance = {
@@ -743,7 +770,7 @@ function serverValidationManager($timeout) {
         removePropertyError: function (propertyAlias, culture, fieldName, segment, options) {
 
             var errors = getPropertyErrors(propertyAlias, culture, segment, fieldName, options);
-            items = items.filter(v => errors.indexOf(v) === -1);
+            errorMsgItems = errorMsgItems.filter(v => errors.indexOf(v) === -1);
 
             if (errors.length > 0) {
                 // removal was successful, re-notify all subscribers
@@ -785,7 +812,7 @@ function serverValidationManager($timeout) {
          * Gets the error message for a content field
          */
         getFieldError: function (fieldName) {
-            var err = _.find(items, function (item) {
+            var err = _.find(errorMsgItems, function (item) {
                 //return true if the property alias matches and if an empty field name is specified or the field name matches
                 return (item.propertyAlias === null && item.culture === "invariant" && item.segment === null && item.fieldName === fieldName);
             });
@@ -811,7 +838,7 @@ function serverValidationManager($timeout) {
                 culture = "invariant";
             }
 
-            var err = _.find(items, function (item) {
+            var err = _.find(errorMsgItems, function (item) {
                 return (item.culture === culture && item.segment === null);
             });
             return err ? true : false;
@@ -837,7 +864,7 @@ function serverValidationManager($timeout) {
                 segment = null;
             }
             
-            var err = _.find(items, function (item) {
+            var err = _.find(errorMsgItems, function (item) {
                 return (item.culture === culture && item.segment === segment);
             });
             return err ? true : false;
@@ -848,7 +875,7 @@ function serverValidationManager($timeout) {
     // Used to return the 'items' array as a reference/getter
     Object.defineProperty(instance, "items", {
         get: function () {
-            return items;
+            return errorMsgItems;
         },
         set: function (value) {
             throw "Cannot set the items array";
