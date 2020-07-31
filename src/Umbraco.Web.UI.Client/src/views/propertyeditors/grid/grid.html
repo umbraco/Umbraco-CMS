@@ -201,7 +201,11 @@
                                                                       <div class="umb-tools" ng-if="control === active">
 
                                                                           <div class="umb-control-tool" ng-if="control.editor.config.settings">
-                                                                              <button class="umb-control-tool-icon icon-settings btn-reset" ng-click="editGridItemSettings(control, 'control')" type="button"></button>
+                                                                              <button type="button" class="umb-control-tool-icon icon-settings btn-reset" ng-click="editGridItemSettings(control, 'control')">
+                                                                                  <span class="sr-only">
+                                                                                      <localize key="general_edit">Edit</localize>
+                                                                                  </span>
+                                                                              </button>
                                                                           </div>
 
                                                                           <div class="umb-control-tool">
