@@ -3,9 +3,9 @@
         input-id="{{model.alias}}"
         checked="renderModel.value"
         on-click="toggle()"
-        show-labels="{{model.config.labelOn ? 'true': 'false'}}"
+        show-labels="{{model.config.showLabels}}"
         label-position="right"
         label-on="{{model.config.labelOn}}"
-        label-off="{{model.config.labelOn}}">
+        label-off="{{model.config.labelOff}}">
     </umb-toggle>
 </div>
