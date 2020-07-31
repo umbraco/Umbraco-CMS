@@ -53,6 +53,22 @@
                 height: 4px;
             }
         }
+
+        // Validation
+        .show-validation &.-has-error {
+            color: @red;
+
+            &:hover {
+                color: @red !important;
+            }
+
+            &::before {
+                background-color: @red;
+            }
+            .badge.--error-badge {
+                display: block;
+            }
+        }
     }
 
     &__action:active,
@@ -185,18 +201,4 @@
             border-left: none;
         }
     }
-}
-
-// Validation
-.show-validation .umb-sub-views-nav-item__action.-has-error,
-.show-validation .umb-sub-views-nav-item > a.-has-error {
-    color: @red;
-
-    &::before {
-        background-color: @red;
-    }
-    .badge.--error-badge {
-        display: block;
-    }
-
 }
