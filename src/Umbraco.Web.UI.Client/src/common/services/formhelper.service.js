@@ -76,7 +76,7 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
             var invalidNgForms = form.$$element.find(`.umb-property ng-form.ng-invalid, .umb-property-editor ng-form.ng-invalid-required`);
             var firstInvalidNgForm = invalidNgForms.first();
 
-            if(firstInvalidNgForm !== null) {
+            if(firstInvalidNgForm.length !== 0) {
                 var focusableFields = [...firstInvalidNgForm.find("umb-range-slider .noUi-handle,input,textarea,select,button")];
                 if(focusableFields.length !== 0) { 
                     var firstErrorEl = focusableFields.find(el => el.type !== "hidden" && el.hasAttribute("readonly") === false);
