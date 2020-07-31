@@ -498,8 +498,7 @@
                     if (tab) {
                         scaffold.variants[0].tabs.push(tab);
 
-                        angular.forEach(tab.properties,
-                            function (property) {
+                        tab.properties.forEach(function (property) {
                                 if (_.find(notSupported, function (x) { return x === property.editor; })) {
                                     property.notSupported = true;
                                     // TODO: Not supported message to be replaced with 'content_nestedContentEditorNotSupported' dictionary key. Currently not possible due to async/timing quirk.
