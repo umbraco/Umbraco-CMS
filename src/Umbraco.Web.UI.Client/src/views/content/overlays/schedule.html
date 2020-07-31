@@ -88,13 +88,12 @@
                 <ng-form name="scheduleSelectorForm" style="width:100%;">
                     <div class="umb-variant-selector-entry" ng-class="{'umb-list-item--error': scheduleSelectorForm.saveVariantReleaseDate.$invalid}">
 
-                        <umb-checkbox
-                            input-id="{{variant.htmlId}}"
-                            name="saveVariantSelector"
-                            model="variant.save"
-                            on-change="vm.changeSelection(variant)"
-                            server-validation-field="{{variant.htmlId}}"
-                        >
+                        <umb-checkbox input-id="{{variant.htmlId}}"
+                                      name="saveVariantSelector"
+                                      model="variant.save"
+                                      on-change="vm.changeSelection(variant)"
+                                      server-validation-field="{{variant.htmlId}}">
+
                             <span class="umb-variant-selector-entry__title" ng-if="!(variant.segment && variant.language)">
                                 <span ng-bind="variant.displayName"></span>
                                 <strong ng-if="variant.isMandatory" class="umb-control-required">*</strong>
@@ -109,12 +108,10 @@
                                 <umb-variant-state variant="variant"></umb-variant-state>
                                 <span ng-show="variant.language.isMandatory"> - <localize key="languages_mandatoryLanguage"></localize></span>
                             </span>
+
                         </umb-checkbox>
 
                         <div>
-
-
-
                             <div class="date-wrapper-mini date-wrapper-mini--checkbox">
                                 <div class="date-wrapper-mini__date" ng-if="(variant.releaseDate || variant.save)">
 
