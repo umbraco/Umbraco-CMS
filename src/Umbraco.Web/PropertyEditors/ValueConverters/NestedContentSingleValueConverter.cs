@@ -56,7 +56,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         {
             using (_proflog.DebugDuration<NestedContentSingleValueConverter>($"ConvertPropertyToNestedContent ({propertyType.DataType.Id})"))
             {
-                var value = (string) inter;
+                var value = (string)inter;
                 if (string.IsNullOrWhiteSpace(value)) return null;
 
                 var objects = JsonConvert.DeserializeObject<List<JObject>>(value);

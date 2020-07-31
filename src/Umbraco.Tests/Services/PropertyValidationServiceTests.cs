@@ -36,7 +36,7 @@ namespace Umbraco.Tests.Services
 
             var propEditors = new PropertyEditorCollection(new DataEditorCollection(new[] { dataEditor }));
 
-            validationService = new PropertyValidationService(propEditors, dataTypeService.Object);
+            validationService = new PropertyValidationService(propEditors, dataTypeService.Object, Mock.Of<ILocalizedTextService>());
         }
 
         [Test]

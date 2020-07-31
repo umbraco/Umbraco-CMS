@@ -14,7 +14,7 @@ namespace Umbraco.Web.Models.ContentEditing
     [DataContract(Name = "content", Namespace = "")]
     public class ContentItemSave : IContentSave<IContent>
     {
-        protected ContentItemSave()
+        public ContentItemSave()
         {
             UploadedFiles = new List<ContentPropertyFile>();
             Variants = new List<ContentVariantSave>();
