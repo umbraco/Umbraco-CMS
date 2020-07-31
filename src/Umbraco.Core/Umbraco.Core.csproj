@@ -132,7 +132,7 @@
     <Compile Include="Migrations\Upgrade\V_8_0_0\Models\ContentTypeDto80.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\Models\PropertyDataDto80.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\Models\PropertyTypeDto80.cs" />
-    <Compile Include="Migrations\Upgrade\V_8_7_0\TagControlChangeDataColumn.cs" />
+    <Compile Include="Migrations\Upgrade\v_8_8_0\TagControlChangeDataColumn.cs" />
     <Compile Include="Models\ContentDataIntegrityReport.cs" />
     <Compile Include="Models\ContentDataIntegrityReportEntry.cs" />
     <Compile Include="Models\ContentDataIntegrityReportOptions.cs" />

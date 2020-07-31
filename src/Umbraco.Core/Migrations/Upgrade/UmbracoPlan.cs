@@ -8,6 +8,7 @@ using Umbraco.Core.Migrations.Upgrade.V_8_0_1;
 using Umbraco.Core.Migrations.Upgrade.V_8_1_0;
 using Umbraco.Core.Migrations.Upgrade.V_8_6_0;
 using Umbraco.Core.Migrations.Upgrade.V_8_7_0;
+using Umbraco.Core.Migrations.Upgrade.V_8_8_0;
 
 namespace Umbraco.Core.Migrations.Upgrade
 {
@@ -194,6 +195,8 @@ namespace Umbraco.Core.Migrations.Upgrade
 
             // to 8.7.0...
             To<MissingDictionaryIndex>("{a78e3369-8ea3-40ec-ad3f-5f76929d2b20}");
+
+            // to 8.8.0...
             To<TagControlChangeDataColumn>("{BBFF8956-2901-4273-9155-02CFCA7700C5}");
 
             //FINAL

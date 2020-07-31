@@ -1,6 +1,6 @@
 ﻿using Umbraco.Core.Persistence.Dtos;
 
-namespace Umbraco.Core.Migrations.Upgrade.V_8_7_0
+namespace Umbraco.Core.Migrations.Upgrade.V_8_8_0
 {
     public class TagControlChangeDataColumn : MigrationBase
     {
@@ -12,7 +12,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_7_0
 
         /// <summary>
         /// Changes the configured storage column <c>dbType</c> in <c>umbracoDataType</c> to nText where the <c>Umbraco.Tags</c> property editor is used.
-        /// Migrates data in <c>umbracoPropertyData</c> from varcharValue to textValue for affected properties. 
+        /// Migrates data in <c>umbracoPropertyData</c> from varcharValue to textValue for affected properties.
         /// </summary>
         public override void Migrate()
         {
