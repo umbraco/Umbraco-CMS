@@ -376,8 +376,7 @@ angular.module("umbraco")
                     target: $scope.target,
                     disableFocalPoint: $scope.disableFocalPoint,
                     submit: function (model) {
-                        console.log("model", model);
-
+                        
                         $scope.model.selection.push($scope.target);
                         $scope.model.submit($scope.model);
 
@@ -385,8 +384,6 @@ angular.module("umbraco")
                     },
                     close: function () {
                         editorService.close();
-
-                        //close();
                     }
                 };
 
