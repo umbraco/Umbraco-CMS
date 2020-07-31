@@ -460,8 +460,7 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
                     ? _.filter(nodes, $scope.model.filter)
                     : _.where(nodes, $scope.model.filter);
 
-                angular.forEach(filtered,
-                    function (value, key) {
+                filtered.forEach(function (value) {
                         value.filtered = true;
                         if ($scope.model.filterCssClass) {
                             if (!value.cssClasses) {
@@ -474,8 +473,7 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
             }
             else {
                 var a = $scope.model.filter.toLowerCase().replace(/\s/g, '').split(',');
-                angular.forEach(nodes,
-                    function (value, key) {
+                nodes.forEach(function (value) {
 
                         var found = a.indexOf(value.metaData.contentType.toLowerCase()) >= 0;
 
