@@ -77,3 +77,20 @@
 .alert-block p + p {
   margin-top: 5px;
 }
+
+
+// Property error alerts
+// -------------------------
+.alert.property-error {
+    &::after {
+        content:'';
+        position: absolute;
+        bottom:0;
+        left: 32px;
+        width: 0;
+        height: 0;
+        border-left: 8px solid transparent;
+        border-right: 8px solid transparent;
+        border-top: 8px solid @warningBackground;
+    }
+}
