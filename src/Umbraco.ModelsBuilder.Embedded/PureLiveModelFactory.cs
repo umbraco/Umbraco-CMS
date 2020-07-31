@@ -17,7 +17,6 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.ModelsBuilder.Embedded.Building;
 using Umbraco.ModelsBuilder.Embedded.Configuration;
-using Umbraco.Web.PublishedCache;
 using File = System.IO.File;
 
 namespace Umbraco.ModelsBuilder.Embedded
@@ -36,7 +35,6 @@ namespace Umbraco.ModelsBuilder.Embedded
         private BuildManager _theBuildManager;
         private readonly Lazy<UmbracoServices> _umbracoServices; // fixme: this is because of circular refs :(
         private UmbracoServices UmbracoServices => _umbracoServices.Value;
-        private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
 
         private static readonly Regex AssemblyVersionRegex = new Regex("AssemblyVersion\\(\"[0-9]+.[0-9]+.[0-9]+.[0-9]+\"\\)", RegexOptions.Compiled);
         private const string ProjVirt = "~/App_Data/Models/all.generated.cs";
@@ -45,12 +43,11 @@ namespace Umbraco.ModelsBuilder.Embedded
         private readonly IModelsBuilderConfig _config;
         private readonly ModelsGenerationError _errors;
 
-        public PureLiveModelFactory(Lazy<UmbracoServices> umbracoServices, IProfilingLogger logger, IModelsBuilderConfig config, IPublishedSnapshotAccessor publishedSnapshotAccessor)
+        public PureLiveModelFactory(Lazy<UmbracoServices> umbracoServices, IProfilingLogger logger, IModelsBuilderConfig config)
         {
             _umbracoServices = umbracoServices;
             _logger = logger;
             _config = config;
-            _publishedSnapshotAccessor = publishedSnapshotAccessor;
             _errors = new ModelsGenerationError(config);
             _ver = 1; // zero is for when we had no version
             _skipver = -1; // nothing to skip
@@ -105,7 +102,7 @@ namespace Umbraco.ModelsBuilder.Embedded
             infos.TryGetValue(contentTypeAlias, out var info);
 
             // create model
-            return info == null ? element : info.Ctor(element, _publishedSnapshotAccessor);
+            return info == null ? element : info.Ctor(element);
         }
 
         // this runs only once the factory is ready
@@ -515,7 +512,7 @@ namespace Umbraco.ModelsBuilder.Embedded
 
         private static Infos RegisterModels(IEnumerable<Type> types)
         {
-            var ctorArgTypes = new[] { typeof(IPublishedElement), typeof(IPublishedSnapshotAccessor) };
+            var ctorArgTypes = new[] { typeof(IPublishedElement) };
             var modelInfos = new Dictionary<string, ModelInfo>(StringComparer.InvariantCultureIgnoreCase);
             var map = new Dictionary<string, Type>();
 
@@ -527,17 +524,17 @@ namespace Umbraco.ModelsBuilder.Embedded
                 foreach (var ctor in type.GetConstructors())
                 {
                     var parms = ctor.GetParameters();
-                    if (parms.Length >= 1 && typeof(IPublishedElement).IsAssignableFrom(parms[0].ParameterType))
+                    if (parms.Length == 1 && typeof(IPublishedElement).IsAssignableFrom(parms[0].ParameterType))
                     {
                         if (constructor != null)
-                            throw new InvalidOperationException($"Type {type.FullName} has more than one public constructor with one argument of type, or implementing, IPropertySet and one argument of type, or implementing, IPublishedSnapshotAccessor.");
+                            throw new InvalidOperationException($"Type {type.FullName} has more than one public constructor with one argument of type, or implementing, IPropertySet.");
                         constructor = ctor;
                         parameterType = parms[0].ParameterType;
                     }
                 }
 
                 if (constructor == null)
-                    throw new InvalidOperationException($"Type {type.FullName} is missing a public constructor with one argument of type, or implementing, IPropertySet and one argument of type, or implementing, IPublishedSnapshotAccessor.");
+                    throw new InvalidOperationException($"Type {type.FullName} is missing a public constructor with one argument of type, or implementing, IPropertySet.");
 
                 var attribute = type.GetCustomAttribute<PublishedModelAttribute>(false);
                 var typeName = attribute == null ? type.Name : attribute.ContentTypeAlias;
@@ -552,7 +549,7 @@ namespace Umbraco.ModelsBuilder.Embedded
                 gen.Emit(OpCodes.Ldarg_0);
                 gen.Emit(OpCodes.Newobj, constructor);
                 gen.Emit(OpCodes.Ret);
-                var func = (Func<IPublishedElement, IPublishedSnapshotAccessor, IPublishedElement>)meth.CreateDelegate(typeof(Func<IPublishedElement, IPublishedSnapshotAccessor, IPublishedElement>));
+                var func = (Func<IPublishedElement, IPublishedElement>)meth.CreateDelegate(typeof(Func<IPublishedElement, IPublishedElement>));
 
                 modelInfos[typeName] = new ModelInfo { ParameterType = parameterType, Ctor = func, ModelType = type };
                 map[typeName] = type;
@@ -641,7 +638,7 @@ namespace Umbraco.ModelsBuilder.Embedded
         internal class ModelInfo
         {
             public Type ParameterType { get; set; }
-            public Func<IPublishedElement, IPublishedSnapshotAccessor, IPublishedElement> Ctor { get; set; }
+            public Func<IPublishedElement, IPublishedElement> Ctor { get; set; }
             public Type ModelType { get; set; }
             public Func<IList> ListCtor { get; set; }
         }
