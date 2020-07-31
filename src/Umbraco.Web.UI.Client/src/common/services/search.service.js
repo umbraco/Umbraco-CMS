@@ -67,7 +67,7 @@ angular.module('umbraco.services')
                 }
 
                 return entityResource.search(args.term, "Document", args.searchFrom, args.canceler, args.dataTypeKey)
-                    .then(data => {
+                    _.each(data, function (item) {
                         data.forEach(item => searchResultFormatter.configureContentResult(item));
                         return data;
                     });
