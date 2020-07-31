@@ -78,9 +78,11 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
 
             if(firstInvalidNgForm !== null) {
                 var focusableFields = [...firstInvalidNgForm.find("umb-range-slider .noUi-handle,input,textarea,select,button")];
-                var firstErrorEl = focusableFields.find(el => el.type !== "hidden" && el.hasAttribute("readonly") === false);
-                if(firstErrorEl !== undefined) {
-                    firstErrorEl.focus();
+                if(focusableFields.length !== 0) { 
+                    var firstErrorEl = focusableFields.find(el => el.type !== "hidden" && el.hasAttribute("readonly") === false);
+                    if(firstErrorEl.length !== 0) {
+                        firstErrorEl.focus();
+                    }
                 }
             }
         },
