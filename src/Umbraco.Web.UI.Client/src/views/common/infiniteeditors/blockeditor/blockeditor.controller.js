@@ -1,6 +1,6 @@
 angular.module("umbraco")
     .controller("Umbraco.Editors.BlockEditorController",
-        function ($scope, localizationService, formHelper) {
+        function ($scope, localizationService, formHelper, overlayService) {
             var vm = this;
 
             vm.model = $scope.model;
@@ -67,6 +67,29 @@ angular.module("umbraco")
                     // * It would have a 'commit' method to commit the removed errors - which we would call in the formHelper.submitForm when it's successful
                     // * It would have a 'rollback' method to reset the removed errors - which we would call here
 
+
+                    if (vm.blockForm.$dirty === true) {
+                        localizationService.localizeMany(["prompt_discardChanges", "blockEditor_blockHasChanges"]).then(function (localizations) {
+                            const confirm = {
+                                title: localizations[0],
+                                view: "default",
+                                content: localizations[1],
+                                submitButtonLabelKey: "general_discard",
+                                submitButtonStyle: "danger",
+                                closeButtonLabelKey: "general_cancel",
+                                submit: function () {
+                                    overlayService.close();
+                                    vm.model.close(vm.model);
+                                },
+                                close: function () {
+                                    overlayService.close();
+                                }
+                            };
+                            overlayService.open(confirm);
+                        });
+
+                        return;
+                    }
                     // TODO: check if content/settings has changed and ask user if they are sure.
                     vm.model.close(vm.model);
                 }
