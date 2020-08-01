@@ -17,7 +17,7 @@ function angularHelper($q) {
          */
         revalidateNgModel: function (scope, ngModel) {
             this.safeApply(scope, function() {
-                angular.forEach(ngModel.$parsers, function (parser) {
+                ngModel.$parsers.forEach(function (parser) {
                     parser(ngModel.$viewValue);
                 });
             });
