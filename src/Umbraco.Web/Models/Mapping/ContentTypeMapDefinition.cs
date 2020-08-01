@@ -338,7 +338,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Properties = context.MapEnumerable<MemberPropertyTypeBasic, MemberPropertyTypeDisplay>(source.Properties);
         }
 
-        // Umbraco.Code.MapAll -Editor -View -Config -ContentTypeId -ContentTypeName -Locked
+        // Umbraco.Code.MapAll -Editor -View -Config -ContentTypeId -ContentTypeName -Locked -DataTypeIcon -DataTypeName
         private static void Map(PropertyTypeBasic source, PropertyTypeDisplay target, MapperContext context)
         {
             target.Alias = source.Alias;
@@ -355,7 +355,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Validation = source.Validation;
         }
 
-        // Umbraco.Code.MapAll -Editor -View -Config -ContentTypeId -ContentTypeName -Locked
+        // Umbraco.Code.MapAll -Editor -View -Config -ContentTypeId -ContentTypeName -Locked -DataTypeIcon -DataTypeName
         private static void Map(MemberPropertyTypeBasic source, MemberPropertyTypeDisplay target, MapperContext context)
         {
             target.Alias = source.Alias;

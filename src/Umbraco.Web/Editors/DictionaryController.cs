@@ -267,44 +267,31 @@ namespace Umbraco.Web.Editors
         /// </returns>
         public IEnumerable<DictionaryOverviewDisplay> GetList()
         {
-            var list = new List<DictionaryOverviewDisplay>();
+            var items = Services.LocalizationService.GetDictionaryItemDescendants(null).ToArray();
+            var list = new List<DictionaryOverviewDisplay>(items.Length);
 
-            const int level = 0;
-
-            foreach (var dictionaryItem in Services.LocalizationService.GetRootDictionaryItems().OrderBy(ItemSort()))
+            // recursive method to build a tree structure from the flat structure returned above
+            void BuildTree(int level = 0, Guid? parentId = null)
             {
-                var item = Mapper.Map<IDictionaryItem, DictionaryOverviewDisplay>(dictionaryItem);
-                item.Level = 0;
-                list.Add(item);
+                var children = items.Where(t => t.ParentId == parentId).ToArray();
+                if(children.Any() == false)
+                {
+                    return;
+                }
 
-                GetChildItemsForList(dictionaryItem, level + 1, list);
+                foreach(var child in children.OrderBy(ItemSort()))
+                {
+                    var display = Mapper.Map<IDictionaryItem, DictionaryOverviewDisplay>(child);
+                    display.Level = level;
+                    list.Add(display);
+
+                    BuildTree(level + 1, child.Key);
+                }                
             }
 
-            return list;
-        }
+            BuildTree();
 
-        /// <summary>
-        /// Get child items for list.
-        /// </summary>
-        /// <param name="dictionaryItem">
-        /// The dictionary item.
-        /// </param>
-        /// <param name="level">
-        /// The level.
-        /// </param>
-        /// <param name="list">
-        /// The list.
-        /// </param>
-        private void GetChildItemsForList(IDictionaryItem dictionaryItem, int level, ICollection<DictionaryOverviewDisplay> list)
-        {
-            foreach (var childItem in Services.LocalizationService.GetDictionaryItemChildren(dictionaryItem.Key).OrderBy(ItemSort()))
-            {
-                var item = Mapper.Map<IDictionaryItem, DictionaryOverviewDisplay>(childItem);
-                item.Level = level;
-                list.Add(item);
-
-                GetChildItemsForList(childItem, level + 1, list);
-            }
+            return list;            
         }
 
         private static Func<IDictionaryItem, string> ItemSort() => item => item.ItemKey;

@@ -173,9 +173,9 @@ function umbModelMapper() {
         /** This converts the source model to a basic entity model, it will throw an exception if there isn't enough data to create the model */
         convertToEntityBasic: function (source) {
             var required = ["id", "name", "icon", "parentId", "path"];
-            _.each(required, function (k) {
-                if (!_.has(source, k)) {
-                    throw "The source object does not contain the property " + k;
+            required.forEach(k => {
+                if (!hasOwnProperty.call(source, k)) {
+                    throw `The source object does not contain the property ${k}`;
                 }
             });
             var optional = ["metaData", "key", "alias"];

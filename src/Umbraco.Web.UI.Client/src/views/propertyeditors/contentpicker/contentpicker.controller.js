@@ -446,7 +446,7 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
         if (entityType !== "Member") {
             entityResource.getUrl(entity.id, entityType).then(function (data) {
                 // update url
-                angular.forEach($scope.renderModel, function (item) {
+                $scope.renderModel.forEach(function (item) {
                     if (item.id === entity.id) {
                         if (entity.trashed) {
                             item.url = vm.labels.general_recycleBin;
