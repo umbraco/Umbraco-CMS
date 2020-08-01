@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    function FocusLock($timeout) {
+    function FocusLock($timeout, eventsService) {
 
         function getAutoFocusElement (elements) {
             var elmentWithAutoFocus = null;
@@ -67,6 +67,13 @@
             }
 
             onInit();
+
+            // Reinitialize the onInit() method if it was not the last editor that was closed
+            eventsService.on('appState.editors.close', (event, args) => {
+                if(args.editors.length !== 0) {
+                    onInit();
+                }
+            });
         }
 
         var directive = {
