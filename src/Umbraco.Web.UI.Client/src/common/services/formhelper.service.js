@@ -33,6 +33,7 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
             if (!args.scope) {
                 throw "args.scope cannot be null";
             }
+
             if (!args.formCtrl) {
                 //try to get the closest form controller
                 currentForm = angularHelper.getRequiredCurrentForm(args.scope);
@@ -44,9 +45,12 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
             //the first thing any form must do is broadcast the formSubmitting event
             args.scope.$broadcast("formSubmitting", { scope: args.scope, action: args.action });
 
+            this.focusOnFirstError(currentForm);
+
             //then check if the form is valid
             if (!args.skipValidation) {
                 if (currentForm.$invalid) {
+
                     return false;
                 }
             }
@@ -55,6 +59,32 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
             serverValidationManager.reset();
 
             return true;
+        },
+
+         /**
+         * @ngdoc function
+         * @name umbraco.services.formHelper#focusOnFirstError
+         * @methodOf umbraco.services.formHelper
+         * @function
+         *
+         * @description
+         * Called by submitForm when a form has been submitted, it will fire a focus on the first found invalid umb-property it finds in the form..
+         * 
+         * @param {object} form Pass in a form object.
+         */
+        focusOnFirstError: function(form) {
+            var invalidNgForms = form.$$element.find(`.umb-property ng-form.ng-invalid, .umb-property-editor ng-form.ng-invalid-required`);
+            var firstInvalidNgForm = invalidNgForms.first();
+
+            if(firstInvalidNgForm.length !== 0) {
+                var focusableFields = [...firstInvalidNgForm.find("umb-range-slider .noUi-handle,input,textarea,select,button")];
+                if(focusableFields.length !== 0) { 
+                    var firstErrorEl = focusableFields.find(el => el.type !== "hidden" && el.hasAttribute("readonly") === false);
+                    if(firstErrorEl.length !== 0) {
+                        firstErrorEl.focus();
+                    }
+                }
+            }
         },
 
         /**
@@ -83,7 +113,7 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
             if (!args || !args.notifications) {
                 return false;
             }
-            if (angular.isArray(args.notifications)) {
+            if (Utilities.isArray(args.notifications)) {
                 for (var i = 0; i < args.notifications.length; i++) {
                     notificationsService.showNotification(args.notifications[i]);
                 }
@@ -159,8 +189,15 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
                 //the alias in model state can be in dot notation which indicates
                 // * the first part is the content property alias
                 // * the second part is the field to which the valiation msg is associated with
-                //There will always be at least 3 parts for content properties since all model errors for properties are prefixed with "_Properties"
+                //There will always be at least 4 parts for content properties since all model errors for properties are prefixed with "_Properties"
                 //If it is not prefixed with "_Properties" that means the error is for a field of the object directly.
+
+                // Example: "_Properties.headerImage.en-US.mySegment.myField"
+                // * it's for a property since it has a _Properties prefix
+                // * it's for the headerImage property type
+                // * it's for the en-US culture
+                // * it's for the mySegment segment
+                // * it's for the myField html field (optional)
 
                 var parts = e.split(".");
 
@@ -179,15 +216,22 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
                         }
                     }
 
-                    //if it contains 3 '.' then we will wire it up to a property's html field
+                    var segment = null;
                     if (parts.length > 3) {
-                        //add an error with a reference to the field for which the validation belongs too
-                        serverValidationManager.addPropertyError(propertyAlias, culture, parts[3], modelState[e][0]);
+                        segment = parts[3];
+                        //special check in case the string is formatted this way
+                        if (segment === "null") {
+                            segment = null;
+                        }
                     }
-                    else {
-                        //add a generic error for the property, no reference to a specific html field
-                        serverValidationManager.addPropertyError(propertyAlias, culture, "", modelState[e][0]);
+
+                    var htmlFieldReference = "";
+                    if (parts.length > 4) {
+                        htmlFieldReference = parts[4] || "";
                     }
+
+                    // add a generic error for the property
+                    serverValidationManager.addPropertyError(propertyAlias, culture, htmlFieldReference, modelState[e][0], segment);
 
                 } else {
 

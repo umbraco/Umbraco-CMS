@@ -25,7 +25,9 @@ module.exports = function (files, out) {
         .pipe(sort());
     
     //in production, embed the templates
-    task = task.pipe(embedTemplates({ basePath: "./src/", minimize: { loose: true } }))
+    if(config.compile.current.embedtemplates === true) {
+        task = task.pipe(embedTemplates({ basePath: "./src/", minimize: { loose: true } }));
+    }
     
     task = task.pipe(concat(out))
         .pipe(wrap('(function(){\n%= body %\n})();'))

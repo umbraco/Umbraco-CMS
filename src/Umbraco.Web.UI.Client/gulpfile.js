@@ -13,11 +13,11 @@
 const { src, dest, series, parallel, lastRun } = require('gulp');
 
 const config = require('./gulp/config');
-const { setDevelopmentMode } = require('./gulp/modes');
+const { setDevelopmentMode, setTestMode } = require('./gulp/modes');
 const { dependencies } = require('./gulp/tasks/dependencies');
 const { js } = require('./gulp/tasks/js');
 const { less } = require('./gulp/tasks/less');
-const { testE2e, testUnit } = require('./gulp/tasks/test');
+const { testE2e, testUnit, runUnitTestServer } = require('./gulp/tasks/test');
 const { views } = require('./gulp/tasks/views');
 const { watchTask } = require('./gulp/tasks/watchTask');
 
@@ -31,6 +31,6 @@ exports.build = series(parallel(dependencies, js, less, views), testUnit);
 exports.dev = series(setDevelopmentMode, parallel(dependencies, js, less, views), watchTask);
 exports.watch = series(watchTask);
 // 
-exports.runTests = series(js, testUnit);
-exports.testUnit = series(testUnit);
-exports.testE2e = series(testE2e);
+exports.runTests = series(setTestMode, parallel(js, testUnit));
+exports.runUnit = series(setTestMode, parallel(js, runUnitTestServer), watchTask);
+exports.testE2e = series(setTestMode, parallel(testE2e));

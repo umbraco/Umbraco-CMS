@@ -7,7 +7,7 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.MultiValuesControl
         $scope.hasError = false;
         $scope.focusOnNew = false;
        
-        if (!angular.isArray($scope.model.value)) {
+        if (!Utilities.isArray($scope.model.value)) {
 
             //make an array from the dictionary
             var items = [];

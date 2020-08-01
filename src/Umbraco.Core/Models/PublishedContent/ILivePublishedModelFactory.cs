@@ -3,6 +3,22 @@
     /// <summary>
     /// Provides a live published model creation service.
     /// </summary>
+    public interface ILivePublishedModelFactory2 : ILivePublishedModelFactory
+    {
+        /// <summary>
+        /// Tells the factory that it should build a new generation of models
+        /// </summary>
+        void Reset();
+
+        /// <summary>
+        /// If the live model factory 
+        /// </summary>
+        bool Enabled { get; }
+    }
+
+    /// <summary>
+    /// Provides a live published model creation service.
+    /// </summary>
     public interface ILivePublishedModelFactory : IPublishedModelFactory
     {
         /// <summary>

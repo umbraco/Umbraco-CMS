@@ -1,7 +1,20 @@
 <label class="checkbox umb-form-check umb-form-check--checkbox {{vm.cssClass}}" ng-class="{ 'umb-form-check--disabled': vm.disabled }">
+    <span class="umb-form-check__symbol">
+        <input ng-if="vm.disableDirtyCheck"
+            type="checkbox"
+            id="{{vm.inputId}}"
+            name="{{vm.name}}"
+            value="{{vm.value}}"
+            class="umb-form-check__input"
+            val-server-field="{{vm.serverValidationField}}"
+            ng-model="vm.model"
+            ng-disabled="vm.disabled"
+            ng-required="vm.required"
+            ng-change="vm.change()"
+            no-dirty-check />
 
-    <div class="umb-form-check__symbol">
-        <input type="checkbox"
+        <input ng-if="!vm.disableDirtyCheck"
+            type="checkbox"
             id="{{vm.inputId}}"
             name="{{vm.name}}"
             value="{{vm.value}}"
@@ -17,12 +30,9 @@
                 <i class="umb-form-check__icon icon-check"></i>
             </span>
         </span>
-    </div>
-    <div class="umb-form-check__info" ng-transclude>
-
-        <i ng-if="vm.iconClass.length" class="{{vm.iconClass}}" aria-hidden="true"></i>
-
+    </span>
+    <span class="umb-form-check__info" ng-transclude>
+        <i ng-if="vm.icon.length" class="{{vm.icon}}" aria-hidden="true"></i>
         <span ng-if="vm.text.length" class="umb-form-check__text">{{vm.text}}</span>
-
-    </div>
+    </span>
 </label>
