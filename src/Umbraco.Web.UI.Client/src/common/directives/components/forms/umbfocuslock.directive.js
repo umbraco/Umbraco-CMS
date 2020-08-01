@@ -58,11 +58,40 @@
                 }
             }
             
+            function observeDomChanges() {
+                // Watch for DOM changes - so we can refresh the focusable elements if an element 
+                // changes from being disabled to being enabled for instance
+                var observer = new MutationObserver(domChange);
+
+                // Options for the observer (which mutations to observe)
+                var config = { attributes: true, attributeOldValue: true, childList: true, subtree: true};
+
+                function domChange(mutationsList) {
+                    for (var mutation of mutationsList) {
+
+                        // Look at the attributes - If the disabled attribute changes we call the getFocusableElements method
+                        // ensuring the enabled element can be tabbed into
+                        if (mutation.type == 'attributes') {
+
+                            if(mutation.attributeName === 'disabled') {
+                                getFocusableElements();
+                            }
+                        }
+                    }
+                }
+
+                // Start observing the target node for configured mutations
+                observer.observe(target, config);
+            }
+
             function onInit() {
                 $timeout(function() {
                     getFocusableElements();
 
                     if(focusableElements.length > 0) {
+
+                        observeDomChanges();
+
                         var defaultFocusedElement = getAutoFocusElement(focusableElements);
     
                         // We need to add the tabbing-active class in order to highlight the focused button since the default style is
