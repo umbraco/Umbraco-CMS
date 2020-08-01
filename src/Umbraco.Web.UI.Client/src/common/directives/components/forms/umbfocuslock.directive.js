@@ -89,6 +89,11 @@
                     onInit();
                 }
             });
+
+            // Remove the event listener
+            scope.$on('$destroy', function () {
+                target.removeEventListener('keydown', handleKeydown);
+            });
         }
 
         var directive = {
