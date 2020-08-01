@@ -16,14 +16,14 @@
         }
 
         function link(scope, element) {
+            var target = element[0];
+            
+            // List of elements that can be focusable within the focus lock
+            var focusableElementsSelector = 'a[href]:not([disabled]):not(.ng-hide), button:not([disabled]):not(.ng-hide), textarea:not([disabled]):not(.ng-hide), input:not([disabled]):not(.ng-hide), select:not([disabled]):not(.ng-hide)';
+            var bodyElement = document.querySelector('body');
+            
             function onInit() {
-                // List of elements that can be focusable within the focus lock
-                var focusableElementsSelector = 'a[href]:not([disabled]):not(.ng-hide), button:not([disabled]):not(.ng-hide), textarea:not([disabled]):not(.ng-hide), input:not([disabled]):not(.ng-hide), select:not([disabled]):not(.ng-hide)';
-                var bodyElement = document.querySelector('body');
-                
                 $timeout(function() {
-                    var target = element[0];
-    
                     var focusableElements = target.querySelectorAll(focusableElementsSelector);
 
                     if(focusableElements.length > 0) {
