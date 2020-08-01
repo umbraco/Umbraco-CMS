@@ -107,7 +107,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
         //queue rules loading
         if (configuredStylesheets) {
-            angular.forEach(configuredStylesheets, function (val, key) {
+            configuredStylesheets.forEach(function (val, key) {
 
                 if (val.indexOf(Umbraco.Sys.ServerVariables.umbracoSettings.cssPath + "/") === 0) {
                     // current format (full path to stylesheet)
@@ -119,7 +119,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 }
 
                 promises.push(stylesheetResource.getRulesByName(val).then(function (rules) {
-                    angular.forEach(rules, function (rule) {
+                    rules.forEach(function (rule) {
                         var r = {};
                         r.title = rule.name;
                         if (rule.selector[0] == ".") {
