@@ -67,11 +67,13 @@
                 var config = { attributes: true, attributeOldValue: true, childList: true, subtree: true};
 
                 function domChange(mutationsList) {
+                    getFocusableElements();
+
                     for (var mutation of mutationsList) {
 
                         // Look at the attributes - If the disabled attribute changes we call the getFocusableElements method
                         // ensuring the enabled element can be tabbed into
-                        if (mutation.type == 'attributes') {
+                        if (mutation.type === 'attributes') {
 
                             if(mutation.attributeName === 'disabled') {
                                 getFocusableElements();
