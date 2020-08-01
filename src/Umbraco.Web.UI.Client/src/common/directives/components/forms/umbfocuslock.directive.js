@@ -116,7 +116,7 @@
 
             // Reinitialize the onInit() method if it was not the last editor that was closed
             eventsService.on('appState.editors.close', (event, args) => {
-                if(args.editors.length !== 0) {
+                if(args && args.editors.length !== 0) {
                     onInit();
                 }
             });
