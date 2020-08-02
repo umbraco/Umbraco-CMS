@@ -69,12 +69,6 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.CropSizesControlle
 	        $scope.hasError = true;
         };
 
-        $scope.createNew = function (event) {
-            if (event.keyCode == 13) {
-                $scope.add(event);
-            }
-        };
-
 	    $scope.sortableOptions = {
             axis: 'y',
             containment: 'parent',
