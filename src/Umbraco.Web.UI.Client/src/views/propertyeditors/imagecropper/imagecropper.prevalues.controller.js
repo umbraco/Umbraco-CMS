@@ -71,6 +71,9 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.CropSizesControlle
         };
 
 	    $scope.sortableOptions = {
-	        axis: 'y'
+            axis: 'y',
+            containment: 'parent',
+            cursor: 'move',
+            tolerance: 'pointer'
 	    }
 	});
