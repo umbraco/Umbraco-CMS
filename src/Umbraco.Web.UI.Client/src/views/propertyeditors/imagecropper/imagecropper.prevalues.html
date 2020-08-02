@@ -13,7 +13,9 @@
                    localize="placeholder"
                    placeholder="@general_alias"
                    focus-when="{{setFocus}}"
-                   ng-change="change()" />
+                   ng-change="change()"
+                   ng-keydown="createNew($event)"
+                   overlay-submit-on-enter="false" />
         </div>
 
         <div class="umb-cropsizes__input-wrap umb-cropsizes__input-wrap--narrow">
@@ -27,13 +29,14 @@
                    val-highlight="{{hasError}}"
                    id="addcropwidth"
                    min="0"
-                   pattern="[0-9]*" />
+                   pattern="[0-9]*"
+                   ng-keydown="createNew($event)"
+                   overlay-submit-on-enter="false" />
         </div>
 
         <div class="umb-cropsizes__input-wrap umb-cropsizes__input-wrap--narrow">
             <label for="addcropheight"><localize key="general_height">Height</localize></label>
-            <input
-                   type="number"
+            <input type="number"
                    name="newItem.height"
                    localize="placeholder"
                    placeholder="@general_height"
@@ -42,7 +45,9 @@
                    val-highlight="{{hasError}}"
                    id="addcropheight"
                    min="0"
-                   pattern="[0-9]*" />
+                   pattern="[0-9]*"
+                   ng-keydown="createNew($event)"
+                   overlay-submit-on-enter="false" />
         </div>
 
         <div class="umb-cropsizes__controls">
