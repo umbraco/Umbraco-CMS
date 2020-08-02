@@ -74,8 +74,9 @@
                         return;
                     }
 
-                    for (var mutation of mutationsList) {
-
+                    for (let index = 0; index < mutationsList.length; index++) {
+                        const mutation = mutationsList[index];
+                        
                         // Look at the attributes - If the disabled attribute changes we call the getFocusableElements method
                         // ensuring the enabled element can be tabbed into
                         if (mutation.type === 'attributes') {
