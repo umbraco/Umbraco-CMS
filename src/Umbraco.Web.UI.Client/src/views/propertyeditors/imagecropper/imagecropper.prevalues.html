@@ -4,50 +4,45 @@
 
         <div class="umb-cropsizes__input-wrap">
             <label for="addcropalias"><localize key="general_alias">Alias</localize></label>
-            <input
-                id="addcropalias"
-                name="newItem.alias"
-                type="text"
-                ng-model="newItem.alias"
-                class="umb-cropsizes__input"
-                val-highlight="{{hasError}}"
-                localize="placeholder"
-                placeholder="@general_alias"
-                focus-when="{{setFocus}}"
-                ng-change="change()"
-            />
+            <input type="text"
+                   id="addcropalias"
+                   name="newItem.alias"
+                   ng-model="newItem.alias"
+                   class="umb-cropsizes__input"
+                   val-highlight="{{hasError}}"
+                   localize="placeholder"
+                   placeholder="@general_alias"
+                   focus-when="{{setFocus}}"
+                   ng-change="change()" />
         </div>
 
         <div class="umb-cropsizes__input-wrap umb-cropsizes__input-wrap--narrow">
             <label for="addcropwidth"><localize key="general_width">Width</localize></label>
-            <input
-                name="newItem.width"
-                type="number"
-                localize="placeholder"
-                placeholder="@general_width"
-                ng-model="newItem.width"
-                class="umb-cropsizes__input"
-                val-highlight="{{hasError}}"
-                id="addcropwidth"
-                min="0"
-                pattern="[0-9]*"
-            />
+            <input type="number"
+                   name="newItem.width"
+                   localize="placeholder"
+                   placeholder="@general_width"
+                   ng-model="newItem.width"
+                   class="umb-cropsizes__input"
+                   val-highlight="{{hasError}}"
+                   id="addcropwidth"
+                   min="0"
+                   pattern="[0-9]*" />
         </div>
 
         <div class="umb-cropsizes__input-wrap umb-cropsizes__input-wrap--narrow">
             <label for="addcropheight"><localize key="general_height">Height</localize></label>
             <input
-                name="newItem.height"
-                type="number"
-                localize="placeholder"
-                placeholder="@general_height"
-                ng-model="newItem.height"
-                class="umb-cropsizes__input"
-                val-highlight="{{hasError}}"
-                id="addcropheight"
-                min="0"
-                pattern="[0-9]*"
-            />
+                   type="number"
+                   name="newItem.height"
+                   localize="placeholder"
+                   placeholder="@general_height"
+                   ng-model="newItem.height"
+                   class="umb-cropsizes__input"
+                   val-highlight="{{hasError}}"
+                   id="addcropheight"
+                   min="0"
+                   pattern="[0-9]*" />
         </div>
 
         <div class="umb-cropsizes__controls">
