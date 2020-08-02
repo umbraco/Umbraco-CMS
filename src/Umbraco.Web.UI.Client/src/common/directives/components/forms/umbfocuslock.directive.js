@@ -25,8 +25,9 @@
             var focusableElementsSelector = 'a[href]:not([disabled]):not(.ng-hide), button:not([disabled]):not(.ng-hide), textarea:not([disabled]):not(.ng-hide), input:not([disabled]):not(.ng-hide), select:not([disabled]):not(.ng-hide)';
             var bodyElement = document.querySelector('body');
 
-            function getFocusableElements() {
-                focusableElements = target.querySelectorAll(focusableElementsSelector);
+            function getFocusableElements(targetElm) {
+                var elm = targetElm ? targetElm : target;
+                focusableElements = elm.querySelectorAll(focusableElementsSelector);
                 firstFocusableElement = focusableElements[0];
                 lastFocusableElement = focusableElements[focusableElements.length -1];
                 
@@ -58,7 +59,8 @@
                 }
             }
             
-            function observeDomChanges() {
+            function observeDomChanges(init) {
+                var targetToObserve = init ? document.querySelector('.umb-editors') : target;
                 // Watch for DOM changes - so we can refresh the focusable elements if an element 
                 // changes from being disabled to being enabled for instance
                 var observer = new MutationObserver(domChange);
@@ -67,7 +69,10 @@
                 var config = { attributes: true, attributeOldValue: true, childList: true, subtree: true};
 
                 function domChange(mutationsList) {
-                    getFocusableElements();
+                    if(!init){
+                        getFocusableElements();
+                        return;
+                    }
 
                     for (var mutation of mutationsList) {
 
@@ -75,20 +80,20 @@
                         // ensuring the enabled element can be tabbed into
                         if (mutation.type === 'attributes') {
 
-                            if(mutation.attributeName === 'disabled') {
-                                getFocusableElements();
+                            if(mutation.attributeName === 'umb-focus-lock') {
+                                onInit(mutation.target);
                             }
                         }
                     }
                 }
 
                 // Start observing the target node for configured mutations
-                observer.observe(target, config);
+                observer.observe(targetToObserve, config);
             }
 
-            function onInit() {
+            function onInit(targetElm) {
                 $timeout(function() {
-                    getFocusableElements();
+                    getFocusableElements(targetElm);
 
                     if(focusableElements.length > 0) {
 
@@ -99,10 +104,13 @@
                         // We need to add the tabbing-active class in order to highlight the focused button since the default style is
                         // outline: none; set in the stylesheet specifically
                         bodyElement.classList.add('tabbing-active');
-        
+
                         // If there is no default focused element put focus on the first focusable element in the nodelist
                         if(defaultFocusedElement === null ){
                             firstFocusableElement.focus();
+                        }
+                        else {
+                            defaultFocusedElement.focus();
                         }
         
                         //  Handle keydown
@@ -117,7 +125,9 @@
             // Reinitialize the onInit() method if it was not the last editor that was closed
             eventsService.on('appState.editors.close', (event, args) => {
                 if(args && args.editors.length !== 0) {
-                    onInit();
+                    if(target.hasAttribute('umb-focus-lock')) {
+                        observeDomChanges(true);
+                    }
                 }
             });
 
