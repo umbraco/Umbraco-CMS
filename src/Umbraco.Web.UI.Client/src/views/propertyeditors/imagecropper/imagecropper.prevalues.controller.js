@@ -69,10 +69,11 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.CropSizesControlle
 	        $scope.hasError = true;
         };
 
-	    $scope.sortableOptions = {
+        $scope.sortableOptions = {
             axis: 'y',
             containment: 'parent',
             cursor: 'move',
             tolerance: 'pointer'
-	    }
+        };
+
 	});
