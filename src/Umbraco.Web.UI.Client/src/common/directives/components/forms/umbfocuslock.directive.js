@@ -66,7 +66,7 @@
                 var observer = new MutationObserver(domChange);
 
                 // Options for the observer (which mutations to observe)
-                var config = { attributes: true, attributeOldValue: true, childList: true, subtree: true};
+                var config = { attributes: true, attributeFilter: ['umb-focus-lock'], childList: true, subtree: true};
 
                 function domChange(mutationsList) {
                     if(!init){
