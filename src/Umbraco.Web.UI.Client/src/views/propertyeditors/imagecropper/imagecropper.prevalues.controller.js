@@ -33,17 +33,16 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.CropSizesControlle
 
         $scope.change = function () {
             // Listen to the change event and set focus 2 false
-            if($scope.setFocus){
+            if ($scope.setFocus) {
                 $scope.setFocus = false;
                 return;
             }
-        }
+        };
 
 	    $scope.add = function (evt) {
             evt.preventDefault();
 
             $scope.editMode = false;
-
             $scope.setFocus = true;
 
 	        if ($scope.newItem && $scope.newItem.alias &&
