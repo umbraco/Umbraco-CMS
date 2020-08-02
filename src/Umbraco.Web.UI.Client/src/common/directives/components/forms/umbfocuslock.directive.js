@@ -83,6 +83,9 @@
 
                             if(mutation.attributeName === 'umb-focus-lock') {
                                 onInit(mutation.target);
+
+                                // Disconnect the observer once onInit has been called again
+                                observer.disconnect();
                             }
                         }
                     }
@@ -149,3 +152,7 @@
     angular.module('umbraco.directives').directive('umbFocusLock', FocusLock);
 
 })();
+
+
+// TODO: observer.disconnect() on destroy - Ensure it does not conflict with the eventlistener for the closed event!
+// TODO: removeEventHandlers on destroy - Be ware of the same as weith observer.disconnect();
