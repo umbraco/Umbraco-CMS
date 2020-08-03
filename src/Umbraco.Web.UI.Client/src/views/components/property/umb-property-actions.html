@@ -4,7 +4,7 @@
         css-class="umb-outline umb-property-actions__toggle"
         action="vm.toggle()"
         mode="small"
-        text="{{vm.isOpen ? vm.labels.openText ? vm.labels.closeText}}">
+        text="{{vm.isOpen ? vm.labels.closeText : vm.labels.openText}}">
     </umb-button-ellipsis>
 
     <div class="umb-property-actions__menu" role="menu" ng-if="vm.isOpen" on-outside-click="vm.close()" on-close="vm.close()" deep-blur="vm.close()">
