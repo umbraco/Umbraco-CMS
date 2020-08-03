@@ -66,8 +66,7 @@ function mediaEditController($scope, $routeParams, $location, $http, $q, appStat
 
         loadMedia().then(function(){
             $scope.page.loading = false;
-        }, function (error) {
-            console.log("loadMedia error", error);
+        }, function () {
             $scope.page.loading = false;
         });
     }
