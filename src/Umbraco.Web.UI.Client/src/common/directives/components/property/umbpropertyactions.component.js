@@ -17,6 +17,7 @@
 
         vm.open = open;
         vm.close = close;
+        vm.toggle = toggle;
         vm.executeAction = executeAction;
 
         vm.$onDestroy = onDestroy;
@@ -30,13 +31,13 @@
             keyboardService.unbind("esc");
         }
 
-        vm.toggle = function () {
+        function toggle() {
             if (vm.isOpen === true) {
                 vm.close();
             } else {
                 vm.open();
             }
-        };
+        }
 
         function open() {
             vm.isOpen = true;
@@ -46,7 +47,7 @@
         function close() {
             vm.isOpen = false;
             destroyDropDown();
-        };
+        }
 
         function executeAction(action) {
             action.method();
