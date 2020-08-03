@@ -4,7 +4,7 @@
     angular
         .module('umbraco')
         .component('umbMiniSearch', {
-            templateUrl: 'views/components/umb-mini-search/umb-mini-search.html',
+            templateUrl: 'views/components/umb-mini-search.html',
             controller: UmbMiniSearchController,
             controllerAs: 'vm',
             bindings: {
