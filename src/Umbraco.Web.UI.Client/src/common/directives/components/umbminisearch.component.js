@@ -18,6 +18,9 @@
     function UmbMiniSearchController($scope) {
         
         var vm = this;
+
+        vm.onKeyDown = onKeyDown;
+        vm.onChange = onChange;
         
         var searchDelay = _.debounce(function () {
             $scope.$apply(function () {
@@ -27,7 +30,7 @@
             });
         }, 500);
     
-        vm.onKeyDown = function (ev) {
+        function onKeyDown(ev) {
             //13: enter
             switch (ev.keyCode) {
                 case 13:
@@ -36,14 +39,14 @@
                     }
                     break;
             }
-        };
+        }
     
-        vm.onChange = function () {
+        function onChange() {
             if (vm.onStartTyping) {
                 vm.onStartTyping();
             }
             searchDelay();
-        };
+        }
 
     }
 
