@@ -751,9 +751,19 @@
     margin-right: 5px;
     position: relative;
     cursor: pointer;
-    display:inline-block;
+    display: inline-block;
 }
 
+.umb-grid .cell-tools,
+.umb-grid .umb-control-tool {
+    .btn-icon {
+        padding: 0;
+    }
+}
+
+.umb-grid .umb-control-tool .btn-icon {
+    color: @white;
+}
 
 
 // Template
@@ -1006,8 +1016,6 @@
     color: @gray-6;
     display: block;
 }
-
-
 
 // Configuration specific styles
 // -------------------------

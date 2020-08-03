@@ -21,8 +21,8 @@
  * </pre>
  */
 angular.module('umbraco.services')
-    .factory('searchService', function ($q, $log, entityResource, contentResource, umbRequestHelper, $injector, searchResultFormatter) {
-
+    .factory('searchService', function (entityResource, $injector, searchResultFormatter) {
+        
         return {
 
             /**
@@ -42,10 +42,11 @@ angular.module('umbraco.services')
                     throw "args.term is required";
                 }
 
-                return entityResource.search(args.term, "Member", args.searchFrom).then(function (data) {
-                    data.forEach(item => searchResultFormatter.configureMemberResult(item));
-                    return data;
-                });
+                return entityResource.search(args.term, "Member", args.searchFrom)
+                    .then(data => {
+                        data.forEach(item => searchResultFormatter.configureMemberResult(item));
+                        return data;
+                    });
             },
 
             /**
@@ -65,10 +66,11 @@ angular.module('umbraco.services')
                     throw "args.term is required";
                 }
 
-                return entityResource.search(args.term, "Document", args.searchFrom, args.canceler, args.dataTypeKey).then(function (data) {
-                    data.forEach(item => searchResultFormatter.configureContentResult(item));
-                    return data;
-                });
+                return entityResource.search(args.term, "Document", args.searchFrom, args.canceler, args.dataTypeKey)
+                    _.each(data, function (item) {
+                        data.forEach(item => searchResultFormatter.configureContentResult(item));
+                        return data;
+                    });
             },
 
             /**
@@ -88,10 +90,11 @@ angular.module('umbraco.services')
                     throw "args.term is required";
                 }
 
-                return entityResource.search(args.term, "Media", args.searchFrom, args.canceler, args.dataTypeKey).then(function (data) {
-                    data.forEach(item => searchResultFormatter.configureMediaResult(item));
-                    return data;
-                });
+                return entityResource.search(args.term, "Media", args.searchFrom, args.canceler, args.dataTypeKey)
+                    .then(data => {
+                        data.forEach(item => searchResultFormatter.configureMediaResult(item));
+                        return data;
+                    });
             },
 
             /**
@@ -111,10 +114,8 @@ angular.module('umbraco.services')
                     throw "args.term is required";
                 }
 
-                return entityResource.searchAll(args.term, args.canceler).then(function (data) {
-
-                    data.forEach(resultByType => {
-
+                return entityResource.searchAll(args.term, args.canceler).then(data => {
+                    Object.values(data).forEach(resultByType => {
                         //we need to format the search result data to include things like the subtitle, urls, etc...
                         // this is done with registered angular services as part of the SearchableTreeAttribute, if that
                         // is not found, than we format with the default formatter
