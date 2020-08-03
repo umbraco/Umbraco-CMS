@@ -30,9 +30,9 @@
             });
         }, 500);
     
-        function onKeyDown(ev) {
+        function onKeyDown(evt) {
             //13: enter
-            switch (ev.keyCode) {
+            switch (evt.keyCode) {
                 case 13:
                     if (vm.onSearch) {
                         vm.onSearch();
