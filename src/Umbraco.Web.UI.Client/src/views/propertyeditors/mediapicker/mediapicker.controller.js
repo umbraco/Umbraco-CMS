@@ -65,7 +65,6 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                         };
 
                         mediaItem.found = found ? true : false;
-                        console.log("mediaItem 1", mediaItem);
 
                         return mediaItem;
                     });
