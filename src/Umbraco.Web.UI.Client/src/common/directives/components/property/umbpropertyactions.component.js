@@ -9,46 +9,50 @@
 
         var vm = this;
 
+        vm.labels = {};
         vm.isOpen = false;
+
+
 
         function initDropDown() {
             keyboardService.bind("esc", vm.close);
         }
+
         function destroyDropDown() {
             keyboardService.unbind("esc");
         }
 
-        vm.toggle = function() {
+        vm.toggle = function () {
             if (vm.isOpen === true) {
                 vm.close();
             } else {
                 vm.open();
             }
-        }
+        };
+
         vm.open = function() {
             vm.isOpen = true;
             initDropDown();
         }
-        vm.close = function() {
+        vm.close = function () {
             vm.isOpen = false;
             destroyDropDown();
-        }
+        };
 
-        vm.executeAction = function(action) {
+        vm.executeAction = function (action) {
             action.method();
             vm.close();
-        }
+        };
 
         vm.$onDestroy = function () {
             if (vm.isOpen === true) {
                 destroyDropDown();
             }
-        }
-        
+        };
     }
 
     var umbPropertyActionsComponent = {
-        templateUrl: 'views/components/property/property-actions/umb-property-actions.html',
+        templateUrl: 'views/components/property/umb-property-actions.html',
         bindings: {
             actions: "<"
         },
