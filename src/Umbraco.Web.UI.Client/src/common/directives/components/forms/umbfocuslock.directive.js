@@ -95,8 +95,31 @@
                 observer.observe(targetToObserve, config);
             }
 
+            function cleanupEventHandlers() {
+                const infiniteEditorsWrapper = document.querySelector('.umb-editors');
+                const infiniteEditors = Array.from(infiniteEditorsWrapper.querySelectorAll('.umb-editor'));
+                const activeEditor = infiniteEditors[infiniteEditors.length - 1];
+                const inactiveEditors = infiniteEditors.filter(editor => editor !== activeEditor);
+
+                if(inactiveEditors.length > 0) {
+                    for (let index = 0; index < inactiveEditors.length; index++) {
+                        const inactiveEditor = inactiveEditors[index];
+                        
+                        // Remove event handlers from inactive editors
+                        inactiveEditor.removeEventListener('keydown', handleKeydown);
+                    }
+                }
+                else {
+                    // Remove event handlers from the active editor
+                    activeEditor.removeEventListener('keydown', handleKeydown);
+                }
+            }
+
             function onInit(targetElm) {
                 $timeout(function() {
+
+                    cleanupEventHandlers();
+
                     getFocusableElements(targetElm);
 
                     if(focusableElements.length > 0) {
