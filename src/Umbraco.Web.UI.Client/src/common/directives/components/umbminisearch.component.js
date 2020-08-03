@@ -20,7 +20,6 @@
         var vm = this;
 
         vm.onKeyDown = onKeyDown;
-        vm.onBlur = onBlur;
         vm.onChange = onChange;
         
         var searchDelay = _.debounce(function () {
@@ -31,19 +30,15 @@
             });
         }, 500);
     
-        function onKeyDown(evt) {
+        function onKeyDown(ev) {
             //13: enter
-            switch (evt.keyCode) {
+            switch (ev.keyCode) {
                 case 13:
                     if (vm.onSearch) {
                         vm.onSearch();
                     }
                     break;
             }
-        }
-
-        function onBlur(evt) {
-            
         }
     
         function onChange() {
