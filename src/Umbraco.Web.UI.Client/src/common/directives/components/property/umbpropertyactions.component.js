@@ -5,14 +5,22 @@
      * A component to render the property action toggle
      */
     
-    function umbPropertyActionsController(keyboardService) {
+    function umbPropertyActionsController(keyboardService, localizationService) {
 
         var vm = this;
 
-        vm.labels = {};
         vm.isOpen = false;
+        vm.labels = {
+            openText: "Open Property Actions",
+            closeText: "Close Property Actions"
+        };
 
+        vm.open = open;
+        vm.close = close;
+        vm.executeAction = executeAction;
 
+        vm.$onDestroy = onDestroy;
+        vm.$onInit = onInit;
 
         function initDropDown() {
             keyboardService.bind("esc", vm.close);
@@ -30,25 +38,41 @@
             }
         };
 
-        vm.open = function() {
+        function open() {
             vm.isOpen = true;
             initDropDown();
         }
-        vm.close = function () {
+
+        function close() {
             vm.isOpen = false;
             destroyDropDown();
         };
 
-        vm.executeAction = function (action) {
+        function executeAction(action) {
             action.method();
             vm.close();
-        };
+        }
 
-        vm.$onDestroy = function () {
+        function onDestroy() {
             if (vm.isOpen === true) {
                 destroyDropDown();
             }
-        };
+        }
+
+        function onInit() {
+            
+            var labelKeys = [
+                "propertyActions_tooltipForPropertyActionsMenu",
+                "propertyActions_tooltipForPropertyActionsMenuClose"
+            ]
+
+            localizationService.localizeMany(labelKeys).then(values => {
+                vm.labels.openText = values[0];
+                vm.labels.closeText = values[1];
+
+                console.log("vm.labels", vm.labels);
+            });
+        }
     }
 
     var umbPropertyActionsComponent = {
