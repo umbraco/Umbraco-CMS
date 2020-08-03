@@ -1,14 +1,13 @@
 @using Umbraco.Core.Models.PublishedContent
 @using Umbraco.Web
 @using Umbraco.Core
-@using Umbraco.Core.Composing
-@using Umbraco.Core.PropertyEditors.ValueConverters
+@using Umbraco.Core.Media
 @using Umbraco.Web.Routing
 @inherits Umbraco.Web.Common.Macros.PartialViewMacroPage
 @inject IPublishedContentQuery PublishedContentQuery
 @inject IVariationContextAccessor VariationContextAccessor
 @inject IPublishedUrlProvider PublishedUrlProvider
-@inject IFactory Factory
+@inject IImageUrlGenerator ImageUrlGenerator
 @*
     Macro to display a gallery of images from the Media section.
     Works with either a 'Single Media Picker' or a 'Multiple Media Picker' macro parameter (see below).
@@ -52,7 +51,7 @@
     {
         /*@<div class="col-xs-6 col-md-3">
             <a href="@item.Url(PublishedUrlProvider)" class="thumbnail">
-                <img src="@(item.GetCropUrl(Factory.GetInstance<IImageUrlGenerator>(), width: 200, height: 200))" alt="@item.Name" />
+                <img src="@(item.GetCropUrl(ImageUrlGenerator, width: 200, height: 200))" alt="@item.Name" />
             </a>
         </div>;*/
     }
