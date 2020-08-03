@@ -79,7 +79,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="App_Data\" />
     <Folder Include="umbraco" />
     <Folder Include="Views\MacroPartials\" />
   </ItemGroup>
