@@ -1,4 +1,8 @@
-﻿using Umbraco.Core.Persistence.Dtos;
+﻿using System.Linq;
+using Umbraco.Core.Migrations.Upgrade.V_8_0_0.Models;
+using Umbraco.Core.Models;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.Dtos;
 
 namespace Umbraco.Core.Migrations.Upgrade.V_8_8_0
 {
@@ -16,11 +20,36 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_8_0
         /// </summary>
         public override void Migrate()
         {
-            //update the storage type of Umbraco.Tags controls
-            Execute.Sql("UPDATE umbracoDataType SET dbType = 'Ntext' WHERE propertyEditorAlias = 'Umbraco.Tags'").Do();
+            //get UmbracoTags datatypes that need to be migrated
+            var sqlDataTypes = Sql()
+               .Select<DataTypeDto>()
+               .From<DataTypeDto>()
+               .Where<DataTypeDto>(x => x.EditorAlias == Constants.PropertyEditors.Aliases.Tags);
+            var dataTypes = Database.Fetch<DataTypeDto>(sqlDataTypes).ToList();
 
-            //move data from varcharValue to textValue (tested that you can null a column used as a data source in sql later in the update)
-            Execute.Sql("UPDATE umbracoPropertyData SET textValue = varcharValue, varcharValue = null WHERE propertyTypeId IN (select id FROM cmsPropertyType WHERE dataTypeId IN (SELECT nodeid FROM umbracoDataType WHERE propertyEditorAlias = 'Umbraco.Tags')) AND textValue IS NULL AND varcharValue IS NOT NULL").Do();
+            foreach (var dataType in dataTypes)
+            {
+                //update the storage type, moving data from VarcharValue to TextValue for Umbraco.Tags controls
+                var propertyDataDtos = Database.Fetch<PropertyDataDto>(Sql()
+                .Select<PropertyDataDto>()
+                .From<PropertyDataDto>()
+                .InnerJoin<PropertyTypeDto>().On<PropertyTypeDto, PropertyDataDto>((pt, pd) => pt.Id == pd.PropertyTypeId)
+                .InnerJoin<DataTypeDto>().On<DataTypeDto, PropertyTypeDto>((dt, pt) => dt.NodeId == pt.DataTypeId)
+                .Where<PropertyTypeDto>(x => x.DataTypeId == dataType.NodeId));
+
+                foreach (var propertyDataDto in propertyDataDtos)
+                {
+                    propertyDataDto.TextValue = propertyDataDto.VarcharValue;
+                    propertyDataDto.VarcharValue = null;
+                    Database.Update(propertyDataDto);
+                }
+
+                //change DbType to Ntext
+                dataType.DbType = ValueStorageType.Ntext.ToString();
+                Database.Update(dataType);
+
+            }
+
         }
     }
 }
