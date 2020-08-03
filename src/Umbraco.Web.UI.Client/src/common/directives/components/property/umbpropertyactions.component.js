@@ -70,8 +70,6 @@
             localizationService.localizeMany(labelKeys).then(values => {
                 vm.labels.openText = values[0];
                 vm.labels.closeText = values[1];
-
-                console.log("vm.labels", vm.labels);
             });
         }
     }
