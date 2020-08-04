@@ -179,9 +179,9 @@ namespace Umbraco.Tests.TestHelpers
                 var compiledPackageXmlParser = new CompiledPackageXmlParser(new ConflictingPackageData(macroService.Value, fileService.Value), globalSettings);
                 return new PackagingService(
                     auditService.Value,
-                    new PackagesRepository(contentService.Value, contentTypeService.Value, dataTypeService.Value, fileService.Value, macroService.Value, localizationService.Value, ioHelper,
+                    new PackagesRepository(contentService.Value, contentTypeService.Value, dataTypeService.Value, fileService.Value, macroService.Value, localizationService.Value, hostingEnvironment,
                         new EntityXmlSerializer(contentService.Value, mediaService.Value, dataTypeService.Value, userService.Value, localizationService.Value, contentTypeService.Value, urlSegmentProviders, TestHelper.ShortStringHelper, propertyEditorCollection), logger, umbracoVersion, globalSettings, "createdPackages.config"),
-                    new PackagesRepository(contentService.Value, contentTypeService.Value, dataTypeService.Value, fileService.Value, macroService.Value, localizationService.Value, ioHelper,
+                    new PackagesRepository(contentService.Value, contentTypeService.Value, dataTypeService.Value, fileService.Value, macroService.Value, localizationService.Value, hostingEnvironment,
                         new EntityXmlSerializer(contentService.Value, mediaService.Value, dataTypeService.Value, userService.Value, localizationService.Value, contentTypeService.Value, urlSegmentProviders, TestHelper.ShortStringHelper, propertyEditorCollection), logger, umbracoVersion,  globalSettings, "installedPackages.config"),
                     new PackageInstallation(
                         new PackageDataInstallation(logger, fileService.Value, macroService.Value, localizationService.Value, dataTypeService.Value, entityService.Value, contentTypeService.Value, contentService.Value, propertyEditorCollection, scopeProvider, shortStringHelper, GetGlobalSettings(), localizedTextService.Value),
