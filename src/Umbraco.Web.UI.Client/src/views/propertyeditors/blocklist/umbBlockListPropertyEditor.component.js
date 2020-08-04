@@ -281,9 +281,9 @@
         }
 
         function deleteAllBlocks() {
-            vm.layout.forEach(entry => {
-                deleteBlock(entry.$block);
-            });
+            while(vm.layout.length) {
+                deleteBlock(vm.layout[0].$block);
+            };
         }
 
         function activateBlock(blockObject) {
