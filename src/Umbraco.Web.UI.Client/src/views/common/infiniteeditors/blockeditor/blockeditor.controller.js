@@ -23,17 +23,14 @@ angular.module("umbraco")
                 if (contentApp) {
                     if (vm.model.hideContent) {
                         apps.splice(apps.indexOf(contentApp), 1);
-                    } else if (vm.model.openSettings !== true) {
-                        contentApp.active = true;
                     }
+                    contentApp.active = (vm.model.openSettings !== true);
                 }
 
                 if (vm.model.settings && vm.model.settings.variants) {
                     var settingsApp = apps.find(entry => entry.alias === "settings");
                     if (settingsApp) {
-                        if (vm.model.openSettings) {
-                            settingsApp.active = true;
-                        }
+                        settingsApp.active = (vm.model.openSettings === true);
                     }
                 }
 
