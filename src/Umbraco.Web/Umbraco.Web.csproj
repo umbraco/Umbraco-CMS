@@ -254,12 +254,12 @@
     <Compile Include="PublishedCache\NuCache\DataSource\AppSettingsNuCachePropertyMapFactory.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\IContentNestedDataSerializer.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\IDictionaryOfPropertyDataSerializer.cs" />
-    <Compile Include="PublishedCache\NuCache\DataSource\INucachePropertyOptionsFactory.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\INuCachePropertyOptionsFactory.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\JsonContentNestedDataSerializer.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\LazyCompressedString.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\MsgPackContentNestedDataSerializer.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\Lz4DictionaryOfPropertyDataSerializer.cs" />
-    <Compile Include="PublishedCache\NuCache\DataSource\NucachePropertyOptions.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\NuCachePropertyOptions.cs" />
     <Compile Include="PublishedCache\NuCache\PublishedSnapshotServiceOptions.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\GenObj.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\GenRef.cs" />

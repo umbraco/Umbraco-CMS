@@ -9,9 +9,9 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 {
     public class AppSettingsNuCachePropertyMapFactory : INuCachePropertyOptionsFactory
     {
-        public NucachePropertyOptions GetNuCachePropertyOptions()
+        public NuCachePropertyOptions GetNuCachePropertyOptions()
         {
-            NucachePropertyOptions options = new NucachePropertyOptions
+            NuCachePropertyOptions options = new NuCachePropertyOptions
             {
                 PropertyMap = GetPropertyMap(),
                 LZ4CompressionLevel = K4os.Compression.LZ4.LZ4Level.L10_OPT,

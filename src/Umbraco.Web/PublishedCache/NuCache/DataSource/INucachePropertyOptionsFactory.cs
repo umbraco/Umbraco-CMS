@@ -8,6 +8,6 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 {
     public interface INuCachePropertyOptionsFactory
     {
-        NucachePropertyOptions GetNuCachePropertyOptions();
+        NuCachePropertyOptions GetNuCachePropertyOptions();
     }
 }

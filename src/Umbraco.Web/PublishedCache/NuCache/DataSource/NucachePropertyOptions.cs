@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 {
-    public class NucachePropertyOptions
+    public class NuCachePropertyOptions
     {
         public IReadOnlyDictionary<string, (NucachePropertyCompressionLevel compress, NucachePropertyDecompressionLevel decompressionLevel,
             string mappedAlias)> PropertyMap

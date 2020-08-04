@@ -146,7 +146,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             }
         }
         private readonly (NucachePropertyCompressionLevel Compress, NucachePropertyDecompressionLevel decompressionLevel, string MappedAlias) DEFAULT_MAP =(NucachePropertyCompressionLevel.None, NucachePropertyDecompressionLevel.NotCompressed, null);
-        private readonly NucachePropertyOptions _nucachePropertyOptions;
+        private readonly NuCachePropertyOptions _nucachePropertyOptions;
 
         public (NucachePropertyCompressionLevel Compress, NucachePropertyDecompressionLevel decompressionLevel, string MappedAlias) GetSerializationMap(string propertyAlias)
         {

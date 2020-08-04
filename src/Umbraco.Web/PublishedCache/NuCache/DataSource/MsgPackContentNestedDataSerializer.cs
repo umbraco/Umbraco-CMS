@@ -12,7 +12,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
     internal class MsgPackContentNestedDataSerializer : IContentNestedDataByteSerializer
     {
         private MessagePackSerializerOptions _options;
-        private readonly NucachePropertyOptions _propertyOptions;
+        private readonly NuCachePropertyOptions _propertyOptions;
 
         public MsgPackContentNestedDataSerializer(INuCachePropertyOptionsFactory propertyOptionsFactory = null)
         {
@@ -34,7 +34,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             _options = defaultOptions
                 .WithResolver(resolver)
                 .WithCompression(MessagePackCompression.Lz4BlockArray);
-            _propertyOptions = propertyOptionsFactory?.GetNuCachePropertyOptions() ?? new NucachePropertyOptions();
+            _propertyOptions = propertyOptionsFactory?.GetNuCachePropertyOptions() ?? new NuCachePropertyOptions();
         }
 
         public string ToJson(string serialized)
