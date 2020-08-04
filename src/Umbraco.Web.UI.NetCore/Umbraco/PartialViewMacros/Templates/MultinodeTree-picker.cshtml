@@ -1,7 +1,9 @@
+@using Umbraco.Core
 @using Umbraco.Core.Models.PublishedContent
-@using Umbraco.Web
-@inherits Umbraco.Web.Macros.PartialViewMacroPage
-
+@using Umbraco.Web.Routing
+@inherits Umbraco.Web.Common.Macros.PartialViewMacroPage
+@inject IPublishedValueFallback PublishedValueFallback
+@inject IPublishedUrlProvider PublishedUrlProvider
 @*
     This snippet lists the items from a Multinode tree picker, using the picker's default settings.
     Content Values stored as XML.
@@ -10,7 +12,7 @@
     multinode treepicker (so: replace "PropertyWithPicker" with the alias of your property).
 *@
 
-@{ var selection = Model.Content.Value<IEnumerable<IPublishedContent>>("PropertyWithPicker").ToArray(); }
+@{ var selection = Model.Content.Value<IEnumerable<IPublishedContent>>(PublishedValueFallback, "PropertyWithPicker").ToArray(); }
 
 @if (selection.Length > 0)
 {
@@ -18,7 +20,7 @@
         @foreach (var item in selection)
         {
             <li>
-                <a href="@item.Url">@item.Name</a>
+                <a href="@item.Url(PublishedUrlProvider)">@item.Name</a>
             </li>
         }
     </ul>

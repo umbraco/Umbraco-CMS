@@ -7,8 +7,9 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Web.Models;
 using Umbraco.Core.Media;
+using Umbraco.Web.Routing;
 
-namespace Umbraco.Web
+namespace Umbraco.Extensions
 {
     public static class ImageCropperTemplateCoreExtensions
     {
@@ -21,12 +22,20 @@ namespace Umbraco.Web
         /// <param name="cropAlias">
         /// The crop alias e.g. thumbnail
         /// </param>
+        /// <param name="imageUrlGenerator">The image url generator.</param>
+        /// <param name="publishedValueFallback">The published value fallback.</param>
+        /// <param name="publishedUrlProvider">The published url provider.</param>
         /// <returns>
         /// The ImageProcessor.Web Url.
         /// </returns>
-        public static string GetCropUrl(this IPublishedContent mediaItem, string cropAlias, IImageUrlGenerator imageUrlGenerator)
+        public static string GetCropUrl(
+            this IPublishedContent mediaItem,
+            string cropAlias,
+            IImageUrlGenerator imageUrlGenerator,
+            IPublishedValueFallback publishedValueFallback,
+            IPublishedUrlProvider publishedUrlProvider)
         {
-            return mediaItem.GetCropUrl(imageUrlGenerator, cropAlias: cropAlias, useCropDimensions: true);
+            return mediaItem.GetCropUrl(imageUrlGenerator, publishedValueFallback, publishedUrlProvider, cropAlias: cropAlias, useCropDimensions: true);
         }
 
         /// <summary>
@@ -41,12 +50,21 @@ namespace Umbraco.Web
         /// <param name="cropAlias">
         /// The crop alias e.g. thumbnail
         /// </param>
+        /// <param name="imageUrlGenerator">The image url generator.</param>
+        /// <param name="publishedValueFallback">The published value fallback.</param>
+        /// <param name="publishedUrlProvider">The published url provider.</param>
         /// <returns>
         /// The ImageProcessor.Web Url.
         /// </returns>
-        public static string GetCropUrl(this IPublishedContent mediaItem, string propertyAlias, string cropAlias, IImageUrlGenerator imageUrlGenerator)
+        public static string GetCropUrl(
+            this IPublishedContent mediaItem,
+            string propertyAlias,
+            string cropAlias,
+            IImageUrlGenerator imageUrlGenerator,
+            IPublishedValueFallback publishedValueFallback,
+            IPublishedUrlProvider publishedUrlProvider)
         {
-            return mediaItem.GetCropUrl(imageUrlGenerator, propertyAlias: propertyAlias, cropAlias: cropAlias, useCropDimensions: true);
+            return mediaItem.GetCropUrl( imageUrlGenerator, publishedValueFallback, publishedUrlProvider, propertyAlias: propertyAlias, cropAlias: cropAlias, useCropDimensions: true);
         }
 
         /// <summary>
@@ -55,6 +73,9 @@ namespace Umbraco.Web
         /// <param name="mediaItem">
         /// The IPublishedContent item.
         /// </param>
+        /// <param name="imageUrlGenerator">The image url generator.</param>
+        /// <param name="publishedValueFallback">The published value fallback.</param>
+        /// <param name="publishedUrlProvider">The published url provider.</param>
         /// <param name="width">
         /// The width of the output image.
         /// </param>
@@ -99,12 +120,15 @@ namespace Umbraco.Web
         /// <param name="upScale">
         /// If the image should be upscaled to requested dimensions
         /// </param>
+
         /// <returns>
         /// The <see cref="string"/>.
         /// </returns>
         public static string GetCropUrl(
              this IPublishedContent mediaItem,
              IImageUrlGenerator imageUrlGenerator,
+             IPublishedValueFallback publishedValueFallback,
+             IPublishedUrlProvider publishedUrlProvider,
              int? width = null,
              int? height = null,
              string propertyAlias = Constants.Conventions.Media.File,
@@ -126,10 +150,10 @@ namespace Umbraco.Web
             if (mediaItem.HasProperty(propertyAlias) == false || mediaItem.HasValue(propertyAlias) == false)
                 return string.Empty;
 
-            var mediaItemUrl = mediaItem.MediaUrl(propertyAlias: propertyAlias);
+            var mediaItemUrl = mediaItem.MediaUrl(publishedUrlProvider, propertyAlias: propertyAlias);
 
             //get the default obj from the value converter
-            var cropperValue = mediaItem.Value(propertyAlias);
+            var cropperValue = mediaItem.Value(publishedValueFallback, propertyAlias);
 
             //is it strongly typed?
             var stronglyTyped = cropperValue as ImageCropperValue;

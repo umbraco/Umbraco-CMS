@@ -1,7 +1,9 @@
+@using Umbraco.Core
 @using Umbraco.Web
-@using Umbraco.Web.Composing
-@inherits Umbraco.Web.Macros.PartialViewMacroPage
-
+@using Umbraco.Web.Routing
+@inherits Umbraco.Web.Common.Macros.PartialViewMacroPage
+@inject IPublishedContentQuery PublishedContentQuery
+@inject IPublishedUrlProvider PublishedUrlProvider
 @*
     Macro to display a series of images from a media folder.
 
@@ -19,7 +21,7 @@
 @if (mediaId != null)
 {
     @* Get the media item associated with the id passed in *@
-    var media = Current.PublishedContentQuery.Media(mediaId);
+    var media = PublishedContentQuery.Media(mediaId);
     var selection = media.Children.ToArray();
 
     if (selection.Length > 0)
@@ -28,7 +30,7 @@
             @foreach (var item in selection)
             {
                 <li>
-                    <img src="@item.Url()" alt="@item.Name" />
+                    <img src="@item.Url(PublishedUrlProvider)" alt="@item.Name" />
                 </li>
             }
         </ul>
