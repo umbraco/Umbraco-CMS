@@ -22,7 +22,7 @@
         };
 
         if ($scope.model.modify) {
-            angular.extend($scope.model.embed, $scope.model.modify);
+            Utilities.extend($scope.model.embed, $scope.model.modify);
 
             showPreview();
         }
