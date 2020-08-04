@@ -730,7 +730,7 @@
                     return null;
                 }
 
-                var dataModel = getDataByUdi(layoutEntry.udi, this.value.contentData);
+                var dataModel = getDataByUdi(layoutEntry.contentUdi, this.value.contentData);
                 if (dataModel === null) {
                     return null;
                 }
