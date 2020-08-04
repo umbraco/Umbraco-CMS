@@ -53,6 +53,39 @@
                 height: 4px;
             }
         }
+
+        // Validation
+        .show-validation &.-has-error {
+            color: @red;
+
+            &:hover {
+                color: @red !important;
+            }
+
+            &::before {
+                background-color: @red;
+            }
+
+            &:not(.is-active) {
+                .badge {
+                    animation-duration: 1.4s;
+                    animation-iteration-count: infinite;
+                    animation-name: umb-sub-views-nav-item--badge-bounce;
+                    animation-timing-function: ease;
+                    @keyframes umb-sub-views-nav-item--badge-bounce {
+                        0%   { transform: translateY(0); }
+                        20%  { transform: translateY(-6px); }
+                        40%  { transform: translateY(0); }
+                        55%  { transform: translateY(-3px); }
+                        70%  { transform: translateY(0); }
+                        100% { transform: translateY(0); }
+                    }
+                }
+                .badge.--error-badge {
+                    display: block;
+                }
+            }
+        }
     }
 
     &__action:active,
@@ -100,6 +133,10 @@
         &:empty {
             height: 12px;
             min-width: 12px;
+        }
+        &.--error-badge {
+            display: none;
+            font-weight: 900;
         }
     }
 
@@ -180,15 +217,5 @@
         .umb-sub-views-nav-item:first {
             border-left: none;
         }
-    }
-}
-
-// Validation
-.show-validation .umb-sub-views-nav-item__action.-has-error,
-.show-validation .umb-sub-views-nav-item > a.-has-error {
-    color: @red;
-
-    &::before {
-        background-color: @red;
     }
 }

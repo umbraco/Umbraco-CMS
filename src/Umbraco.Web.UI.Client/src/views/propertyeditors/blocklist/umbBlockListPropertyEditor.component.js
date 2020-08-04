@@ -101,10 +101,6 @@
                 scopeOfExistence = vm.umbElementEditorContent.getScope();
             }
 
-            // Create Model Object, to manage our data for this Block Editor.
-            modelObject = blockEditorService.createModelObject(vm.model.value, vm.model.editor, vm.model.config.blocks, scopeOfExistence, $scope);
-            modelObject.load().then(onLoaded);
-
             copyAllBlocksAction = {
                 labelKey: "clipboard_labelForCopyAllEntries",
                 labelTokens: [vm.model.label],
@@ -128,6 +124,11 @@
             if (vm.umbProperty) {
                 vm.umbProperty.setPropertyActions(propertyActions);
             }
+
+            // Create Model Object, to manage our data for this Block Editor.
+            modelObject = blockEditorService.createModelObject(vm.model.value, vm.model.editor, vm.model.config.blocks, scopeOfExistence, $scope);
+            modelObject.load().then(onLoaded);
+
         };
 
         // Called when we save the value, the server may return an updated data and our value is re-synced
