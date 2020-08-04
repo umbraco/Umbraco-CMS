@@ -12,12 +12,17 @@ context('Partial View Macro Files', () => {
     cy.umbracoTreeItem("settings", ["Partial View Macro Files"]).rightclick();
   }
 
-  it('Create new partial view macro', () => {
-    const name = "TestPartialViewMacro";
-    const fileName = name + ".cshtml";
+  function cleanup(name, extension = ".cshtml") {
+    fileName = name + extension;
 
     cy.umbracoEnsureMacroNameNotExists(name);
     cy.umbracoEnsurePartialViewMacroFileNameNotExists(fileName);
+  }
+
+  it('Create new partial view macro', () => {
+    const name = "TestPartialViewMacro";
+
+    cleanup(name);
 
     navigateToSettings();
 
@@ -35,16 +40,13 @@ context('Partial View Macro Files', () => {
     cy.umbracoSuccessNotification().should('be.visible');
 
     //Clean up
-    cy.umbracoEnsurePartialViewMacroFileNameNotExists(fileName);
-    cy.umbracoEnsureMacroNameNotExists(name);
+    cleanup(name);
   });
 
   it('Create new partial view macro without macro', () => {
     const name = "TestPartialMacrolessMacro";
-    const fileName = name + ".cshtml";
 
-    cy.umbracoEnsurePartialViewMacroFileNameNotExists(fileName);
-    cy.umbracoEnsureMacroNameNotExists(name);
+    cleanup(name);
 
     navigateToSettings();
 
@@ -62,19 +64,15 @@ context('Partial View Macro Files', () => {
     cy.umbracoSuccessNotification().should('be.visible');
 
     // Clean
-    cy.umbracoEnsurePartialViewMacroFileNameNotExists(fileName);
-    cy.umbracoEnsureMacroNameNotExists(name);
+    cleanup(name);
   });
 
   it('Create new partial view macro from snippet', () => {
     const name = "TestPartialFromSnippet";
-    const fileName = name + ".cshtml";
 
-    cy.umbracoEnsureMacroNameNotExists(name);
-    cy.umbracoEnsurePartialViewMacroFileNameNotExists(fileName);
+    cleanup(name);
 
     navigateToSettings();
-
     cy.umbracoContextMenuAction("action-create").click();
 
     cy.get('.menu-label').eq(2).click();
@@ -92,8 +90,7 @@ context('Partial View Macro Files', () => {
     cy.umbracoSuccessNotification().should('be.visible');
 
     // Clean
-    cy.umbracoEnsurePartialViewMacroFileNameNotExists(fileName);
-    cy.umbracoEnsureMacroNameNotExists(name);
+    cleanup(name);
   });
 
 });
