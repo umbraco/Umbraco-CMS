@@ -1,10 +1,12 @@
 using System;
-using System.Collections;
 using System.Data.Common;
 using System.Data.SqlClient;
+using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
@@ -13,7 +15,6 @@ using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Extensions.Hosting;
 using Serilog.Extensions.Logging;
-using Umbraco.Composing;
 using Umbraco.Configuration;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
@@ -26,6 +27,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Runtime;
 using Umbraco.Web.Common.AspNetCore;
+using Umbraco.Web.Common.Extensions;
 using Umbraco.Web.Common.Profiler;
 
 namespace Umbraco.Extensions
@@ -156,6 +158,23 @@ namespace Umbraco.Extensions
             return services;
         }
 
+        public static IServiceCollection AddUmbracoRequestLocalization(this IServiceCollection services)
+        {
+            services.Configure<RequestLocalizationOptions>(options =>
+            {
+                var supportedCultures = CultureInfo
+                    .GetCultures(CultureTypes.AllCultures & ~ CultureTypes.NeutralCultures)
+                    .Where(cul => !String.IsNullOrEmpty(cul.Name))
+                    .ToArray();
+
+                options.SupportedCultures = supportedCultures;
+                options.SupportedUICultures = supportedCultures;
+                options.AddInitialRequestCultureProvider(new UmbracoBackOfficeIdentityCultureProvider());
+            });
+
+            return services;
+        }
+
         /// <summary>
         /// Adds the Umbraco Back Core requirements
         /// </summary>
@@ -182,6 +201,10 @@ namespace Umbraco.Extensions
             if (container is null) throw new ArgumentNullException(nameof(container));
             if (entryAssembly is null) throw new ArgumentNullException(nameof(entryAssembly));
 
+            // Set culture options
+            services.AddUmbracoRequestLocalization();
+
+            // Add supported databases
             services.AddUmbracoSqlCeSupport();
             services.AddUmbracoSqlServerSupport();
 
@@ -228,7 +251,7 @@ namespace Umbraco.Extensions
             factory = coreRuntime.Configure(container);
 
             return services;
-        }        
+        }
 
         private static ITypeFinder CreateTypeFinder(Core.Logging.ILogger logger, IProfiler profiler, IWebHostEnvironment webHostEnvironment, Assembly entryAssembly, ITypeFinderSettings typeFinderSettings)
         {
