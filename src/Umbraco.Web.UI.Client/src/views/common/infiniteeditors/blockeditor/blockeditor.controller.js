@@ -42,6 +42,7 @@ angular.module("umbraco")
 
             vm.submitAndClose = function () {
                 if (vm.model && vm.model.submit) {
+
                     // always keep server validations since this will be a nested editor and server validations are global
                     if (formHelper.submitForm({
                         scope: $scope,
@@ -49,13 +50,16 @@ angular.module("umbraco")
                         keepServerValidation: true
                     })) {
                         vm.model.submit(vm.model);
+                        vm.saveButtonState = "success";
+                    } else {
+                        vm.saveButtonState = "error";
                     }
                 }
             }
 
             vm.close = function () {
                 if (vm.model && vm.model.close) {
-                    // TODO: At this stage there could very well have been server errors that have been cleared 
+                    // TODO: At this stage there could very well have been server errors that have been cleared
                     // but if we 'close' we are basically cancelling the value changes which means we'd want to cancel
                     // all of the server errors just cleared. It would be possible to do that but also quite annoying.
                     // The rudimentary way would be to:
