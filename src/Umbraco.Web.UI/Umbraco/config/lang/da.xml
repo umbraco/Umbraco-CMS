@@ -647,6 +647,7 @@
     <key alias="design">Design</key>
     <key alias="dictionary">Ordbog</key>
     <key alias="dimensions">Dimensioner</key>
+    <key alias="discard">Kassér</key>
     <key alias="down">Ned</key>
     <key alias="download">Hent</key>
     <key alias="edit">Rediger</key>
@@ -1851,6 +1852,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="tabBlockSettings">Indstillinger</key>
     <key alias="headlineAdvanced">Avanceret</key>
     <key alias="forceHideContentEditor">Skjuld indholds editoren</key>
+    <key alias="blockHasChanges">Du har lavet ændringer til dette indhold. Er du sikker på at du vil kassere dem?</key>
   </area>
 
 </language>
