@@ -29,7 +29,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     /// enable this for webapi controllers, however since this controller is used to render macro content and macros can access
     /// Session, we don't want it to throw null reference exceptions.
     /// </remarks>
-    [PluginController("UmbracoApi")]
+    [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     public class MacroRenderingController : UmbracoAuthorizedJsonController
     {
         private readonly IMacroService _macroService;

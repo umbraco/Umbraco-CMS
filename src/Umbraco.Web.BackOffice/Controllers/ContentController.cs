@@ -48,7 +48,7 @@ namespace Umbraco.Web.Editors
     /// This controller is decorated with the UmbracoApplicationAuthorizeAttribute which means that any user requesting
     /// access to ALL of the methods on this controller will need access to the content application.
     /// </remarks>
-    [PluginController("UmbracoApi")]
+    [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     [UmbracoApplicationAuthorize(Constants.Applications.Content)]
     public class ContentController : ContentControllerBase
     {
