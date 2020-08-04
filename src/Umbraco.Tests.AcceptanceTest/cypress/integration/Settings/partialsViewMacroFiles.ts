@@ -64,35 +64,35 @@ context('Partial View Macro Files', () => {
   });
 
   it('Create new partial view macro from snippet', () => {
-      const name = "TestPartialFromSnippet";
-      const fileName = name + ".cshtml";
+    const name = "TestPartialFromSnippet";
+    const fileName = name + ".cshtml";
 
-      cy.umbracoEnsureMacroNameNotExists(fileName);
-      cy.umbracoEnsureMacroNameNotExists(fileName);
+    cy.umbracoEnsureMacroNameNotExists(fileName);
+    cy.umbracoEnsureMacroNameNotExists(fileName);
 
-      cy.umbracoSection('settings');
-      cy.get('li .umb-tree-root:contains("Settings")').should("be.visible");
+    cy.umbracoSection('settings');
+    cy.get('li .umb-tree-root:contains("Settings")').should("be.visible");
 
-      cy.umbracoTreeItem("settings", ["Partial View Macro Files"]).rightclick();
+    cy.umbracoTreeItem("settings", ["Partial View Macro Files"]).rightclick();
 
-      cy.umbracoContextMenuAction("action-create").click();
-      cy.get('.menu-label').eq(2).click();
+    cy.umbracoContextMenuAction("action-create").click();
+    cy.get('.menu-label').eq(2).click();
 
-      // Select snippet
-      cy.get('.menu-label').eq(1).click();
+    // Select snippet
+    cy.get('.menu-label').eq(1).click();
 
-      // Type name
-      cy.umbracoEditorHeaderName(name);
+    // Type name
+    cy.umbracoEditorHeaderName(name);
 
-      // Save
-      cy.get('.btn-success').click();
+    // Save
+    cy.get('.btn-success').click();
 
-      // Assert
-      cy.umbracoSuccessNotification().should('be.visible');
+    // Assert
+    cy.umbracoSuccessNotification().should('be.visible');
 
-      // Clean
-      cy.umbracoEnsurePartialViewMacroFileNameNotExists(fileName);
-      cy.umbracoEnsureMacroNameNotExists(name);
+    // Clean
+    cy.umbracoEnsurePartialViewMacroFileNameNotExists(fileName);
+    cy.umbracoEnsureMacroNameNotExists(name);
   });
 
 });
