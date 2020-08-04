@@ -326,7 +326,6 @@
                 openSettings: openSettings === true,
                 liveEditing: liveEditing,
                 title: blockObject.label,
-                index: blockIndex,
                 view: "views/common/infiniteeditors/blockeditor/blockeditor.html",
                 size: blockObject.config.editorSize || "medium",
                 submit: function(blockEditorModel) {
