@@ -9,7 +9,10 @@
 (function () {
     "use strict";
 
-    function DocumentTypesEditController($scope, $routeParams, contentTypeResource, dataTypeResource, editorState, contentEditingHelper, formHelper, navigationService, iconHelper, contentTypeHelper, notificationsService, $q, localizationService, overlayHelper, eventsService, angularHelper, editorService) {
+    function DocumentTypesEditController($scope, $routeParams, $q,
+        contentTypeResource, editorState, contentEditingHelper,
+        navigationService, iconHelper, contentTypeHelper, notificationsService,
+        localizationService, overlayHelper, eventsService, angularHelper, editorService) {
 
         var vm = this;
         var evts = [];

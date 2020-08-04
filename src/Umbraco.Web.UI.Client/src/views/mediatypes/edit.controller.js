@@ -10,7 +10,7 @@
     "use strict";
 
     function MediaTypesEditController($scope, $routeParams, $q,
-        mediaTypeResource, dataTypeResource, editorState, contentEditingHelper, 
+        mediaTypeResource, editorState, contentEditingHelper, 
         navigationService, iconHelper, contentTypeHelper, notificationsService,
         localizationService, overlayHelper, eventsService, angularHelper) {
 

@@ -10,7 +10,7 @@
     "use strict";
 
     function MemberTypesEditController($scope, $routeParams, $q,
-        memberTypeResource, dataTypeResource, editorState, iconHelper,
+        memberTypeResource, editorState, iconHelper,
         navigationService, contentEditingHelper, notificationsService, localizationService,
         overlayHelper, contentTypeHelper, angularHelper, eventsService) {
 
