@@ -90,12 +90,12 @@
             }
 
             function cleanupEventHandlers() {
-                const activeEditor = infiniteEditors[infiniteEditors.length - 1];
-                const inactiveEditors = infiniteEditors.filter(editor => editor !== activeEditor);
+                var activeEditor = infiniteEditors[infiniteEditors.length - 1];
+                var inactiveEditors = infiniteEditors.filter(editor => editor !== activeEditor);
 
                 if(inactiveEditors.length > 0) {
-                    for (let index = 0; index < inactiveEditors.length; index++) {
-                        const inactiveEditor = inactiveEditors[index];
+                    for (var index = 0; index < inactiveEditors.length; index++) {
+                        var inactiveEditor = inactiveEditors[index];
                         
                         // Remove event handlers from inactive editors
                         inactiveEditor.removeEventListener('keydown', handleKeydown);
@@ -108,7 +108,7 @@
             }
 
             function onInit(targetElm, delay) {
-                const timeout = delay ? delay : 500;
+                var timeout = delay ? delay : 500;
 
                 $timeout(() => {
 
@@ -154,7 +154,7 @@
                 disconnectObserver = true;
 
                 // Pass the correct editor in order to find the focusable elements
-                const newTarget = infiniteEditors[infiniteEditors.length - 2];
+                var newTarget = infiniteEditors[infiniteEditors.length - 2];
 
                 if(infiniteEditors.length > 1){
                     // Passing the timeout parameter as a string on purpose to bypass the falsy value that a number would give
