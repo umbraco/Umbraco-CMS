@@ -198,7 +198,7 @@ angular.module("umbraco.directives")
                 }
             }));
 
-            // Update tree icon is changed
+            // Update tree icon if changed
             evts.push(eventsService.on("editors.tree.icon.changed", function (e, args) {          
                 if (args.icon !== scope.node.icon && args.id === scope.node.id) {
                     scope.node.icon = args.icon;
