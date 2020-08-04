@@ -4,11 +4,11 @@
  *
  * @description
  * <b>Added in Umbraco 8.7</b>. Model Object for dealing with data of Block Editors.
- * 
+ *
  * Block Editor Model Object provides the basic features for editing data of a block editor.<br/>
  * Use the Block Editor Service to instantiate the Model Object.<br/>
  * See {@link umbraco.services.blockEditorService blockEditorService}
- * 
+ *
  */
 (function () {
     'use strict';
@@ -236,7 +236,7 @@
 
 
         /**
-         * Formats the content apps and ensures unsupported property's have the notsupported view (returns a promise)
+         * Formats the content apps and ensures unsupported property's have the notsupported view
          * @param {any} scaffold
          */
         function formatScaffoldData(scaffold) {
@@ -255,7 +255,7 @@
             // could be empty in tests
             if (!scaffold.apps) {
                 console.warn("No content apps found in scaffold");
-                return $q.resolve(scaffold);
+                return scaffold;
             }
 
             // replace view of content app
@@ -271,22 +271,27 @@
                 scaffold.apps.splice(infoAppIndex, 1);
             }
 
+            return scaffold;
+        }
+
+        /**
+         * Creates a settings content app, we only want to do this if settings is present on the specific block.
+         * @param {any} contentModel
+         */
+        function appendSettingsContentApp(contentModel, settingsName) {
+            if (!contentModel.apps) {
+                return
+            }
+
             // add the settings app
-            return localizationService.localize("blockEditor_tabBlockSettings").then(
-                function (settingsName) {
-
-                    var settingsTab = {
-                        "name": settingsName,
-                        "alias": "settings",
-                        "icon": "icon-settings",
-                        "view": "views/common/infiniteeditors/blockeditor/blockeditor.settings.html",
-                        "hasError": false
-                    };
-                    scaffold.apps.push(settingsTab);
-
-                    return scaffold;
-                }
-            );
+            var settingsTab = {
+                "name": settingsName,
+                "alias": "settings",
+                "icon": "icon-settings",
+                "view": "views/common/infiniteeditors/blockeditor/blockeditor.settings.html",
+                "hasError": false
+            };
+            contentModel.apps.push(settingsTab);
         }
 
         /**
@@ -308,6 +313,8 @@
             }
 
             this.__watchers = [];
+
+            this.__labels = {};
 
             // ensure basic part of data-structure is in place:
             this.value = propertyModelValue;
@@ -373,7 +380,19 @@
              * @returns {Promise} A Promise object which resolves when all scaffold models are loaded.
              */
             load: function () {
+
+                var self = this;
+
                 var tasks = [];
+
+                tasks.push(localizationService.localize("blockEditor_tabBlockSettings").then(
+                    function (settingsName) {
+                        // self.__labels might not exists anymore, this happens if this instance has been destroyed before the load is complete.
+                        if(self.__labels) {
+                            self.__labels.settingsName = settingsName;
+                        }
+                    }
+                ));
 
                 var scaffoldKeys = [];
 
@@ -387,19 +406,11 @@
                 // removing duplicates.
                 scaffoldKeys = scaffoldKeys.filter((value, index, self) => self.indexOf(value) === index);
 
-                var self = this;
-
                 scaffoldKeys.forEach(contentTypeKey => {
                     tasks.push(contentResource.getScaffoldByKey(-20, contentTypeKey).then(scaffold => {
                         // self.scaffolds might not exists anymore, this happens if this instance has been destroyed before the load is complete.
                         if (self.scaffolds) {
-                            return formatScaffoldData(scaffold).then(s => {
-                                self.scaffolds.push(s);
-                                return s;
-                            });
-                        }
-                        else {
-                            return $q.resolve(scaffold);
+                            self.scaffolds.push(formatScaffoldData(scaffold));
                         }
                     }));
                 });
@@ -525,7 +536,7 @@
                 var blockObject = {};
                 // Set an angularJS cloneNode method, to avoid this object begin cloned.
                 blockObject.cloneNode = function () {
-                    return null;// angularJS accept this as a cloned value as long as the 
+                    return null;// angularJS accept this as a cloned value as long as the
                 }
                 blockObject.key = String.CreateGuid().replace(/-/g, "");
                 blockObject.config = Utilities.copy(blockConfiguration);
@@ -577,6 +588,9 @@
                         ensureUdiAndKey(blockObject.settings, settingsUdi);
 
                         mapToElementModel(blockObject.settings, settingsData);
+
+                        // add settings content-app
+                        appendSettingsContentApp(blockObject.content, this.__labels.settingsName);
                     }
                 }
 
@@ -623,7 +637,7 @@
 
                     // remove model from isolatedScope.
                     delete this.__scope.blockObjects["_" + this.key];
-                    // NOTE: It seems like we should call this.__scope.$destroy(); since that is the only way to remove a scope from it's parent, 
+                    // NOTE: It seems like we should call this.__scope.$destroy(); since that is the only way to remove a scope from it's parent,
                     // however that is not the case since __scope is actually this.isolatedScope which gets cleaned up when the outer scope is
                     // destroyed. If we do that here it breaks the scope chain and validation.
                     delete this.__scope;
