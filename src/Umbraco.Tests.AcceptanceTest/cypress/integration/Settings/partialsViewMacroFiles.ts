@@ -32,6 +32,35 @@ context('Partial View Macro Files', () => {
     //Clean up
     cy.umbracoEnsurePartialViewMacroFileNameNotExists(fileName);
     cy.umbracoEnsureMacroNameNotExists(name);
-   });
+  });
+
+  it('Create new partial view macro without macro', () => {
+    const name = "TestPartialMacrolessMacro";
+    const fileName = name + ".cshtml";
+
+    cy.umbracoEnsurePartialViewMacroFileNameNotExists(fileName);
+    cy.umbracoEnsureMacroNameNotExists(fileName);
+
+    cy.umbracoSection('settings');
+    cy.get('li .umb-tree-root:contains("Settings")').should("be.visible");
+
+    cy.umbracoTreeItem("settings", ["Partial View Macro Files"]).rightclick();
+
+    cy.umbracoContextMenuAction("action-create").click();
+    cy.get('.menu-label').eq(1).click();
+
+    // Type name
+    cy.umbracoEditorHeaderName(name);
+
+    // Save
+    cy.get('.btn-success').click();
+
+    // Assert
+    cy.umbracoSuccessNotification().should('be.visible');
+
+    // Clean
+    cy.umbracoEnsurePartialViewMacroFileNameNotExists(fileName);
+    cy.umbracoEnsureMacroNameNotExists(name);
+  });
 
 });
