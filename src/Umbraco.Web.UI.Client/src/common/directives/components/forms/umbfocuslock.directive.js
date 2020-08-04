@@ -20,10 +20,18 @@
             var focusableElements;
             var firstFocusableElement;
             var lastFocusableElement;
+            var infiniteEditorsWrapper;
+            var infiniteEditors;
+            var disconnectObserver = false;
             
             // List of elements that can be focusable within the focus lock
             var focusableElementsSelector = 'a[href]:not([disabled]):not(.ng-hide), button:not([disabled]):not(.ng-hide), textarea:not([disabled]):not(.ng-hide), input:not([disabled]):not(.ng-hide), select:not([disabled]):not(.ng-hide)';
             var bodyElement = document.querySelector('body');
+
+            function getDomNodes(){
+                infiniteEditorsWrapper = document.querySelector('.umb-editors');
+                infiniteEditors = Array.from(infiniteEditorsWrapper.querySelectorAll('.umb-editor'));
+            }
 
             function getFocusableElements(targetElm) {
                 var elm = targetElm ? targetElm : target;
@@ -66,38 +74,22 @@
                 var observer = new MutationObserver(domChange);
 
                 // Options for the observer (which mutations to observe)
-                var config = { attributes: true, attributeFilter: ['umb-focus-lock'], childList: true, subtree: true};
+                var config = { attributes: true, childList: true, subtree: true};
 
-                function domChange(mutationsList) {
-                    if(!init){
-                        getFocusableElements();
-                        return;
-                    }
-
-                    for (let index = 0; index < mutationsList.length; index++) {
-                        const mutation = mutationsList[index];
-                        
-                        // Look at the attributes - If the disabled attribute changes we call the getFocusableElements method
-                        // ensuring the enabled element can be tabbed into
-                        if (mutation.type === 'attributes') {
-
-                            if(mutation.attributeName === 'umb-focus-lock') {
-                                onInit(mutation.target);
-
-                                // Disconnect the observer once onInit has been called again
-                                observer.disconnect();
-                            }
-                        }
-                    }
+                function domChange() {
+                    getFocusableElements();
                 }
 
                 // Start observing the target node for configured mutations
                 observer.observe(targetToObserve, config);
+
+                // Disconnect observer
+                if(disconnectObserver){
+                    observer.disconnect();
+                }
             }
 
             function cleanupEventHandlers() {
-                const infiniteEditorsWrapper = document.querySelector('.umb-editors');
-                const infiniteEditors = Array.from(infiniteEditorsWrapper.querySelectorAll('.umb-editor'));
                 const activeEditor = infiniteEditors[infiniteEditors.length - 1];
                 const inactiveEditors = infiniteEditors.filter(editor => editor !== activeEditor);
 
@@ -115,10 +107,17 @@
                 }
             }
 
-            function onInit(targetElm) {
-                $timeout(function() {
+            function onInit(targetElm, delay) {
+                const timeout = delay ? delay : 500;
 
-                    cleanupEventHandlers();
+                $timeout(() => {
+
+                    getDomNodes();
+                    
+                    // Only do the cleanup if we're in infinite editing mode
+                    if(infiniteEditors.length > 0){
+                        cleanupEventHandlers();
+                    }
 
                     getFocusableElements(targetElm);
 
@@ -144,22 +143,25 @@
                         target.addEventListener('keydown', handleKeydown);
                     }
 
-                }, 500);
+                }, timeout);
             }
 
             onInit();
 
-            // Reinitialize the onInit() method if it was not the last editor that was closed
-            eventsService.on('appState.editors.close', (event, args) => {
-                if(args && args.editors.length !== 0) {
-                    if(target.hasAttribute('umb-focus-lock')) {
-                        observeDomChanges(true);
-                    }
-                }
-            });
-
-            // Remove the event listener
+            // If more than one editor is still open then re-initialize otherwise remove the event listener
             scope.$on('$destroy', function () {
+                // Make sure to disconnect the observer so we potentially don't end up with having many active ones
+                disconnectObserver = true;
+
+                // Pass the correct editor in order to find the focusable elements
+                const newTarget = infiniteEditors[infiniteEditors.length - 2];
+
+                if(infiniteEditors.length > 1){
+                    // Passing the timeout parameter as a string on purpose to bypass the falsy value that a number would give
+                    onInit(newTarget, '0');
+                    return;
+                }
+                
                 target.removeEventListener('keydown', handleKeydown);
             });
         }
@@ -175,7 +177,3 @@
     angular.module('umbraco.directives').directive('umbFocusLock', FocusLock);
 
 })();
-
-
-// TODO: observer.disconnect() on destroy - Ensure it does not conflict with the eventlistener for the closed event!
-// TODO: removeEventHandlers on destroy - Be ware of the same as weith observer.disconnect();
