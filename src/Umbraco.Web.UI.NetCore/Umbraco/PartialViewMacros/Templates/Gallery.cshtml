@@ -2,12 +2,15 @@
 @using Umbraco.Web
 @using Umbraco.Core
 @using Umbraco.Core.Media
+@using Umbraco.Extensions
 @using Umbraco.Web.Routing
 @inherits Umbraco.Web.Common.Macros.PartialViewMacroPage
+@inject IPublishedValueFallback PublishedValueFallback
 @inject IPublishedContentQuery PublishedContentQuery
 @inject IVariationContextAccessor VariationContextAccessor
 @inject IPublishedUrlProvider PublishedUrlProvider
 @inject IImageUrlGenerator ImageUrlGenerator
+
 @*
     Macro to display a gallery of images from the Media section.
     Works with either a 'Single Media Picker' or a 'Multiple Media Picker' macro parameter (see below).
@@ -34,25 +37,22 @@
             @* a single image *@
             if (media.IsDocumentType("Image"))
             {
-                Render(media);
+                <div class="col-xs-6 col-md-3">
+                    <a href="@media.Url(PublishedUrlProvider)" class="thumbnail">
+                        <img src="@media.GetCropUrl(ImageUrlGenerator, PublishedValueFallback, PublishedUrlProvider, width: 200, height: 200)" alt="@media.Name"/>
+                    </a>
+                </div>
             }
 
             @* a folder with images under it *@
             foreach (var image in media.Children(VariationContextAccessor))
             {
-                Render(image);
+                <div class="col-xs-6 col-md-3">
+                    <a href="@image.Url(PublishedUrlProvider)" class="thumbnail">
+                        <img src="@image.GetCropUrl(ImageUrlGenerator, PublishedValueFallback, PublishedUrlProvider, width: 200, height: 200)" alt="@image.Name"/>
+                    </a>
+                </div>
             }
         }
     </div>
-}
-
-@{
-    void Render(IPublishedContent item)
-    {
-        /*@<div class="col-xs-6 col-md-3">
-            <a href="@item.Url(PublishedUrlProvider)" class="thumbnail">
-                <img src="@(item.GetCropUrl(ImageUrlGenerator, width: 200, height: 200))" alt="@item.Name" />
-            </a>
-        </div>;*/
-    }
 }
