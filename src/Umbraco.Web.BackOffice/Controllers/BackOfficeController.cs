@@ -88,7 +88,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         public async Task<IActionResult> VerifyInvite(string invite)
         {
             //if you are hitting VerifyInvite, you're already signed in as a different user, and the token is invalid
-            //you'll exit on one of the return RedirectToAction("Default") but you're still logged in so you just get
+            //you'll exit on one of the return RedirectToAction(nameof(Default)) but you're still logged in so you just get
             //dumped at the default admin view with no detail
             if (_webSecurity.IsAuthenticated())
             {
@@ -138,7 +138,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             //sign the user in
             DateTime? previousLastLoginDate = identityUser.LastLoginDateUtc;
             await _signInManager.SignInAsync(identityUser, false);
-            //reset the lastlogindate back to previous as the user hasn't actually logged in, to add a flag or similar to SignInManager would be a breaking change
+            //reset the lastlogindate back to previous as the user hasn't actually logged in, to add a flag or similar to BackOfficeSignInManager would be a breaking change
             identityUser.LastLoginDateUtc = previousLastLoginDate;
             await _userManager.UpdateAsync(identityUser);
 
@@ -158,7 +158,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             return await RenderDefaultOrProcessExternalLoginAsync(
                 //The default view to render when there is no external login info or errors
                 () => View(viewPath),
-                //The ActionResult to perform if external login is successful
+                //The IActionResult to perform if external login is successful
                 () => Redirect("/"));
         }
 
