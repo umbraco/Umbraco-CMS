@@ -149,7 +149,7 @@
                 <div style="position: relative;">
                     <button type="button" class="btn btn-link dropdown-toggle flex" ng-click="vm.toggleFilter('orderBy')">
                         <span><localize key="general_orderBy">Order by</localize>:</span>
-                        <span class="bold" style="margin-left: 2px;">{{ vm.getSortLabel(vm.usersOptions.orderBy, vm.usersOptions.orderDirection) }} </span>
+                        <span class="bold truncate dib" style="margin-left: 5px; margin-right: 3px; max-width: 150px;">{{ vm.getSortLabel(vm.usersOptions.orderBy, vm.usersOptions.orderDirection) }} </span>
                         <span class="caret"></span>
                     </button>
                     <umb-dropdown class="pull-right" ng-if="vm.page.showOrderByFilter" on-close="vm.page.showOrderByFilter = false;" umb-keyboard-list>
