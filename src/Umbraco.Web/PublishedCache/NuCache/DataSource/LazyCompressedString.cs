@@ -8,15 +8,23 @@ using System.Threading.Tasks;
 
 namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 {
-    public class LazyCompressedString
+    /// <summary>
+    /// Lazily decompresses a LZ4 Pickler compressed UTF8 string
+    /// </summary>
+    internal class LazyCompressedString
     {
         private byte[] _bytes;
         private string _str;
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="bytes">LZ4 Pickle compressed UTF8 String</param>
         public LazyCompressedString(byte[] bytes)
         {
             _bytes = bytes;
         }
+
         public override string ToString()
         {
             return LazyInitializer.EnsureInitialized(ref _str, () =>

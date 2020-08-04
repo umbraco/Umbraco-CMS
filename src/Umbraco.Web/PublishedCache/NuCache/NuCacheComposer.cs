@@ -14,13 +14,14 @@ namespace Umbraco.Web.PublishedCache.NuCache
             base.Compose(composition);
 
             var serializer = ConfigurationManager.AppSettings["Umbraco.Web.PublishedCache.NuCache.Serializer"];
-
+            composition.Register<INuCachePropertyOptionsFactory, AppSettingsNuCachePropertyMapFactory>();
+            composition.Register<Lz4DictionaryOfPropertyDataSerializer, Lz4DictionaryOfPropertyDataSerializer>();
             if (serializer == "MsgPack")
             {
                 var propertyDictionarySerializer = ConfigurationManager.AppSettings["Umbraco.Web.PublishedCache.NuCache.DictionaryOfPropertiesSerializer"];
                 if (propertyDictionarySerializer == "LZ4Map")
                 {
-                    composition.Register<INucachePropertyOptionsFactory, AppSettingsNucachePropertyMapFactory>();
+                    
                     composition.Register(factory =>
                     {
                         var lz4Serializer = factory.GetInstance<Lz4DictionaryOfPropertyDataSerializer>();

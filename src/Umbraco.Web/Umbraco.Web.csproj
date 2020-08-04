@@ -251,7 +251,7 @@
     <Compile Include="Compose\NestedContentPropertyComposer.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\MultipleMediaPickerParameterEditor.cs" />
     <Compile Include="PropertyEditors\RichTextEditorPastedImages.cs" />
-    <Compile Include="PublishedCache\NuCache\DataSource\AppSettingsNucachePropertyMapFactory.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\AppSettingsNuCachePropertyMapFactory.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\IContentNestedDataSerializer.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\IDictionaryOfPropertyDataSerializer.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\INucachePropertyOptionsFactory.cs" />

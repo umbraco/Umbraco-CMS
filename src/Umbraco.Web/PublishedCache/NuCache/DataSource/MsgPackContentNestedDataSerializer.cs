@@ -14,7 +14,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         private MessagePackSerializerOptions _options;
         private readonly NucachePropertyOptions _propertyOptions;
 
-        public MsgPackContentNestedDataSerializer(NucachePropertyOptions propertyOptions = null)
+        public MsgPackContentNestedDataSerializer(INuCachePropertyOptionsFactory propertyOptionsFactory = null)
         {
             var defaultOptions = ContractlessStandardResolver.Options;
 
@@ -34,7 +34,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             _options = defaultOptions
                 .WithResolver(resolver)
                 .WithCompression(MessagePackCompression.Lz4BlockArray);
-            _propertyOptions = propertyOptions ?? new NucachePropertyOptions();
+            _propertyOptions = propertyOptionsFactory?.GetNuCachePropertyOptions() ?? new NucachePropertyOptions();
         }
 
         public string ToJson(string serialized)

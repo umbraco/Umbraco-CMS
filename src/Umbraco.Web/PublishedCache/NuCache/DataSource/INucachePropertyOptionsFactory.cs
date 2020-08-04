@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 {
-    public interface INucachePropertyOptionsFactory
+    public interface INuCachePropertyOptionsFactory
     {
-        NucachePropertyOptions GetNucachePropertyOptions();
+        NucachePropertyOptions GetNuCachePropertyOptions();
     }
 }

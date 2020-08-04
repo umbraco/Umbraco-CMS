@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 {
-    public class AppSettingsNucachePropertyMapFactory : INucachePropertyOptionsFactory
+    public class AppSettingsNuCachePropertyMapFactory : INuCachePropertyOptionsFactory
     {
-        public NucachePropertyOptions GetNucachePropertyOptions()
+        public NucachePropertyOptions GetNuCachePropertyOptions()
         {
             NucachePropertyOptions options = new NucachePropertyOptions
             {
