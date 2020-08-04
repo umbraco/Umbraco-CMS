@@ -19,7 +19,7 @@ namespace Umbraco.Core.Services.Implement
         /// <inheritdoc />
         public string GetValue(string key)
         {
-            using (var scope = _scopeProvider.CreateScope())
+            using (var scope = _scopeProvider.CreateScope(autoComplete: true))
             {
                 return _repository.Get(key)?.Value;
             }
