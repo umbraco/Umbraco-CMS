@@ -17,7 +17,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     /// <summary>
     /// An API controller used for dealing with member groups
     /// </summary>
-    [PluginController("UmbracoApi")]
+    [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     [UmbracoTreeAuthorize(Constants.Trees.MemberGroups)]
     public class MemberGroupController : UmbracoAuthorizedJsonController
     {
