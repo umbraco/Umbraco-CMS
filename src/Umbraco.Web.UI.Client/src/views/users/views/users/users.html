@@ -103,20 +103,20 @@
         </umb-editor-sub-header>
 
         <!-- Filters -->
-        <div style="margin-bottom: 20px;" class="flex items-center">
+        <div class="flex items-center mb3">
 
             <div style="font-size: 16px;">
                 <span class="bold"><localize key="sections_users">Users</localize></span> <span ng-if="vm.usersOptions.totalItems">({{vm.usersOptions.totalItems}})</span>
             </div>
 
-            <div class="flex" style="margin-left: auto;">
+            <div class="flex ml-auto">
 
                 <!-- State filter -->
-                <div style="position: relative;" ng-if="vm.userStatesFilter.length > 0">
-                    <button type="button" class="btn btn-link dropdown-toggle flex" ng-click="vm.toggleFilter('state')">
+                <div class="umb-filter" ng-if="vm.userStatesFilter.length > 0">
+                    <button type="button" class="btn btn-link dropdown-toggle umb-filter__toggle" ng-click="vm.toggleFilter('state')">
                         <span><localize key="general_status">Status</localize>:</span>
-                        <span class="bold truncate dib" style="margin-left: 5px; margin-right: 3px; max-width: 150px;">{{ vm.getFilterName(vm.userStatesFilter) }}</span>
-                        <span class="caret"></span>
+                        <span class="bold truncate dib umb-filter__label">{{ vm.getFilterName(vm.userStatesFilter) }}</span>
+                        <span class="caret" aria-hidden="true"></span>
                     </button>
                     <umb-dropdown class="pull-right" ng-if="vm.page.showStatusFilter" on-close="vm.page.showStatusFilter = false;">
                         <umb-dropdown-item ng-repeat="userState in vm.userStatesFilter | filter:{ key: '!All'}" ng-show="userState.count > 0" style="padding: 8px 20px 8px 16px;">
@@ -129,11 +129,11 @@
                 </div>
 
                 <!-- Groups filter -->
-                <div style="position: relative;">
-                    <button type="button" class="btn btn-link dropdown-toggle flex" ng-click="vm.toggleFilter('group')">
+                <div class="umb-filter">
+                    <button type="button" class="btn btn-link dropdown-toggle umb-filter__toggle" ng-click="vm.toggleFilter('group')">
                         <span><localize key="general_groups">Groups</localize>:</span>
-                        <span class="bold truncate dib" style="margin-left: 5px; margin-right: 3px; max-width: 150px;">{{ vm.getFilterName(vm.userGroups) }}</span>
-                        <span class="caret"></span>
+                        <span class="bold truncate dib umb-filter__label">{{ vm.getFilterName(vm.userGroups) }}</span>
+                        <span class="caret" aria-hidden="true"></span>
                     </button>
                     <umb-dropdown class="pull-right" ng-if="vm.page.showGroupFilter" on-close="vm.page.showGroupFilter = false;">
                         <umb-dropdown-item ng-repeat="userGroup in vm.userGroups" style="padding: 8px 20px 8px 16px;">
@@ -146,11 +146,11 @@
                 </div>
 
                 <!-- Order By -->
-                <div style="position: relative;">
-                    <button type="button" class="btn btn-link dropdown-toggle flex" ng-click="vm.toggleFilter('orderBy')">
+                <div class="umb-filter">
+                    <button type="button" class="btn btn-link dropdown-toggle umb-filter__toggle" ng-click="vm.toggleFilter('orderBy')">
                         <span><localize key="general_orderBy">Order by</localize>:</span>
-                        <span class="bold truncate dib" style="margin-left: 5px; margin-right: 3px; max-width: 150px;">{{ vm.getSortLabel(vm.usersOptions.orderBy, vm.usersOptions.orderDirection) }} </span>
-                        <span class="caret"></span>
+                        <span class="bold truncate dib umb-filter__label">{{ vm.getSortLabel(vm.usersOptions.orderBy, vm.usersOptions.orderDirection) }} </span>
+                        <span class="caret" aria-hidden="true"></span>
                     </button>
                     <umb-dropdown class="pull-right" ng-if="vm.page.showOrderByFilter" on-close="vm.page.showOrderByFilter = false;" umb-keyboard-list>
                         <umb-dropdown-item ng-repeat="sortData in vm.userSortData">
