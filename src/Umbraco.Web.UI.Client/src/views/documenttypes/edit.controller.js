@@ -21,6 +21,7 @@
         var isElement = $routeParams.iselement;
         var allowVaryByCulture = $routeParams.culturevary;
         var infiniteMode = $scope.model && $scope.model.infiniteMode;
+        var documentTypeIcon = "";
 
         vm.save = save;
         vm.close = close;
@@ -354,6 +355,10 @@
                     // emit event
                     var args = { documentType: vm.contentType };
                     eventsService.emit("editors.documentType.saved", args);
+                    
+                    if (documentTypeIcon !== vm.contentType.icon) {
+                        eventsService.emit("editors.tree.icon.changed", args);
+                    }
 
                     vm.page.saveButtonState = "success";
 
@@ -402,10 +407,12 @@
             // convert icons for content type
             convertLegacyIcons(contentType);
 
-            vm.contentType = contentType;
-
             //set a shared state
-            editorState.set(vm.contentType);
+            editorState.set(contentType);
+
+            vm.contentType = contentType;
+            
+            documentTypeIcon = contentType.icon;
 
             loadButtons();
         }
