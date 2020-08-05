@@ -1,10 +1,8 @@
 ﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Web.Razor.Parser.SyntaxTree;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -12,7 +10,6 @@ using Umbraco.Core.Models.Blocks;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
-using static Umbraco.Core.Models.Blocks.BlockEditorData;
 using static Umbraco.Core.Models.Blocks.BlockItemData;
 
 namespace Umbraco.Web.PropertyEditors
@@ -49,7 +46,7 @@ namespace Umbraco.Web.PropertyEditors
         internal class BlockEditorPropertyValueEditor : DataValueEditor, IDataValueReference
         {
             private readonly PropertyEditorCollection _propertyEditors;
-            private readonly IDataTypeService _dataTypeService; // TODO: Not used yet but we'll need it to fill in the FromEditor/ToEditor
+            private readonly IDataTypeService _dataTypeService; 
             private readonly ILogger _logger;
             private readonly BlockEditorValues _blockEditorValues;
 
@@ -60,7 +57,7 @@ namespace Umbraco.Web.PropertyEditors
                 _dataTypeService = dataTypeService;
                 _logger = logger;
                 _blockEditorValues = new BlockEditorValues(new BlockListEditorDataConverter(), contentTypeService, _logger);
-                Validators.Add(new BlockEditorValidator(_blockEditorValues, propertyEditors, dataTypeService, textService));
+                Validators.Add(new BlockEditorValidator(_blockEditorValues, propertyEditors, dataTypeService, textService, contentTypeService));
                 Validators.Add(new MinMaxValidator(_blockEditorValues, textService));
             }
 
@@ -262,10 +259,13 @@ namespace Umbraco.Web.PropertyEditors
         internal class BlockEditorValidator : ComplexEditorValidator
         {
             private readonly BlockEditorValues _blockEditorValues;
+            private readonly IContentTypeService _contentTypeService;
 
-            public BlockEditorValidator(BlockEditorValues blockEditorValues, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, ILocalizedTextService textService) : base(propertyEditors, dataTypeService, textService)
+            public BlockEditorValidator(BlockEditorValues blockEditorValues, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, ILocalizedTextService textService, IContentTypeService contentTypeService)
+                : base(propertyEditors, dataTypeService, textService)
             {
                 _blockEditorValues = blockEditorValues;
+                _contentTypeService = contentTypeService;
             }
 
             protected override IEnumerable<ElementTypeValidationModel> GetElementTypeValidation(object value)
@@ -273,8 +273,28 @@ namespace Umbraco.Web.PropertyEditors
                 var blockEditorData = _blockEditorValues.DeserializeAndClean(value);
                 if (blockEditorData != null)
                 {
-                    foreach (var row in blockEditorData.BlockValue.ContentData.Concat(blockEditorData.BlockValue.SettingsData))
+                    // There is no guarantee that the client will post data for every property defined in the Element Type but we still
+                    // need to validate that data for each property especially for things like 'required' data to work.
+                    // Lookup all element types for all content/settings and then we can populate any empty properties.
+                    var allElements = blockEditorData.BlockValue.ContentData.Concat(blockEditorData.BlockValue.SettingsData).ToList();
+                    var allElementTypes = _contentTypeService.GetAll(allElements.Select(x => x.ContentTypeKey).ToArray()).ToDictionary(x => x.Key);
+
+                    foreach (var row in allElements)
                     {
+                        if (!allElementTypes.TryGetValue(row.ContentTypeKey, out var elementType))
+                            throw new InvalidOperationException($"No element type found with key {row.ContentTypeKey}");
+
+                        // now ensure missing properties
+                        foreach (var elementTypeProp in elementType.CompositionPropertyTypes)
+                        {
+                            if (!row.PropertyValues.ContainsKey(elementTypeProp.Alias))
+                            {
+                                // set values to null
+                                row.PropertyValues[elementTypeProp.Alias] = new BlockPropertyValue(null, elementTypeProp);
+                                row.RawPropertyValues[elementTypeProp.Alias] = null;
+                            }
+                        }
+
                         var elementValidation = new ElementTypeValidationModel(row.ContentTypeAlias, row.Key);
                         foreach (var prop in row.PropertyValues)
                         {
@@ -369,11 +389,7 @@ namespace Umbraco.Web.PropertyEditors
                     else
                     {
                         // set the value to include the resolved property type
-                        propValues[prop.Key] = new BlockPropertyValue
-                        {
-                            PropertyType = propType,
-                            Value = prop.Value
-                        };
+                        propValues[prop.Key] = new BlockPropertyValue(prop.Value, propType);
                     }
                 }
 
