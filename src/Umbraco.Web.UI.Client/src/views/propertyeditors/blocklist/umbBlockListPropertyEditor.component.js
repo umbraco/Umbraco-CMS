@@ -64,7 +64,7 @@
         });
 
         vm.$onInit = function() {
-            if (!vm.umbVariantContent) {
+            if (vm.umbProperty && !vm.umbVariantContent) {// if we dont have vm.umbProperty, it means we are in the DocumentTypeEditor.
                 // not found, then fallback to searching the scope chain, this may be needed when DOM inheritance isn't maintained but scope
                 // inheritance is (i.e.infinite editing)
                 var found = angularHelper.traverseScopeChain($scope, s => s && s.vm && s.vm.constructor.name === "umbVariantContentController");
