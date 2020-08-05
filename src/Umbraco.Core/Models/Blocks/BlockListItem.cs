@@ -7,10 +7,10 @@ namespace Umbraco.Core.Models.Blocks
     /// <summary>
     /// Represents a layout item for the Block List editor
     /// </summary>
-    [DataContract(Name = "blockListLayout", Namespace = "")]
-    public class BlockListLayoutReference : IBlockReference<IPublishedElement>
+    [DataContract(Name = "block", Namespace = "")]
+    public class BlockListItem : IBlockReference<IPublishedElement>
     {
-        public BlockListLayoutReference(Udi contentUdi, IPublishedElement content, Udi settingsUdi, IPublishedElement settings)
+        public BlockListItem(Udi contentUdi, IPublishedElement content, Udi settingsUdi, IPublishedElement settings)
         {
             ContentUdi = contentUdi ?? throw new ArgumentNullException(nameof(contentUdi));            
             Content = content ?? throw new ArgumentNullException(nameof(content));
@@ -33,19 +33,13 @@ namespace Umbraco.Core.Models.Blocks
         /// <summary>
         /// The content data item referenced
         /// </summary>
-        /// <remarks>
-        /// This is ignored from serialization since it is just a reference to the actual data element
-        /// </remarks>
-        [IgnoreDataMember]
+        [DataMember(Name = "content")]
         public IPublishedElement Content { get; }
 
         /// <summary>
         /// The settings data item referenced
         /// </summary>
-        /// <remarks>
-        /// This is ignored from serialization since it is just a reference to the actual data element
-        /// </remarks>
-        [IgnoreDataMember]
+        [DataMember(Name = "settings")]
         public IPublishedElement Settings { get; }
     }
 }
