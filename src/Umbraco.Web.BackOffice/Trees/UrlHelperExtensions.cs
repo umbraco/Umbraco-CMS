@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
+using System.Net;
 using System.Text;
-using System.Web;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Core;
@@ -32,7 +32,7 @@ namespace Umbraco.Extensions
 
             for (var p = 0; p < pathPaths.Length; p++)
             {
-                var path = HttpUtility.UrlEncode(string.Join("/", pathPaths.Take(p + 1)));
+                var path = WebUtility.UrlEncode(string.Join("/", pathPaths.Take(p + 1)));
                 if (string.IsNullOrEmpty(path) == false)
                 {
                     sb.Append(",");

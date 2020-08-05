@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Web;
+using System.Net;
 using Microsoft.AspNetCore.Http;
 using Umbraco.Core;
 using Umbraco.Core.IO;
@@ -48,7 +48,7 @@ namespace Umbraco.Web.BackOffice.Trees
         protected override TreeNodeCollection GetTreeNodes(string id, FormCollection queryStrings)
         {
             var path = string.IsNullOrEmpty(id) == false && id != Constants.System.RootString
-                ? HttpUtility.UrlDecode(id).TrimStart("/")
+                ? WebUtility.UrlDecode(id).TrimStart("/")
                 : "";
 
             var directories = FileSystem.GetDirectories(path);
@@ -59,7 +59,7 @@ namespace Umbraco.Web.BackOffice.Trees
                 var hasChildren = FileSystem.GetFiles(directory).Any() || FileSystem.GetDirectories(directory).Any();
 
                 var name = Path.GetFileName(directory);
-                var node = CreateTreeNode(HttpUtility.UrlEncode(directory), path, queryStrings, name, "icon-folder", hasChildren);
+                var node = CreateTreeNode(WebUtility.UrlEncode(directory), path, queryStrings, name, "icon-folder", hasChildren);
                 OnRenderFolderNode(ref node);
                 if (node != null)
                     nodes.Add(node);
@@ -83,7 +83,7 @@ namespace Umbraco.Web.BackOffice.Trees
                 if (withoutExt.IsNullOrWhiteSpace()) continue;
 
                 var name = Path.GetFileName(file);
-                var node = CreateTreeNode(HttpUtility.UrlEncode(file), path, queryStrings, name, FileIcon, false);
+                var node = CreateTreeNode(WebUtility.UrlEncode(file), path, queryStrings, name, FileIcon, false);
                 OnRenderFileNode(ref node);
                 if (node != null)
                     nodes.Add(node);
@@ -159,7 +159,7 @@ namespace Umbraco.Web.BackOffice.Trees
             var menu = MenuItemCollectionFactory.Create();
 
             var path = string.IsNullOrEmpty(id) == false && id != Constants.System.RootString
-                ? HttpUtility.UrlDecode(id).TrimStart("/")
+                ? WebUtility.UrlDecode(id).TrimStart("/")
                 : "";
 
             var isFile = FileSystem.FileExists(path);
