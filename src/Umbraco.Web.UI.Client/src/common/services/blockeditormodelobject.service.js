@@ -363,12 +363,12 @@
              * @ngdoc method
              * @name getBlockConfiguration
              * @methodOf umbraco.services.blockEditorModelObject
-             * @description Get block configuration object for a given contentTypeKey.
-             * @param {string} key contentTypeKey to recive the configuration model for.
-             * @returns {Object | null} Configuration model for the that specific block. Or ´null´ if the contentTypeKey isnt available in the current block configurations.
+             * @description Get block configuration object for a given contentElementTypeKey.
+             * @param {string} key contentElementTypeKey to recive the configuration model for.
+             * @returns {Object | null} Configuration model for the that specific block. Or ´null´ if the contentElementTypeKey isnt available in the current block configurations.
              */
             getBlockConfiguration: function (key) {
-                return this.blockConfigurations.find(bc => bc.contentTypeKey === key) || null;
+                return this.blockConfigurations.find(bc => bc.contentElementTypeKey === key) || null;
             },
 
             /**
@@ -397,7 +397,8 @@
                 var scaffoldKeys = [];
 
                 this.blockConfigurations.forEach(blockConfiguration => {
-                    scaffoldKeys.push(blockConfiguration.contentTypeKey);
+                    console.log(blockConfiguration)
+                    scaffoldKeys.push(blockConfiguration.contentElementTypeKey);
                     if (blockConfiguration.settingsElementTypeKey != null) {
                         scaffoldKeys.push(blockConfiguration.settingsElementTypeKey);
                     }
@@ -426,7 +427,7 @@
              * @return {Array} array of strings representing alias.
              */
             getAvailableAliasesForBlockContent: function () {
-                return this.blockConfigurations.map(blockConfiguration => this.getScaffoldFromKey(blockConfiguration.contentTypeKey).contentTypeAlias);
+                return this.blockConfigurations.map(blockConfiguration => this.getScaffoldFromKey(blockConfiguration.contentElementTypeKey).contentTypeAlias);
             },
 
             /**
@@ -442,7 +443,7 @@
                 var blocks = [];
 
                 this.blockConfigurations.forEach(blockConfiguration => {
-                    var scaffold = this.getScaffoldFromKey(blockConfiguration.contentTypeKey);
+                    var scaffold = this.getScaffoldFromKey(blockConfiguration.contentElementTypeKey);
                     if (scaffold) {
                         blocks.push({
                             blockConfigModel: blockConfiguration,
@@ -514,12 +515,12 @@
                 var contentScaffold;
 
                 if (blockConfiguration === null) {
-                    console.error("The block entry of " + contentUdi + " is not being initialized because its contentTypeKey is not allowed for this PropertyEditor");
+                    console.error("The block of " + contentUdi + " is not being initialized because its contentTypeKey('" + dataModel.contentTypeKey + "') is not allowed for this PropertyEditor");
                 }
                 else {
-                    contentScaffold = this.getScaffoldFromKey(blockConfiguration.contentTypeKey);
+                    contentScaffold = this.getScaffoldFromKey(blockConfiguration.contentElementTypeKey);
                     if (contentScaffold === null) {
-                        console.error("The block entry of " + contentUdi + " is not begin initialized cause its Element Type was not loaded.");
+                        console.error("The block of " + contentUdi + " is not begin initialized cause its Element Type was not loaded.");
                     }
                 }
 
@@ -705,18 +706,18 @@
              * @name create
              * @methodOf umbraco.services.blockEditorModelObject
              * @description Create a empty layout entry, notice the layout entry is not added to the property editors model layout object, since the layout sturcture depends on the property editor.
-             * @param {string} contentTypeKey the contentTypeKey of the block you wish to create, if contentTypeKey is not avaiable in the block configuration then ´null´ will be returned.
-             * @return {Object | null} Layout entry object, to be inserted at a decired location in the layout object. Or null if contentTypeKey is unavaiaible.
+             * @param {string} contentElementTypeKey the contentElementTypeKey of the block you wish to create, if contentElementTypeKey is not avaiable in the block configuration then ´null´ will be returned.
+             * @return {Object | null} Layout entry object, to be inserted at a decired location in the layout object. Or null if contentElementTypeKey is unavaiaible.
              */
-            create: function (contentTypeKey) {
+            create: function (contentElementTypeKey) {
 
-                var blockConfiguration = this.getBlockConfiguration(contentTypeKey);
+                var blockConfiguration = this.getBlockConfiguration(contentElementTypeKey);
                 if (blockConfiguration === null) {
                     return null;
                 }
 
                 var entry = {
-                    contentUdi: createDataEntry(contentTypeKey, this.value.contentData)
+                    contentUdi: createDataEntry(contentElementTypeKey, this.value.contentData)
                 }
 
                 if (blockConfiguration.settingsElementTypeKey != null) {
@@ -737,9 +738,9 @@
 
                 elementTypeDataModel = Utilities.copy(elementTypeDataModel);
 
-                var contentTypeKey = elementTypeDataModel.contentTypeKey;
+                var contentElementTypeKey = elementTypeDataModel.contentTypeKey;
 
-                var layoutEntry = this.create(contentTypeKey);
+                var layoutEntry = this.create(contentElementTypeKey);
                 if (layoutEntry === null) {
                     return null;
                 }
