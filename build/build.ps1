@@ -183,7 +183,7 @@
     $this.CopyFiles("$($this.SolutionRoot)\src\Umbraco.Web.UI.NetCore\Config", "*", "$($this.BuildTemp)\WebApp\config")
     $this.RemoveFile("$($this.BuildTemp)\WebApp\Config\*.Release.*")
     $this.CopyFiles("$($this.SolutionRoot)\src\Umbraco.Web.UI.NetCore\Umbraco", "*", "$($this.BuildTemp)\WebApp\umbraco")
-    $excludeUmbracoDirs = @("$($this.BuildTemp)\WebApp\umbraco\config","$($this.BuildTemp)\WebApp\umbraco\lib")
+    $excludeUmbracoDirs = @("$($this.BuildTemp)\WebApp\umbraco\lib")
     $this.RemoveDirectory($excludeUmbracoDirs)
     $this.CopyFiles("$($this.SolutionRoot)\src\Umbraco.Web.UI.NetCore\Views", "*", "$($this.BuildTemp)\WebApp\Views")
     Copy-Item "$($this.SolutionRoot)\src\Umbraco.Web.UI.NetCore\appsettings.json" "$($this.BuildTemp)\WebApp"
