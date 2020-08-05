@@ -336,20 +336,15 @@
     $this.CopyFiles("$templates", "*", "$tmp\Templates")
 
     Write-Host "Copy program.cs and startup.cs for templates"
-    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore", "Program.cs", "$tmp\Templates\Umbasic")
-    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore", "Startup.cs", "$tmp\Templates\Umbasic")
-    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore", "appsettings.json", "$tmp\Templates\Umbasic")
-    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore", "appsettings.Development.json", "$tmp\Templates\Umbasic")
-
-    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore", "Program.cs", "$tmp\Templates\Umbddition")
-    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore", "Startup.cs", "$tmp\Templates\Umbddition")
-    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore", "appsettings.json", "$tmp\Templates\Umbddition")
-    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore", "appsettings.Development.json", "$tmp\Templates\Umbddition")
-
+    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore", "Program.cs", "$tmp\Templates\UmbracoSolution")
+    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore", "Startup.cs", "$tmp\Templates\UmbracoSolution")
+    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore", "appsettings.json", "$tmp\Templates\UmbracoSolution")
+    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore", "appsettings.Development.json", "$tmp\Templates\UmbracoSolution")
   })
 
   $ubuild.DefineMethod("PackageZip",
   {
+
     Write-Host "Create Zip packages"
 
     $src = "$($this.SolutionRoot)\src"
