@@ -1,0 +1,42 @@
+{
+    "$schema": "http://json.schemastore.org/template",
+    "author": "Umbraco HQ",
+    "classifications": [ "Web", "CMS", "Umbraco"],
+    "identity": "Umbraco.Templates.WebApp",
+    "name": "Umbraco - Empty Solution",
+    "shortName": "umbraco",
+    "tags": {
+        "language": "C#",
+        "type": "project"
+    },
+    "sourceName": "Umbasic", // Will be replaced with the value provided via -n
+    "preferNameDirectory": true,
+    "symbols": {
+        "version": {
+            "type": "parameter",
+            "datatype": "string",
+            "defaultValue": "9.0.0",
+            "description": "The version of Umbraco to load using NuGet",
+            "replaces": "UMBRACO_VERSION_FROM_TEMPLATE"
+        },
+        "skipRestore": {
+            "type": "parameter",
+            "datatype": "bool",
+            "description": "If specified, skips the automatic restore of the project on create.",
+            "defaultValue": "false"
+        }
+    },
+    "postActions": [
+        {
+            "condition": "(!skipRestore)",
+            "description": "Restore NuGet packages required by this project.",
+            "manualInstructions": [
+                {
+                    "text": "Run 'dotnet restore'"
+                }
+            ],
+            "actionId": "210D431B-A78B-4D2F-B762-4ED3E3EA9025",
+            "continueOnError": true
+        }
+    ]
+}
