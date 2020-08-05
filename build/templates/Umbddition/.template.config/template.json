@@ -1,9 +1,9 @@
 {
     "$schema": "http://json.schemastore.org/template",
     "author": "Umbraco HQ",
-    "classifications": [ "Web", "CMS", "Umbraco"],
+    "classifications": [ "Web", "CMS", "Umbraco", "SQLCE"],
     "identity": "Umbraco.Templates.SqlCe",
-    "name": "Umbraco - Empty Solution with SQL CE support (Windows only)",
+    "name": "Umbraco - Empty Solution with SQL CE support",
     "shortName": "umbraco-sqlce",
     "tags": {
         "language": "C#",
@@ -19,24 +19,15 @@
             "description": "The version of Umbraco to load using NuGet",
             "replaces": "UMBRACO_VERSION_FROM_TEMPLATE"
         },
-        "skipRestore": {
-            "type": "parameter",
-            "datatype": "bool",
-            "description": "If specified, skips the automatic restore of the project on create.",
-            "defaultValue": "false"
+        "namespaceReplacer": {
+            "type": "generated",
+            "generator": "coalesce",
+            "parameters": {
+                "sourceVariableName": "name",
+                "defaultValue": "UmbracoSolution",
+                "fallbackVariableName": "name"
+            },
+            "replaces":"Umbraco.Web.UI.NetCore"
         }
-    },
-    "postActions": [
-        {
-            "condition": "(!skipRestore)",
-            "description": "Restore NuGet packages required by this project.",
-            "manualInstructions": [
-                {
-                    "text": "Run 'dotnet restore'"
-                }
-            ],
-            "actionId": "210D431B-A78B-4D2F-B762-4ED3E3EA9025",
-            "continueOnError": true
-        }
-    ]
+    }
 }
