@@ -1,19 +1,22 @@
 /// <reference types="Cypress" />
+import { PartialViewMacroBuilder } from "umbraco-cypress-testhelpers/lib/cms/builders/partialViewMacros/partialViewMacroBuilder";
+
 context('Partial View Macro Files', () => {
 
   beforeEach(() => {
     cy.umbracoLogin(Cypress.env('username'), Cypress.env('password'));
   });
 
-  function navigateToSettings() {
+  function openPartialViewMacroCreatePanel() {
     cy.umbracoSection('settings');
     cy.get('li .umb-tree-root:contains("Settings")').should("be.visible");
 
     cy.umbracoTreeItem("settings", ["Partial View Macro Files"]).rightclick();
+    cy.umbracoContextMenuAction("action-create").click();
   }
 
   function cleanup(name, extension = ".cshtml") {
-    fileName = name + extension;
+    const fileName = name + extension;
 
     cy.umbracoEnsureMacroNameNotExists(name);
     cy.umbracoEnsurePartialViewMacroFileNameNotExists(fileName);
@@ -24,9 +27,7 @@ context('Partial View Macro Files', () => {
 
     cleanup(name);
 
-    navigateToSettings();
-
-    cy.umbracoContextMenuAction("action-create").click();
+    openPartialViewMacroCreatePanel();
 
     cy.get('.menu-label').first().click(); // TODO: Fucked we cant use something like cy.umbracoContextMenuAction("action-label").click();
 
@@ -38,6 +39,7 @@ context('Partial View Macro Files', () => {
 
     //Assert
     cy.umbracoSuccessNotification().should('be.visible');
+    cy.umbracoMacroExists(name).then(exists => { expect(exists).to.be.true; });
 
     //Clean up
     cleanup(name);
@@ -48,9 +50,7 @@ context('Partial View Macro Files', () => {
 
     cleanup(name);
 
-    navigateToSettings();
-
-    cy.umbracoContextMenuAction("action-create").click();
+    openPartialViewMacroCreatePanel();
 
     cy.get('.menu-label').eq(1).click();
 
@@ -62,6 +62,7 @@ context('Partial View Macro Files', () => {
 
     // Assert
     cy.umbracoSuccessNotification().should('be.visible');
+    cy.umbracoMacroExists(name).then(exists => { expect(exists).to.be.false; });
 
     // Clean
     cleanup(name);
@@ -72,8 +73,7 @@ context('Partial View Macro Files', () => {
 
     cleanup(name);
 
-    navigateToSettings();
-    cy.umbracoContextMenuAction("action-create").click();
+    openPartialViewMacroCreatePanel();
 
     cy.get('.menu-label').eq(2).click();
 
@@ -88,8 +88,67 @@ context('Partial View Macro Files', () => {
 
     // Assert
     cy.umbracoSuccessNotification().should('be.visible');
+    cy.umbracoMacroExists(name).then(exists => { expect(exists).to.be.true; });
 
     // Clean
+    cleanup(name);
+  });
+
+  it('Delete partial view macro', () => {
+    const name = "TestDeletePartialViewMacro";
+    const fullName = name + ".cshtml"
+
+    cleanup(name);
+
+    const partialViewMacro = new PartialViewMacroBuilder()
+      .withName(name)
+      .withContent("@inherits Umbraco.Web.Macros.PartialViewMacroPage")
+      .build();
+    
+    cy.savePartialViewMacro(partialViewMacro);
+    
+    // Navigate to settings
+    cy.umbracoSection('settings');
+    cy.get('li .umb-tree-root:contains("Settings")').should("be.visible");
+
+    // Delete partialViewMacro
+    cy.umbracoTreeItem("settings", ["Partial View Macro Files", fullName]).rightclick();
+    cy.umbracoContextMenuAction("action-delete").click();
+    cy.umbracoButtonByLabelKey("general_ok").click();
+
+    // Assert
+    cy.contains(fullName).should('not.exist');
+
+    // Clearn
+    cleanup(name);
+  });
+
+  it('Edit partial view macro', () => {
+    const name = "TestPartialViewMacroEditable";
+    const fullName = name + ".cshtml";
+
+    cleanup(name);
+
+    const partialViewMacro = new PartialViewMacroBuilder()
+      .withName(name)
+      .withContent("@inherits Umbraco.Web.Macros.PartialViewMacroPage")
+      .build();
+    
+    cy.savePartialViewMacro(partialViewMacro);
+
+    // Navigate to settings
+    cy.umbracoSection('settings');
+    cy.get('li .umb-tree-root:contains("Settings")').should("be.visible");
+    cy.umbracoTreeItem("settings", ["Partial View Macro Files", fullName]).click();
+
+    // Type an edit
+    cy.get('.ace_content').type(" // test");
+    // Save
+    cy.get('.btn-success').click();
+
+    // Assert
+    cy.umbracoSuccessNotification().should('be.visible');
+
     cleanup(name);
   });
 
