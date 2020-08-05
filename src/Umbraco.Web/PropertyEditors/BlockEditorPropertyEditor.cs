@@ -241,19 +241,33 @@ namespace Umbraco.Web.PropertyEditors
             public IEnumerable<ValidationResult> Validate(object value, string valueType, object dataTypeConfiguration)
             {
                 var blockConfig = (BlockListConfiguration)dataTypeConfiguration;
+                if (blockConfig == null) yield break;
+
+                var validationLimit = blockConfig.ValidationLimit;
+                if (validationLimit == null) yield break;
+
                 var blockEditorData = _blockEditorValues.DeserializeAndClean(value);
-                if ((blockEditorData == null && blockConfig?.ValidationLimit?.Min > 0)
-                    || (blockEditorData != null && blockEditorData.Layout.Count() < blockConfig?.ValidationLimit?.Min))
+
+                if ((blockEditorData == null && validationLimit.Min.HasValue && validationLimit.Min > 0)
+                    || (blockEditorData != null && validationLimit.Min.HasValue && blockEditorData.Layout.Count() < validationLimit.Min))
                 {
                     yield return new ValidationResult(
-                        _textService.Localize("validation/entriesShort", new[] { blockConfig.ValidationLimit.Min.ToString(), (blockConfig.ValidationLimit.Min - blockEditorData.Layout.Count()).ToString() }),
+                        _textService.Localize("validation/entriesShort", new[]
+                        {
+                            validationLimit.Min.ToString(),
+                            (validationLimit.Min - blockEditorData.Layout.Count()).ToString()
+                        }),
                         new[] { "minCount" });
                 }
 
-                if (blockEditorData != null && blockEditorData.Layout.Count() > blockConfig?.ValidationLimit?.Max)
+                if (blockEditorData != null && validationLimit.Max.HasValue && blockEditorData.Layout.Count() > validationLimit.Max)
                 {
                     yield return new ValidationResult(
-                        _textService.Localize("validation/entriesExceed", new[] { blockConfig.ValidationLimit.Max.ToString(), (blockEditorData.Layout.Count() - blockConfig.ValidationLimit.Max).ToString() }),
+                        _textService.Localize("validation/entriesExceed", new[]
+                        {
+                            validationLimit.Max.ToString(),
+                            (blockEditorData.Layout.Count() - validationLimit.Max).ToString()
+                        }),
                         new[] { "maxCount" });
                 }
             }
@@ -326,7 +340,7 @@ namespace Umbraco.Web.PropertyEditors
                 var contentTypePropertyTypes = new Dictionary<string, Dictionary<string, PropertyType>>();
 
                 // filter out any content that isn't referenced in the layout references
-                foreach(var block in blockEditorData.BlockValue.ContentData.Where(x => blockEditorData.References.Any(r => r.ContentUdi == x.Udi)))
+                foreach (var block in blockEditorData.BlockValue.ContentData.Where(x => blockEditorData.References.Any(r => r.ContentUdi == x.Udi)))
                 {
                     ResolveBlockItemData(block, contentTypePropertyTypes);
                 }
