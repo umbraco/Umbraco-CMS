@@ -156,24 +156,7 @@ namespace Umbraco.Extensions
                 out factory);
 
             return services;
-        }
-
-        public static IServiceCollection AddUmbracoRequestLocalization(this IServiceCollection services)
-        {
-            services.Configure<RequestLocalizationOptions>(options =>
-            {
-                var supportedCultures = CultureInfo
-                    .GetCultures(CultureTypes.AllCultures & ~ CultureTypes.NeutralCultures)
-                    .Where(cul => !String.IsNullOrEmpty(cul.Name))
-                    .ToArray();
-
-                options.SupportedCultures = supportedCultures;
-                options.SupportedUICultures = supportedCultures;
-                options.AddInitialRequestCultureProvider(new UmbracoBackOfficeIdentityCultureProvider());
-            });
-
-            return services;
-        }
+        }   
 
         /// <summary>
         /// Adds the Umbraco Back Core requirements
@@ -200,9 +183,6 @@ namespace Umbraco.Extensions
             var container = umbContainer;
             if (container is null) throw new ArgumentNullException(nameof(container));
             if (entryAssembly is null) throw new ArgumentNullException(nameof(entryAssembly));
-
-            // Set culture options
-            services.AddUmbracoRequestLocalization();
 
             // Add supported databases
             services.AddUmbracoSqlCeSupport();

@@ -10,7 +10,7 @@ namespace Umbraco.Web.Common.ApplicationModels
 {
 
     /// <summary>
-    /// A custom application model provider for Umbraco controllers
+    /// An application model provider for Umbraco API controllers to behave like WebApi controllers
     /// </summary>
     /// <remarks>
     /// <para>
