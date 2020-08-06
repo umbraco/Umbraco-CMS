@@ -238,16 +238,16 @@
 
             block.hideContentInOverlay = block.config.forceHideContentEditorInOverlay === true || inlineEditing === true;
             block.showSettings = block.config.settingsElementTypeKey != null;
-            block.showCopy = vm.supportCopy && block.config.contentTypeKey != null;// if we have content, otherwise it doesn't make sense to copy.
+            block.showCopy = vm.supportCopy && block.config.contentElementTypeKey != null;// if we have content, otherwise it doesn't make sense to copy.
 
             return block;
         }
 
 
-        function addNewBlock(index, contentTypeKey) {
+        function addNewBlock(index, contentElementTypeKey) {
 
             // Create layout entry. (not added to property model jet.)
-            var layoutEntry = modelObject.create(contentTypeKey);
+            var layoutEntry = modelObject.create(contentElementTypeKey);
             if (layoutEntry === null) {
                 return false;
             }
@@ -416,7 +416,7 @@
                 submit: function(blockPickerModel, mouseEvent) {
                     var added = false;
                     if (blockPickerModel && blockPickerModel.selectedItem) {
-                        added = addNewBlock(createIndex, blockPickerModel.selectedItem.blockConfigModel.contentTypeKey);
+                        added = addNewBlock(createIndex, blockPickerModel.selectedItem.blockConfigModel.contentElementTypeKey);
                     }
 
                     if(!(mouseEvent.ctrlKey || mouseEvent.metaKey)) {
