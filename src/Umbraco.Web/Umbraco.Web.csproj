@@ -143,10 +143,13 @@
     <Compile Include="Compose\AuditEventsComponent.cs" />
     <Compile Include="Compose\AuditEventsComposer.cs" />
     <Compile Include="Compose\BackOfficeUserAuditEventsComponent.cs" />
+    <Compile Include="BlockListTemplateExtensions.cs" />
     <Compile Include="Compose\BackOfficeUserAuditEventsComposer.cs" />
     <Compile Include="Compose\NestedContentPropertyComponent.cs" />
     <Compile Include="Composing\CompositionExtensions\Installer.cs" />
     <Compile Include="Composing\LightInject\LightInjectContainer.cs" />
+    <Compile Include="PropertyEditors\Validation\ContentPropertyValidationResult.cs" />
+    <Compile Include="PropertyEditors\Validation\ValidationResultConverter.cs" />
     <Compile Include="Security\IdentityFactoryMiddleware.cs" />
     <Compile Include="WebApi\Filters\OnlyLocalRequestsAttribute.cs" />
     <Compile Include="WebAssets\CDF\ClientDependencyRuntimeMinifier.cs" />
@@ -154,6 +157,7 @@
     <Compile Include="Mvc\RenderNoContentController.cs" />
     <Compile Include="Editors\BackOfficePreviewModel.cs" />
     <Compile Include="Editors\EditorModelEventManager.cs" />
+    <Compile Include="Editors\ElementTypeController.cs" />
     <Compile Include="Editors\Filters\ContentSaveModelValidator.cs" />
     <Compile Include="Editors\Filters\DataTypeValidateAttribute.cs" />
     <Compile Include="Editors\Filters\MediaSaveModelValidator.cs" />
@@ -568,7 +572,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="ContentApps" />
+    <Folder Include="PropertyEditors\ValueConverters" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

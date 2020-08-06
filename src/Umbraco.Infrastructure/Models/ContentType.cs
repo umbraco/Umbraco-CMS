@@ -69,7 +69,7 @@ namespace Umbraco.Core.Models
         /// Internal property to store the Id of the default template
         /// </summary>
         [DataMember]
-        internal int DefaultTemplateId
+        public int DefaultTemplateId
         {
             get => _defaultTemplate;
             set => SetPropertyValueAndDetectChanges(value, ref _defaultTemplate, nameof(DefaultTemplateId));

@@ -90,6 +90,7 @@ namespace Umbraco.Web.Models.Mapping
             target.AllowedTemplates = GetAllowedTemplates(source);
             target.ContentApps = _commonMapper.GetContentApps(source);
             target.ContentTypeId = source.ContentType.Id;
+            target.ContentTypeKey = source.ContentType.Key;
             target.ContentTypeAlias = source.ContentType.Alias;
             target.ContentTypeName = _localizedTextService.UmbracoDictionaryTranslate(_cultureDictionary, source.ContentType.Name);
             target.DocumentType = _commonMapper.GetContentType(source, context);

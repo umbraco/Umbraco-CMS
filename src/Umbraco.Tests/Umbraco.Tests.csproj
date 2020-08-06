@@ -150,6 +150,7 @@
     <Compile Include="Services\KeyValueServiceTests.cs" />
     <Compile Include="Persistence\Repositories\UserRepositoryTest.cs" />
     <Compile Include="UmbracoExamine\ExamineExtensions.cs" />
+    <Compile Include="PropertyEditors\BlockListPropertyValueConverterTests.cs" />
     <Compile Include="PropertyEditors\DataValueReferenceFactoryCollectionTests.cs" />
     <Compile Include="PropertyEditors\NestedContentPropertyComponentTests.cs" />
     <Compile Include="PublishedContent\NuCacheChildrenTests.cs" />
@@ -257,7 +258,7 @@
     <Compile Include="Web\HttpCookieExtensionsTests.cs" />
     <Compile Include="Templates\HtmlImageSourceParserTests.cs" />
     <Compile Include="Web\Mvc\HtmlStringUtilitiesTests.cs" />
-    <Compile Include="Web\ModelStateExtensionsTests.cs" />
+    <Compile Include="Web\Validation\ModelStateExtensionsTests.cs" />
     <Compile Include="Web\Mvc\RenderIndexActionSelectorAttributeTests.cs" />
     <Compile Include="Persistence\NPocoTests\PetaPocoCachesTest.cs" />
     <Compile Include="Persistence\Repositories\DomainRepositoryTest.cs" />
@@ -465,6 +466,7 @@
     <Compile Include="Composing\TypeFinderTests.cs" />
     <Compile Include="Routing\UmbracoModuleTests.cs" />
     <Compile Include="Web\UrlHelperExtensionTests.cs" />
+    <Compile Include="Web\Validation\ContentModelValidatorTests.cs" />
     <Compile Include="Web\WebExtensionMethodTests.cs" />
     <Compile Include="LegacyXmlPublishedCache\DictionaryPublishedContent.cs" />
     <Compile Include="LegacyXmlPublishedCache\DomainCache.cs" />

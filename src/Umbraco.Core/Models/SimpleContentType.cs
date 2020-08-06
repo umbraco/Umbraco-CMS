@@ -51,6 +51,7 @@ namespace Umbraco.Core.Models
 
         public Guid Key { get; }
 
+        /// <inheritdoc />
         public ITemplate DefaultTemplate { get;  }
 
         public ContentVariation Variations { get; }
@@ -58,7 +59,7 @@ namespace Umbraco.Core.Models
         public string Icon { get; }
 
         public bool IsContainer { get; }
-        
+
         public string Name { get; }
 
         public bool AllowedAsRoot { get; }
@@ -93,5 +94,5 @@ namespace Umbraco.Core.Models
                 return ((Alias != null ? Alias.GetHashCode() : 0) * 397) ^ Id;
             }
         }
-    }
+   }
 }

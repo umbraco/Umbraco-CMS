@@ -44,6 +44,7 @@ using Umbraco.Web.Media.EmbedProviders;
 using Umbraco.Web.Migrations.PostMigrations;
 using Umbraco.Web.Models.PublishedContent;
 using Umbraco.Web.PropertyEditors;
+using Umbraco.Web.PropertyEditors.ValueConverters;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Search;
@@ -52,6 +53,7 @@ using Umbraco.Web.Services;
 using Umbraco.Web.Templates;
 using Umbraco.Web.Trees;
 using IntegerValidator = Umbraco.Core.PropertyEditors.Validators.IntegerValidator;
+using TextStringValueConverter = Umbraco.Core.PropertyEditors.ValueConverters.TextStringValueConverter;
 
 namespace Umbraco.Core.Runtime
 {
@@ -213,6 +215,7 @@ namespace Umbraco.Core.Runtime
             composition.RegisterUnique<HtmlImageSourceParser>();
             composition.RegisterUnique<HtmlUrlParser>();
             composition.RegisterUnique<RichTextEditorPastedImages>();
+            composition.RegisterUnique<BlockEditorConverter>();
 
             // both TinyMceValueConverter (in Core) and RteMacroRenderingValueConverter (in Web) will be
             // discovered when CoreBootManager configures the converters. We HAVE to remove one of them

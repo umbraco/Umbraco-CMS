@@ -90,7 +90,7 @@ namespace Umbraco.Tests.Testing.TestingTests
                 new MediaUrlProviderCollection( Enumerable.Empty<IMediaUrlProvider>())
                 , umbracoContext.VariationContextAccessor);
 
-            var contentType = new PublishedContentType(666, "alias", PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.Nothing);
+            var contentType = new PublishedContentType(Guid.NewGuid(), 666, "alias", PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.Nothing);
             var publishedContent = Mock.Of<IPublishedContent>();
             Mock.Get(publishedContent).Setup(x => x.ContentType).Returns(contentType);
 

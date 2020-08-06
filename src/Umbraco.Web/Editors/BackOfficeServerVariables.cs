@@ -340,6 +340,10 @@ namespace Umbraco.Web.Editors
                             "imageUrlGeneratorApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ImageUrlGeneratorController>(
                                 controller => controller.GetCropUrl(null, null, null, null, null))
                         },
+                        {
+                            "elementTypeApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ElementTypeController>(
+                                controller => controller.GetAll())
+                        },
                     }
                 },
                 {

@@ -79,5 +79,15 @@ namespace Umbraco.Web.Security
             else
                 return currentPrincipal.Identity.Name;
         }
+
+        /// <summary>
+        /// Returns true if the provider specified is a built-in Umbraco membership provider
+        /// </summary>
+        /// <param name="membershipProvider"></param>
+        /// <returns></returns>
+        public static bool IsUmbracoMembershipProvider(this MembershipProvider membershipProvider)
+        {
+            return (membershipProvider is UmbracoMembershipProviderBase);
+        }
     }
 }

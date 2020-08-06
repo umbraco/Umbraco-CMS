@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -31,7 +32,7 @@ namespace Umbraco.Tests.Routing
                     factory:Mock.Of<IPublishedContentTypeFactory>()
                     )
             };
-            _publishedContentType = new PublishedContentType(0, "Doc", PublishedItemType.Content, Enumerable.Empty<string>(), properties, ContentVariation.Nothing);
+            _publishedContentType = new PublishedContentType(Guid.NewGuid(), 0, "Doc", PublishedItemType.Content, Enumerable.Empty<string>(), properties, ContentVariation.Nothing);
         }
 
         protected override PublishedContentType GetPublishedContentTypeByAlias(string alias)
