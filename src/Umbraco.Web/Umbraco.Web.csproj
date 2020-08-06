@@ -261,7 +261,6 @@
     <Compile Include="Security\ForceRenewalCookieAuthenticationMiddleware.cs" />
     <Compile Include="Security\GetUserSecondsMiddleWare.cs" />
     <Compile Include="Security\IUmbracoBackOfficeTwoFactorOptions.cs" />
-    <Compile Include="Security\PreviewAuthenticationMiddleware.cs" />
     <Compile Include="Security\WebAuthExtensions.cs" />
     <Compile Include="WebAssets\CDF\UmbracoClientDependencyLoader.cs" />
     <Compile Include="UmbracoDefaultOwinStartup.cs" />
@@ -410,7 +409,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="ContentApps" />
+    <Folder Include="ContentApps\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

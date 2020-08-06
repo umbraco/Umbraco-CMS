@@ -9,15 +9,6 @@ namespace Umbraco.Web
             return cookieManager.GetCookieValue(Constants.Web.PreviewCookieName);
         }
 
-        /// <summary>
-        /// Does a preview cookie exist ?
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        public static bool HasPreviewCookie(this ICookieManager cookieManager)
-        {
-            return cookieManager.HasCookie(Constants.Web.PreviewCookieName);
-        }
     }
 
 }
