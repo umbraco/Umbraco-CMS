@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    function FocusLock($timeout, eventsService) {
+    function FocusLock($timeout, $rootScope) {
 
         function getAutoFocusElement (elements) {
             var elmentWithAutoFocus = null;
@@ -23,6 +23,13 @@
             var infiniteEditorsWrapper;
             var infiniteEditors;
             var disconnectObserver = false;
+            var closingEditor = false;
+
+            if(!$rootScope.lastKnowFocusedElements){
+                $rootScope.lastKnowFocusedElements = [];
+            }
+
+            $rootScope.lastKnowFocusedElements.push(document.activeElement);
             
             // List of elements that can be focusable within the focus lock
             var focusableElementsSelector = 'a[href]:not([disabled]):not(.ng-hide), button:not([disabled]):not(.ng-hide), textarea:not([disabled]):not(.ng-hide), input:not([disabled]):not(.ng-hide), select:not([disabled]):not(.ng-hide)';
@@ -64,6 +71,55 @@
                         firstFocusableElement.focus();
                         event.preventDefault();
                     }
+                }
+            }
+
+            function clearLastKnownFocusedElements() {
+                $rootScope.lastKnowFocusedElements = [];
+            }
+
+            function setElementFocus() {
+                var defaultFocusedElement = getAutoFocusElement(focusableElements);
+                var lastknownElement;
+
+                if(closingEditor){
+                    var lastItemIndex = $rootScope.lastKnowFocusedElements.length - 1;
+                    var editorInfo = infiniteEditors[0].querySelector('.editor-info');
+
+                    // If there is only one editor open, search for the "editor-info" inside it and set focus on it
+                    // This is relevant when a property editor has been selected and the editor where we selected it from
+                    // is closed taking us back to the first layer
+                    // Otherwise set it to the last element in the lastKnownFocusedElements array
+                    if(infiniteEditors.length === 1 && editorInfo !== null){
+                        lastknownElement = editorInfo;
+
+                        // Clear the array
+                        clearLastKnownFocusedElements();
+                    }
+                    else {
+                        lastknownElement = $rootScope.lastKnowFocusedElements[lastItemIndex];
+
+                        // Remove the last item from the array so we always set the correct lastKnowFocus for each layer
+                        $rootScope.lastKnowFocusedElements.splice(lastItemIndex, 1);
+                    }
+
+                    // Update the lastknowelement variable here
+                    closingEditor = false;
+                }
+
+                // 1st - we check for any last known element - Usually the element the trigger the opening of a new layer
+                // If it exists it will receive fous
+                // 2nd - We check to see if a default focus has been set using the umb-auto-focus directive. If not we set focus on
+                // the first focusable element
+                // 3rd - Otherwise put the focus on the default focused element
+                if(lastknownElement){
+                    lastknownElement.focus();
+                }
+                else if(defaultFocusedElement === null ){
+                    firstFocusableElement.focus();
+                }
+                else {
+                    defaultFocusedElement.focus();
                 }
             }
             
@@ -124,20 +180,12 @@
                     if(focusableElements.length > 0) {
 
                         observeDomChanges();
-
-                        var defaultFocusedElement = getAutoFocusElement(focusableElements);
     
                         // We need to add the tabbing-active class in order to highlight the focused button since the default style is
                         // outline: none; set in the stylesheet specifically
                         bodyElement.classList.add('tabbing-active');
 
-                        // If there is no default focused element put focus on the first focusable element in the nodelist
-                        if(defaultFocusedElement === null ){
-                            firstFocusableElement.focus();
-                        }
-                        else {
-                            defaultFocusedElement.focus();
-                        }
+                        setElementFocus();
         
                         //  Handle keydown
                         target.addEventListener('keydown', handleKeydown);
@@ -157,11 +205,20 @@
                 var newTarget = infiniteEditors[infiniteEditors.length - 2];
 
                 if(infiniteEditors.length > 1){
+                    // Setting closing till true will let us re-apply the last known focus to then opened layer that then becomes
+                    // active
+                    closingEditor = true;
+
                     // Passing the timeout parameter as a string on purpose to bypass the falsy value that a number would give
                     onInit(newTarget, '0');
+
                     return;
                 }
                 
+                // Clear lastKnowFocusedElements
+                clearLastKnownFocusedElements();
+
+                // Cleanup event handler
                 target.removeEventListener('keydown', handleKeydown);
             });
         }
