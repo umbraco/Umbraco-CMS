@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Specialized;
+using Microsoft.AspNetCore.Http;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
@@ -58,20 +59,9 @@ namespace Umbraco.Web.Website.Controllers
         /// Redirects to the Umbraco page with the given id and passes provided querystring
         /// </summary>
         /// <param name="pageId"></param>
-        /// <param name="queryStringValues"></param>
-        /// <returns></returns>
-        protected RedirectToUmbracoPageResult RedirectToUmbracoPage(int pageId, NameValueCollection queryStringValues)
-        {
-            return new RedirectToUmbracoPageResult(pageId, queryStringValues, _publishedUrlProvider, UmbracoContextAccessor);
-        }
-
-        /// <summary>
-        /// Redirects to the Umbraco page with the given id and passes provided querystring
-        /// </summary>
-        /// <param name="pageId"></param>
         /// <param name="queryString"></param>
         /// <returns></returns>
-        protected RedirectToUmbracoPageResult RedirectToUmbracoPage(int pageId, string queryString)
+        protected RedirectToUmbracoPageResult RedirectToUmbracoPage(int pageId, QueryString queryString)
         {
             return new RedirectToUmbracoPageResult(pageId, queryString, _publishedUrlProvider, UmbracoContextAccessor);
         }
@@ -90,20 +80,9 @@ namespace Umbraco.Web.Website.Controllers
         /// Redirects to the Umbraco page with the given published content and passes provided querystring
         /// </summary>
         /// <param name="publishedContent"></param>
-        /// <param name="queryStringValues"></param>
-        /// <returns></returns>
-        protected RedirectToUmbracoPageResult RedirectToUmbracoPage(IPublishedContent publishedContent, NameValueCollection queryStringValues)
-        {
-            return new RedirectToUmbracoPageResult(publishedContent, queryStringValues, _publishedUrlProvider, UmbracoContextAccessor);
-        }
-
-        /// <summary>
-        /// Redirects to the Umbraco page with the given published content and passes provided querystring
-        /// </summary>
-        /// <param name="publishedContent"></param>
         /// <param name="queryString"></param>
         /// <returns></returns>
-        protected RedirectToUmbracoPageResult RedirectToUmbracoPage(IPublishedContent publishedContent, string queryString)
+        protected RedirectToUmbracoPageResult RedirectToUmbracoPage(IPublishedContent publishedContent, QueryString queryString)
         {
             return new RedirectToUmbracoPageResult(publishedContent, queryString, _publishedUrlProvider, UmbracoContextAccessor);
         }
@@ -120,19 +99,9 @@ namespace Umbraco.Web.Website.Controllers
         /// <summary>
         /// Redirects to the currently rendered Umbraco page and passes provided querystring
         /// </summary>
-        /// <param name="queryStringValues"></param>
-        /// <returns></returns>
-        protected RedirectToUmbracoPageResult RedirectToCurrentUmbracoPage(NameValueCollection queryStringValues)
-        {
-            return new RedirectToUmbracoPageResult(CurrentPage, queryStringValues, _publishedUrlProvider, UmbracoContextAccessor);
-        }
-
-        /// <summary>
-        /// Redirects to the currently rendered Umbraco page and passes provided querystring
-        /// </summary>
         /// <param name="queryString"></param>
         /// <returns></returns>
-        protected RedirectToUmbracoPageResult RedirectToCurrentUmbracoPage(string queryString)
+        protected RedirectToUmbracoPageResult RedirectToCurrentUmbracoPage(QueryString queryString)
         {
             return new RedirectToUmbracoPageResult(CurrentPage, queryString, _publishedUrlProvider, UmbracoContextAccessor);
         }

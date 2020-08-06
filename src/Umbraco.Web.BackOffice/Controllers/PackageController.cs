@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
-using System.Web;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Semver;
@@ -113,16 +112,15 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             var cd = new System.Net.Mime.ContentDisposition
             {
-                FileName =  HttpUtility.UrlEncode(fileName, encoding),
+                FileName =  WebUtility.UrlEncode(fileName),
                 Inline = false  // false = prompt the user for downloading;  true = browser to try to show the file inline
             };
             Response.Headers.Add("Content-Disposition", cd.ToString());
             // Set custom header so umbRequestHelper.downloadFile can save the correct filename
-            Response.Headers.Add("x-filename", HttpUtility.UrlEncode(fileName, encoding));
+            Response.Headers.Add("x-filename", WebUtility.UrlEncode(fileName));
             return new FileStreamResult(System.IO.File.OpenRead(fullPath), new MediaTypeHeaderValue("application/octet-stream")
             {
                 Charset = encoding.WebName,
-
             });
 
         }
