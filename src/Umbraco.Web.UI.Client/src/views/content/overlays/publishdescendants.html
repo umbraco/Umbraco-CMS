@@ -8,10 +8,13 @@
         <div class="flex mb3">
             <umb-toggle
                 checked="vm.includeUnpublished"
+                input-id="includeUnpublished"
                 on-click="vm.toggleIncludeUnpublished()"
                 class="mr2">
             </umb-toggle>
-            <localize key="content_includeUnpublished"></localize>
+            <label for="includeUnpublished">
+                <localize key="content_includeUnpublished">Include drafts and unpublished content items.</localize>
+            </label>
         </div>
 
     </div>
@@ -25,10 +28,13 @@
         <div class="flex mb3">
             <umb-toggle
                 checked="vm.includeUnpublished"
+                input-id="includeUnpublished"
                 on-click="vm.toggleIncludeUnpublished()"
                 class="mr2">
             </umb-toggle>
-            <localize key="content_includeUnpublished"></localize>
+            <label for="includeUnpublished">
+                <localize key="content_includeUnpublished">Include drafts and unpublished content items.</localize>
+            </label>
         </div>
 
         <div class="umb-list umb-list--condensed">
