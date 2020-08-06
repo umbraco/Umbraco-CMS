@@ -28,7 +28,7 @@
             }
         });
 
-    function BlockListController($scope, editorService, clipboardService, localizationService, overlayService, blockEditorService, udiService, serverValidationManager, angularHelper) {
+    function BlockListController($scope, editorService, clipboardService, localizationService, overlayService, blockEditorService, udiService, serverValidationManager, angularHelper, umbRequestHelper) {
 
         var unsubscribe = [];
         var modelObject;
@@ -220,8 +220,19 @@
                 });
             }
 
-            // TODO: Why is there a '/' prefixed? that means this will never work with virtual directories
-            block.view = (block.config.view ? "/" + block.config.view : getDefaultViewForBlock(block));
+            if(block.config.view) {
+                // make sure the config view is formatted as a virtual path
+                block.config.view = block.config.view.startsWith("~/")
+                ? block.config.view
+                : block.config.view.startsWith("/")
+                    ? "~" + block.config.view
+                    : "~/" + block.config.view;
+
+                block.config.view = umbRequestHelper.convertVirtualToAbsolutePath(block.config.view);
+                block.view = block.config.view;
+            } else {
+                block.view = getDefaultViewForBlock(block);
+            }
 
             block.hideContentInOverlay = block.config.forceHideContentEditorInOverlay === true || inlineEditing === true;
             block.showSettings = block.config.settingsElementTypeKey != null;
