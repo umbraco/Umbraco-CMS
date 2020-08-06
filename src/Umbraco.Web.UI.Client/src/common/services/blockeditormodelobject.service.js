@@ -397,7 +397,6 @@
                 var scaffoldKeys = [];
 
                 this.blockConfigurations.forEach(blockConfiguration => {
-                    console.log(blockConfiguration)
                     scaffoldKeys.push(blockConfiguration.contentElementTypeKey);
                     if (blockConfiguration.settingsElementTypeKey != null) {
                         scaffoldKeys.push(blockConfiguration.settingsElementTypeKey);
