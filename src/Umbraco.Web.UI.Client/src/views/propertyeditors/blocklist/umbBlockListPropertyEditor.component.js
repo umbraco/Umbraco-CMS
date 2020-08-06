@@ -221,13 +221,7 @@
             }
 
             if(block.config.view) {
-                // make sure the config view is formatted as a virtual path
-                block.config.view = block.config.view.startsWith("~/")
-                ? block.config.view
-                : block.config.view.startsWith("/")
-                    ? "~" + block.config.view
-                    : "~/" + block.config.view;
-
+                block.config.view = umbRequestHelper.ensureVirtualPath(block.config.view);
                 block.config.view = umbRequestHelper.convertVirtualToAbsolutePath(block.config.view);
                 block.view = block.config.view;
             } else {
