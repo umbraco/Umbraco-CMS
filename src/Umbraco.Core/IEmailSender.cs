@@ -8,6 +8,7 @@ namespace Umbraco.Core
     /// </summary>
     public interface IEmailSender
     {
+        // TODO: This would be better if MailMessage was our own abstraction!
         Task SendAsync(MailMessage message);
     }
 }
