@@ -1,5 +1,5 @@
 /// <reference types="Cypress" />
-import { PartialViewMacroBuilder } from "umbraco-cypress-testhelpers/lib/cms/builders/partialViewMacros/partialViewMacroBuilder";
+import { PartialViewMacroBuilder } from "umbraco-cypress-testhelpers";
 
 context('Partial View Macro Files', () => {
 
