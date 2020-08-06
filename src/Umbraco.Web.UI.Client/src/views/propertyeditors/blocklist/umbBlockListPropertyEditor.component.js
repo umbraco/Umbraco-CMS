@@ -211,14 +211,16 @@
             // to the scaffolded content object representing this block. This is required for validation
             // along with ensuring that the umb-property inheritance is constently maintained.
             if (vm.umbVariantContent.editor.content.language) {
-                block.content.language = vm.umbVariantContent.editor.content.language;
-                // currently we only ever deal with invariant content for blocks so there's only one
-                block.content.variants[0].tabs.forEach(tab => {
-                    tab.properties.forEach(prop => {
-                        prop.culture = vm.umbVariantContent.editor.content.language.culture;
-                    });
-                });
+                // set the scaffolded content's language to the language of the current editor
+                block.content.language = vm.umbVariantContent.editor.content.language;                
             }
+            // currently we only ever deal with invariant content for blocks so there's only one
+            block.content.variants[0].tabs.forEach(tab => {
+                tab.properties.forEach(prop => {
+                    // set the scaffolded property to the culture of the containing property
+                    prop.culture = vm.umbProperty.property.culture ;
+                });
+            });
 
             // TODO: Why is there a '/' prefixed? that means this will never work with virtual directories
             block.view = (block.config.view ? "/" + block.config.view : getDefaultViewForBlock(block));
