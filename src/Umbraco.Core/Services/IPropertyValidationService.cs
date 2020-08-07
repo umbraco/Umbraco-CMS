@@ -1,4 +1,7 @@
-﻿using Umbraco.Core.Models;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using Umbraco.Core.Models;
+using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Core.Services
 {
@@ -13,5 +16,14 @@ namespace Umbraco.Core.Services
         /// Gets a value indicating whether the property has valid values.
         /// </summary>
         bool IsPropertyValid(IProperty property, string culture = "*", string segment = "*");
+
+        IEnumerable<ValidationResult> ValidatePropertyValue(
+            IDataEditor editor,
+            IDataType dataType,
+            object postedValue,
+            bool isRequired,
+            string validationRegExp,
+            string isRequiredMessage,
+            string validationRegExpMessage);
     }
 }

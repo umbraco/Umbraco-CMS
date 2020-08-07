@@ -172,7 +172,7 @@ namespace Umbraco.Core
             });
         }
 
-        
+
 
         /// <summary>
         /// Registers a custom entity type.
@@ -187,6 +187,7 @@ namespace Umbraco.Core
                 { Constants.UdiEntityType.Unknown, UdiType.Unknown },
 
                 { Constants.UdiEntityType.AnyGuid, UdiType.GuidUdi },
+                { Constants.UdiEntityType.Element, UdiType.GuidUdi },
                 { Constants.UdiEntityType.Document, UdiType.GuidUdi },
                 { Constants.UdiEntityType.DocumentBlueprint, UdiType.GuidUdi },
                 { Constants.UdiEntityType.Media, UdiType.GuidUdi },

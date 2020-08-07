@@ -140,6 +140,7 @@
     <Compile Include="AspNet\AspNetUserAgentProvider.cs" />
     <Compile Include="AspNet\FrameworkMarchal.cs" />
     <Compile Include="AspNet\AspNetUmbracoApplicationLifetime.cs" />
+    <Compile Include="BlockListTemplateExtensions.cs" />
     <Compile Include="Compose\AuditEventsComponent.cs" />
     <Compile Include="Compose\AuditEventsComposer.cs" />
     <Compile Include="Compose\BackOfficeUserAuditEventsComponent.cs" />
@@ -408,9 +409,6 @@
     <None Include="..\Umbraco.Web.UI\Views\web.config">
       <Link>Mvc\web.config</Link>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="ContentApps" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

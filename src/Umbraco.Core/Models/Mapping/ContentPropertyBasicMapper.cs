@@ -44,6 +44,9 @@ namespace Umbraco.Web.Models.Mapping
                     property.PropertyType.PropertyEditorAlias);
 
                 editor = _propertyEditors[Constants.PropertyEditors.Aliases.Label];
+
+                if (editor == null)
+                    throw new InvalidOperationException($"Could not resolve the property editor {Constants.PropertyEditors.Aliases.Label}");
             }
 
             dest.Id = property.Id;
