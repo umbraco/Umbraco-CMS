@@ -351,7 +351,8 @@
                 // update our values
                 this.value = propertyModelValue;
                 this.value.layout = this.value.layout || {};
-                this.value.data = this.value.data || [];
+                this.value.contentData = this.value.contentData || [];
+                this.value.settingsData = this.value.settingsData || [];
 
                 // re-create the watchers
                 this.__watchers = [];

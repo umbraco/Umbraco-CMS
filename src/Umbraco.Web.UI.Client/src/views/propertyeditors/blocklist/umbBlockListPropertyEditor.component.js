@@ -202,23 +202,36 @@
             return "views/propertyeditors/blocklist/blocklistentryeditors/labelblock/labelblock.editor.html";
         }
 
+        /**
+         * Ensure that the containing content variant languag and current property culture is transfered along
+         * to the scaffolded content object representing this block.
+         * This is required for validation along with ensuring that the umb-property inheritance is constently maintained.
+         * @param {any} content
+         */
+        function ensureCultureData(content) {
+
+            if (!content) return;
+
+            if (vm.umbVariantContent.editor.content.language) {
+                // set the scaffolded content's language to the language of the current editor
+                content.language = vm.umbVariantContent.editor.content.language;
+            }
+            // currently we only ever deal with invariant content for blocks so there's only one
+            content.variants[0].tabs.forEach(tab => {
+                tab.properties.forEach(prop => {
+                    // set the scaffolded property to the culture of the containing property
+                    prop.culture = vm.umbProperty.property.culture;
+                });
+            });
+        }
+
         function getBlockObject(entry) {
             var block = modelObject.getBlockObject(entry);
 
             if (block === null) return null;
 
-            // ensure that the containing content variant language/culture is transfered along
-            // to the scaffolded content object representing this block. This is required for validation
-            // along with ensuring that the umb-property inheritance is constently maintained.
-            if (vm.umbVariantContent.editor.content.language) {
-                block.content.language = vm.umbVariantContent.editor.content.language;
-                // currently we only ever deal with invariant content for blocks so there's only one
-                block.content.variants[0].tabs.forEach(tab => {
-                    tab.properties.forEach(prop => {
-                        prop.culture = vm.umbVariantContent.editor.content.language.culture;
-                    });
-                });
-            }
+            ensureCultureData(block.content);
+            ensureCultureData(block.settings);
 
             // TODO: Why is there a '/' prefixed? that means this will never work with virtual directories
             block.view = (block.config.view ? "/" + block.config.view : getDefaultViewForBlock(block));
@@ -272,8 +285,12 @@
             var removed = vm.layout.splice(layoutIndex, 1);
             removed.forEach(x => {
                 // remove any server validation errors associated
-                var guid = udiService.getKey(x.contentUdi);
-                serverValidationManager.removePropertyError(guid, vm.umbProperty.property.culture, vm.umbProperty.property.segment, "", { matchType: "contains" });
+                var guids = [udiService.getKey(x.contentUdi), (x.settingsUdi ? udiService.getKey(x.settingsUdi) : null)];
+                guids.forEach(guid => {
+                    if (guid) {
+                        serverValidationManager.removePropertyError(guid, vm.umbProperty.property.culture, vm.umbProperty.property.segment, "", { matchType: "contains" });
+                    }
+                })
             });
 
             modelObject.removeDataAndDestroyModel(block);
