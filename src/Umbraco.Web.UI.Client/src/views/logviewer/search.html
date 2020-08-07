@@ -39,7 +39,11 @@
                             <umb-dropdown class="pull-left" ng-if="vm.page.showLevelFilter" on-close="vm.page.showLevelFilter = false;">
                                 <umb-dropdown-item ng-repeat="level in vm.logLevels" class="dropdown-item">
                                     <div class="flex items-center">
-                                        <umb-checkbox input-id="loglevel-{{$index}}" name="loglevel" model="level.selected" on-change="vm.setLogLevelFilter(level)" />
+                                        <umb-checkbox input-id="loglevel-{{$index}}"
+                                                      name="loglevel"
+                                                      model="level.selected"
+                                                      on-change="vm.setLogLevelFilter(level)">
+                                        </umb-checkbox>
                                         <label for="loglevel-{{$index}}">
                                             <umb-badge size="s" color="{{level.logTypeColor}}">{{level.name}}</umb-badge>
                                         </label>
