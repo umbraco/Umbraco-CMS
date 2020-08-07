@@ -17,10 +17,10 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
          * @function
          *
          * @description
-         * Called by controllers when submitting a form - this ensures that all client validation is checked, 
+         * Called by controllers when submitting a form - this ensures that all client validation is checked,
          * server validation is cleared, that the correct events execute and status messages are displayed.
          * This returns true if the form is valid, otherwise false if form submission cannot continue.
-         * 
+         *
          * @param {object} args An object containing arguments for form submission
          */
         submitForm: function (args) {
@@ -45,7 +45,7 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
             args.scope.$broadcast("formSubmitting", { scope: args.scope, action: args.action });
 
             // Some property editors need to perform an action after all property editors have reacted to the formSubmitting.
-            args.scope.$broadcast("postFormSubmitting", { scope: args.scope, action: args.action });
+            args.scope.$broadcast("formSubmittingFinalPhase", { scope: args.scope, action: args.action });
 
             //then check if the form is valid
             if (!args.skipValidation) {
@@ -73,7 +73,7 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
          *
          * @description
          * Called by controllers when a form has been successfully submitted, this ensures the correct events are raised.
-         * 
+         *
          * @param {object} args An object containing arguments for form submission
          */
         resetForm: function (args) {
@@ -109,7 +109,7 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
          * @description
          * Needs to be called when a form submission fails, this will wire up all server validation errors in ModelState and
          * add the correct messages to the notifications. If a server error has occurred this will show a ysod.
-         * 
+         *
          * @param {object} err The error object returned from the http promise
          */
         handleError: function (err) {
@@ -148,7 +148,7 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
          *
          * @description
          * This wires up all of the server validation model state so that valServer and valServerField directives work
-         * 
+         *
          * @param {object} err The error object returned from the http promise
          */
         handleServerValidation: function (modelState) {
