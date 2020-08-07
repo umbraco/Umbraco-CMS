@@ -48,7 +48,7 @@
             $scope.valFormManager = model.valFormManager;
 
             if (model.stylesheet) {
-                model.stylesheet = umbRequestHelper.ensureVirtualPath(model.stylesheet);
+                model.stylesheet = umbRequestHelper.convertVirtualToAbsolutePath(model.stylesheet);
                 var shadowRoot = $element[0].attachShadow({ mode: 'open' });
                 shadowRoot.innerHTML = `
                     <style>
