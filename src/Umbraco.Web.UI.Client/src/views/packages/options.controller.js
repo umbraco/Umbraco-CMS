@@ -8,7 +8,7 @@
         vm.showBackButton = true;
         vm.loading = true;
         vm.back = back;
-        
+
         const packageId = $routeParams.id;
 
         function onInit() {
@@ -20,13 +20,6 @@
                 $scope.package = pck;
 
                 vm.loading = false;
-
-                //make sure the packageView is formatted as a virtual path
-                pck.packageView = pck.packageView.startsWith("~/")
-                    ? pck.packageView
-                    : pck.packageView.startsWith("/")
-                        ? "~" + pck.packageView
-                        : "~/" + pck.packageView;
 
                 pck.packageView = umbRequestHelper.convertVirtualToAbsolutePath(pck.packageView);
 
