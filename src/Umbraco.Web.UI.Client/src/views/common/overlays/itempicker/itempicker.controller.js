@@ -26,7 +26,9 @@ function ItemPickerOverlay($scope, localizationService) {
 
     $scope.showTooltip = function(item, $event) {
         if (!item.tooltip) {
-            $scope.mouseLeave();
+            if($scope.mouseLeave) {
+                $scope.mouseLeave();
+            }
             return;
         }
         $scope.tooltip = {

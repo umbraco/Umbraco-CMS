@@ -64,7 +64,7 @@
         });
 
         vm.$onInit = function() {
-            if (!vm.umbVariantContent) {
+            if (vm.umbProperty && !vm.umbVariantContent) {// if we dont have vm.umbProperty, it means we are in the DocumentTypeEditor.
                 // not found, then fallback to searching the scope chain, this may be needed when DOM inheritance isn't maintained but scope
                 // inheritance is (i.e.infinite editing)
                 var found = angularHelper.traverseScopeChain($scope, s => s && s.vm && s.vm.constructor.name === "umbVariantContentController");
@@ -230,16 +230,16 @@
 
             block.hideContentInOverlay = block.config.forceHideContentEditorInOverlay === true || inlineEditing === true;
             block.showSettings = block.config.settingsElementTypeKey != null;
-            block.showCopy = vm.supportCopy && block.config.contentTypeKey != null;// if we have content, otherwise it doesn't make sense to copy.
+            block.showCopy = vm.supportCopy && block.config.contentElementTypeKey != null;// if we have content, otherwise it doesn't make sense to copy.
 
             return block;
         }
 
 
-        function addNewBlock(index, contentTypeKey) {
+        function addNewBlock(index, contentElementTypeKey) {
 
             // Create layout entry. (not added to property model jet.)
-            var layoutEntry = modelObject.create(contentTypeKey);
+            var layoutEntry = modelObject.create(contentElementTypeKey);
             if (layoutEntry === null) {
                 return false;
             }
@@ -408,7 +408,7 @@
                 submit: function(blockPickerModel, mouseEvent) {
                     var added = false;
                     if (blockPickerModel && blockPickerModel.selectedItem) {
-                        added = addNewBlock(createIndex, blockPickerModel.selectedItem.blockConfigModel.contentTypeKey);
+                        added = addNewBlock(createIndex, blockPickerModel.selectedItem.blockConfigModel.contentElementTypeKey);
                     }
 
                     if(!(mouseEvent.ctrlKey || mouseEvent.metaKey)) {
