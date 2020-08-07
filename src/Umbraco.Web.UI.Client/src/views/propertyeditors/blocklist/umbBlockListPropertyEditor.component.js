@@ -285,8 +285,12 @@
             var removed = vm.layout.splice(layoutIndex, 1);
             removed.forEach(x => {
                 // remove any server validation errors associated
-                var guid = udiService.getKey(x.contentUdi);
-                serverValidationManager.removePropertyError(guid, vm.umbProperty.property.culture, vm.umbProperty.property.segment, "", { matchType: "contains" });
+                var guids = [udiService.getKey(x.contentUdi), (x.settingsUdi ? udiService.getKey(x.settingsUdi) : null)];
+                guids.forEach(guid => {
+                    if (guid) {
+                        serverValidationManager.removePropertyError(guid, vm.umbProperty.property.culture, vm.umbProperty.property.segment, "", { matchType: "contains" });
+                    }
+                })
             });
 
             modelObject.removeDataAndDestroyModel(block);
