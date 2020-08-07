@@ -6,15 +6,13 @@
         </div>
 
         <div class="flex mb3">
-
             <umb-toggle checked="vm.includeUnpublished"
                         on-click="vm.toggleIncludeUnpublished()"
                         class="mr2"
                         label-on="{{vm.labels.includeUnpublished}}"
                         label-off="{{vm.labels.includeUnpublished}}"
                         label-position="right"
-                        show-labels="true"/>
-
+                        show-labels="true"></umb-toggle>
         </div>
 
     </div>
@@ -26,12 +24,13 @@
         </div>
 
         <div class="flex mb3">
-            <umb-toggle
-                checked="vm.includeUnpublished"
-                on-click="vm.toggleIncludeUnpublished()"
-                class="mr2"
-            />
-            <localize key="content_includeUnpublished"></localize>
+            <umb-toggle checked="vm.includeUnpublished"
+                        on-click="vm.toggleIncludeUnpublished()"
+                        class="mr2"
+                        label-on="{{vm.labels.includeUnpublished}}"
+                        label-off="{{vm.labels.includeUnpublished}}"
+                        label-position="right"
+                        show-labels="true"></umb-toggle>
         </div>
 
         <div class="umb-list umb-list--condensed">
