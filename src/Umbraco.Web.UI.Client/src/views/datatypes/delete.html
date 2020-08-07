@@ -106,17 +106,18 @@
 
                         </div>
 
-                        <umb-checkbox model="vm.confirmed" text="{{vm.labels.deleteConfirm}}">
+                        <umb-checkbox model="vm.confirmed"
+                                      text="{{vm.labels.deleteConfirm}}">
                         </umb-checkbox>
 
                     </div>
 
 
                 <umb-confirm ng-if="vm.confirmed || vm.hasReferences === false"
-                            on-confirm="vm.performDelete"
-                            on-cancel="vm.cancel"
-                            confirm-button-style="danger"
-                            confirm-label-key="general_delete">
+                             on-confirm="vm.performDelete"
+                             on-cancel="vm.cancel"
+                             confirm-button-style="danger"
+                             confirm-label-key="general_delete">
                 </umb-confirm>
             </div>
         </ng-switch>

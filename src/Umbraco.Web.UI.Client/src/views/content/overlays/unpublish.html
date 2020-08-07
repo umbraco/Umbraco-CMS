@@ -17,14 +17,13 @@
                 <ng-form name="unpublishVariantSelectorForm">
                     <div class="umb-variant-selector-entry" ng-class="{'umb-list-item--error': unpublishVariantSelectorForm.unpublishVariantSelector.$invalid}">
 
-                        <umb-checkbox
-                            input-id="{{variant.htmlId}}"
-                            name="unpublishVariantSelector"
-                            model="variant.save"
-                            on-change="vm.changeSelection(variant)"
-                            disabled="variant.disabled"
-                            server-validation-field="{{variant.htmlId}}"
-                        >
+                        <umb-checkbox input-id="{{variant.htmlId}}"
+                                      name="unpublishVariantSelector"
+                                      model="variant.save"
+                                      on-change="vm.changeSelection(variant)"
+                                      disabled="variant.disabled"
+                                      server-validation-field="{{variant.htmlId}}">
+
                             <span class="umb-variant-selector-entry__title" ng-if="!(variant.segment && variant.language)">
                                 <span ng-bind="variant.displayName"></span>
                                 <strong ng-if="variant.isMandatory" class="umb-control-required">*</strong>
@@ -42,17 +41,15 @@
                             <span class="umb-variant-selector-entry__description" ng-messages="publishVariantSelectorForm.publishVariantSelector.$error" show-validation-on-submit>
                                 <span class="text-error" ng-message="valServerField">{{publishVariantSelectorForm.publishVariantSelector.errorMsg}}</span>
                             </span>
+
                         </umb-checkbox>
 
                         <umb-variant-notification-list notifications="variant.notifications"></umb-variant-notification-list>
 
                     </div>
-
                 </ng-form>
             </div>
             <br />
         </div>
-
     </div>
-
 </div>
