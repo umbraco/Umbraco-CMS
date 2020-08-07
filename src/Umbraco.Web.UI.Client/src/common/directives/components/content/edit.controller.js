@@ -562,6 +562,7 @@
                     view: "views/content/overlays/unpublish.html",
                     variants: $scope.content.variants, //set a model property for the dialog
                     skipFormValidation: true, //when submitting the overlay form, skip any client side validation
+                    includeUnpublished: false,
                     submitButtonLabelKey: "content_unpublish",
                     submitButtonStyle: "warning",
                     submit: function (model) {
