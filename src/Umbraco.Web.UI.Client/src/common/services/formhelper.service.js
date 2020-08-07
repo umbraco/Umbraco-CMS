@@ -47,6 +47,9 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
             // Some property editors need to perform an action after all property editors have reacted to the formSubmitting.
             args.scope.$broadcast("postFormSubmitting", { scope: args.scope, action: args.action });
 
+            // Set the form state to submitted
+            currentForm.$setSubmitted();
+
             //then check if the form is valid
             if (!args.skipValidation) {
                 if (currentForm.$invalid) {
@@ -77,14 +80,28 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
          * @param {object} args An object containing arguments for form submission
          */
         resetForm: function (args) {
+
+            var currentForm;
+
             if (!args) {
                 throw "args cannot be null";
             }
             if (!args.scope) {
                 throw "args.scope cannot be null";
             }
+            if (!args.formCtrl) {
+                //try to get the closest form controller
+                currentForm = angularHelper.getRequiredCurrentForm(args.scope);
+            }
+            else {
+                currentForm = args.formCtrl;
+            }
 
-            args.scope.$broadcast("formSubmitted", { scope: args.scope });
+            // Set the form state to pristine
+            currentForm.$setPristine();
+            currentForm.$setUntouched();
+
+            args.scope.$broadcast(args.hasErrors ? "formSubmittedValidationFailed" : "formSubmitted", { scope: args.scope });
         },
 
         showNotifications: function (args) {

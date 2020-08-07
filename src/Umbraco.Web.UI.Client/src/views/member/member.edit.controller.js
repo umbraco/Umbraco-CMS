@@ -208,7 +208,7 @@ function MemberEditController($scope, $routeParams, $location, appState, memberR
                     navigationService.syncTree({ tree: "member", path: path.split(","), forceReload: true });
 
             }, function (err) {
-
+                    formHelper.resetForm({ scope: $scope, hasErrors: true });
                     contentEditingHelper.handleSaveError({
                         err: err,
                         rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, err.data)

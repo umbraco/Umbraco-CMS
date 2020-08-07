@@ -168,7 +168,9 @@
                         extendedSave(saved).then(function (result) {
                             //if all is good, then reset the form
                             formHelper.resetForm({ scope: $scope });
-                        }, Utilities.noop);
+                        }, function () {
+                            formHelper.resetForm({ scope: $scope, hasErrors: true });
+                        });
 
                         vm.user = _.omit(saved, "navigation");
                         //restore
@@ -179,7 +181,7 @@
                         vm.page.saveButtonState = "success";
 
                     }, function (err) {
-
+                        formHelper.resetForm({ scope: $scope, hasErrors: true });
                         contentEditingHelper.handleSaveError({
                             err: err,
                             showNotifications: true
