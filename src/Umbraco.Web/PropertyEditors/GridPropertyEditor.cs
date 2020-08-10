@@ -29,6 +29,7 @@ namespace Umbraco.Web.PropertyEditors
     {
         private IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly HtmlImageSourceParser _imageSourceParser;
+        private readonly HtmlMacroParameterParser _macroParameterParser;
         private readonly RichTextEditorPastedImages _pastedImages;
         private readonly HtmlLocalLinkParser _localLinkParser;
         private readonly IImageUrlGenerator _imageUrlGenerator;
@@ -39,15 +40,25 @@ namespace Umbraco.Web.PropertyEditors
             HtmlImageSourceParser imageSourceParser,
             RichTextEditorPastedImages pastedImages,
             HtmlLocalLinkParser localLinkParser)
-            : this(logger, umbracoContextAccessor, imageSourceParser, pastedImages, localLinkParser, Current.ImageUrlGenerator)
+            : this(logger, umbracoContextAccessor, imageSourceParser, pastedImages, localLinkParser, Current.Factory.GetInstance<HtmlMacroParameterParser>(),Current.ImageUrlGenerator)
         {
         }
-
+        [Obsolete("Use the constructor which takes an HtmlMacroParameterParser")]
+        public GridPropertyEditor(ILogger logger,
+    IUmbracoContextAccessor umbracoContextAccessor,
+    HtmlImageSourceParser imageSourceParser,
+    RichTextEditorPastedImages pastedImages,
+    HtmlLocalLinkParser localLinkParser,
+            IImageUrlGenerator imageUrlGenerator)
+    : this(logger, umbracoContextAccessor, imageSourceParser, pastedImages, localLinkParser, Current.Factory.GetInstance<HtmlMacroParameterParser>(), imageUrlGenerator)
+        {
+        }
         public GridPropertyEditor(ILogger logger,
             IUmbracoContextAccessor umbracoContextAccessor,
             HtmlImageSourceParser imageSourceParser,
             RichTextEditorPastedImages pastedImages,
             HtmlLocalLinkParser localLinkParser,
+            HtmlMacroParameterParser macroParameterParser,
             IImageUrlGenerator imageUrlGenerator)
             : base(logger)
         {
@@ -55,6 +66,7 @@ namespace Umbraco.Web.PropertyEditors
             _imageSourceParser = imageSourceParser;
             _pastedImages = pastedImages;
             _localLinkParser = localLinkParser;
+            _macroParameterParser = macroParameterParser;
             _imageUrlGenerator = imageUrlGenerator;
         }
 
@@ -72,6 +84,7 @@ namespace Umbraco.Web.PropertyEditors
         {
             private readonly IUmbracoContextAccessor _umbracoContextAccessor;
             private readonly HtmlImageSourceParser _imageSourceParser;
+            private readonly HtmlMacroParameterParser _macroParameterParser;
             private readonly RichTextEditorPastedImages _pastedImages;
             private readonly RichTextPropertyEditor.RichTextPropertyValueEditor _richTextPropertyValueEditor;
             private readonly MediaPickerPropertyEditor.MediaPickerPropertyValueEditor _mediaPickerPropertyValueEditor;
@@ -83,23 +96,34 @@ namespace Umbraco.Web.PropertyEditors
                 HtmlImageSourceParser imageSourceParser,
                 RichTextEditorPastedImages pastedImages,
                 HtmlLocalLinkParser localLinkParser)
-                : this(attribute, umbracoContextAccessor, imageSourceParser, pastedImages, localLinkParser, Current.ImageUrlGenerator)
+                : this(attribute, umbracoContextAccessor, imageSourceParser, pastedImages, localLinkParser,Current.Factory.GetInstance<HtmlMacroParameterParser>(), Current.ImageUrlGenerator)
             {
             }
-
+            [Obsolete("Use the constructor which takes an HtmlMacroParameterParser")]
+            public GridPropertyValueEditor(DataEditorAttribute attribute,
+                    IUmbracoContextAccessor umbracoContextAccessor,
+                    HtmlImageSourceParser imageSourceParser,
+                    RichTextEditorPastedImages pastedImages,
+                    HtmlLocalLinkParser localLinkParser,
+                IImageUrlGenerator imageUrlGenerator)
+                : this(attribute, umbracoContextAccessor, imageSourceParser, pastedImages, localLinkParser, Current.Factory.GetInstance<HtmlMacroParameterParser>(), imageUrlGenerator)
+            {
+            }
             public GridPropertyValueEditor(DataEditorAttribute attribute,
                 IUmbracoContextAccessor umbracoContextAccessor,
                 HtmlImageSourceParser imageSourceParser,
                 RichTextEditorPastedImages pastedImages,
                 HtmlLocalLinkParser localLinkParser,
+                HtmlMacroParameterParser macroParameterParser,
                 IImageUrlGenerator imageUrlGenerator)
                 : base(attribute)
             {
                 _umbracoContextAccessor = umbracoContextAccessor;
                 _imageSourceParser = imageSourceParser;
                 _pastedImages = pastedImages;
-                _richTextPropertyValueEditor = new RichTextPropertyEditor.RichTextPropertyValueEditor(attribute, umbracoContextAccessor, imageSourceParser, localLinkParser, pastedImages, _imageUrlGenerator);
+                _richTextPropertyValueEditor = new RichTextPropertyEditor.RichTextPropertyValueEditor(attribute, umbracoContextAccessor, imageSourceParser, localLinkParser, macroParameterParser, pastedImages, _imageUrlGenerator);
                 _mediaPickerPropertyValueEditor = new MediaPickerPropertyEditor.MediaPickerPropertyValueEditor(attribute);
+                _macroParameterParser = macroParameterParser;
                 _imageUrlGenerator = imageUrlGenerator;
             }
 
@@ -125,7 +149,7 @@ namespace Umbraco.Web.PropertyEditors
                 var mediaParent = config?.MediaParentId;
                 var mediaParentId = mediaParent == null ? Guid.Empty : mediaParent.Guid;
 
-                var grid = DeserializeGridValue(rawJson, out var rtes, out _);
+                var grid = DeserializeGridValue(rawJson, out var rtes, out _, out _);
 
                 var userId = _umbracoContextAccessor.UmbracoContext?.Security?.CurrentUser?.Id ?? Constants.Security.SuperUserId;
 
@@ -158,7 +182,7 @@ namespace Umbraco.Web.PropertyEditors
                 var val = property.GetValue(culture, segment)?.ToString();
                 if (val.IsNullOrWhiteSpace()) return string.Empty;
 
-                var grid = DeserializeGridValue(val, out var rtes, out _);
+                var grid = DeserializeGridValue(val, out var rtes, out _, out _);
 
                 //process the rte values
                 foreach (var rte in rtes.ToList())
@@ -172,7 +196,7 @@ namespace Umbraco.Web.PropertyEditors
                 return grid;
             }
 
-            private GridValue DeserializeGridValue(string rawJson, out IEnumerable<GridValue.GridControl> richTextValues, out IEnumerable<GridValue.GridControl> mediaValues)
+            private GridValue DeserializeGridValue(string rawJson, out IEnumerable<GridValue.GridControl> richTextValues, out IEnumerable<GridValue.GridControl> mediaValues, out IEnumerable<GridValue.GridControl> macroValues)
             {
                 var grid = JsonConvert.DeserializeObject<GridValue>(rawJson);
 
@@ -180,7 +204,8 @@ namespace Umbraco.Web.PropertyEditors
                 var controls = grid.Sections.SelectMany(x => x.Rows.SelectMany(r => r.Areas).SelectMany(a => a.Controls)).ToArray();
                 richTextValues = controls.Where(x => x.Editor.Alias.ToLowerInvariant() == "rte");
                 mediaValues = controls.Where(x => x.Editor.Alias.ToLowerInvariant() == "media");
-
+                // Find all the macros
+                macroValues = controls.Where(x => x.Editor.Alias.ToLowerInvariant() == "macro");
                 return grid;
             }
 
@@ -196,7 +221,7 @@ namespace Umbraco.Web.PropertyEditors
                 if (rawJson.IsNullOrWhiteSpace())
                     yield break;
 
-                DeserializeGridValue(rawJson, out var richTextEditorValues, out var mediaValues);
+                DeserializeGridValue(rawJson, out var richTextEditorValues, out var mediaValues, out var macroValues);
 
                 foreach (var umbracoEntityReference in richTextEditorValues.SelectMany(x =>
                     _richTextPropertyValueEditor.GetReferences(x.Value)))
@@ -205,6 +230,18 @@ namespace Umbraco.Web.PropertyEditors
                 foreach (var umbracoEntityReference in mediaValues.SelectMany(x =>
                     _mediaPickerPropertyValueEditor.GetReferences(x.Value["udi"])))
                     yield return umbracoEntityReference;
+
+                //Macros don't really have a Property Editor for which we can call GetRefererences
+                //where does the responsibility lie for MacroParametersEditors to report their references?
+                //when we don't easily know the property type for a parameter - without 'looking up' which would be expensive?
+                //pragmatically we only care if the parameter has a value that is a media udi eg umb://media
+                //so we 'could' just loop through all parameter values here and add references for any values that are media udis... eg they are in use! however they are picked
+                //Is the HtmlMacroParameterParser the right place to put this method?
+                var udis = _macroParameterParser.FindUdisFromGridControlMacroParameters(macroValues);
+                foreach (var udi in udis)
+                {
+                    yield return new UmbracoEntityReference(udi);
+                }              
             }
         }
     }
