@@ -511,6 +511,14 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// <inheritdoc />
         public void SetLastLogin(string username, DateTime date)
         {
+            // Important - these queries are designed to execute without an exclusive WriteLock taken in our distributed lock
+            // table. However due to the data that we are updating which relies on version data we cannot update this data
+            // without taking some locks, otherwise we'll end up with strange situations because when a member is updated, that operation
+            // deletes and re-inserts all property data. So if there are concurrent transactions, one deleting and re-inserting and another trying
+            // to update there can be problems. This is only an issue for cmsPropertyData, not umbracoContentVersion because that table just
+            // maintains a single row and it isn't deleted/re-inserted.
+            // So the important part here is the ForUpdate() call on the select to fetch the property data to update.
+
             // Update the cms property value for the member
 
             var sqlSelectTemplateProperty = SqlContext.Templates.Get("Umbraco.Core.MemberRepository.SetLastLogin1", s => s
@@ -522,7 +530,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 .InnerJoin<MemberDto>().On<MemberDto, NodeDto>((l, r) => l.NodeId == r.NodeId)
                 .Where<NodeDto>(x => x.NodeObjectType == SqlTemplate.Arg<Guid>("nodeObjectType"))
                 .Where<PropertyTypeDto>(x => x.Alias == SqlTemplate.Arg<string>("propertyTypeAlias"))
-                .Where<MemberDto>(x => x.LoginName == SqlTemplate.Arg<string>("username")));
+                .Where<MemberDto>(x => x.LoginName == SqlTemplate.Arg<string>("username"))
+                .ForUpdate());
             var sqlSelectProperty = sqlSelectTemplateProperty.Sql(Constants.ObjectTypes.Member, Constants.Conventions.Member.LastLoginDate, username);
 
             var update = Sql()
