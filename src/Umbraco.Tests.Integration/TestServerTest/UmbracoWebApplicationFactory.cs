@@ -53,7 +53,8 @@ namespace Umbraco.Tests.Integration.TestServerTest
             {
                 x.AddInMemoryCollection(new Dictionary<string, string>()
                 {
-                    ["ConnectionStrings:"+ Constants.System.UmbracoConnectionName] = _testDbConnectionString
+                    ["ConnectionStrings:"+ Constants.System.UmbracoConnectionName] = _testDbConnectionString,
+                    ["Umbraco:CMS:Hosting:Debug"] = "true",
                 });
             });
 

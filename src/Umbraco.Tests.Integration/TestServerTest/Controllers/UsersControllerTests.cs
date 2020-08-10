@@ -168,6 +168,7 @@ namespace Umbraco.Tests.Integration.TestServerTest.Controllers
             {
                 var expected = new InvalidOperationException();
                 Assert.IsNotNull(actual);
+                Assert.AreEqual(expected.GetType(), actual.ExceptionType);
                 Assert.AreEqual(expected.Message, actual.ExceptionMessage);
             });
         }
