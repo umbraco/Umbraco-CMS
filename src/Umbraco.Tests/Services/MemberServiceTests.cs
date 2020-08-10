@@ -49,9 +49,27 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void Can_Update_Member_Property_Value()
+        {
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+            ServiceContext.MemberTypeService.Save(memberType);
+            IMember member = MockedMember.CreateSimpleMember(memberType, "hello", "helloworld@test123.com", "hello", "hello");
+            member.SetValue("title", "title of mine");
+            ServiceContext.MemberService.Save(member);
+
+            // re-get
+            member = ServiceContext.MemberService.GetById(member.Id);
+            member.SetValue("title", "another title of mine");
+            ServiceContext.MemberService.Save(member);
+
+            // re-get
+            member = ServiceContext.MemberService.GetById(member.Id);
+            Assert.AreEqual("another title of mine", member.GetValue("title"));
+        }
+
+        [Test]
         public void Can_Get_By_Username()
         {
-            var now = DateTime.Now;
             var memberType = ServiceContext.MemberTypeService.Get("member");
             IMember member = new Member("xname", "xemail", "xusername", "xrawpassword", memberType, true);
             ServiceContext.MemberService.Save(member);

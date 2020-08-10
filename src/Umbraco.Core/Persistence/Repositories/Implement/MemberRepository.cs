@@ -385,12 +385,23 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (changedCols.Count > 0)
                 Database.Update(dto, changedCols);
 
-            // replace the property data
-            var deletePropertyDataSql = SqlContext.Sql().Delete<PropertyDataDto>().Where<PropertyDataDto>(x => x.VersionId == member.VersionId);
-            Database.Execute(deletePropertyDataSql);
+            // replace the property data, lookup the data to update with a UPDLOCK
+            var propDataSql = SqlContext.Sql().Select("*").From<PropertyDataDto>().Where<PropertyDataDto>(x => x.VersionId == member.VersionId).ForUpdate();
+            var existingPropData = Database.Fetch<PropertyDataDto>(propDataSql).ToDictionary(x => x.PropertyTypeId);
             var propertyDataDtos = PropertyFactory.BuildDtos(member.ContentType.Variations, member.VersionId, 0, entity.Properties, LanguageRepository, out _, out _);
             foreach (var propertyDataDto in propertyDataDtos)
-                Database.Insert(propertyDataDto);
+            {
+                // Check if this already exists and update, else insert a new one
+                if (existingPropData.TryGetValue(propertyDataDto.PropertyTypeId, out var propData))
+                {
+                    propertyDataDto.Id = propData.Id;
+                    Database.Update(propertyDataDto);
+                }
+                else
+                {
+                    Database.Insert(propertyDataDto);
+                }
+            }   
 
             SetEntityTags(entity, _tagRepository);
 
