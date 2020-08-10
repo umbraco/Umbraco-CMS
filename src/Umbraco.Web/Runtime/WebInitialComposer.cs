@@ -109,6 +109,7 @@ namespace Umbraco.Web.Runtime
             composition.RegisterUnique<HtmlLocalLinkParser>();
             composition.RegisterUnique<HtmlUrlParser>();
             composition.RegisterUnique<HtmlImageSourceParser>();
+            composition.RegisterUnique<HtmlMacroParameterParser>();
             composition.RegisterUnique<RichTextEditorPastedImages>();
 
             // register the umbraco helper - this is Transient! very important!
