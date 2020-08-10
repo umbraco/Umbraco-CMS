@@ -385,7 +385,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (changedCols.Count > 0)
                 Database.Update(dto, changedCols);
 
-            // replace the property data, lookup the data to update with a UPDLOCK
+            // Replace the property data
+            // Lookup the data to update with a UPDLOCK (using ForUpdate()) this is because we have another method that doesn't take an explicit WriteLock
+            // in SetLastLogin which is called very often and we want to avoid the lock timeout for the explicit lock table but we still need to ensure atomic
+            // operations between that method and this one. 
+
             var propDataSql = SqlContext.Sql().Select("*").From<PropertyDataDto>().Where<PropertyDataDto>(x => x.VersionId == member.VersionId).ForUpdate();
             var existingPropData = Database.Fetch<PropertyDataDto>(propDataSql).ToDictionary(x => x.PropertyTypeId);
             var propertyDataDtos = PropertyFactory.BuildDtos(member.ContentType.Variations, member.VersionId, 0, entity.Properties, LanguageRepository, out _, out _);
