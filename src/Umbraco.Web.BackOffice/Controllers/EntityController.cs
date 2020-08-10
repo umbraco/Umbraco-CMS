@@ -44,7 +44,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     /// </para>
     /// <para>Some objects such as macros are not based on CMSNode</para>
     /// </remarks>
-    [PluginController("UmbracoApi")]
+    [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     public class EntityController : UmbracoAuthorizedJsonController
     {
         private readonly ITreeService _treeService;

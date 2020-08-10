@@ -33,7 +33,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     /// <summary>
     /// Controller to back the User.Resource service, used for fetching user data when already authenticated. user.service is currently used for handling authentication
     /// </summary>
-    [PluginController("UmbracoApi")]
+    [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     public class CurrentUserController : UmbracoAuthorizedJsonController
     {
         private readonly IMediaFileSystem _mediaFileSystem;

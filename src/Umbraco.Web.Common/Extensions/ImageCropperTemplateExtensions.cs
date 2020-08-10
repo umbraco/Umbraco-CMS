@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Globalization;
 using Newtonsoft.Json;
+using Umbraco.Composing;
 using Umbraco.Core;
-using Umbraco.Web.Composing;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 
-namespace Umbraco.Web
+namespace Umbraco.Extensions
 {
     /// <summary>
     /// Provides extension methods for getting ImageProcessor Url from the core Image Cropper property editor

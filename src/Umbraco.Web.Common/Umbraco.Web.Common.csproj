@@ -25,8 +25,8 @@
       <PackageReference Include="MiniProfiler.AspNetCore.Mvc" Version="4.1.0" />
       <PackageReference Include="NETStandard.Library" Version="2.0.3" />
       <PackageReference Include="Serilog.AspNetCore" Version="3.2.0" />
-      <PackageReference Include="SixLabors.ImageSharp.Web" Version="1.0.0-rc0001" />
-      <PackageReference Include="Smidge" Version="3.1.0" />
+      <PackageReference Include="SixLabors.ImageSharp.Web" Version="1.0.0-rc0003" />
+      <PackageReference Include="Smidge" Version="3.1.1" />
       <PackageReference Include="Smidge.Nuglify" Version="2.0.0" />
     </ItemGroup>
 

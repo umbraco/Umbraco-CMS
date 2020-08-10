@@ -17,7 +17,7 @@ using Constants = Umbraco.Core.Constants;
 namespace Umbraco.Web.BackOffice.Controllers
 {
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
-    [UmbracoTreeAuthorizeAttribute(Constants.Trees.Templates)]
+    [UmbracoTreeAuthorize(Constants.Trees.Templates)]
     public class TemplateController : BackOfficeNotificationsController
     {
         private readonly IFileService _fileService;

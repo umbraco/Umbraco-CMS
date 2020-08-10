@@ -302,7 +302,6 @@
     <Compile Include="Persistence\Repositories\TagRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\NotificationsRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\TemplateRepositoryTest.cs" />
-    <Compile Include="PropertyEditors\ImageCropperTest.cs" />
     <Compile Include="PublishedContent\PublishedContentExtensionTests.cs" />
     <Compile Include="PropertyEditors\ColorListValidatorTest.cs" />
     <Compile Include="PropertyEditors\MultiValuePropertyEditorTests.cs" />

@@ -1,7 +1,11 @@
+@using Umbraco.Core
+@using Umbraco.Core.Models.PublishedContent
 @using Umbraco.Web
-@using Umbraco.Web.Composing
-@inherits Umbraco.Web.Macros.PartialViewMacroPage
-
+@using Umbraco.Web.Routing
+@inherits Umbraco.Web.Common.Macros.PartialViewMacroPage
+@inject IPublishedContentQuery PublishedContentQuery
+@inject IPublishedValueFallback PublishedValueFallback
+@inject IPublishedUrlProvider PublishedUrlProvider
 @*
     Macro to list all child pages under a specific page in the content tree.
 
@@ -19,15 +23,15 @@
 @if (startNodeId != null)
 {
     @* Get the starting page *@
-    var startNode = Current.PublishedContentQuery.Content(startNodeId);
-    var selection = startNode.Children.Where(x => x.IsVisible()).ToArray();
+    var startNode = PublishedContentQuery.Content(startNodeId);
+    var selection = startNode.Children.Where(x => x.IsVisible(PublishedValueFallback)).ToArray();
 
     if (selection.Length > 0)
     {
         <ul>
             @foreach (var item in selection)
             {
-                <li><a href="@item.Url">@item.Name</a></li>
+                <li><a href="@item.Url(PublishedUrlProvider)">@item.Name</a></li>
             }
         </ul>
     }

@@ -29,13 +29,14 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Hosting;
 using Umbraco.Extensions;
 using Umbraco.Web.Routing;
+using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Editors
 {
     /// <summary>
     /// The API controller used for editing content
     /// </summary>
-    [PluginController("UmbracoApi")]
+    [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     [ValidationFilter]
     [AngularJsonOnlyConfiguration]
     [IsBackOffice]

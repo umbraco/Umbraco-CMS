@@ -1,6 +1,9 @@
-@using Umbraco.Web
-@inherits Umbraco.Web.Macros.PartialViewMacroPage
-
+@using Umbraco.Core
+@using Umbraco.Core.Models.PublishedContent
+@using Umbraco.Web.Routing
+@inherits Umbraco.Web.Common.Macros.PartialViewMacroPage
+@inject IPublishedValueFallback PublishedValueFallback
+@inject IPublishedUrlProvider PublishedUrlProvider
 @*
     Macro to list all child pages with a specific property, sorted by the value of that property.
 
@@ -17,14 +20,14 @@
 
 @if (propertyAlias != null)
 {
-    var selection = Model.Content.Children.Where(x => x.IsVisible()).OrderBy(x => x.Value(propertyAlias.ToString())).ToArray();
+    var selection = Model.Content.Children.Where(x => x.IsVisible(PublishedValueFallback)).OrderBy(x => x.Value(PublishedValueFallback, propertyAlias.ToString())).ToArray();
 
     if (selection.Length > 0)
     {
         <ul>
             @foreach (var item in selection)
             {
-                <li><a href="@item.Url">@item.Name</a></li>
+                <li><a href="@item.Url(PublishedUrlProvider)">@item.Name</a></li>
             }
         </ul>
     }

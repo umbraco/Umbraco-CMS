@@ -25,7 +25,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     /// <summary>
     ///     An API controller used for dealing with content types
     /// </summary>
-    [PluginController("UmbracoApi")]
+    [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     [UmbracoTreeAuthorize(Constants.Trees.MediaTypes)]
     public class MediaTypeController : ContentTypeControllerBase<IMediaType>
     {

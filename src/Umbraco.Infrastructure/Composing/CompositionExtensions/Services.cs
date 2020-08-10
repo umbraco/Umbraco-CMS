@@ -89,7 +89,7 @@ namespace Umbraco.Core.Composing.CompositionExtensions
                 factory.GetInstance<IFileService>(),
                 factory.GetInstance<IMacroService>(),
                 factory.GetInstance<ILocalizationService>(),
-                factory.GetInstance<IIOHelper>(),
+                factory.GetInstance<IHostingEnvironment>(),
                 factory.GetInstance<IEntityXmlSerializer>(),
                 factory.GetInstance<ILogger>(),
                 factory.GetInstance<IUmbracoVersion>(),
