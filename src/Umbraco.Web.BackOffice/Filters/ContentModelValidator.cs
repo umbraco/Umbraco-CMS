@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -19,13 +21,16 @@ namespace Umbraco.Web.BackOffice.Filters
     /// </summary>
     internal abstract class ContentModelValidator
     {
+
         protected IWebSecurity WebSecurity { get; }
+        public IPropertyValidationService PropertyValidationService { get; }
         protected ILogger Logger { get; }
 
-        protected ContentModelValidator(ILogger logger, IWebSecurity webSecurity)
+        protected ContentModelValidator(ILogger logger, IWebSecurity webSecurity, IPropertyValidationService propertyValidationService)
         {
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
             WebSecurity = webSecurity ?? throw new ArgumentNullException(nameof(webSecurity));
+            PropertyValidationService = propertyValidationService ?? throw new ArgumentNullException(nameof(propertyValidationService));
         }
     }
 
@@ -46,7 +51,12 @@ namespace Umbraco.Web.BackOffice.Filters
     {
         private readonly ILocalizedTextService _textService;
 
-        protected ContentModelValidator(ILogger logger, IWebSecurity webSecurity, ILocalizedTextService textService) : base(logger, webSecurity)
+        protected ContentModelValidator(
+            ILogger logger,
+            IWebSecurity webSecurity,
+            ILocalizedTextService textService,
+            IPropertyValidationService propertyValidationService)
+            : base(logger, webSecurity, propertyValidationService)
         {
             _textService = textService ?? throw new ArgumentNullException(nameof(textService));
         }
@@ -126,18 +136,6 @@ namespace Umbraco.Web.BackOffice.Filters
         {
             var properties = modelWithProperties.Properties.ToDictionary(x => x.Alias, x => x);
 
-            // Retrieve default messages used for required and regex validatation.  We'll replace these
-            // if set with custom ones if they've been provided for a given property.
-            var requiredDefaultMessages = new[]
-                {
-                    _textService.Localize("validation", "invalidNull"),
-                    _textService.Localize("validation", "invalidEmpty")
-                };
-            var formatDefaultMessages = new[]
-                {
-                    _textService.Localize("validation", "invalidPattern"),
-                };
-
             foreach (var p in dto.Properties)
             {
                 var editor = p.PropertyEditor;
@@ -157,7 +155,7 @@ namespace Umbraco.Web.BackOffice.Filters
 
                 var postedValue = postedProp.Value;
 
-                ValidatePropertyValue(model, modelWithProperties, editor, p, postedValue, modelState, requiredDefaultMessages, formatDefaultMessages);
+                ValidatePropertyValue(model, modelWithProperties, editor, p, postedValue, modelState);
 
             }
 
@@ -181,26 +179,29 @@ namespace Umbraco.Web.BackOffice.Filters
             IDataEditor editor,
             ContentPropertyDto property,
             object postedValue,
-            ModelStateDictionary modelState,
-            string[] requiredDefaultMessages,
-            string[] formatDefaultMessages)
+            ModelStateDictionary modelState)
         {
-            var valueEditor = editor.GetValueEditor(property.DataType.Configuration);
-            foreach (var r in valueEditor.Validate(postedValue, property.IsRequired, property.ValidationRegExp))
+            if (property is null) throw new ArgumentNullException(nameof(property));
+            if (property.DataType is null) throw new InvalidOperationException($"{nameof(property)}.{nameof(property.DataType)} cannot be null");
+
+            foreach (var validationResult in PropertyValidationService.ValidatePropertyValue(
+                editor, property.DataType, postedValue, property.IsRequired,
+                property.ValidationRegExp, property.IsRequiredMessage, property.ValidationRegExpMessage))
             {
-                // If we've got custom error messages, we'll replace the default ones that will have been applied in the call to Validate().
-                if (property.IsRequired && !string.IsNullOrWhiteSpace(property.IsRequiredMessage) && requiredDefaultMessages.Contains(r.ErrorMessage, StringComparer.OrdinalIgnoreCase))
-                {
-                    r.ErrorMessage = property.IsRequiredMessage;
-                }
-
-                if (!string.IsNullOrWhiteSpace(property.ValidationRegExp) && !string.IsNullOrWhiteSpace(property.ValidationRegExpMessage) && formatDefaultMessages.Contains(r.ErrorMessage, StringComparer.OrdinalIgnoreCase))
-                {
-                    r.ErrorMessage = property.ValidationRegExpMessage;
-                }
-
-                modelState.AddPropertyError(r, property.Alias, property.Culture, property.Segment);
+                AddPropertyError(model, modelWithProperties, editor, property, validationResult, modelState);
             }
         }
+
+        protected virtual void AddPropertyError(
+            TModelSave model,
+            TModelWithProperties modelWithProperties,
+            IDataEditor editor,
+            ContentPropertyDto property,
+            ValidationResult validationResult,
+            ModelStateDictionary modelState)
+        {
+            modelState.AddPropertyError(validationResult, property.Alias, property.Culture, property.Segment);
+        }
+
     }
 }

@@ -17,11 +17,21 @@ namespace Umbraco.Core.Security
         /// <param name="identity"></param>
         public static void EnsureCulture(this IIdentity identity)
         {
+            var culture = GetCulture(identity);
+            if (!(culture is null))
+            {
+                Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture = culture;
+            }
+        }
+
+        public static CultureInfo GetCulture(this IIdentity identity)
+        {
             if (identity is UmbracoBackOfficeIdentity umbIdentity && umbIdentity.IsAuthenticated)
             {
-                Thread.CurrentThread.CurrentUICulture =
-                    Thread.CurrentThread.CurrentCulture = UserCultures.GetOrAdd(umbIdentity.Culture, s => new CultureInfo(s));
+                return UserCultures.GetOrAdd(umbIdentity.Culture, s => new CultureInfo(s));
             }
+
+            return null;
         }
 
 

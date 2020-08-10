@@ -1,12 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Web.Http.ModelBinding;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Services;
-using Umbraco.Web;
+using Umbraco.Extensions;
 
-namespace Umbraco.Tests.Web
+namespace Umbraco.Tests.Web.Validation
 {
     [TestFixture]
     public class ModelStateExtensionsTests

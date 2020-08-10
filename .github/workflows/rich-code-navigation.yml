@@ -1,0 +1,24 @@
+name: Microsoft Rich Code Navigation
+
+on:
+  pull_request:
+  push:
+    branches: [ v8/dev ]
+
+jobs:
+  RichNavigation:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Run Umbraco Build Script with Powershell
+      working-directory: 'build'
+      run: .\build.ps1
+      shell: powershell
+
+    - name: Microsoft Rich Code Navigation Indexer
+      uses: microsoft/RichCodeNavIndexer@v0.1
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        languages: csharp,typescript

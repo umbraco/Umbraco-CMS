@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Examine;
+using Umbraco.Core.Composing;
+using Umbraco.Core.Logging;
 
 namespace Umbraco.Examine
 {
@@ -12,12 +14,14 @@ namespace Umbraco.Examine
     /// </summary>
     public class IndexRebuilder
     {
+        private readonly IProfilingLogger _logger;
         private readonly IEnumerable<IIndexPopulator> _populators;
         public IExamineManager ExamineManager { get; }
 
-        public IndexRebuilder(IExamineManager examineManager, IEnumerable<IIndexPopulator> populators)
+        public IndexRebuilder(IProfilingLogger logger, IExamineManager examineManager, IEnumerable<IIndexPopulator> populators)
         {
             _populators = populators;
+            _logger = logger;
             ExamineManager = examineManager;
         }
 
@@ -55,7 +59,14 @@ namespace Umbraco.Examine
             // run each populator over the indexes
             foreach(var populator in _populators)
             {
-                populator.Populate(indexes);
+                try
+                {
+                    populator.Populate(indexes);
+                }
+                catch (Exception e)
+                {
+                    _logger.Error<IndexRebuilder>(e, "Index populating failed for populator {Populator}", populator.GetType());
+                }
             }
         }
 

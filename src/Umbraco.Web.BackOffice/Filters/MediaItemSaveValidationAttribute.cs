@@ -23,6 +23,7 @@ namespace Umbraco.Web.BackOffice.Filters
         private sealed class MediaItemSaveValidationFilter : IActionFilter
         {
             private readonly IEntityService _entityService;
+            private readonly IPropertyValidationService _propertyValidationService;
 
 
             private readonly ILogger _logger;
@@ -30,20 +31,26 @@ namespace Umbraco.Web.BackOffice.Filters
             private readonly ILocalizedTextService _textService;
             private readonly IWebSecurity _webSecurity;
 
-            public MediaItemSaveValidationFilter(ILogger logger, IWebSecurity webSecurity,
-                ILocalizedTextService textService, IMediaService mediaService, IEntityService entityService)
+            public MediaItemSaveValidationFilter(
+                ILogger logger,
+                IWebSecurity webSecurity,
+                ILocalizedTextService textService,
+                IMediaService mediaService,
+                IEntityService entityService,
+                IPropertyValidationService propertyValidationService)
             {
                 _logger = logger ?? throw new ArgumentNullException(nameof(logger));
                 _webSecurity = webSecurity ?? throw new ArgumentNullException(nameof(webSecurity));
                 _textService = textService ?? throw new ArgumentNullException(nameof(textService));
                 _mediaService = mediaService ?? throw new ArgumentNullException(nameof(mediaService));
                 _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
+                _propertyValidationService = propertyValidationService ?? throw new ArgumentNullException(nameof(propertyValidationService));
             }
 
             public void OnActionExecuting(ActionExecutingContext context)
             {
                 var model = (MediaItemSave) context.ActionArguments["contentItem"];
-                var contentItemValidator = new MediaSaveModelValidator(_logger, _webSecurity, _textService);
+                var contentItemValidator = new MediaSaveModelValidator(_logger, _webSecurity, _textService, _propertyValidationService);
 
                 if (ValidateUserAccess(model, context))
                 {

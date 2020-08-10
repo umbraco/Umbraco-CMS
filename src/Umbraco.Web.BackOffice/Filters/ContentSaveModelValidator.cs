@@ -11,8 +11,14 @@ namespace Umbraco.Web.BackOffice.Filters
     /// </summary>
     internal class ContentSaveModelValidator : ContentModelValidator<IContent, ContentItemSave, ContentVariantSave>
     {
-        public ContentSaveModelValidator(ILogger logger, IWebSecurity webSecurity, ILocalizedTextService textService) : base(logger, webSecurity, textService)
+        public ContentSaveModelValidator(
+            ILogger logger,
+            IWebSecurity webSecurity,
+            ILocalizedTextService textService,
+            IPropertyValidationService propertyValidationService)
+            : base(logger, webSecurity, textService, propertyValidationService)
         {
         }
+
     }
 }

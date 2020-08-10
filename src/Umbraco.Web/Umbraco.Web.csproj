@@ -141,6 +141,7 @@
     <Compile Include="AspNet\AspNetUserAgentProvider.cs" />
     <Compile Include="AspNet\FrameworkMarchal.cs" />
     <Compile Include="AspNet\AspNetUmbracoApplicationLifetime.cs" />
+    <Compile Include="BlockListTemplateExtensions.cs" />
     <Compile Include="Compose\AuditEventsComponent.cs" />
     <Compile Include="Compose\AuditEventsComposer.cs" />
     <Compile Include="Compose\BackOfficeUserAuditEventsComponent.cs" />

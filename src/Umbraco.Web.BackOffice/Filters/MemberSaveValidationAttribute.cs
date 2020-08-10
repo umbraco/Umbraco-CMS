@@ -27,8 +27,16 @@ namespace Umbraco.Web.BackOffice.Filters
             private readonly IMemberTypeService _memberTypeService;
             private readonly IMemberService _memberService;
             private readonly IShortStringHelper _shortStringHelper;
+            private readonly IPropertyValidationService _propertyValidationService;
 
-            public MemberSaveValidationFilter(ILogger logger, IWebSecurity webSecurity, ILocalizedTextService textService, IMemberTypeService memberTypeService, IMemberService memberService, IShortStringHelper shortStringHelper)
+            public MemberSaveValidationFilter(
+                ILogger logger,
+                IWebSecurity webSecurity,
+                ILocalizedTextService textService,
+                IMemberTypeService memberTypeService,
+                IMemberService memberService,
+                IShortStringHelper shortStringHelper,
+                IPropertyValidationService propertyValidationService)
             {
                 _logger = logger ?? throw new ArgumentNullException(nameof(logger));
                 _webSecurity = webSecurity ?? throw new ArgumentNullException(nameof(webSecurity));
@@ -36,12 +44,13 @@ namespace Umbraco.Web.BackOffice.Filters
                 _memberTypeService = memberTypeService ?? throw new ArgumentNullException(nameof(memberTypeService));
                 _memberService = memberService  ?? throw new ArgumentNullException(nameof(memberService));
                 _shortStringHelper = shortStringHelper ?? throw new ArgumentNullException(nameof(shortStringHelper));
+                _propertyValidationService = propertyValidationService ?? throw new ArgumentNullException(nameof(propertyValidationService));
             }
 
             public void OnActionExecuting(ActionExecutingContext context)
             {
                 var model = (MemberSave)context.ActionArguments["contentItem"];
-                var contentItemValidator = new MemberSaveModelValidator(_logger, _webSecurity, _textService, _memberTypeService, _memberService, _shortStringHelper);
+                var contentItemValidator = new MemberSaveModelValidator(_logger, _webSecurity, _textService, _memberTypeService, _memberService, _shortStringHelper, _propertyValidationService);
                 //now do each validation step
                 if (contentItemValidator.ValidateExistingContent(model, context))
                     if (contentItemValidator.ValidateProperties(model, model, context))

@@ -176,7 +176,7 @@ namespace Umbraco.Web.Scheduling
             }
 
             var periodInMilliseconds = healthCheckSettingsConfig.NotificationSettings.PeriodInHours * 60 * 60 * 1000;
-            var task = new HealthCheckNotifier(_healthCheckRunner, delayInMilliseconds, periodInMilliseconds, healthChecks, notifications, _mainDom, logger, _healthChecksSettingsConfig, _serverRegistrar, _runtime);
+            var task = new HealthCheckNotifier(_healthCheckRunner, delayInMilliseconds, periodInMilliseconds, healthChecks, notifications, _mainDom, logger, _healthChecksSettingsConfig, _serverRegistrar, _runtime, _scopeProvider);
             _healthCheckRunner.TryAdd(task);
             return task;
         }

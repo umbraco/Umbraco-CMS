@@ -225,7 +225,7 @@ namespace Umbraco.Web.Compose
                 }
                 catch (Exception e)
                 {
-                    _logger.Error<InstructionProcessTask>("Failed (will repeat).", e);
+                    _logger.Error<InstructionProcessTask>(e, "Failed (will repeat).");
                 }
                 return true; // repeat
             }

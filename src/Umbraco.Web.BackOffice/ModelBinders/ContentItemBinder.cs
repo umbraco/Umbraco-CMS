@@ -74,7 +74,15 @@ namespace Umbraco.Web.BackOffice.ModelBinders
                 return;
             }
 
-            model.PersistedContent = ContentControllerBase.IsCreatingAction(model.Action) ? CreateNew(model) : GetExisting(model);
+            var persistedContent = ContentControllerBase.IsCreatingAction(model.Action) ? CreateNew(model) : GetExisting(model);
+            BindModel(model, persistedContent, _modelBinderHelper, _umbracoMapper);
+
+            bindingContext.Result = ModelBindingResult.Success(model);
+        }
+
+        internal static void BindModel(ContentItemSave model, IContent persistedContent, ContentModelBinderHelper modelBinderHelper, UmbracoMapper umbracoMapper)
+        {
+            model.PersistedContent =persistedContent;
 
             //create the dto from the persisted model
             if (model.PersistedContent != null)
@@ -82,7 +90,7 @@ namespace Umbraco.Web.BackOffice.ModelBinders
                 foreach (var variant in model.Variants)
                 {
                     //map the property dto collection with the culture of the current variant
-                    variant.PropertyCollectionDto = _umbracoMapper.Map<ContentPropertyCollectionDto>(
+                    variant.PropertyCollectionDto = umbracoMapper.Map<ContentPropertyCollectionDto>(
                         model.PersistedContent,
                         context =>
                         {
@@ -92,13 +100,9 @@ namespace Umbraco.Web.BackOffice.ModelBinders
                         });
 
                     //now map all of the saved values to the dto
-                    _modelBinderHelper.MapPropertyValuesFromSaved(variant, variant.PropertyCollectionDto);
+                    modelBinderHelper.MapPropertyValuesFromSaved(variant, variant.PropertyCollectionDto);
                 }
             }
-
-            bindingContext.Result = ModelBindingResult.Success(model);
         }
-
-
     }
 }
