@@ -61,28 +61,34 @@ var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.servi
                 }
             });
 
-            previewHub.client.refreshed = function (message, sender) {
-                console.log("Notified by SignalR preview hub (" + message + ").");
+            if (previewHub && previewHub.client) {
+                previewHub.client.refreshed = function (message, sender) {
+                    console.log("Notified by SignalR preview hub (" + message + ").");
 
-                if ($scope.pageId != message) {
-                    console.log("Not a notification for us (" + $scope.pageId + ").");
-                    return;
-                }
+                    if ($scope.pageId != message) {
+                        console.log("Not a notification for us (" + $scope.pageId + ").");
+                        return;
+                    }
 
-                if (!visibleContent) {
-                    console.log("Not visible, will reload.");
-                    dirtyContent = true;
-                    return;
-                }
+                    if (!visibleContent) {
+                        console.log("Not visible, will reload.");
+                        dirtyContent = true;
+                        return;
+                    }
 
-                console.log("Reloading.");
-                var iframeDoc = (iframe.contentWindow || iframe.contentDocument);
-                iframeDoc.location.reload();
-            };
+                    console.log("Reloading.");
+                    var iframeDoc = (iframe.contentWindow || iframe.contentDocument);
+                    iframeDoc.location.reload();
+                };
+            }
 
-            $.connection.hub.start()
-                .done(function () { console.log("Connected to SignalR preview hub (ID=" + $.connection.hub.id + ")"); })
-                .fail(function () { console.log("Could not connect to SignalR preview hub."); });
+            try {
+                $.connection.hub.start()
+                    .done(function () { console.log("Connected to SignalR preview hub (ID=" + $.connection.hub.id + ")"); })
+                    .fail(function () { console.log("Could not connect to SignalR preview hub."); });
+            } catch (e) {
+                console.error("Could not establish signalr connection. Error: " + e);
+            }
         }
 
         var isInit = getParameterByName("init");

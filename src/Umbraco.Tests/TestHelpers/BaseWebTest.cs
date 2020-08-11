@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading;
 using Moq;
 using NUnit.Framework;
@@ -6,8 +7,11 @@ using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Tests.Common;
 using Umbraco.Tests.PublishedContent;
 using Umbraco.Tests.TestHelpers.Stubs;
@@ -38,7 +42,11 @@ namespace Umbraco.Tests.TestHelpers
             // need to specify a custom callback for unit tests
             // AutoPublishedContentTypes generates properties automatically
 
-            var type = new AutoPublishedContentType(0, "anything", new PublishedPropertyType[] { });
+            var dataTypeService = new TestObjects.TestDataTypeService(
+                new DataType(new VoidEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(),Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>())) { Id = 1 });
+
+            var factory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), new PropertyValueConverterCollection(Array.Empty<IPropertyValueConverter>()), dataTypeService);
+            var type = new AutoPublishedContentType(Guid.NewGuid(), 0, "anything", new PublishedPropertyType[] { });
             ContentTypesCache.GetPublishedContentTypeByAlias = alias => GetPublishedContentTypeByAlias(alias) ?? type;
         }
 

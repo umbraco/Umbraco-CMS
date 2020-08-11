@@ -43,7 +43,7 @@ using Umbraco.Web.Security;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
-    [PluginController("UmbracoApi")]
+    [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     [UmbracoApplicationAuthorize(Constants.Applications.Users)]
     [PrefixlessBodyModelValidator]
     [IsCurrentUserModelFilter]

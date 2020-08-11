@@ -89,10 +89,7 @@ namespace Umbraco.Web
             // Ensure owin is configured for Umbraco back office authentication.
             // Front-end OWIN cookie configuration must be declared after this code.
             app
-                // already moved to netcore
-                //.UseUmbracoBackOfficeCookieAuthentication(UmbracoContextAccessor, RuntimeState, Services.UserService, GlobalSettings, SecuritySettings, HostingEnvironment, RequestCache, PipelineStage.Authenticate)
-                .UseUmbracoBackOfficeExternalCookieAuthentication(UmbracoContextAccessor, RuntimeState, GlobalSettings, HostingEnvironment, RequestCache, PipelineStage.Authenticate)
-                .UseUmbracoPreviewAuthentication(UmbracoContextAccessor, RuntimeState, GlobalSettings, SecuritySettings, HostingEnvironment, RequestCache, PipelineStage.Authorize);
+                .UseUmbracoBackOfficeExternalCookieAuthentication(UmbracoContextAccessor, RuntimeState, GlobalSettings, HostingEnvironment, RequestCache, PipelineStage.Authenticate);
         }
 
         public static event EventHandler<OwinMiddlewareConfiguredEventArgs> MiddlewareConfigured;

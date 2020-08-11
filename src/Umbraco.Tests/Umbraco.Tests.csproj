@@ -145,7 +145,6 @@
     <Compile Include="Security\OwinDataProtectorTokenProviderTests.cs" />
     <Compile Include="Services\KeyValueServiceTests.cs" />
     <Compile Include="Persistence\Repositories\UserRepositoryTest.cs" />
-    <Compile Include="TestHelpers\Entities\MockedContent.cs" />
     <Compile Include="TestHelpers\Entities\MockedEntity.cs" />
     <Compile Include="TestHelpers\Entities\MockedMedia.cs" />
     <Compile Include="TestHelpers\Entities\MockedMember.cs" />
@@ -153,6 +152,7 @@
     <Compile Include="TestHelpers\Entities\MockedUser.cs" />
     <Compile Include="TestHelpers\Entities\MockedUserGroup.cs" />
     <Compile Include="UmbracoExamine\ExamineExtensions.cs" />
+    <Compile Include="PropertyEditors\BlockListPropertyValueConverterTests.cs" />
     <Compile Include="PropertyEditors\DataValueReferenceFactoryCollectionTests.cs" />
     <Compile Include="PropertyEditors\NestedContentPropertyComponentTests.cs" />
     <Compile Include="PublishedContent\NuCacheChildrenTests.cs" />
@@ -220,7 +220,6 @@
     <Compile Include="TestHelpers\ControllerTesting\TraceExceptionLogger.cs" />
     <Compile Include="Testing\Objects\Accessors\NoHttpContextAccessor.cs" />
     <Compile Include="TestHelpers\Stubs\TestExamineManager.cs" />
-    <Compile Include="Testing\ContentBaseExtensions.cs" />
     <Compile Include="Testing\Objects\TestUmbracoContextFactory.cs" />
     <Compile Include="Testing\TestDatabase.cs" />
     <Compile Include="Testing\TestingTests\NUnitTests.cs" />
@@ -253,7 +252,6 @@
     <Compile Include="Web\HttpCookieExtensionsTests.cs" />
     <Compile Include="Templates\HtmlImageSourceParserTests.cs" />
     <Compile Include="Web\Mvc\HtmlStringUtilitiesTests.cs" />
-    <Compile Include="Web\ModelStateExtensionsTests.cs" />
     <Compile Include="Web\Mvc\RenderIndexActionSelectorAttributeTests.cs" />
     <Compile Include="Persistence\NPocoTests\PetaPocoCachesTest.cs" />
     <Compile Include="Persistence\Repositories\DomainRepositoryTest.cs" />
@@ -302,7 +300,6 @@
     <Compile Include="Persistence\Repositories\TagRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\NotificationsRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\TemplateRepositoryTest.cs" />
-    <Compile Include="PropertyEditors\ImageCropperTest.cs" />
     <Compile Include="PublishedContent\PublishedContentExtensionTests.cs" />
     <Compile Include="PropertyEditors\ColorListValidatorTest.cs" />
     <Compile Include="PropertyEditors\MultiValuePropertyEditorTests.cs" />
@@ -432,7 +429,6 @@
     </Compile>
     <Compile Include="UmbracoExamine\ExamineDemoDataMediaService.cs" />
     <Compile Include="UmbracoExamine\ExamineDemoDataContentService.cs" />
-    <Compile Include="CoreThings\UriExtensionsTests.cs" />
     <Compile Include="Composing\PackageActionCollectionTests.cs" />
     <Compile Include="Composing\TypeLoaderExtensions.cs" />
     <Compile Include="Composing\TypeLoaderTests.cs" />
@@ -561,7 +557,9 @@
     <Content Include="Services\Importing\XsltSearch-Package.xml" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Models\Mapping\" />
     <Folder Include="Models\Mapping" />
+    <Folder Include="Web\Validation" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />

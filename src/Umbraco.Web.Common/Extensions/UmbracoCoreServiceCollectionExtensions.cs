@@ -1,10 +1,12 @@
 using System;
-using System.Collections;
 using System.Data.Common;
 using System.Data.SqlClient;
+using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
@@ -13,7 +15,6 @@ using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Extensions.Hosting;
 using Serilog.Extensions.Logging;
-using Umbraco.Composing;
 using Umbraco.Configuration;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
@@ -26,6 +27,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Runtime;
 using Umbraco.Web.Common.AspNetCore;
+using Umbraco.Web.Common.Extensions;
 using Umbraco.Web.Common.Profiler;
 
 namespace Umbraco.Extensions
@@ -154,7 +156,7 @@ namespace Umbraco.Extensions
                 out factory);
 
             return services;
-        }
+        }   
 
         /// <summary>
         /// Adds the Umbraco Back Core requirements
@@ -182,6 +184,7 @@ namespace Umbraco.Extensions
             if (container is null) throw new ArgumentNullException(nameof(container));
             if (entryAssembly is null) throw new ArgumentNullException(nameof(entryAssembly));
 
+            // Add supported databases
             services.AddUmbracoSqlCeSupport();
             services.AddUmbracoSqlServerSupport();
 

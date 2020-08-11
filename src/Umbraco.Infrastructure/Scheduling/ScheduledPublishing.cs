@@ -9,16 +9,18 @@ namespace Umbraco.Web.Scheduling
 {
     public class ScheduledPublishing : RecurringTaskBase
     {
-        private readonly IRuntimeState _runtime;
-        private readonly IMainDom _mainDom;
-        private readonly IServerRegistrar _serverRegistrar;
         private readonly IContentService _contentService;
-        private readonly IUmbracoContextFactory _umbracoContextFactory;
         private readonly ILogger _logger;
+        private readonly IMainDom _mainDom;
+        private readonly IRuntimeState _runtime;
         private readonly IServerMessenger _serverMessenger;
+        private readonly IServerRegistrar _serverRegistrar;
+        private readonly IUmbracoContextFactory _umbracoContextFactory;
 
-        public ScheduledPublishing(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
-            IRuntimeState runtime, IMainDom mainDom, IServerRegistrar serverRegistrar, IContentService contentService, IUmbracoContextFactory umbracoContextFactory, ILogger logger, IServerMessenger serverMessenger)
+        public ScheduledPublishing(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds,
+            int periodMilliseconds,
+            IRuntimeState runtime, IMainDom mainDom, IServerRegistrar serverRegistrar, IContentService contentService,
+            IUmbracoContextFactory umbracoContextFactory, ILogger logger, IServerMessenger serverMessenger)
             : base(runner, delayMilliseconds, periodMilliseconds)
         {
             _runtime = runtime;
@@ -29,6 +31,8 @@ namespace Umbraco.Web.Scheduling
             _logger = logger;
             _serverMessenger = serverMessenger;
         }
+
+        public override bool IsAsync => false;
 
         public override bool PerformRun()
         {
@@ -61,24 +65,27 @@ namespace Umbraco.Web.Scheduling
 
             try
             {
-                // ensure we run with an UmbracoContext, because this may run in a background task,
-                // yet developers may be using the 'current' UmbracoContext in the event handlers
-                //
+                // We don't need an explicit scope here because PerformScheduledPublish creates it's own scope
+                // so it's safe as it will create it's own ambient scope.
+                // Ensure we run with an UmbracoContext, because this will run in a background task,
+                // and developers may be using the UmbracoContext in the event handlers.
+
                 // TODO: or maybe not, CacheRefresherComponent already ensures a context when handling events
                 // - UmbracoContext 'current' needs to be refactored and cleaned up
                 // - batched messenger should not depend on a current HttpContext
                 //    but then what should be its "scope"? could we attach it to scopes?
                 // - and we should definitively *not* have to flush it here (should be auto)
                 //
-                using (
-                var contextReference = _umbracoContextFactory.EnsureUmbracoContext())
+                using (var contextReference = _umbracoContextFactory.EnsureUmbracoContext())
                 {
                     try
                     {
                         // run
                         var result = _contentService.PerformScheduledPublish(DateTime.Now);
                         foreach (var grouped in result.GroupBy(x => x.Result))
-                            _logger.Info<ScheduledPublishing>("Scheduled publishing result: '{StatusCount}' items with status {Status}", grouped.Count(), grouped.Key);
+                            _logger.Info<ScheduledPublishing>(
+                                "Scheduled publishing result: '{StatusCount}' items with status {Status}",
+                                grouped.Count(), grouped.Key);
                     }
                     finally
                     {
@@ -96,7 +103,5 @@ namespace Umbraco.Web.Scheduling
 
             return true; // repeat
         }
-
-        public override bool IsAsync => false;
     }
 }

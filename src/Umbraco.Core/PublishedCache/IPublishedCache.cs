@@ -235,5 +235,12 @@ namespace Umbraco.Web.PublishedCache
         /// <param name="contentType">The content type.</param>
         /// <returns>The contents.</returns>
         IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType);
+
+        /// <summary>
+        /// Gets a content type identified by its alias.
+        /// </summary>
+        /// <param name="key">The content type key.</param>
+        /// <returns>The content type, or null.</returns>
+        IPublishedContentType GetContentType(Guid key);
     }
 }

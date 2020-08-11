@@ -95,7 +95,7 @@ namespace Umbraco.Tests.PropertyEditors
                     })));
 
             var publishedPropType = new PublishedPropertyType(
-                new PublishedContentType(1234, "test", PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.Nothing),
+                new PublishedContentType(Guid.NewGuid(),1234, "test", PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.Nothing),
                 new PropertyType(TestHelper.ShortStringHelper,  "test", ValueStorageType.Nvarchar) { DataTypeId = 123 },
                 new PropertyValueConverterCollection(Enumerable.Empty<IPropertyValueConverter>()),
                 Mock.Of<IPublishedModelFactory>(), mockPublishedContentTypeFactory.Object);

@@ -29,7 +29,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     /// Content Types, Member Types or Media Types ... and of course to Data Types
     /// </remarks>
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
-    [UmbracoTreeAuthorizeAttribute(Constants.Trees.DataTypes, Constants.Trees.DocumentTypes, Constants.Trees.MediaTypes, Constants.Trees.MemberTypes)]
+    [UmbracoTreeAuthorize(Constants.Trees.DataTypes, Constants.Trees.DocumentTypes, Constants.Trees.MediaTypes, Constants.Trees.MemberTypes)]
     public class DataTypeController : BackOfficeNotificationsController
     {
         private readonly PropertyEditorCollection _propertyEditors;
@@ -425,7 +425,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <remarks>
         /// Permission is granted to this method if the user has access to any of these sections: Content, media, settings, developer, members
         /// </remarks>
-        [UmbracoTreeAuthorizeAttribute(Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members,
+        [UmbracoTreeAuthorize(Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members,
             Constants.Applications.Settings, Constants.Applications.Packages)]
         public IDictionary<string, IEnumerable<DataTypeBasic>> GetGroupedDataTypes()
         {
@@ -457,7 +457,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <remarks>
         /// Permission is granted to this method if the user has access to any of these sections: Content, media, settings, developer, members
         /// </remarks>
-        [UmbracoTreeAuthorizeAttribute(Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members,
+        [UmbracoTreeAuthorize(Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members,
             Constants.Applications.Settings, Constants.Applications.Packages)]
 
         public IDictionary<string, IEnumerable<DataTypeBasic>> GetGroupedPropertyEditors()
@@ -490,7 +490,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <remarks>
         /// Permission is granted to this method if the user has access to any of these sections: Content, media, settings, developer, members
         /// </remarks>
-        [UmbracoTreeAuthorizeAttribute(Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members,
+        [UmbracoTreeAuthorize(Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members,
             Constants.Applications.Settings, Constants.Applications.Packages)]
 
         public IEnumerable<PropertyEditorBasic> GetAllPropertyEditors()

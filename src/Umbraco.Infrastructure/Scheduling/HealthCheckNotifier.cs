@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.HealthChecks;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Sync;
 using Umbraco.Web.HealthCheck;
 
@@ -14,20 +15,31 @@ namespace Umbraco.Web.Scheduling
         private readonly IMainDom _mainDom;
         private readonly HealthCheckCollection _healthChecks;
         private readonly HealthCheckNotificationMethodCollection _notifications;
+        private readonly IScopeProvider _scopeProvider;
         private readonly IProfilingLogger _logger;
         private readonly IHealthChecksSettings _healthChecksSettingsConfig;
         private readonly IServerRegistrar _serverRegistrar;
         private readonly IRuntimeState _runtimeState;
 
-        public HealthCheckNotifier(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
-            HealthCheckCollection healthChecks, HealthCheckNotificationMethodCollection notifications,
-            IMainDom mainDom, IProfilingLogger logger, IHealthChecksSettings healthChecksSettingsConfig, IServerRegistrar serverRegistrar,
-            IRuntimeState runtimeState)
+        public HealthCheckNotifier(
+            IBackgroundTaskRunner<RecurringTaskBase> runner,
+            int delayMilliseconds,
+            int periodMilliseconds,
+            HealthCheckCollection healthChecks,
+            HealthCheckNotificationMethodCollection notifications,
+            IMainDom mainDom,
+            IProfilingLogger logger,
+            IHealthChecksSettings healthChecksSettingsConfig,
+            IServerRegistrar serverRegistrar,
+            IRuntimeState runtimeState,
+            IScopeProvider scopeProvider)
             : base(runner, delayMilliseconds, periodMilliseconds)
         {
             _healthChecks = healthChecks;
             _notifications = notifications;
             _mainDom = mainDom;
+            _scopeProvider = scopeProvider;
+            _runtimeState = runtimeState;
             _logger = logger;
             _healthChecksSettingsConfig = healthChecksSettingsConfig;
             _serverRegistrar = serverRegistrar;
@@ -56,6 +68,10 @@ namespace Umbraco.Web.Scheduling
                 return false; // do NOT repeat, going down
             }
 
+            // Ensure we use an explicit scope since we are running on a background thread and plugin health
+            // checks can be making service/database calls so we want to ensure the CallContext/Ambient scope
+            // isn't used since that can be problematic.
+            using (var scope = _scopeProvider.CreateScope())
             using (_logger.DebugDuration<HealthCheckNotifier>("Health checks executing", "Health checks complete"))
             {
                 var healthCheckConfig = _healthChecksSettingsConfig;

@@ -47,7 +47,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     /// This controller is decorated with the UmbracoApplicationAuthorizeAttribute which means that any user requesting
     /// access to ALL of the methods on this controller will need access to the media application.
     /// </remarks>
-    [PluginController("UmbracoApi")]
+    [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     [UmbracoApplicationAuthorize(Constants.Applications.Media)]
     public class MediaController : ContentControllerBase
     {

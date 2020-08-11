@@ -23,7 +23,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     /// The API controller for editing relation types.
     /// </summary>
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
-    [UmbracoTreeAuthorizeAttribute(Constants.Trees.RelationTypes)]
+    [UmbracoTreeAuthorize(Constants.Trees.RelationTypes)]
     public class RelationTypeController : BackOfficeNotificationsController
     {
         private readonly ILogger _logger;

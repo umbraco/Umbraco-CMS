@@ -5,18 +5,16 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Tests.TestHelpers;
 using Moq;
-using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Core.Services;
-using Umbraco.Core.Strings;
 using Umbraco.Web;
 using Umbraco.Web.Templates;
-using Umbraco.Web.Models;
 using Umbraco.Web.Routing;
 using Umbraco.Core.Media;
+using System;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -73,7 +71,7 @@ namespace Umbraco.Tests.PublishedContent
                 yield return publishedContentTypeFactory.CreatePropertyType(contentType, "content", 1);
             }
 
-            var type = new AutoPublishedContentType(0, "anything", CreatePropertyTypes);
+            var type = new AutoPublishedContentType(Guid.NewGuid(), 0, "anything", CreatePropertyTypes);
             ContentTypesCache.GetPublishedContentTypeByAlias = alias => type;
 
             var umbracoContext = GetUmbracoContext("/test");

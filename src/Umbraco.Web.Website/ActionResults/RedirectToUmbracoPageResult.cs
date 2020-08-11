@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Specialized;
-using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,7 +19,7 @@ namespace Umbraco.Web.Website.ActionResults
     {
         private IPublishedContent _publishedContent;
         private readonly int _pageId;
-        private readonly NameValueCollection _queryStringValues;
+        private readonly QueryString _queryString;
         private readonly IPublishedUrlProvider _publishedUrlProvider;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private string _url;
@@ -79,24 +78,10 @@ namespace Umbraco.Web.Website.ActionResults
         /// <param name="pageId"></param>
         /// <param name="queryStringValues"></param>
         /// <param name="publishedUrlProvider"></param>
-        public RedirectToUmbracoPageResult(int pageId, NameValueCollection queryStringValues, IPublishedUrlProvider publishedUrlProvider, IUmbracoContextAccessor umbracoContextAccessor)
+        public RedirectToUmbracoPageResult(int pageId, QueryString queryString, IPublishedUrlProvider publishedUrlProvider, IUmbracoContextAccessor umbracoContextAccessor)
         {
             _pageId = pageId;
-            _queryStringValues = queryStringValues;
-            _publishedUrlProvider = publishedUrlProvider;
-            _umbracoContextAccessor = umbracoContextAccessor;
-        }
-
-        /// <summary>
-        /// Creates a new RedirectToUmbracoResult
-        /// </summary>
-        /// <param name="pageId"></param>
-        /// <param name="queryString"></param>
-        /// <param name="publishedUrlProvider"></param>
-        public RedirectToUmbracoPageResult(int pageId, string queryString, IPublishedUrlProvider publishedUrlProvider, IUmbracoContextAccessor umbracoContextAccessor)
-        {
-            _pageId = pageId;
-            _queryStringValues = ParseQueryString(queryString);
+            _queryString = queryString;
             _publishedUrlProvider = publishedUrlProvider;
             _umbracoContextAccessor = umbracoContextAccessor;
         }
@@ -119,30 +104,14 @@ namespace Umbraco.Web.Website.ActionResults
         /// Creates a new RedirectToUmbracoResult
         /// </summary>
         /// <param name="publishedContent"></param>
-        /// <param name="queryStringValues"></param>
-        /// <param name="publishedUrlProvider"></param>
-        /// <param name="umbracoContextAccessor"></param>
-        public RedirectToUmbracoPageResult(IPublishedContent publishedContent, NameValueCollection queryStringValues, IPublishedUrlProvider publishedUrlProvider, IUmbracoContextAccessor umbracoContextAccessor)
-        {
-            _publishedContent = publishedContent;
-            _pageId = publishedContent.Id;
-            _queryStringValues = queryStringValues;
-            _publishedUrlProvider = publishedUrlProvider;
-            _umbracoContextAccessor = umbracoContextAccessor;
-        }
-
-        /// <summary>
-        /// Creates a new RedirectToUmbracoResult
-        /// </summary>
-        /// <param name="publishedContent"></param>
         /// <param name="queryString"></param>
         /// <param name="publishedUrlProvider"></param>
         /// <param name="umbracoContextAccessor"></param>
-        public RedirectToUmbracoPageResult(IPublishedContent publishedContent, string queryString, IPublishedUrlProvider publishedUrlProvider, IUmbracoContextAccessor umbracoContextAccessor)
+        public RedirectToUmbracoPageResult(IPublishedContent publishedContent, QueryString queryString, IPublishedUrlProvider publishedUrlProvider, IUmbracoContextAccessor umbracoContextAccessor)
         {
             _publishedContent = publishedContent;
             _pageId = publishedContent.Id;
-            _queryStringValues = ParseQueryString(queryString);
+            _queryString = queryString;
             _publishedUrlProvider = publishedUrlProvider;
             _umbracoContextAccessor = umbracoContextAccessor;
         }
@@ -155,10 +124,9 @@ namespace Umbraco.Web.Website.ActionResults
             var ioHelper = httpContext.RequestServices.GetRequiredService<IIOHelper>();
             var destinationUrl = ioHelper.ResolveUrl(Url);
 
-            if (!(_queryStringValues is null) && _queryStringValues.Count > 0)
+            if (_queryString.HasValue)
             {
-                destinationUrl += "?" + string.Join("&",
-                                                       _queryStringValues.AllKeys.Select(x => x + "=" + HttpUtility.UrlEncode(_queryStringValues[x])));
+                destinationUrl += _queryString.ToUriComponent();
             }
 
             var tempDataDictionaryFactory = context.HttpContext.RequestServices.GetRequiredService<ITempDataDictionaryFactory>();
@@ -170,9 +138,5 @@ namespace Umbraco.Web.Website.ActionResults
             return Task.CompletedTask;
         }
 
-        private NameValueCollection ParseQueryString(string queryString)
-        {
-            return !string.IsNullOrEmpty(queryString) ? HttpUtility.ParseQueryString(queryString) : null;
-        }
     }
 }

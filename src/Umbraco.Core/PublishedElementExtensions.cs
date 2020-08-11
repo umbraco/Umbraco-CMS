@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Core
 {
@@ -172,6 +174,31 @@ namespace Umbraco.Core
             // rely on the property converter - will return default bool value, ie false, if property
             // is not defined, or has no value, else will return its value.
             return content.Value<bool>(publishedValueFallback, Constants.Conventions.Content.NaviHide) == false;
+        }
+
+        #endregion
+
+        #region MediaUrl
+
+        /// <summary>
+        /// Gets the url for a media.
+        /// </summary>
+        /// <param name="content">The content item.</param>
+        /// <param name="publishedUrlProvider">The published url provider.</param>
+        /// <param name="culture">The culture (use current culture by default).</param>
+        /// <param name="mode">The url mode (use site configuration by default).</param>
+        /// <param name="propertyAlias">The alias of the property (use 'umbracoFile' by default).</param>
+        /// <returns>The url for the media.</returns>
+        /// <remarks>
+        /// <para>The value of this property is contextual. It depends on the 'current' request uri,
+        /// if any. In addition, when the content type is multi-lingual, this is the url for the
+        /// specified culture. Otherwise, it is the invariant url.</para>
+        /// </remarks>
+        public static string MediaUrl(this IPublishedContent content, IPublishedUrlProvider publishedUrlProvider, string culture = null, UrlMode mode = UrlMode.Default, string propertyAlias = Constants.Conventions.Media.File)
+        {
+            if (publishedUrlProvider == null) throw new ArgumentNullException(nameof(publishedUrlProvider));
+
+            return publishedUrlProvider.GetMediaUrl(content, mode, culture, propertyAlias);
         }
 
         #endregion

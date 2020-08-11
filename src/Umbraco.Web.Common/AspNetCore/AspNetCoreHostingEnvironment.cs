@@ -22,7 +22,10 @@ namespace Umbraco.Web.Common.AspNetCore
             ApplicationId = AppDomain.CurrentDomain.Id.ToString();
             ApplicationPhysicalPath = webHostEnvironment.ContentRootPath;
 
-            ApplicationVirtualPath = "/"; //TODO how to find this, This is a server thing, not application thing.
+            //TODO how to find this, This is a server thing, not application thing.
+            ApplicationVirtualPath = hostingSettings.ApplicationVirtualPath?.EnsureStartsWith('/')
+                                     ?? "/";
+            
             IISVersion = new Version(0, 0); // TODO not necessary IIS
 
         }

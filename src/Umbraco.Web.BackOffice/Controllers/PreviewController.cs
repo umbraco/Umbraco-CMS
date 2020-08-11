@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using System;
+using System.IO;
 using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
@@ -9,6 +10,7 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Services;
 using Umbraco.Core.WebAssets;
+using Umbraco.Extensions;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.ActionResults;
 using Umbraco.Web.Common.Filters;
@@ -29,14 +31,9 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IGlobalSettings _globalSettings;
         private readonly IPublishedSnapshotService _publishedSnapshotService;
         private readonly IWebSecurity _webSecurity;
-        private readonly ILocalizationService _localizationService;
-        private readonly IUmbracoVersion _umbracoVersion;
-        private readonly IContentSettings _contentSettings;
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ILocalizationService _localizationService;        
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ICookieManager _cookieManager;
-        private readonly IRuntimeSettings _runtimeSettings;
-        private readonly ISecuritySettings _securitySettings;
         private readonly IRuntimeMinifier _runtimeMinifier;
         private readonly ICompositeViewEngine _viewEngines;
 
@@ -46,13 +43,8 @@ namespace Umbraco.Web.BackOffice.Controllers
             IPublishedSnapshotService publishedSnapshotService,
             IWebSecurity webSecurity,
             ILocalizationService localizationService,
-            IUmbracoVersion umbracoVersion,
-            IContentSettings contentSettings,
-            IHttpContextAccessor httpContextAccessor,
             IHostingEnvironment hostingEnvironment,
             ICookieManager cookieManager,
-            IRuntimeSettings settings,
-            ISecuritySettings securitySettings,
             IRuntimeMinifier runtimeMinifier,
             ICompositeViewEngine viewEngines)
         {
@@ -61,13 +53,8 @@ namespace Umbraco.Web.BackOffice.Controllers
             _publishedSnapshotService = publishedSnapshotService;
             _webSecurity = webSecurity;
             _localizationService = localizationService;
-            _umbracoVersion = umbracoVersion;
-            _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
-            _httpContextAccessor = httpContextAccessor;
             _hostingEnvironment = hostingEnvironment;
             _cookieManager = cookieManager;
-            _runtimeSettings = settings;
-            _securitySettings = securitySettings;
             _runtimeMinifier = runtimeMinifier;
             _viewEngines = viewEngines;
         }
@@ -78,7 +65,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         {
             var availableLanguages = _localizationService.GetAllLanguages();
 
-            var model = new BackOfficePreviewModel(_features, _globalSettings, _umbracoVersion, availableLanguages, _contentSettings, _hostingEnvironment, _runtimeSettings, _securitySettings);
+            var model = new BackOfficePreviewModel(_features, availableLanguages);
 
             if (model.PreviewExtendedHeaderView.IsNullOrWhiteSpace() == false)
             {
@@ -87,7 +74,13 @@ namespace Umbraco.Web.BackOffice.Controllers
                     throw new InvalidOperationException("Could not find the view " + model.PreviewExtendedHeaderView + ", the following locations were searched: " + Environment.NewLine + string.Join(Environment.NewLine, viewEngineResult.SearchedLocations));
             }
 
-            return View(_globalSettings.GetBackOfficePath(_hostingEnvironment).EnsureEndsWith('/') + "Views/Preview/" + "Index.cshtml", model);
+            var viewPath = Path.Combine(
+                _globalSettings.UmbracoPath,
+                Constants.Web.Mvc.BackOfficeArea,
+                ControllerExtensions.GetControllerName<PreviewController>() + ".cshtml")
+                .Replace("\\", "/"); // convert to forward slashes since it's a virtual path
+
+            return View(viewPath, model);
         }
 
         /// <summary>
@@ -120,9 +113,8 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             // use a numeric url because content may not be in cache and so .Url would fail
             var query = culture.IsNullOrWhiteSpace() ? string.Empty : $"?culture={culture}";
-            Response.Redirect($"../../{id}.aspx{query}", true);
 
-            return null;
+            return RedirectPermanent($"../../{id}.aspx{query}");
         }
 
         public ActionResult End(string redir = null)
