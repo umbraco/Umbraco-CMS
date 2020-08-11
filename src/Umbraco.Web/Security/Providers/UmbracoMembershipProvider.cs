@@ -556,6 +556,8 @@ namespace Umbraco.Web.Security.Providers
 
             var authenticated = CheckPassword(password, member.RawPasswordValue);
 
+            var requiresFullSave = false;
+
             if (authenticated == false)
             {
                 // TODO: Increment login attempts - lock if too many.
@@ -575,6 +577,8 @@ namespace Umbraco.Web.Security.Providers
                 {
                     Current.Logger.Info<UmbracoMembershipProviderBase>("Login attempt failed for username {Username} from IP address {IpAddress}", username, GetCurrentRequestIpAddress());
                 }
+
+                requiresFullSave = true;
             }
             else
             {
@@ -582,6 +586,7 @@ namespace Umbraco.Web.Security.Providers
                 {
                     //we have successfully logged in, reset the AccessFailedCount
                     member.FailedPasswordAttempts = 0;
+                    requiresFullSave = true;
                 }
 
                 member.LastLoginDate = DateTime.Now;
@@ -589,15 +594,23 @@ namespace Umbraco.Web.Security.Providers
                 Current.Logger.Info<UmbracoMembershipProviderBase>("Login attempt succeeded for username {Username} from IP address {IpAddress}", username, GetCurrentRequestIpAddress());
             }
 
-            //don't raise events for this! It just sets the member dates, if we do raise events this will
+            // don't raise events for this! It just sets the member dates, if we do raise events this will
             // cause all distributed cache to execute - which will clear out some caches we don't want.
             // http://issues.umbraco.org/issue/U4-3451
             // TODO: In v8 we aren't going to have an overload to disable events, so we'll need to make a different method
             // for this type of thing (i.e. UpdateLastLogin or similar).
 
-            // when upgrading from 7.2 to 7.3 trying to save will throw
-            if (UmbracoVersion.Current >= new Version(7, 3, 0, 0))
-                MemberService.Save(member, false);
+            if (requiresFullSave)
+            {
+                // when upgrading from 7.2 to 7.3 trying to save will throw
+                if (UmbracoVersion.Current >= new Version(7, 3, 0, 0))
+                    MemberService.Save(member, false);
+            }
+            else
+            {
+                // set the last login date without full save (fast, no locks)
+                MemberService.SetLastLogin(member.Username, member.LastLoginDate);
+            }
 
             return new ValidateUserResult
             {
