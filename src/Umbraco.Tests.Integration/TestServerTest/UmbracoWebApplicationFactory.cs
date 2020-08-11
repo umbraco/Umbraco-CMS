@@ -20,7 +20,7 @@ using Umbraco.Core.Mapping;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 using Umbraco.Web.Common.Security;
-using Umbraco.Web.UI.BackOffice;
+using Umbraco.Web.UI.NetCore;
 
 namespace Umbraco.Tests.Integration.TestServerTest
 {

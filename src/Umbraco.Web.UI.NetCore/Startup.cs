@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Umbraco.Extensions;
 
-namespace Umbraco.Web.UI.BackOffice
+namespace Umbraco.Web.UI.NetCore
 {
     public class Startup
     {
