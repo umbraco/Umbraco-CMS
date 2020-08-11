@@ -15,6 +15,8 @@ namespace Umbraco.Core.Models
         /// </summary>
         string Alias { get; }
 
+        string Description { get; }
+
         /// <summary>
         /// Gets the default template of the content type.
         /// </summary>

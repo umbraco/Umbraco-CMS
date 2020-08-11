@@ -45,6 +45,7 @@ namespace Umbraco.Core.Models
             Name = contentType.Name;
             AllowedAsRoot = contentType.AllowedAsRoot;
             IsElement = contentType.IsElement;
+            Description = contentType.Description;
         }
 
         /// <inheritdoc />
@@ -73,6 +74,9 @@ namespace Umbraco.Core.Models
 
         /// <inheritdoc />
         public bool IsElement { get; }
+
+        /// <inheritdoc />
+        public string Description { get; }
 
         /// <inheritdoc />
         public bool SupportsPropertyVariation(string culture, string segment, bool wildcards = false)

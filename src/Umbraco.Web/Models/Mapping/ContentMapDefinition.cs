@@ -79,6 +79,7 @@ namespace Umbraco.Web.Models.Mapping
             target.ContentTypeKey = source.ContentType.Key;
             target.ContentTypeAlias = source.ContentType.Alias;
             target.ContentTypeName = _localizedTextService.UmbracoDictionaryTranslate(source.ContentType.Name);
+            target.ContentTypeDescription = source.ContentType.Description;
             target.DocumentType = _commonMapper.GetContentType(source, context);
             target.Icon = source.ContentType.Icon;
             target.Id = source.Id;
