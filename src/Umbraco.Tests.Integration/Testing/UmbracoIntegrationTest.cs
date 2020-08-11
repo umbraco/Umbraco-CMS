@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
@@ -18,7 +19,9 @@ using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Integration.Extensions;
 using Umbraco.Tests.Integration.Implementations;
 using Umbraco.Extensions;
+using Umbraco.Tests.Testing;
 using Umbraco.Web;
+using ILogger = Umbraco.Core.Logging.ILogger;
 
 namespace Umbraco.Tests.Integration.Testing
 {
@@ -98,6 +101,8 @@ namespace Umbraco.Tests.Integration.Testing
         {
             var umbracoContainer = GetUmbracoContainer(out var serviceProviderFactory);
             var testHelper = new TestHelper();
+            // get the currently set db options
+            var testOptions = TestOptionAttributeBase.GetTestOptions<UmbracoTestAttribute>();
 
             var hostBuilder = new HostBuilder()
                 .UseUmbraco(serviceProviderFactory)
@@ -117,6 +122,9 @@ namespace Umbraco.Tests.Integration.Testing
 
                     services.AddMvc();
 
+
+                    services.AddSingleton<ILogger>(new ConsoleLogger(new MessageTemplates()));
+
                     CustomTestSetup(services);
                 });
 
@@ -129,9 +137,14 @@ namespace Umbraco.Tests.Integration.Testing
             app.UseTestLocalDb(testHelper.WorkingDirectory, this, out var connectionString);
             TestDBConnectionString = connectionString;
 
-            app.UseUmbracoCore();
+            if (testOptions.Boot)
+            {
+                app.UseUmbracoCore();
+            }
 
         }
+
+        protected T GetRequiredService<T>() => Services.GetRequiredService<T>();
 
         #region Common services
 

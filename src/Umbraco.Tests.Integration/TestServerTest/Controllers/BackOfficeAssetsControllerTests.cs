@@ -7,7 +7,6 @@ using Umbraco.Web.BackOffice.Controllers;
 namespace Umbraco.Tests.Integration.TestServerTest.Controllers
 {
     [TestFixture]
-    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class BackOfficeAssetsControllerTests: UmbracoTestServerTestBase
     {
         [Test]

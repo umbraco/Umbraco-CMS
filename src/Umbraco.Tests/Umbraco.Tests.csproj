@@ -207,7 +207,6 @@
     <Compile Include="Scoping\ScopeFileSystemsTests.cs" />
     <Compile Include="Scoping\ScopedNuCacheTests.cs" />
     <Compile Include="Scoping\ScopeTests.cs" />
-    <Compile Include="Services\AuditServiceTests.cs" />
     <Compile Include="Services\CachedDataTypeServiceTests.cs" />
     <Compile Include="Services\ConsentServiceTests.cs" />
     <Compile Include="Services\SectionServiceTests.cs" />

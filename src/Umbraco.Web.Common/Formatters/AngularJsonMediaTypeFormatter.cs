@@ -21,8 +21,7 @@ namespace Umbraco.Web.Common.Formatters
         public AngularJsonMediaTypeFormatter(JsonSerializerSettings serializerSettings, ArrayPool<char> charPool, MvcOptions mvcOptions)
             : base(serializerSettings, charPool, mvcOptions)
         {
-            serializerSettings.Converters.Add(new VersionConverter());
-            serializerSettings.ContractResolver = new DefaultContractResolver();
+
         }
 
         protected override JsonWriter CreateJsonWriter(TextWriter writer)
