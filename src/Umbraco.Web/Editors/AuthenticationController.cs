@@ -83,48 +83,6 @@ namespace Umbraco.Web.Editors
             ?? (_signInManager = TryGetOwinContext().Result.GetBackOfficeSignInManager());
 
 
-
-        /// <summary>
-        /// Checks if a valid token is specified for an invited user and if so logs the user in and returns the user object
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="token"></param>
-        /// <returns></returns>
-        /// <remarks>
-        /// This will also update the security stamp for the user so it can only be used once
-        /// </remarks>
-        [ValidateAngularAntiForgeryToken]
-        public async Task<UserDisplay> PostVerifyInvite([FromUri]int id, [FromUri]string token)
-        {
-            if (string.IsNullOrWhiteSpace(token))
-                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
-
-            var decoded = token.FromUrlBase64();
-            if (decoded.IsNullOrWhiteSpace())
-                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
-
-            var identityUser = await UserManager.FindByIdAsync(id.ToString());
-            if (identityUser == null)
-                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
-
-            var result = await UserManager.ConfirmEmailAsync(identityUser, decoded);
-
-            if (result.Succeeded == false)
-            {
-                throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse(result.Errors.ToErrorMessage()));
-            }
-
-            Request.TryGetOwinContext().Result.Authentication.SignOut(
-                Core.Constants.Security.BackOfficeAuthenticationType,
-                Core.Constants.Security.BackOfficeExternalAuthenticationType);
-
-            await SignInManager.SignInAsync(identityUser, false, false);
-
-            var user = Services.UserService.GetUserById(id);
-
-            return Mapper.Map<UserDisplay>(user);
-        }
-
         [WebApi.UmbracoAuthorize]
         [ValidateAngularAntiForgeryToken]
         public async Task<HttpResponseMessage> PostUnLinkLogin(UnLinkLoginModel unlinkLoginModel)
@@ -150,37 +108,6 @@ namespace Umbraco.Web.Editors
         }
 
 
-        /// <summary>
-        /// When a user is invited they are not approved but we need to resolve the partially logged on (non approved)
-        /// user.
-        /// </summary>
-        /// <returns></returns>
-        /// <remarks>
-        /// We cannot user GetCurrentUser since that requires they are approved, this is the same as GetCurrentUser but doesn't require them to be approved
-        /// </remarks>
-        [WebApi.UmbracoAuthorize(requireApproval: false)]
-        [SetAngularAntiForgeryTokens]
-        public UserDetail GetCurrentInvitedUser()
-        {
-            var user = Security.CurrentUser;
-
-            if (user.IsApproved)
-            {
-                // if they are approved, than they are no longer invited and we can return an error
-                throw new HttpResponseException(Request.CreateUserNoAccessResponse());
-            }
-
-            var result = Mapper.Map<UserDetail>(user);
-            var httpContextAttempt = TryGetHttpContext();
-            if (httpContextAttempt.Success)
-            {
-                // set their remaining seconds
-                result.SecondsUntilTimeout = httpContextAttempt.Result.GetRemainingAuthSeconds();
-            }
-
-            return result;
-        }
-
         // TODO: This should be on the CurrentUserController?
         [WebApi.UmbracoAuthorize]
         [ValidateAngularAntiForgeryToken]
@@ -188,56 +115,6 @@ namespace Umbraco.Web.Editors
         {
             var identityUser = await UserManager.FindByIdAsync(Security.GetUserId().ResultOr(0).ToString());
             return identityUser.Logins.ToDictionary(x => x.LoginProvider, x => x.ProviderKey);
-        }
-
-
-        /// <summary>
-        /// Processes a password reset request.  Looks for a match on the provided email address
-        /// and if found sends an email with a link to reset it
-        /// </summary>
-        /// <returns></returns>
-        [SetAngularAntiForgeryTokens]
-        public async Task<HttpResponseMessage> PostRequestPasswordReset(RequestPasswordResetModel model)
-        {
-            // If this feature is switched off in configuration the UI will be amended to not make the request to reset password available.
-            // So this is just a server-side secondary check.
-            if (_securitySettings.AllowPasswordReset == false)
-            {
-                throw new HttpResponseException(HttpStatusCode.BadRequest);
-            }
-            var identityUser = await UserManager.FindByEmailAsync(model.Email);
-            if (identityUser != null)
-            {
-                var user = Services.UserService.GetByEmail(model.Email);
-                if (user != null)
-                {
-                    var code = await UserManager.GeneratePasswordResetTokenAsync(identityUser);
-                    var callbackUrl = ConstructCallbackUrl(identityUser.Id, code);
-
-                    var message = Services.TextService.Localize("resetPasswordEmailCopyFormat",
-                        // Ensure the culture of the found user is used for the email!
-                        UmbracoUserExtensions.GetUserCulture(identityUser.Culture, Services.TextService, GlobalSettings),
-                        new[] { identityUser.UserName, callbackUrl });
-
-                    var subject = Services.TextService.Localize("login/resetPasswordEmailCopySubject",
-                        // Ensure the culture of the found user is used for the email!
-                        UmbracoUserExtensions.GetUserCulture(identityUser.Culture, Services.TextService, GlobalSettings));
-
-                    var mailMessage = new MailMessage()
-                    {
-                        Subject = subject,
-                        Body = message,
-                        IsBodyHtml = true,
-                        To = { user.Email}
-                    };
-
-                    await _emailSender.SendAsync(mailMessage);
-
-                    UserManager.RaiseForgotPasswordRequestedEvent(User, user.Id);
-                }
-            }
-
-            return Request.CreateResponse(HttpStatusCode.OK);
         }
 
         /// <summary>
@@ -314,108 +191,11 @@ namespace Umbraco.Web.Editors
             return Request.CreateValidationErrorResponse("Invalid code");
         }
 
-        /// <summary>
-        /// Processes a set password request.  Validates the request and sets a new password.
-        /// </summary>
-        /// <returns></returns>
-        [SetAngularAntiForgeryTokens]
-        public async Task<HttpResponseMessage> PostSetPassword(SetPasswordModel model)
-        {
-            var identityUser = await UserManager.FindByIdAsync(model.UserId.ToString());
-
-            var result = await UserManager.ResetPasswordAsync(identityUser, model.ResetCode, model.Password);
-            if (result.Succeeded)
-            {
-                var lockedOut = await UserManager.IsLockedOutAsync(identityUser);
-                if (lockedOut)
-                {
-                    Logger.Info<AuthenticationController>("User {UserId} is currently locked out, unlocking and resetting AccessFailedCount", model.UserId);
-
-                    //// var user = await UserManager.FindByIdAsync(model.UserId);
-                    var unlockResult = await UserManager.SetLockoutEndDateAsync(identityUser, DateTimeOffset.Now);
-                    if (unlockResult.Succeeded == false)
-                    {
-                        Logger.Warn<AuthenticationController>("Could not unlock for user {UserId} - error {UnlockError}", model.UserId, unlockResult.Errors.First().Description);
-                    }
-
-                    var resetAccessFailedCountResult = await UserManager.ResetAccessFailedCountAsync(identityUser);
-                    if (resetAccessFailedCountResult.Succeeded == false)
-                    {
-                        Logger.Warn<AuthenticationController>("Could not reset access failed count {UserId} - error {UnlockError}", model.UserId, unlockResult.Errors.First().Description);
-                    }
-                }
-
-                // They've successfully set their password, we can now update their user account to be confirmed
-                // if user was only invited, then they have not been approved
-                // but a successful forgot password flow (e.g. if their token had expired and they did a forgot password instead of request new invite)
-                // means we have verified their email
-                if (!await UserManager.IsEmailConfirmedAsync(identityUser))
-                {
-                    await UserManager.ConfirmEmailAsync(identityUser, model.ResetCode);
-                }
-
-                // invited is not approved, never logged in, invited date present
-                /*
-                if (LastLoginDate == default && IsApproved == false && InvitedDate != null)
-                    return UserState.Invited;
-                */
-                if (identityUser != null && !identityUser.IsApproved)
-                {
-                    var user = Services.UserService.GetByUsername(identityUser.UserName);
-                    // also check InvitedDate and never logged in, otherwise this would allow a disabled user to reactivate their account with a forgot password
-                    if (user.LastLoginDate == default && user.InvitedDate != null)
-                    {
-                        user.IsApproved = true;
-                        user.InvitedDate = null;
-                        Services.UserService.Save(user);
-                    }
-                }
-
-                UserManager.RaiseForgotPasswordChangedSuccessEvent(User, model.UserId);
-                return Request.CreateResponse(HttpStatusCode.OK);
-            }
-            return Request.CreateValidationErrorResponse(
-                result.Errors.Any() ? result.Errors.First().Description : "Set password failed");
-        }
-
-
-
-
         // NOTE: This has been migrated to netcore, but in netcore we don't explicitly set the principal in this method, that's done in ConfigureUmbracoBackOfficeCookieOptions so don't worry about that
         private HttpResponseMessage SetPrincipalAndReturnUserDetail(IUser user, IPrincipal principal)
         {
             throw new NotImplementedException();
         }
-
-        private string ConstructCallbackUrl(int userId, string code)
-        {
-            // Get an mvc helper to get the url
-            var http = EnsureHttpContext();
-            var urlHelper = new UrlHelper(http.Request.RequestContext);
-            var action = urlHelper.Action("ValidatePasswordResetCode", "BackOffice",
-                new
-                {
-                    area = GlobalSettings.GetUmbracoMvcArea(_hostingEnvironment),
-                    u = userId,
-                    r = code
-                });
-
-            // Construct full URL using configured application URL (which will fall back to request)
-            var applicationUri = _requestAccessor.GetApplicationUrl();
-            var callbackUri = new Uri(applicationUri, action);
-            return callbackUri.ToString();
-        }
-
-
-        private HttpContextBase EnsureHttpContext()
-        {
-            var attempt = this.TryGetHttpContext();
-            if (attempt.Success == false)
-                throw new InvalidOperationException("This method requires that an HttpContext be active");
-            return attempt.Result;
-        }
-
-
 
         private void AddModelErrors(IdentityResult result, string prefix = "")
         {
