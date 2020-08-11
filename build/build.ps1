@@ -457,7 +457,7 @@
   {
     $this.VerifyNuGetConsistency(
       ("UmbracoCms", "UmbracoCms.Core", "UmbracoCms.Web"),
-      ("Umbraco.Core", "Umbraco.Web", "Umbraco.Web.UI", "Umbraco.Examine"))
+      ("Umbraco.Core", "Umbraco.Infrastructure", "Umbraco.Configuration", "Umbraco.Web.UI.NetCore", "Umbraco.Examine.Lucene", "Umbraco.PublishedCache.NuCache", "Umbraco.Web.Common", "Umbraco.Web.Website", "Umbraco.Web.BackOffice"))
     if ($this.OnError()) { return }
   })
 
