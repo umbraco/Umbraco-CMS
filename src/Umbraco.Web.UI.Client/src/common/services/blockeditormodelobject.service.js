@@ -447,7 +447,7 @@
                     if (scaffold) {
                         blocks.push({
                             blockConfigModel: blockConfiguration,
-                            elementTypeModel: scaffold.documentType
+                            elementTypeModel: {icon: scaffold.icon, name: scaffold.contentTypeName, description: scaffold.contentTypeDescription}
                         });
                     }
                 });
