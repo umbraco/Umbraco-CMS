@@ -200,10 +200,6 @@
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
-    <Content Include="Umbraco\PartialViewMacros\Templates\SiteMap.cshtml">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
     <Content Include="Umbraco\Views\Default.cshtml" />
     <Content Include="Umbraco\Views\AuthorizeUpgrade.cshtml" />
     <Content Include="Views\Web.config">
