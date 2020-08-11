@@ -1,24 +1,14 @@
 ﻿using System;
 using System.Threading;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Owin;
-using Microsoft.Owin.Extensions;
-using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
-using Microsoft.Owin.Security.DataHandler;
 using Microsoft.Owin.Security.DataProtection;
 using Owin;
 using Umbraco.Core;
-using Umbraco.Core.BackOffice;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.Mapping;
-using Umbraco.Net;
-using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Constants = Umbraco.Core.Constants;
 
@@ -81,65 +71,6 @@ namespace Umbraco.Web.Security
                 CookieDomain = Current.Configs.Security().AuthCookieDomain
             }, stage);
 
-            return app;
-        }
-
-        /// <summary>
-        /// In order for preview to work this needs to be called
-        /// </summary>
-        /// <param name="app"></param>
-        /// <param name="umbracoContextAccessor"></param>
-        /// <param name="runtimeState"></param>
-        /// <param name="globalSettings"></param>
-        /// <param name="securitySettings"></param>
-        /// <param name="ioHelper"></param>
-        /// <param name="hostingEnvironment"></param>
-        /// <param name="requestCache"></param>
-        /// <returns></returns>
-        /// <remarks>
-        /// This ensures that during a preview request that the back office use is also Authenticated and that the back office Identity
-        /// is added as a secondary identity to the current IPrincipal so it can be used to Authorize the previewed document.
-        /// </remarks>
-        /// <remarks>
-        /// By default this will be configured to execute on PipelineStage.PostAuthenticate
-        /// </remarks>
-        public static IAppBuilder UseUmbracoPreviewAuthentication(this IAppBuilder app, IUmbracoContextAccessor umbracoContextAccessor, IRuntimeState runtimeState, IGlobalSettings globalSettings, ISecuritySettings securitySettings, IHostingEnvironment hostingEnvironment, IRequestCache requestCache)
-        {
-            return app.UseUmbracoPreviewAuthentication(umbracoContextAccessor, runtimeState, globalSettings, securitySettings, hostingEnvironment, requestCache, PipelineStage.PostAuthenticate);
-        }
-
-        /// <summary>
-        /// In order for preview to work this needs to be called
-        /// </summary>
-        /// <param name="app"></param>
-        /// <param name="umbracoContextAccessor"></param>
-        /// <param name="runtimeState"></param>
-        /// <param name="globalSettings"></param>
-        /// <param name="securitySettings"></param>
-        /// <param name="ioHelper"></param>
-        /// <param name="hostingEnvironment"></param>
-        /// <param name="requestCache"></param>
-        /// <param name="stage"></param>
-        /// <returns></returns>
-        /// <remarks>
-        /// This ensures that during a preview request that the back office use is also Authenticated and that the back office Identity
-        /// is added as a secondary identity to the current IPrincipal so it can be used to Authorize the previewed document.
-        /// </remarks>
-        public static IAppBuilder UseUmbracoPreviewAuthentication(this IAppBuilder app, IUmbracoContextAccessor umbracoContextAccessor, IRuntimeState runtimeState, IGlobalSettings globalSettings, ISecuritySettings securitySettings, IHostingEnvironment hostingEnvironment, IRequestCache requestCache, PipelineStage stage)
-        {
-            if (runtimeState.Level != RuntimeLevel.Run) return app;
-
-            //var authOptions = app.CreateUmbracoCookieAuthOptions(umbracoContextAccessor, globalSettings, runtimeState, securitySettings, hostingEnvironment, requestCache);
-            app.Use(typeof(PreviewAuthenticationMiddleware), /*authOptions*/null, globalSettings, hostingEnvironment);
-
-            // This middleware must execute at least on PostAuthentication, by default it is on Authorize
-            // The middleware needs to execute after the RoleManagerModule executes which is during PostAuthenticate,
-            // currently I've had 100% success with ensuring this fires after RoleManagerModule even if this is set
-            // to PostAuthenticate though not sure if that's always a guarantee so by default it's Authorize.
-            if (stage < PipelineStage.PostAuthenticate)
-                throw new InvalidOperationException("The stage specified for UseUmbracoPreviewAuthentication must be greater than or equal to " + PipelineStage.PostAuthenticate);
-
-            app.UseStageMarker(stage);
             return app;
         }
 

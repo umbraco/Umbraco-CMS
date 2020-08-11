@@ -429,7 +429,6 @@
     </Compile>
     <Compile Include="UmbracoExamine\ExamineDemoDataMediaService.cs" />
     <Compile Include="UmbracoExamine\ExamineDemoDataContentService.cs" />
-    <Compile Include="CoreThings\UriExtensionsTests.cs" />
     <Compile Include="Composing\PackageActionCollectionTests.cs" />
     <Compile Include="Composing\TypeLoaderExtensions.cs" />
     <Compile Include="Composing\TypeLoaderTests.cs" />
@@ -558,6 +557,7 @@
     <Content Include="Services\Importing\XsltSearch-Package.xml" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Models\Mapping\" />
     <Folder Include="Models\Mapping" />
     <Folder Include="Web\Validation" />
   </ItemGroup>

@@ -18,9 +18,6 @@ namespace Umbraco.Web
     /// </summary>
     public static class UrlHelperRenderExtensions
     {
-
-        private static readonly IHtmlString EmptyHtmlString = new HtmlString(string.Empty);
-
         // #region GetCropUrl
         //
         // /// <summary>

@@ -27,6 +27,7 @@ namespace Umbraco.Web.BackOffice.Runtime
             composition.Register<BackOfficeSessionIdValidator>(Lifetime.Request);
             composition.Register<BackOfficeSecurityStampValidator>(Lifetime.Request);
 
+            composition.RegisterUnique<PreviewAuthenticationMiddleware>();
             composition.RegisterUnique<IBackOfficeAntiforgery, BackOfficeAntiforgery>();
 
             // register back office trees
