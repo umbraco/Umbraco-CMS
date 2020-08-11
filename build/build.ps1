@@ -379,6 +379,7 @@
     $env:UMBRACO_RELEASE=$this.Version.Release
     $env:UMBRACO_COMMENT=$this.Version.Comment
     $env:UMBRACO_BUILD=$this.Version.Build
+    $env:UMBRACO_TMP="$($this.SolutionRoot)\build.tmp"
 
     if ($args -and $args[0] -eq "vso")
     {
