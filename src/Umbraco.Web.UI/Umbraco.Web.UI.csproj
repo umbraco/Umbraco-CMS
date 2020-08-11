@@ -80,7 +80,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="umbraco" />
-    <Folder Include="Views\MacroPartials\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CSharpTest.Net.Collections" Version="14.906.1403.1082" />
@@ -200,8 +199,6 @@
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
-    <Content Include="Umbraco\Views\Default.cshtml" />
-    <Content Include="Umbraco\Views\AuthorizeUpgrade.cshtml" />
     <Content Include="Views\Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -216,10 +213,7 @@
     <Content Include="Views\Partials\Grid\Editors\Textstring.cshtml" />
     <Content Include="Views\Partials\Grid\Editors\Base.cshtml" />
     <Content Include="Views\Partials\Grid\Bootstrap3-Fluid.cshtml" />
-    <Content Include="Umbraco\Views\Preview\Index.cshtml" />
-    <Content Include="Umbraco\Views\web.config" />
     <Content Include="Views\Partials\BlockList\Default.cshtml" />
-    <None Include="Web.Debug.config.transformed" />
     <None Include="web.Template.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>
       <SubType>Designer</SubType>
