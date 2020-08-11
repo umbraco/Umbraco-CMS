@@ -5,20 +5,25 @@ using Microsoft.Owin;
 using Microsoft.Owin.Security;
 using Umbraco.Core;
 using Umbraco.Core.Models.Identity;
-using Umbraco.Core.Security;
 using Umbraco.Web.Security;
 
 namespace Umbraco.Web
 {
     public static class OwinExtensions
     {
+        /// <summary>
+        /// Used by external login providers to set any errors that occur during the OAuth negotiation
+        /// </summary>
+        /// <param name="owinContext"></param>
+        /// <param name="errors"></param>
         public static void SetExternalLoginProviderErrors(this IOwinContext owinContext, BackOfficeExternalLoginProviderErrors errors)
-        {
-            // TODO: Once this is set, we could use more custom middleware to set the cookie and redirect so it's not up to the
-            // oauth provider to handle all of this manually
-            owinContext.Set(errors);
-        }
+            => owinContext.Set(errors);
 
+        /// <summary>
+        /// Retrieve any errors set by external login providers during OAuth negotiation
+        /// </summary>
+        /// <param name="owinContext"></param>
+        /// <returns></returns>
         internal static BackOfficeExternalLoginProviderErrors GetExternalLoginProviderErrors(this IOwinContext owinContext)
             => owinContext.Get<BackOfficeExternalLoginProviderErrors>();
 

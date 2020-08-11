@@ -354,8 +354,9 @@ namespace Umbraco.Web.Editors
 
             ViewData.SetUmbracoPath(GlobalSettings.GetUmbracoMvcArea());
 
-            //check if there is the TempData with the any token name specified, if so, assign to view bag and render the view
-            if (ViewData.FromTempData(TempData, ViewDataExtensions.TokenExternalSignInError) ||
+            //check if there is the TempData or cookies with the any token name specified, if so, assign to view bag and render the view
+            if (ViewData.FromBase64CookieData<BackOfficeExternalLoginProviderErrors>(HttpContext, ViewDataExtensions.TokenExternalSignInError) ||
+                ViewData.FromTempData(TempData, ViewDataExtensions.TokenExternalSignInError) ||
                 ViewData.FromTempData(TempData, ViewDataExtensions.TokenPasswordResetCode))
                 return defaultResponse();
 
@@ -491,10 +492,7 @@ namespace Umbraco.Web.Editors
                     }
 
                     //call the callback if one is assigned
-                    if (autoLinkOptions.OnAutoLinking != null)
-                    {
-                        autoLinkOptions.OnAutoLinking(autoLinkUser, loginInfo);
-                    }
+                    autoLinkOptions.OnAutoLinking?.Invoke(autoLinkUser, loginInfo);
 
                     var userCreationResult = await UserManager.CreateAsync(autoLinkUser);
 

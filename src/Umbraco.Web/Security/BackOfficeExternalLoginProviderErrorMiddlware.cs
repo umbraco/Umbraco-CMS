@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using Microsoft.Owin;
@@ -7,6 +9,13 @@ using Umbraco.Core;
 
 namespace Umbraco.Web.Security
 {
+    /// <summary>
+    /// Used to handle errors registered by external login providers
+    /// </summary>
+    /// <remarks>
+    /// When an external login provider registers an error with <see cref="OwinExtensions.SetExternalLoginProviderErrors"/> during the OAuth process,
+    /// this middleware will detect that, store the errors into cookie data and redirect to the back office login so we can read the errors back out.
+    /// </remarks>
     internal class BackOfficeExternalLoginProviderErrorMiddlware : OwinMiddleware
     {
         public BackOfficeExternalLoginProviderErrorMiddlware(OwinMiddleware next) : base(next)
@@ -15,40 +24,31 @@ namespace Umbraco.Web.Security
 
         public override async Task Invoke(IOwinContext context)
         {
+            var shortCircuit = false;
             if (!context.Request.Uri.IsClientSideRequest())
             {
                 // check if we have any errors registered
                 var errors = context.GetExternalLoginProviderErrors();
                 if (errors != null)
                 {
-                    // this is pretty nasty to resolve this from the MVC service locator but that's all we can really work with since that is where it is
-                    var tempDataProvider = DependencyResolver.Current.GetService<ITempDataProvider>();
+                    shortCircuit = true;
 
-                    // create a 'fake' controller context for temp data to work. we want to use temp data because it's self managing and we won't have to
-                    // deal with resetting anything and plus it's configurable (by default uses session). better than creating a state manager ourselves.
-                    var controllerContext = new ControllerContext(
-                        context.TryGetHttpContext().Result,
-                        new System.Web.Routing.RouteData(),
-                        new EmptyController());
+                    var serialized = Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(errors)));
 
-                    tempDataProvider.SaveTempData(controllerContext, new Dictionary<string, object>
+                    context.Response.Cookies.Append("ExternalSignInError", serialized, new CookieOptions
                     {
-                        [ViewDataExtensions.TokenExternalSignInError] = errors
+                        Expires = DateTime.Now.AddMinutes(5),
+                        HttpOnly = true,
+                        Secure = context.Request.IsSecure
                     });
+
+                    context.Response.Redirect(context.Request.Uri.ToString());
                 }
             }
 
-            if (Next != null)
+            if (Next != null && !shortCircuit)
             {
                 await Next.Invoke(context);
-            }
-        }
-
-        private class EmptyController : ControllerBase
-        {
-            protected override void ExecuteCore()
-            {
-                throw new System.NotImplementedException();
             }
         }
     }

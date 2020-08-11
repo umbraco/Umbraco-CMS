@@ -7,7 +7,7 @@ function externalLoginInfoService(externalLoginInfo, umbRequestHelper) {
 
     function getExternalLoginProvider(provider) {
         if (provider) {
-            var found = _.filter(externalLoginInfo.providers, x => x.authType == provider);
+            var found = _.find(externalLoginInfo.providers, x => x.authType == provider);
             return found;
         }
         return null;
@@ -16,14 +16,6 @@ function externalLoginInfoService(externalLoginInfo, umbRequestHelper) {
     function getExternalLoginProviderView(provider) {
         var found = getExternalLoginProvider(provider);
         if (found) {
-            return umbRequestHelper.convertVirtualToAbsolutePath(found.properties.UmbracoBackOfficeExternalLoginOptions.BackOfficeCustomLoginView);
-        }
-        return null;
-    }
-
-    function getExternalLoginProviderViewForErrors(provider) {
-        var found = getExternalLoginProvider(provider);
-        if (found && found.properties.UmbracoBackOfficeExternalLoginOptions.BackOfficeCustomLoginViewHandlesErrors) {
             return umbRequestHelper.convertVirtualToAbsolutePath(found.properties.UmbracoBackOfficeExternalLoginOptions.BackOfficeCustomLoginView);
         }
         return null;
@@ -74,8 +66,7 @@ function externalLoginInfoService(externalLoginInfo, umbRequestHelper) {
         hasDenyLocalLogin: hasDenyLocalLogin,
         getLoginProviders: getLoginProviders,
         getUserInviteLink: getUserInviteLink,
-        getExternalLoginProviderView: getExternalLoginProviderView,
-        getExternalLoginProviderViewForErrors: getExternalLoginProviderViewForErrors
+        getExternalLoginProviderView: getExternalLoginProviderView
     };
 }
 angular.module('umbraco.services').factory('externalLoginInfoService', externalLoginInfoService);

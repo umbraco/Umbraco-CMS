@@ -125,15 +125,6 @@
 
                     <div class="external-logins" ng-if="vm.externalLoginProviders.length > 0">
 
-                        <div ng-if="!vm.externalLoginProviderView">
-                            <div class="text-error" ng-repeat="error in vm.externalLoginInfo.errors">
-                                <span>{{error}}</span>
-                            </div>
-                        </div>
-                        <div ng-if="vm.externalLoginProviderView">
-                            <div ng-include="vm.externalLoginProviderView"></div>
-                        </div>
-
                         <form method="POST" name="vm.externalLoginForm" action="{{vm.externalLoginFormAction}}">
 
                             <div ng-repeat="login in vm.externalLoginProviders">
@@ -145,6 +136,14 @@
                                     <i class="fa" ng-class="login.properties.SocialIcon"></i>
                                     <localize key="login_signInWith">Sign in with</localize>&nbsp;{{login.caption}}
                                 </button>
+
+                                <div ng-if="login.errors">
+                                    <div class="text-error" ng-repeat="error in login.errors">
+                                        <span>{{error}}</span>
+                                    </div>
+                                </div>
+
+                                <div ng-if="login.customView" ng-include="login.customView"></div>
 
                             </div>
                         </form>

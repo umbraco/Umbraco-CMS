@@ -53,16 +53,9 @@ namespace Umbraco.Web.Security
         /// </summary>
         /// <remarks>
         /// The types of customization used for this view are:
-        /// - Displaying external login provider errors
         /// - Displaying extra information, links, etc... to the user when logging out
         /// - Displaying extra information, links, etc... to the user when logging in (if auto-login redirect is disabled)
         /// </remarks>
         public string BackOfficeCustomLoginView { get; set; }
-
-        /// <summary>
-        /// If set to true then Umbraco will not automatically show any external login provider errors for this provider and instead will leave it up to the custom view
-        /// assigned to display any errors
-        /// </summary>
-        public bool BackOfficeCustomLoginViewHandlesErrors { get; set; }
     }
 }

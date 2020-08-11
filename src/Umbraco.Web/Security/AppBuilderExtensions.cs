@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Threading;
+using System.Web;
 using System.Web.Mvc;
+using System.Web.SessionState;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
@@ -386,7 +388,7 @@ namespace Umbraco.Web.Security
         /// <param name="stage"></param>
         /// <returns></returns>
         public static IAppBuilder UseUmbracoBackOfficeExternalLoginErrors(this IAppBuilder app, PipelineStage stage = PipelineStage.Authorize)
-        {
+        {            
             app.Use(typeof(BackOfficeExternalLoginProviderErrorMiddlware));
             app.UseStageMarker(stage);
             return app;

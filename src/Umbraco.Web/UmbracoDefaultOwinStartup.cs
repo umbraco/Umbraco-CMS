@@ -68,6 +68,9 @@ namespace Umbraco.Web
             // Configure OWIN for authentication.
             ConfigureUmbracoAuthentication(app);
 
+            // must come after all authentication
+            app.UseUmbracoBackOfficeExternalLoginErrors();
+
             app
                 .UseSignalR(GlobalSettings)
                 .FinalizeMiddlewareConfiguration();
@@ -99,8 +102,8 @@ namespace Umbraco.Web
             app
                 .UseUmbracoBackOfficeCookieAuthentication(UmbracoContextAccessor, RuntimeState, Services.UserService, GlobalSettings, UmbracoSettings.Security, PipelineStage.Authenticate)
                 .UseUmbracoBackOfficeExternalCookieAuthentication(UmbracoContextAccessor, RuntimeState, GlobalSettings, PipelineStage.Authenticate)
-                .UseUmbracoPreviewAuthentication(UmbracoContextAccessor, RuntimeState, GlobalSettings, UmbracoSettings.Security, PipelineStage.Authorize)
-                .UseUmbracoBackOfficeExternalLoginErrors();
+                // TODO: this would be considered a breaking change but this must come after all authentication so should be moved within ConfigureMiddleware
+                .UseUmbracoPreviewAuthentication(UmbracoContextAccessor, RuntimeState, GlobalSettings, UmbracoSettings.Security, PipelineStage.Authorize);
         }
 
         public static event EventHandler<OwinMiddlewareConfiguredEventArgs> MiddlewareConfigured;

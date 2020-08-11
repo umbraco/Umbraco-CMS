@@ -40,15 +40,21 @@
             uploadProgress: 0,
             maxFileSize: Umbraco.Sys.ServerVariables.umbracoSettings.maxFileSize + "KB",
             acceptedFileTypes: mediaHelper.formatFileTypes(Umbraco.Sys.ServerVariables.umbracoSettings.imageFileTypes),
-            uploaded: false
+            uploaded: false 
         };
 
         vm.allowPasswordReset = Umbraco.Sys.ServerVariables.umbracoSettings.canSendRequiredEmail && Umbraco.Sys.ServerVariables.umbracoSettings.allowPasswordReset;
         vm.errorMsg = "";
         vm.externalLoginFormAction = Umbraco.Sys.ServerVariables.umbracoUrls.externalLoginsUrl;
         vm.externalLoginProviders = externalLoginInfoService.getLoginProviders();
+        vm.externalLoginProviders.forEach(x => {
+            x.customView = externalLoginInfoService.getExternalLoginProviderView(x.authType);
+            // if there are errors set for this specific provider than assign them directly to the model
+            if (externalLoginInfo.errorProvider === x.authType) {
+                x.errors = externalLoginInfo.errors;
+            }
+        });
         vm.denyLocalLogin = externalLoginInfoService.hasDenyLocalLogin();
-        vm.externalLoginProviderView = externalLoginInfo.errorProvider ? externalLoginInfoService.getExternalLoginProviderViewForErrors(externalLoginInfo.errorProvider) : null;
         vm.externalLoginInfo = externalLoginInfo;
         vm.resetPasswordCodeInfo = resetPasswordCodeInfo;
         vm.backgroundImage = Umbraco.Sys.ServerVariables.umbracoSettings.loginBackgroundImage;
