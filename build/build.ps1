@@ -340,6 +340,8 @@
     $this.CopyFiles("$src\Umbraco.Web.UI.NetCore", "Startup.cs", "$tmp\Templates\UmbracoSolution")
     $this.CopyFiles("$src\Umbraco.Web.UI.NetCore", "appsettings.json", "$tmp\Templates\UmbracoSolution")
     $this.CopyFiles("$src\Umbraco.Web.UI.NetCore", "appsettings.Development.json", "$tmp\Templates\UmbracoSolution")
+
+  $this.RemoveDirectory("$tmp\Templates\UmbracoSolution\bin")
   })
 
   $ubuild.DefineMethod("PackageZip",
