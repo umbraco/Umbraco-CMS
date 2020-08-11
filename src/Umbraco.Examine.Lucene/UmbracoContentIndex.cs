@@ -21,7 +21,7 @@ namespace Umbraco.Examine
     /// </summary>
     public class UmbracoContentIndex : UmbracoExamineIndex, IUmbracoContentIndex
     {
-        
+
         protected ILocalizationService LanguageService { get; }
 
         #region Constructors

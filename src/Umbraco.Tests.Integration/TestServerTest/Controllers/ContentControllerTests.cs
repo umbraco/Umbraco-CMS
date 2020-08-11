@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Common.Builders;
@@ -16,9 +17,8 @@ using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Tests.Integration.TestServerTest.Controllers
 {
-    [Explicit("We need to fix the tests on buildserver and when running multiple tests in one run")]
     [TestFixture]
-    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
+    [Explicit("Need to figure out whats wrong with these tests when executed all in one run.")]
     public class ContentControllerTests : UmbracoTestServerTestBase
     {
 
@@ -150,7 +150,7 @@ namespace Umbraco.Tests.Integration.TestServerTest.Controllers
             Assert.Multiple(() =>
             {
                 Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
-                Assert.AreEqual(")]}',\n{\"message\":\"No variants flagged for saving\"}", body);
+                Assert.AreEqual(")]}',\n{\"Message\":\"No variants flagged for saving\"}", body);
             });
 
         }

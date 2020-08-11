@@ -22,9 +22,7 @@ using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Tests.Integration.TestServerTest.Controllers
 {
-    [Explicit("We need to fix the tests on buildserver and when running multiple tests in one run")]
     [TestFixture]
-    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class UsersControllerTests : UmbracoTestServerTestBase
     {
         [Test]
@@ -182,7 +180,7 @@ namespace Umbraco.Tests.Integration.TestServerTest.Controllers
 
             var user = new UserBuilder()
                 .AddUserGroup()
-                .WithAlias("writer") // Needs to be an existing alias
+                    .WithAlias("writer") // Needs to be an existing alias
                 .Done()
                 .WithIsLockedOut(true, DateTime.UtcNow)
                 .Build();
