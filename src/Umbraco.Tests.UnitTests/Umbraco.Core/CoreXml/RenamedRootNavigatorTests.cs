@@ -2,6 +2,7 @@
 using System.Xml.XPath;
 using NUnit.Framework;
 using Umbraco.Core.Xml.XPath;
+using Umbraco.Tests.Common.TestHelpers;
 
 namespace Umbraco.Tests.CoreXml
 {

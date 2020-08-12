@@ -1,6 +1,6 @@
-﻿namespace Umbraco.Tests
+﻿namespace Umbraco.Tests.Common.TestHelpers
 {
-    static class StringNewLineExtensions
+public static class StringNewLineExtensions
     {
         /// <summary>
         /// Ensures Lf only everywhere.

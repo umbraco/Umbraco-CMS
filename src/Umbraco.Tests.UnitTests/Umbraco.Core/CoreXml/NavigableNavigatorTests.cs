@@ -10,12 +10,12 @@ using System.Xml.Xsl;
 using Umbraco.Core.Xml;
 using Umbraco.Core.Xml.XPath;
 using NUnit.Framework;
-using Umbraco.Tests.Testing;
+using Umbraco.Tests.Common.TestHelpers;
 
 namespace Umbraco.Tests.CoreXml
 {
     [TestFixture]
-    public class NavigableNavigatorTests : UmbracoTestBase
+    public class NavigableNavigatorTests
     {
         [Test]
         public void NewNavigatorIsAtRoot()
@@ -76,7 +76,6 @@ namespace Umbraco.Tests.CoreXml
         {
             // in non-native we can't have Value dump everything, else
             // we'd dump the entire database? Makes not much sense.
-
             Assert.AreEqual(native ? "\n        blah\n            blah\n        bam\n        " : string.Empty, nav.Value.Lf()); // !!
             Assert.IsTrue(nav.MoveToFirstChild());
             Assert.AreEqual("root", nav.Name);

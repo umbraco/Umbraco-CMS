@@ -122,7 +122,6 @@
     <Compile Include="Composing\ContainerConformingTests.cs" />
     <Compile Include="Configurations\GlobalSettingsTests.cs" />
     <Compile Include="Components\ComponentTests.cs" />
-    <Compile Include="CoreXml\RenamedRootNavigatorTests.cs" />
     <Compile Include="LegacyXmlPublishedCache\ContentXmlDto.cs" />
     <Compile Include="LegacyXmlPublishedCache\PreviewXmlDto.cs" />
     <Compile Include="Manifest\ManifestContentAppTests.cs" />
@@ -258,7 +257,6 @@
     <Compile Include="Routing\UrlRoutingTestBase.cs" />
     <Compile Include="Services\ContentTypeServiceExtensionsTests.cs" />
     <Compile Include="Services\PublicAccessServiceTests.cs" />
-    <Compile Include="StringNewlineExtensions.cs" />
     <Compile Include="Strings\StylesheetHelperTests.cs" />
     <Compile Include="Strings\StringValidationTests.cs" />
     <Compile Include="Web\Mvc\RenderNoContentControllerTests.cs" />
@@ -283,7 +281,6 @@
     <Compile Include="Cache\AppCacheTests.cs" />
     <Compile Include="Cache\HttpRequestAppCacheTests.cs" />
     <Compile Include="Cache\RuntimeAppCacheTests.cs" />
-    <Compile Include="CoreXml\FrameworkXmlTests.cs" />
     <Compile Include="Models\ContentExtensionsTests.cs" />
     <Compile Include="Web\Mvc\MergeParentContextViewDataAttributeTests.cs" />
     <Compile Include="Web\Mvc\ViewDataDictionaryExtensionTests.cs" />
@@ -318,7 +315,6 @@
     <Compile Include="Services\UserServiceTests.cs" />
     <Compile Include="Manifest\ManifestParserTests.cs" />
     <Compile Include="Templates\ViewHelperTests.cs" />
-    <Compile Include="CoreXml\NavigableNavigatorTests.cs" />
     <Compile Include="Cache\PublishedCache\PublishedMediaCacheTests.cs" />
     <Compile Include="Strings\CmsHelperCasingTests.cs" />
     <Compile Include="Strings\DefaultShortStringHelperTests.cs" />
