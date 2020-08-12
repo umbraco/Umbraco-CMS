@@ -42,7 +42,7 @@
                                localize="placeholder"
                                placeholder="@placeholders_entername"
                                name="headerName"
-                               ng-show="!nameLocked"
+                               ng-if="!nameLocked"
                                ng-model="name"
                                ng-class="{'name-is-empty': $parent.name===null || $parent.name===''}"
                                umb-auto-focus
