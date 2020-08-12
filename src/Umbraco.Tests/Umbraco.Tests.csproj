@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -288,7 +288,6 @@
     <Compile Include="Cache\HttpRequestAppCacheTests.cs" />
     <Compile Include="Cache\RuntimeAppCacheTests.cs" />
     <Compile Include="CoreXml\FrameworkXmlTests.cs" />
-    <Compile Include="Macros\MacroParserTests.cs" />
     <Compile Include="Models\ContentExtensionsTests.cs" />
     <Compile Include="Web\Mvc\MergeParentContextViewDataAttributeTests.cs" />
     <Compile Include="Web\Mvc\ViewDataDictionaryExtensionTests.cs" />
