@@ -39,21 +39,21 @@
     </metadata>
     <files>
         <!-- libs -->
-        <file src="$BuildTmp$\WebApp\bin\Umbraco.Web.BackOffice.dll" target="lib\netcoreapp3.1\Umbraco.Web.BackOffice.dll" />
-        <file src="$BuildTmp$\WebApp\bin\Umbraco.Web.Common.dll" target="lib\netcoreapp3.1\Umbraco.Web.Common.dll" />
-        <file src="$BuildTmp$\WebApp\bin\Umbraco.Web.Website.dll" target="lib\netcoreapp3.1\Umbraco.Web.Website.dll" />
+        <file src="$BuildTmp$\bin\Umbraco.Web.BackOffice.dll" target="lib\netcoreapp3.1\Umbraco.Web.BackOffice.dll" />
+        <file src="$BuildTmp$\bin\Umbraco.Web.Common.dll" target="lib\netcoreapp3.1\Umbraco.Web.Common.dll" />
+        <file src="$BuildTmp$\bin\Umbraco.Web.Website.dll" target="lib\netcoreapp3.1\Umbraco.Web.Website.dll" />
         <!--Umbraco.ModelsBuilder.Embedded-->
 
         <!-- docs -->
-        <file src="$BuildTmp$\WebApp\bin\Umbraco.Web.BackOffice.xml" target="lib\netcoreapp3.1\Umbraco.Web.BackOffice.xml" />
-        <file src="$BuildTmp$\WebApp\bin\Umbraco.Web.Common.xml" target="lib\netcoreapp3.1\Umbraco.Web.Common.xml" />
-        <file src="$BuildTmp$\WebApp\bin\Umbraco.Web.Website.xml" target="lib\netcoreapp3.1\Umbraco.Web.Website.xml" />
+        <file src="$BuildTmp$\bin\Umbraco.Web.BackOffice.xml" target="lib\netcoreapp3.1\Umbraco.Web.BackOffice.xml" />
+        <file src="$BuildTmp$\bin\Umbraco.Web.Common.xml" target="lib\netcoreapp3.1\Umbraco.Web.Common.xml" />
+        <file src="$BuildTmp$\bin\Umbraco.Web.Website.xml" target="lib\netcoreapp3.1\Umbraco.Web.Website.xml" />
         <!--Umbraco.ModelsBuilder.Embedded-->
 
         <!-- symbols -->
-        <file src="$BuildTmp$\WebApp\bin\Umbraco.Web.BackOffice.pdb" target="lib\netcoreapp3.1\Umbraco.Web.BackOffice.pdb" />
-        <file src="$BuildTmp$\WebApp\bin\Umbraco.Web.Common.pdb" target="lib\netcoreapp3.1\Umbraco.Web.Common.pdb" />
-        <file src="$BuildTmp$\WebApp\bin\Umbraco.Web.Website.pdb" target="lib\netcoreapp3.1\Umbraco.Web.Website.pdb" />
+        <file src="$BuildTmp$\bin\Umbraco.Web.BackOffice.pdb" target="lib\netcoreapp3.1\Umbraco.Web.BackOffice.pdb" />
+        <file src="$BuildTmp$\bin\Umbraco.Web.Common.pdb" target="lib\netcoreapp3.1\Umbraco.Web.Common.pdb" />
+        <file src="$BuildTmp$\bin\Umbraco.Web.Website.pdb" target="lib\netcoreapp3.1\Umbraco.Web.Website.pdb" />
         <!--Umbraco.ModelsBuilder.Embedded-->
     </files>
 </package>
