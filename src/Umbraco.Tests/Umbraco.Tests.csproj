@@ -121,7 +121,6 @@
     <Compile Include="Composing\CompositionTests.cs" />
     <Compile Include="Composing\ContainerConformingTests.cs" />
     <Compile Include="Configurations\GlobalSettingsTests.cs" />
-    <Compile Include="CoreThings\CallContextTests.cs" />
     <Compile Include="Components\ComponentTests.cs" />
     <Compile Include="CoreXml\RenamedRootNavigatorTests.cs" />
     <Compile Include="LegacyXmlPublishedCache\ContentXmlDto.cs" />
@@ -229,10 +228,8 @@
     <Compile Include="Persistence\UnitOfWorkTests.cs" />
     <Compile Include="Persistence\Repositories\RedirectUrlRepositoryTests.cs" />
     <Compile Include="Testing\UmbracoTestBase.cs" />
-    <Compile Include="CoreThings\TryConvertToTests.cs" />
     <Compile Include="TestHelpers\TestObjects-Mocks.cs" />
     <Compile Include="TestHelpers\TestObjects.cs" />
-    <Compile Include="CoreThings\UdiTests.cs" />
     <Compile Include="UmbracoExamine\RandomIdRamDirectory.cs" />
     <Compile Include="UmbracoExamine\UmbracoContentValueSetValidatorTests.cs" />
     <Compile Include="Web\AngularIntegration\AngularAntiForgeryTests.cs" />
@@ -380,7 +377,6 @@
     <Compile Include="Persistence\Repositories\ScriptRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\StylesheetRepositoryTest.cs" />
     <Compile Include="PublishedContent\PublishedContentMoreTests.cs" />
-    <Compile Include="CoreThings\ObjectExtensionsTests.cs" />
     <Compile Include="Cache\PublishedCache\PublishedContentCacheTests.cs" />
     <Compile Include="Composing\LazyCollectionBuilderTests.cs" />
     <Compile Include="Composing\CollectionBuildersTests.cs" />
