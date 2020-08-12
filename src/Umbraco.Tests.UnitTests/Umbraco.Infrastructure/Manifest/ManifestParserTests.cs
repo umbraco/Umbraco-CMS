@@ -14,7 +14,7 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Dashboards;
 using Umbraco.Core.Serialization;
 using Umbraco.Core.Strings;
-using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.UnitTests.TestHelpers;
 
 namespace Umbraco.Tests.Manifest
 {
@@ -57,7 +57,6 @@ namespace Umbraco.Tests.Manifest
         }
     }
 ]}";
-
             var manifest = _parser.ParseManifest(json);
 
             Assert.AreEqual(1, manifest.ParameterEditors.Length);
