@@ -28,6 +28,11 @@
     </ItemGroup>
 
     <ItemGroup>
+        <Content Remove="App_Data\**" />
+    </ItemGroup>
+
+    
+    <ItemGroup>
         <None Include="config\**\*.*">
             <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -38,6 +43,7 @@
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
             <CopyToPublishDirectory>Always</CopyToPublishDirectory>
         </None>
+        <None Remove="App_Data\**" />
     </ItemGroup>
     
     <ItemGroup>
@@ -45,6 +51,8 @@
         <!-- TODO: remove the reference to System.Configuration.ConfigurationManager when Examine/lucene dont need it-->
         <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.7.0" />
     </ItemGroup>
+
+
 
 
 
