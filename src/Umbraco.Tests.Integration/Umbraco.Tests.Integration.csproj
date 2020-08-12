@@ -14,6 +14,16 @@
     </ItemGroup>
 
     <ItemGroup>
+      <None Remove="Logging\logviewer.searches.config.js" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="Logging\logviewer.searches.config.js">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
+
+    <ItemGroup>
         <PackageReference Include="LightInject.Microsoft.DependencyInjection" Version="3.3.0" />
         <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="3.1.4" />
@@ -38,6 +48,9 @@
     </ItemGroup>
 
     <ItemGroup>
+      <None Update="Logging\UmbracoTraceLog.UNITTEST.20181112.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
       <None Update="Umbraco.Configuration\Configurations\umbracoSettings.config">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
