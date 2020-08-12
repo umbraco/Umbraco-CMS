@@ -27,7 +27,7 @@
         <EmbeddedResource Remove="App_Data\**" />
     </ItemGroup>
 
-
+    <ItemGroup>
         <None Include="config\**\*.*">
             <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
