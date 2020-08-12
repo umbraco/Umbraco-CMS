@@ -29,7 +29,6 @@ angular.module("umbraco")
             var dialogOptions = $scope.model;
 
             $scope.disableFolderSelect = (dialogOptions.disableFolderSelect && dialogOptions.disableFolderSelect !== "0") ? true : false;
-            $scope.disableFocalPoint = (dialogOptions.disableFocalPoint && dialogOptions.disableFocalPoint !== "0") ? true : false;
             $scope.onlyImages = (dialogOptions.onlyImages && dialogOptions.onlyImages !== "0") ? true : false;
             $scope.onlyFolders = (dialogOptions.onlyFolders && dialogOptions.onlyFolders !== "0") ? true : false;
             $scope.showDetails = (dialogOptions.showDetails && dialogOptions.showDetails !== "0") ? true : false;
@@ -374,7 +373,6 @@ angular.module("umbraco")
                     size: "small",
                     cropSize: $scope.cropSize,
                     target: $scope.target,
-                    disableFocalPoint: $scope.disableFocalPoint,
                     submit: function (model) {
                         
                         $scope.model.selection.push($scope.target);

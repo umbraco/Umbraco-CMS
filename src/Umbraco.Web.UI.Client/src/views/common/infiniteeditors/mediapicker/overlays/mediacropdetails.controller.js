@@ -6,6 +6,8 @@
 
             vm.submit = submit;
             vm.close = close;
+            vm.cropNotSet = cropNotSet;
+            vm.cropSet = cropSet;
 
             if (!$scope.model.target.coordinates && !$scope.model.target.focalPoint) {
                 $scope.model.target.focalPoint = { left: .5, top: .5 };
@@ -54,6 +56,16 @@
                 if ($scope.model && $scope.model.close) {
                     $scope.model.close($scope.model);
                 }
+            }
+
+            function cropNotSet() {
+                var model = $scope.model;
+                return !(model.cropSize || {}).width && model.target.thumbnail;
+            }
+
+            function cropSet() {
+                var model = $scope.model;
+                return (model.cropSize || {}).width && model.target.thumbnail;
             }
 
         });
