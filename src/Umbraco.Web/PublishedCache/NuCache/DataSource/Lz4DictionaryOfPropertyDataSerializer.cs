@@ -68,6 +68,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 
                     switch (map.CompressLevel)
                     {                        
+                        case NucachePropertyCompressionLevel.SQLDatabase:
                         case NucachePropertyCompressionLevel.NuCacheDatabase:
                             if (!(pdata.Value is null) && pdata.Value is byte[] byteArrayValue)
                             {
@@ -149,7 +150,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             }
         }
         private static readonly NuCacheCompressionOptions DefaultMap = new NuCacheCompressionOptions(NucachePropertyCompressionLevel.None, NucachePropertyDecompressionLevel.NotCompressed, null);
-        private readonly NuCachePropertyOptions _nucachePropertyOptions;
+        private readonly NuCachePropertyCompressionOptions _nucachePropertyOptions;
 
         public NuCacheCompressionOptions GetSerializationMap(string propertyAlias)
         {

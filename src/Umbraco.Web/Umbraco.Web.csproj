@@ -262,7 +262,7 @@
     <Compile Include="PublishedCache\NuCache\DataSource\NuCacheCompressionOptions.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\NucachePropertyCompressionLevel.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\NucachePropertyDecompressionLevel.cs" />
-    <Compile Include="PublishedCache\NuCache\DataSource\NuCachePropertyOptions.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\NuCachePropertyCompressionOptions.cs" />
     <Compile Include="PublishedCache\NuCache\PublishedSnapshotServiceOptions.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\GenObj.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\GenRef.cs" />

@@ -10,14 +10,13 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
     // TODO: We'll remove this when the responsibility for compressing property data is at the property editor level
     internal class AppSettingsNuCachePropertyMapFactory : INuCachePropertyOptionsFactory
     {
-        public NuCachePropertyOptions GetNuCachePropertyOptions()
+        public NuCachePropertyCompressionOptions GetNuCachePropertyOptions()
         {
-            NuCachePropertyOptions options = new NuCachePropertyOptions
-            {
-                PropertyMap = GetPropertyMap(),
-                LZ4CompressionLevel = K4os.Compression.LZ4.LZ4Level.L10_OPT,
-                MinimumCompressibleStringLength = null
-            };
+            var options = new NuCachePropertyCompressionOptions(
+                GetPropertyMap(),
+                K4os.Compression.LZ4.LZ4Level.L10_OPT,
+                null);
+
             return options;
         }
 
