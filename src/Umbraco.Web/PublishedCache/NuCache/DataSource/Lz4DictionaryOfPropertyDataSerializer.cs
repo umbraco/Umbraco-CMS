@@ -67,7 +67,8 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                     pdata.Value = ReadObject(stream);
 
                     switch (map.CompressLevel)
-                    {                        
+                    {
+                        // If the property is compressed at either the DB or Nucache level, it means it's compressed here and we need to decompress
                         case NucachePropertyCompressionLevel.SQLDatabase:
                         case NucachePropertyCompressionLevel.NuCacheDatabase:
                             if (!(pdata.Value is null) && pdata.Value is byte[] byteArrayValue)
@@ -80,8 +81,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                                         break;
                                     case NucachePropertyDecompressionLevel.NotCompressed:
                                         //Shouldn't be any not compressed
-                                        // TODO: Do we need to throw here?
-                                        break; 
+                                        throw new InvalidOperationException($"{NucachePropertyDecompressionLevel.NotCompressed} cannot be a decompression option for property {alias} since it's compresion option is {map.CompressLevel}");
                                     case NucachePropertyDecompressionLevel.Immediate:
                                     default:
                                         pdata.Value = Encoding.UTF8.GetString(LZ4Pickler.Unpickle(byteArrayValue));

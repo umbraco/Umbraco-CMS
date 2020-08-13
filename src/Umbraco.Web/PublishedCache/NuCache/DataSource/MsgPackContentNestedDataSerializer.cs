@@ -97,7 +97,12 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 
         public ContentNestedData DeserializeBytes(byte[] data) => MessagePackSerializer.Deserialize<ContentNestedData>(data, _options);
 
-        public byte[] SerializeBytes(ContentNestedData nestedData) => MessagePackSerializer.Serialize(nestedData, _options);
+        public byte[] SerializeBytes(ContentNestedData nestedData)
+        {
+            Optimize(nestedData);
+
+            return MessagePackSerializer.Serialize(nestedData, _options);
+        }
 
         //private class ContentNestedDataResolver : IFormatterResolver
         //{

@@ -16,6 +16,10 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         private const char PrefixDouble = 'B';
         private const char PrefixDateTime = 'D';
         private const char PrefixByte = 'O';
+
+        // TODO: It might make sense to have another prefix for an LZ4 compressed byte array.
+        // Would be an improvement for the SQLDatabase compression option because then you could mix compressed and decompressed properties with the same alias.
+        // For example, don't compress recent content, but compress older content.
         private const char PrefixByteArray = 'A';
 
         protected string ReadString(Stream stream) => PrimitiveSerializer.String.ReadFrom(stream);
