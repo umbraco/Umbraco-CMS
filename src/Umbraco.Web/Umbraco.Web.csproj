@@ -260,6 +260,8 @@
     <Compile Include="PublishedCache\NuCache\DataSource\MsgPackContentNestedDataSerializer.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\Lz4DictionaryOfPropertyDataSerializer.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\NuCacheCompressionOptions.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\NucachePropertyCompressionLevel.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\NucachePropertyDecompressionLevel.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\NuCachePropertyOptions.cs" />
     <Compile Include="PublishedCache\NuCache\PublishedSnapshotServiceOptions.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\GenObj.cs" />

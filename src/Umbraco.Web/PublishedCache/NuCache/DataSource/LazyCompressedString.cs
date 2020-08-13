@@ -13,6 +13,8 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
     /// </summary>
     internal class LazyCompressedString
     {
+        // TODO: This could be a struct
+
         private byte[] _bytes;
         private string _str;
 

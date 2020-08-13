@@ -9,26 +9,10 @@ using K4os.Compression.LZ4;
 
 namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 {
-    /// <summary>
-    /// If/where to compress custom properties for nucache
-    /// </summary>
-    public enum NucachePropertyCompressionLevel
-    {
-        None = 0,
-        SQLDatabase = 1,
-        NuCacheDatabase = 2
-    }
-    /// <summary>
-    /// If/where to decompress custom properties for nucache
-    /// </summary>
-    public enum NucachePropertyDecompressionLevel
-    {
-        NotCompressed = 0,
-        Immediate = 1,
-        Lazy = 2
-    }
 
-
+    /// <summary>
+    /// Serializes/Deserializes property data as a dictionary for BTree with Lz4 compression options
+    /// </summary>
     internal class Lz4DictionaryOfPropertyDataSerializer : SerializerBase, ISerializer<IDictionary<string, PropertyData[]>>, IDictionaryOfPropertyDataSerializer
     {
         private readonly IReadOnlyDictionary<string, NuCacheCompressionOptions> _compressProperties;
@@ -58,7 +42,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 
                 // read property alias
                 var alias = PrimitiveSerializer.String.ReadFrom(stream);
-                var map = GetDeSerializationMap(alias);
+                var map = GetDeserializationMap(alias);
                 var key = string.Intern(map.MappedAlias ?? alias);
 
                 // read values count
@@ -82,23 +66,30 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                     pdata.Segment = ReadStringObject(stream, true) ?? string.Empty;
                     pdata.Value = ReadObject(stream);
 
-                    if ((map.CompressLevel.Equals(NucachePropertyCompressionLevel.NuCacheDatabase) || map.CompressLevel.Equals(NucachePropertyCompressionLevel.SQLDatabase))
-                        && pdata.Value != null && pdata.Value is byte[] byteArrayValue)
-                    {
-                        //Compressed string
-                        switch (map.DecompressLevel)
-                        {
-                            case NucachePropertyDecompressionLevel.Lazy:
-                                pdata.Value = new LazyCompressedString(byteArrayValue);
-                                break;
-                            case NucachePropertyDecompressionLevel.NotCompressed:
-                                break;//Shouldn't be any not compressed
-                            case NucachePropertyDecompressionLevel.Immediate:
-                            default:
-                                pdata.Value = Encoding.UTF8.GetString(LZ4Pickler.Unpickle(byteArrayValue));
-                                break;
-                        }
-                    }
+                    switch (map.CompressLevel)
+                    {                        
+                        case NucachePropertyCompressionLevel.SQLDatabase:
+                        case NucachePropertyCompressionLevel.NuCacheDatabase:
+                            if (!(pdata.Value is null) && pdata.Value is byte[] byteArrayValue)
+                            {
+                                //Compressed string
+                                switch (map.DecompressLevel)
+                                {
+                                    case NucachePropertyDecompressionLevel.Lazy:
+                                        pdata.Value = new LazyCompressedString(byteArrayValue);
+                                        break;
+                                    case NucachePropertyDecompressionLevel.NotCompressed:
+                                        //Shouldn't be any not compressed
+                                        // TODO: Do we need to throw here?
+                                        break; 
+                                    case NucachePropertyDecompressionLevel.Immediate:
+                                    default:
+                                        pdata.Value = Encoding.UTF8.GetString(LZ4Pickler.Unpickle(byteArrayValue));
+                                        break;
+                                }
+                            }
+                            break;                      
+                    }                    
                 }
 
                 dict[key] = pdatas.ToArray();
@@ -131,17 +122,30 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                     WriteObject(pdata.Culture ?? string.Empty, stream);
                     WriteObject(pdata.Segment ?? string.Empty, stream);
 
-                    //Only compress strings
-                    if (pdata.Value is string stringValue && pdata.Value != null && map.CompressLevel.Equals(NucachePropertyCompressionLevel.NuCacheDatabase)
-                        && (_nucachePropertyOptions.MinimumCompressibleStringLength == null
-                        || !_nucachePropertyOptions.MinimumCompressibleStringLength.HasValue
-                        || stringValue.Length > _nucachePropertyOptions.MinimumCompressibleStringLength.Value))
+                    //Only compress strings                    
+                    switch (map.CompressLevel)
                     {
-                        var stringBytes = Encoding.UTF8.GetBytes(stringValue);
-                        var compressedBytes = LZ4Pickler.Pickle(stringBytes, _nucachePropertyOptions.LZ4CompressionLevel);
-                        WriteObject(compressedBytes, stream);
+                        // If we're compressing into btree at the property level
+                        case NucachePropertyCompressionLevel.NuCacheDatabase:
+
+                            if (pdata.Value is string stringValue && !(pdata.Value is null)
+                                && (_nucachePropertyOptions.MinimumCompressibleStringLength is null
+                                || !_nucachePropertyOptions.MinimumCompressibleStringLength.HasValue
+                                || stringValue.Length > _nucachePropertyOptions.MinimumCompressibleStringLength.Value))
+                            {
+                                var stringBytes = Encoding.UTF8.GetBytes(stringValue);
+                                var compressedBytes = LZ4Pickler.Pickle(stringBytes, _nucachePropertyOptions.LZ4CompressionLevel);
+                                WriteObject(compressedBytes, stream);
+                            }
+                            else
+                            {
+                                WriteObject(pdata.Value, stream);
+                            }
+                            break;
+                        default:
+                            WriteObject(pdata.Value, stream);
+                            break;
                     }
-                    WriteObject(pdata.Value, stream);
                 }
             }
         }
@@ -150,7 +154,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 
         public NuCacheCompressionOptions GetSerializationMap(string propertyAlias)
         {
-            if (_compressProperties == null)
+            if (_compressProperties is null)
             {
                 return DefaultMap;
             }
@@ -161,9 +165,9 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 
             return DefaultMap;
         }
-        public NuCacheCompressionOptions GetDeSerializationMap(string propertyAlias)
+        public NuCacheCompressionOptions GetDeserializationMap(string propertyAlias)
         {
-            if (_uncompressProperties == null)
+            if (_uncompressProperties is null)
             {
                 return DefaultMap;
             }

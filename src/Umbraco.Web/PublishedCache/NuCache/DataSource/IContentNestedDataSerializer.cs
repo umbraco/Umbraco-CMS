@@ -1,19 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Umbraco.Web.PublishedCache.NuCache.DataSource
+﻿namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 {
-    // TODO: We need a better name, not sure why the class is called ContentNested in the first place
+    // TODO: We need better names if possible, not sure why the class is called ContentNested in the first place
+
+    /// <summary>
+    /// Serializes/Deserializes <see cref="ContentNestedData"/> document to the SQL Database as bytes
+    /// </summary>
     public interface IContentNestedDataByteSerializer : IContentNestedDataSerializer
     {
         ContentNestedData DeserializeBytes(byte[] data);
         byte[] SerializeBytes(ContentNestedData nestedData);
     }
 
-    // TODO: We need a better name, not sure why the class is called ContentNested in the first place
+    /// <summary>
+    /// Serializes/Deserializes <see cref="ContentNestedData"/> document to the SQL Database as a string
+    /// </summary>
     public interface IContentNestedDataSerializer
     {
         ContentNestedData Deserialize(string data);        

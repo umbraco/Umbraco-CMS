@@ -14,6 +14,13 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 
         public NucachePropertyCompressionLevel CompressLevel { get; private set; }
         public NucachePropertyDecompressionLevel DecompressLevel { get; private set; }
+
+        /// <summary>
+        /// Used to map a real property alias to a shorter moniker in memory
+        /// </summary>
+        /// <remarks>
+        /// This is simply a memory saving mechanism
+        /// </remarks>
         public string MappedAlias { get; private set; }
 
         public override bool Equals(object obj)
