@@ -119,7 +119,7 @@ context('Partial View Macro Files', () => {
     // Assert
     cy.contains(fullName).should('not.exist');
 
-    // Clearn
+    // Clean
     cleanup(name);
   });
 
