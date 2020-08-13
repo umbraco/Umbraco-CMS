@@ -4,7 +4,8 @@
     function ContentEditController($rootScope, $scope, $routeParams, $q, $window,
         appState, contentResource, entityResource, navigationService, notificationsService,
         serverValidationManager, contentEditingHelper, localizationService, formHelper, umbRequestHelper,
-        editorState, $http, eventsService, overlayService, $location, localStorageService, treeService) {
+        editorState, $http, eventsService, overlayService, $location, localStorageService, treeService,
+        $exceptionHandler) {
 
         var evts = [];
         var infiniteMode = $scope.infiniteModel && $scope.infiniteModel.infiniteMode;
@@ -515,6 +516,12 @@
             }
         }
 
+        function handleHttpException(err) {
+            if (err && !err.status) {
+                $exceptionHandler(err);
+            }
+        }
+
         /** Just shows a simple notification that there are client side validation issues to be fixed */
         function showValidationNotification() {
             //TODO: We need to make the validation UI much better, there's a lot of inconsistencies in v8 including colors, issues with the property groups and validation errors between variants
@@ -555,6 +562,7 @@
                     view: "views/content/overlays/unpublish.html",
                     variants: $scope.content.variants, //set a model property for the dialog
                     skipFormValidation: true, //when submitting the overlay form, skip any client side validation
+                    includeUnpublished: false,
                     submitButtonLabelKey: "content_unpublish",
                     submitButtonStyle: "warning",
                     submit: function (model) {
@@ -575,6 +583,7 @@
                                 overlayService.close();
                             }, function (err) {
                                 $scope.page.buttonGroupState = 'error';
+                                handleHttpException(err);
                             });
 
 
@@ -620,8 +629,7 @@
                                     model.submitButtonState = "error";
                                     //re-map the dialog model since we've re-bound the properties
                                     dialog.variants = $scope.content.variants;
-                                    //don't reject, we've handled the error
-                                    return $q.when(err);
+                                    handleHttpException(err);
                                 });
                         },
                         close: function () {
@@ -642,8 +650,9 @@
                     action: "sendToPublish"
                 }).then(function () {
                     $scope.page.buttonGroupState = "success";
-                }, function () {
+                }, function (err) {
                     $scope.page.buttonGroupState = "error";
+                    handleHttpException(err);
                 });;
             }
         };
@@ -679,8 +688,7 @@
                                     model.submitButtonState = "error";
                                     //re-map the dialog model since we've re-bound the properties
                                     dialog.variants = $scope.content.variants;
-                                    //don't reject, we've handled the error
-                                    return $q.when(err);
+                                    handleHttpException(err);
                                 });
                         },
                         close: function () {
@@ -703,8 +711,9 @@
                     action: "publish"
                 }).then(function () {
                     $scope.page.buttonGroupState = "success";
-                }, function () {
+                }, function (err) {
                     $scope.page.buttonGroupState = "error";
+                    handleHttpException(err);
                 });
             }
         };
@@ -742,8 +751,7 @@
                                     model.submitButtonState = "error";
                                     //re-map the dialog model since we've re-bound the properties
                                     dialog.variants = $scope.content.variants;
-                                    //don't reject, we've handled the error
-                                    return $q.when(err);
+                                    handleHttpException(err);
                                 });
                         },
                         close: function (oldModel) {
@@ -766,8 +774,9 @@
                     action: "save"
                 }).then(function () {
                     $scope.page.saveButtonState = "success";
-                }, function () {
+                }, function (err) {
                     $scope.page.saveButtonState = "error";
+                    handleHttpException(err);
                 });
             }
 
@@ -820,8 +829,7 @@
                             model.submitButtonState = "error";
                             //re-map the dialog model since we've re-bound the properties
                             dialog.variants = Utilities.copy($scope.content.variants);
-                            //don't reject, we've handled the error
-                            return $q.when(err);
+                            handleHttpException(err);
                         });
 
                     },
@@ -880,8 +888,7 @@
                             model.submitButtonState = "error";
                             //re-map the dialog model since we've re-bound the properties
                             dialog.variants = $scope.content.variants;
-                            //don't reject, we've handled the error
-                            return $q.when(err);
+                            handleHttpException(err);
                         });
 
                     },

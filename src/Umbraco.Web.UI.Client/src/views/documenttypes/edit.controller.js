@@ -359,6 +359,7 @@
 
                     if (infiniteMode && $scope.model.submit) {
                         $scope.model.documentTypeAlias = vm.contentType.alias;
+                        $scope.model.documentTypeKey = vm.contentType.key;
                         $scope.model.submit($scope.model);
                     }
 
