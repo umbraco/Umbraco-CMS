@@ -17,6 +17,7 @@ namespace Umbraco.Core.Persistence.DatabaseModelDefinitions
         public virtual string ColumnName { get; set; }
 
         public virtual ICollection<IndexColumnDefinition> Columns { get; set; }
+        public virtual ICollection<IndexColumnDefinition> IncludeColumns { get; set; }
         public IndexTypes IndexType { get; set; }
     }
 }
