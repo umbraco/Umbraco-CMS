@@ -5,7 +5,7 @@
     /// <summary>
     /// Serializes/Deserializes <see cref="ContentNestedData"/> document to the SQL Database as bytes
     /// </summary>
-    public interface IContentNestedDataByteSerializer : IContentNestedDataSerializer
+    public interface IContentNestedDataByteSerializer
     {
         ContentNestedData DeserializeBytes(byte[] data);
         byte[] SerializeBytes(ContentNestedData nestedData);

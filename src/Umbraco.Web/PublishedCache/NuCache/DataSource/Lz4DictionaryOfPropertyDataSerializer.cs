@@ -68,7 +68,6 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 
                     switch (map.CompressLevel)
                     {                        
-                        case NucachePropertyCompressionLevel.SQLDatabase:
                         case NucachePropertyCompressionLevel.NuCacheDatabase:
                             if (!(pdata.Value is null) && pdata.Value is byte[] byteArrayValue)
                             {

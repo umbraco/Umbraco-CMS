@@ -1,23 +1,17 @@
-﻿using K4os.Compression.LZ4;
-using MessagePack;
-using MessagePack.Formatters;
+﻿using MessagePack;
 using MessagePack.Resolvers;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 {
     /// <summary>
     /// Serializes/Deserializes <see cref="ContentNestedData"/> document to the SQL Database as bytes using MessagePack
     /// </summary>
-    internal class MsgPackContentNestedDataSerializer : IContentNestedDataByteSerializer
+    internal class MsgPackContentNestedDataSerializer : IContentNestedDataByteSerializer, IContentNestedDataSerializer
     {
-        private MessagePackSerializerOptions _options;
-        private readonly NuCachePropertyOptions _propertyOptions;
+        private readonly MessagePackSerializerOptions _options;
 
-        public MsgPackContentNestedDataSerializer(INuCachePropertyOptionsFactory propertyOptionsFactory = null)
+        public MsgPackContentNestedDataSerializer()
         {
             var defaultOptions = ContractlessStandardResolver.Options;
 
@@ -37,7 +31,6 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             _options = defaultOptions
                 .WithResolver(resolver)
                 .WithCompression(MessagePackCompression.Lz4BlockArray);
-            _propertyOptions = propertyOptionsFactory?.GetNuCachePropertyOptions() ?? new NuCachePropertyOptions();
         }
 
         public string ToJson(string serialized)
@@ -56,43 +49,8 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 
         public string Serialize(ContentNestedData nestedData)
         {
-            Optimize(nestedData);
-
             var bin = MessagePackSerializer.Serialize(nestedData, _options);
             return Convert.ToBase64String(bin);
-        }
-
-        /// <summary>
-        /// Compress properties and map property names to shorter names
-        /// </summary>
-        /// <param name="nestedData"></param>
-        private void Optimize(ContentNestedData nestedData)
-        {
-            if (_propertyOptions.PropertyMap != null && _propertyOptions.PropertyMap.Count > 0)
-            {
-                foreach (var map in _propertyOptions.PropertyMap)
-                {
-                    if (map.Value.CompressLevel.Equals(NucachePropertyCompressionLevel.SQLDatabase))
-                    {
-                        if (nestedData.PropertyData.TryGetValue(map.Key, out PropertyData[] properties))
-                        {
-                            foreach (var property in properties.Where(x => x.Value != null && x.Value is string))
-                            {
-                                property.Value = LZ4Pickler.Pickle(Encoding.UTF8.GetBytes(property.Value as string), _propertyOptions.LZ4CompressionLevel);
-                            }
-                        }
-                    }
-
-                    // if there is an alias map for this property then use that instead of the real property alias
-                    // (used to save memory, the mapped alias is normally a single char or at least a smaller string)
-                    if (map.Value.MappedAlias != null && !map.Key.Equals(map.Value.MappedAlias)
-                        && nestedData.PropertyData.Remove(map.Key)
-                        && nestedData.PropertyData.TryGetValue(map.Key, out PropertyData[] properties2))
-                    {
-                        nestedData.PropertyData.Add(map.Value.MappedAlias, properties2);
-                    }
-                }
-            }
         }
 
         public ContentNestedData DeserializeBytes(byte[] data) => MessagePackSerializer.Deserialize<ContentNestedData>(data, _options);
