@@ -5,8 +5,17 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 {
     class ContentDataSerializer : ISerializer<ContentData>
     {
+        public ContentDataSerializer(IDictionaryOfPropertyDataSerializer dictionaryOfPropertyDataSerializer = null)
+        {
+            _dictionaryOfPropertyDataSerializer = dictionaryOfPropertyDataSerializer;
+            if(_dictionaryOfPropertyDataSerializer == null)
+            {
+                _dictionaryOfPropertyDataSerializer = PropertiesSerializer;
+            }
+        }
         private static readonly DictionaryOfPropertyDataSerializer PropertiesSerializer = new DictionaryOfPropertyDataSerializer();
         private static readonly DictionaryOfCultureVariationSerializer CultureVariationsSerializer = new DictionaryOfCultureVariationSerializer();
+        private readonly IDictionaryOfPropertyDataSerializer _dictionaryOfPropertyDataSerializer;
 
         public ContentData ReadFrom(Stream stream)
         {
@@ -19,7 +28,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 VersionDate = PrimitiveSerializer.DateTime.ReadFrom(stream),
                 WriterId = PrimitiveSerializer.Int32.ReadFrom(stream),
                 TemplateId = PrimitiveSerializer.Int32.ReadFrom(stream),
-                Properties = PropertiesSerializer.ReadFrom(stream), // TODO: We don't want to allocate empty arrays
+                Properties = _dictionaryOfPropertyDataSerializer.ReadFrom(stream), // TODO: We don't want to allocate empty arrays
                 CultureInfos = CultureVariationsSerializer.ReadFrom(stream) // TODO: We don't want to allocate empty arrays
             };
         }
@@ -36,7 +45,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             {
                 PrimitiveSerializer.Int32.WriteTo(value.TemplateId.Value, stream);
             }
-            PropertiesSerializer.WriteTo(value.Properties, stream);
+            _dictionaryOfPropertyDataSerializer.WriteTo(value.Properties, stream);
             CultureVariationsSerializer.WriteTo(value.CultureInfos, stream);
         }
     }

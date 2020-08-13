@@ -6,7 +6,7 @@ using Umbraco.Core;
 
 namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 {
-    internal class DictionaryOfPropertyDataSerializer : SerializerBase, ISerializer<IDictionary<string, PropertyData[]>>
+    internal class DictionaryOfPropertyDataSerializer : SerializerBase, ISerializer<IDictionary<string, PropertyData[]>>, IDictionaryOfPropertyDataSerializer
     {
         public IDictionary<string, PropertyData[]> ReadFrom(Stream stream)
         {

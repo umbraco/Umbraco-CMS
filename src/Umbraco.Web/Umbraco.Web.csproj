@@ -68,6 +68,9 @@
     <PackageReference Include="ImageProcessor">
       <Version>2.7.0.100</Version>
     </PackageReference>
+    <PackageReference Include="K4os.Compression.LZ4">
+      <Version>1.1.11</Version>
+    </PackageReference>
     <PackageReference Include="LightInject" Version="5.4.0" />
     <PackageReference Include="LightInject.Annotation" Version="1.1.0" />
     <PackageReference Include="LightInject.Mvc" Version="2.0.0" />
@@ -248,9 +251,15 @@
     <Compile Include="Compose\NestedContentPropertyComposer.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\MultipleMediaPickerParameterEditor.cs" />
     <Compile Include="PropertyEditors\RichTextEditorPastedImages.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\AppSettingsNuCachePropertyMapFactory.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\IContentNestedDataSerializer.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\IDictionaryOfPropertyDataSerializer.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\INuCachePropertyOptionsFactory.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\JsonContentNestedDataSerializer.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\LazyCompressedString.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\MsgPackContentNestedDataSerializer.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\Lz4DictionaryOfPropertyDataSerializer.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\NuCachePropertyOptions.cs" />
     <Compile Include="PublishedCache\NuCache\PublishedSnapshotServiceOptions.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\GenObj.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\GenRef.cs" />
