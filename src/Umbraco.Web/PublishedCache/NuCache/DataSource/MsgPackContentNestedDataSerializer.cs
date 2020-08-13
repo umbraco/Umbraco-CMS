@@ -86,9 +86,9 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                     // if there is an alias map for this property then use that instead of the real property alias
                     // (used to save memory, the mapped alias is normally a single char or at least a smaller string)
                     if (map.Value.MappedAlias != null && !map.Key.Equals(map.Value.MappedAlias)
-                        && nestedData.PropertyData.Remove(map.Key)
                         && nestedData.PropertyData.TryGetValue(map.Key, out PropertyData[] properties2))
                     {
+                        nestedData.PropertyData.Remove(map.Key);
                         nestedData.PropertyData.Add(map.Value.MappedAlias, properties2);
                     }
                 }
