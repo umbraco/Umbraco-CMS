@@ -188,6 +188,7 @@ Use this directive to construct a header inside the main editor window.
 </ul>
 
 @param {string} name The content name.
+@param {boolean=} nameRequired Require name to be defined. (True by default)
 @param {array=} tabs Array of tabs. See example above.
 @param {array=} navigation Array of sub views. See example above.
 @param {boolean=} nameLocked Set to <code>true</code> to lock the name.
@@ -199,7 +200,7 @@ Use this directive to construct a header inside the main editor window.
 @param {boolean=} hideAlias Set to <code>true</code> to hide alias.
 @param {string=} description Add a description to the content.
 @param {boolean=} hideDescription Set to <code>true</code> to hide description.
-@param {boolean=} setpagetitle If true the page title will be set to reflect the type of data the header is working with 
+@param {boolean=} setpagetitle If true the page title will be set to reflect the type of data the header is working with
 @param {string=} editorfor The localization to use to aid accessibility on the edit and create screen
 **/
 
@@ -207,7 +208,7 @@ Use this directive to construct a header inside the main editor window.
     'use strict';
 
     function EditorHeaderDirective(editorService, localizationService, editorState, $rootScope) {
-        
+
         function link(scope, $injector) {
 
             scope.vm = {};
@@ -329,11 +330,11 @@ Use this directive to construct a header inside the main editor window.
                     }
                     scope.accessibility.a11yMessageVisible = !isEmptyOrSpaces(scope.accessibility.a11yMessage);
                     scope.accessibility.a11yNameVisible = !isEmptyOrSpaces(scope.accessibility.a11yName);
-                    
+
                 });
             }
 
-           
+
 
            function isEmptyOrSpaces(str) {
                return str === null || str===undefined || str.trim ==='';
@@ -348,7 +349,7 @@ Use this directive to construct a header inside the main editor window.
             });
         }
 
-        
+
 
         var directive = {
             transclude: true,
@@ -358,6 +359,7 @@ Use this directive to construct a header inside the main editor window.
             scope: {
                 name: "=",
                 nameLocked: "=",
+                nameRequired: "=?",
                 menu: "=",
                 hideActionsMenu: "<?",
                 icon: "=",
