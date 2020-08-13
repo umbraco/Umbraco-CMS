@@ -69,7 +69,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             {
                 foreach (var map in _propertyOptions.PropertyMap)
                 {
-                    if (map.Value.compress.Equals(NucachePropertyCompressionLevel.SQLDatabase))
+                    if (map.Value.CompressLevel.Equals(NucachePropertyCompressionLevel.SQLDatabase))
                     {
                         if (nestedData.PropertyData.TryGetValue(map.Key, out PropertyData[] properties))
                         {
@@ -79,11 +79,11 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                             }
                         }
                     }
-                    if (map.Value.mappedAlias != null && !map.Key.Equals(map.Value.mappedAlias)
+                    if (map.Value.MappedAlias != null && !map.Key.Equals(map.Value.MappedAlias)
                         && nestedData.PropertyData.Remove(map.Key) && nestedData.PropertyData.TryGetValue(map.Key, out PropertyData[] properties2))
                     {
                         nestedData.PropertyData.Remove(map.Key);
-                        nestedData.PropertyData.Add(map.Value.mappedAlias, properties2);
+                        nestedData.PropertyData.Add(map.Value.MappedAlias, properties2);
                     }
                 }
             }

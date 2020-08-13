@@ -7,7 +7,8 @@ using System.Threading.Tasks;
 
 namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 {
-    public class AppSettingsNuCachePropertyMapFactory : INuCachePropertyOptionsFactory
+    // TODO: We'll remove this when the responsibility for compressing property data is at the property editor level
+    internal class AppSettingsNuCachePropertyMapFactory : INuCachePropertyOptionsFactory
     {
         public NuCachePropertyOptions GetNuCachePropertyOptions()
         {
@@ -20,9 +21,9 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             return options;
         }
 
-        public IReadOnlyDictionary<string, (NucachePropertyCompressionLevel compress, NucachePropertyDecompressionLevel decompressionLevel, string mappedAlias)> GetPropertyMap()
+        public IReadOnlyDictionary<string, NuCacheCompressionOptions> GetPropertyMap()
         {
-            var propertyMap = new Dictionary<string, (NucachePropertyCompressionLevel compress, NucachePropertyDecompressionLevel decompressionLevel, string mappedAlias)>();
+            var propertyMap = new Dictionary<string, NuCacheCompressionOptions>();
             // TODO: Use xml/json/c# to define map
             var propertyDictionarySerializerMap = ConfigurationManager.AppSettings["Umbraco.Web.PublishedCache.NuCache.PropertySerializationMap"];
             if (!string.IsNullOrWhiteSpace(propertyDictionarySerializerMap))
@@ -39,7 +40,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                         );
                         return v;
                     })
-                    .ToList().ForEach(x => propertyMap.Add(x.alias, (x.compressionLevel, x.decompressionLevel, x.mappedAlias)));
+                    .ToList().ForEach(x => propertyMap.Add(x.alias, new NuCacheCompressionOptions(x.compressionLevel, x.decompressionLevel, x.mappedAlias)));
             }
             return propertyMap;
         }

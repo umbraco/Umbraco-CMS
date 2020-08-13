@@ -16,7 +16,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
     {
         None = 0,
         SQLDatabase = 1,
-        NucacheDatabase = 2
+        NuCacheDatabase = 2
     }
     /// <summary>
     /// If/where to decompress custom properties for nucache
@@ -28,22 +28,22 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         Lazy = 2
     }
 
-    
+
     internal class Lz4DictionaryOfPropertyDataSerializer : SerializerBase, ISerializer<IDictionary<string, PropertyData[]>>, IDictionaryOfPropertyDataSerializer
     {
-        private readonly IReadOnlyDictionary<string, (NucachePropertyCompressionLevel compress, NucachePropertyDecompressionLevel decompressionLevel, string mappedAlias)> _compressProperties;
-        private readonly IReadOnlyDictionary<string, (NucachePropertyCompressionLevel compress, NucachePropertyDecompressionLevel decompressionLevel, string mappedAlias)> _uncompressProperties;
+        private readonly IReadOnlyDictionary<string, NuCacheCompressionOptions> _compressProperties;
+        private readonly IReadOnlyDictionary<string, NuCacheCompressionOptions> _uncompressProperties;
 
 
         public Lz4DictionaryOfPropertyDataSerializer(INuCachePropertyOptionsFactory nucachePropertyOptionsFactory)
         {
             var nucachePropertyOptions = nucachePropertyOptionsFactory.GetNuCachePropertyOptions();
-            _compressProperties = nucachePropertyOptions.PropertyMap.ToList().ToDictionary(x => string.Intern(x.Key), x => (x.Value.compress,x.Value.decompressionLevel, string.Intern(x.Value.mappedAlias)));
-            _uncompressProperties = _compressProperties.ToList().ToDictionary(x => x.Value.mappedAlias, x => (x.Value.compress, x.Value.decompressionLevel, x.Key));
+            _compressProperties = nucachePropertyOptions.PropertyMap.ToList().ToDictionary(x => string.Intern(x.Key), x => new NuCacheCompressionOptions(x.Value.CompressLevel, x.Value.DecompressLevel, string.Intern(x.Value.MappedAlias)));
+            _uncompressProperties = _compressProperties.ToList().ToDictionary(x => x.Value.MappedAlias, x => new NuCacheCompressionOptions(x.Value.CompressLevel, x.Value.DecompressLevel, x.Key));
 
             _nucachePropertyOptions = nucachePropertyOptions;
         }
-       
+
 
         public IDictionary<string, PropertyData[]> ReadFrom(Stream stream)
         {
@@ -82,11 +82,11 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                     pdata.Segment = ReadStringObject(stream, true) ?? string.Empty;
                     pdata.Value = ReadObject(stream);
 
-                    if ((map.Compress.Equals(NucachePropertyCompressionLevel.NucacheDatabase) || map.Compress.Equals(NucachePropertyCompressionLevel.SQLDatabase))
+                    if ((map.CompressLevel.Equals(NucachePropertyCompressionLevel.NuCacheDatabase) || map.CompressLevel.Equals(NucachePropertyCompressionLevel.SQLDatabase))
                         && pdata.Value != null && pdata.Value is byte[] byteArrayValue)
                     {
                         //Compressed string
-                        switch (map.decompressionLevel)
+                        switch (map.DecompressLevel)
                         {
                             case NucachePropertyDecompressionLevel.Lazy:
                                 pdata.Value = new LazyCompressedString(byteArrayValue);
@@ -132,7 +132,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                     WriteObject(pdata.Segment ?? string.Empty, stream);
 
                     //Only compress strings
-                    if (pdata.Value is string stringValue && pdata.Value != null && map.Compress.Equals(NucachePropertyCompressionLevel.NucacheDatabase)
+                    if (pdata.Value is string stringValue && pdata.Value != null && map.CompressLevel.Equals(NucachePropertyCompressionLevel.NuCacheDatabase)
                         && (_nucachePropertyOptions.MinimumCompressibleStringLength == null
                         || !_nucachePropertyOptions.MinimumCompressibleStringLength.HasValue
                         || stringValue.Length > _nucachePropertyOptions.MinimumCompressibleStringLength.Value))
@@ -145,33 +145,33 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 }
             }
         }
-        private readonly (NucachePropertyCompressionLevel Compress, NucachePropertyDecompressionLevel decompressionLevel, string MappedAlias) DEFAULT_MAP =(NucachePropertyCompressionLevel.None, NucachePropertyDecompressionLevel.NotCompressed, null);
+        private static readonly NuCacheCompressionOptions DefaultMap = new NuCacheCompressionOptions(NucachePropertyCompressionLevel.None, NucachePropertyDecompressionLevel.NotCompressed, null);
         private readonly NuCachePropertyOptions _nucachePropertyOptions;
 
-        public (NucachePropertyCompressionLevel Compress, NucachePropertyDecompressionLevel decompressionLevel, string MappedAlias) GetSerializationMap(string propertyAlias)
+        public NuCacheCompressionOptions GetSerializationMap(string propertyAlias)
         {
             if (_compressProperties == null)
             {
-                return DEFAULT_MAP;
+                return DefaultMap;
             }
-            if (_compressProperties.TryGetValue(propertyAlias, out (NucachePropertyCompressionLevel compress, NucachePropertyDecompressionLevel decompressionLevel, string mappedAlias) map))
+            if (_compressProperties.TryGetValue(propertyAlias, out var map1))
             {
-                return map;
+                return map1;
             }
 
-            return DEFAULT_MAP;
+            return DefaultMap;
         }
-        public (NucachePropertyCompressionLevel Compress, NucachePropertyDecompressionLevel decompressionLevel, string MappedAlias) GetDeSerializationMap(string propertyAlias)
+        public NuCacheCompressionOptions GetDeSerializationMap(string propertyAlias)
         {
             if (_uncompressProperties == null)
             {
-                return DEFAULT_MAP;
+                return DefaultMap;
             }
-            if (_uncompressProperties.TryGetValue(propertyAlias, out (NucachePropertyCompressionLevel compress, NucachePropertyDecompressionLevel decompressionLevel, string mappedAlias) map))
+            if (_uncompressProperties.TryGetValue(propertyAlias, out var map2))
             {
-                return map;
+                return map2;
             }
-            return DEFAULT_MAP;
+            return DefaultMap;
         }
     }
 }
