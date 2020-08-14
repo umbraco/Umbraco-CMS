@@ -70,6 +70,9 @@ namespace Umbraco.Web.PropertyEditors
         [ConfigurationField("maxPropertyWidth", "Property editor width", "textstring", Description = "optional css overwrite, example: 800px or 100%")]
         public string MaxPropertyWidth { get; set; }
 
+        [ConfigurationField("labelOnTop", "Label on top", "boolean", Description = "Move the property label on top to provide move space for the editor.")]
+        public bool LabelOnTop { get; set; }
+
 
     }
 }

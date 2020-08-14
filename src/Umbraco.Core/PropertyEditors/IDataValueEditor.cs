@@ -36,6 +36,11 @@ namespace Umbraco.Core.PropertyEditors
         bool HideLabel { get; }
 
         /// <summary>
+        /// Gets a value indicating whether to display the associated label on top of the controls.
+        /// </summary>
+        bool LabelOnTop { get; }
+
+        /// <summary>
         /// Validates a property value.
         /// </summary>
         /// <param name="value">The property value.</param>

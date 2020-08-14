@@ -134,6 +134,12 @@ namespace Umbraco.Core.PropertyEditors
         public bool HideLabel { get; set; }
 
         /// <summary>
+        /// If this is true the associated label will be placed on top to provide full width for the editor.
+        /// </summary>
+        [JsonProperty("labelOnTop")]
+        public bool LabelOnTop { get; set; }
+
+        /// <summary>
         /// Set this to true if the property editor is for display purposes only
         /// </summary>
         public virtual bool IsReadOnly => false;

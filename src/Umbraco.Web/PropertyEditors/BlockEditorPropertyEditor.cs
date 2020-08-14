@@ -46,7 +46,7 @@ namespace Umbraco.Web.PropertyEditors
         internal class BlockEditorPropertyValueEditor : DataValueEditor, IDataValueReference
         {
             private readonly PropertyEditorCollection _propertyEditors;
-            private readonly IDataTypeService _dataTypeService; 
+            private readonly IDataTypeService _dataTypeService;
             private readonly ILogger _logger;
             private readonly BlockEditorValues _blockEditorValues;
 
@@ -89,6 +89,23 @@ namespace Umbraco.Web.PropertyEditors
                 }
 
                 return result;
+            }
+
+
+            /// <inheritdoc />
+            public override object Configuration
+            {
+                get => base.Configuration;
+                set
+                {
+                    if (value == null)
+                        throw new ArgumentNullException(nameof(value));
+                    if (!(value is BlockListConfiguration configuration))
+                        throw new ArgumentException($"Expected a {typeof(BlockListConfiguration).Name}, but got {value.GetType().Name}.", nameof(value));
+                    base.Configuration = value;
+
+                    LabelOnTop = configuration.LabelOnTop.TryConvertTo<bool>().Result;
+                }
             }
 
             #region Convert database // editor
