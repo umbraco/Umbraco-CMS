@@ -348,7 +348,7 @@ where tbl.[name]=@0 and col.[name]=@1;", tableName, columnName)
                 ? string.Join(",", index.Columns.Select(x => GetQuotedColumnName(x.Name)))
                 : GetQuotedColumnName(index.ColumnName);
 
-            var includeColumns = index.IncludeColumns.Any()
+            var includeColumns = index.IncludeColumns?.Any() ?? false
                ? $" INCLUDE ({string.Join(",", index.IncludeColumns.Select(x => GetQuotedColumnName(x.Name)))})"
                : string.Empty;
 

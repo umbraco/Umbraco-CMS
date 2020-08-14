@@ -236,6 +236,20 @@ where table_name=@0 and column_name=@1", tableName, columnName).FirstOrDefault()
         }
 
         public override string DropIndex { get { return "DROP INDEX {1}.{0}"; } }
+        public override string CreateIndex => "CREATE {0}{1}INDEX {2} ON {3} ({4})";
+        public override string Format(IndexDefinition index)
+        {
+            var name = string.IsNullOrEmpty(index.Name)
+                ? $"IX_{index.TableName}_{index.ColumnName}"
+                : index.Name;
 
+            var columns = index.Columns.Any()
+                ? string.Join(",", index.Columns.Select(x => GetQuotedColumnName(x.Name)))
+                : GetQuotedColumnName(index.ColumnName);
+
+
+            return string.Format(CreateIndex, GetIndexType(index.IndexType), " ", GetQuotedName(name),
+                                 GetQuotedTableName(index.TableName), columns);
+        }
     }
 }
