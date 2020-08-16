@@ -600,15 +600,11 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
 
         #region Content types
 
-        public override IPublishedContentType GetContentType(int id)
-        {
-            return _contentTypeCache.Get(PublishedItemType.Media, id);
-        }
+        public override IPublishedContentType GetContentType(int id) => _contentTypeCache.Get(PublishedItemType.Media, id);
 
-        public override IPublishedContentType GetContentType(string alias)
-        {
-            return _contentTypeCache.Get(PublishedItemType.Media, alias);
-        }
+        public override IPublishedContentType GetContentType(string alias) => _contentTypeCache.Get(PublishedItemType.Media, alias);
+
+        public override IPublishedContentType GetContentType(Guid key) => _contentTypeCache.Get(PublishedItemType.Media, key);
 
         public override IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType)
         {

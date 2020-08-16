@@ -30,8 +30,9 @@ namespace Umbraco.Web.BackOffice.Filters
             ILocalizedTextService textService,
             IMemberTypeService memberTypeService,
             IMemberService memberService,
-            IShortStringHelper shortStringHelper)
-            : base(logger, webSecurity, textService)
+            IShortStringHelper shortStringHelper,
+            IPropertyValidationService propertyValidationService)
+            : base(logger, webSecurity, textService, propertyValidationService)
         {
             _memberTypeService = memberTypeService ?? throw new ArgumentNullException(nameof(memberTypeService));
             _memberService = memberService ?? throw new ArgumentNullException(nameof(memberService));

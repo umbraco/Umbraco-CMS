@@ -22,8 +22,4 @@
         <ProjectReference Include="..\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj" />
         <ProjectReference Include="..\Umbraco.Web.Common\Umbraco.Web.Common.csproj" />
     </ItemGroup>
-
-    <ItemGroup>
-        <PackageReference Include="SixLabors.ImageSharp.Web" Version="1.0.0-rc0001" />
-    </ItemGroup>
 </Project>

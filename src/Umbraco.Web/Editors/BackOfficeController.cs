@@ -40,17 +40,13 @@ namespace Umbraco.Web.Editors
     public class BackOfficeController : UmbracoController
     {
         private readonly UmbracoFeatures _features;
-        private readonly IRuntimeState _runtimeState;
         private BackOfficeOwinUserManager _userManager;
         private BackOfficeSignInManager _signInManager;
         private readonly IUmbracoVersion _umbracoVersion;
-        private readonly IGridConfig _gridConfig;
         private readonly IContentSettings _contentSettings;
-        private readonly TreeCollection _treeCollection;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IRuntimeSettings _runtimeSettings;
         private readonly ISecuritySettings _securitySettings;
-        private readonly IRuntimeMinifier _runtimeMinifier;
 
         public BackOfficeController(
             UmbracoFeatures features,
@@ -59,29 +55,20 @@ namespace Umbraco.Web.Editors
             ServiceContext services,
             AppCaches appCaches,
             IProfilingLogger profilingLogger,
-            IRuntimeState runtimeState,
             IUmbracoVersion umbracoVersion,
-            IGridConfig gridConfig,
             IContentSettings contentSettings,
-            TreeCollection treeCollection,
             IHostingEnvironment hostingEnvironment,
-            IHttpContextAccessor httpContextAccessor,
             IRuntimeSettings settings,
-            ISecuritySettings securitySettings,
-            IRuntimeMinifier runtimeMinifier)
+            ISecuritySettings securitySettings)
             : base(globalSettings, umbracoContextAccessor, services, appCaches, profilingLogger)
 
         {
             _features = features;
-            _runtimeState = runtimeState;
             _umbracoVersion = umbracoVersion;
-            _gridConfig = gridConfig ?? throw new ArgumentNullException(nameof(gridConfig));
             _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
-            _treeCollection = treeCollection ?? throw new ArgumentNullException(nameof(treeCollection));
             _hostingEnvironment = hostingEnvironment;
             _runtimeSettings = settings;
             _securitySettings = securitySettings;
-            _runtimeMinifier = runtimeMinifier;
         }
 
         protected BackOfficeSignInManager SignInManager => _signInManager ?? (_signInManager = OwinContext.GetBackOfficeSignInManager());

@@ -348,6 +348,10 @@ namespace Umbraco.Web.BackOffice.Controllers
                             "imageUrlGeneratorApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<ImageUrlGeneratorController>(
                                 controller => controller.GetCropUrl(null, null, null, null, null))
                         },
+                        {
+                            "elementTypeApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<ElementTypeController>(
+                                controller => controller.GetAll())
+                        },
                     }
                 },
                 {

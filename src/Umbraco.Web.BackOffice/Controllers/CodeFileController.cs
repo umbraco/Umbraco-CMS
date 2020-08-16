@@ -31,7 +31,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     // ref: https://www.exceptionnotfound.net/the-asp-net-web-api-exception-handling-pipeline-a-guided-tour/
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     //[PrefixlessBodyModelValidator]
-    [UmbracoApplicationAuthorizeAttribute(Constants.Applications.Settings)]
+    [UmbracoApplicationAuthorize(Constants.Applications.Settings)]
     public class CodeFileController : BackOfficeNotificationsController
     {
         private readonly IIOHelper _ioHelper;

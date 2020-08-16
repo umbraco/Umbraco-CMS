@@ -31,15 +31,21 @@ namespace Umbraco.Web.BackOffice.Filters
         {
             private readonly IContentService _contentService;
             private readonly IEntityService _entityService;
+            private readonly IPropertyValidationService _propertyValidationService;
             private readonly ILogger _logger;
             private readonly ILocalizedTextService _textService;
             private readonly IUserService _userService;
             private readonly IWebSecurity _webSecurity;
 
 
-            public ContentSaveValidationFilter(ILogger logger, IWebSecurity webSecurity,
-                ILocalizedTextService textService, IContentService contentService, IUserService userService,
-                IEntityService entityService)
+            public ContentSaveValidationFilter(
+                ILogger logger,
+                IWebSecurity webSecurity,
+                ILocalizedTextService textService,
+                IContentService contentService,
+                IUserService userService,
+                IEntityService entityService,
+                IPropertyValidationService propertyValidationService)
             {
                 _logger = logger ?? throw new ArgumentNullException(nameof(logger));
                 _webSecurity = webSecurity ?? throw new ArgumentNullException(nameof(webSecurity));
@@ -47,12 +53,13 @@ namespace Umbraco.Web.BackOffice.Filters
                 _contentService = contentService ?? throw new ArgumentNullException(nameof(contentService));
                 _userService = userService ?? throw new ArgumentNullException(nameof(userService));
                 _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
+                _propertyValidationService = propertyValidationService ?? throw new ArgumentNullException(nameof(propertyValidationService));
             }
 
             public void OnActionExecuting(ActionExecutingContext context)
             {
                 var model = (ContentItemSave) context.ActionArguments["contentItem"];
-                var contentItemValidator = new ContentSaveModelValidator(_logger, _webSecurity, _textService);
+                var contentItemValidator = new ContentSaveModelValidator(_logger, _webSecurity, _textService, _propertyValidationService);
 
                 if (!ValidateAtLeastOneVariantIsBeingSaved(model, context)) return;
                 if (!contentItemValidator.ValidateExistingContent(model, context)) return;

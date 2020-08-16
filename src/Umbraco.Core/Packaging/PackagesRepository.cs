@@ -6,6 +6,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Xml.Linq;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -28,7 +29,7 @@ namespace Umbraco.Core.Packaging
         private readonly ILocalizationService _languageService;
         private readonly IEntityXmlSerializer _serializer;
         private readonly ILogger _logger;
-        private readonly IIOHelper _ioHelper;
+        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly string _packageRepositoryFileName;
         private readonly string _mediaFolderPath;
         private readonly string _packagesFolderPath;
@@ -45,7 +46,7 @@ namespace Umbraco.Core.Packaging
         /// <param name="fileService"></param>
         /// <param name="macroService"></param>
         /// <param name="languageService"></param>
-        /// <param name="ioHelper"></param>
+        /// <param name="hostingEnvironment"></param>
         /// <param name="serializer"></param>
         /// <param name="logger"></param>
         /// <param name="packageRepositoryFileName">
@@ -57,7 +58,7 @@ namespace Umbraco.Core.Packaging
         public PackagesRepository(IContentService contentService, IContentTypeService contentTypeService,
             IDataTypeService dataTypeService, IFileService fileService, IMacroService macroService,
             ILocalizationService languageService,
-            IIOHelper ioHelper,
+            IHostingEnvironment hostingEnvironment,
             IEntityXmlSerializer serializer, ILogger logger,
             IUmbracoVersion umbracoVersion,
             IGlobalSettings globalSettings,
@@ -73,7 +74,7 @@ namespace Umbraco.Core.Packaging
             _languageService = languageService;
             _serializer = serializer;
             _logger = logger;
-            _ioHelper = ioHelper;
+            _hostingEnvironment = hostingEnvironment;
             _packageRepositoryFileName = packageRepositoryFileName;
 
             _tempFolderPath = tempFolderPath ?? Constants.SystemDirectories.TempData.EnsureEndsWith('/') + "PackageFiles";
@@ -162,7 +163,7 @@ namespace Umbraco.Core.Packaging
             ValidatePackage(definition);
 
             //Create a folder for building this package
-            var temporaryPath = _ioHelper.MapPath(_tempFolderPath.EnsureEndsWith('/') + Guid.NewGuid());
+            var temporaryPath = _hostingEnvironment.MapPathContentRoot(_tempFolderPath.EnsureEndsWith('/') + Guid.NewGuid());
             if (Directory.Exists(temporaryPath) == false)
                 Directory.CreateDirectory(temporaryPath);
 
@@ -183,15 +184,19 @@ namespace Umbraco.Core.Packaging
                 PackageLanguages(definition, root);
                 PackageDataTypes(definition, root);
 
+                // TODO: This needs to be split into content vs web files, for now we are going to
+                // assume all files are web (www) files. But this is a larger discussion/change since
+                // we will actually need to modify how packages and files are organized.
+
                 //Files
                 foreach (var fileName in definition.Files)
-                    AppendFileToPackage(fileName, temporaryPath, filesXml, _ioHelper);
+                    AppendFileToPackage(fileName, temporaryPath, filesXml, true);
 
                 //Load view on install...
                 if (!string.IsNullOrEmpty(definition.PackageView))
                 {
                     var control = new XElement("view", definition.PackageView);
-                    AppendFileToPackage(definition.PackageView, temporaryPath, filesXml, _ioHelper);
+                    AppendFileToPackage(definition.PackageView, temporaryPath, filesXml, true);
                     root.Add(control);
                 }
 
@@ -221,11 +226,11 @@ namespace Umbraco.Core.Packaging
 
                 // check if there's a packages directory below media
 
-                if (Directory.Exists(_ioHelper.MapPath(_mediaFolderPath)) == false)
-                    Directory.CreateDirectory(_ioHelper.MapPath(_mediaFolderPath));
+                if (Directory.Exists(_hostingEnvironment.MapPathWebRoot(_mediaFolderPath)) == false)
+                    Directory.CreateDirectory(_hostingEnvironment.MapPathWebRoot(_mediaFolderPath));
 
                 var packPath = _mediaFolderPath.EnsureEndsWith('/') + (definition.Name + "_" + definition.Version).Replace(' ', '_') + ".zip";
-                ZipPackage(temporaryPath, _ioHelper.MapPath(packPath));
+                ZipPackage(temporaryPath, _hostingEnvironment.MapPathWebRoot(packPath));
 
                 //we need to update the package path and save it
                 definition.PackagePath = packPath;
@@ -301,7 +306,7 @@ namespace Umbraco.Core.Packaging
                 macros.Add(macroXml);
                 //if the macro has a file copy it to the xml
                 if (!string.IsNullOrEmpty(macro.MacroSource))
-                    AppendFileToPackage(macro.MacroSource, temporaryPath, filesXml,_ioHelper);
+                    AppendFileToPackage(macro.MacroSource, temporaryPath, filesXml, false);
             }
             root.Add(macros);
         }
@@ -451,12 +456,13 @@ namespace Umbraco.Core.Packaging
         /// <param name="path">The path.</param>
         /// <param name="packageDirectory">The package directory.</param>
         /// <param name="filesXml">The files xml node</param>
-        private static void AppendFileToPackage(string path, string packageDirectory, XContainer filesXml, IIOHelper ioHelper)
+        /// <param name="isWebFile">true if it's a web file, false if it's a content file</param>
+        private void AppendFileToPackage(string path, string packageDirectory, XContainer filesXml, bool isWebFile)
         {
             if (!path.StartsWith("~/") && !path.StartsWith("/"))
                 path = "~/" + path;
 
-            var serverPath = ioHelper.MapPath(path);
+            var serverPath = isWebFile ? _hostingEnvironment.MapPathWebRoot(path) : _hostingEnvironment.MapPathContentRoot(path);
 
             if (File.Exists(serverPath))
                 AppendFileXml(new FileInfo(serverPath), path, packageDirectory, filesXml);
@@ -615,11 +621,11 @@ namespace Umbraco.Core.Packaging
 
         private XDocument EnsureStorage(out string packagesFile)
         {
-            var packagesFolder = _ioHelper.MapPath(_packagesFolderPath);
+            var packagesFolder = _hostingEnvironment.MapPathContentRoot(_packagesFolderPath);
             //ensure it exists
             Directory.CreateDirectory(packagesFolder);
 
-            packagesFile = _ioHelper.MapPath(CreatedPackagesFile);
+            packagesFile = _hostingEnvironment.MapPathContentRoot(CreatedPackagesFile);
             if (!File.Exists(packagesFile))
             {
                 var xml = new XDocument(new XElement("packages"));

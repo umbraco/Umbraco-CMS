@@ -168,8 +168,12 @@
       > $log
 
    # get files into WebApp\bin
-   & dotnet publish "$src\Umbraco.Web.UI.NetCore\Umbraco.Web.UI.NetCore.csproj" `
+    & dotnet publish "$src\Umbraco.Web.UI.NetCore\Umbraco.Web.UI.NetCore.csproj" `
       --output "$($this.BuildTemp)\WebApp\bin\\" `
+      > $log
+
+    & dotnet publish "$src\Umbraco.Persistance.SqlCe\Umbraco.Persistance.SqlCe.csproj" `
+      --output "$($this.BuildTemp)\SqlCe\" `
       > $log
 
     # remove extra files
@@ -183,7 +187,7 @@
     $this.CopyFiles("$($this.SolutionRoot)\src\Umbraco.Web.UI.NetCore\Config", "*", "$($this.BuildTemp)\WebApp\config")
     $this.RemoveFile("$($this.BuildTemp)\WebApp\Config\*.Release.*")
     $this.CopyFiles("$($this.SolutionRoot)\src\Umbraco.Web.UI.NetCore\Umbraco", "*", "$($this.BuildTemp)\WebApp\umbraco")
-    $excludeUmbracoDirs = @("$($this.BuildTemp)\WebApp\umbraco\config","$($this.BuildTemp)\WebApp\umbraco\lib")
+    $excludeUmbracoDirs = @("$($this.BuildTemp)\WebApp\umbraco\lib")
     $this.RemoveDirectory($excludeUmbracoDirs)
     $this.CopyFiles("$($this.SolutionRoot)\src\Umbraco.Web.UI.NetCore\Views", "*", "$($this.BuildTemp)\WebApp\Views")
     Copy-Item "$($this.SolutionRoot)\src\Umbraco.Web.UI.NetCore\appsettings.json" "$($this.BuildTemp)\WebApp"
@@ -262,6 +266,7 @@
     $src = "$($this.SolutionRoot)\src"
     $tmp = "$($this.BuildTemp)"
     $out = "$($this.BuildOutput)"
+    $templates = "$($this.SolutionRoot)\build\templates"
 
     $buildConfiguration = "Release"
 
@@ -282,6 +287,7 @@
     mkdir "$tmp\Configs" > $null
     mkdir "$tmp\Configs\Lang" > $null
     mkdir "$tmp\WebApp\App_Data" > $null
+    mkdir "$tmp\Templates" > $null
     #mkdir "$tmp\WebApp\Media" > $null
     #mkdir "$tmp\WebApp\Views" > $null
 
@@ -326,10 +332,25 @@
     $this.CopyFiles("$src\Umbraco.Web.UI.NetCore\wwwroot\umbraco\js", "*", "$tmp\WebApp\wwwroot\umbraco\js")
     $this.CopyFiles("$src\Umbraco.Web.UI.NetCore\wwwroot\umbraco\lib", "*", "$tmp\WebApp\wwwroot\umbraco\lib")
     $this.CopyFiles("$src\Umbraco.Web.UI.NetCore\wwwroot\umbraco\views", "*", "$tmp\WebApp\wwwroot\umbraco\views")
+
+
+
+    # Prepare templates
+    Write-Host "Copy template files"
+    $this.CopyFiles("$templates", "*", "$tmp\Templates")
+
+    Write-Host "Copy program.cs and startup.cs for templates"
+    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore", "Program.cs", "$tmp\Templates\UmbracoSolution")
+    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore", "Startup.cs", "$tmp\Templates\UmbracoSolution")
+    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore", "appsettings.json", "$tmp\Templates\UmbracoSolution")
+    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore", "appsettings.Development.json", "$tmp\Templates\UmbracoSolution")
+
+  $this.RemoveDirectory("$tmp\Templates\UmbracoSolution\bin")
   })
 
   $ubuild.DefineMethod("PackageZip",
   {
+
     Write-Host "Create Zip packages"
 
     $src = "$($this.SolutionRoot)\src"
@@ -362,6 +383,7 @@
     $env:UMBRACO_RELEASE=$this.Version.Release
     $env:UMBRACO_COMMENT=$this.Version.Comment
     $env:UMBRACO_BUILD=$this.Version.Build
+    $env:UMBRACO_TMP="$($this.SolutionRoot)\build.tmp"
 
     if ($args -and $args[0] -eq "vso")
     {
@@ -392,6 +414,7 @@
   $ubuild.DefineMethod("PackageNuGet",
   {
     $nuspecs = "$($this.SolutionRoot)\build\NuSpecs"
+    $templates = "$($this.BuildTemp)\Templates"
 
     Write-Host "Create NuGet packages"
 
@@ -419,6 +442,12 @@
         -Verbosity detailed -outputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.cmssqlce.log"
     if (-not $?) { throw "Failed to pack NuGet UmbracoCms.SqlCe." }
 
+    &$this.BuildEnv.NuGet Pack "$templates\Umbraco.Templates.nuspec" `
+        -Properties BuildTmp="$($this.BuildTemp)" `
+        -Version "$($this.Version.Semver.ToString())" `
+        -Verbosity detailed -outputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.templates.log"
+    if (-not $?) { throw "Failed to pack NuGet Umbraco.Templates." }
+
     # run hook
     if ($this.HasMethod("PostPackageNuGet"))
     {
@@ -432,7 +461,7 @@
   {
     $this.VerifyNuGetConsistency(
       ("UmbracoCms", "UmbracoCms.Core", "UmbracoCms.Web"),
-      ("Umbraco.Core", "Umbraco.Web", "Umbraco.Web.UI", "Umbraco.Examine"))
+      ("Umbraco.Core", "Umbraco.Infrastructure", "Umbraco.Configuration", "Umbraco.Web.UI.NetCore", "Umbraco.Examine.Lucene", "Umbraco.PublishedCache.NuCache", "Umbraco.Web.Common", "Umbraco.Web.Website", "Umbraco.Web.BackOffice"))
     if ($this.OnError()) { return }
   })
 

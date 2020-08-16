@@ -5,21 +5,26 @@
 
         var vm = this;
 
-        vm.includeUnpublished = false;
+        vm.includeUnpublished = $scope.model.includeUnpublished || false;
 
         vm.changeSelection = changeSelection;
         vm.toggleIncludeUnpublished = toggleIncludeUnpublished;
 
-
         function onInit() {
 
             vm.variants = $scope.model.variants;
-            vm.displayVariants = vm.variants.slice(0);// shallow copy, we dont want to share the array-object(because we will be performing a sort method) but each entry should be shared (because we need validation and notifications).
+            vm.displayVariants = vm.variants.slice(0); // shallow copy, we don't want to share the array-object (because we will be performing a sort method) but each entry should be shared (because we need validation and notifications).
             vm.labels = {};
 
+            // get localized texts for use in directives
             if (!$scope.model.title) {
                 localizationService.localize("buttons_publishDescendants").then(function (value) {
                     $scope.model.title = value;
+                });
+            }
+            if (!vm.labels.includeUnpublished) {
+                localizationService.localize("content_includeUnpublished").then(function (value) {
+                    vm.labels.includeUnpublished = value;
                 });
             }
 
@@ -72,8 +77,9 @@
         }
 
         function toggleIncludeUnpublished() {
-            console.log("toggleIncludeUnpublished")
             vm.includeUnpublished = !vm.includeUnpublished;
+            // make sure this value is pushed back to the scope
+            $scope.model.includeUnpublished = vm.includeUnpublished;
         }
 
         /** Returns true if publishing is possible based on if there are un-published mandatory languages */

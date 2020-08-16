@@ -15,7 +15,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     /// <summary>
     /// The API controller used for building content queries within the template
     /// </summary>
-    [PluginController("UmbracoApi")]
+    [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     [JsonCamelCaseFormatter]
     public class TemplateQueryController : UmbracoAuthorizedJsonController
     {

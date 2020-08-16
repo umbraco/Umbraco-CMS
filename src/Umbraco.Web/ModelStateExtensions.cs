@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web.Mvc;
@@ -39,24 +39,8 @@ namespace Umbraco.Web
             return state.Where(v => v.Key.StartsWith(prefix + ".")).All(v => !v.Value.Errors.Any());
         }
 
-        /// <summary>
-        /// Adds the error to model state correctly for a property so we can use it on the client side.
-        /// </summary>
-        /// <param name="modelState"></param>
-        /// <param name="result"></param>
-        /// <param name="propertyAlias"></param>
-        /// <param name="culture">The culture for the property, if the property is invariant than this is empty</param>
-        internal static void AddPropertyError(this System.Web.Http.ModelBinding.ModelStateDictionary modelState,
-            ValidationResult result, string propertyAlias, string culture = "", string segment = "")
-        {
-            if (culture == null)
-                culture = "";
-            modelState.AddValidationError(result, "_Properties", propertyAlias,
-                //if the culture is null, we'll add the term 'invariant' as part of the key
-                culture.IsNullOrWhiteSpace() ? "invariant" : culture,
-                // if the segment is null, we'll add the term 'null' as part of the key
-                segment.IsNullOrWhiteSpace() ? "null" : segment);
-        }
+
+
 
         /// <summary>
         /// Adds a generic culture error for use in displaying the culture validation error in the save/publish/etc... dialogs
@@ -164,12 +148,12 @@ namespace Umbraco.Web
             var delimitedParts = string.Join(".", parts);
             foreach (var memberName in result.MemberNames)
             {
-                modelState.TryAddModelError($"{delimitedParts}.{memberName}", result.ErrorMessage);
+                modelState.TryAddModelError($"{delimitedParts}.{memberName}", result.ToString());
                 withNames = true;
             }
             if (!withNames)
             {
-                modelState.TryAddModelError($"{delimitedParts}", result.ErrorMessage);
+                modelState.TryAddModelError($"{delimitedParts}", result.ToString());
             }
 
         }
@@ -233,6 +217,7 @@ namespace Umbraco.Web
                         }
                 };
         }
+
 
     }
 }

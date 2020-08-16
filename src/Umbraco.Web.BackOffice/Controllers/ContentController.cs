@@ -48,7 +48,7 @@ namespace Umbraco.Web.Editors
     /// This controller is decorated with the UmbracoApplicationAuthorizeAttribute which means that any user requesting
     /// access to ALL of the methods on this controller will need access to the content application.
     /// </remarks>
-    [PluginController("UmbracoApi")]
+    [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     [UmbracoApplicationAuthorize(Constants.Applications.Content)]
     public class ContentController : ContentControllerBase
     {
@@ -405,6 +405,29 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
+            return GetEmpty(contentType, parentId);
+        }
+
+
+        /// <summary>
+        /// Gets an empty content item for the document type.
+        /// </summary>
+        /// <param name="contentTypeKey"></param>
+        /// <param name="parentId"></param>
+        [TypeFilter(typeof(OutgoingEditorModelEventAttribute))]
+        public ContentItemDisplay GetEmptyByKey(Guid contentTypeKey, int parentId)
+        {
+            var contentType = _contentTypeService.Get(contentTypeKey);
+            if (contentType == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            return GetEmpty(contentType, parentId);
+        }
+
+        private ContentItemDisplay GetEmpty(IContentType contentType, int parentId)
+        {
             var emptyContent = _contentService.Create("", parentId, contentType.Alias, _webSecurity.GetUserId().ResultOr(0));
             var mapped = MapToDisplay(emptyContent);
             // translate the content type name if applicable

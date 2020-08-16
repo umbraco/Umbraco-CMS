@@ -56,7 +56,7 @@ module.exports = {
                 ],
                 out: "umbraco.directives.js"
             }
-            
+
         },
 
         //selectors for copying all views into the build
@@ -77,7 +77,7 @@ module.exports = {
             assets: "./src/assets/**"
         }
     },
-    roots: ["../Umbraco.Web.UI.NetCore/wwwroot/"],
+    roots: ["../Umbraco.Web.UI/", "../Umbraco.Web.UI.NetCore/wwwroot/"],
     targets: {
         js: "umbraco/js/",
         lib: "umbraco/lib/",
