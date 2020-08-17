@@ -285,7 +285,7 @@
     <key alias="addTextBox">Tilføj en ny tekstboks</key>
     <key alias="removeTextBox">Fjern denne tekstboks</key>
     <key alias="contentRoot">Indholdsrod</key>
-    <key alias="includeUnpublished">Inkluder ikke-udgivet indhold.</key>
+    <key alias="includeUnpublished">Medtag udkast: udgiv også ikke-publicerede sider.</key>
     <key alias="isSensitiveValue">Denne værdi er skjult.Hvis du har brug for adgang til at se denne værdi, bedes du kontakte din web-administrator.</key>
     <key alias="isSensitiveValue_short">Denne værdi er skjult.</key>
     <key alias="languagesToPublishForFirstTime">Hvilke sprog vil du gerne udgive? Alle sprog med indhold gemmes!</key>
@@ -647,6 +647,7 @@
     <key alias="design">Design</key>
     <key alias="dictionary">Ordbog</key>
     <key alias="dimensions">Dimensioner</key>
+    <key alias="discard">Kassér</key>
     <key alias="down">Ned</key>
     <key alias="download">Hent</key>
     <key alias="edit">Rediger</key>
@@ -668,6 +669,7 @@
     <key alias="icon">Ikon</key>
     <key alias="id">Id</key>
     <key alias="import">Importer</key>
+    <key alias="includeFromsubFolders">Inkludér undermapper i søgning</key>
     <key alias="excludeFromSubFolders">Søg kun i denne mappe</key>
     <key alias="info">Info</key>
     <key alias="innerMargin">Indre margen</key>
@@ -1850,6 +1852,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="tabBlockSettings">Indstillinger</key>
     <key alias="headlineAdvanced">Avanceret</key>
     <key alias="forceHideContentEditor">Skjuld indholds editoren</key>
+    <key alias="blockHasChanges">Du har lavet ændringer til dette indhold. Er du sikker på at du vil kassere dem?</key>
   </area>
 
 </language>

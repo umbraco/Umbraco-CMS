@@ -3,6 +3,7 @@
     <PropertyGroup>
         <TargetFramework>netcoreapp3.1</TargetFramework>
         <OutputType>Library</OutputType>
+        <LangVersion>latest</LangVersion>
     </PropertyGroup>
 	
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">

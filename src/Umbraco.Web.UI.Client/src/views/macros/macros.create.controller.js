@@ -25,7 +25,7 @@ function MacrosCreateController($scope, $location, macroResource, navigationServ
                 navigationService.syncTree({ tree: "macros", path: currPath + "," + data, forceReload: true, activate: true });
 
                 // reset form state
-                formHelper.resetForm({ scope: $scope });
+                formHelper.resetForm({ scope: $scope, formCtrl: this.createMacroForm });
 
                 // navigate to edit view
                 var currentSection = appState.getSectionState("currentSection");
@@ -33,6 +33,7 @@ function MacrosCreateController($scope, $location, macroResource, navigationServ
 
 
             }, function (err) {
+                formHelper.resetForm({ scope: $scope, formCtrl: this.createMacroForm, hasErrors: true });
                 if (err.data && err.data.message) {
                     notificationsService.error(err.data.message);
                     navigationService.hideMenu();

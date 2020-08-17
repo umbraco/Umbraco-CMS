@@ -1,6 +1,6 @@
 angular.module("umbraco")
     .controller("Umbraco.Editors.BlockEditorController",
-        function ($scope, localizationService, formHelper) {
+        function ($scope, localizationService, formHelper, overlayService) {
             var vm = this;
 
             vm.model = $scope.model;
@@ -23,17 +23,14 @@ angular.module("umbraco")
                 if (contentApp) {
                     if (vm.model.hideContent) {
                         apps.splice(apps.indexOf(contentApp), 1);
-                    } else if (vm.model.openSettings !== true) {
-                        contentApp.active = true;
                     }
+                    contentApp.active = (vm.model.openSettings !== true);
                 }
 
                 if (vm.model.settings && vm.model.settings.variants) {
                     var settingsApp = apps.find(entry => entry.alias === "settings");
                     if (settingsApp) {
-                        if (vm.model.openSettings) {
-                            settingsApp.active = true;
-                        }
+                        settingsApp.active = (vm.model.openSettings === true);
                     }
                 }
 
@@ -42,6 +39,7 @@ angular.module("umbraco")
 
             vm.submitAndClose = function () {
                 if (vm.model && vm.model.submit) {
+
                     // always keep server validations since this will be a nested editor and server validations are global
                     if (formHelper.submitForm({
                         scope: $scope,
@@ -49,13 +47,16 @@ angular.module("umbraco")
                         keepServerValidation: true
                     })) {
                         vm.model.submit(vm.model);
+                        vm.saveButtonState = "success";
+                    } else {
+                        vm.saveButtonState = "error";
                     }
                 }
             }
 
             vm.close = function () {
                 if (vm.model && vm.model.close) {
-                    // TODO: At this stage there could very well have been server errors that have been cleared 
+                    // TODO: At this stage there could very well have been server errors that have been cleared
                     // but if we 'close' we are basically cancelling the value changes which means we'd want to cancel
                     // all of the server errors just cleared. It would be possible to do that but also quite annoying.
                     // The rudimentary way would be to:
@@ -67,6 +68,29 @@ angular.module("umbraco")
                     // * It would have a 'commit' method to commit the removed errors - which we would call in the formHelper.submitForm when it's successful
                     // * It would have a 'rollback' method to reset the removed errors - which we would call here
 
+
+                    if (vm.blockForm.$dirty === true) {
+                        localizationService.localizeMany(["prompt_discardChanges", "blockEditor_blockHasChanges"]).then(function (localizations) {
+                            const confirm = {
+                                title: localizations[0],
+                                view: "default",
+                                content: localizations[1],
+                                submitButtonLabelKey: "general_discard",
+                                submitButtonStyle: "danger",
+                                closeButtonLabelKey: "general_cancel",
+                                submit: function () {
+                                    overlayService.close();
+                                    vm.model.close(vm.model);
+                                },
+                                close: function () {
+                                    overlayService.close();
+                                }
+                            };
+                            overlayService.open(confirm);
+                        });
+
+                        return;
+                    }
                     // TODO: check if content/settings has changed and ask user if they are sure.
                     vm.model.close(vm.model);
                 }

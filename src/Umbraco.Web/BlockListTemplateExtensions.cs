@@ -14,7 +14,7 @@ namespace Umbraco.Web
 
         public static MvcHtmlString GetBlockListHtml(this HtmlHelper html, BlockListModel model, string template = DefaultTemplate)
         {
-            if (model?.Layout == null || !model.Layout.Any()) return new MvcHtmlString(string.Empty);
+            if (model?.Count == 0) return new MvcHtmlString(string.Empty);
 
             var view = DefaultFolder + template;
             return html.Partial(view, model);

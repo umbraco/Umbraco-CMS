@@ -582,6 +582,7 @@
                                 eventsService.emit("content.unpublished", { content: $scope.content });
                                 overlayService.close();
                             }, function (err) {
+                                formHelper.resetForm({ scope: $scope, hasErrors: true });
                                 $scope.page.buttonGroupState = 'error';
                                 handleHttpException(err);
                             });
