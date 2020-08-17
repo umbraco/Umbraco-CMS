@@ -321,7 +321,6 @@ namespace Umbraco.Core.Migrations.Install
             var database = scope.Database;
             var dbSchema = new DatabaseSchemaCreator(database, _logger, _umbracoVersion, _globalSettings);
             _databaseSchemaValidationResult = dbSchema.ValidateSchema();
-            scope.Complete();
             return _databaseSchemaValidationResult;
         }
 
