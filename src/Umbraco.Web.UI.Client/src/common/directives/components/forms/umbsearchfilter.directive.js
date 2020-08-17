@@ -42,7 +42,7 @@
         vm.change = change;
 
         function onInit() {
-            vm.inputId = vm.inputId || "umb-check_" + String.CreateGuid();
+            vm.inputId = vm.inputId || "umb-search-filter_" + String.CreateGuid();
             vm.autoFocus = vm.autoFocus === true;
             vm.preventSubmitOnEnter = vm.preventSubmitOnEnter === true;
 
