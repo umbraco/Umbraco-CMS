@@ -35,11 +35,11 @@ namespace Umbraco.Tests.Logging
         {
             //Create an example JSON log file to check results
             //As a one time setup for all tets in this class/fixture
-            var helper = new TestHelper();
-            var ioHelper = helper.IOHelper;
-            var hostingEnv = helper.GetHostingEnvironment();
+            var testHelper = new TestHelper();
+            var ioHelper = testHelper.IOHelper;
+            var hostingEnv = testHelper.GetHostingEnvironment();
 
-            var loggingConfiguration = helper.GetLoggingConfiguration(hostingEnv);
+            var loggingConfiguration = testHelper.GetLoggingConfiguration(hostingEnv);
 
             var exampleLogfilePath = Path.Combine(TestContext.CurrentContext.TestDirectory, @"Logging\", _logfileName);
             _newLogfileDirPath = loggingConfiguration.LogDirectory;
