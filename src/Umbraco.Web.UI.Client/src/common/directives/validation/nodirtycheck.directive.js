@@ -10,13 +10,19 @@ function noDirtyCheck() {
         require: 'ngModel',
         link: function (scope, elm, attrs, ctrl) {
 
-            var alwaysFalse = {
-                    get: function () { return false; },
-                    set: function () { }
-                };
-            Object.defineProperty(ctrl, '$pristine', alwaysFalse);
-            Object.defineProperty(ctrl, '$dirty', alwaysFalse);
+            var dirtyCheck = scope.$eval(attrs.noDirtyCheck) === false;
+            if (dirtyCheck)
+                return;
 
+            ctrl.$setDirty = angular.noop;
+
+            //var alwaysFalse = {
+            //    get: function () { return false; },
+            //    set: function () { }
+            //};
+
+            //Object.defineProperty(ctrl, '$pristine', alwaysFalse);
+            //Object.defineProperty(ctrl, '$dirty', alwaysFalse);
         }
     };
 }
