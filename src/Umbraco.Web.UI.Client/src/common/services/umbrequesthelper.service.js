@@ -19,20 +19,18 @@ function umbRequestHelper($http, $q, notificationsService, eventsService, formHe
          * @param {string} a virtual path, if this is already an absolute path it will just be returned, if this is a relative path an exception will be thrown
          */
         convertVirtualToAbsolutePath: function(virtualPath) {
-            // This will convert a local path to virtual path (i.e. /App_Plugins/Blah/Test.html ) to an virtual path (i.e. ~/App_Plugins/Blah/Test.html)
-            if(virtualPath.startsWith("~/") === false) {
-                if(virtualPath.startsWith("/")) {
-                    virtualPath =  "~" + virtualPath;
-                } else {
-                    virtualPath = "~/" + virtualPath;
-                }
+            if (virtualPath.startsWith("/")) {
+                return virtualPath;
             }
-
+            if (!virtualPath.startsWith("~/")) {
+                throw "The path " + virtualPath + " is not a virtual path";
+            }
             if (!Umbraco.Sys.ServerVariables.application.applicationPath) {
                 throw "No applicationPath defined in Umbraco.ServerVariables.application.applicationPath";
             }
             return Umbraco.Sys.ServerVariables.application.applicationPath + virtualPath.trimStart("~/");
         },
+
 
         /**
          * @ngdoc method

@@ -220,10 +220,10 @@
                 });
             }
 
-            if(block.config.view) {
-                block.config.view = umbRequestHelper.convertVirtualToAbsolutePath(block.config.view);
-                block.view = block.config.view;
-            } else {
+            if(block.config.view) {                
+                block.view = umbRequestHelper.convertVirtualToAbsolutePath(block.config.view);
+            }
+            else {
                 block.view = getDefaultViewForBlock(block);
             }
 
