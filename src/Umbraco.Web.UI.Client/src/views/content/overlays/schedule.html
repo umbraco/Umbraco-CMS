@@ -23,18 +23,18 @@
                                    on-close="vm.datePickerClose(vm.variants[0], 'publish')">
 
                         <div>
-                            <button type="button" ng-show="vm.variants[0].releaseDate" class="btn umb-button--xs" style="outline: none;">
+                            <button type="button" ng-show="vm.variants[0].releaseDate" class="btn btn-reset umb-button--xs" style="outline: none;">
                                 {{vm.variants[0].releaseDateFormatted}}
                             </button>
 
-                            <button type="button" ng-hide="vm.variants[0].releaseDate">
+                            <button type="button" class="btn-reset" ng-hide="vm.variants[0].releaseDate">
                                 <localize key="content_setDate">Set date</localize>
                             </button>
                         </div>
 
                     </umb-date-time-picker>
 
-                    <button type="button" ng-show="vm.variants[0].releaseDate" ng-click="vm.clearPublishDate(vm.variants[0])" class="btn umb-button--xs dropdown-toggle umb-button-group__toggle" style="margin-left: -2px;">
+                    <button type="button" ng-show="vm.variants[0].releaseDate" ng-click="vm.clearPublishDate(vm.variants[0])" class="btn btn-reset umb-button--xs dropdown-toggle umb-button-group__toggle" style="margin-left: -2px;">
                         <umb-icon icon="icon-wrong" class="icon icon-wrong"></umb-icon>
                     </button>
 
@@ -56,18 +56,18 @@
                                    on-close="vm.datePickerClose(vm.variants[0], 'unpublish')">
 
                         <div>
-                            <button ng-show="vm.variants[0].expireDate" class="btn umb-button--xs" style="outline: none;">
+                            <button ng-show="vm.variants[0].expireDate" class="btn btn-reset umb-button--xs" style="outline: none;">
                                 {{vm.variants[0].expireDateFormatted}}
                             </button>
 
-                            <button type="button" ng-hide="vm.variants[0].expireDate">
+                            <button type="button" class="btn-reset" ng-hide="vm.variants[0].expireDate">
                                 <localize key="content_setDate">Set date</localize>
                             </button>
                         </div>
 
                     </umb-date-time-picker>
 
-                    <button type="button" ng-show="vm.variants[0].expireDate" ng-click="vm.clearUnpublishDate(vm.variants[0])" class="btn umb-button--xs dropdown-toggle umb-button-group__toggle" style="margin-left: -2px;">
+                    <button type="button" ng-show="vm.variants[0].expireDate" ng-click="vm.clearUnpublishDate(vm.variants[0])" class="btn btn-reset umb-button--xs dropdown-toggle umb-button-group__toggle" style="margin-left: -2px;">
                         <umb-icon icon="icon-wrong" class="icon icon-wrong"></umb-icon>
                     </button>
 
@@ -126,11 +126,11 @@
                                                        on-open="vm.datePickerShow(variant, 'publish')"
                                                        on-close="vm.datePickerClose(variant, 'publish')">
                                             <div>
-                                                <button ng-show="variant.releaseDate" class="btn umb-button--xxs btn-outline umb-outline">
+                                                <button ng-show="variant.releaseDate" class="btn btn-reset umb-button--xxs btn-outline umb-outline">
                                                     {{variant.releaseDateFormatted}}
                                                 </button>
 
-                                                <button type="button" ng-hide="variant.releaseDate">
+                                                <button type="button" class="btn-reset" ng-hide="variant.releaseDate">
                                                     <localize key="content_setDate">Set date</localize>
                                                 </button>
                                             </div>
@@ -152,16 +152,16 @@
                                                        on-open="vm.datePickerShow(variant, 'unpublish')"
                                                        on-close="vm.datePickerClose(variant, 'unpublish')">
                                             <div>
-                                                <button type="button" ng-show="variant.expireDate" class="btn umb-button--xxs btn-outline umb-outline">
+                                                <button type="button" ng-show="variant.expireDate" class="btn btm-reset umb-button--xxs btn-outline umb-outline">
                                                     {{variant.expireDateFormatted}}
                                                 </button>
 
-                                                <button type="button" ng-hide="variant.expireDate">
+                                                <button type="button" class="btn-reset" ng-hide="variant.expireDate">
                                                     <localize key="content_setDate">Set date</localize>
                                                 </button>
                                             </div>
                                         </umb-date-time-picker>
-                                        <button type="button" ng-show="variant.expireDate" ng-click="vm.clearUnpublishDate(variant)" class="btn umb-button--xxs dropdown-toggle umb-button-group__toggle btn-outline umb-outline" style="margin-left: -2px;">
+                                        <button type="button" ng-show="variant.expireDate" ng-click="vm.clearUnpublishDate(variant)" class="btn btn-reset umb-button--xxs dropdown-toggle umb-button-group__toggle btn-outline umb-outline" style="margin-left: -2px;">
                                             <umb-icon icon="icon-wrong" class="icon icon-wrong"></umb-icon>
                                         </button>
                                     </div>
