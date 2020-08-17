@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using Newtonsoft.Json;
 using NUnit.Framework;
@@ -49,7 +50,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
             Assert.AreEqual(1, stylesheet.Properties.Count());
             Assert.AreEqual("Test", stylesheet.Properties.Single().Name);
             Assert.AreEqual("p", stylesheet.Properties.Single().Alias);
-            Assert.AreEqual("font-weight:bold;\r\nfont-family:Arial;", stylesheet.Properties.Single().Value);
+            Assert.AreEqual("font-weight:bold;"+Environment.NewLine+"font-family:Arial;", stylesheet.Properties.Single().Value);
         }
 
         [Test]
@@ -90,7 +91,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
             // Assert
             Assert.AreEqual("li", prop.Alias);
             Assert.AreEqual("font-size:5em;", prop.Value);
-            Assert.AreEqual("body { color:#000; } /**umb_name:Hello*/\r\nli {\r\n\tfont-size:5em;\r\n} .bold {font-weight:bold;}", stylesheet.Content);
+            Assert.AreEqual("body { color:#000; } /**umb_name:Hello*/" +Environment.NewLine+ "li {" +Environment.NewLine+ "\tfont-size:5em;" +Environment.NewLine+ "} .bold {font-weight:bold;}", stylesheet.Content);
         }
 
         [Test]

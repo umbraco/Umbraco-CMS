@@ -1,32 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
-using System.Web.UI;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Owin.Security;
-using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
-using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Core.Services;
 using Umbraco.Web.Features;
 using Umbraco.Web.Security;
 using Constants = Umbraco.Core.Constants;
-using Umbraco.Core.Configuration.Grid;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.WebAssets;
-using Umbraco.Extensions;
-using Umbraco.Web.Trees;
-using Umbraco.Web.WebAssets;
 using BackOfficeIdentityUser = Umbraco.Core.BackOffice.BackOfficeIdentityUser;
 
 namespace Umbraco.Web.Editors
@@ -76,85 +65,6 @@ namespace Umbraco.Web.Editors
         protected BackOfficeOwinUserManager UserManager => _userManager ?? (_userManager = OwinContext.GetBackOfficeUserManager());
 
         protected IAuthenticationManager AuthenticationManager => OwinContext.Authentication;
-
-        [HttpGet]
-        public async Task<ActionResult> VerifyInvite(string invite)
-        {
-            //if you are hitting VerifyInvite, you're already signed in as a different user, and the token is invalid
-            //you'll exit on one of the return RedirectToAction("Default") but you're still logged in so you just get
-            //dumped at the default admin view with no detail
-            if(Security.IsAuthenticated())
-            {
-                AuthenticationManager.SignOut(
-                    Core.Constants.Security.BackOfficeAuthenticationType,
-                    Core.Constants.Security.BackOfficeExternalAuthenticationType);
-            }
-
-            if (invite == null)
-            {
-                Logger.Warn<BackOfficeController>("VerifyUser endpoint reached with invalid token: NULL");
-                return RedirectToAction("Default");
-            }
-
-            var parts = Server.UrlDecode(invite).Split('|');
-
-            if (parts.Length != 2)
-            {
-                Logger.Warn<BackOfficeController>("VerifyUser endpoint reached with invalid token: {Invite}", invite);
-                return RedirectToAction("Default");
-            }
-
-            var token = parts[1];
-
-            var decoded = token.FromUrlBase64();
-            if (decoded.IsNullOrWhiteSpace())
-            {
-                Logger.Warn<BackOfficeController>("VerifyUser endpoint reached with invalid token: {Invite}", invite);
-                return RedirectToAction("Default");
-            }
-
-            var id = parts[0];
-
-            var identityUser = await UserManager.FindByIdAsync(id);
-            if (identityUser == null)
-            {
-                Logger.Warn<BackOfficeController>("VerifyUser endpoint reached with non existing user: {UserId}", id);
-                return RedirectToAction("Default");
-            }
-
-            var result = await UserManager.ConfirmEmailAsync(identityUser, decoded);
-
-            if (result.Succeeded == false)
-            {
-                Logger.Warn<BackOfficeController>("Could not verify email, Error: {Errors}, Token: {Invite}", result.Errors.ToErrorMessage(), invite);
-                return new RedirectResult(Url.Action("Default") + "#/login/false?invite=3");
-            }
-
-            //sign the user in
-            DateTime? previousLastLoginDate = identityUser.LastLoginDateUtc;
-            await SignInManager.SignInAsync(identityUser, false, false);
-            //reset the lastlogindate back to previous as the user hasn't actually logged in, to add a flag or similar to SignInManager would be a breaking change
-            identityUser.LastLoginDateUtc = previousLastLoginDate;
-            await UserManager.UpdateAsync(identityUser);
-
-            return new RedirectResult(Url.Action("Default") + "#/login/false?invite=1");
-        }
-
-        /// <summary>
-        /// This Action is used by the installer when an upgrade is detected but the admin user is not logged in. We need to
-        /// ensure the user is authenticated before the install takes place so we redirect here to show the standard login screen.
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet]
-        [StatusCodeResult(System.Net.HttpStatusCode.ServiceUnavailable)]
-        public async Task<ActionResult> AuthorizeUpgrade()
-        {
-            return await RenderDefaultOrProcessExternalLoginAsync(
-                //The default view to render when there is no external login info or errors
-                () => View(GlobalSettings.GetBackOfficePath(_hostingEnvironment).EnsureEndsWith('/') + "Views/AuthorizeUpgrade.cshtml", new BackOfficeModel(_features, GlobalSettings, _umbracoVersion, _contentSettings, _hostingEnvironment, _runtimeSettings, _securitySettings)),
-                //The ActionResult to perform if external login is successful
-                () => Redirect("/"));
-        }
 
 
         // TODO: for converting to netcore, some examples:

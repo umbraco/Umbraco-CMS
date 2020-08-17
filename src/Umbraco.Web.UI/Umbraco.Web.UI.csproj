@@ -79,8 +79,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="App_Data\" />
-    <Folder Include="Views\MacroPartials\" />
+    <Folder Include="umbraco" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CSharpTest.Net.Collections" Version="14.906.1403.1082" />
@@ -143,7 +142,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <None Include="Config\splashes\NoNodes.cshtml" />
-    <Content Include="Umbraco\Install\Views\Web.config" />
     <None Include="Config\ClientDependency.Release.config">
       <DependentUpon>ClientDependency.config</DependentUpon>
       <SubType>Designer</SubType>
@@ -175,7 +173,6 @@
       <SubType>Designer</SubType>
     </None>
     <Content Include="Config\logviewer.searches.config.js" />
-    <Content Include="Umbraco\Install\Views\Index.cshtml" />
     <Content Include="Media\Web.config" />
     <Content Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -202,8 +199,6 @@
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
-    <Content Include="Umbraco\Views\Default.cshtml" />
-    <Content Include="Umbraco\Views\AuthorizeUpgrade.cshtml" />
     <Content Include="Views\Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -218,10 +213,7 @@
     <Content Include="Views\Partials\Grid\Editors\Textstring.cshtml" />
     <Content Include="Views\Partials\Grid\Editors\Base.cshtml" />
     <Content Include="Views\Partials\Grid\Bootstrap3-Fluid.cshtml" />
-    <Content Include="Umbraco\Views\Preview\Index.cshtml" />
-    <Content Include="Umbraco\Views\web.config" />
     <Content Include="Views\Partials\BlockList\Default.cshtml" />
-    <None Include="Web.Debug.config.transformed" />
     <None Include="web.Template.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>
       <SubType>Designer</SubType>
@@ -230,14 +222,10 @@
       <DependentUpon>Web.Template.config</DependentUpon>
       <SubType>Designer</SubType>
     </None>
-    <Content Include="Umbraco\Js\dualSelectBox.js" />
-    <Content Include="Umbraco\Js\guiFunctions.js" />
-    <Content Include="Umbraco\Js\umbracoCheckKeys.js" />
     <!--<Content Include="Umbraco\users\PermissionEditor.aspx" />-->
     <None Include="web.Template.config">
       <SubType>Designer</SubType>
     </None>
-    <Content Include="Config\BackOfficeTours\getting-started.json" />
   </ItemGroup>
   <!-- determine VSToolsPath -->
   <PropertyGroup>

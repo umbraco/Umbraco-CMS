@@ -33,6 +33,5 @@ namespace Umbraco.Extensions
             return app;
         }
 
-        
     }
 }

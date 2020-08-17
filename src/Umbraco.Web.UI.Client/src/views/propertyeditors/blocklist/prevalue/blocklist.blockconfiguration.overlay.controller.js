@@ -23,7 +23,7 @@
             return elementTypeResource.getAll().then(function (elementTypes) {
                 vm.elementTypes = elementTypes;
 
-                vm.contentPreview = vm.getElementTypeByKey(vm.block.contentTypeKey);
+                vm.contentPreview = vm.getElementTypeByKey(vm.block.contentElementTypeKey);
                 vm.settingsPreview = vm.getElementTypeByKey(vm.block.settingsElementTypeKey);
             });
         }
@@ -100,6 +100,7 @@
         };
         vm.applySettingsToBlock = function(block, key) {
             block.settingsElementTypeKey = key;
+            vm.settingsPreview = vm.getElementTypeByKey(vm.block.settingsElementTypeKey);
         };
 
         vm.requestRemoveSettingsForBlock = function(block) {
@@ -167,7 +168,7 @@
                     }
                 };
                 editorService.treePicker(filePicker);
-            
+
             });
         }
         vm.requestRemoveViewForBlock = function(block) {
@@ -190,10 +191,10 @@
         };
 
 
-        
+
         vm.addStylesheetForBlock = function(block) {
             localizationService.localize("blockEditor_headlineAddCustomStylesheet").then(function(localizedTitle) {
-                    
+
                 const filePicker = {
                     title: localizedTitle,
                     section: "settings",

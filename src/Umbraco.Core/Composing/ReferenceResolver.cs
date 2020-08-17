@@ -85,7 +85,7 @@ namespace Umbraco.Core.Composing
 
         private IEnumerable<string> GetAssemblyFolders(IEnumerable<Assembly> assemblies)
         {
-            return assemblies.Select(x => Path.GetDirectoryName(GetAssemblyLocation(x)).ToLowerInvariant()).Distinct();
+            return assemblies.Select(x => Path.GetDirectoryName(GetAssemblyLocation(x))).Distinct();
         }
 
         // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Mvc/Mvc.Core/src/ApplicationParts/RelatedAssemblyAttribute.cs

@@ -19,7 +19,13 @@
                     </p>
 
                     <div class="pa-select-type">
-                        <umb-radiobutton input-id="protectionTypeMember" name="protectionType" value="member" model="vm.type" text="" />
+
+                        <umb-radiobutton input-id="protectionTypeMember"
+                                         name="protectionType"
+                                         value="member"
+                                         model="vm.type"
+                                         text="">
+                        </umb-radiobutton>
 
                         <label for="protectionTypeMember" class="flex flex-column flex-auto">
                             <strong class="pa-access-header bold"><localize key="publicAccess_paMembers">Specific members protection</localize></strong>
@@ -28,7 +34,12 @@
                     </div>
 
                     <div class="pa-select-type">
-                        <umb-radiobutton input-id="protectionTypeGroup" name="protectionType" value="group" model="vm.type" />
+
+                        <umb-radiobutton input-id="protectionTypeGroup"
+                                         name="protectionType"
+                                         value="group"
+                                         model="vm.type">
+                        </umb-radiobutton>
 
                         <label for="protectionTypeGroup" class="flex flex-column flex-auto">
                             <strong class="pa-access-header bold"><localize key="publicAccess_paGroups">Group based protection</localize></strong>

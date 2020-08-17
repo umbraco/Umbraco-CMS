@@ -39,6 +39,9 @@
         }
     }
 }
+ng-form.ng-invalid-val-server-match-settings > .umb-block-list__block > .umb-block-list__block--actions {
+    opacity: 1;
+}
 .umb-block-list__block--actions {
     position: absolute;
     z-index:999999999;// We always want to be on top of custom view, but we need to make sure we still are behind relevant Umbraco CMS UI. ToDo: Needs further testing.
@@ -58,15 +61,92 @@
         &:hover {
             color: @ui-action-discreet-type-hover;
         }
+        > .__error-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            min-width: 8px;
+            color: @white;
+            background-color: @ui-active-type;
+            border: 2px solid @white;
+            border-radius: 50%;
+            font-size: 8px;
+            font-weight: bold;
+            padding: 2px;
+            line-height: 8px;
+            background-color: @red;
+            display: none;
+            font-weight: 900;
+        }
+        &.--error > .__error-badge {
+            display: block;
+
+            animation-duration: 1.4s;
+            animation-iteration-count: infinite;
+            animation-name: umb-block-list__action--badge-bounce;
+            animation-timing-function: ease;
+            @keyframes umb-block-list__action--badge-bounce {
+                0%   { transform: translateY(0); }
+                20%  { transform: translateY(-4px); }
+                40%  { transform: translateY(0); }
+                55%  { transform: translateY(-2px); }
+                70%  { transform: translateY(0); }
+                100% { transform: translateY(0); }
+            }
+
+        }
     }
 }
 
 .umb-block-list__block--content {
-    position: relative;
-    width: 100%;
-    min-height: @umb-block-list__item_minimum_height;
-    background-color: @white;
-    border-radius: @baseBorderRadius;
+
+    > div {
+        position: relative;
+        width: 100%;
+        min-height: @umb-block-list__item_minimum_height;
+        background-color: @white;
+        border-radius: @baseBorderRadius;
+        box-sizing: border-box;
+    }
+
+    &.--show-validation {
+        ng-form.ng-invalid-val-server-match-content > .umb-block-list__block > & > div {
+            border: 2px solid @formErrorText;
+            border-radius: @baseBorderRadius;
+            &::after {
+                content: "!";
+                position: absolute;
+                top: -12px;
+                right: -12px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 18px;
+                height: 18px;
+                border-radius: 50%;
+                font-size: 13px;
+                text-align: center;
+                font-weight: bold;
+                background-color: @errorBackground;
+                color: @errorText;
+                border: 2px solid @white;
+                font-weight: 900;
+    
+                animation-duration: 1.4s;
+                animation-iteration-count: infinite;
+                animation-name: umb-block-list__block--content--badge-bounce;
+                animation-timing-function: ease;
+                @keyframes umb-block-list__block--content--badge-bounce {
+                    0%   { transform: translateY(0); }
+                    20%  { transform: translateY(-6px); }
+                    40%  { transform: translateY(0); }
+                    55%  { transform: translateY(-3px); }
+                    70%  { transform: translateY(0); }
+                    100% { transform: translateY(0); }
+                }
+            }
+        }
+    }
 }
 
 .blockelement__draggable-element {

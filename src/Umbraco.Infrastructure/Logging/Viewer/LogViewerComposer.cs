@@ -17,9 +17,9 @@ namespace Umbraco.Core.Logging.Viewer
             {
                 var hostingEnvironment = factory.GetInstance<IHostingEnvironment>();
                 return new LoggingConfiguration(
-                    Path.Combine(hostingEnvironment.ApplicationPhysicalPath, "App_Data\\Logs"),
-                    Path.Combine(hostingEnvironment.ApplicationPhysicalPath, "config\\serilog.config"),
-                    Path.Combine(hostingEnvironment.ApplicationPhysicalPath, "config\\serilog.user.config"));
+                    Path.Combine(hostingEnvironment.ApplicationPhysicalPath, "App_Data", "Logs"),
+                    Path.Combine(hostingEnvironment.ApplicationPhysicalPath, "config", "serilog.config"),
+                    Path.Combine(hostingEnvironment.ApplicationPhysicalPath, "config", "serilog.user.config"));
             });
             composition.RegisterUnique<ILogViewerConfig, LogViewerConfig>();
             composition.SetLogViewer<SerilogJsonLogViewer>();

@@ -90,11 +90,12 @@ namespace Umbraco.Web.PropertyEditors
                 _dataTypeService = dataTypeService;
                 _logger = logger;
                 _nestedContentValues = new NestedContentValues(contentTypeService);
-                Validators.Add(new NestedContentValidator(_nestedContentValues, propertyEditors, dataTypeService, localizedTextService));
+                Validators.Add(new NestedContentValidator(_nestedContentValues, propertyEditors, dataTypeService, localizedTextService, contentTypeService));
 
                 _contentTypes = new Lazy<Dictionary<string, IContentType>>(() =>
                     _contentTypeService.GetAll().ToDictionary(c => c.Alias)
                 );
+
             }
 
             /// <inheritdoc />
@@ -300,16 +301,47 @@ namespace Umbraco.Web.PropertyEditors
         internal class NestedContentValidator : ComplexEditorValidator
         {
             private readonly NestedContentValues _nestedContentValues;
+            private readonly IContentTypeService _contentTypeService;
 
-            public NestedContentValidator(NestedContentValues nestedContentValues, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, ILocalizedTextService textService)
+            public NestedContentValidator(NestedContentValues nestedContentValues, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, ILocalizedTextService textService, IContentTypeService contentTypeService)
                 : base(propertyEditors, dataTypeService, textService)
             {
                 _nestedContentValues = nestedContentValues;
+                _contentTypeService = contentTypeService;
             }
             protected override IEnumerable<ElementTypeValidationModel> GetElementTypeValidation(object value)
             {
-                foreach (var row in _nestedContentValues.GetPropertyValues(value))
+                var rows = _nestedContentValues.GetPropertyValues(value);
+                if (rows.Count == 0) yield break;
+
+                // There is no guarantee that the client will post data for every property defined in the Element Type but we still
+                // need to validate that data for each property especially for things like 'required' data to work.
+                // Lookup all element types for all content/settings and then we can populate any empty properties.
+                var allElementAliases = rows.Select(x => x.ContentTypeAlias).ToList();
+                // unfortunately we need to get all content types and post filter - but they are cached so its ok, there's
+                // no overload to lookup by many aliases.
+                var allElementTypes = _contentTypeService.GetAll().Where(x => allElementAliases.Contains(x.Alias)).ToDictionary(x => x.Alias);
+
+                foreach (var row in rows)
                 {
+                    if (!allElementTypes.TryGetValue(row.ContentTypeAlias, out var elementType))
+                        throw new InvalidOperationException($"No element type found with alias {row.ContentTypeAlias}");
+
+                    // now ensure missing properties
+                    foreach (var elementTypeProp in elementType.CompositionPropertyTypes)
+                    {
+                        if (!row.PropertyValues.ContainsKey(elementTypeProp.Alias))
+                        {
+                            // set values to null
+                            row.PropertyValues[elementTypeProp.Alias] = new NestedContentValues.NestedContentPropertyValue
+                            {
+                                PropertyType = elementTypeProp,
+                                Value = null
+                            };
+                            row.RawPropertyValues[elementTypeProp.Alias] = null;
+                        }
+                    }
+
                     var elementValidation = new ElementTypeValidationModel(row.ContentTypeAlias, row.Id);
                     foreach (var prop in row.PropertyValues)
                     {

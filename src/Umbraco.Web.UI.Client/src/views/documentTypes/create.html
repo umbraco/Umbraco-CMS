@@ -1,0 +1,117 @@
+<div ng-controller="Umbraco.Editors.DocumentTypes.CreateController">
+
+    <div class="umbracoDialog umb-dialog-body with-footer" ng-cloak>
+
+        <div class="umb-pane" ng-if="!model.creatingFolder && !model.creatingDoctypeCollection">
+            <h5><localize key="create_createUnder">Create an item under</localize> {{currentNode.name}}</h5>
+
+            <ul class="umb-actions umb-actions-child">
+                <li data-element="action-documentType" class="umb-action" ng-hide="model.disableTemplates">
+                    <button href="" ng-click="createDocType()" class="umb-action-link umb-outline btn-reset" umb-auto-focus>
+                        <i class="large icon icon-item-arrangement"></i>
+                        <span class="menu-label">
+                            <localize key="content_documentType">Document type</localize>
+                        </span>
+                    </button>
+                </li>
+                <li data-element="action-documentTypeWithoutTemplate" class="umb-action">
+                    <button href="" ng-click="createComponent()" class="umb-action-link umb-outline btn-reset">
+                        <i class="large icon icon-item-arrangement"></i>
+                        <span class="menu-label">
+                            <localize ng-if="model.disableTemplates === false" key="create_documentTypeWithoutTemplate"></localize>
+                            <localize ng-if="model.disableTemplates === true" key="content_documentType">Document type></localize>
+                        </span>
+                    </button>
+                </li>
+                <li data-element="action-documentTypeCollection" class="umb-action">
+                    <button href="" ng-click="showCreateDocTypeCollection()" class="umb-action-link umb-outline btn-reset">
+                        <i class="large icon icon-thumbnail-list"></i>
+                        <span class="menu-label">
+                            Document Type Collection...
+                            <!--<localize key="content_documentType_collection">Document Type Collection</localize>-->
+                        </span>
+                    </button>
+                </li>
+                <li data-element="action-folder" ng-if="model.allowCreateFolder" class="umb-action">
+                    <button href="" ng-click="showCreateFolder()" class="umb-action-link umb-outline btn-reset">
+                        <i class="large icon icon-folder"></i>
+                        <span class="menu-label"><localize key="general_folder"></localize>...</span>
+                    </button>
+                </li>
+            </ul>
+        </div>
+
+        <div class="umb-pane" ng-if="model.creatingFolder">
+            <form novalidate name="createFolderForm"
+                ng-submit="createContainer()"
+                val-form-manager>
+
+                <div ng-show="error">
+                    <div class="alert alert-error">
+                        <div><strong>{{error.errorMsg}}</strong></div>
+                        <div>{{error.data.message}}</div>
+                    </div>
+                </div>
+
+                <umb-control-group label="Enter a folder name" hide-label="false">
+                    <input type="text" name="folderName" maxlength="255" ng-model="model.folderName" class="umb-textstring textstring input-block-level" umb-auto-focus required />
+                </umb-control-group>
+
+                <button type="submit" class="btn btn-primary"><localize key="general_create">Create</localize></button>
+            </form>
+        </div>
+
+        <div class="umb-pane" ng-if="model.creatingDoctypeCollection">
+            <small>
+                A Document Type collection is a fast way to create two Document Types in one task.
+                The Item Document Type will automatically be
+                allowed under the Parent Document Type.
+            </small>
+            <p>&nbsp;</p>
+            <form novalidate name="createDoctypeCollectionForm"
+                ng-submit="createCollection()"
+                val-form-manager>
+
+                <div ng-show="error">
+                    <div class="alert alert-error">
+                        <div><strong>{{error.errorMsg}}</strong></div>
+                        <div>{{error.data.message}}</div>
+                    </div>
+                </div>
+
+                <umb-control-group>
+                    <label for="collectionName" class="control-label">Name of the Parent Document Type</label>
+                    <input type="text" name="collectionName" id="collectionName" ng-model="model.collectionName" maxlength="255" class="umb-textstring textstring input-block-level" umb-auto-focus required />
+
+                    <umb-checkbox ng-if="model.disableTemplates === false"
+                                  name="collectionCreateTemplate"
+                                  model="model.collectionCreateTemplate"
+                                  text="Create template for the Parent Document Type">
+                    </umb-checkbox>
+                </umb-control-group>
+
+                <umb-control-group>
+                    <label for="collectionItemName" class="control-label">Name of the Item Document Type</label>
+                    <input type="text" name="collectionItemName" id="collectionItemName" ng-model="model.collectionItemName" maxlength="255" class="umb-textstring textstring input-block-level" required />
+
+                    <umb-checkbox ng-if="model.disableTemplates === false"
+                                  name="collectionItemCreateTemplate"
+                                  model="model.collectionItemCreateTemplate"
+                                  text="Create template for the Item Document Type">
+                    </umb-checkbox>
+                </umb-control-group>
+
+                <div class="mt3">
+                    <button type="submit" class="btn btn-primary"><localize key="general_create">Create</localize></button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar" ng-if="!model.creatingFolder">
+        <button class="btn btn-info" ng-click="close(true)">
+            <localize key="buttons_somethingElse">Do something else</localize>
+        </button>
+    </div>
+
+</div>

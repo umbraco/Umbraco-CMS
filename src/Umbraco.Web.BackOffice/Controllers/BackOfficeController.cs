@@ -13,14 +13,17 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Grid;
 using Umbraco.Core.Hosting;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 using Umbraco.Core.WebAssets;
 using Umbraco.Extensions;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.ActionResults;
 using Umbraco.Web.Common.Attributes;
+using Umbraco.Web.Common.Filters;
 using Umbraco.Web.Common.Security;
 using Umbraco.Web.Models;
+using Umbraco.Web.Security;
 using Umbraco.Web.WebAssets;
 using Constants = Umbraco.Core.Constants;
 
@@ -40,6 +43,8 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly BackOfficeServerVariables _backOfficeServerVariables;
         private readonly AppCaches _appCaches;
         private readonly BackOfficeSignInManager _signInManager;
+        private readonly IWebSecurity _webSecurity;
+        private readonly ILogger _logger;
 
         public BackOfficeController(
             BackOfficeUserManager userManager,
@@ -51,7 +56,10 @@ namespace Umbraco.Web.BackOffice.Controllers
             IGridConfig gridConfig,
             BackOfficeServerVariables backOfficeServerVariables,
             AppCaches appCaches,
-            BackOfficeSignInManager signInManager)
+            BackOfficeSignInManager signInManager,
+            IWebSecurity webSecurity,
+            ILogger logger)
+
         {
             _userManager = userManager;
             _runtimeMinifier = runtimeMinifier;
@@ -63,6 +71,8 @@ namespace Umbraco.Web.BackOffice.Controllers
             _backOfficeServerVariables = backOfficeServerVariables;
             _appCaches = appCaches;
             _signInManager = signInManager;
+            _webSecurity = webSecurity;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -74,6 +84,84 @@ namespace Umbraco.Web.BackOffice.Controllers
             return await RenderDefaultOrProcessExternalLoginAsync(
                 () => View(viewPath),
                 () => View(viewPath));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> VerifyInvite(string invite)
+        {
+            //if you are hitting VerifyInvite, you're already signed in as a different user, and the token is invalid
+            //you'll exit on one of the return RedirectToAction(nameof(Default)) but you're still logged in so you just get
+            //dumped at the default admin view with no detail
+            if (_webSecurity.IsAuthenticated())
+            {
+                await _signInManager.SignOutAsync();
+            }
+
+            if (invite == null)
+            {
+                _logger.Warn<BackOfficeController>("VerifyUser endpoint reached with invalid token: NULL");
+                return RedirectToAction(nameof(Default));
+            }
+
+            var parts = System.Net.WebUtility.UrlDecode(invite).Split('|');
+
+            if (parts.Length != 2)
+            {
+                _logger.Warn<BackOfficeController>("VerifyUser endpoint reached with invalid token: {Invite}", invite);
+                return RedirectToAction(nameof(Default));
+            }
+
+            var token = parts[1];
+
+            var decoded = token.FromUrlBase64();
+            if (decoded.IsNullOrWhiteSpace())
+            {
+                _logger.Warn<BackOfficeController>("VerifyUser endpoint reached with invalid token: {Invite}", invite);
+                return RedirectToAction(nameof(Default));
+            }
+
+            var id = parts[0];
+
+            var identityUser = await _userManager.FindByIdAsync(id);
+            if (identityUser == null)
+            {
+                _logger.Warn<BackOfficeController>("VerifyUser endpoint reached with non existing user: {UserId}", id);
+                return RedirectToAction(nameof(Default));
+            }
+
+            var result = await _userManager.ConfirmEmailAsync(identityUser, decoded);
+
+            if (result.Succeeded == false)
+            {
+                _logger.Warn<BackOfficeController>("Could not verify email, Error: {Errors}, Token: {Invite}", result.Errors.ToErrorMessage(), invite);
+                return new RedirectResult(Url.Action(nameof(Default)) + "#/login/false?invite=3");
+            }
+
+            //sign the user in
+            DateTime? previousLastLoginDate = identityUser.LastLoginDateUtc;
+            await _signInManager.SignInAsync(identityUser, false);
+            //reset the lastlogindate back to previous as the user hasn't actually logged in, to add a flag or similar to BackOfficeSignInManager would be a breaking change
+            identityUser.LastLoginDateUtc = previousLastLoginDate;
+            await _userManager.UpdateAsync(identityUser);
+
+            return new RedirectResult(Url.Action(nameof(Default)) + "#/login/false?invite=1");
+        }
+
+        /// <summary>
+        /// This Action is used by the installer when an upgrade is detected but the admin user is not logged in. We need to
+        /// ensure the user is authenticated before the install takes place so we redirect here to show the standard login screen.
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [StatusCodeResult(System.Net.HttpStatusCode.ServiceUnavailable)]
+        public async Task<IActionResult> AuthorizeUpgrade()
+        {
+            var viewPath = Path.Combine(_globalSettings.UmbracoPath, Umbraco.Core.Constants.Web.Mvc.BackOfficeArea, nameof(AuthorizeUpgrade) + ".cshtml");
+            return await RenderDefaultOrProcessExternalLoginAsync(
+                //The default view to render when there is no external login info or errors
+                () => View(viewPath),
+                //The IActionResult to perform if external login is successful
+                () => Redirect("/"));
         }
 
         /// <summary>
@@ -97,8 +185,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         [HttpGet]
         public Dictionary<string, Dictionary<string, string>> LocalizedText(string culture = null)
         {
-            var securityHelper = _umbracoContextAccessor.GetRequiredUmbracoContext().Security;
-            var isAuthenticated = securityHelper.IsAuthenticated();
+            var isAuthenticated = _webSecurity.IsAuthenticated();
 
             var cultureInfo = string.IsNullOrWhiteSpace(culture)
                 //if the user is logged in, get their culture, otherwise default to 'en'

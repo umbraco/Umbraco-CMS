@@ -122,73 +122,81 @@
                                 on-remove="vm.removeContentItem()">
                             </umb-node-preview>
 
-                            <a href=""
-                                ng-if="!vm.package.contentNodeId"
-                                style="margin-bottom: 10px;"
-                                class="umb-node-preview-add"
-                                ng-click="vm.openContentPicker()"
-                                prevent-default>
+                            <button type="button"
+                                    ng-if="!vm.package.contentNodeId"
+                                    style="margin-bottom: 10px;"
+                                    class="umb-node-preview-add"
+                                    ng-click="vm.openContentPicker()">
                                 <localize key="general_add">Add</localize>
-                            </a>
+                            </button>
 
-                                <umb-checkbox model="vm.package.contentLoadChildNodes"
-                                                disabled="!vm.package.contentNodeId"
-                                                text="{{vm.labels.includeAllChildNodes}}" />
+                            <umb-checkbox model="vm.package.contentLoadChildNodes"
+                                          disabled="!vm.package.contentNodeId"
+                                          text="{{vm.labels.includeAllChildNodes}}">
+                            </umb-checkbox>
+
                         </umb-control-group>
 
                         <umb-control-group label="@treeHeaders_documentTypes">
                             <div ng-repeat="doctype in ::vm.documentTypes | orderBy:'name'">
-                                    <umb-checkbox model="doctype.selected"
-                                                  on-change="vm.selectDocumentType(doctype)"
-                                                  text="{{doctype.name}}" />
+                                <umb-checkbox model="doctype.selected"
+                                              on-change="vm.selectDocumentType(doctype)"
+                                              text="{{doctype.name}}">
+                                </umb-checkbox>
                             </div>
                         </umb-control-group>
 
                         <umb-control-group label="@treeHeaders_templates">
                             <div ng-repeat="template in ::vm.templates | orderBy:'name'">
-                                    <umb-checkbox model="template.selected"
-                                                  on-change="vm.selectTemplate(template)"
-                                                  text="{{template.name}}" />
+                                <umb-checkbox model="template.selected"
+                                              on-change="vm.selectTemplate(template)"
+                                              text="{{template.name}}">
+                                </umb-checkbox>
                             </div>
                         </umb-control-group>
 
                         <umb-control-group label="@treeHeaders_stylesheets">
                             <div ng-repeat="stylesheet in ::vm.stylesheets | orderBy:'name'">
-                                    <umb-checkbox model="stylesheet.selected"
-                                                  on-change="vm.selectStyleSheet(stylesheet)"
-                                                  text="{{stylesheet.path}}" />
+                                <umb-checkbox model="stylesheet.selected"
+                                              on-change="vm.selectStyleSheet(stylesheet)"
+                                              text="{{stylesheet.path}}">
+                                </umb-checkbox>
                             </div>
                         </umb-control-group>
 
                         <umb-control-group label="@treeHeaders_macros">
                             <div ng-repeat="macro in ::vm.macros | orderBy:'name'">
-                                    <umb-checkbox model="macro.selected"
-                                                  on-change="vm.selectMacro(macro)"
-                                                  text="{{macro.name}}" />
+                                <umb-checkbox model="macro.selected"
+                                              on-change="vm.selectMacro(macro)"
+                                              text="{{macro.name}}">
+                                </umb-checkbox>
                             </div>
                         </umb-control-group>
 
                         <umb-control-group label="@treeHeaders_languages">
                             <div ng-repeat="language in ::vm.languages | orderBy:'name'">
-                                    <umb-checkbox model="language.selected"
-                                                  on-change="vm.selectLanguage(language)"
-                                                  text="{{language.name}}" />
+                                <umb-checkbox model="language.selected"
+                                              on-change="vm.selectLanguage(language)"
+                                              text="{{language.name}}">
+                                </umb-checkbox>
                             </div>
                         </umb-control-group>
 
                         <umb-control-group label="@treeHeaders_dictionary">
                             <div ng-repeat="dictionaryItem in ::vm.dictionaryItems | orderBy:'name'">
-                                    <umb-checkbox model="dictionaryItem.selected"
-                                                  on-change="vm.selectDictionaryItem(dictionaryItem)"
-                                                  text="{{dictionaryItem.name}}" />
+                                <umb-checkbox model="dictionaryItem.selected"
+                                              on-change="vm.selectDictionaryItem(dictionaryItem)"
+                                              text="{{dictionaryItem.name}}">
+                                </umb-checkbox>
                             </div>
                         </umb-control-group>
 
                         <umb-control-group label="@treeHeaders_dataTypes">
                             <div ng-repeat="dataType in ::vm.dataTypes | orderBy:'name'">
-                                    <umb-checkbox model="dataType.selected"
-                                                  on-change="vm.selectDataType(dataType)"
-                                                  text="{{dataType.name}}" />
+                                <umb-checkbox model="dataType.selected"
+                                              on-change="vm.selectDataType(dataType)"
+                                              text="{{dataType.name}}">
+                                </umb-checkbox>
                             </div>
                         </umb-control-group>
 

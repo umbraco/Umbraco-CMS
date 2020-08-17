@@ -47,17 +47,9 @@ namespace Umbraco.Web.Models.Mapping
 
         public ContentTypeBasic GetContentType(IContentBase source, MapperContext context)
         {
-
-            var user = _umbracoContextAccessor.UmbracoContext?.Security?.CurrentUser;
-            if (user?.AllowedSections.Any(x => x.Equals(Constants.Applications.Settings)) ?? false)
-            {
-                var contentType = _contentTypeBaseServiceProvider.GetContentTypeOf(source);
-                var contentTypeBasic = context.Map<IContentTypeComposition, ContentTypeBasic>(contentType);
-
-                return contentTypeBasic;
-            }
-            //no access
-            return null;
+            var contentType = _contentTypeBaseServiceProvider.GetContentTypeOf(source);
+            var contentTypeBasic = context.Map<IContentTypeComposition, ContentTypeBasic>(contentType);
+            return contentTypeBasic;
         }
 
         public IEnumerable<ContentApp> GetContentApps(IUmbracoEntity source)

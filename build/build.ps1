@@ -168,8 +168,12 @@
       > $log
 
    # get files into WebApp\bin
-   & dotnet publish "$src\Umbraco.Web.UI.NetCore\Umbraco.Web.UI.NetCore.csproj" `
+    & dotnet publish "$src\Umbraco.Web.UI.NetCore\Umbraco.Web.UI.NetCore.csproj" `
       --output "$($this.BuildTemp)\WebApp\bin\\" `
+      > $log
+
+    & dotnet publish "$src\Umbraco.Persistance.SqlCe\Umbraco.Persistance.SqlCe.csproj" `
+      --output "$($this.BuildTemp)\SqlCe\" `
       > $log
 
     # remove extra files
