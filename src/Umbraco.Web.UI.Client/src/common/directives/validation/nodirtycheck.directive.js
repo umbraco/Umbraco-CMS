@@ -14,15 +14,7 @@ function noDirtyCheck() {
             if (dirtyCheck)
                 return;
 
-            ctrl.$setDirty = angular.noop;
-
-            //var alwaysFalse = {
-            //    get: function () { return false; },
-            //    set: function () { }
-            //};
-
-            //Object.defineProperty(ctrl, '$pristine', alwaysFalse);
-            //Object.defineProperty(ctrl, '$dirty', alwaysFalse);
+            ctrl.$setDirty = false;
         }
     };
 }
