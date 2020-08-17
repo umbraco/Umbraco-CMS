@@ -20,6 +20,7 @@
     var qryDebug = Context.Request.Query["umbDebug"].TryConvertTo<bool>();
     isDebug = qryDebug.Success && qryDebug.Result;
     var backOfficePath = globalSettings.GetBackOfficePath(hostingEnvironment);
+
 }
 
 <!DOCTYPE html>
