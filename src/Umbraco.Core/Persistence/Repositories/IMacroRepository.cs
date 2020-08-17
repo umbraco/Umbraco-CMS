@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Persistence.Repositories
@@ -7,6 +8,8 @@ namespace Umbraco.Core.Persistence.Repositories
     {
 
         //IEnumerable<IMacro> GetAll(params string[] aliases);
+        IMacro GetByAlias(string alias);
+        IEnumerable<IMacro> GetAllByAlias(string[] aliases);
 
     }
 }

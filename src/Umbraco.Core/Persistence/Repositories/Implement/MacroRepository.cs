@@ -15,9 +15,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 {
     internal class MacroRepository : NPocoRepositoryBase<int, IMacro>, IMacroRepository
     {
+        private readonly IRepositoryCachePolicy<IMacro, string> _macroByAliasCachePolicy;
         public MacroRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger)
             : base(scopeAccessor, cache, logger)
-        { }
+        {
+            _macroByAliasCachePolicy = new DefaultRepositoryCachePolicy<IMacro, string>(GlobalIsolatedCache, ScopeAccessor, DefaultOptions);
+        }
 
         protected override IMacro PerformGet(int id)
         {
@@ -212,6 +215,25 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
 
             entity.ResetDirtyProperties();
+        }
+
+        public IMacro GetByAlias(string alias)
+        {
+            return _macroByAliasCachePolicy.Get(alias, PerformGetByAlias, PerformGetAllByAlias);
+        }
+        public IEnumerable<IMacro> GetAllByAlias(string[] aliases)
+        {
+            return _macroByAliasCachePolicy.GetAll(aliases, PerformGetAllByAlias);
+        }
+        private IMacro PerformGetByAlias(string alias)
+        {
+            var query = Query<IMacro>().Where(x => x.Alias.Equals(alias));
+            return PerformGetByQuery(query).FirstOrDefault();
+        }
+        private IEnumerable<IMacro> PerformGetAllByAlias(params string[] aliases)
+        {
+            var query = Query<IMacro>().WhereIn(x => x.Alias, aliases);
+            return PerformGetByQuery(query);
         }
     }
 }
