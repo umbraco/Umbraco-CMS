@@ -130,7 +130,7 @@ function dependencies() {
         },
         {
             "name": "chart.js",
-            "src":  ["./node_modules/chart.js/dist/chart.min.js"],
+            "src":  ["./node_modules/chart.js/dist/Chart.min.js"],
             "base": "./node_modules/chart.js/dist"
         },
         {
@@ -180,7 +180,7 @@ function dependencies() {
         },
         {
             "name": "lazyload-js",
-            "src":  ["./node_modules/lazyload-js/lazyload.min.js"],
+            "src":  ["./node_modules/lazyload-js/LazyLoad.min.js"],
             "base": "./node_modules/lazyload-js"
         },
         {

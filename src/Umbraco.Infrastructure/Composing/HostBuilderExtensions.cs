@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Hosting;
+using Serilog;
 
 namespace Umbraco.Core.Composing
 {
@@ -25,6 +26,7 @@ namespace Umbraco.Core.Composing
         /// <param name="umbracoServiceProviderFactory"></param>
         /// <returns></returns>
         public static IHostBuilder UseUmbraco(this IHostBuilder builder, UmbracoServiceProviderFactory umbracoServiceProviderFactory)
-            => builder.UseServiceProviderFactory(umbracoServiceProviderFactory);
+            => builder.UseServiceProviderFactory(umbracoServiceProviderFactory)
+                .UseSerilog();
     }
 }

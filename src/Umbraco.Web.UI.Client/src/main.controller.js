@@ -228,5 +228,5 @@ function MainController($scope, $location, appState, treeService, notificationsS
 angular.module('umbraco').controller("Umbraco.MainController", MainController).
     config(function (tmhDynamicLocaleProvider) {
         //Set url for locale files
-        tmhDynamicLocaleProvider.localeLocationPattern('lib/angular-i18n/angular-locale_{{locale}}.js');
+        tmhDynamicLocaleProvider.localeLocationPattern('lib/angular-i18n/angular-locale_{{locale | lowercase}}.js');
     });

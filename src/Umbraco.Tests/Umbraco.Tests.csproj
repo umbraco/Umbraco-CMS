@@ -463,9 +463,6 @@
     <None Include="App.config">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Logging\UmbracoTraceLog.UNITTEST.20181112.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="Packaging\Packages\Document_Type_Picker_1.1.umb" />
     <None Include="UmbracoExamine\TestFiles\umbraco-sort.config">
       <SubType>Designer</SubType>
@@ -533,6 +530,9 @@
   <ItemGroup>
     <Content Include="Logging\logviewer.searches.config.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Logging\UmbracoTraceLog.UNITTEST.20181112.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Migrations\SqlScripts\MySqlTotal-480.sql" />
     <Content Include="Migrations\SqlScripts\SqlCe-SchemaAndData-4110.sql" />

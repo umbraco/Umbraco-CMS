@@ -1,11 +1,24 @@
-﻿@using Umbraco.Web.Composing
+﻿@using Umbraco.Core
 @using Umbraco.Web.WebAssets
+@using Umbraco.Web.Common.Security
+@using Umbraco.Core.WebAssets
+@using Umbraco.Core.Configuration
+@using Umbraco.Core.Hosting
+@using Umbraco.Extensions
+@using Umbraco.Core.Logging
+@using Umbraco.Web.BackOffice.Controllers
+@inject BackOfficeSignInManager signInManager
+@inject BackOfficeServerVariables backOfficeServerVariables
+@inject IUmbracoVersion umbracoVersion
+@inject IHostingEnvironment hostingEnvironment
+@inject IGlobalSettings globalSettings
+@inject IRuntimeMinifier runtimeMinifier
+@inject IProfilerHtml profilerHtml
 
-@inherits System.Web.Mvc.WebViewPage<Umbraco.Web.Editors.BackOfficePreviewModel>
+
+@model Umbraco.Web.Editors.BackOfficePreviewModel
 @{
     var disableDevicePreview = Model.DisableDevicePreview.ToString().ToLowerInvariant();
-
-    var runtimeMinifier = Current.RuntimeMinifier;
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -15,17 +28,15 @@
     <meta name="robots" content="noindex, nofollow">
     <meta name="pinterest" content="nopin" />
 
-
-    @Html.Raw(runtimeMinifier.RenderCssHereAsync(BackOfficeWebAssets.UmbracoPreviewCssBundleName).Result)
-
+    @Html.Raw(await runtimeMinifier.RenderCssHereAsync(BackOfficeWebAssets.UmbracoPreviewCssBundleName))
 
 </head>
 <body id="canvasdesignerPanel" ng-mouseover="outlinePositionHide()" ng-controller="previewController" ng-class="{'tabbing-active': tabbingActive === true}" ng-click="windowClickHandler($event)">
     <div class="wait" ng-show="!frameLoaded"></div>
 
-    @if (string.IsNullOrWhiteSpace(Model.PreviewExtendedHeaderView) == false)
+    @if (!string.IsNullOrWhiteSpace(Model.PreviewExtendedHeaderView))
     {
-        @Html.Partial(Model.PreviewExtendedHeaderView)
+        @await Html.PartialAsync(Model.PreviewExtendedHeaderView)
     }
 
     <div id="demo-iframe-wrapper" class="{{previewDevice.css}}">
@@ -71,8 +82,8 @@
 
     </div>
 
-    <script src="../lib/lazyload-js/lazyload.min.js"></script>
-    <script src="@Url.GetUrlWithCacheBust("Application", "Preview")"></script>
+    <script src="../lib/lazyload-js/LazyLoad.min.js"></script>
+    <script src="@Url.GetUrlWithCacheBust("Application", "Preview", null, hostingEnvironment, umbracoVersion, runtimeMinifier)"></script>
 
 </body>
 </html>

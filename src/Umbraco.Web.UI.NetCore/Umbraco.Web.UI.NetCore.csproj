@@ -13,14 +13,25 @@
         <CopyRazorGenerateFilesToPublishDirectory>true</CopyRazorGenerateFilesToPublishDirectory>
     </PropertyGroup>
     <ItemGroup>
-      <ProjectReference Include="..\Umbraco.Examine.Lucene\Umbraco.Examine.Lucene.csproj" />
-      <ProjectReference Include="..\Umbraco.Persistance.SqlCe\Umbraco.Persistance.SqlCe.csproj" />
       <ProjectReference Include="..\Umbraco.PublishedCache.NuCache\Umbraco.PublishedCache.NuCache.csproj" />
       <ProjectReference Include="..\Umbraco.Web.BackOffice\Umbraco.Web.BackOffice.csproj" />
       <ProjectReference Include="..\Umbraco.Web.Common\Umbraco.Web.Common.csproj" />
       <ProjectReference Include="..\Umbraco.Web.Website\Umbraco.Web.Website.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+        <Compile Remove="App_Data\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <EmbeddedResource Remove="App_Data\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Content Remove="App_Data\**" />
+    </ItemGroup>
+
+    
     <ItemGroup>
         <None Include="config\**\*.*">
             <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
@@ -32,6 +43,7 @@
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
             <CopyToPublishDirectory>Always</CopyToPublishDirectory>
         </None>
+        <None Remove="App_Data\**" />
     </ItemGroup>
     
     <ItemGroup>
@@ -39,6 +51,8 @@
         <!-- TODO: remove the reference to System.Configuration.ConfigurationManager when Examine/lucene dont need it-->
         <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.7.0" />
     </ItemGroup>
+
+
 
 
 
