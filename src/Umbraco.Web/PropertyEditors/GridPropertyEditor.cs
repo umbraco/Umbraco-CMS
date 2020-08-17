@@ -230,18 +230,11 @@ namespace Umbraco.Web.PropertyEditors
                 foreach (var umbracoEntityReference in mediaValues.SelectMany(x =>
                     _mediaPickerPropertyValueEditor.GetReferences(x.Value["udi"])))
                     yield return umbracoEntityReference;
+                
+                foreach (var umbracoEntityReference in _macroParameterParser.FindUmbracoEntityReferencesFromGridControlMacros(macroValues))
+                    yield return umbracoEntityReference;
 
-                //Macros don't really have a Property Editor for which we can call GetRefererences
-                //where does the responsibility lie for MacroParametersEditors to report their references?
-                //when we don't easily know the property type for a parameter - without 'looking up' which would be expensive?
-                //pragmatically we only care if the parameter has a value that is a media udi eg umb://media
-                //so we 'could' just loop through all parameter values here and add references for any values that are media udis... eg they are in use! however they are picked
-                //Is the HtmlMacroParameterParser the right place to put this method?
-                var udis = _macroParameterParser.FindUdisFromGridControlMacroParameters(macroValues);
-                foreach (var udi in udis)
-                {
-                    yield return new UmbracoEntityReference(udi);
-                }              
+                              
             }
         }
     }

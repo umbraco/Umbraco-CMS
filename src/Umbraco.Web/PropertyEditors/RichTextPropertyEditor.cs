@@ -164,12 +164,15 @@ namespace Umbraco.Web.PropertyEditors
 
                 foreach (var udi in _imageSourceParser.FindUdisFromDataAttributes(asString))
                     yield return new UmbracoEntityReference(udi);
-                foreach (var udi in _macroParameterParser.FindUdisFromMacroParameters(asString))
-                    yield return new UmbracoEntityReference(udi);
+                
                 foreach (var udi in _localLinkParser.FindUdisFromLocalLinks(asString))
                     yield return new UmbracoEntityReference(udi);
-                // is the TODO below a reference to needing to scan for media used in Macro parameters (see _macroParameterParser above) or a more general future TODO for some kind of 'tracking macro use' function? (is there an issue for this?)
+
+                foreach (var umbracoEntityReference in _macroParameterParser.FindUmbracoEntityReferencesFromEmbeddedMacros(asString))
+                    yield return umbracoEntityReference;
                 //TODO: Detect Macros too ... but we can save that for a later date, right now need to do media refs
+                //UPDATE: We are getting the Macros in 'FindUmbracoEntityReferencesFromEmbeddedMacros' do we just return the Macro Udis here too? do they need their own relationAlias?
+
             }
         }
 
