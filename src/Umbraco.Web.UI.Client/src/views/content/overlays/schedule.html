@@ -56,7 +56,7 @@
                                    on-close="vm.datePickerClose(vm.variants[0], 'unpublish')">
 
                         <div>
-                            <button ng-show="vm.variants[0].expireDate" class="btn btn-reset umb-button--xs" style="outline: none;">
+                            <button type="button" ng-show="vm.variants[0].expireDate" class="btn btn-reset umb-button--xs" style="outline: none;">
                                 {{vm.variants[0].expireDateFormatted}}
                             </button>
 
@@ -126,7 +126,7 @@
                                                        on-open="vm.datePickerShow(variant, 'publish')"
                                                        on-close="vm.datePickerClose(variant, 'publish')">
                                             <div>
-                                                <button ng-show="variant.releaseDate" class="btn btn-reset umb-button--xxs btn-outline umb-outline">
+                                                <button type="button" ng-show="variant.releaseDate" class="btn btn-reset umb-button--xxs btn-outline umb-outline">
                                                     {{variant.releaseDateFormatted}}
                                                 </button>
 
