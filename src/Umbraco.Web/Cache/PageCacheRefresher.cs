@@ -51,7 +51,11 @@ namespace Umbraco.Web.Cache
         public override void RefreshAll()
         {
             if (Suspendable.PageCacheRefresher.CanRefreshDocumentCacheFromDatabase)
+            {
                 content.Instance.RefreshContentFromDatabase();
+                content.Instance.ClearPreviewXmlContent();
+            }
+               
             ClearCaches();
             base.RefreshAll();
         }
@@ -63,7 +67,12 @@ namespace Umbraco.Web.Cache
         public override void Refresh(int id)
         {
             if (Suspendable.PageCacheRefresher.CanUpdateDocumentCache)
-                content.Instance.UpdateDocumentCache(id);
+            {
+                var d = new Document(id);
+                content.Instance.UpdateDocumentCache(d);
+                content.Instance.UpdatePreviewXmlContent(d);
+            }
+               
             ClearCaches();
             base.Refresh(id);
         }
@@ -75,7 +84,11 @@ namespace Umbraco.Web.Cache
         public override void Remove(int id)
         {
             if (Suspendable.PageCacheRefresher.CanUpdateDocumentCache)
+            {
                 content.Instance.ClearDocumentCache(id, false);
+                content.Instance.ClearPreviewXmlContent(id);
+            }
+                
             ClearCaches();
             base.Remove(id);
         }
@@ -83,7 +96,12 @@ namespace Umbraco.Web.Cache
         public override void Refresh(IContent instance)
         {
             if (Suspendable.PageCacheRefresher.CanUpdateDocumentCache)
-                content.Instance.UpdateDocumentCache(new Document(instance));
+            {
+                Document d = new Document(instance);
+                content.Instance.UpdateDocumentCache(d);
+                content.Instance.UpdatePreviewXmlContent(d);
+            }
+
             ClearCaches();
             base.Refresh(instance);
         }
@@ -91,7 +109,11 @@ namespace Umbraco.Web.Cache
         public override void Remove(IContent instance)
         {
             if (Suspendable.PageCacheRefresher.CanUpdateDocumentCache)
+            {               
                 content.Instance.ClearDocumentCache(new Document(instance), false);
+                content.Instance.ClearPreviewXmlContent(instance.Id);
+            }
+               
             ClearCaches();
             base.Remove(instance);
         }
