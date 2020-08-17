@@ -48,10 +48,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Update="Logging\UmbracoTraceLog.UNITTEST.20181112.json">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="Umbraco.Configuration\Configurations\umbracoSettings.config">
+        <None Update="Umbraco.Configuration\Configurations\umbracoSettings.config">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
       <None Update="Umbraco.Configuration\Configurations\umbracoSettings.minimal.config">
