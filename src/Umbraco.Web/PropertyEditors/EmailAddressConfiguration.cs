@@ -7,7 +7,7 @@ namespace Umbraco.Web.PropertyEditors
     /// </summary>
     public class EmailAddressConfiguration
     {
-        [ConfigurationField("IsRequired", "Required?", "boolean")]
+        [ConfigurationField("IsRequired", "Required?", "hidden", Description = "Deprecated; Make this required by selecting mandatory when adding to the document type")]
         public bool IsRequired { get; set; }
     }
 }
