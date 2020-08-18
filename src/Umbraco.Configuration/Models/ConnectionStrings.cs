@@ -56,6 +56,11 @@ namespace Umbraco.Configuration.Models
                 {
                     return Constants.DbProviderNames.SqlServer;
                 }
+
+                if (builder.TryGetValue("Initial Catalog", out var i) && i is string initialCatalog && !string.IsNullOrEmpty(initialCatalog))
+                {
+                    return Constants.DbProviderNames.SqlServer;
+                }
             }
 
             throw new ArgumentException("Cannot determine provider name from connection string", nameof(connectionString));
