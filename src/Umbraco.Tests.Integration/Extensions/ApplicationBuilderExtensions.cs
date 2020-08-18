@@ -99,10 +99,11 @@ namespace Umbraco.Tests.Integration.Extensions
                     break;
                 case UmbracoTestOptions.Database.NewSchemaPerFixture:
 
-                    throw new NotImplementedException();
+                    // New DB + Schema
+                    var newSchemaFixtureDbId = db.AttachSchema();
 
-                    //// Add teardown callback
-                    //integrationTest.OnFixtureTearDown(() => db.Detach());
+                    // Add teardown callback
+                    integrationTest.OnFixtureTearDown(() => db.Detach(newSchemaFixtureDbId));
 
                     break;
                 case UmbracoTestOptions.Database.NewEmptyPerFixture:
