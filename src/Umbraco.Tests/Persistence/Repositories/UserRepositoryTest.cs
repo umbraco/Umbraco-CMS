@@ -15,6 +15,7 @@ using Umbraco.Core.PropertyEditors;
 using System;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Serialization;
+using MockedUser = Umbraco.Tests.TestHelpers.Entities.MockedUser;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {

@@ -1,32 +1,31 @@
 ﻿using System;
 using System.Linq;
 using NUnit.Framework;
-using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Scoping;
-using Umbraco.Tests.TestHelpers;
+using Umbraco.Core.Services;
+using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
 
-namespace Umbraco.Tests.Persistence.Repositories
+namespace Umbraco.Tests.Integration.Persistence.Repositories
 {
     [TestFixture]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-    public class RedirectUrlRepositoryTests : TestWithDatabaseBase
+    public class RedirectUrlRepositoryTests : UmbracoIntegrationTest
     {
-        public override void SetUp()
+        [SetUp]
+        public void SetUp()
         {
-            base.SetUp();
-
             CreateTestData();
         }
 
         [Test]
         public void CanSaveAndGet()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = ScopeProvider;
 
             using (var scope = provider.CreateScope())
             {
@@ -56,7 +55,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void CanSaveAndGetMostRecent()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = ScopeProvider;
 
             Assert.AreNotEqual(_textpage.Id, _otherpage.Id);
 
@@ -104,7 +103,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void CanSaveAndGetByContent()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = ScopeProvider;
 
             using (var scope = provider.CreateScope())
             {
@@ -148,7 +147,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void CanSaveAndDelete()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = ScopeProvider;
 
             using (var scope = provider.CreateScope())
             {
@@ -195,32 +194,35 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         public void CreateTestData()
         {
+            var fileService = GetRequiredService<IFileService>();
+            var contentService = GetRequiredService<IContentService>();
+            var contentTypeService = GetRequiredService<IContentTypeService>();
             //Create and Save ContentType "umbTextpage" -> (NodeDto.NodeIdSeed)
             var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage", "Textpage");
             contentType.Key = Guid.NewGuid();
-            ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
-            ServiceContext.ContentTypeService.Save(contentType);
+            fileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
+            contentTypeService.Save(contentType);
 
             //Create and Save Content "Homepage" based on "umbTextpage" -> (NodeDto.NodeIdSeed + 1)
             _textpage = MockedContent.CreateSimpleContent(contentType);
             _textpage.Key = Guid.NewGuid();
-            ServiceContext.ContentService.Save(_textpage);
+            contentService.Save(_textpage);
 
             //Create and Save Content "Text Page 1" based on "umbTextpage" -> (NodeDto.NodeIdSeed + 2)
             _subpage = MockedContent.CreateSimpleContent(contentType, "Text Page 1", _textpage.Id);
             _subpage.Key = Guid.NewGuid();
-            ServiceContext.ContentService.Save(_subpage);
+            contentService.Save(_subpage);
 
             //Create and Save Content "Text Page 1" based on "umbTextpage" -> (NodeDto.NodeIdSeed + 3)
             _otherpage = MockedContent.CreateSimpleContent(contentType, "Text Page 2", _textpage.Id);
             _otherpage.Key = Guid.NewGuid();
-            ServiceContext.ContentService.Save(_otherpage);
+            contentService.Save(_otherpage);
 
             //Create and Save Content "Text Page Deleted" based on "umbTextpage" -> (NodeDto.NodeIdSeed + 4)
             _trashed = MockedContent.CreateSimpleContent(contentType, "Text Page Deleted", -20);
             _trashed.Key = Guid.NewGuid();
             ((Content) _trashed).Trashed = true;
-            ServiceContext.ContentService.Save(_trashed);
+            contentService.Save(_trashed);
         }
     }
 }

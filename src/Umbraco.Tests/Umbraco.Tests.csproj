@@ -139,18 +139,13 @@
     <Compile Include="Models\VariationTests.cs" />
     <Compile Include="Persistence\Mappers\MapperTestBase.cs" />
     <Compile Include="Persistence\Repositories\DocumentRepositoryTest.cs" />
-    <Compile Include="Persistence\Repositories\EntityRepositoryTest.cs" />
-    <Compile Include="Persistence\Repositories\KeyValueRepositoryTests.cs" />
     <Compile Include="Security\BackOfficeOwinUserManagerTests.cs" />
     <Compile Include="Security\OwinDataProtectorTokenProviderTests.cs" />
     <Compile Include="Services\KeyValueServiceTests.cs" />
     <Compile Include="Persistence\Repositories\UserRepositoryTest.cs" />
     <Compile Include="TestHelpers\Entities\MockedEntity.cs" />
-    <Compile Include="TestHelpers\Entities\MockedMedia.cs" />
-    <Compile Include="TestHelpers\Entities\MockedMember.cs" />
     <Compile Include="TestHelpers\Entities\MockedPropertyTypes.cs" />
     <Compile Include="TestHelpers\Entities\MockedUser.cs" />
-    <Compile Include="TestHelpers\Entities\MockedUserGroup.cs" />
     <Compile Include="UmbracoExamine\ExamineExtensions.cs" />
     <Compile Include="PropertyEditors\BlockListPropertyValueConverterTests.cs" />
     <Compile Include="PropertyEditors\DataValueReferenceFactoryCollectionTests.cs" />
@@ -189,8 +184,6 @@
     <Compile Include="Packaging\PackageExtractionTests.cs" />
     <Compile Include="Persistence\NPocoTests\NPocoFetchTests.cs" />
     <Compile Include="Persistence\NPocoTests\NPocoSqlTemplateTests.cs" />
-    <Compile Include="Persistence\Repositories\SimilarNodeNameTests.cs" />
-    <Compile Include="Persistence\Repositories\UserGroupRepositoryTest.cs" />
     <Compile Include="Published\ConvertersTests.cs" />
     <Compile Include="Routing\ContentFinderByUrlAndTemplateTests.cs" />
     <Compile Include="Routing\ContentFinderByUrlTests.cs" />
@@ -228,7 +221,6 @@
     <Compile Include="Migrations\PostMigrationTests.cs" />
     <Compile Include="Persistence\NPocoTests\NPocoSqlExtensionsTests.cs" />
     <Compile Include="Persistence\UnitOfWorkTests.cs" />
-    <Compile Include="Persistence\Repositories\RedirectUrlRepositoryTests.cs" />
     <Compile Include="Testing\UmbracoTestBase.cs" />
     <Compile Include="CoreThings\TryConvertToTests.cs" />
     <Compile Include="TestHelpers\TestObjects-Mocks.cs" />
@@ -294,12 +286,9 @@
     <Compile Include="Web\Mvc\ViewDataDictionaryExtensionTests.cs" />
     <Compile Include="Persistence\NPocoTests\NPocoBulkInsertTests.cs" />
     <Compile Include="Persistence\Querying\ContentTypeSqlMappingTests.cs" />
-    <Compile Include="Persistence\Repositories\MacroRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\MemberRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\MemberTypeRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\TagRepositoryTest.cs" />
-    <Compile Include="Persistence\Repositories\NotificationsRepositoryTest.cs" />
-    <Compile Include="Persistence\Repositories\TemplateRepositoryTest.cs" />
     <Compile Include="PublishedContent\PublishedContentExtensionTests.cs" />
     <Compile Include="PropertyEditors\ColorListValidatorTest.cs" />
     <Compile Include="PropertyEditors\MultiValuePropertyEditorTests.cs" />
@@ -345,7 +334,6 @@
     <Compile Include="Persistence\Querying\ExpressionTests.cs" />
     <Compile Include="Persistence\Querying\MediaRepositorySqlClausesTest.cs" />
     <Compile Include="Persistence\Querying\MediaTypeRepositorySqlClausesTest.cs" />
-    <Compile Include="Persistence\Repositories\ServerRegistrationRepositoryTest.cs" />
     <Compile Include="Persistence\SchemaValidationTest.cs" />
     <Compile Include="Persistence\SyntaxProvider\SqlCeSyntaxProviderTests.cs" />
     <Compile Include="PublishedContent\PublishedContentDataTableTests.cs" />
@@ -373,12 +361,9 @@
     <Compile Include="Persistence\Querying\QueryBuilderTests.cs" />
     <Compile Include="Persistence\Repositories\ContentTypeRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\DataTypeDefinitionRepositoryTest.cs" />
-    <Compile Include="Persistence\Repositories\DictionaryRepositoryTest.cs" />
-    <Compile Include="Persistence\Repositories\LanguageRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\MediaRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\MediaTypeRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\RelationRepositoryTest.cs" />
-    <Compile Include="Persistence\Repositories\RelationTypeRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\ScriptRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\StylesheetRepositoryTest.cs" />
     <Compile Include="PublishedContent\PublishedContentMoreTests.cs" />
@@ -558,8 +543,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Models\Mapping\" />
-    <Folder Include="Models\Mapping" />
-    <Folder Include="Web\Validation" />
+    <Folder Include="Web\Validation\" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
