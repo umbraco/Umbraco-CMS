@@ -3,7 +3,7 @@
 
         <umb-block-list-block stylesheet="{{::vm.layout.$block.config.stylesheet}}"
                               class="umb-block-list__block--content"
-                              ng-class="{'blockelement__draggable-element': vm.layout.$block.config.stylesheet}"
+                              ng-class="{'blockelement__draggable-element': vm.layout.$block.config.stylesheet, '--show-validation': vm.layout.$block.showValidation === true}"
                               view="{{vm.layout.$block.view}}"
                               api="vm.blockEditorApi"
                               block="vm.layout.$block"

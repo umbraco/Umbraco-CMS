@@ -100,6 +100,7 @@
         };
         vm.applySettingsToBlock = function(block, key) {
             block.settingsElementTypeKey = key;
+            vm.settingsPreview = vm.getElementTypeByKey(vm.block.settingsElementTypeKey);
         };
 
         vm.requestRemoveSettingsForBlock = function(block) {

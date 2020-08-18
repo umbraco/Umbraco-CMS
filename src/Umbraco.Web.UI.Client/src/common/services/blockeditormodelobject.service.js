@@ -331,7 +331,7 @@
             this.isolatedScope.blockObjects = {};
 
             this.__watchers.push(this.isolatedScope.$on("$destroy", this.destroy.bind(this)));
-            this.__watchers.push(propertyEditorScope.$on("postFormSubmitting", this.sync.bind(this)));
+            this.__watchers.push(propertyEditorScope.$on("formSubmittingFinalPhase", this.sync.bind(this)));
 
         };
 
@@ -351,12 +351,13 @@
                 // update our values
                 this.value = propertyModelValue;
                 this.value.layout = this.value.layout || {};
-                this.value.data = this.value.data || [];
+                this.value.contentData = this.value.contentData || [];
+                this.value.settingsData = this.value.settingsData || [];
 
                 // re-create the watchers
                 this.__watchers = [];
                 this.__watchers.push(this.isolatedScope.$on("$destroy", this.destroy.bind(this)));
-                this.__watchers.push(propertyEditorScope.$on("postFormSubmitting", this.sync.bind(this)));
+                this.__watchers.push(propertyEditorScope.$on("formSubmittingFinalPhase", this.sync.bind(this)));
             },
 
             /**
