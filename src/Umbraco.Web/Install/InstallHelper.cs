@@ -133,6 +133,13 @@ namespace Umbraco.Web.Install
                     return true;
                 }
 
+                //if connection string is specified and valid and Db is empty, let's treat as if no connection string, so, new install
+                if (_databaseBuilder.IsConnectionStringConfigured(databaseSettings) == true
+                    && _databaseBuilder.IsDbEmpty())
+                {
+                    return true;
+                }
+
                 return _databaseBuilder.HasSomeNonDefaultUser() == false;
             }
         }

@@ -89,6 +89,18 @@ namespace Umbraco.Core.Migrations.Install
             return DbConnectionExtensions.IsConnectionAvailable(connectionString, providerName);
         }
 
+        /// <summary>
+        /// Checks if the database contains any table
+        /// </summary>
+        /// <returns>True if DB is empty, false if it contains at least one table</returns>
+        internal bool IsDbEmpty()
+        {
+            using (var scope = _scopeProvider.CreateScope())
+            {
+                return scope.Database.SqlContext.SqlSyntax.GetTablesInSchema(scope.Database).Any() == false;
+            }
+        }
+
         internal bool HasSomeNonDefaultUser()
         {
             using (var scope = _scopeProvider.CreateScope())

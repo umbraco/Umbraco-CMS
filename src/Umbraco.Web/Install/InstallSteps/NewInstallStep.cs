@@ -141,6 +141,13 @@ namespace Umbraco.Web.Install.InstallSteps
             // left a version number in there but cleared out their db conn string, in that case, it's really a new install.
             if (_globalSettings.ConfigurationStatus.IsNullOrWhiteSpace() == false && databaseSettings != null) return false;
 
+            //if connection string is specified and valid and Db is empty, let's treat as if no connection string, so, new install
+            if (_databaseBuilder.IsConnectionStringConfigured(databaseSettings) == true
+                && _databaseBuilder.IsDbEmpty())
+            {
+                return true;
+            }
+
             if (_databaseBuilder.IsConnectionStringConfigured(databaseSettings) && _databaseBuilder.IsDatabaseConfigured)
                 return _databaseBuilder.HasSomeNonDefaultUser() == false;
 
