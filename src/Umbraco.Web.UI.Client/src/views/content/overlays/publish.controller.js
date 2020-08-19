@@ -78,7 +78,7 @@
         }
 
         function notPublishedMandatoryFilter(variant) {
-            return variant.state !== "Published" && variant.state !== "PublishedPendingChanges" && isMandatoryFilter(variant);
+            return variant.state !== "Published" && variant.state !== "PublishedPendingChanges" && variant.isMandatory === true;
         }
         function isMandatoryFilter(variant) {
             //determine a variant is 'dirty' (meaning it will show up as publish-able) if it's
