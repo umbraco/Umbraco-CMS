@@ -80,7 +80,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         }
 
         [HttpGet]
-        public PagedResult<LogMessage> GetLogs(string orderDirection = "Descending", int pageNumber = 1, string filterExpression = null, [FromQuery]string[] logLevels = null, [FromQuery] DateTime? startDate = null,[FromQuery] DateTime? endDate = null)
+        public PagedResult<LogMessage> GetLogs(string orderDirection = "Descending", int pageNumber = 1, string filterExpression = null, [FromQuery(Name = "logLevels[]")]string[] logLevels = null, [FromQuery]DateTime? startDate = null, [FromQuery]DateTime? endDate = null)
         {
             var logTimePeriod = GetTimePeriod(startDate, endDate);
 

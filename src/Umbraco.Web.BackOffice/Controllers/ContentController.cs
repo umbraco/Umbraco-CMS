@@ -2441,7 +2441,7 @@ namespace Umbraco.Web.Editors
         // set up public access using role based access
         [EnsureUserPermissionForContent("contentId", ActionProtect.ActionLetter)]
         [HttpPost]
-        public IActionResult PostPublicAccess(int contentId, [FromQuery]string[] groups, [FromQuery]string[] usernames, int loginPageId, int errorPageId)
+        public IActionResult PostPublicAccess(int contentId, [FromQuery(Name = "groups[]")]string[] groups, [FromQuery(Name = "usernames[]")]string[] usernames, int loginPageId, int errorPageId)
         {
             if ((groups == null || groups.Any() == false) && (usernames == null || usernames.Any() == false))
             {

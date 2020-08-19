@@ -17,15 +17,13 @@ namespace Umbraco.Core.Composing
         private static readonly string[] UmbracoCoreAssemblyNames = new[]
             {
                 "Umbraco.Core",
-                "Umbraco.Web",
                 "Umbraco.Infrastructure",
                 "Umbraco.PublishedCache.NuCache",
-                "Umbraco.ModelsBuilder.Embedded",
+              //  "Umbraco.ModelsBuilder.Embedded", TODO reintroduce when ModelsBuilder is migrated
                 "Umbraco.Examine.Lucene",
                 "Umbraco.Web.Common",
                 "Umbraco.Web.BackOffice",
                 "Umbraco.Web.Website",
-                "Umbraco.Web.NetCore"
             };
 
         public DefaultUmbracoAssemblyProvider(Assembly entryPointAssembly)
