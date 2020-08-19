@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.PropertyEditors;
+﻿using System;
+using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -8,6 +9,7 @@ namespace Umbraco.Web.PropertyEditors
     public class EmailAddressConfiguration
     {
         [ConfigurationField("IsRequired", "Required?", "hidden", Description = "Deprecated; Make this required by selecting mandatory when adding to the document type")]
+        [Obsolete("No longer used, use `Mandatory` for the property instead. Will be removed in the next major version")]
         public bool IsRequired { get; set; }
     }
 }
