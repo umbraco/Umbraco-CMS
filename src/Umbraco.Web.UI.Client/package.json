@@ -2,7 +2,7 @@
   "private": true,
   "scripts": {
     "test": "gulp runTests",
-    "unit": "gulp testUnit",
+    "unit": "gulp runUnit",
     "e2e": "gulp testE2e",
     "build": "gulp build",
     "dev": "gulp dev",
@@ -73,6 +73,7 @@
     "gulp-wrap-js": "0.4.1",
     "jasmine-core": "3.5.0",
     "karma": "4.4.1",
+    "karma-chrome-launcher": "^3.1.0",
     "karma-jasmine": "2.0.1",
     "karma-junit-reporter": "2.0.1",
     "karma-phantomjs-launcher": "1.0.4",
