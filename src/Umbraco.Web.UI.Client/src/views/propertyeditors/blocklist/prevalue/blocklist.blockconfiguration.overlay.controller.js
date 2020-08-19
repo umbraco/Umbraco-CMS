@@ -147,7 +147,7 @@
 
 
         vm.addViewForBlock = function(block) {
-            localizationService.localize("blockEditor_headlineSelectView").then(function(localizedTitle) {
+            localizationService.localize("blockEditor_headlineAddCustomView").then(function(localizedTitle) {
 
                 const filePicker = {
                     title: localizedTitle,
