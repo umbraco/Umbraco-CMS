@@ -15,7 +15,7 @@ function externalLoginInfoService(externalLoginInfo, umbRequestHelper) {
 
     function getExternalLoginProviderView(provider) {
         var found = getExternalLoginProvider(provider);
-        if (found) {
+        if (found && found.properties.UmbracoBackOfficeExternalLoginOptions && found.properties.UmbracoBackOfficeExternalLoginOptions.BackOfficeCustomLoginView) {
             return umbRequestHelper.convertVirtualToAbsolutePath(found.properties.UmbracoBackOfficeExternalLoginOptions.BackOfficeCustomLoginView);
         }
         return null;
