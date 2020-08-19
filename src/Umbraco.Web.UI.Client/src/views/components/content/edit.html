@@ -47,7 +47,7 @@
                         ng-if="!page.isNew && content.allowPreview && page.showPreviewButton"
                         type="button"
                         button-style="link"
-                        action="preview(content)"
+                        action="preview()"
                         label-key="buttons_saveAndPreview">
                     </umb-button>
 
@@ -57,7 +57,7 @@
                         type="button"
                         button-style="{{page.saveButtonStyle}}"
                         state="page.saveButtonState"
-                        action="save(content)"
+                        action="save()"
                         label-key="buttons_save"
                         shortcut="ctrl+s"
                         add-ellipsis="{{page.saveButtonEllipsis}}">
@@ -77,7 +77,7 @@
 
                     <umb-button
                         ng-if="infiniteModel.infiniteMode && page.allowInfiniteSaveAndClose"
-                        action="saveAndClose(content)"
+                        action="saveAndClose()"
                         button-style="primary"
                         state="saveAndCloseButtonState"
                         label-key="buttons_saveAndClose"
@@ -86,7 +86,7 @@
 
                     <umb-button
                         ng-if="infiniteModel.infiniteMode && page.allowInfinitePublishAndClose"
-                        action="publishAndClose(content)"
+                        action="publishAndClose()"
                         button-style="primary"
                         state="publishAndCloseButtonState"
                         label-key="buttons_publishAndClose"

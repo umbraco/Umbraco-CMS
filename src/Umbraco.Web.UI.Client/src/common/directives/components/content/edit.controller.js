@@ -25,6 +25,9 @@
         if (infiniteMode) {
             $scope.page.allowInfinitePublishAndClose = $scope.infiniteModel.allowPublishAndClose;
             $scope.page.allowInfiniteSaveAndClose = $scope.infiniteModel.allowSaveAndClose;
+            // check if we are opening with create mode
+            $scope.isNew = $scope.infiniteModel.create ? true : false;
+            $scope.page.isNew = $scope.isNew;
         }
 
         $scope.page.buttonGroupState = "init";
@@ -654,7 +657,8 @@
             }
         };
 
-        $scope.saveAndPublish = function () {
+        $scope.saveAndPublish = function (closeInfinite) {
+            closeInfinite = closeInfinite === undefined ? false : closeInfinite;
             clearNotifications($scope.content);
             if (hasVariants($scope.content)) {
                 //before we launch the dialog we want to execute all client side validations first
@@ -666,7 +670,9 @@
                         skipFormValidation: true, //when submitting the overlay form, skip any client side validation
                         submitButtonLabelKey: "buttons_saveAndPublish",
                         submit: function (model) {
+
                             model.submitButtonState = "busy";
+
                             clearNotifications($scope.content);
                             //we need to return this promise so that the dialog can handle the result and wire up the validation response
                             return performSave({
@@ -677,12 +683,23 @@
                                 //show all notifications manually here since we disabled showing them automatically in the save method
                                 formHelper.showNotifications(data);
                                 clearNotifications($scope.content);
+                                
+                                if (closeInfinite) {
+                                    if ($scope.infiniteModel.submit) {
+                                        $scope.infiniteModel.contentNode = $scope.content;
+                                        $scope.infiniteModel.submit($scope.infiniteModel);
+                                    }
+                                }
+
                                 overlayService.close();
+
                                 return $q.when(data);
                             },
                                 function (err) {
                                     clearDirtyState($scope.content.variants);
+
                                     model.submitButtonState = "error";
+
                                     //re-map the dialog model since we've re-bound the properties
                                     dialog.variants = $scope.content.variants;
                                     //don't reject, we've handled the error
@@ -703,19 +720,36 @@
                 //ensure the flags are set
                 $scope.content.variants[0].save = true;
                 $scope.content.variants[0].publish = true;
-                $scope.page.buttonGroupState = "busy";
+                if (!closeInfinite) {
+                    $scope.page.buttonGroupState = "busy";
+                } else {
+                    $scope.publishAndCloseButtonState = "busy";
+                }
                 return performSave({
                     saveMethod: contentResource.publish,
                     action: "publish"
                 }).then(function () {
-                    $scope.page.buttonGroupState = "success";
+                    if (!closeInfinite) {
+                        $scope.page.buttonGroupState = "success";
+                    } else {
+                        if ($scope.infiniteModel.submit) {
+                            $scope.infiniteModel.contentNode = $scope.content;
+                            $scope.infiniteModel.submit($scope.infiniteModel);
+                        }
+                        $scope.publishAndCloseButtonState = "success";
+                    }
                 }, function () {
-                    $scope.page.buttonGroupState = "error";
+                    if (!infinite) {
+                        $scope.page.buttonGroupState = "error";
+                    } else {
+                        $scope.publishAndCloseButtonState = "error";
+                    }
                 });
             }
         };
 
-        $scope.save = function () {
+        $scope.save = function (closeInfinite) {
+            closeInfinite = closeInfinite === undefined ? false : closeInfinite;
             clearNotifications($scope.content);
             // TODO: Add "..." to save button label if there are more than one variant to publish - currently it just adds the elipses if there's more than 1 variant
             if (hasVariants($scope.content)) {
@@ -729,7 +763,9 @@
                         skipFormValidation: true, //when submitting the overlay form, skip any client side validation
                         submitButtonLabelKey: "buttons_save",
                         submit: function (model) {
+
                             model.submitButtonState = "busy";
+
                             clearNotifications($scope.content);
                             //we need to return this promise so that the dialog can handle the result and wire up the validation response
                             return performSave({
@@ -740,12 +776,22 @@
                                 //show all notifications manually here since we disabled showing them automatically in the save method
                                 formHelper.showNotifications(data);
                                 clearNotifications($scope.content);
+                                
+                                if (closeInfinite) {
+                                    if ($scope.infiniteModel.submit) {
+                                        $scope.infiniteModel.contentNode = $scope.content;
+                                        $scope.infiniteModel.submit($scope.infiniteModel);
+                                    }
+                                }
                                 overlayService.close();
+
                                 return $q.when(data);
                             },
                                 function (err) {
                                     clearDirtyState($scope.content.variants);
+
                                     model.submitButtonState = "error";
+     
                                     //re-map the dialog model since we've re-bound the properties
                                     dialog.variants = $scope.content.variants;
                                     //don't reject, we've handled the error
@@ -766,17 +812,47 @@
             else {
                 //ensure the flags are set
                 $scope.content.variants[0].save = true;
-                $scope.page.saveButtonState = "busy";
+                if (!closeInfinite) {
+                    $scope.page.saveButtonState = "busy";
+                } else {
+                    $scope.saveAndCloseButtonState = "busy";
+                }
                 return performSave({
                     saveMethod: $scope.saveMethod(),
                     action: "save"
                 }).then(function () {
-                    $scope.page.saveButtonState = "success";
-                }, function () {
-                    $scope.page.saveButtonState = "error";
-                });
+                    if (!closeInfinite) {
+                        $scope.page.saveButtonState = "success";
+                    } else {
+                        if ($scope.infiniteModel.submit) {
+                            $scope.infiniteModel.contentNode = $scope.content;
+                            $scope.infiniteModel.submit($scope.infiniteModel);
+                        }
+                        $scope.saveAndCloseButtonState = "success";
+
+                    }
+                },
+                    function () {
+                        if (!closeInfinite) {
+                            $scope.page.saveButtonState = "error";
+                        } else {
+                            $scope.saveAndCloseButtonState = "error";
+                        }
+                    });
             }
 
+        };
+
+        /* publish method used in infinite editing */
+        $scope.publishAndClose = function () {
+            // call standard save and publish with flag to close infinite;
+            $scope.saveAndPublish(true);
+        };
+
+        /* save method used in infinite editing */
+        $scope.saveAndClose = function () {
+            // call standard save with flag to close infinite;
+            $scope.save(true);
         };
 
         $scope.schedule = function () {
@@ -942,168 +1018,7 @@
             }
         };
 
-        /* publish method used in infinite editing */
-        $scope.publishAndClose = function () {
 
-
-            clearNotifications($scope.content);
-            if (hasVariants($scope.content)) {
-                //before we launch the dialog we want to execute all client side validations first
-                if (formHelper.submitForm({ scope: $scope, action: "publish" })) {
-                    var dialog = {
-                        parentScope: $scope,
-                        view: "views/content/overlays/publish.html",
-                        variants: $scope.content.variants, //set a model property for the dialog
-                        skipFormValidation: true, //when submitting the overlay form, skip any client side validation
-                        submitButtonLabelKey: "buttons_saveAndPublish",
-
-                        submit: function (model) {
-
-                            $scope.publishAndCloseButtonState = "busy";
-
-                            clearNotifications($scope.content);
-
-                            //we need to return this promise so that the dialog can handle the result and wire up the validation response
-                            return performSave({
-                                saveMethod: contentResource.publish,
-                                action: "publish",
-                                showNotifications: false
-
-                            }).then(function (data) {
-                                //show all notifications manually here since we disabled showing them automatically in the save method
-                                formHelper.showNotifications(data);
-                                clearNotifications($scope.content);
-                                overlayService.close();
-
-                                if ($scope.infiniteModel.submit) {
-                                    $scope.infiniteModel.contentNode = $scope.content;
-                                    $scope.infiniteModel.submit($scope.infiniteModel);
-                                }
-                                $scope.publishAndCloseButtonState = "success";
-
-
-                                return $q.when(data);
-                            },
-                                function (err) {
-                                    clearDirtyState($scope.content.variants);
-
-                                    $scope.publishAndCloseButtonState = "error";
-
-                                    //re-map the dialog model since we've re-bound the properties
-                                    dialog.variants = $scope.content.variants;
-                                    //don't reject, we've handled the error
-                                    return $q.when(err);
-                                });
-                        },
-                        close: function () {
-                            overlayService.close();
-                        }
-                    };
-                    overlayService.open(dialog);
-                }
-                else {
-                    showValidationNotification();
-                }
-            }
-            else {
-                //ensure the flags are set
-                $scope.content.variants[0].save = true;
-                $scope.content.variants[0].publish = true;
-                $scope.publishAndCloseButtonState = "busy";
-                return performSave({
-                    saveMethod: contentResource.publish,
-                    action: "publish"
-                }).then(function () {
-
-
-                    if ($scope.infiniteModel.submit) {
-                        $scope.infiniteModel.contentNode = $scope.content;
-                        $scope.infiniteModel.submit($scope.infiniteModel);
-                    }
-                    $scope.publishAndCloseButtonState = "success";
-
-                }, function () {
-                    $scope.publishAndCloseButtonState = "error";
-                });
-            }
-        };
-
-        /* save method used in infinite editing */
-        $scope.saveAndClose = function () {
-
-            clearNotifications($scope.content);
-            // TODO: Add "..." to save button label if there are more than one variant to publish - currently it just adds the elipses if there's more than 1 variant
-            if (hasVariants($scope.content)) {
-                //before we launch the dialog we want to execute all client side validations first
-                if (formHelper.submitForm({ scope: $scope, action: "openSaveDialog" })) {
-
-                    var dialog = {
-                        parentScope: $scope,
-                        view: "views/content/overlays/save.html",
-                        variants: $scope.content.variants, //set a model property for the dialog
-                        skipFormValidation: true, //when submitting the overlay form, skip any client side validation
-                        submitButtonLabelKey: "buttons_save",
-
-                        submit: function (model) {
-                            $scope.saveAndCloseButtonState= "busy";
-                            clearNotifications($scope.content);
-                            //we need to return this promise so that the dialog can handle the result and wire up the validation response
-                            return performSave({
-                                saveMethod: $scope.saveMethod(),
-                                action: "save",
-                                showNotifications: false
-                            }).then(function (data) {
-                                //show all notifications manually here since we disabled showing them automatically in the save method
-                                formHelper.showNotifications(data);
-                                clearNotifications($scope.content);
-                                overlayService.close();
-
-                                if ($scope.infiniteModel.submit) {
-                                    $scope.infiniteModel.contentNode = $scope.content;
-                                    $scope.infiniteModel.submit($scope.infiniteModel);
-                                }
-                                return $q.when(data);
-                            },
-                                function (err) {
-                                    clearDirtyState($scope.content.variants);
-                                    $scope.saveAndCloseButtonState = "error";
-                                    //re-map the dialog model since we've re-bound the properties
-                                    dialog.variants = $scope.content.variants;
-                                    //don't reject, we've handled the error
-                                    return $q.when(err);
-                                });
-                        },
-                        close: function (oldModel) {
-                            overlayService.close();
-                        }
-                    };
-
-                    overlayService.open(dialog);
-                }
-                else {
-                    showValidationNotification();
-                }
-            }
-            else {
-                //ensure the flags are set
-                $scope.content.variants[0].save = true;
-                $scope.saveAndCloseButtonState = "busy";
-                return performSave({
-                    saveMethod: $scope.saveMethod(),
-                    action: "save"
-                }).then(function () {
-                    if ($scope.infiniteModel.submit) {
-                        $scope.infiniteModel.contentNode = $scope.content;
-                        $scope.infiniteModel.submit($scope.infiniteModel);
-                    }
-                    $scope.saveAndCloseButtonState = "success";
-                }, function () {
-                    $scope.saveAndCloseButtonState = "error";
-                });
-            }
-
-
-        };
 
         /**
          * Call back when a content app changes
