@@ -233,8 +233,7 @@
             ensureCultureData(block.content);
             ensureCultureData(block.settings);
 
-            // TODO: Why is there a '/' prefixed? that means this will never work with virtual directories
-            block.view = (block.config.view ? "/" + block.config.view : getDefaultViewForBlock(block));
+            block.view = (block.config.view ? block.config.view : getDefaultViewForBlock(block));
             block.showValidation = block.config.view ? true : false;
 
             block.hideContentInOverlay = block.config.forceHideContentEditorInOverlay === true || inlineEditing === true;
