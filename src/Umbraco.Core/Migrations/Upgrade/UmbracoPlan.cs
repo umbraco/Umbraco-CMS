@@ -7,6 +7,7 @@ using Umbraco.Core.Migrations.Upgrade.V_8_0_0;
 using Umbraco.Core.Migrations.Upgrade.V_8_0_1;
 using Umbraco.Core.Migrations.Upgrade.V_8_1_0;
 using Umbraco.Core.Migrations.Upgrade.V_8_6_0;
+using Umbraco.Core.Migrations.Upgrade.V_8_7_0;
 
 namespace Umbraco.Core.Migrations.Upgrade
 {
@@ -193,6 +194,9 @@ namespace Umbraco.Core.Migrations.Upgrade
 
 
             To<MissingDictionaryIndex>("{a78e3369-8ea3-40ec-ad3f-5f76929d2b20}");
+
+            // to 8.7.0...
+            To<NestedContentPropertyEditorsMigration>("{a730b327-300b-4b60-bd18-9a4f05b8e931}");
 
             //FINAL
         }
