@@ -18,7 +18,10 @@ function mediaHelper(umbRequestHelper, $log) {
          */
         formatMediaEntityData: function (mediaEntity) {
             if (mediaEntity && mediaEntity.metaData) {
-                if (mediaEntity.metaData.MediaPath) {
+                if (mediaEntity.metaData.IsFolder !== null && mediaEntity.metaData.IsFolder !== undefined) {
+                    mediaEntity.isFolder = mediaEntity.metaData.IsFolder;
+                }
+                else if (mediaEntity.metaData.MediaPath) {
                     mediaEntity.thumbnail = this.resolveFileFromEntity(mediaEntity, true);
                     mediaEntity.image = this.resolveFileFromEntity(mediaEntity, false);
                     mediaEntity.isFolder = mediaEntity.image ? false : true;

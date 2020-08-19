@@ -458,9 +458,9 @@ namespace Umbraco.Web.Editors
 
                 // else proceed as usual
 
-                return Services.EntityService.GetChildren(id, objectType.Value)
+                return HackForMediaEntities(Services.EntityService.GetChildren(id, objectType.Value)
                     .WhereNotNull()
-                    .Select(Mapper.Map<EntityBasic>);
+                    .Select(Mapper.Map<EntityBasic>), type);
             }
             //now we need to convert the unknown ones
             switch (type)
@@ -1036,5 +1036,38 @@ namespace Umbraco.Web.Editors
             return entities;
         }
 
+        /// <summary>
+        /// This will add some custom metadata to media entities to hack around the isFolder problem
+        /// THIS SHOULD NOT BE REQUIRED IN V8!
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <param name="entityType"></param>
+        /// <returns></returns>
+        private IEnumerable<EntityBasic> HackForMediaEntities(IEnumerable<EntityBasic> entities, UmbracoEntityTypes entityType)
+        {
+            // GetAllMediaTypes is a cached value so no perf issue here but we will still lazily resolve this only when necessary
+            var allMediaTypes = new Lazy<IEnumerable<IMediaType>>(() => Services.ContentTypeService.GetAllMediaTypes());
+            if (entityType == UmbracoEntityTypes.Media)
+            {
+                foreach (var e in entities)
+                {
+                    if (e.AdditionalData.TryGetValue("MediaPath", out var mp) && mp is string mediaPath && !mediaPath.IsNullOrWhiteSpace())
+                    {
+                        // It's not a folder if it has media path
+                        e.AdditionalData["IsFolder"] = false;
+                    }
+                    else
+                    {
+                        var mt = allMediaTypes.Value.FirstOrDefault(x => x.Alias == e.Alias);
+                        if (mt != null)
+                        {
+                            // It's not a folder if it's media type has a property type of umbracoFile
+                            e.AdditionalData["IsFolder"] = !mt.CompositionPropertyTypes.Any(x => x.Alias.InvariantEquals(Constants.Conventions.Media.File));
+                        }                        
+                    }
+                }
+            }
+            return entities;
+        }
     }
 }
