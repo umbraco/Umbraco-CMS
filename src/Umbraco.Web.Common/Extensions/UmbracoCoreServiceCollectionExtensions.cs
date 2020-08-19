@@ -16,6 +16,7 @@ using Serilog;
 using Serilog.Extensions.Hosting;
 using Serilog.Extensions.Logging;
 using Umbraco.Configuration;
+using Umbraco.Configuration.Models;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
@@ -105,10 +106,10 @@ namespace Umbraco.Extensions
         {
             if (configuration == null) throw new ArgumentNullException(nameof(configuration));
 
+            services.Configure<TourSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "Tours"));
+
             var configsFactory = new AspNetCoreConfigsFactory(configuration);
-
             var configs = configsFactory.Create();
-
             services.AddSingleton(configs);
 
             return services;

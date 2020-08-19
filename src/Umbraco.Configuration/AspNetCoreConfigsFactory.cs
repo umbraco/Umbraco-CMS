@@ -21,7 +21,7 @@ namespace Umbraco.Configuration
         {
             var configs = new Configs();
 
-            configs.Add<ITourSettings>(() => new TourSettings(_configuration));
+            //configs.Add<ITourSettings>(() => new TourSettings(_configuration));
             configs.Add<ICoreDebugSettings>(() => new CoreDebugSettings(_configuration));
             configs.Add<IRequestHandlerSettings>(() => new RequestHandlerSettings(_configuration));
             configs.Add<ISecuritySettings>(() => new SecuritySettings(_configuration));
