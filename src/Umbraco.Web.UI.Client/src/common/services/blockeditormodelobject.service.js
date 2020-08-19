@@ -14,7 +14,7 @@
     'use strict';
 
 
-    function blockEditorModelObjectFactory($interpolate, $q, udiService, contentResource, localizationService) {
+    function blockEditorModelObjectFactory($interpolate, $q, udiService, contentResource, localizationService, umbRequestHelper) {
 
         /**
          * Simple mapping from property model content entry to editing model,
