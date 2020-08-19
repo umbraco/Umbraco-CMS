@@ -28,7 +28,7 @@
             }
         });
 
-    function BlockListController($scope, editorService, clipboardService, localizationService, overlayService, blockEditorService, udiService, serverValidationManager, angularHelper, umbRequestHelper) {
+    function BlockListController($scope, editorService, clipboardService, localizationService, overlayService, blockEditorService, udiService, serverValidationManager, angularHelper) {
 
         var unsubscribe = [];
         var modelObject;
