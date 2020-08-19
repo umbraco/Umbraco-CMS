@@ -1,4 +1,5 @@
-﻿using System.Xml.XPath;
+﻿using System;
+using System.Xml.XPath;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 
@@ -8,6 +9,7 @@ namespace Umbraco.Web.PublishedCache
     {
         IPublishedContent GetByProviderKey(object key);
         IPublishedContent GetById(int memberId);
+        IPublishedContent GetById(Guid memberId);
         IPublishedContent GetByUsername(string username);
         IPublishedContent GetByEmail(string email);
         IPublishedContent GetByMember(IMember member);

@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
@@ -27,46 +30,59 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             => PropertyCacheLevel.Snapshot;
 
         public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
-            => typeof (IPublishedContent);
+        {
+            var isMultiple = IsMultipleDataType(propertyType.DataType);
+            return isMultiple
+                    ? typeof(IEnumerable<IPublishedContent>)
+                    : typeof(IPublishedContent);
+        }
+
+        private bool IsMultipleDataType(PublishedDataType dataType)
+        {
+            return ConfigurationEditor.ConfigurationAs<MemberPickerConfiguration>(dataType.Configuration).MaxNumber == 1;
+        }
 
         public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object source, bool preview)
         {
             if (source == null) return null;
 
-            var attemptConvertInt = source.TryConvertTo<int>();
-            if (attemptConvertInt.Success)
-                return attemptConvertInt.Result;
-            var attemptConvertUdi = source.TryConvertTo<Udi>();
-            if (attemptConvertUdi.Success)
-                return attemptConvertUdi.Result;
-            return null;
+            var nodeIds = source.ToString()
+                .Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(Udi.Parse)
+                .ToArray();
+
+            return nodeIds;
         }
 
         public override object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel cacheLevel, object source, bool preview)
         {
-            if (source == null)
-                return null;
+            var isMultiple = IsMultipleDataType(propertyType.DataType);
 
-            if (Current.UmbracoContext != null)
+            var udis = (Udi[])source;
+            var memberItems = new List<IPublishedContent>();
+
+            if (source == null) return isMultiple ? memberItems : null;
+
+            if (udis.Any())
             {
-                IPublishedContent member;
-                if (source is int id)
+                foreach (var udi in udis)
                 {
-                    member = _publishedSnapshotAccessor.PublishedSnapshot.Members.GetById(id);
-                    if (member != null)
-                        return member;
+                    var guidUdi = udi as GuidUdi;
+                    if (guidUdi == null) continue;
+                    var item = _publishedSnapshotAccessor.PublishedSnapshot.Members.GetById(guidUdi.Guid);
+                    if (item != null)
+                        memberItems.Add(item);
                 }
-                else
-                {
-                    var sourceUdi = source as GuidUdi;
-                    if (sourceUdi == null) return null;
-                    member = _publishedSnapshotAccessor.PublishedSnapshot.Members.GetByProviderKey(sourceUdi.Guid);
-                    if (member != null)
-                        return member;
-                }
+
+                return isMultiple ? memberItems : FirstOrDefault(memberItems);
             }
 
             return source;
+        }
+
+        private object FirstOrDefault(IList memberItems)
+        {
+            return memberItems.Count == 0 ? null : memberItems[0];
         }
     }
 }

@@ -60,6 +60,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 .Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries)
                 .Select(Udi.Parse)
                 .ToArray();
+
             return nodeIds;
         }
 

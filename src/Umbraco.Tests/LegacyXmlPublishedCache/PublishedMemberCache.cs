@@ -62,6 +62,24 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
                 });
         }
 
+        public IPublishedContent GetById(Guid memberId)
+        {
+            return _requestCache.GetCacheItem<IPublishedContent>(
+                GetCacheKey("GetById", memberId), () =>
+                {
+                    var provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
+                    if (provider.IsUmbracoMembershipProvider() == false)
+                    {
+                        throw new NotSupportedException("Cannot access this method unless the Umbraco membership provider is active");
+                    }
+
+                    var result = _memberService.GetByKey(memberId);
+                    if (result == null) return null;
+                    var type = _contentTypeCache.Get(PublishedItemType.Member, result.ContentTypeId);
+                    return new PublishedMember(result, type).CreateModel();
+                });
+        }
+
         public IPublishedContent GetByUsername(string username)
         {
             return _requestCache.GetCacheItem<IPublishedContent>(
