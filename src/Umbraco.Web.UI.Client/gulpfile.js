@@ -31,7 +31,7 @@ var karmaServer = require('karma').Server;
 Helper functions
 ***************************************************************/
 function processJs(files, out) {
-    
+
     return gulp.src(files)
      // check for js errors
      .pipe(eslint())
@@ -58,7 +58,7 @@ function processLess(files, out) {
         .pipe(postcss(processors))
         .pipe(rename(out))
         .pipe(gulp.dest(root + targets.css));
-    
+
     console.log(out + " compiled");
 }
 
@@ -67,7 +67,7 @@ Paths and destinations
 Each group is iterated automatically in the setup tasks below
 ***************************************************************/
 var sources = {
-    
+
     //less files used by backoffice and preview
     //processed in the less task
     less: {
@@ -104,7 +104,7 @@ var sources = {
         js: "./src/*.js",
         lib: "./lib/**/*",
         bower: "./lib-bower/**/*",
-        assets: "./src/assets/**"    
+        assets: "./src/assets/**"
     }
 };
 
@@ -140,7 +140,7 @@ gulp.task('docserve', function(cb) {
 /**************************
  * Task processes and copies all dependencies, either installed by bower, npm or stored locally in the project
  **************************/
-gulp.task('dependencies', function () { 
+gulp.task('dependencies', function () {
 
     //bower component specific copy rules
     //this is to patch the sometimes wonky rules these libs are distrbuted under
@@ -163,8 +163,9 @@ gulp.task('dependencies', function () {
             { base: "./bower_components/font-awesome/" })
             .pipe(gulp.dest(root + targets.lib + "/font-awesome"))
     );
-    
+
     // ace Editor
+    console.log(`Copying 'ace-builds' from bower_components/ace-builds/src-min-noconflict/  to ${root + targets.lib + "/ace-builds"}`);
     stream.add(
         gulp.src(["bower_components/ace-builds/src-min-noconflict/ace.js",
             "bower_components/ace-builds/src-min-noconflict/ext-language_tools.js",
@@ -199,21 +200,23 @@ gulp.task('dependencies', function () {
             .pipe(gulp.dest(root + targets.lib + "/codemirror"))
     );
 
-    //copy over libs which are not on bower (/lib) and 
+    //copy over libs which are not on bower (/lib) and
     //libraries that have been managed by bower-installer (/lib-bower)
+    console.log(`Copying 'lib' ${sources.globs.lib} to ${root + targets.lib}`);
     stream.add(
          gulp.src(sources.globs.lib)
             .pipe(gulp.dest(root + targets.lib))
         );
 
+    console.log(`Copying 'bower' ${sources.globs.bower} to ${root + targets.lib}`);
     stream.add(
          gulp.src(sources.globs.bower)
             .pipe(gulp.dest(root + targets.lib))
         );
 
-    //Copies all static assets into /root / assets folder 
+    //Copies all static assets into /root / assets folder
     //css, fonts and image files
-    stream.add( 
+    stream.add(
             gulp.src(sources.globs.assets)
 				.pipe(imagemin([
                     imagemin.gifsicle({interlaced: true}),
@@ -231,20 +234,20 @@ gulp.task('dependencies', function () {
 
     // Copies all the less files related to the preview into their folder
     //these are not pre-processed as preview has its own less combiler client side
-    stream.add( 
+    stream.add(
             gulp.src("src/canvasdesigner/editors/*.less")
                 .pipe(gulp.dest(root + targets.assets + "/less"))
         );
-		
+
 	// Todo: check if we need these fileSize
-    stream.add( 
+    stream.add(
             gulp.src("src/views/propertyeditors/grid/config/*.*")
                 .pipe(gulp.dest(root + targets.views + "/propertyeditors/grid/config"))
-        );		
-    stream.add( 
+        );
+    stream.add(
             gulp.src("src/views/dashboard/default/*.jpg")
                 .pipe(gulp.dest(root + targets.views + "/dashboard/default"))
-        );		
+        );
 
     return stream;
 });
@@ -253,8 +256,8 @@ gulp.task('dependencies', function () {
 /**************************
  * Copies all angular JS files into their seperate umbraco.*.js file
  **************************/
-gulp.task('js', function () { 
-  
+gulp.task('js', function () {
+
     //we run multiple streams, so merge them all together
     var stream = new MergeStream();
 
@@ -271,7 +274,7 @@ gulp.task('js', function () {
 });
 
 gulp.task('less', function () {
-    
+
     var stream = new MergeStream();
 
     _.forEach(sources.less, function (group) {
@@ -294,9 +297,9 @@ gulp.task('views', function () {
             gulp.src(group.files)
                 .pipe( gulp.dest(root + targets.views + group.folder) )
         );
-    
+
     });
-   
+
     return stream;
 });
 
@@ -311,13 +314,13 @@ gulp.task('watch', function () {
 
         if(group.watch !== false){
 
-            stream.add( 
+            stream.add(
 
                 watch(group.files, { ignoreInitial: true, interval: watchInterval }, function (file) {
 
                     console.info(file.path + " has changed, added to:  " + group.out);
                     processJs(group.files, group.out);
-                
+
                 })
 
             );
@@ -326,7 +329,7 @@ gulp.task('watch', function () {
 
     });
 
-    stream.add( 
+    stream.add(
         //watch all less files and trigger the less task
         watch(sources.globs.less, { ignoreInitial: true, interval: watchInterval }, function () {
             gulp.run(['less']);
@@ -334,13 +337,13 @@ gulp.task('watch', function () {
     );
 
     //watch all views - copy single file changes
-    stream.add( 
+    stream.add(
         watch(sources.globs.views, { interval: watchInterval })
         .pipe(gulp.dest(root + targets.views))
     );
 
     //watch all app js files that will not be merged - copy single file changes
-    stream.add( 
+    stream.add(
         watch(sources.globs.js, { interval: watchInterval })
         .pipe(gulp.dest(root + targets.js))
     );
@@ -385,7 +388,7 @@ gulp.task('connect:docs', function (cb) {
 });
 
 gulp.task('open:docs', function (cb) {
-    
+
     var options = {
         uri: 'http://localhost:8880/index.html'
     };

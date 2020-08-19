@@ -42,7 +42,8 @@
       "font-awesome",
       "angular",
       "bootstrap",
-      "codemirror"
+      "codemirror",
+      "ace-builds"
     ],
     "sources": {
       "moment": [
