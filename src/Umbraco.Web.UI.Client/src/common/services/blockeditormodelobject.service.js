@@ -325,6 +325,18 @@
             this.propertyEditorAlias = propertyEditorAlias;
             this.blockConfigurations = blockConfigurations;
 
+            this.blockConfigurations.forEach(blockConfiguration => {
+                if (blockConfiguration.view != null && blockConfiguration.view !== "") {
+                    blockConfiguration.view = umbRequestHelper.convertVirtualToAbsolutePath(blockConfiguration.view);
+                }
+                if (blockConfiguration.stylesheet != null && blockConfiguration.stylesheet !== "") {
+                    blockConfiguration.stylesheet = umbRequestHelper.convertVirtualToAbsolutePath(blockConfiguration.stylesheet);
+                }
+                if (blockConfiguration.thumbnail != null && blockConfiguration.thumbnail !== "") {
+                    blockConfiguration.thumbnail = umbRequestHelper.convertVirtualToAbsolutePath(blockConfiguration.thumbnail);
+                }
+            });
+
             this.scaffolds = [];
 
             this.isolatedScope = scopeOfExistance.$new(true);
@@ -541,15 +553,6 @@
                 }
                 blockObject.key = String.CreateGuid().replace(/-/g, "");
                 blockObject.config = Utilities.copy(blockConfiguration);
-                if (blockObject.config.view != null && blockObject.config.view !== "") {
-                    blockObject.config.view = umbRequestHelper.convertVirtualToAbsolutePath(blockObject.config.view);
-                }
-                if (blockObject.config.stylesheet != null && blockObject.config.stylesheet !== "") {
-                    blockObject.config.stylesheet = umbRequestHelper.convertVirtualToAbsolutePath(blockObject.config.stylesheet);
-                }
-                if (blockObject.config.thumbnail != null && blockObject.config.thumbnail !== "") {
-                    blockObject.config.thumbnail = umbRequestHelper.convertVirtualToAbsolutePath(blockObject.config.thumbnail);
-                }
                 if (blockObject.config.label && blockObject.config.label !== "") {
                     blockObject.labelInterpolator = $interpolate(blockObject.config.label);
                 }
