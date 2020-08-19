@@ -235,11 +235,9 @@
             block.stylesheet = null;
         };
 
+        vm.addThumbnailForBlock = function (block) {
 
-
-        vm.addThumbnailForBlock = function(block) {
-
-            localizationService.localize("blockEditor_headlineAddThumbnail").then(function(localizedTitle) {
+            localizationService.localize("blockEditor_headlineAddThumbnail").then(function (localizedTitle) {
 
                 const thumbnailPicker = {
                     title: localizedTitle,
@@ -250,6 +248,7 @@
                     filter: function (i) {
                         return !(i.name.indexOf(".jpg") !== -1 || i.name.indexOf(".jpeg") !== -1 || i.name.indexOf(".png") !== -1 || i.name.indexOf(".svg") !== -1 || i.name.indexOf(".webp") !== -1 || i.name.indexOf(".gif") !== -1);
                     },
+                    filterCssClass: "not-allowed",
                     select: function (file) {
                         block.thumbnail = file.name;
                         editorService.close();
@@ -259,27 +258,24 @@
                     }
                 };
                 editorService.treePicker(thumbnailPicker);
-
             });
-        }
+        };
+
         vm.removeThumbnailForBlock = function(entry) {
             entry.thumbnail = null;
         };
-
-
-
 
         vm.submit = function () {
             if ($scope.model && $scope.model.submit) {
                 $scope.model.submit($scope.model);
             }
-        }
+        };
 
-        vm.close = function() {
+        vm.close = function () {
             if ($scope.model && $scope.model.close) {
                 $scope.model.close($scope.model);
             }
-        }
+        };
 
         $scope.$on('$destroy', function () {
             unsubscribe.forEach(u => { u(); });
