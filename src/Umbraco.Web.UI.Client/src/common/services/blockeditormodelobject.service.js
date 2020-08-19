@@ -541,6 +541,15 @@
                 }
                 blockObject.key = String.CreateGuid().replace(/-/g, "");
                 blockObject.config = Utilities.copy(blockConfiguration);
+                if (blockObject.config.view != null && blockObject.config.view !== "") {
+                    blockObject.config.view = umbRequestHelper.convertVirtualToAbsolutePath(blockObject.config.view);
+                }
+                if (blockObject.config.stylesheet != null && blockObject.config.stylesheet !== "") {
+                    blockObject.config.stylesheet = umbRequestHelper.convertVirtualToAbsolutePath(blockObject.config.stylesheet);
+                }
+                if (blockObject.config.thumbnail != null && blockObject.config.thumbnail !== "") {
+                    blockObject.config.thumbnail = umbRequestHelper.convertVirtualToAbsolutePath(blockObject.config.thumbnail);
+                }
                 if (blockObject.config.label && blockObject.config.label !== "") {
                     blockObject.labelInterpolator = $interpolate(blockObject.config.label);
                 }

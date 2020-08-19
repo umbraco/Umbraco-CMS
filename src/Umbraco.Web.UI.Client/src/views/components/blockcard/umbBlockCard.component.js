@@ -14,15 +14,9 @@
             }
         });
 
-    function BlockCardController(umbRequestHelper) {
+    function BlockCardController() {
 
         var vm = this;
-
-        vm.$onInit = function() {
-            if(vm.blockConfigModel.thumbnail != null && vm.blockConfigModel.thumbnail != "") {
-                vm.thumbnail = convertVirtualToAbsolutePath(vm.blockConfigModel.thumbnail);
-            }
-        }
 
     }
 

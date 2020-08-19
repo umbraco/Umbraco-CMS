@@ -233,7 +233,7 @@
             ensureCultureData(block.content);
             ensureCultureData(block.settings);
 
-            block.view = (block.config.view ? umbRequestHelper.convertVirtualToAbsolutePath(block.config.view) : getDefaultViewForBlock(block));
+            block.view = (block.config.view ? block.config.view : getDefaultViewForBlock(block));
             block.showValidation = block.config.view ? true : false;
 
             block.hideContentInOverlay = block.config.forceHideContentEditorInOverlay === true || inlineEditing === true;
