@@ -30,7 +30,6 @@
             }
 
             loadElementTypes();
-
         }
 
         function loadElementTypes() {
@@ -47,9 +46,10 @@
                 }
             }
         }
+
         unsubscribe.push(eventsService.on("editors.documentType.saved", updateUsedElementTypes));
 
-        vm.requestRemoveBlockByIndex = function (index) {
+        vm.requestRemoveBlockByIndex = function ($event, index) {
             localizationService.localizeMany(["general_delete", "blockEditor_confirmDeleteBlockMessage", "blockEditor_confirmDeleteBlockNotice"]).then(function (data) {
                 var contentElementType = vm.getElementTypeByKey($scope.model.value[index].contentTypeKey);
                 overlayService.confirmDelete({
@@ -65,7 +65,10 @@
                     }
                 });
             });
-        }
+
+            $event.preventDefault();
+            $event.stopPropagation();
+        };
 
         vm.removeBlockByIndex = function (index) {
             $scope.model.value.splice(index, 1);
@@ -77,7 +80,6 @@
             cursor: "grabbing",
             placeholder: 'umb-block-card --sortable-placeholder'
         };
-        
 
         vm.getAvailableElementTypes = function () {
             return vm.elementTypes.filter(function (type) {
@@ -96,7 +98,7 @@
         };
 
         vm.openAddDialog = function ($event, entry) {
-
+            
             //we have to add the 'alias' property to the objects, to meet the data requirements of itempicker.
             var selectedItems = Utilities.copy($scope.model.value).forEach((obj) => {
                 obj.alias = vm.getElementTypeByKey(obj.contentTypeKey).alias;
@@ -133,17 +135,16 @@
                 };
 
                 overlayService.open(elemTypeSelectorOverlay);
-                
             });
         };
 
-        vm.createElementTypeAndCallback = function(callback) {
+        vm.createElementTypeAndCallback = function (callback) {
             const editor = {
                 create: true,
                 infiniteMode: true,
                 isElement: true,
                 submit: function (model) {
-                    loadElementTypes().then( function () {
+                    loadElementTypes().then(function () {
                         callback(model.documentTypeKey);
                     });
                     editorService.close();
@@ -153,7 +154,7 @@
                 }
             };
             editorService.documentTypeEditor(editor);
-        }
+        };
 
         vm.addBlockFromElementTypeKey = function(key) {
 
@@ -171,10 +172,6 @@
 
             $scope.model.value.push(entry);
         };
-
-
-
-
 
         vm.openBlockOverlay = function (block) {
 
@@ -201,9 +198,7 @@
 
                 // open property settings editor
                 editorService.open(overlayModel);
-
             });
-
         };
 
         $scope.$on('$destroy', function () {
