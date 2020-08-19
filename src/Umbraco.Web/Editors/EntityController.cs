@@ -161,7 +161,7 @@ namespace Umbraco.Web.Editors
         {
             var foundContent = GetResultForId(id, type);
 
-            return foundContent.Path.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse);
+            return foundContent.Path.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse);
         }
 
         /// <summary>
@@ -223,7 +223,8 @@ namespace Umbraco.Web.Editors
             var ancestors = GetAncestors(id, type);
 
             //if content, skip the first node for replicating NiceUrl defaults
-            if(type == UmbracoEntityTypes.Document) {
+            if (type == UmbracoEntityTypes.Document)
+            {
                 ancestors = ancestors.Skip(1);
             }
 
@@ -283,7 +284,7 @@ namespace Umbraco.Web.Editors
 
 
         [HttpGet]
-        public UrlAndAnchors GetUrlAndAnchors([FromUri]int id)
+        public UrlAndAnchors GetUrlAndAnchors([FromUri] int id)
         {
             var url = Umbraco.Url(id);
             var anchorValues = Services.ContentService.GetAnchorValuesFromRTEs(id);
@@ -357,7 +358,7 @@ namespace Umbraco.Web.Editors
         /// </remarks>
         [HttpGet]
         [HttpPost]
-        public IEnumerable<EntityBasic> GetByIds([FromJsonPath]int[] ids, UmbracoEntityTypes type)
+        public IEnumerable<EntityBasic> GetByIds([FromJsonPath] int[] ids, UmbracoEntityTypes type)
         {
             if (ids == null)
             {
@@ -377,7 +378,7 @@ namespace Umbraco.Web.Editors
         /// </remarks>
         [HttpGet]
         [HttpPost]
-        public IEnumerable<EntityBasic> GetByIds([FromJsonPath]Guid[] ids, UmbracoEntityTypes type)
+        public IEnumerable<EntityBasic> GetByIds([FromJsonPath] Guid[] ids, UmbracoEntityTypes type)
         {
             if (ids == null)
             {
@@ -399,7 +400,7 @@ namespace Umbraco.Web.Editors
         /// </remarks>
         [HttpGet]
         [HttpPost]
-        public IEnumerable<EntityBasic> GetByIds([FromJsonPath]Udi[] ids, [FromUri]UmbracoEntityTypes type)
+        public IEnumerable<EntityBasic> GetByIds([FromJsonPath] Udi[] ids, [FromUri] UmbracoEntityTypes type)
         {
             if (ids == null)
             {
@@ -426,7 +427,7 @@ namespace Umbraco.Web.Editors
 
         [Obsolete("Use GetyByIds instead")]
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public IEnumerable<EntityBasic> GetByKeys([FromUri]Guid[] ids, UmbracoEntityTypes type)
+        public IEnumerable<EntityBasic> GetByKeys([FromUri] Guid[] ids, UmbracoEntityTypes type)
         {
             if (ids == null)
             {
@@ -460,7 +461,7 @@ namespace Umbraco.Web.Editors
 
                 return HackForMediaEntities(Services.EntityService.GetChildren(id, objectType.Value)
                     .WhereNotNull()
-                    .Select(Mapper.Map<EntityBasic>), type);
+                    .Select(Mapper.Map<EntityBasic>).ToList(), type);
             }
             //now we need to convert the unknown ones
             switch (type)
@@ -529,7 +530,9 @@ namespace Umbraco.Web.Editors
             //quite a bit of plumbing to do in the Services/Repository, we'll revert to a paged search
 
             long total;
-            var searchResult = _treeSearcher.ExamineSearch(Umbraco, filter ?? "", type, pageSize, pageNumber - 1, out total, id);
+            var searchResult = HackForMediaEntities(
+                _treeSearcher.ExamineSearch(Umbraco, filter ?? "", type, pageSize, pageNumber - 1, out total, id).ToList(),
+                type);
 
             return new PagedResult<EntityBasic>(total, pageNumber, pageSize)
             {
@@ -599,7 +602,7 @@ namespace Umbraco.Web.Editors
 
                 var pagedResult = new PagedResult<EntityBasic>(totalRecords, pageNumber, pageSize)
                 {
-                    Items = entities.Select(Mapper.Map<EntityBasic>)
+                    Items = HackForMediaEntities(entities.Select(Mapper.Map<EntityBasic>).ToList(), type)
                 };
 
                 return pagedResult;
@@ -678,7 +681,7 @@ namespace Umbraco.Web.Editors
 
                 var pagedResult = new PagedResult<EntityBasic>(totalRecords, pageNumber, pageSize)
                 {
-                    Items = entities.Select(Mapper.Map<EntityBasic>)
+                    Items = HackForMediaEntities(entities.Select(Mapper.Map<EntityBasic>).ToList(), type)
                 };
 
                 return pagedResult;
@@ -705,7 +708,7 @@ namespace Umbraco.Web.Editors
             return GetResultForAncestors(id, type, dataTypeId);
         }
 
-        public IEnumerable<EntityBasic> GetAll(UmbracoEntityTypes type, string postFilter, [FromUri]IDictionary<string, object> postFilterParams)
+        public IEnumerable<EntityBasic> GetAll(UmbracoEntityTypes type, string postFilter, [FromUri] IDictionary<string, object> postFilterParams)
         {
             return GetResultForAll(type, postFilter, postFilterParams);
         }
@@ -721,7 +724,9 @@ namespace Umbraco.Web.Editors
         private IEnumerable<SearchResultItem> ExamineSearch(string query, UmbracoEntityTypes entityType, string searchFrom = null, bool ignoreUserStartNodes = false)
         {
             long total;
-            return _treeSearcher.ExamineSearch(Umbraco, query, entityType, 200, 0, out total, searchFrom, ignoreUserStartNodes);
+            return HackForMediaEntities(
+                _treeSearcher.ExamineSearch(Umbraco, query, entityType, 200, 0, out total, searchFrom, ignoreUserStartNodes).ToList(),
+                entityType);
         }
 
         private IEnumerable<EntityBasic> GetResultForAncestors(int id, UmbracoEntityTypes entityType, Guid? dataTypeId = null)
@@ -770,10 +775,10 @@ namespace Umbraco.Web.Editors
 
                 return ids.Length == 0
                     ? Enumerable.Empty<EntityBasic>()
-                    : Services.EntityService.GetAll(objectType.Value, ids)
+                    : HackForMediaEntities(Services.EntityService.GetAll(objectType.Value, ids)
                         .WhereNotNull()
                         .OrderBy(x => x.Level)
-                        .Select(Mapper.Map<EntityBasic>);
+                        .Select(Mapper.Map<EntityBasic>).ToList(), entityType);
             }
             //now we need to convert the unknown ones
             switch (entityType)
@@ -803,7 +808,7 @@ namespace Umbraco.Web.Editors
             {
                 //TODO: Should we order this by something ?
                 var entities = Services.EntityService.GetAll(objectType.Value).WhereNotNull().Select(Mapper.Map<EntityBasic>);
-                return ExecutePostFilter(entities, postFilter, postFilterParams);
+                return HackForMediaEntities(ExecutePostFilter(entities, postFilter, postFilterParams).ToList(), entityType);
             }
             //now we need to convert the unknown ones
             switch (entityType)
@@ -873,7 +878,7 @@ namespace Umbraco.Web.Editors
                 var xref = entities.ToDictionary(x => x.Key);
                 var result = keys.Select(x => xref.ContainsKey(x) ? xref[x] : null).Where(x => x != null);
 
-                return result;
+                return HackForMediaEntities(result.ToList(), entityType);
             }
             //now we need to convert the unknown ones
             switch (entityType)
@@ -905,7 +910,7 @@ namespace Umbraco.Web.Editors
                 var xref = entities.ToDictionary(x => x.Id);
                 var result = ids.Select(x => xref.ContainsKey(x) ? xref[x] : null).Where(x => x != null);
 
-                return result;
+                return HackForMediaEntities(result.ToList(), entityType);
             }
             //now we need to convert the unknown ones
             switch (entityType)
@@ -931,7 +936,7 @@ namespace Umbraco.Web.Editors
                 {
                     throw new HttpResponseException(HttpStatusCode.NotFound);
                 }
-                return Mapper.Map<EntityBasic>(found);
+                return HackForMediaEntity(Mapper.Map<EntityBasic>(found), entityType);
             }
             //now we need to convert the unknown ones
             switch (entityType)
@@ -963,7 +968,7 @@ namespace Umbraco.Web.Editors
                 {
                     throw new HttpResponseException(HttpStatusCode.NotFound);
                 }
-                return Mapper.Map<EntityBasic>(found);
+                return HackForMediaEntity(Mapper.Map<EntityBasic>(found), entityType);
             }
             //now we need to convert the unknown ones
             switch (entityType)
@@ -1037,13 +1042,64 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
+        /// This will add some custom metadata to a media entity to hack around the isFolder problem
+        /// THIS SHOULD NOT BE REQUIRED IN V8!
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="entityType"></param>
+        /// <returns></returns>
+        private T HackForMediaEntity<T>(T entity, UmbracoEntityTypes entityType)
+            where T : EntityBasic
+        {
+            if (entityType == UmbracoEntityTypes.Media)
+            {
+                var allMediaTypes = new Lazy<IEnumerable<IMediaType>>(() => Services.ContentTypeService.GetAllMediaTypes());
+                return HackForMediaEntity(entity, entityType, allMediaTypes);
+            }
+            return entity;
+        }
+
+        /// <summary>
+        /// This will add some custom metadata to a media entity to hack around the isFolder problem
+        /// THIS SHOULD NOT BE REQUIRED IN V8!
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="entity"></param>
+        /// <param name="entityType"></param>
+        /// <param name="allMediaTypes"></param>
+        /// <returns></returns>
+        private T HackForMediaEntity<T>(T entity, UmbracoEntityTypes entityType, Lazy<IEnumerable<IMediaType>> allMediaTypes)
+            where T : EntityBasic
+        {
+            if (entityType == UmbracoEntityTypes.Media)
+            {
+                if (entity.AdditionalData.TryGetValue("MediaPath", out var mp) && mp is string mediaPath && !mediaPath.IsNullOrWhiteSpace())
+                {
+                    // It's not a folder if it has media path
+                    entity.AdditionalData["IsFolder"] = false;
+                }
+                else
+                {
+                    var mt = allMediaTypes.Value.FirstOrDefault(x => x.Alias == entity.Alias);
+                    if (mt != null)
+                    {
+                        // It's not a folder if it's media type has a property type of umbracoFile
+                        entity.AdditionalData["IsFolder"] = !mt.CompositionPropertyTypes.Any(x => x.Alias.InvariantEquals(Constants.Conventions.Media.File));
+                    }
+                }
+            }
+            return entity;
+        }
+
+        /// <summary>
         /// This will add some custom metadata to media entities to hack around the isFolder problem
         /// THIS SHOULD NOT BE REQUIRED IN V8!
         /// </summary>
         /// <param name="entities"></param>
         /// <param name="entityType"></param>
         /// <returns></returns>
-        private IEnumerable<EntityBasic> HackForMediaEntities(IEnumerable<EntityBasic> entities, UmbracoEntityTypes entityType)
+        private IList<T> HackForMediaEntities<T>(IList<T> entities, UmbracoEntityTypes entityType)
+        where T : EntityBasic
         {
             // GetAllMediaTypes is a cached value so no perf issue here but we will still lazily resolve this only when necessary
             var allMediaTypes = new Lazy<IEnumerable<IMediaType>>(() => Services.ContentTypeService.GetAllMediaTypes());
@@ -1051,20 +1107,7 @@ namespace Umbraco.Web.Editors
             {
                 foreach (var e in entities)
                 {
-                    if (e.AdditionalData.TryGetValue("MediaPath", out var mp) && mp is string mediaPath && !mediaPath.IsNullOrWhiteSpace())
-                    {
-                        // It's not a folder if it has media path
-                        e.AdditionalData["IsFolder"] = false;
-                    }
-                    else
-                    {
-                        var mt = allMediaTypes.Value.FirstOrDefault(x => x.Alias == e.Alias);
-                        if (mt != null)
-                        {
-                            // It's not a folder if it's media type has a property type of umbracoFile
-                            e.AdditionalData["IsFolder"] = !mt.CompositionPropertyTypes.Any(x => x.Alias.InvariantEquals(Constants.Conventions.Media.File));
-                        }                        
-                    }
+                    HackForMediaEntity(e, entityType, allMediaTypes);
                 }
             }
             return entities;
