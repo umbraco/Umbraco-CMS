@@ -7,20 +7,9 @@ namespace Umbraco.Configuration.Models
     /// <summary>
     ///     Represents the models builder configuration.
     /// </summary>
-    internal class ModelsBuilderConfig : IModelsBuilderConfig
+    public class ModelsBuilderConfig 
     {
-        private const string Prefix = Constants.Configuration.ConfigModelsBuilderPrefix;
-        private readonly IConfiguration _configuration;
-
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="ModelsBuilderConfig" /> class.
-        /// </summary>
-        public ModelsBuilderConfig(IConfiguration configuration)
-        {
-            _configuration = configuration;
-        }
-
-        public string DefaultModelsDirectory => "~/App_Data/Models";
+        public static string DefaultModelsDirectory => "~/App_Data/Models";
 
         /// <summary>
         ///     Gets a value indicating whether the whole models experience is enabled.
@@ -29,25 +18,26 @@ namespace Umbraco.Configuration.Models
         ///     <para>If this is false then absolutely nothing happens.</para>
         ///     <para>Default value is <c>false</c> which means that unless we have this setting, nothing happens.</para>
         /// </remarks>
-        public bool Enable => _configuration.GetValue(Prefix+"Enable", false);
+        public bool Enable { get; set; } = false;
 
         /// <summary>
         ///     Gets the models mode.
         /// </summary>
-        public ModelsMode ModelsMode =>
-            _configuration.GetValue(Prefix+"ModelsMode", ModelsMode.Nothing);
+        public ModelsMode ModelsMode { get; set; } = ModelsMode.Nothing;
 
         /// <summary>
         ///     Gets the models namespace.
         /// </summary>
         /// <remarks>That value could be overriden by other (attribute in user's code...). Return default if no value was supplied.</remarks>
-        public string ModelsNamespace => _configuration.GetValue<string>(Prefix+"ModelsNamespace");
+        public string ModelsNamespace { get; set; }
 
         /// <summary>
         ///     Gets a value indicating whether we should enable the models factory.
         /// </summary>
         /// <remarks>Default value is <c>true</c> because no factory is enabled by default in Umbraco.</remarks>
-        public bool EnableFactory => _configuration.GetValue(Prefix+"EnableFactory", true);
+        public bool EnableFactory { get; set; } = true;
+
+        private bool _flagOutOfDateModels;
 
         /// <summary>
         ///     Gets a value indicating whether we should flag out-of-date models.
@@ -57,15 +47,26 @@ namespace Umbraco.Configuration.Models
         ///     setting is activated the ~/App_Data/Models/ood.txt file is then created. When models are
         ///     generated through the dashboard, the files is cleared. Default value is <c>false</c>.
         /// </remarks>
-        public bool FlagOutOfDateModels =>
-            _configuration.GetValue(Prefix+"FlagOutOfDateModels", false) && !ModelsMode.IsLive();
+        public bool FlagOutOfDateModels
+        {
+            get => _flagOutOfDateModels;
+
+            set
+            {
+                if (!ModelsMode.IsLive())
+                {
+                    _flagOutOfDateModels = false;
+                }
+
+                _flagOutOfDateModels = value;
+            }
+        }
 
         /// <summary>
         ///     Gets the models directory.
         /// </summary>
         /// <remarks>Default is ~/App_Data/Models but that can be changed.</remarks>
-        public string ModelsDirectory =>
-            _configuration.GetValue(Prefix+"ModelsDirectory", "~/App_Data/Models");
+        public string ModelsDirectory { get; set; } = DefaultModelsDirectory;
 
         /// <summary>
         ///     Gets a value indicating whether to accept an unsafe value for ModelsDirectory.
@@ -74,13 +75,12 @@ namespace Umbraco.Configuration.Models
         ///     An unsafe value is an absolute path, or a relative path pointing outside
         ///     of the website root.
         /// </remarks>
-        public bool AcceptUnsafeModelsDirectory =>
-            _configuration.GetValue(Prefix+"AcceptUnsafeModelsDirectory", false);
+        public bool AcceptUnsafeModelsDirectory { get; set; } = false;
 
         /// <summary>
         ///     Gets a value indicating the debug log level.
         /// </summary>
         /// <remarks>0 means minimal (safe on live site), anything else means more and more details (maybe not safe).</remarks>
-        public int DebugLevel => _configuration.GetValue(Prefix+"DebugLevel", 0);
+        public int DebugLevel { get; set; } = 0;
     }
 }

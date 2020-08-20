@@ -1,33 +1,17 @@
-﻿using Microsoft.Extensions.Configuration;
-using Umbraco.Core;
-using Umbraco.Core.Configuration.UmbracoSettings;
-
-namespace Umbraco.Configuration.Models
+﻿namespace Umbraco.Configuration.Models
 {
-    internal class SecuritySettings : ISecuritySettings
+    public class SecuritySettings
     {
-        private const string Prefix = Constants.Configuration.ConfigSecurityPrefix;
-        private readonly IConfiguration _configuration;
+        public bool KeepUserLoggedIn { get; set; } = false;
 
-        public SecuritySettings(IConfiguration configuration)
-        {
-            _configuration = configuration;
-        }
+        public bool HideDisabledUsersInBackoffice { get; set; } = false;
 
-        public bool KeepUserLoggedIn => _configuration.GetValue(Prefix + "KeepUserLoggedIn", false);
+        public bool AllowPasswordReset { get; set; } = true;
 
-        public bool HideDisabledUsersInBackoffice =>
-            _configuration.GetValue(Prefix + "HideDisabledUsersInBackoffice", false);
+        public string AuthCookieName { get; set; } = "UMB_UCONTEXT";
 
-        public bool AllowPasswordReset =>
-            _configuration.GetValue(Prefix + "AllowPasswordResetAllowPasswordReset", true);
+        public string AuthCookieDomain { get; set; }
 
-        public string AuthCookieName =>
-            _configuration.GetValue(Prefix + "AuthCookieName", "UMB_UCONTEXT");
-
-        public string AuthCookieDomain =>
-            _configuration.GetValue<string>(Prefix + "AuthCookieDomain");
-
-        public bool UsernameIsEmail => _configuration.GetValue(Prefix + "UsernameIsEmail", true);
+        public bool UsernameIsEmail { get; set; } = true;
     }
 }

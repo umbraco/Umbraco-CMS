@@ -1,9 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Net.Mail;
-using Microsoft.Extensions.Configuration;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
+﻿using System.Text.Json.Serialization;
 
 namespace Umbraco.Configuration.Models
 {
@@ -11,91 +6,57 @@ namespace Umbraco.Configuration.Models
     ///     The GlobalSettings Class contains general settings information for the entire Umbraco instance based on information
     ///     from  web.config appsettings
     /// </summary>
-    internal class GlobalSettings : IGlobalSettings
+    public class GlobalSettings
     {
-        private const string Prefix = Constants.Configuration.ConfigGlobalPrefix;
-
         internal const string
             StaticReservedPaths = "~/app_plugins/,~/install/,~/mini-profiler-resources/,"; //must end with a comma!
 
         internal const string
             StaticReservedUrls = "~/config/splashes/noNodes.aspx,~/.well-known,"; //must end with a comma!
 
-        private readonly IConfiguration _configuration;
+        public string ReservedUrls { get; set; } = StaticReservedUrls;
 
-        public GlobalSettings(IConfiguration configuration)
-        {
-            _configuration = configuration;
-        }
-
-        public string ReservedUrls => _configuration.GetValue(Prefix + "ReservedUrls", StaticReservedUrls);
-        public string ReservedPaths => _configuration.GetValue(Prefix + "ReservedPaths", StaticReservedPaths);
+        public string ReservedPaths { get; set; } = StaticReservedPaths;
 
         // TODO: https://github.com/umbraco/Umbraco-CMS/issues/4238 - stop having version in web.config appSettings
-        public string ConfigurationStatus
-        {
-            get => _configuration.GetValue<string>(Prefix + "ConfigurationStatus");
-            set => throw new NotImplementedException("We should remove this and only use the value from database");
-        }
+        // TODO: previously this would throw on set, but presumably we can't do that if we do still want this in config.
+        public string ConfigurationStatus { get; set; }
 
-        public int TimeOutInMinutes => _configuration.GetValue(Prefix + "TimeOutInMinutes", 20);
-        public string DefaultUILanguage => _configuration.GetValue(Prefix + "DefaultUILanguage", "en-US");
+        public int TimeOutInMinutes { get; set; } = 20;
 
-        public bool HideTopLevelNodeFromPath =>
-            _configuration.GetValue(Prefix + "HideTopLevelNodeFromPath", false);
+        public string DefaultUILanguage { get; set; } = "en-US";
 
-        public bool UseHttps => _configuration.GetValue(Prefix + "UseHttps", false);
-        public int VersionCheckPeriod => _configuration.GetValue(Prefix + "VersionCheckPeriod", 7);
-        public string UmbracoPath => _configuration.GetValue(Prefix + "UmbracoPath", "~/umbraco");
-        public string UmbracoCssPath => _configuration.GetValue(Prefix + "UmbracoCssPath", "~/css");
+        public bool HideTopLevelNodeFromPath { get; set; } = false;
 
-        public string UmbracoScriptsPath =>
-            _configuration.GetValue(Prefix + "UmbracoScriptsPath", "~/scripts");
+        public bool UseHttps { get; set; } = false;
 
-        public string UmbracoMediaPath => _configuration.GetValue(Prefix + "UmbracoMediaPath", "~/media");
+        public int VersionCheckPeriod { get; set; } = 7;
 
-        public bool InstallMissingDatabase =>
-            _configuration.GetValue(Prefix + "InstallMissingDatabase", false);
+        public string UmbracoPath { get; set; } = "~/umbraco";
 
-        public bool InstallEmptyDatabase => _configuration.GetValue(Prefix + "InstallEmptyDatabase", false);
+        public string UmbracoCssPath { get; set; } = "~/css";
 
-        public bool DisableElectionForSingleServer =>
-            _configuration.GetValue(Prefix + "DisableElectionForSingleServer", false);
+        public string UmbracoScriptsPath { get; set; } = "~/scripts";
 
-        public string RegisterType => _configuration.GetValue(Prefix + "RegisterType", string.Empty);
+        public string UmbracoMediaPath { get; set; } = "~/media";
 
-        public string DatabaseFactoryServerVersion =>
-            _configuration.GetValue(Prefix + "DatabaseFactoryServerVersion", string.Empty);
+        public bool InstallMissingDatabase { get; set; } = false;
 
-        public string MainDomLock => _configuration.GetValue(Prefix + "MainDomLock", string.Empty);
+        public bool InstallEmptyDatabase { get; set; } = false;
 
-        public string NoNodesViewPath =>
-            _configuration.GetValue(Prefix + "NoNodesViewPath", "~/config/splashes/NoNodes.cshtml");
+        public bool DisableElectionForSingleServer { get; set; } = false;
 
-        public bool IsSmtpServerConfigured =>
-            _configuration.GetSection(Constants.Configuration.ConfigGlobalPrefix + "Smtp")?.GetChildren().Any() ?? false;
+        public string RegisterType { get; set; } = string.Empty;
 
-        public ISmtpSettings SmtpSettings =>
-            new SmtpSettingsImpl(_configuration.GetSection(Constants.Configuration.ConfigGlobalPrefix + "Smtp"));
+        public string DatabaseFactoryServerVersion { get; set; } = string.Empty;
 
-        private class SmtpSettingsImpl : ISmtpSettings
-        {
-            private readonly IConfigurationSection _configurationSection;
+        public string MainDomLock { get; set; } = string.Empty;
 
-            public SmtpSettingsImpl(IConfigurationSection configurationSection)
-            {
-                _configurationSection = configurationSection;
-            }
+        public string NoNodesViewPath { get; set; } = "~/config/splashes/NoNodes.cshtml";
 
-            public string From => _configurationSection.GetValue<string>("From");
-            public string Host => _configurationSection.GetValue<string>("Host");
-            public int Port => _configurationSection.GetValue<int>("Port");
-            public string PickupDirectoryLocation => _configurationSection.GetValue<string>("PickupDirectoryLocation");
-            public SmtpDeliveryMethod DeliveryMethod => _configurationSection.GetValue<SmtpDeliveryMethod>("DeliveryMethod");
+        public bool IsSmtpServerConfigured => !string.IsNullOrWhiteSpace(SmtpSettings?.Host);
 
-            public string Username => _configurationSection.GetValue<string>("Username");
-
-            public string Password => _configurationSection.GetValue<string>("Password");
-        }
+        [JsonPropertyName("Smtp")]
+        public SmtpSettings SmtpSettings { get; set; }
     }
 }

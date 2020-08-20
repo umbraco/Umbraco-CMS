@@ -1,20 +1,7 @@
-﻿using Microsoft.Extensions.Configuration;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
-
-namespace Umbraco.Configuration.Models
+﻿namespace Umbraco.Configuration.Models
 {
-    internal class IndexCreatorSettings : IIndexCreatorSettings
+    public class IndexCreatorSettings
     {
-        private const string Prefix = Constants.Configuration.ConfigPrefix + "Examine:";
-        private readonly IConfiguration _configuration;
-
-        public IndexCreatorSettings(IConfiguration configuration)
-        {
-            _configuration = configuration;
-        }
-
-        public string LuceneDirectoryFactory =>
-            _configuration.GetValue<string>(Prefix + "LuceneDirectoryFactory");
+        public string LuceneDirectoryFactory { get; set; }
     }
 }

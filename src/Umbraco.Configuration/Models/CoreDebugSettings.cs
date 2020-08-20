@@ -1,23 +1,9 @@
-﻿using Microsoft.Extensions.Configuration;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
-
-namespace Umbraco.Configuration.Models
+﻿namespace Umbraco.Configuration.Models
 {
-    internal class CoreDebugSettings : ICoreDebugSettings
+    public class CoreDebugSettings
     {
-        private const string Prefix = Constants.Configuration.ConfigPrefix + "Core:Debug:";
-        private readonly IConfiguration _configuration;
+        public bool LogUncompletedScopes { get; set; } = false;
 
-        public CoreDebugSettings(IConfiguration configuration)
-        {
-            _configuration = configuration;
-        }
-
-        public bool LogUncompletedScopes =>
-            _configuration.GetValue(Prefix+"LogUncompletedScopes", false);
-
-        public bool DumpOnTimeoutThreadAbort =>
-            _configuration.GetValue(Prefix+"DumpOnTimeoutThreadAbort", false);
+        public bool DumpOnTimeoutThreadAbort { get; set; } = false;
     }
 }

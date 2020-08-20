@@ -1,23 +1,11 @@
-﻿using Microsoft.Extensions.Configuration;
-using Umbraco.Core;
-using Umbraco.Core.Configuration.UmbracoSettings;
+﻿using Umbraco.Core.Configuration.UmbracoSettings;
 
 namespace Umbraco.Configuration.Models
 {
-    internal class KeepAliveSettings : IKeepAliveSettings
+    public class KeepAliveSettings : IKeepAliveSettings
     {
-        private const string Prefix = Constants.Configuration.ConfigPrefix + "KeepAlive:";
-        private readonly IConfiguration _configuration;
+        public bool DisableKeepAliveTask { get; set; } = false;
 
-        public KeepAliveSettings(IConfiguration configuration)
-        {
-            _configuration = configuration;
-        }
-
-        public bool DisableKeepAliveTask =>
-            _configuration.GetValue(Prefix + "DisableKeepAliveTask", false);
-
-        public string KeepAlivePingUrl => _configuration.GetValue(Prefix + "KeepAlivePingUrl",
-            "{umbracoApplicationUrl}/api/keepalive/ping");
+        public string KeepAlivePingUrl { get; set; } = "{umbracoApplicationUrl}/api/keepalive/ping";
     }
 }

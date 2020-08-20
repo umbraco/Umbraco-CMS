@@ -1,38 +1,21 @@
-﻿using Microsoft.Extensions.Configuration;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
+﻿using Umbraco.Core;
 
 namespace Umbraco.Configuration.Models
 {
-    internal class MemberPasswordConfigurationSettings : IMemberPasswordConfiguration
+    public class MemberPasswordConfigurationSettings
     {
-        private const string Prefix = Constants.Configuration.ConfigSecurityPrefix + "MemberPassword:";
-        private readonly IConfiguration _configuration;
+        public int RequiredLength { get; set; } = 10;
 
-        public MemberPasswordConfigurationSettings(IConfiguration configuration)
-        {
-            _configuration = configuration;
-        }
+        public bool RequireNonLetterOrDigit { get; set; } = false;
 
-        public int RequiredLength =>
-            _configuration.GetValue(Prefix + "RequiredLength", 10);
+        public bool RequireDigit { get; set; } = false;
 
-        public bool RequireNonLetterOrDigit =>
-            _configuration.GetValue(Prefix + "RequireNonLetterOrDigit", false);
+        public bool RequireLowercase { get; set; } = false;
 
-        public bool RequireDigit =>
-            _configuration.GetValue(Prefix + "RequireDigit", false);
+        public bool RequireUppercase { get; set; } = false;
 
-        public bool RequireLowercase =>
-            _configuration.GetValue(Prefix + "RequireLowercase", false);
+        public string HashAlgorithmType { get; set; } = Constants.Security.AspNetUmbraco8PasswordHashAlgorithmName;
 
-        public bool RequireUppercase =>
-            _configuration.GetValue(Prefix + "RequireUppercase", false);
-
-        public string HashAlgorithmType =>
-            _configuration.GetValue(Prefix + "HashAlgorithmType", Constants.Security.AspNetUmbraco8PasswordHashAlgorithmName); // TODO: Need to change to current format when we do members
-
-        public int MaxFailedAccessAttemptsBeforeLockout =>
-            _configuration.GetValue(Prefix + "MaxFailedAccessAttemptsBeforeLockout", 5);
+        public int MaxFailedAccessAttemptsBeforeLockout { get; set; } = 5;
     }
 }

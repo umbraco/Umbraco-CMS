@@ -1,42 +1,23 @@
-﻿using Microsoft.Extensions.Configuration;
-using Umbraco.Core;
-using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.Models.PublishedContent;
+﻿using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Configuration.Models
 {
-    internal class WebRoutingSettings : IWebRoutingSettings
+    public class WebRoutingSettings
     {
-        private const string Prefix = Constants.Configuration.ConfigPrefix + "WebRouting:";
-        private readonly IConfiguration _configuration;
+        public bool TrySkipIisCustomErrors { get; set; } = false;
 
-        public WebRoutingSettings(IConfiguration configuration)
-        {
-            _configuration = configuration;
-        }
+        public bool InternalRedirectPreservesTemplate { get; set; } = false;
 
-        public bool TrySkipIisCustomErrors =>
-            _configuration.GetValue(Prefix + "TrySkipIisCustomErrors", false);
+        public bool DisableAlternativeTemplates { get; set; } = false;
 
-        public bool InternalRedirectPreservesTemplate =>
-            _configuration.GetValue(Prefix + "InternalRedirectPreservesTemplate", false);
+        public bool ValidateAlternativeTemplates { get; set; } = false;
 
-        public bool DisableAlternativeTemplates =>
-            _configuration.GetValue(Prefix + "DisableAlternativeTemplates", false);
+        public bool DisableFindContentByIdPath { get; set; } = false;
 
-        public bool ValidateAlternativeTemplates =>
-            _configuration.GetValue(Prefix + "ValidateAlternativeTemplates", false);
+        public bool DisableRedirectUrlTracking { get; set; } = false;
 
-        public bool DisableFindContentByIdPath =>
-            _configuration.GetValue(Prefix + "DisableFindContentByIdPath", false);
+        public string UrlProviderMode { get; set; } = UrlMode.Auto.ToString();
 
-        public bool DisableRedirectUrlTracking =>
-            _configuration.GetValue(Prefix + "DisableRedirectUrlTracking", false);
-
-        public string UrlProviderMode =>
-            _configuration.GetValue(Prefix + "UrlProviderMode", UrlMode.Auto.ToString());
-
-        public string UmbracoApplicationUrl =>
-            _configuration.GetValue<string>(Prefix + "UmbracoApplicationUrl");
+        public string UmbracoApplicationUrl { get; set; }
     }
 }

@@ -1,12 +1,9 @@
 using System;
 using System.Data.Common;
 using System.Data.SqlClient;
-using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
@@ -28,13 +25,11 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Runtime;
 using Umbraco.Web.Common.AspNetCore;
-using Umbraco.Web.Common.Extensions;
 using Umbraco.Web.Common.Profiler;
+using CoreDebugSettings = Umbraco.Configuration.Models.CoreDebugSettings;
 
 namespace Umbraco.Extensions
 {
-
-
     public static class UmbracoCoreServiceCollectionExtensions
     {
         /// <summary>
@@ -107,6 +102,24 @@ namespace Umbraco.Extensions
             if (configuration == null) throw new ArgumentNullException(nameof(configuration));
 
             services.Configure<TourSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "Tours"));
+            services.Configure<CoreDebugSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "Core:Debug"));
+            services.Configure<SecuritySettings>(configuration.GetSection(Constants.Configuration.ConfigSecurityPrefix));
+            services.Configure<UserPasswordConfigurationSettings>(configuration.GetSection(Constants.Configuration.ConfigSecurityPrefix + "UserPassword:"));
+            services.Configure<MemberPasswordConfigurationSettings>(configuration.GetSection(Constants.Configuration.ConfigSecurityPrefix + "MemberPassword:"));
+            services.Configure<KeepAliveSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "KeepAlive:"));
+            services.Configure<ContentSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "Content:"));
+            services.Configure<LoggingSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "Logging:"));
+            services.Configure<ExceptionFilterSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "ExceptionFilter:"));
+            services.Configure<ActiveDirectorySettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "ActiveDirectory:"));
+            services.Configure<RuntimeSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "Runtime:"));
+            services.Configure<RuntimeSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "TypeFinder:"));
+            services.Configure<NuCacheSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "NuCache:"));
+            services.Configure<WebRoutingSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "WebRouting:"));
+            services.Configure<IndexCreatorSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "Examine:"));
+            services.Configure<ModelsBuilderConfig>(configuration.GetSection(Constants.Configuration.ConfigModelsBuilderPrefix));
+            services.Configure<HostingSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "Hosting:"));
+            services.Configure<GlobalSettings>(configuration.GetSection(Constants.Configuration.ConfigGlobalPrefix));
+            services.Configure<ImagingSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "Imaging:"));
 
             var configsFactory = new AspNetCoreConfigsFactory(configuration);
             var configs = configsFactory.Create();
