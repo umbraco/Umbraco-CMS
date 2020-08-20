@@ -165,9 +165,7 @@
             icon: 'trash',
             method: removeAllEntries,
             isDisabled: true
-        }
-
-
+        };
 
         // helper to force the current form into the dirty state
         function setDirty() {
@@ -295,7 +293,7 @@
             return (vm.nodes.length > vm.minItems)
                 ? true
                 : model.config.contentTypes.length > 1;
-        }
+        };
 
         function deleteNode(idx) {
             var removed = vm.nodes.splice(idx, 1);
@@ -310,6 +308,7 @@
             updateModel();
             validate();
         };
+
         vm.requestDeleteNode = function (idx) {
             if (!vm.canDeleteNode(idx)) {
                 return;
@@ -397,10 +396,11 @@
 
             var scaffold = getScaffold(model.value[idx].ncContentTypeAlias);
             return scaffold && scaffold.icon ? iconHelper.convertFromLegacyIcon(scaffold.icon) : "icon-folder";
-        }
+        };
 
         vm.sortableOptions = {
             axis: "y",
+            containment: "parent",
             cursor: "move",
             handle: '.umb-nested-content__header-bar',
             distance: 10,

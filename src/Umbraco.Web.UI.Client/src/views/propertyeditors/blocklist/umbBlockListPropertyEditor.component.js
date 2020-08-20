@@ -587,6 +587,7 @@
 
         vm.sortableOptions = {
             axis: "y",
+            containment: "parent",
             cursor: "grabbing",
             handle: ".blockelement__draggable-element",
             cancel: "input,textarea,select,option",
