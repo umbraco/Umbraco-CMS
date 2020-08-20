@@ -104,9 +104,9 @@ context('Partial View Macro Files', () => {
       .withName(name)
       .withContent("@inherits Umbraco.Web.Macros.PartialViewMacroPage")
       .build();
-    
+
     cy.savePartialViewMacro(partialViewMacro);
-    
+
     // Navigate to settings
     cy.umbracoSection('settings');
     cy.get('li .umb-tree-root:contains("Settings")').should("be.visible");
@@ -133,7 +133,7 @@ context('Partial View Macro Files', () => {
       .withName(name)
       .withContent("@inherits Umbraco.Web.Macros.PartialViewMacroPage")
       .build();
-    
+
     cy.savePartialViewMacro(partialViewMacro);
 
     // Navigate to settings
@@ -142,7 +142,7 @@ context('Partial View Macro Files', () => {
     cy.umbracoTreeItem("settings", ["Partial View Macro Files", fullName]).click();
 
     // Type an edit
-    cy.get('.ace_content').type(" // test");
+    cy.get('.ace_text-input').type(" // test", {force:true} );
     // Save
     cy.get('.btn-success').click();
 

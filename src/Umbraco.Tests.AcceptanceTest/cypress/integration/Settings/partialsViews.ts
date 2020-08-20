@@ -107,11 +107,11 @@ context('Partial Views', () => {
         cy.umbracoContextMenuAction("action-delete").click();
         cy.umbracoButtonByLabelKey("general_ok").click();
 
-        // Assert 
+        // Assert
         cy.contains(fileName).should('not.exist');
         cy.umbracoPartialViewExists(fileName).then(exists => { expect(exists).to.be.false; });
 
-        // Clean 
+        // Clean
         cy.umbracoEnsurePartialViewNameNotExists(fileName);
     });
 
@@ -132,7 +132,7 @@ context('Partial Views', () => {
         // Open partial view
         cy.umbracoTreeItem("settings", ["Partial Views", fileName]).click();
         // Edit
-        cy.get('.ace_content').type("var num = 5;");
+        cy.get('.ace_text-input').type("var num = 5;", {force:true} );
         cy.get('.btn-success').click();
 
         // Assert
