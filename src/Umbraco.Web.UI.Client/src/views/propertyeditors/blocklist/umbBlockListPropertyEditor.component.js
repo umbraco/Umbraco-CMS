@@ -612,26 +612,23 @@
             }
 
             // validate limits:
-            if (vm.propertyForm) {
+            if (vm.propertyForm && vm.validationLimit) {
 
                 var isMinRequirementGood = vm.validationLimit.min === null || vm.layout.length >= vm.validationLimit.min;
                 vm.propertyForm.minCount.$setValidity("minCount", isMinRequirementGood);
 
                 var isMaxRequirementGood = vm.validationLimit.max === null || vm.layout.length <= vm.validationLimit.max;
                 vm.propertyForm.maxCount.$setValidity("maxCount", isMaxRequirementGood);
-
             }
         }
-        unsubscribe.push($scope.$watch(() => vm.layout.length, onAmountOfBlocksChanged));
 
+        unsubscribe.push($scope.$watch(() => vm.layout.length, onAmountOfBlocksChanged));
 
         $scope.$on("$destroy", function () {
             for (const subscription of unsubscribe) {
                 subscription();
             }
         });
-
-
     }
 
 })();
