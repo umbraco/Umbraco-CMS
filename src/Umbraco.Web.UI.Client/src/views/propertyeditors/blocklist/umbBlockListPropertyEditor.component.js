@@ -34,8 +34,8 @@
         var modelObject;
 
         // Property actions:
-        var copyAllBlocksAction;
-        var deleteAllBlocksAction;
+        var copyAllBlocksAction = null;
+        var deleteAllBlocksAction = null;
 
         var inlineEditing = false;
         var liveEditing = true;
@@ -107,14 +107,15 @@
                 icon: "documents",
                 method: requestCopyAllBlocks,
                 isDisabled: true
-            }
+            };
+
             deleteAllBlocksAction = {
                 labelKey: 'clipboard_labelForRemoveAllEntries',
                 labelTokens: [],
                 icon: 'trash',
                 method: requestDeleteAllBlocks,
                 isDisabled: true
-            }
+            };
 
             var propertyActions = [
                 copyAllBlocksAction,
@@ -603,8 +604,12 @@
         function onAmountOfBlocksChanged() {
 
             // enable/disable property actions
-            copyAllBlocksAction.isDisabled = vm.layout.length === 0;
-            deleteAllBlocksAction.isDisabled = vm.layout.length === 0;
+            if (copyAllBlocksAction) {
+                copyAllBlocksAction.isDisabled = vm.layout.length === 0;
+            }
+            if (deleteAllBlocksAction) {
+                deleteAllBlocksAction.isDisabled = vm.layout.length === 0;
+            }
 
             // validate limits:
             if (vm.propertyForm) {
