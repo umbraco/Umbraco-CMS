@@ -18,7 +18,7 @@ namespace Umbraco.Tests.UmbracoExamine
             _profilingLogger = new ProfilingLogger(logger, new LogProfiler(logger));
         }
 
-        private IProfilingLogger _profilingLogger;
+        protected IProfilingLogger _profilingLogger;
         protected override IProfilingLogger ProfilingLogger => _profilingLogger;
 
         /// <summary>

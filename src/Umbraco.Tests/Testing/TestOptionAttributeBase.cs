@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using NUnit.Framework;
 using Umbraco.Core.Exceptions;
 
@@ -24,13 +26,69 @@ namespace Umbraco.Tests.Testing
         {
             return Get<TOptions>(type, null);
         }
+        /// <summary>
+        /// Find the class name and method name that has the attribute
+        /// </summary>
+        /// <param name="callerName">Out Caller Method Name</param>
+        /// <returns>Caller Class Name</returns>
+        public static string GetBenchmarkTestCaller(out string callerName)
+        {
+            string fullName;
+            Type declaringType;
+            int skipFrames = 2;
+            MethodBase method;
+            do
+            {
+                method = null;
+                method = new StackFrame(skipFrames, false).GetMethod();
+                declaringType = method.DeclaringType;
+                if (declaringType == null)
+                {
+                    callerName = method.Name;
+                    return method.Name;
+                }
+                skipFrames++;
 
+                fullName = declaringType.FullName;
+                if(!declaringType.Module.Name.Equals("Umbraco.Tests.dll", StringComparison.OrdinalIgnoreCase) && method.Name == "SetUp")
+                {
+                    //base class setup method called SetUp, we don't want this method, we want the method that calls this one.
+                    //It's a bit hacky, need to check instead if the base class is in the Umbraco.Tests.dll
+                    method = null;
+                    method = new StackFrame(skipFrames, false).GetMethod();
+                    declaringType = method.DeclaringType;
+                    if (declaringType == null)
+                    {
+                        callerName = method.Name;
+                        return method.Name;
+                    }
+                    skipFrames++;
+                }
+            }
+            while (declaringType.Module.Name.Equals("mscorlib.dll", StringComparison.OrdinalIgnoreCase)
+            ||
+            declaringType.Module.Name.Equals("Umbraco.Tests.dll", StringComparison.OrdinalIgnoreCase)
+            );
+            callerName = method.Name;
+            return fullName;
+        }
         public static TOptions GetTestOptions<TOptions>()
             where TOptions : TestOptionAttributeBase, new()
         {
             var test = TestContext.CurrentContext.Test;
             var typeName = test.ClassName;
             var methodName = test.MethodName;
+            if (typeName == "NUnit.Framework.Internal.TestExecutionContext+AdhocContext")
+            {
+                AppDomain currentDomain = AppDomain.CurrentDomain;
+
+                var isBenchmark = currentDomain.GetAssemblies()
+                    .Any(a => a.FullName.Contains("BenchmarkDotNet"));
+                if (isBenchmark)
+                {
+                    typeName = GetBenchmarkTestCaller(out methodName);
+                }
+            }
             var type = Type.GetType(typeName, false);
             if (type == null)
             {

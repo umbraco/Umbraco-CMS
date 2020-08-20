@@ -53,6 +53,7 @@
     <Compile Include="CtorInvokeBenchmarks.cs" />
     <Compile Include="HexStringBenchmarks.cs" />
     <Compile Include="EnumeratorBenchmarks.cs" />
+    <Compile Include="IndexBenchmarks.cs" />
     <Compile Include="LinqCastBenchmarks.cs" />
     <Compile Include="ModelToSqlExpressionHelperBenchmarks.cs" />
     <Compile Include="Program.cs" />
@@ -90,6 +91,9 @@
   <ItemGroup>
     <PackageReference Include="BenchmarkDotNet">
       <Version>0.11.3</Version>
+    </PackageReference>
+    <PackageReference Include="Umbraco.SqlServerCE">
+      <Version>4.0.0.1</Version>
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
