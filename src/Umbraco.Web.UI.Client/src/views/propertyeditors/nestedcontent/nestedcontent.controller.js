@@ -27,7 +27,7 @@
                 }
             }
         }
-        
+
         clipboardService.registrerClearPropertyResolver(clearNestedContentPropertiesForStorage)
 
 
@@ -49,7 +49,7 @@
                 }
             }
         }
-        
+
         clipboardService.registrerClearPropertyResolver(clearInnerNestedContentPropertiesForStorage)
     }]);
 
@@ -245,6 +245,7 @@
             _.each(singleEntriesForPaste, function (entry) {
                 vm.overlayMenu.pasteItems.push({
                     type: "elementType",
+                    date: entry.date,
                     name: entry.label,
                     data: entry.data,
                     icon: entry.icon
@@ -255,10 +256,15 @@
             _.each(arrayEntriesForPaste, function (entry) {
                 vm.overlayMenu.pasteItems.push({
                     type: "elementTypeArray",
+                    date: entry.date,
                     name: entry.label,
                     data: entry.data,
                     icon: entry.icon
                 });
+            });
+
+            vm.overlayMenu.pasteItems.sort( (a, b) => {
+                return b.date - a.date
             });
 
             vm.overlayMenu.title = labels.grid_addElement;
