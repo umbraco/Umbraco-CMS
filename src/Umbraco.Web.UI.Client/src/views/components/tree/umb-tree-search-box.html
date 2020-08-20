@@ -1,6 +1,6 @@
 <div class="form-search">
-    <i class="icon icon-search" ng-if="showSearch == 'false'"></i>
-    <a class="icon icon-arrow-left" ng-if="showSearch == 'true'" title="Back" ng-click="hideSearch()"></a>
+    <i class="icon icon-search" ng-if="showSearch == 'false'" aria-hidden="true"></i>
+    <button type="button" class="btn-reset icon icon-arrow-left" ng-if="showSearch == 'true'" localize="title" title="@general_back" ng-click="hideSearch()"></button>
     <input type="text"
            ng-model="term"
            class="umb-search-field search-query -full-width-input"

@@ -1,7 +1,7 @@
 (function () {
     "use strict";
     
-    function ScheduleContentController($scope, $timeout, localizationService, dateHelper, userService, contentEditingHelper) {
+    function ScheduleContentController($scope, $timeout, localizationService, dateHelper, userService) {
 
         var vm = this;
 
@@ -25,64 +25,60 @@
             vm.variants = $scope.model.variants;
             vm.displayVariants = vm.variants.slice(0);// shallow copy, we dont want to share the array-object(because we will be performing a sort method) but each entry should be shared (because we need validation and notifications).
 
-            for (let i = 0; i < vm.variants.length; i++) {
-                origDates.push({
-                    releaseDate: vm.variants[i].releaseDate,
-                    expireDate: vm.variants[i].expireDate
-                });
-            }
-
             if(!$scope.model.title) {
-                localizationService.localize("general_scheduledPublishing").then(function(value){
+                localizationService.localize("general_scheduledPublishing").then(value => {
                     $scope.model.title = value;
                 });
             }
-           
-            _.each(vm.variants, function (variant) {
-                variant.isMandatory = isMandatoryFilter(variant);
 
+            vm.variants.forEach(variant => {
+                origDates.push({
+                    releaseDate: variant.releaseDate,
+                    expireDate: variant.expireDate
+                });
+
+                variant.isMandatory = isMandatoryFilter(variant);
             });
 
             // Check for variants: if a node is invariant it will still have the default language in variants
             // so we have to check for length > 1
             if (vm.variants.length > 1) {
 
-                vm.displayVariants.sort(function (a, b) {
+                vm.displayVariants.sort((a, b) => {
                     if (a.language && b.language) {
-                        if (a.language.name > b.language.name) {
+                        if (a.language.name < b.language.name) {
                             return -1;
                         }
-                        if (a.language.name < b.language.name) {
+                        if (a.language.name > b.language.name) {
                             return 1;
                         }
                     }
                     if (a.segment && b.segment) {
-                        if (a.segment > b.segment) {
+                        if (a.segment < b.segment) {
                             return -1;
                         }
-                        if (a.segment < b.segment) {
+                        if (a.segment > b.segment) {
                             return 1;
                         }
                     }
                     return 0;
                 });
 
-                _.each(vm.variants, function (v) {
+                vm.variants.forEach(v => {
                     if (v.active) {
                         v.save = true;
                     }
                 });
                 
-                $scope.model.disableSubmitButton = !canSchedule();
-            
+                $scope.model.disableSubmitButton = !canSchedule();            
             }
 
             // get current backoffice user and format dates
-            userService.getCurrentUser().then(function (currentUser) {
+            userService.getCurrentUser().then(currentUser => {
 
                 vm.currentUser = currentUser;
 
-                angular.forEach(vm.variants, function(variant) {
+                vm.variants.forEach(variant => {
 
                     // prevent selecting publish/unpublish date before today
                     var now = new Date();
@@ -103,9 +99,7 @@
                         formatDatesToLocal(variant);
                     }
                 });
-
             });
-
         }
 
         /**
@@ -132,7 +126,6 @@
          * @param {any} type publish or unpublish
          */
         function datePickerChange(variant, dateStr, type) {
-            console.log("datePickerChange", variant, dateStr, type)
             if (type === 'publish') {
                 setPublishDate(variant, dateStr);
             } else if (type === 'unpublish') {
@@ -179,9 +172,7 @@
          */
         function checkForBackdropClick() {
 
-            var open = _.find(vm.variants, function (variant) {
-                return variant.releaseDatePickerOpen || variant.expireDatePickerOpen;
-            });
+            var open = vm.variants.find(variant => variant.releaseDatePickerOpen || variant.expireDatePickerOpen);
 
             if(open) {
                 $scope.model.disableBackdropClick = true;
@@ -247,7 +238,6 @@
          * @param {any} variant 
          */
         function clearPublishDate(variant) {
-            console.log("clearPublishDate", variant, variant.releaseDate)
             if(variant && variant.releaseDate) {
                 variant.releaseDate = null;
                 // we don't have a publish date anymore so we can clear the min date for unpublish
@@ -263,7 +253,6 @@
          * @param {any} variant 
          */
         function clearUnpublishDate(variant) {
-            console.log("clearUnpublishDate", variant)
             if(variant && variant.expireDate) {
                 variant.expireDate = null;
                 // we don't have a unpublish date anymore so we can clear the max date for publish
@@ -358,20 +347,19 @@
         onInit();
 
         //when this dialog is closed, clean up
-        $scope.$on('$destroy', function () {
-            for (var i = 0; i < vm.variants.length; i++) {
-                vm.variants[i].save = false;
+        $scope.$on('$destroy', () => {
+            vm.variants.forEach(variant => {
+                variant.save = false;
                 // remove properties only needed for this dialog
-                delete vm.variants[i].releaseDateFormatted;
-                delete vm.variants[i].expireDateFormatted;
-                delete vm.variants[i].datePickerConfig;
-                delete vm.variants[i].releaseDatePickerInstance;
-                delete vm.variants[i].expireDatePickerInstance;
-                delete vm.variants[i].releaseDatePickerOpen;
-                delete vm.variants[i].expireDatePickerOpen;
-            } 
+                delete variant.releaseDateFormatted;
+                delete variant.expireDateFormatted;
+                delete variant.datePickerConfig;
+                delete variant.releaseDatePickerInstance;
+                delete variant.expireDatePickerInstance;
+                delete variant.releaseDatePickerOpen;
+                delete variant.expireDatePickerOpen;
+            }); 
         });
-
     }
 
     angular.module("umbraco").controller("Umbraco.Overlays.ScheduleContentController", ScheduleContentController);
