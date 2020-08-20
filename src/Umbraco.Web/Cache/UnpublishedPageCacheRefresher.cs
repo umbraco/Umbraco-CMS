@@ -62,7 +62,8 @@ namespace Umbraco.Web.Cache
             {
                 Id = x.Id,
                 Key = x.Key,
-                Operation = operationType
+                Operation = operationType,
+                IsBlueprint = x.IsBlueprint
             }).ToArray();
             var json = JsonConvert.SerializeObject(items);
             return json;
@@ -83,6 +84,7 @@ namespace Umbraco.Web.Cache
             public int Id { get; set; }
             public Guid? Key { get; set; }
             public OperationType Operation { get; set; }
+            public bool? IsBlueprint { get; set; }
         }
 
         #endregion
@@ -102,10 +104,18 @@ namespace Umbraco.Web.Cache
             ClearRepositoryCacheItemById(id);
             ClearAllIsolatedCacheByEntityType<PublicAccessEntry>();
             content.Instance.UpdateSortOrder(id);
-            var d = new Document(id);
-            content.Instance.UpdateDocumentCache(d);
-            content.Instance.UpdatePreviewXmlContent(d);
-            DistributedCache.Instance.ClearDomainCacheOnCurrentServer();
+            Document d = null;
+            try
+            {
+                d = new Document(id);
+            }
+            catch (Exception){ } // not a document, cannot continue
+            if (d != null)
+            {
+                content.Instance.UpdateDocumentCache(d);
+                content.Instance.UpdatePreviewXmlContent(d);
+                DistributedCache.Instance.ClearDomainCacheOnCurrentServer();
+            }
             base.Refresh(id);
         }
 
@@ -124,11 +134,14 @@ namespace Umbraco.Web.Cache
         {
             ClearRepositoryCacheItemById(instance.Id);
             ClearAllIsolatedCacheByEntityType<PublicAccessEntry>();
-            content.Instance.UpdateSortOrder(instance);
-            var d = new Document(instance);
-            content.Instance.UpdateDocumentCache(d);
-            content.Instance.UpdatePreviewXmlContent(d);
-            DistributedCache.Instance.ClearDomainCacheOnCurrentServer();
+            if (!instance.IsBlueprint)
+            {
+                content.Instance.UpdateSortOrder(instance);
+                var d = new Document(instance);
+                content.Instance.UpdateDocumentCache(d);
+                content.Instance.UpdatePreviewXmlContent(d);
+                DistributedCache.Instance.ClearDomainCacheOnCurrentServer();
+            }
             base.Refresh(instance);
         }
 
@@ -136,9 +149,12 @@ namespace Umbraco.Web.Cache
         {
             ApplicationContext.Current.Services.IdkMap.ClearCache(instance.Id);
             ClearRepositoryCacheItemById(instance.Id);
-            ClearAllIsolatedCacheByEntityType<PublicAccessEntry>();
-            DistributedCache.Instance.ClearDomainCacheOnCurrentServer();
-            content.Instance.ClearPreviewXmlContent(instance.Id);
+            if (!instance.IsBlueprint)
+            {
+                ClearAllIsolatedCacheByEntityType<PublicAccessEntry>();
+                DistributedCache.Instance.ClearDomainCacheOnCurrentServer();
+                content.Instance.ClearPreviewXmlContent(instance.Id);
+            }
             base.Remove(instance);
         }
 
@@ -164,11 +180,31 @@ namespace Umbraco.Web.Cache
                 }
 
                 if (payload.Operation == OperationType.Refresh)
-                {
-                    content.Instance.UpdateSortOrder(payload.Id);
-                    var d = new Document(payload.Id);
-                    content.Instance.UpdateDocumentCache(d);
-                    content.Instance.UpdatePreviewXmlContent(d);
+                {                    
+                    if (!payload.IsBlueprint.HasValue)
+                    {
+                        // if this is null (since it was added later) then we need to try/catch since we don't know what it is
+                        Document d = null;
+                        try
+                        {
+                            d = new Document(payload.Id);
+                        }
+                        catch (Exception) { } // not a document, cannot continue
+                        if (d != null)
+                        {
+                            content.Instance.UpdateSortOrder(payload.Id);
+                            content.Instance.UpdateDocumentCache(d);
+                            content.Instance.UpdatePreviewXmlContent(d);
+                        }
+                    }
+                    else if (!payload.IsBlueprint.Value)
+                    {
+                        // if it's not a blueprint, then need to refresh the published cache 
+                        var d = new Document(payload.Id);
+                        content.Instance.UpdateSortOrder(payload.Id);                        
+                        content.Instance.UpdateDocumentCache(d);
+                        content.Instance.UpdatePreviewXmlContent(d);
+                    }
 
                     base.Refresh(payload.Id);
                 }
