@@ -15,7 +15,7 @@
         });
 
     function BlockCardController() {
-        
+
         var vm = this;
 
     }
