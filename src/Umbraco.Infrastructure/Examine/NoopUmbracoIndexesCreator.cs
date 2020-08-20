@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Examine;
 using Umbraco.Examine;
 
@@ -8,7 +9,7 @@ namespace Umbraco.Infrastructure.Examine
     {
         public IEnumerable<IIndex> Create()
         {
-            return new IIndex[0];
+            return Enumerable.Empty<IIndex>();
         }
     }
 }
