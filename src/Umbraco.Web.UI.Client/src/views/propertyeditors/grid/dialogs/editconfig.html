@@ -16,16 +16,18 @@
                 <umb-box>
                     <umb-box-content>
 
-                        <ng-form name="gridConfigEditor">
+                        <ng-form name="vm.gridConfigEditor">
 
                             <h4>{{model.name}}</h4>
                             <p>Settings will only save if the entered json configuration is valid</p>
-                            <textarea name="configSource"
-                                validate-on="'blur'"
-                                rows="20" class="umb-property-editor umb-textarea"
-                                umb-raw-model="model.config"></textarea>
 
-                            <div class="alert alert-error" ng-show="gridConfigEditor.$invalid === true">
+                            <div data-element="code-editor"
+                                 auto-scale="85"
+                                 umb-ace-editor="vm.aceOption"
+                                 model="vm.configJson">
+                            </div>
+
+                            <div class="alert alert-error mt3" ng-show="vm.gridConfigEditor.$invalid === true">
                                 This configuration is not valid json, and will not be saved.
                             </div>
 

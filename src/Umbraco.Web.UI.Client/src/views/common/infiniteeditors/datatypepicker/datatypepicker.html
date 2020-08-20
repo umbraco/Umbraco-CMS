@@ -15,20 +15,15 @@
             <umb-box>
                 <umb-box-content>
 
-                    <div class="umb-control-group -no-border">
-                        <div class="form-search">
-                            <i class="icon-search"></i>
-                            <input type="text"
-                                    style="width: 100%"
-                                    ng-change="vm.searchTermChanged()"
-                                    ng-model="vm.searchTerm"
-                                    class="umb-search-field search-query search-input input-block-level"
-                                    localize="placeholder"
-                                    placeholder="@placeholders_search"
-                                    umb-auto-focus
-                                    no-dirty-check />
-                        </div>
-                    </div>
+                    <umb-search-filter
+                        input-id="datatype-search"
+                        model="vm.searchTerm"
+                        label-key="placeholders_search"
+                        text="Type to search"
+                        on-change="vm.searchTermChanged()"
+                        auto-focus="true"
+                    >
+                    </umb-search-filter>
 
                     <umb-load-indicator ng-if="vm.loading === true"></umb-load-indicator>
 

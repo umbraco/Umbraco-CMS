@@ -359,6 +359,7 @@
 
                     if (infiniteMode && $scope.model.submit) {
                         $scope.model.documentTypeAlias = vm.contentType.alias;
+                        $scope.model.documentTypeKey = vm.contentType.key;
                         $scope.model.submit($scope.model);
                     }
 
@@ -385,18 +386,6 @@
         }
 
         function init(contentType) {
-
-            // set all tab to inactive
-            if (contentType.groups.length !== 0) {
-                angular.forEach(contentType.groups, function (group) {
-
-                    angular.forEach(group.properties, function (property) {
-                        // get data type details for each property
-                        getDataTypeDetails(property);
-                    });
-
-                });
-            }
 
             // insert template on new doc types
             if (!noTemplate && contentType.id === 0) {
@@ -431,7 +420,7 @@
                     contentType.defaultTemplate.alias = contentType.alias;
                 }
                 //sync allowed templates that had the placeholder flag
-                angular.forEach(contentType.allowedTemplates, function (allowedTemplate) {
+                contentType.allowedTemplates.forEach(function (allowedTemplate) {
                     if (allowedTemplate.placeholder) {
                         allowedTemplate.name = contentType.name;
                         allowedTemplate.alias = contentType.alias;
@@ -452,16 +441,6 @@
 
             // set icon back on contentType
             contentType.icon = contentTypeArray[0].icon;
-        }
-
-        function getDataTypeDetails(property) {
-            if (property.propertyState !== "init") {
-                dataTypeResource.getById(property.dataTypeId)
-                    .then(function (dataType) {
-                        property.dataTypeIcon = dataType.icon;
-                        property.dataTypeName = dataType.name;
-                    });
-            }
         }
 
         /** Syncs the content type  to it's tree node - this occurs on first load and after saving */

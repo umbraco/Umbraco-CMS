@@ -165,11 +165,9 @@ function umbRequestHelper($http, $q, notificationsService, eventsService, formHe
                     return; //sometimes oddly this happens, nothing we can do
                 }
 
-                if (!response.status && response.message && response.stack) {
-                    //this is a JS/angular error that we should deal with
-                    return $q.reject({
-                        errorMsg: response.message
-                    });
+                if (!response.status) {
+                    //this is a JS/angular error
+                    return $q.reject(response);
                 }
 
                 //invoke the callback
@@ -265,9 +263,7 @@ function umbRequestHelper($http, $q, notificationsService, eventsService, formHe
 
                     //reset the tabs and set the active one
                     if (response.data.tabs && response.data.tabs.length > 0) {
-                        _.each(response.data.tabs, function (item) {
-                            item.active = false;
-                        });
+                        response.data.tabs.forEach(item => item.active = false);
                         response.data.tabs[activeTabIndex].active = true;
                     }
 
@@ -280,7 +276,11 @@ function umbRequestHelper($http, $q, notificationsService, eventsService, formHe
                     //the data returned is the up-to-date data so the UI will refresh
                     return $q.resolve(response.data);
                 }, function (response) {
-                    //failure callback
+
+                    if (!response.status) {
+                        //this is a JS/angular error
+                        return $q.reject(response);
+                    }
 
                     //when there's a 500 (unhandled) error show a YSOD overlay if debugging is enabled.
                     if (response.status >= 500 && response.status < 600) {
@@ -324,7 +324,7 @@ function umbRequestHelper($http, $q, notificationsService, eventsService, formHe
             if (!jsonData) { throw "jsonData cannot be null"; }
 
             if (Utilities.isArray(jsonData)) {
-                _.each(jsonData, function (item) {
+                jsonData.forEach(item => {
                     if (!item.key || !item.value) { throw "jsonData array item must have both a key and a value property"; }
                 });
             }
@@ -342,7 +342,7 @@ function umbRequestHelper($http, $q, notificationsService, eventsService, formHe
                     var formData = new FormData();
                     //add the json data
                     if (Utilities.isArray(data)) {
-                        _.each(data, function(item) {
+                        data.forEach(item => {
                             formData.append(item.key, !Utilities.isString(item.value) ? Utilities.toJson(item.value) : item.value);
                         });
                     }
