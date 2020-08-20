@@ -1,31 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Net.Http;
-using System.Threading.Tasks;
-using Umbraco.Core.Services;
-using Umbraco.Web.Models;
-using Umbraco.Web.Models.ContentEditing;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.BackOffice;
 using Umbraco.Core.Cache;
-using Umbraco.Core.IO;
-using Umbraco.Web.WebApi.Filters;
-using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Media;
+using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Extensions;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.BackOffice.Security;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Exceptions;
+using Umbraco.Web.Models;
+using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Security;
 
 namespace Umbraco.Web.BackOffice.Controllers
@@ -37,7 +36,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     public class CurrentUserController : UmbracoAuthorizedJsonController
     {
         private readonly IMediaFileSystem _mediaFileSystem;
-        private readonly IContentSettings _contentSettings;
+        private readonly ContentSettings _contentSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IImageUrlGenerator _imageUrlGenerator;
         private readonly IWebSecurity _webSecurity;
@@ -51,7 +50,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
         public CurrentUserController(
             IMediaFileSystem mediaFileSystem,
-            IContentSettings contentSettings,
+            IOptionsSnapshot<ContentSettings> contentSettings,
             IHostingEnvironment hostingEnvironment,
             IImageUrlGenerator imageUrlGenerator,
             IWebSecurity webSecurity,
@@ -64,7 +63,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             IShortStringHelper shortStringHelper)
         {
             _mediaFileSystem = mediaFileSystem;
-            _contentSettings = contentSettings;
+            _contentSettings = contentSettings.Value;
             _hostingEnvironment = hostingEnvironment;
             _imageUrlGenerator = imageUrlGenerator;
             _webSecurity = webSecurity;

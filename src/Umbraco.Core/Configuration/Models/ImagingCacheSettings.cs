@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Umbraco.Configuration.Models
+namespace Umbraco.Core.Configuration.Models
 {
     public class ImagingCacheSettings
     {

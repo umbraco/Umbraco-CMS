@@ -1,6 +1,6 @@
 ﻿using Umbraco.Core.Configuration.UmbracoSettings;
 
-namespace Umbraco.Configuration.Models
+namespace Umbraco.Core.Configuration.Models
 {
     public class KeepAliveSettings : IKeepAliveSettings
     {

@@ -1,8 +1,9 @@
 ﻿using Umbraco.Core;
+using Umbraco.Core.Configuration;
 
-namespace Umbraco.Configuration.Models
+namespace Umbraco.Core.Configuration.Models
 {
-    public class MemberPasswordConfigurationSettings
+    public class MemberPasswordConfigurationSettings : IPasswordConfiguration
     {
         public int RequiredLength { get; set; } = 10;
 

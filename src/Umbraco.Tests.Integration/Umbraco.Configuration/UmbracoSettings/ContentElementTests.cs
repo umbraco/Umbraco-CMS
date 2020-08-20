@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Macros;
 
 namespace Umbraco.Tests.Integration.Umbraco.Configuration.UmbracoSettings

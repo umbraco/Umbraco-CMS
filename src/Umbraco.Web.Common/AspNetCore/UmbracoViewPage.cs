@@ -3,9 +3,10 @@ using System.Text;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
@@ -25,7 +26,7 @@ namespace Umbraco.Web.Common.AspNetCore
         private IUmbracoContext _umbracoContext;
         private IUmbracoContextAccessor UmbracoContextAccessor => Context.RequestServices.GetRequiredService<IUmbracoContextAccessor>();
         private IGlobalSettings GlobalSettings => Context.RequestServices.GetRequiredService<IGlobalSettings>();
-        private IContentSettings ContentSettings => Context.RequestServices.GetRequiredService<IContentSettings>();
+        private ContentSettings ContentSettings => Context.RequestServices.GetRequiredService<IOptionsSnapshot<ContentSettings>>().Value;
         private IProfilerHtml ProfilerHtml => Context.RequestServices.GetRequiredService<IProfilerHtml>();
         private IIOHelper IOHelper => Context.RequestServices.GetRequiredService<IIOHelper>();
 

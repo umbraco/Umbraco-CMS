@@ -5,18 +5,18 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Web;
 using System.Web.Mvc;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Web.Features;
-using Umbraco.Web.HealthCheck;
-using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Mvc;
-using Umbraco.Web.Trees;
-using Constants = Umbraco.Core.Constants;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.WebAssets;
+using Umbraco.Web.Features;
+using Umbraco.Web.Mvc;
 using Umbraco.Web.Security;
+using Umbraco.Web.Trees;
+using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Editors
 {
@@ -34,8 +34,8 @@ namespace Umbraco.Web.Editors
         private readonly TreeCollection _treeCollection;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IHostingEnvironment _hostingEnvironment;
-        private readonly IRuntimeSettings _settings;
-        private readonly ISecuritySettings _securitySettings;
+        private readonly RuntimeSettings _runtimeSettings;
+        private readonly SecuritySettings _securitySettings;
         private readonly IRuntimeMinifier _runtimeMinifier;
 
         internal BackOfficeServerVariables(
@@ -47,8 +47,8 @@ namespace Umbraco.Web.Editors
             IContentSettings contentSettings,
             TreeCollection treeCollection,
             IHostingEnvironment hostingEnvironment,
-            IRuntimeSettings settings,
-            ISecuritySettings securitySettings,
+            IOptionsSnapshot<RuntimeSettings> runtimeSettings,
+            IOptionsSnapshot<SecuritySettings> securitySettings,
             IRuntimeMinifier runtimeMinifier)
         {
             _urlHelper = urlHelper;
@@ -59,8 +59,8 @@ namespace Umbraco.Web.Editors
             _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
             _treeCollection = treeCollection ?? throw new ArgumentNullException(nameof(treeCollection));
             _hostingEnvironment = hostingEnvironment;
-            _settings = settings;
-            _securitySettings = securitySettings;
+            _runtimeSettings = runtimeSettings.Value;
+            _securitySettings = securitySettings.Value;
             _runtimeMinifier = runtimeMinifier;
         }
 
@@ -288,7 +288,7 @@ namespace Umbraco.Web.Editors
 
         private string GetMaxRequestLength()
         {
-            return _settings.MaxRequestLength.HasValue ? _settings.MaxRequestLength.Value.ToString() : string.Empty;
+            return _runtimeSettings.MaxRequestLength.HasValue ? _runtimeSettings.MaxRequestLength.Value.ToString() : string.Empty;
         }
     }
 }

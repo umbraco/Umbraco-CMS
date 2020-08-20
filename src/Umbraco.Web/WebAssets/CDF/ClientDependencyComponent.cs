@@ -3,9 +3,11 @@ using System.Collections.Specialized;
 using System.IO;
 using ClientDependency.Core.CompositeFiles.Providers;
 using ClientDependency.Core.Config;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Web.Runtime;
 
@@ -16,16 +18,16 @@ namespace Umbraco.Web.WebAssets.CDF
     {
         private readonly IHostingSettings _hostingSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
-        private readonly IRuntimeSettings _settings;
+        private readonly RuntimeSettings _runtimeSettings;
 
         public ClientDependencyComponent(
             IHostingSettings hostingSettings,
             IHostingEnvironment hostingEnvironment,
-            IRuntimeSettings settings)
+            IOptionsSnapshot<RuntimeSettings> runtimeSettings)
         {
             _hostingSettings = hostingSettings;
             _hostingEnvironment = hostingEnvironment;
-            _settings = settings;
+            _runtimeSettings = runtimeSettings.Value;
         }
 
         public void Initialize()
@@ -54,10 +56,10 @@ namespace Umbraco.Web.WebAssets.CDF
                     = Path.Combine(cachePath, "ClientDependency");
             }
 
-            if (_settings.MaxQueryStringLength.HasValue || _settings.MaxRequestLength.HasValue)
+            if (_runtimeSettings.MaxQueryStringLength.HasValue || _runtimeSettings.MaxRequestLength.HasValue)
             {
                 //set the max url length for CDF to be the smallest of the max query length, max request length
-                ClientDependency.Core.CompositeFiles.CompositeDependencyHandler.MaxHandlerUrlLength = Math.Min(_settings.MaxQueryStringLength.GetValueOrDefault(), _settings.MaxRequestLength.GetValueOrDefault());
+                ClientDependency.Core.CompositeFiles.CompositeDependencyHandler.MaxHandlerUrlLength = Math.Min(_runtimeSettings.MaxQueryStringLength.GetValueOrDefault(), _runtimeSettings.MaxRequestLength.GetValueOrDefault());
             }
 
             //Register a custom renderer - used to process property editor dependencies

@@ -112,7 +112,7 @@ namespace Umbraco.Extensions
             services.Configure<ExceptionFilterSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "ExceptionFilter:"));
             services.Configure<ActiveDirectorySettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "ActiveDirectory:"));
             services.Configure<RuntimeSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "Runtime:"));
-            services.Configure<RuntimeSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "TypeFinder:"));
+            services.Configure<TypeFinderSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "TypeFinder:"));
             services.Configure<NuCacheSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "NuCache:"));
             services.Configure<WebRoutingSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "WebRouting:"));
             services.Configure<IndexCreatorSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "Examine:"));

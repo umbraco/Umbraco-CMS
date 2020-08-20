@@ -15,6 +15,7 @@ using Umbraco.Core.PropertyEditors;
 using System;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Serialization;
+using Umbraco.Core.Configuration.Models;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
@@ -68,7 +69,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         private UserRepository CreateRepository(IScopeProvider provider)
         {
             var accessor = (IScopeAccessor) provider;
-            var repository = new UserRepository(accessor, AppCaches.Disabled, Logger, Mappers, TestObjects.GetGlobalSettings(), Mock.Of<IUserPasswordConfiguration>(), new JsonNetSerializer());
+            var repository = new UserRepository(accessor, AppCaches.Disabled, Logger, Mappers, TestObjects.GetGlobalSettings(), new UserPasswordConfigurationSettings(), new JsonNetSerializer());
             return repository;
         }
 

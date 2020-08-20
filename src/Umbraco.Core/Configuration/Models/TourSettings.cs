@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Configuration.Models
+﻿namespace Umbraco.Core.Configuration.Models
 {
     public class TourSettings
     {

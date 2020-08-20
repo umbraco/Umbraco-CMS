@@ -6,8 +6,10 @@ using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
-using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Strings;
@@ -28,19 +30,19 @@ namespace Umbraco.Web.BackOffice.Controllers
     {
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IShortStringHelper _shortStringHelper;
-        private readonly IContentSettings _contentSettings;
+        private readonly ContentSettings _contentSettings;
         private readonly IIOHelper _ioHelper;
 
         public TinyMceController(
             IHostingEnvironment hostingEnvironment,
             IShortStringHelper shortStringHelper,
-            IContentSettings contentSettings,
+            IOptionsSnapshot<ContentSettings> contentSettings,
             IIOHelper ioHelper
         )
         {
             _hostingEnvironment = hostingEnvironment;
             _shortStringHelper = shortStringHelper;
-            _contentSettings = contentSettings;
+            _contentSettings = contentSettings.Value;
             _ioHelper = ioHelper;
         }
 
@@ -76,7 +78,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             var safeFileName = fileName.ToSafeFileName(_shortStringHelper);
             var ext = safeFileName.Substring(safeFileName.LastIndexOf('.') + 1).ToLower();
 
-            if (_contentSettings.IsFileAllowedForUpload(ext) == false || _contentSettings.ImageFileTypes.Contains(ext) == false)
+            if (_contentSettings.IsFileAllowedForUpload(ext) == false || _contentSettings.Imaging.ImageFileTypes.Contains(ext) == false)
             {
                 // Throw some error - to say can't upload this IMG type
                 return new UmbracoProblemResult("This is not an image filetype extension that is approved", HttpStatusCode.BadRequest);

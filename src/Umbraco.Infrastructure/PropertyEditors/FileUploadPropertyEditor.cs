@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
-using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -22,13 +24,32 @@ namespace Umbraco.Web.PropertyEditors
     public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator
     {
         private readonly IMediaFileSystem _mediaFileSystem;
-        private readonly IContentSettings _contentSettings;
+        private readonly ContentSettings _contentSettings;
         private readonly UploadAutoFillProperties _uploadAutoFillProperties;
         private readonly IDataTypeService _dataTypeService;
         private readonly ILocalizationService _localizationService;
         private readonly ILocalizedTextService _localizedTextService;
 
-        public FileUploadPropertyEditor(ILogger logger, IMediaFileSystem mediaFileSystem, IContentSettings contentSettings, IDataTypeService dataTypeService, ILocalizationService localizationService, ILocalizedTextService localizedTextService, IShortStringHelper shortStringHelper)
+        public FileUploadPropertyEditor(
+            ILogger logger,
+            IMediaFileSystem mediaFileSystem,
+            IOptionsSnapshot<ContentSettings> contentSettings,
+            IDataTypeService dataTypeService,
+            ILocalizationService localizationService,
+            ILocalizedTextService localizedTextService,
+            IShortStringHelper shortStringHelper)
+            : this(logger, mediaFileSystem, contentSettings.Value, dataTypeService, localizationService, localizedTextService, shortStringHelper)
+        {
+        }
+
+        public FileUploadPropertyEditor(
+            ILogger logger,
+            IMediaFileSystem mediaFileSystem,
+            ContentSettings contentSettings,
+            IDataTypeService dataTypeService,
+            ILocalizationService localizationService,
+            ILocalizedTextService localizedTextService,
+            IShortStringHelper shortStringHelper)
             : base(logger, dataTypeService, localizationService, localizedTextService, shortStringHelper)
         {
             _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));

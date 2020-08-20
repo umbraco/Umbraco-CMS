@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration.Json;
 using Microsoft.Extensions.FileProviders;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+
 namespace Umbraco.Core.Configuration
 {
     public class JsonConfigManipulator : IConfigManipulator

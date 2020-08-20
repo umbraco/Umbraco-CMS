@@ -1,6 +1,6 @@
 ﻿using System.Net.Mail;
 
-namespace Umbraco.Configuration.Models
+namespace Umbraco.Core.Configuration.Models
 {
     public class SmtpSettings
     {

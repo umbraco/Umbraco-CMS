@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
-using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -29,7 +31,7 @@ namespace Umbraco.Web.PropertyEditors
     public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator
     {
         private readonly IMediaFileSystem _mediaFileSystem;
-        private readonly IContentSettings _contentSettings;
+        private readonly ContentSettings _contentSettings;
         private readonly IDataTypeService _dataTypeService;
         private readonly ILocalizationService _localizationService;
         private readonly IIOHelper _ioHelper;
@@ -38,8 +40,32 @@ namespace Umbraco.Web.PropertyEditors
         /// <summary>
         /// Initializes a new instance of the <see cref="ImageCropperPropertyEditor"/> class.
         /// </summary>
-        public ImageCropperPropertyEditor(ILogger logger, IMediaFileSystem mediaFileSystem, IContentSettings contentSettings, IDataTypeService dataTypeService, ILocalizationService localizationService, IIOHelper ioHelper, IShortStringHelper shortStringHelper, ILocalizedTextService localizedTextService)
-            : base(logger, dataTypeService, localizationService, localizedTextService,shortStringHelper)
+        public ImageCropperPropertyEditor(
+            ILogger logger,
+            IMediaFileSystem mediaFileSystem,
+            IOptionsSnapshot<ContentSettings> contentSettings,
+            IDataTypeService dataTypeService,
+            ILocalizationService localizationService,
+            IIOHelper ioHelper,
+            IShortStringHelper shortStringHelper,
+            ILocalizedTextService localizedTextService)
+            : this(logger, mediaFileSystem, contentSettings.Value, dataTypeService, localizationService, ioHelper, shortStringHelper, localizedTextService)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ImageCropperPropertyEditor"/> class.
+        /// </summary>
+        public ImageCropperPropertyEditor(
+            ILogger logger,
+            IMediaFileSystem mediaFileSystem,
+            ContentSettings contentSettings,
+            IDataTypeService dataTypeService,
+            ILocalizationService localizationService,
+            IIOHelper ioHelper,
+            IShortStringHelper shortStringHelper,
+            ILocalizedTextService localizedTextService)
+            : base(logger, dataTypeService, localizationService, localizedTextService, shortStringHelper)
         {
             _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
             _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));

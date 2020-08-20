@@ -7,6 +7,7 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Events;
 using Umbraco.Core.Hosting;
@@ -95,7 +96,7 @@ namespace Umbraco.Tests.TestHelpers
             ILogger logger,
             IIOHelper ioHelper,
             IGlobalSettings globalSettings,
-            IContentSettings contentSettings,
+            ContentSettings contentSettings,
             IEventMessagesFactory eventMessagesFactory,
             UrlSegmentProviderCollection urlSegmentProviders,
             IUmbracoVersion umbracoVersion,

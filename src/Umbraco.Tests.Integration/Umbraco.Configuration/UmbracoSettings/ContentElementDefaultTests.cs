@@ -2,7 +2,7 @@
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Configuration;
 
 namespace Umbraco.Tests.Integration.Umbraco.Configuration.UmbracoSettings
 {

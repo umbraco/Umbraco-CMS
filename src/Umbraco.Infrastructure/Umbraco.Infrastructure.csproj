@@ -41,7 +41,7 @@
       <PackageReference Include="System.Drawing.Common" Version="4.7.0" />
       <PackageReference Include="System.IO.FileSystem.AccessControl" Version="4.7.0" />
       <PackageReference Include="System.Threading.Tasks.Dataflow" Version="4.9.0" />
-       <PackageReference Include="Examine.Core" Version="2.0.0-alpha.20200128.15" />
+      <PackageReference Include="Examine.Core" Version="2.0.0-alpha.20200128.15" />
     </ItemGroup>
 
     <ItemGroup>
@@ -97,6 +97,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Umbraco.Configuration\Umbraco.Configuration.csproj" />
       <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj" />
     </ItemGroup>
 

@@ -1,14 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
+using Microsoft.Extensions.Options;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
-using Current = Umbraco.Composing.Current;
+using CoreDebugSettings = Umbraco.Core.Configuration.Models.CoreDebugSettings;
 
 #if DEBUG_SCOPES
 using System.Linq;
@@ -26,10 +25,15 @@ namespace Umbraco.Core.Scoping
         private readonly ITypeFinder _typeFinder;
         private readonly IRequestCache _requestCache;
         private readonly FileSystems _fileSystems;
-        private readonly ICoreDebugSettings _coreDebugSettings;
+        private readonly CoreDebugSettings _coreDebugSettings;
         private readonly IMediaFileSystem _mediaFileSystem;
 
-        public ScopeProvider(IUmbracoDatabaseFactory databaseFactory, FileSystems fileSystems, ICoreDebugSettings coreDebugSettings, IMediaFileSystem mediaFileSystem, ILogger logger, ITypeFinder typeFinder, IRequestCache requestCache)
+        public ScopeProvider(IUmbracoDatabaseFactory databaseFactory, FileSystems fileSystems, IOptionsSnapshot<CoreDebugSettings> coreDebugSettings, IMediaFileSystem mediaFileSystem, ILogger logger, ITypeFinder typeFinder, IRequestCache requestCache)
+            :this(databaseFactory, fileSystems, coreDebugSettings.Value, mediaFileSystem, logger, typeFinder, requestCache)
+        {
+        }
+
+        public ScopeProvider(IUmbracoDatabaseFactory databaseFactory, FileSystems fileSystems, CoreDebugSettings coreDebugSettings, IMediaFileSystem mediaFileSystem, ILogger logger, ITypeFinder typeFinder, IRequestCache requestCache)
         {
             DatabaseFactory = databaseFactory;
             _fileSystems = fileSystems;

@@ -4,7 +4,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.HealthChecks;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using ConnectionStrings = Umbraco.Configuration.Models.ConnectionStrings;
-using CoreDebugSettings = Umbraco.Configuration.Models.CoreDebugSettings;
+using CoreDebugSettings = Umbraco.Core.Configuration.Models.CoreDebugSettings;
 
 namespace Umbraco.Configuration
 {

@@ -5,20 +5,20 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.BackOffice;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.Services;
-using Umbraco.Net;
 using Umbraco.Core.Security;
+using Umbraco.Core.Services;
 using Umbraco.Extensions;
-using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Net;
 using Umbraco.Web.Common.Security;
-using Microsoft.AspNetCore.Routing;
 
 namespace Umbraco.Web.BackOffice.Security
 {
@@ -28,7 +28,7 @@ namespace Umbraco.Web.BackOffice.Security
     public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAuthenticationOptions>
     {
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
-        private readonly ISecuritySettings _securitySettings;
+        private readonly SecuritySettings _securitySettings;
         private readonly IGlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IRuntimeState _runtimeState;
@@ -42,7 +42,7 @@ namespace Umbraco.Web.BackOffice.Security
 
         public ConfigureBackOfficeCookieOptions(
             IUmbracoContextAccessor umbracoContextAccessor,
-            ISecuritySettings securitySettings,
+            IOptionsSnapshot<SecuritySettings> securitySettings,
             IGlobalSettings globalSettings,
             IHostingEnvironment hostingEnvironment,
             IRuntimeState runtimeState,
@@ -55,7 +55,7 @@ namespace Umbraco.Web.BackOffice.Security
             LinkGenerator linkGenerator)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
-            _securitySettings = securitySettings;
+            _securitySettings = securitySettings.Value;
             _globalSettings = globalSettings;
             _hostingEnvironment = hostingEnvironment;
             _runtimeState = runtimeState;
@@ -230,7 +230,7 @@ namespace Umbraco.Web.BackOffice.Security
         }
 
         /// <summary>
-        /// Ensures the ticket is renewed if the <see cref="ISecuritySettings.KeepUserLoggedIn"/> is set to true
+        /// Ensures the ticket is renewed if the <see cref="SecuritySettings.KeepUserLoggedIn"/> is set to true
         /// and the current request is for the get user seconds endpoint
         /// </summary>
         /// <param name="context"></param>

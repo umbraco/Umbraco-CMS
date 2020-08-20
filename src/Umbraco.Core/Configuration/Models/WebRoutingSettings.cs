@@ -1,6 +1,6 @@
 ﻿using Umbraco.Core.Models.PublishedContent;
 
-namespace Umbraco.Configuration.Models
+namespace Umbraco.Core.Configuration.Models
 {
     public class WebRoutingSettings
     {

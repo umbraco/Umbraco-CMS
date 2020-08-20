@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Umbraco.Configuration.Models
+namespace Umbraco.Core.Configuration.Models
 {
     /// <summary>
     ///     The GlobalSettings Class contains general settings information for the entire Umbraco instance based on information

@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.UmbracoSettings;
 
-namespace Umbraco.Configuration.Models
+namespace Umbraco.Core.Configuration.Models
 {
     public class ContentImagingSettings
     {

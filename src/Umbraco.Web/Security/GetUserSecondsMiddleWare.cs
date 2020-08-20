@@ -3,14 +3,13 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Threading.Tasks;
 using System.Web;
+using Microsoft.Extensions.Options;
 using Microsoft.Owin;
 using Microsoft.Owin.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
-using Umbraco.Core.Security;
 
 namespace Umbraco.Web.Security
 {
@@ -26,7 +25,7 @@ namespace Umbraco.Web.Security
     {
         private readonly UmbracoBackOfficeCookieAuthOptions _authOptions;
         private readonly IGlobalSettings _globalSettings;
-        private readonly ISecuritySettings _security;
+        private readonly SecuritySettings _securitySettings;
         private readonly ILogger _logger;
         private readonly IHostingEnvironment _hostingEnvironment;
 
@@ -34,14 +33,14 @@ namespace Umbraco.Web.Security
             OwinMiddleware next,
             UmbracoBackOfficeCookieAuthOptions authOptions,
             IGlobalSettings globalSettings,
-            ISecuritySettings security,
+            IOptionsSnapshot<SecuritySettings> securitySettings,
             ILogger logger,
             IHostingEnvironment hostingEnvironment)
             : base(next)
         {
             _authOptions = authOptions ?? throw new ArgumentNullException(nameof(authOptions));
             _globalSettings = globalSettings;
-            _security = security;
+            _securitySettings = securitySettings.Value;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _hostingEnvironment = hostingEnvironment;
         }
@@ -55,7 +54,7 @@ namespace Umbraco.Web.Security
                 && request.Uri.AbsolutePath.InvariantEquals(
                     $"{_globalSettings.GetBackOfficePath(_hostingEnvironment)}/backoffice/UmbracoApi/Authentication/GetRemainingTimeoutSeconds"))
             {
-                var cookie = _authOptions.CookieManager.GetRequestCookie(context, _security.AuthCookieName);
+                var cookie = _authOptions.CookieManager.GetRequestCookie(context, _securitySettings.AuthCookieName);
                 if (cookie.IsNullOrWhiteSpace() == false)
                 {
                     var ticket = _authOptions.TicketDataFormat.Unprotect(cookie);
@@ -75,7 +74,7 @@ namespace Umbraco.Web.Security
                         //Ok, so here we need to check if we want to process/renew the auth ticket for each
                         // of these requests. If that is the case, the user will really never be logged out until they
                         // close their browser (there will be edge cases of that, especially when debugging)
-                        if (_security.KeepUserLoggedIn)
+                        if (_securitySettings.KeepUserLoggedIn)
                         {
                             var currentUtc = _authOptions.SystemClock.UtcNow;
                             var issuedUtc = ticket.Properties.IssuedUtc;

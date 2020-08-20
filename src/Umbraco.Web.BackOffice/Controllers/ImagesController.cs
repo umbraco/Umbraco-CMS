@@ -1,8 +1,10 @@
 ﻿using System;
 using System.IO;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
-using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
 using Umbraco.Core.Media;
 using Umbraco.Core.Models;
@@ -18,13 +20,13 @@ namespace Umbraco.Web.BackOffice.Controllers
     public class ImagesController : UmbracoAuthorizedApiController
     {
         private readonly IMediaFileSystem _mediaFileSystem;
-        private readonly IContentSettings _contentSettings;
+        private readonly ContentSettings _contentSettings;
         private readonly IImageUrlGenerator _imageUrlGenerator;
 
-        public ImagesController(IMediaFileSystem mediaFileSystem, IContentSettings contentSettings, IImageUrlGenerator imageUrlGenerator)
+        public ImagesController(IMediaFileSystem mediaFileSystem, IOptionsSnapshot<ContentSettings> contentSettings, IImageUrlGenerator imageUrlGenerator)
         {
             _mediaFileSystem = mediaFileSystem;
-            _contentSettings = contentSettings;
+            _contentSettings = contentSettings.Value;
             _imageUrlGenerator = imageUrlGenerator;
         }
 

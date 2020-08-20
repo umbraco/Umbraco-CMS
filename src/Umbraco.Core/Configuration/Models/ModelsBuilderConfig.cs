@@ -1,8 +1,6 @@
-﻿using Microsoft.Extensions.Configuration;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
+﻿using Umbraco.Configuration;
 
-namespace Umbraco.Configuration.Models
+namespace Umbraco.Core.Configuration.Models
 {
     /// <summary>
     ///     Represents the models builder configuration.

@@ -6,9 +6,9 @@ using System.Linq;
 using System.Net.Mail;
 using System.Text;
 using System.Threading;
-using Umbraco.Core.Composing;
+using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -16,7 +16,6 @@ using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Scoping;
-using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Services.Implement
 {
@@ -28,12 +27,18 @@ namespace Umbraco.Core.Services.Implement
         private readonly ILocalizationService _localizationService;
         private readonly INotificationsRepository _notificationsRepository;
         private readonly IGlobalSettings _globalSettings;
-        private readonly IContentSettings _contentSettings;
+        private readonly ContentSettings _contentSettings;
         private readonly ILogger _logger;
         private readonly IIOHelper _ioHelper;
 
         public NotificationService(IScopeProvider provider, IUserService userService, IContentService contentService, ILocalizationService localizationService,
-            ILogger logger, IIOHelper ioHelper, INotificationsRepository notificationsRepository, IGlobalSettings globalSettings, IContentSettings contentSettings)
+            ILogger logger, IIOHelper ioHelper, INotificationsRepository notificationsRepository, IGlobalSettings globalSettings, IOptionsSnapshot<ContentSettings> contentSettings)
+            : this(provider, userService, contentService, localizationService, logger, ioHelper, notificationsRepository, globalSettings, contentSettings.Value)
+        {
+        }
+
+        public NotificationService(IScopeProvider provider, IUserService userService, IContentService contentService, ILocalizationService localizationService,
+            ILogger logger, IIOHelper ioHelper, INotificationsRepository notificationsRepository, IGlobalSettings globalSettings, ContentSettings contentSettings)
         {
             _notificationsRepository = notificationsRepository;
             _globalSettings = globalSettings;
@@ -302,7 +307,7 @@ namespace Umbraco.Core.Services.Implement
 
             if (content.ContentType.VariesByNothing())
             {
-                if (!_contentSettings.DisableHtmlEmail)
+                if (!_contentSettings.Notifications.DisableHtmlEmail)
                 {
                     //create the HTML summary for invariant content
 
@@ -344,7 +349,7 @@ namespace Umbraco.Core.Services.Implement
             {
                 //it's variant, so detect what cultures have changed
 
-                if (!_contentSettings.DisableHtmlEmail)
+                if (!_contentSettings.Notifications.DisableHtmlEmail)
                 {
                     //Create the HTML based summary (ul of culture names)
 
@@ -406,13 +411,13 @@ namespace Umbraco.Core.Services.Implement
                 summary.ToString());
 
             // create the mail message
-            var mail = new MailMessage(_contentSettings.NotificationEmailAddress, mailingUser.Email);
+            var mail = new MailMessage(_contentSettings.Notifications.NotificationEmailAddress, mailingUser.Email);
 
             // populate the message
 
 
             mail.Subject = createSubject((mailingUser, subjectVars));
-            if (_contentSettings.DisableHtmlEmail)
+            if (_contentSettings.Notifications.DisableHtmlEmail)
             {
                 mail.IsBodyHtml = false;
                 mail.Body = createBody((user: mailingUser, body: bodyVars, false));

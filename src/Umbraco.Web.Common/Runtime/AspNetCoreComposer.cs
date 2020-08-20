@@ -26,6 +26,8 @@ using Umbraco.Web.Common.Templates;
 using Umbraco.Web.Common.Security;
 using Umbraco.Web.Security;
 using Umbraco.Web.Templates;
+using Umbraco.Configuration.Models;
+using Microsoft.Extensions.Options;
 
 namespace Umbraco.Web.Common.Runtime
 {
@@ -96,7 +98,7 @@ namespace Umbraco.Web.Common.Runtime
 
             composition.RegisterUnique<ITemplateRenderer, TemplateRenderer>();
             composition.RegisterUnique<IPublicAccessChecker, PublicAccessChecker>();
-            composition.RegisterUnique<LegacyPasswordSecurity>(factory => new LegacyPasswordSecurity(factory.GetInstance<IUserPasswordConfiguration>()));
+            composition.RegisterUnique(factory => new LegacyPasswordSecurity(factory.GetInstance<IOptionsSnapshot<UserPasswordConfigurationSettings>>().Value));
 
 
         }

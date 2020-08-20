@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.HealthChecks;
-using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
@@ -39,8 +39,8 @@ namespace Umbraco.Web.Scheduling
         private readonly IHealthChecksSettings _healthChecksSettingsConfig;
         private readonly IServerMessenger _serverMessenger;
         private readonly IRequestAccessor _requestAccessor;
-        private readonly ILoggingSettings _loggingSettings;
-        private readonly IKeepAliveSettings _keepAliveSettings;
+        private readonly LoggingSettings _loggingSettings;
+        private readonly KeepAliveSettings _keepAliveSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
 
         private BackgroundTaskRunner<IBackgroundTask> _keepAliveRunner;
@@ -59,7 +59,7 @@ namespace Umbraco.Web.Scheduling
             IScopeProvider scopeProvider, IUmbracoContextFactory umbracoContextFactory, IProfilingLogger logger,
             IApplicationShutdownRegistry applicationShutdownRegistry, IHealthChecksSettings healthChecksSettingsConfig,
             IServerMessenger serverMessenger, IRequestAccessor requestAccessor,
-            ILoggingSettings loggingSettings, IKeepAliveSettings keepAliveSettings,
+            IOptionsSnapshot<LoggingSettings> loggingSettings, IOptionsSnapshot<KeepAliveSettings> keepAliveSettings,
             IHostingEnvironment hostingEnvironment)
         {
             _runtime = runtime;
@@ -77,8 +77,8 @@ namespace Umbraco.Web.Scheduling
             _healthChecksSettingsConfig = healthChecksSettingsConfig ?? throw new ArgumentNullException(nameof(healthChecksSettingsConfig));
             _serverMessenger = serverMessenger;
             _requestAccessor = requestAccessor;
-            _loggingSettings = loggingSettings;
-            _keepAliveSettings = keepAliveSettings;
+            _loggingSettings = loggingSettings.Value;
+            _keepAliveSettings = keepAliveSettings.Value;
             _hostingEnvironment = hostingEnvironment;
         }
 
@@ -137,7 +137,7 @@ namespace Umbraco.Web.Scheduling
             });
         }
 
-        private IBackgroundTask RegisterKeepAlive(IKeepAliveSettings keepAliveSettings)
+        private IBackgroundTask RegisterKeepAlive(KeepAliveSettings keepAliveSettings)
         {
             // ping/keepalive
             // on all servers
@@ -181,7 +181,7 @@ namespace Umbraco.Web.Scheduling
             return task;
         }
 
-        private IBackgroundTask RegisterLogScrubber(ILoggingSettings settings)
+        private IBackgroundTask RegisterLogScrubber(LoggingSettings settings)
         {
             // log scrubbing
             // install on all, will only run on non-replica servers

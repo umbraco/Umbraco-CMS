@@ -14,6 +14,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
+using CoreDebugSettings = Umbraco.Core.Configuration.Models.CoreDebugSettings;
 
 namespace Umbraco.Tests.Components
 {
@@ -35,7 +36,7 @@ namespace Umbraco.Tests.Components
             var typeFinder = TestHelper.GetTypeFinder();
             var f = new UmbracoDatabaseFactory(logger, SettingsForTests.DefaultGlobalSettings, Mock.Of<IConnectionStrings>(), new Lazy<IMapperCollection>(() => new MapperCollection(Enumerable.Empty<BaseMapper>())), TestHelper.DbProviderFactoryCreator);
             var fs = new FileSystems(mock.Object, logger, TestHelper.IOHelper, SettingsForTests.GenerateMockGlobalSettings(), TestHelper.GetHostingEnvironment());
-            var coreDebug = Mock.Of<ICoreDebugSettings>();
+            var coreDebug = new CoreDebugSettings();
             var mediaFileSystem = Mock.Of<IMediaFileSystem>();
             var p = new ScopeProvider(f, fs, coreDebug, mediaFileSystem, logger, typeFinder, NoAppCache.Instance);
 
