@@ -583,6 +583,26 @@ namespace Umbraco.Web.Search
 
             public static void Execute(ExamineComponent examineComponent, IContent content, bool isPublished)
             {
+                // TODO: This is ugly, it is going to build the value set 3x and for 2 of those times it will be the same value
+                // set. We can do better.
+
+                // TODO: We are .ToList() ing each of the calls to GetValueSets here. This is currently required but isn't the way
+                // that this was intended to work. Ideally, the IEnumerable package gets passed to Examine and it is only iterated/executed
+                // when the indexing takes place which would occur on a background thread. This is problematic with how the ContentValueSetBuilder
+                // in combination with UmbracoContentIndex.PerformIndexItems works because (at least what I've come to believe) we are using yield
+                // return in the GetValueSets call in combination with trying to lazily resolve the enumerable but because we GroupBy in
+                // UmbracoContentIndex.PerformIndexItems it's eagerly executed but then lazily executed again on the background thread and I believe
+                // that in doing this when the call is made to _userService.GetProfilesById it's trying to resolve a scope from an AsyncLocal instance
+                // that has already been disposed higher up it's chain. I 'think' to how the eager/lazy enumeration happens with yield return that it's
+                // capturing a scope/AsyncLocal instance that it shouldn't really be using.
+
+                // TODO: We don't want these value sets to be eagerly built in this thread since this is most likely going to be a request thread.
+                // This is why the lazy execution of the Enumerable had the intended affect of executing only when requested on the background thread.
+                // This could still be acheived: Either we have a custom Enumerable/Enumerator to do this, or we simply call the below code
+                // on a background thread... which would be much easier!
+
+                // TODO: I think this is an issue in v8 too!
+
                 foreach (var index in examineComponent._examineManager.Indexes.OfType<IUmbracoIndex>()
                     //filter the indexers
                     .Where(x => isPublished || !x.PublishedValuesOnly)
@@ -593,7 +613,7 @@ namespace Umbraco.Web.Search
                         ? examineComponent._publishedContentValueSetBuilder
                         : (IValueSetBuilder<IContent>)examineComponent._contentValueSetBuilder;
 
-                    index.IndexItems(builder.GetValueSets(content));
+                    index.IndexItems(builder.GetValueSets(content).ToList());
                 }
             }
         }
