@@ -250,6 +250,7 @@
                     filter: function (i) {
                         return !(i.name.indexOf(".jpg") !== -1 || i.name.indexOf(".jpeg") !== -1 || i.name.indexOf(".png") !== -1 || i.name.indexOf(".svg") !== -1 || i.name.indexOf(".webp") !== -1 || i.name.indexOf(".gif") !== -1);
                     },
+                    filterCssClass: "not-allowed",
                     select: function (file) {
                         const id = decodeURIComponent(file.id.replace(/\+/g, " "));
                         block.thumbnail = "~/" + id;
