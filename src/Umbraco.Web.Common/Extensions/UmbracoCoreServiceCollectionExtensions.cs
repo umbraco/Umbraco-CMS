@@ -156,7 +156,7 @@ namespace Umbraco.Extensions
                 out factory);
 
             return services;
-        }   
+        }
 
         /// <summary>
         /// Adds the Umbraco Back Core requirements
@@ -252,8 +252,8 @@ namespace Umbraco.Extensions
             var connStrings = configs.ConnectionStrings();
             var appSettingMainDomLock = globalSettings.MainDomLock;
 
-            var isLinux = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
-            var mainDomLock = appSettingMainDomLock == "SqlMainDomLock" || isLinux == true
+            var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+            var mainDomLock = appSettingMainDomLock == "SqlMainDomLock" || isWindows == false
                 ? (IMainDomLock)new SqlMainDomLock(logger, globalSettings, connStrings, dbProviderFactoryCreator, hostingEnvironment)
                 : new MainDomSemaphoreLock(logger, hostingEnvironment);
 

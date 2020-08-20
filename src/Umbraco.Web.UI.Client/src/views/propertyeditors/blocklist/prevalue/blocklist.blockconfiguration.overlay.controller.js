@@ -147,7 +147,7 @@
 
 
         vm.addViewForBlock = function(block) {
-            localizationService.localize("blockEditor_headlineSelectView").then(function(localizedTitle) {
+            localizationService.localize("blockEditor_headlineAddCustomView").then(function(localizedTitle) {
 
                 const filePicker = {
                     title: localizedTitle,
@@ -160,7 +160,7 @@
                     },
                     select: function (node) {
                         const filepath = decodeURIComponent(node.id.replace(/\+/g, " "));
-                        block.view = filepath;
+                        block.view = "~/" + filepath;
                         editorService.close();
                     },
                     close: function () {
@@ -206,7 +206,7 @@
                     },
                     select: function (node) {
                         const filepath = decodeURIComponent(node.id.replace(/\+/g, " "));
-                        block.stylesheet = filepath;
+                        block.stylesheet = "~/" + filepath;
                         editorService.close();
                     },
                     close: function () {
@@ -252,7 +252,8 @@
                         return !(i.name.indexOf(".jpg") !== -1 || i.name.indexOf(".jpeg") !== -1 || i.name.indexOf(".png") !== -1 || i.name.indexOf(".svg") !== -1 || i.name.indexOf(".webp") !== -1 || i.name.indexOf(".gif") !== -1);
                     },
                     select: function (file) {
-                        block.thumbnail = file.name;
+                        const id = decodeURIComponent(file.id.replace(/\+/g, " "));
+                        block.thumbnail = "~/" + id;
                         editorService.close();
                     },
                     close: function () {
