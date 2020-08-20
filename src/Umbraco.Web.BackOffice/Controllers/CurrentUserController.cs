@@ -235,5 +235,12 @@ namespace Umbraco.Web.BackOffice.Controllers
             throw HttpResponseException.CreateValidationErrorResponse(ModelState);
         }
 
+        [UmbracoAuthorize]
+        [ValidateAngularAntiForgeryToken]
+        public async Task<Dictionary<string, string>> GetCurrentUserLinkedLogins()
+        {
+            var identityUser = await _backOfficeUserManager.FindByIdAsync(_webSecurity.GetUserId().ResultOr(0).ToString());
+            return identityUser.Logins.ToDictionary(x => x.LoginProvider, x => x.ProviderKey);
+        }
     }
 }
