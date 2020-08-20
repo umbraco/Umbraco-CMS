@@ -794,6 +794,8 @@
     <key alias="videos">Videos</key>
     <key alias="clear">Clear</key>
     <key alias="installing">Installing</key>
+    <key alias="customValidation">Custom Validation Pattern</key>
+    <key alias="mandatoryMessage">Custom Mandatory Message</key>
   </area>
   <area alias="colors">
     <key alias="blue">Blue</key>

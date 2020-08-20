@@ -198,6 +198,16 @@
                                         <localize key="general_mandatory"></localize>
                                     </div>
 
+                                    <div class="umb-group-builder__property-tag -white" ng-if="property.validation.mandatoryMessage">
+                                        <i class="umb-group-builder__property-tag-icon">*</i>
+                                        <localize key="general_mandatoryMessage">Custom Mandatory Message</localize>
+                                    </div>
+
+                                    <div class="umb-group-builder__property-tag -white" ng-if="property.validation.pattern">
+                                        <i class="umb-group-builder__property-tag-icon">*</i>
+                                        <localize key="general_customValidation">Custom Validation</localize>
+                                    </div>
+
                                     <div class="umb-group-builder__property-tag -white" ng-if="property.showOnMemberProfile">
                                         <i class="icon-eye umb-group-builder__property-tag-icon"></i>
                                         <localize key="contentTypeEditor_showOnMemberProfile"></localize>
