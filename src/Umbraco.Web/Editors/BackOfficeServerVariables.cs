@@ -326,6 +326,10 @@ namespace Umbraco.Web.Editors
                             "elementTypeApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ElementTypeController>(
                                 controller => controller.GetAll())
                         },
+                        {
+                            "trackedReferencesApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<TrackedReferencesController>(
+                                controller => controller.GetPagedReferences(0, string.Empty, 1, 1))
+                        }
                     }
                 },
                 {
