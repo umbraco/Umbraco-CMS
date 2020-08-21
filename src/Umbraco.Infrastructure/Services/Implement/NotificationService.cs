@@ -26,19 +26,19 @@ namespace Umbraco.Core.Services.Implement
         private readonly IContentService _contentService;
         private readonly ILocalizationService _localizationService;
         private readonly INotificationsRepository _notificationsRepository;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly ContentSettings _contentSettings;
         private readonly ILogger _logger;
         private readonly IIOHelper _ioHelper;
 
         public NotificationService(IScopeProvider provider, IUserService userService, IContentService contentService, ILocalizationService localizationService,
-            ILogger logger, IIOHelper ioHelper, INotificationsRepository notificationsRepository, IGlobalSettings globalSettings, IOptionsSnapshot<ContentSettings> contentSettings)
-            : this(provider, userService, contentService, localizationService, logger, ioHelper, notificationsRepository, globalSettings, contentSettings.Value)
+            ILogger logger, IIOHelper ioHelper, INotificationsRepository notificationsRepository, IOptionsSnapshot<GlobalSettings> globalSettings, IOptionsSnapshot<ContentSettings> contentSettings)
+            : this(provider, userService, contentService, localizationService, logger, ioHelper, notificationsRepository, globalSettings.Value, contentSettings.Value)
         {
         }
 
         public NotificationService(IScopeProvider provider, IUserService userService, IContentService contentService, ILocalizationService localizationService,
-            ILogger logger, IIOHelper ioHelper, INotificationsRepository notificationsRepository, IGlobalSettings globalSettings, ContentSettings contentSettings)
+            ILogger logger, IIOHelper ioHelper, INotificationsRepository notificationsRepository, GlobalSettings globalSettings, ContentSettings contentSettings)
         {
             _notificationsRepository = notificationsRepository;
             _globalSettings = globalSettings;

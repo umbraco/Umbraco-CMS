@@ -6,6 +6,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Web.Install.Models;
 using Umbraco.Core.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace Umbraco.Web.Install.InstallSteps
 {
@@ -16,12 +17,12 @@ namespace Umbraco.Web.Install.InstallSteps
     {
         private readonly DatabaseBuilder _databaseBuilder;
         private readonly ILogger _logger;
-        private readonly IConnectionStrings _connectionStrings;
+        private readonly ConnectionStrings _connectionStrings;
 
-        public DatabaseConfigureStep(DatabaseBuilder databaseBuilder, IConnectionStrings connectionStrings)
+        public DatabaseConfigureStep(DatabaseBuilder databaseBuilder, IOptionsSnapshot<ConnectionStrings> connectionStrings)
         {
             _databaseBuilder = databaseBuilder;
-            _connectionStrings = connectionStrings ?? throw new ArgumentNullException(nameof(connectionStrings));
+            _connectionStrings = connectionStrings.Value ?? throw new ArgumentNullException(nameof(connectionStrings));
         }
 
         public override Task<InstallSetupResult> ExecuteAsync(DatabaseModel database)

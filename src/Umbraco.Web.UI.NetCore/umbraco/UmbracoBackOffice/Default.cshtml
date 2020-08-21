@@ -1,8 +1,10 @@
-﻿@using Umbraco.Core
+﻿@using Microsoft.Extensions.Options;
+@using Umbraco.Core
 @using Umbraco.Web.WebAssets
 @using Umbraco.Web.Common.Security
 @using Umbraco.Core.WebAssets
 @using Umbraco.Core.Configuration
+@using Umbraco.Core.Configuration.Models
 @using Umbraco.Core.Hosting
 @using Umbraco.Extensions
 @using Umbraco.Core.Logging
@@ -11,15 +13,15 @@
 @inject BackOfficeServerVariables backOfficeServerVariables
 @inject IUmbracoVersion umbracoVersion
 @inject IHostingEnvironment hostingEnvironment
-@inject IGlobalSettings globalSettings
+@inject IOptionsSnapshot<GlobalSettings> globalSettings
 @inject IRuntimeMinifier runtimeMinifier
 @inject IProfilerHtml profilerHtml
 
 @{
     var isDebug = false;
-    var qryDebug = Context.Request.Query["umbDebug"].TryConvertTo<bool>();
+    var qryDebug = Context.Request.Query["umbDebug"].ToString().TryConvertTo<bool>();
     isDebug = qryDebug.Success && qryDebug.Result;
-    var backOfficePath = globalSettings.GetBackOfficePath(hostingEnvironment);
+    var backOfficePath = globalSettings.Value.GetBackOfficePath(hostingEnvironment);
 }
 
 <!DOCTYPE html>

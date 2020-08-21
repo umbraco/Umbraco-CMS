@@ -26,7 +26,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     internal class UserRepository : NPocoRepositoryBase<int, IUser>, IUserRepository
     {
         private readonly IMapperCollection _mapperCollection;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly UserPasswordConfigurationSettings _passwordConfiguration;
         private readonly IJsonSerializer _jsonSerializer;
         private string _passwordConfigJson;
@@ -47,10 +47,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             AppCaches appCaches,
             ILogger logger,
             IMapperCollection mapperCollection,
-            IGlobalSettings globalSettings,
+            IOptionsSnapshot<GlobalSettings> globalSettings,
             IOptionsSnapshot<UserPasswordConfigurationSettings> passwordConfiguration,
             IJsonSerializer jsonSerializer)
-            : this(scopeAccessor, appCaches, logger, mapperCollection, globalSettings, passwordConfiguration.Value, jsonSerializer)
+            : this(scopeAccessor, appCaches, logger, mapperCollection, globalSettings.Value, passwordConfiguration.Value, jsonSerializer)
         {
         }
 
@@ -69,7 +69,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             AppCaches appCaches,
             ILogger logger,
             IMapperCollection mapperCollection,
-            IGlobalSettings globalSettings,
+            GlobalSettings globalSettings,
             UserPasswordConfigurationSettings passwordConfiguration,
             IJsonSerializer jsonSerializer)
             : base(scopeAccessor, appCaches, logger)

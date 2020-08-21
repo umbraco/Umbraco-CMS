@@ -4,6 +4,8 @@ using System.Linq;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Configuration.Models;
+using Microsoft.Extensions.Options;
 
 namespace Umbraco.Web.Routing
 {
@@ -24,7 +26,7 @@ namespace Umbraco.Web.Routing
         /// <param name="mediaUrlProviders">The list of media url providers.</param>
         /// <param name="variationContextAccessor">The current variation accessor.</param>
         /// <param name="propertyEditorCollection"></param>
-        public UrlProvider(IUmbracoContextAccessor umbracoContextAccessor, IWebRoutingSettings routingSettings, UrlProviderCollection urlProviders, MediaUrlProviderCollection mediaUrlProviders, IVariationContextAccessor variationContextAccessor)
+        public UrlProvider(IUmbracoContextAccessor umbracoContextAccessor, IOptionsSnapshot<WebRoutingSettings> routingSettings, UrlProviderCollection urlProviders, MediaUrlProviderCollection mediaUrlProviders, IVariationContextAccessor variationContextAccessor)
         {
             if (routingSettings == null) throw new ArgumentNullException(nameof(routingSettings));
 
@@ -35,7 +37,7 @@ namespace Umbraco.Web.Routing
             var provider = UrlMode.Auto;
             Mode = provider;
 
-            if (Enum<UrlMode>.TryParse(routingSettings.UrlProviderMode, out provider))
+            if (Enum<UrlMode>.TryParse(routingSettings.Value.UrlProviderMode, out provider))
             {
                 Mode = provider;
             }

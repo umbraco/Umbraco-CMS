@@ -39,7 +39,7 @@ namespace Umbraco.Web.Editors
     {
         private BackOfficeOwinUserManager _userManager;
         private BackOfficeSignInManager _signInManager;
-        private readonly IUserPasswordConfiguration _passwordConfiguration;
+        private readonly UserPasswordConfigurationSettings _passwordConfiguration;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IRuntimeState _runtimeState;
         private readonly SecuritySettings _securitySettings;
@@ -47,8 +47,8 @@ namespace Umbraco.Web.Editors
         private readonly IEmailSender _emailSender;
 
         public AuthenticationController(
-            IUserPasswordConfiguration passwordConfiguration,
-            IGlobalSettings globalSettings,
+            IOptionsSnapshot<UserPasswordConfigurationSettings> passwordConfiguration,
+            IOptionsSnapshot<GlobalSettings> globalSettings,
             IHostingEnvironment hostingEnvironment,
             IUmbracoContextAccessor umbracoContextAccessor,
             ISqlContext sqlContext,
@@ -63,7 +63,7 @@ namespace Umbraco.Web.Editors
             IEmailSender emailSender)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoMapper, publishedUrlProvider)
         {
-            _passwordConfiguration = passwordConfiguration ?? throw new ArgumentNullException(nameof(passwordConfiguration));
+            _passwordConfiguration = passwordConfiguration.Value ?? throw new ArgumentNullException(nameof(passwordConfiguration));
             _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
             _runtimeState = runtimeState ?? throw new ArgumentNullException(nameof(runtimeState));
             _securitySettings = securitySettings.Value ?? throw new ArgumentNullException(nameof(securitySettings));

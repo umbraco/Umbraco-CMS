@@ -30,29 +30,26 @@ namespace Umbraco.Web.Install.InstallSteps
         private readonly IUserService _userService;
         private readonly DatabaseBuilder _databaseBuilder;
         private static HttpClient _httpClient;
-        private readonly IGlobalSettings _globalSettings;
         private readonly UserPasswordConfigurationSettings _passwordConfiguration;
         private readonly SecuritySettings _securitySettings;
-        private readonly IConnectionStrings _connectionStrings;
+        private readonly ConnectionStrings _connectionStrings;
         private readonly ICookieManager _cookieManager;
         private readonly BackOfficeUserManager _userManager;
 
         public NewInstallStep(
             IUserService userService,
             DatabaseBuilder databaseBuilder,
-            IGlobalSettings globalSettings,
             IOptionsSnapshot<UserPasswordConfigurationSettings> passwordConfiguration,
             IOptionsSnapshot<SecuritySettings> securitySettings,
-            IConnectionStrings connectionStrings,
+            IOptionsSnapshot<ConnectionStrings> connectionStrings,
             ICookieManager cookieManager,
             BackOfficeUserManager userManager)
         {
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _databaseBuilder = databaseBuilder ?? throw new ArgumentNullException(nameof(databaseBuilder));
-            _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
             _passwordConfiguration = passwordConfiguration.Value ?? throw new ArgumentNullException(nameof(passwordConfiguration));
             _securitySettings = securitySettings.Value ?? throw new ArgumentNullException(nameof(securitySettings));
-            _connectionStrings = connectionStrings ?? throw new ArgumentNullException(nameof(connectionStrings));
+            _connectionStrings = connectionStrings.Value ?? throw new ArgumentNullException(nameof(connectionStrings));
             _cookieManager = cookieManager;
             _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
         }

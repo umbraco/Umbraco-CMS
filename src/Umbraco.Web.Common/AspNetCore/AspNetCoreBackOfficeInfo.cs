@@ -1,11 +1,17 @@
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 
 namespace Umbraco.Web.Common.AspNetCore
 {
     public class AspNetCoreBackOfficeInfo : IBackOfficeInfo
     {
-        public AspNetCoreBackOfficeInfo(IGlobalSettings globalSettings)
+        public AspNetCoreBackOfficeInfo(IOptionsSnapshot<GlobalSettings> globalSettings)
+            : this(globalSettings.Value)
+        {
+        }
+
+        public AspNetCoreBackOfficeInfo(GlobalSettings globalSettings)
         {
             GetAbsoluteUrl = globalSettings.UmbracoPath;
         }

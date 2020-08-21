@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Text;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
 
 namespace Umbraco.ModelsBuilder.Embedded.Building
@@ -8,11 +9,11 @@ namespace Umbraco.ModelsBuilder.Embedded.Building
     public class ModelsGenerator
     {
         private readonly UmbracoServices _umbracoService;
-        private readonly IModelsBuilderConfig _config;
+        private readonly ModelsBuilderConfig _config;
         private readonly OutOfDateModelsStatus _outOfDateModels;
         private readonly IIOHelper _ioHelper;
 
-        public ModelsGenerator(UmbracoServices umbracoService, IModelsBuilderConfig config, OutOfDateModelsStatus outOfDateModels, IIOHelper ioHelper)
+        public ModelsGenerator(UmbracoServices umbracoService, ModelsBuilderConfig config, OutOfDateModelsStatus outOfDateModels, IIOHelper ioHelper)
         {
             _umbracoService = umbracoService;
             _config = config;

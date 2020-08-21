@@ -19,6 +19,8 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.ModelsBuilder.Embedded.Building;
 using File = System.IO.File;
+using Umbraco.Core.Configuration.Models;
+using Microsoft.Extensions.Options;
 
 namespace Umbraco.ModelsBuilder.Embedded
 {
@@ -41,7 +43,7 @@ namespace Umbraco.ModelsBuilder.Embedded
         private const string ProjVirt = "~/App_Data/Models/all.generated.cs";
         private static readonly string[] OurFiles = { "models.hash", "models.generated.cs", "all.generated.cs", "all.dll.path", "models.err" };
 
-        private readonly IModelsBuilderConfig _config;
+        private readonly ModelsBuilderConfig _config;
         private readonly IApplicationShutdownRegistry _hostingLifetime;
         private readonly IIOHelper _ioHelper;
         private readonly ModelsGenerationError _errors;
@@ -49,7 +51,7 @@ namespace Umbraco.ModelsBuilder.Embedded
         public PureLiveModelFactory(
             Lazy<UmbracoServices> umbracoServices,
             IProfilingLogger logger,
-            IModelsBuilderConfig config,
+            IOptionsSnapshot<ModelsBuilderConfig> config,
             IHostingEnvironment hostingEnvironment,
             IApplicationShutdownRegistry hostingLifetime,
             IIOHelper ioHelper)

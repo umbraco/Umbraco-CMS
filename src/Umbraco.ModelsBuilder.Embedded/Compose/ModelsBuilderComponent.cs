@@ -15,19 +15,21 @@ using Umbraco.ModelsBuilder.Embedded.BackOffice;
 using Umbraco.Web;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebAssets;
+using Umbraco.Core.Configuration.Models;
+using Microsoft.Extensions.Options;
 
 namespace Umbraco.ModelsBuilder.Embedded.Compose
 {
     internal class ModelsBuilderComponent : IComponent
     {
-        private readonly IModelsBuilderConfig _config;
+        private readonly ModelsBuilderConfig _config;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly LiveModelsProvider _liveModelsProvider;
         private readonly OutOfDateModelsStatus _outOfDateModels;
 
-        public ModelsBuilderComponent(IModelsBuilderConfig config, IShortStringHelper shortStringHelper, LiveModelsProvider liveModelsProvider, OutOfDateModelsStatus outOfDateModels)
+        public ModelsBuilderComponent(IOptionsSnapshot<ModelsBuilderConfig> config, IShortStringHelper shortStringHelper, LiveModelsProvider liveModelsProvider, OutOfDateModelsStatus outOfDateModels)
         {
-            _config = config;
+            _config = config.Value;
             _shortStringHelper = shortStringHelper;
             _liveModelsProvider = liveModelsProvider;
             _outOfDateModels = outOfDateModels;

@@ -1,7 +1,8 @@
 using System;
 using System.Web.Mvc;
+using Microsoft.Extensions.Options;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
@@ -10,7 +11,6 @@ using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Mvc
 {
-
     /// <summary>
     /// Represents the default front-end rendering controller.
     /// </summary>
@@ -25,7 +25,7 @@ namespace Umbraco.Web.Mvc
             ActionInvoker = new RenderActionInvoker();
         }
 
-        public RenderMvcController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger)
+        public RenderMvcController(IOptionsSnapshot<GlobalSettings> globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger)
             : base(globalSettings, umbracoContextAccessor, services, appCaches, profilingLogger)
         {
             ActionInvoker = new RenderActionInvoker();

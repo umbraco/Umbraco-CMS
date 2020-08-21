@@ -2,8 +2,9 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Web.BackOffice.Security;
 
 namespace Umbraco.Extensions
@@ -20,12 +21,12 @@ namespace Umbraco.Extensions
         private class SetAngularAntiForgeryTokensFilter : IAsyncActionFilter
         {
             private readonly IBackOfficeAntiforgery _antiforgery;
-            private readonly IGlobalSettings _globalSettings;
+            private readonly GlobalSettings _globalSettings;
 
-            public SetAngularAntiForgeryTokensFilter(IBackOfficeAntiforgery antiforgery, IGlobalSettings globalSettings)
+            public SetAngularAntiForgeryTokensFilter(IBackOfficeAntiforgery antiforgery, IOptionsSnapshot<GlobalSettings> globalSettings)
             {
                 _antiforgery = antiforgery;
-                _globalSettings = globalSettings;
+                _globalSettings = globalSettings.Value;
             }
 
             public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)

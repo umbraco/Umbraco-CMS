@@ -66,7 +66,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IEntityService _entityService;
         private readonly IMediaService _mediaService;
         private readonly IContentService _contentService;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly BackOfficeUserManager _backOfficeUserManager;
         private readonly ILogger _logger;
         private readonly LinkGenerator _linkGenerator;
@@ -89,7 +89,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             IEntityService entityService,
             IMediaService mediaService,
             IContentService contentService,
-            IGlobalSettings globalSettings,
+            IOptionsSnapshot<GlobalSettings> globalSettings,
             BackOfficeUserManager backOfficeUserManager,
             ILogger logger,
             LinkGenerator linkGenerator)
@@ -111,7 +111,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _entityService = entityService;
             _mediaService = mediaService;
             _contentService = contentService;
-            _globalSettings = globalSettings;
+            _globalSettings = globalSettings.Value;
             _backOfficeUserManager = backOfficeUserManager;
             _logger = logger;
             _linkGenerator = linkGenerator;

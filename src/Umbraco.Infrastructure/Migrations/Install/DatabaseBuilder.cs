@@ -2,7 +2,9 @@
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
+using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -21,7 +23,7 @@ namespace Umbraco.Core.Migrations.Install
     {
         private readonly IUmbracoDatabaseFactory _databaseFactory;
         private readonly IScopeProvider _scopeProvider;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly IRuntimeState _runtime;
         private readonly IMigrationBuilder _migrationBuilder;
         private readonly IKeyValueService _keyValueService;
@@ -38,7 +40,7 @@ namespace Umbraco.Core.Migrations.Install
         /// </summary>
         public DatabaseBuilder(
             IScopeProvider scopeProvider,
-            IGlobalSettings globalSettings,
+            IOptionsSnapshot<GlobalSettings> globalSettings,
             IUmbracoDatabaseFactory databaseFactory,
             IRuntimeState runtime,
             ILogger logger,
@@ -50,7 +52,7 @@ namespace Umbraco.Core.Migrations.Install
             IConfigManipulator configManipulator)
         {
             _scopeProvider = scopeProvider;
-            _globalSettings = globalSettings;
+            _globalSettings = globalSettings.Value;
             _databaseFactory = databaseFactory;
             _runtime = runtime;
             _logger = logger;

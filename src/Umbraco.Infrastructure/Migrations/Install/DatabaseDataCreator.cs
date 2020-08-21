@@ -1,6 +1,7 @@
 ﻿using System;
 using NPoco;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Upgrade;
 using Umbraco.Core.Models;
@@ -16,9 +17,9 @@ namespace Umbraco.Core.Migrations.Install
         private readonly IDatabase _database;
         private readonly ILogger _logger;
         private readonly IUmbracoVersion _umbracoVersion;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
 
-        public DatabaseDataCreator(IDatabase database, ILogger logger, IUmbracoVersion umbracoVersion, IGlobalSettings globalSettings)
+        public DatabaseDataCreator(IDatabase database, ILogger logger, IUmbracoVersion umbracoVersion, GlobalSettings globalSettings)
         {
             _database = database;
             _logger = logger;

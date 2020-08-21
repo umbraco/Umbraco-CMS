@@ -29,7 +29,7 @@ namespace Umbraco.Web.BackOffice.Security
     {
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly SecuritySettings _securitySettings;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IRuntimeState _runtimeState;
         private readonly IDataProtectionProvider _dataProtection;
@@ -43,7 +43,7 @@ namespace Umbraco.Web.BackOffice.Security
         public ConfigureBackOfficeCookieOptions(
             IUmbracoContextAccessor umbracoContextAccessor,
             IOptionsSnapshot<SecuritySettings> securitySettings,
-            IGlobalSettings globalSettings,
+            IOptionsSnapshot<GlobalSettings> globalSettings,
             IHostingEnvironment hostingEnvironment,
             IRuntimeState runtimeState,
             IDataProtectionProvider dataProtection,
@@ -56,7 +56,7 @@ namespace Umbraco.Web.BackOffice.Security
         {
             _umbracoContextAccessor = umbracoContextAccessor;
             _securitySettings = securitySettings.Value;
-            _globalSettings = globalSettings;
+            _globalSettings = globalSettings.Value;
             _hostingEnvironment = hostingEnvironment;
             _runtimeState = runtimeState;
             _dataProtection = dataProtection;

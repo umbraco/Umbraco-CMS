@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Configuration.UmbracoSettings;
 
 namespace Umbraco.Core.Composing
@@ -11,10 +11,10 @@ namespace Umbraco.Core.Composing
     /// </summary>
     public class TypeFinderConfig : ITypeFinderConfig
     {
-        private readonly ITypeFinderSettings _settings;
+        private readonly TypeFinderSettings _settings;
         private IEnumerable<string> _assembliesAcceptingLoadExceptions;
 
-        public TypeFinderConfig(ITypeFinderSettings settings)
+        public TypeFinderConfig(TypeFinderSettings settings)
         {
             _settings = settings;
         }

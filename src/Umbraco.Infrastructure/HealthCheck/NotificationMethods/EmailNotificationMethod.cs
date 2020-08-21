@@ -17,13 +17,13 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
         private readonly ILocalizedTextService _textService;
         private readonly IRequestAccessor _requestAccessor;
 
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly ContentSettings _contentSettings;
 
         public EmailNotificationMethod(
             ILocalizedTextService textService,
             IRequestAccessor requestAccessor,
-            IGlobalSettings globalSettings,
+            IOptionsSnapshot<GlobalSettings> globalSettings,
             IHealthChecksSettings healthChecksSettings,
             IOptionsSnapshot<ContentSettings> contentSettings)
             : base(healthChecksSettings)
@@ -39,7 +39,7 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
 
             _textService = textService ?? throw new ArgumentNullException(nameof(textService));
             _requestAccessor = requestAccessor;
-            _globalSettings = globalSettings;
+            _globalSettings = globalSettings.Value;
             _contentSettings = contentSettings.Value ?? throw new ArgumentNullException(nameof(contentSettings));
         }
 

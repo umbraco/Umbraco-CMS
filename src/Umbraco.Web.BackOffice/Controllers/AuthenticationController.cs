@@ -45,7 +45,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IUserService _userService;
         private readonly ILocalizedTextService _textService;
         private readonly UmbracoMapper _umbracoMapper;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly SecuritySettings _securitySettings;
         private readonly ILogger _logger;
         private readonly IIpResolver _ipResolver;
@@ -64,7 +64,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             IUserService userService,
             ILocalizedTextService textService,
             UmbracoMapper umbracoMapper,
-            IGlobalSettings globalSettings,
+            IOptionsSnapshot<GlobalSettings> globalSettings,
             IOptionsSnapshot<SecuritySettings> securitySettings,
             ILogger logger,
             IIpResolver ipResolver,
@@ -79,7 +79,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _userService = userService;
             _textService = textService;
             _umbracoMapper = umbracoMapper;
-            _globalSettings = globalSettings;
+            _globalSettings = globalSettings.Value;
             _securitySettings = securitySettings.Value;
             _logger = logger;
             _ipResolver = ipResolver;

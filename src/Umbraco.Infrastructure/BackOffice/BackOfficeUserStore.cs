@@ -5,7 +5,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Identity;
@@ -32,11 +34,16 @@ namespace Umbraco.Core.BackOffice
         private readonly IUserService _userService;
         private readonly IEntityService _entityService;
         private readonly IExternalLoginService _externalLoginService;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly UmbracoMapper _mapper;
         private bool _disposed = false;
 
-        public BackOfficeUserStore(IUserService userService, IEntityService entityService, IExternalLoginService externalLoginService, IGlobalSettings globalSettings, UmbracoMapper mapper)
+        public BackOfficeUserStore(IUserService userService, IEntityService entityService, IExternalLoginService externalLoginService, IOptionsSnapshot<GlobalSettings> globalSettings, UmbracoMapper mapper)
+            : this(userService, entityService, externalLoginService, globalSettings.Value, mapper)
+        {
+        }
+
+        public BackOfficeUserStore(IUserService userService, IEntityService entityService, IExternalLoginService externalLoginService, GlobalSettings globalSettings, UmbracoMapper mapper)
         {
             _userService = userService;
             _entityService = entityService;

@@ -46,7 +46,7 @@ namespace Umbraco.Web.Security
             IUserService userService,
             IEntityService entityService,
             IExternalLoginService externalLoginService,
-            IGlobalSettings globalSettings,
+            GlobalSettings globalSettings,
             UmbracoMapper mapper,
             UserPasswordConfigurationSettings passwordConfiguration,
             IIpResolver ipResolver,

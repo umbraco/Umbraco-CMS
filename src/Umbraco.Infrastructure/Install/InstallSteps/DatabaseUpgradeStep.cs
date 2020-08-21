@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Install;
@@ -20,8 +22,8 @@ namespace Umbraco.Web.Install.InstallSteps
         private readonly IRuntimeState _runtime;
         private readonly ILogger _logger;
         private readonly IUmbracoVersion _umbracoVersion;
-        private readonly IGlobalSettings _globalSettings;
-        private readonly IConnectionStrings _connectionStrings;
+        private readonly GlobalSettings _globalSettings;
+        private readonly ConnectionStrings _connectionStrings;
         private readonly IIOHelper _ioHelper;
         private readonly IConfigManipulator _configManipulator;
 
@@ -30,8 +32,8 @@ namespace Umbraco.Web.Install.InstallSteps
             IRuntimeState runtime,
             ILogger logger,
             IUmbracoVersion umbracoVersion,
-            IGlobalSettings globalSettings,
-            IConnectionStrings connectionStrings,
+            IOptionsSnapshot<GlobalSettings> globalSettings,
+            IOptionsSnapshot<ConnectionStrings> connectionStrings,
             IIOHelper ioHelper,
             IConfigManipulator configManipulator)
         {
@@ -39,8 +41,8 @@ namespace Umbraco.Web.Install.InstallSteps
             _runtime = runtime;
             _logger = logger;
             _umbracoVersion = umbracoVersion;
-            _globalSettings = globalSettings;
-            _connectionStrings = connectionStrings ?? throw new ArgumentNullException(nameof(connectionStrings));
+            _globalSettings = globalSettings.Value;
+            _connectionStrings = connectionStrings.Value ?? throw new ArgumentNullException(nameof(connectionStrings));
             _ioHelper = ioHelper;
             _configManipulator = configManipulator;
         }

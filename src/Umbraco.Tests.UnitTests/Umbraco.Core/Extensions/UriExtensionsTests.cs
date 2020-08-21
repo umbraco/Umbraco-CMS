@@ -18,7 +18,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Extensions
         {
             _settingsForTests = new SettingsForTests();
             _hostEnvironment = Mock.Of<IWebHostEnvironment>();
-            _globalSettings = _settingsForTests.GenerateMockGlobalSettings();
+            _globalSettings = _settingsForTests.GenerateStubGlobalSettings();
         }
 
         private SettingsForTests _settingsForTests;

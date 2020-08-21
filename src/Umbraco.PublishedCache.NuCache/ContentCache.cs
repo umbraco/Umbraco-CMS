@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Xml.XPath;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Xml;
 using Umbraco.Core.Xml.XPath;
@@ -19,7 +21,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly IAppCache _snapshotCache;
         private readonly IAppCache _elementsCache;
         private readonly IDomainCache _domainCache;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly IVariationContextAccessor _variationContextAccessor;
 
         #region Constructor
@@ -29,7 +31,12 @@ namespace Umbraco.Web.PublishedCache.NuCache
         // it's too late for UmbracoContext which has captured previewDefault and stuff into these ctor vars
         // but, no, UmbracoContext returns snapshot.Content which comes from elements SO a resync should create a new cache
 
-        public ContentCache(bool previewDefault, ContentStore.Snapshot snapshot, IAppCache snapshotCache, IAppCache elementsCache, IDomainCache domainCache, IGlobalSettings globalSettings, IVariationContextAccessor variationContextAccessor)
+        public ContentCache(bool previewDefault, ContentStore.Snapshot snapshot, IAppCache snapshotCache, IAppCache elementsCache, IDomainCache domainCache, IOptionsSnapshot<GlobalSettings> globalSettings, IVariationContextAccessor variationContextAccessor)
+            : this(previewDefault, snapshot, snapshotCache, elementsCache, domainCache, globalSettings.Value, variationContextAccessor)
+        {
+        }
+
+        public ContentCache(bool previewDefault, ContentStore.Snapshot snapshot, IAppCache snapshotCache, IAppCache elementsCache, IDomainCache domainCache, GlobalSettings globalSettings, IVariationContextAccessor variationContextAccessor)
             : base(previewDefault)
         {
             _snapshot = snapshot;

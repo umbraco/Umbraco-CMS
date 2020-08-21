@@ -24,7 +24,7 @@ namespace Umbraco.Web.Security
     internal class GetUserSecondsMiddleWare : OwinMiddleware
     {
         private readonly UmbracoBackOfficeCookieAuthOptions _authOptions;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly SecuritySettings _securitySettings;
         private readonly ILogger _logger;
         private readonly IHostingEnvironment _hostingEnvironment;
@@ -32,14 +32,14 @@ namespace Umbraco.Web.Security
         public GetUserSecondsMiddleWare(
             OwinMiddleware next,
             UmbracoBackOfficeCookieAuthOptions authOptions,
-            IGlobalSettings globalSettings,
+            IOptionsSnapshot<GlobalSettings> globalSettings,
             IOptionsSnapshot<SecuritySettings> securitySettings,
             ILogger logger,
             IHostingEnvironment hostingEnvironment)
             : base(next)
         {
             _authOptions = authOptions ?? throw new ArgumentNullException(nameof(authOptions));
-            _globalSettings = globalSettings;
+            _globalSettings = globalSettings.Value;
             _securitySettings = securitySettings.Value;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _hostingEnvironment = hostingEnvironment;

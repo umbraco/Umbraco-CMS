@@ -5,6 +5,7 @@ using System.IO;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
@@ -26,11 +27,12 @@ namespace Umbraco.Core.Runtime
         private readonly RuntimeState _state;
         private readonly IUmbracoBootPermissionChecker _umbracoBootPermissionChecker;
         private readonly IRequestCache _requestCache;
-        private readonly IGlobalSettings _globalSettings;
-        private readonly IConnectionStrings _connectionStrings;
+        private readonly GlobalSettings _globalSettings;
+        private readonly ConnectionStrings _connectionStrings;
 
         public CoreRuntime(
-            Configs configs,
+            GlobalSettings globalSettings,
+            ConnectionStrings connectionStrings,
             IUmbracoVersion umbracoVersion,
             IIOHelper ioHelper,
             ILogger logger,
@@ -43,9 +45,11 @@ namespace Umbraco.Core.Runtime
             ITypeFinder typeFinder,
             IRequestCache requestCache)
         {
+            _globalSettings = globalSettings;
+            _connectionStrings = connectionStrings;
+
             IOHelper = ioHelper;
-            Configs = configs;
-            UmbracoVersion = umbracoVersion ;
+            UmbracoVersion = umbracoVersion;
             Profiler = profiler;
             HostingEnvironment = hostingEnvironment;
             BackOfficeInfo = backOfficeInfo;
@@ -58,14 +62,10 @@ namespace Umbraco.Core.Runtime
             MainDom = mainDom;
             TypeFinder = typeFinder;
 
-            _globalSettings = Configs.Global();
-            _connectionStrings = configs.ConnectionStrings();
-
-
             // runtime state
             // beware! must use '() => _factory.GetInstance<T>()' and NOT '_factory.GetInstance<T>'
             // as the second one captures the current value (null) and therefore fails
-           _state = new RuntimeState(Configs.Global(), UmbracoVersion)
+           _state = new RuntimeState(_globalSettings, UmbracoVersion)
             {
                 Level = RuntimeLevel.Boot
             };
@@ -99,8 +99,8 @@ namespace Umbraco.Core.Runtime
         /// Gets the <see cref="IIOHelper"/>
         /// </summary>
         protected IIOHelper IOHelper { get; }
+
         protected IHostingEnvironment HostingEnvironment { get; }
-        protected Configs Configs { get; }
         protected IUmbracoVersion UmbracoVersion { get; }
 
         /// <inheritdoc />
@@ -179,7 +179,7 @@ namespace Umbraco.Core.Runtime
                 var typeLoader = new TypeLoader(TypeFinder, appCaches.RuntimeCache, new DirectoryInfo(HostingEnvironment.LocalTempPath), ProfilingLogger);
 
                 // create the composition
-                composition = new Composition(register, typeLoader, ProfilingLogger, _state, Configs, IOHelper, appCaches);
+                composition = new Composition(register, typeLoader, ProfilingLogger, _state, IOHelper, appCaches);
                 composition.RegisterEssentials(Logger, Profiler, ProfilingLogger, MainDom, appCaches, databaseFactory, typeLoader, _state, TypeFinder, IOHelper, UmbracoVersion, DbProviderFactoryCreator, HostingEnvironment, BackOfficeInfo);
 
                 // register ourselves (TODO: Should we put this in RegisterEssentials?)

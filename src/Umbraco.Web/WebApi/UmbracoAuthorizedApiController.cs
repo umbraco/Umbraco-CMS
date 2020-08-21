@@ -8,6 +8,8 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Security;
 using Umbraco.Core.Mapping;
 using Umbraco.Web.Routing;
+using Microsoft.Extensions.Options;
+using Umbraco.Core.Configuration.Models;
 
 namespace Umbraco.Web.WebApi
 {
@@ -35,7 +37,7 @@ namespace Umbraco.Web.WebApi
         {
         }
 
-        protected UmbracoAuthorizedApiController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoMapper umbracoMapper, IPublishedUrlProvider publishedUrlProvider)
+        protected UmbracoAuthorizedApiController(IOptionsSnapshot<GlobalSettings> globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoMapper umbracoMapper, IPublishedUrlProvider publishedUrlProvider)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoMapper, publishedUrlProvider)
         {
         }

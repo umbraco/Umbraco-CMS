@@ -3,10 +3,12 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.Options;
 using Semver;
 using Umbraco.Composing;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Common.Attributes;
@@ -22,20 +24,20 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly ICookieManager _cookieManager;
         private readonly IWebSecurity _webSecurity;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
 
         public UpdateCheckController(
             IUpgradeService upgradeService,
             IUmbracoVersion umbracoVersion,
             ICookieManager cookieManager,
             IWebSecurity webSecurity,
-            IGlobalSettings globalSettings)
+            IOptionsSnapshot<GlobalSettings> globalSettings)
         {
             _upgradeService = upgradeService ?? throw new ArgumentNullException(nameof(upgradeService));
             _umbracoVersion = umbracoVersion ?? throw new ArgumentNullException(nameof(umbracoVersion));
             _cookieManager = cookieManager ?? throw new ArgumentNullException(nameof(cookieManager));
             _webSecurity = webSecurity ?? throw new ArgumentNullException(nameof(webSecurity));
-            _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
+            _globalSettings = globalSettings.Value ?? throw new ArgumentNullException(nameof(globalSettings));
         }
 
         [UpdateCheckResponseFilter]
@@ -77,11 +79,11 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             private class UpdateCheckResponseFilter : IActionFilter
             {
-                private readonly IGlobalSettings _globalSettings;
+                private readonly GlobalSettings _globalSettings;
 
-                public UpdateCheckResponseFilter(IGlobalSettings globalSettings)
+                public UpdateCheckResponseFilter(IOptionsSnapshot<GlobalSettings> globalSettings)
                 {
-                    _globalSettings = globalSettings;
+                    _globalSettings = globalSettings.Value;
                 }
 
                 public void OnActionExecuted(ActionExecutedContext context)

@@ -1,19 +1,26 @@
 using System;
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 
 namespace Umbraco.Web.Common.AspNetCore
 {
-    public class AspNetCoreHostingEnvironment : Umbraco.Core.Hosting.IHostingEnvironment
+    public class AspNetCoreHostingEnvironment : Core.Hosting.IHostingEnvironment
     {
-        private readonly IHostingSettings _hostingSettings;
+        private readonly HostingSettings _hostingSettings;
         private readonly IWebHostEnvironment _webHostEnvironment;
 
         private string _localTempPath;
 
-        public AspNetCoreHostingEnvironment(IHostingSettings hostingSettings, IWebHostEnvironment webHostEnvironment)
+        public AspNetCoreHostingEnvironment(IOptionsSnapshot<HostingSettings> hostingSettings, IWebHostEnvironment webHostEnvironment)
+            : this(hostingSettings.Value, webHostEnvironment)
+        {
+        }
+
+        public AspNetCoreHostingEnvironment(HostingSettings hostingSettings, IWebHostEnvironment webHostEnvironment)
         {
             _hostingSettings = hostingSettings ?? throw new ArgumentNullException(nameof(hostingSettings));
             _webHostEnvironment = webHostEnvironment ?? throw new ArgumentNullException(nameof(webHostEnvironment));
@@ -27,7 +34,6 @@ namespace Umbraco.Web.Common.AspNetCore
                                      ?? "/";
             
             IISVersion = new Version(0, 0); // TODO not necessary IIS
-
         }
 
         public bool IsHosted { get; } = true;

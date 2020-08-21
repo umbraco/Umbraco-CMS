@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Web;
 using System.Web.Mvc;
+using Microsoft.Extensions.Options;
 using Microsoft.Owin;
-using Umbraco.Core.Cache;
-using Umbraco.Web.Composing;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Mvc
@@ -21,9 +22,9 @@ namespace Umbraco.Web.Mvc
         internal Guid InstanceId { get; } = Guid.NewGuid();
 
         /// <summary>
-        /// Gets or sets the Umbraco context.
+        /// Gets the global settings from configuration.
         /// </summary>
-        public IGlobalSettings GlobalSettings { get; }
+        public GlobalSettings GlobalSettings { get; }
 
         /// <summary>
         /// Gets the Umbraco context.
@@ -69,7 +70,7 @@ namespace Umbraco.Web.Mvc
 
         protected UmbracoController()
             : this(
-                  Current.Factory.GetInstance<IGlobalSettings>(),
+                  Current.Factory.GetInstance<IOptionsSnapshot<GlobalSettings>>(),
                   Current.Factory.GetInstance<IUmbracoContextAccessor>(),
                   Current.Factory.GetInstance<ServiceContext>(),
                   Current.Factory.GetInstance<AppCaches>(),
@@ -78,9 +79,9 @@ namespace Umbraco.Web.Mvc
         {
         }
 
-        protected UmbracoController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger)
+        protected UmbracoController(IOptionsSnapshot<GlobalSettings> globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger)
         {
-            GlobalSettings = globalSettings;
+            GlobalSettings = globalSettings.Value;
             UmbracoContextAccessor = umbracoContextAccessor;
             Services = services;
             AppCaches = appCaches;

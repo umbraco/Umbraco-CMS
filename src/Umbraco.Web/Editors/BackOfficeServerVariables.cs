@@ -28,7 +28,7 @@ namespace Umbraco.Web.Editors
         private readonly UrlHelper _urlHelper;
         private readonly IRuntimeState _runtimeState;
         private readonly UmbracoFeatures _features;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly IContentSettings _contentSettings;
         private readonly TreeCollection _treeCollection;
@@ -42,7 +42,7 @@ namespace Umbraco.Web.Editors
             UrlHelper urlHelper,
             IRuntimeState runtimeState,
             UmbracoFeatures features,
-            IGlobalSettings globalSettings,
+            IOptionsSnapshot<GlobalSettings> globalSettings,
             IUmbracoVersion umbracoVersion,
             IContentSettings contentSettings,
             TreeCollection treeCollection,
@@ -54,7 +54,7 @@ namespace Umbraco.Web.Editors
             _urlHelper = urlHelper;
             _runtimeState = runtimeState;
             _features = features;
-            _globalSettings = globalSettings;
+            _globalSettings = globalSettings.Value;
             _umbracoVersion = umbracoVersion;
             _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
             _treeCollection = treeCollection ?? throw new ArgumentNullException(nameof(treeCollection));

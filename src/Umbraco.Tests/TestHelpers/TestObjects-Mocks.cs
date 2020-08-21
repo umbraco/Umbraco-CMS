@@ -8,6 +8,7 @@ using Moq;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -136,10 +137,11 @@ namespace Umbraco.Tests.TestHelpers
             return umbracoContextFactory.EnsureUmbracoContext().UmbracoContext;
         }
 
-        public IGlobalSettings GetGlobalSettings()
+        public GlobalSettings GetGlobalSettings()
         {
             return SettingsForTests.DefaultGlobalSettings;
         }
+
         public IFileSystems GetFileSystemsMock()
         {
             var fileSystems = Mock.Of<IFileSystems>();

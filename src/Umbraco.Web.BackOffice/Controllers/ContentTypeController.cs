@@ -39,6 +39,8 @@ using Umbraco.Web.Editors;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 using ContentType = Umbraco.Core.Models.ContentType;
+using Umbraco.Core.Configuration.Models;
+using Microsoft.Extensions.Options;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -55,7 +57,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     public class ContentTypeController : ContentTypeControllerBase<IContentType>
     {
         private readonly IEntityXmlSerializer _serializer;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly IScopeProvider _scopeProvider;
         private readonly IIOHelper _ioHelper;
@@ -74,7 +76,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IEntityService _entityService;
         private readonly IHostingEnvironment _hostingEnvironment;
 
-
         public ContentTypeController(
             ICultureDictionary cultureDictionary,
             EditorValidatorCollection editorValidatorCollection,
@@ -84,7 +85,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             UmbracoMapper umbracoMapper,
             ILocalizedTextService localizedTextService,
             IEntityXmlSerializer serializer,
-            IGlobalSettings globalSettings,
+            IOptionsSnapshot<GlobalSettings> globalSettings,
             PropertyEditorCollection propertyEditors,
             IScopeProvider scopeProvider,
             IIOHelper ioHelper,
@@ -108,7 +109,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 localizedTextService)
         {
             _serializer = serializer;
-            _globalSettings = globalSettings;
+            _globalSettings = globalSettings.Value;
             _propertyEditors = propertyEditors;
             _scopeProvider = scopeProvider;
             _ioHelper = ioHelper;

@@ -31,7 +31,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly LinkGenerator _linkGenerator;
         private readonly IRuntimeState _runtimeState;
         private readonly UmbracoFeatures _features;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly ContentSettings _contentSettings;
         private readonly TreeCollection _treeCollection;
@@ -46,7 +46,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             LinkGenerator linkGenerator,
             IRuntimeState runtimeState,
             UmbracoFeatures features,
-            IGlobalSettings globalSettings,
+            IOptionsSnapshot<GlobalSettings> globalSettings,
             IUmbracoVersion umbracoVersion,
             IOptionsSnapshot<ContentSettings> contentSettings,
             IHttpContextAccessor httpContextAccessor,
@@ -60,7 +60,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _linkGenerator = linkGenerator;
             _runtimeState = runtimeState;
             _features = features;
-            _globalSettings = globalSettings;
+            _globalSettings = globalSettings.Value;
             _umbracoVersion = umbracoVersion;
             _contentSettings = contentSettings.Value ?? throw new ArgumentNullException(nameof(contentSettings));
             _httpContextAccessor = httpContextAccessor;

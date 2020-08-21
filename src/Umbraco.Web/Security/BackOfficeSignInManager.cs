@@ -11,6 +11,7 @@ using Umbraco.Core;
 using Umbraco.Core.BackOffice;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.BackOffice;
+using Umbraco.Core.Configuration.Models;
 
 namespace Umbraco.Web.Security
 {
@@ -25,7 +26,7 @@ namespace Umbraco.Web.Security
         private readonly IUserClaimsPrincipalFactory<BackOfficeIdentityUser> _claimsPrincipalFactory;
         private readonly IAuthenticationManager _authenticationManager;
         private readonly ILogger _logger;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly IOwinRequest _request;
 
         public BackOfficeSignInManager(
@@ -33,7 +34,18 @@ namespace Umbraco.Web.Security
             IUserClaimsPrincipalFactory<BackOfficeIdentityUser> claimsPrincipalFactory,
             IAuthenticationManager authenticationManager,
             ILogger logger,
-            IGlobalSettings globalSettings,
+            IOptionsSnapshot<GlobalSettings> globalSettings,
+            IOwinRequest request)
+            :this(userManager, claimsPrincipalFactory, authenticationManager, logger, globalSettings.Value, request)
+        {
+        }
+
+        public BackOfficeSignInManager(
+            BackOfficeUserManager<BackOfficeIdentityUser> userManager,
+            IUserClaimsPrincipalFactory<BackOfficeIdentityUser> claimsPrincipalFactory,
+            IAuthenticationManager authenticationManager,
+            ILogger logger,
+            GlobalSettings globalSettings,
             IOwinRequest request)
         {
             _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
@@ -52,7 +64,7 @@ namespace Umbraco.Web.Security
             return claimsPrincipal.Identity as ClaimsIdentity;
         }
 
-        public static BackOfficeSignInManager Create(IOwinContext context, IGlobalSettings globalSettings, ILogger logger)
+        public static BackOfficeSignInManager Create(IOwinContext context, GlobalSettings globalSettings, ILogger logger)
         {
             var userManager = context.GetBackOfficeUserManager();
 

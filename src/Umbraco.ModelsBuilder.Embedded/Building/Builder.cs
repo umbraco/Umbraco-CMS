@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 
 namespace Umbraco.ModelsBuilder.Embedded.Building
 {
@@ -70,7 +71,7 @@ namespace Umbraco.ModelsBuilder.Embedded.Building
         /// </summary>
         /// <param name="typeModels">The list of models to generate.</param>
         /// <param name="modelsNamespace">The models namespace.</param>
-        protected Builder(IModelsBuilderConfig config, IList<TypeModel> typeModels)
+        protected Builder(ModelsBuilderConfig config, IList<TypeModel> typeModels)
         {
             _typeModels = typeModels ?? throw new ArgumentNullException(nameof(typeModels));
 

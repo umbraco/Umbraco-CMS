@@ -16,16 +16,16 @@ namespace Umbraco.Web.WebAssets.CDF
     [ComposeAfter(typeof(WebInitialComponent))]
     public sealed class ClientDependencyComponent : IComponent
     {
-        private readonly IHostingSettings _hostingSettings;
+        private readonly HostingSettings _hostingSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly RuntimeSettings _runtimeSettings;
 
         public ClientDependencyComponent(
-            IHostingSettings hostingSettings,
+            IOptionsSnapshot<HostingSettings> hostingSettings,
             IHostingEnvironment hostingEnvironment,
             IOptionsSnapshot<RuntimeSettings> runtimeSettings)
         {
-            _hostingSettings = hostingSettings;
+            _hostingSettings = hostingSettings.Value;
             _hostingEnvironment = hostingEnvironment;
             _runtimeSettings = runtimeSettings.Value;
         }

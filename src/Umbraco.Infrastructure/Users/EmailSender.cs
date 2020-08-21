@@ -2,9 +2,11 @@
 using System.Linq;
 using System.Net.Mail;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using MimeKit;
 using MimeKit.Text;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Events;
 using SmtpClient = MailKit.Net.Smtp.SmtpClient;
 
@@ -17,14 +19,23 @@ namespace Umbraco.Core
     {
         // TODO: This should encapsulate a BackgroundTaskRunner with a queue to send these emails!
 
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly bool _enableEvents;
 
-        public EmailSender(IGlobalSettings globalSettings) : this(globalSettings, false)
+        public EmailSender(IOptionsSnapshot<GlobalSettings> globalSettings) : this(globalSettings, false)
         {
         }
 
-        public EmailSender(IGlobalSettings globalSettings, bool enableEvents)
+        public EmailSender(IOptionsSnapshot<GlobalSettings> globalSettings, bool enableEvents)
+            : this(globalSettings.Value, enableEvents)
+        {
+        }
+
+        public EmailSender(GlobalSettings globalSettings) : this(globalSettings, false)
+        {
+        }
+
+        public EmailSender(GlobalSettings globalSettings, bool enableEvents)
         {
             _globalSettings = globalSettings;
             _enableEvents = enableEvents;
@@ -107,7 +118,7 @@ namespace Umbraco.Core
         /// <remarks>
         /// We assume this is possible if either an event handler is registered or an smtp server is configured
         /// </remarks>
-        public static bool CanSendRequiredEmail(IGlobalSettings globalSettings) => EventHandlerRegistered || globalSettings.IsSmtpServerConfigured;
+        public static bool CanSendRequiredEmail(GlobalSettings globalSettings) => EventHandlerRegistered || globalSettings.IsSmtpServerConfigured;
 
         /// <summary>
         /// returns true if an event handler has been registered

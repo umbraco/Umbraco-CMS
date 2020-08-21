@@ -14,11 +14,11 @@ using Umbraco.Web.Features;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 using Umbraco.Web.WebApi.Filters;
+using Microsoft.Extensions.Options;
+using Umbraco.Core.Configuration.Models;
 
 namespace Umbraco.Web.WebApi
 {
-
-
     /// <summary>
     /// Provides a base class for Umbraco API controllers.
     /// </summary>
@@ -26,7 +26,6 @@ namespace Umbraco.Web.WebApi
     [FeatureAuthorize]
     public abstract class UmbracoApiControllerBase : ApiController, IUmbracoFeature
     {
-
         // note: all Umbraco controllers have two constructors: one with all dependencies, which should be used,
         // and one with auto dependencies, ie no dependencies - and then dependencies are automatically obtained
         // here from the Current service locator - this is obviously evil, but it allows us to add new dependencies
@@ -38,7 +37,7 @@ namespace Umbraco.Web.WebApi
         /// <remarks>Dependencies are obtained from the <see cref="Current"/> service locator.</remarks>
         protected UmbracoApiControllerBase()
             : this(
-                Current.Factory.GetInstance<IGlobalSettings>(),
+                Current.Factory.GetInstance<IOptionsSnapshot<GlobalSettings>>(),
                 Current.Factory.GetInstance<IUmbracoContextAccessor>(),
                 Current.Factory.GetInstance<ISqlContext>(),
                 Current.Factory.GetInstance<ServiceContext>(),
@@ -53,10 +52,10 @@ namespace Umbraco.Web.WebApi
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoApiControllerBase"/> class with all its dependencies.
         /// </summary>
-        protected UmbracoApiControllerBase(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoMapper umbracoMapper, IPublishedUrlProvider publishedUrlProvider)
+        protected UmbracoApiControllerBase(IOptionsSnapshot<GlobalSettings> globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoMapper umbracoMapper, IPublishedUrlProvider publishedUrlProvider)
         {
             UmbracoContextAccessor = umbracoContextAccessor;
-            GlobalSettings = globalSettings;
+            GlobalSettings = globalSettings.Value;
             SqlContext = sqlContext;
             Services = services;
             AppCaches = appCaches;
@@ -73,9 +72,9 @@ namespace Umbraco.Web.WebApi
         internal Guid InstanceId { get; } = Guid.NewGuid();
 
         /// <summary>
-        /// Gets the Umbraco context.
+        /// Gets the global settings from configuration.
         /// </summary>
-        public virtual IGlobalSettings GlobalSettings { get; }
+        public virtual GlobalSettings GlobalSettings { get; }
 
         /// <summary>
         /// Gets the Umbraco context.

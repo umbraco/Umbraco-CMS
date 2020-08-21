@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Configuration;
 using System.Reflection;
 using Semver;
+using Umbraco.Core.Configuration.Models;
 
 namespace Umbraco.Core.Configuration
 {
@@ -10,10 +10,10 @@ namespace Umbraco.Core.Configuration
     /// </summary>
     public class UmbracoVersion : IUmbracoVersion
     {
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
 
-        public UmbracoVersion(IGlobalSettings globalSettings)
-        : this()
+        public UmbracoVersion(GlobalSettings globalSettings)
+            : this()
         {
             _globalSettings = globalSettings;
         }

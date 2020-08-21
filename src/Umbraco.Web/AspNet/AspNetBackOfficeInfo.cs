@@ -1,6 +1,8 @@
 using System.Web;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -9,12 +11,17 @@ namespace Umbraco.Web
 {
     public class AspNetBackOfficeInfo : IBackOfficeInfo
     {
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly IIOHelper _ioHelper;
         private readonly ILogger _logger;
-        private readonly IWebRoutingSettings _webRoutingSettings;
+        private readonly WebRoutingSettings _webRoutingSettings;
 
-        public AspNetBackOfficeInfo(IGlobalSettings globalSettings, IIOHelper ioHelper, ILogger logger, IWebRoutingSettings webRoutingSettings)
+        public AspNetBackOfficeInfo(IOptionsSnapshot<GlobalSettings> globalSettings, IIOHelper ioHelper, ILogger logger, IOptionsSnapshot<WebRoutingSettings> webRoutingSettings)
+            : this(globalSettings.Value, ioHelper, logger, webRoutingSettings.Value)
+        {
+        }
+
+        public AspNetBackOfficeInfo(GlobalSettings globalSettings, IIOHelper ioHelper, ILogger logger, WebRoutingSettings webRoutingSettings)
         {
             _globalSettings = globalSettings;
             _ioHelper = ioHelper;

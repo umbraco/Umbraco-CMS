@@ -41,7 +41,7 @@ namespace Umbraco.Web.Editors
 
         public BackOfficeController(
             UmbracoFeatures features,
-            IGlobalSettings globalSettings,
+            IOptionsSnapshot<GlobalSettings> globalSettings,
             IUmbracoContextAccessor umbracoContextAccessor,
             ServiceContext services,
             AppCaches appCaches,

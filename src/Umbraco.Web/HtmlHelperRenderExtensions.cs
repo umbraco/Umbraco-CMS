@@ -10,6 +10,7 @@ using System.Web.Mvc.Html;
 using System.Web.Routing;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Web.Mvc;
@@ -60,18 +61,18 @@ namespace Umbraco.Web
         /// <remarks>
         /// See: http://issues.umbraco.org/issue/U4-1614
         /// </remarks>
-        public static MvcHtmlString PreviewBadge(this HtmlHelper helper, IHttpContextAccessor httpContextAccessor, IGlobalSettings globalSettings, IIOHelper ioHelper, IContentSettings contentSettings)
+        public static MvcHtmlString PreviewBadge(this HtmlHelper helper, IHttpContextAccessor httpContextAccessor, GlobalSettings globalSettings, IIOHelper ioHelper, IContentSettings contentSettings)
         {
             if (Current.UmbracoContext.InPreviewMode)
             {
                 var htmlBadge =
-                    String.Format(contentSettings.PreviewBadge,
+                    string.Format(contentSettings.PreviewBadge,
                                 ioHelper.ResolveUrl(globalSettings.UmbracoPath),
                                   WebUtility.UrlEncode(httpContextAccessor.GetRequiredHttpContext().Request.Path),
                                   Current.UmbracoContext.PublishedRequest.PublishedContent.Id);
                 return new MvcHtmlString(htmlBadge);
             }
-            return new MvcHtmlString("");
+            return new MvcHtmlString(string.Empty);
 
         }
 

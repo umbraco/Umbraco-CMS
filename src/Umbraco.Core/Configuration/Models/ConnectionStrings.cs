@@ -1,25 +1,27 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data.Common;
-using Microsoft.Extensions.Configuration;
+using System.Text.Json.Serialization;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 
 namespace Umbraco.Configuration.Models
 {
-    public class ConnectionStrings : IConnectionStrings
+    public class ConnectionStrings
     {
-        private readonly IConfiguration _configuration;
+        [JsonPropertyName(Constants.System.UmbracoConnectionName)]
+        public string UmbracoConnectionString { get; set; }
 
-        public ConnectionStrings(IConfiguration configuration)
-        {
-            _configuration = configuration;
-        }
+        private Dictionary<string, string> AsDictionary() => new Dictionary<string, string>
+            {
+                { Constants.System.UmbracoConnectionName, UmbracoConnectionString }
+            };
 
         public ConfigConnectionString this[string key]
         {
             get
             {
-                var connectionString = _configuration.GetConnectionString(key);
+                var connectionString = this.AsDictionary()[key];
                 var provider = ParseProvider(connectionString);
                 return new ConfigConnectionString(connectionString, provider, key);
             }

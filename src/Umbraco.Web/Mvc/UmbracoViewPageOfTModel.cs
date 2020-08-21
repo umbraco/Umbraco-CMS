@@ -3,9 +3,11 @@ using System.Text;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.WebPages;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
@@ -22,8 +24,8 @@ namespace Umbraco.Web.Mvc
     /// </summary>
     public abstract class UmbracoViewPage<TModel> : WebViewPage<TModel>
     {
-        private readonly IGlobalSettings _globalSettings;
-        private readonly IContentSettings _contentSettings;
+        private readonly GlobalSettings _globalSettings;
+        private readonly ContentSettings _contentSettings;
 
         private IUmbracoContext _umbracoContext;
         private UmbracoHelper _helper;
@@ -105,18 +107,18 @@ namespace Umbraco.Web.Mvc
             : this(
                 Current.Factory.GetInstance<ServiceContext>(),
                 Current.Factory.GetInstance<AppCaches>(),
-                Current.Factory.GetInstance<IGlobalSettings>(),
-                Current.Factory.GetInstance<IContentSettings>()
+                Current.Factory.GetInstance<IOptionsSnapshot<GlobalSettings>>(),
+                Current.Factory.GetInstance<IOptionsSnapshot<ContentSettings>>()
             )
         {
         }
 
-        protected UmbracoViewPage(ServiceContext services, AppCaches appCaches, IGlobalSettings globalSettings, IContentSettings contentSettings)
+        protected UmbracoViewPage(ServiceContext services, AppCaches appCaches, IOptionsSnapshot<GlobalSettings> globalSettings, IOptionsSnapshot<ContentSettings> contentSettings)
         {
             Services = services;
             AppCaches = appCaches;
-            _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
-            _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
+            _globalSettings = globalSettings.Value ?? throw new ArgumentNullException(nameof(globalSettings));
+            _contentSettings = contentSettings.Value ?? throw new ArgumentNullException(nameof(contentSettings));
         }
 
         // view logic below:

@@ -9,15 +9,16 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Serilog;
 using Serilog.Extensions.Hosting;
 using Serilog.Extensions.Logging;
 using Umbraco.Configuration;
-using Umbraco.Configuration.Models;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Logging.Serilog;
@@ -26,7 +27,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Runtime;
 using Umbraco.Web.Common.AspNetCore;
 using Umbraco.Web.Common.Profiler;
-using CoreDebugSettings = Umbraco.Configuration.Models.CoreDebugSettings;
+using CoreDebugSettings = Umbraco.Core.Configuration.Models.CoreDebugSettings;
 
 namespace Umbraco.Extensions
 {
@@ -101,6 +102,7 @@ namespace Umbraco.Extensions
         {
             if (configuration == null) throw new ArgumentNullException(nameof(configuration));
 
+            services.Configure<ConnectionStrings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "ConnectionStrings"));
             services.Configure<TourSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "Tours"));
             services.Configure<CoreDebugSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "Core:Debug"));
             services.Configure<SecuritySettings>(configuration.GetSection(Constants.Configuration.ConfigSecurityPrefix));
@@ -113,12 +115,12 @@ namespace Umbraco.Extensions
             services.Configure<ActiveDirectorySettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "ActiveDirectory:"));
             services.Configure<RuntimeSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "Runtime:"));
             services.Configure<TypeFinderSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "TypeFinder:"));
+            services.Configure<GlobalSettings>(configuration.GetSection(Constants.Configuration.ConfigGlobalPrefix));
+            services.Configure<HostingSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "Hosting:"));
             services.Configure<NuCacheSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "NuCache:"));
             services.Configure<WebRoutingSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "WebRouting:"));
             services.Configure<IndexCreatorSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "Examine:"));
             services.Configure<ModelsBuilderConfig>(configuration.GetSection(Constants.Configuration.ConfigModelsBuilderPrefix));
-            services.Configure<HostingSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "Hosting:"));
-            services.Configure<GlobalSettings>(configuration.GetSection(Constants.Configuration.ConfigGlobalPrefix));
             services.Configure<ImagingSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "Imaging:"));
 
             var configsFactory = new AspNetCoreConfigsFactory(configuration);
@@ -217,21 +219,27 @@ namespace Umbraco.Extensions
             // into the container. This is not true for `Configs` but we should do that too, see comments in
             // `RegisterEssentials`.
             var serviceProvider = services.BuildServiceProvider();
-            var configs = serviceProvider.GetService<Configs>();
+
+            var globalSettings = serviceProvider.GetService<IOptionsSnapshot<GlobalSettings>>().Value;
+            var connectionStrings = serviceProvider.GetService<IOptionsSnapshot<ConnectionStrings>>().Value;
+            var hostingSettings = serviceProvider.GetService<IOptionsSnapshot<HostingSettings>>().Value;
+            var typeFinderSettings = serviceProvider.GetService<IOptionsSnapshot<TypeFinderSettings>>().Value;
+
             var dbProviderFactoryCreator = serviceProvider.GetRequiredService<IDbProviderFactoryCreator>();
 
             CreateCompositionRoot(services,
-                configs,
+                globalSettings,
+                hostingSettings,
                 webHostEnvironment,
                 loggingConfiguration,
                 out var logger, out var ioHelper, out var hostingEnvironment, out var backOfficeInfo, out var profiler);
 
-            var globalSettings = configs.Global();
             var umbracoVersion = new UmbracoVersion(globalSettings);
-            var typeFinder = CreateTypeFinder(logger, profiler, webHostEnvironment, entryAssembly, configs.TypeFinder());
+            var typeFinder = CreateTypeFinder(logger, profiler, webHostEnvironment, entryAssembly, typeFinderSettings);
 
             var coreRuntime = GetCoreRuntime(
-                configs,
+                globalSettings,
+                connectionStrings,
                 umbracoVersion,
                 ioHelper,
                 logger,
@@ -247,7 +255,7 @@ namespace Umbraco.Extensions
             return services;
         }
 
-        private static ITypeFinder CreateTypeFinder(Core.Logging.ILogger logger, IProfiler profiler, IWebHostEnvironment webHostEnvironment, Assembly entryAssembly, ITypeFinderSettings typeFinderSettings)
+        private static ITypeFinder CreateTypeFinder(Core.Logging.ILogger logger, IProfiler profiler, IWebHostEnvironment webHostEnvironment, Assembly entryAssembly, TypeFinderSettings typeFinderSettings)
         {
             var runtimeHashPaths = new RuntimeHashPaths();
             runtimeHashPaths.AddFolder(new DirectoryInfo(Path.Combine(webHostEnvironment.ContentRootPath, "bin")));
@@ -256,25 +264,23 @@ namespace Umbraco.Extensions
         }
 
         private static IRuntime GetCoreRuntime(
-            Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, Core.Logging.ILogger logger,
+            GlobalSettings globalSettings, ConnectionStrings connectionStrings, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, Core.Logging.ILogger logger,
             IProfiler profiler, Core.Hosting.IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo,
             ITypeFinder typeFinder, IRequestCache requestCache, IDbProviderFactoryCreator dbProviderFactoryCreator)
         {
-
             // Determine if we should use the sql main dom or the default
-            var globalSettings = configs.Global();
-            var connStrings = configs.ConnectionStrings();
             var appSettingMainDomLock = globalSettings.MainDomLock;
 
             var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
             var mainDomLock = appSettingMainDomLock == "SqlMainDomLock" || isWindows == false
-                ? (IMainDomLock)new SqlMainDomLock(logger, globalSettings, connStrings, dbProviderFactoryCreator, hostingEnvironment)
+                ? (IMainDomLock)new SqlMainDomLock(logger, globalSettings, connectionStrings, dbProviderFactoryCreator, hostingEnvironment)
                 : new MainDomSemaphoreLock(logger, hostingEnvironment);
 
             var mainDom = new MainDom(logger, mainDomLock);
 
             var coreRuntime = new CoreRuntime(
-                configs,
+                globalSettings,
+                connectionStrings,
                 umbracoVersion,
                 ioHelper,
                 logger,
@@ -292,7 +298,8 @@ namespace Umbraco.Extensions
 
         private static IServiceCollection CreateCompositionRoot(
             IServiceCollection services,
-            Configs configs,
+            GlobalSettings globalSettings,
+            HostingSettings hostingSettings,
             IWebHostEnvironment webHostEnvironment,
             ILoggingConfiguration loggingConfiguration,
             out Core.Logging.ILogger logger,
@@ -301,14 +308,12 @@ namespace Umbraco.Extensions
             out IBackOfficeInfo backOfficeInfo,
             out IProfiler profiler)
         {
-            if (configs == null)
-                throw new InvalidOperationException($"Could not resolve type {typeof(Configs)} from the container, ensure {nameof(AddUmbracoConfiguration)} is called before calling {nameof(AddUmbracoCore)}");
+            if (globalSettings == null)
+                throw new InvalidOperationException($"Could not resolve type {typeof(GlobalSettings)} from the container, ensure {nameof(AddUmbracoConfiguration)} is called before calling {nameof(AddUmbracoCore)}");
 
-            var hostingSettings = configs.Hosting();
-            var globalSettings = configs.Global();
 
             hostingEnvironment = new AspNetCoreHostingEnvironment(hostingSettings, webHostEnvironment);
-            ioHelper = new IOHelper(hostingEnvironment, globalSettings);
+            ioHelper = new IOHelper(hostingEnvironment);
             logger = AddLogger(services, hostingEnvironment, loggingConfiguration);
 
             backOfficeInfo = new AspNetCoreBackOfficeInfo(globalSettings);

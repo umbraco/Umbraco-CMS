@@ -9,6 +9,7 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -44,7 +45,7 @@ namespace Umbraco.Web
                     Path.Combine(hostingEnvironment.ApplicationPhysicalPath, "App_Data\\Logs"),
                     Path.Combine(hostingEnvironment.ApplicationPhysicalPath, "config\\serilog.config"),
                     Path.Combine(hostingEnvironment.ApplicationPhysicalPath, "config\\serilog.user.config"));
-                var ioHelper = new IOHelper(hostingEnvironment, globalSettings);
+                var ioHelper = new IOHelper(hostingEnvironment);
                 var logger = SerilogLogger.CreateWithDefaultConfiguration(hostingEnvironment, loggingConfiguration);
 
                 var configs = configFactory.Create();
@@ -125,7 +126,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets the application register.
         /// </summary>
-        protected virtual IRegister GetRegister(IGlobalSettings globalSettings)
+        protected virtual IRegister GetRegister(GlobalSettings globalSettings)
         {
             return RegisterFactory.Create(globalSettings);
         }
