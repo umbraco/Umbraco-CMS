@@ -13,6 +13,7 @@ using AutoFixture.NUnit3;
 using Umbraco.Core.Hosting;
 using System.IO;
 using System.Reflection;
+using System.Linq;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common
 {
@@ -29,7 +30,11 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common
             var viewResult = await sut.Index() as ViewResult;
             var sections = viewResult.ViewName.Split("\\");
             var fileName = sections[sections.Length - 1];
-            var location = new FileInfo(typeof(InstallController).Assembly.Location).Directory;
+
+            // TODO: Don't use DirectoryInfo to get contents of UmbracoInstall, use something that works everywhere.
+            var views = new DirectoryInfo(@"..\\..\\..\\..\\Umbraco.Web.UI.NetCore\\umbraco\\UmbracoInstall").GetFiles()
+                .Select(f => f.Name).ToArray();
+            Assert.True(views.Contains(fileName), $"Expected {fileName} to exist, but it didn't");
         }
     }
 }
