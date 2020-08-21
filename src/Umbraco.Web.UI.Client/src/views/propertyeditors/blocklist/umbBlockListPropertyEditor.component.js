@@ -240,6 +240,22 @@
             block.showSettings = block.config.settingsElementTypeKey != null;
             block.showCopy = vm.supportCopy && block.config.contentElementTypeKey != null;// if we have content, otherwise it doesn't make sense to copy.
 
+            block.setParentForm = function (parentForm) {
+                this._parentForm = parentForm;
+            }
+            block.activate = activateBlock.bind(null, block);
+            block.edit = function () {
+                var blockIndex = vm.layout.indexOf(this.layout);
+                editBlock(this, false, blockIndex, this._parentForm);
+            }
+            block.editSettings = function () {
+                var blockIndex = vm.layout.indexOf(this.layout);
+                editBlock(this, true, blockIndex, this._parentForm);
+            }
+            block.requestDelete = requestDeleteBlock.bind(null, block);
+            block.delete = deleteBlock.bind(null, block);
+            block.copy = copyBlock.bind(null, block);
+
             return block;
         }
 
