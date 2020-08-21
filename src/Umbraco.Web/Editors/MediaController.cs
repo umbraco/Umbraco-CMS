@@ -947,31 +947,5 @@ namespace Umbraco.Web.Editors
 
             return hasPathAccess;
         }
-
-        public PagedResult<EntityBasic> GetPagedReferences(int id, string entityType, int pageNumber = 1, int pageSize = 100)
-        {
-            if (pageNumber <= 0 || pageSize <= 0)
-            {
-                throw new NotSupportedException("Both pageNumber and pageSize must be greater than zero");
-            }
-
-            var objectType = ObjectTypes.GetUmbracoObjectType(entityType);
-            var udiType = ObjectTypes.GetUdiType(objectType);
-
-            var relations = Services.RelationService.GetPagedParentEntitiesByChildId(id, pageNumber - 1, pageSize, out var totalRecords, objectType);
-
-            return new PagedResult<EntityBasic>(totalRecords, pageNumber, pageSize)
-            {
-                Items = relations.Cast<ContentEntitySlim>().Select(rel => new EntityBasic
-                {
-                    Id = rel.Id,
-                    Key = rel.Key,
-                    Udi = Udi.Create(udiType, rel.Key),
-                    Icon = rel.ContentTypeIcon,
-                    Name = rel.Name,
-                    Alias = rel.ContentTypeAlias
-                })
-            };
-        }
     }
 }
