@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Web.Compilation;
-using System.Web.Hosting;
-using Umbraco.Core;
+using Umbraco.Composing;
 
 namespace Umbraco.ModelsBuilder.Embedded
 {
@@ -14,7 +12,7 @@ namespace Umbraco.ModelsBuilder.Embedded
 
         static ReferencedAssemblies()
         {
-            LazyLocations = new Lazy<IEnumerable<string>>(() => HostingEnvironment.IsHosted
+            LazyLocations = new Lazy<IEnumerable<string>>(() => Current.HostingEnvironment.IsHosted // fixme inject!
                 ? GetAllReferencedAssembliesLocationFromBuildManager()
                 : GetAllReferencedAssembliesFromDomain());
         }

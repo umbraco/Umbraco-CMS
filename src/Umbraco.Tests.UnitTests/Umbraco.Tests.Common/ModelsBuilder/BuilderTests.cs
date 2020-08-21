@@ -67,6 +67,7 @@ using System.Web;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web;
+using Umbraco.Web.PublishedCache;
 using Umbraco.ModelsBuilder.Embedded;
 
 namespace Umbraco.Web.PublishedModels
@@ -74,8 +75,6 @@ namespace Umbraco.Web.PublishedModels
 	[PublishedModel(""type1"")]
 	public partial class Type1 : PublishedContentModel
 	{
-		private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
-
 		// helpers
 #pragma warning disable 0109 // new is redundant
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder.Embedded"", """ + version + @""")]
@@ -83,19 +82,17 @@ namespace Umbraco.Web.PublishedModels
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder.Embedded"", """ + version + @""")]
 		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder.Embedded"", """ + version + @""")]
-		public new static IPublishedContentType GetModelContentType()
-			=> PublishedModelUtility.GetModelContentType(_publishedSnapshotAccessor, ModelItemType, ModelTypeAlias);
+		public new static IPublishedContentType GetModelContentType(IPublishedSnapshotAccessor publishedSnapshotAccessor)
+			=> PublishedModelUtility.GetModelContentType(publishedSnapshotAccessor, ModelItemType, ModelTypeAlias);
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder.Embedded"", """ + version + @""")]
-		public static IPublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<Type1, TValue>> selector)
-			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(), selector);
+		public static IPublishedPropertyType GetModelPropertyType<TValue>(IPublishedSnapshotAccessor publishedSnapshotAccessor, Expression<Func<Type1, TValue>> selector)
+			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(publishedSnapshotAccessor), selector);
 #pragma warning restore 0109
 
 		// ctor
-		public Type1(IPublishedContent content, IPublishedSnapshotAccessor publishedSnapshotAccessor)
+		public Type1(IPublishedContent content)
 			: base(content)
-		{
-			_publishedSnapshotAccessor = publishedSnapshotAccessor;
-		}
+		{ }
 
 		// properties
 
@@ -186,6 +183,7 @@ using System.Web;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web;
+using Umbraco.Web.PublishedCache;
 using Umbraco.ModelsBuilder.Embedded;
 
 namespace Umbraco.Web.PublishedModels
@@ -193,8 +191,6 @@ namespace Umbraco.Web.PublishedModels
 	[PublishedModel(""type1"")]
 	public partial class Type1 : PublishedContentModel
 	{
-		private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
-
 		// helpers
 #pragma warning disable 0109 // new is redundant
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder.Embedded"", """ + version + @""")]
@@ -202,19 +198,17 @@ namespace Umbraco.Web.PublishedModels
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder.Embedded"", """ + version + @""")]
 		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder.Embedded"", """ + version + @""")]
-		public new static IPublishedContentType GetModelContentType()
-			=> PublishedModelUtility.GetModelContentType(_publishedSnapshotAccessor, ModelItemType, ModelTypeAlias);
+		public new static IPublishedContentType GetModelContentType(IPublishedSnapshotAccessor publishedSnapshotAccessor)
+			=> PublishedModelUtility.GetModelContentType(publishedSnapshotAccessor, ModelItemType, ModelTypeAlias);
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder.Embedded"", """ + version + @""")]
-		public static IPublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<Type1, TValue>> selector)
-			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(), selector);
+		public static IPublishedPropertyType GetModelPropertyType<TValue>(IPublishedSnapshotAccessor publishedSnapshotAccessor, Expression<Func<Type1, TValue>> selector)
+			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(publishedSnapshotAccessor), selector);
 #pragma warning restore 0109
 
 		// ctor
-		public Type1(IPublishedContent content, IPublishedSnapshotAccessor publishedSnapshotAccessor)
+		public Type1(IPublishedContent content)
 			: base(content)
-		{
-			_publishedSnapshotAccessor = publishedSnapshotAccessor;
-		}
+		{ }
 
 		// properties
 

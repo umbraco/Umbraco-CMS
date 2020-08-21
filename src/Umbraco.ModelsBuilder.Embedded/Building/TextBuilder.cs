@@ -174,7 +174,6 @@ namespace Umbraco.ModelsBuilder.Embedded.Building
 
             // write the constants & static methods
             // as 'new' since parent has its own - or maybe not - disable warning
-            sb.Append("\t\tprivate readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;\n\n");
             sb.Append("\t\t// helpers\n");
             sb.Append("#pragma warning disable 0109 // new is redundant\n");
             WriteGeneratedCodeAttribute(sb, "\t\t");
@@ -185,16 +184,16 @@ namespace Umbraco.ModelsBuilder.Embedded.Building
             sb.AppendFormat("\t\tpublic new const PublishedItemType ModelItemType = PublishedItemType.{0};\n",
                 itemType);
             WriteGeneratedCodeAttribute(sb, "\t\t");
-            sb.Append("\t\tpublic new static IPublishedContentType GetModelContentType()\n");
-            sb.Append("\t\t\t=> PublishedModelUtility.GetModelContentType(_publishedSnapshotAccessor, ModelItemType, ModelTypeAlias);\n");
+            sb.Append("\t\tpublic new static IPublishedContentType GetModelContentType(IPublishedSnapshotAccessor publishedSnapshotAccessor)\n");
+            sb.Append("\t\t\t=> PublishedModelUtility.GetModelContentType(publishedSnapshotAccessor, ModelItemType, ModelTypeAlias);\n");
             WriteGeneratedCodeAttribute(sb, "\t\t");
-            sb.AppendFormat("\t\tpublic static IPublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<{0}, TValue>> selector)\n",
+            sb.AppendFormat("\t\tpublic static IPublishedPropertyType GetModelPropertyType<TValue>(IPublishedSnapshotAccessor publishedSnapshotAccessor, Expression<Func<{0}, TValue>> selector)\n",
                 type.ClrName);
-            sb.Append("\t\t\t=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(), selector);\n");
+            sb.Append("\t\t\t=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(publishedSnapshotAccessor), selector);\n");
             sb.Append("#pragma warning restore 0109\n\n");
 
             // write the ctor
-            sb.AppendFormat("\t\t// ctor\n\t\tpublic {0}(IPublished{1} content, IPublishedSnapshotAccessor publishedSnapshotAccessor)\n\t\t\t: base(content)\n\t\t{{\n\t\t\t_publishedSnapshotAccessor = publishedSnapshotAccessor;\n\t\t}}\n\n",
+            sb.AppendFormat("\t\t// ctor\n\t\tpublic {0}(IPublished{1} content)\n\t\t\t: base(content)\n\t\t{{ }}\n\n",
                 type.ClrName, type.IsElement ? "Element" : "Content");
 
             // write the properties
