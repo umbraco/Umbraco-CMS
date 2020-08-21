@@ -1,0 +1,46 @@
+<div ng-controller="Umbraco.Editors.RelationTypes.SettingsController as vm">
+    <umb-box>
+        <umb-box-content>
+            <!-- ID -->
+            <umb-control-group label="Id">
+                <div>{{model.relationType.id}}</div>
+                <small>{{model.relationType.key}}</small>
+            </umb-control-group>
+
+            <!-- Direction -->
+            <umb-control-group label="@relationType_direction">
+                <ul class="unstyled">
+                    <li>
+                        <umb-radiobutton name="relationTypeDirection"
+                                         value="false"
+                                         model="model.relationType.isBidirectional"
+                                         text="{{vm.labels.parentToChild}}">
+                        </umb-radiobutton>
+                    </li>
+                    <li>
+                        <umb-radiobutton name="relationTypeDirection"
+                                         value="true"
+                                         model="model.relationType.isBidirectional"
+                                         text="{{vm.labels.bidirectional}}">
+                        </umb-radiobutton>
+                    </li>
+                </ul>
+            </umb-control-group>
+
+            <!-- Parent-->
+            <umb-control-group label="@relationType_parent">
+                <div>{{model.relationType.parentObjectTypeName}}</div>
+            </umb-control-group>
+
+            <!-- Child -->
+            <umb-control-group label="@relationType_child">
+                <div>{{model.relationType.childObjectTypeName}}</div>
+            </umb-control-group>
+
+            <!-- Relation count -->
+            <umb-control-group label="@relationType_count" ng-if="model.relationType.relations.length > 0">
+                <div>{{model.relationType.relations.length}}</div>
+            </umb-control-group>
+        </umb-box-content>
+    </umb-box>
+</div>

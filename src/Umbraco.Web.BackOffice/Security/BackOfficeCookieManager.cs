@@ -20,7 +20,7 @@ namespace Umbraco.Web.BackOffice.Security
     /// A custom cookie manager that is used to read the cookie from the request.
     /// </summary>
     /// <remarks>
-    /// Umbraco's back office cookie needs to be read on two paths: /umbraco and /install and /base therefore we cannot just set the cookie path to be /umbraco,
+    /// Umbraco's back office cookie needs to be read on two paths: /umbraco and /install, therefore we cannot just set the cookie path to be /umbraco,
     /// instead we'll specify our own cookie manager and return null if the request isn't for an acceptable path.
     /// </remarks>
     public class BackOfficeCookieManager : ChunkingCookieManager, ICookieManager
@@ -69,7 +69,6 @@ namespace Umbraco.Web.BackOffice.Security
         /// We auth the request when:
         /// * it is a back office request
         /// * it is an installer request
-        /// * it is a /base request
         /// * it is a preview request
         /// </remarks>
         public bool ShouldAuthenticateRequest(Uri requestUri, bool checkForceAuthTokens = true)
@@ -94,6 +93,7 @@ namespace Umbraco.Web.BackOffice.Security
                 //check installer
                 || requestUri.IsInstallerRequest(_hostingEnvironment))
                 return true;
+
             return false;
         }
 

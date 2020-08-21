@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using SixLabors.ImageSharp.Web.DependencyInjection;
 using Umbraco.Web.BackOffice.Routing;
+using Umbraco.Web.BackOffice.Security;
 
 namespace Umbraco.Extensions
 {
@@ -27,9 +28,10 @@ namespace Umbraco.Extensions
             app.UseImageSharp();
             app.UseStaticFiles();
 
+            app.UseMiddleware<PreviewAuthenticationMiddleware>();
+
             return app;
         }
 
-        
     }
 }

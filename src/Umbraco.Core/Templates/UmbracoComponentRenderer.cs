@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq;
 using System.IO;
-using System.Web;
 using Umbraco.Web.Templates;
 using System.Collections.Generic;
+using System.Net;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Strings;
 using Umbraco.Web;
@@ -120,7 +120,7 @@ namespace Umbraco.Core.Templates
             //NOTE: the value could have HTML encoded values, so we need to deal with that
             var macroProps = parameters?.ToDictionary(
                 x => x.Key.ToLowerInvariant(),
-                i => (i.Value is string) ? HttpUtility.HtmlDecode(i.Value.ToString()) : i.Value);
+                i => (i.Value is string) ? WebUtility.HtmlDecode(i.Value.ToString()) : i.Value);
 
             var html = _macroRenderer.Render(alias, content, macroProps).Text;
 

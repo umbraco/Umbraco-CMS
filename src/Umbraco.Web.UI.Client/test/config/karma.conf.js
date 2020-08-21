@@ -11,7 +11,6 @@ module.exports = function (config) {
         files: [
 
             // Jasmine plugins
-            'node_modules/jasmine-promise-matchers/dist/jasmine-promise-matchers.js',
             
             //libraries
             'node_modules/jquery/dist/jquery.min.js',
@@ -27,7 +26,7 @@ module.exports = function (config) {
             'node_modules/underscore/underscore-min.js',
             'node_modules/moment/min/moment-with-locales.js',
             'lib/umbraco/Extensions.js',
-            'node_modules/lazyload-js/lazyload.min.js',
+            'node_modules/lazyload-js/LazyLoad.min.js',
             'node_modules/angular-dynamic-locale/dist/tmhDynamicLocale.min.js',
 
             //app bootstrap and loader

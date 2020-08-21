@@ -31,13 +31,17 @@ function MainController($scope, $location, appState, treeService, notificationsS
     // For more information about this approach, see https://hackernoon.com/removing-that-ugly-focus-ring-and-keeping-it-too-6c8727fefcd2
     function handleFirstTab(evt) {
         if (evt.keyCode === 9) {
-            $scope.tabbingActive = true;
-            $scope.$digest();
-            window.removeEventListener('keydown', handleFirstTab);
-            window.addEventListener('mousedown', disableTabbingActive);
+            enableTabbingActive();
         }
     }
     
+    function enableTabbingActive() {
+        $scope.tabbingActive = true;
+        $scope.$digest();
+        window.addEventListener('mousedown', disableTabbingActive);
+        window.removeEventListener("keydown", handleFirstTab);
+    }
+
     function disableTabbingActive(evt) {
         $scope.tabbingActive = false;
         $scope.$digest();
@@ -46,6 +50,12 @@ function MainController($scope, $location, appState, treeService, notificationsS
     }
 
     window.addEventListener("keydown", handleFirstTab);
+
+    $scope.$on("showFocusOutline", function() {
+        $scope.tabbingActive = true;
+        window.addEventListener('mousedown', disableTabbingActive);
+        window.removeEventListener("keydown", handleFirstTab);
+    });
 
 
     $scope.removeNotification = function (index) {
@@ -218,5 +228,5 @@ function MainController($scope, $location, appState, treeService, notificationsS
 angular.module('umbraco').controller("Umbraco.MainController", MainController).
     config(function (tmhDynamicLocaleProvider) {
         //Set url for locale files
-        tmhDynamicLocaleProvider.localeLocationPattern('lib/angular-i18n/angular-locale_{{locale}}.js');
+        tmhDynamicLocaleProvider.localeLocationPattern('lib/angular-i18n/angular-locale_{{locale | lowercase}}.js');
     });

@@ -35,8 +35,8 @@ namespace Umbraco.Web
             // Determine if we should use the sql main dom or the default
             var appSettingMainDomLock = globalSettings.MainDomLock;
 
-            var isLinux = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
-            var mainDomLock = appSettingMainDomLock == "SqlMainDomLock" || isLinux == true
+            var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+            var mainDomLock = appSettingMainDomLock == "SqlMainDomLock" || isWindows == false
                 ? (IMainDomLock)new SqlMainDomLock(logger, globalSettings, connectionStrings, dbProviderFactoryCreator, hostingEnvironment)
                 : new MainDomSemaphoreLock(logger, hostingEnvironment);
 

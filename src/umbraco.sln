@@ -60,12 +60,16 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Umbraco.Web.UI.Client", "ht
 		StartServerOnDebug = "false"
 	EndProjectSection
 EndProject
-Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Umbraco.Tests.AcceptanceTest", "Umbraco.Tests.AcceptanceTest\", "{9E4C8A12-FBE0-4673-8CE2-DF99D5D57817}"
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Umbraco.Tests.AcceptanceTest", "http://localhost:58896", "{9E4C8A12-FBE0-4673-8CE2-DF99D5D57817}"
 	ProjectSection(WebsiteProperties) = preProject
-		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.0"
+        UseIISExpress = "true"
+        TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.5"
 		Debug.AspNetCompiler.VirtualPath = "/localhost_58896"
 		Debug.AspNetCompiler.PhysicalPath = "Umbraco.Tests.AcceptanceTest\"
 		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_58896\"
+		Debug.AspNetCompiler.VirtualPath = "/localhost_62926"
+		Debug.AspNetCompiler.PhysicalPath = "Umbraco.Tests.AcceptanceTest\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_62926\"
 		Debug.AspNetCompiler.Updateable = "true"
 		Debug.AspNetCompiler.ForceOverwrite = "true"
 		Debug.AspNetCompiler.FixedNames = "false"
@@ -73,11 +77,17 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Umbraco.Tests.AcceptanceTes
 		Release.AspNetCompiler.VirtualPath = "/localhost_58896"
 		Release.AspNetCompiler.PhysicalPath = "Umbraco.Tests.AcceptanceTest\"
 		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_58896\"
+		Release.AspNetCompiler.VirtualPath = "/localhost_62926"
+		Release.AspNetCompiler.PhysicalPath = "Umbraco.Tests.AcceptanceTest\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_62926\"
 		Release.AspNetCompiler.Updateable = "true"
 		Release.AspNetCompiler.ForceOverwrite = "true"
 		Release.AspNetCompiler.FixedNames = "false"
 		Release.AspNetCompiler.Debug = "False"
+        DefaultWebSiteLanguage = "Visual C#"
+        StartServerOnDebug = "false"
 		VWDPort = "58896"
+		VWDPort = "62926"
 		SlnRelativePath = "Umbraco.Tests.AcceptanceTest\"
 	EndProjectSection
 EndProject
@@ -164,9 +174,7 @@ Global
 		{3819A550-DCEC-4153-91B4-8BA9F7F0B9B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3819A550-DCEC-4153-91B4-8BA9F7F0B9B4}.Release|Any CPU.ActiveCfg = Debug|Any CPU
 		{9E4C8A12-FBE0-4673-8CE2-DF99D5D57817}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9E4C8A12-FBE0-4673-8CE2-DF99D5D57817}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9E4C8A12-FBE0-4673-8CE2-DF99D5D57817}.Release|Any CPU.ActiveCfg = Debug|Any CPU
-		{9E4C8A12-FBE0-4673-8CE2-DF99D5D57817}.Release|Any CPU.Build.0 = Debug|Any CPU
 		{651E1350-91B6-44B7-BD60-7207006D7003}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{651E1350-91B6-44B7-BD60-7207006D7003}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{651E1350-91B6-44B7-BD60-7207006D7003}.Release|Any CPU.ActiveCfg = Release|Any CPU

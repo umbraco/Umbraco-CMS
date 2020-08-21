@@ -1,19 +1,26 @@
 ﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Routing;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
+using System.Net.Mail;
 using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.BackOffice;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 using Umbraco.Extensions;
 using Umbraco.Net;
 using Umbraco.Web.BackOffice.Filters;
+using Umbraco.Web.Common.ActionsResults;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Controllers;
 using Umbraco.Web.Common.Exceptions;
@@ -36,11 +43,16 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly BackOfficeUserManager _userManager;
         private readonly BackOfficeSignInManager _signInManager;
         private readonly IUserService _userService;
+        private readonly ILocalizedTextService _textService;
         private readonly UmbracoMapper _umbracoMapper;
         private readonly IGlobalSettings _globalSettings;
+        private readonly ISecuritySettings _securitySettings;
         private readonly ILogger _logger;
         private readonly IIpResolver _ipResolver;
         private readonly IUserPasswordConfiguration _passwordConfiguration;
+        private readonly IEmailSender _emailSender;
+        private readonly Core.Hosting.IHostingEnvironment _hostingEnvironment;
+        private readonly IRequestAccessor _requestAccessor;
 
         // TODO: We need to import the logic from Umbraco.Web.Editors.AuthenticationController
         // TODO: We need to review all _userManager.Raise calls since many/most should be on the usermanager or signinmanager, very few should be here
@@ -50,21 +62,31 @@ namespace Umbraco.Web.BackOffice.Controllers
             BackOfficeUserManager backOfficeUserManager,
             BackOfficeSignInManager signInManager,
             IUserService userService,
+            ILocalizedTextService textService,
             UmbracoMapper umbracoMapper,
             IGlobalSettings globalSettings,
+            ISecuritySettings securitySettings,
             ILogger logger,
             IIpResolver ipResolver,
-            IUserPasswordConfiguration passwordConfiguration)
+            IUserPasswordConfiguration passwordConfiguration,
+            IEmailSender emailSender,
+            Core.Hosting.IHostingEnvironment hostingEnvironment,
+            IRequestAccessor requestAccessor)
         {
             _webSecurity = webSecurity;
             _userManager = backOfficeUserManager;
             _signInManager = signInManager;
             _userService = userService;
+            _textService = textService;
             _umbracoMapper = umbracoMapper;
             _globalSettings = globalSettings;
+            _securitySettings = securitySettings;
             _logger = logger;
             _ipResolver = ipResolver;
             _passwordConfiguration = passwordConfiguration;
+            _emailSender = emailSender;
+            _hostingEnvironment = hostingEnvironment;
+            _requestAccessor = requestAccessor;
         }
 
         /// <summary>
@@ -75,6 +97,45 @@ namespace Umbraco.Web.BackOffice.Controllers
         public IDictionary<string, object> GetPasswordConfig(int userId)
         {
             return _passwordConfiguration.GetConfiguration(userId != _webSecurity.CurrentUser.Id);
+        }
+
+        /// <summary>
+        /// Checks if a valid token is specified for an invited user and if so logs the user in and returns the user object
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// This will also update the security stamp for the user so it can only be used once
+        /// </remarks>
+        [ValidateAngularAntiForgeryToken]
+        public async Task<ActionResult<UserDisplay>> PostVerifyInvite([FromQuery] int id, [FromQuery] string token)
+        {
+            if (string.IsNullOrWhiteSpace(token))
+                return NotFound();
+
+            var decoded = token.FromUrlBase64();
+            if (decoded.IsNullOrWhiteSpace())
+                return NotFound();
+
+            var identityUser = await _userManager.FindByIdAsync(id.ToString());
+            if (identityUser == null)
+                return NotFound();
+
+            var result = await _userManager.ConfirmEmailAsync(identityUser, decoded);
+
+            if (result.Succeeded == false)
+            {
+                throw HttpResponseException.CreateNotificationValidationErrorResponse(result.Errors.ToErrorMessage());
+            }
+
+            await _signInManager.SignOutAsync();
+
+            await _signInManager.SignInAsync(identityUser, false);
+
+            var user = _userService.GetUserById(id);
+
+            return _umbracoMapper.Map<UserDisplay>(user);
         }
 
         [HttpGet]
@@ -129,6 +190,34 @@ namespace Umbraco.Web.BackOffice.Controllers
             var result = _umbracoMapper.Map<UserDetail>(user);
 
             //set their remaining seconds
+            result.SecondsUntilTimeout = HttpContext.User.GetRemainingAuthSeconds();
+
+            return result;
+        }
+
+        /// <summary>
+        /// When a user is invited they are not approved but we need to resolve the partially logged on (non approved)
+        /// user.
+        /// </summary>
+        /// <returns></returns>
+        /// <remarks>
+        /// We cannot user GetCurrentUser since that requires they are approved, this is the same as GetCurrentUser but doesn't require them to be approved
+        /// </remarks>
+        [UmbracoAuthorize(redirectToUmbracoLogin: false, requireApproval: false)]
+        [SetAngularAntiForgeryTokens]
+        public ActionResult<UserDetail> GetCurrentInvitedUser()
+        {
+            var user = _webSecurity.CurrentUser;
+
+            if (user.IsApproved)
+            {
+                // if they are approved, than they are no longer invited and we can return an error
+                return Forbid();
+            }
+
+            var result = _umbracoMapper.Map<UserDetail>(user);
+
+            // set their remaining seconds
             result.SecondsUntilTimeout = HttpContext.User.GetRemainingAuthSeconds();
 
             return result;
@@ -200,6 +289,118 @@ namespace Umbraco.Web.BackOffice.Controllers
         }
 
         /// <summary>
+        /// Processes a password reset request.  Looks for a match on the provided email address
+        /// and if found sends an email with a link to reset it
+        /// </summary>
+        /// <returns></returns>
+        [SetAngularAntiForgeryTokens]
+        public async Task<IActionResult> PostRequestPasswordReset(RequestPasswordResetModel model)
+        {
+            // If this feature is switched off in configuration the UI will be amended to not make the request to reset password available.
+            // So this is just a server-side secondary check.
+            if (_securitySettings.AllowPasswordReset == false)
+                return BadRequest();
+
+            var identityUser = await _userManager.FindByEmailAsync(model.Email);
+            if (identityUser != null)
+            {
+                var user = _userService.GetByEmail(model.Email);
+                if (user != null)
+                {
+                    var code = await _userManager.GeneratePasswordResetTokenAsync(identityUser);
+                    var callbackUrl = ConstructCallbackUrl(identityUser.Id, code);
+
+                    var message = _textService.Localize("resetPasswordEmailCopyFormat",
+                        // Ensure the culture of the found user is used for the email!
+                        UmbracoUserExtensions.GetUserCulture(identityUser.Culture, _textService, _globalSettings),
+                        new[] { identityUser.UserName, callbackUrl });
+
+                    var subject = _textService.Localize("login/resetPasswordEmailCopySubject",
+                        // Ensure the culture of the found user is used for the email!
+                        UmbracoUserExtensions.GetUserCulture(identityUser.Culture, _textService, _globalSettings));
+
+                    var mailMessage = new MailMessage()
+                    {
+                        Subject = subject,
+                        Body = message,
+                        IsBodyHtml = true,
+                        To = { user.Email }
+                    };
+
+                    await _emailSender.SendAsync(mailMessage);
+
+                    _userManager.RaiseForgotPasswordRequestedEvent(User, user.Id);
+                }
+            }
+
+            return Ok();
+        }
+
+        /// <summary>
+        /// Processes a set password request.  Validates the request and sets a new password.
+        /// </summary>
+        /// <returns></returns>
+        [SetAngularAntiForgeryTokens]
+        public async Task<IActionResult> PostSetPassword(SetPasswordModel model)
+        {
+            var identityUser = await _userManager.FindByIdAsync(model.UserId.ToString());
+
+            var result = await _userManager.ResetPasswordAsync(identityUser, model.ResetCode, model.Password);
+            if (result.Succeeded)
+            {
+                var lockedOut = await _userManager.IsLockedOutAsync(identityUser);
+                if (lockedOut)
+                {
+                    _logger.Info<AuthenticationController>("User {UserId} is currently locked out, unlocking and resetting AccessFailedCount", model.UserId);
+
+                    //// var user = await UserManager.FindByIdAsync(model.UserId);
+                    var unlockResult = await _userManager.SetLockoutEndDateAsync(identityUser, DateTimeOffset.Now);
+                    if (unlockResult.Succeeded == false)
+                    {
+                        _logger.Warn<AuthenticationController>("Could not unlock for user {UserId} - error {UnlockError}", model.UserId, unlockResult.Errors.First().Description);
+                    }
+
+                    var resetAccessFailedCountResult = await _userManager.ResetAccessFailedCountAsync(identityUser);
+                    if (resetAccessFailedCountResult.Succeeded == false)
+                    {
+                        _logger.Warn<AuthenticationController>("Could not reset access failed count {UserId} - error {UnlockError}", model.UserId, unlockResult.Errors.First().Description);
+                    }
+                }
+
+                // They've successfully set their password, we can now update their user account to be confirmed
+                // if user was only invited, then they have not been approved
+                // but a successful forgot password flow (e.g. if their token had expired and they did a forgot password instead of request new invite)
+                // means we have verified their email
+                if (!await _userManager.IsEmailConfirmedAsync(identityUser))
+                {
+                    await _userManager.ConfirmEmailAsync(identityUser, model.ResetCode);
+                }
+
+                // invited is not approved, never logged in, invited date present
+                /*
+                if (LastLoginDate == default && IsApproved == false && InvitedDate != null)
+                    return UserState.Invited;
+                */
+                if (identityUser != null && !identityUser.IsApproved)
+                {
+                    var user = _userService.GetByUsername(identityUser.UserName);
+                    // also check InvitedDate and never logged in, otherwise this would allow a disabled user to reactivate their account with a forgot password
+                    if (user.LastLoginDate == default && user.InvitedDate != null)
+                    {
+                        user.IsApproved = true;
+                        user.InvitedDate = null;
+                        _userService.Save(user);
+                    }
+                }
+
+                _userManager.RaiseForgotPasswordChangedSuccessEvent(User, model.UserId);
+                return Ok();
+            }
+
+            return new ValidationErrorResult(result.Errors.Any() ? result.Errors.First().Description : "Set password failed");
+        }
+
+        /// <summary>
         /// Logs the current user out
         /// </summary>
         /// <returns></returns>
@@ -230,6 +431,24 @@ namespace Umbraco.Web.BackOffice.Controllers
             userDetail.SecondsUntilTimeout = TimeSpan.FromMinutes(_globalSettings.TimeOutInMinutes).TotalSeconds;
 
             return userDetail;
+        }
+
+        private string ConstructCallbackUrl(int userId, string code)
+        {
+            // Get an mvc helper to get the url
+            var urlHelper = new UrlHelper(ControllerContext);
+            var action = urlHelper.Action(nameof(BackOfficeController.ValidatePasswordResetCode), ControllerExtensions.GetControllerName<BackOfficeController>(),
+                new
+                {
+                    area = _globalSettings.GetUmbracoMvcArea(_hostingEnvironment),
+                    u = userId,
+                    r = code
+                });
+
+            // Construct full URL using configured application URL (which will fall back to request)
+            var applicationUri = _requestAccessor.GetApplicationUrl();
+            var callbackUri = new Uri(applicationUri, action);
+            return callbackUri.ToString();
         }
     }
 }

@@ -25,7 +25,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     /// <summary>
     /// Am abstract API controller providing functionality used for dealing with content and media types
     /// </summary>
-    [PluginController("UmbracoApi")]
+    [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     //[PrefixlessBodyModelValidator] //TODO reintroduce
     public abstract class ContentTypeControllerBase<TContentType> : UmbracoAuthorizedJsonController
         where TContentType : class, IContentTypeComposition

@@ -131,6 +131,21 @@ function clipboardService(notificationsService, eventsService, localStorageServi
 
     /**
     * @ngdoc method
+    * @name umbraco.services.clipboardService#registrerPropertyClearingResolver
+    * @methodOf umbraco.services.clipboardService
+    *
+    * @param {string} function A method executed for every property and inner properties copied.
+    *
+    * @description
+    * Executed for all properties including inner properties when performing a copy action.
+    */
+   service.registrerClearPropertyResolver = function(resolver) {
+        clearPropertyResolvers.push(resolver);
+    };
+
+
+    /**
+    * @ngdoc method
     * @name umbraco.services.clipboardService#copy
     * @methodOf umbraco.services.clipboardService
     *

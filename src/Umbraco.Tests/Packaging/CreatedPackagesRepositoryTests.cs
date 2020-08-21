@@ -41,7 +41,7 @@ namespace Umbraco.Tests.Packaging
         public ICreatedPackagesRepository PackageBuilder => new PackagesRepository(
             ServiceContext.ContentService, ServiceContext.ContentTypeService, ServiceContext.DataTypeService,
             ServiceContext.FileService, ServiceContext.MacroService, ServiceContext.LocalizationService,
-            IOHelper,
+            HostingEnvironment,
             Factory.GetInstance<IEntityXmlSerializer>(), Logger,
             UmbracoVersion,
             Factory.GetInstance<IGlobalSettings>(),

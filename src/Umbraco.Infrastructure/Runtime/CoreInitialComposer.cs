@@ -30,6 +30,7 @@ using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
 using Umbraco.Examine;
+using Umbraco.Infrastructure.Examine;
 using Umbraco.Infrastructure.Media;
 using Umbraco.Web;
 using Umbraco.Web.Actions;
@@ -44,6 +45,7 @@ using Umbraco.Web.Media.EmbedProviders;
 using Umbraco.Web.Migrations.PostMigrations;
 using Umbraco.Web.Models.PublishedContent;
 using Umbraco.Web.PropertyEditors;
+using Umbraco.Web.PropertyEditors.ValueConverters;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Search;
@@ -52,6 +54,7 @@ using Umbraco.Web.Services;
 using Umbraco.Web.Templates;
 using Umbraco.Web.Trees;
 using IntegerValidator = Umbraco.Core.PropertyEditors.Validators.IntegerValidator;
+using TextStringValueConverter = Umbraco.Core.PropertyEditors.ValueConverters.TextStringValueConverter;
 
 namespace Umbraco.Core.Runtime
 {
@@ -213,6 +216,7 @@ namespace Umbraco.Core.Runtime
             composition.RegisterUnique<HtmlImageSourceParser>();
             composition.RegisterUnique<HtmlUrlParser>();
             composition.RegisterUnique<RichTextEditorPastedImages>();
+            composition.RegisterUnique<BlockEditorConverter>();
 
             // both TinyMceValueConverter (in Core) and RteMacroRenderingValueConverter (in Web) will be
             // discovered when CoreBootManager configures the converters. We HAVE to remove one of them
@@ -362,7 +366,9 @@ namespace Umbraco.Core.Runtime
 
             composition.RegisterUnique<IUmbracoComponentRenderer, UmbracoComponentRenderer>();
 
-
+            // Register noop versions for examine to be overridden by examine
+            composition.RegisterUnique<IUmbracoIndexesCreator, NoopUmbracoIndexesCreator>();
+            composition.RegisterUnique<IBackOfficeExamineSearcher, NoopBackOfficeExamineSearcher>();
         }
     }
 }

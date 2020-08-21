@@ -1,5 +1,4 @@
-﻿using System.Text;
-using System.Web;
+﻿using System.Net;
 using Newtonsoft.Json;
 
 namespace Umbraco.Web.Media.EmbedProviders
@@ -52,7 +51,7 @@ namespace Umbraco.Web.Media.EmbedProviders
         {
             if (Type == "photo")
             {
-                return "<img src=\"" + Url + "\" width=\"" + Width + "\" height=\"" + Height + "\" alt=\"" + HttpUtility.HtmlEncode(Title) + "\" />";
+                return "<img src=\"" + Url + "\" width=\"" + Width + "\" height=\"" + Height + "\" alt=\"" + WebUtility.HtmlEncode(Title) + "\" />";
             }
 
             return string.IsNullOrEmpty(Html) == false ? Html : string.Empty;

@@ -11,6 +11,7 @@ using NUnit.Framework;
 using Umbraco.Composing;
 using Umbraco.Extensions;
 using Umbraco.Tests.Integration.Testing;
+using Umbraco.Tests.Testing;
 using Umbraco.Web;
 using Umbraco.Web.Common.Controllers;
 using Umbraco.Web.Editors;
@@ -19,6 +20,7 @@ using Umbraco.Web.Editors;
 namespace Umbraco.Tests.Integration.TestServerTest
 {
     [TestFixture]
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Console, Boot = false)]
     public abstract class UmbracoTestServerTestBase : UmbracoIntegrationTest
     {
         [SetUp]
@@ -29,7 +31,6 @@ namespace Umbraco.Tests.Integration.TestServerTest
                 AllowAutoRedirect = false
             });
             LinkGenerator = Factory.Services.GetRequiredService<LinkGenerator>();
-
         }
 
         /// <summary>

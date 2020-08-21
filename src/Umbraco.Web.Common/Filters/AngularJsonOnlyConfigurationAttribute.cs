@@ -2,6 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
 using Umbraco.Web.Common.Formatters;
 
 namespace Umbraco.Web.Common.Filters
@@ -18,13 +21,11 @@ namespace Umbraco.Web.Common.Filters
 
         private class AngularJsonOnlyConfigurationFilter : IResultFilter
         {
-            private readonly IOptions<MvcNewtonsoftJsonOptions> _mvcNewtonsoftJsonOptions;
             private readonly ArrayPool<char> _arrayPool;
             private readonly IOptions<MvcOptions> _options;
 
-            public AngularJsonOnlyConfigurationFilter(IOptions<MvcNewtonsoftJsonOptions> mvcNewtonsoftJsonOptions, ArrayPool<char> arrayPool, IOptions<MvcOptions> options)
+            public AngularJsonOnlyConfigurationFilter(ArrayPool<char> arrayPool, IOptions<MvcOptions> options)
             {
-                _mvcNewtonsoftJsonOptions = mvcNewtonsoftJsonOptions;
                 _arrayPool = arrayPool;
                 _options = options;
             }
@@ -37,8 +38,14 @@ namespace Umbraco.Web.Common.Filters
             {
                 if (context.Result is ObjectResult objectResult)
                 {
+                    var serializerSettings = new JsonSerializerSettings()
+                    {
+                        ContractResolver = new DefaultContractResolver(),
+                        Converters = {new VersionConverter()}
+                    };
+
                     objectResult.Formatters.Clear();
-                    objectResult.Formatters.Add(new AngularJsonMediaTypeFormatter(_mvcNewtonsoftJsonOptions.Value.SerializerSettings, _arrayPool, _options.Value));
+                    objectResult.Formatters.Add(new AngularJsonMediaTypeFormatter(serializerSettings, _arrayPool, _options.Value));
                 }
             }
         }

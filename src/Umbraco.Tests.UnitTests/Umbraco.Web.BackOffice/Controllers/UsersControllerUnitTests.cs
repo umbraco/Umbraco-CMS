@@ -1,11 +1,10 @@
 ﻿using System.Threading;
-using System.Threading.Tasks;
 using AutoFixture.NUnit3;
 using Microsoft.AspNetCore.Identity;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core.BackOffice;
-using Umbraco.Tests.Common.AutoFixture;
+using Umbraco.Tests.UnitTests.AutoFixture;
 using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.Common.Exceptions;
 
@@ -15,7 +14,7 @@ namespace Umbraco.Tests.Web.Controllers
     public class UsersControllerUnitTests
     {
         [Test,AutoMoqData]
-        public async Task PostUnlockUsers_When_User_Lockout_Update_Fails_Expect_Failure_Response(
+        public void PostUnlockUsers_When_User_Lockout_Update_Fails_Expect_Failure_Response(
             [Frozen] IUserStore<BackOfficeIdentityUser> userStore,
             UsersController sut,
             BackOfficeIdentityUser user,

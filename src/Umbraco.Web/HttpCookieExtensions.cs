@@ -98,16 +98,6 @@ namespace Umbraco.Web
         }
 
         /// <summary>
-        /// Does a preview cookie exist ?
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        public static bool HasPreviewCookie(this IOwinRequest request)
-        {
-            return request.Cookies[Constants.Web.PreviewCookieName] != null;
-        }
-
-        /// <summary>
         /// Returns the cookie's string value
         /// </summary>
         /// <param name="request"></param>

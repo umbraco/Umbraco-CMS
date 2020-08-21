@@ -28,7 +28,7 @@ namespace Umbraco.Web.Editors
     /// <summary>
     /// An API controller used for dealing with member types
     /// </summary>
-    [PluginController("UmbracoApi")]
+    [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     [UmbracoTreeAuthorize(new string[] { Constants.Trees.MemberTypes, Constants.Trees.Members})]
     public class MemberTypeController : ContentTypeControllerBase<IMemberType>
     {

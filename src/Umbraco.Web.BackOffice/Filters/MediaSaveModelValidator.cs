@@ -11,7 +11,12 @@ namespace Umbraco.Web.BackOffice.Filters
     /// </summary>
     internal class MediaSaveModelValidator : ContentModelValidator<IMedia, MediaItemSave, IContentProperties<ContentPropertyBasic>>
     {
-        public MediaSaveModelValidator(ILogger logger, IWebSecurity webSecurity, ILocalizedTextService textService) : base(logger, webSecurity, textService)
+        public MediaSaveModelValidator(
+            ILogger logger,
+            IWebSecurity webSecurity,
+            ILocalizedTextService textService,
+            IPropertyValidationService propertyValidationService)
+            : base(logger, webSecurity, textService, propertyValidationService)
         {
         }
     }

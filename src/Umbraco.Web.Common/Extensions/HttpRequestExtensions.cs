@@ -13,6 +13,17 @@ namespace Umbraco.Extensions
 {
     public static class HttpRequestExtensions
     {
+
+        /// <summary>
+        /// Check if a preview cookie exist
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public static bool HasPreviewCookie(this HttpRequest request)
+        {
+            return request.Cookies.TryGetValue(Constants.Web.PreviewCookieName, out var cookieVal) && !cookieVal.IsNullOrWhiteSpace();
+        }
+
         public static bool IsBackOfficeRequest(this HttpRequest request, IGlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
         {
             return new Uri(request.GetEncodedUrl(), UriKind.RelativeOrAbsolute).IsBackOfficeRequest(globalSettings, hostingEnvironment);

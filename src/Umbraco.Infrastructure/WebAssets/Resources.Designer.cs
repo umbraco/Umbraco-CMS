@@ -11,8 +11,8 @@
 namespace Umbraco.Web.WebAssets
 {
     using System;
-    
-    
+
+
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -24,15 +24,15 @@ namespace Umbraco.Web.WebAssets
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
-        
+
         private static global::System.Resources.ResourceManager resourceMan;
-        
+
         private static global::System.Globalization.CultureInfo resourceCulture;
-        
+
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
         internal Resources() {
         }
-        
+
         /// <summary>
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
@@ -46,7 +46,7 @@ namespace Umbraco.Web.WebAssets
                 return resourceMan;
             }
         }
-        
+
         /// <summary>
         ///   Overrides the current thread's CurrentUICulture property for all
         ///   resource lookups using this strongly typed resource class.
@@ -60,7 +60,7 @@ namespace Umbraco.Web.WebAssets
                 resourceCulture = value;
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to [
         ///    &apos;lib/jquery/jquery.min.js&apos;,
@@ -86,7 +86,7 @@ namespace Umbraco.Web.WebAssets
                 return ResourceManager.GetString("JsInitialize", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to LazyLoad.js(&quot;##JsInitialize##&quot;, function () {
         ///    //we need to set the legacy UmbClientMgr path
@@ -107,7 +107,7 @@ namespace Umbraco.Web.WebAssets
                 return ResourceManager.GetString("Main", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to [
         ///    &apos;../lib/jquery/jquery.min.js&apos;,
@@ -130,7 +130,7 @@ namespace Umbraco.Web.WebAssets
                 return ResourceManager.GetString("PreviewInitialize", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to // TODO: This would be nicer as an angular module so it can be injected into stuff... that&apos;d be heaps nicer, but
         ///// how to do that when this is not a regular JS file, it is a server side JS file and RequireJS seems to only want
@@ -147,7 +147,7 @@ namespace Umbraco.Web.WebAssets
                 return ResourceManager.GetString("ServerVariables", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to [
         ///    &apos;lib/tinymce/tinymce.min.js&apos;,

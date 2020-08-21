@@ -21,6 +21,7 @@
 
             public const string AnyGuid = "any-guid"; // that one is for tests
 
+            public const string Element = "element";
             public const string Document = "document";
 
             public const string DocumentBlueprint = "document-blueprint";
