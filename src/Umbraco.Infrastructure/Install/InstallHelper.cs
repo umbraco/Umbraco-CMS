@@ -14,6 +14,7 @@ using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Web.Install.Models;
 using Microsoft.Extensions.Options;
+using Umbraco.Core.Configuration.Models;
 
 namespace Umbraco.Web.Install
 {

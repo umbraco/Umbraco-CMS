@@ -5,7 +5,7 @@ using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Web.Install.Models;
-using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Microsoft.Extensions.Options;
 
 namespace Umbraco.Web.Install.InstallSteps

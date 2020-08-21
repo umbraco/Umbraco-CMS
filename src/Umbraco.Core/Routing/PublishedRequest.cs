@@ -36,10 +36,21 @@ namespace Umbraco.Web.Routing
         /// <param name="umbracoContext">The Umbraco context.</param>
         /// <param name="uri">The request <c>Uri</c>.</param>
         public PublishedRequest(IPublishedRouter publishedRouter, IUmbracoContext umbracoContext, IOptionsSnapshot<WebRoutingSettings> webRoutingSettings, Uri uri = null)
+            : this(publishedRouter, umbracoContext, webRoutingSettings.Value, uri)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="IPublishedRequest"/> class.
+        /// </summary>
+        /// <param name="publishedRouter">The published router.</param>
+        /// <param name="umbracoContext">The Umbraco context.</param>
+        /// <param name="uri">The request <c>Uri</c>.</param>
+        public PublishedRequest(IPublishedRouter publishedRouter, IUmbracoContext umbracoContext, WebRoutingSettings webRoutingSettings, Uri uri = null)
         {
             UmbracoContext = umbracoContext ?? throw new ArgumentNullException(nameof(umbracoContext));
             _publishedRouter = publishedRouter ?? throw new ArgumentNullException(nameof(publishedRouter));
-            _webRoutingSettings = webRoutingSettings.Value;
+            _webRoutingSettings = webRoutingSettings;
             Uri = uri ?? umbracoContext.CleanedUmbracoUrl;
         }
 
