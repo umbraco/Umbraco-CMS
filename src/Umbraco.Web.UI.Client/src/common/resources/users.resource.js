@@ -295,6 +295,38 @@
                 "Failed to retrieve data for user " + userId);
         }
 
+
+        /**
+          * @ngdoc method
+          * @name umbraco.resources.usersResource#getUsers
+          * @methodOf umbraco.resources.usersResource
+          *
+          * @description
+          * Gets users from ids
+          *
+          * ##usage
+          * <pre>
+          * usersResource.getUsers([1,2,3])
+          *    .then(function(data) {
+          *        alert("It's here");
+          *    });
+          * </pre>
+          * 
+          * @param {Array} userIds user ids.
+          * @returns {Promise} resourcePromise object containing the users array.
+          *
+          */
+        function getUsers(userIds) {
+
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "userApiBaseUrl",
+                        "GetByIds",
+                        { ids: userIds })),
+                "Failed to retrieve data for users " + userIds);
+        }
+
         /**
           * @ngdoc method
           * @name umbraco.resources.usersResource#createUser
@@ -481,6 +513,7 @@
             setUserGroupsOnUsers: setUserGroupsOnUsers,
             getPagedResults: getPagedResults,
             getUser: getUser,
+            getUsers: getUsers,
             createUser: createUser,
             inviteUser: inviteUser,
             saveUser: saveUser,

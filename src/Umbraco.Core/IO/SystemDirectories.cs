@@ -11,6 +11,8 @@ namespace Umbraco.Core.IO
 
         public static string Data => "~/App_Data";
 
+        public static string LogFiles => Data + "/Logs";
+
         public static string TempData => Data + "/TEMP";
 
         public static string TempFileUploads => TempData + "/FileUploads";

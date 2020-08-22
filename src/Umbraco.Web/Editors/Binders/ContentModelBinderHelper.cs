@@ -15,9 +15,9 @@ namespace Umbraco.Web.Editors.Binders
     /// <summary>
     /// Helper methods to bind media/member models
     /// </summary>
-    internal class ContentModelBinderHelper
+    internal static class ContentModelBinderHelper
     {
-        public TModelSave BindModelFromMultipartRequest<TModelSave>(HttpActionContext actionContext, ModelBindingContext bindingContext)
+        public static TModelSave BindModelFromMultipartRequest<TModelSave>(HttpActionContext actionContext, ModelBindingContext bindingContext)
             where TModelSave : IHaveUploadedFiles
         {
             var result = actionContext.ReadAsMultipart(SystemDirectories.TempFileUploads);
@@ -86,7 +86,7 @@ namespace Umbraco.Web.Editors.Binders
         /// </summary>
         /// <param name="saveModel"></param>
         /// <param name="dto"></param>
-        public void MapPropertyValuesFromSaved(IContentProperties<ContentPropertyBasic> saveModel, ContentPropertyCollectionDto dto)
+        public static void MapPropertyValuesFromSaved(IContentProperties<ContentPropertyBasic> saveModel, ContentPropertyCollectionDto dto)
         {
             //NOTE: Don't convert this to linq, this is much quicker
             foreach (var p in saveModel.Properties)
