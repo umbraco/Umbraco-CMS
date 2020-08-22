@@ -33,6 +33,7 @@
                             <umb-box-header title="Saved Searches"></umb-box-header>
                             <umb-box-content>
                                 <table>
+                                    <caption class="sr-only">Saved Searches</caption>
                                     <tbody>
                                         <tr>
                                             <td>
@@ -55,18 +56,19 @@
                             <umb-box-header title="Common Log Messages"></umb-box-header>
                             <umb-box-content class="block-form">
                                 <em>Total Unique Message types</em>: {{ vm.commonLogMessages.length }}
-                                <table class="table table-hover">
-                                    <tbody>
-                                        <tr ng-repeat="template in vm.commonLogMessages | limitTo:vm.commonLogMessagesCount" ng-click="vm.findMessageTemplate(template)" style="cursor: pointer;">
-                                            <td>
-                                                {{ template.MessageTemplate }}
-                                            </td>
-                                            <td>
-                                                {{ template.Count }}
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                            <table class="table table-hover">
+                                <caption class="sr-only">Common Log Messages Total Unique Message types: {{ vm.commonLogMessages.length }}</caption>
+                                <tbody>
+                                    <tr ng-repeat="template in vm.commonLogMessages | limitTo:vm.commonLogMessagesCount" ng-click="vm.findMessageTemplate(template)" style="cursor: pointer;">
+                                        <td>
+                                            {{ template.MessageTemplate }}
+                                        </td>
+                                        <td>
+                                            {{ template.Count }}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                                 <umb-button ng-if="vm.commonLogMessagesCount < vm.commonLogMessages.length"
                                             button-style="action"
                                             type="button"
