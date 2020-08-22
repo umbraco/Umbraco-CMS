@@ -38,14 +38,18 @@
                                            ng-repeat="section in currentLayout.sections"
                                            ng-click="configureSection(section, currentLayout)"
                                            ng-style="{width: percentage(section.grid) +'%'}">
-                                           <span class="sr-only">Edit grid layout</span>
+                                           <span class="sr-only">
+                                            <localize key="grid_editGridLayout">Edit grid layout</localize>
+                                        </span>
                                         </button>
 
                                         <button type="button" class="btn-reset td uSky-templates-column add" ng-if="availableLayoutSpace > 0"
                                            ng-click="configureSection(undefined, currentLayout)"
                                            ng-style="{width: percentage(availableLayoutSpace) + '%'}">
                                             <i class="icon icon-add" aria-hidden="true"></i>
-                                            <span class="sr-only">Add grid layout</span>
+                                            <span class="sr-only">
+                                                <localize key="grid_addGridLayout">Add grid layout</localize>
+                                            </span>
                                         </a>
 
                                     </div>
