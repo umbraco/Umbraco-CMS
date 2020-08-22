@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function UnpublishController($scope, localizationService, contentEditingHelper) {
+    function UnpublishController($scope, localizationService) {
 
         var vm = this;
         var autoSelectedVariants = [];
@@ -15,41 +15,39 @@
 
             // set dialog title
             if (!$scope.model.title) {
-                localizationService.localize("content_unpublish").then(function (value) {
+                localizationService.localize("content_unpublish").then(value => {
                     $scope.model.title = value;
                 });
             }
 
-            _.each(vm.variants, function (variant) {
+            vm.variants.forEach(variant => {
                 variant.isMandatory = isMandatoryFilter(variant);
             });
 
             // node has variants
             if (vm.variants.length !== 1) {
                 
-                vm.unpublishableVariants.sort(function (a, b) {
+                vm.unpublishableVariants.sort((a, b) => {
                     if (a.language && b.language) {
-                        if (a.language.name > b.language.name) {
+                        if (a.language.name < b.language.name) {
                             return -1;
                         }
-                        if (a.language.name < b.language.name) {
+                        if (a.language.name > b.language.name) {
                             return 1;
                         }
                     }
                     if (a.segment && b.segment) {
-                        if (a.segment > b.segment) {
+                        if (a.segment < b.segment) {
                             return -1;
                         }
-                        if (a.segment < b.segment) {
+                        if (a.segment > b.segment) {
                             return 1;
                         }
                     }
                     return 0;
                 });
 
-                var active = _.find(vm.variants, function (v) {
-                    return v.active;
-                });
+                var active = vm.variants.find(v => v.active);
 
                 if (active && publishedVariantFilter(active)) {
                     //ensure that the current one is selected
@@ -66,10 +64,10 @@
 
             // if a mandatory variant is selected we want to select all other variants, we cant have anything published if a mandatory variants gets unpublished.
             // and disable selection for the others
-            if(selectedVariant.save && selectedVariant.segment == null && selectedVariant.language && selectedVariant.language.isMandatory) {
+            if (selectedVariant.save && selectedVariant.segment == null && selectedVariant.language && selectedVariant.language.isMandatory) {
 
-                vm.variants.forEach(function(variant) {
-                    if(!variant.save) {
+                vm.variants.forEach(variant => {
+                    if (!variant.save) {
                         // keep track of the variants we automaically select
                         // so we can remove the selection again
                         autoSelectedVariants.push(variant);
@@ -80,30 +78,29 @@
 
                 // make sure the mandatory isn't disabled so we can deselect again
                 selectedVariant.disabled = false;
-
             }
 
             // if a mandatory variant is deselected we want to deselet all the variants
             // that was automatically selected so it goes back to the state before the mandatory language was selected.
             // We also want to enable all checkboxes again
-            if(!selectedVariant.save && selectedVariant.segment == null && selectedVariant.language && selectedVariant.language.isMandatory) {
+            if (!selectedVariant.save && selectedVariant.segment == null && selectedVariant.language && selectedVariant.language.isMandatory) {
                 
-                vm.variants.forEach( function(variant){
+                vm.variants.forEach(variant => {
 
                     // check if variant was auto selected, then deselect
-                    if(_.contains(autoSelectedVariants, variant)) {
+                    let autoSelected = autoSelectedVariants.find(x => x.culture === variant.culture);
+                    if (autoSelected) {
                         variant.save = false;
-                    };
+                    }
 
                     variant.disabled = false;
                 });
+
                 autoSelectedVariants = [];
             }
 
             // disable submit button if nothing is selected
-            var firstSelected = _.find(vm.variants, function (v) {
-                return v.save;
-            });
+            var firstSelected = vm.variants.find(v => v.save);
             $scope.model.disableSubmitButton = !firstSelected; //disable submit button if there is none selected
 
         }
@@ -123,11 +120,10 @@
         }
 
         //when this dialog is closed, remove all unpublish and disabled flags
-        $scope.$on('$destroy', function () {
-            for (var i = 0; i < vm.variants.length; i++) {
-                vm.variants[i].save = false;
-                vm.variants[i].disabled = false;
-            }
+        $scope.$on('$destroy', () => {
+            vm.variants.forEach(variant => {
+                variant.save = variant.disabled = false;
+            });
         });
 
         onInit();

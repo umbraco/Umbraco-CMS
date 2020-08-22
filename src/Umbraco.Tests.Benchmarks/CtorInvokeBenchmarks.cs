@@ -16,6 +16,8 @@ namespace Umbraco.Tests.Benchmarks
     // - it's faster to get+invoke the ctor
     // - emitting the ctor is unless if invoked only 1
 
+    // TODO: Check out https://docs.microsoft.com/en-us/dotnet/api/system.reflection.emit.constructorbuilder?view=netcore-3.1 ?
+
     //[Config(typeof(Config))]
     [MemoryDiagnoser]
     public class CtorInvokeBenchmarks

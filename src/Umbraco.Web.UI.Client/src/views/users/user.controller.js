@@ -281,7 +281,7 @@
                 submit: function (model) {
                     // select items
                     if (model.selection) {
-                        angular.forEach(model.selection, function (item) {
+                        model.selection.forEach(function (item) {
                             if (item.id === "-1") {
                                 item.name = vm.labels.contentRoot;
                                 item.icon = "icon-folder";
@@ -310,7 +310,7 @@
                 submit: function (model) {
                     // select items
                     if (model.selection) {
-                        angular.forEach(model.selection, function (item) {
+                        model.selection.forEach(function (item) {
                             if (item.id === "-1") {
                                 item.name = vm.labels.mediaRoot;
                                 item.icon = "icon-folder";
@@ -333,7 +333,7 @@
             var found = false;
             // check if item is already in the selected list
             if (selection.length > 0) {
-                angular.forEach(selection, function (selectedItem) {
+                selection.forEach(function (selectedItem) {
                     if (selectedItem.udi === item.udi) {
                         found = true;
                     }
