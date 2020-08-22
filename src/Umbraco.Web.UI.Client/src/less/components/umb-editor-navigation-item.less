@@ -20,10 +20,16 @@
         justify-content: center;
         height: calc(~'@{editorHeaderHeight}'- ~'1px'); // need to offset the 1px border-bottom on .umb-editor-header - avoids overflowing top of the container
         color: @ui-active-type;
+        user-select: none;
 
         &:hover {
             color: @ui-active-type-hover  !important;
             text-decoration: none;
+        }
+
+        &:disabled {
+            pointer-events: none;
+            color: @gray-6;
         }
 
         &::before {

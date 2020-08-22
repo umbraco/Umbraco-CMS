@@ -25,6 +25,7 @@ namespace Umbraco.Core
                     { Unknown, UdiType.Unknown },
 
                     { AnyGuid, UdiType.GuidUdi },
+                    { Element, UdiType.GuidUdi },
                     { Document, UdiType.GuidUdi },
                     { DocumentBlueprint, UdiType.GuidUdi },
                     { Media, UdiType.GuidUdi },
@@ -63,6 +64,8 @@ namespace Umbraco.Core
             // guid entity types
 
             public const string AnyGuid = "any-guid"; // that one is for tests
+
+            public const string Element = "element";
 
             public const string Document = "document";
 

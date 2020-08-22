@@ -3,7 +3,7 @@
     <p ng-if="(mediaItems|filter:{trashed:true}).length == 1"><localize key="mediaPicker_pickedTrashedItem"></localize></p>
     <p ng-if="(mediaItems|filter:{trashed:true}).length > 1"><localize key="mediaPicker_pickedTrashedItems"></localize></p>
 
-    <div data-element="sortable-thumbnails" class="flex flex-wrap error">
+    <div data-element="sortable-thumbnails" class="umb-sortable-thumbnails-container error">
         <ul ui-sortable="sortableOptions" ng-model="mediaItems" class="umb-sortable-thumbnails">
             <li data-element="sortable-thumbnail-{{$index}}" class="umb-sortable-thumbnails__wrapper" ng-repeat="media in mediaItems track by $index">
 
