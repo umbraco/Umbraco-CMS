@@ -1,17 +1,16 @@
 ﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Threading;
 using System.Web;
 using System.Web.Routing;
-using Microsoft.Extensions.Options;
 using Umbraco.Core;
-using Umbraco.Core.Collections;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
+using System.Threading;
+using System.Collections.Generic;
+using System.Linq;
+using System.Collections.Concurrent;
+using Umbraco.Core.Collections;
 using Umbraco.Core.IO;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web
 {
@@ -23,19 +22,19 @@ namespace Umbraco.Web
     /// </remarks>
     public sealed class RoutableDocumentFilter
     {
+        public RoutableDocumentFilter(IGlobalSettings globalSettings, IIOHelper ioHelper)
+        {
+            _globalSettings = globalSettings;
+            _ioHelper = ioHelper;
+        }
+
         private static readonly ConcurrentDictionary<string, bool> RouteChecks = new ConcurrentDictionary<string, bool>();
-        private readonly GlobalSettings _globalSettings;
+        private readonly IGlobalSettings _globalSettings;
         private readonly IIOHelper _ioHelper;
         private object _locker = new object();
         private bool _isInit = false;
         private int? _routeCount;
         private HashSet<string> _reservedList;
-
-        public RoutableDocumentFilter(IOptionsSnapshot<GlobalSettings> globalSettings, IIOHelper ioHelper)
-        {
-            _globalSettings = globalSettings.Value;
-            _ioHelper = ioHelper;
-        }
 
         /// <summary>
         /// Checks if the request is a document request (i.e. one that the module should handle)

@@ -17,8 +17,6 @@ using Umbraco.Web.WebApi;
 
 using Constants = Umbraco.Core.Constants;
 using Current = Umbraco.Web.Composing.Current;
-using Umbraco.Core.Configuration.Models;
-using Microsoft.Extensions.Options;
 
 namespace Umbraco.Web.Runtime
 {
@@ -27,7 +25,7 @@ namespace Umbraco.Web.Runtime
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly SurfaceControllerTypeCollection _surfaceControllerTypes;
         private readonly UmbracoApiControllerTypeCollection _apiControllerTypes;
-        private readonly GlobalSettings _globalSettings;
+        private readonly IGlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IShortStringHelper _shortStringHelper;
 
@@ -35,14 +33,14 @@ namespace Umbraco.Web.Runtime
             IUmbracoContextAccessor umbracoContextAccessor,
             SurfaceControllerTypeCollection surfaceControllerTypes,
             UmbracoApiControllerTypeCollection apiControllerTypes,
-            IOptionsSnapshot<GlobalSettings> globalSettings,
+            IGlobalSettings globalSettings,
             IHostingEnvironment hostingEnvironment,
             IShortStringHelper shortStringHelper)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
             _surfaceControllerTypes = surfaceControllerTypes;
             _apiControllerTypes = apiControllerTypes;
-            _globalSettings = globalSettings.Value;
+            _globalSettings = globalSettings;
             _hostingEnvironment = hostingEnvironment;
             _shortStringHelper = shortStringHelper;
         }
@@ -113,7 +111,7 @@ namespace Umbraco.Web.Runtime
         // internal for tests
         internal static void CreateRoutes(
             IUmbracoContextAccessor umbracoContextAccessor,
-            GlobalSettings globalSettings,
+            IGlobalSettings globalSettings,
             IShortStringHelper shortStringHelper,
             SurfaceControllerTypeCollection surfaceControllerTypes,
             UmbracoApiControllerTypeCollection apiControllerTypes,
@@ -151,7 +149,7 @@ namespace Umbraco.Web.Runtime
         }
 
         private static void RoutePluginControllers(
-            GlobalSettings globalSettings,
+            IGlobalSettings globalSettings,
             SurfaceControllerTypeCollection surfaceControllerTypes,
             UmbracoApiControllerTypeCollection apiControllerTypes,
             IHostingEnvironment hostingEnvironment)

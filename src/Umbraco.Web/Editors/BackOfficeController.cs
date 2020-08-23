@@ -4,21 +4,19 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Options;
 using Microsoft.Owin.Security;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
+using Umbraco.Web.Mvc;
 using Umbraco.Core.Services;
 using Umbraco.Web.Features;
-using Umbraco.Web.Mvc;
 using Umbraco.Web.Security;
-using BackOfficeIdentityUser = Umbraco.Core.BackOffice.BackOfficeIdentityUser;
 using Constants = Umbraco.Core.Constants;
+using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Hosting;
+using BackOfficeIdentityUser = Umbraco.Core.BackOffice.BackOfficeIdentityUser;
 
 namespace Umbraco.Web.Editors
 {
@@ -36,12 +34,12 @@ namespace Umbraco.Web.Editors
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly IContentSettings _contentSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
-        private readonly RuntimeSettings _runtimeSettings;
-        private readonly SecuritySettings _securitySettings;
+        private readonly IRuntimeSettings _runtimeSettings;
+        private readonly ISecuritySettings _securitySettings;
 
         public BackOfficeController(
             UmbracoFeatures features,
-            IOptionsSnapshot<GlobalSettings> globalSettings,
+            IGlobalSettings globalSettings,
             IUmbracoContextAccessor umbracoContextAccessor,
             ServiceContext services,
             AppCaches appCaches,
@@ -49,16 +47,17 @@ namespace Umbraco.Web.Editors
             IUmbracoVersion umbracoVersion,
             IContentSettings contentSettings,
             IHostingEnvironment hostingEnvironment,
-            IOptionsSnapshot<RuntimeSettings> runtimeSettings,
-            IOptionsSnapshot<SecuritySettings> securitySettings)
+            IRuntimeSettings settings,
+            ISecuritySettings securitySettings)
             : base(globalSettings, umbracoContextAccessor, services, appCaches, profilingLogger)
+
         {
             _features = features;
             _umbracoVersion = umbracoVersion;
             _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
             _hostingEnvironment = hostingEnvironment;
-            _runtimeSettings = runtimeSettings.Value;
-            _securitySettings = securitySettings.Value;
+            _runtimeSettings = settings;
+            _securitySettings = securitySettings;
         }
 
         protected BackOfficeSignInManager SignInManager => _signInManager ?? (_signInManager = OwinContext.GetBackOfficeSignInManager());

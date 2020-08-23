@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Web.Mvc;
-using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
 using Umbraco.Web.Models;
 
@@ -12,13 +10,13 @@ namespace Umbraco.Web.Mvc
     {
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly IIOHelper _ioHelper;
-        private readonly GlobalSettings _globalSettings;
+        private readonly IGlobalSettings _globalSettings;
 
-        public RenderNoContentController(IUmbracoContextAccessor umbracoContextAccessor, IIOHelper ioHelper, IOptionsSnapshot<GlobalSettings> globalSettings)
+        public RenderNoContentController(IUmbracoContextAccessor umbracoContextAccessor, IIOHelper ioHelper, IGlobalSettings globalSettings)
         {
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
             _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
-            _globalSettings = globalSettings.Value ?? throw new ArgumentNullException(nameof(globalSettings));
+            _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
         }
 
         public ActionResult Index()

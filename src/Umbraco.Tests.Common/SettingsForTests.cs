@@ -3,7 +3,7 @@ using Moq;
 using Semver;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.Configuration.Legacy;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models.PublishedContent;
@@ -16,23 +16,25 @@ namespace Umbraco.Tests.Common
         {
         }
 
-        public GlobalSettings GenerateStubGlobalSettings(IUmbracoVersion umbVersion = null)
+        public IGlobalSettings GenerateMockGlobalSettings(IUmbracoVersion umbVersion = null)
         {
             var semanticVersion = umbVersion?.SemanticVersion ?? new SemVersion(9);
 
-            var config = new GlobalSettings
-            {
-                UseHttps = false,
-                HideTopLevelNodeFromPath = false,
-                TimeOutInMinutes = 20,
-                DefaultUILanguage = "en",
-                ReservedPaths = (GlobalSettings.StaticReservedPaths + "~/umbraco"),
-                ReservedUrls = GlobalSettings.StaticReservedUrls,
-                UmbracoPath = "~/umbraco",
-                UmbracoMediaPath = "~/media",
-                UmbracoCssPath = "~/css",
-                UmbracoScriptsPath = "~/scripts",
-            };
+            var config = Mock.Of<IGlobalSettings>(
+                settings =>
+                    settings.UseHttps == false &&
+                    settings.HideTopLevelNodeFromPath == false &&
+                    settings.TimeOutInMinutes == 20 &&
+                    settings.DefaultUILanguage == "en" &&
+                    settings.ReservedPaths == (GlobalSettings.StaticReservedPaths + "~/umbraco") &&
+                    settings.ReservedUrls == GlobalSettings.StaticReservedUrls &&
+                    settings.UmbracoPath == "~/umbraco" &&
+                    settings.UmbracoMediaPath == "~/media" &&
+                    settings.UmbracoCssPath == "~/css" &&
+                    settings.UmbracoScriptsPath == "~/scripts"
+            );
+
+
 
             return config;
         }
@@ -102,15 +104,15 @@ namespace Umbraco.Tests.Common
             _defaultHostingSettings = null;
         }
 
-        private readonly Dictionary<SemVersion, GlobalSettings> _defaultGlobalSettings = new Dictionary<SemVersion, GlobalSettings>();
+        private readonly Dictionary<SemVersion, IGlobalSettings> _defaultGlobalSettings = new Dictionary<SemVersion, IGlobalSettings>();
         private IHostingSettings _defaultHostingSettings;
 
-        public GlobalSettings GetDefaultGlobalSettings(IUmbracoVersion umbVersion)
+        public IGlobalSettings GetDefaultGlobalSettings(IUmbracoVersion umbVersion)
         {
             if (_defaultGlobalSettings.TryGetValue(umbVersion.SemanticVersion, out var settings))
                 return settings;
 
-            settings = GenerateStubGlobalSettings(umbVersion);
+            settings = GenerateMockGlobalSettings(umbVersion);
             _defaultGlobalSettings[umbVersion.SemanticVersion] = settings;
             return settings;
         }

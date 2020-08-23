@@ -3,11 +3,9 @@ using System.Collections.Specialized;
 using System.IO;
 using ClientDependency.Core.CompositeFiles.Providers;
 using ClientDependency.Core.Config;
-using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Web.Runtime;
 
@@ -16,18 +14,18 @@ namespace Umbraco.Web.WebAssets.CDF
     [ComposeAfter(typeof(WebInitialComponent))]
     public sealed class ClientDependencyComponent : IComponent
     {
-        private readonly HostingSettings _hostingSettings;
+        private readonly IHostingSettings _hostingSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
-        private readonly RuntimeSettings _runtimeSettings;
+        private readonly IRuntimeSettings _settings;
 
         public ClientDependencyComponent(
-            IOptionsSnapshot<HostingSettings> hostingSettings,
+            IHostingSettings hostingSettings,
             IHostingEnvironment hostingEnvironment,
-            IOptionsSnapshot<RuntimeSettings> runtimeSettings)
+            IRuntimeSettings settings)
         {
-            _hostingSettings = hostingSettings.Value;
+            _hostingSettings = hostingSettings;
             _hostingEnvironment = hostingEnvironment;
-            _runtimeSettings = runtimeSettings.Value;
+            _settings = settings;
         }
 
         public void Initialize()
@@ -56,10 +54,10 @@ namespace Umbraco.Web.WebAssets.CDF
                     = Path.Combine(cachePath, "ClientDependency");
             }
 
-            if (_runtimeSettings.MaxQueryStringLength.HasValue || _runtimeSettings.MaxRequestLength.HasValue)
+            if (_settings.MaxQueryStringLength.HasValue || _settings.MaxRequestLength.HasValue)
             {
                 //set the max url length for CDF to be the smallest of the max query length, max request length
-                ClientDependency.Core.CompositeFiles.CompositeDependencyHandler.MaxHandlerUrlLength = Math.Min(_runtimeSettings.MaxQueryStringLength.GetValueOrDefault(), _runtimeSettings.MaxRequestLength.GetValueOrDefault());
+                ClientDependency.Core.CompositeFiles.CompositeDependencyHandler.MaxHandlerUrlLength = Math.Min(_settings.MaxQueryStringLength.GetValueOrDefault(), _settings.MaxRequestLength.GetValueOrDefault());
             }
 
             //Register a custom renderer - used to process property editor dependencies

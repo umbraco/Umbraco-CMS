@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Options;
-using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 using Umbraco.Web.Common.AspNetCore;
 using IHostingEnvironment = Umbraco.Core.Hosting.IHostingEnvironment;
 
@@ -9,7 +9,7 @@ namespace Umbraco.Tests.Integration.Implementations
 
     public class TestHostingEnvironment : AspNetCoreHostingEnvironment, IHostingEnvironment
     {
-        public TestHostingEnvironment(IOptionsSnapshot<HostingSettings> hostingSettings, IWebHostEnvironment webHostEnvironment)
+        public TestHostingEnvironment(IHostingSettings hostingSettings, IWebHostEnvironment webHostEnvironment)
             : base(hostingSettings, webHostEnvironment)
         {
         }

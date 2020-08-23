@@ -33,7 +33,6 @@ using Umbraco.Web;
 using Umbraco.Web.Hosting;
 using Umbraco.Web.Routing;
 using File = System.IO.File;
-using CoreDebugSettings = Umbraco.Core.Configuration.Models.CoreDebugSettings;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -58,7 +57,7 @@ namespace Umbraco.Tests.TestHelpers
 
             public override IBackOfficeInfo GetBackOfficeInfo()
                 => new AspNetBackOfficeInfo(
-                    SettingsForTests.GenerateStubGlobalSettings(GetUmbracoVersion()),
+                    SettingsForTests.GenerateMockGlobalSettings(GetUmbracoVersion()),
                     TestHelper.IOHelper, Mock.Of<ILogger>(), SettingsForTests.GenerateMockWebRoutingSettings());
 
             public override IHostingEnvironment GetHostingEnvironment()
@@ -95,7 +94,7 @@ namespace Umbraco.Tests.TestHelpers
         public static IDbProviderFactoryCreator DbProviderFactoryCreator => _testHelperInternal.DbProviderFactoryCreator;
         public static IBulkSqlInsertProvider BulkSqlInsertProvider => _testHelperInternal.BulkSqlInsertProvider;
         public static IMarchal Marchal => _testHelperInternal.Marchal;
-        public static CoreDebugSettings CoreDebugSettings => _testHelperInternal.CoreDebugSettings;
+        public static ICoreDebugSettings CoreDebugSettings => _testHelperInternal.CoreDebugSettings;
 
 
         public static IIOHelper IOHelper => _testHelperInternal.IOHelper;

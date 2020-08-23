@@ -18,7 +18,6 @@ using Umbraco.Core.Serialization;
 using Umbraco.Core.Strings;
 using Umbraco.Web;
 using Umbraco.Web.Routing;
-using CoreDebugSettings = Umbraco.Core.Configuration.Models.CoreDebugSettings;
 
 namespace Umbraco.Tests.Common
 {
@@ -83,14 +82,14 @@ namespace Umbraco.Tests.Common
         public abstract IDbProviderFactoryCreator DbProviderFactoryCreator { get; }
         public abstract IBulkSqlInsertProvider BulkSqlInsertProvider { get; }
         public abstract IMarchal Marchal { get; }
-        public CoreDebugSettings CoreDebugSettings { get; } =  new CoreDebugSettings();
+        public ICoreDebugSettings CoreDebugSettings { get; } =  new CoreDebugSettings();
 
         public IIOHelper IOHelper
         {
             get
             {
                 if (_ioHelper == null)
-                    _ioHelper = new IOHelper(GetHostingEnvironment(), SettingsForTests.GenerateStubGlobalSettings());
+                    _ioHelper = new IOHelper(GetHostingEnvironment(), SettingsForTests.GenerateMockGlobalSettings());
                 return _ioHelper;
             }
         }

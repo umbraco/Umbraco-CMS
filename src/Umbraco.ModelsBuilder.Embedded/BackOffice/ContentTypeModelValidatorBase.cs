@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using Microsoft.Extensions.Options;
+using Umbraco.Core.Configuration;
 using Umbraco.Core;
-using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Models.ContentEditing;
@@ -14,11 +13,11 @@ namespace Umbraco.ModelsBuilder.Embedded.BackOffice
         where TModel : ContentTypeSave<TProperty>
         where TProperty : PropertyTypeBasic
     {
-        private readonly ModelsBuilderConfig _config;
+        private readonly IModelsBuilderConfig _config;
 
-        public ContentTypeModelValidatorBase(IOptionsSnapshot<ModelsBuilderConfig> config)
+        public ContentTypeModelValidatorBase(IModelsBuilderConfig config)
         {
-            _config = config.Value;
+            _config = config;
         }
 
         protected override IEnumerable<ValidationResult> Validate(TModel model)

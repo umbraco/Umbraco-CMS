@@ -25,7 +25,7 @@ namespace Umbraco.Tests.Security
             var testHelper = new TestHelper();
 
             var httpContextAccessor = testHelper.GetHttpContextAccessor();
-            var globalSettings = testHelper.SettingsForTests.GenerateStubGlobalSettings();
+            var globalSettings = testHelper.SettingsForTests.GenerateMockGlobalSettings();
             
             var runtime = Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Install);
             var mgr = new BackOfficeCookieManager(
@@ -50,7 +50,7 @@ namespace Umbraco.Tests.Security
             //hostingEnvironment.ToAbsolute(globalSettings.UmbracoPath);
 
             var httpContextAccessor = testHelper.GetHttpContextAccessor();
-            var globalSettings = testHelper.SettingsForTests.GenerateStubGlobalSettings();
+            var globalSettings = testHelper.SettingsForTests.GenerateMockGlobalSettings();
             
             var runtime = Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Run);
             var mgr = new BackOfficeCookieManager(
@@ -72,7 +72,7 @@ namespace Umbraco.Tests.Security
             var testHelper = new TestHelper();
 
             var httpContextAccessor = testHelper.GetHttpContextAccessor();
-            var globalSettings = testHelper.SettingsForTests.GenerateStubGlobalSettings();
+            var globalSettings = testHelper.SettingsForTests.GenerateMockGlobalSettings();
 
             var runtime = Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Run);
             
@@ -97,7 +97,7 @@ namespace Umbraco.Tests.Security
             var testHelper = new TestHelper();
 
             var httpContextAccessor = testHelper.GetHttpContextAccessor();
-            var globalSettings = testHelper.SettingsForTests.GenerateStubGlobalSettings();
+            var globalSettings = testHelper.SettingsForTests.GenerateMockGlobalSettings();
 
             var runtime = Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Run);
 
@@ -119,7 +119,7 @@ namespace Umbraco.Tests.Security
             var testHelper = new TestHelper();
 
             var httpContextAccessor = testHelper.GetHttpContextAccessor();
-            var globalSettings = testHelper.SettingsForTests.GenerateStubGlobalSettings();
+            var globalSettings = testHelper.SettingsForTests.GenerateMockGlobalSettings();
 
             var runtime = Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Run);
 

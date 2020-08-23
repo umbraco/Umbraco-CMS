@@ -1,30 +1,35 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Collections.Generic;
+using System.Net.Mail;
 using System.Security.Principal;
 using System.Threading.Tasks;
+using System.Web;
 using System.Web.Http;
+using System.Web.Mvc;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Mapping;
-using Umbraco.Core.Persistence;
+using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models;
+using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
-using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
-using Constants = Umbraco.Core.Constants;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence;
 using IUser = Umbraco.Core.Models.Membership.IUser;
+using Umbraco.Core.Mapping;
+using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Hosting;
+using Umbraco.Extensions;
+using Umbraco.Web.Routing;
+using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Editors
 {
@@ -39,16 +44,16 @@ namespace Umbraco.Web.Editors
     {
         private BackOfficeOwinUserManager _userManager;
         private BackOfficeSignInManager _signInManager;
-        private readonly UserPasswordConfigurationSettings _passwordConfiguration;
+        private readonly IUserPasswordConfiguration _passwordConfiguration;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IRuntimeState _runtimeState;
-        private readonly SecuritySettings _securitySettings;
+        private readonly ISecuritySettings _securitySettings;
         private readonly IRequestAccessor _requestAccessor;
         private readonly IEmailSender _emailSender;
 
         public AuthenticationController(
-            IOptionsSnapshot<UserPasswordConfigurationSettings> passwordConfiguration,
-            IOptionsSnapshot<GlobalSettings> globalSettings,
+            IUserPasswordConfiguration passwordConfiguration,
+            IGlobalSettings globalSettings,
             IHostingEnvironment hostingEnvironment,
             IUmbracoContextAccessor umbracoContextAccessor,
             ISqlContext sqlContext,
@@ -57,16 +62,16 @@ namespace Umbraco.Web.Editors
             IProfilingLogger logger,
             IRuntimeState runtimeState,
             UmbracoMapper umbracoMapper,
-            IOptionsSnapshot<SecuritySettings> securitySettings,
+            ISecuritySettings securitySettings,
             IPublishedUrlProvider publishedUrlProvider,
             IRequestAccessor requestAccessor,
             IEmailSender emailSender)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoMapper, publishedUrlProvider)
         {
-            _passwordConfiguration = passwordConfiguration.Value ?? throw new ArgumentNullException(nameof(passwordConfiguration));
+            _passwordConfiguration = passwordConfiguration ?? throw new ArgumentNullException(nameof(passwordConfiguration));
             _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
             _runtimeState = runtimeState ?? throw new ArgumentNullException(nameof(runtimeState));
-            _securitySettings = securitySettings.Value ?? throw new ArgumentNullException(nameof(securitySettings));
+            _securitySettings = securitySettings ?? throw new ArgumentNullException(nameof(securitySettings));
             _requestAccessor = requestAccessor ?? throw new ArgumentNullException(nameof(securitySettings));
             _emailSender = emailSender;
         }

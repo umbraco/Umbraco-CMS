@@ -1,7 +1,5 @@
-﻿using Microsoft.Extensions.Options;
-using Umbraco.Core.Cache;
+﻿using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
@@ -23,7 +21,7 @@ namespace Umbraco.Web.Mvc
         {
         }
 
-        protected UmbracoAuthorizedController(IOptionsSnapshot<GlobalSettings> globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger)
+        protected UmbracoAuthorizedController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger)
             : base(globalSettings, umbracoContextAccessor, services, appCaches, profilingLogger)
         {
         }

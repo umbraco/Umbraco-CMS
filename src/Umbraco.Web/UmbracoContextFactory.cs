@@ -1,9 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Text;
-using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
@@ -22,7 +20,7 @@ namespace Umbraco.Web
         private readonly IVariationContextAccessor _variationContextAccessor;
         private readonly IDefaultCultureAccessor _defaultCultureAccessor;
 
-        private readonly GlobalSettings _globalSettings;
+        private readonly IGlobalSettings _globalSettings;
         private readonly IUserService _userService;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IHttpContextAccessor _httpContextAccessor;
@@ -37,7 +35,7 @@ namespace Umbraco.Web
             IPublishedSnapshotService publishedSnapshotService,
             IVariationContextAccessor variationContextAccessor,
             IDefaultCultureAccessor defaultCultureAccessor,
-            IOptionsSnapshot<GlobalSettings> globalSettings,
+            IGlobalSettings globalSettings,
             IUserService userService,
             IHostingEnvironment hostingEnvironment,
             UriUtility uriUtility,
@@ -48,7 +46,7 @@ namespace Umbraco.Web
             _publishedSnapshotService = publishedSnapshotService ?? throw new ArgumentNullException(nameof(publishedSnapshotService));
             _variationContextAccessor = variationContextAccessor ?? throw new ArgumentNullException(nameof(variationContextAccessor));
             _defaultCultureAccessor = defaultCultureAccessor ?? throw new ArgumentNullException(nameof(defaultCultureAccessor));
-            _globalSettings = globalSettings.Value ?? throw new ArgumentNullException(nameof(globalSettings));
+            _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _hostingEnvironment = hostingEnvironment;
             _uriUtility = uriUtility;

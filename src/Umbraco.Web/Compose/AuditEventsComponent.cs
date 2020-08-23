@@ -11,8 +11,6 @@ using Umbraco.Net;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Extensions;
-using Umbraco.Core.Configuration.Models;
-using Microsoft.Extensions.Options;
 
 namespace Umbraco.Core.Compose
 {
@@ -22,15 +20,15 @@ namespace Umbraco.Core.Compose
         private readonly IUserService _userService;
         private readonly IEntityService _entityService;
         private readonly IIpResolver _ipResolver;
-        private readonly GlobalSettings _globalSettings;
+        private readonly IGlobalSettings _globalSettings;
 
-        public AuditEventsComponent(IAuditService auditService, IUserService userService, IEntityService entityService, IIpResolver ipResolver, IOptionsSnapshot<GlobalSettings> globalSettings)
+        public AuditEventsComponent(IAuditService auditService, IUserService userService, IEntityService entityService, IIpResolver ipResolver, IGlobalSettings globalSettings)
         {
             _auditService = auditService;
             _userService = userService;
             _entityService = entityService;
             _ipResolver = ipResolver;
-            _globalSettings = globalSettings.Value;
+            _globalSettings = globalSettings;
         }
 
         public void Initialize()
@@ -51,7 +49,7 @@ namespace Umbraco.Core.Compose
         public void Terminate()
         { }
 
-        public static IUser UnknownUser(GlobalSettings globalSettings) => new User(globalSettings) { Id = Constants.Security.UnknownUserId, Name = Constants.Security.UnknownUserName, Email = "" };
+        public static IUser UnknownUser(IGlobalSettings globalSettings) => new User(globalSettings) { Id = Constants.Security.UnknownUserId, Name = Constants.Security.UnknownUserName, Email = "" };
 
         private IUser CurrentPerformingUser
         {

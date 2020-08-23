@@ -2,17 +2,16 @@
 using System.IO;
 using System.Text;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
 
 namespace Umbraco.ModelsBuilder.Embedded
 {
     public sealed class ModelsGenerationError
     {
-        private readonly ModelsBuilderConfig _config;
+        private readonly IModelsBuilderConfig _config;
         private readonly IIOHelper _ioHelper;
 
-        public ModelsGenerationError(ModelsBuilderConfig config, IIOHelper ioHelper)
+        public ModelsGenerationError(IModelsBuilderConfig config, IIOHelper ioHelper)
         {
             _config = config;
             _ioHelper = ioHelper;

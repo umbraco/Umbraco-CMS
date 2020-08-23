@@ -2,27 +2,27 @@ using System;
 using System.Reflection;
 using System.Web;
 using System.Web.Hosting;
-using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 
 namespace Umbraco.Web.Hosting
 {
     public class AspNetHostingEnvironment : IHostingEnvironment
     {
-        private readonly HostingSettings _hostingSettings;
+
+        private readonly IHostingSettings _hostingSettings;
         private string _localTempPath;
 
-        public AspNetHostingEnvironment(IOptionsSnapshot<HostingSettings> hostingSettings)
+
+        public AspNetHostingEnvironment(IHostingSettings hostingSettings)
         {
-            _hostingSettings = hostingSettings.Value ?? throw new ArgumentNullException(nameof(hostingSettings));
+            _hostingSettings = hostingSettings ?? throw new ArgumentNullException(nameof(hostingSettings));
             SiteName = HostingEnvironment.SiteName;
             ApplicationId = HostingEnvironment.ApplicationID;
             // when we are not hosted (i.e. unit test or otherwise) we'll need to get the root path from the executing assembly
             ApplicationPhysicalPath = HostingEnvironment.ApplicationPhysicalPath ?? Assembly.GetExecutingAssembly().GetRootDirectorySafe();
-            ApplicationVirtualPath = _hostingSettings.ApplicationVirtualPath?.EnsureStartsWith('/')
+            ApplicationVirtualPath = hostingSettings.ApplicationVirtualPath?.EnsureStartsWith('/')
                                      ?? HostingEnvironment.ApplicationVirtualPath?.EnsureStartsWith("/")
                                      ?? "/";
             IISVersion = HttpRuntime.IISVersion;

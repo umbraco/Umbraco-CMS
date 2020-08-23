@@ -8,7 +8,6 @@ using Microsoft.Owin.Security.DataProtection;
 using Umbraco.Core;
 using Umbraco.Core.BackOffice;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
@@ -21,7 +20,7 @@ namespace Umbraco.Web.Security
         public const string OwinMarkerKey = "Umbraco.Web.Security.Identity.BackOfficeUserManagerMarker";
 
         public BackOfficeOwinUserManager(
-            IOptions<UserPasswordConfigurationSettings> passwordConfiguration,
+            IUserPasswordConfiguration passwordConfiguration,
             IIpResolver ipResolver,
             IUserStore<BackOfficeIdentityUser> store,
             IOptions<BackOfficeIdentityOptions> optionsAccessor,
@@ -33,7 +32,7 @@ namespace Umbraco.Web.Security
             ILogger<UserManager<BackOfficeIdentityUser>> logger)
             : base(ipResolver, store, optionsAccessor, null, userValidators, passwordValidators, keyNormalizer, errors, null, logger, passwordConfiguration)
         {
-            PasswordConfiguration = passwordConfiguration.Value;
+            PasswordConfiguration = passwordConfiguration;
             InitUserManager(this, dataProtectionProvider);
         }
 
@@ -46,9 +45,9 @@ namespace Umbraco.Web.Security
             IUserService userService,
             IEntityService entityService,
             IExternalLoginService externalLoginService,
-            GlobalSettings globalSettings,
+            IGlobalSettings globalSettings,
             UmbracoMapper mapper,
-            UserPasswordConfigurationSettings passwordConfiguration,
+            IUserPasswordConfiguration passwordConfiguration,
             IIpResolver ipResolver,
             BackOfficeIdentityErrorDescriber errors,
             IDataProtectionProvider dataProtectionProvider,
@@ -69,7 +68,7 @@ namespace Umbraco.Web.Security
         /// Creates a BackOfficeUserManager instance with all default options and a custom BackOfficeUserManager instance
         /// </summary>
         public static BackOfficeOwinUserManager Create(
-            UserPasswordConfigurationSettings passwordConfiguration,
+            IUserPasswordConfiguration passwordConfiguration,
             IIpResolver ipResolver,
             IUserStore<BackOfficeIdentityUser> customUserStore,
             BackOfficeIdentityErrorDescriber errors,
@@ -104,7 +103,7 @@ namespace Umbraco.Web.Security
             options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromDays(30);
 
             return new BackOfficeOwinUserManager(
-                new OptionsWrapper<UserPasswordConfigurationSettings>(passwordConfiguration),
+                passwordConfiguration,
                 ipResolver,
                 customUserStore,
                 new OptionsWrapper<BackOfficeIdentityOptions>(options),

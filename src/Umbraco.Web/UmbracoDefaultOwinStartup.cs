@@ -1,19 +1,19 @@
 ﻿using System;
-using Microsoft.Extensions.Options;
 using Microsoft.Owin;
 using Owin;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Hosting;
+using Umbraco.Core.IO;
 using Umbraco.Core.Mapping;
-using Umbraco.Core.Services;
 using Umbraco.Net;
+using Umbraco.Core.Services;
 using Umbraco.Web;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Security;
+
 
 [assembly: OwinStartup("UmbracoDefaultOwinStartup", typeof(UmbracoDefaultOwinStartup))]
 
@@ -30,7 +30,7 @@ namespace Umbraco.Web
         protected IUmbracoContextAccessor UmbracoContextAccessor => Current.UmbracoContextAccessor;
         protected IGlobalSettings GlobalSettings => Current.Factory.GetInstance<IGlobalSettings>();
         protected IContentSettings ContentSettings => Current.Factory.GetInstance<IContentSettings>();
-        protected SecuritySettings SecuritySettings => Current.Factory.GetInstance<IOptionsSnapshot<SecuritySettings>>().Value;
+        protected ISecuritySettings SecuritySettings => Current.Factory.GetInstance<ISecuritySettings>();
         protected IUserPasswordConfiguration UserPasswordConfig => Current.Factory.GetInstance<IUserPasswordConfiguration>();
         protected IRuntimeState RuntimeState => Current.RuntimeState;
         protected ServiceContext Services => Current.Services;

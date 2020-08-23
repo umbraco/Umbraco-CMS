@@ -1,6 +1,5 @@
 ﻿using System.IO;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
 using Umbraco.Web.Cache;
 
@@ -8,10 +7,10 @@ namespace Umbraco.ModelsBuilder.Embedded
 {
     public sealed class OutOfDateModelsStatus
     {
-        private readonly ModelsBuilderConfig _config;
+        private readonly IModelsBuilderConfig _config;
         private readonly IIOHelper _ioHelper;
 
-        public OutOfDateModelsStatus(ModelsBuilderConfig config, IIOHelper ioHelper)
+        public OutOfDateModelsStatus(IModelsBuilderConfig config, IIOHelper ioHelper)
         {
             _config = config;
             _ioHelper = ioHelper;

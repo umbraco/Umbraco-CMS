@@ -1,5 +1,4 @@
 ﻿using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Configuration.UmbracoSettings;
 
 namespace Umbraco.Tests.TestHelpers
@@ -8,7 +7,7 @@ namespace Umbraco.Tests.TestHelpers
     {
         private static Common.SettingsForTests _settingsForTests = new Common.SettingsForTests();
 
-        public static IGlobalSettings GenerateMockGlobalSettings() => _settingsForTests.GenerateStubGlobalSettings(TestHelper.GetUmbracoVersion());
+        public static IGlobalSettings GenerateMockGlobalSettings() => _settingsForTests.GenerateMockGlobalSettings(TestHelper.GetUmbracoVersion());
 
         /// <summary>
         /// Returns generated settings which can be stubbed to return whatever values necessary
@@ -46,7 +45,7 @@ namespace Umbraco.Tests.TestHelpers
 
         public static void Reset() => _settingsForTests.Reset();
 
-        internal static GlobalSettings DefaultGlobalSettings => _settingsForTests.GetDefaultGlobalSettings(TestHelper.GetUmbracoVersion());
+        internal static IGlobalSettings DefaultGlobalSettings => _settingsForTests.GetDefaultGlobalSettings(TestHelper.GetUmbracoVersion());
 
         internal static IHostingSettings DefaultHostingSettings => _settingsForTests.DefaultHostingSettings;
 
