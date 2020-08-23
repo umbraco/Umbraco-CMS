@@ -16,6 +16,7 @@ using Umbraco.Core.Logging.Serilog;
 using Umbraco.Core.Logging.Serilog.Enrichers;
 using Umbraco.Net;
 using Umbraco.Web.AspNet;
+using Umbraco.Web.Configuration;
 using Umbraco.Web.Hosting;
 using Umbraco.Web.Logging;
 using Current = Umbraco.Web.Composing.Current;
@@ -44,7 +45,7 @@ namespace Umbraco.Web
                     Path.Combine(hostingEnvironment.ApplicationPhysicalPath, "App_Data\\Logs"),
                     Path.Combine(hostingEnvironment.ApplicationPhysicalPath, "config\\serilog.config"),
                     Path.Combine(hostingEnvironment.ApplicationPhysicalPath, "config\\serilog.user.config"));
-                var ioHelper = new IOHelper(hostingEnvironment, globalSettings);
+                var ioHelper = new IOHelper(hostingEnvironment);
                 var logger = SerilogLogger.CreateWithDefaultConfiguration(hostingEnvironment, loggingConfiguration);
 
                 var configs = configFactory.Create();
@@ -127,7 +128,7 @@ namespace Umbraco.Web
         /// </summary>
         protected virtual IRegister GetRegister(IGlobalSettings globalSettings)
         {
-            return RegisterFactory.Create(globalSettings);
+            return RegisterFactory.Create(ConfigModelConversions.ConvertGlobalSettings(globalSettings));
         }
 
         // events - in the order they trigger
@@ -160,7 +161,7 @@ namespace Umbraco.Web
 
 
             var globalSettings =  Umbraco.Composing.Current.Configs.Global();
-            var umbracoVersion = new UmbracoVersion(globalSettings);
+            var umbracoVersion = new UmbracoVersion(ConfigModelConversions.ConvertGlobalSettings(globalSettings));
 
             // create the register for the application, and boot
             // the boot manager is responsible for registrations

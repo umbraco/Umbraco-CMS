@@ -12,6 +12,7 @@ using Umbraco.Core.Security;
 using Umbraco.Web.Security;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
+using Umbraco.Web.Configuration;
 
 namespace Umbraco.Web.WebApi.Filters
 {
@@ -78,7 +79,7 @@ namespace Umbraco.Web.WebApi.Filters
                 () => user.Username != identity.Username,
                 () =>
                 {
-                    var culture = user.GetUserCulture(Current.Services.TextService, Current.Configs.Global());
+                    var culture = user.GetUserCulture(Current.Services.TextService, ConfigModelConversions.ConvertGlobalSettings(Current.Configs.Global()));
                     return culture != null && culture.ToString() != identity.Culture;
                 },
                 () => user.AllowedSections.UnsortedSequenceEqual(identity.AllowedApplications) == false,

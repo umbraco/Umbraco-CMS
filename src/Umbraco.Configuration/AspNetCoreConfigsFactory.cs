@@ -3,6 +3,7 @@ using Umbraco.Configuration.Models;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.HealthChecks;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using CoreDebugSettings = Umbraco.Configuration.Models.CoreDebugSettings;
 
 namespace Umbraco.Configuration
 {

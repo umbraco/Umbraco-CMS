@@ -4,6 +4,7 @@ using System.Web.Mvc;
 using Umbraco.Core;
 using Umbraco.Web.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Web.Configuration;
 using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Mvc
@@ -55,7 +56,7 @@ namespace Umbraco.Web.Mvc
         {
             if (redirectToUmbracoLogin)
             {
-                _redirectUrl = Current.Configs.Global().GetBackOfficePath(Current.HostingEnvironment).EnsureStartsWith("~");
+                _redirectUrl = ConfigModelConversions.ConvertGlobalSettings(Current.Configs.Global()).GetBackOfficePath(Current.HostingEnvironment).EnsureStartsWith("~");
             }
         }
 

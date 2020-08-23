@@ -11,6 +11,7 @@ using Umbraco.Net;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Extensions;
+using Umbraco.Web.Configuration;
 
 namespace Umbraco.Core.Compose
 {
@@ -49,7 +50,7 @@ namespace Umbraco.Core.Compose
         public void Terminate()
         { }
 
-        public static IUser UnknownUser(IGlobalSettings globalSettings) => new User(globalSettings) { Id = Constants.Security.UnknownUserId, Name = Constants.Security.UnknownUserName, Email = "" };
+        public static IUser UnknownUser(IGlobalSettings globalSettings) => new User(ConfigModelConversions.ConvertGlobalSettings(globalSettings)) { Id = Constants.Security.UnknownUserId, Name = Constants.Security.UnknownUserName, Email = "" };
 
         private IUser CurrentPerformingUser
         {

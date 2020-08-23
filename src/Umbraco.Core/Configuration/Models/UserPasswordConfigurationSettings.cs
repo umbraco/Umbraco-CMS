@@ -1,7 +1,4 @@
-﻿using Umbraco.Core;
-using Umbraco.Core.Configuration;
-
-namespace Umbraco.Core.Configuration.Models
+﻿namespace Umbraco.Core.Configuration.Models
 {
     public class UserPasswordConfigurationSettings : IPasswordConfiguration
     {

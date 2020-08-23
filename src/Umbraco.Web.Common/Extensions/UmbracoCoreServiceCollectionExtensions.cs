@@ -28,6 +28,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Runtime;
 using Umbraco.Web.Common.AspNetCore;
 using Umbraco.Web.Common.Profiler;
+using ConnectionStrings = Umbraco.Core.Configuration.Models.ConnectionStrings;
 using CoreDebugSettings = Umbraco.Core.Configuration.Models.CoreDebugSettings;
 
 namespace Umbraco.Extensions
@@ -124,6 +125,9 @@ namespace Umbraco.Extensions
             services.Configure<ModelsBuilderConfig>(configuration.GetSection(Constants.Configuration.ConfigModelsBuilderPrefix));
             services.Configure<ImagingSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "Imaging:"));
 
+            // TODO: HealthChecksSettings (+ one other?)
+
+            // TODO: remove this
             var configsFactory = new AspNetCoreConfigsFactory(configuration);
             var configs = configsFactory.Create();
             services.AddSingleton(configs);

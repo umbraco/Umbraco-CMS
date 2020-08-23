@@ -14,6 +14,7 @@ using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Web.Runtime;
+using Umbraco.Web.Configuration;
 
 namespace Umbraco.Web
 {
@@ -29,8 +30,8 @@ namespace Umbraco.Web
 
             var dbProviderFactoryCreator = new UmbracoDbProviderFactoryCreator();
 
-            var globalSettings = configs.Global();
-            var connectionStrings = configs.ConnectionStrings();
+            var globalSettings = ConfigModelConversions.ConvertGlobalSettings(configs.Global());
+            var connectionStrings = ConfigModelConversions.ConvertConnectionStrings(configs.ConnectionStrings());
 
             // Determine if we should use the sql main dom or the default
             var appSettingMainDomLock = globalSettings.MainDomLock;
@@ -44,7 +45,7 @@ namespace Umbraco.Web
 
             var requestCache = new HttpRequestAppCache(() => HttpContext.Current != null ? HttpContext.Current.Items : null);
             var umbracoBootPermissionChecker = new AspNetUmbracoBootPermissionChecker();
-            return new CoreRuntime(configs, umbracoVersion, ioHelper, logger, profiler, umbracoBootPermissionChecker, hostingEnvironment, backOfficeInfo, dbProviderFactoryCreator, mainDom,
+            return new CoreRuntime(globalSettings, connectionStrings, umbracoVersion, ioHelper, logger, profiler, umbracoBootPermissionChecker, hostingEnvironment, backOfficeInfo, dbProviderFactoryCreator, mainDom,
                 GetTypeFinder(hostingEnvironment, logger, profiler), requestCache);
         }
 

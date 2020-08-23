@@ -11,6 +11,7 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Security;
+using Umbraco.Web.Configuration;
 
 namespace Umbraco.Web.Security
 {
@@ -53,7 +54,7 @@ namespace Umbraco.Web.Security
 
             if (request.Uri.Scheme.InvariantStartsWith("http")
                 && request.Uri.AbsolutePath.InvariantEquals(
-                    $"{_globalSettings.GetBackOfficePath(_hostingEnvironment)}/backoffice/UmbracoApi/Authentication/GetRemainingTimeoutSeconds"))
+                    $"{ConfigModelConversions.ConvertGlobalSettings(_globalSettings).GetBackOfficePath(_hostingEnvironment)}/backoffice/UmbracoApi/Authentication/GetRemainingTimeoutSeconds"))
             {
                 var cookie = _authOptions.CookieManager.GetRequestCookie(context, _security.AuthCookieName);
                 if (cookie.IsNullOrWhiteSpace() == false)

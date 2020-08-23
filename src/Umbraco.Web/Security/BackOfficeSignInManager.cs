@@ -11,6 +11,7 @@ using Umbraco.Core;
 using Umbraco.Core.BackOffice;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.BackOffice;
+using Umbraco.Web.Configuration;
 
 namespace Umbraco.Web.Security
 {
@@ -78,7 +79,7 @@ namespace Umbraco.Web.Security
             var user = await _userManager.FindByNameAsync(userName);
 
             //if the user is null, create an empty one which can be used for auto-linking
-            if (user == null) user = BackOfficeIdentityUser.CreateNew(_globalSettings, userName, null, _globalSettings.DefaultUILanguage);
+            if (user == null) user = BackOfficeIdentityUser.CreateNew(ConfigModelConversions.ConvertGlobalSettings(_globalSettings), userName, null, _globalSettings.DefaultUILanguage);
 
             //check the password for the user, this will allow a developer to auto-link
             //an account if they have specified an IBackOfficeUserPasswordChecker

@@ -1,19 +1,21 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
 
 namespace Umbraco.ModelsBuilder.Embedded
 {
     public sealed class ModelsGenerationError
     {
-        private readonly IModelsBuilderConfig _config;
+        private readonly ModelsBuilderConfig _config;
         private readonly IIOHelper _ioHelper;
 
-        public ModelsGenerationError(IModelsBuilderConfig config, IIOHelper ioHelper)
+        public ModelsGenerationError(IOptionsSnapshot<ModelsBuilderConfig> config, IIOHelper ioHelper)
         {
-            _config = config;
+            _config = config.Value;
             _ioHelper = ioHelper;
         }
 

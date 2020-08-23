@@ -10,25 +10,15 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Compile Remove="Legacy\**" />
       <Compile Remove="obj\**" />
-      <Compile Remove="UmbracoSettings\**" />
     </ItemGroup>
 
     <ItemGroup>
-      <EmbeddedResource Remove="Legacy\**" />
       <EmbeddedResource Remove="obj\**" />
-      <EmbeddedResource Remove="UmbracoSettings\**" />
     </ItemGroup>
 
     <ItemGroup>
-      <None Remove="Legacy\**" />
       <None Remove="obj\**" />
-      <None Remove="UmbracoSettings\**" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Compile Remove="ConfigsFactory.cs" />
     </ItemGroup>
 
     <ItemGroup>

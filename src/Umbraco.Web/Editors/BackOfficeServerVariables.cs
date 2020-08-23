@@ -7,6 +7,7 @@ using System.Web;
 using System.Web.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Web.Configuration;
 using Umbraco.Web.Features;
 using Umbraco.Web.HealthCheck;
 using Umbraco.Web.Models.ContentEditing;
@@ -143,7 +144,7 @@ namespace Umbraco.Web.Editors
                 {
                     "umbracoSettings", new Dictionary<string, object>
                     {
-                        {"umbracoPath", _globalSettings.GetBackOfficePath(_hostingEnvironment)},
+                        {"umbracoPath", ConfigModelConversions.ConvertGlobalSettings(_globalSettings).GetBackOfficePath(_hostingEnvironment)},
                         {"mediaPath", _hostingEnvironment.ToAbsolute(globalSettings.UmbracoMediaPath).TrimEnd('/')},
                         {"appPluginsPath", _hostingEnvironment.ToAbsolute(Constants.SystemDirectories.AppPlugins).TrimEnd('/')},
                         {
@@ -167,8 +168,8 @@ namespace Umbraco.Web.Editors
                         {"cssPath", _hostingEnvironment.ToAbsolute(globalSettings.UmbracoCssPath).TrimEnd('/')},
                         {"allowPasswordReset", _securitySettings.AllowPasswordReset},
                         {"loginBackgroundImage", _contentSettings.LoginBackgroundImage},
-                        {"showUserInvite", EmailSender.CanSendRequiredEmail(globalSettings)},
-                        {"canSendRequiredEmail", EmailSender.CanSendRequiredEmail(globalSettings)},
+                        {"showUserInvite", EmailSender.CanSendRequiredEmail(ConfigModelConversions.ConvertGlobalSettings(globalSettings))},
+                        {"canSendRequiredEmail", EmailSender.CanSendRequiredEmail(ConfigModelConversions.ConvertGlobalSettings(globalSettings))},
                         {"showAllowSegmentationForDocumentTypes", false},
                     }
                 },

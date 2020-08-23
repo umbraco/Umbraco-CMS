@@ -148,6 +148,7 @@
     <Compile Include="Compose\BackOfficeUserAuditEventsComposer.cs" />
     <Compile Include="Compose\NestedContentPropertyComponent.cs" />
     <Compile Include="Composing\LightInject\LightInjectContainer.cs" />
+    <Compile Include="Configuration\ConfigModelConversions.cs" />
     <Compile Include="Editors\PasswordChanger.cs" />
     <Compile Include="HttpContextExtensions.cs" />
     <Compile Include="Macros\MacroRenderer.cs" />

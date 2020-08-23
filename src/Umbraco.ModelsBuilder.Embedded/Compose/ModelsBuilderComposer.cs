@@ -6,15 +6,22 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.ModelsBuilder.Embedded.Building;
+using Umbraco.Core.Configuration.Models;
+using Microsoft.Extensions.Options;
 
 namespace Umbraco.ModelsBuilder.Embedded.Compose
 {
-
-
     [ComposeBefore(typeof(IPublishedCacheComposer))]
     [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
     public sealed class ModelsBuilderComposer : ICoreComposer
     {
+        private readonly ModelsBuilderConfig _config;
+
+        public ModelsBuilderComposer(IOptionsSnapshot<ModelsBuilderConfig> config)
+        {
+            _config = config.Value;
+        }
+
         public void Compose(Composition composition)
         {
             var isLegacyModelsBuilderInstalled = IsLegacyModelsBuilderInstalled();
@@ -32,9 +39,9 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
             composition.RegisterUnique<OutOfDateModelsStatus>();
             composition.RegisterUnique<ModelsGenerationError>();
             
-            if (composition.Configs.ModelsBuilder().ModelsMode == ModelsMode.PureLive)
+            if (_config.ModelsMode == ModelsMode.PureLive)
                 ComposeForLiveModels(composition);
-            else if (composition.Configs.ModelsBuilder().EnableFactory)
+            else if (_config.EnableFactory)
                 ComposeForDefaultModelsFactory(composition);
         }
 
