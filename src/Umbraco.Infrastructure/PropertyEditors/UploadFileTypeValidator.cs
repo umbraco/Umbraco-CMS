@@ -23,7 +23,7 @@ namespace Umbraco.Web.PropertyEditors
             _contentSettings = contentSettings;
         }
 
-        public UploadFileTypeValidator(ILocalizedTextService localizedTextService, IOptionsSnapshot<ContentSettings> contentSettings)
+        public UploadFileTypeValidator(ILocalizedTextService localizedTextService, IOptions<ContentSettings> contentSettings)
             : this(localizedTextService, contentSettings.Value)
         {
         }

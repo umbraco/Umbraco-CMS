@@ -42,8 +42,8 @@ namespace Umbraco.Web.BackOffice.Security
 
         public ConfigureBackOfficeCookieOptions(
             IUmbracoContextAccessor umbracoContextAccessor,
-            IOptionsSnapshot<SecuritySettings> securitySettings,
-            IOptionsSnapshot<GlobalSettings> globalSettings,
+            IOptions<SecuritySettings> securitySettings,
+            IOptions<GlobalSettings> globalSettings,
             IHostingEnvironment hostingEnvironment,
             IRuntimeState runtimeState,
             IDataProtectionProvider dataProtection,

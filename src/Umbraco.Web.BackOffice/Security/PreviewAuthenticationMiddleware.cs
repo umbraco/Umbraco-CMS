@@ -21,7 +21,7 @@ namespace Umbraco.Web.BackOffice.Security
         private readonly IHostingEnvironment _hostingEnvironment;
 
         public PreviewAuthenticationMiddleware(
-            IOptionsSnapshot<GlobalSettings> globalSettings,
+            IOptions<GlobalSettings> globalSettings,
             IHostingEnvironment hostingEnvironment)
         {
             _globalSettings = globalSettings.Value;

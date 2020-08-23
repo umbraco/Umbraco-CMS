@@ -22,7 +22,7 @@ namespace Umbraco.Examine
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IndexCreatorSettings _settings;
 
-        protected LuceneIndexCreator(ITypeFinder typeFinder, IHostingEnvironment hostingEnvironment, IOptionsSnapshot<IndexCreatorSettings> settings)
+        protected LuceneIndexCreator(ITypeFinder typeFinder, IHostingEnvironment hostingEnvironment, IOptions<IndexCreatorSettings> settings)
         {
             _typeFinder = typeFinder;
             _hostingEnvironment = hostingEnvironment;

@@ -39,7 +39,7 @@ namespace Umbraco.Web.Common.Install
             IWebSecurity webSecurity,
             InstallHelper installHelper,
             IRuntimeState runtime,
-            IOptionsSnapshot<GlobalSettings> globalSettings,
+            IOptions<GlobalSettings> globalSettings,
             IRuntimeMinifier runtimeMinifier,
             IHostingEnvironment hostingEnvironment,
             IUmbracoVersion umbracoVersion,

@@ -19,7 +19,7 @@ namespace Umbraco.Web.Install.InstallSteps
         private readonly ILogger _logger;
         private readonly ConnectionStrings _connectionStrings;
 
-        public DatabaseConfigureStep(DatabaseBuilder databaseBuilder, IOptionsSnapshot<ConnectionStrings> connectionStrings)
+        public DatabaseConfigureStep(DatabaseBuilder databaseBuilder, IOptions<ConnectionStrings> connectionStrings)
         {
             _databaseBuilder = databaseBuilder;
             _connectionStrings = connectionStrings.Value ?? throw new ArgumentNullException(nameof(connectionStrings));

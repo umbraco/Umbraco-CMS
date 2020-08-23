@@ -47,8 +47,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             AppCaches appCaches,
             ILogger logger,
             IMapperCollection mapperCollection,
-            IOptionsSnapshot<GlobalSettings> globalSettings,
-            IOptionsSnapshot<UserPasswordConfigurationSettings> passwordConfiguration,
+            IOptions<GlobalSettings> globalSettings,
+            IOptions<UserPasswordConfigurationSettings> passwordConfiguration,
             IJsonSerializer jsonSerializer)
             : this(scopeAccessor, appCaches, logger, mapperCollection, globalSettings.Value, passwordConfiguration.Value, jsonSerializer)
         {

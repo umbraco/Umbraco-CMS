@@ -35,7 +35,7 @@ namespace Umbraco.Web.Routing
         /// <param name="publishedRouter">The published router.</param>
         /// <param name="umbracoContext">The Umbraco context.</param>
         /// <param name="uri">The request <c>Uri</c>.</param>
-        public PublishedRequest(IPublishedRouter publishedRouter, IUmbracoContext umbracoContext, IOptionsSnapshot<WebRoutingSettings> webRoutingSettings, Uri uri = null)
+        public PublishedRequest(IPublishedRouter publishedRouter, IUmbracoContext umbracoContext, IOptions<WebRoutingSettings> webRoutingSettings, Uri uri = null)
             : this(publishedRouter, umbracoContext, webRoutingSettings.Value, uri)
         {
         }

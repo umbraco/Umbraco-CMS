@@ -22,11 +22,11 @@ namespace Umbraco.Core
         private readonly GlobalSettings _globalSettings;
         private readonly bool _enableEvents;
 
-        public EmailSender(IOptionsSnapshot<GlobalSettings> globalSettings) : this(globalSettings, false)
+        public EmailSender(IOptions<GlobalSettings> globalSettings) : this(globalSettings, false)
         {
         }
 
-        public EmailSender(IOptionsSnapshot<GlobalSettings> globalSettings, bool enableEvents)
+        public EmailSender(IOptions<GlobalSettings> globalSettings, bool enableEvents)
             : this(globalSettings.Value, enableEvents)
         {
         }

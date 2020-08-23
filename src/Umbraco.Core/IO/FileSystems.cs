@@ -6,6 +6,8 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
+using Umbraco.Core.Configuration.Models;
+using Microsoft.Extensions.Options;
 
 namespace Umbraco.Core.IO
 {
@@ -36,12 +38,12 @@ namespace Umbraco.Core.IO
         #region Constructor
 
         // DI wants a public ctor
-        public FileSystems(IFactory container, ILogger logger, IIOHelper ioHelper, IGlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
+        public FileSystems(IFactory container, ILogger logger, IIOHelper ioHelper, IOptions<GlobalSettings> globalSettings, IHostingEnvironment hostingEnvironment)
         {
             _container = container;
             _logger = logger;
             _ioHelper = ioHelper;
-            _globalSettings = globalSettings;
+            _globalSettings = globalSettings.Value;
             _hostingEnvironment = hostingEnvironment;
         }
 
@@ -156,7 +158,7 @@ namespace Umbraco.Core.IO
 
         // internal for tests
         internal IReadOnlyDictionary<Type, string> Paths => _paths;
-        private IGlobalSettings _globalSettings;
+        private GlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
 
         /// <summary>

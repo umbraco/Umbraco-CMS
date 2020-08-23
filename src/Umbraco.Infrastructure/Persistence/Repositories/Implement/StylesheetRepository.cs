@@ -17,7 +17,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         private readonly IIOHelper _ioHelper;
         private readonly GlobalSettings _globalSettings;
 
-        public StylesheetRepository(IFileSystems fileSystems, IIOHelper ioHelper, IOptionsSnapshot<GlobalSettings> globalSettings)
+        public StylesheetRepository(IFileSystems fileSystems, IIOHelper ioHelper, IOptions<GlobalSettings> globalSettings)
             : base(fileSystems.StylesheetsFileSystem)
         {
             _ioHelper = ioHelper;

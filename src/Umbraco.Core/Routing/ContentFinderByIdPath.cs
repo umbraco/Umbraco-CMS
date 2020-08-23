@@ -21,7 +21,7 @@ namespace Umbraco.Web.Routing
         private readonly IRequestAccessor _requestAccessor;
         private readonly WebRoutingSettings _webRoutingSettings;
 
-        public ContentFinderByIdPath(IOptionsSnapshot<WebRoutingSettings> webRoutingSettings, ILogger logger, IRequestAccessor requestAccessor)
+        public ContentFinderByIdPath(IOptions<WebRoutingSettings> webRoutingSettings, ILogger logger, IRequestAccessor requestAccessor)
         {
             _webRoutingSettings = webRoutingSettings.Value ?? throw new System.ArgumentNullException(nameof(webRoutingSettings));
             _logger = logger ?? throw new System.ArgumentNullException(nameof(logger));

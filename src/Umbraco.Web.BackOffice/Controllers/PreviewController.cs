@@ -41,7 +41,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
         public PreviewController(
             UmbracoFeatures features,
-            IOptionsSnapshot<GlobalSettings> globalSettings,
+            IOptions<GlobalSettings> globalSettings,
             IPublishedSnapshotService publishedSnapshotService,
             IWebSecurity webSecurity,
             ILocalizationService localizationService,

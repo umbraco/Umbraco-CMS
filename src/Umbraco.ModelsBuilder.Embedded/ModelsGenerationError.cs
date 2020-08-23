@@ -13,7 +13,7 @@ namespace Umbraco.ModelsBuilder.Embedded
         private readonly ModelsBuilderConfig _config;
         private readonly IIOHelper _ioHelper;
 
-        public ModelsGenerationError(IOptionsSnapshot<ModelsBuilderConfig> config, IIOHelper ioHelper)
+        public ModelsGenerationError(IOptions<ModelsBuilderConfig> config, IIOHelper ioHelper)
         {
             _config = config.Value;
             _ioHelper = ioHelper;

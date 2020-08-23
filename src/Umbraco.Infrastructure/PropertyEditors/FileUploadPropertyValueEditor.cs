@@ -26,7 +26,7 @@ namespace Umbraco.Web.PropertyEditors
             ILocalizationService localizationService,
             ILocalizedTextService localizedTextService,
             IShortStringHelper shortStringHelper,
-            IOptionsSnapshot<ContentSettings> contentSettings)
+            IOptions<ContentSettings> contentSettings)
             : this(attribute, mediaFileSystem, dataTypeService, localizationService, localizedTextService, shortStringHelper, contentSettings.Value)
         {
         }

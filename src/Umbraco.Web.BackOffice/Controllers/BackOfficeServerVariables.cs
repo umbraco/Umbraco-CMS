@@ -46,14 +46,14 @@ namespace Umbraco.Web.BackOffice.Controllers
             LinkGenerator linkGenerator,
             IRuntimeState runtimeState,
             UmbracoFeatures features,
-            IOptionsSnapshot<GlobalSettings> globalSettings,
+            IOptions<GlobalSettings> globalSettings,
             IUmbracoVersion umbracoVersion,
-            IOptionsSnapshot<ContentSettings> contentSettings,
+            IOptions<ContentSettings> contentSettings,
             IHttpContextAccessor httpContextAccessor,
             TreeCollection treeCollection,
             IHostingEnvironment hostingEnvironment,
-            IOptionsSnapshot<RuntimeSettings> runtimeSettings,
-            IOptionsSnapshot<SecuritySettings> securitySettings,
+            IOptions<RuntimeSettings> runtimeSettings,
+            IOptions<SecuritySettings> securitySettings,
             IRuntimeMinifier runtimeMinifier,
             IAuthenticationSchemeProvider authenticationSchemeProvider)
         {

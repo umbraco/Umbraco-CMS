@@ -32,8 +32,8 @@ namespace Umbraco.Web.Install.InstallSteps
             IRuntimeState runtime,
             ILogger logger,
             IUmbracoVersion umbracoVersion,
-            IOptionsSnapshot<GlobalSettings> globalSettings,
-            IOptionsSnapshot<ConnectionStrings> connectionStrings,
+            IOptions<GlobalSettings> globalSettings,
+            IOptions<ConnectionStrings> connectionStrings,
             IIOHelper ioHelper,
             IConfigManipulator configManipulator)
         {

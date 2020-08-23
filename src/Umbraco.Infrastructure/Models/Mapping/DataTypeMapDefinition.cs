@@ -18,7 +18,7 @@ namespace Umbraco.Web.Models.Mapping
         private readonly ILogger _logger;
         private readonly ContentSettings _contentSettings;
 
-        public DataTypeMapDefinition(PropertyEditorCollection propertyEditors, ILogger logger, IOptionsSnapshot<ContentSettings> contentSettings)
+        public DataTypeMapDefinition(PropertyEditorCollection propertyEditors, ILogger logger, IOptions<ContentSettings> contentSettings)
         {
             _propertyEditors = propertyEditors;
             _logger = logger;

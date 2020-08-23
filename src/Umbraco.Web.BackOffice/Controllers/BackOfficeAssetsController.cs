@@ -19,7 +19,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     {
         private readonly IFileSystem _jsLibFileSystem;
 
-        public BackOfficeAssetsController(IIOHelper ioHelper, IHostingEnvironment hostingEnvironment, ILogger logger, IOptionsSnapshot<GlobalSettings> globalSettings)
+        public BackOfficeAssetsController(IIOHelper ioHelper, IHostingEnvironment hostingEnvironment, ILogger logger, IOptions<GlobalSettings> globalSettings)
         {
             _jsLibFileSystem = new PhysicalFileSystem(ioHelper, hostingEnvironment, logger, globalSettings.Value.UmbracoPath + Path.DirectorySeparatorChar + "lib");
         }

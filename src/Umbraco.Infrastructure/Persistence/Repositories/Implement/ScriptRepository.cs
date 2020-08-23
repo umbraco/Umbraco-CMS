@@ -18,7 +18,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         private readonly IIOHelper _ioHelper;
         private readonly GlobalSettings _globalSettings;
 
-        public ScriptRepository(IFileSystems fileSystems, IIOHelper ioHelper, IOptionsSnapshot<GlobalSettings> globalSettings)
+        public ScriptRepository(IFileSystems fileSystems, IIOHelper ioHelper, IOptions<GlobalSettings> globalSettings)
             : base(fileSystems.ScriptsFileSystem)
         {
             _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));

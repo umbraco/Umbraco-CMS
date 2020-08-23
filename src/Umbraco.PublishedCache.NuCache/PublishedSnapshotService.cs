@@ -87,14 +87,14 @@ namespace Umbraco.Web.PublishedCache.NuCache
             IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository,
             IDefaultCultureAccessor defaultCultureAccessor,
             IDataSource dataSource,
-            IOptionsSnapshot<GlobalSettings> globalSettings,
+            IOptions<GlobalSettings> globalSettings,
             IEntityXmlSerializer entitySerializer,
             IPublishedModelFactory publishedModelFactory,
             UrlSegmentProviderCollection urlSegmentProviders,
             IHostingEnvironment hostingEnvironment,
             IShortStringHelper shortStringHelper,
             IIOHelper ioHelper,
-            IOptionsSnapshot<NuCacheSettings> config)
+            IOptions<NuCacheSettings> config)
             : base(publishedSnapshotAccessor, variationContextAccessor)
         {
             //if (Interlocked.Increment(ref _singletonCheck) > 1)

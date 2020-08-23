@@ -28,7 +28,7 @@ namespace Umbraco.Core.Services.Implement
         private readonly bool _isUpgrading;
 
         public UserService(IScopeProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory, IRuntimeState runtimeState,
-            IUserRepository userRepository, IUserGroupRepository userGroupRepository, IOptionsSnapshot<GlobalSettings> globalSettings)
+            IUserRepository userRepository, IUserGroupRepository userGroupRepository, IOptions<GlobalSettings> globalSettings)
             : base(provider, logger, eventMessagesFactory)
         {
             _userRepository = userRepository;

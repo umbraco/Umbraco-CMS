@@ -39,9 +39,9 @@ namespace Umbraco.Web.Install.InstallSteps
         public NewInstallStep(
             IUserService userService,
             DatabaseBuilder databaseBuilder,
-            IOptionsSnapshot<UserPasswordConfigurationSettings> passwordConfiguration,
-            IOptionsSnapshot<SecuritySettings> securitySettings,
-            IOptionsSnapshot<ConnectionStrings> connectionStrings,
+            IOptions<UserPasswordConfigurationSettings> passwordConfiguration,
+            IOptions<SecuritySettings> securitySettings,
+            IOptions<ConnectionStrings> connectionStrings,
             ICookieManager cookieManager,
             BackOfficeUserManager userManager)
         {

@@ -25,8 +25,8 @@ namespace Umbraco.Web.Common.AspNetCore
 
         private IUmbracoContext _umbracoContext;
         private IUmbracoContextAccessor UmbracoContextAccessor => Context.RequestServices.GetRequiredService<IUmbracoContextAccessor>();
-        private GlobalSettings GlobalSettings => Context.RequestServices.GetRequiredService<IOptionsSnapshot<GlobalSettings>>().Value;
-        private ContentSettings ContentSettings => Context.RequestServices.GetRequiredService<IOptionsSnapshot<ContentSettings>>().Value;
+        private GlobalSettings GlobalSettings => Context.RequestServices.GetRequiredService<IOptions<GlobalSettings>>().Value;
+        private ContentSettings ContentSettings => Context.RequestServices.GetRequiredService<IOptions<ContentSettings>>().Value;
         private IProfilerHtml ProfilerHtml => Context.RequestServices.GetRequiredService<IProfilerHtml>();
         private IIOHelper IOHelper => Context.RequestServices.GetRequiredService<IIOHelper>();
 

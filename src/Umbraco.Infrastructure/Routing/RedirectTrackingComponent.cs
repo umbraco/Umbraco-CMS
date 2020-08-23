@@ -31,7 +31,7 @@ namespace Umbraco.Web.Routing
         private readonly IRedirectUrlService _redirectUrlService;
         private readonly IVariationContextAccessor _variationContextAccessor;
 
-        public RedirectTrackingComponent(IOptionsSnapshot<WebRoutingSettings> webRoutingSettings, IPublishedSnapshotAccessor publishedSnapshotAccessor, IRedirectUrlService redirectUrlService, IVariationContextAccessor variationContextAccessor)
+        public RedirectTrackingComponent(IOptions<WebRoutingSettings> webRoutingSettings, IPublishedSnapshotAccessor publishedSnapshotAccessor, IRedirectUrlService redirectUrlService, IVariationContextAccessor variationContextAccessor)
         {
             _webRoutingSettings = webRoutingSettings.Value;
             _publishedSnapshotAccessor = publishedSnapshotAccessor;

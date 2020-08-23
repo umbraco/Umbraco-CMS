@@ -23,7 +23,7 @@ namespace Umbraco.Web.BackOffice.Routing
         private readonly string _umbracoPathSegment;
 
         public BackOfficeAreaRoutes(
-            IOptionsSnapshot<GlobalSettings> globalSettings,
+            IOptions<GlobalSettings> globalSettings,
             IHostingEnvironment hostingEnvironment,
             IRuntimeState runtimeState,
             UmbracoApiControllerTypeCollection apiControllers)

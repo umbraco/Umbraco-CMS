@@ -38,7 +38,7 @@ namespace Umbraco.Web.Models.Mapping
             IMemberTypeService memberTypeService,
             IMemberService memberService,
             IMemberGroupService memberGroupService,
-            IOptionsSnapshot<MemberPasswordConfigurationSettings> memberPasswordConfiguration,
+            IOptions<MemberPasswordConfigurationSettings> memberPasswordConfiguration,
             IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
             PropertyEditorCollection propertyEditorCollection)
             : base(cultureDictionary, localizedTextService, contentTypeBaseServiceProvider)

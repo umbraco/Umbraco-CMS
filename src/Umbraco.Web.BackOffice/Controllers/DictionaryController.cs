@@ -43,7 +43,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             ILogger logger,
             ILocalizationService localizationService,
             IWebSecurity webSecurity,
-            IOptionsSnapshot<GlobalSettings> globalSettings,
+            IOptions<GlobalSettings> globalSettings,
             ILocalizedTextService localizedTextService,
             UmbracoMapper umbracoMapper
             )

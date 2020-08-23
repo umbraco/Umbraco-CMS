@@ -36,7 +36,7 @@ namespace Umbraco.Web.WebAssets
             IManifestParser parser,
             PropertyEditorCollection propertyEditorCollection,
             IHostingEnvironment hostingEnvironment,
-            IOptionsSnapshot<GlobalSettings> globalSettings)
+            IOptions<GlobalSettings> globalSettings)
         {
             _runtimeMinifier = runtimeMinifier;
             _parser = parser;

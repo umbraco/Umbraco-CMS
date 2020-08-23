@@ -38,7 +38,7 @@ namespace Umbraco.Web.Routing
         /// Initializes a new instance of the <see cref="PublishedRouter"/> class.
         /// </summary>
         public PublishedRouter(
-            IOptionsSnapshot<WebRoutingSettings> webRoutingSettings,
+            IOptions<WebRoutingSettings> webRoutingSettings,
             ContentFinderCollection contentFinders,
             IContentLastChanceFinder contentLastChanceFinder,
             IVariationContextAccessor variationContextAccessor,

@@ -19,7 +19,7 @@ namespace Umbraco.Infrastructure.Logging.Serilog.Enrichers
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IMarchal _marchal;
 
-        public ThreadAbortExceptionEnricher(IOptionsSnapshot<CoreDebugSettings> coreDebugSettings, IHostingEnvironment hostingEnvironment, IMarchal marchal)
+        public ThreadAbortExceptionEnricher(IOptions<CoreDebugSettings> coreDebugSettings, IHostingEnvironment hostingEnvironment, IMarchal marchal)
         {
             _coreDebugSettings = coreDebugSettings.Value;
             _hostingEnvironment = hostingEnvironment;

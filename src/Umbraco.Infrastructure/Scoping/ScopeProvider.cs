@@ -28,7 +28,7 @@ namespace Umbraco.Core.Scoping
         private readonly CoreDebugSettings _coreDebugSettings;
         private readonly IMediaFileSystem _mediaFileSystem;
 
-        public ScopeProvider(IUmbracoDatabaseFactory databaseFactory, FileSystems fileSystems, IOptionsSnapshot<CoreDebugSettings> coreDebugSettings, IMediaFileSystem mediaFileSystem, ILogger logger, ITypeFinder typeFinder, IRequestCache requestCache)
+        public ScopeProvider(IUmbracoDatabaseFactory databaseFactory, FileSystems fileSystems, IOptions<CoreDebugSettings> coreDebugSettings, IMediaFileSystem mediaFileSystem, ILogger logger, ITypeFinder typeFinder, IRequestCache requestCache)
             :this(databaseFactory, fileSystems, coreDebugSettings.Value, mediaFileSystem, logger, typeFinder, requestCache)
         {
         }

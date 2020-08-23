@@ -20,7 +20,7 @@ namespace Umbraco.Web.Scheduling
         private static HttpClient _httpClient;
 
         public KeepAlive(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
-            IRequestAccessor requestAccessor, IMainDom mainDom, IOptionsSnapshot<KeepAliveSettings> keepAliveSettings, IProfilingLogger logger, IServerRegistrar serverRegistrar)
+            IRequestAccessor requestAccessor, IMainDom mainDom, IOptions<KeepAliveSettings> keepAliveSettings, IProfilingLogger logger, IServerRegistrar serverRegistrar)
             : this(runner, delayMilliseconds, periodMilliseconds, requestAccessor, mainDom, keepAliveSettings.Value, logger, serverRegistrar)
         {
         }

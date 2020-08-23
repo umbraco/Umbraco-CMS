@@ -27,7 +27,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         public TourController(
             TourFilterCollection filters,
             IHostingEnvironment hostingEnvironment,
-            IOptionsSnapshot<TourSettings> tourSettings,
+            IOptions<TourSettings> tourSettings,
             IWebSecurity webSecurity,
             IContentTypeService contentTypeService)
         {

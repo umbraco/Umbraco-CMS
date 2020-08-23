@@ -30,7 +30,7 @@ namespace Umbraco.Web.BackOffice.Filters
     {
         private readonly GlobalSettings _globalSettings;
 
-        public UmbracoWebApiRequireHttpsFilter(IOptionsSnapshot<GlobalSettings> globalSettings)
+        public UmbracoWebApiRequireHttpsFilter(IOptions<GlobalSettings> globalSettings)
         {
             _globalSettings = globalSettings.Value;
         }

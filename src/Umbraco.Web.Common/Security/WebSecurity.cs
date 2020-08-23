@@ -22,7 +22,7 @@ namespace Umbraco.Web.Common.Security
 
         public WebSecurity(
             IUserService userService,
-            IOptionsSnapshot<GlobalSettings> globalSettings,
+            IOptions<GlobalSettings> globalSettings,
             IHostingEnvironment hostingEnvironment,
             IHttpContextAccessor httpContextAccessor)
         {

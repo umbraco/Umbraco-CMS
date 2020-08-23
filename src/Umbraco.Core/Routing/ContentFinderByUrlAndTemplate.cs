@@ -23,7 +23,7 @@ namespace Umbraco.Web.Routing
         private readonly IContentTypeService _contentTypeService;
         private readonly WebRoutingSettings _webRoutingSettings;
 
-        public ContentFinderByUrlAndTemplate(ILogger logger, IFileService fileService, IContentTypeService contentTypeService, IOptionsSnapshot<WebRoutingSettings> webRoutingSettings)
+        public ContentFinderByUrlAndTemplate(ILogger logger, IFileService fileService, IContentTypeService contentTypeService, IOptions<WebRoutingSettings> webRoutingSettings)
             : base(logger)
         {
             _fileService = fileService;

@@ -41,7 +41,7 @@ namespace Umbraco.Extensions
 
             // TODO: We need to avoid this, surely there's a way? See ContainerTests.BuildServiceProvider_Before_Host_Is_Configured
             var serviceProvider = services.BuildServiceProvider();
-            var imagingSettings = serviceProvider.GetService<IOptionsSnapshot<ImagingSettings>>().Value;
+            var imagingSettings = serviceProvider.GetService<IOptions<ImagingSettings>>().Value;
             services.AddUmbracoImageSharp(imagingSettings);
 
             return services;

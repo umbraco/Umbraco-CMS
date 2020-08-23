@@ -25,7 +25,7 @@ namespace Umbraco.Web.Install
         private readonly IIOHelper _ioHelper;
         private readonly IPublishedSnapshotService _publishedSnapshotService;
 
-        public FilePermissionHelper(IOptionsSnapshot<GlobalSettings> globalSettings, IIOHelper ioHelper, IPublishedSnapshotService publishedSnapshotService)
+        public FilePermissionHelper(IOptions<GlobalSettings> globalSettings, IIOHelper ioHelper, IPublishedSnapshotService publishedSnapshotService)
         {
             _globalSettings = globalSettings.Value;
             _ioHelper = ioHelper;

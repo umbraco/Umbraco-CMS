@@ -63,7 +63,7 @@ namespace Umbraco.Core.Packaging
             IHostingEnvironment hostingEnvironment,
             IEntityXmlSerializer serializer, ILogger logger,
             IUmbracoVersion umbracoVersion,
-            IOptionsSnapshot<GlobalSettings> globalSettings,
+            IOptions<GlobalSettings> globalSettings,
             string packageRepositoryFileName,
             string tempFolderPath = null, string packagesFolderPath = null, string mediaFolderPath = null)
         {

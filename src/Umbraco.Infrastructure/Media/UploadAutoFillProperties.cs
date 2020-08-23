@@ -24,7 +24,7 @@ namespace Umbraco.Web.Media
         public UploadAutoFillProperties(
             IMediaFileSystem mediaFileSystem,
             ILogger logger,
-            IOptionsSnapshot<ContentSettings> contentSettings)
+            IOptions<ContentSettings> contentSettings)
             : this(mediaFileSystem, logger, contentSettings.Value)
         {
         }

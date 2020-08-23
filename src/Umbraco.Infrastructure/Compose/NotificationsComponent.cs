@@ -174,7 +174,7 @@ namespace Umbraco.Web.Compose
                 INotificationService notificationService,
                 IUserService userService,
                 ILocalizedTextService textService,
-                IOptionsSnapshot<GlobalSettings> globalSettings,
+                IOptions<GlobalSettings> globalSettings,
                 ILogger logger)
             {
                 _umbracoContextAccessor = umbracoContextAccessor;

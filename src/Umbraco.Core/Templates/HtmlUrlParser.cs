@@ -15,7 +15,7 @@ namespace Umbraco.Web.Templates
         private static readonly Regex ResolveUrlPattern = new Regex("(=[\"\']?)(\\W?\\~(?:.(?![\"\']?\\s+(?:\\S+)=|[>\"\']))+.)[\"\']?",
             RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
 
-        public HtmlUrlParser(IOptionsSnapshot<ContentSettings> contentSettings, IProfilingLogger logger, IIOHelper ioHelper)
+        public HtmlUrlParser(IOptions<ContentSettings> contentSettings, IProfilingLogger logger, IIOHelper ioHelper)
         {
             _contentSettings = contentSettings.Value;
             _ioHelper = ioHelper;

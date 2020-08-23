@@ -99,7 +99,7 @@ namespace Umbraco.Core.Composing.CompositionExtensions
                 var ioHelper = factory.GetInstance<IIOHelper>();
                 var hostingEnvironment = factory.GetInstance<IHostingEnvironment>();
                 var logger = factory.GetInstance<ILogger>();
-                var globalSettings = factory.GetInstance<IOptionsSnapshot<GlobalSettings>>().Value;
+                var globalSettings = factory.GetInstance<IOptions<GlobalSettings>>().Value;
 
                 var rootPath = hostingEnvironment.MapPathWebRoot(globalSettings.UmbracoMediaPath);
                 var rootUrl = hostingEnvironment.ToAbsolute(globalSettings.UmbracoMediaPath);

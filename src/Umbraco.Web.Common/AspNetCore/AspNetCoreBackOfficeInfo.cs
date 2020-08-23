@@ -6,7 +6,7 @@ namespace Umbraco.Web.Common.AspNetCore
 {
     public class AspNetCoreBackOfficeInfo : IBackOfficeInfo
     {
-        public AspNetCoreBackOfficeInfo(IOptionsSnapshot<GlobalSettings> globalSettings)
+        public AspNetCoreBackOfficeInfo(IOptions<GlobalSettings> globalSettings)
             : this(globalSettings.Value)
         {
         }

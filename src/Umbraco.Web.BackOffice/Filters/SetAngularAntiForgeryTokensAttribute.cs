@@ -23,7 +23,7 @@ namespace Umbraco.Extensions
             private readonly IBackOfficeAntiforgery _antiforgery;
             private readonly GlobalSettings _globalSettings;
 
-            public SetAngularAntiForgeryTokensFilter(IBackOfficeAntiforgery antiforgery, IOptionsSnapshot<GlobalSettings> globalSettings)
+            public SetAngularAntiForgeryTokensFilter(IBackOfficeAntiforgery antiforgery, IOptions<GlobalSettings> globalSettings)
             {
                 _antiforgery = antiforgery;
                 _globalSettings = globalSettings.Value;

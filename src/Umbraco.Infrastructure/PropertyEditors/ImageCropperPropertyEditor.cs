@@ -43,7 +43,7 @@ namespace Umbraco.Web.PropertyEditors
         public ImageCropperPropertyEditor(
             ILogger logger,
             IMediaFileSystem mediaFileSystem,
-            IOptionsSnapshot<ContentSettings> contentSettings,
+            IOptions<ContentSettings> contentSettings,
             IDataTypeService dataTypeService,
             ILocalizationService localizationService,
             IIOHelper ioHelper,

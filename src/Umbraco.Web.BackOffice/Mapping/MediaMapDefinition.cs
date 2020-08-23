@@ -26,7 +26,7 @@ namespace Umbraco.Web.Models.Mapping
         private readonly ContentSettings _contentSettings;
 
         public MediaMapDefinition(ICultureDictionary cultureDictionary, CommonMapper commonMapper, CommonTreeNodeMapper commonTreeNodeMapper, IMediaService mediaService, IMediaTypeService mediaTypeService,
-            ILocalizedTextService localizedTextService, MediaUrlGeneratorCollection mediaUrlGenerators, IOptionsSnapshot<ContentSettings> contentSettings, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider)
+            ILocalizedTextService localizedTextService, MediaUrlGeneratorCollection mediaUrlGenerators, IOptions<ContentSettings> contentSettings, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider)
         {
             _commonMapper = commonMapper;
             _commonTreeNodeMapper = commonTreeNodeMapper;

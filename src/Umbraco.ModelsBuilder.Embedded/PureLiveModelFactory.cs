@@ -51,7 +51,7 @@ namespace Umbraco.ModelsBuilder.Embedded
         public PureLiveModelFactory(
             Lazy<UmbracoServices> umbracoServices,
             IProfilingLogger logger,
-            IOptionsSnapshot<ModelsBuilderConfig> config,
+            IOptions<ModelsBuilderConfig> config,
             IHostingEnvironment hostingEnvironment,
             IApplicationShutdownRegistry hostingLifetime,
             IIOHelper ioHelper)

@@ -37,7 +37,7 @@ namespace Umbraco.Web.Macros
         public MacroRenderer(
             IProfilingLogger plogger,
             IUmbracoContextAccessor umbracoContextAccessor,
-            IOptionsSnapshot<ContentSettings> contentSettings,
+            IOptions<ContentSettings> contentSettings,
             ILocalizedTextService textService,
             AppCaches appCaches,
             IMacroService macroService,

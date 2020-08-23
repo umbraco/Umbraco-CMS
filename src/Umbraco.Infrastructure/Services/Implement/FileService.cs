@@ -40,7 +40,7 @@ namespace Umbraco.Core.Services.Implement
         public FileService(IScopeProvider uowProvider, ILogger logger, IEventMessagesFactory eventMessagesFactory,
             IStylesheetRepository stylesheetRepository, IScriptRepository scriptRepository, ITemplateRepository templateRepository,
             IPartialViewRepository partialViewRepository, IPartialViewMacroRepository partialViewMacroRepository,
-            IAuditRepository auditRepository, IShortStringHelper shortStringHelper, IOptionsSnapshot<GlobalSettings> globalSettings, IHostingEnvironment hostingEnvironment)
+            IAuditRepository auditRepository, IShortStringHelper shortStringHelper, IOptions<GlobalSettings> globalSettings, IHostingEnvironment hostingEnvironment)
             : base(uowProvider, logger, eventMessagesFactory)
         {
             _stylesheetRepository = stylesheetRepository;

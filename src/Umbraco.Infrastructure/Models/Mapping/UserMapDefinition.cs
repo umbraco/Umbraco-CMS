@@ -37,7 +37,7 @@ namespace Umbraco.Web.Models.Mapping
         private readonly IImageUrlGenerator _imageUrlGenerator;
 
         public UserMapDefinition(ILocalizedTextService textService, IUserService userService, IEntityService entityService, ISectionService sectionService,
-            AppCaches appCaches, ActionCollection actions, IOptionsSnapshot<GlobalSettings> globalSettings, IMediaFileSystem mediaFileSystem, IShortStringHelper shortStringHelper,
+            AppCaches appCaches, ActionCollection actions, IOptions<GlobalSettings> globalSettings, IMediaFileSystem mediaFileSystem, IShortStringHelper shortStringHelper,
             IImageUrlGenerator imageUrlGenerator)
         {
             _sectionService = sectionService;

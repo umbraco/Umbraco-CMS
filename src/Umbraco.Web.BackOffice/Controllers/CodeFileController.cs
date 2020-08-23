@@ -48,7 +48,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             ILocalizedTextService localizedTextService,
             UmbracoMapper umbracoMapper,
             IShortStringHelper shortStringHelper,
-            IOptionsSnapshot<GlobalSettings> globalSettings)
+            IOptions<GlobalSettings> globalSettings)
         {
             _ioHelper = ioHelper;
             _fileSystems = fileSystems;

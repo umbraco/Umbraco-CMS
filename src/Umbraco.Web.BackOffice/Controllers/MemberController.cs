@@ -63,7 +63,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             IShortStringHelper shortStringHelper,
             IEventMessagesFactory eventMessages,
             ILocalizedTextService localizedTextService,
-            IOptionsSnapshot<MemberPasswordConfigurationSettings> passwordConfig,
+            IOptions<MemberPasswordConfigurationSettings> passwordConfig,
             PropertyEditorCollection propertyEditors,
             LegacyPasswordSecurity passwordSecurity,
             UmbracoMapper umbracoMapper,

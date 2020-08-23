@@ -32,7 +32,7 @@ namespace Umbraco.Core.Services.Implement
         private readonly IIOHelper _ioHelper;
 
         public NotificationService(IScopeProvider provider, IUserService userService, IContentService contentService, ILocalizationService localizationService,
-            ILogger logger, IIOHelper ioHelper, INotificationsRepository notificationsRepository, IOptionsSnapshot<GlobalSettings> globalSettings, IOptionsSnapshot<ContentSettings> contentSettings)
+            ILogger logger, IIOHelper ioHelper, INotificationsRepository notificationsRepository, IOptions<GlobalSettings> globalSettings, IOptions<ContentSettings> contentSettings)
             : this(provider, userService, contentService, localizationService, logger, ioHelper, notificationsRepository, globalSettings.Value, contentSettings.Value)
         {
         }

@@ -33,7 +33,7 @@ namespace Umbraco.Web.PropertyEditors
         public FileUploadPropertyEditor(
             ILogger logger,
             IMediaFileSystem mediaFileSystem,
-            IOptionsSnapshot<ContentSettings> contentSettings,
+            IOptions<ContentSettings> contentSettings,
             IDataTypeService dataTypeService,
             ILocalizationService localizationService,
             ILocalizedTextService localizedTextService,

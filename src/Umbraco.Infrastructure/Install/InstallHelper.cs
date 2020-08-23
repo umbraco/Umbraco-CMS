@@ -35,7 +35,7 @@ namespace Umbraco.Web.Install
         public InstallHelper(DatabaseBuilder databaseBuilder,
             ILogger logger,
             IUmbracoVersion umbracoVersion,
-            IOptionsSnapshot<ConnectionStrings> connectionStrings,
+            IOptions<ConnectionStrings> connectionStrings,
             IInstallationService installationService,
             ICookieManager cookieManager,
             IUserAgentProvider userAgentProvider,

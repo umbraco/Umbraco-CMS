@@ -16,7 +16,7 @@ namespace Umbraco.Web.BackOffice.Security
     {
         private readonly UserPasswordConfigurationSettings _userPasswordConfiguration;
 
-        public ConfigureBackOfficeIdentityOptions(IOptionsSnapshot<UserPasswordConfigurationSettings> userPasswordConfiguration)
+        public ConfigureBackOfficeIdentityOptions(IOptions<UserPasswordConfigurationSettings> userPasswordConfiguration)
         {
             _userPasswordConfiguration = userPasswordConfiguration.Value;
         }

@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Options;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
 
@@ -11,7 +10,7 @@ namespace Umbraco.Core.Runtime
         private readonly IIOHelper _ioHelper;
         private readonly GlobalSettings _globalSettings;
 
-        public CoreInitialComponent(IIOHelper ioHelper, IOptionsSnapshot<GlobalSettings> globalSettings)
+        public CoreInitialComponent(IIOHelper ioHelper, IOptions<GlobalSettings> globalSettings)
         {
             _ioHelper = ioHelper;
             _globalSettings = globalSettings.Value;

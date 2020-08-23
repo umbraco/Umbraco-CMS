@@ -97,7 +97,7 @@ namespace Umbraco.Web.Common.Runtime
 
             composition.RegisterUnique<ITemplateRenderer, TemplateRenderer>();
             composition.RegisterUnique<IPublicAccessChecker, PublicAccessChecker>();
-            composition.RegisterUnique(factory => new LegacyPasswordSecurity(factory.GetInstance<IOptionsSnapshot<UserPasswordConfigurationSettings>>().Value));
+            composition.RegisterUnique(factory => new LegacyPasswordSecurity(factory.GetInstance<IOptions<UserPasswordConfigurationSettings>>().Value));
 
 
         }

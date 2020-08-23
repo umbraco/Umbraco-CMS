@@ -38,7 +38,7 @@ namespace Umbraco.Core.BackOffice
         private readonly UmbracoMapper _mapper;
         private bool _disposed = false;
 
-        public BackOfficeUserStore(IUserService userService, IEntityService entityService, IExternalLoginService externalLoginService, IOptionsSnapshot<GlobalSettings> globalSettings, UmbracoMapper mapper)
+        public BackOfficeUserStore(IUserService userService, IEntityService entityService, IExternalLoginService externalLoginService, IOptions<GlobalSettings> globalSettings, UmbracoMapper mapper)
             : this(userService, entityService, externalLoginService, globalSettings.Value, mapper)
         {
         }

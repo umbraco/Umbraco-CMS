@@ -41,7 +41,7 @@ namespace Umbraco.Web
             IPublishedSnapshotService publishedSnapshotService,
             IVariationContextAccessor variationContextAccessor,
             IDefaultCultureAccessor defaultCultureAccessor,
-            IOptionsSnapshot<GlobalSettings> globalSettings,
+            IOptions<GlobalSettings> globalSettings,
             IUserService userService,
             IHostingEnvironment hostingEnvironment,
             UriUtility uriUtility,

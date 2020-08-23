@@ -63,7 +63,7 @@ namespace Umbraco.Web.Trees
             IDataTypeService dataTypeService,
             UmbracoTreeSearcher treeSearcher,
             ActionCollection actions,
-            IOptionsSnapshot<GlobalSettings> globalSettings,
+            IOptions<GlobalSettings> globalSettings,
             IContentService contentService,
             IPublicAccessService publicAccessService,
             ILocalizationService localizationService)

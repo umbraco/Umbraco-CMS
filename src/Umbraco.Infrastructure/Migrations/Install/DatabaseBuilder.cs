@@ -40,7 +40,7 @@ namespace Umbraco.Core.Migrations.Install
         /// </summary>
         public DatabaseBuilder(
             IScopeProvider scopeProvider,
-            IOptionsSnapshot<GlobalSettings> globalSettings,
+            IOptions<GlobalSettings> globalSettings,
             IUmbracoDatabaseFactory databaseFactory,
             IRuntimeState runtime,
             ILogger logger,

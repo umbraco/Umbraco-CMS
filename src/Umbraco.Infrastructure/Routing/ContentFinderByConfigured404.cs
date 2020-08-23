@@ -23,7 +23,7 @@ namespace Umbraco.Web.Routing
         public ContentFinderByConfigured404(
             ILogger logger,
             IEntityService entityService,
-            IOptionsSnapshot<ContentSettings> contentConfigSettings,
+            IOptions<ContentSettings> contentConfigSettings,
             IExamineManager examineManager)
         {
             _logger = logger;

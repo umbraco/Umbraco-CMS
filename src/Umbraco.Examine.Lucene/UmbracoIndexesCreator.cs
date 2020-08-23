@@ -30,7 +30,7 @@ namespace Umbraco.Examine
             IUmbracoIndexConfig umbracoIndexConfig,
             IHostingEnvironment hostingEnvironment,
             IRuntimeState runtimeState,
-            IOptionsSnapshot<IndexCreatorSettings> settings) : base(typeFinder, hostingEnvironment, settings)
+            IOptions<IndexCreatorSettings> settings) : base(typeFinder, hostingEnvironment, settings)
         {
             ProfilingLogger = profilingLogger ?? throw new System.ArgumentNullException(nameof(profilingLogger));
             LanguageService = languageService ?? throw new System.ArgumentNullException(nameof(languageService));

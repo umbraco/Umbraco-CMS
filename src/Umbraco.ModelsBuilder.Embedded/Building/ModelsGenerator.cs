@@ -14,7 +14,7 @@ namespace Umbraco.ModelsBuilder.Embedded.Building
         private readonly OutOfDateModelsStatus _outOfDateModels;
         private readonly IIOHelper _ioHelper;
 
-        public ModelsGenerator(UmbracoServices umbracoService, IOptionsSnapshot<ModelsBuilderConfig> config, OutOfDateModelsStatus outOfDateModels, IIOHelper ioHelper)
+        public ModelsGenerator(UmbracoServices umbracoService, IOptions<ModelsBuilderConfig> config, OutOfDateModelsStatus outOfDateModels, IIOHelper ioHelper)
         {
             _umbracoService = umbracoService;
             _config = config.Value;

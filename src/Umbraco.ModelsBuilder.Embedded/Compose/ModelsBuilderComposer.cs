@@ -17,7 +17,7 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
     {
         private readonly ModelsBuilderConfig _config;
 
-        public ModelsBuilderComposer(IOptionsSnapshot<ModelsBuilderConfig> config)
+        public ModelsBuilderComposer(IOptions<ModelsBuilderConfig> config)
         {
             _config = config.Value;
         }

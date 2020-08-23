@@ -31,7 +31,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
         public LanguageController(ILocalizationService localizationService,
             UmbracoMapper umbracoMapper,
-            IOptionsSnapshot<GlobalSettings> globalSettings)
+            IOptions<GlobalSettings> globalSettings)
         {
             _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
             _umbracoMapper = umbracoMapper ?? throw new ArgumentNullException(nameof(umbracoMapper));

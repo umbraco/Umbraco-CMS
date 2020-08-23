@@ -23,9 +23,9 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
         public EmailNotificationMethod(
             ILocalizedTextService textService,
             IRequestAccessor requestAccessor,
-            IOptionsSnapshot<GlobalSettings> globalSettings,
+            IOptions<GlobalSettings> globalSettings,
             IHealthChecksSettings healthChecksSettings,
-            IOptionsSnapshot<ContentSettings> contentSettings)
+            IOptions<ContentSettings> contentSettings)
             : base(healthChecksSettings)
         {
             var recipientEmail = Settings?["recipientEmail"]?.Value;

@@ -37,7 +37,7 @@ namespace Umbraco.Web.Models.Mapping
 
         public ContentTypeMapDefinition(CommonMapper commonMapper, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IFileService fileService,
             IContentTypeService contentTypeService, IMediaTypeService mediaTypeService, IMemberTypeService memberTypeService,
-            ILogger logger, IShortStringHelper shortStringHelper, IOptionsSnapshot<GlobalSettings> globalSettings, IHostingEnvironment hostingEnvironment)
+            ILogger logger, IShortStringHelper shortStringHelper, IOptions<GlobalSettings> globalSettings, IHostingEnvironment hostingEnvironment)
         {
             _commonMapper = commonMapper;
             _propertyEditors = propertyEditors;

@@ -45,7 +45,7 @@ namespace Umbraco.Web.Common.Templates
             IPublishedRouter publishedRouter,
             IFileService fileService,
             ILocalizationService textService,
-            IOptionsSnapshot<WebRoutingSettings> webRoutingSettings,
+            IOptions<WebRoutingSettings> webRoutingSettings,
             IShortStringHelper shortStringHelper,
             IHttpContextAccessor httpContextAccessor,
             ICompositeViewEngine viewEngine)

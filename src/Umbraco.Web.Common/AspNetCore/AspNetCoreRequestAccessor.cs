@@ -22,7 +22,7 @@ namespace Umbraco.Web.Common.AspNetCore
         public AspNetCoreRequestAccessor(IHttpContextAccessor httpContextAccessor,
             IUmbracoRequestLifetime umbracoRequestLifetime,
             IUmbracoContextAccessor umbracoContextAccessor,
-            IOptionsSnapshot<WebRoutingSettings> webRoutingSettings)
+            IOptions<WebRoutingSettings> webRoutingSettings)
         {
             _httpContextAccessor = httpContextAccessor;
             _umbracoContextAccessor = umbracoContextAccessor;

@@ -23,7 +23,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly ContentSettings _contentSettings;
         private readonly IImageUrlGenerator _imageUrlGenerator;
 
-        public ImagesController(IMediaFileSystem mediaFileSystem, IOptionsSnapshot<ContentSettings> contentSettings, IImageUrlGenerator imageUrlGenerator)
+        public ImagesController(IMediaFileSystem mediaFileSystem, IOptions<ContentSettings> contentSettings, IImageUrlGenerator imageUrlGenerator)
         {
             _mediaFileSystem = mediaFileSystem;
             _contentSettings = contentSettings.Value;

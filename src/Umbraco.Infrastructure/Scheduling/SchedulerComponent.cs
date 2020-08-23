@@ -59,7 +59,7 @@ namespace Umbraco.Web.Scheduling
             IScopeProvider scopeProvider, IUmbracoContextFactory umbracoContextFactory, IProfilingLogger logger,
             IApplicationShutdownRegistry applicationShutdownRegistry, IHealthChecksSettings healthChecksSettingsConfig,
             IServerMessenger serverMessenger, IRequestAccessor requestAccessor,
-            IOptionsSnapshot<LoggingSettings> loggingSettings, IOptionsSnapshot<KeepAliveSettings> keepAliveSettings,
+            IOptions<LoggingSettings> loggingSettings, IOptions<KeepAliveSettings> keepAliveSettings,
             IHostingEnvironment hostingEnvironment)
         {
             _runtime = runtime;

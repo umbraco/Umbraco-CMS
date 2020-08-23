@@ -73,11 +73,11 @@ namespace Umbraco.Web.BackOffice.Controllers
 
         public UsersController(
             IMediaFileSystem mediaFileSystem,
-            IOptionsSnapshot<ContentSettings> contentSettings,
+            IOptions<ContentSettings> contentSettings,
             IHostingEnvironment hostingEnvironment,
             ISqlContext sqlContext,
             IImageUrlGenerator imageUrlGenerator,
-            IOptionsSnapshot<SecuritySettings> securitySettings,
+            IOptions<SecuritySettings> securitySettings,
             IRequestAccessor requestAccessor,
             IEmailSender emailSender,
             IWebSecurity webSecurity,
@@ -89,7 +89,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             IEntityService entityService,
             IMediaService mediaService,
             IContentService contentService,
-            IOptionsSnapshot<GlobalSettings> globalSettings,
+            IOptions<GlobalSettings> globalSettings,
             BackOfficeUserManager backOfficeUserManager,
             ILogger logger,
             LinkGenerator linkGenerator)

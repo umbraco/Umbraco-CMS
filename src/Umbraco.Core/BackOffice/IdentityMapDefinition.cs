@@ -15,7 +15,7 @@ namespace Umbraco.Core.BackOffice
         private readonly IEntityService _entityService;
         private readonly GlobalSettings _globalSettings;
 
-        public IdentityMapDefinition(ILocalizedTextService textService, IEntityService entityService, IOptionsSnapshot<GlobalSettings> globalSettings)
+        public IdentityMapDefinition(ILocalizedTextService textService, IEntityService entityService, IOptions<GlobalSettings> globalSettings)
         {
             _textService = textService;
             _entityService = entityService;

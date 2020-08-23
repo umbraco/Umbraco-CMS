@@ -50,7 +50,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
         public CurrentUserController(
             IMediaFileSystem mediaFileSystem,
-            IOptionsSnapshot<ContentSettings> contentSettings,
+            IOptions<ContentSettings> contentSettings,
             IHostingEnvironment hostingEnvironment,
             IImageUrlGenerator imageUrlGenerator,
             IWebSecurity webSecurity,

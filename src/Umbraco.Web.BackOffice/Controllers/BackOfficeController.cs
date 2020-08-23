@@ -50,7 +50,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         public BackOfficeController(
             BackOfficeUserManager userManager,
             IRuntimeMinifier runtimeMinifier,
-            IOptionsSnapshot<GlobalSettings> globalSettings,
+            IOptions<GlobalSettings> globalSettings,
             IHostingEnvironment hostingEnvironment,
             IUmbracoContextAccessor umbracoContextAccessor,
             ILocalizedTextService textService,

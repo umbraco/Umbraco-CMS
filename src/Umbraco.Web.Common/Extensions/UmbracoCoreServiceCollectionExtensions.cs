@@ -124,6 +124,7 @@ namespace Umbraco.Extensions
             services.Configure<IndexCreatorSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "Examine:"));
             services.Configure<ModelsBuilderConfig>(configuration.GetSection(Constants.Configuration.ConfigModelsBuilderPrefix));
             services.Configure<ImagingSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "Imaging:"));
+            services.Configure<RequestHandlerSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "RequestHandler:"));
 
             // TODO: HealthChecksSettings (+ one other?)
 
@@ -225,10 +226,10 @@ namespace Umbraco.Extensions
             // `RegisterEssentials`.
             var serviceProvider = services.BuildServiceProvider();
 
-            var globalSettings = serviceProvider.GetService<IOptionsSnapshot<GlobalSettings>>().Value;
-            var connectionStrings = serviceProvider.GetService<IOptionsSnapshot<ConnectionStrings>>().Value;
-            var hostingSettings = serviceProvider.GetService<IOptionsSnapshot<HostingSettings>>().Value;
-            var typeFinderSettings = serviceProvider.GetService<IOptionsSnapshot<TypeFinderSettings>>().Value;
+            var globalSettings = serviceProvider.GetService<IOptions<GlobalSettings>>().Value;
+            var connectionStrings = serviceProvider.GetService<IOptions<ConnectionStrings>>().Value;
+            var hostingSettings = serviceProvider.GetService<IOptions<HostingSettings>>().Value;
+            var typeFinderSettings = serviceProvider.GetService<IOptions<TypeFinderSettings>>().Value;
 
             var dbProviderFactoryCreator = serviceProvider.GetRequiredService<IDbProviderFactoryCreator>();
 

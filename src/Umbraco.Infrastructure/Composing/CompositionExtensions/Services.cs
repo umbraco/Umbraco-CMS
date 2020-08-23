@@ -96,13 +96,13 @@ namespace Umbraco.Core.Composing.CompositionExtensions
                 factory.GetInstance<IEntityXmlSerializer>(),
                 factory.GetInstance<ILogger>(),
                 factory.GetInstance<IUmbracoVersion>(),
-                factory.GetInstance<IOptionsSnapshot<GlobalSettings>>(),
+                factory.GetInstance<IOptions<GlobalSettings>>(),
                 packageRepoFileName);
 
         private static LocalizedTextServiceFileSources SourcesFactory(IFactory container)
         {
             var hostingEnvironment = container.GetInstance<IHostingEnvironment>();
-            var globalSettings = container.GetInstance<IOptionsSnapshot<GlobalSettings>>().Value;
+            var globalSettings = container.GetInstance<IOptions<GlobalSettings>>().Value;
             var mainLangFolder = new DirectoryInfo(hostingEnvironment.MapPathContentRoot(WebPath.Combine(globalSettings.UmbracoPath , "config","lang")));
             var appPlugins = new DirectoryInfo(hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.AppPlugins));
             var configLangFolder = new DirectoryInfo(hostingEnvironment.MapPathContentRoot(WebPath.Combine(Constants.SystemDirectories.Config  ,"lang")));

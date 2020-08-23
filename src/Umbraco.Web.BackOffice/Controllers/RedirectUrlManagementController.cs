@@ -28,7 +28,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IHostingEnvironment _hostingEnvironment;
 
         public RedirectUrlManagementController(ILogger logger,
-            IOptionsSnapshot<WebRoutingSettings> webRoutingSettings,
+            IOptions<WebRoutingSettings> webRoutingSettings,
             IWebSecurity webSecurity,
             IRedirectUrlService redirectUrlService,
             UmbracoMapper umbracoMapper,
