@@ -17,21 +17,21 @@ context('Backoffice Tour', () => {
         //assert
         cy.get('[data-element="help-tours"]').should("be.visible");
         cy.get('[data-element="help-tours"]').click();
-        cy.get('[data-element="help-tours"] .umb-progress-circle', { timeout: 60000 }).contains('17%');
+        getPercentage(60000, 17);
     });
 
     it('Backoffice introduction tour should run then rerun', () => {
         //act
         cy.umbracoGlobalHelp().should("be.visible");
         cy.umbracoGlobalHelp().click();
-        runBackOfficeIntroTour(0, 'Start');
-        runBackOfficeIntroTour(17, 'Rerun');
+        runBackOfficeIntroTour(0, 'Start', 60000);
+        runBackOfficeIntroTour(17, 'Rerun', 60000);
 
         //assert
         cy.get('[data-element="help-tours"]').should("be.visible");
-    cy.get('[data-element="help-tours"] .umb-help-list').first().click();
-        cy.get('[data-element="help-tours"] .umb-progress-circle', { timeout: 60000 }).contains('17%');
+        cy.get('[data-element="help-tours"] .umb-help-list').click();
         cy.umbracoGlobalHelp().should("be.visible");
+        getPercentage(60000, 17);
     });
 
     afterEach(() => {
@@ -39,6 +39,10 @@ context('Backoffice Tour', () => {
         resetTourData();
     });
 });
+
+function getPercentage(percentage, timeout) {
+    cy.get('[data-element="help-tours"] .umb-progress-circle', { timeout: timeout }).get('[percentage]').contains(percentage + '%');
+}
 
 function resetTourData() {
     var tourStatus =
@@ -64,17 +68,16 @@ function resetTourData() {
     })
 }
 
-function runBackOfficeIntroTour(percentageComplete, buttonText) {
+function runBackOfficeIntroTour(percentageComplete, buttonText, timeout) {
     cy.get('[data-element="help-tours"]').should("be.visible");
-  cy.get('[data-element="help-tours"]').click();
-  cy.get('[data-element="help-tours"] .umb-progress-circle', { timeout: 60000 }).contains(percentageComplete + '%');
-    cy.get('[data-element="help-tours"] .umb-progress-circle', { timeout: 60000 }).get('[percentage]').contains(percentageComplete + '%');
+    cy.get('[data-element="help-tours"]').click();
+    cy.get('[data-element="help-tours"] .umb-progress-circle', { timeout: timeout }).get('[percentage]').contains(percentageComplete + '%');
     cy.get('[data-element="help-tours"]').click();
     cy.get('[data-element="tour-umbIntroIntroduction"] .umb-button').should("be.visible");
     cy.get('[data-element="tour-umbIntroIntroduction"] .umb-button').contains(buttonText);
     cy.get('[data-element="tour-umbIntroIntroduction"] .umb-button').click();
     //act
-    cy.get('.umb-tour-step', { timeout: 60000 }).should('be.visible');
+    cy.get('.umb-tour-step', { timeout: timeout }).should('be.visible');
     cy.get('.umb-tour-step__footer').should('be.visible');
     cy.get('.umb-tour-step__counter').should('be.visible');
 
@@ -83,15 +86,15 @@ function runBackOfficeIntroTour(percentageComplete, buttonText) {
         cy.get('.umb-tour-step__footer .umb-button').should('be.visible').click();
     }
     cy.umbracoGlobalUser().click()
-    cy.get('.umb-tour-step__counter', { timeout: 10000 }).contains('8/12');
+    cy.get('.umb-tour-step__counter', { timeout: timeout }).contains('8/12');
     cy.get('.umb-tour-step__footer .umb-button').should('be.visible').click();
-    cy.get('.umb-tour-step__counter', { timeout: 10000 }).contains('9/12');
+    cy.get('.umb-tour-step__counter', { timeout: timeout }).contains('9/12');
     cy.get('.umb-overlay-drawer__align-right .umb-button').should('be.visible').click();
-    cy.get('.umb-tour-step__counter', { timeout: 10000 }).contains('10/12');
+    cy.get('.umb-tour-step__counter', { timeout: timeout }).contains('10/12');
     cy.umbracoGlobalHelp().click()
 
     for (let i = 11; i < 13; i++) {
-        cy.get('.umb-tour-step__counter', { timeout: 10000 }).contains(i + '/12');
+        cy.get('.umb-tour-step__counter', { timeout: timeout }).contains(i + '/12');
         cy.get('.umb-tour-step__footer .umb-button').should('be.visible').click();
     }
     cy.get('.umb-tour-step__footer .umb-button').should('be.visible').click();
