@@ -19,7 +19,13 @@
                     </p>
 
                     <div class="pa-select-type">
-                        <umb-radiobutton input-id="protectionTypeMember" name="protectionType" value="member" model="vm.type" text="" />
+
+                        <umb-radiobutton input-id="protectionTypeMember"
+                                         name="protectionType"
+                                         value="member"
+                                         model="vm.type"
+                                         text="">
+                        </umb-radiobutton>
 
                         <label for="protectionTypeMember" class="flex flex-column flex-auto">
                             <strong class="pa-access-header bold"><localize key="publicAccess_paMembers">Specific members protection</localize></strong>
@@ -28,7 +34,12 @@
                     </div>
 
                     <div class="pa-select-type">
-                        <umb-radiobutton input-id="protectionTypeGroup" name="protectionType" value="group" model="vm.type" />
+
+                        <umb-radiobutton input-id="protectionTypeGroup"
+                                         name="protectionType"
+                                         value="group"
+                                         model="vm.type">
+                        </umb-radiobutton>
 
                         <label for="protectionTypeGroup" class="flex flex-column flex-auto">
                             <strong class="pa-access-header bold"><localize key="publicAccess_paGroups">Group based protection</localize></strong>
@@ -47,9 +58,9 @@
                                               allow-remove="true"
                                               on-remove="vm.removeMember(member)">
                             </umb-node-preview>
-                            <a href ng-click="vm.pickMember()" class="umb-node-preview-add" prevent-default>
+                            <button type="button" ng-click="vm.pickMember()" class="umb-node-preview-add">
                                 <localize key="general_add">Add</localize>
-                            </a>
+                            </button>
                         </div>
                     </div>
 
@@ -66,9 +77,9 @@
                                               allow-remove="true"
                                               on-remove="vm.removeGroup(group)">
                             </umb-node-preview>
-                            <a href ng-click="vm.pickGroup()" class="umb-node-preview-add" prevent-default>
+                            <button type="button" ng-click="vm.pickGroup()" class="umb-node-preview-add">
                                 <localize key="general_add">Add</localize>
-                            </a>
+                            </button>
                         </div>
                     </div>
 
@@ -81,15 +92,15 @@
                                         <strong><localize key="publicAccess_paLoginPage">Login Page</localize></strong>
                                         <small><localize key="publicAccess_paLoginPageHelp">Choose the page that contains the login form</localize></small>
                                     </label>
-                                    <a href ng-show="!vm.loginPage" ng-click="vm.pickLoginPage()" class="umb-node-preview-add" prevent-default>
-                                        <localize key="general_add">Add</localize>
-                                    </a>
                                     <umb-node-preview ng-show="vm.loginPage"
                                                       icon="vm.loginPage.icon"
                                                       name="vm.loginPage.name"
                                                       allow-remove="true"
                                                       on-remove="vm.loginPage = null">
                                     </umb-node-preview>
+                                    <button type="button" ng-show="!vm.loginPage" ng-click="vm.pickLoginPage()" class="umb-node-preview-add">
+                                        <localize key="general_add">Add</localize>
+                                    </button>
                                 </div>
                             </div>
                             <div class="control-group umb-control-group">
@@ -98,15 +109,15 @@
                                         <strong><localize key="publicAccess_paErrorPage">Error Page</localize></strong>
                                         <small><localize key="publicAccess_paErrorPageHelp">Used when people are logged on, but do not have access</localize></small>
                                     </label>
-                                    <a href ng-show="!vm.errorPage" ng-click="vm.pickErrorPage()" class="umb-node-preview-add" prevent-default>
-                                        <localize key="general_add">Add</localize>
-                                    </a>
                                     <umb-node-preview ng-show="vm.errorPage"
                                                       icon="vm.errorPage.icon"
                                                       name="vm.errorPage.name"
                                                       allow-remove="true"
                                                       on-remove="vm.errorPage = null">
                                     </umb-node-preview>
+                                    <button type="button" ng-show="!vm.errorPage" ng-click="vm.pickErrorPage()" class="umb-node-preview-add">
+                                        <localize key="general_add">Add</localize>
+                                    </button>
                                 </div>
                             </div>
                         </div>

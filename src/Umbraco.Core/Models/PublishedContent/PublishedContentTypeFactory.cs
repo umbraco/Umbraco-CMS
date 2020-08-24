@@ -35,18 +35,18 @@ namespace Umbraco.Core.Models.PublishedContent
         /// This method is for tests and is not intended to be used directly from application code.
         /// </summary>
         /// <remarks>Values are assumed to be consisted and are not checked.</remarks>
-        internal IPublishedContentType CreateContentType(int id, string alias, Func<IPublishedContentType, IEnumerable<IPublishedPropertyType>> propertyTypes, ContentVariation variations = ContentVariation.Nothing, bool isElement = false)
+        internal IPublishedContentType CreateContentType(Guid key, int id, string alias, Func<IPublishedContentType, IEnumerable<IPublishedPropertyType>> propertyTypes, ContentVariation variations = ContentVariation.Nothing, bool isElement = false)
         {
-            return new PublishedContentType(id, alias, PublishedItemType.Content, Enumerable.Empty<string>(), propertyTypes, variations, isElement);
+            return new PublishedContentType(key, id, alias, PublishedItemType.Content, Enumerable.Empty<string>(), propertyTypes, variations, isElement);
         }
 
         /// <summary>
         /// This method is for tests and is not intended to be used directly from application code.
         /// </summary>
         /// <remarks>Values are assumed to be consisted and are not checked.</remarks>
-        internal IPublishedContentType CreateContentType(int id, string alias, IEnumerable<string> compositionAliases, Func<IPublishedContentType, IEnumerable<IPublishedPropertyType>> propertyTypes, ContentVariation variations = ContentVariation.Nothing, bool isElement = false)
+        internal IPublishedContentType CreateContentType(Guid key, int id, string alias, IEnumerable<string> compositionAliases, Func<IPublishedContentType, IEnumerable<IPublishedPropertyType>> propertyTypes, ContentVariation variations = ContentVariation.Nothing, bool isElement = false)
         {
-            return new PublishedContentType(id, alias, PublishedItemType.Content, compositionAliases, propertyTypes, variations, isElement);
+            return new PublishedContentType(key, id, alias, PublishedItemType.Content, compositionAliases, propertyTypes, variations, isElement);
         }
 
         /// <inheritdoc />
