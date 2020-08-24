@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Reflection;
 using Microsoft.AspNetCore.Hosting;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Tests.Common;
+using Umbraco.Tests.Common.Builders;
 using Umbraco.Web.Common.AspNetCore;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.Extensions
@@ -18,12 +18,12 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Extensions
         {
             _settingsForTests = new SettingsForTests();
             _hostEnvironment = Mock.Of<IWebHostEnvironment>();
-            _globalSettings = _settingsForTests.GenerateStubGlobalSettings();
+            _globalSettings = new GlobalSettingsBuilder().Build();
         }
 
         private SettingsForTests _settingsForTests;
         private IWebHostEnvironment _hostEnvironment;
-        private IGlobalSettings _globalSettings;
+        private GlobalSettings _globalSettings;
 
         [TestCase("http://www.domain.com/umbraco/preview/frame?id=1234", "", true)]
         [TestCase("http://www.domain.com/umbraco", "", true)]
@@ -47,10 +47,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Extensions
         [TestCase("http://www.domain.com/umbraco/test/legacyAjaxCalls.ashx?some=query&blah=js", "", true)]
         public void Is_Back_Office_Request(string input, string virtualPath, bool expected)
         {
-            
-            var mockHostingSettings = Mock.Get(_settingsForTests.GenerateMockHostingSettings());
-            mockHostingSettings.Setup(x => x.ApplicationVirtualPath).Returns(virtualPath);
-            var hostingEnvironment = new AspNetCoreHostingEnvironment(mockHostingSettings.Object, _hostEnvironment);
+            var hostingSettings = new HostingSettingsBuilder().WithApplicationVirtualPath(virtualPath).Build();
+            var hostingEnvironment = new AspNetCoreHostingEnvironment(hostingSettings, _hostEnvironment);
 
             var source = new Uri(input);
             Assert.AreEqual(expected, source.IsBackOfficeRequest(_globalSettings, hostingEnvironment));
@@ -68,8 +66,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Extensions
         public void Is_Installer_Request(string input, bool expected)
         {
             var source = new Uri(input);
-            var mockHostingSettings = Mock.Get(_settingsForTests.GenerateMockHostingSettings());
-            var hostingEnvironment = new AspNetCoreHostingEnvironment(mockHostingSettings.Object, _hostEnvironment);
+            var hostingSettings = new HostingSettingsBuilder().Build();
+            var hostingEnvironment = new AspNetCoreHostingEnvironment(hostingSettings, _hostEnvironment);
             Assert.AreEqual(expected, source.IsInstallerRequest(hostingEnvironment));
         }
 

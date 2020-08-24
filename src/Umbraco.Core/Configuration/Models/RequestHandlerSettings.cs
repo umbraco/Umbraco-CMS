@@ -5,7 +5,6 @@ namespace Umbraco.Core.Configuration.Models
 {
     public class RequestHandlerSettings
     {
-        private const string Prefix = Constants.Configuration.ConfigPrefix + "RequestHandler:";
         private static readonly CharItem[] DefaultCharCollection =
         {
             new CharItem { Char = " ", Replacement = "-" },

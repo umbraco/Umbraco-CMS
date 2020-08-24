@@ -6,7 +6,7 @@ using AutoFixture.NUnit3;
 using Microsoft.AspNetCore.Identity;
 using Moq;
 using Umbraco.Core.BackOffice;
-using Umbraco.Core.Configuration;
+using Umbraco.Tests.Common.Builders;
 using Umbraco.Web.BackOffice.Controllers;
 
 namespace Umbraco.Tests.UnitTests.AutoFixture
@@ -33,7 +33,7 @@ namespace Umbraco.Tests.UnitTests.AutoFixture
                 {
                     fixture.Customize<BackOfficeIdentityUser>(
                         u => u.FromFactory<string ,string, string>(
-                            (a,b,c) => BackOfficeIdentityUser.CreateNew(Mock.Of<IGlobalSettings>(),a,b,c)));
+                            (a,b,c) => BackOfficeIdentityUser.CreateNew(new GlobalSettingsBuilder().Build(),a,b,c)));
                     fixture
                         .Customize(new ConstructorCustomization(typeof(UsersController), new GreedyConstructorQuery()))
                         .Customize(new ConstructorCustomization(typeof(BackOfficeUserManager), new GreedyConstructorQuery()))
