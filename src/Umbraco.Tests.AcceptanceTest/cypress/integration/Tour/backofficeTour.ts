@@ -29,7 +29,7 @@ context('Backoffice Tour', () => {
 
     //assert
     cy.get('[data-element="help-tours"]').should("be.visible");
-    cy.get('[data-element="help-tours"]').click();
+    cy.get('[data-element="help-tours"] .umb-help-list').first().click();
     cy.get('[data-element="help-tours"] .umb-progress-circle', { timeout: 60000 }).contains('17%');
     cy.umbracoGlobalHelp().should("be.visible");
   });
