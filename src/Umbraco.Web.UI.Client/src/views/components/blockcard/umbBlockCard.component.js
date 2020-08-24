@@ -14,9 +14,39 @@
             }
         });
 
-    function BlockCardController() {
+    function BlockCardController($scope, umbRequestHelper) {
 
         var vm = this;
+        vm.styleBackgroundImage = "transparent";
+
+        var unwatch = $scope.$watch("vm.blockConfigModel.thumbnail", (newValue, oldValue) => {
+            console.log("updateThumbnail")
+            if(newValue !== oldValue) {
+                vm.updateThumbnail();
+            }
+        });
+
+        vm.$onInit = function () {
+
+            vm.updateThumbnail();
+
+        }
+        vm.$onDestroy = function () {
+            unwatch();
+        }
+
+        vm.updateThumbnail = function () {
+            if (vm.blockConfigModel.thumbnail == null || vm.blockConfigModel.thumbnail === "") {
+                vm.styleBackgroundImage = "transparent";
+                return;
+            }
+
+            var path = umbRequestHelper.convertVirtualToAbsolutePath(vm.blockConfigModel.thumbnail);
+            if (path.toLowerCase().endsWith(".svg") === false) {
+                path += "?upscale=false&width=400)";
+            }
+            vm.styleBackgroundImage = 'url(\''+path+'\')';
+        }
 
     }
 
