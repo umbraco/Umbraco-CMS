@@ -33,11 +33,11 @@ context('Backoffice Tour', () => {
     cy.get('[data-element="help-tours"] .umb-progress-circle', { timeout: 60000 }).contains('17%');
     cy.umbracoGlobalHelp().should("be.visible");
   });
-});
 
-afterEach(() => {
-  //cleanup
-  resetTourData();
+  afterEach(() => {
+      //cleanup
+      resetTourData();
+  });
 });
 
 function resetTourData() {
