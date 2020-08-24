@@ -22,6 +22,8 @@ using Umbraco.Extensions;
 using Umbraco.Tests.Testing;
 using Umbraco.Web;
 using ILogger = Umbraco.Core.Logging.ILogger;
+using Umbraco.Core.Configuration.Models;
+using Microsoft.Extensions.Options;
 
 namespace Umbraco.Tests.Integration.Testing
 {
@@ -54,7 +56,7 @@ namespace Umbraco.Tests.Integration.Testing
         /// <remarks>
         /// There must only be ONE instance shared between all tests in a session
         /// </remarks>
-        public static LocalDbTestDatabase GetOrCreate(string filesPath, ILogger logger, IGlobalSettings globalSettings, IUmbracoDatabaseFactory dbFactory)
+        public static LocalDbTestDatabase GetOrCreate(string filesPath, ILogger logger, GlobalSettings globalSettings, IUmbracoDatabaseFactory dbFactory)
         {
             lock (_dbLocker)
             {
@@ -175,7 +177,7 @@ namespace Umbraco.Tests.Integration.Testing
         protected AppCaches AppCaches => Services.GetRequiredService<AppCaches>();
         protected IIOHelper IOHelper => Services.GetRequiredService<IIOHelper>();
         protected IShortStringHelper ShortStringHelper => Services.GetRequiredService<IShortStringHelper>();
-        protected IGlobalSettings GlobalSettings => Services.GetRequiredService<IGlobalSettings>();
+        protected GlobalSettings GlobalSettings => Services.GetRequiredService<IOptions<GlobalSettings>>().Value;
         protected IMapperCollection Mappers => Services.GetRequiredService<IMapperCollection>();
 
         #endregion

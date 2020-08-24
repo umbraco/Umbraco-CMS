@@ -19,6 +19,7 @@ using Umbraco.Core.Runtime;
 using Umbraco.Tests.Common;
 using Umbraco.Web.Common.AspNetCore;
 using IHostingEnvironment = Umbraco.Core.Hosting.IHostingEnvironment;
+using Umbraco.Tests.Common.Builders;
 
 namespace Umbraco.Tests.Integration.Implementations
 {
@@ -102,14 +103,17 @@ namespace Umbraco.Tests.Integration.Implementations
         public override IBackOfficeInfo GetBackOfficeInfo()
         {
             if (_backOfficeInfo == null)
-                _backOfficeInfo =
-                    new AspNetCoreBackOfficeInfo(SettingsForTests.GetDefaultGlobalSettings(GetUmbracoVersion()));
+            {
+                var globalSettings = new GlobalSettingsBuilder().Build();
+                _backOfficeInfo = new AspNetCoreBackOfficeInfo(globalSettings);
+            }
+
             return _backOfficeInfo;
         }
 
         public override IHostingEnvironment GetHostingEnvironment()
             => _hostingEnvironment ??= new TestHostingEnvironment(
-                SettingsForTests.DefaultHostingSettings,
+                new HostingSettingsBuilder().Build(),
                 _hostEnvironment);
 
         public override IApplicationShutdownRegistry GetHostingEnvironmentLifetime() => _hostingLifetime;

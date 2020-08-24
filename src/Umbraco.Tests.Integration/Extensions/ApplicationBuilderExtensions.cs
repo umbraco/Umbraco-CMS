@@ -5,9 +5,11 @@ using System.IO;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Tests.Integration.Testing;
@@ -46,7 +48,7 @@ namespace Umbraco.Tests.Integration.Extensions
 
             var db = UmbracoIntegrationTest.GetOrCreate(dbFilePath,
                 app.ApplicationServices.GetRequiredService<ILogger>(),
-                app.ApplicationServices.GetRequiredService<IGlobalSettings>(),
+                app.ApplicationServices.GetRequiredService<IOptions<GlobalSettings>>().Value,
                 app.ApplicationServices.GetRequiredService<IUmbracoDatabaseFactory>());
 
 
