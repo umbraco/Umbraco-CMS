@@ -1,7 +1,7 @@
 /// <reference types="Cypress" />
 
 context('Backoffice Tour', () => {
-
+    var timeout = 60000;
     beforeEach(() => {
         //arrange
         cy.umbracoLogin(Cypress.env('username'), Cypress.env('password'));
@@ -17,21 +17,21 @@ context('Backoffice Tour', () => {
         //assert
         cy.get('[data-element="help-tours"]').should("be.visible");
         cy.get('[data-element="help-tours"]').click();
-        getPercentage(17, 60000);
+        getPercentage(17, timeout);
     });
 
     it('Backoffice introduction tour should run then rerun', () => {
         //act
         cy.umbracoGlobalHelp().should("be.visible");
         cy.umbracoGlobalHelp().click();
-        runBackOfficeIntroTour(0, 'Start', 60000);
-        runBackOfficeIntroTour(17, 'Rerun', 60000);
+        runBackOfficeIntroTour(0, 'Start', timeout);
+        runBackOfficeIntroTour(17, 'Rerun', timeout);
 
         //assert
         cy.get('[data-element="help-tours"]').should("be.visible");
         cy.get('[data-element="help-tours"]').click();
         cy.umbracoGlobalHelp().should("be.visible");
-        getPercentage(17, 60000);
+        getPercentage(17, timeout);
     });
 
     afterEach(() => {
