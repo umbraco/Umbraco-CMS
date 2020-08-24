@@ -2291,7 +2291,7 @@ namespace Umbraco.Web.Editors
             return notifications;
         }
 
-        public IActionResult PostNotificationOptions(int contentId, [FromQuery] string[] notifyOptions)
+        public IActionResult PostNotificationOptions(int contentId, [FromQuery(Name="notifyOptions[]")] string[] notifyOptions)
         {
             if (contentId <= 0) return NotFound();
             var content = _contentService.GetById(contentId);

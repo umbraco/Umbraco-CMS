@@ -30,6 +30,7 @@ using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
 using Umbraco.Examine;
+using Umbraco.Infrastructure.Examine;
 using Umbraco.Infrastructure.Media;
 using Umbraco.Web;
 using Umbraco.Web.Actions;
@@ -367,7 +368,9 @@ namespace Umbraco.Core.Runtime
 
             composition.RegisterUnique<IUmbracoComponentRenderer, UmbracoComponentRenderer>();
 
-
+            // Register noop versions for examine to be overridden by examine
+            composition.RegisterUnique<IUmbracoIndexesCreator, NoopUmbracoIndexesCreator>();
+            composition.RegisterUnique<IBackOfficeExamineSearcher, NoopBackOfficeExamineSearcher>();
         }
     }
 }

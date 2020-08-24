@@ -14,7 +14,7 @@
     'use strict';
 
 
-    function blockEditorModelObjectFactory($interpolate, $q, udiService, contentResource, localizationService) {
+    function blockEditorModelObjectFactory($interpolate, $q, udiService, contentResource, localizationService, umbRequestHelper) {
 
         /**
          * Simple mapping from property model content entry to editing model,
@@ -324,6 +324,18 @@
 
             this.propertyEditorAlias = propertyEditorAlias;
             this.blockConfigurations = blockConfigurations;
+
+            this.blockConfigurations.forEach(blockConfiguration => {
+                if (blockConfiguration.view != null && blockConfiguration.view !== "") {
+                    blockConfiguration.view = umbRequestHelper.convertVirtualToAbsolutePath(blockConfiguration.view);
+                }
+                if (blockConfiguration.stylesheet != null && blockConfiguration.stylesheet !== "") {
+                    blockConfiguration.stylesheet = umbRequestHelper.convertVirtualToAbsolutePath(blockConfiguration.stylesheet);
+                }
+                if (blockConfiguration.thumbnail != null && blockConfiguration.thumbnail !== "") {
+                    blockConfiguration.thumbnail = umbRequestHelper.convertVirtualToAbsolutePath(blockConfiguration.thumbnail);
+                }
+            });
 
             this.scaffolds = [];
 

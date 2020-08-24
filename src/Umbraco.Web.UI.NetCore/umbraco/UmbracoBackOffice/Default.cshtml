@@ -18,9 +18,7 @@
 @inject IProfilerHtml profilerHtml
 
 @{
-    var isDebug = false;
-    var qryDebug = Context.Request.Query["umbDebug"].ToString().TryConvertTo<bool>();
-    isDebug = qryDebug.Success && qryDebug.Result;
+    bool.TryParse(Context.Request.Query["umbDebug"], out bool isDebug);
     var backOfficePath = globalSettings.Value.GetBackOfficePath(hostingEnvironment);
 }
 

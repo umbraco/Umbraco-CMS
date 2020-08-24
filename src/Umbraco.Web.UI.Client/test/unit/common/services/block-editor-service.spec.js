@@ -41,7 +41,7 @@
     }));
 
 
-    var blockConfigurationMock = { contentElementTypeKey: "7C5B74D1-E2F9-45A3-AE4B-FC7A829BF8AB", label: "Test label", settingsElementTypeKey: null, view: "testview.html" };
+    var blockConfigurationMock = { contentElementTypeKey: "7C5B74D1-E2F9-45A3-AE4B-FC7A829BF8AB", label: "Test label", settingsElementTypeKey: null, view: "/testview.html" };
 
     var propertyModelMock = {
         layout: {
@@ -60,7 +60,7 @@
         ]
     };
 
-    var blockWithSettingsConfigurationMock = { contentElementTypeKey: "7C5B74D1-E2F9-45A3-AE4B-FC7A829BF8AB", label: "Test label", settingsElementTypeKey: "7C5B74D1-E2F9-45A3-AE4B-FC7A829BF8AB", view: "testview.html" };
+    var blockWithSettingsConfigurationMock = { contentElementTypeKey: "7C5B74D1-E2F9-45A3-AE4B-FC7A829BF8AB", label: "Test label", settingsElementTypeKey: "7C5B74D1-E2F9-45A3-AE4B-FC7A829BF8AB", view: "/testview.html" };
     var propertyModelWithSettingsMock = {
         layout: {
             "Umbraco.TestBlockEditor": [

@@ -5,8 +5,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="UmbracoCms" Version="UMBRACO_VERSION_FROM_TEMPLATE" />
-        <PackageReference Include="UmbracoCms.SqlCe" Version="UMBRACO_VERSION_FROM_TEMPLATE" Condition="'$(UseSqlCe)' == 'true'" />
+        <PackageReference Include="Umbraco.Cms" Version="UMBRACO_VERSION_FROM_TEMPLATE" />
+        <PackageReference Include="Umbraco.Cms.SqlCe" Version="UMBRACO_VERSION_FROM_TEMPLATE" Condition="'$(UseSqlCe)' == 'true'" />
         <PackageReference Include="Umbraco.SqlServerCE" Version="4.0.0.1" Condition="'$(UseSqlCe)' == 'true'" />
     </ItemGroup>
 
