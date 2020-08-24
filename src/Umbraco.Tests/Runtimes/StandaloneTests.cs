@@ -37,6 +37,7 @@ using Current = Umbraco.Web.Composing.Current;
 using Umbraco.Tests.Common;
 using Umbraco.Tests.Common.Composing;
 using Umbraco.Core.Media;
+using Umbraco.Tests.Common.Builders;
 
 namespace Umbraco.Tests.Runtimes
 {
@@ -63,10 +64,10 @@ namespace Umbraco.Tests.Runtimes
             var profiler = new LogProfiler(logger);
             var profilingLogger = new ProfilingLogger(logger, profiler);
             var appCaches = AppCaches.Disabled;
-            var globalSettings = TestHelper.GetConfigs().Global();
-            var connectionStrings = TestHelper.GetConfigs().ConnectionStrings();
+            var globalSettings = new GlobalSettingsBuilder().Build();
+            var connectionStrings = new ConnectionStringsBuilder().Build();
             var typeFinder = TestHelper.GetTypeFinder();
-            var databaseFactory = new UmbracoDatabaseFactory(logger,globalSettings, connectionStrings, new Lazy<IMapperCollection>(() => factory.GetInstance<IMapperCollection>()),  TestHelper.DbProviderFactoryCreator);
+            var databaseFactory = new UmbracoDatabaseFactory(logger, globalSettings, connectionStrings, new Lazy<IMapperCollection>(() => factory.GetInstance<IMapperCollection>()),  TestHelper.DbProviderFactoryCreator);
             var ioHelper = TestHelper.IOHelper;
             var hostingEnvironment = Mock.Of<IHostingEnvironment>();
             var typeLoader = new TypeLoader(typeFinder, appCaches.RuntimeCache, new DirectoryInfo(ioHelper.MapPath("~/App_Data/TEMP")), profilingLogger);
@@ -77,14 +78,13 @@ namespace Umbraco.Tests.Runtimes
             var configs = TestHelper.GetConfigs();
             var variationContextAccessor = TestHelper.VariationContextAccessor;
 
-
             // create the register and the composition
             var register = TestHelper.GetRegister();
-            var composition = new Composition(register, typeLoader, profilingLogger, runtimeState, configs, ioHelper, appCaches);
+            var composition = new Composition(register, typeLoader, profilingLogger, runtimeState, ioHelper, appCaches);
             composition.RegisterEssentials(logger, profiler, profilingLogger, mainDom, appCaches, databaseFactory, typeLoader, runtimeState, typeFinder, ioHelper, umbracoVersion, TestHelper.DbProviderFactoryCreator, hostingEnvironment, backOfficeInfo);
 
             // create the core runtime and have it compose itself
-            var coreRuntime = new CoreRuntime(configs, umbracoVersion, ioHelper, logger, profiler, new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, TestHelper.DbProviderFactoryCreator, TestHelper.MainDom, typeFinder, NoAppCache.Instance);
+            var coreRuntime = new CoreRuntime(globalSettings, connectionStrings, umbracoVersion, ioHelper, logger, profiler, new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, TestHelper.DbProviderFactoryCreator, TestHelper.MainDom, typeFinder, NoAppCache.Instance);
 
             // determine actual runtime level
             runtimeState.DetermineRuntimeLevel(databaseFactory, logger);
@@ -124,8 +124,6 @@ namespace Umbraco.Tests.Runtimes
                 .Append<DistributedCacheBinderComponent>();
 
             // configure
-            composition.Configs.Add(() => TestHelpers.SettingsForTests.DefaultGlobalSettings);
-            composition.Configs.Add(TestHelpers.SettingsForTests.GenerateMockContentSettings);
 
             // create and register the factory
             Current.Factory = factory = composition.CreateFactory();
@@ -163,7 +161,8 @@ namespace Umbraco.Tests.Runtimes
                 var scopeProvider = factory.GetInstance<IScopeProvider>();
                 using (var scope = scopeProvider.CreateScope())
                 {
-                    var creator = new DatabaseSchemaCreator(scope.Database, logger, umbracoVersion, TestHelpers.SettingsForTests.DefaultGlobalSettings);
+                    var globalSettings = new GlobalSettingsBuilder().Build();
+                    var creator = new DatabaseSchemaCreator(scope.Database, logger, umbracoVersion, globalSettings);
                     creator.InitializeDatabaseSchema();
                     scope.Complete();
                 }
@@ -273,7 +272,7 @@ namespace Umbraco.Tests.Runtimes
 
             // create the register and the composition
             var register = TestHelper.GetRegister();
-            var composition = new Composition(register, typeLoader, profilingLogger, runtimeState, configs, ioHelper, appCaches);
+            var composition = new Composition(register, typeLoader, profilingLogger, runtimeState, ioHelper, appCaches);
             var umbracoVersion = TestHelper.GetUmbracoVersion();
             composition.RegisterEssentials(logger, profiler, profilingLogger, mainDom, appCaches, databaseFactory, typeLoader, runtimeState, typeFinder, ioHelper, umbracoVersion, TestHelper.DbProviderFactoryCreator, hostingEnvironment, backOfficeInfo);
 

@@ -16,6 +16,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
+using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 using File = System.IO.File;
@@ -55,7 +56,7 @@ namespace Umbraco.Tests.Packaging
             Factory.GetInstance<PropertyEditorCollection>(),
             Factory.GetInstance<IScopeProvider>(),
             Factory.GetInstance<IShortStringHelper>(),
-            Factory.GetInstance<IGlobalSettings>(),
+            new GlobalSettingsBuilder().Build(),
             Factory.GetInstance<ILocalizedTextService>()
             );
 

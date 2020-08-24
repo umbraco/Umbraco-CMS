@@ -60,6 +60,8 @@ using Umbraco.Web.Trees;
 using Current = Umbraco.Web.Composing.Current;
 using Umbraco.Tests.Common;
 using Umbraco.Core.Media;
+using Umbraco.Tests.Common.Builders;
+using Umbraco.Web.Configuration;
 
 namespace Umbraco.Tests.Testing
 {
@@ -177,7 +179,7 @@ namespace Umbraco.Tests.Testing
 
             IBackOfficeInfo backOfficeInfo = new AspNetBackOfficeInfo(globalSettings, IOHelper, logger, settings);
             IIpResolver ipResolver = new AspNetIpResolver();
-            UmbracoVersion = new UmbracoVersion(globalSettings);
+            UmbracoVersion = new UmbracoVersion(ConfigModelConversions.ConvertGlobalSettings(globalSettings));
 
 
             LocalizedTextService = new LocalizedTextService(new Dictionary<CultureInfo, Lazy<XDocument>>(), logger);
@@ -187,7 +189,7 @@ namespace Umbraco.Tests.Testing
 
 
 
-            Composition = new Composition(register, typeLoader, proflogger, ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.GetConfigs(), TestHelper.IOHelper, AppCaches.NoCache);
+            Composition = new Composition(register, typeLoader, proflogger, ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.IOHelper, AppCaches.NoCache);
 
 
 
@@ -319,15 +321,15 @@ namespace Umbraco.Tests.Testing
             Composition.RegisterUnique<HtmlImageSourceParser>();
             Composition.RegisterUnique<RichTextEditorPastedImages>();
             Composition.RegisterUnique<IPublishedValueFallback, NoopPublishedValueFallback>();
+
+            var webRoutingSettings = new WebRoutingSettingsBuilder().Build();
             Composition.RegisterUnique<IPublishedUrlProvider>(factory =>
                 new UrlProvider(
                     factory.GetInstance<IUmbracoContextAccessor>(),
-                    TestHelpers.SettingsForTests.GenerateMockWebRoutingSettings(),
+                    Microsoft.Extensions.Options.Options.Create(webRoutingSettings),
                     new UrlProviderCollection(Enumerable.Empty<IUrlProvider>()),
                     new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>()),
-                    factory.GetInstance<IVariationContextAccessor>()
-
-                    ));
+                    factory.GetInstance<IVariationContextAccessor>()));
 
 
 
@@ -457,8 +459,8 @@ namespace Umbraco.Tests.Testing
 
             Composition.RegisterUnique<IEventMessagesFactory>(_ => new TransientEventMessagesFactory());
 
-            var globalSettings = TestHelper.GetConfigs().Global();
-            var connectionStrings = TestHelper.GetConfigs().ConnectionStrings();
+            var globalSettings = new GlobalSettingsBuilder().Build();
+            var connectionStrings = new ConnectionStringsBuilder().Build();
 
             Composition.RegisterUnique<IUmbracoDatabaseFactory>(f => new UmbracoDatabaseFactory(Logger,
                 globalSettings,

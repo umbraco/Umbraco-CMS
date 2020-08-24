@@ -15,6 +15,7 @@ using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Services;
 using Umbraco.Persistance.SqlCe;
+using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Security;
 
@@ -38,8 +39,8 @@ namespace Umbraco.Tests.Persistence
             _sqlSyntaxProviders = new[] { (ISqlSyntaxProvider) _sqlCeSyntaxProvider };
             _logger = Mock.Of<ILogger>();
             _umbracoVersion = TestHelper.GetUmbracoVersion();
-            var globalSettings = TestHelper.GetConfigs().Global();
-            var connectionStrings = TestHelper.GetConfigs().ConnectionStrings();
+            var globalSettings = new GlobalSettingsBuilder().Build();
+            var connectionStrings = new ConnectionStringsBuilder().Build();
             _databaseFactory = new UmbracoDatabaseFactory(_logger, globalSettings, connectionStrings,  new Lazy<IMapperCollection>(() => Mock.Of<IMapperCollection>()), TestHelper.DbProviderFactoryCreator);
         }
 
@@ -94,7 +95,7 @@ namespace Umbraco.Tests.Persistence
             using (var database = _databaseFactory.CreateDatabase())
             using (var transaction = database.GetTransaction())
             {
-                schemaHelper = new DatabaseSchemaCreator(database, _logger, _umbracoVersion, SettingsForTests.GenerateMockGlobalSettings());
+                schemaHelper = new DatabaseSchemaCreator(database, _logger, _umbracoVersion, new GlobalSettingsBuilder().Build());
                 schemaHelper.InitializeDatabaseSchema();
                 transaction.Complete();
             }

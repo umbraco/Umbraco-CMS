@@ -4,6 +4,7 @@ using System.Threading;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.Services;
 
@@ -34,7 +35,8 @@ namespace Umbraco.Tests.Services
 
         private IUser CreateTestUser()
         {
-            var user = new User(TestObjects.GetGlobalSettings())
+            var globalSettings = new GlobalSettingsBuilder().Build();
+            var user = new User(globalSettings)
             {
                 Name = "Test user",
                 Username = "testUser",

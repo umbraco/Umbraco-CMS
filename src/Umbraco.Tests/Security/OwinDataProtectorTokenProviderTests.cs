@@ -9,6 +9,7 @@ using NUnit.Framework;
 using Umbraco.Core.BackOffice;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Tests.Common.Builders;
 using Umbraco.Web.Security;
 
 namespace Umbraco.Tests.Security
@@ -227,6 +228,7 @@ namespace Umbraco.Tests.Security
             _mockDataProtector.Setup(x => x.Protect(It.IsAny<byte[]>())).Returns((byte[] originalBytes) => originalBytes);
             _mockDataProtector.Setup(x => x.Unprotect(It.IsAny<byte[]>())).Returns((byte[] originalBytes) => originalBytes);
 
+            var globalSettings = new GlobalSettingsBuilder().Build();
             var mockGlobalSettings = new Mock<IGlobalSettings>();
             mockGlobalSettings.Setup(x => x.DefaultUILanguage).Returns("test");
 
@@ -234,7 +236,7 @@ namespace Umbraco.Tests.Security
                 null, null, null, null, null, null, null, null);
             _mockUserManager.Setup(x => x.SupportsUserSecurityStamp).Returns(false);
 
-            _testUser = new BackOfficeIdentityUser(mockGlobalSettings.Object, 2, new List<IReadOnlyUserGroup>())
+            _testUser = new BackOfficeIdentityUser(globalSettings, 2, new List<IReadOnlyUserGroup>())
             {
                 UserName = "alice",
                 Name = "Alice",

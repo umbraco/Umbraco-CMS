@@ -5,7 +5,7 @@ namespace Umbraco.Core.Configuration.Models
 {
     public class RequestHandlerSettings
     {
-        private static readonly CharItem[] DefaultCharCollection =
+        internal static readonly CharItem[] DefaultCharCollection =
         {
             new CharItem { Char = " ", Replacement = "-" },
             new CharItem { Char = "\"", Replacement = "" },
@@ -40,33 +40,29 @@ namespace Umbraco.Core.Configuration.Models
         public bool TryConvertUrlsToAscii { get; set; } = false;
 
         //We need to special handle ":", as this character is special in keys
-        public IEnumerable<IChar> CharCollection
-        {
-            get
-            {
-                // TODO: implement from configuration
 
-                //var collection = _configuration.GetSection(Prefix + "CharCollection").GetChildren()
-                //    .Select(x => new CharItem()
-                //    {
-                //        Char = x.GetValue<string>("Char"),
-                //        Replacement = x.GetValue<string>("Replacement"),
-                //    }).ToArray();
+        // TODO: implement from configuration
 
-                //if (collection.Any() || _configuration.GetSection("Prefix").GetChildren().Any(x =>
-                //    x.Key.Equals("CharCollection", StringComparison.OrdinalIgnoreCase)))
-                //{
-                //    return collection;
-                //}
+        //var collection = _configuration.GetSection(Prefix + "CharCollection").GetChildren()
+        //    .Select(x => new CharItem()
+        //    {
+        //        Char = x.GetValue<string>("Char"),
+        //        Replacement = x.GetValue<string>("Replacement"),
+        //    }).ToArray();
 
-                return DefaultCharCollection;
-            }
-        }
+        //if (collection.Any() || _configuration.GetSection("Prefix").GetChildren().Any(x =>
+        //    x.Key.Equals("CharCollection", StringComparison.OrdinalIgnoreCase)))
+        //{
+        //    return collection;
+        //}
 
+        // return DefaultCharCollection;
+        public IEnumerable<IChar> CharCollection { get; set; }
 
         public class CharItem : IChar
         {
             public string Char { get; set; }
+
             public string Replacement { get; set; }
         }
     }

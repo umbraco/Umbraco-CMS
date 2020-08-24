@@ -15,6 +15,7 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
+using Umbraco.Web.Configuration;
 
 namespace Umbraco.Tests.Routing
 {
@@ -32,7 +33,7 @@ namespace Umbraco.Tests.Routing
             //create the module
             var logger = Mock.Of<ILogger>();
             var globalSettings = TestObjects.GetGlobalSettings();
-            var runtime = new RuntimeState(globalSettings, UmbracoVersion);
+            var runtime = new RuntimeState(ConfigModelConversions.ConvertGlobalSettings(globalSettings), UmbracoVersion);
 
             _module = new UmbracoInjectedModule
             (

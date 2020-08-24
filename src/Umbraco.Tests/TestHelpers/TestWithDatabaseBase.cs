@@ -33,6 +33,7 @@ using Umbraco.Persistance.SqlCe;
 using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Web.WebApi;
 using Umbraco.Tests.Common;
+using Umbraco.Tests.Common.Builders;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -301,7 +302,8 @@ namespace Umbraco.Tests.TestHelpers
             {
                 using (var scope = ScopeProvider.CreateScope())
                 {
-                    var schemaHelper = new DatabaseSchemaCreator(scope.Database, Logger, UmbracoVersion, TestObjects.GetGlobalSettings());
+                    var globalSettings = new GlobalSettingsBuilder().Build();
+                    var schemaHelper = new DatabaseSchemaCreator(scope.Database, Logger, UmbracoVersion, globalSettings);
                     //Create the umbraco database and its base data
                     schemaHelper.InitializeDatabaseSchema();
 

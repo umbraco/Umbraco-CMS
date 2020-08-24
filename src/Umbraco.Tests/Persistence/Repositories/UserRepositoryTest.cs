@@ -16,6 +16,7 @@ using System;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Serialization;
 using Umbraco.Core.Configuration.Models;
+using Umbraco.Tests.Common.Builders;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
@@ -28,9 +29,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         private MediaRepository CreateMediaRepository(IScopeProvider provider, out IMediaTypeRepository mediaTypeRepository)
         {
             var accessor = (IScopeAccessor) provider;
+            var globalSettings = new GlobalSettingsBuilder().Build();
             var templateRepository = new TemplateRepository(accessor, AppCaches.Disabled, Logger, TestObjects.GetFileSystemsMock(), IOHelper, ShortStringHelper);
             var commonRepository = new ContentTypeCommonRepository(accessor, templateRepository, AppCaches, ShortStringHelper);
-            var languageRepository = new LanguageRepository(accessor, AppCaches, Logger, TestObjects.GetGlobalSettings());
+            var languageRepository = new LanguageRepository(accessor, AppCaches, Logger, Microsoft.Extensions.Options.Options.Create(globalSettings));
             mediaTypeRepository = new MediaTypeRepository(accessor, AppCaches, Mock.Of<ILogger>(), commonRepository, languageRepository, ShortStringHelper);
             var tagRepository = new TagRepository(accessor, AppCaches, Mock.Of<ILogger>());
             var relationTypeRepository = new RelationTypeRepository(accessor, AppCaches.Disabled, Logger);
@@ -52,10 +54,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         private DocumentRepository CreateContentRepository(IScopeProvider provider, out IContentTypeRepository contentTypeRepository, out ITemplateRepository templateRepository)
         {
             var accessor = (IScopeAccessor) provider;
+            var globalSettings = new GlobalSettingsBuilder().Build();
             templateRepository = new TemplateRepository(accessor, AppCaches, Logger, TestObjects.GetFileSystemsMock(), IOHelper, ShortStringHelper);
             var tagRepository = new TagRepository(accessor, AppCaches, Logger);
             var commonRepository = new ContentTypeCommonRepository(accessor, templateRepository, AppCaches, ShortStringHelper);
-            var languageRepository = new LanguageRepository(accessor, AppCaches, Logger, TestObjects.GetGlobalSettings());
+            var languageRepository = new LanguageRepository(accessor, AppCaches, Logger, Microsoft.Extensions.Options.Options.Create(globalSettings));
             contentTypeRepository = new ContentTypeRepository(accessor, AppCaches, Logger, commonRepository, languageRepository, ShortStringHelper);
             var relationTypeRepository = new RelationTypeRepository(accessor, AppCaches.Disabled, Logger);
             var entityRepository = new EntityRepository(accessor);
@@ -69,7 +72,8 @@ namespace Umbraco.Tests.Persistence.Repositories
         private UserRepository CreateRepository(IScopeProvider provider)
         {
             var accessor = (IScopeAccessor) provider;
-            var repository = new UserRepository(accessor, AppCaches.Disabled, Logger, Mappers, TestObjects.GetGlobalSettings(), new UserPasswordConfigurationSettings(), new JsonNetSerializer());
+            var globalSettings = new GlobalSettingsBuilder().Build();
+            var repository = new UserRepository(accessor, AppCaches.Disabled, Logger, Mappers, globalSettings, new UserPasswordConfigurationSettings(), new JsonNetSerializer());
             return repository;
         }
 

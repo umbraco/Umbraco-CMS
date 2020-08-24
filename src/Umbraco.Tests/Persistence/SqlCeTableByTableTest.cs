@@ -2,10 +2,12 @@
 using NPoco;
 using NUnit.Framework;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
@@ -16,7 +18,7 @@ namespace Umbraco.Tests.Persistence
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class SqlCeTableByTableTest : TestWithDatabaseBase
     {
-        public IGlobalSettings GlobalSettings => SettingsForTests.GenerateMockGlobalSettings();
+        public GlobalSettings GlobalSettings => new GlobalSettingsBuilder().Build();
 
         [Test]
         public void Can_Create_umbracoNode_Table()

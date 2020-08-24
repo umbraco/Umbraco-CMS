@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
-using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models.Packaging;
 using File = System.IO.File;
 
@@ -15,9 +15,9 @@ namespace Umbraco.Core.Packaging
     public class CompiledPackageXmlParser
     {
         private readonly ConflictingPackageData _conflictingPackageData;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
 
-        public CompiledPackageXmlParser(ConflictingPackageData conflictingPackageData, IGlobalSettings globalSettings)
+        public CompiledPackageXmlParser(ConflictingPackageData conflictingPackageData, GlobalSettings globalSettings)
         {
             _conflictingPackageData = conflictingPackageData;
             _globalSettings = globalSettings;

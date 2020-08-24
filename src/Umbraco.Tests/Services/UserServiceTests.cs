@@ -15,7 +15,7 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.Actions;
-
+using Umbraco.Tests.Common.Builders;
 
 namespace Umbraco.Tests.Services
 {
@@ -721,7 +721,8 @@ namespace Umbraco.Tests.Services
             var hash = new HMACSHA1();
             hash.Key = Encoding.Unicode.GetBytes(password);
             var encodedPassword = Convert.ToBase64String(hash.ComputeHash(Encoding.Unicode.GetBytes(password)));
-            var membershipUser = new User(TestObjects.GetGlobalSettings(), "JohnDoe", "john@umbraco.io", encodedPassword, encodedPassword);
+            var globalSettings = new GlobalSettingsBuilder().Build();
+            var membershipUser = new User(globalSettings, "JohnDoe", "john@umbraco.io", encodedPassword, encodedPassword);
             userService.Save(membershipUser);
 
             // Assert

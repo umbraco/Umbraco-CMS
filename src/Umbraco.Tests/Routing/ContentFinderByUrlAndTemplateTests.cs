@@ -8,6 +8,7 @@ using Umbraco.Web.Routing;
 using Umbraco.Core.Models;
 using Umbraco.Tests.Testing;
 using Current = Umbraco.Web.Composing.Current;
+using Umbraco.Tests.Common.Builders;
 
 namespace Umbraco.Tests.Routing
 {
@@ -38,7 +39,8 @@ namespace Umbraco.Tests.Routing
             var umbracoContext = GetUmbracoContext(urlAsString, template1.Id, globalSettings:globalSettings.Object);
             var publishedRouter = CreatePublishedRouter();
             var frequest = publishedRouter.CreateRequest(umbracoContext);
-            var lookup = new ContentFinderByUrlAndTemplate(Logger, ServiceContext.FileService, ServiceContext.ContentTypeService, SettingsForTests.GenerateMockWebRoutingSettings());
+            var webRoutingSettings = new WebRoutingSettingsBuilder().Build();
+            var lookup = new ContentFinderByUrlAndTemplate(Logger, ServiceContext.FileService, ServiceContext.ContentTypeService, webRoutingSettings);
 
             var result = lookup.TryFindContent(frequest);
 
