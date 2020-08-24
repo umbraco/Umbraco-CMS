@@ -9,9 +9,30 @@ namespace Umbraco.Extensions
 {
     public static class UmbracoBackOfficeApplicationBuilderExtensions
     {
+        public static IApplicationBuilder UseUmbraco(this IApplicationBuilder app)
+        {
+            if (app == null) throw new ArgumentNullException(nameof(app));
+            app.UseStatusCodePages();
+            app.UseRouting();
+
+            app.UseUmbracoCore();
+            app.UseUmbracoRouting();
+            app.UseRequestLocalization();
+            app.UseUmbracoRequestLogging();
+            app.UseUmbracoBackOffice();
+            app.UseUmbracoInstaller();
+
+            return app;
+        }
+
         public static IApplicationBuilder UseUmbracoBackOffice(this IApplicationBuilder app)
         {
             if (app == null) throw new ArgumentNullException(nameof(app));
+
+            // Important we handle image manipulations before the static files, otherwise the querystring is just ignored.
+            // TODO: Since we are dependent on these we need to register them but what happens when we call this multiple times since we are dependent on this for UseUmbracoBackOffice too?
+            app.UseImageSharp();
+            app.UseStaticFiles();
 
             if (!app.UmbracoCanBoot()) return app;
 

@@ -1,5 +1,10 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using System;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Umbraco.Core;
@@ -17,6 +22,49 @@ namespace Umbraco.Extensions
 {
     public static class UmbracoBackOfficeServiceCollectionExtensions
     {
+         public static IServiceCollection AddUmbraco(this IServiceCollection services, IWebHostEnvironment webHostEnvironment, IConfiguration config)
+        {
+            if (services == null) throw new ArgumentNullException(nameof(services));
+
+            // TODO: We will need to decide on if we want to use the ServiceBasedControllerActivator to create our controllers
+            // or use the default IControllerActivator: DefaultControllerActivator (which doesn't directly use the container to resolve controllers)
+            // This will affect whether we need to explicitly register controllers in the container like we do today in v8.
+            // What we absolutely must do though is make sure we explicitly opt-in to using one or the other *always* for our controllers instead of
+            // relying on a global configuration set by a user since if a custom IControllerActivator is used for our own controllers we may not
+            // guarantee it will work. And then... is that even possible?
+
+            // TODO: we will need to simplify this and prob just have a one or 2 main method that devs call which call all other required methods,
+            // but for now we'll just be explicit with all of them
+            services.AddUmbracoConfiguration(config);
+            services.AddUmbracoCore(webHostEnvironment, out var factory);
+            services.AddUmbracoWebComponents();
+            services.AddUmbracoRuntimeMinifier(config);
+            services.AddUmbracoBackOffice();
+            services.AddUmbracoBackOfficeIdentity();
+            services.AddMiniProfiler(options =>
+            {
+                options.ShouldProfile = request => false; // WebProfiler determine and start profiling. We should not use the MiniProfilerMiddleware to also profile
+            });
+
+            //We need to have runtime compilation of views when using umbraco. We could consider having only this when a specific config is set.
+            //But as far as I can see, there are still precompiled views, even when this is activated, so maybe it is okay.
+            services.AddControllersWithViews().AddRazorRuntimeCompilation();
+
+
+            // If using Kestrel: https://stackoverflow.com/a/55196057
+            services.Configure<KestrelServerOptions>(options =>
+            {
+                options.AllowSynchronousIO = true;
+            });
+
+            services.Configure<IISServerOptions>(options =>
+            {
+                options.AllowSynchronousIO = true;
+            });
+
+            return services;
+        }
+
         /// <summary>
         /// Adds the services required for running the Umbraco back office
         /// </summary>
