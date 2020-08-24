@@ -16,6 +16,8 @@ using Umbraco.Core.Services;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Configuration;
+using ConfigModelConversions = Umbraco.Tests.TestHelpers.ConfigModelConversions;
+using Umbraco.Tests.Common.Builders;
 
 namespace Umbraco.Tests.Routing
 {
@@ -32,8 +34,8 @@ namespace Umbraco.Tests.Routing
             // FIXME: be able to get the UmbracoModule from the container. any reason settings were from testobjects?
             //create the module
             var logger = Mock.Of<ILogger>();
-            var globalSettings = TestObjects.GetGlobalSettings();
-            var runtime = new RuntimeState(ConfigModelConversions.ConvertGlobalSettings(globalSettings), UmbracoVersion);
+            var globalSettings = new GlobalSettingsBuilder().Build();
+            var runtime = new RuntimeState(globalSettings, UmbracoVersion);
 
             _module = new UmbracoInjectedModule
             (
@@ -41,10 +43,10 @@ namespace Umbraco.Tests.Routing
                 logger,
                 null, // FIXME: PublishedRouter complexities...
                 Mock.Of<IUmbracoContextFactory>(),
-                new RoutableDocumentFilter(globalSettings, IOHelper),
+                new RoutableDocumentFilter(ConfigModelConversions.ConvertGlobalSettings(globalSettings), IOHelper),
                 UriUtility,
                 AppCaches.RequestCache,
-                globalSettings,
+                ConfigModelConversions.ConvertGlobalSettings(globalSettings),
                 HostingEnvironment
             );
 

@@ -16,6 +16,7 @@ using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Components;
 using Current = Umbraco.Web.Composing.Current;
+using Umbraco.Tests.Common.Builders;
 
 namespace Umbraco.Tests.Scoping
 {
@@ -38,7 +39,8 @@ namespace Umbraco.Tests.Scoping
 
             _testObjects = new TestObjects(register);
 
-            composition.RegisterUnique(factory => new FileSystems(factory, factory.TryGetInstance<ILogger>(), TestHelper.IOHelper, SettingsForTests.GenerateMockGlobalSettings(), TestHelper.GetHostingEnvironment()));
+            var globalSettings = new GlobalSettingsBuilder().Build();
+            composition.RegisterUnique(factory => new FileSystems(factory, factory.TryGetInstance<ILogger>(), TestHelper.IOHelper, Microsoft.Extensions.Options.Options.Create(globalSettings), TestHelper.GetHostingEnvironment()));
             composition.WithCollectionBuilder<MapperCollectionBuilder>();
 
             composition.Configs.Add(() => SettingsForTests.DefaultGlobalSettings);

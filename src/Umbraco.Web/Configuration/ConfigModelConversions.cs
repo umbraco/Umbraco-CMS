@@ -9,7 +9,7 @@ namespace Umbraco.Web.Configuration
 {
     /// <summary>
     /// TEMPORARY: this class has been added just to ensure Umbraco.Web functionality continues to compile, by
-    /// converting between <see cref="IGlobalSettings"></see> (used by
+    /// converting between e.g. <see cref="IGlobalSettings"></see> (used by
     /// legacy configuration and <see cref="GlobalSettings"></see> (used by Netcore/IOptions configuration).
     /// </summary>
     public static class ConfigModelConversions

@@ -12,6 +12,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
+using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 
@@ -37,7 +38,8 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private IStylesheetRepository CreateRepository()
         {
-            return new StylesheetRepository(_fileSystems, IOHelper, TestObjects.GetGlobalSettings());
+            var globalSettings = new GlobalSettingsBuilder().Build();
+            return new StylesheetRepository(_fileSystems, IOHelper, Microsoft.Extensions.Options.Options.Create(globalSettings));
         }
 
         [Test]

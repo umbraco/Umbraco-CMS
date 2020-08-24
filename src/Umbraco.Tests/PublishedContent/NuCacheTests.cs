@@ -201,14 +201,14 @@ namespace Umbraco.Tests.PublishedContent
                 Mock.Of<IMemberRepository>(),
                 new TestDefaultCultureAccessor(),
                 dataSource,
-                globalSettings,
+                Microsoft.Extensions.Options.Options.Create(globalSettings),
                 Mock.Of<IEntityXmlSerializer>(),
                 publishedModelFactory,
                 new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider(TestHelper.ShortStringHelper) }),
                 TestHelper.GetHostingEnvironment(),
                 new MockShortStringHelper(),
                 TestHelper.IOHelper,
-                nuCacheSettings);
+                Microsoft.Extensions.Options.Options.Create(nuCacheSettings));
 
             // invariant is the current default
             _variationAccesor.VariationContext = new VariationContext();

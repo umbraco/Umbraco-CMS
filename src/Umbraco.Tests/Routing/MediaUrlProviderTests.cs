@@ -13,6 +13,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Common;
+using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.PublishedContent;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
@@ -34,12 +35,12 @@ namespace Umbraco.Tests.Routing
 
             var logger = Mock.Of<ILogger>();
             var mediaFileSystemMock = Mock.Of<IMediaFileSystem>();
-            var contentSection = Mock.Of<IContentSettings>();
+            var contentSettings = new ContentSettingsBuilder().Build();
             var dataTypeService = Mock.Of<IDataTypeService>();
             var propertyEditors = new MediaUrlGeneratorCollection(new IMediaUrlGenerator[]
             {
-                new FileUploadPropertyEditor(logger, mediaFileSystemMock, contentSection, dataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper),
-                new ImageCropperPropertyEditor(logger, mediaFileSystemMock, contentSection, dataTypeService, LocalizationService, IOHelper, ShortStringHelper, LocalizedTextService),
+                new FileUploadPropertyEditor(logger, mediaFileSystemMock, contentSettings, dataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper),
+                new ImageCropperPropertyEditor(logger, mediaFileSystemMock, contentSettings, dataTypeService, LocalizationService, IOHelper, ShortStringHelper, LocalizedTextService),
             });
             _mediaUrlProvider = new DefaultMediaUrlProvider(propertyEditors, UriUtility);
         }
@@ -149,9 +150,10 @@ namespace Umbraco.Tests.Routing
 
         private IPublishedUrlProvider GetPublishedUrlProvider(IUmbracoContext umbracoContext)
         {
+            var webRoutingSettings = new WebRoutingSettingsBuilder().Build();
             return new UrlProvider(
                 new TestUmbracoContextAccessor(umbracoContext),
-                TestHelper.WebRoutingSettings,
+                Microsoft.Extensions.Options.Options.Create(webRoutingSettings),
                 new UrlProviderCollection(Enumerable.Empty<IUrlProvider>()),
                 new MediaUrlProviderCollection(new []{_mediaUrlProvider}),
                 Mock.Of<IVariationContextAccessor>()

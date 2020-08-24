@@ -47,7 +47,11 @@ namespace Umbraco.Tests.Packaging
                 _testBaseFolder.Delete(true);
         }
 
-        private CompiledPackageXmlParser Parser => new CompiledPackageXmlParser(new ConflictingPackageData(ServiceContext.MacroService, ServiceContext.FileService),Factory.GetInstance<IGlobalSettings>());
+        private CompiledPackageXmlParser Parser => new CompiledPackageXmlParser(
+            new ConflictingPackageData(
+                ServiceContext.MacroService,
+                ServiceContext.FileService),
+                new GlobalSettingsBuilder().Build());
 
         private PackageDataInstallation PackageDataInstallation => new PackageDataInstallation(
             Logger, ServiceContext.FileService, ServiceContext.MacroService, ServiceContext.LocalizationService,
@@ -57,8 +61,7 @@ namespace Umbraco.Tests.Packaging
             Factory.GetInstance<IScopeProvider>(),
             Factory.GetInstance<IShortStringHelper>(),
             new GlobalSettingsBuilder().Build(),
-            Factory.GetInstance<ILocalizedTextService>()
-            );
+            Factory.GetInstance<ILocalizedTextService>()            );
 
         private IPackageInstallation PackageInstallation => new PackageInstallation(
             PackageDataInstallation,

@@ -145,6 +145,7 @@
     <Compile Include="Security\OwinDataProtectorTokenProviderTests.cs" />
     <Compile Include="Services\KeyValueServiceTests.cs" />
     <Compile Include="Persistence\Repositories\UserRepositoryTest.cs" />
+    <Compile Include="TestHelpers\ConfigModelConversions.cs" />
     <Compile Include="TestHelpers\Entities\MockedEntity.cs" />
     <Compile Include="TestHelpers\Entities\MockedMedia.cs" />
     <Compile Include="TestHelpers\Entities\MockedMember.cs" />
@@ -558,8 +559,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Models\Mapping\" />
-    <Folder Include="Models\Mapping" />
-    <Folder Include="Web\Validation" />
+    <Folder Include="Web\Validation\" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />

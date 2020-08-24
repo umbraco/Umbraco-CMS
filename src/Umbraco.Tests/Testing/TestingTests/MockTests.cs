@@ -27,6 +27,7 @@ using Umbraco.Web.Security;
 using Umbraco.Web.Security.Providers;
 using Umbraco.Web.WebApi;
 using Current = Umbraco.Web.Composing.Current;
+using Umbraco.Tests.Common.Builders;
 
 namespace Umbraco.Tests.Testing.TestingTests
 {
@@ -84,9 +85,10 @@ namespace Umbraco.Tests.Testing.TestingTests
                 .Returns(UrlInfo.Url("/hello/world/1234"));
             var urlProvider = urlProviderMock.Object;
 
+            var webRoutingSettings = new WebRoutingSettingsBuilder().Build();
             var theUrlProvider = new UrlProvider(
                 new TestUmbracoContextAccessor(umbracoContext),
-                TestHelper.WebRoutingSettings,
+                Microsoft.Extensions.Options.Options.Create(webRoutingSettings),
                 new UrlProviderCollection(new [] { urlProvider }),
                 new MediaUrlProviderCollection( Enumerable.Empty<IMediaUrlProvider>())
                 , umbracoContext.VariationContextAccessor);
