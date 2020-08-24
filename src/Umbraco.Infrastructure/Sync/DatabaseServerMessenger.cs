@@ -63,6 +63,13 @@ namespace Umbraco.Core.Sync
             _lastPruned = _lastSync = DateTime.UtcNow;
             _syncIdle = new ManualResetEvent(true);
             _distCacheFilePath = new Lazy<string>(() => GetDistCacheFilePath(hostingEnvironment));
+
+            // See notes on LocalIdentity
+            LocalIdentity = NetworkHelper.MachineName // eg DOMAIN\SERVER
+                + "/" + _hostingEnvironment.ApplicationId // eg /LM/S3SVC/11/ROOT
+                + " [P" + Process.GetCurrentProcess().Id // eg 1234
+                + "/D" + AppDomain.CurrentDomain.Id // eg 22
+                + "] " + Guid.NewGuid().ToString("N").ToUpper(); // make it truly unique
         }
 
         protected ILogger Logger { get; }
@@ -526,11 +533,7 @@ namespace Umbraco.Core.Sync
         /// <para>Practically, all we really need is the guid, the other infos are here for information
         /// and debugging purposes.</para>
         /// </remarks>
-        protected string LocalIdentity => NetworkHelper.MachineName // eg DOMAIN\SERVER
-            + "/" + _hostingEnvironment.ApplicationId // eg /LM/S3SVC/11/ROOT
-            + " [P" + Process.GetCurrentProcess().Id // eg 1234
-            + "/D" + AppDomain.CurrentDomain.Id // eg 22
-            + "] " + Guid.NewGuid().ToString("N").ToUpper(); // make it truly unique
+        protected string LocalIdentity { get; }
 
         private string GetDistCacheFilePath(IHostingEnvironment hostingEnvironment)
         {
