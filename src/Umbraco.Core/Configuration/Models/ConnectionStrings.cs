@@ -1,13 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Common;
-using System.Text.Json.Serialization;
 
 namespace Umbraco.Core.Configuration.Models
 {
     public class ConnectionStrings
     {
-        [JsonPropertyName(Constants.System.UmbracoConnectionName)]
+        // Backing field for UmbracoConnectionString to load from configuration value with key umbracoDbDSN.
+        // Attributes cannot be applied to map from keys that don't match, and have chosen to retain the key name
+        // used in configuration for older Umbraco versions.
+        // See: https://stackoverflow.com/a/54607296/489433
+        private string umbracoDbDSN
+        {
+            get => string.Empty;
+            set => UmbracoConnectionString = value;
+        }
+
         public string UmbracoConnectionString { get; set; }
 
         private Dictionary<string, string> AsDictionary() => new Dictionary<string, string>

@@ -29,7 +29,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         public static string[] GetUrls(this IMedia media, ContentSettings contentSettings, MediaUrlGeneratorCollection mediaUrlGenerators)
         {
-            return contentSettings.Imaging.ImageAutoFillProperties
+            return contentSettings.Imaging.AutoFillImageProperties
                 .Select(field => media.GetUrl(field.Alias, mediaUrlGenerators))
                 .Where(link => string.IsNullOrWhiteSpace(link) == false)
                 .ToArray();

@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Text.Json.Serialization;
-using Umbraco.Core;
 using Umbraco.Core.Configuration.UmbracoSettings;
 
 namespace Umbraco.Core.Configuration.Models
@@ -21,8 +19,7 @@ namespace Umbraco.Core.Configuration.Models
 
         public IEnumerable<string> ImageFileTypes { get; set; } = new[] { "jpeg", "jpg", "gif", "bmp", "png", "tiff", "tif" };
 
-        [JsonPropertyName("AutoFillImageProperties")]
-        public IEnumerable<IImagingAutoFillUploadField> ImageAutoFillProperties { get; set; } = DefaultImagingAutoFillUploadField;
+        public IEnumerable<IImagingAutoFillUploadField> AutoFillImageProperties { get; set; } = DefaultImagingAutoFillUploadField;
 
         private class ImagingAutoFillUploadField : IImagingAutoFillUploadField
         {

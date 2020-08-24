@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace Umbraco.Core.Configuration.Models
+﻿namespace Umbraco.Core.Configuration.Models
 {
     public class ImagingCacheSettings
     {
@@ -10,7 +8,6 @@ namespace Umbraco.Core.Configuration.Models
 
         public uint CachedNameLength { get; set; } = 7;
 
-        [JsonPropertyName("Folder")]
         public string CacheFolder { get; set; } = "../App_Data/Cache";
     }
 }

@@ -20,7 +20,6 @@
       <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.7.0" />
       <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.3.0" />
       <PackageReference Include="System.Runtime.Caching" Version="4.6.0" />
-      <PackageReference Include="System.Text.Json" Version="4.7.2" />
     </ItemGroup>
 
     <ItemGroup>

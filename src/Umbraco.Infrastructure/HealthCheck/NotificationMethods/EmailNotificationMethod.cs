@@ -24,7 +24,7 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
             ILocalizedTextService textService,
             IRequestAccessor requestAccessor,
             IOptions<GlobalSettings> globalSettings,
-            IHealthChecksSettings healthChecksSettings,
+            IOptions<HealthChecksSettings> healthChecksSettings,
             IOptions<ContentSettings> contentSettings)
             : base(healthChecksSettings)
         {

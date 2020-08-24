@@ -125,7 +125,7 @@ namespace Umbraco.Core.Runtime
             // register a server registrar, by default it's the db registrar
             composition.RegisterUnique<IServerRegistrar>(f =>
             {
-                var globalSettings = f.GetInstance<IGlobalSettings>();
+                var globalSettings = f.GetInstance<IOptions<GlobalSettings>>().Value;
 
                 // TODO:  we still register the full IServerMessenger because
                 // even on 1 single server we can have 2 concurrent app domains

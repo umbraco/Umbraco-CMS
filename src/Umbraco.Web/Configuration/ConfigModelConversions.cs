@@ -29,7 +29,7 @@ namespace Umbraco.Web.Configuration
                 RegisterType = globalSettings.RegisterType,
                 ReservedPaths = globalSettings.ReservedPaths,
                 ReservedUrls = globalSettings.ReservedUrls,
-                SmtpSettings = new SmtpSettings
+                Smtp = new SmtpSettings
                 {
                     DeliveryMethod = globalSettings.SmtpSettings.DeliveryMethod,
                     From = globalSettings.SmtpSettings.From,

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text.Json.Serialization;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Macros;
 
@@ -20,7 +19,6 @@ namespace Umbraco.Core.Configuration.Models
         // TODO: to retain previous configuration structure, this should come from a nested collection,
         // "Errors:Error404".  Although we can use JsonPropertyName to map when the JSON field name differs
         // from the one in this class, not sure how we'd "flatten" a collection like this.
-        [JsonPropertyName("Error404")]
         public IEnumerable<IContentErrorPage> Error404Collection { get; set; }
 
         // public IEnumerable<IContentErrorPage> Error404Collection => _configuration
@@ -30,7 +28,6 @@ namespace Umbraco.Core.Configuration.Models
 
         public string PreviewBadge { get; set; } = DefaultPreviewBadge;
 
-        [JsonPropertyName("MacroErrors")]
         public MacroErrorBehaviour MacroErrorBehaviour { get; set; } = MacroErrorBehaviour.Inline;
 
         public IEnumerable<string> DisallowedUploadFiles { get; set; } = new[] { "ashx", "aspx", "ascx", "config", "cshtml", "vbhtml", "asmx", "air", "axd" };

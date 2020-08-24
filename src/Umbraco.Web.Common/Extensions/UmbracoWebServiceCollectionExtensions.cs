@@ -64,8 +64,8 @@ namespace Umbraco.Extensions
                         options.CachedNameLength = imagingSettings.Cache.CachedNameLength;
                         options.OnParseCommands = context =>
                         {
-                            RemoveIntParamenterIfValueGreatherThen(context.Commands, ResizeWebProcessor.Width, imagingSettings.Resize.MaxResizeWidth);
-                            RemoveIntParamenterIfValueGreatherThen(context.Commands, ResizeWebProcessor.Height, imagingSettings.Resize.MaxResizeHeight);
+                            RemoveIntParamenterIfValueGreatherThen(context.Commands, ResizeWebProcessor.Width, imagingSettings.Resize.MaxWidth);
+                            RemoveIntParamenterIfValueGreatherThen(context.Commands, ResizeWebProcessor.Height, imagingSettings.Resize.MaxHeight);
                         };
                         options.OnBeforeSave = _ => { };
                         options.OnProcessed = _ => { };

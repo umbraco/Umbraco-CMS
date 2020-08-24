@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace Umbraco.Core.Configuration.Models
+﻿namespace Umbraco.Core.Configuration.Models
 {
     /// <summary>
     ///     The GlobalSettings Class contains general settings information for the entire Umbraco instance based on information
@@ -54,9 +52,8 @@ namespace Umbraco.Core.Configuration.Models
 
         public string NoNodesViewPath { get; set; } = "~/config/splashes/NoNodes.cshtml";
 
-        public bool IsSmtpServerConfigured => !string.IsNullOrWhiteSpace(SmtpSettings?.Host);
+        public bool IsSmtpServerConfigured => !string.IsNullOrWhiteSpace(Smtp?.Host);
 
-        [JsonPropertyName("Smtp")]
-        public SmtpSettings SmtpSettings { get; set; }
+        public SmtpSettings Smtp { get; set; }
     }
 }

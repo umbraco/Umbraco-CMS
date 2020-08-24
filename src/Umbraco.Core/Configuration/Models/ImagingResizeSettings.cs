@@ -1,14 +1,9 @@
-﻿
-using System.Text.Json.Serialization;
-
-namespace Umbraco.Core.Configuration.Models
+﻿namespace Umbraco.Core.Configuration.Models
 {
     public class ImagingResizeSettings
     {
-        [JsonPropertyName("MaxWidth")]
-        public int MaxResizeWidth { get; set; } = 5000;
+        public int MaxWidth { get; set; } = 5000;
 
-        [JsonPropertyName("MaxHeight")]
-        public int MaxResizeHeight { get; set; } = 5000;
+        public int MaxHeight { get; set; } = 5000;
     }
 }

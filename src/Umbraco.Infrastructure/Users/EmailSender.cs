@@ -60,12 +60,12 @@ namespace Umbraco.Core
                 using (var client = new SmtpClient())
                 {
 
-                    client.Connect(_globalSettings.SmtpSettings.Host, _globalSettings.SmtpSettings.Port);
+                    client.Connect(_globalSettings.Smtp.Host, _globalSettings.Smtp.Port);
 
-                    if (!(_globalSettings.SmtpSettings.Username is null &&
-                          _globalSettings.SmtpSettings.Password is null))
+                    if (!(_globalSettings.Smtp.Username is null &&
+                          _globalSettings.Smtp.Password is null))
                     {
-                        client.Authenticate(_globalSettings.SmtpSettings.Username, _globalSettings.SmtpSettings.Password);
+                        client.Authenticate(_globalSettings.Smtp.Username, _globalSettings.Smtp.Password);
                     }
 
                     client.Send(ConstructEmailMessage(message));
@@ -89,16 +89,16 @@ namespace Umbraco.Core
             {
                 using (var client = new SmtpClient())
                 {
-                    await client.ConnectAsync(_globalSettings.SmtpSettings.Host, _globalSettings.SmtpSettings.Port);
+                    await client.ConnectAsync(_globalSettings.Smtp.Host, _globalSettings.Smtp.Port);
 
-                    if (!(_globalSettings.SmtpSettings.Username is null &&
-                          _globalSettings.SmtpSettings.Password is null))
+                    if (!(_globalSettings.Smtp.Username is null &&
+                          _globalSettings.Smtp.Password is null))
                     {
-                        await client.AuthenticateAsync(_globalSettings.SmtpSettings.Username, _globalSettings.SmtpSettings.Password);
+                        await client.AuthenticateAsync(_globalSettings.Smtp.Username, _globalSettings.Smtp.Password);
                     }
 
                     var mailMessage = ConstructEmailMessage(message);
-                    if (_globalSettings.SmtpSettings.DeliveryMethod == SmtpDeliveryMethod.Network)
+                    if (_globalSettings.Smtp.DeliveryMethod == SmtpDeliveryMethod.Network)
                     {
                         await client.SendAsync(mailMessage);
                     }
@@ -143,7 +143,7 @@ namespace Umbraco.Core
         {
             var fromEmail = mailMessage.From?.Address;
             if(string.IsNullOrEmpty(fromEmail))
-                fromEmail = _globalSettings.SmtpSettings.From;
+                fromEmail = _globalSettings.Smtp.From;
 
             var messageToSend = new MimeMessage
             {

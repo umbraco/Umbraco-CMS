@@ -36,7 +36,7 @@ namespace Umbraco.Web.Scheduling
         private readonly HealthCheckCollection _healthChecks;
         private readonly HealthCheckNotificationMethodCollection _notifications;
         private readonly IUmbracoContextFactory _umbracoContextFactory;
-        private readonly IHealthChecksSettings _healthChecksSettingsConfig;
+        private readonly HealthChecksSettings _healthChecksSettings;
         private readonly IServerMessenger _serverMessenger;
         private readonly IRequestAccessor _requestAccessor;
         private readonly LoggingSettings _loggingSettings;
@@ -57,7 +57,7 @@ namespace Umbraco.Web.Scheduling
             IContentService contentService, IAuditService auditService,
             HealthCheckCollection healthChecks, HealthCheckNotificationMethodCollection notifications,
             IScopeProvider scopeProvider, IUmbracoContextFactory umbracoContextFactory, IProfilingLogger logger,
-            IApplicationShutdownRegistry applicationShutdownRegistry, IHealthChecksSettings healthChecksSettingsConfig,
+            IApplicationShutdownRegistry applicationShutdownRegistry, IOptions<HealthChecksSettings> healthChecksSettings,
             IServerMessenger serverMessenger, IRequestAccessor requestAccessor,
             IOptions<LoggingSettings> loggingSettings, IOptions<KeepAliveSettings> keepAliveSettings,
             IHostingEnvironment hostingEnvironment)
@@ -74,7 +74,7 @@ namespace Umbraco.Web.Scheduling
 
             _healthChecks = healthChecks;
             _notifications = notifications;
-            _healthChecksSettingsConfig = healthChecksSettingsConfig ?? throw new ArgumentNullException(nameof(healthChecksSettingsConfig));
+            _healthChecksSettings = healthChecksSettings.Value ?? throw new ArgumentNullException(nameof(healthChecksSettings));
             _serverMessenger = serverMessenger;
             _requestAccessor = requestAccessor;
             _loggingSettings = loggingSettings.Value;
@@ -129,7 +129,7 @@ namespace Umbraco.Web.Scheduling
                 tasks.Add(RegisterLogScrubber(_loggingSettings));
                 tasks.Add(RegisterTempFileCleanup());
 
-                var healthCheckConfig = _healthChecksSettingsConfig;
+                var healthCheckConfig = _healthChecksSettings;
                 if (healthCheckConfig.NotificationSettings.Enabled)
                     tasks.Add(RegisterHealthCheckNotifier(healthCheckConfig, _healthChecks, _notifications, _logger));
 
@@ -155,7 +155,7 @@ namespace Umbraco.Web.Scheduling
             return task;
         }
 
-        private IBackgroundTask RegisterHealthCheckNotifier(IHealthChecksSettings healthCheckSettingsConfig,
+        private IBackgroundTask RegisterHealthCheckNotifier(HealthChecksSettings healthCheckSettingsConfig,
             HealthCheckCollection healthChecks, HealthCheckNotificationMethodCollection notifications,
             IProfilingLogger logger)
         {
@@ -176,7 +176,7 @@ namespace Umbraco.Web.Scheduling
             }
 
             var periodInMilliseconds = healthCheckSettingsConfig.NotificationSettings.PeriodInHours * 60 * 60 * 1000;
-            var task = new HealthCheckNotifier(_healthCheckRunner, delayInMilliseconds, periodInMilliseconds, healthChecks, notifications, _mainDom, logger, _healthChecksSettingsConfig, _serverRegistrar, _runtime, _scopeProvider);
+            var task = new HealthCheckNotifier(_healthCheckRunner, delayInMilliseconds, periodInMilliseconds, healthChecks, notifications, _mainDom, logger, _healthChecksSettings, _serverRegistrar, _runtime, _scopeProvider);
             _healthCheckRunner.TryAdd(task);
             return task;
         }
