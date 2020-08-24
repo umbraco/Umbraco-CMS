@@ -17,7 +17,7 @@ context('Backoffice Tour', () => {
         //assert
         cy.get('[data-element="help-tours"]').should("be.visible");
         cy.get('[data-element="help-tours"]').click();
-        getPercentage(60000, 17);
+        getPercentage(17, 60000);
     });
 
     it('Backoffice introduction tour should run then rerun', () => {
@@ -29,9 +29,9 @@ context('Backoffice Tour', () => {
 
         //assert
         cy.get('[data-element="help-tours"]').should("be.visible");
-        cy.get('[data-element="help-tours"] .umb-help-list').click();
+        cy.get('[data-element="help-tours"]').click();
         cy.umbracoGlobalHelp().should("be.visible");
-        getPercentage(60000, 17);
+        getPercentage(17, 60000);
     });
 
     afterEach(() => {
