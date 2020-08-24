@@ -39,6 +39,7 @@ namespace Umbraco.Tests.UnitTests.AutoFixture
                     fixture
                         .Customize(new ConstructorCustomization(typeof(UsersController), new GreedyConstructorQuery()))
                         .Customize(new ConstructorCustomization(typeof(InstallController), new GreedyConstructorQuery()))
+                        .Customize(new ConstructorCustomization(typeof(PreviewController), new GreedyConstructorQuery()))
                         .Customize(new ConstructorCustomization(typeof(BackOfficeUserManager), new GreedyConstructorQuery()))
                         .Customize(new AutoMoqCustomization());
 
