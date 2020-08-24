@@ -18,6 +18,7 @@ using Umbraco.Core.Serialization;
 using Umbraco.Core.Strings;
 using Umbraco.Web;
 using Umbraco.Web.Routing;
+using Umbraco.Tests.Common.Builders;
 
 namespace Umbraco.Tests.Common
 {
@@ -49,8 +50,9 @@ namespace Umbraco.Tests.Common
 
         public IRuntimeState GetRuntimeState()
         {
+            var globalSettings = new GlobalSettingsBuilder().Build();
             return new RuntimeState(
-                Mock.Of<IGlobalSettings>(),
+                globalSettings,
                 GetUmbracoVersion());
         }
 
@@ -89,7 +91,7 @@ namespace Umbraco.Tests.Common
             get
             {
                 if (_ioHelper == null)
-                    _ioHelper = new IOHelper(GetHostingEnvironment(), SettingsForTests.GenerateMockGlobalSettings());
+                    _ioHelper = new IOHelper(GetHostingEnvironment());
                 return _ioHelper;
             }
         }
@@ -126,11 +128,11 @@ namespace Umbraco.Tests.Common
             return relativePath.Replace("~/", bin + "/");
         }
 
-        public IUmbracoVersion GetUmbracoVersion() => new UmbracoVersion(GetConfigs().Global());
+        public IUmbracoVersion GetUmbracoVersion() => new UmbracoVersion(new GlobalSettingsBuilder().Build());
 
         public IRegister GetRegister()
         {
-            return RegisterFactory.Create(GetConfigs().Global());
+            return RegisterFactory.Create(new GlobalSettingsBuilder().Build());
         }
 
         public abstract IHostingEnvironment GetHostingEnvironment();
