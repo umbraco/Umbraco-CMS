@@ -25,12 +25,12 @@
             var disconnectObserver = false;
             var closingEditor = false;
 
-            if(!$rootScope.lastKnowFocusedElements){
-                $rootScope.lastKnowFocusedElements = [];
+            if(!$rootScope.lastKnownFocusableElements){
+                $rootScope.lastKnownFocusableElements = [];
             }
 
-            $rootScope.lastKnowFocusedElements.push(document.activeElement);
-            
+            $rootScope.lastKnownFocusableElements.push(document.activeElement);
+
             // List of elements that can be focusable within the focus lock
             var focusableElementsSelector = 'a[href]:not([disabled]):not(.ng-hide), button:not([disabled]):not(.ng-hide), textarea:not([disabled]):not(.ng-hide), input:not([disabled]):not(.ng-hide), select:not([disabled]):not(.ng-hide)';
             var bodyElement = document.querySelector('body');
@@ -45,17 +45,17 @@
                 focusableElements = elm.querySelectorAll(focusableElementsSelector);
                 firstFocusableElement = focusableElements[0];
                 lastFocusableElement = focusableElements[focusableElements.length -1];
-                
+
                 return focusableElements;
             }
 
             function handleKeydown() {
                 var isTabPressed = (event.key === 'Tab' || event.keyCode === 9);
-                
+
                 if (!isTabPressed){
                     return;
                 }
-    
+
                 // If shift + tab key
                 if(event.shiftKey){
                     // Set focus on the last focusable element if shift+tab are pressed meaning we go backwards
@@ -75,7 +75,7 @@
             }
 
             function clearLastKnownFocusedElements() {
-                $rootScope.lastKnowFocusedElements = [];
+                $rootScope.lastKnownFocusableElements = [];
             }
 
             function setElementFocus() {
@@ -83,7 +83,7 @@
                 var lastknownElement;
 
                 if(closingEditor){
-                    var lastItemIndex = $rootScope.lastKnowFocusedElements.length - 1;
+                    var lastItemIndex = $rootScope.lastKnownFocusableElements.length - 1;
                     var editorInfo = infiniteEditors[0].querySelector('.editor-info');
 
                     // If there is only one editor open, search for the "editor-info" inside it and set focus on it
@@ -97,10 +97,10 @@
                         clearLastKnownFocusedElements();
                     }
                     else {
-                        lastknownElement = $rootScope.lastKnowFocusedElements[lastItemIndex];
+                        lastknownElement = $rootScope.lastKnownFocusableElements[lastItemIndex];
 
                         // Remove the last item from the array so we always set the correct lastKnowFocus for each layer
-                        $rootScope.lastKnowFocusedElements.splice(lastItemIndex, 1);
+                        $rootScope.lastKnownFocusableElements.splice(lastItemIndex, 1);
                     }
 
                     // Update the lastknowelement variable here
@@ -122,10 +122,10 @@
                     defaultFocusedElement.focus();
                 }
             }
-            
+
             function observeDomChanges(init) {
                 var targetToObserve = init ? document.querySelector('.umb-editors') : target;
-                // Watch for DOM changes - so we can refresh the focusable elements if an element 
+                // Watch for DOM changes - so we can refresh the focusable elements if an element
                 // changes from being disabled to being enabled for instance
                 var observer = new MutationObserver(domChange);
 
@@ -152,7 +152,7 @@
                 if(inactiveEditors.length > 0) {
                     for (var index = 0; index < inactiveEditors.length; index++) {
                         var inactiveEditor = inactiveEditors[index];
-                        
+
                         // Remove event handlers from inactive editors
                         inactiveEditor.removeEventListener('keydown', handleKeydown);
                     }
@@ -169,7 +169,7 @@
                 $timeout(() => {
 
                     getDomNodes();
-                    
+
                     // Only do the cleanup if we're in infinite editing mode
                     if(infiniteEditors.length > 0){
                         cleanupEventHandlers();
@@ -180,13 +180,13 @@
                     if(focusableElements.length > 0) {
 
                         observeDomChanges();
-    
+
                         // We need to add the tabbing-active class in order to highlight the focused button since the default style is
                         // outline: none; set in the stylesheet specifically
                         bodyElement.classList.add('tabbing-active');
 
                         setElementFocus();
-        
+
                         //  Handle keydown
                         target.addEventListener('keydown', handleKeydown);
                     }
@@ -214,8 +214,8 @@
 
                     return;
                 }
-                
-                // Clear lastKnowFocusedElements
+
+                // Clear lastKnownFocusableElements
                 clearLastKnownFocusedElements();
 
                 // Cleanup event handler
