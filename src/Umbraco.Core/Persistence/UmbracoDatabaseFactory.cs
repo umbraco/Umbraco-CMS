@@ -156,6 +156,7 @@ namespace Umbraco.Core.Persistence
                 case SqlServerSyntaxProvider.VersionName.V2014:
                 case SqlServerSyntaxProvider.VersionName.V2016:
                 case SqlServerSyntaxProvider.VersionName.V2017:
+                case SqlServerSyntaxProvider.VersionName.V2019:
                     _databaseType = DatabaseType.SqlServer2012;
                     break;
                 // else leave unchanged
