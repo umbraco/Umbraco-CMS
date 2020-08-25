@@ -7,7 +7,7 @@ namespace Umbraco.Tests.Common.Builders
     public class RequestHandlerSettingsBuilder : BuilderBase<RequestHandlerSettings>
     {
         private bool? _addTrailingSlash;
-        private bool? _convertUrlsToAscii;
+        private string _convertUrlsToAscii;
         private IEnumerable<IChar> _charCollection;
 
         public RequestHandlerSettingsBuilder WithAddTrailingSlash(bool addTrailingSlash)
@@ -16,7 +16,7 @@ namespace Umbraco.Tests.Common.Builders
             return this;
         }
 
-        public RequestHandlerSettingsBuilder WithConvertUrlsToAscii(bool convertUrlsToAscii)
+        public RequestHandlerSettingsBuilder WithConvertUrlsToAscii(string convertUrlsToAscii)
         {
             _convertUrlsToAscii = convertUrlsToAscii;
             return this;
@@ -26,13 +26,12 @@ namespace Umbraco.Tests.Common.Builders
         {
             _charCollection = charCollection;
             return this;
-        }
-        
+        }        
 
         public override RequestHandlerSettings Build()
         {
             var addTrailingSlash = _addTrailingSlash ?? false;
-            var convertUrlsToAscii = _convertUrlsToAscii ?? false;
+            var convertUrlsToAscii = _convertUrlsToAscii ?? "false";
             var charCollection = _charCollection ?? RequestHandlerSettings.DefaultCharCollection;
 
             return new RequestHandlerSettings

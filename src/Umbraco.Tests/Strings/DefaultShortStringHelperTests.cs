@@ -98,7 +98,7 @@ namespace Umbraco.Tests.Strings
         public void U4_4056()
         {
             var requestHandlerSettings = new RequestHandlerSettingsBuilder()
-                .WithConvertUrlsToAscii(false)
+                .WithConvertUrlsToAscii("false")
                 .WithCharCollection(Enumerable.Empty<IChar>())
                 .Build();
 
@@ -123,7 +123,7 @@ namespace Umbraco.Tests.Strings
         public void U4_4056_TryAscii()
         {
             var requestHandlerSettings = new RequestHandlerSettingsBuilder()
-                .WithConvertUrlsToAscii(false)
+                .WithConvertUrlsToAscii("false")
                 .WithCharCollection(Enumerable.Empty<IChar>())
                 .Build();
 
@@ -411,7 +411,7 @@ namespace Umbraco.Tests.Strings
             var settings = _requestHandlerSettings;
             var contentMock = Mock.Get(settings);
             contentMock.Setup(x => x.CharCollection).Returns(Enumerable.Empty<IChar>());
-            contentMock.Setup(x => x.ConvertUrlsToAscii).Returns(false);
+            contentMock.Setup(x => x.ConvertUrlsToAscii).Returns("false");
 
             var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(settings));
 

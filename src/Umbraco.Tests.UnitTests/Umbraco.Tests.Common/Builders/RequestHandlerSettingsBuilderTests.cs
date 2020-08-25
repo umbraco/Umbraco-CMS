@@ -15,7 +15,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Tests.Common.Builders
         {
             // Arrange
             const bool addTrailingSlash = true;
-            const bool convertUrlsToAscii = true;
+            const string convertUrlsToAscii = "try";
             var charCollection = new List<IChar> { new CharItem { Char = "a", Replacement = "b" } };
 
             var builder = new RequestHandlerSettingsBuilder();

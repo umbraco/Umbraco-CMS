@@ -25,7 +25,7 @@ namespace Umbraco.Tests.Configurations
 
             var hostingEnvironment = new AspNetHostingEnvironment(mockHostingSettings.Object);
 
-            var globalSettings = new GlobalSettingsBuilder().WithUmbracoPath(path).Build();
+            var globalSettings = new GlobalSettingsBuilder().WithPath(path).Build();
 
             Assert.AreEqual(outcome, globalSettings.GetUmbracoMvcAreaNoCache(hostingEnvironment));
         }
