@@ -17,10 +17,9 @@
     function BlockCardController($scope, umbRequestHelper) {
 
         var vm = this;
-        vm.styleBackgroundImage = "transparent";
+        vm.styleBackgroundImage = "none";
 
         var unwatch = $scope.$watch("vm.blockConfigModel.thumbnail", (newValue, oldValue) => {
-            console.log("updateThumbnail")
             if(newValue !== oldValue) {
                 vm.updateThumbnail();
             }
@@ -37,7 +36,7 @@
 
         vm.updateThumbnail = function () {
             if (vm.blockConfigModel.thumbnail == null || vm.blockConfigModel.thumbnail === "") {
-                vm.styleBackgroundImage = "transparent";
+                vm.styleBackgroundImage = "none";
                 return;
             }
 
