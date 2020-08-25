@@ -20,7 +20,7 @@ namespace Umbraco.Core.Persistence.Dtos
 
         [Column("uniqueId")]
         [NullSetting(NullSetting = NullSettings.NotNull)]
-        [Index(IndexTypes.UniqueNonClustered, Name = "IX_" + TableName + "_UniqueId")]
+        [Index(IndexTypes.UniqueNonClustered, Name = "IX_" + TableName + "_UniqueId", IncludeColumns = "parentId,level,path,sortOrder,trashed,nodeUser,text,createDate")]
         [Constraint(Default = SystemMethods.NewGuid)]
         public Guid UniqueId { get; set; }
 
@@ -58,7 +58,7 @@ namespace Umbraco.Core.Persistence.Dtos
 
         [Column("nodeObjectType")] // TODO: db rename to 'objectType'
         [NullSetting(NullSetting = NullSettings.Null)]        
-        [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_ObjectType")]        
+        [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_ObjectType", IncludeColumns = "parentId,level,path,sortOrder,trashed,nodeUser,text,createDate")]        
         public Guid? NodeObjectType { get; set; }
 
         [Column("createDate")]

@@ -14,13 +14,17 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_8_0
         }
 
         public override void Migrate()
-        {            
-            var nodeDtoLevelIndex = $"IX_{NodeDto.TableName}_Level";
-            CreateIndexes<NodeDto>(nodeDtoLevelIndex); // add the new definition
+        {
+            var indexesToReplace = new[] { $"IX_{NodeDto.TableName}_UniqueId", $"IX_{NodeDto.TableName}_ObjectType" };
+            DeleteIndexes<NodeDto>(indexesToReplace); // delete existing ones
+             // add the new definitions
+            CreateIndexes<NodeDto>($"IX_{NodeDto.TableName}_Level");
+            CreateIndexes<NodeDto>(indexesToReplace);
+
 
             var contentVersionNodeIdIndex = $"IX_{ContentVersionDto.TableName}_NodeId";
             DeleteIndexes<ContentVersionDto>(contentVersionNodeIdIndex); // delete existing ones
-            CreateIndexes<ContentVersionDto>(contentVersionNodeIdIndex); // add the updated definition
+            CreateIndexes<ContentVersionDto>(contentVersionNodeIdIndex); // add the updated definitions
         }
 
         private void DeleteIndexes<T>(params string[] toDelete)
