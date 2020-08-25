@@ -42,7 +42,7 @@ namespace Umbraco.Configuration.Models
         public string DefaultUILanguage => _configuration.GetValue(Prefix + "DefaultUILanguage", "en-US");
 
         public bool HideTopLevelNodeFromPath =>
-            _configuration.GetValue(Prefix + "HideTopLevelNodeFromPath", false);
+            _configuration.GetValue(Prefix + "HideTopLevelNodeFromPath", true);
 
         public bool UseHttps => _configuration.GetValue(Prefix + "UseHttps", false);
         public int VersionCheckPeriod => _configuration.GetValue(Prefix + "VersionCheckPeriod", 7);
