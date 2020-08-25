@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using System.Web.Http.Controllers;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
@@ -33,6 +34,7 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     [UmbracoTreeAuthorize(Constants.Trees.Dictionary)]
     [EnableOverrideAuthorization]
+    [DictionaryControllerConfiguration]
     public class DictionaryController : BackOfficeNotificationsController
     {
         public DictionaryController(
@@ -48,6 +50,19 @@ namespace Umbraco.Web.Editors
             IPublishedUrlProvider publishedUrlProvider)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, shortStringHelper, umbracoMapper, publishedUrlProvider)
         {
+        }
+
+        /// <summary>
+        /// Configures this controller with a custom action selector
+        /// </summary>
+        private class DictionaryControllerConfigurationAttribute : Attribute, IControllerConfiguration
+        {
+            public void Initialize(HttpControllerSettings controllerSettings, HttpControllerDescriptor controllerDescriptor)
+            {
+                controllerSettings.Services.Replace(typeof(IHttpActionSelector), new ParameterSwapControllerActionSelector(
+                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetById", "id", typeof(int), typeof(Guid), typeof(Udi))
+                ));
+            }
         }
 
         /// <summary>
@@ -141,7 +156,52 @@ namespace Umbraco.Web.Editors
         public DictionaryDisplay GetById(int id)
         {
             var dictionary = Services.LocalizationService.GetDictionaryItemById(id);
+            if (dictionary == null)
+                throw new HttpResponseException(HttpStatusCode.NotFound);
 
+            return Mapper.Map<IDictionaryItem, DictionaryDisplay>(dictionary);
+        }
+
+        /// <summary>
+        /// Gets a dictionary item by guid
+        /// </summary>
+        /// <param name="id">
+        /// The id.
+        /// </param>
+        /// <returns>
+        /// The <see cref="DictionaryDisplay"/>.
+        /// </returns>
+        /// <exception cref="HttpResponseException">
+        ///  Returns a not found response when dictionary item does not exist
+        /// </exception>
+        public DictionaryDisplay GetById(Guid id)
+        {
+            var dictionary = Services.LocalizationService.GetDictionaryItemById(id);
+            if (dictionary == null)
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            return Mapper.Map<IDictionaryItem, DictionaryDisplay>(dictionary);
+        }
+
+        /// <summary>
+        /// Gets a dictionary item by udi
+        /// </summary>
+        /// <param name="id">
+        /// The id.
+        /// </param>
+        /// <returns>
+        /// The <see cref="DictionaryDisplay"/>.
+        /// </returns>
+        /// <exception cref="HttpResponseException">
+        ///  Returns a not found response when dictionary item does not exist
+        /// </exception>
+        public DictionaryDisplay GetById(Udi id)
+        {
+            var guidUdi = id as GuidUdi;
+            if (guidUdi == null)
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            var dictionary = Services.LocalizationService.GetDictionaryItemById(guidUdi.Guid);
             if (dictionary == null)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
 
@@ -219,44 +279,31 @@ namespace Umbraco.Web.Editors
         /// </returns>
         public IEnumerable<DictionaryOverviewDisplay> GetList()
         {
-            var list = new List<DictionaryOverviewDisplay>();
+            var items = Services.LocalizationService.GetDictionaryItemDescendants(null).ToArray();
+            var list = new List<DictionaryOverviewDisplay>(items.Length);
 
-            const int level = 0;
-
-            foreach (var dictionaryItem in Services.LocalizationService.GetRootDictionaryItems().OrderBy(ItemSort()))
+            // recursive method to build a tree structure from the flat structure returned above
+            void BuildTree(int level = 0, Guid? parentId = null)
             {
-                var item = Mapper.Map<IDictionaryItem, DictionaryOverviewDisplay>(dictionaryItem);
-                item.Level = 0;
-                list.Add(item);
+                var children = items.Where(t => t.ParentId == parentId).ToArray();
+                if(children.Any() == false)
+                {
+                    return;
+                }
 
-                GetChildItemsForList(dictionaryItem, level + 1, list);
+                foreach(var child in children.OrderBy(ItemSort()))
+                {
+                    var display = Mapper.Map<IDictionaryItem, DictionaryOverviewDisplay>(child);
+                    display.Level = level;
+                    list.Add(display);
+
+                    BuildTree(level + 1, child.Key);
+                }                
             }
 
-            return list;
-        }
+            BuildTree();
 
-        /// <summary>
-        /// Get child items for list.
-        /// </summary>
-        /// <param name="dictionaryItem">
-        /// The dictionary item.
-        /// </param>
-        /// <param name="level">
-        /// The level.
-        /// </param>
-        /// <param name="list">
-        /// The list.
-        /// </param>
-        private void GetChildItemsForList(IDictionaryItem dictionaryItem, int level, ICollection<DictionaryOverviewDisplay> list)
-        {
-            foreach (var childItem in Services.LocalizationService.GetDictionaryItemChildren(dictionaryItem.Key).OrderBy(ItemSort()))
-            {
-                var item = Mapper.Map<IDictionaryItem, DictionaryOverviewDisplay>(childItem);
-                item.Level = level;
-                list.Add(item);
-
-                GetChildItemsForList(childItem, level + 1, list);
-            }
+            return list;            
         }
 
         private static Func<IDictionaryItem, string> ItemSort() => item => item.ItemKey;

@@ -40,6 +40,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Trashed = source.Trashed;
             target.Udi = Udi.Create(ObjectTypes.GetUdiType(source.NodeObjectType), source.Key);
 
+
             if (source is IContentEntitySlim contentSlim)
             {
                 source.AdditionalData["ContentTypeAlias"] = contentSlim.ContentTypeAlias;
@@ -52,6 +53,8 @@ namespace Umbraco.Web.Models.Mapping
 
             if (source is IMediaEntitySlim mediaSlim)
             {
+                //pass UpdateDate for MediaPicker ListView ordering
+                source.AdditionalData["UpdateDate"] = mediaSlim.UpdateDate;
                 source.AdditionalData["MediaPath"] = mediaSlim.MediaPath;
             }
 
@@ -181,7 +184,8 @@ namespace Umbraco.Web.Models.Mapping
                 target.Name = source.Values.ContainsKey($"nodeName_{culture}") ? source.Values[$"nodeName_{culture}"] : target.Name;
             }
 
-            if (source.Values.TryGetValue(UmbracoExamineFieldNames.UmbracoFileFieldName, out var umbracoFile))
+            if (source.Values.TryGetValue(UmbracoExamineFieldNames.UmbracoFileFieldName, out var umbracoFile) &&
+                umbracoFile.IsNullOrWhiteSpace() == false)
             {
                 if (umbracoFile != null)
                 {

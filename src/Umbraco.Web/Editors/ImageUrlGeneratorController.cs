@@ -31,7 +31,12 @@ namespace Umbraco.Web.Editors
 
         public string GetCropUrl(string mediaPath, int? width = null, int? height = null, ImageCropMode? imageCropMode = null, string animationProcessMode = null)
         {
-            return mediaPath.GetCropUrl(_imageUrlGenerator, null, width: width, height: height, imageCropMode: imageCropMode, animationProcessMode: animationProcessMode);
+            return mediaPath.GetCropUrl(_imageUrlGenerator,
+                null,
+                width: width,
+                height: height,
+                imageCropMode: imageCropMode,
+                animationProcessMode: animationProcessMode);
         }
     }
 }

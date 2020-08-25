@@ -146,6 +146,9 @@ namespace Umbraco.Core.Configuration.Legacy
             }
         }
 
+
+
+
         /// <summary>
         /// Gets or sets the configuration status. This will return the version number of the currently installed umbraco instance.
         /// </summary>
@@ -314,6 +317,15 @@ namespace Umbraco.Core.Configuration.Legacy
 
         private string _databaseFactoryServerVersion;
         public string DatabaseFactoryServerVersion => GetterWithDefaultValue(Constants.AppSettings.Debug.DatabaseFactoryServerVersion, string.Empty, ref _databaseFactoryServerVersion);
+
+
+
+        private string _iconsPath;
+        /// <summary>
+        /// Gets the path to folder containing the icons used in the umbraco backoffice (/umbraco/assets/icons by default).
+        /// </summary>
+        /// <value>The icons path.</value>
+        public string IconsPath => GetterWithDefaultValue(Constants.AppSettings.IconsPath, $"{UmbracoPath}/assets/icons", ref _iconsPath);
 
         private string _mainDomLock;
 

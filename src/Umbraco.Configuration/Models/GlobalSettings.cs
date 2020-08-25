@@ -47,6 +47,8 @@ namespace Umbraco.Configuration.Models
         public bool UseHttps => _configuration.GetValue(Prefix + "UseHttps", false);
         public int VersionCheckPeriod => _configuration.GetValue(Prefix + "VersionCheckPeriod", 7);
         public string UmbracoPath => _configuration.GetValue(Prefix + "UmbracoPath", "~/umbraco");
+        public string IconsPath => _configuration.GetValue(Prefix + "IconsPath", $"{UmbracoPath}/assets/icons");
+
         public string UmbracoCssPath => _configuration.GetValue(Prefix + "UmbracoCssPath", "~/css");
 
         public string UmbracoScriptsPath =>

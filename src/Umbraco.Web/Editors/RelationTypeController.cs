@@ -17,6 +17,7 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
+using System.Web.Http.Controllers;
 using Umbraco.Core.Mapping;
 using Umbraco.Web.Routing;
 
@@ -28,6 +29,7 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     [UmbracoTreeAuthorize(Constants.Trees.RelationTypes)]
     [EnableOverrideAuthorization]
+    [RelationTypeControllerConfiguration]
     public class RelationTypeController : BackOfficeNotificationsController
     {
         public RelationTypeController(
@@ -46,22 +48,65 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Gets a relation type by ID.
+        /// Configures this controller with a custom action selector
+        /// </summary>
+        private class RelationTypeControllerConfigurationAttribute : Attribute, IControllerConfiguration
+        {
+            public void Initialize(HttpControllerSettings controllerSettings, HttpControllerDescriptor controllerDescriptor)
+            {
+                controllerSettings.Services.Replace(typeof(IHttpActionSelector), new ParameterSwapControllerActionSelector(
+                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetById", "id", typeof(int), typeof(Guid), typeof(Udi))
+                ));
+            }
+        }
+
+        /// <summary>
+        /// Gets a relation type by id
         /// </summary>
         /// <param name="id">The relation type ID.</param>
         /// <returns>Returns the <see cref="RelationTypeDisplay"/>.</returns>
         public RelationTypeDisplay GetById(int id)
         {
             var relationType = Services.RelationService.GetRelationTypeById(id);
-
             if (relationType == null)
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
+            return Mapper.Map<IRelationType, RelationTypeDisplay>(relationType);
+        }
 
-            var display = Mapper.Map<IRelationType, RelationTypeDisplay>(relationType);
+        /// <summary>
+        /// Gets a relation type by guid
+        /// </summary>
+        /// <param name="id">The relation type ID.</param>
+        /// <returns>Returns the <see cref="RelationTypeDisplay"/>.</returns>
+        public RelationTypeDisplay GetById(Guid id)
+        {
+            var relationType = Services.RelationService.GetRelationTypeById(id);
+            if (relationType == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+            return Mapper.Map<IRelationType, RelationTypeDisplay>(relationType);
+        }
 
-            return display;
+        /// <summary>
+        /// Gets a relation type by udi
+        /// </summary>
+        /// <param name="id">The relation type ID.</param>
+        /// <returns>Returns the <see cref="RelationTypeDisplay"/>.</returns>
+        public RelationTypeDisplay GetById(Udi id)
+        {
+            var guidUdi = id as GuidUdi;
+            if (guidUdi == null)
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            var relationType = Services.RelationService.GetRelationTypeById(guidUdi.Guid);
+            if (relationType == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+            return Mapper.Map<IRelationType, RelationTypeDisplay>(relationType);
         }
 
         public PagedResult<RelationDisplay> GetPagedResults(int id, int pageNumber = 1, int pageSize = 100)

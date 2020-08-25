@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using System.Web.Http.Controllers;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
@@ -17,6 +18,7 @@ using Umbraco.Core.Strings;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Routing;
+using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
 
@@ -24,6 +26,7 @@ namespace Umbraco.Web.Editors
 {
     [PluginController("UmbracoApi")]
     [UmbracoTreeAuthorize(Constants.Trees.Templates)]
+    [TemplateControllerConfiguration]
     public class TemplateController : BackOfficeNotificationsController
     {
         public TemplateController(
@@ -39,6 +42,19 @@ namespace Umbraco.Web.Editors
             IPublishedUrlProvider publishedUrlProvider)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, shortStringHelper, umbracoMapper, publishedUrlProvider)
         {
+        }
+
+        /// <summary>
+        /// Configures this controller with a custom action selector
+        /// </summary>
+        private class TemplateControllerConfigurationAttribute : Attribute, IControllerConfiguration
+        {
+            public void Initialize(HttpControllerSettings controllerSettings, HttpControllerDescriptor controllerDescriptor)
+            {
+                controllerSettings.Services.Replace(typeof(IHttpActionSelector), new ParameterSwapControllerActionSelector(
+                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetById", "id", typeof(int), typeof(Guid), typeof(Udi))
+                ));
+            }
         }
 
         /// <summary>
@@ -62,7 +78,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Gets the content json for the content id
+        /// Gets the template json for the template id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -71,6 +87,40 @@ namespace Umbraco.Web.Editors
             var template = Services.FileService.GetTemplate(id);
             if (template == null)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            return Mapper.Map<ITemplate, TemplateDisplay>(template);
+        }
+
+        /// <summary>
+        /// Gets the template json for the template guid
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public TemplateDisplay GetById(Guid id)
+        {
+            var template = Services.FileService.GetTemplate(id);
+            if (template == null)
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            return Mapper.Map<ITemplate, TemplateDisplay>(template);
+        }
+
+        /// <summary>
+        /// Gets the template json for the template udi
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public TemplateDisplay GetById(Udi id)
+        {
+            var guidUdi = id as GuidUdi;
+            if (guidUdi == null)
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            var template = Services.FileService.GetTemplate(guidUdi.Guid);
+            if (template == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
 
             return Mapper.Map<ITemplate, TemplateDisplay>(template);
         }

@@ -94,6 +94,13 @@ namespace Umbraco.Web.Editors
             };
         }
 
+        public IEnumerable<AuditLog> GetLog(AuditType logType, DateTime? sinceDate = null)
+        {
+            var result = Services.AuditService.GetLogs(Enum<AuditType>.Parse(logType.ToString()), sinceDate);
+            var mapped = Mapper.MapEnumerable<IAuditItem, AuditLog>(result);
+            return mapped;
+        }
+
         private IEnumerable<AuditLog> MapAvatarsAndNames(IEnumerable<AuditLog> items)
         {
             var mappedItems = items.ToList();

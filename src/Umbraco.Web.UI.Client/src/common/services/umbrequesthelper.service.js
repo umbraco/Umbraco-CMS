@@ -263,9 +263,7 @@ function umbRequestHelper($http, $q, notificationsService, eventsService, formHe
 
                     //reset the tabs and set the active one
                     if (response.data.tabs && response.data.tabs.length > 0) {
-                        _.each(response.data.tabs, function (item) {
-                            item.active = false;
-                        });
+                        response.data.tabs.forEach(item => item.active = false);
                         response.data.tabs[activeTabIndex].active = true;
                     }
 
@@ -326,7 +324,7 @@ function umbRequestHelper($http, $q, notificationsService, eventsService, formHe
             if (!jsonData) { throw "jsonData cannot be null"; }
 
             if (Utilities.isArray(jsonData)) {
-                _.each(jsonData, function (item) {
+                jsonData.forEach(item => {
                     if (!item.key || !item.value) { throw "jsonData array item must have both a key and a value property"; }
                 });
             }
@@ -344,7 +342,7 @@ function umbRequestHelper($http, $q, notificationsService, eventsService, formHe
                     var formData = new FormData();
                     //add the json data
                     if (Utilities.isArray(data)) {
-                        _.each(data, function(item) {
+                        data.forEach(item => {
                             formData.append(item.key, !Utilities.isString(item.value) ? Utilities.toJson(item.value) : item.value);
                         });
                     }
