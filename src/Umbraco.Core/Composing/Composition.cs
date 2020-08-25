@@ -60,6 +60,11 @@ namespace Umbraco.Core.Composing
         /// </summary>
         public IRuntimeState RuntimeState { get; }
 
+        /// <summary>	
+        /// Gets the configurations.	
+        /// </summary>	
+        public Configs Configs { get; }
+
         #endregion
 
         #region IRegister
