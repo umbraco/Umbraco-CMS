@@ -18,7 +18,6 @@ namespace Umbraco.Tests.Common.Builders
         private bool? _hideTopLevelNodeFromPath;
         private bool? _installEmptyDatabase;
         private bool? _installMissingDatabase;
-        private bool? _isSmtpServerConfigured;
         private string _path;
         private string _registerType;
         private string _reservedPaths;
@@ -26,7 +25,6 @@ namespace Umbraco.Tests.Common.Builders
         private int? _timeOutInMinutes;
         private string _umbracoCssPath;
         private string _umbracoMediaPath;
-        private string _umbracoPath;
         private string _umbracoScriptsPath;
         private string _mainDomLock;
         private string _noNodesViewPath;
@@ -83,12 +81,6 @@ namespace Umbraco.Tests.Common.Builders
             return this;
         }
 
-        public GlobalSettingsBuilder<TParent> WithIsSmtpServerConfigured(bool isSmtpServerConfigured)
-        {
-            _isSmtpServerConfigured = isSmtpServerConfigured;
-            return this;
-        }
-
         public GlobalSettingsBuilder<TParent> WithPath(string path)
         {
             _path = path;
@@ -110,12 +102,6 @@ namespace Umbraco.Tests.Common.Builders
         public GlobalSettingsBuilder<TParent> WithReservedUrls(string reservedUrls)
         {
             _reservedUrls = reservedUrls;
-            return this;
-        }
-
-        public GlobalSettingsBuilder<TParent> WithUmbracoPath(string umbracoPath)
-        {
-            _umbracoPath = umbracoPath;
             return this;
         }
 
@@ -178,7 +164,7 @@ namespace Umbraco.Tests.Common.Builders
             var registerType = _registerType ?? null;
             var reservedPaths = _reservedPaths ?? "~/app_plugins/,~/install/,~/mini-profiler-resources/,";
             var reservedUrls = _reservedUrls ?? "~/config/splashes/noNodes.aspx,~/.well-known,";
-            var umbracoPath = _umbracoPath ?? "~/umbraco";
+            var path = _path ?? "~/umbraco";
             var useHttps = _useHttps ?? false;
             var umbracoCssPath = _umbracoCssPath ?? "~/css";
             var umbracoMediaPath = _umbracoMediaPath ?? "~/media";
@@ -201,7 +187,7 @@ namespace Umbraco.Tests.Common.Builders
                 RegisterType = registerType,
                 ReservedPaths = reservedPaths,
                 ReservedUrls = reservedUrls,
-                UmbracoPath = umbracoPath,
+                Path = path,
                 UseHttps = useHttps,
                 UmbracoCssPath = umbracoCssPath,
                 UmbracoMediaPath = umbracoMediaPath,

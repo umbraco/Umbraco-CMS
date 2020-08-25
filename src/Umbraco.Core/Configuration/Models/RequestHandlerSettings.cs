@@ -35,9 +35,11 @@ namespace Umbraco.Core.Configuration.Models
 
         public bool AddTrailingSlash { get; set; } = true;
 
-        public bool ConvertUrlsToAscii { get; set; } = true;
+        public string ConvertUrlsToAscii { get; set; } = "try";
 
-        public bool TryConvertUrlsToAscii { get; set; } = false;
+        public bool ShouldConvertUrlsToAscii => ConvertUrlsToAscii.InvariantEquals("true");
+
+        public bool ShouldTryConvertUrlsToAscii => ConvertUrlsToAscii.InvariantEquals("try");
 
         //We need to special handle ":", as this character is special in keys
 

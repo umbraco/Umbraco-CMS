@@ -78,7 +78,7 @@ namespace Umbraco.Web.Common.Install
                 {
                     case ValidateRequestAttempt.FailedNoPrivileges:
                     case ValidateRequestAttempt.FailedNoContextId:
-                        return Redirect(_globalSettings.UmbracoPath + "/AuthorizeUpgrade?redir=" + Request.GetEncodedUrl());
+                        return Redirect(_globalSettings.Path + "/AuthorizeUpgrade?redir=" + Request.GetEncodedUrl());
                 }
             }
 
@@ -86,7 +86,7 @@ namespace Umbraco.Web.Common.Install
             ViewData.SetInstallApiBaseUrl(Url.GetInstallerApiUrl());
 
             // get the base umbraco folder
-            var baseFolder = _hostingEnvironment.ToAbsolute(_globalSettings.UmbracoPath);
+            var baseFolder = _hostingEnvironment.ToAbsolute(_globalSettings.Path);
             ViewData.SetUmbracoBaseFolder(baseFolder);
 
             ViewData.SetUmbracoVersion(_umbracoVersion.SemanticVersion);

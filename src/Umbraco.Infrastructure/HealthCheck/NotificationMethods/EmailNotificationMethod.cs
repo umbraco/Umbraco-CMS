@@ -79,7 +79,7 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
 
         private MailMessage CreateMailMessage(string subject, string message)
         {
-            var to = _contentSettings.Notifications.NotificationEmailAddress;
+            var to = _contentSettings.Notifications.Email;
 
             if (string.IsNullOrWhiteSpace(subject))
                 subject = "Umbraco Health Check Status";

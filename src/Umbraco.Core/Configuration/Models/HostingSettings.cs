@@ -13,6 +13,6 @@
         /// Gets a value indicating whether umbraco is running in [debug mode].
         /// </summary>
         /// <value><c>true</c> if [debug mode]; otherwise, <c>false</c>.</value>
-        public bool DebugMode { get; set; } = false;
+        public bool Debug { get; set; } = false;
     }
 }

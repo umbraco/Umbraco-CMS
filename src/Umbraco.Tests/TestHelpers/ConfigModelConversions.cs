@@ -39,7 +39,7 @@ namespace Umbraco.Tests.TestHelpers
                 TimeOutInMinutes = globalSettings.TimeOutInMinutes,
                 UmbracoCssPath = globalSettings.UmbracoCssPath,
                 UmbracoMediaPath = globalSettings.UmbracoMediaPath,
-                UmbracoPath = globalSettings.UmbracoPath,
+                UmbracoPath = globalSettings.Path,
                 UmbracoScriptsPath = globalSettings.UmbracoScriptsPath,
                 UseHttps = globalSettings.UseHttps,
                 VersionCheckPeriod = globalSettings.VersionCheckPeriod,

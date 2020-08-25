@@ -2,7 +2,7 @@
 {
     public class ContentNotificationSettings
     {
-        public string NotificationEmailAddress { get; set; }
+        public string Email { get; set; }
 
         public bool DisableHtmlEmail { get; set; } = false;
     }

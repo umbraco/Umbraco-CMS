@@ -30,7 +30,7 @@
 
         public int VersionCheckPeriod { get; set; } = 7;
 
-        public string UmbracoPath { get; set; } = "~/umbraco";
+        public string Path { get; set; } = "~/umbraco";
 
         public string UmbracoCssPath { get; set; } = "~/css";
 

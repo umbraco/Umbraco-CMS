@@ -28,7 +28,7 @@ namespace Umbraco.Core.Configuration.Models
 
         public string PreviewBadge { get; set; } = DefaultPreviewBadge;
 
-        public MacroErrorBehaviour MacroErrorBehaviour { get; set; } = MacroErrorBehaviour.Inline;
+        public MacroErrorBehaviour MacroErrors { get; set; } = MacroErrorBehaviour.Inline;
 
         public IEnumerable<string> DisallowedUploadFiles { get; set; } = new[] { "ashx", "aspx", "ascx", "config", "cshtml", "vbhtml", "asmx", "air", "axd" };
 

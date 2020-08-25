@@ -13,5 +13,9 @@
         public string AuthCookieDomain { get; set; }
 
         public bool UsernameIsEmail { get; set; } = true;
+
+        public UserPasswordConfigurationSettings UserPassword { get; set; }
+
+        public MemberPasswordConfigurationSettings MemberPassword { get; set; }
     }
 }

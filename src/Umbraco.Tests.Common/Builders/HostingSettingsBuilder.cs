@@ -6,7 +6,7 @@ namespace Umbraco.Tests.Common.Builders
     public class HostingSettingsBuilder : BuilderBase<HostingSettings>
     {
         private string _applicationVirtualPath;
-        private bool? _debugMode;
+        private bool? _debug;
         private LocalTempStorage? _localTempStorageLocation;
 
         public HostingSettingsBuilder WithApplicationVirtualPath(string applicationVirtualPath)
@@ -15,9 +15,9 @@ namespace Umbraco.Tests.Common.Builders
             return this;
         }
 
-        public HostingSettingsBuilder WithDebugMode(bool debugMode)
+        public HostingSettingsBuilder WithDebug(bool debug)
         {
-            _debugMode = debugMode;
+            _debug = debug;
             return this;
         }
 
@@ -29,14 +29,14 @@ namespace Umbraco.Tests.Common.Builders
 
         public override HostingSettings Build()
         {
-            var debugMode = _debugMode ?? false;
+            var debug = _debug ?? false;
             var localTempStorageLocation = _localTempStorageLocation ?? LocalTempStorage.Default;
             var applicationVirtualPath = _applicationVirtualPath ?? null;
 
             return new HostingSettings
             {
                 ApplicationVirtualPath = applicationVirtualPath,
-                DebugMode = debugMode,
+                Debug = debug,
                 LocalTempStorageLocation = localTempStorageLocation,                
             };
         }

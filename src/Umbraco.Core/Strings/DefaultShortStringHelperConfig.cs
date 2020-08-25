@@ -65,9 +65,9 @@ namespace Umbraco.Core.Strings
                 .ToDictionary(x => x.Char, x => x.Replacement);
 
             var urlSegmentConvertTo = CleanStringType.Utf8;
-            if (requestHandlerSettings.ConvertUrlsToAscii)
+            if (requestHandlerSettings.ShouldConvertUrlsToAscii)
                 urlSegmentConvertTo = CleanStringType.Ascii;
-            if (requestHandlerSettings.TryConvertUrlsToAscii)
+            if (requestHandlerSettings.ShouldTryConvertUrlsToAscii)
                 urlSegmentConvertTo = CleanStringType.TryAscii;
 
             return WithConfig(CleanStringType.UrlSegment, new Config

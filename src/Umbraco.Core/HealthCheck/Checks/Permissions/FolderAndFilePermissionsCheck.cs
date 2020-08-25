@@ -77,7 +77,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Permissions
                 { _globalSettings.UmbracoCssPath, PermissionCheckRequirement.Optional },
                 { _globalSettings.UmbracoMediaPath, PermissionCheckRequirement.Optional },
                 { _globalSettings.UmbracoScriptsPath, PermissionCheckRequirement.Optional },
-                { _globalSettings.UmbracoPath, PermissionCheckRequirement.Optional },
+                { _globalSettings.Path, PermissionCheckRequirement.Optional },
                 { Constants.SystemDirectories.MvcViews, PermissionCheckRequirement.Optional }
             };
 

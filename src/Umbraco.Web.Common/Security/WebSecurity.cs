@@ -115,7 +115,7 @@ namespace Umbraco.Web.Common.Security
 
         private static bool RequestIsInUmbracoApplication(IHttpContextAccessor httpContextAccessor, GlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
         {
-            return httpContextAccessor.GetRequiredHttpContext().Request.Path.ToString().IndexOf(hostingEnvironment.ToAbsolute(globalSettings.UmbracoPath), StringComparison.InvariantCultureIgnoreCase) > -1;
+            return httpContextAccessor.GetRequiredHttpContext().Request.Path.ToString().IndexOf(hostingEnvironment.ToAbsolute(globalSettings.Path), StringComparison.InvariantCultureIgnoreCase) > -1;
         }
     }
 }

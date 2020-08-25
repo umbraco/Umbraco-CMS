@@ -78,7 +78,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         [HttpGet]
         public async Task<IActionResult> Default()
         {
-            var viewPath = Path.Combine(_globalSettings.UmbracoPath , Constants.Web.Mvc.BackOfficeArea, nameof(Default) + ".cshtml")
+            var viewPath = Path.Combine(_globalSettings.Path , Constants.Web.Mvc.BackOfficeArea, nameof(Default) + ".cshtml")
                 .Replace("\\", "/"); // convert to forward slashes since it's a virtual path
             
             return await RenderDefaultOrProcessExternalLoginAsync(
@@ -156,7 +156,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         [StatusCodeResult(System.Net.HttpStatusCode.ServiceUnavailable)]
         public async Task<IActionResult> AuthorizeUpgrade()
         {
-            var viewPath = Path.Combine(_globalSettings.UmbracoPath, Umbraco.Core.Constants.Web.Mvc.BackOfficeArea, nameof(AuthorizeUpgrade) + ".cshtml");
+            var viewPath = Path.Combine(_globalSettings.Path, Umbraco.Core.Constants.Web.Mvc.BackOfficeArea, nameof(AuthorizeUpgrade) + ".cshtml");
             return await RenderDefaultOrProcessExternalLoginAsync(
                 //The default view to render when there is no external login info or errors
                 () => View(viewPath),

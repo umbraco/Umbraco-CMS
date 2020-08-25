@@ -18,12 +18,12 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Tests.Common.Builders
 
             // Act
             var hostingSettings = builder
-                .WithDebugMode(debugMode)
+                .WithDebug(debugMode)
                 .WithLocalTempStorageLocation(localTempStorageLocation)
                 .Build();
 
             // Assert
-            Assert.AreEqual(debugMode, hostingSettings.DebugMode);
+            Assert.AreEqual(debugMode, hostingSettings.Debug);
             Assert.AreEqual(localTempStorageLocation, hostingSettings.LocalTempStorageLocation);
         }
     }

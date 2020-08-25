@@ -43,7 +43,7 @@ namespace Umbraco.Web.Common.AspNetCore
         public string ApplicationServerAddress { get; }
 
         public string ApplicationVirtualPath { get; }
-        public bool IsDebugMode => _hostingSettings.DebugMode;
+        public bool IsDebugMode => _hostingSettings.Debug;
 
         public Version IISVersion { get; }
         public string LocalTempPath
