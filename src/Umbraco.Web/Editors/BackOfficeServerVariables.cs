@@ -7,17 +7,15 @@ using System.Web;
 using System.Web.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Web.Configuration;
-using Umbraco.Web.Features;
-using Umbraco.Web.HealthCheck;
-using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Mvc;
-using Umbraco.Web.Trees;
-using Constants = Umbraco.Core.Constants;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.WebAssets;
+using Umbraco.Infrastructure.Configuration;
+using Umbraco.Web.Features;
+using Umbraco.Web.Mvc;
 using Umbraco.Web.Security;
+using Umbraco.Web.Trees;
+using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Editors
 {
@@ -144,7 +142,7 @@ namespace Umbraco.Web.Editors
                 {
                     "umbracoSettings", new Dictionary<string, object>
                     {
-                        {"umbracoPath", ConfigModelConversions.ConvertGlobalSettings(_globalSettings).GetBackOfficePath(_hostingEnvironment)},
+                        {"umbracoPath", ConfigModelConversionsFromLegacy.ConvertGlobalSettings(_globalSettings).GetBackOfficePath(_hostingEnvironment)},
                         {"mediaPath", _hostingEnvironment.ToAbsolute(globalSettings.UmbracoMediaPath).TrimEnd('/')},
                         {"appPluginsPath", _hostingEnvironment.ToAbsolute(Constants.SystemDirectories.AppPlugins).TrimEnd('/')},
                         {
@@ -168,8 +166,8 @@ namespace Umbraco.Web.Editors
                         {"cssPath", _hostingEnvironment.ToAbsolute(globalSettings.UmbracoCssPath).TrimEnd('/')},
                         {"allowPasswordReset", _securitySettings.AllowPasswordReset},
                         {"loginBackgroundImage", _contentSettings.LoginBackgroundImage},
-                        {"showUserInvite", EmailSender.CanSendRequiredEmail(ConfigModelConversions.ConvertGlobalSettings(globalSettings))},
-                        {"canSendRequiredEmail", EmailSender.CanSendRequiredEmail(ConfigModelConversions.ConvertGlobalSettings(globalSettings))},
+                        {"showUserInvite", EmailSender.CanSendRequiredEmail(ConfigModelConversionsFromLegacy.ConvertGlobalSettings(globalSettings))},
+                        {"canSendRequiredEmail", EmailSender.CanSendRequiredEmail(ConfigModelConversionsFromLegacy.ConvertGlobalSettings(globalSettings))},
                         {"showAllowSegmentationForDocumentTypes", false},
                     }
                 },

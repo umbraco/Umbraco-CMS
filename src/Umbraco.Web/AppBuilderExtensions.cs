@@ -4,7 +4,7 @@ using Microsoft.Owin.Logging;
 using Owin;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
-using Umbraco.Web.Configuration;
+using Umbraco.Infrastructure.Configuration;
 using Umbraco.Web.Logging;
 
 namespace Umbraco.Web
@@ -47,7 +47,7 @@ namespace Umbraco.Web
         /// <param name="hostingEnvironment"></param>
         public static IAppBuilder UseSignalR(this IAppBuilder app, IGlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
         {
-            var umbracoPath = ConfigModelConversions.ConvertGlobalSettings(globalSettings).GetUmbracoMvcArea(hostingEnvironment);
+            var umbracoPath = ConfigModelConversionsFromLegacy.ConvertGlobalSettings(globalSettings).GetUmbracoMvcArea(hostingEnvironment);
             var signalrPath = HttpRuntime.AppDomainAppVirtualPath + umbracoPath + "/BackOffice/signalr";
             return app.MapSignalR(signalrPath, new HubConfiguration { EnableDetailedErrors = true });
         }

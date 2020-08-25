@@ -1,23 +1,13 @@
 ﻿using System;
-using System.IO;
 using System.Threading;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
+using Umbraco.Core.Logging;
+using Umbraco.Infrastructure.Configuration;
+using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
-using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Sync;
-using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Services;
-using Umbraco.Web.PublishedCache;
-using Umbraco.Web.Routing;
-using Umbraco.Web.Configuration;
-using ConfigModelConversions = Umbraco.Tests.TestHelpers.ConfigModelConversions;
-using Umbraco.Tests.Common.Builders;
 
 namespace Umbraco.Tests.Routing
 {
@@ -43,10 +33,10 @@ namespace Umbraco.Tests.Routing
                 logger,
                 null, // FIXME: PublishedRouter complexities...
                 Mock.Of<IUmbracoContextFactory>(),
-                new RoutableDocumentFilter(ConfigModelConversions.ConvertGlobalSettings(globalSettings), IOHelper),
+                new RoutableDocumentFilter(ConfigModelConversionsToLegacy.ConvertGlobalSettings(globalSettings), IOHelper),
                 UriUtility,
                 AppCaches.RequestCache,
-                ConfigModelConversions.ConvertGlobalSettings(globalSettings),
+                ConfigModelConversionsToLegacy.ConvertGlobalSettings(globalSettings),
                 HostingEnvironment
             );
 

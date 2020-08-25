@@ -145,7 +145,6 @@
     <Compile Include="Security\OwinDataProtectorTokenProviderTests.cs" />
     <Compile Include="Services\KeyValueServiceTests.cs" />
     <Compile Include="Persistence\Repositories\UserRepositoryTest.cs" />
-    <Compile Include="TestHelpers\ConfigModelConversions.cs" />
     <Compile Include="TestHelpers\Entities\MockedEntity.cs" />
     <Compile Include="TestHelpers\Entities\MockedMedia.cs" />
     <Compile Include="TestHelpers\Entities\MockedMember.cs" />

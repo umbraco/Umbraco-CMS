@@ -11,6 +11,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
+using Umbraco.Infrastructure.Configuration;
 using Umbraco.Net;
 using Umbraco.Web.Configuration;
 
@@ -54,7 +55,7 @@ namespace Umbraco.Web.Security
             IDataProtectionProvider dataProtectionProvider,
             ILogger<UserManager<BackOfficeIdentityUser>> logger)
         {
-            var store = new BackOfficeUserStore(userService, entityService, externalLoginService, ConfigModelConversions.ConvertGlobalSettings(globalSettings), mapper);
+            var store = new BackOfficeUserStore(userService, entityService, externalLoginService, ConfigModelConversionsFromLegacy.ConvertGlobalSettings(globalSettings), mapper);
 
             return Create(
                 passwordConfiguration,

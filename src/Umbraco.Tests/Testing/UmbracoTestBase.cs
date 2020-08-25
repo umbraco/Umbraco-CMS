@@ -37,6 +37,7 @@ using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Strings;
+using Umbraco.Infrastructure.Configuration;
 using Umbraco.Net;
 using Umbraco.Tests.Common;
 using Umbraco.Tests.Common.Builders;
@@ -58,7 +59,6 @@ using Umbraco.Web.Security.Providers;
 using Umbraco.Web.Services;
 using Umbraco.Web.Templates;
 using Umbraco.Web.Trees;
-using ConfigModelConversions = Umbraco.Tests.TestHelpers.ConfigModelConversions;
 using Current = Umbraco.Web.Composing.Current;
 using FileSystems = Umbraco.Core.IO.FileSystems;
 
@@ -176,7 +176,7 @@ namespace Umbraco.Tests.Testing
             var globalSettings = new GlobalSettingsBuilder().Build();
             var settings = TestHelpers.SettingsForTests.GenerateMockWebRoutingSettings();
 
-            IBackOfficeInfo backOfficeInfo = new AspNetBackOfficeInfo(ConfigModelConversions.ConvertGlobalSettings(globalSettings), IOHelper, logger, settings);
+            IBackOfficeInfo backOfficeInfo = new AspNetBackOfficeInfo(ConfigModelConversionsToLegacy.ConvertGlobalSettings(globalSettings), IOHelper, logger, settings);
             IIpResolver ipResolver = new AspNetIpResolver();
             UmbracoVersion = new UmbracoVersion(globalSettings);
 
@@ -188,7 +188,7 @@ namespace Umbraco.Tests.Testing
 
 
 
-            Composition = new Composition(register, typeLoader, proflogger, ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.IOHelper, AppCaches.NoCache);
+            Composition = new Composition(register, typeLoader, proflogger, ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.GetConfigs(), TestHelper.IOHelper, AppCaches.NoCache);
 
 
 
@@ -412,6 +412,23 @@ namespace Umbraco.Tests.Testing
 
         protected virtual void ComposeSettings()
         {
+            var contentSettings = new ContentSettingsBuilder().Build();
+            var coreDebugSettings = new CoreDebugSettingsBuilder().Build();
+            var globalSettings = new GlobalSettingsBuilder().Build();
+            var nuCacheSettings = new NuCacheSettingsBuilder().Build();
+            var requestHandlerSettings = new RequestHandlerSettingsBuilder().Build();
+            var userPasswordConfigurationSettings = new UserPasswordConfigurationSettingsBuilder().Build();
+            var webRoutingSettings = new WebRoutingSettingsBuilder().Build();
+
+            Composition.Register(x => Microsoft.Extensions.Options.Options.Create(contentSettings));
+            Composition.Register(x => Microsoft.Extensions.Options.Options.Create(coreDebugSettings));
+            Composition.Register(x => Microsoft.Extensions.Options.Options.Create(globalSettings));
+            Composition.Register(x => Microsoft.Extensions.Options.Options.Create(nuCacheSettings));
+            Composition.Register(x => Microsoft.Extensions.Options.Options.Create(requestHandlerSettings));
+            Composition.Register(x => Microsoft.Extensions.Options.Options.Create(userPasswordConfigurationSettings));
+            Composition.Register(x => Microsoft.Extensions.Options.Options.Create(webRoutingSettings));
+
+            // TODO: remove this once legacy config is fully extracted.
             Composition.Configs.Add(() => TestHelpers.SettingsForTests.DefaultGlobalSettings);
             Composition.Configs.Add(() => TestHelpers.SettingsForTests.DefaultHostingSettings);
             Composition.Configs.Add(TestHelpers.SettingsForTests.GenerateMockRequestHandlerSettings);
@@ -420,8 +437,6 @@ namespace Umbraco.Tests.Testing
             Composition.Configs.Add(TestHelpers.SettingsForTests.GenerateMockUserPasswordConfiguration);
             Composition.Configs.Add(TestHelpers.SettingsForTests.GenerateMockMemberPasswordConfiguration);
             Composition.Configs.Add(TestHelpers.SettingsForTests.GenerateMockContentSettings);
-
-            //Composition.Configs.Add<IUserPasswordConfiguration>(() => new DefaultUserPasswordConfig());
         }
 
         protected virtual void ComposeApplication(bool withApplication)

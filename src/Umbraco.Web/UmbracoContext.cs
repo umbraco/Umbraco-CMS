@@ -4,8 +4,8 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Infrastructure.Configuration;
 using Umbraco.Web.Composing;
-using Umbraco.Web.Configuration;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
@@ -182,7 +182,7 @@ namespace Umbraco.Web
         {
             var request = GetRequestFromContext();
             if (request?.Url != null
-                && request.Url.IsBackOfficeRequest(ConfigModelConversions.ConvertGlobalSettings(_globalSettings), _hostingEnvironment) == false
+                && request.Url.IsBackOfficeRequest(ConfigModelConversionsFromLegacy.ConvertGlobalSettings(_globalSettings), _hostingEnvironment) == false
                 && Security.CurrentUser != null)
             {
                 var previewToken = _cookieManager.GetPreviewCookieValue(); // may be null or empty

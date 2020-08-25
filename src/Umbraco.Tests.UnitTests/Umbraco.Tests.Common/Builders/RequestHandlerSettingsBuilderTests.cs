@@ -24,6 +24,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Tests.Common.Builders
             var requestHandlerSettings = builder
                 .WithAddTrailingSlash(addTrailingSlash)
                 .WithConvertUrlsToAscii(convertUrlsToAscii)
+                .WithCharCollection(charCollection)
                 .Build();
 
             // Assert

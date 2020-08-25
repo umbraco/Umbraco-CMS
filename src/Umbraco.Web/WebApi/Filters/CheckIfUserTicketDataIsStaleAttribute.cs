@@ -5,14 +5,13 @@ using System.Threading.Tasks;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
 using Umbraco.Core;
-using Umbraco.Web.Composing;
 using Umbraco.Core.BackOffice;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Security;
-using Umbraco.Web.Security;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
-using Umbraco.Web.Configuration;
+using Umbraco.Core.Models.Membership;
+using Umbraco.Infrastructure.Configuration;
+using Umbraco.Web.Composing;
+using Umbraco.Web.Security;
 
 namespace Umbraco.Web.WebApi.Filters
 {
@@ -79,7 +78,7 @@ namespace Umbraco.Web.WebApi.Filters
                 () => user.Username != identity.Username,
                 () =>
                 {
-                    var culture = user.GetUserCulture(Current.Services.TextService, ConfigModelConversions.ConvertGlobalSettings(Current.Configs.Global()));
+                    var culture = user.GetUserCulture(Current.Services.TextService, ConfigModelConversionsFromLegacy.ConvertGlobalSettings(Current.Configs.Global()));
                     return culture != null && culture.ToString() != identity.Culture;
                 },
                 () => user.AllowedSections.UnsortedSequenceEqual(identity.AllowedApplications) == false,

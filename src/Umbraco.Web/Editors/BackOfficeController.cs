@@ -11,13 +11,13 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Web.Mvc;
 using Umbraco.Core.Services;
-using Umbraco.Web.Configuration;
 using Umbraco.Web.Features;
 using Umbraco.Web.Security;
 using Constants = Umbraco.Core.Constants;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Hosting;
 using BackOfficeIdentityUser = Umbraco.Core.BackOffice.BackOfficeIdentityUser;
+using Umbraco.Infrastructure.Configuration;
 
 namespace Umbraco.Web.Editors
 {
@@ -140,7 +140,7 @@ namespace Umbraco.Web.Editors
             if (defaultResponse == null) throw new ArgumentNullException("defaultResponse");
             if (externalSignInResponse == null) throw new ArgumentNullException("externalSignInResponse");
 
-            ViewData.SetUmbracoPath(ConfigModelConversions.ConvertGlobalSettings(GlobalSettings).GetUmbracoMvcArea(_hostingEnvironment));
+            ViewData.SetUmbracoPath(ConfigModelConversionsFromLegacy.ConvertGlobalSettings(GlobalSettings).GetUmbracoMvcArea(_hostingEnvironment));
 
             //check if there is the TempData with the any token name specified, if so, assign to view bag and render the view
             if (ViewData.FromTempData(TempData, ViewDataExtensions.TokenExternalSignInError) ||
@@ -255,7 +255,7 @@ namespace Umbraco.Web.Editors
                     var groups = Services.UserService.GetUserGroupsByAlias(autoLinkOptions.GetDefaultUserGroups(UmbracoContext, loginInfo));
 
                     var autoLinkUser = BackOfficeIdentityUser.CreateNew(
-                        ConfigModelConversions.ConvertGlobalSettings(GlobalSettings),
+                        ConfigModelConversionsFromLegacy.ConvertGlobalSettings(GlobalSettings),
                         loginInfo.Email,
                         loginInfo.Email,
                         autoLinkOptions.GetDefaultCulture(UmbracoContext, loginInfo));

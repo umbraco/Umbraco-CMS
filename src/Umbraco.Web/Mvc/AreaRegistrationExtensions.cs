@@ -6,11 +6,8 @@ using System.Web.Routing;
 using System.Web.SessionState;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Exceptions;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
-using Umbraco.Web.Composing;
-using Umbraco.Web.Configuration;
+using Umbraco.Infrastructure.Configuration;
 using Umbraco.Web.WebApi;
 
 namespace Umbraco.Web.Mvc
@@ -61,7 +58,7 @@ namespace Umbraco.Web.Mvc
             if (routes == null) throw new ArgumentNullException(nameof(routes));
             if (defaultId == null) throw new ArgumentNullException(nameof(defaultId));
 
-            var umbracoArea = ConfigModelConversions.ConvertGlobalSettings(globalSettings).GetUmbracoMvcArea(hostingEnvironment);
+            var umbracoArea = ConfigModelConversionsFromLegacy.ConvertGlobalSettings(globalSettings).GetUmbracoMvcArea(hostingEnvironment);
 
             //routes are explicitly named with controller names and IDs
             var url = umbracoArea + "/" +

@@ -127,6 +127,11 @@ namespace Umbraco.Extensions
             services.Configure<UserPasswordConfigurationSettings>(configuration.GetSection(Constants.Configuration.ConfigSecurityPrefix + "UserPassword"));
             services.Configure<WebRoutingSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "WebRouting"));
 
+            // TODO: remove this once no longer requred in Umbraco.Web.	
+            var configsFactory = new AspNetCoreConfigsFactory(configuration);
+            var configs = configsFactory.Create();
+            services.AddSingleton(configs);
+
             return services;
         }
 

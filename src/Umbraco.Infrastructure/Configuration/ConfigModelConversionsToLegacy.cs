@@ -1,15 +1,17 @@
-﻿using System.Net.Mail;
+﻿using System.Collections.Generic;
+using System.Net.Mail;
+using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 
-namespace Umbraco.Tests.TestHelpers
+namespace Umbraco.Infrastructure.Configuration
 {
     /// <summary>
     /// TEMPORARY: this class has been added just to ensure tests on Umbraco.Web functionality, that still use the interface
     /// based configuration, by converting between e.g <see cref="GlobalSettings"></see> (used by
     /// legacy configuration and <see cref="IGlobalSettings"></see> (used by Netcore/IOptions configuration).
     /// </summary>
-    public static class ConfigModelConversions
+    public static class ConfigModelConversionsToLegacy
     {
         public static IGlobalSettings ConvertGlobalSettings(GlobalSettings globalSettings)
         {
@@ -44,6 +46,13 @@ namespace Umbraco.Tests.TestHelpers
                 UseHttps = globalSettings.UseHttps,
                 VersionCheckPeriod = globalSettings.VersionCheckPeriod,
             };
+        }
+
+        public static IConnectionStrings ConvertConnectionStrings(ConnectionStrings connectionStrings)
+        {
+            var result = new TestConnectionStrings();
+            result.AddEntry(Constants.System.UmbracoConnectionName, connectionStrings.UmbracoConnectionString);
+            return result;
         }
 
         private class TestGlobalSettings : IGlobalSettings
@@ -104,6 +113,18 @@ namespace Umbraco.Tests.TestHelpers
             public string Username { get; set; }
 
             public string Password { get; set; }
+        }
+
+        private class TestConnectionStrings : IConnectionStrings
+        {
+            private IDictionary<string, ConfigConnectionString> _dictionary = new Dictionary<string, ConfigConnectionString>();
+
+            public ConfigConnectionString this[string key] => _dictionary[key];
+
+            public void AddEntry(string key, string connectionString)
+            {
+                _dictionary.Add(key, new ConfigConnectionString(connectionString, string.Empty, key));
+            }
         }
     }
 }

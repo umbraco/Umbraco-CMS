@@ -28,14 +28,16 @@ namespace Umbraco.Core.Composing
         /// <param name="typeLoader">A type loader.</param>
         /// <param name="logger">A logger.</param>
         /// <param name="runtimeState">The runtime state.</param>
+        /// <param name="configs">Optional configs.</param>
         /// <param name="ioHelper">An IOHelper</param>
         /// <param name="appCaches"></param>
-        public Composition(IRegister register,  TypeLoader typeLoader, IProfilingLogger logger, IRuntimeState runtimeState, IIOHelper ioHelper, AppCaches appCaches)
+        public Composition(IRegister register, TypeLoader typeLoader, IProfilingLogger logger, IRuntimeState runtimeState, Configs configs, IIOHelper ioHelper, AppCaches appCaches)
         {
             _register = register ?? throw new ArgumentNullException(nameof(register));
             TypeLoader = typeLoader ?? throw new ArgumentNullException(nameof(typeLoader));
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
             RuntimeState = runtimeState ?? throw new ArgumentNullException(nameof(runtimeState));
+            Configs = configs ?? throw new ArgumentNullException(nameof(configs));
             IOHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
             AppCaches = appCaches ?? throw new ArgumentNullException(nameof(appCaches));
         }
@@ -60,6 +62,7 @@ namespace Umbraco.Core.Composing
         /// </summary>
         public IRuntimeState RuntimeState { get; }
 
+        // TODO: remove this once no longer required for functionality in Umbraco.Web.
         /// <summary>	
         /// Gets the configurations.	
         /// </summary>	
@@ -133,8 +136,7 @@ namespace Umbraco.Core.Composing
 
             IFactory factory = null;
 
-            // TODO: what to do about this?
-            //Configs.RegisterWith(_register);
+            Configs.RegisterWith(_register);
 
             // ReSharper disable once AccessToModifiedClosure -- on purpose
             _register.Register(_ => factory, Lifetime.Singleton);

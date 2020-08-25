@@ -59,7 +59,7 @@ namespace Umbraco.Core.Configuration.Models
         //}
 
         // return DefaultCharCollection;
-        public IEnumerable<IChar> CharCollection { get; set; }
+        public IEnumerable<IChar> CharCollection { get; set; } = DefaultCharCollection;
 
         public class CharItem : IChar
         {

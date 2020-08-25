@@ -12,6 +12,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
+using Umbraco.Infrastructure.Configuration;
 
 namespace Umbraco.Core.Runtime
 {
@@ -179,7 +180,11 @@ namespace Umbraco.Core.Runtime
                 var typeLoader = new TypeLoader(TypeFinder, appCaches.RuntimeCache, new DirectoryInfo(HostingEnvironment.LocalTempPath), ProfilingLogger);
 
                 // create the composition
-                composition = new Composition(register, typeLoader, ProfilingLogger, _state, IOHelper, appCaches);
+                // TODO: remove the configs parameter once we no longer need to provide it for Umbraco.Web and Umbraco.Tests functionality.
+                var configs = new Configs();
+                configs.Add<IGlobalSettings>(() => ConfigModelConversionsToLegacy.ConvertGlobalSettings(_globalSettings));
+                configs.Add<IConnectionStrings>(() => ConfigModelConversionsToLegacy.ConvertConnectionStrings(_connectionStrings));
+                composition = new Composition(register, typeLoader, ProfilingLogger, _state, configs, IOHelper, appCaches);
                 composition.RegisterEssentials(Logger, Profiler, ProfilingLogger, MainDom, appCaches, databaseFactory, typeLoader, _state, TypeFinder, IOHelper, UmbracoVersion, DbProviderFactoryCreator, HostingEnvironment, BackOfficeInfo);
 
                 // register ourselves (TODO: Should we put this in RegisterEssentials?)

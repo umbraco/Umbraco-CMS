@@ -1,20 +1,14 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Threading;
+﻿using System.Runtime.InteropServices;
 using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Logging.Serilog;
-using Umbraco.Core.Runtime;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Runtime;
+using Umbraco.Infrastructure.Configuration;
 using Umbraco.Web.Runtime;
-using Umbraco.Web.Configuration;
 
 namespace Umbraco.Web
 {
@@ -30,8 +24,8 @@ namespace Umbraco.Web
 
             var dbProviderFactoryCreator = new UmbracoDbProviderFactoryCreator();
 
-            var globalSettings = ConfigModelConversions.ConvertGlobalSettings(configs.Global());
-            var connectionStrings = ConfigModelConversions.ConvertConnectionStrings(configs.ConnectionStrings());
+            var globalSettings = ConfigModelConversionsFromLegacy.ConvertGlobalSettings(configs.Global());
+            var connectionStrings = ConfigModelConversionsFromLegacy.ConvertConnectionStrings(configs.ConnectionStrings());
 
             // Determine if we should use the sql main dom or the default
             var appSettingMainDomLock = globalSettings.MainDomLock;

@@ -1,10 +1,10 @@
-﻿using Serilog.Context;
-using System;
+﻿using System;
 using System.IO;
 using System.Reflection;
 using System.Threading;
 using System.Web;
 using System.Web.Hosting;
+using Serilog.Context;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
@@ -14,9 +14,8 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Logging.Serilog;
 using Umbraco.Core.Logging.Serilog.Enrichers;
+using Umbraco.Infrastructure.Configuration;
 using Umbraco.Net;
-using Umbraco.Web.AspNet;
-using Umbraco.Web.Configuration;
 using Umbraco.Web.Hosting;
 using Umbraco.Web.Logging;
 using Current = Umbraco.Web.Composing.Current;
@@ -128,7 +127,7 @@ namespace Umbraco.Web
         /// </summary>
         protected virtual IRegister GetRegister(IGlobalSettings globalSettings)
         {
-            return RegisterFactory.Create(ConfigModelConversions.ConvertGlobalSettings(globalSettings));
+            return RegisterFactory.Create(ConfigModelConversionsFromLegacy.ConvertGlobalSettings(globalSettings));
         }
 
         // events - in the order they trigger
@@ -161,7 +160,7 @@ namespace Umbraco.Web
 
 
             var globalSettings =  Umbraco.Composing.Current.Configs.Global();
-            var umbracoVersion = new UmbracoVersion(ConfigModelConversions.ConvertGlobalSettings(globalSettings));
+            var umbracoVersion = new UmbracoVersion(ConfigModelConversionsFromLegacy.ConvertGlobalSettings(globalSettings));
 
             // create the register for the application, and boot
             // the boot manager is responsible for registrations

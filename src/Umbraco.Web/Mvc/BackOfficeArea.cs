@@ -1,9 +1,7 @@
 ﻿using System.Web.Mvc;
-using Umbraco.Web.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
-using Umbraco.Web.Configuration;
+using Umbraco.Infrastructure.Configuration;
 using Umbraco.Web.Editors;
 
 namespace Umbraco.Web.Mvc
@@ -51,6 +49,6 @@ namespace Umbraco.Web.Mvc
                 new[] {typeof (BackOfficeController).Namespace});
         }
 
-        public override string AreaName => ConfigModelConversions.ConvertGlobalSettings(_globalSettings).GetUmbracoMvcArea(_hostingEnvironment);
+        public override string AreaName => ConfigModelConversionsFromLegacy.ConvertGlobalSettings(_globalSettings).GetUmbracoMvcArea(_hostingEnvironment);
     }
 }

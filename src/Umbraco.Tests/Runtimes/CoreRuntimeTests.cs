@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using Examine;
 using Moq;
 using NUnit.Framework;
@@ -9,14 +8,13 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.Events;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Runtime;
-using Umbraco.Core.Scoping;
+using Umbraco.Infrastructure.Configuration;
 using Umbraco.Net;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Stubs;
@@ -118,7 +116,7 @@ namespace Umbraco.Tests.Runtimes
         public class TestRuntime : CoreRuntime
         {
             public TestRuntime(Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)
-                : base(Umbraco.Web.Configuration.ConfigModelConversions.ConvertGlobalSettings(configs.Global()), Umbraco.Web.Configuration.ConfigModelConversions.ConvertConnectionStrings(configs.ConnectionStrings()), umbracoVersion, ioHelper, logger,  profiler, new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, TestHelper.DbProviderFactoryCreator, TestHelper.MainDom, TestHelper.GetTypeFinder(), NoAppCache.Instance)
+                : base(ConfigModelConversionsFromLegacy.ConvertGlobalSettings(configs.Global()), ConfigModelConversionsFromLegacy.ConvertConnectionStrings(configs.ConnectionStrings()), umbracoVersion, ioHelper, logger,  profiler, new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, TestHelper.DbProviderFactoryCreator, TestHelper.MainDom, TestHelper.GetTypeFinder(), NoAppCache.Instance)
             {
 
             }

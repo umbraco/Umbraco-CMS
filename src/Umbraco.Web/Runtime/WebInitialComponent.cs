@@ -10,12 +10,9 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Strings;
-using Umbraco.Core.IO;
-using Umbraco.Web.Configuration;
-using Umbraco.Web.Install;
+using Umbraco.Infrastructure.Configuration;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
-
 using Constants = Umbraco.Core.Constants;
 using Current = Umbraco.Web.Composing.Current;
 
@@ -118,7 +115,7 @@ namespace Umbraco.Web.Runtime
             UmbracoApiControllerTypeCollection apiControllerTypes,
             IHostingEnvironment hostingEnvironment)
         {
-            var umbracoPath = ConfigModelConversions.ConvertGlobalSettings(globalSettings).GetUmbracoMvcArea(hostingEnvironment);
+            var umbracoPath = ConfigModelConversionsFromLegacy.ConvertGlobalSettings(globalSettings).GetUmbracoMvcArea(hostingEnvironment);
 
             // create the front-end route
             var defaultRoute = RouteTable.Routes.MapRoute(
@@ -155,7 +152,7 @@ namespace Umbraco.Web.Runtime
             UmbracoApiControllerTypeCollection apiControllerTypes,
             IHostingEnvironment hostingEnvironment)
         {
-            var umbracoPath = ConfigModelConversions.ConvertGlobalSettings(globalSettings).GetUmbracoMvcArea(hostingEnvironment);
+            var umbracoPath = ConfigModelConversionsFromLegacy.ConvertGlobalSettings(globalSettings).GetUmbracoMvcArea(hostingEnvironment);
 
             // need to find the plugin controllers and route them
             var pluginControllers = surfaceControllerTypes.Concat(apiControllerTypes).ToArray();
