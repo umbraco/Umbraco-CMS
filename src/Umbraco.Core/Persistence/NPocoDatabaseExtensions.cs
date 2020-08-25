@@ -27,12 +27,13 @@ namespace Umbraco.Core.Persistence
         /// The number of rows to load per page
         /// </param>
         /// <param name="sql"></param>
+        /// <param name="sqlCount">Specify a custom Sql command to get the total count, if null is specified than the auto-generated sql count will be used</param>
         /// <returns></returns>
         /// <remarks>
         /// NPoco's normal Page returns a List{T} but sometimes we don't want all that in memory and instead want to
         /// iterate over each row with a reader using Query vs Fetch.
         /// </remarks>
-        internal static IEnumerable<T> QueryPaged<T>(this IDatabase database, long pageSize, Sql sql)
+        internal static IEnumerable<T> QueryPaged<T>(this IDatabase database, long pageSize, Sql sql, Sql sqlCount)
         {
             var sqlString = sql.SQL;
             var sqlArgs = sql.Arguments;
@@ -42,12 +43,12 @@ namespace Umbraco.Core.Persistence
             do
             {
                 // Get the paged queries
-                database.BuildPageQueries<T>(pageIndex * pageSize, pageSize, sqlString, ref sqlArgs, out var sqlCount, out var sqlPage);
+                database.BuildPageQueries<T>(pageIndex * pageSize, pageSize, sqlString, ref sqlArgs, out var generatedSqlCount, out var sqlPage);
 
                 // get the item count once
                 if (itemCount == null)
                 {
-                    itemCount = database.ExecuteScalar<int>(sqlCount, sqlArgs);
+                    itemCount = database.ExecuteScalar<int>(sqlCount?.SQL ?? generatedSqlCount, sqlCount?.Arguments ?? sqlArgs);
                 }
                 pageIndex++;
 
@@ -59,6 +60,22 @@ namespace Umbraco.Core.Persistence
 
             } while ((pageIndex * pageSize) < itemCount);
         }
+
+        /// <summary>
+        /// Iterates over the result of a paged data set with a db reader
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="database"></param>
+        /// <param name="pageSize">
+        /// The number of rows to load per page
+        /// </param>
+        /// <param name="sql"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// NPoco's normal Page returns a List{T} but sometimes we don't want all that in memory and instead want to
+        /// iterate over each row with a reader using Query vs Fetch.
+        /// </remarks>
+        internal static IEnumerable<T> QueryPaged<T>(this IDatabase database, long pageSize, Sql sql) => database.QueryPaged<T>(pageSize, sql, null);
 
         // NOTE
         //

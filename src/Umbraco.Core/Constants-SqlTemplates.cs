@@ -15,6 +15,12 @@
                 public const string GetReservedId = "Umbraco.Core.VersionableRepository.GetReservedId";
             }
 
+
+            internal static class NuCacheDatabaseDataSource
+            {
+                public const string ContentSourcesSelect1 = "Umbraco.Web.PublishedCache.NuCache.DataSource.ContentSourcesSelect1";
+                public const string ContentSourcesCount = "Umbraco.Web.PublishedCache.NuCache.DataSource.ContentSourcesCount";
+            }
         }
     }
 }
