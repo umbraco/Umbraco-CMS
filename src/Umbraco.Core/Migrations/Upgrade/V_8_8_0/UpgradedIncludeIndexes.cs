@@ -2,8 +2,6 @@
 using Umbraco.Core.Migrations.Expressions.Execute.Expressions;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Core.Migrations.Upgrade.V_8_8_0
 {
@@ -16,20 +14,13 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_8_0
         }
 
         public override void Migrate()
-        {
-            // Rebuild keys and indexes for these tables, unfortunately we cannot use the Delete.KeysAndIndexes
-            // procedure since for some reason that tries to drop the PK and we don't want that and it would be a breaking
-            // change to add another parameter to that method so we'll just manually do it.
-                        
-            var nodeDtoObjectTypeIndex = $"IX_{NodeDto.TableName}_ObjectType"; // this is the one we'll rebuild
-            // delete existing ones
-            DeleteIndexes<NodeDto>($"IX_{NodeDto.TableName}_ParentId", $"IX_{NodeDto.TableName}_Trashed", nodeDtoObjectTypeIndex);
-            CreateIndexes<NodeDto>(nodeDtoObjectTypeIndex);
+        {            
+            var nodeDtoLevelIndex = $"IX_{NodeDto.TableName}_Level";
+            CreateIndexes<NodeDto>(nodeDtoLevelIndex); // add the new definition
 
             var contentVersionNodeIdIndex = $"IX_{ContentVersionDto.TableName}_NodeId";
-            // delete existing ones
-            DeleteIndexes<ContentVersionDto>(contentVersionNodeIdIndex);
-            CreateIndexes<ContentVersionDto>(contentVersionNodeIdIndex);
+            DeleteIndexes<ContentVersionDto>(contentVersionNodeIdIndex); // delete existing ones
+            CreateIndexes<ContentVersionDto>(contentVersionNodeIdIndex); // add the updated definition
         }
 
         private void DeleteIndexes<T>(params string[] toDelete)

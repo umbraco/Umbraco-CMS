@@ -16,6 +16,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var serializer = ConfigurationManager.AppSettings["Umbraco.Web.PublishedCache.NuCache.Serializer"];
             composition.Register<INuCachePropertyOptionsFactory, AppSettingsNuCachePropertyMapFactory>();
             composition.Register<Lz4DictionaryOfPropertyDataSerializer, Lz4DictionaryOfPropertyDataSerializer>();
+
+            // TODO: Based on our findings it seems like this should not be configurable, we should just be using this because it's better
             if (serializer == "MsgPack")
             {
                 var propertyDictionarySerializer = ConfigurationManager.AppSettings["Umbraco.Web.PublishedCache.NuCache.DictionaryOfPropertiesSerializer"];

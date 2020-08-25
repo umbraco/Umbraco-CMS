@@ -26,9 +26,12 @@ namespace Umbraco.Core.Persistence.Dtos
 
         [Column("parentId")]
         [ForeignKey(typeof(NodeDto))]
+        [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_ParentId")]
         public int ParentId { get; set; }
 
+        // NOTE: This index is primarily for the nucache data lookup, see https://github.com/umbraco/Umbraco-CMS/pull/8365#issuecomment-673404177
         [Column("level")]
+        [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_Level", ForColumns = "level,parentId,sortOrder,nodeObjectType,trashed", IncludeColumns = "nodeUser,path,uniqueId,createDate")]
         public short Level { get; set; }
 
         [Column("path")]
@@ -41,6 +44,7 @@ namespace Umbraco.Core.Persistence.Dtos
 
         [Column("trashed")]
         [Constraint(Default = "0")]
+        [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_Trashed")]
         public bool Trashed { get; set; }
 
         [Column("nodeUser")] // TODO: db rename to 'createUserId'
@@ -53,8 +57,8 @@ namespace Umbraco.Core.Persistence.Dtos
         public string Text { get; set; }
 
         [Column("nodeObjectType")] // TODO: db rename to 'objectType'
-        [NullSetting(NullSetting = NullSettings.Null)]
-        [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_ObjectType", ForColumns = "level,parentId,sortOrder,nodeObjectType,trashed", IncludeColumns = "nodeUser,path,uniqueId,createDate")]
+        [NullSetting(NullSetting = NullSettings.Null)]        
+        [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_ObjectType")]        
         public Guid? NodeObjectType { get; set; }
 
         [Column("createDate")]
