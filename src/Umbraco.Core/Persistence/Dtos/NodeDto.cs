@@ -26,7 +26,6 @@ namespace Umbraco.Core.Persistence.Dtos
 
         [Column("parentId")]
         [ForeignKey(typeof(NodeDto))]
-        [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_ParentId")]
         public int ParentId { get; set; }
 
         [Column("level")]
@@ -42,7 +41,6 @@ namespace Umbraco.Core.Persistence.Dtos
 
         [Column("trashed")]
         [Constraint(Default = "0")]
-        [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_Trashed")]
         public bool Trashed { get; set; }
 
         [Column("nodeUser")] // TODO: db rename to 'createUserId'
@@ -56,7 +54,7 @@ namespace Umbraco.Core.Persistence.Dtos
 
         [Column("nodeObjectType")] // TODO: db rename to 'objectType'
         [NullSetting(NullSetting = NullSettings.Null)]
-        [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_ObjectType")]
+        [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_ObjectType", ForColumns = "level,parentId,sortOrder,nodeObjectType,trashed", IncludeColumns = "nodeUser,path,uniqueId,createDate")]
         public Guid? NodeObjectType { get; set; }
 
         [Column("createDate")]
