@@ -411,9 +411,9 @@ namespace Umbraco.Core.Services.Implement
                 string.Concat(siteUri.Authority, _ioHelper.ResolveUrl(_globalSettings.UmbracoPath)),
                 summary.ToString());
 
-            var fromMail = _contentSettings.Notifications.NotificationEmailAddress ?? _globalSettings.SmtpSettings.From;
+            var fromMail = _contentSettings.Notifications.NotificationEmailAddress ?? _globalSettings.Smtp.From;
             // create the mail message
-            var mail = new MailMessage(fromMail, mailingUser.Email);
+            var mail = new MailMessage(fromMail, fromMail);
 
             // populate the message
 
