@@ -3,8 +3,10 @@ using System.Net;
 using System.Net.Http;
 using System.Runtime.Serialization;
 using System.Web.Hosting;
+using Microsoft.Extensions.Options;
 using Umbraco.Configuration;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Exceptions;
 using Umbraco.ModelsBuilder.Embedded.Building;
 using Umbraco.Web.Editors;
@@ -23,16 +25,16 @@ namespace Umbraco.ModelsBuilder.Embedded.BackOffice
     [UmbracoApplicationAuthorize(Core.Constants.Applications.Settings)]
     public class ModelsBuilderDashboardController : UmbracoAuthorizedJsonController
     {
-        private readonly IModelsBuilderConfig _config;
+        private readonly ModelsBuilderConfig _config;
         private readonly ModelsGenerator _modelGenerator;
         private readonly OutOfDateModelsStatus _outOfDateModels;
         private readonly ModelsGenerationError _mbErrors;
         private readonly DashboardReport _dashboardReport;
 
-        public ModelsBuilderDashboardController(IModelsBuilderConfig config, ModelsGenerator modelsGenerator, OutOfDateModelsStatus outOfDateModels, ModelsGenerationError mbErrors)
+        public ModelsBuilderDashboardController(IOptions<ModelsBuilderConfig> config, ModelsGenerator modelsGenerator, OutOfDateModelsStatus outOfDateModels, ModelsGenerationError mbErrors)
         {
             //_umbracoServices = umbracoServices;
-            _config = config;
+            _config = config.Value;
             _modelGenerator = modelsGenerator;
             _outOfDateModels = outOfDateModels;
             _mbErrors = mbErrors;

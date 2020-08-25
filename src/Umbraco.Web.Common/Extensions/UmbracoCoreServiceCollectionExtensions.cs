@@ -14,7 +14,6 @@ using Serilog;
 using Serilog.Extensions.Hosting;
 using Serilog.Extensions.Logging;
 using Umbraco.Configuration;
-using Umbraco.Configuration.Models;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;

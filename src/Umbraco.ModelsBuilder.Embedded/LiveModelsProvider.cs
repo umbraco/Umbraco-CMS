@@ -6,6 +6,8 @@ using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
 using Umbraco.ModelsBuilder.Embedded.Building;
 using Umbraco.Web.Cache;
+using Umbraco.Core.Configuration.Models;
+using Microsoft.Extensions.Options;
 
 namespace Umbraco.ModelsBuilder.Embedded
 {
@@ -15,7 +17,7 @@ namespace Umbraco.ModelsBuilder.Embedded
         private static Mutex _mutex;
         private static int _req;
         private readonly ILogger _logger;
-        private readonly IModelsBuilderConfig _config;
+        private readonly ModelsBuilderConfig _config;
         private readonly ModelsGenerator _modelGenerator;
         private readonly ModelsGenerationError _mbErrors;
         private readonly IHostingEnvironment _hostingEnvironment;
@@ -23,10 +25,10 @@ namespace Umbraco.ModelsBuilder.Embedded
         // we do not manage pure live here
         internal bool IsEnabled => _config.ModelsMode.IsLiveNotPure();
 
-        public LiveModelsProvider(ILogger logger, IModelsBuilderConfig config, ModelsGenerator modelGenerator, ModelsGenerationError mbErrors, IHostingEnvironment hostingEnvironment)
+        public LiveModelsProvider(ILogger logger, IOptions<ModelsBuilderConfig> config, ModelsGenerator modelGenerator, ModelsGenerationError mbErrors, IHostingEnvironment hostingEnvironment)
         {
             _logger = logger;
-            _config = config ?? throw new ArgumentNullException(nameof(config));
+            _config = config.Value ?? throw new ArgumentNullException(nameof(config));
             _modelGenerator = modelGenerator;
             _mbErrors = mbErrors;
             _hostingEnvironment = hostingEnvironment;
