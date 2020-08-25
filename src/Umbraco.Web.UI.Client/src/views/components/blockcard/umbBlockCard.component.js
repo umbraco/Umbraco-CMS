@@ -42,7 +42,7 @@
 
             var path = umbRequestHelper.convertVirtualToAbsolutePath(vm.blockConfigModel.thumbnail);
             if (path.toLowerCase().endsWith(".svg") === false) {
-                path += "?upscale=false&width=400)";
+                path += "?upscale=false&width=400";
             }
             vm.styleBackgroundImage = 'url(\''+path+'\')';
         }
