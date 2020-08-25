@@ -32,6 +32,7 @@ namespace Umbraco.Core.Persistence.Dtos
         public int? UserId { get => _userId == 0 ? null : _userId; set => _userId = value; } //return null if zero
 
         [Column("current")]
+        [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_Current", IncludeColumns = "nodeId")]
         public bool Current { get; set; }
 
         // about current:
