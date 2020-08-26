@@ -34,8 +34,8 @@
         var modelObject;
 
         // Property actions:
-        var copyAllBlocksAction;
-        var deleteAllBlocksAction;
+        var copyAllBlocksAction = null;
+        var deleteAllBlocksAction = null;
 
         var inlineEditing = false;
         var liveEditing = true;
@@ -107,14 +107,15 @@
                 icon: "documents",
                 method: requestCopyAllBlocks,
                 isDisabled: true
-            }
+            };
+
             deleteAllBlocksAction = {
                 labelKey: 'clipboard_labelForRemoveAllEntries',
                 labelTokens: [],
                 icon: 'trash',
                 method: requestDeleteAllBlocks,
                 isDisabled: true
-            }
+            };
 
             var propertyActions = [
                 copyAllBlocksAction,
@@ -609,30 +610,31 @@
         function onAmountOfBlocksChanged() {
 
             // enable/disable property actions
-            copyAllBlocksAction.isDisabled = vm.layout.length === 0;
-            deleteAllBlocksAction.isDisabled = vm.layout.length === 0;
+            if (copyAllBlocksAction) {
+                copyAllBlocksAction.isDisabled = vm.layout.length === 0;
+            }
+            if (deleteAllBlocksAction) {
+                deleteAllBlocksAction.isDisabled = vm.layout.length === 0;
+            }
 
             // validate limits:
-            if (vm.propertyForm) {
+            if (vm.propertyForm && vm.validationLimit) {
 
                 var isMinRequirementGood = vm.validationLimit.min === null || vm.layout.length >= vm.validationLimit.min;
                 vm.propertyForm.minCount.$setValidity("minCount", isMinRequirementGood);
 
                 var isMaxRequirementGood = vm.validationLimit.max === null || vm.layout.length <= vm.validationLimit.max;
                 vm.propertyForm.maxCount.$setValidity("maxCount", isMaxRequirementGood);
-
             }
         }
-        unsubscribe.push($scope.$watch(() => vm.layout.length, onAmountOfBlocksChanged));
 
+        unsubscribe.push($scope.$watch(() => vm.layout.length, onAmountOfBlocksChanged));
 
         $scope.$on("$destroy", function () {
             for (const subscription of unsubscribe) {
                 subscription();
             }
         });
-
-
     }
 
 })();
