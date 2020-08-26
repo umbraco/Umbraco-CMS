@@ -21,15 +21,15 @@
                                   on-edit="model.openViewPicker()"
                                   on-remove="model.removeMacroView()">
                 </umb-node-preview>
+
                 <input type="hidden" ng-model="mandatoryViewValidator" ng-required="!model.macro.node" />
 
-                <a href=""
-                   ng-show="!model.macro.node"
-                   class="umb-node-preview-add"
-                   ng-click="model.openViewPicker()"
-                   prevent-default>
+                <button type="button"
+                        class="umb-node-preview-add"
+                        ng-show="!model.macro.node"
+                        ng-click="model.openViewPicker()">
                     <localize key="general_add">Add</localize>
-                </a>
+                </button>
 
             </umb-control-group>
         </umb-box-content>
@@ -38,10 +38,10 @@
         <umb-box-header title="Editor settings"></umb-box-header>
         <umb-box-content>
             <umb-control-group label="Use in rich text editor and the grid">
-                <umb-toggle checked="model.macro.useInEditor" on-click="model.toggle('useInEditor')" ></umb-toggle>
+                <umb-toggle checked="model.macro.useInEditor" on-click="model.toggle('useInEditor')"></umb-toggle>
             </umb-control-group>
             <umb-control-group label="Render in rich text editor and the grid" ng-if="model.macro.useInEditor">
-                <umb-toggle checked="model.macro.renderInEditor && model.macro.useInEditor"  on-click="model.toggle('renderInEditor')" ></umb-toggle>
+                <umb-toggle checked="model.macro.renderInEditor && model.macro.useInEditor" on-click="model.toggle('renderInEditor')"></umb-toggle>
             </umb-control-group>
         </umb-box-content>
     </umb-box>
