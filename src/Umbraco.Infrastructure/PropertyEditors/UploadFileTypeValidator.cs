@@ -17,15 +17,10 @@ namespace Umbraco.Web.PropertyEditors
         private readonly ILocalizedTextService _localizedTextService;
         private readonly ContentSettings _contentSettings;
 
-        public UploadFileTypeValidator(ILocalizedTextService localizedTextService, ContentSettings contentSettings)
+        public UploadFileTypeValidator(ILocalizedTextService localizedTextService, IOptions<ContentSettings> contentSettings)
         {
             _localizedTextService = localizedTextService;
-            _contentSettings = contentSettings;
-        }
-
-        public UploadFileTypeValidator(ILocalizedTextService localizedTextService, IOptions<ContentSettings> contentSettings)
-            : this(localizedTextService, contentSettings.Value)
-        {
+            _contentSettings = contentSettings.Value;
         }
 
         public IEnumerable<ValidationResult> Validate(object value, string valueType, object dataTypeConfiguration)

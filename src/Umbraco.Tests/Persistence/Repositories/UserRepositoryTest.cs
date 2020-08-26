@@ -73,7 +73,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             var accessor = (IScopeAccessor) provider;
             var globalSettings = new GlobalSettingsBuilder().Build();
-            var repository = new UserRepository(accessor, AppCaches.Disabled, Logger, Mappers, globalSettings, new UserPasswordConfigurationSettings(), new JsonNetSerializer());
+            var repository = new UserRepository(accessor, AppCaches.Disabled, Logger, Mappers, Microsoft.Extensions.Options.Options.Create(globalSettings), Microsoft.Extensions.Options.Options.Create(new UserPasswordConfigurationSettings()), new JsonNetSerializer());
             return repository;
         }
 

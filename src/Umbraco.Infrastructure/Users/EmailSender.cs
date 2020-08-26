@@ -27,17 +27,8 @@ namespace Umbraco.Core
         }
 
         public EmailSender(IOptions<GlobalSettings> globalSettings, bool enableEvents)
-            : this(globalSettings.Value, enableEvents)
         {
-        }
-
-        public EmailSender(GlobalSettings globalSettings) : this(globalSettings, false)
-        {
-        }
-
-        public EmailSender(GlobalSettings globalSettings, bool enableEvents)
-        {
-            _globalSettings = globalSettings;
+            _globalSettings = globalSettings.Value;
             _enableEvents = enableEvents;
 
             _smtpConfigured = new Lazy<bool>(() => _globalSettings.IsSmtpServerConfigured);

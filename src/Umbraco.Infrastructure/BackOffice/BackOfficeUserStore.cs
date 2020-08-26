@@ -39,16 +39,11 @@ namespace Umbraco.Core.BackOffice
         private bool _disposed = false;
 
         public BackOfficeUserStore(IUserService userService, IEntityService entityService, IExternalLoginService externalLoginService, IOptions<GlobalSettings> globalSettings, UmbracoMapper mapper)
-            : this(userService, entityService, externalLoginService, globalSettings.Value, mapper)
-        {
-        }
-
-        public BackOfficeUserStore(IUserService userService, IEntityService entityService, IExternalLoginService externalLoginService, GlobalSettings globalSettings, UmbracoMapper mapper)
         {
             _userService = userService;
             _entityService = entityService;
             _externalLoginService = externalLoginService;
-            _globalSettings = globalSettings;
+            _globalSettings = globalSettings.Value;
             if (userService == null) throw new ArgumentNullException("userService");
             if (externalLoginService == null) throw new ArgumentNullException("externalLoginService");
             _mapper = mapper;

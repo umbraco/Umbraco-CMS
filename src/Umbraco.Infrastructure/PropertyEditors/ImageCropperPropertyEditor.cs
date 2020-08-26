@@ -49,32 +49,16 @@ namespace Umbraco.Web.PropertyEditors
             IIOHelper ioHelper,
             IShortStringHelper shortStringHelper,
             ILocalizedTextService localizedTextService)
-            : this(logger, mediaFileSystem, contentSettings.Value, dataTypeService, localizationService, ioHelper, shortStringHelper, localizedTextService)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ImageCropperPropertyEditor"/> class.
-        /// </summary>
-        public ImageCropperPropertyEditor(
-            ILogger logger,
-            IMediaFileSystem mediaFileSystem,
-            ContentSettings contentSettings,
-            IDataTypeService dataTypeService,
-            ILocalizationService localizationService,
-            IIOHelper ioHelper,
-            IShortStringHelper shortStringHelper,
-            ILocalizedTextService localizedTextService)
             : base(logger, dataTypeService, localizationService, localizedTextService, shortStringHelper)
         {
             _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
-            _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
+            _contentSettings = contentSettings.Value ?? throw new ArgumentNullException(nameof(contentSettings));
             _dataTypeService = dataTypeService;
             _localizationService = localizationService;
             _ioHelper = ioHelper;
 
             // TODO: inject?
-            _autoFillProperties = new UploadAutoFillProperties(_mediaFileSystem, logger, _contentSettings);
+            _autoFillProperties = new UploadAutoFillProperties(_mediaFileSystem, logger, contentSettings);
         }
 
         public bool TryGetMediaPath(string alias, object value, out string mediaPath)

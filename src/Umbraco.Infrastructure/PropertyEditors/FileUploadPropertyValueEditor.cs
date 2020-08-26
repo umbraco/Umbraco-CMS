@@ -27,22 +27,10 @@ namespace Umbraco.Web.PropertyEditors
             ILocalizedTextService localizedTextService,
             IShortStringHelper shortStringHelper,
             IOptions<ContentSettings> contentSettings)
-            : this(attribute, mediaFileSystem, dataTypeService, localizationService, localizedTextService, shortStringHelper, contentSettings.Value)
-        {
-        }
-
-        public FileUploadPropertyValueEditor(
-            DataEditorAttribute attribute,
-            IMediaFileSystem mediaFileSystem,
-            IDataTypeService dataTypeService,
-            ILocalizationService localizationService,
-            ILocalizedTextService localizedTextService,
-            IShortStringHelper shortStringHelper,
-            ContentSettings contentSettings)
             : base(dataTypeService, localizationService, localizedTextService, shortStringHelper, attribute)
         {
             _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
-            _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
+            _contentSettings = contentSettings.Value ?? throw new ArgumentNullException(nameof(contentSettings));
         }
 
         /// <summary>

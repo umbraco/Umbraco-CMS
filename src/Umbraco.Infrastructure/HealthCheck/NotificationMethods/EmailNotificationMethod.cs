@@ -70,7 +70,7 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
 
             var subject = _textService.Localize("healthcheck/scheduledHealthCheckEmailSubject", new[] { host.ToString() });
 
-            var mailSender = new EmailSender(_globalSettings);
+            var mailSender = new EmailSender(Options.Create(_globalSettings));
             using (var mailMessage = CreateMailMessage(subject, message))
             {
                 await mailSender.SendAsync(mailMessage);

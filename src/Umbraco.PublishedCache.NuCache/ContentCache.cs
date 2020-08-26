@@ -32,18 +32,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
         // but, no, UmbracoContext returns snapshot.Content which comes from elements SO a resync should create a new cache
 
         public ContentCache(bool previewDefault, ContentStore.Snapshot snapshot, IAppCache snapshotCache, IAppCache elementsCache, IDomainCache domainCache, IOptions<GlobalSettings> globalSettings, IVariationContextAccessor variationContextAccessor)
-            : this(previewDefault, snapshot, snapshotCache, elementsCache, domainCache, globalSettings.Value, variationContextAccessor)
-        {
-        }
-
-        public ContentCache(bool previewDefault, ContentStore.Snapshot snapshot, IAppCache snapshotCache, IAppCache elementsCache, IDomainCache domainCache, GlobalSettings globalSettings, IVariationContextAccessor variationContextAccessor)
             : base(previewDefault)
         {
             _snapshot = snapshot;
             _snapshotCache = snapshotCache;
             _elementsCache = elementsCache;
             _domainCache = domainCache;
-            _globalSettings = globalSettings;
+            _globalSettings = globalSettings.Value;
             _variationContextAccessor = variationContextAccessor;
         }
 

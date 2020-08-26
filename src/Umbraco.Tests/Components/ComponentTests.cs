@@ -41,7 +41,7 @@ namespace Umbraco.Tests.Components
             var fs = new FileSystems(mock.Object, logger, TestHelper.IOHelper, Options.Create(globalSettings), TestHelper.GetHostingEnvironment());
             var coreDebug = new CoreDebugSettingsBuilder().Build();
             var mediaFileSystem = Mock.Of<IMediaFileSystem>();
-            var p = new ScopeProvider(f, fs, coreDebug, mediaFileSystem, logger, typeFinder, NoAppCache.Instance);
+            var p = new ScopeProvider(f, fs, Microsoft.Extensions.Options.Options.Create(coreDebug), mediaFileSystem, logger, typeFinder, NoAppCache.Instance);
 
             mock.Setup(x => x.GetInstance(typeof (ILogger))).Returns(logger);
             mock.Setup(x => x.GetInstance(typeof (IProfilingLogger))).Returns(new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));

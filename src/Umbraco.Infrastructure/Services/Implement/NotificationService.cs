@@ -33,16 +33,10 @@ namespace Umbraco.Core.Services.Implement
 
         public NotificationService(IScopeProvider provider, IUserService userService, IContentService contentService, ILocalizationService localizationService,
             ILogger logger, IIOHelper ioHelper, INotificationsRepository notificationsRepository, IOptions<GlobalSettings> globalSettings, IOptions<ContentSettings> contentSettings, IEmailSender emailSender)
-            : this(provider, userService, contentService, localizationService, logger, ioHelper, notificationsRepository, globalSettings.Value, contentSettings.Value, emailSender)
-        {
-        }
-
-        public NotificationService(IScopeProvider provider, IUserService userService, IContentService contentService, ILocalizationService localizationService,
-            ILogger logger, IIOHelper ioHelper, INotificationsRepository notificationsRepository, GlobalSettings globalSettings, ContentSettings contentSettings, IEmailSender emailSender)
         {
             _notificationsRepository = notificationsRepository;
-            _globalSettings = globalSettings;
-            _contentSettings = contentSettings;
+            _globalSettings = globalSettings.Value;
+            _contentSettings = contentSettings.Value;
             _emailSender = emailSender;
             _uowProvider = provider ?? throw new ArgumentNullException(nameof(provider));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));

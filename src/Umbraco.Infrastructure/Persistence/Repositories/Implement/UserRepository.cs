@@ -50,33 +50,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             IOptions<GlobalSettings> globalSettings,
             IOptions<UserPasswordConfigurationSettings> passwordConfiguration,
             IJsonSerializer jsonSerializer)
-            : this(scopeAccessor, appCaches, logger, mapperCollection, globalSettings.Value, passwordConfiguration.Value, jsonSerializer)
-        {
-        }
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="scopeAccessor"></param>
-        /// <param name="appCaches"></param>
-        /// <param name="logger"></param>
-        /// <param name="mapperCollection">
-        /// A dictionary specifying the configuration for user passwords. If this is null then no password configuration will be persisted or read.
-        /// </param>
-        /// <param name="globalSettings"></param>
-        public UserRepository(
-            IScopeAccessor scopeAccessor,
-            AppCaches appCaches,
-            ILogger logger,
-            IMapperCollection mapperCollection,
-            GlobalSettings globalSettings,
-            UserPasswordConfigurationSettings passwordConfiguration,
-            IJsonSerializer jsonSerializer)
             : base(scopeAccessor, appCaches, logger)
         {
             _mapperCollection = mapperCollection ?? throw new ArgumentNullException(nameof(mapperCollection));
-            _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
-            _passwordConfiguration = passwordConfiguration ?? throw new ArgumentNullException(nameof(passwordConfiguration));
+            _globalSettings = globalSettings.Value ?? throw new ArgumentNullException(nameof(globalSettings));
+            _passwordConfiguration = passwordConfiguration.Value ?? throw new ArgumentNullException(nameof(passwordConfiguration));
             _jsonSerializer = jsonSerializer;
         }
 

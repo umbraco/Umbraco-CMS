@@ -35,7 +35,7 @@ namespace Umbraco.Tests.Models
             var contentSettings = new ContentSettingsBuilder().Build();
 
             var mediaFileSystem = new MediaFileSystem(Mock.Of<IFileSystem>(), scheme, logger, ShortStringHelper);
-            var ignored = new FileUploadPropertyEditor(Mock.Of<ILogger>(), mediaFileSystem, contentSettings, DataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper);
+            var ignored = new FileUploadPropertyEditor(Mock.Of<ILogger>(), mediaFileSystem, Microsoft.Extensions.Options.Options.Create(contentSettings), DataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper);
 
             var media = MockedMedia.CreateMediaImage(mediaType, -1);
             media.WriterId = -1; // else it's zero and that's not a user and it breaks the tests

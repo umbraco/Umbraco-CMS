@@ -21,18 +21,12 @@ namespace Umbraco.Web.Scheduling
 
         public LogScrubber(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
             IMainDom mainDom, IServerRegistrar serverRegistrar, IAuditService auditService, IOptions<LoggingSettings> settings, IScopeProvider scopeProvider, IProfilingLogger logger)
-            : this(runner, delayMilliseconds, periodMilliseconds, mainDom, serverRegistrar, auditService, settings.Value, scopeProvider, logger)
-        {
-        }
-
-        public LogScrubber(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
-            IMainDom mainDom, IServerRegistrar serverRegistrar, IAuditService auditService, LoggingSettings settings, IScopeProvider scopeProvider, IProfilingLogger logger)
             : base(runner, delayMilliseconds, periodMilliseconds)
         {
             _mainDom = mainDom;
             _serverRegistrar = serverRegistrar;
             _auditService = auditService;
-            _settings = settings;
+            _settings = settings.Value;
             _scopeProvider = scopeProvider;
             _logger = logger;
         }

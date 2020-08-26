@@ -141,7 +141,7 @@ namespace Umbraco.Web.Scheduling
         {
             // ping/keepalive
             // on all servers
-            var task = new KeepAlive(_keepAliveRunner, DefaultDelayMilliseconds, FiveMinuteMilliseconds, _requestAccessor, _mainDom, keepAliveSettings, _logger, _serverRegistrar);
+            var task = new KeepAlive(_keepAliveRunner, DefaultDelayMilliseconds, FiveMinuteMilliseconds, _requestAccessor, _mainDom, Options.Create(keepAliveSettings), _logger, _serverRegistrar);
             _keepAliveRunner.TryAdd(task);
             return task;
         }
@@ -185,7 +185,7 @@ namespace Umbraco.Web.Scheduling
         {
             // log scrubbing
             // install on all, will only run on non-replica servers
-            var task = new LogScrubber(_scrubberRunner, DefaultDelayMilliseconds, LogScrubber.GetLogScrubbingInterval(), _mainDom, _serverRegistrar, _auditService, settings, _scopeProvider, _logger);
+            var task = new LogScrubber(_scrubberRunner, DefaultDelayMilliseconds, LogScrubber.GetLogScrubbingInterval(), _mainDom, _serverRegistrar, _auditService, Options.Create(settings), _scopeProvider, _logger);
             _scrubberRunner.TryAdd(task);
             return task;
         }

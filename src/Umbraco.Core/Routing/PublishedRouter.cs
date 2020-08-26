@@ -69,7 +69,7 @@ namespace Umbraco.Web.Routing
         /// <inheritdoc />
         public IPublishedRequest CreateRequest(IUmbracoContext umbracoContext, Uri uri = null)
         {
-            return new PublishedRequest(this, umbracoContext, _webRoutingSettings, uri ?? umbracoContext.CleanedUmbracoUrl);
+            return new PublishedRequest(this, umbracoContext, Options.Create(_webRoutingSettings), uri ?? umbracoContext.CleanedUmbracoUrl);
         }
 
         #region Request

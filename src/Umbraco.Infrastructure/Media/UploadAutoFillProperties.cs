@@ -25,18 +25,10 @@ namespace Umbraco.Web.Media
             IMediaFileSystem mediaFileSystem,
             ILogger logger,
             IOptions<ContentSettings> contentSettings)
-            : this(mediaFileSystem, logger, contentSettings.Value)
-        {
-        }
-
-        public UploadAutoFillProperties(
-            IMediaFileSystem mediaFileSystem,
-            ILogger logger,
-            ContentSettings contentSettings)
         {
             _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
+            _contentSettings = contentSettings.Value ?? throw new ArgumentNullException(nameof(contentSettings));
         }
 
         /// <summary>

@@ -21,17 +21,11 @@ namespace Umbraco.Web.Scheduling
 
         public KeepAlive(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
             IRequestAccessor requestAccessor, IMainDom mainDom, IOptions<KeepAliveSettings> keepAliveSettings, IProfilingLogger logger, IServerRegistrar serverRegistrar)
-            : this(runner, delayMilliseconds, periodMilliseconds, requestAccessor, mainDom, keepAliveSettings.Value, logger, serverRegistrar)
-        {
-        }
-
-        public KeepAlive(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
-            IRequestAccessor requestAccessor, IMainDom mainDom, KeepAliveSettings keepAliveSettings, IProfilingLogger logger, IServerRegistrar serverRegistrar)
             : base(runner, delayMilliseconds, periodMilliseconds)
         {
             _requestAccessor = requestAccessor;
             _mainDom = mainDom;
-            _keepAliveSettings = keepAliveSettings;
+            _keepAliveSettings = keepAliveSettings.Value;
             _logger = logger;
             _serverRegistrar = serverRegistrar;
             if (_httpClient == null)

@@ -38,22 +38,10 @@ namespace Umbraco.Web.PropertyEditors
             ILocalizationService localizationService,
             ILocalizedTextService localizedTextService,
             IShortStringHelper shortStringHelper)
-            : this(logger, mediaFileSystem, contentSettings.Value, dataTypeService, localizationService, localizedTextService, shortStringHelper)
-        {
-        }
-
-        public FileUploadPropertyEditor(
-            ILogger logger,
-            IMediaFileSystem mediaFileSystem,
-            ContentSettings contentSettings,
-            IDataTypeService dataTypeService,
-            ILocalizationService localizationService,
-            ILocalizedTextService localizedTextService,
-            IShortStringHelper shortStringHelper)
             : base(logger, dataTypeService, localizationService, localizedTextService, shortStringHelper)
         {
             _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
-            _contentSettings = contentSettings;
+            _contentSettings = contentSettings.Value;
             _dataTypeService = dataTypeService;
             _localizationService = localizationService;
             _localizedTextService = localizedTextService;
@@ -66,8 +54,8 @@ namespace Umbraco.Web.PropertyEditors
         /// <returns>The corresponding property value editor.</returns>
         protected override IDataValueEditor CreateValueEditor()
         {
-            var editor = new FileUploadPropertyValueEditor(Attribute, _mediaFileSystem, _dataTypeService, _localizationService, _localizedTextService, ShortStringHelper, _contentSettings);
-            editor.Validators.Add(new UploadFileTypeValidator(_localizedTextService, _contentSettings));
+            var editor = new FileUploadPropertyValueEditor(Attribute, _mediaFileSystem, _dataTypeService, _localizationService, _localizedTextService, ShortStringHelper, Options.Create(_contentSettings));
+            editor.Validators.Add(new UploadFileTypeValidator(_localizedTextService, Options.Create(_contentSettings)));
             return editor;
         }
 
