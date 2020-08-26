@@ -11,7 +11,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 
     internal class JsonContentNestedDataSerializer : IContentNestedDataSerializer
     {
-        public ContentNestedData Deserialize(string data)
+        public ContentNestedData Deserialize(int contentTypeId, string data)
         {
             // by default JsonConvert will deserialize our numeric values as Int64
             // which is bad, because they were Int32 in the database - take care
@@ -30,7 +30,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             return JsonConvert.DeserializeObject<ContentNestedData>(data, settings);
         }
 
-        public string Serialize(ContentNestedData nestedData)
+        public string Serialize(int contentTypeId, ContentNestedData nestedData)
         {
             // note that numeric values (which are Int32) are serialized without their
             // type (eg "value":1234) and JsonConvert by default deserializes them as Int64

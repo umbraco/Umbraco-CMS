@@ -2,10 +2,12 @@
 using MessagePack;
 using MessagePack.Formatters;
 using MessagePack.Resolvers;
+using NPoco.FluentMappings;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Umbraco.Web.PropertyEditors;
 
 namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 {
@@ -15,9 +17,9 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
     internal class MsgPackContentNestedDataSerializer : IContentNestedDataByteSerializer
     {
         private MessagePackSerializerOptions _options;
-        private readonly NuCachePropertyCompressionOptions _propertyOptions;
+        private readonly IPropertyCompressionOptions _propertyOptions;
 
-        public MsgPackContentNestedDataSerializer(INuCachePropertyOptionsFactory propertyOptionsFactory = null)
+        public MsgPackContentNestedDataSerializer(IPropertyCompressionOptions propertyOptions = null)
         {
             var defaultOptions = ContractlessStandardResolver.Options;
 
@@ -37,7 +39,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             _options = defaultOptions
                 .WithResolver(resolver)
                 .WithCompression(MessagePackCompression.Lz4BlockArray);
-            _propertyOptions = propertyOptionsFactory?.GetNuCachePropertyOptions() ?? NuCachePropertyCompressionOptions.Empty;
+            _propertyOptions = propertyOptions ?? new NoopPropertyCompressionOptions();
         }
 
         public string ToJson(string serialized)
@@ -47,113 +49,69 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             return json;
         }
 
-        public ContentNestedData Deserialize(string data)
+        public ContentNestedData Deserialize(int contentTypeId, string data)
         {
             var bin = Convert.FromBase64String(data);
             var nestedData = MessagePackSerializer.Deserialize<ContentNestedData>(bin, _options);
-            Expand(nestedData);
+            Expand(contentTypeId, nestedData);
             return nestedData;
         }
 
-        public string Serialize(ContentNestedData nestedData)
+        public string Serialize(int contentTypeId, ContentNestedData nestedData)
         {
-            Compress(nestedData);
+            Compress(contentTypeId, nestedData);
             var bin = MessagePackSerializer.Serialize(nestedData, _options);
             return Convert.ToBase64String(bin);
         }
 
-        public ContentNestedData DeserializeBytes(byte[] data)
+        public ContentNestedData DeserializeBytes(int contentTypeId, byte[] data)
         {
             var nestedData = MessagePackSerializer.Deserialize<ContentNestedData>(data, _options);
-            Expand(nestedData);
+            Expand(contentTypeId, nestedData);
             return nestedData;
         }
 
-        public byte[] SerializeBytes(ContentNestedData nestedData)
+        public byte[] SerializeBytes(int contentTypeId, ContentNestedData nestedData)
         {
-            Compress(nestedData);
+            Compress(contentTypeId, nestedData);
             return MessagePackSerializer.Serialize(nestedData, _options);
         }
 
         /// <summary>
-        /// Used during serialization to compress properties and map property names to shorter names
+        /// Used during serialization to compress properties
         /// </summary>
         /// <param name="nestedData"></param>
-        private void Compress(ContentNestedData nestedData)
+        private void Compress(int contentTypeId, ContentNestedData nestedData)
         {
-            if (_propertyOptions.PropertyMap != null && _propertyOptions.PropertyMap.Count > 0)
+            foreach(var propertyAliasToData in nestedData.PropertyData)
             {
-                foreach (var map in _propertyOptions.PropertyMap)
+                if (_propertyOptions.IsCompressed(contentTypeId, propertyAliasToData.Key))
                 {
-                    if (map.Value.CompressLevel.Equals(NucachePropertyCompressionLevel.SQLDatabase))
+                    foreach(var property in propertyAliasToData.Value.Where(x => x.Value != null && x.Value is string))
                     {
-                        if (nestedData.PropertyData.TryGetValue(map.Key, out PropertyData[] properties))
-                        {
-                            foreach (var property in properties.Where(x => x.Value != null && x.Value is string))
-                            {
-                                property.Value = LZ4Pickler.Pickle(Encoding.UTF8.GetBytes(property.Value as string), _propertyOptions.LZ4CompressionLevel);
-                            }
-                        }
-                    }
-
-                    // if there is an alias map for this property then use that instead of the real property alias
-                    // (used to save memory, the mapped alias is normally a single char or at least a smaller string)
-                    if (map.Value.MappedAlias != null && !map.Key.Equals(map.Value.MappedAlias)
-                        && nestedData.PropertyData.TryGetValue(map.Key, out PropertyData[] properties2))
-                    {
-                        nestedData.PropertyData.Remove(map.Key);
-                        nestedData.PropertyData.Add(map.Value.MappedAlias, properties2);
+                        property.Value = LZ4Pickler.Pickle(Encoding.UTF8.GetBytes((string)property.Value), LZ4Level.L00_FAST);
                     }
                 }
             }
         }
 
         /// <summary>
-        /// Used during deserialization to map the property data as lazy or expand the value and re-map back to the true property aliases
+        /// Used during deserialization to map the property data as lazy or expand the value
         /// </summary>
         /// <param name="nestedData"></param>
-        private void Expand(ContentNestedData nestedData)
+        private void Expand(int contentTypeId, ContentNestedData nestedData)
         {
-            if (_propertyOptions.PropertyMap != null && _propertyOptions.PropertyMap.Count > 0)
+            foreach (var propertyAliasToData in nestedData.PropertyData)
             {
-                foreach (var map in _propertyOptions.PropertyMap)
+                if (_propertyOptions.IsCompressed(contentTypeId, propertyAliasToData.Key))
                 {
-                    if (map.Value.CompressLevel.Equals(NucachePropertyCompressionLevel.SQLDatabase))
+                    foreach (var property in propertyAliasToData.Value.Where(x => x.Value != null))
                     {
-                        // if there is an alias map for this property then re-map to the real property alias                    
-                        if (map.Value.MappedAlias != null && !map.Key.Equals(map.Value.MappedAlias)
-                            && nestedData.PropertyData.TryGetValue(map.Value.MappedAlias, out PropertyData[] properties2))
+                        if (property.Value is byte[] byteArrayValue)
                         {
-                            nestedData.PropertyData.Remove(map.Value.MappedAlias);
-                            nestedData.PropertyData.Add(map.Key, properties2);
-                        }
-
-                        if (nestedData.PropertyData.TryGetValue(map.Key, out PropertyData[] properties))
-                        {
-                            foreach (var pdata in properties)
-                            {
-                                if (!(pdata.Value is null) && pdata.Value is byte[] byteArrayValue)
-                                {
-                                    //Compressed string
-                                    switch (map.Value.DecompressLevel)
-                                    {
-                                        case NucachePropertyDecompressionLevel.Lazy:
-                                            pdata.Value = new LazyCompressedString(byteArrayValue);
-                                            break;
-                                        case NucachePropertyDecompressionLevel.NotCompressed:
-                                            //Shouldn't be any not compressed
-                                            throw new InvalidOperationException($"{NucachePropertyDecompressionLevel.NotCompressed} cannot be a decompression option for property {map.Key} since it's compresion option is {map.Value.CompressLevel}");
-                                        case NucachePropertyDecompressionLevel.Immediate:
-                                        default:
-                                            pdata.Value = Encoding.UTF8.GetString(LZ4Pickler.Unpickle(byteArrayValue));
-                                            break;
-                                    }
-                                }
-                            }
+                            property.Value = new LazyCompressedString(byteArrayValue);
                         }
                     }
-
-                   
                 }
             }
         }

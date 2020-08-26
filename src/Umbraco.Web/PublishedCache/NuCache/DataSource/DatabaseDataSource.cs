@@ -259,8 +259,8 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 else
                 {
                     var nested = _contentNestedDataSerializer is IContentNestedDataByteSerializer byteSerializer
-                        ? byteSerializer.DeserializeBytes(dto.EditDataRaw)
-                        : _contentNestedDataSerializer.Deserialize(dto.EditData);
+                        ? byteSerializer.DeserializeBytes(dto.ContentTypeId, dto.EditDataRaw)
+                        : _contentNestedDataSerializer.Deserialize(dto.ContentTypeId, dto.EditData);
 
                     d = new ContentData
                     {
@@ -288,8 +288,8 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 else
                 {
                     var nested = _contentNestedDataSerializer is IContentNestedDataByteSerializer byteSerializer
-                        ? byteSerializer.DeserializeBytes(dto.PubDataRaw)
-                        : _contentNestedDataSerializer.Deserialize(dto.PubData);
+                        ? byteSerializer.DeserializeBytes(dto.ContentTypeId, dto.PubDataRaw)
+                        : _contentNestedDataSerializer.Deserialize(dto.ContentTypeId, dto.PubData);
 
                     p = new ContentData
                     {
@@ -326,8 +326,8 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 throw new InvalidOperationException("No data for media " + dto.Id);
 
             var nested = _contentNestedDataSerializer is IContentNestedDataByteSerializer byteSerializer
-                ? byteSerializer.DeserializeBytes(dto.EditDataRaw)
-                : _contentNestedDataSerializer.Deserialize(dto.EditData);
+                ? byteSerializer.DeserializeBytes(dto.ContentTypeId, dto.EditDataRaw)
+                : _contentNestedDataSerializer.Deserialize(dto.ContentTypeId, dto.EditData);
 
             var p = new ContentData
             {

@@ -55,14 +55,14 @@ namespace Umbraco.Tests.PublishedContent
                 UrlSegment = "home"
             };
 
-            var json = jsonSerializer.Serialize(content);
-            var msgPack = msgPackSerializer.Serialize(content);
+            var json = jsonSerializer.Serialize(1, content);
+            var msgPack = msgPackSerializer.Serialize(1, content);
 
             Console.WriteLine(json);
             Console.WriteLine(msgPackSerializer.ToJson(msgPack));
 
-            var jsonContent = jsonSerializer.Deserialize(json);
-            var msgPackContent = msgPackSerializer.Deserialize(msgPack);
+            var jsonContent = jsonSerializer.Deserialize(1, json);
+            var msgPackContent = msgPackSerializer.Deserialize(1, msgPack);
 
 
             CollectionAssert.AreEqual(jsonContent.CultureData.Keys, msgPackContent.CultureData.Keys);

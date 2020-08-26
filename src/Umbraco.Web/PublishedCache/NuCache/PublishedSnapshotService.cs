@@ -1459,8 +1459,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             {
                 NodeId = content.Id,
                 Published = published,
-                Data = !(_contentNestedDataSerializer is IContentNestedDataByteSerializer) ? _contentNestedDataSerializer.Serialize(nestedData) : null,
-                RawData = (_contentNestedDataSerializer is IContentNestedDataByteSerializer byteSerializer) ? byteSerializer.SerializeBytes(nestedData) : null
+                Data = !(_contentNestedDataSerializer is IContentNestedDataByteSerializer) ? _contentNestedDataSerializer.Serialize(content.ContentTypeId, nestedData) : null,
+                RawData = (_contentNestedDataSerializer is IContentNestedDataByteSerializer byteSerializer) ? byteSerializer.SerializeBytes(content.ContentTypeId, nestedData) : null
             };
 
             //Core.Composing.Current.Logger.Debug<PublishedSnapshotService>(dto.Data);

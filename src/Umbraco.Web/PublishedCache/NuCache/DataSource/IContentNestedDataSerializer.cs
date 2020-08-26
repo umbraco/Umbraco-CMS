@@ -7,8 +7,8 @@
     /// </summary>
     public interface IContentNestedDataByteSerializer : IContentNestedDataSerializer
     {
-        ContentNestedData DeserializeBytes(byte[] data);
-        byte[] SerializeBytes(ContentNestedData nestedData);
+        ContentNestedData DeserializeBytes(int contentTypeId, byte[] data);
+        byte[] SerializeBytes(int contentTypeId, ContentNestedData nestedData);
     }
 
     /// <summary>
@@ -16,7 +16,7 @@
     /// </summary>
     public interface IContentNestedDataSerializer
     {
-        ContentNestedData Deserialize(string data);        
-        string Serialize(ContentNestedData nestedData);        
+        ContentNestedData Deserialize(int contentTypeId, string data);
+        string Serialize(int contentTypeId, ContentNestedData nestedData);        
     }
 }

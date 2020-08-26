@@ -16,11 +16,8 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         private const char PrefixDouble = 'B';
         private const char PrefixDateTime = 'D';
         private const char PrefixByte = 'O';
-
-        // TODO: It might make sense to have another prefix for an LZ4 compressed byte array.
-        // Would be an improvement for the SQLDatabase compression option because then you could mix compressed and decompressed properties with the same alias.
-        // For example, don't compress recent content, but compress older content.
         private const char PrefixByteArray = 'A';
+        private const char PrefixCompressedStringByteArray = 'C';
 
         protected string ReadString(Stream stream) => PrimitiveSerializer.String.ReadFrom(stream);
         protected int ReadInt(Stream stream) => PrimitiveSerializer.Int32.ReadFrom(stream);
@@ -30,7 +27,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         protected DateTime ReadDateTime(Stream stream) => PrimitiveSerializer.DateTime.ReadFrom(stream);
         protected byte[] ReadByteArray(Stream stream) => PrimitiveSerializer.Bytes.ReadFrom(stream);
 
-        private T? ReadObject<T>(Stream stream, char t, Func<Stream, T> read)
+        private T? ReadStruct<T>(Stream stream, char t, Func<Stream, T> read)
             where T : struct
         {
             var type = PrimitiveSerializer.Char.ReadFrom(stream);
@@ -51,29 +48,19 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 : PrimitiveSerializer.String.ReadFrom(stream);
         }
 
-        protected int? ReadIntObject(Stream stream) => ReadObject(stream, PrefixInt32, ReadInt);
-        protected long? ReadLongObject(Stream stream) => ReadObject(stream, PrefixLong, ReadLong);
-        protected float? ReadFloatObject(Stream stream) => ReadObject(stream, PrefixFloat, ReadFloat);
-        protected double? ReadDoubleObject(Stream stream) => ReadObject(stream, PrefixDouble, ReadDouble);
-        protected DateTime? ReadDateTimeObject(Stream stream) => ReadObject(stream, PrefixDateTime, ReadDateTime);
-
-        protected byte[] ReadByteArrayObject(Stream stream) // required 'cos byte[] is not a struct
-        {
-            var type = PrimitiveSerializer.Char.ReadFrom(stream);
-            if (type == PrefixNull) return null;
-            if (type != PrefixByteArray)
-                throw new NotSupportedException($"Cannot deserialize type '{type}', expected '{PrefixByteArray}'.");
-            return PrimitiveSerializer.Bytes.ReadFrom(stream);
-        }
-
+        protected int? ReadIntObject(Stream stream) => ReadStruct(stream, PrefixInt32, ReadInt);
+        protected long? ReadLongObject(Stream stream) => ReadStruct(stream, PrefixLong, ReadLong);
+        protected float? ReadFloatObject(Stream stream) => ReadStruct(stream, PrefixFloat, ReadFloat);
+        protected double? ReadDoubleObject(Stream stream) => ReadStruct(stream, PrefixDouble, ReadDouble);
+        protected DateTime? ReadDateTimeObject(Stream stream) => ReadStruct(stream, PrefixDateTime, ReadDateTime);
 
         protected object ReadObject(Stream stream)
             => ReadObject(PrimitiveSerializer.Char.ReadFrom(stream), stream);
 
         protected object ReadObject(char type, Stream stream)
         {
-            // NOTE: There is going to be a ton of boxing going on here, but i'm not sure we can avoid that because innevitably with our
-            // current model structure the value will need to end up being 'object' at some point anyways.
+            // NOTE: This method is only called when reading property data, some boxing may occur but all other reads for structs are
+            // done with ReadStruct to reduce all boxing.
 
             switch (type)
             {
@@ -98,8 +85,8 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 case PrefixDateTime:
                     return PrimitiveSerializer.DateTime.ReadFrom(stream);
                 case PrefixByteArray:
-                    // When it's a byte array always return as a LazyCompressedString
-                    // TODO: Else we need to make a different prefix for lazy vs eager loading
+                    return PrimitiveSerializer.Bytes.ReadFrom(stream);
+                case PrefixCompressedStringByteArray:
                     return new LazyCompressedString(PrimitiveSerializer.Bytes.ReadFrom(stream));
                 default:
                     throw new NotSupportedException($"Cannot deserialize unknown type '{type}'.");
@@ -108,6 +95,9 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 
         protected void WriteObject(object value, Stream stream)
         {
+            // NOTE: This method is only currently used to write 'string' information, all other writes are done directly with the PrimitiveSerializer
+            // so no boxing occurs. Though potentially we should write everything via this class just like we do for reads.
+
             if (value == null)
             {
                 PrimitiveSerializer.Char.WriteTo(PrefixNull, stream);
@@ -164,7 +154,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             }
             else if (value is LazyCompressedString lazyCompressedString)
             {
-                PrimitiveSerializer.Char.WriteTo(PrefixByteArray, stream);
+                PrimitiveSerializer.Char.WriteTo(PrefixCompressedStringByteArray, stream);
                 PrimitiveSerializer.Bytes.WriteTo(lazyCompressedString.GetBytes(), stream);
             }
             else
