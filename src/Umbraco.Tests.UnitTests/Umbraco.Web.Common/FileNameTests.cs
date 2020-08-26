@@ -51,7 +51,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common
             var viewResult = await sut.Index() as ViewResult;
             var fileName = getViewName(viewResult, Path.DirectorySeparatorChar.ToString());
 
-            // TODO: Don't use DirectoryInfo to get contents of UmbracoInstall, use something that works everywhere.
             var views = getUiFiles(new string[] { "Umbraco", "UmbracoInstall" });
             Assert.True(views.Contains(fileName), $"Expected {fileName} to exist, but it didn't");
         }
