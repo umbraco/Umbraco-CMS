@@ -13,8 +13,7 @@
 (function () {
     'use strict';
 
-
-    function blockEditorModelObjectFactory($interpolate, $q, udiService, contentResource, localizationService, umbRequestHelper) {
+    function blockEditorModelObjectFactory($interpolate, $q, udiService, contentResource, localizationService, umbRequestHelper, clipboardService) {
 
         /**
          * Simple mapping from property model content entry to editing model,
@@ -748,7 +747,9 @@
              */
             createFromElementType: function (elementTypeDataModel) {
 
-                elementTypeDataModel = Utilities.copy(elementTypeDataModel);
+
+                elementTypeDataModel = clipboardService.parseContentForPaste(elementTypeDataModel);
+
 
                 var contentElementTypeKey = elementTypeDataModel.contentTypeKey;
 
