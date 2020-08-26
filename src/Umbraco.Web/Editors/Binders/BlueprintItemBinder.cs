@@ -11,8 +11,8 @@ namespace Umbraco.Web.Editors.Binders
         {
         }
 
-        public BlueprintItemBinder(ILogger logger, ServiceContext services, IUmbracoContextAccessor umbracoContextAccessor)
-            : base(logger, services, umbracoContextAccessor)
+        public BlueprintItemBinder(ServiceContext services)
+            : base(services)
         {
         }
 

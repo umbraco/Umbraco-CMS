@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function SendToPublishController($scope, localizationService, contentEditingHelper) {
+    function SendToPublishController($scope, localizationService) {
 
         var vm = this;
         vm.loading = true;
@@ -19,7 +19,7 @@
                 });
             }
 
-            _.each(vm.variants, function (variant) {
+            vm.variants.forEach(variant => {
                 variant.isMandatory = isMandatoryFilter(variant);
             });
             
@@ -27,27 +27,27 @@
             
             if (vm.availableVariants.length !== 0) {
 
-                vm.availableVariants = vm.availableVariants.sort(function (a, b) {
+                vm.availableVariants.sort((a, b) => {
                     if (a.language && b.language) {
-                        if (a.language.name > b.language.name) {
+                        if (a.language.name < b.language.name) {
                             return -1;
                         }
-                        if (a.language.name < b.language.name) {
+                        if (a.language.name > b.language.name) {
                             return 1;
                         }
                     }
                     if (a.segment && b.segment) {
-                        if (a.segment > b.segment) {
+                        if (a.segment < b.segment) {
                             return -1;
                         }
-                        if (a.segment < b.segment) {
+                        if (a.segment > b.segment) {
                             return 1;
                         }
                     }
                     return 0;
                 });
 
-                _.each(vm.availableVariants, function (v) {
+                vm.availableVariants.forEach(v => {
                     if(v.active) {
                         v.save = true;
                     }
@@ -63,9 +63,7 @@
         }
 
         function changeSelection() {
-            var firstSelected = _.find(vm.variants, function (v) {
-                return v.save;
-            });
+            var firstSelected = vm.variants.find(v => v.save);
             $scope.model.disableSubmitButton = !firstSelected; //disable submit button if there is none selected
         }
 
@@ -87,9 +85,9 @@
 
         //when this dialog is closed, reset all 'save' flags
         $scope.$on('$destroy', function () {
-            for (var i = 0; i < vm.variants.length; i++) {
-                vm.variants[i].save = false;
-            }
+            vm.variants.forEach(variant => {
+                variant.save = false;
+            });
         });
 
         onInit();

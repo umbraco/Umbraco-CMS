@@ -36,5 +36,8 @@ csharp_style_var_when_type_is_apparent = true:suggestion
 csharp_style_var_elsewhere = true:suggestion
 csharp_prefer_braces = false : none
 
-[*.{js,less}]
+[*.js]
+trim_trailing_whitespace = true
+
+[*.less]
 trim_trailing_whitespace = false
