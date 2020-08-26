@@ -110,7 +110,7 @@ namespace Umbraco.Tests.Persistence.Querying
             Assert.AreEqual("-1,1046,1076,1089%", result.Arguments[0]);
             Assert.AreEqual(1046, result.Arguments[1]);
             Assert.AreEqual(true, result.Arguments[2]);
-            Assert.AreEqual(true, result.Arguments[3]);
+            Assert.AreEqual(false, result.Arguments[3]);
         }
     }
 }
