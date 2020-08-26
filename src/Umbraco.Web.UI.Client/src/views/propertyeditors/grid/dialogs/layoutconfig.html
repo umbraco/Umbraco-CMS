@@ -33,17 +33,23 @@
                                 <div class="tb" style="height: 70px; border-width: 2px; padding: 2px">
                                     <div class="tr">
 
-                                        <a class="td uSky-templates-column"
+                                        <button type="button" class="btn-reset td uSky-templates-column"
                                            ng-class="{last:$last, selected:section==currentSection}"
                                            ng-repeat="section in currentLayout.sections"
                                            ng-click="configureSection(section, currentLayout)"
                                            ng-style="{width: percentage(section.grid) +'%'}">
-                                        </a>
+                                           <span class="sr-only">
+                                            <localize key="grid_editGridLayout">Edit grid layout</localize>
+                                        </span>
+                                        </button>
 
-                                        <a class="td uSky-templates-column add" ng-if="availableLayoutSpace > 0"
+                                        <button type="button" class="btn-reset td uSky-templates-column add" ng-if="availableLayoutSpace > 0"
                                            ng-click="configureSection(undefined, currentLayout)"
                                            ng-style="{width: percentage(availableLayoutSpace) + '%'}">
-                                            <i class="icon icon-add"></i>
+                                            <i class="icon icon-add" aria-hidden="true"></i>
+                                            <span class="sr-only">
+                                                <localize key="grid_addGridLayout">Add grid layout</localize>
+                                            </span>
                                         </a>
 
                                     </div>

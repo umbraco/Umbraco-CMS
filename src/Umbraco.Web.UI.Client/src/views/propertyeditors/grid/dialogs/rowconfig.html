@@ -40,18 +40,26 @@
                             <div class="tb" style="height: auto; border: none !important; background: none">
                                 <div class="tr">
 
-                                    <a class="td uSky-templates-column"
+                                    <button type="button" class="btn-reset td uSky-templates-column"
                                         ng-class="{last:$last, selected:cell==currentCell}"
                                         ng-repeat="cell in currentRow.areas"
                                         ng-click="configureCell(cell, currentRow)"
                                         ng-style="{width: percentage(cell.grid) + '%'}">
-                                    </a>
+                                        <span class="sr-only">
+                                            <span class="sr-only">
+                                                <localize key="grid_editRowConfiguration">Edit row configuration</localize>
+                                            </span>
+                                        </span>
+                                    </button>
 
-                                    <a class="td uSky-templates-column add"
+                                    <button type="button" class="btn-reset td uSky-templates-column add"
                                        ng-click="configureCell(null, currentRow)"
                                        ng-style="{width: percentage(availableRowSpace) + '%'}">
-                                        <i class="icon icon-add"></i>
-                                    </a>
+                                        <i class="icon icon-add" aria-hidden="true"></i>
+                                        <span class="sr-only">
+                                            <localize key="grid_addRowConfiguration">Add row configuration</localize>
+                                        </span>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -104,7 +112,7 @@
                                                 <i class="icon {{editor.icon}}" aria-hidden="true"></i> {{editor.name}}
                                                 <small class="input-label--small">({{editor.alias}})</small>
                                             </umb-checkbox>
-                                            
+
                                         </li>
                                     </ul>
                                 </div>
