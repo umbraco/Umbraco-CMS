@@ -124,6 +124,7 @@
     <Compile Include="AppBuilderExtensions.cs" />
     <Compile Include="AreaRegistrationContextExtensions.cs" />
     <Compile Include="AspNetHttpContextAccessor.cs" />
+    <Compile Include="BlockListTemplateExtensions.cs" />
     <Compile Include="Cache\DistributedCacheBinder.cs" />
     <Compile Include="Cache\DistributedCacheBinderComposer.cs" />
     <Compile Include="Cache\DistributedCacheBinder_Handlers.cs" />
@@ -156,6 +157,7 @@
     <Compile Include="Dashboards\RedirectUrlDashboard.cs" />
     <Compile Include="Dashboards\SettingsDashboards.cs" />
     <Compile Include="Editors\BackOfficePreviewModel.cs" />
+    <Compile Include="Editors\ElementTypeController.cs" />
     <Compile Include="Editors\Filters\ContentSaveModelValidator.cs" />
     <Compile Include="Editors\Filters\MediaSaveModelValidator.cs" />
     <Compile Include="Editors\IconController.cs" />
@@ -247,9 +249,21 @@
     <Compile Include="Mvc\SurfaceControllerTypeCollectionBuilder.cs" />
     <Compile Include="Mvc\ValidateUmbracoFormRouteStringAttribute.cs" />
     <Compile Include="Profiling\WebProfilingController.cs" />
+    <Compile Include="PropertyEditors\BlockEditorPropertyEditor.cs" />
+    <Compile Include="PropertyEditors\BlockListConfiguration.cs" />
+    <Compile Include="PropertyEditors\BlockListConfigurationEditor.cs" />
+    <Compile Include="PropertyEditors\BlockListPropertyEditor.cs" />
     <Compile Include="Compose\NestedContentPropertyComposer.cs" />
+    <Compile Include="PropertyEditors\ComplexEditorValidator.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\MultipleMediaPickerParameterEditor.cs" />
     <Compile Include="PropertyEditors\RichTextEditorPastedImages.cs" />
+    <Compile Include="PropertyEditors\Validation\ComplexEditorElementTypeValidationResult.cs" />
+    <Compile Include="PropertyEditors\Validation\ComplexEditorPropertyTypeValidationResult.cs" />
+    <Compile Include="PropertyEditors\Validation\ComplexEditorValidationResult.cs" />
+    <Compile Include="PropertyEditors\Validation\ContentPropertyValidationResult.cs" />
+    <Compile Include="PropertyEditors\Validation\ValidationResultConverter.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\BlockEditorConverter.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\BlockListPropertyValueConverter.cs" />
     <Compile Include="PublishedCache\NuCache\PublishedSnapshotServiceOptions.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\GenObj.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\GenRef.cs" />

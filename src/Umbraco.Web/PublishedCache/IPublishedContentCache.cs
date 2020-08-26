@@ -4,6 +4,11 @@ using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Web.PublishedCache
 {
+    public interface IPublishedContentCache2 : IPublishedContentCache, IPublishedCache2
+    {
+        // NOTE: this is here purely to avoid API breaking changes
+    }
+
     public interface IPublishedContentCache : IPublishedCache
     {
         /// <summary>

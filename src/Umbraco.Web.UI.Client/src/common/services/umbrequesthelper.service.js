@@ -165,11 +165,9 @@ function umbRequestHelper($http, $q, notificationsService, eventsService, formHe
                     return; //sometimes oddly this happens, nothing we can do
                 }
 
-                if (!response.status && response.message && response.stack) {
-                    //this is a JS/angular error that we should deal with
-                    return $q.reject({
-                        errorMsg: response.message
-                    });
+                if (!response.status) {
+                    //this is a JS/angular error
+                    return $q.reject(response);
                 }
 
                 //invoke the callback
@@ -278,7 +276,11 @@ function umbRequestHelper($http, $q, notificationsService, eventsService, formHe
                     //the data returned is the up-to-date data so the UI will refresh
                     return $q.resolve(response.data);
                 }, function (response) {
-                    //failure callback
+
+                    if (!response.status) {
+                        //this is a JS/angular error
+                        return $q.reject(response);
+                    }
 
                     //when there's a 500 (unhandled) error show a YSOD overlay if debugging is enabled.
                     if (response.status >= 500 && response.status < 600) {
