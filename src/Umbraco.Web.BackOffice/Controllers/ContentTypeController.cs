@@ -578,7 +578,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
 
             var dataInstaller = new PackageDataInstallation(_logger, _fileService, _macroService, _LocalizationService,
-                _dataTypeService, _entityService, _contentTypeService, _contentService, _propertyEditors, _scopeProvider, _shortStringHelper, _globalSettings, _localizedTextService);
+                _dataTypeService, _entityService, _contentTypeService, _contentService, _propertyEditors, _scopeProvider, _shortStringHelper, Options.Create(_globalSettings), _localizedTextService);
 
             var xd = new XmlDocument {XmlResolver = null};
             xd.Load(filePath);

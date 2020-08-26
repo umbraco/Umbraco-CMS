@@ -16,6 +16,7 @@ using Umbraco.Tests.TestHelpers;
 using Umbraco.Core.Composing.CompositionExtensions;
 using Current = Umbraco.Web.Composing.Current;
 using FileSystems = Umbraco.Core.IO.FileSystems;
+using Umbraco.Tests.Common.Builders;
 
 namespace Umbraco.Tests.IO
 {
@@ -42,7 +43,9 @@ namespace Umbraco.Tests.IO
             composition.RegisterUnique(TestHelper.GetHostingEnvironment());
 
             composition.Configs.Add(() => SettingsForTests.DefaultGlobalSettings);
-            composition.Configs.Add(SettingsForTests.GenerateMockContentSettings);
+
+            var globalSettings = new GlobalSettingsBuilder().Build();
+            composition.Register(x => Microsoft.Extensions.Options.Options.Create(globalSettings));
 
             composition.ComposeFileSystems();
 

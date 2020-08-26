@@ -27,7 +27,7 @@ namespace Umbraco.Tests.Routing
 
             _globalSettings = new GlobalSettingsBuilder().Build();
             _webRoutingSettings = new WebRoutingSettingsBuilder().Build();
-            _requestHandlerSettings = new RequestHandlerSettingsBuilder().Build();
+            _requestHandlerSettings = new RequestHandlerSettingsBuilder().WithAddTrailingSlash(true).Build();
         }
 
         private ILocalizedTextService GetTextService()

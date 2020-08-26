@@ -38,6 +38,7 @@ using Umbraco.Tests.Common;
 using Umbraco.Tests.Common.Composing;
 using Umbraco.Core.Media;
 using Umbraco.Tests.Common.Builders;
+using Microsoft.Extensions.Options;
 
 namespace Umbraco.Tests.Runtimes
 {
@@ -117,6 +118,23 @@ namespace Umbraco.Tests.Runtimes
             composition.RegisterUnique<IUmbracoContextFactory, UmbracoContextFactory>();
             composition.RegisterUnique<IMacroRenderer, MacroRenderer>();
             composition.RegisterUnique<MediaUrlProviderCollection>(_ => new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>()));
+
+            // TODO: found these registration were necessary here as dependencies for ComponentCollection
+            // are not resolved.  Need to check this if these explicit registrations are the best way to handle this.
+            var contentSettings = new ContentSettingsBuilder().Build();
+            var coreDebugSettings = new CoreDebugSettingsBuilder().Build();
+            var nuCacheSettings = new NuCacheSettingsBuilder().Build();
+            var requestHandlerSettings = new RequestHandlerSettingsBuilder().Build();
+            var userPasswordConfigurationSettings = new UserPasswordConfigurationSettingsBuilder().Build();
+            var webRoutingSettings = new WebRoutingSettingsBuilder().Build();
+
+            composition.Register(x => Options.Create(globalSettings));
+            composition.Register(x => Options.Create(contentSettings));
+            composition.Register(x => Options.Create(coreDebugSettings));
+            composition.Register(x => Options.Create(nuCacheSettings));
+            composition.Register(x => Options.Create(requestHandlerSettings));
+            composition.Register(x => Options.Create(userPasswordConfigurationSettings));
+            composition.Register(x => Options.Create(webRoutingSettings));
 
             // initialize some components only/individually
             composition.WithCollectionBuilder<ComponentCollectionBuilder>()

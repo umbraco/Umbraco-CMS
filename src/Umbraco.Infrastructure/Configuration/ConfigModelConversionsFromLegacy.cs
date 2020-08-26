@@ -26,16 +26,18 @@ namespace Umbraco.Infrastructure.Configuration
                 RegisterType = globalSettings.RegisterType,
                 ReservedPaths = globalSettings.ReservedPaths,
                 ReservedUrls = globalSettings.ReservedUrls,
-                Smtp = new SmtpSettings
-                {
-                    DeliveryMethod = globalSettings.SmtpSettings.DeliveryMethod,
-                    From = globalSettings.SmtpSettings.From,
-                    Host = globalSettings.SmtpSettings.Host,
-                    Password = globalSettings.SmtpSettings.Password,
-                    PickupDirectoryLocation = globalSettings.SmtpSettings.PickupDirectoryLocation,
-                    Port = globalSettings.SmtpSettings.Port,
-                    Username = globalSettings.SmtpSettings.Username,
-                },
+                Smtp = globalSettings.SmtpSettings != null
+                    ? new SmtpSettings
+                        {
+                            DeliveryMethod = globalSettings.SmtpSettings.DeliveryMethod,
+                            From = globalSettings.SmtpSettings.From,
+                            Host = globalSettings.SmtpSettings.Host,
+                            Password = globalSettings.SmtpSettings.Password,
+                            PickupDirectoryLocation = globalSettings.SmtpSettings.PickupDirectoryLocation,
+                            Port = globalSettings.SmtpSettings.Port,
+                            Username = globalSettings.SmtpSettings.Username,
+                        }
+                    : new SmtpSettings(),
                 TimeOutInMinutes = globalSettings.TimeOutInMinutes,
                 UmbracoCssPath = globalSettings.UmbracoCssPath,
                 UmbracoMediaPath = globalSettings.UmbracoMediaPath,

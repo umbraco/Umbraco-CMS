@@ -75,7 +75,7 @@ namespace Umbraco.Tests.Integration
             Assert.IsFalse(MyComponent.IsInit);
             Assert.IsFalse(MyComponent.IsTerminated);
 
-            // TODO: found these registration were necessary here (as we haven't called the HostBuilder?), and dependencies for ComponentCollection
+            // TODO: found these registration were necessary here (as we haven't called the HostBuilder?), as dependencies for ComponentCollection
             // are not resolved.  Need to check this if these explicit registrations are the best way to handle this.
             var contentSettings = new ContentSettingsBuilder().Build();
             var coreDebugSettings = new CoreDebugSettingsBuilder().Build();

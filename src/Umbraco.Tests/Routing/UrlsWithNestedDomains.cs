@@ -36,7 +36,7 @@ namespace Umbraco.Tests.Routing
         public void DoNotPolluteCache()
         {
             var globalSettings = new GlobalSettingsBuilder().WithHideTopLevelNodeFromPath(false).Build();
-            var requestHandlerSettings = new RequestHandlerSettingsBuilder().Build();
+            var requestHandlerSettings = new RequestHandlerSettingsBuilder().WithAddTrailingSlash(true).Build();
 
             SetDomains1();
 

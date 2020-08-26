@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Linq;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Infrastructure.Configuration;
@@ -12,9 +12,7 @@ using Umbraco.Tests.Common;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Tests.PublishedContent;
-using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
-using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 
@@ -22,20 +20,21 @@ namespace Umbraco.Tests.Routing
 {
     [TestFixture]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
-    public class UrlProviderTests : BaseWebTest
+    public class UrlProviderWithoutHideTopLevelNodeFromPathTests : BaseUrlProviderTest
     {
-        private IUmbracoContextAccessor UmbracoContextAccessor { get; } = new TestUmbracoContextAccessor();
+        private readonly GlobalSettings _globalSettings;
 
-        protected override void Compose()
+        public UrlProviderWithoutHideTopLevelNodeFromPathTests()
         {
-            base.Compose();
-            Composition.Register<ISiteDomainHelper, SiteDomainHelper>();
+            _globalSettings = new GlobalSettingsBuilder().WithHideTopLevelNodeFromPath(HideTopLevelNodeFromPath).Build();
         }
+
+        protected override bool HideTopLevelNodeFromPath => false;
 
         protected override void ComposeSettings()
         {
-            Composition.Configs.Add(TestHelpers.SettingsForTests.GenerateMockContentSettings);
-            Composition.Configs.Add(TestHelpers.SettingsForTests.GenerateMockGlobalSettings);
+            base.ComposeSettings();
+            Composition.Register(x => Microsoft.Extensions.Options.Options.Create(_globalSettings));
         }
 
         /// <summary>
@@ -45,21 +44,17 @@ namespace Umbraco.Tests.Routing
         [Test]
         public void Ensure_Cache_Is_Correct()
         {
-            var globalSettings = new GlobalSettingsBuilder().WithHideTopLevelNodeFromPath(false).Build();
+            var requestHandlerSettings = new RequestHandlerSettingsBuilder().WithAddTrailingSlash(false).Build();
 
-            var requestHandlerSettings = new RequestHandlerSettingsBuilder().Build();
-
-            var umbracoContext = GetUmbracoContext("/test", 1111, globalSettings: ConfigModelConversionsToLegacy.ConvertGlobalSettings(globalSettings));
+            var umbracoContext = GetUmbracoContext("/test", 1111, globalSettings: ConfigModelConversionsToLegacy.ConvertGlobalSettings(_globalSettings));
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
             var urlProvider = new DefaultUrlProvider(
                 Microsoft.Extensions.Options.Options.Create(requestHandlerSettings),
                 Logger,
-                Microsoft.Extensions.Options.Options.Create(globalSettings),
+                Microsoft.Extensions.Options.Options.Create(_globalSettings),
                 new SiteDomainHelper(), umbracoContextAccessor, UriUtility);
 
             var publishedUrlProvider = GetPublishedUrlProvider(umbracoContext, urlProvider);
-            var requestHandlerMock = Mock.Get(requestHandlerSettings);
-            requestHandlerMock.Setup(x => x.AddTrailingSlash).Returns(false);// (cached routes have none)
 
             var samples = new Dictionary<int, string> {
                 { 1046, "/home" },
@@ -100,18 +95,6 @@ namespace Umbraco.Tests.Routing
             Assert.AreEqual(0, cachedIds.Count);
         }
 
-        private IPublishedUrlProvider GetPublishedUrlProvider(IUmbracoContext umbracoContext, DefaultUrlProvider urlProvider)
-        {
-            var webRoutingSettings = new WebRoutingSettingsBuilder().Build();
-            return new UrlProvider(
-                new TestUmbracoContextAccessor(umbracoContext),
-                Microsoft.Extensions.Options.Options.Create(webRoutingSettings),
-                new UrlProviderCollection(new []{urlProvider}),
-                new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>()),
-                Mock.Of<IVariationContextAccessor>());
-        }
-
-        // test hideTopLevelNodeFromPath false
         [TestCase(1046, "/home/")]
         [TestCase(1173, "/home/sub1/")]
         [TestCase(1174, "/home/sub1/sub2/")]
@@ -122,45 +105,14 @@ namespace Umbraco.Tests.Routing
         [TestCase(1172, "/test-page/")]
         public void Get_Url_Not_Hiding_Top_Level(int nodeId, string niceUrlMatch)
         {
-            var globalSettings = new GlobalSettingsBuilder().WithHideTopLevelNodeFromPath(false).Build();
+            var requestHandlerSettings = new RequestHandlerSettingsBuilder().WithAddTrailingSlash(true).Build();
 
-            var requestHandlerSettings = new RequestHandlerSettingsBuilder().Build();
-
-            var umbracoContext = GetUmbracoContext("/test", 1111, globalSettings: ConfigModelConversionsToLegacy.ConvertGlobalSettings(globalSettings));
+            var umbracoContext = GetUmbracoContext("/test", 1111, globalSettings: ConfigModelConversionsToLegacy.ConvertGlobalSettings(_globalSettings));
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
             var urlProvider = new DefaultUrlProvider(
                 Microsoft.Extensions.Options.Options.Create(requestHandlerSettings),
                 Logger,
-                Microsoft.Extensions.Options.Options.Create(globalSettings),
-                new SiteDomainHelper(), umbracoContextAccessor, UriUtility);
-            var publishedUrlProvider = GetPublishedUrlProvider(umbracoContext, urlProvider);
-
-            var result = publishedUrlProvider.GetUrl(nodeId);
-            Assert.AreEqual(niceUrlMatch, result);
-        }
-
-        // no need for umbracoUseDirectoryUrls test = should be handled by UriUtilityTests
-
-        // test hideTopLevelNodeFromPath true
-        [TestCase(1046, "/")]
-        [TestCase(1173, "/sub1/")]
-        [TestCase(1174, "/sub1/sub2/")]
-        [TestCase(1176, "/sub1/sub-3/")]
-        [TestCase(1177, "/sub1/custom-sub-1/")]
-        [TestCase(1178, "/sub1/custom-sub-2/")]
-        [TestCase(1175, "/sub-2/")]
-        [TestCase(1172, "/test-page/")] // not hidden because not first root
-        public void Get_Url_Hiding_Top_Level(int nodeId, string niceUrlMatch)
-        {
-            var globalSettings = new GlobalSettingsBuilder().WithHideTopLevelNodeFromPath(true).Build();
-
-            var requestHandlerSettings = new RequestHandlerSettingsBuilder().Build();
-            var umbracoContext = GetUmbracoContext("/test", 1111, globalSettings: ConfigModelConversionsToLegacy.ConvertGlobalSettings(globalSettings));
-            var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
-            var urlProvider = new DefaultUrlProvider(
-                Microsoft.Extensions.Options.Options.Create(requestHandlerSettings),
-                Logger,
-                Microsoft.Extensions.Options.Options.Create(globalSettings),
+                Microsoft.Extensions.Options.Options.Create(_globalSettings),
                 new SiteDomainHelper(), umbracoContextAccessor, UriUtility);
             var publishedUrlProvider = GetPublishedUrlProvider(umbracoContext, urlProvider);
 
@@ -173,9 +125,7 @@ namespace Umbraco.Tests.Routing
         {
             const string currentUri = "http://example.us/test";
 
-            var globalSettings = new GlobalSettingsBuilder().WithHideTopLevelNodeFromPath(false).Build();
-
-            var requestHandlerSettings = new RequestHandlerSettingsBuilder().Build();
+            var requestHandlerSettings = new RequestHandlerSettingsBuilder().WithAddTrailingSlash(true).Build();
 
             var contentType = new PublishedContentType(Guid.NewGuid(), 666, "alias", PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.Culture);
             var publishedContent = new SolidPublishedContent(contentType) { Id = 1234 };
@@ -197,13 +147,13 @@ namespace Umbraco.Tests.Routing
                 .Returns(snapshot);
 
             var umbracoContext = GetUmbracoContext(currentUri,
-                globalSettings: ConfigModelConversionsToLegacy.ConvertGlobalSettings(globalSettings),
+                globalSettings: ConfigModelConversionsToLegacy.ConvertGlobalSettings(_globalSettings),
                 snapshotService: snapshotService.Object);
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
             var urlProvider = new DefaultUrlProvider(
                 Microsoft.Extensions.Options.Options.Create(requestHandlerSettings),
                 Logger,
-                Microsoft.Extensions.Options.Options.Create(globalSettings),
+                Microsoft.Extensions.Options.Options.Create(_globalSettings),
                 new SiteDomainHelper(), umbracoContextAccessor, UriUtility);
             var publishedUrlProvider = GetPublishedUrlProvider(umbracoContext, urlProvider);
 
@@ -221,9 +171,7 @@ namespace Umbraco.Tests.Routing
         {
             const string currentUri = "http://example.fr/test";
 
-            var globalSettings = new GlobalSettingsBuilder().WithHideTopLevelNodeFromPath(false).Build();
-
-            var requestHandlerSettings = new RequestHandlerSettingsBuilder().Build();
+            var requestHandlerSettings = new RequestHandlerSettingsBuilder().WithAddTrailingSlash(true).Build();
 
             var contentType = new PublishedContentType(Guid.NewGuid(), 666, "alias", PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.Culture);
             var publishedContent = new SolidPublishedContent(contentType) { Id = 1234 };
@@ -254,13 +202,13 @@ namespace Umbraco.Tests.Routing
                 .Returns(snapshot);
 
             var umbracoContext = GetUmbracoContext(currentUri,
-                globalSettings: ConfigModelConversionsToLegacy.ConvertGlobalSettings(globalSettings),
+                globalSettings: ConfigModelConversionsToLegacy.ConvertGlobalSettings(_globalSettings),
                 snapshotService: snapshotService.Object);
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
             var urlProvider = new DefaultUrlProvider(
                 Microsoft.Extensions.Options.Options.Create(requestHandlerSettings),
                 Logger,
-                Microsoft.Extensions.Options.Options.Create(globalSettings),
+                Microsoft.Extensions.Options.Options.Create(_globalSettings),
                 new SiteDomainHelper(), umbracoContextAccessor, UriUtility);
 
             var publishedUrlProvider = GetPublishedUrlProvider(umbracoContext, urlProvider);
@@ -278,9 +226,7 @@ namespace Umbraco.Tests.Routing
         {
             const string currentUri = "http://example.us/test";
 
-            var globalSettings = new GlobalSettingsBuilder().WithHideTopLevelNodeFromPath(false).Build();
-
-            var requestHandlerSettings = new RequestHandlerSettingsBuilder().Build();
+            var requestHandlerSettings = new RequestHandlerSettingsBuilder().WithAddTrailingSlash(true).Build();
 
             var contentType = new PublishedContentType(Guid.NewGuid(), 666, "alias", PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.Culture);
             var publishedContent = new SolidPublishedContent(contentType) { Id = 1234 };
@@ -311,13 +257,13 @@ namespace Umbraco.Tests.Routing
                 .Returns(snapshot);
 
             var umbracoContext = GetUmbracoContext(currentUri,
-                globalSettings: ConfigModelConversionsToLegacy.ConvertGlobalSettings(globalSettings),
+                globalSettings: ConfigModelConversionsToLegacy.ConvertGlobalSettings(_globalSettings),
                 snapshotService: snapshotService.Object);
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
             var urlProvider = new DefaultUrlProvider(
                 Microsoft.Extensions.Options.Options.Create(requestHandlerSettings),
                 Logger,
-                Microsoft.Extensions.Options.Options.Create(globalSettings),
+                Microsoft.Extensions.Options.Options.Create(_globalSettings),
                 new SiteDomainHelper(), umbracoContextAccessor, UriUtility);
 
 
@@ -331,16 +277,14 @@ namespace Umbraco.Tests.Routing
         [Test]
         public void Get_Url_Relative_Or_Absolute()
         {
-            var globalSettings = new GlobalSettingsBuilder().WithHideTopLevelNodeFromPath(false).Build();
+            var requestHandlerSettings = new RequestHandlerSettingsBuilder().WithAddTrailingSlash(true).Build();
 
-            var requestHandlerSettings = new RequestHandlerSettingsBuilder().Build();
-
-            var umbracoContext = GetUmbracoContext("http://example.com/test", 1111, globalSettings: ConfigModelConversionsToLegacy.ConvertGlobalSettings(globalSettings));
+            var umbracoContext = GetUmbracoContext("http://example.com/test", 1111, globalSettings: ConfigModelConversionsToLegacy.ConvertGlobalSettings(_globalSettings));
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
             var urlProvider = new DefaultUrlProvider(
                 Microsoft.Extensions.Options.Options.Create(requestHandlerSettings),
                 Logger,
-                Microsoft.Extensions.Options.Options.Create(globalSettings),
+                Microsoft.Extensions.Options.Options.Create(_globalSettings),
                 new SiteDomainHelper(), umbracoContextAccessor, UriUtility);
             var publishedUrlProvider = GetPublishedUrlProvider(umbracoContext, urlProvider);
 
@@ -353,15 +297,13 @@ namespace Umbraco.Tests.Routing
         [Test]
         public void Get_Url_Unpublished()
         {
-            var globalSettings = new GlobalSettingsBuilder().WithHideTopLevelNodeFromPath(false).Build();
-
             var requestHandlerSettings = new RequestHandlerSettingsBuilder().Build();
 
             var urlProvider = new DefaultUrlProvider(Microsoft.Extensions.Options.Options.Create(requestHandlerSettings),
                 Logger,
-                Microsoft.Extensions.Options.Options.Create(globalSettings),
+                Microsoft.Extensions.Options.Options.Create(_globalSettings),
                 new SiteDomainHelper(), UmbracoContextAccessor, UriUtility);
-            var umbracoContext = GetUmbracoContext("http://example.com/test", 1111, globalSettings: ConfigModelConversionsToLegacy.ConvertGlobalSettings(globalSettings));
+            var umbracoContext = GetUmbracoContext("http://example.com/test", 1111, globalSettings: ConfigModelConversionsToLegacy.ConvertGlobalSettings(_globalSettings));
             var publishedUrlProvider = GetPublishedUrlProvider(umbracoContext, urlProvider);
 
             //mock the Umbraco settings that we need

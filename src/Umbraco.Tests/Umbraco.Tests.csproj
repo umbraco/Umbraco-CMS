@@ -141,6 +141,8 @@
     <Compile Include="Persistence\Repositories\DocumentRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\EntityRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\KeyValueRepositoryTests.cs" />
+    <Compile Include="Routing\BaseUrlProviderTest.cs" />
+    <Compile Include="Routing\UrlProviderWithHideTopLevelNodeFromPathTests.cs" />
     <Compile Include="Security\BackOfficeOwinUserManagerTests.cs" />
     <Compile Include="Security\OwinDataProtectorTokenProviderTests.cs" />
     <Compile Include="Services\KeyValueServiceTests.cs" />
@@ -195,7 +197,7 @@
     <Compile Include="Routing\ContentFinderByUrlAndTemplateTests.cs" />
     <Compile Include="Routing\ContentFinderByUrlTests.cs" />
     <Compile Include="Routing\ContentFinderByUrlWithDomainsTests.cs" />
-    <Compile Include="Routing\UrlProviderTests.cs" />
+    <Compile Include="Routing\UrlProviderWithoutHideTopLevelNodeFromPathTests.cs" />
     <Compile Include="Routing\UrlRoutesTests.cs" />
     <Compile Include="Routing\UrlsProviderWithDomainsTests.cs" />
     <Compile Include="Scheduling\BackgroundTaskRunnerTests2.cs" />

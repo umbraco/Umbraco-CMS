@@ -60,8 +60,8 @@ namespace Umbraco.Tests.Packaging
             Factory.GetInstance<PropertyEditorCollection>(),
             Factory.GetInstance<IScopeProvider>(),
             Factory.GetInstance<IShortStringHelper>(),
-            new GlobalSettingsBuilder().Build(),
-            Factory.GetInstance<ILocalizedTextService>()            );
+            Microsoft.Extensions.Options.Options.Create(new GlobalSettingsBuilder().Build()),
+            Factory.GetInstance<ILocalizedTextService>());
 
         private IPackageInstallation PackageInstallation => new PackageInstallation(
             PackageDataInstallation,

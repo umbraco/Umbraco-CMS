@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using Microsoft.Extensions.Options;
 using Umbraco.Core.Collections;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
@@ -38,7 +39,7 @@ namespace Umbraco.Core.Packaging
 
         public PackageDataInstallation(ILogger logger, IFileService fileService, IMacroService macroService, ILocalizationService localizationService,
             IDataTypeService dataTypeService, IEntityService entityService, IContentTypeService contentTypeService,
-            IContentService contentService, PropertyEditorCollection propertyEditors, IScopeProvider scopeProvider, IShortStringHelper shortStringHelper, GlobalSettings globalSettings,
+            IContentService contentService, PropertyEditorCollection propertyEditors, IScopeProvider scopeProvider, IShortStringHelper shortStringHelper, IOptions<GlobalSettings> globalSettings,
             ILocalizedTextService localizedTextService)
         {
             _logger = logger;
@@ -49,7 +50,7 @@ namespace Umbraco.Core.Packaging
             _propertyEditors = propertyEditors;
             _scopeProvider = scopeProvider;
             _shortStringHelper = shortStringHelper;
-            _globalSettings = globalSettings;
+            _globalSettings = globalSettings.Value;
             _localizedTextService = localizedTextService;
             _entityService = entityService;
             _contentTypeService = contentTypeService;

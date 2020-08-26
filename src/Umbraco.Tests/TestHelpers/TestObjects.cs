@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using Microsoft.Extensions.Options;
@@ -187,7 +188,7 @@ namespace Umbraco.Tests.TestHelpers
                     new PackagesRepository(contentService.Value, contentTypeService.Value, dataTypeService.Value, fileService.Value, macroService.Value, localizationService.Value, hostingEnvironment,
                         new EntityXmlSerializer(contentService.Value, mediaService.Value, dataTypeService.Value, userService.Value, localizationService.Value, contentTypeService.Value, urlSegmentProviders, TestHelper.ShortStringHelper, propertyEditorCollection), logger, umbracoVersion, Options.Create(globalSettings), "installedPackages.config"),
                     new PackageInstallation(
-                        new PackageDataInstallation(logger, fileService.Value, macroService.Value, localizationService.Value, dataTypeService.Value, entityService.Value, contentTypeService.Value, contentService.Value, propertyEditorCollection, scopeProvider, shortStringHelper, globalSettings, localizedTextService.Value),
+                        new PackageDataInstallation(logger, fileService.Value, macroService.Value, localizationService.Value, dataTypeService.Value, entityService.Value, contentTypeService.Value, contentService.Value, propertyEditorCollection, scopeProvider, shortStringHelper, Microsoft.Extensions.Options.Options.Create(globalSettings), localizedTextService.Value),
                         new PackageFileInstallation(compiledPackageXmlParser, ioHelper, new ProfilingLogger(logger, new TestProfiler())),
                         compiledPackageXmlParser, Mock.Of<IPackageActionRunner>(),
                         Mock.Of<IHostingEnvironment>(x => x.ApplicationPhysicalPath == ioHelper.MapPath("~"))),
@@ -245,7 +246,8 @@ namespace Umbraco.Tests.TestHelpers
         public IScopeProvider GetScopeProvider(ILogger logger, ITypeFinder typeFinder = null, FileSystems fileSystems = null, IUmbracoDatabaseFactory databaseFactory = null)
         {
             var globalSettings = new GlobalSettingsBuilder().Build();
-            var connectionStrings = new ConnectionStringsBuilder().Build();
+            var connectionString = ConfigurationManager.ConnectionStrings[Constants.System.UmbracoConnectionName].ConnectionString;
+            var connectionStrings = new ConnectionStringsBuilder().WithUmbracoConnectionString(connectionString).Build();
             var coreDebugSettings = new CoreDebugSettingsBuilder().Build();
 
             if (databaseFactory == null)
