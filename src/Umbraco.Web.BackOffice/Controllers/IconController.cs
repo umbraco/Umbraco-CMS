@@ -8,6 +8,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
 using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.Common.Attributes;
+using Umbraco.Web.Common.Filters;
 
 namespace Umbraco.Web.Editors
 {
@@ -30,6 +31,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="iconName"></param>
         /// <returns></returns>
+        [DetermineAmbiguousActionByPassingParameters]
         public IconModel GetIcon(string iconName)
         {
             return string.IsNullOrWhiteSpace(iconName)
@@ -43,6 +45,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="fileInfo"></param>
         /// <returns></returns>
+        [DetermineAmbiguousActionByPassingParameters]
         public IconModel GetIcon(FileInfo fileInfo)
         {
             return fileInfo == null || string.IsNullOrWhiteSpace(fileInfo.Name)
