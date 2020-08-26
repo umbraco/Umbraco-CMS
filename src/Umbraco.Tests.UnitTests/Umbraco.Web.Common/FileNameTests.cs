@@ -49,7 +49,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common
         {
             Mock.Get(hostingEnvironment).Setup(x => x.ToAbsolute(It.IsAny<string>())).Returns("http://localhost/");
             var viewResult = await sut.Index() as ViewResult;
-            var fileName = getViewName(viewResult, "\\");
+            var fileName = getViewName(viewResult, Path.DirectorySeparatorChar.ToString());
 
             // TODO: Don't use DirectoryInfo to get contents of UmbracoInstall, use something that works everywhere.
             var views = getUiFiles(new string[] { "Umbraco", "UmbracoInstall" });
@@ -66,7 +66,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common
             var viewResult = sut.Index() as ViewResult;
             var fileName = getViewName(viewResult);
 
-            var views = getUiFiles(new string[] {"umbraco", "UmbracoBackOffice" });
+            var views = getUiFiles(new string[] {"Umbraco", "UmbracoBackOffice" });
 
             Assert.True(views.Contains(fileName), $"Expected {fileName} to exist, but it didn't");
         }
@@ -87,7 +87,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common
 
             var viewResult = await sut.Default() as ViewResult;
             var fileName = getViewName(viewResult);
-            var views = getUiFiles(new string[] { "umbraco", "UmbracoBackOffice" });
+            var views = getUiFiles(new string[] { "Umbraco", "UmbracoBackOffice" });
 
             Assert.True(views.Contains(fileName), $"Expected {fileName} to exist, but it didn't");
         }
@@ -97,7 +97,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common
         public void LanguageFilesAreLowercase()
         {
             
-            var files = getUiFiles(new string[] { "umbraco", "config", "lang" });
+            var files = getUiFiles(new string[] { "Umbraco", "config", "lang" });
             foreach (var fileName in files)
             {
                 Assert.AreEqual(fileName.ToLower(), fileName, $"Language files must be all lowercase but {fileName} is not lowercase.");
