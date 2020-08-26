@@ -21,6 +21,16 @@
         string ReservedPaths { get; }
 
         /// <summary>
+        /// Gets the path to umbraco's icons directory (/umbraco/assets/icons by default).
+        /// </summary>
+        string IconsPath { get; }
+
+        /// <summary>
+        /// Gets or sets the configuration status. This will return the version number of the currently installed umbraco instance.
+        /// </summary>
+        string ConfigurationStatus { get; set; }
+
+        /// <summary>
         /// Gets the time out in minutes.
         /// </summary>
         int TimeOutInMinutes { get; }

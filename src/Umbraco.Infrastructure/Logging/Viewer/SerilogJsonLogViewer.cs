@@ -5,8 +5,6 @@ using System.Linq;
 using Newtonsoft.Json;
 using Serilog.Events;
 using Serilog.Formatting.Compact.Reader;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
 
 namespace Umbraco.Core.Logging.Viewer
 {

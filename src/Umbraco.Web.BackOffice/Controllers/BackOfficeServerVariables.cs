@@ -181,6 +181,10 @@ namespace Umbraco.Web.BackOffice.Controllers
                                 controller => controller.GetRootMedia())
                         },
                         {
+                            "iconApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<IconController>(
+                                controller => controller.GetIcon(""))
+                        },
+                        {
                             "imagesApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<ImagesController>(
                                 controller => controller.GetBigThumbnail(""))
                         },

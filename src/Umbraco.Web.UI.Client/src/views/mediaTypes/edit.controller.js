@@ -9,10 +9,10 @@
 (function () {
     "use strict";
 
-    function MediaTypesEditController($scope, $routeParams, mediaTypeResource, 
-        dataTypeResource, editorState, contentEditingHelper, formHelper, 
-        navigationService, iconHelper, contentTypeHelper, notificationsService, 
-        $q, localizationService, overlayHelper, eventsService, angularHelper) {
+    function MediaTypesEditController($scope, $routeParams, $q,
+        mediaTypeResource, dataTypeResource, editorState, contentEditingHelper, 
+        navigationService, iconHelper, contentTypeHelper, notificationsService,
+        localizationService, overlayHelper, eventsService, angularHelper) {
 
         var vm = this;
         var evts = [];
@@ -248,6 +248,7 @@
         });
 
         if (create) {
+            
             vm.page.loading = true;
 
             //we are creating so get an empty data type item
@@ -370,18 +371,6 @@
 
         function init(contentType) {
 
-            // set all tab to inactive
-            if (contentType.groups.length !== 0) {
-                angular.forEach(contentType.groups, function (group) {
-
-                    angular.forEach(group.properties, function (property) {
-                        // get data type details for each property
-                        getDataTypeDetails(property);
-                    });
-
-                });
-            }
-
             // convert icons for content type
             convertLegacyIcons(contentType);
 
@@ -405,18 +394,6 @@
             contentType.icon = contentTypeArray[0].icon;
         }
 
-        function getDataTypeDetails(property) {
-            if (property.propertyState !== "init") {
-
-                dataTypeResource.getById(property.dataTypeId)
-                    .then(function(dataType) {
-                        property.dataTypeIcon = dataType.icon;
-                        property.dataTypeName = dataType.name;
-                    });
-            }
-        }
-
-
         /** Syncs the content type  to it's tree node - this occurs on first load and after saving */
         function syncTreeNode(dt, path, initialLoad) {
             navigationService.syncTree({ tree: "mediatypes", path: path.split(","), forceReload: initialLoad !== true }).then(function(syncArgs) {
@@ -425,7 +402,7 @@
         }
 
         function close() {
-            if(infiniteMode && $scope.model.close) {
+            if (infiniteMode && $scope.model.close) {
                 $scope.model.close();
             }
         }

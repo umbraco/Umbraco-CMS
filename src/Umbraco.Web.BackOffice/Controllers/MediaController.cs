@@ -160,15 +160,15 @@ namespace Umbraco.Web.BackOffice.Controllers
         [DetermineAmbiguousActionByPassingParameters]
         public MediaItemDisplay GetById(int id)
         {
-            var foundContent = GetObjectFromRequest(() => _mediaService.GetById(id));
+            var foundMedia = GetObjectFromRequest(() => _mediaService.GetById(id));
 
-            if (foundContent == null)
+            if (foundMedia == null)
             {
                 HandleContentNotFound(id);
                 //HandleContentNotFound will throw an exception
                 return null;
             }
-            return _umbracoMapper.Map<MediaItemDisplay>(foundContent);
+            return _umbracoMapper.Map<MediaItemDisplay>(foundMedia);
         }
 
         /// <summary>
@@ -181,15 +181,15 @@ namespace Umbraco.Web.BackOffice.Controllers
         [DetermineAmbiguousActionByPassingParameters]
         public MediaItemDisplay GetById(Guid id)
         {
-            var foundContent = GetObjectFromRequest(() => _mediaService.GetById(id));
+            var foundMedia = GetObjectFromRequest(() => _mediaService.GetById(id));
 
-            if (foundContent == null)
+            if (foundMedia == null)
             {
                 HandleContentNotFound(id);
                 //HandleContentNotFound will throw an exception
                 return null;
             }
-            return _umbracoMapper.Map<MediaItemDisplay>(foundContent);
+            return _umbracoMapper.Map<MediaItemDisplay>(foundMedia);
         }
 
         /// <summary>
@@ -800,10 +800,13 @@ namespace Umbraco.Web.BackOffice.Controllers
             var total = long.MaxValue;
             while (page * pageSize < total)
             {
-                var children = _mediaService.GetPagedChildren(mediaId, page, pageSize, out total,
+                var children = _mediaService.GetPagedChildren(mediaId, page++, pageSize, out total,
                     _sqlContext.Query<IMedia>().Where(x => x.Name == nameToFind));
-                foreach (var c in children)
-                    return c; //return first one if any are found
+                var match = children.FirstOrDefault(c => c.ContentType.Alias == contentTypeAlias);
+                if (match != null)
+                {
+                    return match;
+                }
             }
             return null;
         }

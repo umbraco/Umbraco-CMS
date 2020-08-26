@@ -71,6 +71,12 @@ namespace Umbraco.Web.BackOffice.Controllers
 
         public int GetCount() => _contentTypeService.Count();
 
+        /// <summary>
+        /// Gets the media type a given id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [DetermineAmbiguousActionByPassingParameters]
         [UmbracoTreeAuthorize(Constants.Trees.MediaTypes, Constants.Trees.Media)]
         public MediaTypeDisplay GetById(int id)
         {
@@ -81,6 +87,48 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
 
             var dto = _umbracoMapper.Map<IMediaType, MediaTypeDisplay>(ct);
+            return dto;
+        }
+
+        /// <summary>
+        /// Gets the media type a given guid
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [DetermineAmbiguousActionByPassingParameters]
+        [UmbracoTreeAuthorize(Constants.Trees.MediaTypes, Constants.Trees.Media)]
+        public MediaTypeDisplay GetById(Guid id)
+        {
+            var mediaType = _mediaTypeService.Get(id);
+            if (mediaType == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            var dto = _umbracoMapper.Map<IMediaType, MediaTypeDisplay>(mediaType);
+            return dto;
+        }
+
+        /// <summary>
+        /// Gets the media type a given udi
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [DetermineAmbiguousActionByPassingParameters]
+        [UmbracoTreeAuthorize(Constants.Trees.MediaTypes, Constants.Trees.Media)]
+        public MediaTypeDisplay GetById(Udi id)
+        {
+            var guidUdi = id as GuidUdi;
+            if (guidUdi == null)
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            var mediaType = _mediaTypeService.Get(guidUdi.Guid);
+            if (mediaType == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            var dto = _umbracoMapper.Map<IMediaType, MediaTypeDisplay>(mediaType);
             return dto;
         }
 
