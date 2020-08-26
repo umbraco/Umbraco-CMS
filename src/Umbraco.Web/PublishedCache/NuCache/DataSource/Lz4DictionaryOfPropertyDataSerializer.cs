@@ -88,8 +88,8 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                                         break;
                                 }
                             }
-                            break;                      
-                    }                    
+                            break;
+                    }
                 }
 
                 dict[key] = pdatas.ToArray();
@@ -122,7 +122,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                     WriteObject(pdata.Culture ?? string.Empty, stream);
                     WriteObject(pdata.Segment ?? string.Empty, stream);
 
-                    //Only compress strings                    
+                    //Only compress strings (if NucachePropertyCompressionLevel.SQLDatabase has been specified then the property value will already be compressed)
                     switch (map.CompressLevel)
                     {
                         // If we're compressing into btree at the property level

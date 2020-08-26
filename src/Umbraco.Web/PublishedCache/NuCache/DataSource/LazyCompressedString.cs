@@ -1,10 +1,7 @@
 ﻿using K4os.Compression.LZ4;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 {
@@ -13,10 +10,8 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
     /// </summary>
     internal class LazyCompressedString
     {
-        // TODO: This could be a struct
-
-        private byte[] _bytes;
         private string _str;
+        private byte[] _bytes;
 
         /// <summary>
         /// Constructor
@@ -25,6 +20,13 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         public LazyCompressedString(byte[] bytes)
         {
             _bytes = bytes;
+        }
+
+        public byte[] GetBytes()
+        {
+            if (_bytes == null)
+                throw new InvalidOperationException("The bytes have already been expanded");
+            return _bytes;
         }
 
         public override string ToString()

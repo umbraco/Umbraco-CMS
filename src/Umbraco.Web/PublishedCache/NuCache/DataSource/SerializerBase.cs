@@ -98,7 +98,9 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 case PrefixDateTime:
                     return PrimitiveSerializer.DateTime.ReadFrom(stream);
                 case PrefixByteArray:
-                    return PrimitiveSerializer.Bytes.ReadFrom(stream);
+                    // When it's a byte array always return as a LazyCompressedString
+                    // TODO: Else we need to make a different prefix for lazy vs eager loading
+                    return new LazyCompressedString(PrimitiveSerializer.Bytes.ReadFrom(stream));
                 default:
                     throw new NotSupportedException($"Cannot deserialize unknown type '{type}'.");
             }
@@ -159,6 +161,11 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             {
                 PrimitiveSerializer.Char.WriteTo(PrefixByteArray, stream);
                 PrimitiveSerializer.Bytes.WriteTo(byteArrayValue, stream);
+            }
+            else if (value is LazyCompressedString lazyCompressedString)
+            {
+                PrimitiveSerializer.Char.WriteTo(PrefixByteArray, stream);
+                PrimitiveSerializer.Bytes.WriteTo(lazyCompressedString.GetBytes(), stream);
             }
             else
                 throw new NotSupportedException("Value type " + value.GetType().FullName + " cannot be serialized.");

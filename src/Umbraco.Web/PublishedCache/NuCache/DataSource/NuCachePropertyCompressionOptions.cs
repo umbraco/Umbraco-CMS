@@ -27,6 +27,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 
         public LZ4Level LZ4CompressionLevel { get; } = LZ4Level.L00_FAST;
 
+        // TODO: Unsure if we really want to keep this
         public long? MinimumCompressibleStringLength { get; }
     }
 }
