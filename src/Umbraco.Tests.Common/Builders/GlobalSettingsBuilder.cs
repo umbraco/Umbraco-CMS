@@ -162,8 +162,8 @@ namespace Umbraco.Tests.Common.Builders
             var installEmptyDatabase = _installEmptyDatabase ?? false;
             var installMissingDatabase = _installMissingDatabase ?? false;
             var registerType = _registerType ?? null;
-            var reservedPaths = _reservedPaths ?? "~/app_plugins/,~/install/,~/mini-profiler-resources/,";
-            var reservedUrls = _reservedUrls ?? "~/config/splashes/noNodes.aspx,~/.well-known,";
+            var reservedPaths = _reservedPaths ?? GlobalSettings.StaticReservedPaths;
+            var reservedUrls = _reservedUrls ?? GlobalSettings.StaticReservedUrls;
             var path = _path ?? "~/umbraco";
             var useHttps = _useHttps ?? false;
             var umbracoCssPath = _umbracoCssPath ?? "~/css";

@@ -55,6 +55,19 @@ namespace Umbraco.Infrastructure.Configuration
             return result;
         }
 
+        public static IUserPasswordConfiguration ConvertUserPasswordConfiguration(UserPasswordConfigurationSettings passwordConfiguration)
+        {
+            return new TestUserPasswordConfiguration
+            {
+                HashAlgorithmType = passwordConfiguration.HashAlgorithmType,
+                RequireDigit = passwordConfiguration.RequireDigit,
+                RequiredLength = passwordConfiguration.RequiredLength,
+                RequireLowercase = passwordConfiguration.RequireLowercase,
+                RequireNonLetterOrDigit = passwordConfiguration.RequireNonLetterOrDigit,
+                RequireUppercase = passwordConfiguration.RequireUppercase,
+            };
+        }
+
         private class TestGlobalSettings : IGlobalSettings
         {
             public string ReservedUrls { get; set; }
@@ -125,6 +138,23 @@ namespace Umbraco.Infrastructure.Configuration
             {
                 _dictionary.Add(key, new ConfigConnectionString(connectionString, string.Empty, key));
             }
+        }
+
+        private class TestUserPasswordConfiguration : IUserPasswordConfiguration
+        {
+            public int RequiredLength { get; set; }
+
+            public bool RequireNonLetterOrDigit { get; set; }
+
+            public bool RequireDigit { get; set; }
+
+            public bool RequireLowercase { get; set; }
+
+            public bool RequireUppercase { get; set; }
+
+            public string HashAlgorithmType { get; set; }
+
+            public int MaxFailedAccessAttemptsBeforeLockout { get; set; }
         }
     }
 }

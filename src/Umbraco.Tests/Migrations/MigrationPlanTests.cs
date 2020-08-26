@@ -9,14 +9,12 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations;
 using Umbraco.Core.Migrations.Upgrade;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Persistance.SqlCe;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
-using Umbraco.Web.Configuration;
 
 namespace Umbraco.Tests.Migrations
 {

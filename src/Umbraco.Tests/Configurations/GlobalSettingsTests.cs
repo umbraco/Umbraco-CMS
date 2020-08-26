@@ -1,10 +1,8 @@
 ﻿using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.IO;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Web.Configuration;
 using Umbraco.Web.Hosting;
 
 namespace Umbraco.Tests.Configurations

@@ -13,7 +13,6 @@ using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Infrastructure.Configuration;
 using Umbraco.Net;
-using Umbraco.Web.Configuration;
 
 namespace Umbraco.Web.Security
 {
@@ -22,7 +21,7 @@ namespace Umbraco.Web.Security
         public const string OwinMarkerKey = "Umbraco.Web.Security.Identity.BackOfficeUserManagerMarker";
 
         public BackOfficeOwinUserManager(
-            IOptions<BackOfficeIdentityOptions> passwordConfiguration,
+            IUserPasswordConfiguration passwordConfiguration,
             IIpResolver ipResolver,
             IUserStore<BackOfficeIdentityUser> store,
             IOptions<BackOfficeIdentityOptions> optionsAccessor,
@@ -32,9 +31,9 @@ namespace Umbraco.Web.Security
             BackOfficeIdentityErrorDescriber errors,
             IDataProtectionProvider dataProtectionProvider,
             ILogger<UserManager<BackOfficeIdentityUser>> logger)
-            : base(ipResolver, store, optionsAccessor, null, userValidators, passwordValidators, keyNormalizer, errors, null, logger, ConfigModelConversions.ConvertToOptionsOfUserPasswordConfigurationSettings(passwordConfiguration))
+            : base(ipResolver, store, optionsAccessor, null, userValidators, passwordValidators, keyNormalizer, errors, null, logger, Microsoft.Extensions.Options.Options.Create(ConfigModelConversionsFromLegacy.ConvertUserPasswordConfiguration(passwordConfiguration)))
         {
-            PasswordConfiguration = ConfigModelConversions.ConvertToOptionsOfUserPasswordConfigurationSettings(passwordConfiguration).Value;
+            PasswordConfiguration = passwordConfiguration;
             InitUserManager(this, dataProtectionProvider);
         }
 
@@ -105,7 +104,7 @@ namespace Umbraco.Web.Security
             options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromDays(30);
 
             return new BackOfficeOwinUserManager(
-                ConfigModelConversions.ConvertToOptionsOfBackOfficeIdentityOptions(passwordConfiguration),
+                passwordConfiguration,
                 ipResolver,
                 customUserStore,
                 new OptionsWrapper<BackOfficeIdentityOptions>(options),

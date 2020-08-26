@@ -28,15 +28,15 @@ namespace Umbraco.Infrastructure.Configuration
                 ReservedUrls = globalSettings.ReservedUrls,
                 Smtp = globalSettings.SmtpSettings != null
                     ? new SmtpSettings
-                        {
-                            DeliveryMethod = globalSettings.SmtpSettings.DeliveryMethod,
-                            From = globalSettings.SmtpSettings.From,
-                            Host = globalSettings.SmtpSettings.Host,
-                            Password = globalSettings.SmtpSettings.Password,
-                            PickupDirectoryLocation = globalSettings.SmtpSettings.PickupDirectoryLocation,
-                            Port = globalSettings.SmtpSettings.Port,
-                            Username = globalSettings.SmtpSettings.Username,
-                        }
+                    {
+                        DeliveryMethod = globalSettings.SmtpSettings.DeliveryMethod,
+                        From = globalSettings.SmtpSettings.From,
+                        Host = globalSettings.SmtpSettings.Host,
+                        Password = globalSettings.SmtpSettings.Password,
+                        PickupDirectoryLocation = globalSettings.SmtpSettings.PickupDirectoryLocation,
+                        Port = globalSettings.SmtpSettings.Port,
+                        Username = globalSettings.SmtpSettings.Username,
+                    }
                     : new SmtpSettings(),
                 TimeOutInMinutes = globalSettings.TimeOutInMinutes,
                 UmbracoCssPath = globalSettings.UmbracoCssPath,
@@ -53,6 +53,19 @@ namespace Umbraco.Infrastructure.Configuration
             return new ConnectionStrings
             {
                 UmbracoConnectionString = connectionStrings[Constants.System.UmbracoConnectionName].ConnectionString
+            };
+        }
+
+        public static UserPasswordConfigurationSettings ConvertUserPasswordConfiguration(IUserPasswordConfiguration passwordConfiguration)
+        {
+            return new UserPasswordConfigurationSettings
+            {
+                HashAlgorithmType = passwordConfiguration.HashAlgorithmType,
+                RequireDigit = passwordConfiguration.RequireDigit,
+                RequiredLength = passwordConfiguration.RequiredLength,
+                RequireLowercase = passwordConfiguration.RequireLowercase,
+                RequireNonLetterOrDigit = passwordConfiguration.RequireNonLetterOrDigit,
+                RequireUppercase = passwordConfiguration.RequireUppercase,
             };
         }
     }

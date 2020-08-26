@@ -10,8 +10,8 @@ using Umbraco.Core;
 using Umbraco.Core.BackOffice;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Infrastructure.Configuration;
 using Umbraco.Net;
-using Umbraco.Tests.Common.Builders;
 using Umbraco.Web.Security;
 
 namespace Umbraco.Tests.Security
@@ -45,8 +45,7 @@ namespace Umbraco.Tests.Security
             var mockGlobalSettings = new Mock<IGlobalSettings>();
             mockGlobalSettings.Setup(x => x.DefaultUILanguage).Returns("test");
 
-            var globalSettings = new GlobalSettingsBuilder().Build();
-            var user = new BackOfficeIdentityUser(globalSettings, 2, new List<IReadOnlyUserGroup>())
+            var user = new BackOfficeIdentityUser(ConfigModelConversionsFromLegacy.ConvertGlobalSettings(mockGlobalSettings.Object), 2, new List<IReadOnlyUserGroup>())
             {
                 UserName = "alice",
                 Name = "Alice",
