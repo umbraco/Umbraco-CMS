@@ -12,7 +12,6 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
-using Umbraco.Infrastructure.Configuration;
 
 namespace Umbraco.Core.Runtime
 {
@@ -30,8 +29,10 @@ namespace Umbraco.Core.Runtime
         private readonly IRequestCache _requestCache;
         private readonly GlobalSettings _globalSettings;
         private readonly ConnectionStrings _connectionStrings;
+        private readonly Configs _configs;
 
         public CoreRuntime(
+            Configs configs, //  TODO: remove this parameter with legacy configuraiton no longer needed in Umbraco.Web and Umbraco.Tests
             GlobalSettings globalSettings,
             ConnectionStrings connectionStrings,
             IUmbracoVersion umbracoVersion,
@@ -46,6 +47,7 @@ namespace Umbraco.Core.Runtime
             ITypeFinder typeFinder,
             IRequestCache requestCache)
         {
+            _configs = configs;
             _globalSettings = globalSettings;
             _connectionStrings = connectionStrings;
 
@@ -180,11 +182,7 @@ namespace Umbraco.Core.Runtime
                 var typeLoader = new TypeLoader(TypeFinder, appCaches.RuntimeCache, new DirectoryInfo(HostingEnvironment.LocalTempPath), ProfilingLogger);
 
                 // create the composition
-                // TODO: remove the configs parameter once we no longer need to provide it for Umbraco.Web and Umbraco.Tests functionality.
-                var configs = new Configs();
-                configs.Add<IGlobalSettings>(() => ConfigModelConversionsToLegacy.ConvertGlobalSettings(_globalSettings));
-                configs.Add<IConnectionStrings>(() => ConfigModelConversionsToLegacy.ConvertConnectionStrings(_connectionStrings));
-                composition = new Composition(register, typeLoader, ProfilingLogger, _state, configs, IOHelper, appCaches);
+                composition = new Composition(register, typeLoader, ProfilingLogger, _state, _configs, IOHelper, appCaches);
                 composition.RegisterEssentials(Logger, Profiler, ProfilingLogger, MainDom, appCaches, databaseFactory, typeLoader, _state, TypeFinder, IOHelper, UmbracoVersion, DbProviderFactoryCreator, HostingEnvironment, BackOfficeInfo);
 
                 // register ourselves (TODO: Should we put this in RegisterEssentials?)

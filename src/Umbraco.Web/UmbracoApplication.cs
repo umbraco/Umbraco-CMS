@@ -19,7 +19,6 @@ namespace Umbraco.Web
     {
         protected override IRuntime GetRuntime(Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)
         {
-
             var connectionStringConfig = configs.ConnectionStrings()[Constants.System.UmbracoConnectionName];
 
             var dbProviderFactoryCreator = new UmbracoDbProviderFactoryCreator();
@@ -39,7 +38,7 @@ namespace Umbraco.Web
 
             var requestCache = new HttpRequestAppCache(() => HttpContext.Current != null ? HttpContext.Current.Items : null);
             var umbracoBootPermissionChecker = new AspNetUmbracoBootPermissionChecker();
-            return new CoreRuntime(globalSettings, connectionStrings, umbracoVersion, ioHelper, logger, profiler, umbracoBootPermissionChecker, hostingEnvironment, backOfficeInfo, dbProviderFactoryCreator, mainDom,
+            return new CoreRuntime(configs, globalSettings, connectionStrings, umbracoVersion, ioHelper, logger, profiler, umbracoBootPermissionChecker, hostingEnvironment, backOfficeInfo, dbProviderFactoryCreator, mainDom,
                 GetTypeFinder(hostingEnvironment, logger, profiler), requestCache);
         }
 

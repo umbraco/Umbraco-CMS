@@ -116,7 +116,7 @@ namespace Umbraco.Tests.Runtimes
         public class TestRuntime : CoreRuntime
         {
             public TestRuntime(Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)
-                : base(ConfigModelConversionsFromLegacy.ConvertGlobalSettings(configs.Global()), ConfigModelConversionsFromLegacy.ConvertConnectionStrings(configs.ConnectionStrings()), umbracoVersion, ioHelper, logger,  profiler, new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, TestHelper.DbProviderFactoryCreator, TestHelper.MainDom, TestHelper.GetTypeFinder(), NoAppCache.Instance)
+                : base(configs, ConfigModelConversionsFromLegacy.ConvertGlobalSettings(configs.Global()), ConfigModelConversionsFromLegacy.ConvertConnectionStrings(configs.ConnectionStrings()), umbracoVersion, ioHelper, logger,  profiler, new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, TestHelper.DbProviderFactoryCreator, TestHelper.MainDom, TestHelper.GetTypeFinder(), NoAppCache.Instance)
             {
 
             }

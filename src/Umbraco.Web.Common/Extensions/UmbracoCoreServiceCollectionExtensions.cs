@@ -241,7 +241,9 @@ namespace Umbraco.Extensions
             var umbracoVersion = new UmbracoVersion(globalSettings);
             var typeFinder = CreateTypeFinder(logger, profiler, webHostEnvironment, entryAssembly, typeFinderSettings);
 
+            var configs = serviceProvider.GetService<Configs>();
             var coreRuntime = GetCoreRuntime(
+                configs,
                 globalSettings,
                 connectionStrings,
                 umbracoVersion,
@@ -268,7 +270,7 @@ namespace Umbraco.Extensions
         }
 
         private static IRuntime GetCoreRuntime(
-            GlobalSettings globalSettings, ConnectionStrings connectionStrings, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, Core.Logging.ILogger logger,
+            Configs configs, GlobalSettings globalSettings, ConnectionStrings connectionStrings, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, Core.Logging.ILogger logger,
             IProfiler profiler, Core.Hosting.IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo,
             ITypeFinder typeFinder, IRequestCache requestCache, IDbProviderFactoryCreator dbProviderFactoryCreator)
         {
@@ -283,6 +285,7 @@ namespace Umbraco.Extensions
             var mainDom = new MainDom(logger, mainDomLock);
 
             var coreRuntime = new CoreRuntime(
+                configs,
                 globalSettings,
                 connectionStrings,
                 umbracoVersion,
