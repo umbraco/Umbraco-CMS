@@ -34,6 +34,7 @@ using Umbraco.Web.Hosting;
 using Umbraco.Web.Routing;
 using File = System.IO.File;
 using Umbraco.Tests.Common.Builders;
+using Microsoft.Extensions.Options;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -106,7 +107,7 @@ namespace Umbraco.Tests.TestHelpers
 
         public static IWebRoutingSettings WebRoutingSettings => _testHelperInternal.WebRoutingSettings;
 
-        public static IEmailSender EmailSender { get; } = new EmailSender(new GlobalSettingsBuilder().Build());
+        public static IEmailSender EmailSender { get; } = new EmailSender(Options.Create(new GlobalSettingsBuilder().Build()));
 
 
         /// <summary>

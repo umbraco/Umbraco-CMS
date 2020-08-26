@@ -39,8 +39,8 @@ namespace Umbraco.Tests.Routing
             var dataTypeService = Mock.Of<IDataTypeService>();
             var propertyEditors = new MediaUrlGeneratorCollection(new IMediaUrlGenerator[]
             {
-                new FileUploadPropertyEditor(logger, mediaFileSystemMock, contentSettings, dataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper),
-                new ImageCropperPropertyEditor(logger, mediaFileSystemMock, contentSettings, dataTypeService, LocalizationService, IOHelper, ShortStringHelper, LocalizedTextService),
+                new FileUploadPropertyEditor(logger, mediaFileSystemMock, Microsoft.Extensions.Options.Options.Create(contentSettings), dataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper),
+                new ImageCropperPropertyEditor(logger, mediaFileSystemMock, Microsoft.Extensions.Options.Options.Create(contentSettings), dataTypeService, LocalizationService, IOHelper, ShortStringHelper, LocalizedTextService),
             });
             _mediaUrlProvider = new DefaultMediaUrlProvider(propertyEditors, UriUtility);
         }
