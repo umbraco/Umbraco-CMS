@@ -71,47 +71,38 @@
 
         vm.denyLocalLogin = externalLoginInfoService.hasDenyLocalLogin();
 
-        // No default buttons with denyLocalLogin
-        // Don't show the invite button if no email is configured
-        if (!vm.denyLocalLogin) {
-            if (Umbraco.Sys.ServerVariables.umbracoSettings.showUserInvite) {
-                vm.defaultButton = {
-                    labelKey: "user_inviteUser",
-                    handler: function () {
-                        vm.setUsersViewState('inviteUser');
-                    }
-                };
-                vm.subButtons = [
-                    {
-                        labelKey: "user_createUser",
-                        handler: function () {
-                            vm.setUsersViewState('createUser');
-                        }
-                    }
-                ];
-            }
-            else {
-                vm.defaultButton = {
+        // returns the object representing the user create button, returns null if deny local login is true
+        function getCreateUserButton() {
+            if (!vm.denyLocalLogin) {
+                return {
                     labelKey: "user_createUser",
                     handler: function () {
                         vm.setUsersViewState('createUser');
                     }
                 };
             }
+            return null;
         }
-        else {
-            // if deny local login then check if there's an invite link in the config
 
-            var customInviteLink = externalLoginInfoService.getUserInviteLink();
-            if (customInviteLink) {
-                vm.defaultButton = {
-                    type: "link",
-                    labelKey: "user_inviteUser",
-                    href: customInviteLink,
-                    hrefTarget: "_blank"
-                };
+        // No default buttons with denyLocalLogin
+        // Don't show the invite button if no email is configured
+        if (Umbraco.Sys.ServerVariables.umbracoSettings.showUserInvite) {
+            vm.defaultButton = {
+                labelKey: "user_inviteUser",
+                handler: function () {
+                    vm.setUsersViewState('inviteUser');
+                }
+            };
+            var createUserBtn = getCreateUserButton();
+            if (createUserBtn) {
+                vm.subButtons = [createUserBtn];
             }
         }
+        else {
+            vm.defaultButton = getCreateUserButton();
+        }
+
+            
 
         vm.toggleFilter = toggleFilter;
         vm.setUsersViewState = setUsersViewState;

@@ -35,11 +35,6 @@ namespace Umbraco.Web.Security
         public bool DenyLocalLogin { get; set; }
 
         /// <summary>
-        /// If specified and <see cref="DenyLocalLogin"/> is true then the user invite button in the back office will link through to this custom URL
-        /// </summary>
-        public string CustomUserInviteLink { get; set; }
-
-        /// <summary>
         /// When specified this will automatically redirect to the OAuth login provider instead of prompting the user to click on the OAuth button first.
         /// </summary>
         /// <remarks>

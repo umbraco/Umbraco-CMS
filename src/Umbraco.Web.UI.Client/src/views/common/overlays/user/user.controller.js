@@ -80,10 +80,9 @@ angular.module("umbraco")
                     //updateTimeout();
 
                     authResource.getCurrentUserLinkedLogins().then(function(logins) {
+
                         //reset all to be un-linked
-                        for (var provider in $scope.externalLoginProviders) {
-                            $scope.externalLoginProviders[provider].linkedProviderKey = undefined;
-                        }
+                        $scope.externalLoginProviders.forEach(provider => provider.linkedProviderKey = undefined);
 
                         //set the linked logins
                         for (var login in logins) {

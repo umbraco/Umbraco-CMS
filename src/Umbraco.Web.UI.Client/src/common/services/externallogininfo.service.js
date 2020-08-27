@@ -47,25 +47,9 @@ function externalLoginInfoService(externalLoginInfo, umbRequestHelper) {
         }
     }
 
-    /**
-     * If there is any external login providers with deny local login, check if any have a custom invite link and return it
-     * @param {any} provider optional to get the invite link directly from the provider, else will return the first one found (if any)
-     */
-    function getUserInviteLink(provider) {
-        if (!provider) {
-            var denyLocalLoginProviders = _.filter(externalLoginInfo.providers, x => x.properties.UmbracoBackOfficeExternalLoginOptions.DenyLocalLogin);
-            var withInviteLink = _.filter(denyLocalLoginProviders, x => x.properties.UmbracoBackOfficeExternalLoginOptions.CustomUserInviteLink);
-            return withInviteLink.length > 0 ? withInviteLink[0].properties.UmbracoBackOfficeExternalLoginOptions.CustomUserInviteLink : null;
-        }
-        else {
-            return provider.properties.UmbracoBackOfficeExternalLoginOptions.CustomUserInviteLink;
-        }
-    }
-
     return {
         hasDenyLocalLogin: hasDenyLocalLogin,
         getLoginProviders: getLoginProviders,
-        getUserInviteLink: getUserInviteLink,
         getExternalLoginProviderView: getExternalLoginProviderView
     };
 }

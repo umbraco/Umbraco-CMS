@@ -610,9 +610,11 @@ namespace Umbraco.Web.Security
             OnLoginSuccess(new IdentityAuditEventArgs(AuditEvent.LoginSucces, GetCurrentRequestIpAddress(), affectedUser: userId));
         }
 
-        internal void RaiseLogoutSuccessEvent(int userId)
+        internal SignOutAuditEventArgs RaiseLogoutSuccessEvent(int userId)
         {
-            OnLogoutSuccess(new IdentityAuditEventArgs(AuditEvent.LogoutSuccess, GetCurrentRequestIpAddress(), affectedUser: userId));
+            var args = new SignOutAuditEventArgs(AuditEvent.LogoutSuccess, GetCurrentRequestIpAddress(), affectedUser: userId);
+            OnLogoutSuccess(args);
+            return args;
         }
 
         internal void RaisePasswordChangedEvent(int userId)

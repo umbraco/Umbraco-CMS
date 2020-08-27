@@ -1,5 +1,5 @@
 angular.module('umbraco.services')
-    .factory('userService', function ($rootScope, eventsService, $q, $location, requestRetryQueue, authResource, emailMarketingResource, $timeout, angularHelper) {
+    .factory('userService', function ($rootScope, eventsService, $q, $location, $window, requestRetryQueue, authResource, emailMarketingResource, $timeout, angularHelper) {
 
         var currentUser = null;
         var lastUserId = null;
@@ -218,8 +218,14 @@ angular.module('umbraco.services')
                 return authResource.performLogout()
                     .then(function (data) {
                         userAuthExpired();
-                        //done!
-                        return null;
+
+                        if (data && data.signOutRedirectUrl) {
+                            $window.location.replace(data.signOutRedirectUrl);
+                        }
+                        else {
+                            //done!
+                            return null;
+                        }
                     });
             },
 

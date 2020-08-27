@@ -210,7 +210,12 @@ namespace Umbraco.Web.Editors
         public async Task<Dictionary<string, string>> GetCurrentUserLinkedLogins()
         {
             var identityUser = await UserManager.FindByIdAsync(UmbracoContext.Security.GetUserId().ResultOr(0));
-            return identityUser.Logins.ToDictionary(x => x.LoginProvider, x => x.ProviderKey);
+            var result = new Dictionary<string, string>();
+            foreach (var l in identityUser.Logins)
+            {
+                result[l.LoginProvider] = l.ProviderKey;
+            }
+            return result;
         }
 
         /// <summary>
@@ -483,7 +488,12 @@ namespace Umbraco.Web.Editors
             if (UserManager != null)
             {
                 int.TryParse(User.Identity.GetUserId(), out var userId);
-                UserManager.RaiseLogoutSuccessEvent(userId);
+                var args = UserManager.RaiseLogoutSuccessEvent(userId);
+                if (!args.SignOutRedirectUrl.IsNullOrWhiteSpace())
+                    return Request.CreateResponse(new
+                    {
+                        signOutRedirectUrl = args.SignOutRedirectUrl
+                    });
             }
 
             return Request.CreateResponse(HttpStatusCode.OK);
