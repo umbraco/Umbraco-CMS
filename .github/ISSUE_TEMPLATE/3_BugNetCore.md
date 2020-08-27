@@ -1,6 +1,6 @@
 ---
 name: 🌟 .Net Core Bug Report 
-about: For bugs specifically for the **upcoming** .NET Core release of Umbraco, don't use this if you're working with Umbraco version 7 or 8
+about: For bugs specifically for the upcoming .NET Core release of Umbraco, don't use this if you're working with Umbraco version 7 or 8
 labels: project/net-core
 ---
 
