@@ -6,6 +6,7 @@ using Umbraco.Core;
 using Umbraco.Extensions;
 using Umbraco.Web.Security;
 using IHostingEnvironment = Umbraco.Core.Hosting.IHostingEnvironment;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Web.BackOffice.Filters
 {
@@ -84,6 +85,10 @@ namespace Umbraco.Web.BackOffice.Filters
                 {
                     context.Result = new ForbidResult();
                 }
+            }
+            else
+            {
+                context.HttpContext.User.Identity.EnsureCulture();
             }
         }
 
