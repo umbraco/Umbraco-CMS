@@ -7,24 +7,24 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
+using Umbraco.Core.Services;
 using Umbraco.Tests.Common.Builders;
-using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Integration.Implementations;
+using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
 
-namespace Umbraco.Tests.Persistence.Repositories
+namespace Umbraco.Tests.Integration.Persistence.Repositories
 {
     [TestFixture]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-    public class TemplateRepositoryTest : TestWithDatabaseBase
+    public class TemplateRepositoryTest : UmbracoIntegrationTest
     {
         private IFileSystems _fileSystems;
 
@@ -33,12 +33,12 @@ namespace Umbraco.Tests.Persistence.Repositories
             return new TemplateRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger, _fileSystems, IOHelper, ShortStringHelper);
         }
 
-        public override void SetUp()
+        [SetUp]
+        public void SetUp()
         {
-            base.SetUp();
-
+            var testHelper = new TestHelper();  
             _fileSystems = Mock.Of<IFileSystems>();
-            var viewsFileSystem = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, Constants.SystemDirectories.MvcViews);
+            var viewsFileSystem = new PhysicalFileSystem(IOHelper, testHelper.GetHostingEnvironment(), Logger, Constants.SystemDirectories.MvcViews);
             Mock.Get(_fileSystems).Setup(x => x.MvcViewsFileSystem).Returns(viewsFileSystem);
         }
 
@@ -46,9 +46,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Instantiate_Repository()
         {
             // Arrange
-            using (ScopeProvider.CreateScope())
+            var provider = ScopeProvider;
+
+            using (provider.CreateScope())
             {
-                var repository = CreateRepository(ScopeProvider);
+                var repository = CreateRepository(provider);
 
                 // Assert
                 Assert.That(repository, Is.Not.Null);
@@ -59,9 +61,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Add_View()
         {
             // Arrange
-            using (ScopeProvider.CreateScope())
+            var provider = ScopeProvider;
+
+            using (provider.CreateScope())
             {
-                var repository = CreateRepository(ScopeProvider);
+                var repository = CreateRepository(provider);
 
                 // Act
                 var template = new Template(ShortStringHelper, "test", "test");
@@ -78,9 +82,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Add_View_With_Default_Content()
         {
             // Arrange
-            using (ScopeProvider.CreateScope())
+            var provider = ScopeProvider;
+
+            using (provider.CreateScope())
             {
-                var repository = CreateRepository(ScopeProvider);
+                var repository = CreateRepository(provider);
 
                 // Act
                 var template = new Template(ShortStringHelper, "test", "test")
@@ -102,9 +108,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Add_View_With_Default_Content_With_Parent()
         {
             // Arrange
-            using (ScopeProvider.CreateScope())
+            var provider = ScopeProvider;
+
+            using (provider.CreateScope())
             {
-                var repository = CreateRepository(ScopeProvider);
+                var repository = CreateRepository(provider);
 
                 //NOTE: This has to be persisted first
                 var template = new Template(ShortStringHelper, "test", "test");
@@ -128,9 +136,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Add_Unique_Alias()
         {
             // Arrange
-            using (ScopeProvider.CreateScope())
+            var provider = ScopeProvider;
+
+            using (provider.CreateScope())
             {
-                var repository = CreateRepository(ScopeProvider);
+                var repository = CreateRepository(provider);
 
                 // Act
                 var template = new Template(ShortStringHelper, "test", "test")
@@ -154,9 +164,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Update_Unique_Alias()
         {
             // Arrange
-            using (ScopeProvider.CreateScope())
+            var provider = ScopeProvider;
+
+            using (provider.CreateScope())
             {
-                var repository = CreateRepository(ScopeProvider);
+                var repository = CreateRepository(provider);
 
                 // Act
                 var template = new Template(ShortStringHelper, "test", "test")
@@ -185,9 +197,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Update_View()
         {
             // Arrange
-            using (ScopeProvider.CreateScope())
+            var provider = ScopeProvider;
+
+            using (provider.CreateScope())
             {
-                var repository = CreateRepository(ScopeProvider);
+                var repository = CreateRepository(provider);
 
                 // Act
                 var template = new Template(ShortStringHelper, "test", "test")
@@ -211,9 +225,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Delete_View()
         {
             // Arrange
-            using (ScopeProvider.CreateScope())
+            var provider = ScopeProvider;
+
+            using (provider.CreateScope())
             {
-                var repository = CreateRepository(ScopeProvider);
+                var repository = CreateRepository(provider);
 
                 var template = new Template(ShortStringHelper, "test", "test")
                 {
@@ -236,23 +252,28 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Delete_When_Assigned_To_Doc()
         {
             // Arrange
-            using (ScopeProvider.CreateScope())
+            var provider = ScopeProvider;
+            var scopeAccessor = (IScopeAccessor) provider;
+            var dataTypeService = GetRequiredService<IDataTypeService>();
+            var fileService = GetRequiredService<IFileService>();
+
+            using (provider.CreateScope())
             {
-                var templateRepository = CreateRepository(ScopeProvider);
+                var templateRepository = CreateRepository(provider);
                 var globalSettings = new GlobalSettingsBuilder().Build();
-                var tagRepository = new TagRepository(ScopeProvider, AppCaches.Disabled, Logger);
-                var commonRepository = new ContentTypeCommonRepository(ScopeProvider, templateRepository, AppCaches, ShortStringHelper);
-                var languageRepository = new LanguageRepository(ScopeProvider, AppCaches.Disabled, Logger, Microsoft.Extensions.Options.Options.Create(globalSettings));
-                var contentTypeRepository = new ContentTypeRepository(ScopeProvider, AppCaches.Disabled, Logger, commonRepository, languageRepository, ShortStringHelper);
-                var relationTypeRepository = new RelationTypeRepository(ScopeProvider, AppCaches.Disabled, Logger);
-                var entityRepository = new EntityRepository(ScopeProvider);
-                var relationRepository = new RelationRepository(ScopeProvider, Logger, relationTypeRepository, entityRepository);
+                var tagRepository = new TagRepository(scopeAccessor, AppCaches.Disabled, Logger);
+                var commonRepository = new ContentTypeCommonRepository(scopeAccessor, templateRepository, AppCaches, ShortStringHelper);
+                var languageRepository = new LanguageRepository(scopeAccessor, AppCaches.Disabled, Logger, Microsoft.Extensions.Options.Options.Create(globalSettings));
+                var contentTypeRepository = new ContentTypeRepository(scopeAccessor, AppCaches.Disabled, Logger, commonRepository, languageRepository, ShortStringHelper);
+                var relationTypeRepository = new RelationTypeRepository(scopeAccessor, AppCaches.Disabled, Logger);
+                var entityRepository = new EntityRepository(scopeAccessor);
+                var relationRepository = new RelationRepository(scopeAccessor, Logger, relationTypeRepository, entityRepository);
                 var propertyEditors = new Lazy<PropertyEditorCollection>(() => new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>())));
                 var dataValueReferences = new DataValueReferenceFactoryCollection(Enumerable.Empty<IDataValueReferenceFactory>());
-                var contentRepo = new DocumentRepository(ScopeProvider, AppCaches.Disabled, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, relationRepository, relationTypeRepository, propertyEditors, dataValueReferences, DataTypeService);
+                var contentRepo = new DocumentRepository(scopeAccessor, AppCaches.Disabled, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, relationRepository, relationTypeRepository, propertyEditors, dataValueReferences, dataTypeService);
 
                 var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage2", "Textpage");
-                ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
+                fileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
                 contentTypeRepository.Save(contentType);
                 var textpage = MockedContent.CreateSimpleContent(contentType);
                 contentRepo.Save(textpage);
@@ -279,9 +300,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Delete_On_Nested_Templates()
         {
             // Arrange
-            using (ScopeProvider.CreateScope())
+            var provider = ScopeProvider;
+
+            using (provider.CreateScope())
             {
-                var repository = CreateRepository(ScopeProvider);
+                var repository = CreateRepository(provider);
 
                 var parent = new Template(ShortStringHelper, "parent", "parent")
                 {
@@ -316,9 +339,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Get_All()
         {
             // Arrange
-            using (ScopeProvider.CreateScope())
+            var provider = ScopeProvider;
+
+            using (provider.CreateScope())
             {
-                var repository = CreateRepository(ScopeProvider);
+                var repository = CreateRepository(provider);
 
                 var created = CreateHierarchy(repository).ToArray();
 
@@ -343,9 +368,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Get_Children()
         {
             // Arrange
-            using (ScopeProvider.CreateScope())
+            var provider = ScopeProvider;
+
+            using (provider.CreateScope())
             {
-                var repository = CreateRepository(ScopeProvider);
+                var repository = CreateRepository(provider);
 
                 var created = CreateHierarchy(repository).ToArray();
 
@@ -365,9 +392,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Get_Children_At_Root()
         {
             // Arrange
-            using (ScopeProvider.CreateScope())
+            var provider = ScopeProvider;
+
+            using (provider.CreateScope())
             {
-                var repository = CreateRepository(ScopeProvider);
+                var repository = CreateRepository(provider);
 
                 CreateHierarchy(repository).ToArray();
 
@@ -384,9 +413,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Get_Descendants()
         {
             // Arrange
-            using (ScopeProvider.CreateScope())
+            var provider = ScopeProvider;
+
+            using (provider.CreateScope())
             {
-                var repository = CreateRepository(ScopeProvider);
+                var repository = CreateRepository(provider);
                 var created = CreateHierarchy(repository).ToArray();
 
                 // Act
@@ -406,9 +437,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Path_Is_Set_Correctly_On_Creation()
         {
             // Arrange
-            using (ScopeProvider.CreateScope())
+            var provider = ScopeProvider;
+
+            using (provider.CreateScope())
             {
-                var repository = CreateRepository(ScopeProvider);
+                var repository = CreateRepository(provider);
 
                 var parent = new Template(ShortStringHelper, "parent", "parent");
                 var child1 = new Template(ShortStringHelper, "child1", "child1");
@@ -466,9 +499,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Path_Is_Set_Correctly_On_Update()
         {
             // Arrange
-            using (ScopeProvider.CreateScope())
+            var provider = ScopeProvider;
+
+            using (provider.CreateScope())
             {
-                var repository = CreateRepository(ScopeProvider);
+                var repository = CreateRepository(provider);
 
                 var parent = new Template(ShortStringHelper, "parent", "parent");
                 var child1 = new Template(ShortStringHelper, "child1", "child1");
@@ -504,9 +539,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Path_Is_Set_Correctly_On_Update_With_Master_Template_Removal()
         {
             // Arrange
-            using (ScopeProvider.CreateScope())
+            var provider = ScopeProvider;
+
+            using (provider.CreateScope())
             {
-                var repository = CreateRepository(ScopeProvider);
+                var repository = CreateRepository(provider);
 
                 var parent = new Template(ShortStringHelper, "parent", "parent");
                 var child1 = new Template(ShortStringHelper, "child1", "child1");
@@ -527,14 +564,13 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [TearDown]
-        public override void TearDown()
+        public void TearDown()
         {
-            base.TearDown();
-
+            var testHelper = new TestHelper();
             _fileSystems  = null;
 
             //Delete all files
-            var fsViews = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, Constants.SystemDirectories.MvcViews);
+            var fsViews = new PhysicalFileSystem(IOHelper, testHelper.GetHostingEnvironment(), Logger, Constants.SystemDirectories.MvcViews);
             var views = fsViews.GetFiles("", "*.cshtml");
             foreach (var file in views)
                 fsViews.DeleteFile(file);

@@ -1,22 +1,22 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
+using Umbraco.Core.Serialization;
+using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
-using Umbraco.Core.PropertyEditors;
-using System;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Serialization;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Tests.Common.Builders;
+using MockedUser = Umbraco.Tests.TestHelpers.Entities.MockedUser;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {

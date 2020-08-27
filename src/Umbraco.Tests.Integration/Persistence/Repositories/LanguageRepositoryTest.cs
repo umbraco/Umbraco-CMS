@@ -1,46 +1,43 @@
 ﻿using System;
 using System.Globalization;
 using System.Linq;
-using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Scoping;
+using Umbraco.Core.Services;
 using Umbraco.Tests.Common.Builders;
-using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;
 
-namespace Umbraco.Tests.Persistence.Repositories
+namespace Umbraco.Tests.Integration.Persistence.Repositories
 {
     [TestFixture]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-    public class LanguageRepositoryTest : TestWithDatabaseBase
+    public class LanguageRepositoryTest : UmbracoIntegrationTest
     {
         private GlobalSettings _globalSettings;
 
-        public override void SetUp()
+        [SetUp]
+        public void SetUp()
         {
-            base.SetUp();
-
             CreateTestData();
-
             _globalSettings = new GlobalSettingsBuilder().Build();
         }
 
         private LanguageRepository CreateRepository(IScopeProvider provider)
         {
-            return new LanguageRepository((IScopeAccessor) provider, AppCaches.Disabled, Mock.Of<ILogger>(), Microsoft.Extensions.Options.Options.Create(_globalSettings));
+            return new LanguageRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger, Microsoft.Extensions.Options.Options.Create(_globalSettings));
         }
 
         [Test]
         public void Can_Perform_Get_On_LanguageRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = ScopeProvider;
             using (var scope = provider.CreateScope())
             {
                 scope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
@@ -61,8 +58,8 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Perform_Get_By_Iso_Code_On_LanguageRepository()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
+            var provider = ScopeProvider;
+            using (provider.CreateScope())
             {
                 var repository = CreateRepository(provider);
 
@@ -90,8 +87,8 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Get_When_Id_Doesnt_Exist_Returns_Null()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
+            var provider = ScopeProvider;
+            using (provider.CreateScope())
             {
                 var repository = CreateRepository(provider);
 
@@ -107,8 +104,8 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetAll_On_LanguageRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
+            var provider = ScopeProvider;
+            using (provider.CreateScope())
             {
                 var repository = CreateRepository(provider);
 
@@ -127,8 +124,8 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetAll_With_Params_On_LanguageRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
+            var provider = ScopeProvider;
+            using (provider.CreateScope())
             {
                 var repository = CreateRepository(provider);
 
@@ -147,7 +144,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetByQuery_On_LanguageRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = ScopeProvider;
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository(provider);
@@ -167,7 +164,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Count_On_LanguageRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = ScopeProvider;
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository(provider);
@@ -185,8 +182,8 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Add_On_LanguageRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
+            var provider = ScopeProvider;
+            using (provider.CreateScope())
             {
                 var repository = CreateRepository(provider);
 
@@ -207,8 +204,8 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Add_On_LanguageRepository_With_Boolean_Properties()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
+            var provider = ScopeProvider;
+            using (provider.CreateScope())
             {
                 var repository = CreateRepository(provider);
 
@@ -229,17 +226,17 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Add_On_LanguageRepository_With_Fallback_Language()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
+            var provider = ScopeProvider;
+            using (provider.CreateScope())
             {
                 var repository = CreateRepository(provider);
 
                 // Act
                 var languageBR = new Language(_globalSettings, "pt-BR")
-                    {
-                        CultureName = "pt-BR",
-                        FallbackLanguageId = 1
-                    };
+                {
+                    CultureName = "pt-BR",
+                    FallbackLanguageId = 1
+                };
                 repository.Save(languageBR);
 
                 // Assert
@@ -253,8 +250,8 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Add_On_LanguageRepository_With_New_Default()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
+            var provider = ScopeProvider;
+            using (provider.CreateScope())
             {
                 var repository = CreateRepository(provider);
 
@@ -281,8 +278,8 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Update_On_LanguageRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
+            var provider = ScopeProvider;
+            using (provider.CreateScope())
             {
                 var repository = CreateRepository(provider);
 
@@ -308,8 +305,8 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Perform_Update_With_Existing_Culture()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
+            var provider = ScopeProvider;
+            using (provider.CreateScope())
             {
                 var repository = CreateRepository(provider);
 
@@ -326,8 +323,8 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Delete_On_LanguageRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
+            var provider = ScopeProvider;
+            using (provider.CreateScope())
             {
                 var repository = CreateRepository(provider);
 
@@ -346,8 +343,8 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Delete_On_LanguageRepository_With_Language_Used_As_Fallback()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
+            var provider = ScopeProvider;
+            using (provider.CreateScope())
             {
                 // Add language to delete as a fall-back language to another one
                 var repository = CreateRepository(provider);
@@ -370,8 +367,8 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Exists_On_LanguageRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
+            var provider = ScopeProvider;
+            using (provider.CreateScope())
             {
                 var repository = CreateRepository(provider);
 
@@ -385,27 +382,22 @@ namespace Umbraco.Tests.Persistence.Repositories
             }
         }
 
-        [TearDown]
-        public override void TearDown()
-        {
-            base.TearDown();
-        }
-
         private void CreateTestData()
         {
             //Id 1 is en-US - when Umbraco is installed
 
+            var localizationService = GetRequiredService<ILocalizationService>();
             var languageDK = new Language(_globalSettings, "da-DK") { CultureName = "da-DK" };
-            ServiceContext.LocalizationService.Save(languageDK);//Id 2
+            localizationService.Save(languageDK);//Id 2
 
             var languageSE = new Language(_globalSettings, "sv-SE") { CultureName = "sv-SE" };
-            ServiceContext.LocalizationService.Save(languageSE);//Id 3
+            localizationService.Save(languageSE);//Id 3
 
             var languageDE = new Language(_globalSettings, "de-DE") { CultureName = "de-DE" };
-            ServiceContext.LocalizationService.Save(languageDE);//Id 4
+            localizationService.Save(languageDE);//Id 4
 
             var languagePT = new Language(_globalSettings, "pt-PT") { CultureName = "pt-PT" };
-            ServiceContext.LocalizationService.Save(languagePT);//Id 5
+            localizationService.Save(languagePT);//Id 5
         }
     }
 }

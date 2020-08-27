@@ -1,12 +1,16 @@
 ﻿using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Tests.TestHelpers.Entities
 {
     public class MockedUserGroup
     {
-        internal static UserGroup CreateUserGroup(string suffix = "", string[] permissions = null, string[] allowedSections = null)
+        public static IShortStringHelper ShortStringHelper { get; } =
+            new DefaultShortStringHelper(new DefaultShortStringHelperConfig());
+
+        public static UserGroup CreateUserGroup(string suffix = "", string[] permissions = null, string[] allowedSections = null)
         {
-            var group = new UserGroup(TestHelper.ShortStringHelper)
+            var group = new UserGroup(ShortStringHelper)
             {
                 Alias = "testUserGroup" + suffix,
                 Name = "TestUserGroup" + suffix,

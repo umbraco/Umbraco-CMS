@@ -1,43 +1,36 @@
-﻿using System;
-using System.Linq;
-using Moq;
+﻿using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Scoping;
-using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;
 
-namespace Umbraco.Tests.Persistence.Repositories
+namespace Umbraco.Tests.Integration.Persistence.Repositories
 {
     [TestFixture]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-    public class RelationTypeRepositoryTest : TestWithDatabaseBase
+    public class RelationTypeRepositoryTest : UmbracoIntegrationTest
     {
-        public override void SetUp()
+        [SetUp]
+        public void SetUp()
         {
-            base.SetUp();
-
             CreateTestData();
         }
 
         private RelationTypeRepository CreateRepository(IScopeProvider provider)
         {
-            return new RelationTypeRepository((IScopeAccessor) provider, AppCaches.Disabled, Mock.Of<ILogger>());
+            return new RelationTypeRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger);
         }
-
 
         [Test]
         public void Can_Perform_Add_On_RelationTypeRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            var provider = ScopeProvider;
+            using (provider.CreateScope())
             {
                 var repository = CreateRepository(provider);
 
@@ -56,8 +49,8 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Update_On_RelationTypeRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            var provider = ScopeProvider;
+            using (provider.CreateScope())
             {
                 var repository = CreateRepository(provider);
 
@@ -81,8 +74,8 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Delete_On_RelationTypeRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            var provider = ScopeProvider;
+            using (provider.CreateScope())
             {
                 var repository = CreateRepository(provider);
 
@@ -101,13 +94,13 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Get_On_RelationTypeRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            var provider = ScopeProvider;
+            using (provider.CreateScope())
             {
                 var repository = CreateRepository(provider);
 
                 // Act
-                var relationType = repository.Get(RelationTypeDto.NodeIdSeed + 2);
+                var relationType = repository.Get(8);
 
                 // Assert
                 Assert.That(relationType, Is.Not.Null);
@@ -124,8 +117,8 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetAll_On_RelationTypeRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            var provider = ScopeProvider;
+            using (provider.CreateScope())
             {
                 var repository = CreateRepository(provider);
 
@@ -144,8 +137,8 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetAll_With_Params_On_RelationTypeRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            var provider = ScopeProvider;
+            using (provider.CreateScope())
             {
                 var repository = CreateRepository(provider);
 
@@ -164,14 +157,14 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Exists_On_RelationTypeRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            var provider = ScopeProvider;
+            using (provider.CreateScope())
             {
                 var repository = CreateRepository(provider);
 
                 // Act
                 var exists = repository.Exists(3);
-                var doesntExist = repository.Exists(6);
+                var doesntExist = repository.Exists(9);
 
                 // Assert
                 Assert.That(exists, Is.True);
@@ -183,8 +176,8 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Count_On_RelationTypeRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            var provider = ScopeProvider;
+            using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository(provider);
 
@@ -201,8 +194,8 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetByQuery_On_RelationTypeRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            var provider = ScopeProvider;
+            using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository(provider);
 
@@ -219,22 +212,16 @@ namespace Umbraco.Tests.Persistence.Repositories
             }
         }
 
-        [TearDown]
-        public override void TearDown()
-        {
-            base.TearDown();
-        }
-
         public void CreateTestData()
         {
             var relateContent = new RelationType("Relate Content on Copy", "relateContentOnCopy", true, Constants.ObjectTypes.Document, Constants.ObjectTypes.Document);
             var relateContentType = new RelationType("Relate ContentType on Copy", "relateContentTypeOnCopy", true, Constants.ObjectTypes.DocumentType, Constants.ObjectTypes.DocumentType);
             var relateContentMedia = new RelationType("Relate Content to Media", "relateContentToMedia", true, Constants.ObjectTypes.Document, Constants.ObjectTypes.Media);
 
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            var provider = ScopeProvider;
+            using (var scope = provider.CreateScope())
             {
-                var repository = new RelationTypeRepository((IScopeAccessor) provider, AppCaches.Disabled, Mock.Of<ILogger>());
+                var repository = new RelationTypeRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger);
 
                 repository.Save(relateContent);//Id 2
                 repository.Save(relateContentType);//Id 3

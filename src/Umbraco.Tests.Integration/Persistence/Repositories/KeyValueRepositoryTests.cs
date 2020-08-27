@@ -4,19 +4,19 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Scoping;
-using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;
 
-namespace Umbraco.Tests.Persistence.Repositories
+namespace Umbraco.Tests.Integration.Persistence.Repositories
 {
     [TestFixture]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-    public class KeyValueRepositoryTests : TestWithDatabaseBase
+    public class KeyValueRepositoryTests : UmbracoIntegrationTest
     {
         [Test]
         public void CanSetAndGet()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = ScopeProvider;
 
             // Insert new key/value
             using (var scope = provider.CreateScope())

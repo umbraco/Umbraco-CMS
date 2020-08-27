@@ -4,43 +4,42 @@ using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Tests.TestHelpers;
-using Umbraco.Tests.Testing;
-using Umbraco.Core;
-using Umbraco.Core.Composing;
+using Umbraco.Core.Services;
 using Umbraco.Tests.Common.Builders;
+using Umbraco.Tests.Integration.Testing;
+using Umbraco.Tests.Testing;
 
-namespace Umbraco.Tests.Persistence.Repositories
+namespace Umbraco.Tests.Integration.Persistence.Repositories
 {
     [TestFixture]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-    public class DictionaryRepositoryTest : TestWithDatabaseBase
+    public class DictionaryRepositoryTest : UmbracoIntegrationTest
     {
-        public override void SetUp()
+        [SetUp]
+        public void SetUp()
         {
-            base.SetUp();
-
             CreateTestData();
         }
 
         private IDictionaryRepository CreateRepository()
         {
-            return Factory.GetInstance<IDictionaryRepository>();
+            return GetRequiredService<IDictionaryRepository>();
         }
 
         [Test]
         public void Can_Perform_Get_By_Key_On_DictionaryRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
+            var localizationService = GetRequiredService<ILocalizationService>();
+            var provider = ScopeProvider;
+            using (provider.CreateScope())
             {
                 var repository = CreateRepository();
                 var dictionaryItem = (IDictionaryItem)new DictionaryItem("Testing1235")
                 {
                     Translations = new List<IDictionaryTranslation>
                     {
-                        new DictionaryTranslation(ServiceContext.LocalizationService.GetLanguageByIsoCode("en-US"), "Hello world")
+                        new DictionaryTranslation(localizationService.GetLanguageByIsoCode("en-US"), "Hello world")
                     }
                 };
 
@@ -56,22 +55,22 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(dictionaryItem.Translations.Any(x => x == null), Is.False);
                 Assert.That(dictionaryItem.Translations.First().Value, Is.EqualTo("Hello world"));
             }
-
         }
 
         [Test]
         public void Can_Perform_Get_By_UniqueId_On_DictionaryRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
+            var localizationService = GetRequiredService<ILocalizationService>();
+            var provider = ScopeProvider;
+            using (provider.CreateScope())
             {
                 var repository = CreateRepository();
                 var dictionaryItem = (IDictionaryItem)new DictionaryItem("Testing1235")
                 {
                     Translations = new List<IDictionaryTranslation>
                     {
-                        new DictionaryTranslation(ServiceContext.LocalizationService.GetLanguageByIsoCode("en-US"), "Hello world")
+                        new DictionaryTranslation(localizationService.GetLanguageByIsoCode("en-US"), "Hello world")
                     }
                 };
 
@@ -93,15 +92,16 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Get_On_DictionaryRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
+            var localizationService = GetRequiredService<ILocalizationService>();
+            var provider = ScopeProvider;
+            using (provider.CreateScope())
             {
                 var repository = CreateRepository();
                 var dictionaryItem = (IDictionaryItem)new DictionaryItem("Testing1235")
                 {
                     Translations = new List<IDictionaryTranslation>
                     {
-                        new DictionaryTranslation(ServiceContext.LocalizationService.GetLanguageByIsoCode("en-US"), "Hello world")
+                        new DictionaryTranslation(localizationService.GetLanguageByIsoCode("en-US"), "Hello world")
                     }
                 };
 
@@ -118,15 +118,14 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(dictionaryItem.Translations.Any(x => x == null), Is.False);
                 Assert.That(dictionaryItem.Translations.First().Value, Is.EqualTo("Hello world"));
             }
-
         }
 
         [Test]
         public void Can_Perform_Get_On_DictionaryRepository_When_No_Language_Assigned()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
+            var provider = ScopeProvider;
+            using (provider.CreateScope())
             {
                 var repository = CreateRepository();
                 var dictionaryItem = (IDictionaryItem) new DictionaryItem("Testing1235");
@@ -142,15 +141,14 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(dictionaryItem.ItemKey, Is.EqualTo("Testing1235"));
                 Assert.That(dictionaryItem.Translations.Any(), Is.False);
             }
-
         }
 
         [Test]
         public void Can_Perform_GetAll_On_DictionaryRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
+            var provider = ScopeProvider;
+            using (provider.CreateScope())
             {
                 var repository = CreateRepository();
 
@@ -170,8 +168,8 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetAll_With_Params_On_DictionaryRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
+            var provider = ScopeProvider;
+            using (provider.CreateScope())
             {
                 var repository = CreateRepository();
 
@@ -190,13 +188,13 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetByQuery_On_DictionaryRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
+            var provider = ScopeProvider;
+            using (provider.CreateScope())
             {
                 var repository = CreateRepository();
 
                 // Act
-                var query = scope.SqlContext.Query<IDictionaryItem>().Where(x => x.ItemKey == "Article");
+                var query = provider.SqlContext.Query<IDictionaryItem>().Where(x => x.ItemKey == "Article");
                 var result = repository.Get(query);
 
                 // Assert
@@ -210,13 +208,13 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Count_On_DictionaryRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
+            var provider = ScopeProvider;
+            using (provider.CreateScope())
             {
                 var repository = CreateRepository();
 
                 // Act
-                var query = scope.SqlContext.Query<IDictionaryItem>().Where(x => x.ItemKey.StartsWith("Read"));
+                var query = provider.SqlContext.Query<IDictionaryItem>().Where(x => x.ItemKey.StartsWith("Read"));
                 var result = repository.Count(query);
 
                 // Assert
@@ -228,19 +226,19 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Add_On_DictionaryRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
+            var provider = ScopeProvider;
+            using (provider.CreateScope())
             {
-                var languageRepository = Factory.GetInstance<ILanguageRepository>();
+                var languageRepository = GetRequiredService<ILanguageRepository>();
                 var repository = CreateRepository();
 
                 var language = languageRepository.Get(1);
 
                 var read = new DictionaryItem("Read");
                 var translations = new List<IDictionaryTranslation>
-                    {
-                        new DictionaryTranslation(language, "Read")
-                    };
+                {
+                    new DictionaryTranslation(language, "Read")
+                };
                 read.Translations = translations;
 
                 // Act
@@ -258,8 +256,8 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Update_On_DictionaryRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
+            var provider = ScopeProvider;
+            using (provider.CreateScope())
             {
                 var repository = CreateRepository();
 
@@ -284,14 +282,15 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Update_WithNewTranslation_On_DictionaryRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
+            var localizationService = GetRequiredService<ILocalizationService>();
+            var provider = ScopeProvider;
+            using (provider.CreateScope())
             {
                 var repository = CreateRepository();
 
                 var globalSettings = new GlobalSettingsBuilder().Build();
                 var languageNo = new Language(globalSettings, "nb-NO") { CultureName = "nb-NO" };
-                ServiceContext.LocalizationService.Save(languageNo);
+                localizationService.Save(languageNo);
 
                 // Act
                 var item = repository.Get(1);
@@ -314,8 +313,8 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Delete_On_DictionaryRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
+            var provider = ScopeProvider;
+            using (provider.CreateScope())
             {
                 var repository = CreateRepository();
 
@@ -334,8 +333,8 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Exists_On_DictionaryRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
+            var provider = ScopeProvider;
+            using (provider.CreateScope())
             {
                 var repository = CreateRepository();
 
@@ -352,8 +351,8 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             Dictionary<string, Guid> keyMap;
 
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
+            var provider = ScopeProvider;
+            using (provider.CreateScope())
             {
                 var repository = CreateRepository();
                 keyMap = repository.GetDictionaryItemKeyMap();
@@ -365,19 +364,14 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Console.WriteLine("{0}: {1}", kvp.Key, kvp.Value);
         }
 
-        [TearDown]
-        public override void TearDown()
-        {
-            base.TearDown();
-        }
-
         public void CreateTestData()
         {
-            var language = ServiceContext.LocalizationService.GetLanguageByIsoCode("en-US");
+            var localizationService = GetRequiredService<ILocalizationService>();
+            var language = localizationService.GetLanguageByIsoCode("en-US");
 
             var globalSettings = new GlobalSettingsBuilder().Build();
             var languageDK = new Language(globalSettings, "da-DK") { CultureName = "da-DK" };
-            ServiceContext.LocalizationService.Save(languageDK);//Id 2
+            localizationService.Save(languageDK);//Id 2
 
             var readMore = new DictionaryItem("Read More");
             var translations = new List<IDictionaryTranslation>
@@ -386,7 +380,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                                        new DictionaryTranslation(languageDK, "Læs mere")
                                    };
             readMore.Translations = translations;
-            ServiceContext.LocalizationService.Save(readMore);//Id 1
+            localizationService.Save(readMore);//Id 1
 
             var article = new DictionaryItem("Article");
             var translations2 = new List<IDictionaryTranslation>
@@ -395,7 +389,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                                        new DictionaryTranslation(languageDK, "Artikel")
                                    };
             article.Translations = translations2;
-            ServiceContext.LocalizationService.Save(article);//Id 2
+            localizationService.Save(article);//Id 2
         }
     }
 }

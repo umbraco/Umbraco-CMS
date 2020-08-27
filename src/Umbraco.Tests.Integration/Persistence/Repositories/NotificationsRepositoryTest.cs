@@ -7,22 +7,21 @@ using Umbraco.Core;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Scoping;
-using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;
 
-namespace Umbraco.Tests.Persistence.Repositories
+namespace Umbraco.Tests.Integration.Persistence.Repositories
 {
     [TestFixture]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-    public class NotificationsRepositoryTest : TestWithDatabaseBase
+    public class NotificationsRepositoryTest : UmbracoIntegrationTest
     {
         [Test]
         public void CreateNotification()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = ScopeProvider;
             using (var scope = provider.CreateScope())
             {
                 var repo = new NotificationsRepository((IScopeAccessor) provider);
@@ -56,10 +55,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void GetUserNotifications()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = ScopeProvider;
             using (var scope = provider.CreateScope())
             {
-
                 var repo = new NotificationsRepository((IScopeAccessor) provider);
 
                 var userDto = new UserDto { Email = "test", Login = "test", Password = "test", UserName = "test", UserLanguage = "en", CreateDate = DateTime.Now, UpdateDate = DateTime.Now };
@@ -85,10 +83,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void GetEntityNotifications()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = ScopeProvider;
             using (var scope = provider.CreateScope())
             {
-
                 var repo = new NotificationsRepository((IScopeAccessor) provider);
 
                 var node1 = new NodeDto { CreateDate = DateTime.Now, Level = 1, NodeObjectType = Constants.ObjectTypes.ContentItem, ParentId = -1, Path = "-1,1", SortOrder = 1, Text = "hello1", Trashed = false, UniqueId = Guid.NewGuid(), UserId = -1 };
@@ -115,10 +112,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Delete_By_Entity()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = ScopeProvider;
             using (var scope = provider.CreateScope())
             {
-
                 var repo = new NotificationsRepository((IScopeAccessor) provider);
 
                 var node1 = new NodeDto { CreateDate = DateTime.Now, Level = 1, NodeObjectType = Constants.ObjectTypes.ContentItem, ParentId = -1, Path = "-1,1", SortOrder = 1, Text = "hello1", Trashed = false, UniqueId = Guid.NewGuid(), UserId = -1 };
@@ -145,10 +141,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Delete_By_User()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = ScopeProvider;
             using (var scope = provider.CreateScope())
             {
-
                 var repo = new NotificationsRepository((IScopeAccessor) provider);
 
                 var userDto = new UserDto { Email = "test", Login = "test", Password = "test", UserName = "test", UserLanguage = "en", CreateDate = DateTime.Now, UpdateDate = DateTime.Now };

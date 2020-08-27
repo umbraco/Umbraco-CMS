@@ -6,17 +6,16 @@ using System.Text;
 using System.Threading;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
-using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
+using Umbraco.Tests.Common.Builders;
+using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.Actions;
-using Umbraco.Tests.Common.Builders;
+using MockedUser = Umbraco.Tests.TestHelpers.Entities.MockedUser;
 
 namespace Umbraco.Tests.Services
 {

@@ -4,20 +4,19 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Scoping;
-using Umbraco.Tests.TestHelpers;
+using Umbraco.Core.Services;
+using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
 
-namespace Umbraco.Tests.Persistence.Repositories
+namespace Umbraco.Tests.Integration.Persistence.Repositories
 {
     [TestFixture]
     [UmbracoTest(Mapper = true, Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-    public class EntityRepositoryTest : TestWithDatabaseBase
+    public class EntityRepositoryTest : UmbracoIntegrationTest
     {
-
         private EntityRepository CreateRepository(IScopeAccessor scopeAccessor)
         {
             var entityRepository = new EntityRepository(scopeAccessor);
@@ -29,36 +28,44 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             //Create content
 
+            var contentService = GetRequiredService<IContentService>();
+            var contentTypeService = GetRequiredService<IContentTypeService>();
             var createdContent = new List<IContent>();
             var contentType = MockedContentTypes.CreateBasicContentType("blah");
-            ServiceContext.ContentTypeService.Save(contentType);            
-            for (int i = 0; i < 10; i++)
+            contentTypeService.Save(contentType);
+            for (var i = 0; i < 10; i++)
             {
                 var c1 = MockedContent.CreateBasicContent(contentType);
-                ServiceContext.ContentService.Save(c1);
+                contentService.Save(c1);
                 createdContent.Add(c1);
             }
 
             //Create media
-
+            
+            var mediaService = GetRequiredService<IMediaService>();
+            var mediaTypeService = GetRequiredService<IMediaTypeService>();
             var createdMedia = new List<IMedia>();
             var imageType = MockedContentTypes.CreateImageMediaType("myImage");
-            ServiceContext.MediaTypeService.Save(imageType);
-            for (int i = 0; i < 10; i++)
+            mediaTypeService.Save(imageType);
+            for (var i = 0; i < 10; i++)
             {
                 var c1 = MockedMedia.CreateMediaImage(imageType, -1);
-                ServiceContext.MediaService.Save(c1);
+                mediaService.Save(c1);
                 createdMedia.Add(c1);
             }
 
             // Create members
-            var memberType = MockedContentTypes.CreateSimpleMemberType("simple");
-            ServiceContext.MemberTypeService.Save(memberType);
-            var createdMembers = MockedMember.CreateSimpleMember(memberType, 10).ToList();
-            ServiceContext.MemberService.Save(createdMembers);
 
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
+            var memberService = GetRequiredService<IMemberService>();
+            var memberTypeService = GetRequiredService<IMemberTypeService>();
+            var memberType = MockedContentTypes.CreateSimpleMemberType("simple");
+            memberTypeService.Save(memberType);
+            var createdMembers = MockedMember.CreateSimpleMember(memberType, 10).ToList();
+            memberService.Save(createdMembers);
+
+            
+            var provider = ScopeProvider;
+            using (provider.CreateScope())
             {
                 var repo = CreateRepository((IScopeAccessor)provider);
 
@@ -66,7 +73,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var objectTypes = new[] { Constants.ObjectTypes.Document, Constants.ObjectTypes.Media, Constants.ObjectTypes.Member };
 
-                var query = SqlContext.Query<IUmbracoEntity>()
+                var query = provider.SqlContext.Query<IUmbracoEntity>()
                     .WhereIn(e => e.Id, ids);
 
                 var entities = repo.GetPagedResultsByQuery(query, objectTypes, 0, 20, out var totalRecords, null, null).ToList();
@@ -88,8 +95,6 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.AreEqual(10, mediaEntities.Count);
                 Assert.AreEqual(10, memberEntities.Count);
             }
-            
         }
-
     }
 }

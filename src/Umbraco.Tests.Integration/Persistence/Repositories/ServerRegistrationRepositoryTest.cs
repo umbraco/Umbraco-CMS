@@ -1,27 +1,25 @@
 ﻿using System;
-using System.Data.SqlServerCe;
+using System.Data.SqlClient;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Scoping;
-using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;
 
-namespace Umbraco.Tests.Persistence.Repositories
+namespace Umbraco.Tests.Integration.Persistence.Repositories
 {
     [TestFixture]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-    public class ServerRegistrationRepositoryTest : TestWithDatabaseBase
+    public class ServerRegistrationRepositoryTest : UmbracoIntegrationTest
     {
         private AppCaches _appCaches;
 
-        public override void SetUp()
+        [SetUp]
+        public void SetUp()
         {
-            base.SetUp();
-
             _appCaches = AppCaches.Disabled;
             CreateTestData();
         }
@@ -35,41 +33,39 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Cannot_Add_Duplicate_Server_Identities()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            var provider = ScopeProvider;
+            using (provider.CreateScope())
             {
                 var repository = CreateRepository(provider);
 
                 var server = new ServerRegistration("http://shazwazza.com", "COMPUTER1", DateTime.Now);
 
-                Assert.Throws<SqlCeException>(() => repository.Save(server));
+                Assert.Throws<SqlException>(() => repository.Save(server));
             }
-
         }
 
         [Test]
         public void Cannot_Update_To_Duplicate_Server_Identities()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            var provider = ScopeProvider;
+            using (provider.CreateScope())
             {
                 var repository = CreateRepository(provider);
 
                 var server = repository.Get(1);
                 server.ServerIdentity = "COMPUTER2";
                 
-                Assert.Throws<SqlCeException>(() => repository.Save(server));
+                Assert.Throws<SqlException>(() => repository.Save(server));
             }
-
         }
 
         [Test]
         public void Can_Instantiate_Repository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            var provider = ScopeProvider;
+            using (provider.CreateScope())
             {
                 var repository = CreateRepository(provider);
 
@@ -82,8 +78,8 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Get_On_Repository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            var provider = ScopeProvider;
+            using (provider.CreateScope())
             {
                 var repository = CreateRepository(provider);
 
@@ -95,16 +91,14 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(server.HasIdentity, Is.True);
                 Assert.That(server.ServerAddress, Is.EqualTo("http://localhost"));
             }
-
-
         }
 
         [Test]
         public void Can_Perform_GetAll_On_Repository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            var provider = ScopeProvider;
+            using (provider.CreateScope())
             {
                 var repository = CreateRepository(provider);
 
@@ -114,7 +108,6 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Assert
                 Assert.That(servers.Count(), Is.EqualTo(3));
             }
-
         }
 
         // queries are not supported due to in-memory caching
@@ -123,7 +116,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         //public void Can_Perform_GetByQuery_On_Repository()
         //{
         //    // Arrange
-        //    var provider = TestObjects.GetScopeProvider(Logger);
+        //    var provider = ScopeProvider;
         //    using (var unitOfWork = provider.GetUnitOfWork())
         //    using (var repository = CreateRepository(provider))
         //    {
@@ -140,7 +133,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         //public void Can_Perform_Count_On_Repository()
         //{
         //    // Arrange
-        //    var provider = TestObjects.GetScopeProvider(Logger);
+        //    var provider = ScopeProvider;
         //    using (var unitOfWork = provider.GetUnitOfWork())
         //    using (var repository = CreateRepository(provider))
         //    {
@@ -157,8 +150,8 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Add_On_Repository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            var provider = ScopeProvider;
+            using (provider.CreateScope())
             {
                 var repository = CreateRepository(provider);
 
@@ -176,8 +169,8 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Update_On_Repository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            var provider = ScopeProvider;
+            using (provider.CreateScope())
             {
                 var repository = CreateRepository(provider);
 
@@ -201,8 +194,8 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Delete_On_Repository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            var provider = ScopeProvider;
+            using (provider.CreateScope())
             {
                 var repository = CreateRepository(provider);
 
@@ -222,8 +215,8 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Exists_On_Repository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            var provider = ScopeProvider;
+            using (provider.CreateScope())
             {
                 var repository = CreateRepository(provider);
 
@@ -237,16 +230,10 @@ namespace Umbraco.Tests.Persistence.Repositories
             }
         }
 
-        [TearDown]
-        public override void TearDown()
-        {
-            base.TearDown();
-        }
-
         public void CreateTestData()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            var provider = ScopeProvider;
+            using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository(provider);
 
@@ -255,7 +242,6 @@ namespace Umbraco.Tests.Persistence.Repositories
                 repository.Save(new ServerRegistration("https://www.another.domain.com", "Computer3", DateTime.Now));
                 scope.Complete();
             }
-
         }
     }
 }
