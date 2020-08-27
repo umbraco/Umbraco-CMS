@@ -28,6 +28,7 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Extensions;
 using Umbraco.Web.BackOffice.Filters;
+using Umbraco.Web.BackOffice.ModelBinders;
 using Umbraco.Web.BackOffice.Security;
 using Umbraco.Web.Common.ActionResults;
 using Umbraco.Web.Common.Attributes;
@@ -232,6 +233,33 @@ namespace Umbraco.Web.BackOffice.Controllers
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
             var result = _umbracoMapper.Map<IUser, UserDisplay>(user);
+            return result;
+        }
+
+        /// <summary>
+        /// Get users by integer ids
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(OutgoingEditorModelEventAttribute))]
+        [AdminUsersAuthorize]
+        public IEnumerable<UserDisplay> GetByIds([FromJsonPath]int[] ids)
+        {
+            if (ids == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            if (ids.Length == 0)
+                return Enumerable.Empty<UserDisplay>();
+
+            var users = _userService.GetUsersById(ids);
+            if (users == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            var result = _umbracoMapper.MapEnumerable<IUser, UserDisplay>(users);
             return result;
         }
 

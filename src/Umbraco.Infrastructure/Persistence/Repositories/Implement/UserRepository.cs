@@ -557,9 +557,9 @@ ORDER BY colName";
             {
                 userDto.EmailConfirmedDate = null;
                 userDto.SecurityStampToken = entity.SecurityStamp = Guid.NewGuid().ToString();
-                
+
                 changedCols.Add("emailConfirmedDate");
-                changedCols.Add("securityStampToken");  
+                changedCols.Add("securityStampToken");
             }
 
             //only update the changed cols
@@ -703,7 +703,13 @@ ORDER BY colName";
             else
                 sql.WhereNotIn<UserDto>(x => x.Id, inSql);
 
-            return ConvertFromDtos(Database.Fetch<UserDto>(sql));
+
+            var dtos = Database.Fetch<UserDto>(sql);
+
+            //adds missing bits like content and media start nodes
+            PerformGetReferencedDtos(dtos);
+
+            return ConvertFromDtos(dtos);
         }
 
         /// <summary>

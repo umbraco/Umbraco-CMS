@@ -8,8 +8,8 @@ namespace Umbraco.Web.PropertyEditors
 {
     [DataEditor(
         Constants.PropertyEditors.Aliases.UserPicker,
-        "User picker",
-        "entitypicker",
+        "User Picker",
+        "userpicker",
         ValueType = ValueTypes.Integer,
         Group = Constants.PropertyEditors.Groups.People,
         Icon = Constants.Icons.User)]

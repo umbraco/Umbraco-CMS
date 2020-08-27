@@ -41,15 +41,20 @@ namespace Umbraco.Core
             public const string ConfigurationStatus = "Umbraco.Core.ConfigurationStatus";
 
             /// <summary>
-            /// Gets the path to umbraco's root directory (/umbraco by default).
+            /// The path to umbraco's root directory (/umbraco by default).
             /// </summary>
             public const string UmbracoPath = "Umbraco.Core.Path";
+
+            /// <summary>
+            /// Gets the path to umbraco's icons directory (/umbraco/assets/icons by default).
+            /// </summary>
+            public const string IconsPath = "Umbraco.Icons.Path";
 
             /// <summary>
             /// The reserved urls from web.config.
             /// </summary>
             public const string ReservedUrls = "Umbraco.Core.ReservedUrls";
-            
+
             /// <summary>
             /// The path of the stylesheet folder.
             /// </summary>

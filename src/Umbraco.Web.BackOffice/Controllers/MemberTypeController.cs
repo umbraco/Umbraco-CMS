@@ -64,7 +64,13 @@ namespace Umbraco.Web.Editors
                 localizedTextService ?? throw new ArgumentNullException(nameof(localizedTextService));
         }
 
+        /// <summary>
+        /// Gets the member type a given id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [UmbracoTreeAuthorize(Constants.Trees.MemberTypes)]
+        [DetermineAmbiguousActionByPassingParameters]
         public MemberTypeDisplay GetById(int id)
         {
             var ct = _memberTypeService.Get(id);
@@ -78,7 +84,49 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Deletes a document type with a given ID
+        /// Gets the member type a given guid
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [UmbracoTreeAuthorize(Constants.Trees.MemberTypes)]
+        [DetermineAmbiguousActionByPassingParameters]
+        public MemberTypeDisplay GetById(Guid id)
+        {
+            var memberType = _memberTypeService.Get(id);
+            if (memberType == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            var dto = _umbracoMapper.Map<IMemberType, MemberTypeDisplay>(memberType);
+            return dto;
+        }
+
+        /// <summary>
+        /// Gets the member type a given udi
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [UmbracoTreeAuthorize(Constants.Trees.MemberTypes)]
+        [DetermineAmbiguousActionByPassingParameters]
+        public MemberTypeDisplay GetById(Udi id)
+        {
+            var guidUdi = id as GuidUdi;
+            if (guidUdi == null)
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            var memberType = _memberTypeService.Get(guidUdi.Guid);
+            if (memberType == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            var dto = _umbracoMapper.Map<IMemberType, MemberTypeDisplay>(memberType);
+            return dto;
+        }
+
+        /// <summary>
+        /// Deletes a document type with a given id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>

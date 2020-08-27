@@ -199,5 +199,9 @@ namespace Umbraco.Tests.Common.Builders
                 NoNodesViewPath = noNodesViewPath,
             };
         }
+            private string _iconsPath;
+
+            public string IconsPath{ get; set; }
+
     }
 }

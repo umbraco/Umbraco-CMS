@@ -98,6 +98,13 @@ namespace Umbraco.Web.BackOffice.Controllers
             };
         }
 
+        public IEnumerable<AuditLog> GetLog(AuditType logType, DateTime? sinceDate = null)
+        {
+            var result = _auditService.GetLogs(Enum<AuditType>.Parse(logType.ToString()), sinceDate);
+            var mapped = _umbracoMapper.MapEnumerable<IAuditItem, AuditLog>(result);
+            return mapped;
+        }
+
         private IEnumerable<AuditLog> MapAvatarsAndNames(IEnumerable<AuditLog> items)
         {
             var mappedItems = items.ToList();

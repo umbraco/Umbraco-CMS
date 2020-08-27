@@ -2,7 +2,7 @@
     <ng-form data-element="editor-icon" name="iconForm">
         <div class="umb-panel-header-icon" ng-if="!hideIcon" ng-click="openIconPicker()" ng-class="{'-placeholder': model.value==='' || model.value===null}"
              title="{{model.value}}">
-            <i class="icon {{model.value}}" ng-if="model.value!=='' && model.value!==null"></i>
+            <i class="icon {{model.value}}" aria-hidden="true" ng-if="model.value!=='' && model.value!==null"></i>
             <div class="umb-panel-header-icon-text" ng-if="model.value==='' || model.value===null">
                 <localize key="settings_addIcon"></localize>
             </div>

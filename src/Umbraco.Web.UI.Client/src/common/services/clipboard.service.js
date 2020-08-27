@@ -11,13 +11,13 @@
  *
  */
 function clipboardService(notificationsService, eventsService, localStorageService, iconHelper) {
-    
+
 
     var clearPropertyResolvers = [];
 
-    
+
     var STORAGE_KEY = "umbClipboardService";
-    
+
     var retriveStorage = function() {
         if (localStorageService.isSupported === false) {
             return null;
@@ -27,32 +27,32 @@ function clipboardService(notificationsService, eventsService, localStorageServi
         if (dataString != null) {
             dataJSON = JSON.parse(dataString);
         }
-        
+
         if(dataJSON == null) {
             dataJSON = new Object();
         }
-        
+
         if(dataJSON.entries === undefined) {
             dataJSON.entries = [];
         }
-        
+
         return dataJSON;
     }
-    
+
     var saveStorage = function(storage) {
         var storageString = JSON.stringify(storage);
-        
+
         try {
             var storageJSON = JSON.parse(storageString);
             localStorageService.set(STORAGE_KEY, storageString);
-            
+
             eventsService.emit("clipboardService.storageUpdate");
-            
+
             return true;
         } catch(e) {
             return false;
         }
-        
+
         return false;
     }
 
@@ -86,17 +86,17 @@ function clipboardService(notificationsService, eventsService, localStorageServi
 
     var isEntryCompatible = function(entry, type, allowedAliases) {
         return entry.type === type
-        && 
+        &&
         (
             (entry.alias && allowedAliases.filter(allowedAlias => allowedAlias === entry.alias).length > 0)
-            || 
+            ||
             (entry.aliases && entry.aliases.filter(entryAlias => allowedAliases.filter(allowedAlias => allowedAlias === entryAlias).length > 0).length === entry.aliases.length)
         );
     }
-    
-    
+
+
     var service = {};
-    
+
 
     /**
     * @ngdoc method
@@ -160,29 +160,29 @@ function clipboardService(notificationsService, eventsService, localStorageServi
     * Saves a single JS-object with a type and alias to the clipboard.
     */
     service.copy = function(type, alias, data, displayLabel, displayIcon, uniqueKey, firstLevelClearupMethod) {
-        
+
         var storage = retriveStorage();
 
         displayLabel = displayLabel || data.name;
         displayIcon = displayIcon || iconHelper.convertFromLegacyIcon(data.icon);
         uniqueKey = uniqueKey || data.key || console.error("missing unique key for this content");
-        
+
         // remove previous copies of this entry:
         storage.entries = storage.entries.filter(
             (entry) => {
                 return entry.unique !== uniqueKey;
             }
         );
-        
-        var entry = {unique:uniqueKey, type:type, alias:alias, data:prepareEntryForStorage(data, firstLevelClearupMethod), label:displayLabel, icon:displayIcon};
+
+        var entry = {unique:uniqueKey, type:type, alias:alias, data:prepareEntryForStorage(data, firstLevelClearupMethod), label:displayLabel, icon:displayIcon, date:Date.now()};
         storage.entries.push(entry);
-        
+
         if (saveStorage(storage) === true) {
             notificationsService.success("Clipboard", "Copied to clipboard.");
         } else {
             notificationsService.error("Clipboard", "Couldnt copy this data to clipboard.");
         }
-        
+
     };
 
 
@@ -203,32 +203,31 @@ function clipboardService(notificationsService, eventsService, localStorageServi
     * Saves a single JS-object with a type and alias to the clipboard.
     */
     service.copyArray = function(type, aliases, datas, displayLabel, displayIcon, uniqueKey, firstLevelClearupMethod) {
-        
+
         var storage = retriveStorage();
-        
+
         // Clean up each entry
         var copiedDatas = datas.map(data => prepareEntryForStorage(data, firstLevelClearupMethod));
-        
+
         // remove previous copies of this entry:
         storage.entries = storage.entries.filter(
             (entry) => {
                 return entry.unique !== uniqueKey;
             }
         );
-        
-        var entry = {unique:uniqueKey, type:type, aliases:aliases, data:copiedDatas, label:displayLabel, icon:displayIcon};
 
+        var entry = {unique:uniqueKey, type:type, aliases:aliases, data:copiedDatas, label:displayLabel, icon:displayIcon, date:Date.now()};
         storage.entries.push(entry);
-        
+
         if (saveStorage(storage) === true) {
             notificationsService.success("Clipboard", "Copied to clipboard.");
         } else {
             notificationsService.error("Clipboard", "Couldnt copy this data to clipboard.");
         }
-        
+
     };
-    
-    
+
+
     /**
     * @ngdoc method
     * @name umbraco.services.supportsCopy#supported
@@ -240,7 +239,7 @@ function clipboardService(notificationsService, eventsService, localStorageServi
     service.isSupported = function() {
         return localStorageService.isSupported;
     };
-    
+
     /**
     * @ngdoc method
     * @name umbraco.services.supportsCopy#hasEntriesOfType
@@ -253,14 +252,14 @@ function clipboardService(notificationsService, eventsService, localStorageServi
     * Determines whether the current clipboard has entries that match a given type and one of the aliases.
     */
     service.hasEntriesOfType = function(type, aliases) {
-        
+
         if(service.retriveEntriesOfType(type, aliases).length > 0) {
             return true;
         }
-        
+
         return false;
     };
-    
+
     /**
     * @ngdoc method
     * @name umbraco.services.supportsCopy#retriveEntriesOfType
@@ -268,24 +267,24 @@ function clipboardService(notificationsService, eventsService, localStorageServi
     *
     * @param {string} type A string defining the type of data to recive.
     * @param {string} aliases A array of strings providing the alias of the data you want to recive.
-    * 
+    *
     * @description
     * Returns an array of entries matching the given type and one of the provided aliases.
     */
     service.retriveEntriesOfType = function(type, allowedAliases) {
-        
+
         var storage = retriveStorage();
-        
+
         // Find entries that are fulfilling the criteria for this nodeType and nodeTypesAliases.
         var filteretEntries = storage.entries.filter(
             (entry) => {
                 return isEntryCompatible(entry, type, allowedAliases);
             }
         );
-        
+
         return filteretEntries;
     };
-    
+
     /**
     * @ngdoc method
     * @name umbraco.services.supportsCopy#retriveEntriesOfType
@@ -293,14 +292,14 @@ function clipboardService(notificationsService, eventsService, localStorageServi
     *
     * @param {string} type A string defining the type of data to recive.
     * @param {string} aliases A array of strings providing the alias of the data you want to recive.
-    * 
+    *
     * @description
     * Returns an array of data of entries matching the given type and one of the provided aliases.
     */
     service.retriveDataOfType = function(type, aliases) {
         return service.retriveEntriesOfType(type, aliases).map((x) => x.data);
     };
-    
+
     /**
     * @ngdoc method
     * @name umbraco.services.supportsCopy#retriveEntriesOfType
@@ -308,12 +307,12 @@ function clipboardService(notificationsService, eventsService, localStorageServi
     *
     * @param {string} type A string defining the type of data to remove.
     * @param {string} aliases A array of strings providing the alias of the data you want to remove.
-    * 
+    *
     * @description
     * Removes entries matching the given type and one of the provided aliases.
     */
     service.clearEntriesOfType = function(type, allowedAliases) {
-        
+
         var storage = retriveStorage();
 
         // Find entries that are NOT fulfilling the criteria for this nodeType and nodeTypesAliases.
@@ -322,14 +321,14 @@ function clipboardService(notificationsService, eventsService, localStorageServi
                 return !isEntryCompatible(entry, type, allowedAliases);
             }
         );
-        
+
         storage.entries = filteretEntries;
 
         saveStorage(storage);
     };
-    
-    
-    
+
+
+
     return service;
 }
 

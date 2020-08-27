@@ -156,11 +156,11 @@
 @ui-active-type-hover:  @blueMid;
 
 @ui-selected:           @sand-5;
-@ui-selected-hover:     ligthen(@sand-5, 10);
+@ui-selected-hover:     ligthen(@sand-5, 10%);
 @ui-selected-type:           @blueExtraDark;
 @ui-selected-type-hover:     @blueMid;
 @ui-selected-border:           @blueDark;
-@ui-selected-border-hover:     darken(@blueDark, 10);
+@ui-selected-border-hover:     darken(@blueDark, 10%);
 
 @ui-light-border:           @pinkLight;
 @ui-light-type:             @gray-4;
@@ -518,7 +518,7 @@
 // -------------------------
 @gridColumns:             12;
 @gridColumnWidth:         60px;
-@gridGutterWidth:         0px;
+@gridGutterWidth:         0;
 @gridRowWidth:            (@gridColumns * @gridColumnWidth) + (@gridGutterWidth * (@gridColumns - 1));
 
 // 1200px min
