@@ -288,7 +288,7 @@
                     view: "views/users/views/overlays/remove.html",
                     username: selection[index].username,
                     userGroupName: vm.userGroup.name.toLowerCase(),
-                    submitButtonLabelKey: "contentTypeEditor_yesDelete",
+                    submitButtonLabelKey: "defaultdialogs_yesRemove",
                     submitButtonStyle: "danger",
 
                     submit: function () {
