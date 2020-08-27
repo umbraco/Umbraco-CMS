@@ -14,8 +14,10 @@ using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
+using Umbraco.Tests.Common.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.Actions;
+using MockedUser = Umbraco.Tests.TestHelpers.Entities.MockedUser;
 
 
 namespace Umbraco.Tests.Services

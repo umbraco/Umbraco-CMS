@@ -1,9 +1,8 @@
 ﻿using System.Linq;
 using NUnit.Framework;
-using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
 
-namespace Umbraco.Tests.Persistence.Repositories
+namespace Umbraco.Tests.Integration.Persistence.Repositories
 {
     [TestFixture]
     public class SimilarNodeNameTests
@@ -35,8 +34,6 @@ namespace Umbraco.Tests.Persistence.Repositories
             else if (expected > 0)
                 Assert.IsTrue(result > 0, "Expected >0 but was " + result);
         }
-
-        
 
         [Test]
         public void OrderByTest()
