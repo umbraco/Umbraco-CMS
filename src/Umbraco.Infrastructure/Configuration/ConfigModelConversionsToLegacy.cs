@@ -43,6 +43,7 @@ namespace Umbraco.Infrastructure.Configuration
                 UmbracoMediaPath = globalSettings.UmbracoMediaPath,
                 UmbracoPath = globalSettings.Path,
                 UmbracoScriptsPath = globalSettings.UmbracoScriptsPath,
+                IconsPath = globalSettings.IconsPath,
                 UseHttps = globalSettings.UseHttps,
                 VersionCheckPeriod = globalSettings.VersionCheckPeriod,
             };
@@ -109,6 +110,10 @@ namespace Umbraco.Infrastructure.Configuration
             public string MainDomLock { get; set; }
 
             public string NoNodesViewPath { get; set; }
+
+            public string IconsPath { get; set; }
+
+            public string ConfigurationStatus { get; set; }
         }
 
         private class TestSmtpSettings : ISmtpSettings

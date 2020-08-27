@@ -32,6 +32,8 @@
 
         public string Path { get; set; } = "~/umbraco";
 
+        public string IconsPath { get; set; } = $"~/umbraco/assets/icons";
+
         public string UmbracoCssPath { get; set; } = "~/css";
 
         public string UmbracoScriptsPath { get; set; } = "~/scripts";

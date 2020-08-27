@@ -43,6 +43,7 @@ namespace Umbraco.Infrastructure.Configuration
                 UmbracoMediaPath = globalSettings.UmbracoMediaPath,
                 Path = globalSettings.UmbracoPath,
                 UmbracoScriptsPath = globalSettings.UmbracoScriptsPath,
+                IconsPath = globalSettings.IconsPath,
                 UseHttps = globalSettings.UseHttps,
                 VersionCheckPeriod = globalSettings.VersionCheckPeriod,
             };
