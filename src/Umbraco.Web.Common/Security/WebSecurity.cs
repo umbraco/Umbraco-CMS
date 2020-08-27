@@ -6,6 +6,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
+using Umbraco.Core.Security;
 using Umbraco.Extensions;
 using Umbraco.Web.Security;
 using Umbraco.Core.Models;
@@ -110,6 +111,10 @@ namespace Umbraco.Web.Common.Security
                 if (throwExceptions) throw new ArgumentException("You have no privileges to the umbraco console. Please contact your administrator");
                 return ValidateRequestAttempt.FailedNoPrivileges;
             }
+
+            var identity = _httpContextAccessor.GetRequiredHttpContext().GetCurrentIdentity();
+            identity.EnsureCulture();
+
             return ValidateRequestAttempt.Success;
         }
 
