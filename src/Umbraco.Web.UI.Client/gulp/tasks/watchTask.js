@@ -4,6 +4,7 @@ const config = require('../config');
 const {watch, series, parallel, dest, src} = require('gulp');
 
 var _ = require('lodash');
+var rename = require('gulp-rename');
 var MergeStream = require('merge-stream');
 
 var processJs = require('../util/processJs');
@@ -12,9 +13,9 @@ var processLess = require('../util/processLess');
 var {js} = require('./js');
 
 function watchTask(cb) {
-    
+
     var watchInterval = 500;
-    
+
     //Setup a watcher for all groups of JS files
     _.forEach(config.sources.js, function (group) {
         if(group.watch !== false) {
@@ -36,11 +37,17 @@ function watchTask(cb) {
             viewWatcher = watch(group.files, { ignoreInitial: true, interval: watchInterval },
                 parallel(
                     function MoveViewsAndRegenerateJS() {
-                        var task = src(group.files);
+                        var task = src(group.files)
+                                 .pipe(rename(function(path) {
+                                        path.dirname = path.dirname.toLowerCase();
+                                        path.basename = path.basename.toLowerCase();
+                                        path.extname = path.extname.toLowerCase();
+                                     }));
 
                         _.forEach(config.roots, function(root){
-                            console.log("copying " + group.files + " to " + root + config.targets.views + group.folder);
-                            task = task.pipe( dest(root + config.targets.views + group.folder) );
+                            var destPath = root + config.targets.views + group.folder;
+                            console.log("copying " + group.files + " to " + destPath);
+                            task = task.pipe( dest(destPath) );
                         });
                     },
                     js

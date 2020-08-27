@@ -27,7 +27,7 @@
                 }
             }
         }
-        
+
         clipboardService.registrerClearPropertyResolver(clearNestedContentPropertiesForStorage)
 
 
@@ -49,7 +49,7 @@
                 }
             }
         }
-        
+
         clipboardService.registrerClearPropertyResolver(clearInnerNestedContentPropertiesForStorage)
     }]);
 
@@ -187,7 +187,7 @@
         };
 
         vm.openNodeTypePicker = function ($event) {
-            
+
             if (vm.nodes.length >= vm.maxItems) {
                 return;
             }
@@ -243,6 +243,7 @@
             _.each(singleEntriesForPaste, function (entry) {
                 dialog.pasteItems.push({
                     type: "elementType",
+                    date: entry.date,
                     name: entry.label,
                     data: entry.data,
                     icon: entry.icon
@@ -253,6 +254,7 @@
             _.each(arrayEntriesForPaste, function (entry) {
                 dialog.pasteItems.push({
                     type: "elementTypeArray",
+                    date: entry.date,
                     name: entry.label,
                     data: entry.data,
                     icon: entry.icon

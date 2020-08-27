@@ -320,7 +320,7 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
             appState.setGlobalState("showTray", false);
         },
 
-        /**     
+        /**
          * @ngdoc method
          * @name umbraco.services.navigationService#syncTree
          * @methodOf umbraco.services.navigationService
@@ -353,14 +353,14 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
             });
         },
 
-        /**     
+        /**
          * @ngdoc method
          * @name umbraco.services.navigationService#hasTree
          * @methodOf umbraco.services.navigationService
          *
          * @description
          * Checks if a tree with the given alias exists.
-         * 
+         *
          * @param {String} treeAlias the tree alias to check
          */
         hasTree: function (treeAlias) {
@@ -629,12 +629,12 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
         getTreeTemplateUrl: function (treeAlias, action) {
             var packageTreeFolder = treeService.getTreePackageFolder(treeAlias);
             if (packageTreeFolder) {
-                return Umbraco.Sys.ServerVariables.umbracoSettings.appPluginsPath +
+                return (Umbraco.Sys.ServerVariables.umbracoSettings.appPluginsPath +
                     "/" + packageTreeFolder +
-                    "/backoffice/" + treeAlias + "/" + action + ".html";
+                    "/backoffice/" + treeAlias + "/" + action + ".html").toLowerCase();
             }
             else {
-                return "views/" + treeAlias + "/" + action + ".html";
+                return ("views/" + treeAlias + "/" + action + ".html").toLowerCase();;
             }
         },
 

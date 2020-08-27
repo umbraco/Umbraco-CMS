@@ -1,4 +1,5 @@
-﻿using Umbraco.Core;
+﻿using System.Runtime.InteropServices;
+using Umbraco.Core;
 using Umbraco.Core.Composing;
 
 namespace Umbraco.Examine
@@ -10,6 +11,10 @@ namespace Umbraco.Examine
     {
         public override void Compose(Composition composition)
         {
+            var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+            if(!isWindows) return;
+
+
             base.Compose(composition);
 
             composition.RegisterUnique<IBackOfficeExamineSearcher, BackOfficeExamineSearcher>();
