@@ -186,37 +186,37 @@
 
                                                 <umb-dropdown ng-if="log.searchDropdownOpen" on-close="log.searchDropdownOpen = false">
                                                     <umb-dropdown-item>
-                                                        <a ng-href="https://www.google.com/search?q={{ log.RenderedMessage }}" href="" target="_blank" rel="noreferrer" localize="title" title="@logViewer_searchThisMessageWithGoogle">
+                                                        <a ng-href="https://www.google.com/search?q={{ log.RenderedMessage }}" target="_blank" rel="noreferrer" localize="title" title="@logViewer_searchThisMessageWithGoogle">
                                                             <img src="https://www.google.com/favicon.ico" width="16" height="16" alt="" /> <localize key="logViewer_searchWithGoogle">Search With Google</localize>
                                                         </a>
                                                     </umb-dropdown-item>
 
                                                     <umb-dropdown-item>
-                                                        <a ng-href="https://www.bing.com/search?q={{ log.RenderedMessage }}" href="" target="_blank" rel="noreferrer" localize="title" title="@logViewer_searchThisMessageWithBing">
+                                                        <a ng-href="https://www.bing.com/search?q={{ log.RenderedMessage }}" target="_blank" rel="noreferrer" localize="title" title="@logViewer_searchThisMessageWithBing">
                                                             <img src="https://www.bing.com/favicon.ico" width="16" height="16" alt="" /> <localize key="logViewer_searchWithBing">Search With Bing</localize>
                                                         </a>
                                                     </umb-dropdown-item>
 
                                                     <umb-dropdown-item>
-                                                        <a ng-href="https://our.umbraco.com/search?q={{ log.RenderedMessage }}&content=wiki,forum,documentation" href="" target="_blank" rel="noreferrer" localize="title" title="@logViewer_searchThisMessageOnOurUmbracoForumsAndDocs">
+                                                        <a ng-href="https://our.umbraco.com/search?q={{ log.RenderedMessage }}&content=wiki,forum,documentation" target="_blank" rel="noreferrer" localize="title" title="@logViewer_searchThisMessageOnOurUmbracoForumsAndDocs">
                                                             <img src="https://our.umbraco.com/assets/images/app-icons/favicon.png" width="16" height="16" alt="" /> <localize key="logViewer_searchOurUmbraco">Search Our Umbraco</localize>
                                                         </a>
                                                     </umb-dropdown-item>
 
                                                     <umb-dropdown-item>
-                                                        <a ng-href="https://www.google.com/?q=site:our.umbraco.com {{ log.RenderedMessage }}&safe=off#q=site:our.umbraco.com {{ log.RenderedMessage }} {{ log.Properties['SourceContext'].Value }}&safe=off" href="" target="_blank" rel="noreferrer" localize="title" title="@logViewer_searchOurUmbracoForumsUsingGoogle">
+                                                        <a ng-href="https://www.google.com/?q=site:our.umbraco.com {{ log.RenderedMessage }}&safe=off#q=site:our.umbraco.com {{ log.RenderedMessage }} {{ log.Properties['SourceContext'].Value }}&safe=off" target="_blank" rel="noreferrer" localize="title" title="@logViewer_searchOurUmbracoForumsUsingGoogle">
                                                             <img src="https://www.google.com/favicon.ico" width="16" height="16" alt="" /> <localize key="logViewer_searchOurUmbracoWithGoogle">Search Our Umbraco with Google</localize>
                                                         </a>
                                                     </umb-dropdown-item>
 
                                                     <umb-dropdown-item>
-                                                        <a ng-href="https://github.com/umbraco/Umbraco-CMS/search?q={{ log.Properties['SourceContext'].Value }}" href="" target="_blank" rel="noreferrer" localize="title" title="@logViewer_searchWithinUmbracoSourceCodeOnGithub">
+                                                        <a ng-href="https://github.com/umbraco/Umbraco-CMS/search?q={{ log.Properties['SourceContext'].Value }}" target="_blank" rel="noreferrer" localize="title" title="@logViewer_searchWithinUmbracoSourceCodeOnGithub">
                                                             <img src="https://www.github.com/favicon.ico" width="16" height="16" alt="" /> <localize key="logViewer_searchUmbracoSource">Search Umbraco Source</localize>
                                                         </a>
                                                     </umb-dropdown-item>
 
                                                     <umb-dropdown-item>
-                                                        <a ng-href="https://github.com/umbraco/Umbraco-CMS/issues?q={{ log.Properties['SourceContext'].Value }}" href="" target="_blank" rel="noreferrer" localize="title" title="@logViewer_searchUmbracoIssuesOnGithub">
+                                                        <a ng-href="https://github.com/umbraco/Umbraco-CMS/issues?q={{ log.Properties['SourceContext'].Value }}" target="_blank" rel="noreferrer" localize="title" title="@logViewer_searchUmbracoIssuesOnGithub">
                                                             <img src="https://www.github.com/favicon.ico" width="16" height="16" alt="" /> <localize key="logViewer_searchUmbracoIssues">Search Umbraco Issues</localize>
                                                         </a>
                                                     </umb-dropdown-item>
