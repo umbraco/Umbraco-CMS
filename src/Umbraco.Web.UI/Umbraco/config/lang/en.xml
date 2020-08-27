@@ -514,6 +514,8 @@
     <key alias="selectEditor">Select editor</key>
     <key alias="selectSnippet">Select snippet</key>
     <key alias="variantdeletewarning">This will delete the node and all its languages. If you only want to delete one language, you should unpublish the node in that language instead.</key>
+    <key alias="propertyuserpickerremovewarning"><![CDATA[This will remove the user <b>%0%</b>.]]></key>
+    <key alias="yesRemove">Yes, remove</key>
   </area>
   <area alias="dictionary">
     <key alias="noItems">There are no dictionary items.</key>
