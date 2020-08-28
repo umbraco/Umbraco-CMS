@@ -48,6 +48,16 @@ namespace Umbraco.Extensions
         }
 
         /// <summary>
+        /// Returns the URL for the installer api
+        /// </summary>
+        /// <param name="linkGenerator"></param>
+        /// <returns></returns>
+        public static string GetInstallerApiUrl(this LinkGenerator linkGenerator)
+        {
+            return linkGenerator.GetPathByAction(nameof(InstallController.Index), ControllerExtensions.GetControllerName<InstallApiController>(), new { area = Constants.Web.Mvc.InstallArea });
+        }
+
+        /// <summary>
         /// Return the Url for a Web Api service
         /// </summary>
         /// <typeparam name="T"></typeparam>

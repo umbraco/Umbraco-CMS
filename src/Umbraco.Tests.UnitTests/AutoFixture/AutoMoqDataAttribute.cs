@@ -8,6 +8,8 @@ using Moq;
 using Umbraco.Core.BackOffice;
 using Umbraco.Core.Configuration;
 using Umbraco.Web.BackOffice.Controllers;
+using Umbraco.Core;
+using Umbraco.Web.Common.Install;
 
 namespace Umbraco.Tests.UnitTests.AutoFixture
 {
@@ -36,12 +38,26 @@ namespace Umbraco.Tests.UnitTests.AutoFixture
                             (a,b,c) => BackOfficeIdentityUser.CreateNew(Mock.Of<IGlobalSettings>(),a,b,c)));
                     fixture
                         .Customize(new ConstructorCustomization(typeof(UsersController), new GreedyConstructorQuery()))
+                        .Customize(new ConstructorCustomization(typeof(InstallController), new GreedyConstructorQuery()))
+                        .Customize(new ConstructorCustomization(typeof(PreviewController), new GreedyConstructorQuery()))
+                        .Customize(new ConstructorCustomization(typeof(BackOfficeController), new GreedyConstructorQuery()))
                         .Customize(new ConstructorCustomization(typeof(BackOfficeUserManager), new GreedyConstructorQuery()))
                         .Customize(new AutoMoqCustomization());
 
                     // When requesting an IUserStore ensure we actually uses a IUserLockoutStore
                     fixture.Customize<IUserStore<BackOfficeIdentityUser>>(cc => cc.FromFactory(() => Mock.Of<IUserLockoutStore<BackOfficeIdentityUser>>()));
 
+                    fixture.Customize<ConfigConnectionString>(
+                        u => u.FromFactory<string, string, string>(
+                            (a, b, c) => new ConfigConnectionString(a, b, c)));
+
+                    fixture.Customize<IUmbracoVersion>(
+                        u => u.FromFactory(
+                            () => new UmbracoVersion()));
+
+                    var connectionStrings = Mock.Of<IConnectionStrings>();
+                    Mock.Get(connectionStrings).Setup(x => x[Constants.System.UmbracoConnectionName]).Returns((ConfigConnectionString)new ConfigConnectionString(string.Empty, string.Empty, string.Empty));
+                    fixture.Customize<IConnectionStrings>(x => x.FromFactory(() => connectionStrings ));
 
 
 

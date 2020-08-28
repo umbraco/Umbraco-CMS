@@ -33,18 +33,6 @@ namespace Umbraco.Extensions
         }
 
         /// <summary>
-        /// Return the installer API url
-        /// </summary>
-        /// <param name="url"></param>
-        /// <returns></returns>
-        public static string GetInstallerApiUrl(this IUrlHelper url)
-        {
-            // there is no default action here so we need to get it by action and trim the action
-            return url.Action("GetSetup", ControllerExtensions.GetControllerName<InstallApiController>(), new { area = Constants.Web.Mvc.InstallArea })
-                .TrimEnd("GetSetup");
-        }
-
-        /// <summary>
         /// Return the Url for a Web Api service
         /// </summary>
         /// <typeparam name="T"></typeparam>
