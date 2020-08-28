@@ -66,6 +66,7 @@ namespace Umbraco.Web.Editors
             return provider.GetConfiguration(Services.UserService);
         }
 
+
         /// <summary>
         /// Checks if a valid token is specified for an invited user and if so logs the user in and returns the user object
         /// </summary>
