@@ -50,7 +50,6 @@ namespace Umbraco.Extensions
             //But as far as I can see, there are still precompiled views, even when this is activated, so maybe it is okay.
             services.AddControllersWithViews().AddRazorRuntimeCompilation();
 
-
             // If using Kestrel: https://stackoverflow.com/a/55196057
             services.Configure<KestrelServerOptions>(options =>
             {

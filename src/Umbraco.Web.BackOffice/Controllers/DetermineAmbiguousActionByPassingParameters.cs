@@ -3,15 +3,16 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.ActionConstraints;
 using Microsoft.AspNetCore.Routing;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Umbraco.Core;
 using Umbraco.Extensions;
 using Umbraco.Web.BackOffice.ModelBinders;
-using Microsoft.AspNetCore.Http;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -102,7 +103,11 @@ namespace Umbraco.Web.BackOffice.Controllers
                 // IMPORTANT: Ensure the requestBody can be read multiple times.
                 routeContext.HttpContext.Request.EnableBuffering();
 
-                var body = _requestBody ??= routeContext.HttpContext.Request.GetRawBodyString();
+                // We need to use the asynchronous method here if synchronous IO is not allowed (it may or may not be, depending
+                // on configuration in UmbracoBackOfficeServiceCollectionExtensions.AddUmbraco()).
+                // We can't use async/await due to the need to override IsValidForRequest, which doesn't have an async override, so going with
+                // this, which seems to be the least worst option for "sync to async" (https://stackoverflow.com/a/32429753/489433).
+                var body = _requestBody ??= Task.Run(() => routeContext.HttpContext.Request.GetRawBodyStringAsync()).GetAwaiter().GetResult();
 
                 var jToken = JsonConvert.DeserializeObject<JToken>(body);
 
