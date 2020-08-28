@@ -54,7 +54,7 @@ namespace Umbraco.Extensions
         /// <returns></returns>
         public static string GetInstallerApiUrl(this LinkGenerator linkGenerator)
         {
-            return linkGenerator.GetPathByAction(nameof(InstallController.Index), ControllerExtensions.GetControllerName<InstallApiController>(), new { area = Constants.Web.Mvc.InstallArea });
+            return linkGenerator.GetPathByAction(nameof(InstallController.Index), ControllerExtensions.GetControllerName<InstallApiController>(), new { area = Constants.Web.Mvc.InstallArea }).EnsureEndsWith('/');
         }
 
         /// <summary>
