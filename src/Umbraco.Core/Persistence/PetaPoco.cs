@@ -344,7 +344,7 @@ namespace Umbraco.Core.Persistence
                 _transactionCancelled = false;
 				OnBeginTransaction();
 			}
-            else if (isolationLevel > _transaction.IsolationLevel)
+            else if (isolationLevel > CurrentTransactionIsolationLevel)
                 throw new Exception("Already in a transaction with a lower isolation level.");
         }
 
