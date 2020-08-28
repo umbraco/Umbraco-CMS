@@ -1,9 +1,10 @@
 <ng-form class="umb-mini-search" ng-class="{'--has-value': vm.model !== null && vm.model !== ''}" novalidate>
-    <i class="icon icon-search" aria-hidden="true"></i>
+    <label for="mini-search"><i class="icon icon-search"></i><span class="sr-only"><localize key="general_typeToSearch">Search...</localize></span></label>
     <input
         class="form-control search-input"
         type="text"
         localize="placeholder,label"
+        id="mini-search"
         label="@general_typeToSearch"
         placeholder="@general_typeToSearch"
         ng-model="vm.model"
