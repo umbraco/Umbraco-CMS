@@ -55,12 +55,11 @@
 
         vm.layout = []; // The layout object specific to this Block Editor, will be a direct reference from Property Model.
         vm.availableBlockTypes = []; // Available block entries of this property editor.
+        vm.labels = {};
 
-        var labels = {};
-        vm.labels = labels;
         localizationService.localizeMany(["grid_addElement", "content_createEmpty"]).then(function (data) {
-            labels.grid_addElement = data[0];
-            labels.content_createEmpty = data[1];
+            vm.labels.grid_addElement = data[0];
+            vm.labels.content_createEmpty = data[1];
         });
 
         vm.$onInit = function() {
