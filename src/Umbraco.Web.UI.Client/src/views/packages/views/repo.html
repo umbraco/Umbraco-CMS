@@ -355,9 +355,11 @@
                             </div>
 
                             <div class="umb-info-local-item mt4 flex items-center flex-column" ng-if="vm.installState.status == '' && vm.localPackage.isCompatible">
+
                                 <umb-checkbox model="vm.localPackage.packageLicenseAccept" required="true">
                                     <strong class="label-text"><localize key="packager_accept">I accept</localize> <a href="#" ng-href="{{vm.localPackage.licenseUrl}}" target="_blank" rel="noopener"><localize key="packager_termsOfUse">terms of use</localize></a></strong>
                                 </umb-checkbox>
+
                                 <umb-button ng-if="vm.installState.type !== 'error'"
                                             class="mt3"
                                             type="button"
