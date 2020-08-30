@@ -109,7 +109,7 @@
 
                             <div class="umb-info-local-item">
                                 <strong><localize key="packager_packageAuthor">Author</localize></strong><br>
-                                <a href="{{ vm.localPackage.authorUrl }}" target="_blank">{{ vm.localPackage.author }}</a>
+                                <a href="{{ vm.localPackage.authorUrl }}" target="_blank" rel="noopener">{{ vm.localPackage.author }}</a>
                             </div>
 
                             <div class="umb-info-local-item" ng-if="vm.localPackage.contributors && vm.localPackage.contributors.length > 0">
@@ -132,7 +132,7 @@
 
                             <div class="umb-info-local-item">
                                 <strong><localize key="packager_packageLicense">License</localize></strong><br>
-                                <a href="{{ vm.localPackage.licenseUrl }}" target="_blank">{{ vm.localPackage.license }}</a>
+                                <a href="{{ vm.localPackage.licenseUrl }}" target="_blank" rel="noopener">{{ vm.localPackage.license }}</a>
                             </div>
 
                             <div class="umb-info-local-item">
