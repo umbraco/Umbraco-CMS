@@ -228,12 +228,11 @@
                                 on-remove="vm.removeFile($index)">
                             </umb-node-preview>
 
-                            <a href=""
-                                class="umb-node-preview-add"
-                                ng-click="vm.openFilePicker()"
-                                prevent-default>
+                           <button type="button"
+                                   class="umb-node-preview-add"
+                                   ng-click="vm.openFilePicker()">
                                 <localize key="general_add">Add</localize>
-                            </a>
+                            </button>
 
                         </umb-control-group>
 
@@ -251,13 +250,12 @@
                                 on-remove="vm.removePackageView()">
                             </umb-node-preview>
 
-                            <a href=""
+                            <button type="button"
                                 ng-show="!vm.package.packageView"
                                 class="umb-node-preview-add"
-                                ng-click="vm.openViewPicker()"
-                                prevent-default>
+                                ng-click="vm.openViewPicker()">
                                 <localize key="general_add">Add</localize>
-                            </a>
+                            </button>
 
                         </umb-control-group>
                     </div>
