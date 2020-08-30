@@ -1,4 +1,4 @@
-<div class="umb-property-actions" ng-if="vm.actions.length > 0">
+<div class="umb-property-actions" ng-class="{ '-open': vm.isOpen }" ng-if="vm.actions.length > 0">
 
     <umb-button-ellipsis
         css-class="umb-outline umb-property-actions__toggle"
