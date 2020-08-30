@@ -194,12 +194,14 @@
 
         function getDefaultViewForBlock(block) {
 
+            var defaultViewFolderPath = "views/propertyeditors/blocklist/blocklistentryeditors/";
+
             if (block.config.unsupported === true)
-                return "views/propertyeditors/blocklist/blocklistentryeditors/unsupportedblock/unsupportedblock.editor.html";
+                return defaultViewFolderPath + "unsupportedblock/unsupportedblock.editor.html";
 
             if (inlineEditing === true)
-                return "views/propertyeditors/blocklist/blocklistentryeditors/inlineblock/inlineblock.editor.html";
-            return "views/propertyeditors/blocklist/blocklistentryeditors/labelblock/labelblock.editor.html";
+                return defaultViewFolderPath + "inlineblock/inlineblock.editor.html";
+            return defaultViewFolderPath + "labelblock/labelblock.editor.html";
         }
 
         /**
