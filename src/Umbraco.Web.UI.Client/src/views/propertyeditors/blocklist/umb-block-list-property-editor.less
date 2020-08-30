@@ -157,7 +157,7 @@ ng-form.ng-invalid-val-server-match-settings > .umb-block-list__block > .umb-blo
 .umb-block-list__block--create-button {
     position: absolute;
     width: 100%;
-    z-index:1;
+    z-index: 1;
     opacity: 0;
     outline: none;
     height: 12px;
@@ -170,28 +170,27 @@ ng-form.ng-invalid-val-server-match-settings > .umb-block-list__block > .umb-blo
         content: '';
         position: absolute;
         background-color: @blueMid;
-        border-top:1px solid white;
-        border-bottom:1px solid white;
+        border-top: 1px solid white;
+        border-bottom: 1px solid white;
         border-radius: 2px;
-        top:5px;
+        top: 5px;
         right: 0;
         left: 0;
         height: 2px;
         animation: umb-block-list__block--create-button_before 400ms ease-in-out alternate infinite;
+
         @keyframes umb-block-list__block--create-button_before {
             0%   { opacity: 1; }
             100% { opacity: 0.5; }
         }
     }
+
     > .__plus {
         position: absolute;
-        pointer-events: none;// lets stop avoiding the mouse values in JS move event.
-        margin-left: -18px - 10px;
-        margin-top: -18px;
-        margin-bottom: -18px;
-        width: 28px;
-        height: 25px;
-        padding-bottom: 3px;
+        pointer-events: none; // lets stop avoiding the mouse values in JS move event.
+        width: 24px;
+        height: 24px;
+        padding: 0;
         border-radius: 3em;
         border: 2px solid @blueMid;
         display: flex;
@@ -202,25 +201,29 @@ ng-form.ng-invalid-val-server-match-settings > .umb-block-list__block > .umb-blo
         font-weight: 800;
         background-color: rgba(255, 255, 255, .96);
         box-shadow: 0 0 0 2px rgba(255, 255, 255, .96);
-        transform: scale(0);
+        transform: scale(0) translate(-80%, -50%);
         transition: transform 240ms ease-in;
         animation: umb-block-list__block--create-button_after 800ms ease-in-out infinite;
+
         @keyframes umb-block-list__block--create-button_after {
             0%   { color: rgba(@blueMid, 0.8); }
             50% { color: rgba(@blueMid, 1); }
             100% { color: rgba(@blueMid, 0.8); }
         }
     }
+
     &:focus {
         > .__plus {
             border: 2px solid @ui-outline;
         }
     }
+
     &:hover, &:focus {
         opacity: 1;
         transition-duration: 120ms;
+
         > .__plus {
-            transform: scale(1);
+            transform: scale(1) translate(-80%, -50%);
             transition-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
     }
