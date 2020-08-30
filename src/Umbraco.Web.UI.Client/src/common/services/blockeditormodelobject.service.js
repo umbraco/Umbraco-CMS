@@ -543,7 +543,6 @@
                         unsupported: true
                     };
                     contentScaffold = {};
-
                 }
 
                 var blockObject = {};
@@ -614,8 +613,7 @@
                     if (this.config.settingsElementTypeKey !== null) {
                         mapElementValues(settings, this.settings);
                     }
-                }
-
+                };
 
                 blockObject.sync = function () {
                     if (this.content !== null) {
@@ -624,7 +622,7 @@
                     if (this.config.settingsElementTypeKey !== null) {
                         mapToPropertyModel(this.settings, this.settingsData);
                     }
-                }
+                };
 
                 // first time instant update of label.
                 blockObject.label = getBlockLabel(blockObject);
@@ -663,7 +661,6 @@
                 }
 
                 return blockObject;
-
             },
 
             /**

@@ -44,13 +44,14 @@
 
         vm.loading = true;
         vm.currentBlockInFocus = null;
-        vm.setBlockFocus = function(block) {
-            if(vm.currentBlockInFocus !== null) {
+        vm.setBlockFocus = function (block) {
+            if (vm.currentBlockInFocus !== null) {
                 vm.currentBlockInFocus.focus = false;
             }
             vm.currentBlockInFocus = block;
             block.focus = true;
-        }
+        };
+
         vm.supportCopy = clipboardService.isSupported();
 
         vm.layout = []; // The layout object specific to this Block Editor, will be a direct reference from Property Model.
