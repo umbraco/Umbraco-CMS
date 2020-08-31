@@ -2200,7 +2200,7 @@ namespace Umbraco.Core.Services.Implement
                     var total = long.MaxValue;
                     while (page * pageSize < total)
                     {
-                        var descendants = GetPagedDescendants(content.Id, page++, pageSize, out total, ordering: Ordering.By("sortOrder"));
+                        var descendants = GetPagedDescendants(content.Id, page++, pageSize, out total);
                         foreach (var descendant in descendants)
                         {
                             // if parent has not been copied, skip, else gets its copy id
