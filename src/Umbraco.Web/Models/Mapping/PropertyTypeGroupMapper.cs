@@ -238,6 +238,8 @@ namespace Umbraco.Web.Models.Mapping
                     Inherited = inherited,
                     DataTypeId = p.DataTypeId,
                     DataTypeKey = p.DataTypeKey,
+                    DataTypeName = dataType.Name,
+                    DataTypeIcon = propertyEditor.Icon,
                     SortOrder = p.SortOrder,
                     ContentTypeId = contentType.Id,
                     ContentTypeName = contentType.Name,

@@ -157,12 +157,11 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             // merge the crop values - the alias + width + height comes from
             // configuration, but each crop can store its own coordinates
 
-            if (Crops == null) return;
-
             var configuredCrops = configuration?.Crops;
             if (configuredCrops == null) return;
 
-            var crops = Crops.ToList();
+            //Use Crops if it's not null, otherwise create a new list
+            var crops = Crops?.ToList() ?? new List<ImageCropperCrop>();
 
             foreach (var configuredCrop in configuredCrops)
             {
