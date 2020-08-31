@@ -347,6 +347,19 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
             }
 
+            var userMgr = TryGetOwinContext().Result.GetBackOfficeUserManager();
+            var inviteArgs = new UserInviteEventArgs(
+                Request.TryGetHttpContext().Result.GetCurrentRequestIpAddress(),
+                performingUser: Security.GetUserId().Result);
+            userMgr.RaiseSendingUserInvite(inviteArgs);
+
+            if (inviteArgs.InviteHandled)
+            {
+                // TODO: now what? We'll need to return a different response to the back office, i don't think we want to create
+                // a local user since that will be part of the auto-link logic. We should ask lars though since that might be
+                // a requirement for him so might need to make it flexible.
+            }
+
             if (EmailSender.CanSendRequiredEmail == false)
             {
                 throw new HttpResponseException(
