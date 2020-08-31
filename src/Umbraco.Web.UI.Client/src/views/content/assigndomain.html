@@ -32,11 +32,15 @@
                         <thead>
                             <tr>
                                 <th>
-                                     <div id="assignDomainLabel" localize="title" title="@assignDomain_domain"><localize key="assignDomain_domain"></localize></div>
+                                    <div id="assignDomainLabel" localize="title" title="@assignDomain_domain">
+                                        <localize key="assignDomain_domain"></localize>
+                                    </div>
                                     <span class="umb-control-required">*</span>
                                 </th>
                                 <th>
-                                    <div id="assignLanguageLabel" localize="title" title="@assignDomain_language"><localize key="assignDomain_language"></localize></div>
+                                    <div id="assignLanguageLabel" localize="title" title="@assignDomain_language">
+                                        <localize key="assignDomain_language"></localize>
+                                    </div>
                                     <span class="umb-control-required">*</span>
                                 </th>
                                 <th />
@@ -45,7 +49,7 @@
                         <tbody>
                             <tr ng-repeat="domain in vm.domains">
                                 <td>
-                                     <input type="text" class="w-100" ng-model="domain.name" name="domain_name_{{$index}}" id="domain_name_{{$index}}" required umb-auto-focus aria-labelledby="assignDomainLabel"/>
+                                    <input type="text" class="w-100" ng-model="domain.name" name="domain_name_{{$index}}" id="domain_name_{{$index}}" required umb-auto-focus aria-labelledby="assignDomainLabel"/>
 
                                     <span ng-if="vm.domainForm.$submitted" ng-messages="vm.domainForm['domain_name_' + $index].$error">
                                         <span class="help-inline" ng-message="required"><localize key="validation_invalidEmpty"></localize></span>
@@ -53,11 +57,14 @@
                                     <span ng-show="domain.duplicate" class="help-inline"><localize key="assignDomain_duplicateDomain"></localize><span ng-show="domain.other">({{domain.other}})</span></span>
                                 </td>
                                 <td>
-                                   <select name="domain_language_{{$index}}" id="domain_language_{{$index}}"
-                                            class="language w-100"
-                                            ng-model="domain.lang"
-                                            ng-options="lang.name for lang in vm.languages"
-                                            required aria-labelledby="assignLanguageLabel">
+                                   <select
+                                       name="domain_language_{{$index}}"
+                                       id="domain_language_{{$index}}"
+                                       class="language w-100"
+                                       ng-model="domain.lang"
+                                       ng-options="lang.name for lang in vm.languages"
+                                       required
+                                       aria-labelledby="assignLanguageLabel">
                                     </select>
                                 </td>
                                 <td>
