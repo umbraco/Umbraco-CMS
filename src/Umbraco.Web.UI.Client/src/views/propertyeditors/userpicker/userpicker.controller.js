@@ -1,4 +1,4 @@
-function userPickerController($scope, usersResource , iconHelper, editorService){
+function userPickerController($scope, usersResource , iconHelper, editorService, overlayService){
 
     function trim(str, chr) {
         var rgxtrim = (!chr) ? new RegExp('^\\s+|\\s+$', 'g') : new RegExp('^' + chr + '+|' + chr + '+$', 'g');
@@ -33,7 +33,24 @@ function userPickerController($scope, usersResource , iconHelper, editorService)
     };
 
     $scope.remove = function (index) {
-        $scope.renderModel.splice(index, 1);
+        const dialog = {
+            view: "views/propertyeditors/userpicker/overlays/remove.html",
+            username: $scope.renderModel[index].name,
+            submitButtonLabelKey: "defaultdialogs_yesRemove",
+            submitButtonStyle: "danger",
+
+            submit: function () {
+                $scope.renderModel.splice(index, 1);
+                $scope.userName = '';
+
+                overlayService.close();
+            },
+            close: function () {
+                overlayService.close();
+            }
+        };
+
+        overlayService.open(dialog);
     };
 
     $scope.add = function (item) {
@@ -43,7 +60,7 @@ function userPickerController($scope, usersResource , iconHelper, editorService)
             }
             else {
                 return i.id;
-            }            
+            }
         });
 
         var itemId = $scope.model.config.idType === "udi" ? item.udi : item.id;

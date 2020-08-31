@@ -286,7 +286,7 @@ angular.module("umbraco")
                     gotoFolder(item);
                 }
                 else {
-                    $scope.clickHandler(item, event, index);
+                    clickHandler(item, event, index);
                 }
             };
 

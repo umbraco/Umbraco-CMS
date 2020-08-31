@@ -514,6 +514,9 @@
     <key alias="selectEditor">Select editor</key>
     <key alias="selectSnippet">Select snippet</key>
     <key alias="variantdeletewarning">This will delete the node and all its languages. If you only want to delete one language, you should unpublish the node in that language instead.</key>
+    <key alias="propertyuserpickerremovewarning"><![CDATA[This will remove the user <b>%0%</b>.]]></key>
+    <key alias="userremovewarning"><![CDATA[This will remove the user <b>%0%</b> from the <b>%1%</b> group]]></key>    
+    <key alias="yesRemove">Yes, remove</key>
   </area>
   <area alias="dictionary">
     <key alias="noItems">There are no dictionary items.</key>
@@ -1599,10 +1602,12 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="gridLayouts">Grid Layouts</key>
     <key alias="gridLayoutsDetail">Layouts are the overall work area for the grid editor, usually you only need one or two different layouts</key>
     <key alias="addGridLayout">Add Grid Layout</key>
+    <key alias="editGridLayout">Edit Grid Layout</key>
     <key alias="addGridLayoutDetail">Adjust the layout by setting column widths and adding additional sections</key>
     <key alias="rowConfigurations">Row configurations</key>
     <key alias="rowConfigurationsDetail">Rows are predefined cells arranged horizontally</key>
     <key alias="addRowConfiguration">Add row configuration</key>
+    <key alias="editRowConfiguration">Edit row configuration</key>
     <key alias="addRowConfigurationDetail">Adjust the row by setting cell widths and adding additional cells</key>
     <key alias="columns">Columns</key>
     <key alias="columnsDetails">Total combined number of columns in the grid layout</key>

@@ -763,6 +763,23 @@ When building a custom infinite editor view you can use the same components as a
 
         /**
          * @ngdoc method
+         * @name umbraco.services.editorService#userGroupEditor
+         * @methodOf umbraco.services.editorService
+         *
+         * @description
+         * Opens the user group picker in infinite editing, the submit callback returns the saved user group
+         * @param {Object} editor rendering options
+         * @param {Callback} editor.submit Submits the editor
+         * @param {Callback} editor.close Closes the editor
+         * @returns {Object} editor object
+         */
+        function userGroupEditor(editor) {
+            editor.view = "views/users/group.html";
+            open(editor);
+        }
+
+        /**
+         * @ngdoc method
          * @name umbraco.services.editorService#templateEditor
          * @methodOf umbraco.services.editorService
          *
@@ -1028,6 +1045,7 @@ When building a custom infinite editor view you can use the same components as a
             nodePermissions: nodePermissions,
             insertCodeSnippet: insertCodeSnippet,
             userGroupPicker: userGroupPicker,
+            userGroupEditor: userGroupEditor,
             templateEditor: templateEditor,
             sectionPicker: sectionPicker,
             insertField: insertField,
