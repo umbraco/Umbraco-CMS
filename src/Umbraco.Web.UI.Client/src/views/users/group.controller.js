@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function UserGroupEditController($scope, $location, $routeParams, userGroupsResource, localizationService, contentEditingHelper, editorService) {
+    function UserGroupEditController($scope, $location, $routeParams, userGroupsResource, localizationService, contentEditingHelper, editorService, overlayService) {
 
         var infiniteMode = $scope.model && $scope.model.infiniteMode;
         var id = infiniteMode ? $scope.model.id : $routeParams.id;
@@ -283,7 +283,25 @@
 
         function removeSelectedItem(index, selection) {
             if (selection && selection.length > 0) {
-                selection.splice(index, 1);
+
+                const dialog = {
+                    view: "views/users/views/overlays/remove.html",
+                    username: selection[index].username,
+                    userGroupName: vm.userGroup.name.toLowerCase(),
+                    submitButtonLabelKey: "defaultdialogs_yesRemove",
+                    submitButtonStyle: "danger",
+
+                    submit: function () {
+                        selection.splice(index, 1);
+
+                        overlayService.close();
+                    },
+                    close: function () {
+                        overlayService.close();
+                    }
+                };
+
+                overlayService.open(dialog);
             }
         }
 
