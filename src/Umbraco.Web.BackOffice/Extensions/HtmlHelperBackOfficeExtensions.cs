@@ -112,12 +112,13 @@ namespace Umbraco.Extensions
         /// <returns></returns>
         public static IHtmlContent AngularValueResetPasswordCodeInfoScript(this IHtmlHelper html, object val)
         {
+            if (val is null) return html.Raw(string.Empty);
+
             var sb = new StringBuilder();
             sb.AppendLine();
             sb.AppendLine(@"var errors = [];");
 
-            var errors = val as IEnumerable<string>;
-            if (errors != null)
+            if (val is IEnumerable<string> errors)
             {
                 foreach (var error in errors)
                 {
@@ -125,13 +126,10 @@ namespace Umbraco.Extensions
                 }
             }
 
-            var resetCodeModel = val as ValidatePasswordResetCodeModel;
-
-
             sb.AppendLine(@"app.value(""resetPasswordCodeInfo"", {");
             sb.AppendLine(@"errors: errors,");
             sb.Append(@"resetCodeModel: ");
-            sb.AppendLine(JsonConvert.SerializeObject(resetCodeModel));
+            sb.AppendLine(val.ToString());
             sb.AppendLine(@"});");
 
             return html.Raw(sb.ToString());

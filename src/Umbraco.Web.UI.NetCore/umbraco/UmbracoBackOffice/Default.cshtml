@@ -107,7 +107,7 @@
     <script>
         document.angularReady = function(app) {
             @await Html.AngularValueExternalLoginInfoScriptAsync(signInManager, ViewData.GetExternalSignInError())
-            @Html.AngularValueResetPasswordCodeInfoScript(ViewData["PasswordResetCode"])
+            @Html.AngularValueResetPasswordCodeInfoScript(ViewData[ViewDataExtensions.TokenPasswordResetCode])
             @await Html.AngularValueTinyMceAssetsAsync(runtimeMinifier)
             //required for the noscript trick
             document.getElementById("mainwrapper").style.display = "inherit";

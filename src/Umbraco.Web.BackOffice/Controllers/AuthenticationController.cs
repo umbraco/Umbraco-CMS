@@ -53,6 +53,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IEmailSender _emailSender;
         private readonly Core.Hosting.IHostingEnvironment _hostingEnvironment;
         private readonly IRequestAccessor _requestAccessor;
+        private readonly LinkGenerator _linkGenerator;
 
         // TODO: We need to import the logic from Umbraco.Web.Editors.AuthenticationController
         // TODO: We need to review all _userManager.Raise calls since many/most should be on the usermanager or signinmanager, very few should be here
@@ -71,7 +72,8 @@ namespace Umbraco.Web.BackOffice.Controllers
             IUserPasswordConfiguration passwordConfiguration,
             IEmailSender emailSender,
             Core.Hosting.IHostingEnvironment hostingEnvironment,
-            IRequestAccessor requestAccessor)
+            IRequestAccessor requestAccessor,
+            LinkGenerator linkGenerator)
         {
             _webSecurity = webSecurity;
             _userManager = backOfficeUserManager;
@@ -87,6 +89,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _emailSender = emailSender;
             _hostingEnvironment = hostingEnvironment;
             _requestAccessor = requestAccessor;
+            _linkGenerator = linkGenerator;
         }
 
         /// <summary>
@@ -438,11 +441,10 @@ namespace Umbraco.Web.BackOffice.Controllers
         private string ConstructCallbackUrl(int userId, string code)
         {
             // Get an mvc helper to get the url
-            var urlHelper = new UrlHelper(ControllerContext);
-            var action = urlHelper.Action(nameof(BackOfficeController.ValidatePasswordResetCode), ControllerExtensions.GetControllerName<BackOfficeController>(),
+            var action = _linkGenerator.GetPathByAction(nameof(BackOfficeController.ValidatePasswordResetCode), ControllerExtensions.GetControllerName<BackOfficeController>(),
                 new
                 {
-                    area = _globalSettings.GetUmbracoMvcArea(_hostingEnvironment),
+                    area = Constants.Web.Mvc.BackOfficeArea,
                     u = userId,
                     r = code
                 });

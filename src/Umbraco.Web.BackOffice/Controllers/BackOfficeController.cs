@@ -14,6 +14,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Grid;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.WebAssets;
 using Umbraco.Extensions;
@@ -45,6 +46,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly BackOfficeSignInManager _signInManager;
         private readonly IWebSecurity _webSecurity;
         private readonly ILogger _logger;
+        private readonly IJsonSerializer _jsonSerializer;
 
         public BackOfficeController(
             BackOfficeUserManager userManager,
@@ -58,7 +60,8 @@ namespace Umbraco.Web.BackOffice.Controllers
             AppCaches appCaches,
             BackOfficeSignInManager signInManager,
             IWebSecurity webSecurity,
-            ILogger logger)
+            ILogger logger,
+            IJsonSerializer jsonSerializer)
 
         {
             _userManager = userManager;
@@ -73,6 +76,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _signInManager = signInManager;
             _webSecurity = webSecurity;
             _logger = logger;
+            _jsonSerializer = jsonSerializer;
         }
 
         [HttpGet]
@@ -80,7 +84,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         {
             var viewPath = Path.Combine(_globalSettings.UmbracoPath , Constants.Web.Mvc.BackOfficeArea, nameof(Default) + ".cshtml")
                 .Replace("\\", "/"); // convert to forward slashes since it's a virtual path
-            
+
             return await RenderDefaultOrProcessExternalLoginAsync(
                 () => View(viewPath),
                 () => View(viewPath));
@@ -250,11 +254,11 @@ namespace Umbraco.Web.BackOffice.Controllers
             var user = await _userManager.FindByIdAsync(userId.ToString());
             if (user != null)
             {
-                var result = await _userManager.VerifyUserTokenAsync(user, "ResetPassword", "ResetPassword", resetCode);
+                var result = await _userManager.VerifyUserTokenAsync(user, "Default", "ResetPassword", resetCode);
                 if (result)
                 {
                     //Add a flag and redirect for it to be displayed
-                    TempData[ViewDataExtensions.TokenPasswordResetCode] = new ValidatePasswordResetCodeModel { UserId = userId, ResetCode = resetCode };
+                    TempData[ViewDataExtensions.TokenPasswordResetCode] =  _jsonSerializer.Serialize(new ValidatePasswordResetCodeModel { UserId = userId, ResetCode = resetCode });
                     return RedirectToLocal(Url.Action("Default", "BackOffice"));
                 }
             }
