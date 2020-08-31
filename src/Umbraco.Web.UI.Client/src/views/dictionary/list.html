@@ -28,11 +28,11 @@
                 <thead>
                     <tr>
                         <th><localize key="general_name">Name</localize></th>
-                        <th ng-repeat="column in vm.items[0].translations">{{column.displayName}}</th>
+                        <th ng-repeat="column in vm.items[0].translations | orderBy:'displayName'">{{column.displayName}}</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr ng-repeat="item in vm.items track by item.id" style="cursor: pointer;">
+                    <tr ng-repeat="item in vm.items | orderBy:'displayName' track by item.id" style="cursor: pointer;">
                         <th>
                             <span class="bold" ng-style="item.style"><a href="" ng-click="vm.clickItem(item.id)">{{item.name}}</a></span>
                         </th>
