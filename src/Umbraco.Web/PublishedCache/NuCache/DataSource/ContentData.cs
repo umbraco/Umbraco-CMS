@@ -6,7 +6,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
     /// <summary>
     /// Represents everything that is specific to an edited or published content version
     /// </summary>
-    internal class ContentData
+    public class ContentData
     {
         public string Name { get; set; }
         public string UrlSegment { get; set; }

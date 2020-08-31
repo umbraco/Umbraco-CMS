@@ -4,9 +4,9 @@ using CSharpTest.Net.Serialization;
 
 namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 {
-    internal class BTree
+    public class BTree
     {
-        public static BPlusTree<int, ContentNodeKit> GetTree(string filepath, bool exists, ContentDataSerializer contentDataSerializer = null)
+        public static BPlusTree<int, ContentNodeKit> GetTree(string filepath, bool exists, ISerializer<ContentData> contentDataSerializer = null)
         {
             var keySerializer = new PrimitiveSerializer();
             var valueSerializer = new ContentNodeKitSerializer(contentDataSerializer);

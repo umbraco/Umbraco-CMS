@@ -8,7 +8,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
     // represents a content "node" ie a pair of draft + published versions
     // internal, never exposed, to be accessed from ContentStore (only!)
     [DebuggerDisplay("Id: {Id}, Path: {Path}")]
-    internal class ContentNode
+    public class ContentNode
     {
         // special ctor for root pseudo node
         public ContentNode()
