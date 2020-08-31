@@ -400,10 +400,14 @@ namespace Umbraco.Core.Scoping
             {
                 try
                 {
-                    if (completed)
-                        _database.CompleteTransaction();
-                    else
-                        _database.AbortTransaction();
+                    // Only call a close on transaction when db is in transaction
+                    if (_database.InTransaction)
+                    {
+                        if (completed)
+                            _database.CompleteTransaction();
+                        else
+                            _database.AbortTransaction();
+                    }
                 }
                 catch
                 {
