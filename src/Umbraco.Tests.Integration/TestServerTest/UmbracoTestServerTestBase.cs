@@ -3,18 +3,20 @@ using System;
 using System.Linq.Expressions;
 using System.Net.Http;
 using System.Reflection;
+using Examine;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Composing;
+using Umbraco.Core.Scoping;
+using Umbraco.Examine;
 using Umbraco.Extensions;
 using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;
 using Umbraco.Web;
 using Umbraco.Web.Common.Controllers;
-using Umbraco.Web.Editors;
 
 
 namespace Umbraco.Tests.Integration.TestServerTest
@@ -23,6 +25,7 @@ namespace Umbraco.Tests.Integration.TestServerTest
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Console, Boot = false)]
     public abstract class UmbracoTestServerTestBase : UmbracoIntegrationTest
     {
+
         [SetUp]
         public void SetUp()
         {
@@ -31,6 +34,21 @@ namespace Umbraco.Tests.Integration.TestServerTest
                 AllowAutoRedirect = false
             });
             LinkGenerator = Factory.Services.GetRequiredService<LinkGenerator>();
+
+            ExecuteExamineIndexOperationsInSync();
+        }
+
+        private void ExecuteExamineIndexOperationsInSync()
+        {
+            var examineManager = Factory.Services.GetRequiredService<IExamineManager>();
+
+            foreach (var index in examineManager.Indexes)
+            {
+                if (index is UmbracoExamineIndex umbracoExamineIndex)
+                {
+                    umbracoExamineIndex.ProcessNonAsync();
+                }
+            }
         }
 
         /// <summary>

@@ -18,7 +18,7 @@ using Umbraco.Web.Models.ContentEditing;
 namespace Umbraco.Tests.Integration.TestServerTest.Controllers
 {
     [TestFixture]
-    [Explicit("Need to figure out whats wrong with these tests when executed all in one run.")]
+    //[Explicit("Need to figure out whats wrong with these tests when executed all in one run.")]
     public class ContentControllerTests : UmbracoTestServerTestBase
     {
 
