@@ -4,6 +4,7 @@
    hotkey="{{::vm.hotkey}}"
    hotkey-when-hidden="true"
    ng-class="{'is-active': vm.item.active, '-has-error': vm.item.hasError}"
+   ng-disabled="vm.item.disabled"
    class="umb-sub-views-nav-item__action umb-outline umb-outline--thin">
     <i class="icon {{ vm.item.icon }}" aria-hidden="true"></i>
     <span class="umb-sub-views-nav-item-text">{{ vm.item.name }}</span>

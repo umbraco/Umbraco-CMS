@@ -138,11 +138,12 @@
                         "name": "Find all logs that use a specific log message template",
                         "query": "@MessageTemplate = '[Timing {TimingId}] {EndMessage} ({TimingDuration}ms)'"
                     }
-                ]
+                ];
             });
 
             //Get all logs on init load
             getLogs();
+
         }
 
 

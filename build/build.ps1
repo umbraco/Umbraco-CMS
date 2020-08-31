@@ -438,14 +438,11 @@
     Write-Host "Prepare C# Documentation"
 
     $src = "$($this.SolutionRoot)\src"
-      $tmp = $this.BuildTemp
-      $out = $this.BuildOutput
+    $tmp = $this.BuildTemp
+    $out = $this.BuildOutput
     $DocFxJson = Join-Path -Path $src "\ApiDocs\docfx.json"
     $DocFxSiteOutput = Join-Path -Path $tmp "\_site\*.*"
 
-
-	#restore nuget packages
-	$this.RestoreNuGet()
     # run DocFx
     $DocFx = $this.BuildEnv.DocFx
 
@@ -463,17 +460,22 @@
     $src = "$($this.SolutionRoot)\src"
     $out = $this.BuildOutput
 
+    # Check if the solution has been built		
+    if (!(Test-Path "$src\Umbraco.Web.UI.Client\node_modules")) {throw "Umbraco needs to be built before generating the Angular Docs"}
+
     "Moving to Umbraco.Web.UI.Docs folder"
-    cd ..\src\Umbraco.Web.UI.Docs
+    cd $src\Umbraco.Web.UI.Docs
 
     "Generating the docs and waiting before executing the next commands"
 	& npm install
     & npx gulp docs
 
+    Pop-Location
+    
     # change baseUrl
     $BaseUrl = "https://our.umbraco.com/apidocs/v8/ui/"
     $IndexPath = "./api/index.html"
-    (Get-Content $IndexPath).replace('location.href.replace(rUrl, indexFile)', "`'" + $BaseUrl + "`'") | Set-Content $IndexPath
+    (Get-Content $IndexPath).replace('origin + location.href.substr(origin.length).replace(rUrl, indexFile)', "`'" + $BaseUrl + "`'") | Set-Content $IndexPath
 
     # zip it
     & $this.BuildEnv.Zip a -tzip -r "$out\ui-docs.zip" "$src\Umbraco.Web.UI.Docs\api\*.*"

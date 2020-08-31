@@ -1197,7 +1197,7 @@ namespace Umbraco.Tests.Services
             Assert.IsFalse(content.HasIdentity);
 
             // content cannot publish values because they are invalid
-            var propertyValidationService = new PropertyValidationService(Factory.GetInstance<PropertyEditorCollection>(), ServiceContext.DataTypeService);
+            var propertyValidationService = new PropertyValidationService(Factory.GetInstance<PropertyEditorCollection>(), ServiceContext.DataTypeService, ServiceContext.TextService);
             var isValid = propertyValidationService.IsPropertyDataValid(content, out var invalidProperties, CultureImpact.Invariant);
             Assert.IsFalse(isValid);
             Assert.IsNotEmpty(invalidProperties);
@@ -1957,6 +1957,33 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual(childCopy.Name, child.Name);
             Assert.AreNotEqual(childCopy.Id, child.Id);
             Assert.AreNotEqual(childCopy.Key, child.Key);
+        }
+
+        
+        [Test]
+        public void Copy_Recursive_Preserves_Sort_Order()
+        {
+            // Arrange
+            var contentService = ServiceContext.ContentService;
+            var temp = contentService.GetById(NodeDto.NodeIdSeed + 2);
+            Assert.AreEqual("Home", temp.Name);
+            Assert.AreEqual(2, contentService.CountChildren(temp.Id));
+            var reversedChildren = contentService.GetPagedChildren(temp.Id, 0, 10, out var total1).Reverse().ToArray();
+            contentService.Sort(reversedChildren);
+
+            // Act
+            var copy = contentService.Copy(temp, temp.ParentId, false, true, Constants.Security.SuperUserId);
+            var content = contentService.GetById(NodeDto.NodeIdSeed + 2);
+
+            // Assert
+            Assert.That(copy, Is.Not.Null);
+            Assert.That(copy.Id, Is.Not.EqualTo(content.Id));
+            Assert.AreNotSame(content, copy);
+            Assert.AreEqual(2, contentService.CountChildren(copy.Id));
+
+            var copiedChildren = contentService.GetPagedChildren(copy.Id, 0, 10, out var total2).OrderBy(c => c.SortOrder).ToArray();
+            Assert.AreEqual(reversedChildren.First().Name, copiedChildren.First().Name);
+            Assert.AreEqual(reversedChildren.Last().Name, copiedChildren.Last().Name);
         }
 
         [Test]

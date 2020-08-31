@@ -72,6 +72,8 @@
                                             content-start-node="userGroup.contentStartNode"
                                             media-start-node="userGroup.mediaStartNode"
                                             allow-remove="true"
+                                            allow-edit="model.allowGroupEdit(userGroup)"
+                                            on-edit="model.editSelectedItem($index, model.user.userGroups)"
                                             on-remove="model.removeSelectedItem($index, model.user.userGroups)">
                     </umb-user-group-preview>
 
