@@ -82,6 +82,7 @@ namespace Umbraco.Tests.Scoping
             var mediaRepository = Mock.Of<IMediaRepository>();
             var memberRepository = Mock.Of<IMemberRepository>();
 
+            ITransactableDictionaryFactory transactableDictionaryFactory = new BPlusTreeTransactableDictionaryFactory();
             var nestedContentDataSerializerFactory = new JsonContentNestedDataSerializerFactory();
             return new PublishedSnapshotService(
                 options,
@@ -101,6 +102,7 @@ namespace Umbraco.Tests.Scoping
                 Factory.GetInstance<IEntityXmlSerializer>(),
                 Mock.Of<IPublishedModelFactory>(),
                 new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() }),
+                transactableDictionaryFactory,
                 nestedContentDataSerializerFactory);
         }
 

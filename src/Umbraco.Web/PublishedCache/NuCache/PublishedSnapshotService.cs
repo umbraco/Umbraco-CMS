@@ -45,8 +45,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly IPublishedModelFactory _publishedModelFactory;
         private readonly IDefaultCultureAccessor _defaultCultureAccessor;
         private readonly UrlSegmentProviderCollection _urlSegmentProviders;
+        private readonly ITransactableDictionaryFactory _transactableDictionaryFactory;
         private readonly IContentCacheDataSerializerFactory _contentCacheDataSerializerFactory;
-        private readonly ContentDataSerializer _contentDataSerializer;
 
         // volatile because we read it with no lock
         private volatile bool _isReady;
@@ -57,8 +57,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly object _storesLock = new object();
         private readonly object _elementsLock = new object();
 
-        private BPlusTree<int, ContentNodeKit> _localContentDb;
-        private BPlusTree<int, ContentNodeKit> _localMediaDb;
+        private ITransactableDictionary<int,ContentNodeKit> _localContentDb;
+        private ITransactableDictionary<int, ContentNodeKit> _localMediaDb;
         private bool _localContentDbExists;
         private bool _localMediaDbExists;
 
@@ -80,7 +80,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
             IDataSource dataSource, IGlobalSettings globalSettings,
             IEntityXmlSerializer entitySerializer,
             IPublishedModelFactory publishedModelFactory,
-            UrlSegmentProviderCollection urlSegmentProviders, IContentCacheDataSerializerFactory contentCacheDataSerializerFactory, ContentDataSerializer contentDataSerializer = null)
+            UrlSegmentProviderCollection urlSegmentProviders,
+            ITransactableDictionaryFactory transactableDictionaryFactory, 
+            IContentCacheDataSerializerFactory contentCacheDataSerializerFactory, 
+            ContentDataSerializer contentDataSerializer = null)
             : base(publishedSnapshotAccessor, variationContextAccessor)
         {
             //if (Interlocked.Increment(ref _singletonCheck) > 1)
@@ -97,8 +100,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _defaultCultureAccessor = defaultCultureAccessor;
             _globalSettings = globalSettings;
             _urlSegmentProviders = urlSegmentProviders;
+            _transactableDictionaryFactory = transactableDictionaryFactory;
             _contentCacheDataSerializerFactory = contentCacheDataSerializerFactory;
-            _contentDataSerializer = contentDataSerializer;
 
             // we need an Xml serializer here so that the member cache can support XPath,
             // for members this is done by navigating the serialized-to-xml member
@@ -180,8 +183,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _localMediaDbExists = File.Exists(localMediaDbPath);
 
             // if both local databases exist then GetTree will open them, else new databases will be created
-            _localContentDb = BTree.GetTree(localContentDbPath, _localContentDbExists, _contentDataSerializer);
-            _localMediaDb = BTree.GetTree(localMediaDbPath, _localMediaDbExists, _contentDataSerializer);
+            _localContentDb = _transactableDictionaryFactory.Get(localContentDbPath, _localContentDbExists);
+            _localMediaDb = _transactableDictionaryFactory.Get(localMediaDbPath, _localMediaDbExists);
 
             _logger.Info<PublishedSnapshotService>("Registered with MainDom, localContentDbExists? {LocalContentDbExists}, localMediaDbExists? {LocalMediaDbExists}", _localContentDbExists, _localMediaDbExists);
         }
@@ -488,7 +491,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         }
 
-        private bool LoadEntitiesFromLocalDbLocked(bool onStartup, BPlusTree<int, ContentNodeKit> localDb, ContentStore store, string entityType)
+        private bool LoadEntitiesFromLocalDbLocked(bool onStartup, ITransactableDictionary<int, ContentNodeKit> localDb, ContentStore store, string entityType)
         {
             var kits = localDb.Select(x => x.Value)
                     .OrderBy(x => x.Node.Level)

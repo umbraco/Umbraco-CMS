@@ -5,7 +5,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 {
     internal class ContentNodeKitSerializer : ISerializer<ContentNodeKit>
     {
-        public ContentNodeKitSerializer(ContentDataSerializer contentDataSerializer = null)
+        public ContentNodeKitSerializer(ISerializer<ContentData> contentDataSerializer = null)
         {
             _contentDataSerializer = contentDataSerializer;
             if(_contentDataSerializer == null)
@@ -13,8 +13,8 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 _contentDataSerializer = DefaultDataSerializer;
             }
         }
-        static readonly ContentDataSerializer DefaultDataSerializer = new ContentDataSerializer();
-        private readonly ContentDataSerializer _contentDataSerializer;
+        static readonly ISerializer<ContentData> DefaultDataSerializer = new ContentDataSerializer();
+        private readonly ISerializer<ContentData> _contentDataSerializer;
 
         //static readonly ListOfIntSerializer ChildContentIdsSerializer = new ListOfIntSerializer();
 

@@ -47,7 +47,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly ConcurrentDictionary<Guid, int> _contentKeyToIdMap;
 
         private readonly ILogger _logger;
-        private BPlusTree<int, ContentNodeKit> _localDb;
+        private ITransactableDictionary<int, ContentNodeKit> _localDb;
         private readonly ConcurrentQueue<GenObj> _genObjs;
         private GenObj _genObj;
         private readonly object _wlocko = new object();
@@ -67,7 +67,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             IPublishedSnapshotAccessor publishedSnapshotAccessor,
             IVariationContextAccessor variationContextAccessor,
             ILogger logger,
-            BPlusTree<int, ContentNodeKit> localDb = null)
+            ITransactableDictionary<int, ContentNodeKit> localDb = null)
         {
             _publishedSnapshotAccessor = publishedSnapshotAccessor;
             _variationContextAccessor = variationContextAccessor;

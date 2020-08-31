@@ -52,7 +52,7 @@ namespace Umbraco.Tests.Services
             var documentRepository = Factory.GetInstance<IDocumentRepository>();
             var mediaRepository = Mock.Of<IMediaRepository>();
             var memberRepository = Mock.Of<IMemberRepository>();
-
+            ITransactableDictionaryFactory transactableDictionaryFactory = new BPlusTreeTransactableDictionaryFactory();
             var nestedContentDataSerializerFactory = new JsonContentNestedDataSerializerFactory();
 
             return new PublishedSnapshotService(
@@ -73,6 +73,7 @@ namespace Umbraco.Tests.Services
                 Factory.GetInstance<IEntityXmlSerializer>(),
                 Mock.Of<IPublishedModelFactory>(),
                 new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() }),
+                transactableDictionaryFactory,
                 nestedContentDataSerializerFactory);
         }
 

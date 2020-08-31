@@ -281,6 +281,10 @@
     <Compile Include="PropertyEditors\ValueConverters\BlockEditorConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\BlockListPropertyValueConverter.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\MsgPackContentNestedDataSerializerFactory.cs" />
+    <Compile Include="PublishedCache\NuCache\BPlusTreeTransactableDictionaryFactory.cs" />
+    <Compile Include="PublishedCache\NuCache\BPlusTreeTransactableDictionary.cs" />
+    <Compile Include="PublishedCache\NuCache\ITransactableDictionary.cs" />
+    <Compile Include="PublishedCache\NuCache\ITransactableDictionaryFactory.cs" />
     <Compile Include="PublishedCache\NuCache\PublishedSnapshotServiceOptions.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\GenObj.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\GenRef.cs" />
