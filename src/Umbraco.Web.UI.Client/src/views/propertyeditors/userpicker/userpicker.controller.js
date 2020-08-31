@@ -33,7 +33,6 @@ function userPickerController($scope, usersResource , iconHelper, editorService,
     };
 
     $scope.remove = function (index) {
-        console.log($scope.renderModel);
         const dialog = {
             view: "views/propertyeditors/userpicker/overlays/remove.html",
             username: $scope.renderModel[index].name,

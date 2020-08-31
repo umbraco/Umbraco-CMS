@@ -2,7 +2,7 @@
     "use strict";
 
     function UserPickerController($scope, usersResource, localizationService, eventsService) {
-
+        
         var vm = this;
 
         vm.users = [];

@@ -1,6 +1,7 @@
 <div ng-controller="Umbraco.Editors.UserPickerController as vm">
 
     <umb-editor-view>
+
         <umb-editor-header
             name="model.title"
             name-locked="true"
@@ -8,9 +9,9 @@
             hide-icon="true"
             hide-description="true">
         </umb-editor-header>
-
+        
         <umb-editor-container>
-
+            
             <umb-load-indicator
                 ng-if="vm.loading">
             </umb-load-indicator>
@@ -33,7 +34,7 @@
                         <a href="" class="umb-user-picker-list-item" ng-repeat="user in vm.users" ng-click="vm.selectUser(user)">
                             <div class="umb-user-picker-list-item__avatar">
                                 <umb-checkmark
-                                    class="umb-user-picker-list-item__checkmark"
+                                    class="umb-user-picker-list-item__checkmark" 
                                     ng-if="user.selected"
                                     checked="user.selected">
                                 </umb-checkmark>
@@ -53,7 +54,7 @@
                             </div>
                         </a>
                     </div>
-
+            
                     <div class="flex justify-center">
                         <umb-pagination
                             ng-if="vm.usersOptions.totalPages"
