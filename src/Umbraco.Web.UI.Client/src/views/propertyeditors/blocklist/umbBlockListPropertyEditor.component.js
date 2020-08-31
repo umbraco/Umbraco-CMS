@@ -44,23 +44,23 @@
 
         vm.loading = true;
         vm.currentBlockInFocus = null;
-        vm.setBlockFocus = function(block) {
-            if(vm.currentBlockInFocus !== null) {
+        vm.setBlockFocus = function (block) {
+            if (vm.currentBlockInFocus !== null) {
                 vm.currentBlockInFocus.focus = false;
             }
             vm.currentBlockInFocus = block;
             block.focus = true;
-        }
+        };
+
         vm.supportCopy = clipboardService.isSupported();
 
         vm.layout = []; // The layout object specific to this Block Editor, will be a direct reference from Property Model.
         vm.availableBlockTypes = []; // Available block entries of this property editor.
+        vm.labels = {};
 
-        var labels = {};
-        vm.labels = labels;
         localizationService.localizeMany(["grid_addElement", "content_createEmpty"]).then(function (data) {
-            labels.grid_addElement = data[0];
-            labels.content_createEmpty = data[1];
+            vm.labels.grid_addElement = data[0];
+            vm.labels.content_createEmpty = data[1];
         });
 
         vm.$onInit = function() {
@@ -195,12 +195,14 @@
 
         function getDefaultViewForBlock(block) {
 
+            var defaultViewFolderPath = "views/propertyeditors/blocklist/blocklistentryeditors/";
+
             if (block.config.unsupported === true)
-                return "views/propertyeditors/blocklist/blocklistentryeditors/unsupportedblock/unsupportedblock.editor.html";
+                return defaultViewFolderPath + "unsupportedblock/unsupportedblock.editor.html";
 
             if (inlineEditing === true)
-                return "views/propertyeditors/blocklist/blocklistentryeditors/inlineblock/inlineblock.editor.html";
-            return "views/propertyeditors/blocklist/blocklistentryeditors/labelblock/labelblock.editor.html";
+                return defaultViewFolderPath + "inlineblock/inlineblock.editor.html";
+            return defaultViewFolderPath + "labelblock/labelblock.editor.html";
         }
 
         /**
