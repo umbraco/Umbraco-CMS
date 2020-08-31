@@ -69,6 +69,18 @@
         };
     }
 
+    if (!String.prototype.trimStartSpecial) {
+        /** trimSpecial extension method for string */
+        // Removes all non printable chars from beginning of a string
+        String.prototype.trimStartSpecial = function () {            
+            var index = 0;
+            while (this.charCodeAt(index) <= 46) {
+                index++;
+            }            
+            return this.substr(index);
+        };
+    }
+
     if (!String.prototype.startsWith) {
         /** startsWith extension method for string */
         String.prototype.startsWith = function (str) {            
