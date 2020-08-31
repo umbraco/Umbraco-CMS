@@ -4,7 +4,7 @@
     </umb-load-indicator>
 
     <umb-editor-view ng-if="!vm.loading">
-        <umb-editor-header 
+        <umb-editor-header
             name="vm.title"
             hide-alias="true"
             hide-description="true"
@@ -34,15 +34,15 @@
                 <tbody>
                     <tr ng-repeat="item in vm.items | orderBy:'displayName' track by item.id" style="cursor: pointer;">
                         <th>
-                            <span class="bold" ng-style="item.style"><a href="" ng-click="vm.clickItem(item.id)">{{item.name}}</a></span>
+                            <button type="button" ng-style="item.style" class="btn-reset bold" ng-click="vm.clickItem(item.id)">{{item.name}}</button>
                         </th>
                         <td ng-repeat="column in item.translations">
-                            <a href="" ng-click="vm.clickItem(item.id)">
+                            <button type="button" class="btn-reset" ng-click="vm.clickItem(item.id)">
                                 <i ng-if="column.hasTranslation" class="icon-check color-green" aria-hidden="true"></i>
-                                <p ng-if="column.hasTranslation" class="sr-only"><localize key="visuallyHiddenTexts_hasTranslation"></localize></p>
+                                <span ng-if="column.hasTranslation" class="sr-only"><localize key="visuallyHiddenTexts_hasTranslation"></localize></span>
                                 <i ng-if="!column.hasTranslation" class="icon-alert color-red" aria-hidden="true"></i>
-                                <p ng-if="!column.hasTranslation" class="sr-only"><localize key="visuallyHiddenTexts_noTranslation"></localize></p>
-                            </a>
+                                <span ng-if="!column.hasTranslation" class="sr-only"><localize key="visuallyHiddenTexts_noTranslation"></localize></span>
+                            </button>
                         </td>
                     </tr>
                 </tbody>
