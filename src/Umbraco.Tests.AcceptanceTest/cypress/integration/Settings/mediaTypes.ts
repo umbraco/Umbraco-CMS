@@ -34,7 +34,7 @@ context('Media Types', () => {
     cy.get('.umb-search-field').type('Textstring');
 
     // Choose first item
-    cy.get('ul.umb-card-grid li a[title="Textstring"]').closest("li").click();
+    cy.get('ul.umb-card-grid li [title="Textstring"]').closest("li").click();
 
     // Save property
     cy.get('.btn-success').last().click();

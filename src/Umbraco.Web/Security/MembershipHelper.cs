@@ -77,6 +77,17 @@ namespace Umbraco.Web.Security
             return _publicAccessService.IsProtected(path);
         }
 
+        public virtual IDictionary<string, bool> IsProtected(IEnumerable<string> paths)
+        {
+            var result = new Dictionary<string, bool>();
+            foreach (var path in paths)
+            {
+                //this is a cached call
+                result[path] = _publicAccessService.IsProtected(path);
+            }
+            return result;
+        }
+
         /// <summary>
         /// Check if the current user has access to a document
         /// </summary>
@@ -84,15 +95,33 @@ namespace Umbraco.Web.Security
         /// <returns>True if the current user has access or if the current document isn't protected</returns>
         public virtual bool MemberHasAccess(string path)
         {
-            //cache this in the request cache
-            return _appCaches.RequestCache.GetCacheItem<bool>($"{typeof(MembershipHelper)}.MemberHasAccess-{path}", () =>
+            if (IsProtected(path))
             {
-                if (IsProtected(path))
-                {
-                    return IsLoggedIn() && HasAccess(path, Roles.Provider);
-                }
-                return true;
-            });
+                return IsLoggedIn() && HasAccess(path, Roles.Provider);
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Checks if the current user has access to the paths
+        /// </summary>
+        /// <param name="paths"></param>
+        /// <returns></returns>
+        public virtual IDictionary<string, bool> MemberHasAccess(IEnumerable<string> paths)
+        {
+            var protectedPaths = IsProtected(paths);
+
+            var pathsWithProtection = protectedPaths.Where(x => x.Value).Select(x => x.Key);
+            var pathsWithAccess = HasAccess(pathsWithProtection, Roles.Provider);
+
+            var result = new Dictionary<string, bool>();
+            foreach(var path in paths)
+            {
+                pathsWithAccess.TryGetValue(path, out var hasAccess);
+                // if it's not found it's false anyways
+                result[path] = hasAccess;
+            }
+            return result;
         }
 
         /// <summary>
@@ -104,6 +133,25 @@ namespace Umbraco.Web.Security
         private bool HasAccess(string path, RoleProvider roleProvider)
         {
             return _publicAccessService.HasAccess(path, CurrentUserName, roleProvider.GetRolesForUser);
+        }
+
+        private IDictionary<string, bool> HasAccess(IEnumerable<string> paths, RoleProvider roleProvider)
+        {
+            // ensure we only lookup user roles once
+            string[] userRoles = null;
+            string[] getUserRoles(string username)
+            {
+                if (userRoles != null) return userRoles;
+                userRoles = roleProvider.GetRolesForUser(username).ToArray();
+                return userRoles;
+            }
+
+            var result = new Dictionary<string, bool>();
+            foreach (var path in paths)
+            {
+                result[path] = IsLoggedIn() && _publicAccessService.HasAccess(path, CurrentUserName, getUserRoles);
+            }
+            return result;
         }
 
         /// <summary>
@@ -796,7 +844,7 @@ namespace Umbraco.Web.Security
         private static string GetCacheKey(string key, params object[] additional)
         {
             var sb = new StringBuilder();
-            sb.Append(typeof (MembershipHelper).Name);
+            sb.Append(typeof(MembershipHelper).Name);
             sb.Append("-");
             sb.Append(key);
             foreach (var s in additional)

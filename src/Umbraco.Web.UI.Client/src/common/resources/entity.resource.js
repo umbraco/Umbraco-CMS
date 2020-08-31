@@ -207,7 +207,7 @@ function entityResource($q, $http, umbRequestHelper) {
         getAnchors: function (rteContent) {
 
             if (!rteContent || rteContent.length === 0) {
-                return [];
+                return $q.when([]);
             }
 
             return umbRequestHelper.resourcePromise(

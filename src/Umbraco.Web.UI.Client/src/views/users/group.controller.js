@@ -3,14 +3,20 @@
 
     function UserGroupEditController($scope, $location, $routeParams, userGroupsResource, localizationService, contentEditingHelper, editorService) {
 
+        var infiniteMode = $scope.model && $scope.model.infiniteMode;
+        var id = infiniteMode ? $scope.model.id : $routeParams.id;
+        var create = infiniteMode ? $scope.model.create : $routeParams.create;
+
         var vm = this;
         var contentPickerOpen = false;
 
         vm.page = {};
         vm.page.rootIcon = "icon-folder";
+        vm.page.submitButtonLabelKey = infiniteMode ? "buttons_saveAndClose" : "buttons_save";
+
         vm.userGroup = {};
         vm.labels = {};
-        vm.showBackButton = true;
+        vm.showBackButton = !infiniteMode;
 
         vm.goToPage = goToPage;
         vm.openSectionPicker = openSectionPicker;
@@ -53,7 +59,7 @@
                 vm.labels.noStartNode = name;
             });
 
-            if ($routeParams.create) {
+            if (create) {
                 // get user group scaffold
                 userGroupsResource.getUserGroupScaffold().then(function (userGroup) {
                     vm.userGroup = userGroup;
@@ -63,7 +69,7 @@
                 });
             } else {
                 // get user group
-                userGroupsResource.getUserGroup($routeParams.id).then(function (userGroup) {
+                userGroupsResource.getUserGroup(id).then(function (userGroup) {
                     vm.userGroup = userGroup;
                     formatGranularPermissionSelection();
                     setSectionIcon(vm.userGroup.sections);
@@ -71,7 +77,6 @@
                     vm.loading = false;
                 });
             }
-
         }
 
         function save() {
@@ -85,11 +90,15 @@
             }).then(function (saved) {
 
                 vm.userGroup = saved;
-                formatGranularPermissionSelection();
-                setSectionIcon(vm.userGroup.sections);
-                makeBreadcrumbs();
-                vm.page.saveButtonState = "success";
 
+                if (infiniteMode) {
+                    $scope.model.submit(vm.userGroup);
+                } else {
+                    formatGranularPermissionSelection();
+                    setSectionIcon(vm.userGroup.sections);
+                    makeBreadcrumbs();
+                    vm.page.saveButtonState = "success";
+                }
             }, function (err) {
                 vm.page.saveButtonState = "error";
             });
@@ -185,7 +194,7 @@
          * however the list to display the permissions isn't via the dictionary way so we need to format it
          */
         function formatGranularPermissionSelection() {
-            angular.forEach(vm.userGroup.assignedPermissions, function (node) {
+            vm.userGroup.assignedPermissions.forEach(function (node) {
                 formatGranularPermissionSelectionForNode(node);
             });
         }
@@ -193,8 +202,8 @@
         function formatGranularPermissionSelectionForNode(node) {
             //the dictionary is assigned via node.permissions we will reformat to node.allowedPermissions
             node.allowedPermissions = [];
-            angular.forEach(node.permissions, function (permissions, key) {
-                angular.forEach(permissions, function (p) {
+            Object.values(node.permissions).forEach(function (permissions) {
+                permissions.forEach(function (p) {
                     if (p.checked) {
                         node.allowedPermissions.push(p);
                     }
@@ -299,7 +308,7 @@
         }
 
         function setSectionIcon(sections) {
-            angular.forEach(sections, function (section) {
+            sections.forEach(function (section) {
                 section.icon = "icon-section";
             });
         }
