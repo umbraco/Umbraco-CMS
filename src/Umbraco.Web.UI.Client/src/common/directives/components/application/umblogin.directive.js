@@ -94,7 +94,8 @@
 
                         //localize the text
                         localizationService.localize("errorHandling_errorInPasswordFormat", [
-                                vm.invitedUserPasswordModel.passwordPolicies.minPasswordLength,
+                            vm.invitedUserPasswordModel.passwordPolicies.minPasswordLength,
+                            vm.invitedUserPasswordModel.passwordPolicies.maxPasswordLength,
                                 vm.invitedUserPasswordModel.passwordPolicies.minNonAlphaNumericChars
                             ]).then(function (data) {
                                 vm.invitedUserPasswordModel.passwordPolicyText = data;

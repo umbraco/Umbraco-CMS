@@ -44,6 +44,14 @@ namespace Umbraco.Core.Security
         }
 
         /// <summary>
+        /// Default is 256
+        /// </summary>
+        public virtual int DefaultMaxPasswordLength
+        {
+            get { return 256; }
+        }
+
+        /// <summary>
         /// Providers can override this setting, default is 0
         /// </summary>
         public virtual int DefaultMinNonAlphanumericChars
@@ -88,6 +96,7 @@ namespace Umbraco.Core.Security
         private int _maxInvalidPasswordAttempts;
         private int _minRequiredNonAlphanumericCharacters;
         private int _minRequiredPasswordLength;
+        private int _maxRequiredPasswordLength;
         private int _passwordAttemptWindow;
         private MembershipPasswordFormat _passwordFormat;
         private string _passwordStrengthRegularExpression;
@@ -148,6 +157,16 @@ namespace Umbraco.Core.Security
         public override int MinRequiredPasswordLength
         {
             get { return _minRequiredPasswordLength; }
+        }
+
+        /// <summary>
+        /// Gets the maximum length required for a password.
+        /// </summary>
+        /// <value></value>
+        /// <returns>The maximum length required for a password. </returns>
+        public int MaxRequiredPasswordLength
+        {
+            get { return _maxRequiredPasswordLength; }
         }
 
         /// <summary>
@@ -247,6 +266,7 @@ namespace Umbraco.Core.Security
             _maxInvalidPasswordAttempts = GetIntValue(config, "maxInvalidPasswordAttempts", 5, false, 0);
             _passwordAttemptWindow = GetIntValue(config, "passwordAttemptWindow", 10, false, 0);
             _minRequiredPasswordLength = GetIntValue(config, "minRequiredPasswordLength", DefaultMinPasswordLength, true, 0x80);
+            _maxRequiredPasswordLength = 256;
             _minRequiredNonAlphanumericCharacters = GetIntValue(config, "minRequiredNonalphanumericCharacters", DefaultMinNonAlphanumericChars, true, 0x80);
             _passwordStrengthRegularExpression = config["passwordStrengthRegularExpression"];
 
@@ -294,7 +314,7 @@ namespace Umbraco.Core.Security
         /// <param name="e"></param>
         protected override void OnValidatingPassword(ValidatePasswordEventArgs e)
         {
-            var attempt = IsPasswordValid(e.Password, MinRequiredNonAlphanumericCharacters, PasswordStrengthRegularExpression, MinRequiredPasswordLength);
+            var attempt = IsPasswordValid(e.Password, MinRequiredNonAlphanumericCharacters, PasswordStrengthRegularExpression, MinRequiredPasswordLength, MinRequiredPasswordLength);
             if (attempt.Success == false)
             {
                 e.Cancel = true;
@@ -472,7 +492,7 @@ namespace Umbraco.Core.Security
             }
 
             // Validate password
-            var passwordValidAttempt = IsPasswordValid(password, MinRequiredNonAlphanumericCharacters, PasswordStrengthRegularExpression, MinRequiredPasswordLength);
+            var passwordValidAttempt = IsPasswordValid(password, MinRequiredNonAlphanumericCharacters, PasswordStrengthRegularExpression, MinRequiredPasswordLength, MaxRequiredPasswordLength);
             if (passwordValidAttempt.Success == false)
             {
                 return MembershipCreateStatus.InvalidPassword;
@@ -575,7 +595,7 @@ namespace Umbraco.Core.Security
 
         protected abstract string PerformResetPassword(string username, string answer, string generatedPassword);
 
-        protected internal static Attempt<PasswordValidityError> IsPasswordValid(string password, int minRequiredNonAlphanumericChars, string strengthRegex, int minLength)
+        protected internal static Attempt<PasswordValidityError> IsPasswordValid(string password, int minRequiredNonAlphanumericChars, string strengthRegex, int minLength, int maxLength)
         {
             if (minRequiredNonAlphanumericChars > 0)
             {
@@ -596,6 +616,11 @@ namespace Umbraco.Core.Security
             }
 
             if (password.Length < minLength)
+            {
+                return Attempt.Fail(PasswordValidityError.Length);
+            }
+
+            if (password.Length > maxLength)
             {
                 return Attempt.Fail(PasswordValidityError.Length);
             }

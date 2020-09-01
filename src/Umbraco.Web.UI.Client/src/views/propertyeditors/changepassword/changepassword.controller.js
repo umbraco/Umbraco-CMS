@@ -13,7 +13,8 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.ChangePasswordCont
           requiresQuestionAnswer: true/false,
           enableReset: true/false,
           enablePasswordRetrieval: true/false,
-          minPasswordLength: 10
+          minPasswordLength: 10,
+          maxPasswordLength: 256
       }
       */
 

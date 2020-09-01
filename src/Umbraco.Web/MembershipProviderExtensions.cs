@@ -25,6 +25,7 @@ namespace Umbraco.Web
             return new Dictionary<string, object>
                 {
                     {"minPasswordLength", membershipProvider.MinRequiredPasswordLength},
+                    {"maxPasswordLength", 256},
                     {"enableReset", canReset},
                     {"enablePasswordRetrieval", membershipProvider.EnablePasswordRetrieval},
                     {"requiresQuestionAnswer", membershipProvider.RequiresQuestionAndAnswer},

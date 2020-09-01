@@ -22,11 +22,11 @@
                             <localize key="user_newPassword">New password</localize>
                             <small style="font-size: 13px;">{{vm.invitedUserPasswordModel.passwordPolicyText}}</small>
                         </label>
-                        <input type="password" ng-model="vm.invitedUserPasswordModel.password" name="password" id="umb-passwordOne" class="-full-width-input" umb-auto-focus required val-server-field="value" ng-minlength="{{vm.invitedUserPasswordModel.passwordPolicies.minPasswordLength}}" ng-maxlength="256" />
+                        <input type="password" ng-model="vm.invitedUserPasswordModel.password" name="password" id="umb-passwordOne" class="-full-width-input" umb-auto-focus required val-server-field="value" ng-minlength="{{vm.invitedUserPasswordModel.passwordPolicies.minPasswordLength}}" ng-maxlength="{{vm.invitedUserPasswordModel.passwordPolicies.maxPasswordLength}}" />
                         <span ng-messages="inviteUserPasswordForm.password.$error" show-validation-on-submit>
                             <span class="help-inline" ng-message="required"><localize key="user_passwordIsBlank">Your new password cannot be blank!</localize></span>
                             <span class="help-inline" ng-message="minlength">Minimum {{vm.invitedUserPasswordModel.passwordPolicies.minPasswordLength}} characters</span>
-                            <span class="help-inline" ng-message="maxlength">Maximum 256 characters</span>
+                            <span class="help-inline" ng-message="maxlength">Maximum {{vm.invitedUserPasswordModel.passwordPolicies.maxPasswordLength}} characters</span>
                             <span class="help-inline" ng-message="valServerField">{{inviteUserPasswordForm.password.errorMsg}}</span>
                         </span>
                     </div>
