@@ -32,8 +32,8 @@
         ], $scope).then(function () {
             var elem = $element.find("input[name='newColor']");
             elem.spectrum({
-                color: null,
                 type: "color",
+                color: defaultColor,
                 showAlpha: false,
                 showInitial: false,
                 showInput: true,
