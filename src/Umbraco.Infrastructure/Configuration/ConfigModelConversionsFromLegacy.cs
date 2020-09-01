@@ -41,7 +41,7 @@ namespace Umbraco.Infrastructure.Configuration
                 TimeOutInMinutes = globalSettings.TimeOutInMinutes,
                 UmbracoCssPath = globalSettings.UmbracoCssPath,
                 UmbracoMediaPath = globalSettings.UmbracoMediaPath,
-                Path = globalSettings.UmbracoPath,
+                UmbracoPath = globalSettings.UmbracoPath,
                 UmbracoScriptsPath = globalSettings.UmbracoScriptsPath,
                 IconsPath = globalSettings.IconsPath,
                 UseHttps = globalSettings.UseHttps,

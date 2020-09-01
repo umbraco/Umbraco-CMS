@@ -18,7 +18,7 @@ namespace Umbraco.Core.Configuration
         public static string GetBackOfficePath(this GlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
         {
             if (_backOfficePath != null) return _backOfficePath;
-            _backOfficePath = hostingEnvironment.ToAbsolute(globalSettings.Path);
+            _backOfficePath = hostingEnvironment.ToAbsolute(globalSettings.UmbracoPath);
             return _backOfficePath;
         }
 
@@ -44,9 +44,9 @@ namespace Umbraco.Core.Configuration
 
         internal static string GetUmbracoMvcAreaNoCache(this GlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
         {
-            var path = string.IsNullOrEmpty(globalSettings.Path)
+            var path = string.IsNullOrEmpty(globalSettings.UmbracoPath)
                 ? string.Empty
-                : hostingEnvironment.ToAbsolute(globalSettings.Path);
+                : hostingEnvironment.ToAbsolute(globalSettings.UmbracoPath);
 
             if (path.IsNullOrWhiteSpace())
                 throw new InvalidOperationException("Cannot create an MVC Area path without the umbracoPath specified");

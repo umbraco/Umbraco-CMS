@@ -21,7 +21,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
         public BackOfficeAssetsController(IIOHelper ioHelper, IHostingEnvironment hostingEnvironment, ILogger logger, IOptions<GlobalSettings> globalSettings)
         {
-            _jsLibFileSystem = new PhysicalFileSystem(ioHelper, hostingEnvironment, logger, globalSettings.Value.Path + Path.DirectorySeparatorChar + "lib");
+            _jsLibFileSystem = new PhysicalFileSystem(ioHelper, hostingEnvironment, logger, globalSettings.Value.UmbracoPath + Path.DirectorySeparatorChar + "lib");
         }
 
         [HttpGet]

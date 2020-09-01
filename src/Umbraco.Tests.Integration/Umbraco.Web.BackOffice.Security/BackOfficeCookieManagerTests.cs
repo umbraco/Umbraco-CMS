@@ -57,7 +57,7 @@ namespace Umbraco.Tests.Security
             var mgr = new BackOfficeCookieManager(
                 Mock.Of<IUmbracoContextAccessor>(),
                 runtime,
-                Mock.Of<IHostingEnvironment>(x => x.ApplicationVirtualPath == "/" && x.ToAbsolute(globalSettings.Path) == "/umbraco"),
+                Mock.Of<IHostingEnvironment>(x => x.ApplicationVirtualPath == "/" && x.ToAbsolute(globalSettings.UmbracoPath) == "/umbraco"),
                 globalSettings,
                 Mock.Of<IRequestCache>(),
                 Mock.Of<LinkGenerator>());
@@ -80,7 +80,7 @@ namespace Umbraco.Tests.Security
             var mgr = new BackOfficeCookieManager(
                 Mock.Of<IUmbracoContextAccessor>(),
                 runtime,
-                Mock.Of<IHostingEnvironment>(x => x.ApplicationVirtualPath == "/" && x.ToAbsolute(globalSettings.Path) == "/umbraco" && x.ToAbsolute(Constants.SystemDirectories.Install) == "/install"),
+                Mock.Of<IHostingEnvironment>(x => x.ApplicationVirtualPath == "/" && x.ToAbsolute(globalSettings.UmbracoPath) == "/umbraco" && x.ToAbsolute(Constants.SystemDirectories.Install) == "/install"),
                 globalSettings,
                 Mock.Of<IRequestCache>(),
                 GetMockLinkGenerator(out var remainingTimeoutSecondsPath, out var isAuthPath));
@@ -105,7 +105,7 @@ namespace Umbraco.Tests.Security
             var mgr = new BackOfficeCookieManager(
                 Mock.Of<IUmbracoContextAccessor>(),
                 runtime,
-                Mock.Of<IHostingEnvironment>(x => x.ApplicationVirtualPath == "/" && x.ToAbsolute(globalSettings.Path) == "/umbraco" && x.ToAbsolute(Constants.SystemDirectories.Install) == "/install"),
+                Mock.Of<IHostingEnvironment>(x => x.ApplicationVirtualPath == "/" && x.ToAbsolute(globalSettings.UmbracoPath) == "/umbraco" && x.ToAbsolute(Constants.SystemDirectories.Install) == "/install"),
                 globalSettings,
                 Mock.Of<IRequestCache>(x => x.IsAvailable == true && x.Get(Constants.Security.ForceReAuthFlag) == "not null"),
                 GetMockLinkGenerator(out var remainingTimeoutSecondsPath, out var isAuthPath));
@@ -127,7 +127,7 @@ namespace Umbraco.Tests.Security
             var mgr = new BackOfficeCookieManager(
                 Mock.Of<IUmbracoContextAccessor>(),
                 runtime,
-                Mock.Of<IHostingEnvironment>(x => x.ApplicationVirtualPath == "/" && x.ToAbsolute(globalSettings.Path) == "/umbraco" && x.ToAbsolute(Constants.SystemDirectories.Install) == "/install"),
+                Mock.Of<IHostingEnvironment>(x => x.ApplicationVirtualPath == "/" && x.ToAbsolute(globalSettings.UmbracoPath) == "/umbraco" && x.ToAbsolute(Constants.SystemDirectories.Install) == "/install"),
                 globalSettings,
                 Mock.Of<IRequestCache>(),
                 GetMockLinkGenerator(out var remainingTimeoutSecondsPath, out var isAuthPath));

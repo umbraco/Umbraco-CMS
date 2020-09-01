@@ -68,7 +68,7 @@ namespace Umbraco.Tests.Runtimes
             var globalSettings = new GlobalSettingsBuilder().Build();
             var connectionStrings = new ConnectionStringsBuilder().Build();
             var typeFinder = TestHelper.GetTypeFinder();
-            var databaseFactory = new UmbracoDatabaseFactory(logger, globalSettings, connectionStrings, new Lazy<IMapperCollection>(() => factory.GetInstance<IMapperCollection>()),  TestHelper.DbProviderFactoryCreator);
+            var databaseFactory = new UmbracoDatabaseFactory(logger, Options.Create(globalSettings), Options.Create(connectionStrings), new Lazy<IMapperCollection>(() => factory.GetInstance<IMapperCollection>()),  TestHelper.DbProviderFactoryCreator);
             var ioHelper = TestHelper.IOHelper;
             var hostingEnvironment = Mock.Of<IHostingEnvironment>();
             var typeLoader = new TypeLoader(typeFinder, appCaches.RuntimeCache, new DirectoryInfo(ioHelper.MapPath("~/App_Data/TEMP")), profilingLogger);

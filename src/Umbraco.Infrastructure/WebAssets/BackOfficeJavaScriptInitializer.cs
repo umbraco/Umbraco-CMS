@@ -48,7 +48,7 @@ namespace Umbraco.Web.WebAssets
             }
             jarray.Append("]");
 
-            return WriteScript(jarray.ToString(), hostingEnvironment.ToAbsolute(globalSettings.Path), angularModule);
+            return WriteScript(jarray.ToString(), hostingEnvironment.ToAbsolute(globalSettings.UmbracoPath), angularModule);
         }
 
         /// <summary>

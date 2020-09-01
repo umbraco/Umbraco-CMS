@@ -31,7 +31,7 @@ namespace Umbraco.Web.Install
             _ioHelper = ioHelper;
             _publishedSnapshotService = publishedSnapshotService;
             _permissionDirs = new[] { _globalSettings.UmbracoCssPath, Constants.SystemDirectories.Config, Constants.SystemDirectories.Data, _globalSettings.UmbracoMediaPath, Constants.SystemDirectories.Preview };
-            _packagesPermissionsDirs = new[] { Constants.SystemDirectories.Bin, _globalSettings.Path, Constants.SystemDirectories.Packages };
+            _packagesPermissionsDirs = new[] { Constants.SystemDirectories.Bin, _globalSettings.UmbracoPath, Constants.SystemDirectories.Packages };
         }
 
         public bool RunFilePermissionTestSuite(out Dictionary<string, IEnumerable<string>> report)

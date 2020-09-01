@@ -64,7 +64,7 @@ namespace Umbraco.Web.Common.AspNetCore
                             // creating previewBadge markup
                             markupToInject =
                                 string.Format(ContentSettings.PreviewBadge,
-                                    IOHelper.ResolveUrl(GlobalSettings.Path),
+                                    IOHelper.ResolveUrl(GlobalSettings.UmbracoPath),
                                     Context.Request.GetEncodedUrl(),
                                     UmbracoContext.PublishedRequest.PublishedContent.Id);
                         }

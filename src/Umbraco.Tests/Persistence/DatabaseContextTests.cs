@@ -3,6 +3,7 @@ using System.Configuration;
 using System.Data.SqlServerCe;
 using System.IO;
 using System.Threading;
+using Microsoft.Extensions.Options;
 using Moq;
 using NPoco;
 using NUnit.Framework;
@@ -41,7 +42,7 @@ namespace Umbraco.Tests.Persistence
             _umbracoVersion = TestHelper.GetUmbracoVersion();
             var globalSettings = new GlobalSettingsBuilder().Build();
             var connectionStrings = new ConnectionStringsBuilder().Build();
-            _databaseFactory = new UmbracoDatabaseFactory(_logger, globalSettings, connectionStrings,  new Lazy<IMapperCollection>(() => Mock.Of<IMapperCollection>()), TestHelper.DbProviderFactoryCreator);
+            _databaseFactory = new UmbracoDatabaseFactory(_logger, Options.Create(globalSettings), Options.Create(connectionStrings),  new Lazy<IMapperCollection>(() => Mock.Of<IMapperCollection>()), TestHelper.DbProviderFactoryCreator);
         }
 
         [TearDown]

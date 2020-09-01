@@ -188,7 +188,7 @@ namespace Umbraco.Tests.TestHelpers
                     new PackagesRepository(contentService.Value, contentTypeService.Value, dataTypeService.Value, fileService.Value, macroService.Value, localizationService.Value, hostingEnvironment,
                         new EntityXmlSerializer(contentService.Value, mediaService.Value, dataTypeService.Value, userService.Value, localizationService.Value, contentTypeService.Value, urlSegmentProviders, TestHelper.ShortStringHelper, propertyEditorCollection), logger, umbracoVersion, Options.Create(globalSettings), "installedPackages.config"),
                     new PackageInstallation(
-                        new PackageDataInstallation(logger, fileService.Value, macroService.Value, localizationService.Value, dataTypeService.Value, entityService.Value, contentTypeService.Value, contentService.Value, propertyEditorCollection, scopeProvider, shortStringHelper, Microsoft.Extensions.Options.Options.Create(globalSettings), localizedTextService.Value),
+                        new PackageDataInstallation(logger, fileService.Value, macroService.Value, localizationService.Value, dataTypeService.Value, entityService.Value, contentTypeService.Value, contentService.Value, propertyEditorCollection, scopeProvider, shortStringHelper, Options.Create(globalSettings), localizedTextService.Value),
                         new PackageFileInstallation(compiledPackageXmlParser, ioHelper, new ProfilingLogger(logger, new TestProfiler())),
                         compiledPackageXmlParser, Mock.Of<IPackageActionRunner>(),
                         Mock.Of<IHostingEnvironment>(x => x.ApplicationPhysicalPath == ioHelper.MapPath("~"))),

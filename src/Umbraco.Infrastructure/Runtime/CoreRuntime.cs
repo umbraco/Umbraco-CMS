@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using Microsoft.Extensions.Options;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
@@ -407,7 +408,7 @@ namespace Umbraco.Core.Runtime
         /// </summary>
         /// <remarks>This is strictly internal, for tests only.</remarks>
         protected internal virtual IUmbracoDatabaseFactory GetDatabaseFactory()
-            => new UmbracoDatabaseFactory(Logger, _globalSettings, _connectionStrings, new Lazy<IMapperCollection>(() => _factory.GetInstance<IMapperCollection>()), DbProviderFactoryCreator);
+            => new UmbracoDatabaseFactory(Logger, Options.Create(_globalSettings), Options.Create(_connectionStrings), new Lazy<IMapperCollection>(() => _factory.GetInstance<IMapperCollection>()), DbProviderFactoryCreator);
 
 
         #endregion

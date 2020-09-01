@@ -18,7 +18,7 @@ namespace Umbraco.Tests.Common.Builders
         private bool? _hideTopLevelNodeFromPath;
         private bool? _installEmptyDatabase;
         private bool? _installMissingDatabase;
-        private string _path;
+        private string _umbracoPath;
         private string _registerType;
         private string _reservedPaths;
         private string _reservedUrls;
@@ -81,9 +81,9 @@ namespace Umbraco.Tests.Common.Builders
             return this;
         }
 
-        public GlobalSettingsBuilder<TParent> WithPath(string path)
+        public GlobalSettingsBuilder<TParent> WithUmbracoPath(string umbracoPath)
         {
-            _path = path;
+            _umbracoPath = umbracoPath;
             return this;
         }
 
@@ -164,7 +164,7 @@ namespace Umbraco.Tests.Common.Builders
             var registerType = _registerType ?? null;
             var reservedPaths = _reservedPaths ?? GlobalSettings.StaticReservedPaths;
             var reservedUrls = _reservedUrls ?? GlobalSettings.StaticReservedUrls;
-            var path = _path ?? "~/umbraco";
+            var umbracoPath = _umbracoPath ?? "~/umbraco";
             var useHttps = _useHttps ?? false;
             var umbracoCssPath = _umbracoCssPath ?? "~/css";
             var umbracoMediaPath = _umbracoMediaPath ?? "~/media";
@@ -187,7 +187,7 @@ namespace Umbraco.Tests.Common.Builders
                 RegisterType = registerType,
                 ReservedPaths = reservedPaths,
                 ReservedUrls = reservedUrls,
-                Path = path,
+                UmbracoPath = umbracoPath,
                 UseHttps = useHttps,
                 UmbracoCssPath = umbracoCssPath,
                 UmbracoMediaPath = umbracoMediaPath,

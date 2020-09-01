@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Configuration.Models;
 using Microsoft.Extensions.Options;
+using Umbraco.Core;
+using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Web.Routing
 {
@@ -28,8 +27,6 @@ namespace Umbraco.Web.Routing
         /// <param name="propertyEditorCollection"></param>
         public UrlProvider(IUmbracoContextAccessor umbracoContextAccessor, IOptions<WebRoutingSettings> routingSettings, UrlProviderCollection urlProviders, MediaUrlProviderCollection mediaUrlProviders, IVariationContextAccessor variationContextAccessor)
         {
-            if (routingSettings == null) throw new ArgumentNullException(nameof(routingSettings));
-
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
             _urlProviders = urlProviders;
             _mediaUrlProviders = mediaUrlProviders;

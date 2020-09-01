@@ -77,7 +77,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
 
             var viewPath = Path.Combine(
-                _globalSettings.Path,
+                _globalSettings.UmbracoPath,
                 Constants.Web.Mvc.BackOfficeArea,
                 ControllerExtensions.GetControllerName<PreviewController>() + ".cshtml")
                 .Replace("\\", "/"); // convert to forward slashes since it's a virtual path

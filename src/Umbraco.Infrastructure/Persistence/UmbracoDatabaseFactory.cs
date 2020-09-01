@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data.Common;
 using System.Threading;
+using Microsoft.Extensions.Options;
 using NPoco;
 using NPoco.FluentMappings;
 using Umbraco.Core.Configuration.Models;
@@ -68,8 +69,8 @@ namespace Umbraco.Core.Persistence
         /// Initializes a new instance of the <see cref="UmbracoDatabaseFactory"/>.
         /// </summary>
         /// <remarks>Used by core runtime.</remarks>
-        public UmbracoDatabaseFactory(ILogger logger, GlobalSettings globalSettings, ConnectionStrings connectionStrings, Lazy<IMapperCollection> mappers,IDbProviderFactoryCreator dbProviderFactoryCreator)
-            : this(logger, globalSettings, connectionStrings, Constants.System.UmbracoConnectionName, mappers, dbProviderFactoryCreator)
+        public UmbracoDatabaseFactory(ILogger logger, IOptions<GlobalSettings> globalSettings, IOptions<ConnectionStrings> connectionStrings, Lazy<IMapperCollection> mappers,IDbProviderFactoryCreator dbProviderFactoryCreator)
+            : this(logger, globalSettings.Value, connectionStrings.Value, Constants.System.UmbracoConnectionName, mappers, dbProviderFactoryCreator)
         {
 
         }
