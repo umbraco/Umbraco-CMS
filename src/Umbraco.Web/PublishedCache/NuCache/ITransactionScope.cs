@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 
 namespace Umbraco.Web.PublishedCache.NuCache
 {
-    public interface ITransactable : IDisposable
+    public interface ITransactionScope : IDisposable
     {
-        ITransactionScope BeginTransaction();
+        void Commit();
+        void Rollback();
     }
 }

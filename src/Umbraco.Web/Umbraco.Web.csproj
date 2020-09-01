@@ -260,6 +260,7 @@
     <Compile Include="PropertyEditors\NoopPropertyCompressionOptions.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\MultipleMediaPickerParameterEditor.cs" />
     <Compile Include="PropertyEditors\RichTextEditorPastedImages.cs" />
+    <Compile Include="PublishedCache\NuCache\BPlusTreeTransactionScope.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\IContentData.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\IContentNestedDataSerializer.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\IDictionaryOfPropertyDataSerializer.cs" />
@@ -279,6 +280,7 @@
     <Compile Include="PublishedCache\NuCache\ITransactable.cs" />
     <Compile Include="PublishedCache\NuCache\ITransactableDictionary.cs" />
     <Compile Include="PublishedCache\NuCache\ITransactableDictionaryFactory.cs" />
+    <Compile Include="PublishedCache\NuCache\ITransactionScope.cs" />
     <Compile Include="PublishedCache\NuCache\PublishedSnapshotServiceOptions.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\GenObj.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\GenRef.cs" />

@@ -87,15 +87,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
         #endregion
 
         #region ITransactable
-        public void Commit()
+        public ITransactionScope BeginTransaction()
         {
-            _bplusTree.Commit();
+            return new BPlusTreeTransactionScope<TKey,TValue>(_bplusTree);
         }
 
-        public void Rollback()
-        {
-            _bplusTree.Rollback();
-        }
         #endregion
 
         #region IEnumerable
@@ -208,6 +204,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
             if (File.Exists(_filePath))
                 File.Delete(_filePath);
         }
+
+        
+
         #endregion
     }
 }
