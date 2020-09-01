@@ -217,10 +217,10 @@ function dependencies() {
         {
             "name": "spectrum",
             "src":  [
-                "./node_modules/spectrum-colorpicker/spectrum.js",
-                "./node_modules/spectrum-colorpicker/spectrum.css"
+                "./node_modules/spectrum-colorpicker2/dist/spectrum.js",
+                "./node_modules/spectrum-colorpicker2/dist/spectrum.css"
             ],
-            "base": "./node_modules/spectrum-colorpicker"
+            "base": "./node_modules/spectrum-colorpicker2/dist"
         },
         {
             "name": "tinymce",
