@@ -33,6 +33,7 @@
             var elem = $element.find("input[name='newColor']");
             elem.spectrum({
                 color: null,
+                type: "color",
                 showAlpha: false,
                 showInitial: false,
                 showInput: true,
