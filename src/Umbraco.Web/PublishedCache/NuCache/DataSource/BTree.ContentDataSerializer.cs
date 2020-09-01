@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using CSharpTest.Net.Serialization;
 
 namespace Umbraco.Web.PublishedCache.NuCache.DataSource
@@ -6,21 +7,27 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
     /// <summary>
     /// Serializes/Deserializes data to BTree data source for <see cref="ContentData"/>
     /// </summary>
-    internal class ContentDataSerializer : ISerializer<ContentData>
+    public class ContentDataSerializer : ISerializer<IContentData>
     {
-        public ContentDataSerializer(IDictionaryOfPropertyDataSerializer dictionaryOfPropertyDataSerializer = null)
+        public ContentDataSerializer(ISerializer<IDictionary<string, PropertyData[]>> dictionaryOfPropertyDataSerializer = null, ISerializer<IReadOnlyDictionary<string, CultureVariation>> dictionaryOfCultureVariationSerializer = null)
         {
             _dictionaryOfPropertyDataSerializer = dictionaryOfPropertyDataSerializer;
-            if(_dictionaryOfPropertyDataSerializer == null)
+            if (_dictionaryOfPropertyDataSerializer == null)
             {
                 _dictionaryOfPropertyDataSerializer = DefaultPropertiesSerializer;
             }
+            _dictionaryOfCultureVariationSerializer = dictionaryOfCultureVariationSerializer;
+            if (_dictionaryOfCultureVariationSerializer == null)
+            {
+                _dictionaryOfCultureVariationSerializer = DefaultCultureVariationsSerializer;
+            }
         }
-        private static readonly DictionaryOfPropertyDataSerializer DefaultPropertiesSerializer = new DictionaryOfPropertyDataSerializer();
-        private static readonly DictionaryOfCultureVariationSerializer DefaultCultureVariationsSerializer = new DictionaryOfCultureVariationSerializer();
-        private readonly IDictionaryOfPropertyDataSerializer _dictionaryOfPropertyDataSerializer;
+        private static readonly ISerializer<IDictionary<string, PropertyData[]>> DefaultPropertiesSerializer = new DictionaryOfPropertyDataSerializer();
+        private static readonly ISerializer<IReadOnlyDictionary<string, CultureVariation>> DefaultCultureVariationsSerializer = new DictionaryOfCultureVariationSerializer();
+        private readonly ISerializer<IDictionary<string, PropertyData[]>> _dictionaryOfPropertyDataSerializer;
+        private readonly ISerializer<IReadOnlyDictionary<string, CultureVariation>> _dictionaryOfCultureVariationSerializer;
 
-        public ContentData ReadFrom(Stream stream)
+        public IContentData ReadFrom(Stream stream)
         {
             return new ContentData
             {
@@ -36,7 +43,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             };
         }
 
-        public void WriteTo(ContentData value, Stream stream)
+        public void WriteTo(IContentData value, Stream stream)
         {
             PrimitiveSerializer.Boolean.WriteTo(value.Published, stream);
             PrimitiveSerializer.String.WriteTo(value.Name, stream);

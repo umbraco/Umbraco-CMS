@@ -6,10 +6,11 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 {
     public class BTree
     {
-        public static BPlusTree<int, ContentNodeKit> GetTree(string filepath, bool exists, ISerializer<ContentData> contentDataSerializer = null)
+        public static BPlusTree<int, ContentNodeKit> GetTree(string filepath, bool exists, ISerializer<ContentNodeKit> contentNodeKitSerializer = null)
         {
             var keySerializer = new PrimitiveSerializer();
-            var valueSerializer = new ContentNodeKitSerializer(contentDataSerializer);
+            var valueSerializer = contentNodeKitSerializer;
+
             var options = new BPlusTree<int, ContentNodeKit>.OptionsV2(keySerializer, valueSerializer)
             {
                 CreateFile = exists ? CreatePolicy.IfNeeded : CreatePolicy.Always,

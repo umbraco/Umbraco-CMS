@@ -8,8 +8,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
     {
         public ContentNode Node;
         public int ContentTypeId;
-        public ContentData DraftData;
-        public ContentData PublishedData;
+        public IContentData DraftData;
+        public IContentData PublishedData;
 
         public bool IsEmpty => Node == null;
 

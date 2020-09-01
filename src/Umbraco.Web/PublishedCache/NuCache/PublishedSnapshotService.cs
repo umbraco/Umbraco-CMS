@@ -7,8 +7,6 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using CSharpTest.Net.Collections;
-using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
@@ -178,16 +176,18 @@ namespace Umbraco.Web.PublishedCache.NuCache
         /// </remarks>
         private void MainDomRegister()
         {
-            var path = GetLocalFilesPath();
-            var localContentDbPath = Path.Combine(path, "NuCache.Content.db");
-            var localMediaDbPath = Path.Combine(path, "NuCache.Media.db");
-
-            _localContentDbExists = File.Exists(localContentDbPath);
-            _localMediaDbExists = File.Exists(localMediaDbPath);
 
             // if both local databases exist then GetTree will open them, else new databases will be created
-            _localContentDb = _transactableDictionaryFactory.Get(localContentDbPath, _localContentDbExists);
-            _localMediaDb = _transactableDictionaryFactory.Get(localMediaDbPath, _localMediaDbExists);
+            var path = GetLocalFilesPath();
+
+            var localContentDbPath = Path.Combine(path, "NuCache.Content.db");
+            _localContentDbExists = File.Exists(localContentDbPath);
+
+            _localContentDb = _transactableDictionaryFactory.Create(localContentDbPath, _localContentDbExists);
+
+            var localMediaDbPath = Path.Combine(path, "NuCache.Media.db");
+            _localMediaDbExists = File.Exists(localMediaDbPath);
+            _localMediaDb = _transactableDictionaryFactory.Create(localMediaDbPath, _localMediaDbExists);
 
             _logger.Info<PublishedSnapshotService>("Registered with MainDom, localContentDbExists? {LocalContentDbExists}, localMediaDbExists? {LocalMediaDbExists}", _localContentDbExists, _localMediaDbExists);
         }
@@ -329,10 +329,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             if (_isReady && _localContentDb != null)
                 throw new InvalidOperationException("Cannot delete local files while the cache uses them.");
 
-            var path = GetLocalFilesPath();
-            var localContentDbPath = Path.Combine(path, "NuCache.Content.db");
-            if (File.Exists(localContentDbPath))
-                File.Delete(localContentDbPath);
+            _localContentDb.DeleteLocalFiles();
         }
 
         private void DeleteLocalFilesForMedia()
@@ -340,10 +337,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             if (_isReady && _localMediaDb != null)
                 throw new InvalidOperationException("Cannot delete local files while the cache uses them.");
 
-            var path = GetLocalFilesPath();
-            var localMediaDbPath = Path.Combine(path, "NuCache.Media.db");
-            if (File.Exists(localMediaDbPath))
-                File.Delete(localMediaDbPath);
+            _localMediaDb.DeleteLocalFiles();
         }
 
         #endregion

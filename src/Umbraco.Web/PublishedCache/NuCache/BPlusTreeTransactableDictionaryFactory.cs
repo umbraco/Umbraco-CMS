@@ -10,15 +10,15 @@ namespace Umbraco.Web.PublishedCache.NuCache
 {
     public class BPlusTreeTransactableDictionaryFactory : ITransactableDictionaryFactory
     {
-        private readonly ISerializer<ContentData> _contentDataSerializer;
+        private readonly ISerializer<ContentNodeKit> _contentNodeKitSerializer;
 
-        public BPlusTreeTransactableDictionaryFactory(ISerializer<ContentData> contentDataSerializer = null)
+        public BPlusTreeTransactableDictionaryFactory(ISerializer<ContentNodeKit> contentNodeKitSerializer = null)
         {
-            _contentDataSerializer = contentDataSerializer;
+            _contentNodeKitSerializer = contentNodeKitSerializer;
         }
-        public ITransactableDictionary<int, ContentNodeKit> Get(string filepath, bool exists)
+        public ITransactableDictionary<int, ContentNodeKit> Create(string filepath, bool exists)
         {
-            return new BPlusTreeTransactableDictionary<int, ContentNodeKit>(BTree.GetTree(filepath, exists, _contentDataSerializer));
+            return new BPlusTreeTransactableDictionary<int, ContentNodeKit>(BTree.GetTree(filepath, exists, _contentNodeKitSerializer), filepath);
         }
     }
 }

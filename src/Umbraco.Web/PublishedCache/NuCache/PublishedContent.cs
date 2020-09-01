@@ -21,7 +21,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public PublishedContent(
             ContentNode contentNode,
-            ContentData contentData,
+            IContentData contentData,
             IPublishedSnapshotAccessor publishedSnapshotAccessor,
             IVariationContextAccessor variationContextAccessor)
         {
@@ -142,7 +142,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         #region PublishedContent
 
-        internal ContentData ContentData { get; }
+        internal IContentData ContentData { get; }
 
         /// <inheritdoc />
         public override int Id => _contentNode.Id;

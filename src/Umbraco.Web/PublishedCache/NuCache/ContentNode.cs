@@ -70,7 +70,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         }
 
         // two-phase ctor, phase 2
-        public void SetContentTypeAndData(IPublishedContentType contentType, ContentData draftData, ContentData publishedData, IPublishedSnapshotAccessor publishedSnapshotAccessor, IVariationContextAccessor variationContextAccessor)
+        public void SetContentTypeAndData(IPublishedContentType contentType, IContentData draftData, IContentData publishedData, IPublishedSnapshotAccessor publishedSnapshotAccessor, IVariationContextAccessor variationContextAccessor)
         {
             ContentType = contentType;
 
@@ -129,8 +129,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
         public readonly DateTime CreateDate;
         public readonly int CreatorId;
 
-        private ContentData _draftData;
-        private ContentData _publishedData;
+        private IContentData _draftData;
+        private IContentData _publishedData;
         private IVariationContextAccessor _variationContextAccessor;
         private IPublishedSnapshotAccessor _publishedSnapshotAccessor;
 
@@ -142,7 +142,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private IPublishedContent _draftModel;
         private IPublishedContent _publishedModel;
 
-        private IPublishedContent GetModel(ref IPublishedContent model, ContentData contentData)
+        private IPublishedContent GetModel(ref IPublishedContent model, IContentData contentData)
         {
             if (model != null) return model;
             if (contentData == null) return null;

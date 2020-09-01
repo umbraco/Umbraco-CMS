@@ -13,10 +13,16 @@ namespace Umbraco.Web.PublishedCache.NuCache
         IEnumerable,
         IDisposable
     {
+        /// <summary>
+        /// Whether the files exist in the local filesystem
+        /// </summary>
+        /// <returns></returns>
+        bool LocalFilesExist();
+
+        /// <summary>
+        /// Delete the local files
+        /// </summary>
+        void DeleteLocalFiles();
     }
-    public interface ITransactable : IDisposable
-    {
-        void Commit();
-        void Rollback();
-    }
+    
 }

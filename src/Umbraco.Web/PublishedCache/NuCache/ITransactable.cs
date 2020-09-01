@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 
 namespace Umbraco.Web.PublishedCache.NuCache
 {
-    public interface ITransactableDictionaryFactory
+    public interface ITransactable : IDisposable
     {
-        ITransactableDictionary<int, ContentNodeKit> Create(string filepath, bool exists);
+        void Commit();
+        void Rollback();
     }
 }

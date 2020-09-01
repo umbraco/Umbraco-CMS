@@ -3,6 +3,7 @@ using CSharpTest.Net.Interfaces;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,11 +13,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
     public class BPlusTreeTransactableDictionary<TKey, TValue> : ITransactableDictionary<TKey, TValue>
     {
         private readonly BPlusTree<TKey, TValue> _bplusTree;
+        private readonly string _filePath;
         private bool _disposedValue;
 
-        public BPlusTreeTransactableDictionary(BPlusTree<TKey, TValue> bplusTree)
+        public BPlusTreeTransactableDictionary(BPlusTree<TKey, TValue> bplusTree,string filePath)
         {
             _bplusTree = bplusTree;
+            _filePath = filePath;
         }
 
         #region IDictionary
@@ -190,10 +193,21 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
             return _bplusTree.TryRemove(key, out value);
         }
+
         #endregion
 
-        #region DictionaryEX
+        #region ITransactableDictionary
 
+        public bool LocalFilesExist()
+        {
+            return File.Exists(_filePath);
+        }
+
+        public void DeleteLocalFiles()
+        {
+            if (File.Exists(_filePath))
+                File.Delete(_filePath);
+        }
         #endregion
     }
 }

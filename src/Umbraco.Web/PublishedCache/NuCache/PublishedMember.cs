@@ -18,7 +18,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private PublishedMember(
             IMember member,
             ContentNode contentNode,
-            ContentData contentData,
+            IContentData contentData,
             IPublishedSnapshotAccessor publishedSnapshotAccessor,
             IVariationContextAccessor variationContextAccessor)
             : base(contentNode, contentData, publishedSnapshotAccessor, variationContextAccessor)
