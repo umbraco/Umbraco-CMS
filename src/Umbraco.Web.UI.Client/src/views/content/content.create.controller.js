@@ -2,7 +2,7 @@
  * @ngdoc controller
  * @name Umbraco.Editors.Content.CreateController
  * @function
- * 
+ *
  * @description
  * The controller for the content creation dialog
  */
@@ -22,7 +22,7 @@ function contentCreateController($scope,
     function initialize() {
         $scope.loading = true;
         $scope.allowedTypes = null;
-        
+
         var getAllowedTypes = contentTypeResource.getAllowedTypes($scope.currentNode.id).then(function (data) {
             $scope.allowedTypes = iconHelper.formatContentTypeIcons(data);
             if ($scope.allowedTypes.length === 0) {
@@ -60,13 +60,13 @@ function contentCreateController($scope,
             .path("/content/content/edit/" + $scope.currentNode.id)
             .search("doctype", docType.alias)
             .search("create", "true")
-            /* when we create a new node we want to make sure it uses the same 
+            /* when we create a new node we want to make sure it uses the same
             language as what is selected in the tree */
             .search("cculture", mainCulture)
-            /* when we create a new node we must make sure that any previously 
+            /* when we create a new node we must make sure that any previously
             opened segments is reset */
             .search("csegment", null)
-            /* when we create a new node we must make sure that any previously 
+            /* when we create a new node we must make sure that any previously
             used blueprint is reset */
             .search("blueprintId", null);
         close();
@@ -92,8 +92,6 @@ function contentCreateController($scope,
         } else {
             createBlank(docType);
         }
-
-        navigationService.hideDialog();
     }
 
     function createFromBlueprint(blueprintId) {
@@ -127,7 +125,7 @@ function contentCreateController($scope,
     $scope.createOrSelectBlueprintIfAny = createOrSelectBlueprintIfAny;
     $scope.createFromBlueprint = createFromBlueprint;
 
-    // the current node changes behind the scenes when the context menu is clicked without closing 
+    // the current node changes behind the scenes when the context menu is clicked without closing
     // the default menu first, so we must watch the current node and re-initialize accordingly
     var unbindModelWatcher = $scope.$watch("currentNode", initialize);
     $scope.$on('$destroy', function () {
