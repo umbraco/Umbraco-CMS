@@ -43,8 +43,8 @@
 
         function onInit() {
             vm.inputId = vm.inputId || "umb-search-filter_" + String.CreateGuid();
-            vm.autoFocus = vm.autoFocus === true;
-            vm.preventSubmitOnEnter = vm.preventSubmitOnEnter === true;
+            vm.autoFocus = Object.toBoolean(vm.autoFocus) === true;
+            vm.preventSubmitOnEnter = Object.toBoolean(vm.preventSubmitOnEnter) === true;
 
             // If a labelKey is passed let's update the returned text if it's does not contain an opening square bracket [
             if (vm.labelKey) {
