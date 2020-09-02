@@ -51,7 +51,7 @@ namespace Umbraco.Tests.Packaging
             new ConflictingPackageData(
                 ServiceContext.MacroService,
                 ServiceContext.FileService),
-                new GlobalSettingsBuilder().Build());
+                Microsoft.Extensions.Options.Options.Create(new GlobalSettingsBuilder().Build()));
 
         private PackageDataInstallation PackageDataInstallation => new PackageDataInstallation(
             Logger, ServiceContext.FileService, ServiceContext.MacroService, ServiceContext.LocalizationService,

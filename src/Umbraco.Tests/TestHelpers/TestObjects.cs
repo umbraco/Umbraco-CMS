@@ -180,7 +180,7 @@ namespace Umbraco.Tests.TestHelpers
             var macroService = GetLazyService<IMacroService>(factory, c => new MacroService(scopeProvider, logger, eventMessagesFactory, GetRepo<IMacroRepository>(c), GetRepo<IAuditRepository>(c)));
             var packagingService = GetLazyService<IPackagingService>(factory, c =>
             {
-                var compiledPackageXmlParser = new CompiledPackageXmlParser(new ConflictingPackageData(macroService.Value, fileService.Value), globalSettings);
+                var compiledPackageXmlParser = new CompiledPackageXmlParser(new ConflictingPackageData(macroService.Value, fileService.Value), Options.Create(globalSettings));
                 return new PackagingService(
                     auditService.Value,
                     new PackagesRepository(contentService.Value, contentTypeService.Value, dataTypeService.Value, fileService.Value, macroService.Value, localizationService.Value, hostingEnvironment,

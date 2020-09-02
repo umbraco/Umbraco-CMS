@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
+using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models.Packaging;
 using File = System.IO.File;
@@ -17,10 +18,10 @@ namespace Umbraco.Core.Packaging
         private readonly ConflictingPackageData _conflictingPackageData;
         private readonly GlobalSettings _globalSettings;
 
-        public CompiledPackageXmlParser(ConflictingPackageData conflictingPackageData, GlobalSettings globalSettings)
+        public CompiledPackageXmlParser(ConflictingPackageData conflictingPackageData, IOptions<GlobalSettings> globalSettings)
         {
             _conflictingPackageData = conflictingPackageData;
-            _globalSettings = globalSettings;
+            _globalSettings = globalSettings.Value;
         }
 
         public CompiledPackage ToCompiledPackage(XDocument xml, FileInfo packageFile, string applicationRootFolder)
