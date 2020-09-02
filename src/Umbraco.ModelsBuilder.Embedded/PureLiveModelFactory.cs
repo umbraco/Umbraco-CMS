@@ -9,8 +9,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Web;
-using System.Web.Compilation;
-using System.Web.WebPages.Razor;
 using Umbraco.Core.Configuration;
 using Umbraco.Core;
 using Umbraco.Core.Hosting;
@@ -19,6 +17,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.ModelsBuilder.Embedded.Building;
 using File = System.IO.File;
+using Umbraco.Core.Composing;
 
 namespace Umbraco.ModelsBuilder.Embedded
 {
@@ -33,18 +32,21 @@ namespace Umbraco.ModelsBuilder.Embedded
         private readonly FileSystemWatcher _watcher;
         private int _ver, _skipver;
         private readonly int _debugLevel;
-        private BuildManager _theBuildManager;
+        private RoslynCompiler _roslynCompiler;
         private readonly Lazy<UmbracoServices> _umbracoServices; // fixme: this is because of circular refs :(
         private UmbracoServices UmbracoServices => _umbracoServices.Value;
 
         private static readonly Regex AssemblyVersionRegex = new Regex("AssemblyVersion\\(\"[0-9]+.[0-9]+.[0-9]+.[0-9]+\"\\)", RegexOptions.Compiled);
         private const string ProjVirt = "~/App_Data/Models/all.generated.cs";
+        private const string CodeGen = "~/App_Data/Models/";
         private static readonly string[] OurFiles = { "models.hash", "models.generated.cs", "all.generated.cs", "all.dll.path", "models.err" };
 
         private readonly IModelsBuilderConfig _config;
+        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IApplicationShutdownRegistry _hostingLifetime;
-        private readonly IIOHelper _ioHelper;
         private readonly ModelsGenerationError _errors;
+        private readonly ITypeFinder _typeFinder;
+        private readonly IPublishedValueFallback _publishedValueFallback;
 
         public PureLiveModelFactory(
             Lazy<UmbracoServices> umbracoServices,
@@ -52,22 +54,25 @@ namespace Umbraco.ModelsBuilder.Embedded
             IModelsBuilderConfig config,
             IHostingEnvironment hostingEnvironment,
             IApplicationShutdownRegistry hostingLifetime,
-            IIOHelper ioHelper)
+            ITypeFinder typeFinder,
+            IPublishedValueFallback publishedValueFallback)
         {
             _umbracoServices = umbracoServices;
             _logger = logger;
             _config = config;
+            _hostingEnvironment = hostingEnvironment;
             _hostingLifetime = hostingLifetime;
-            _ioHelper = ioHelper;
-            _errors = new ModelsGenerationError(config, ioHelper);
+            _typeFinder = typeFinder;
+            _publishedValueFallback = publishedValueFallback;
+            _errors = new ModelsGenerationError(config, _hostingEnvironment);
             _ver = 1; // zero is for when we had no version
             _skipver = -1; // nothing to skip
 
-            RazorBuildProvider.CodeGenerationStarted += RazorBuildProvider_CodeGenerationStarted;
+            // RazorBuildProvider.CodeGenerationStarted += RazorBuildProvider_CodeGenerationStarted;
 
             if (!hostingEnvironment.IsHosted) return;
 
-            var modelsDirectory = _config.ModelsDirectoryAbsolute(_ioHelper);
+            var modelsDirectory = _config.ModelsDirectoryAbsolute(_hostingEnvironment);
             if (!Directory.Exists(modelsDirectory))
                 Directory.CreateDirectory(modelsDirectory);
 
@@ -113,7 +118,7 @@ namespace Umbraco.ModelsBuilder.Embedded
             infos.TryGetValue(contentTypeAlias, out var info);
 
             // create model
-            return info == null ? element : info.Ctor(element);
+            return info == null ? element : info.Ctor(element, _publishedValueFallback);
         }
 
         // this runs only once the factory is ready
@@ -200,13 +205,14 @@ namespace Umbraco.ModelsBuilder.Embedded
 
                 if (_debugLevel > 0)
                     _logger.Debug<PureLiveModelFactory>("RazorBuildProvider.CodeGenerationStarted");
-                if (!(sender is RazorBuildProvider provider)) return;
+                // TODO: How to handle this? 
+                // if (!(sender is RazorBuildProvider provider)) return;
 
                 // add the assembly, and add a dependency to a text file that will change on each
                 // compilation as in some environments (could not figure which/why) the BuildManager
                 // would not re-compile the views when the models assembly is rebuilt.
-                provider.AssemblyBuilder.AddAssemblyReference(_modelsAssembly);
-                provider.AddVirtualPathDependency(ProjVirt);
+                //provider.AssemblyBuilder.AddAssemblyReference(_modelsAssembly);
+                //provider.AddVirtualPathDependency(ProjVirt);
             }
             finally
             {
@@ -227,7 +233,7 @@ namespace Umbraco.ModelsBuilder.Embedded
                 _hasModels = false;
                 _pendingRebuild = true;
 
-                var modelsDirectory = _config.ModelsDirectoryAbsolute(_ioHelper);
+                var modelsDirectory = _config.ModelsDirectoryAbsolute(_hostingEnvironment);
                 if (!Directory.Exists(modelsDirectory))
                     Directory.CreateDirectory(modelsDirectory);
 
@@ -248,16 +254,13 @@ namespace Umbraco.ModelsBuilder.Embedded
         }
 
         // gets "the" build manager
-        private BuildManager TheBuildManager
+        private RoslynCompiler RoslynCompiler
         {
             get
             {
-                if (_theBuildManager != null) return _theBuildManager;
-                var prop = typeof(BuildManager).GetProperty("TheBuildManager", BindingFlags.NonPublic | BindingFlags.Static);
-                if (prop == null)
-                    throw new InvalidOperationException("Could not get BuildManager.TheBuildManager property.");
-                _theBuildManager = (BuildManager)prop.GetValue(null);
-                return _theBuildManager;
+                if (_roslynCompiler != null) return _roslynCompiler;
+                _roslynCompiler = new RoslynCompiler(System.Runtime.Loader.AssemblyLoadContext.All.SelectMany(x => x.Assemblies));
+                return _roslynCompiler;
             }
         }
 
@@ -285,7 +288,7 @@ namespace Umbraco.ModelsBuilder.Embedded
             {
                 // always take the BuildManager lock *before* taking the _locker lock
                 // to avoid possible deadlock situations (see notes above)
-                Monitor.Enter(TheBuildManager, ref buildManagerLocked);
+                Monitor.Enter(RoslynCompiler, ref buildManagerLocked);
 
                 _locker.EnterUpgradeableReadLock();
 
@@ -343,13 +346,13 @@ namespace Umbraco.ModelsBuilder.Embedded
                 if (_locker.IsUpgradeableReadLockHeld)
                     _locker.ExitUpgradeableReadLock();
                 if (buildManagerLocked)
-                    Monitor.Exit(TheBuildManager);
+                    Monitor.Exit(RoslynCompiler);
             }
         }
 
         private Assembly GetModelsAssembly(bool forceRebuild)
         {
-            var modelsDirectory = _config.ModelsDirectoryAbsolute(_ioHelper);
+            var modelsDirectory = _config.ModelsDirectoryAbsolute(_hostingEnvironment);
             if (!Directory.Exists(modelsDirectory))
                 Directory.CreateDirectory(modelsDirectory);
 
@@ -402,7 +405,7 @@ namespace Umbraco.ModelsBuilder.Embedded
                 if (File.Exists(dllPathFile))
                 {
                     var dllPath = File.ReadAllText(dllPathFile);
-                    var codegen = HttpRuntime.CodegenDir;
+                    var codegen = CodeGen;
 
                     _logger.Debug<PureLiveModelFactory>($"Cached models dll at {dllPath}.");
 
@@ -452,7 +455,7 @@ namespace Umbraco.ModelsBuilder.Embedded
                 _ver++;
                 try
                 {
-                    assembly = BuildManager.GetCompiledAssembly(ProjVirt);
+                    assembly = RoslynCompiler.GetCompiledAssembly(_hostingEnvironment.MapPathContentRoot(ProjVirt), Path.Combine(_hostingEnvironment.ApplicationPhysicalPath, "App_Data", $"generated.cs.{currentHash}.dll"));
                     File.WriteAllText(dllPathFile, assembly.Location);
                 }
                 catch
@@ -490,7 +493,7 @@ namespace Umbraco.ModelsBuilder.Embedded
             // compile and register
             try
             {
-                assembly = BuildManager.GetCompiledAssembly(ProjVirt);
+                assembly = RoslynCompiler.GetCompiledAssembly(_hostingEnvironment.MapPathContentRoot(ProjVirt), Path.Combine(_hostingEnvironment.ApplicationPhysicalPath, "App_Data", $"generated.cs.{currentHash}.dll"));
                 File.WriteAllText(dllPathFile, assembly.Location);
                 File.WriteAllText(modelsHashFile, currentHash);
             }
@@ -523,7 +526,7 @@ namespace Umbraco.ModelsBuilder.Embedded
 
         private static Infos RegisterModels(IEnumerable<Type> types)
         {
-            var ctorArgTypes = new[] { typeof(IPublishedElement) };
+            var ctorArgTypes = new[] { typeof(IPublishedElement), typeof(IPublishedValueFallback) };
             var modelInfos = new Dictionary<string, ModelInfo>(StringComparer.InvariantCultureIgnoreCase);
             var map = new Dictionary<string, Type>();
 
@@ -535,7 +538,7 @@ namespace Umbraco.ModelsBuilder.Embedded
                 foreach (var ctor in type.GetConstructors())
                 {
                     var parms = ctor.GetParameters();
-                    if (parms.Length == 1 && typeof(IPublishedElement).IsAssignableFrom(parms[0].ParameterType))
+                    if (parms.Length == 2 && typeof(IPublishedElement).IsAssignableFrom(parms[0].ParameterType) && typeof(IPublishedValueFallback).IsAssignableFrom(parms[1].ParameterType))
                     {
                         if (constructor != null)
                             throw new InvalidOperationException($"Type {type.FullName} has more than one public constructor with one argument of type, or implementing, IPropertySet.");
@@ -562,7 +565,7 @@ namespace Umbraco.ModelsBuilder.Embedded
                 gen.Emit(OpCodes.Ldarg_0);
                 gen.Emit(OpCodes.Newobj, constructor);
                 gen.Emit(OpCodes.Ret);
-                var func = (Func<IPublishedElement, IPublishedElement>)meth.CreateDelegate(typeof(Func<IPublishedElement, IPublishedElement>));
+                var func = (Func<IPublishedElement, IPublishedValueFallback, IPublishedElement>)meth.CreateDelegate(typeof(Func<IPublishedElement, IPublishedValueFallback, IPublishedElement>));
 
                 modelInfos[typeName] = new ModelInfo { ParameterType = parameterType, Ctor = func, ModelType = type };
                 map[typeName] = type;
@@ -573,7 +576,7 @@ namespace Umbraco.ModelsBuilder.Embedded
 
         private string GenerateModelsCode(IList<TypeModel> typeModels)
         {
-            var modelsDirectory = _config.ModelsDirectoryAbsolute(_ioHelper);
+            var modelsDirectory = _config.ModelsDirectoryAbsolute(_hostingEnvironment);
             if (!Directory.Exists(modelsDirectory))
                 Directory.CreateDirectory(modelsDirectory);
 
@@ -651,7 +654,7 @@ namespace Umbraco.ModelsBuilder.Embedded
         internal class ModelInfo
         {
             public Type ParameterType { get; set; }
-            public Func<IPublishedElement, IPublishedElement> Ctor { get; set; }
+            public Func<IPublishedElement, IPublishedValueFallback, IPublishedElement> Ctor { get; set; }
             public Type ModelType { get; set; }
             public Func<IList> ListCtor { get; set; }
         }

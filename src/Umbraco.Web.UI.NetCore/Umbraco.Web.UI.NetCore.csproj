@@ -98,6 +98,7 @@
         <Content Remove="Umbraco\PartialViewMacros\Templates\EditProfile.cshtml" />
     </ItemGroup>
 
+    <ItemGroup>
         <Content Remove="App_Data\**" />
     </ItemGroup>
 

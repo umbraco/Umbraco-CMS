@@ -29,7 +29,7 @@ namespace Umbraco.Configuration.Models
         ///     <para>If this is false then absolutely nothing happens.</para>
         ///     <para>Default value is <c>false</c> which means that unless we have this setting, nothing happens.</para>
         /// </remarks>
-        public bool Enable => _configuration.GetValue(Prefix+"Enable", false);
+        public bool Enable => _configuration.GetValue(Prefix+"Enable", true);
 
         /// <summary>
         ///     Gets the models mode.

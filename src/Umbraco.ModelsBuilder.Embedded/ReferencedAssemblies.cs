@@ -9,12 +9,12 @@ namespace Umbraco.ModelsBuilder.Embedded
     internal static class ReferencedAssemblies
     {
         private static readonly Lazy<IEnumerable<string>> LazyLocations;
-
+        // TODO: Do we even use this anymore?
         static ReferencedAssemblies()
         {
-            LazyLocations = new Lazy<IEnumerable<string>>(() => Current.HostingEnvironment.IsHosted // fixme inject!
-                ? GetAllReferencedAssembliesLocationFromBuildManager()
-                : GetAllReferencedAssembliesFromDomain());
+            //LazyLocations = new Lazy<IEnumerable<string>>(() => Current.HostingEnvironment.IsHosted // fixme inject!
+            //    ? GetAllReferencedAssembliesLocationFromBuildManager()
+            //    : GetAllReferencedAssembliesFromDomain());
         }
 
         /// <summary>
@@ -26,7 +26,7 @@ namespace Umbraco.ModelsBuilder.Embedded
         public static Assembly GetNetStandardAssembly(List<Assembly> assemblies)
         {
             if (assemblies == null)
-                assemblies = BuildManager.GetReferencedAssemblies().Cast<Assembly>().ToList();
+                //assemblies = BuildManager.GetReferencedAssemblies().Cast<Assembly>().ToList();
 
             // for some reason, netstandard is also missing from BuildManager.ReferencedAssemblies and yet, is part of
             // the references that CSharpCompiler (above) receives - where is it coming from? cannot figure it out
@@ -60,34 +60,34 @@ namespace Umbraco.ModelsBuilder.Embedded
         }
 
         // hosted, get referenced assemblies from the BuildManager and filter
-        private static IEnumerable<string> GetAllReferencedAssembliesLocationFromBuildManager()
-        {
-            var assemblies = BuildManager.GetReferencedAssemblies().Cast<Assembly>().ToList();
+        //private static IEnumerable<string> GetAllReferencedAssembliesLocationFromBuildManager()
+        //{
+        //    //var assemblies = BuildManager.GetReferencedAssemblies().Cast<Assembly>().ToList();
 
-            assemblies.Add(typeof(ReferencedAssemblies).Assembly); // always include ourselves
+        //    assemblies.Add(typeof(ReferencedAssemblies).Assembly); // always include ourselves
 
-            // see https://github.com/aspnet/RoslynCodeDomProvider/blob/master/src/Microsoft.CodeDom.Providers.DotNetCompilerPlatform/CSharpCompiler.cs:
-            // mentions "Bug 913691: Explicitly add System.Runtime as a reference."
-            // and explicitly adds System.Runtime to references before invoking csc.exe
-            // so, doing the same here
-            try
-            {
-                var systemRuntime = Assembly.Load("System.Runtime, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a");
-                assemblies.Add(systemRuntime);
-            }
-            catch { /* never mind */ }
+        //    // see https://github.com/aspnet/RoslynCodeDomProvider/blob/master/src/Microsoft.CodeDom.Providers.DotNetCompilerPlatform/CSharpCompiler.cs:
+        //    // mentions "Bug 913691: Explicitly add System.Runtime as a reference."
+        //    // and explicitly adds System.Runtime to references before invoking csc.exe
+        //    // so, doing the same here
+        //    try
+        //    {
+        //        var systemRuntime = Assembly.Load("System.Runtime, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a");
+        //        assemblies.Add(systemRuntime);
+        //    }
+        //    catch { /* never mind */ }
 
-            // for some reason, netstandard is also missing from BuildManager.ReferencedAssemblies and yet, is part of
-            // the references that CSharpCompiler (above) receives - where is it coming from? cannot figure it out
-            var netStandard = GetNetStandardAssembly(assemblies);
-            if (netStandard != null) assemblies.Add(netStandard);
+        //    // for some reason, netstandard is also missing from BuildManager.ReferencedAssemblies and yet, is part of
+        //    // the references that CSharpCompiler (above) receives - where is it coming from? cannot figure it out
+        //    var netStandard = GetNetStandardAssembly(assemblies);
+        //    if (netStandard != null) assemblies.Add(netStandard);
 
-            return assemblies
-                .Where(x => !x.IsDynamic && !x.Location.IsNullOrWhiteSpace())
-                .Select(x => x.Location)
-                .Distinct()
-                .ToList();
-        }
+        //    return assemblies
+        //        .Where(x => !x.IsDynamic && !x.Location.IsNullOrWhiteSpace())
+        //        .Select(x => x.Location)
+        //        .Distinct()
+        //        .ToList();
+        //}
 
         // non-hosted, do our best
         private static IEnumerable<string> GetAllReferencedAssembliesFromDomain()

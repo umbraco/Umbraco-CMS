@@ -26,14 +26,11 @@ namespace Umbraco.ModelsBuilder.Embedded.Building
         protected readonly IList<string> TypesUsing = new List<string>
         {
             "System",
-            "System.Collections.Generic",
             "System.Linq.Expressions",
-            "System.Web",
-            "Umbraco.Core.Models",
             "Umbraco.Core.Models.PublishedContent",
-            "Umbraco.Web",
             "Umbraco.Web.PublishedCache",
-            "Umbraco.ModelsBuilder.Embedded"
+            "Umbraco.ModelsBuilder.Embedded",
+            "Umbraco.Core"
         };
 
         /// <summary>
