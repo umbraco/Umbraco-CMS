@@ -129,10 +129,6 @@ namespace Umbraco.Tests.Integration.TestServerTest
 
         public override void ConfigureServices(IServiceCollection services)
         {
-            //services.AddSingleton(TestHelper.DbProviderFactoryCreator);
-            //var webHostEnvironment = TestHelper.GetWebHostEnvironment();
-            //services.AddRequiredNetCoreServices(TestHelper, webHostEnvironment);
-
             var umbracoBuilder = services.AddUmbraco(TestHelper.GetWebHostEnvironment(), Configuration);
             umbracoBuilder
                 .WithConfiguration()
@@ -141,7 +137,7 @@ namespace Umbraco.Tests.Integration.TestServerTest
                 .WithRuntimeMinifier()
                 .WithBackOffice()
                 .WithBackOfficeIdentity()
-                //.WithMiniProfiler()
+                //.WithMiniProfiler() // we don't want this running in tests
                 .WithMvcAndRazor(mvcBuilding: mvcBuilder =>
                 {
                     mvcBuilder.AddApplicationPart(typeof(ContentController).Assembly);                    
