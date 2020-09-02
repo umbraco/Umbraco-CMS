@@ -37,7 +37,6 @@ namespace Umbraco.ModelsBuilder.Embedded
         private UmbracoServices UmbracoServices => _umbracoServices.Value;
 
         private static readonly Regex AssemblyVersionRegex = new Regex("AssemblyVersion\\(\"[0-9]+.[0-9]+.[0-9]+.[0-9]+\"\\)", RegexOptions.Compiled);
-        private const string ProjVirt = "~/App_Data/Models/all.generated.cs";
         private const string CodeGen = "~/App_Data/Models/";
         private static readonly string[] OurFiles = { "models.hash", "models.generated.cs", "all.generated.cs", "all.dll.path", "models.err" };
 
@@ -45,7 +44,6 @@ namespace Umbraco.ModelsBuilder.Embedded
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IApplicationShutdownRegistry _hostingLifetime;
         private readonly ModelsGenerationError _errors;
-        private readonly ITypeFinder _typeFinder;
         private readonly IPublishedValueFallback _publishedValueFallback;
 
         public PureLiveModelFactory(
@@ -54,7 +52,6 @@ namespace Umbraco.ModelsBuilder.Embedded
             IModelsBuilderConfig config,
             IHostingEnvironment hostingEnvironment,
             IApplicationShutdownRegistry hostingLifetime,
-            ITypeFinder typeFinder,
             IPublishedValueFallback publishedValueFallback)
         {
             _umbracoServices = umbracoServices;
@@ -62,7 +59,6 @@ namespace Umbraco.ModelsBuilder.Embedded
             _config = config;
             _hostingEnvironment = hostingEnvironment;
             _hostingLifetime = hostingLifetime;
-            _typeFinder = typeFinder;
             _publishedValueFallback = publishedValueFallback;
             _errors = new ModelsGenerationError(config, _hostingEnvironment);
             _ver = 1; // zero is for when we had no version
@@ -512,7 +508,7 @@ namespace Umbraco.ModelsBuilder.Embedded
             var dirInfo = new DirectoryInfo(Path.Combine(_hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempData), "Models"));
             if (!dirInfo.Exists)
                 System.IO.Directory.CreateDirectory(dirInfo.FullName);
-            return Path.Combine(dirInfo.FullName, $"generated.cs.{currentHash}.dll");
+            return Path.Combine(dirInfo.FullName, $"generated.cs{currentHash}.dll");
         }
 
         private void ClearOnFailingToCompile(string dllPathFile, string modelsHashFile, string projFile)
