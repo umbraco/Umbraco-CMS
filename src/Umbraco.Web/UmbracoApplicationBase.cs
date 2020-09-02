@@ -160,7 +160,7 @@ namespace Umbraco.Web
 
 
             var globalSettings =  Umbraco.Composing.Current.Configs.Global();
-            var umbracoVersion = new UmbracoVersion(ConfigModelConversionsFromLegacy.ConvertGlobalSettings(globalSettings));
+            var umbracoVersion = new UmbracoVersion();
 
             // create the register for the application, and boot
             // the boot manager is responsible for registrations

@@ -126,7 +126,7 @@ namespace Umbraco.Extensions
             services.Configure<UserPasswordConfigurationSettings>(configuration.GetSection(Constants.Configuration.ConfigSecurityPrefix + "UserPassword"));
             services.Configure<WebRoutingSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "WebRouting"));
 
-            // TODO: remove this once no longer requred in Umbraco.Web.	
+            // TODO: remove this once no longer requred in Umbraco.Web.
             var configsFactory = new AspNetCoreConfigsFactory(configuration);
             var configs = configsFactory.Create();
             services.AddSingleton(configs);
@@ -238,7 +238,7 @@ namespace Umbraco.Extensions
                 loggingConfiguration,
                 out var logger, out var ioHelper, out var hostingEnvironment, out var backOfficeInfo, out var profiler);
 
-            var umbracoVersion = new UmbracoVersion(globalSettings);
+            var umbracoVersion = new UmbracoVersion();
             var typeFinder = CreateTypeFinder(logger, profiler, webHostEnvironment, entryAssembly, typeFinderSettings);
 
             var configs = serviceProvider.GetService<Configs>();
