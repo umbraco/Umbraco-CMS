@@ -37,7 +37,7 @@
 
                         <umb-radiobutton input-id="protectionTypeGroup"
                                          name="protectionType"
-                                         value="group"
+                                         value="role"
                                          model="vm.type">
                         </umb-radiobutton>
 
@@ -64,26 +64,26 @@
                         </div>
                     </div>
 
-                    <div ng-show="vm.step === 'group' && !vm.hasGroups">
+                    <div ng-show="vm.step === 'role' && !vm.hasRoles">
                         <p><localize key="publicAccess_paGroupsNoGroups">You need to create a member group before you can use group based authentication</localize></p>
                     </div>
 
-                    <div ng-show="vm.step === 'group' && vm.hasGroups">
+                    <div ng-show="vm.step === 'role' && vm.hasRoles">
                         <p><localize key="publicAccess_paSelectGroups" tokens="[currentNode.name]">Select the groups that should have access to this page</localize></p>
                         <div>
-                            <umb-node-preview ng-repeat="group in vm.groups | orderBy:'name'"
+                            <umb-node-preview ng-repeat="role in vm.roles | orderBy:'name'"
                                               icon="'icon-users'"
-                                              name="group.name"
+                                              name="role.name"
                                               allow-remove="true"
-                                              on-remove="vm.removeGroup(group)">
+                                              on-remove="vm.removeRole(role)">
                             </umb-node-preview>
-                            <button type="button" ng-click="vm.pickGroup()" class="umb-node-preview-add">
+                            <button type="button" ng-click="vm.pickRole()" class="umb-node-preview-add">
                                 <localize key="general_add">Add</localize>
                             </button>
                         </div>
                     </div>
 
-                    <div ng-show="vm.step === 'member' || vm.hasGroups">
+                    <div ng-show="vm.step === 'member' || vm.hasRoles">
                         <p class="mt4"><localize key="publicAccess_paSelectPages">Select the pages that contain login form and error messages</localize></p>
                         <div>
                             <div class="control-group umb-control-group -no-border">

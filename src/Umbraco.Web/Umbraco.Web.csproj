@@ -242,6 +242,7 @@
     <Compile Include="Models\Mapping\CommonMapper.cs" />
     <Compile Include="Models\Mapping\MapperContextExtensions.cs" />
     <Compile Include="Models\PublishedContent\HybridVariationContextAccessor.cs" />
+    <Compile Include="Models\RoleDisplay.cs" />
     <Compile Include="Models\TemplateQuery\QueryConditionExtensions.cs" />
     <Compile Include="Mvc\HttpUmbracoFormRouteStringException.cs" />
     <Compile Include="Mvc\ModelBindingExceptionFilter.cs" />
@@ -281,6 +282,7 @@
     <Compile Include="Search\ExamineUserComponent.cs" />
     <Compile Include="Search\IUmbracoTreeSearcherFields.cs" />
     <Compile Include="Search\UmbracoTreeSearcherFields.cs" />
+    <Compile Include="Security\Providers\IRoleProviderWithDisplayNames.cs" />
     <Compile Include="Services\DashboardService.cs" />
     <Compile Include="Services\IDashboardService.cs" />
     <Compile Include="Models\Link.cs" />

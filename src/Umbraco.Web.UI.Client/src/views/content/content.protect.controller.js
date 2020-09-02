@@ -16,8 +16,8 @@
         vm.toggle = toggle;
         vm.pickLoginPage = pickLoginPage;
         vm.pickErrorPage = pickErrorPage;
-        vm.pickGroup = pickGroup;
-        vm.removeGroup = removeGroup;
+        vm.pickRole = pickRole;
+        vm.removeRole = removeRole;
         vm.pickMember = pickMember;
         vm.removeMember = removeMember;
         vm.removeProtection = removeProtection;
@@ -36,7 +36,8 @@
                 // init the current settings for public access (if any)
                 vm.loginPage = publicAccess.loginPage;
                 vm.errorPage = publicAccess.errorPage;
-                vm.groups = publicAccess.groups || [];
+                vm.roles = publicAccess.roles || [];
+                vm.allRoles = publicAccess.allRoles || [];
                 vm.members = publicAccess.members || [];
                 vm.canRemove = true;
 
@@ -44,8 +45,8 @@
                     vm.type = "member";
                     next();
                 }
-                else if (vm.groups.length) {
-                    vm.type = "group";
+                else if (vm.roles.length) {
+                    vm.type = "role";
                     next();
                 }
                 else {
@@ -55,16 +56,18 @@
         }
 
         function next() {
-            if (vm.type === "group") {
+            if (vm.type === "role") {
                 vm.loading = true;
-                // get all existing member groups for lookup upon selection
-                // NOTE: if/when member groups support infinite editing, we can't rely on using a cached lookup list of valid groups anymore
-                memberGroupResource.getGroups().then(function (groups) {
-                    vm.step = vm.type;
-                    vm.allGroups = groups;
-                    vm.hasGroups = groups.length > 0;
-                    vm.loading = false;
-                });
+                
+                var roles = vm.allRoles;
+
+                vm.step = vm.type;
+                vm.allRoles = roles;
+                vm.hasRoles = roles.length > 0;
+                vm.loading = false;
+
+                vm.allRoles.push();
+
             }
             else {
                 vm.step = vm.type;
@@ -81,8 +84,8 @@
             if (!vm.loginPage || !vm.errorPage) {
                 return false;
             }
-            if (vm.type === "group") {
-                return vm.groups && vm.groups.length > 0;
+            if (vm.type === "role") {
+                return vm.roles && vm.roles.length > 0;
             }
             if (vm.type === "member") {
                 return vm.members && vm.members.length > 0;
@@ -92,9 +95,9 @@
 
         function save() {
             vm.buttonState = "busy";
-            var groups = _.map(vm.groups, function (group) { return group.name; });
+            var roles = _.map(vm.roles, function (role) { return role.id; });
             var usernames = _.map(vm.members, function (member) { return member.username; });
-            contentResource.updatePublicAccess(id, groups, usernames, vm.loginPage.id, vm.errorPage.id).then(
+            contentResource.updatePublicAccess(id, roles, usernames, vm.loginPage.id, vm.errorPage.id).then(
                 function () {
                     localizationService.localize("publicAccess_paIsProtected", [$scope.currentNode.name]).then(function (value) {
                         vm.success = {
@@ -116,40 +119,49 @@
             navigationService.hideDialog();
         }
 
-        function toggle(group) {
-            group.selected = !group.selected;
+        function toggle(role) {
+            role.selected = !role.selected;
             $scope.dialog.confirmDiscardChanges = true;
         }
 
-        function pickGroup() {
+        function pickRole() {
             navigationService.allowHideDialog(false);
-            editorService.memberGroupPicker({
-                multiPicker: true,
-                submit: function(model) {
-                    var selectedGroupIds = model.selectedMemberGroups
-                        ? model.selectedMemberGroups
-                        : [model.selectedMemberGroup];
-                    _.each(selectedGroupIds,
-                        function (groupId) {
-                            // find the group in the lookup list and add it if it isn't already
-                            var group = _.find(vm.allGroups, function(g) { return g.id === parseInt(groupId); });
-                            if (group && !_.find(vm.groups, function (g) { return g.id === group.id })) {
-                                vm.groups.push(group);
-                            }
+
+            var masterTemplate = {
+                title: 'Choose Roles', //TODO: Translation
+                listType: 'tree',
+                multiPicker : true,
+                availableItems: vm.allRoles,
+                submit: function (model) {
+
+                    if (model.selectedItems) {
+
+                        model.selectedItems.forEach(function(selectedRole) {
+
+                            var alreadyInRoles = vm.roles.filter(function(role){return role.id === selectedRole.id}).length > 0;
+
+                            if(!alreadyInRoles)
+                                vm.roles.push(selectedRole);
                         });
+                    }
+
                     editorService.close();
                     navigationService.allowHideDialog(true);
                     $scope.dialog.confirmDiscardChanges = true;
+
                 },
-                close: function() {
+                close: function () {
+                    // close dialog
                     editorService.close();
-                    navigationService.allowHideDialog(true);
+                    
                 }
-            });
+            };
+            editorService.itemPicker(masterTemplate);
+
         }
 
-        function removeGroup(group) {
-            vm.groups = _.reject(vm.groups, function(g) { return g.id === group.id });
+        function removeRole(role) {
+            vm.roles = _.reject(vm.roles, function(g) { return g.id === role.id });
             $scope.dialog.confirmDiscardChanges = true;
         }
 

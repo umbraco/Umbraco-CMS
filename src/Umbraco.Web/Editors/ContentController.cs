@@ -36,7 +36,9 @@ using Umbraco.Web.Editors.Filters;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Security;
+using Umbraco.Web.Models;
 using Umbraco.Web.Routing;
+using Umbraco.Web.Security.Providers;
 using Umbraco.Core.Collections;
 
 namespace Umbraco.Web.Editors
@@ -2378,10 +2380,50 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
             }
 
+            var defaultMemberGroupIcon = "icon-users-alt";
             var entry = Services.PublicAccessService.GetEntryForContent(content);
+
+            var rolesProvider = Roles.Provider;
+
+            RoleDisplay[] allRoles;
+
+            // mappings for reuse in different places only in this method.
+            RoleDisplay MapUmbracoRole(IMemberGroup role)
+            {
+                return new RoleDisplay() {Id = role.Id.ToString(), Name = role.Name, Icon = defaultMemberGroupIcon};
+            }
+
+            RoleDisplay MapStandardRoleProviderRole(string role)
+            {
+                return new RoleDisplay() {Id = role, Name = role, Icon = defaultMemberGroupIcon};
+            }
+
+            if (rolesProvider is MembersRoleProvider)
+            {
+                // Using Umbraco's standard MemberRoleProvider
+                var allGroups = Services.MemberGroupService.GetAll().ToArray();
+                allRoles = allGroups.Select(MapUmbracoRole).ToArray();
+            }
+            else if (rolesProvider is IRoleProviderWithDisplayNames roleProviderDisplayNames)
+            {
+                // A Custom Provider is configured, let's se if it implements the custom interface for friendly names
+                allRoles = roleProviderDisplayNames.GetAllRolesWithDisplayName();
+            }
+            else
+            {
+                // A regular ASP.NET role provider
+                var allCustomRoles = rolesProvider.GetAllRoles();
+                allRoles = allCustomRoles.Select(MapStandardRoleProviderRole).ToArray();
+            }
+
             if (entry == null || entry.ProtectedNodeId != content.Id)
             {
-                return Request.CreateResponse(HttpStatusCode.OK);
+                // If there is no existing protection, let's just return here.
+                return Request.CreateResponse(HttpStatusCode.OK, new PublicAccess
+                {
+                    AllRoles = allRoles
+                });
+
             }
 
             var loginPageEntity = Services.EntityService.Get(entry.LoginNodeId, UmbracoObjectTypes.Document);
@@ -2416,18 +2458,18 @@ namespace Umbraco.Web.Editors
                     break;
             }
 
-            var allGroups = Services.MemberGroupService.GetAll().ToArray();
-            var groups = entry.Rules
+            // Maps selected roles.
+            RoleDisplay[] roles = entry.Rules
                 .Where(rule => rule.RuleType == Constants.Conventions.PublicAccess.MemberRoleRuleType)
-                .Select(rule => allGroups.FirstOrDefault(g => g.Name == rule.RuleValue))
+                .Select(rule => allRoles.FirstOrDefault(g => g.Id == rule.RuleValue))
                 .Where(memberGroup => memberGroup != null)
-                .Select(Mapper.Map<MemberGroupDisplay>)
                 .ToArray();
-
+            
             return Request.CreateResponse(HttpStatusCode.OK, new PublicAccess
             {
                 Members = members,
-                Groups = groups,
+                Roles = roles,
+                AllRoles = allRoles,
                 LoginPage = loginPageEntity != null ? Mapper.Map<EntityBasic>(loginPageEntity) : null,
                 ErrorPage = errorPageEntity != null ? Mapper.Map<EntityBasic>(errorPageEntity) : null
             });

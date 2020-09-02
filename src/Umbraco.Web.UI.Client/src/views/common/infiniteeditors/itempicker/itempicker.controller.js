@@ -12,8 +12,13 @@ function ItemPickerController($scope, localizationService) {
     var vm = this;
 
     vm.selectItem = selectItem;
+
+    vm.multiPicker = $scope.model.multiPicker || false;
+    vm.listType = $scope.model.listType || 'grid';
+
     vm.submit = submit;
     vm.close = close;
+    vm.isSelected = isSelected;
 
     function onInit() {
         if (!$scope.model.title) {
@@ -21,15 +26,43 @@ function ItemPickerController($scope, localizationService) {
                 $scope.model.title = value;
             });
         }
+
+        if (vm.multiPicker) {
+            vm.selectedItems = [];
+
+            //if (Utilities.isArray($scope.model.selectedItems)) {
+            //    vm.selectedItems = $scope.model.selectedItems;
+            //}
+            //TODO: Push selected items from model
+        }
+
+
+    }
+
+    function isSelected(item) {
+        return vm.selectedItems.indexOf(item) > -1;
     }
 
     function selectItem(item) {
-        $scope.model.selectedItem = item;
-        submit($scope.model);
+
+        if (vm.multiPicker) {
+            
+            if (vm.selectedItems.indexOf(item) > -1) {
+                vm.selectedItems.splice(vm.selectedItems.indexOf(item), 1);
+            } else {
+                vm.selectedItems.push(item);
+            }
+
+        } else {
+            $scope.model.selectedItem = item;
+            submit($scope.model);
+        }
+
     };
 
     function submit(model) {
         if($scope.model.submit) {
+            $scope.model.selectedItems = vm.selectedItems;
             $scope.model.submit(model);
         }
     }
