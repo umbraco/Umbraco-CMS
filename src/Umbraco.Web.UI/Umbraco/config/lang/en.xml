@@ -676,6 +676,7 @@
     <key alias="design">Design</key>
     <key alias="dictionary">Dictionary</key>
     <key alias="dimensions">Dimensions</key>
+    <key alias="discard">Discard</key>
     <key alias="down">Down</key>
     <key alias="download">Download</key>
     <key alias="edit">Edit</key>
@@ -2479,6 +2480,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="tabBlockSettings">Settings</key>
     <key alias="headlineAdvanced">Advanced</key>
     <key alias="forceHideContentEditor">Force hide content editor</key>
+    <key alias="blockHasChanges">You have made changes to this content. Are you sure you want to discard them?</key>
   </area>
   <area alias="contentTemplatesDashboard">
     <key alias="whatHeadline">What are Content Templates?</key>
