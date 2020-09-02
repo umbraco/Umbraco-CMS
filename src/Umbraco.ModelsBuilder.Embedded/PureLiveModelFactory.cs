@@ -455,7 +455,7 @@ namespace Umbraco.ModelsBuilder.Embedded
                 _ver++;
                 try
                 {
-                    assembly = RoslynCompiler.GetCompiledAssembly(_hostingEnvironment.MapPathContentRoot(ProjVirt), Path.Combine(_hostingEnvironment.ApplicationPhysicalPath, "App_Data", $"generated.cs.{currentHash}.dll"));
+                    assembly = RoslynCompiler.GetCompiledAssembly(_hostingEnvironment.MapPathContentRoot(projFile), GetOutputAssemblyPath(currentHash));
                     File.WriteAllText(dllPathFile, assembly.Location);
                 }
                 catch
@@ -493,7 +493,7 @@ namespace Umbraco.ModelsBuilder.Embedded
             // compile and register
             try
             {
-                assembly = RoslynCompiler.GetCompiledAssembly(_hostingEnvironment.MapPathContentRoot(ProjVirt), Path.Combine(_hostingEnvironment.ApplicationPhysicalPath, "App_Data", $"generated.cs.{currentHash}.dll"));
+                assembly = RoslynCompiler.GetCompiledAssembly(_hostingEnvironment.MapPathContentRoot(projFile),GetOutputAssemblyPath(currentHash));
                 File.WriteAllText(dllPathFile, assembly.Location);
                 File.WriteAllText(modelsHashFile, currentHash);
             }
@@ -505,6 +505,14 @@ namespace Umbraco.ModelsBuilder.Embedded
 
             _logger.Debug<PureLiveModelFactory>("Done rebuilding.");
             return assembly;
+        }
+
+        private string GetOutputAssemblyPath(string currentHash)
+        {
+            var dirInfo = new DirectoryInfo(Path.Combine(_hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempData), "Models"));
+            if (!dirInfo.Exists)
+                System.IO.Directory.CreateDirectory(dirInfo.FullName);
+            return Path.Combine(dirInfo.FullName, $"generated.cs.{currentHash}.dll");
         }
 
         private void ClearOnFailingToCompile(string dllPathFile, string modelsHashFile, string projFile)
