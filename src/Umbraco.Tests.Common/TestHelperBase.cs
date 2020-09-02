@@ -47,13 +47,6 @@ namespace Umbraco.Tests.Common
 
         public Configs GetConfigs() => GetConfigsFactory().Create();
 
-        public IRuntimeState GetRuntimeState()
-        {
-            return new RuntimeState(
-                Mock.Of<IGlobalSettings>(),
-                GetUmbracoVersion());
-        }
-
         public abstract IBackOfficeInfo GetBackOfficeInfo();
 
         public IConfigsFactory GetConfigsFactory() => new ConfigsFactory();

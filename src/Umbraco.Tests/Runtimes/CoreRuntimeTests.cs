@@ -125,7 +125,7 @@ namespace Umbraco.Tests.Runtimes
 
             // must override the database factory
             // else BootFailedException because U cannot connect to the configured db
-            protected internal override IUmbracoDatabaseFactory GetDatabaseFactory()
+            protected internal override IUmbracoDatabaseFactory CreateDatabaseFactory()
             {
                 var mock = new Mock<IUmbracoDatabaseFactory>();
                 mock.Setup(x => x.Configured).Returns(true);

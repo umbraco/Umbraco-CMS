@@ -2,22 +2,26 @@
 using System;
 using System.Linq.Expressions;
 using System.Net.Http;
-using System.Reflection;
-using Examine;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Composing;
-using Umbraco.Core.Scoping;
-using Umbraco.Examine;
+using Umbraco.Core;
 using Umbraco.Extensions;
 using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;
 using Umbraco.Web;
+using Umbraco.Web.Common.Builder;
 using Umbraco.Web.Common.Controllers;
-
+using Umbraco.Web.Editors;
+using Microsoft.Extensions.Hosting;
 
 namespace Umbraco.Tests.Integration.TestServerTest
 {
@@ -25,36 +29,55 @@ namespace Umbraco.Tests.Integration.TestServerTest
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Console, Boot = false)]
     public abstract class UmbracoTestServerTestBase : UmbracoIntegrationTest
     {
-
         [SetUp]
-        public void SetUp()
+        public override Task Setup()
         {
-            Factory = new UmbracoWebApplicationFactory(TestDBConnectionString);
-            Client = Factory.CreateClient(new WebApplicationFactoryClientOptions(){
-                AllowAutoRedirect = false
+            InMemoryConfiguration["ConnectionStrings:" + Constants.System.UmbracoConnectionName] = null;
+            InMemoryConfiguration["Umbraco:CMS:Hosting:Debug"] = "true";
+
+            // create new WebApplicationFactory specifying 'this' as the IStartup instance
+            var factory = new UmbracoWebApplicationFactory<UmbracoTestServerTestBase>(CreateHostBuilder);
+
+            // additional host configuration for web server integration tests
+            Factory = factory.WithWebHostBuilder(builder =>
+            {
+                // Executes after the standard ConfigureServices method
+                builder.ConfigureTestServices(services =>
+                {
+                    services.AddAuthentication("Test").AddScheme<AuthenticationSchemeOptions, TestAuthHandler>("Test", options => { });
+                });
             });
+
+            Client = Factory.CreateClient(new WebApplicationFactoryClientOptions
+            {                
+                AllowAutoRedirect = false                
+            });
+
             LinkGenerator = Factory.Services.GetRequiredService<LinkGenerator>();
 
-            ExecuteExamineIndexOperationsInSync();
+            return Task.CompletedTask;
         }
 
-        private void ExecuteExamineIndexOperationsInSync()
+        public override IHostBuilder CreateHostBuilder()
         {
-            var examineManager = Factory.Services.GetRequiredService<IExamineManager>();
+            var builder = base.CreateHostBuilder();
+            builder.ConfigureWebHost(builder =>
+             {
+                 // need to configure the IWebHostEnvironment too
+                 builder.ConfigureServices((c, s) => {
+                     c.HostingEnvironment = TestHelper.GetWebHostEnvironment();
+                 });
 
-            foreach (var index in examineManager.Indexes)
-            {
-                if (index is UmbracoExamineIndex umbracoExamineIndex)
-                {
-                    umbracoExamineIndex.ProcessNonAsync();
-                }
-            }
+                 // call startup
+                 builder.Configure(app =>
+                 {
+                     Services = app.ApplicationServices;
+                     Configure(app);
+                 });
+             })
+                .UseEnvironment(Environments.Development);
+            return builder;
         }
-
-        /// <summary>
-        /// Get the service from the underlying container that is also used by the <see cref="Client"/>.
-        /// </summary>
-        protected T GetRequiredService<T>() => Factory.Services.GetRequiredService<T>();
 
         /// <summary>
         /// Prepare a url before using <see cref="Client"/>.
@@ -85,13 +108,14 @@ namespace Umbraco.Tests.Integration.TestServerTest
             return url;
         }
 
-        protected HttpClient Client { get; set; }
-        protected LinkGenerator LinkGenerator { get; set; }
-        protected UmbracoWebApplicationFactory Factory { get; set; }
+        protected HttpClient Client { get; private set; }
+        protected LinkGenerator LinkGenerator { get; private set; }
+        protected WebApplicationFactory<UmbracoTestServerTestBase> Factory { get; private set; }
 
         [TearDown]
-        public void TearDown()
+        public override void TearDown()
         {
+            base.TearDown();
 
             Factory.Dispose();
 
@@ -99,7 +123,40 @@ namespace Umbraco.Tests.Integration.TestServerTest
             {
                 Current.IsInitialized = false;
             }
-
         }
+
+        #region IStartup
+
+        public override void ConfigureServices(IServiceCollection services)
+        {
+            //services.AddSingleton(TestHelper.DbProviderFactoryCreator);
+            //var webHostEnvironment = TestHelper.GetWebHostEnvironment();
+            //services.AddRequiredNetCoreServices(TestHelper, webHostEnvironment);
+
+            var umbracoBuilder = services.AddUmbraco(TestHelper.GetWebHostEnvironment(), Configuration);
+            umbracoBuilder
+                .WithConfiguration()
+                .WithTestCore(TestHelper, UmbracoContainer, UseTestLocalDb) // This is the important one!
+                .WithWebComponents()
+                .WithRuntimeMinifier()
+                .WithBackOffice()
+                .WithBackOfficeIdentity()
+                //.WithMiniProfiler()
+                .WithMvcAndRazor(mvcBuilding: mvcBuilder =>
+                {
+                    mvcBuilder.AddApplicationPart(typeof(ContentController).Assembly);                    
+                })
+                .WithWebServer()
+                .Build();
+        }
+
+        public override void Configure(IApplicationBuilder app)
+        {            
+            app.UseUmbraco();
+        }
+
+        #endregion
+
+
     }
 }

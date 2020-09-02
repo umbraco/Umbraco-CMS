@@ -88,7 +88,7 @@ namespace Umbraco.Tests.Integration
         [Test]
         public async Task AddUmbracoCore()
         {
-            var umbracoContainer = UmbracoIntegrationTest.GetUmbracoContainer(out var serviceProviderFactory);
+            var umbracoContainer = UmbracoIntegrationTest.CreateUmbracoContainer(out var serviceProviderFactory);
             var testHelper = new TestHelper();
 
             var hostBuilder = new HostBuilder()
@@ -128,7 +128,7 @@ namespace Umbraco.Tests.Integration
         [Test]
         public async Task UseUmbracoCore()
         {
-            var umbracoContainer = UmbracoIntegrationTest.GetUmbracoContainer(out var serviceProviderFactory);
+            var umbracoContainer = UmbracoIntegrationTest.CreateUmbracoContainer(out var serviceProviderFactory);
             var testHelper = new TestHelper();
 
             var hostBuilder = new HostBuilder()

@@ -178,6 +178,31 @@ namespace Umbraco.Extensions
             IRequestCache requestCache,
             ILoggingConfiguration loggingConfiguration,
             out IFactory factory)
+            => services.AddUmbracoCore(webHostEnvironment, umbContainer, entryAssembly, requestCache, loggingConfiguration, GetCoreRuntime, out factory);
+
+        /// <summary>
+        /// Adds the Umbraco Back Core requirements
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="webHostEnvironment"></param>
+        /// <param name="umbContainer"></param>
+        /// <param name="entryAssembly"></param>
+        /// <param name="requestCache"></param>
+        /// <param name="httpContextAccessor"></param>
+        /// <param name="loggingConfiguration"></param>
+        /// <param name="getRuntime">Delegate to create an <see cref="IRuntime"/></param>
+        /// <param name="factory"></param>
+        /// <returns></returns>
+        public static IServiceCollection AddUmbracoCore(
+            this IServiceCollection services,
+            IWebHostEnvironment webHostEnvironment,
+            IRegister umbContainer,
+            Assembly entryAssembly,
+            IRequestCache requestCache,
+            ILoggingConfiguration loggingConfiguration,
+            // TODO: Yep that's extremely ugly
+            Func<Configs, IUmbracoVersion, IIOHelper, Core.Logging.ILogger, IProfiler, Core.Hosting.IHostingEnvironment, IBackOfficeInfo, ITypeFinder, IRequestCache, IDbProviderFactoryCreator, IRuntime> getRuntime,
+            out IFactory factory)
         {
             if (services is null) throw new ArgumentNullException(nameof(services));
             var container = umbContainer;
@@ -216,7 +241,7 @@ namespace Umbraco.Extensions
             var umbracoVersion = new UmbracoVersion(globalSettings);
             var typeFinder = CreateTypeFinder(logger, profiler, webHostEnvironment, entryAssembly, configs.TypeFinder());
 
-            var coreRuntime = GetCoreRuntime(
+            var runtime = getRuntime(
                 configs,
                 umbracoVersion,
                 ioHelper,
@@ -228,7 +253,7 @@ namespace Umbraco.Extensions
                 requestCache,
                 dbProviderFactoryCreator);
 
-            factory = coreRuntime.Configure(container);
+            factory = runtime.Configure(container);
 
             return services;
         }

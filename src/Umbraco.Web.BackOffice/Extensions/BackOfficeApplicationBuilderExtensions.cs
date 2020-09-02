@@ -7,7 +7,7 @@ using Umbraco.Web.BackOffice.Security;
 
 namespace Umbraco.Extensions
 {
-    public static class UmbracoBackOfficeApplicationBuilderExtensions
+    public static class BackOfficeApplicationBuilderExtensions
     {
         public static IApplicationBuilder UseUmbraco(this IApplicationBuilder app)
         {
@@ -43,11 +43,6 @@ namespace Umbraco.Extensions
             });
 
             app.UseUmbracoRuntimeMinification();
-
-            // Important we handle image manipulations before the static files, otherwise the querystring is just ignored.
-            // TODO: Since we are dependent on these we need to register them but what happens when we call this multiple times since we are dependent on this for UseUmbracoWebsite too?
-            app.UseImageSharp();
-            app.UseStaticFiles();
 
             app.UseMiddleware<PreviewAuthenticationMiddleware>();
 

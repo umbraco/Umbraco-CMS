@@ -20,6 +20,7 @@ namespace Umbraco.Examine
             composition.RegisterUnique<IBackOfficeExamineSearcher, BackOfficeExamineSearcher>();
             composition.RegisterUnique<IUmbracoIndexesCreator, UmbracoIndexesCreator>();
             composition.RegisterUnique<IIndexDiagnosticsFactory, LuceneIndexDiagnosticsFactory>();
+            composition.RegisterUnique<ILuceneDirectoryFactory, LuceneFileSystemDirectoryFactory>();
         }
     }
 }
