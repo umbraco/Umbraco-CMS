@@ -1,4 +1,4 @@
-<ng-form name="vm.blockRowForm" val-server-match="{ 'contains' : { 'valServerMatchContent': vm.layout.$block.content.key, 'valServerMatchSettings': vm.layout.$block.settings.key } }">
+<ng-form name="vm.blockRowForm" val-server-match="vm.valServerMatch">
     <div class="umb-block-list__block" ng-class="{'--active':vm.layout.$block.active}">
 
         <umb-block-list-block stylesheet="{{::vm.layout.$block.config.stylesheet}}"

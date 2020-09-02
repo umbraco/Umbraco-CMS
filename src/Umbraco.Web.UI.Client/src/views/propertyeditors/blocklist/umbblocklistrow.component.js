@@ -30,7 +30,14 @@
         var vm = this;
 
         vm.$onInit = function () {
-          
+            vm.valServerMatch = {
+                contains: {
+                    valServerMatchContent: vm.layout.$block.content.key
+                }
+            };
+            if (vm.layout.$block.settings) {
+                vm.valServerMatch.contains.valServerMatchSettings = vm.layout.$block.settings.key;
+            }
         };
     }   
 
