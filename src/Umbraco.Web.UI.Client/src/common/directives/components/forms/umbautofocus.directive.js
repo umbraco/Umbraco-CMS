@@ -1,27 +1,18 @@
 angular.module("umbraco.directives")
     .directive('umbAutoFocus', function($timeout) {
 
-        return function (scope, element, attrs) {
+        return function(scope, element, attr){
             var update = function() {
                 //if it uses its default naming
-                if (element.val() === "" || attrs.focusOnFilled){
+                if(element.val() === "" || attr.focusOnFilled){
                     element.trigger("focus");
                 }
             };
 
-            var enabled = true;
-            //check if there's a value for the attribute, if there is and it's false then we conditionally don't
-            //use auto focus.
-            if (attrs.umbAutoFocus) {
-                attrs.$observe("umbAutoFocus", function (newVal) {
-                    enabled = (newVal === "false" || newVal === 0 || newVal === false) ? false : true;
-                });
-            }
-
-            if (enabled) {
+            if (attr.umbAutoFocus !== "false") {
                 $timeout(function() {
                     update();
                 });
             }
-        };
+    };
 });
