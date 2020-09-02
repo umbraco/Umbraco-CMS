@@ -563,6 +563,7 @@ namespace Umbraco.ModelsBuilder.Embedded
                 var meth = new DynamicMethod(string.Empty, typeof(IPublishedElement), ctorArgTypes, type.Module, true);
                 var gen = meth.GetILGenerator();
                 gen.Emit(OpCodes.Ldarg_0);
+                gen.Emit(OpCodes.Ldarg_1);
                 gen.Emit(OpCodes.Newobj, constructor);
                 gen.Emit(OpCodes.Ret);
                 var func = (Func<IPublishedElement, IPublishedValueFallback, IPublishedElement>)meth.CreateDelegate(typeof(Func<IPublishedElement, IPublishedValueFallback, IPublishedElement>));
