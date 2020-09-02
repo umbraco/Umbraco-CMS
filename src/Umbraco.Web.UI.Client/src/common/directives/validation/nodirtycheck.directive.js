@@ -15,7 +15,13 @@ function noDirtyCheck() {
             if (dirtyCheck)
                 return;
 
-            ctrl.$setDirty = Utilities.noop;
+            var alwaysFalse = {
+                get: function () { return false; },
+                set: function () { }
+            };
+
+            Object.defineProperty(ctrl, '$pristine', alwaysFalse);
+            Object.defineProperty(ctrl, '$dirty', alwaysFalse);
         }
     };
 }
