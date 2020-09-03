@@ -118,7 +118,7 @@
             }
 
             //const options = ctrl.options ? ctrl.options : defaultOptions;
-            const options = angular.extend({}, defaultOptions, ctrl.options);
+            const options = Utilities.extend(defaultOptions, ctrl.options);
 
             var elem = angular.element(element);
 
