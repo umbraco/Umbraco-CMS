@@ -178,7 +178,7 @@ namespace Umbraco.Tests.Testing
 
             IBackOfficeInfo backOfficeInfo = new AspNetBackOfficeInfo(ConfigModelConversionsToLegacy.ConvertGlobalSettings(globalSettings), IOHelper, logger, settings);
             IIpResolver ipResolver = new AspNetIpResolver();
-            UmbracoVersion = new UmbracoVersion(globalSettings);
+            UmbracoVersion = new UmbracoVersion();
 
 
             LocalizedTextService = new LocalizedTextService(new Dictionary<CultureInfo, Lazy<XDocument>>(), logger);

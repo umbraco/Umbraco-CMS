@@ -128,7 +128,7 @@ namespace Umbraco.Tests.Common
             return relativePath.Replace("~/", bin + "/");
         }
 
-        public IUmbracoVersion GetUmbracoVersion() => new UmbracoVersion(new GlobalSettingsBuilder().Build());
+        public IUmbracoVersion GetUmbracoVersion() => new UmbracoVersion();
 
         public IRegister GetRegister()
         {

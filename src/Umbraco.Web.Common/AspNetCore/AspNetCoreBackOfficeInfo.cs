@@ -7,13 +7,8 @@ namespace Umbraco.Web.Common.AspNetCore
     public class AspNetCoreBackOfficeInfo : IBackOfficeInfo
     {
         public AspNetCoreBackOfficeInfo(IOptions<GlobalSettings> globalSettings)
-            : this(globalSettings.Value)
         {
-        }
-
-        public AspNetCoreBackOfficeInfo(GlobalSettings globalSettings)
-        {
-            GetAbsoluteUrl = globalSettings.UmbracoPath;
+            GetAbsoluteUrl = globalSettings.Value.UmbracoPath;
         }
 
         public string GetAbsoluteUrl { get; } // TODO make absolute

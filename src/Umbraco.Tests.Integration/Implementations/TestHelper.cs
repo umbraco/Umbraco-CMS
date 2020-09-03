@@ -20,6 +20,7 @@ using Umbraco.Tests.Common;
 using Umbraco.Web.Common.AspNetCore;
 using IHostingEnvironment = Umbraco.Core.Hosting.IHostingEnvironment;
 using Umbraco.Tests.Common.Builders;
+using Microsoft.Extensions.Options;
 
 namespace Umbraco.Tests.Integration.Implementations
 {
@@ -105,7 +106,7 @@ namespace Umbraco.Tests.Integration.Implementations
             if (_backOfficeInfo == null)
             {
                 var globalSettings = new GlobalSettingsBuilder().Build();
-                _backOfficeInfo = new AspNetCoreBackOfficeInfo(globalSettings);
+                _backOfficeInfo = new AspNetCoreBackOfficeInfo(Options.Create(globalSettings));
             }
 
             return _backOfficeInfo;

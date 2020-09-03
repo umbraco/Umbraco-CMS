@@ -126,6 +126,12 @@ namespace Umbraco.Extensions
             services.Configure<UserPasswordConfigurationSettings>(configuration.GetSection(Constants.Configuration.ConfigSecurityPrefix + "UserPassword"));
             services.Configure<WebRoutingSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "WebRouting"));
 
+            //services.Configure<TourSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "Tours"));
+            services.Configure<TourSettings>(settings =>
+            {
+                settings.EnableTours = false;
+            });
+
             // TODO: remove this once no longer requred in Umbraco.Web.	
             var configsFactory = new AspNetCoreConfigsFactory(configuration);
             var configs = configsFactory.Create();
@@ -224,10 +230,10 @@ namespace Umbraco.Extensions
             // `RegisterEssentials`.
             var serviceProvider = services.BuildServiceProvider();
 
-            var globalSettings = serviceProvider.GetService<IOptions<GlobalSettings>>().Value;
-            var connectionStrings = serviceProvider.GetService<IOptions<ConnectionStrings>>().Value;
-            var hostingSettings = serviceProvider.GetService<IOptions<HostingSettings>>().Value;
-            var typeFinderSettings = serviceProvider.GetService<IOptions<TypeFinderSettings>>().Value;
+            var globalSettings = serviceProvider.GetService<IOptions<GlobalSettings>>();
+            var connectionStrings = serviceProvider.GetService<IOptions<ConnectionStrings>>();
+            var hostingSettings = serviceProvider.GetService<IOptions<HostingSettings>>();
+            var typeFinderSettings = serviceProvider.GetService<IOptions<TypeFinderSettings>>();
 
             var dbProviderFactoryCreator = serviceProvider.GetRequiredService<IDbProviderFactoryCreator>();
 
@@ -238,14 +244,14 @@ namespace Umbraco.Extensions
                 loggingConfiguration,
                 out var logger, out var ioHelper, out var hostingEnvironment, out var backOfficeInfo, out var profiler);
 
-            var umbracoVersion = new UmbracoVersion(globalSettings);
+            var umbracoVersion = new UmbracoVersion();
             var typeFinder = CreateTypeFinder(logger, profiler, webHostEnvironment, entryAssembly, typeFinderSettings);
 
             var configs = serviceProvider.GetService<Configs>();
             var coreRuntime = GetCoreRuntime(
                 configs,
-                globalSettings,
-                connectionStrings,
+                globalSettings.Value,
+                connectionStrings.Value,
                 umbracoVersion,
                 ioHelper,
                 logger,
@@ -261,7 +267,7 @@ namespace Umbraco.Extensions
             return services;
         }
 
-        private static ITypeFinder CreateTypeFinder(Core.Logging.ILogger logger, IProfiler profiler, IWebHostEnvironment webHostEnvironment, Assembly entryAssembly, TypeFinderSettings typeFinderSettings)
+        private static ITypeFinder CreateTypeFinder(Core.Logging.ILogger logger, IProfiler profiler, IWebHostEnvironment webHostEnvironment, Assembly entryAssembly, IOptions<TypeFinderSettings> typeFinderSettings)
         {
             var runtimeHashPaths = new RuntimeHashPaths();
             runtimeHashPaths.AddFolder(new DirectoryInfo(Path.Combine(webHostEnvironment.ContentRootPath, "bin")));
@@ -305,8 +311,8 @@ namespace Umbraco.Extensions
 
         private static IServiceCollection CreateCompositionRoot(
             IServiceCollection services,
-            GlobalSettings globalSettings,
-            HostingSettings hostingSettings,
+            IOptions<GlobalSettings> globalSettings,
+            IOptions<HostingSettings> hostingSettings,
             IWebHostEnvironment webHostEnvironment,
             ILoggingConfiguration loggingConfiguration,
             out Core.Logging.ILogger logger,
@@ -317,7 +323,6 @@ namespace Umbraco.Extensions
         {
             if (globalSettings == null)
                 throw new InvalidOperationException($"Could not resolve type {typeof(GlobalSettings)} from the container, ensure {nameof(AddUmbracoConfiguration)} is called before calling {nameof(AddUmbracoCore)}");
-
 
             hostingEnvironment = new AspNetCoreHostingEnvironment(hostingSettings, webHostEnvironment);
             ioHelper = new IOHelper(hostingEnvironment);

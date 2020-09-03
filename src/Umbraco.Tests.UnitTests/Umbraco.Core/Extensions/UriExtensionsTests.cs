@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -48,7 +49,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Extensions
         public void Is_Back_Office_Request(string input, string virtualPath, bool expected)
         {
             var hostingSettings = new HostingSettingsBuilder().WithApplicationVirtualPath(virtualPath).Build();
-            var hostingEnvironment = new AspNetCoreHostingEnvironment(hostingSettings, _hostEnvironment);
+            var hostingEnvironment = new AspNetCoreHostingEnvironment(Options.Create(hostingSettings), _hostEnvironment);
 
             var source = new Uri(input);
             Assert.AreEqual(expected, source.IsBackOfficeRequest(_globalSettings, hostingEnvironment));
@@ -67,7 +68,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Extensions
         {
             var source = new Uri(input);
             var hostingSettings = new HostingSettingsBuilder().Build();
-            var hostingEnvironment = new AspNetCoreHostingEnvironment(hostingSettings, _hostEnvironment);
+            var hostingEnvironment = new AspNetCoreHostingEnvironment(Options.Create(hostingSettings), _hostEnvironment);
             Assert.AreEqual(expected, source.IsInstallerRequest(hostingEnvironment));
         }
 

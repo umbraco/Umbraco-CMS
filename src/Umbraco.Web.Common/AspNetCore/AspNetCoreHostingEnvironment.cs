@@ -16,13 +16,8 @@ namespace Umbraco.Web.Common.AspNetCore
         private string _localTempPath;
 
         public AspNetCoreHostingEnvironment(IOptions<HostingSettings> hostingSettings, IWebHostEnvironment webHostEnvironment)
-            : this(hostingSettings.Value, webHostEnvironment)
         {
-        }
-
-        public AspNetCoreHostingEnvironment(HostingSettings hostingSettings, IWebHostEnvironment webHostEnvironment)
-        {
-            _hostingSettings = hostingSettings ?? throw new ArgumentNullException(nameof(hostingSettings));
+            _hostingSettings = hostingSettings.Value ?? throw new ArgumentNullException(nameof(hostingSettings));
             _webHostEnvironment = webHostEnvironment ?? throw new ArgumentNullException(nameof(webHostEnvironment));
 
             SiteName = webHostEnvironment.ApplicationName;
@@ -30,7 +25,7 @@ namespace Umbraco.Web.Common.AspNetCore
             ApplicationPhysicalPath = webHostEnvironment.ContentRootPath;
 
             //TODO how to find this, This is a server thing, not application thing.
-            ApplicationVirtualPath = hostingSettings.ApplicationVirtualPath?.EnsureStartsWith('/')
+            ApplicationVirtualPath = _hostingSettings.ApplicationVirtualPath?.EnsureStartsWith('/')
                                      ?? "/";
             
             IISVersion = new Version(0, 0); // TODO not necessary IIS
