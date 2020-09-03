@@ -19,9 +19,9 @@ function clipboardService(notificationsService, eventsService, localStorageServi
 
     var clearPropertyResolvers = {};
     var pastePropertyResolvers = {};
-    var pasteTypeResolvers = {};
+    var clipboardTypeResolvers = {};
 
-    pasteTypeResolvers[TYPES.ELEMENT_TYPE] = function(data, propMethod) {
+    clipboardTypeResolvers[TYPES.ELEMENT_TYPE] = function(data, propMethod) {
         for (var t = 0; t < data.variants[0].tabs.length; t++) {
             var tab = data.variants[0].tabs[t];
             for (var p = 0; p < tab.properties.length; p++) {
@@ -30,7 +30,7 @@ function clipboardService(notificationsService, eventsService, localStorageServi
             }
         }
     }
-    pasteTypeResolvers[TYPES.RAW] = function(data, propMethod) {
+    clipboardTypeResolvers[TYPES.RAW] = function(data, propMethod) {
         for (var p = 0; p < data.length; p++) {
             propMethod(data[p], TYPES.RAW);
         }
@@ -96,7 +96,7 @@ function clipboardService(notificationsService, eventsService, localStorageServi
             firstLevelClearupMethod(cloneData);
         }
 
-        var typeResolver = pasteTypeResolvers[type];
+        var typeResolver = clipboardTypeResolvers[type];
         if(typeResolver) {
             typeResolver(cloneData, resolvePropertyForStorage);
         } else {
@@ -153,7 +153,7 @@ function clipboardService(notificationsService, eventsService, localStorageServi
     service.parseContentForPaste = function(pasteEntryData, type) {
         var cloneData = Utilities.copy(pasteEntryData);
 
-        var typeResolver = pasteTypeResolvers[type];
+        var typeResolver = clipboardTypeResolvers[type];
         if(typeResolver) {
             typeResolver(cloneData, resolvePropertyForPaste);
         } else {
@@ -232,10 +232,10 @@ function clipboardService(notificationsService, eventsService, localStorageServi
     * Executed for all properties including inner properties when performing a paste action.
     */
     service.registrerTypeResolvers = function(resolver, type) {
-        if(!pasteTypeResolvers[type]) {
-            pasteTypeResolvers[type] = [];
+        if(!clipboardTypeResolvers[type]) {
+            clipboardTypeResolvers[type] = [];
         }
-        pasteTypeResolvers[type].push(resolver);
+        clipboardTypeResolvers[type].push(resolver);
     };
 
 
