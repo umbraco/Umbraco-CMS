@@ -44,7 +44,15 @@ namespace Umbraco.ModelsBuilder.Embedded
             // TODO: Get proper temp file location/filename
             var sourceCode = File.ReadAllText(pathToSourceFile);
 
-            CompileToFile(saveLocation, sourceCode, "ModelsGeneratedAssembly", _refs);
+            // If someone adds a property to an existing document type, and then later removes it again
+            // The hash of the TypeModel will be the same, and we'll get an error because we can't overwrite the file because it's in use
+            // this will clear the hash file and the assembly will be recompiled for no reason.
+            // TODO: Handle this in a less dumb way.
+            if (!File.Exists(saveLocation))
+            {
+                CompileToFile(saveLocation, sourceCode, "ModelsGeneratedAssembly", _refs);
+            }
+                
             return Assembly.LoadFile(saveLocation);
 
         } 
