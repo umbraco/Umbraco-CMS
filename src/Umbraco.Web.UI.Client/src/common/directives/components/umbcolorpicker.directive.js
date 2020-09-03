@@ -42,7 +42,7 @@
     })();
 </pre>
 
-@param {function} beforeShow (<code>expression</code>): Callback function before color picker is shown.
+@param {function} onBeforeShow (<code>expression</code>): Callback function before color picker is shown.
 @param {function} onChange (<code>expression</code>): Callback function when the color is changed.
 @param {function} onShow (<code>expression</code>): Callback function when color picker is shown.
 @param {function} onHide (<code>expression</code>): Callback function when color picker is hidden.
@@ -128,8 +128,6 @@
 
             colorPickerInstance = colorPicker;
 
-            console.log("colorPickerInstance", colorPickerInstance);
-
             // destroy the color picker instance when the dom element is removed
             elem.on('$destroy', function () {
                 colorPickerInstance.destroy();
@@ -145,13 +143,10 @@
             
             if (colorPickerInstance) {
 
-                console.log("setUpCallbacks", colorPickerInstance);
-
                 // bind hook for beforeShow
                 if (ctrl.onBeforeShow) {
                     colorPickerInstance.on('beforeShow.spectrum', (e, color) => {
                         $timeout(function () {
-                            console.log("beforeShow", color);
                             ctrl.onBeforeShow({ color: color });
                         });
                     });
@@ -161,7 +156,6 @@
                 if (ctrl.onShow) {
                     colorPickerInstance.on('show.spectrum', (e, color) => {
                         $timeout(function () {
-                            console.log("onShow", color);
                             ctrl.onShow({ color: color });
                         });
                     });
@@ -171,7 +165,6 @@
                 if (ctrl.onHide) {
                     colorPickerInstance.on('hide.spectrum', (e, color) => {
                         $timeout(function () {
-                            console.log("onHide", color);
                             ctrl.onHide({ color: color });
                         });
                     });
@@ -181,7 +174,6 @@
                 if (ctrl.onChange) {
                     colorPickerInstance.on('change.spectrum', (e, color) => {
                         $timeout(function () {
-                            console.log("onChange", color);
                             ctrl.onChange({ color: color });
                         });
                     });
@@ -191,7 +183,6 @@
                 if (ctrl.onMove) {
                     colorPickerInstance.on('move.spectrum', (e, color) => {
                         $timeout(function () {
-                            console.log("onMove", color);
                             ctrl.onMove({ color: color });
                         });
                     });

@@ -1,5 +1,5 @@
 ﻿angular.module("umbraco").controller("Umbraco.PrevalueEditors.MultiColorPickerController",
-    function ($scope, assetsService, angularHelper, $element, eventsService) {
+    function ($scope, angularHelper, $element, eventsService) {
 
         var vm = this;
 
