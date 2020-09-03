@@ -29,6 +29,15 @@
         function Controller() {
     
             var vm = this;
+
+            vm.options = {
+                type: "color",
+                color: defaultColor,
+                showAlpha: false,
+                showPalette: true,
+                showPaletteOnly: false,
+                preferredFormat: "hex",
+            };
             
             vm.show = show;
             vm.hide = hide;
@@ -111,6 +120,8 @@
         }
 
         function setColorPicker(element, labels) {
+
+            // Spectrum options: https://seballot.github.io/spectrum/#options
 
             const defaultOptions = {
                 type: "color",
