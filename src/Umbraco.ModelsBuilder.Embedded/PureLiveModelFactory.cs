@@ -176,8 +176,6 @@ namespace Umbraco.ModelsBuilder.Embedded
 
                 // clear stuff
                 var modelsHashFile = Path.Combine(modelsDirectory, "models.hash");
-                //var modelsSrcFile = Path.Combine(modelsDirectory, "models.generated.cs");
-                //var projFile = Path.Combine(modelsDirectory, "all.generated.cs");
                 var dllPathFile = Path.Combine(modelsDirectory, "all.dll.path");
 
                 if (File.Exists(dllPathFile)) File.Delete(dllPathFile);
@@ -466,7 +464,7 @@ namespace Umbraco.ModelsBuilder.Embedded
         {
             var dirInfo = new DirectoryInfo(Path.Combine(_hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempData), "Models"));
             if (!dirInfo.Exists)
-                System.IO.Directory.CreateDirectory(dirInfo.FullName);
+                Directory.CreateDirectory(dirInfo.FullName);
             return Path.Combine(dirInfo.FullName, $"generated.cs{currentHash}.dll");
         }
 
