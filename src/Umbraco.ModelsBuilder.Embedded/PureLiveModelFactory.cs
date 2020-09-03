@@ -158,63 +158,6 @@ namespace Umbraco.ModelsBuilder.Embedded
 
         #region Compilation
 
-        // deadlock note
-        //
-        // when RazorBuildProvider_CodeGenerationStarted runs, the thread has Monitor.Enter-ed the BuildManager
-        // singleton instance, through a call to CompilationLock.GetLock in BuildManager.GetVPathBuildResultInternal,
-        // and now wants to lock _locker.
-        // when EnsureModels runs, the thread locks _locker and then wants BuildManager to compile, which in turns
-        // requires that the BuildManager can Monitor.Enter-ed itself.
-        // so:
-        //
-        // T1 - needs to ensure models, locks _locker
-        // T2 - needs to compile a view, locks BuildManager
-        //      hits RazorBuildProvider_CodeGenerationStarted
-        //      wants to lock _locker, wait
-        // T1 - needs to compile models, using BuildManager
-        //      wants to lock itself, wait
-        // <deadlock>
-        //
-        // until ASP.NET kills the long-running request (thread abort)
-        //
-        // problem is, we *want* to suspend views compilation while the models assembly is being changed else we
-        // end up with views compiled and cached with the old assembly, while models come from the new assembly,
-        // which gives more YSOD. so we *have* to lock _locker in RazorBuildProvider_CodeGenerationStarted.
-        //
-        // one "easy" solution consists in locking the BuildManager *before* _locker in EnsureModels, thus ensuring
-        // we always lock in the same order, and getting rid of deadlocks - but that requires having access to the
-        // current BuildManager instance, which is BuildManager.TheBuildManager, which is an internal property.
-        //
-        // well, that's what we are doing in this class' TheBuildManager property, using reflection.
-
-        private void RazorBuildProvider_CodeGenerationStarted(object sender, EventArgs e)
-        {
-            try
-            {
-                _locker.EnterReadLock();
-
-                // just be safe - can happen if the first view is not an Umbraco view,
-                // or if something went wrong and we don't have an assembly at all
-                if (_modelsAssembly == null) return;
-
-                if (_debugLevel > 0)
-                    _logger.Debug<PureLiveModelFactory>("RazorBuildProvider.CodeGenerationStarted");
-                // TODO: How to handle this? 
-                // if (!(sender is RazorBuildProvider provider)) return;
-
-                // add the assembly, and add a dependency to a text file that will change on each
-                // compilation as in some environments (could not figure which/why) the BuildManager
-                // would not re-compile the views when the models assembly is rebuilt.
-                //provider.AssemblyBuilder.AddAssemblyReference(_modelsAssembly);
-                //provider.AddVirtualPathDependency(ProjVirt);
-            }
-            finally
-            {
-                if (_locker.IsReadLockHeld)
-                    _locker.ExitReadLock();
-            }
-        }
-
         // tells the factory that it should build a new generation of models
         private void ResetModels()
         {
