@@ -1,5 +1,12 @@
 ﻿angular.module("umbraco").controller("Umbraco.PrevalueEditors.MultiColorPickerController",
     function ($scope, $timeout, assetsService, angularHelper, $element, localizationService, eventsService) {
+
+        var vm = this;
+
+        vm.show = show;
+        vm.hide = hide;
+        vm.change = change;
+
         //NOTE: We need to make each color an object, not just a string because you cannot 2-way bind to a primitive.
         var defaultColor = "000000";
         var defaultLabel = null;
@@ -8,6 +15,38 @@
         $scope.newLabel = defaultLabel;
         $scope.hasError = false;
         $scope.focusOnNew = false;
+
+        //$scope.options = {
+        //    type: "color",
+        //    color: defaultColor,
+        //    showAlpha: false,
+        //    showInitial: false,
+        //    showInput: true,
+        //    chooseText: $scope.labels.choose,
+        //    cancelText: $scope.labels.cancel,
+        //    preferredFormat: "hex",
+        //    clickoutFiresChange: true
+        //};
+
+        function hide(color) {
+            // show the add button
+            $element.find(".btn.add").show();
+        }
+
+        function show(color) {
+            // hide the add button
+            $element.find(".btn.add").hide();
+        }
+
+        function change(color) {
+            console.log("color", color);
+
+            console.log("hex color", color.toHexString());
+
+            angularHelper.safeApply($scope, function () {
+                $scope.newColor = color.toHexString().trimStart("#"); // #ff0000
+            });
+        }
 
         $scope.labels = {};
 
