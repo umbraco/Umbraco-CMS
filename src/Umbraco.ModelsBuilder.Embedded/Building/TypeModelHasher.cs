@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using Umbraco.Core;
 
 namespace Umbraco.ModelsBuilder.Embedded.Building
 {
@@ -40,23 +41,8 @@ namespace Umbraco.ModelsBuilder.Embedded.Building
 
             // Include the MB version in the hash so that if the MB version changes, models are rebuilt
             builder.Append(ApiVersion.Current.Version.ToString());
-
-            return GenerateHash(builder.ToString());
-        }
-
-        private static string GenerateHash(string input)
-        {
-            using (var md5 = MD5.Create())
-            {
-                var hashBytes = md5.ComputeHash(Encoding.UTF8.GetBytes(input));
-                var builder = new StringBuilder();
-                foreach(var b in hashBytes)
-                {
-                    builder.Append(b.ToString("X"));
-                }
-
-                return builder.ToString();
-            }
+            
+            return builder.ToString().GenerateHash();
         }
     }
 }
