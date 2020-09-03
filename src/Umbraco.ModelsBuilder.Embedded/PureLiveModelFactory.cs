@@ -397,6 +397,7 @@ namespace Umbraco.ModelsBuilder.Embedded
                 // directory, and then we end up referencing a dll which is *not* in that
                 // directory, and BuildManager fails to instantiate views ("the view found
                 // at ... was not created").
+                // TODO: Since we use Roslyn Compiler now, instead of BuildManager this shouldn't matter anymore?? 
                 //
                 if (File.Exists(dllPathFile))
                 {
@@ -405,7 +406,7 @@ namespace Umbraco.ModelsBuilder.Embedded
 
                     _logger.Debug<PureLiveModelFactory>($"Cached models dll at {dllPath}.");
 
-                    if (File.Exists(dllPath) && !File.Exists(dllPath + ".delete") && dllPath.StartsWith(codegen))
+                    if (File.Exists(dllPath) && !File.Exists(dllPath + ".delete") /*&& dllPath.StartsWith(codegen)*/)
                     {
                         assembly = Assembly.LoadFile(dllPath);
                         var attr = assembly.GetCustomAttribute<ModelsBuilderAssemblyAttribute>();
