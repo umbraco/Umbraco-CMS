@@ -21,11 +21,6 @@ namespace Umbraco.Examine
     /// </summary>
     public class UmbracoContentIndex : UmbracoExamineIndex, IUmbracoContentIndex, IDisposable
     {
-
-        void IDisposable.Dispose()
-        {
-            base.Dispose();
-        }
         protected ILocalizationService LanguageService { get; }
 
         #region Constructors
