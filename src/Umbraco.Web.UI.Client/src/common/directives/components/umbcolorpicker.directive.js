@@ -167,7 +167,7 @@
 
                 // bind hook for hide
                 if (ctrl.onHide) {
-                    pickrInstance.on('hide', (color) => {
+                    colorPickerInstance.on('hide', (color) => {
                         $timeout(function () {
                             ctrl.onHide({ color: color });
                         });
