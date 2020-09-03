@@ -14,7 +14,7 @@
             <input name="newLabel" type="text" ng-model="newLabel" focus-when="{{focusOnNew}}" class="umb-property-editor color-label" localize="placeholder" placeholder="@general_label" ng-show="vm.labelEnabled" />
         </div>
         <div class="umb-prevalues-multivalues__right">
-            <button type="button" class="btn btn-info add" ng-click="add($event)"><localize key="general_add">Add</localize></button>
+            <button type="button" class="btn btn-info add" ng-click="vm.add($event)"><localize key="general_add">Add</localize></button>
         </div>
     </div>
     <div ui-sortable="sortableOptions" ng-model="model.value">
@@ -29,7 +29,7 @@
                 </div>
             </div>
             <div class="umb-prevalues-multivalues__right">
-                <button type="button" class="umb-node-preview__action umb-node-preview__action--red" ng-click="remove(item, $event)"><localize key="general_remove">Remove</localize></button>
+                <button type="button" class="umb-node-preview__action umb-node-preview__action--red" ng-click="vm.remove(item, $event)"><localize key="general_remove">Remove</localize></button>
             </div>
         </div>
     </div>

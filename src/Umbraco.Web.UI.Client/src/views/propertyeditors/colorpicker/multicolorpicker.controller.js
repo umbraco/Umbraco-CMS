@@ -3,6 +3,9 @@
 
         var vm = this;
 
+        vm.add = add;
+        vm.remove = remove;
+
         vm.show = show;
         vm.hide = hide;
         vm.change = change;
@@ -83,7 +86,7 @@
             return label !== null && typeof label !== "undefined" && label !== "" && label.length && label.length > 0;
         }
 
-        $scope.remove = function (item, evt) {
+        function remove(item, evt) {
 
             evt.preventDefault();
 
@@ -92,9 +95,9 @@
             });
 
             angularHelper.getCurrentForm($scope).$setDirty();
-        };
+        }
 
-        $scope.add = function (evt) {
+        function add(evt) {
             evt.preventDefault();
 
             if ($scope.newColor) {
@@ -114,11 +117,10 @@
                     return;
                 }
 
-                //there was an error, do the highlight (will be set back by the directive)
+                // there was an error, do the highlight (will be set back by the directive)
                 $scope.hasError = true;
             }
-
-        };
+        }
 
         $scope.sortableOptions = {
             axis: 'y',
