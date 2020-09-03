@@ -132,7 +132,7 @@ namespace Umbraco.Extensions
                 settings.EnableTours = false;
             });
 
-            // TODO: remove this once no longer requred in Umbraco.Web.	
+            // TODO: remove this once no longer requred in Umbraco.Web.
             var configsFactory = new AspNetCoreConfigsFactory(configuration);
             var configs = configsFactory.Create();
             services.AddSingleton(configs);
