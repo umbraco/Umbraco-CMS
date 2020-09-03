@@ -30,7 +30,7 @@
             vm.change = change;
 
             function change(color) {
-                
+                color.toHexString().trimStart("#");
             }
         }
     
@@ -39,7 +39,7 @@
     })();
 </pre>
 
-@param {object} ngModel (<code>binding</code>): Value for the color picker.
+@param {string} ngModel (<code>binding</code>): Value for the color picker.
 @param {object} options (<code>binding</code>): Config object for the color picker.
 @param {function} onBeforeShow (<code>expression</code>): Callback function before color picker is shown.
 @param {function} onChange (<code>expression</code>): Callback function when the color is changed.
@@ -138,51 +138,54 @@
             $scope.$applyAsync();
         }
 
+
+        // Spectrum events: https://seballot.github.io/spectrum/#events
+
         function setUpCallbacks() {
             
             if (colorPickerInstance) {
 
                 // bind hook for beforeShow
                 if (ctrl.onBeforeShow) {
-                    colorPickerInstance.on('beforeShow.spectrum', (e, color) => {
+                    colorPickerInstance.on('beforeShow.spectrum', (e, tinycolor) => {
                         $timeout(function () {
-                            ctrl.onBeforeShow({ color: color });
+                            ctrl.onBeforeShow({ color: tinycolor });
                         });
                     });
                 }
 
                 // bind hook for show
                 if (ctrl.onShow) {
-                    colorPickerInstance.on('show.spectrum', (e, color) => {
+                    colorPickerInstance.on('show.spectrum', (e, tinycolor) => {
                         $timeout(function () {
-                            ctrl.onShow({ color: color });
+                            ctrl.onShow({ color: tinycolor });
                         });
                     });
                 }
 
                 // bind hook for hide
                 if (ctrl.onHide) {
-                    colorPickerInstance.on('hide.spectrum', (e, color) => {
+                    colorPickerInstance.on('hide.spectrum', (e, tinycolor) => {
                         $timeout(function () {
-                            ctrl.onHide({ color: color });
+                            ctrl.onHide({ color: tinycolor });
                         });
                     });
                 }
 
                 // bind hook for change
                 if (ctrl.onChange) {
-                    colorPickerInstance.on('change.spectrum', (e, color) => {
+                    colorPickerInstance.on('change.spectrum', (e, tinycolor) => {
                         $timeout(function () {
-                            ctrl.onChange({ color: color });
+                            ctrl.onChange({ color: tinycolor });
                         });
                     });
                 }
 
                 // bind hook for move
                 if (ctrl.onMove) {
-                    colorPickerInstance.on('move.spectrum', (e, color) => {
+                    colorPickerInstance.on('move.spectrum', (e, tinycolor) => {
                         $timeout(function () {
-                            ctrl.onMove({ color: color });
+                            ctrl.onMove({ color: tinycolor });
                         });
                     });
                 }
