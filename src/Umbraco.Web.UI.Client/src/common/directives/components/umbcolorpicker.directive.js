@@ -92,16 +92,13 @@
             });
 
             $timeout(function () {
-                const element = $element.find('.umb-color-picker')[0];
+                const element = $element.find('.umb-color-picker input')[0];
                 setColorPicker(element, labels);
             }, 0, true);
 
         }
 
         function setColorPicker(element, labels) {
-
-            //colorPickerInstance = element;
-            //console.log("colorPickerInstance", colorPickerInstance);
 
             const defaultOptions = {
                 type: "color",
@@ -126,11 +123,12 @@
 
             var elem = angular.element(element);
 
-            // Create new color pickr
+            // Create new color pickr instance
             const colorPicker = elem.spectrum(options);
-            console.log("colorPicker", colorPicker);
 
             colorPickerInstance = colorPicker;
+
+            console.log("colorPickerInstance", colorPickerInstance);
 
             // destroy the color picker instance when the dom element is removed
             elem.on('$destroy', function () {
@@ -147,19 +145,23 @@
             
             if (colorPickerInstance) {
 
+                console.log("setUpCallbacks", colorPickerInstance);
+
                 // bind hook for beforeShow
-                if (ctrl.beforeShow) {
-                    colorPickerInstance.on('beforeShow', (color) => {
+                if (ctrl.onBeforeShow) {
+                    colorPickerInstance.on('beforeShow.spectrum', (e, color) => {
                         $timeout(function () {
-                            ctrl.beforeShow({ color: color });
+                            console.log("beforeShow", color);
+                            ctrl.onBeforeShow({ color: color });
                         });
                     });
                 }
 
                 // bind hook for show
                 if (ctrl.onShow) {
-                    colorPickerInstance.on('show', (color) => {
+                    colorPickerInstance.on('show.spectrum', (e, color) => {
                         $timeout(function () {
+                            console.log("onShow", color);
                             ctrl.onShow({ color: color });
                         });
                     });
@@ -167,8 +169,9 @@
 
                 // bind hook for hide
                 if (ctrl.onHide) {
-                    colorPickerInstance.on('hide', (color) => {
+                    colorPickerInstance.on('hide.spectrum', (e, color) => {
                         $timeout(function () {
+                            console.log("onHide", color);
                             ctrl.onHide({ color: color });
                         });
                     });
@@ -176,8 +179,9 @@
 
                 // bind hook for change
                 if (ctrl.onChange) {
-                    colorPickerInstance.on('change', (color) => {
+                    colorPickerInstance.on('change.spectrum', (e, color) => {
                         $timeout(function () {
+                            console.log("onChange", color);
                             ctrl.onChange({ color: color });
                         });
                     });
@@ -185,8 +189,9 @@
 
                 // bind hook for move
                 if (ctrl.onMove) {
-                    colorPickerInstance.on('move', (color) => {
+                    colorPickerInstance.on('move.spectrum', (e, color) => {
                         $timeout(function () {
+                            console.log("onMove", color);
                             ctrl.onMove({ color: color });
                         });
                     });
@@ -199,13 +204,12 @@
     angular
         .module('umbraco.directives')
         .component('umbColorPicker', {
-            template: '<div class="umb-color-picker"></div>',
+            template: '<div class="umb-color-picker"><input type="hidden" /></div>',
             controller: ColorPickerController,
-            controllerAs: 'vm',
             bindings: {
                 ngModel: '<',
                 options: '<',
-                beforeShow: '&',
+                onBeforeShow: '&',
                 onShow: '&',
                 onHide: '&',
                 onChange: '&',
