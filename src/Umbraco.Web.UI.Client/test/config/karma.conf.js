@@ -100,14 +100,7 @@ module.exports = function (config) {
         // - PhantomJS
         // - IE (only Windows)
         // CLI --browsers Chrome,Firefox,Safari
-        browsers: ['ChromeHeadless'],
-
-        customLaunchers: {
-            ChromeDebugging: {
-                base: 'Chrome',
-                flags: ['--remote-debugging-port=9333']
-            }
-        },
+        browsers: ['jsdom'],
 
         // allow waiting a bit longer, some machines require this
 
@@ -123,11 +116,9 @@ module.exports = function (config) {
 
         plugins: [
             require('karma-jasmine'),
-            require('karma-phantomjs-launcher'),
-            require('karma-chrome-launcher'),
+            require('karma-jsdom-launcher'),
             require('karma-junit-reporter'),
             require('karma-spec-reporter')
-
         ],
 
         // the default configuration
