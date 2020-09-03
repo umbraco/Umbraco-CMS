@@ -5,10 +5,11 @@ using AutoFixture.Kernel;
 using AutoFixture.NUnit3;
 using Microsoft.AspNetCore.Identity;
 using Moq;
+using Umbraco.Core;
 using Umbraco.Core.BackOffice;
+using Umbraco.Core.Configuration;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Web.BackOffice.Controllers;
-using Umbraco.Core;
 using Umbraco.Web.Common.Install;
 
 namespace Umbraco.Tests.UnitTests.AutoFixture
