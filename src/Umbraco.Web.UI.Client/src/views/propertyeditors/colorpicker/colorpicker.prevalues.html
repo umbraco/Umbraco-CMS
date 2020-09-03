@@ -10,8 +10,6 @@
                 on-change="vm.change(color)">
             </umb-color-picker>
 
-            <input name="newColor" id="newColor" type="hidden" />
-
             <label for="newColor" val-highlight="{{hasError}}">#{{newColor}}</label>
             <input name="newLabel" type="text" ng-model="newLabel" focus-when="{{focusOnNew}}" class="umb-property-editor color-label" placeholder="Label" ng-show="labelEnabled" />
         </div>

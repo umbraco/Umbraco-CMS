@@ -1,5 +1,5 @@
 ﻿angular.module("umbraco").controller("Umbraco.PrevalueEditors.MultiColorPickerController",
-    function ($scope, $timeout, assetsService, angularHelper, $element, localizationService, eventsService) {
+    function ($scope, assetsService, angularHelper, $element, eventsService) {
 
         var vm = this;
 
@@ -39,61 +39,14 @@
         }
 
         function change(color) {
-            console.log("color", color);
-
-            console.log("hex color", color.toHexString());
-
             angularHelper.safeApply($scope, function () {
                 $scope.newColor = color.toHexString().trimStart("#"); // #ff0000
             });
         }
 
-        $scope.labels = {};
-
-        var labelKeys = [
-            "general_cancel",
-            "general_choose"
-        ];
-
         $scope.labelEnabled = false;
         eventsService.on("toggleValue", function (e, args) {
             $scope.labelEnabled = args.value;
-        });
-        
-        localizationService.localizeMany(labelKeys).then(function (values) {
-            $scope.labels.cancel = values[0];
-            $scope.labels.choose = values[1];
-        });
-
-        assetsService.load([
-            //"lib/spectrum/tinycolor.js",
-            "lib/spectrum/spectrum.js"
-        ], $scope).then(function () {
-            var elem = $element.find("input[name='newColor']");
-            elem.spectrum({
-                type: "color",
-                color: defaultColor,
-                showAlpha: false,
-                showInitial: false,
-                showInput: true,
-                chooseText: $scope.labels.choose,
-                cancelText: $scope.labels.cancel,
-                preferredFormat: "hex",
-                clickoutFiresChange: true,
-                hide: function (color) {
-                    //show the add butotn
-                    $element.find(".btn.add").show();
-                },
-                change: function (color) {
-                    angularHelper.safeApply($scope, function () {
-                        $scope.newColor = color.toHexString().trimStart("#"); // #ff0000
-                    });
-                },
-                show: function() {
-                    //hide the add butotn
-                    $element.find(".btn.add").hide();
-                }
-            });
         });
 
         if (!Utilities.isArray($scope.model.value)) {
@@ -184,6 +137,4 @@
             }
         };
 
-        //load the separate css for the editor to avoid it blocking our js loading
-        assetsService.loadCss("lib/spectrum/spectrum.css", $scope);
     });
