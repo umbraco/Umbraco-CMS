@@ -12,7 +12,10 @@
     <div ng-controller="My.ColorController as vm">
         
         <umb-color-picker
-            on-change="vm.selectItem">
+            options="vm.options"
+            on-show="vm.show(color)"
+            on-hide="vm.hide(color)"
+            on-change="vm.change(color)">
         </umb-color-picker>
     
     </div>
