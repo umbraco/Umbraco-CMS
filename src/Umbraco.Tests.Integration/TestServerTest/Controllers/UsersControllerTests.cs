@@ -149,7 +149,7 @@ namespace Umbraco.Tests.Integration.TestServerTest.Controllers
         }
 
         [Test]
-        public async Task PostUnlockUsers_When_User_Does_Not_Exist_Expect_InvalidOperationException()
+        public async Task PostUnlockUsers_When_User_Does_Not_Exist_Expect_Zero_Users_Message()
         {
             var userId = 42; // Must not exist
             var url = PrepareUrl<UsersController>(x => x.PostUnlockUsers(new []{userId}));
@@ -158,18 +158,15 @@ namespace Umbraco.Tests.Integration.TestServerTest.Controllers
             var response = await Client.PostAsync(url, new StringContent(string.Empty));
             var body = await response.Content.ReadAsStringAsync();
             body = body.TrimStart(AngularJsonMediaTypeFormatter.XsrfPrefix);
-            Assert.AreEqual(HttpStatusCode.InternalServerError, response.StatusCode);
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
 
-            var actual = JsonConvert.DeserializeObject<ExceptionViewModel>(body, new JsonSerializerSettings
+            var actual = JsonConvert.DeserializeObject<SimpleNotificationModel>(body, new JsonSerializerSettings
             {
                 ContractResolver = new IgnoreRequiredAttributesResolver()
             });
             Assert.Multiple(() =>
             {
-                var expected = new InvalidOperationException();
-                Assert.IsNotNull(actual);
-                Assert.AreEqual(expected.GetType(), actual.ExceptionType);
-                Assert.AreEqual(expected.Message, actual.ExceptionMessage);
+                Assert.AreEqual($"Unlocked 0 users", actual.Message);
             });
         }
 
@@ -229,8 +226,6 @@ namespace Umbraco.Tests.Integration.TestServerTest.Controllers
             {
                 userService.Save(user);
             }
-
-
 
             var url = PrepareUrl<UsersController>(x => x.PostUnlockUsers(users.Select(x=>x.Id).ToArray()));
 
