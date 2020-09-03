@@ -64,8 +64,6 @@ namespace Umbraco.ModelsBuilder.Embedded
             _ver = 1; // zero is for when we had no version
             _skipver = -1; // nothing to skip
 
-            // RazorBuildProvider.CodeGenerationStarted += RazorBuildProvider_CodeGenerationStarted;
-
             if (!hostingEnvironment.IsHosted) return;
 
             var modelsDirectory = _config.ModelsDirectoryAbsolute(_hostingEnvironment);
@@ -249,7 +247,7 @@ namespace Umbraco.ModelsBuilder.Embedded
             }
         }
 
-        // gets "the" build manager
+        // gets the RoslynCompiler
         private RoslynCompiler RoslynCompiler
         {
             get
@@ -391,14 +389,6 @@ namespace Umbraco.ModelsBuilder.Embedded
                 // ensure that the .dll file does not have a corresponding .dll.delete file
                 // as that would mean the the .dll file is going to be deleted and should not
                 // be re-used - that should not happen in theory, but better be safe
-                //
-                // ensure that the .dll file is in the current codegen directory - when IIS
-                // or Express does a full restart, it can switch to an entirely new codegen
-                // directory, and then we end up referencing a dll which is *not* in that
-                // directory, and BuildManager fails to instantiate views ("the view found
-                // at ... was not created").
-                // TODO: Since we use Roslyn Compiler now, instead of BuildManager this shouldn't matter anymore?? 
-                //
                 if (File.Exists(dllPathFile))
                 {
                     var dllPath = File.ReadAllText(dllPathFile);
@@ -406,7 +396,7 @@ namespace Umbraco.ModelsBuilder.Embedded
 
                     _logger.Debug<PureLiveModelFactory>($"Cached models dll at {dllPath}.");
 
-                    if (File.Exists(dllPath) && !File.Exists(dllPath + ".delete") /*&& dllPath.StartsWith(codegen)*/)
+                    if (File.Exists(dllPath) && !File.Exists(dllPath + ".delete"))
                     {
                         assembly = Assembly.LoadFile(dllPath);
                         var attr = assembly.GetCustomAttribute<ModelsBuilderAssemblyAttribute>();
@@ -444,15 +434,12 @@ namespace Umbraco.ModelsBuilder.Embedded
                     File.WriteAllText(projFile, text);
                 }
 
-                // generate a marker file that will be a dependency
-                // see note in RazorBuildProvider_CodeGenerationStarted
-                // NO: using all.generated.cs as a dependency
-                //File.WriteAllText(Path.Combine(modelsDirectory, "models.dep"), "VER:" + _ver);
-
                 _ver++;
                 try
                 {
                     assembly = RoslynCompiler.GetCompiledAssembly(_hostingEnvironment.MapPathContentRoot(projFile), GetOutputAssemblyPath(currentHash));
+                    // Delete old assembly file, it's a alot easier to do before we overwrite the dllPathFile
+                    DeleteAssembly(dllPathFile);
                     File.WriteAllText(dllPathFile, assembly.Location);
                 }
                 catch
@@ -490,7 +477,9 @@ namespace Umbraco.ModelsBuilder.Embedded
             // compile and register
             try
             {
-                assembly = RoslynCompiler.GetCompiledAssembly(_hostingEnvironment.MapPathContentRoot(projFile),GetOutputAssemblyPath(currentHash));
+                assembly = RoslynCompiler.GetCompiledAssembly(_hostingEnvironment.MapPathContentRoot(projFile), GetOutputAssemblyPath(currentHash));
+                // Delete old assembly file, it's a alot easier to do before we overwrite the dllPathFile
+                DeleteAssembly(dllPathFile);
                 File.WriteAllText(dllPathFile, assembly.Location);
                 File.WriteAllText(modelsHashFile, currentHash);
             }
@@ -502,6 +491,18 @@ namespace Umbraco.ModelsBuilder.Embedded
 
             _logger.Debug<PureLiveModelFactory>("Done rebuilding.");
             return assembly;
+        }
+
+        private static void DeleteAssembly(string dllPathFile)
+        {
+            // We can't do this because the dllPathFile gets deleted when a new document type is saved
+            // But how do we delete the old assembly?
+            // It seems like ISS doesn't release it even though a new dll is genrated and loaded.
+            if (File.Exists(dllPathFile))
+            {
+                var dllPath = File.ReadAllText(dllPathFile);
+                File.Delete(dllPath);
+            }
         }
 
         private string GetOutputAssemblyPath(string currentHash)
