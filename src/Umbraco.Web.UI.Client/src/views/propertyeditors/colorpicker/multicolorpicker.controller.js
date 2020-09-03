@@ -18,17 +18,11 @@
         $scope.hasError = false;
         $scope.focusOnNew = false;
 
-        //$scope.options = {
-        //    type: "color",
-        //    color: defaultColor,
-        //    showAlpha: false,
-        //    showInitial: false,
-        //    showInput: true,
-        //    chooseText: $scope.labels.choose,
-        //    cancelText: $scope.labels.cancel,
-        //    preferredFormat: "hex",
-        //    clickoutFiresChange: true
-        //};
+        $scope.options = {
+            type: "color",
+            color: defaultColor,
+            showAlpha: false
+        };
 
         function hide(color) {
             // show the add button
