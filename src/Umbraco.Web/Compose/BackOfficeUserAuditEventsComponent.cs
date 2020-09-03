@@ -38,7 +38,19 @@ namespace Umbraco.Web.Compose
         }
 
         public void Terminate()
-        { }
+        {
+            //BackOfficeUserManager.AccountLocked -= ;
+            //BackOfficeUserManager.AccountUnlocked -= ;
+            BackOfficeOwinUserManager.ForgotPasswordRequested -= OnForgotPasswordRequest;
+            BackOfficeOwinUserManager.ForgotPasswordChangedSuccess -= OnForgotPasswordChange;
+            BackOfficeOwinUserManager.LoginFailed -= OnLoginFailed;
+            //BackOfficeUserManager.LoginRequiresVerification -= ;
+            BackOfficeOwinUserManager.LoginSuccess -= OnLoginSuccess;
+            BackOfficeOwinUserManager.LogoutSuccess -= OnLogoutSuccess;
+            BackOfficeOwinUserManager.PasswordChanged -= OnPasswordChanged;
+            BackOfficeOwinUserManager.PasswordReset -= OnPasswordReset;
+            //BackOfficeUserManager.ResetAccessFailedCount -= ;
+        }
 
         private IUser GetPerformingUser(int userId)
         {

@@ -35,7 +35,9 @@ namespace Umbraco.Web.Logging
         }
 
         public void Terminate()
-        { }
+        {
+            UmbracoApplicationBase.ApplicationInit -= InitializeApplication;
+        }
 
         private void InitializeApplication(object sender, EventArgs args)
         {

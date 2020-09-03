@@ -47,7 +47,19 @@ namespace Umbraco.Core.Compose
         }
 
         public void Terminate()
-        { }
+        {
+            UserService.SavedUserGroup -= OnSavedUserGroupWithUsers;
+
+            UserService.SavedUser -= OnSavedUser;
+            UserService.DeletedUser -= OnDeletedUser;
+            UserService.UserGroupPermissionsAssigned -= UserGroupPermissionAssigned;
+
+            MemberService.Saved -= OnSavedMember;
+            MemberService.Deleted -= OnDeletedMember;
+            MemberService.AssignedRoles -= OnAssignedRoles;
+            MemberService.RemovedRoles -= OnRemovedRoles;
+            MemberService.Exported -= OnMemberExported;
+        }
 
         public static IUser UnknownUser(IGlobalSettings globalSettings) => new User(globalSettings) { Id = Constants.Security.UnknownUserId, Name = Constants.Security.UnknownUserName, Email = "" };
 
