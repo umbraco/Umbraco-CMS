@@ -64,7 +64,7 @@ namespace Umbraco.Core
             {
                 lock (liveFactory.SyncRoot)
                 {
-                    liveFactory.Refresh(); // TODO: Reset to Reset
+                    liveFactory.Reset();
 
                     action();
                 }
