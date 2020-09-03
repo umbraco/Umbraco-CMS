@@ -7,6 +7,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 using Umbraco.Core.WebAssets;
 using Umbraco.Examine;
+using Umbraco.Web.Compose;
 using Umbraco.Web.PublishedCache.NuCache;
 using Umbraco.Web.Scheduling;
 using Umbraco.Web.Search;
@@ -28,6 +29,7 @@ namespace Umbraco.Tests.Integration.Testing
             base.Compose(composition);
 
             composition.Components().Remove<SchedulerComponent>();
+            composition.Components().Remove<DatabaseServerRegistrarAndMessengerComponent>();
             composition.RegisterUnique<BackgroundIndexRebuilder, TestBackgroundIndexRebuilder>();
             composition.RegisterUnique<IRuntimeMinifier>(factory => Mock.Of<IRuntimeMinifier>());
 

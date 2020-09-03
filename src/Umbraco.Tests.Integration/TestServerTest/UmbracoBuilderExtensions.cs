@@ -26,13 +26,27 @@ namespace Umbraco.Tests.Integration.TestServerTest
                             builder.WebHostEnvironment,
                             container,
                             typeof(UmbracoBuilderExtensions).Assembly,
-                            NoAppCache.Instance,
+                            AppCaches.NoCache, // Disable caches in integration tests
                             testHelper.GetLoggingConfiguration(),
                             // TODO: Yep that's extremely ugly
-                            (a, b, c, d, e, f, g, h, i, j) =>
-                                UmbracoIntegrationTest.CreateTestRuntime(a, b, c, d, e, f, g, h, i, j,
+                            (configs, umbVersion, ioHelper, logger, profiler, hostingEnv, backOfficeInfo, typeFinder, appCaches, dbProviderFactoryCreator) =>
+                            {
+                                var runtime = UmbracoIntegrationTest.CreateTestRuntime(
+                                    configs,
+                                    umbVersion,
+                                    ioHelper,
+                                    logger,
+                                    profiler,
+                                    hostingEnv,
+                                    backOfficeInfo,
+                                    typeFinder,
+                                    appCaches,
+                                    dbProviderFactoryCreator,
                                     testHelper.MainDom,         // SimpleMainDom
-                                    dbInstallEventHandler),     // DB Installation event handler
+                                    dbInstallEventHandler);     // DB Installation event handler
+
+                                return runtime;
+                            },     
                             out _);
                     });
         }

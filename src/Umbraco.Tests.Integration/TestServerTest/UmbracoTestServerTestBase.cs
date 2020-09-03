@@ -49,8 +49,8 @@ namespace Umbraco.Tests.Integration.TestServerTest
             });
 
             Client = Factory.CreateClient(new WebApplicationFactoryClientOptions
-            {                
-                AllowAutoRedirect = false                
+            {
+                AllowAutoRedirect = false
             });
 
             LinkGenerator = Factory.Services.GetRequiredService<LinkGenerator>();
@@ -62,9 +62,10 @@ namespace Umbraco.Tests.Integration.TestServerTest
         {
             var builder = base.CreateHostBuilder();
             builder.ConfigureWebHost(builder =>
-             {
+            {
                  // need to configure the IWebHostEnvironment too
-                 builder.ConfigureServices((c, s) => {
+                 builder.ConfigureServices((c, s) =>
+                 {
                      c.HostingEnvironment = TestHelper.GetWebHostEnvironment();
                  });
 
@@ -74,8 +75,8 @@ namespace Umbraco.Tests.Integration.TestServerTest
                      Services = app.ApplicationServices;
                      Configure(app);
                  });
-             })
-                .UseEnvironment(Environments.Development);
+             }).UseEnvironment(Environments.Development);
+
             return builder;
         }
 
@@ -140,14 +141,14 @@ namespace Umbraco.Tests.Integration.TestServerTest
                 //.WithMiniProfiler() // we don't want this running in tests
                 .WithMvcAndRazor(mvcBuilding: mvcBuilder =>
                 {
-                    mvcBuilder.AddApplicationPart(typeof(ContentController).Assembly);                    
+                    mvcBuilder.AddApplicationPart(typeof(ContentController).Assembly);
                 })
                 .WithWebServer()
                 .Build();
         }
 
         public override void Configure(IApplicationBuilder app)
-        {            
+        {
             app.UseUmbraco();
         }
 

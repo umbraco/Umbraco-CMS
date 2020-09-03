@@ -25,7 +25,6 @@ using Umbraco.Core.Runtime;
 using Umbraco.Core;
 using Moq;
 using System.Collections.Generic;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using System.Data.SqlClient;
 using System.Data.Common;
@@ -52,18 +51,30 @@ namespace Umbraco.Tests.Integration.Testing
             return umbracoContainer;
         }
 
-        private Action _testTeardown = null;
-        private Action _fixtureTeardown = null;
+        private List<Action> _testTeardown = null;
+        private List<Action> _fixtureTeardown = new List<Action>();
 
-        public void OnTestTearDown(Action tearDown) => _testTeardown = tearDown;
+        public void OnTestTearDown(Action tearDown)
+        {
+            if (_testTeardown == null)
+                _testTeardown = new List<Action>();
+            _testTeardown.Add(tearDown);
+        }
 
-        public void OnFixtureTearDown(Action tearDown) => _fixtureTeardown = tearDown;
+        public void OnFixtureTearDown(Action tearDown) => _fixtureTeardown.Add(tearDown);
 
         [OneTimeTearDown]
-        public void FixtureTearDown() => _fixtureTeardown?.Invoke();
+        public void FixtureTearDown()
+        {
+            foreach (var a in _fixtureTeardown) a();
+        }
 
         [TearDown]
-        public virtual void TearDown() => _testTeardown?.Invoke();
+        public virtual void TearDown()
+        {
+            foreach (var a in _testTeardown) a();
+            _testTeardown = null;
+        }
 
         [SetUp]
         public virtual async Task Setup()
@@ -117,14 +128,14 @@ namespace Umbraco.Tests.Integration.Testing
         /// <param name="hostingEnvironment"></param>
         /// <param name="backOfficeInfo"></param>
         /// <param name="typeFinder"></param>
-        /// <param name="requestCache"></param>
+        /// <param name="appCaches"></param>
         /// <param name="dbProviderFactoryCreator"></param>
         /// <returns></returns>
         public CoreRuntime CreateTestRuntime(Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper,
             ILogger logger, IProfiler profiler, Core.Hosting.IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo,
-            ITypeFinder typeFinder, IRequestCache requestCache, IDbProviderFactoryCreator dbProviderFactoryCreator)
+            ITypeFinder typeFinder, AppCaches appCaches, IDbProviderFactoryCreator dbProviderFactoryCreator)
         {
-            return CreateTestRuntime(configs,
+            var runtime = CreateTestRuntime(configs,
                 umbracoVersion,
                 ioHelper,
                 logger,
@@ -132,11 +143,13 @@ namespace Umbraco.Tests.Integration.Testing
                 hostingEnvironment,
                 backOfficeInfo,                
                 typeFinder,
-                requestCache,
+                appCaches,
                 dbProviderFactoryCreator,
                 TestHelper.MainDom, // SimpleMainDom
                 UseTestLocalDb // DB Installation event handler
-                );
+            );
+
+            return runtime;
         }
 
         /// <summary>
@@ -157,7 +170,7 @@ namespace Umbraco.Tests.Integration.Testing
         /// <returns></returns>
         public static CoreRuntime CreateTestRuntime(Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper,
             ILogger logger, IProfiler profiler, Core.Hosting.IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo,
-            ITypeFinder typeFinder, IRequestCache requestCache, IDbProviderFactoryCreator dbProviderFactoryCreator,
+            ITypeFinder typeFinder, AppCaches appCaches, IDbProviderFactoryCreator dbProviderFactoryCreator,
             IMainDom mainDom, Action<CoreRuntime, RuntimeEssentialsEventArgs> eventHandler)
         {
             var runtime = new CoreRuntime(
@@ -172,7 +185,7 @@ namespace Umbraco.Tests.Integration.Testing
                 dbProviderFactoryCreator,
                 mainDom,
                 typeFinder,
-                requestCache);
+                appCaches);
 
             runtime.RuntimeEssentials += (sender, args) => eventHandler(sender, args);
 
@@ -191,7 +204,15 @@ namespace Umbraco.Tests.Integration.Testing
 
             // Add it!
             services.AddUmbracoConfiguration(Configuration);
-            services.AddUmbracoCore(webHostEnvironment, UmbracoContainer, GetType().Assembly, NoAppCache.Instance, TestHelper.GetLoggingConfiguration(), CreateTestRuntime, out _);
+            services.AddUmbracoCore(
+                webHostEnvironment,
+                UmbracoContainer,
+                GetType().Assembly,
+                AppCaches.NoCache, // Disable caches for integration tests
+                TestHelper.GetLoggingConfiguration(),
+                CreateTestRuntime,
+                out _);
+
             services.AddUmbracoWebComponents();
             services.AddUmbracoRuntimeMinifier(Configuration);
             services.AddUmbracoBackOffice();
@@ -225,14 +246,17 @@ namespace Umbraco.Tests.Integration.Testing
         private static LocalDbTestDatabase _dbInstance;
 
         /// <summary>
-        /// Event handler for the <see cref="CoreRuntime.RuntimeEssentials"/> to install the database
+        /// Event handler for the <see cref="CoreRuntime.RuntimeEssentials"/> to install the database and register the <see cref="IRuntime"/> to Terminate
         /// </summary>
-        /// <param name="sender"></param>
+        /// <param name="runtime"></param>
         /// <param name="args"></param>
-        protected void UseTestLocalDb(CoreRuntime sender, RuntimeEssentialsEventArgs args)
+        protected void UseTestLocalDb(CoreRuntime runtime, RuntimeEssentialsEventArgs args)
         {
+            // MUST be terminated on teardown
+            OnTestTearDown(() => runtime.Terminate());
+
             // This will create a db, install the schema and ensure the app is configured to run
-            InstallTestLocalDb(args.DatabaseFactory, sender.ProfilingLogger, sender.Configs.Global(), sender.State, TestHelper.WorkingDirectory, out var connectionString);
+            InstallTestLocalDb(args.DatabaseFactory, runtime.ProfilingLogger, runtime.Configs.Global(), runtime.State, TestHelper.WorkingDirectory, out var connectionString);
             TestDBConnectionString = connectionString;
             InMemoryConfiguration["ConnectionStrings:" + Constants.System.UmbracoConnectionName] = TestDBConnectionString;
         }

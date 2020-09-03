@@ -27,12 +27,11 @@ namespace Umbraco.Core.Runtime
         // runtime state, this instance will get replaced again once the essential services are available to run the check
         private RuntimeState _state = RuntimeState.Booting();
         private readonly IUmbracoBootPermissionChecker _umbracoBootPermissionChecker;
-        private readonly IRequestCache _requestCache;
         private readonly IGlobalSettings _globalSettings;
         private readonly IConnectionStrings _connectionStrings;
 
         public CoreRuntime(
-            Configs configs,
+            Configs configs,            
             IUmbracoVersion umbracoVersion,
             IIOHelper ioHelper,
             ILogger logger,
@@ -43,10 +42,11 @@ namespace Umbraco.Core.Runtime
             IDbProviderFactoryCreator dbProviderFactoryCreator,
             IMainDom mainDom,
             ITypeFinder typeFinder,
-            IRequestCache requestCache)
+            AppCaches appCaches)
         {
             IOHelper = ioHelper;
             Configs = configs;
+            AppCaches = appCaches;
             UmbracoVersion = umbracoVersion ;
             Profiler = profiler;
             HostingEnvironment = hostingEnvironment;
@@ -54,8 +54,7 @@ namespace Umbraco.Core.Runtime
             DbProviderFactoryCreator = dbProviderFactoryCreator;
 
             _umbracoBootPermissionChecker = umbracoBootPermissionChecker;
-            _requestCache = requestCache;
-
+            
             Logger = logger;
             MainDom = mainDom;
             TypeFinder = typeFinder;
@@ -95,6 +94,7 @@ namespace Umbraco.Core.Runtime
         protected IIOHelper IOHelper { get; }
         protected IHostingEnvironment HostingEnvironment { get; }
         public Configs Configs { get; }
+        public AppCaches AppCaches { get; }
         public IUmbracoVersion UmbracoVersion { get; }
 
         /// <inheritdoc />
@@ -161,28 +161,25 @@ namespace Umbraco.Core.Runtime
                 // run handlers
                 OnRuntimeBoot();
 
-                // application caches
-                var appCaches = CreateAppCaches();
-
                 // database factory
                 var databaseFactory = CreateDatabaseFactory();
 
                 // type finder/loader
-                var typeLoader = new TypeLoader(TypeFinder, appCaches.RuntimeCache, new DirectoryInfo(HostingEnvironment.LocalTempPath), ProfilingLogger);
+                var typeLoader = new TypeLoader(TypeFinder, AppCaches.RuntimeCache, new DirectoryInfo(HostingEnvironment.LocalTempPath), ProfilingLogger);
 
                 // re-create the state object with the essential services
                 _state = new RuntimeState(Configs.Global(), UmbracoVersion, databaseFactory, Logger);
 
                 // create the composition
-                composition = new Composition(register, typeLoader, ProfilingLogger, _state, Configs, IOHelper, appCaches);
+                composition = new Composition(register, typeLoader, ProfilingLogger, _state, Configs, IOHelper, AppCaches);
 
-                composition.RegisterEssentials(Logger, Profiler, ProfilingLogger, MainDom, appCaches, databaseFactory, typeLoader, _state, TypeFinder, IOHelper, UmbracoVersion, DbProviderFactoryCreator, HostingEnvironment, BackOfficeInfo);
+                composition.RegisterEssentials(Logger, Profiler, ProfilingLogger, MainDom, AppCaches, databaseFactory, typeLoader, _state, TypeFinder, IOHelper, UmbracoVersion, DbProviderFactoryCreator, HostingEnvironment, BackOfficeInfo);
 
                 // register ourselves (TODO: Should we put this in RegisterEssentials?)
                 composition.Register<IRuntime>(_ => this, Lifetime.Singleton);
 
                 // run handlers
-                OnRuntimeEssentials(composition, appCaches, typeLoader, databaseFactory);
+                OnRuntimeEssentials(composition, AppCaches, typeLoader, databaseFactory);
 
                 try
                 {
@@ -365,21 +362,6 @@ namespace Umbraco.Core.Runtime
         /// </summary>
         protected virtual IEnumerable<Type> GetComposerTypes(TypeLoader typeLoader)
             => typeLoader.GetTypes<IComposer>();
-
-        /// <summary>
-        /// Creates the application caches.
-        /// </summary>
-        protected virtual AppCaches CreateAppCaches()
-        {
-            // need the deep clone runtime cache provider to ensure entities are cached properly, ie
-            // are cloned in and cloned out - no request-based cache here since no web-based context,
-            // is overridden by the web runtime
-
-            return new AppCaches(
-                new DeepCloneAppCache(new ObjectCacheAppCache()),
-                _requestCache,
-                new IsolatedCaches(type => new DeepCloneAppCache(new ObjectCacheAppCache())));
-        }
 
         /// <summary>
         /// Returns the application path of the site/solution
