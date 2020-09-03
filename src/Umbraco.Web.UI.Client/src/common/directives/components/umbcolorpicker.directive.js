@@ -26,8 +26,18 @@
         function Controller() {
     
             var vm = this;
-    
+            
+            vm.show = show;
+            vm.hide = hide;
             vm.change = change;
+
+            function show(color) {
+                color.toHexString().trimStart("#");
+            }
+
+            function hide(color) {
+                color.toHexString().trimStart("#");
+            }
 
             function change(color) {
                 color.toHexString().trimStart("#");
