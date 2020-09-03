@@ -150,7 +150,6 @@
             $scope.$applyAsync();
         }
 
-
         // Spectrum events: https://seballot.github.io/spectrum/#events
 
         function setUpCallbacks() {
