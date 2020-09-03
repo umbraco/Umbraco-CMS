@@ -92,7 +92,7 @@
             });
 
             $timeout(function () {
-                const element = $element.find('.umb-color-picker input')[0];
+                const element = $element.find('.umb-color-picker > input')[0];
                 setColorPicker(element, labels);
             }, 0, true);
 
