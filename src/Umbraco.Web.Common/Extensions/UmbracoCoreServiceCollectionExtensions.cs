@@ -325,7 +325,7 @@ namespace Umbraco.Extensions
             var globalSettings = configs.Global();
 
             hostingEnvironment = new AspNetCoreHostingEnvironment(hostingSettings, webHostEnvironment);
-            ioHelper = new IOHelper(hostingEnvironment, globalSettings);
+            ioHelper = new IOHelper(hostingEnvironment);
             logger = AddLogger(services, hostingEnvironment, loggingConfiguration);
 
             backOfficeInfo = new AspNetCoreBackOfficeInfo(globalSettings);

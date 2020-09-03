@@ -82,7 +82,7 @@ namespace Umbraco.Tests.Common
             get
             {
                 if (_ioHelper == null)
-                    _ioHelper = new IOHelper(GetHostingEnvironment(), SettingsForTests.GenerateMockGlobalSettings());
+                    _ioHelper = new IOHelper(GetHostingEnvironment());
                 return _ioHelper;
             }
         }

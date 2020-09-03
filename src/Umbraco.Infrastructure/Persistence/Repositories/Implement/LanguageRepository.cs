@@ -40,7 +40,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override ILanguage PerformGet(int id)
         {
-            throw new NotSupportedException(); // not required since policy is full dataset
+            return PerformGetAll(id).FirstOrDefault();
         }
 
         protected override IEnumerable<ILanguage> PerformGetAll(params int[] ids)
