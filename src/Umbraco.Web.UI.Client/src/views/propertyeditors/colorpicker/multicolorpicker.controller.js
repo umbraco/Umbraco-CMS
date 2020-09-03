@@ -7,6 +7,8 @@
         vm.hide = hide;
         vm.change = change;
 
+        vm.labelEnabled = false;
+
         //NOTE: We need to make each color an object, not just a string because you cannot 2-way bind to a primitive.
         var defaultColor = "000000";
         var defaultLabel = null;
@@ -44,9 +46,8 @@
             });
         }
 
-        $scope.labelEnabled = false;
         eventsService.on("toggleValue", function (e, args) {
-            $scope.labelEnabled = args.value;
+            vm.labelEnabled = args.value;
         });
 
         if (!Utilities.isArray($scope.model.value)) {
