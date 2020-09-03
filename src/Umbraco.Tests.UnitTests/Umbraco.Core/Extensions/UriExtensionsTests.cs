@@ -48,10 +48,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Extensions
         [TestCase("http://www.domain.com/umbraco/test/legacyAjaxCalls.ashx?some=query&blah=js", "", true)]
         public void Is_Back_Office_Request(string input, string virtualPath, bool expected)
         {
-            var hostingSettings = new HostingSettingsBuilder().WithApplicationVirtualPath(virtualPath).Build();
-            var hostingEnvironment = new AspNetCoreHostingEnvironment(Options.Create(hostingSettings), _hostEnvironment);
-
             var source = new Uri(input);
+            var hostingEnvironment = CreateHostingEnvironment(virtualPath);
             Assert.AreEqual(expected, source.IsBackOfficeRequest(_globalSettings, hostingEnvironment));
         }
 
@@ -67,9 +65,15 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Extensions
         public void Is_Installer_Request(string input, bool expected)
         {
             var source = new Uri(input);
-            var hostingSettings = new HostingSettingsBuilder().Build();
-            var hostingEnvironment = new AspNetCoreHostingEnvironment(Options.Create(hostingSettings), _hostEnvironment);
+            var hostingEnvironment = CreateHostingEnvironment();
             Assert.AreEqual(expected, source.IsInstallerRequest(hostingEnvironment));
+        }
+
+        private AspNetCoreHostingEnvironment CreateHostingEnvironment(string virtualPath = "")
+        {
+            var hostingSettings = new HostingSettingsBuilder().WithApplicationVirtualPath(virtualPath).Build();
+            var mockedOptionsMonitorOfHostingSettings = Mock.Of<IOptionsMonitor<HostingSettings>>(x => x.CurrentValue == hostingSettings);
+            return new AspNetCoreHostingEnvironment(mockedOptionsMonitorOfHostingSettings, _hostEnvironment);
         }
 
         [TestCase("http://www.domain.com/foo/bar", "/", "http://www.domain.com/")]

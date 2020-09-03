@@ -1,26 +1,26 @@
-﻿
-using System;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Hosting;
-using Moq;
+﻿using System;
 using System.Data.Common;
 using System.IO;
 using System.Net;
 using System.Reflection;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
+using Moq;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Diagnostics;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
-using Umbraco.Net;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Runtime;
+using Umbraco.Net;
 using Umbraco.Tests.Common;
+using Umbraco.Tests.Common.Builders;
 using Umbraco.Web.Common.AspNetCore;
 using IHostingEnvironment = Umbraco.Core.Hosting.IHostingEnvironment;
-using Umbraco.Tests.Common.Builders;
-using Microsoft.Extensions.Options;
 
 namespace Umbraco.Tests.Integration.Implementations
 {
@@ -106,7 +106,8 @@ namespace Umbraco.Tests.Integration.Implementations
             if (_backOfficeInfo == null)
             {
                 var globalSettings = new GlobalSettingsBuilder().Build();
-                _backOfficeInfo = new AspNetCoreBackOfficeInfo(Options.Create(globalSettings));
+                var mockedOptionsMonitorOfGlobalSettings = Mock.Of<IOptionsMonitor<GlobalSettings>>(x => x.CurrentValue == globalSettings);
+                _backOfficeInfo = new AspNetCoreBackOfficeInfo(mockedOptionsMonitorOfGlobalSettings);
             }
 
             return _backOfficeInfo;
@@ -114,8 +115,14 @@ namespace Umbraco.Tests.Integration.Implementations
 
         public override IHostingEnvironment GetHostingEnvironment()
             => _hostingEnvironment ??= new TestHostingEnvironment(
-                new HostingSettingsBuilder().Build(),
+                GetIOptionsMonitorOfHostingSettings(),
                 _hostEnvironment);
+
+        private IOptionsMonitor<HostingSettings> GetIOptionsMonitorOfHostingSettings()
+        {
+            var hostingSettings = new HostingSettingsBuilder().Build();
+            return Mock.Of<IOptionsMonitor<HostingSettings>>(x => x.CurrentValue == hostingSettings);
+        }
 
         public override IApplicationShutdownRegistry GetHostingEnvironmentLifetime() => _hostingLifetime;
 

@@ -15,9 +15,9 @@ namespace Umbraco.Web.Common.AspNetCore
 
         private string _localTempPath;
 
-        public AspNetCoreHostingEnvironment(IOptions<HostingSettings> hostingSettings, IWebHostEnvironment webHostEnvironment)
+        public AspNetCoreHostingEnvironment(IOptionsMonitor<HostingSettings> hostingSettings, IWebHostEnvironment webHostEnvironment)
         {
-            _hostingSettings = hostingSettings.Value ?? throw new ArgumentNullException(nameof(hostingSettings));
+            _hostingSettings = hostingSettings.CurrentValue ?? throw new ArgumentNullException(nameof(hostingSettings));
             _webHostEnvironment = webHostEnvironment ?? throw new ArgumentNullException(nameof(webHostEnvironment));
 
             SiteName = webHostEnvironment.ApplicationName;

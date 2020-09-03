@@ -230,10 +230,10 @@ namespace Umbraco.Extensions
             // `RegisterEssentials`.
             var serviceProvider = services.BuildServiceProvider();
 
-            var globalSettings = serviceProvider.GetService<IOptions<GlobalSettings>>();
+            var globalSettings = serviceProvider.GetService<IOptionsMonitor<GlobalSettings>>();
             var connectionStrings = serviceProvider.GetService<IOptions<ConnectionStrings>>();
-            var hostingSettings = serviceProvider.GetService<IOptions<HostingSettings>>();
-            var typeFinderSettings = serviceProvider.GetService<IOptions<TypeFinderSettings>>();
+            var hostingSettings = serviceProvider.GetService<IOptionsMonitor<HostingSettings>>();
+            var typeFinderSettings = serviceProvider.GetService<IOptionsMonitor<TypeFinderSettings>>();
 
             var dbProviderFactoryCreator = serviceProvider.GetRequiredService<IDbProviderFactoryCreator>();
 
@@ -250,7 +250,7 @@ namespace Umbraco.Extensions
             var configs = serviceProvider.GetService<Configs>();
             var coreRuntime = GetCoreRuntime(
                 configs,
-                globalSettings.Value,
+                globalSettings.CurrentValue,
                 connectionStrings.Value,
                 umbracoVersion,
                 ioHelper,
@@ -267,7 +267,7 @@ namespace Umbraco.Extensions
             return services;
         }
 
-        private static ITypeFinder CreateTypeFinder(Core.Logging.ILogger logger, IProfiler profiler, IWebHostEnvironment webHostEnvironment, Assembly entryAssembly, IOptions<TypeFinderSettings> typeFinderSettings)
+        private static ITypeFinder CreateTypeFinder(Core.Logging.ILogger logger, IProfiler profiler, IWebHostEnvironment webHostEnvironment, Assembly entryAssembly, IOptionsMonitor<TypeFinderSettings> typeFinderSettings)
         {
             var runtimeHashPaths = new RuntimeHashPaths();
             runtimeHashPaths.AddFolder(new DirectoryInfo(Path.Combine(webHostEnvironment.ContentRootPath, "bin")));
@@ -311,8 +311,8 @@ namespace Umbraco.Extensions
 
         private static IServiceCollection CreateCompositionRoot(
             IServiceCollection services,
-            IOptions<GlobalSettings> globalSettings,
-            IOptions<HostingSettings> hostingSettings,
+            IOptionsMonitor<GlobalSettings> globalSettings,
+            IOptionsMonitor<HostingSettings> hostingSettings,
             IWebHostEnvironment webHostEnvironment,
             ILoggingConfiguration loggingConfiguration,
             out Core.Logging.ILogger logger,
