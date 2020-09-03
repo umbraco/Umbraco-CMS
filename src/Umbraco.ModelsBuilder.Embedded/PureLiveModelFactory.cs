@@ -18,6 +18,7 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.ModelsBuilder.Embedded.Building;
 using File = System.IO.File;
 using Umbraco.Core.Composing;
+using System.Runtime.Loader;
 
 namespace Umbraco.ModelsBuilder.Embedded
 {
@@ -339,7 +340,10 @@ namespace Umbraco.ModelsBuilder.Embedded
 
                     if (File.Exists(dllPath) && !File.Exists(dllPath + ".delete"))
                     {
-                        assembly = Assembly.LoadFile(dllPath);
+                        // TODO: Figure out loading and unloading the assemblies to allow you to delete them.
+                        AssemblyLoadContext assemblyContext = new AssemblyLoadContext("ModelsBuilder");
+                        assembly = assemblyContext.LoadFromAssemblyPath(dllPath);
+                        
                         var attr = assembly.GetCustomAttribute<ModelsBuilderAssemblyAttribute>();
                         if (attr != null && attr.PureLive && attr.SourceHash == currentHash)
                         {
