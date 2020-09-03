@@ -438,9 +438,8 @@ namespace Umbraco.ModelsBuilder.Embedded
                 try
                 {
                     assembly = RoslynCompiler.GetCompiledAssembly(_hostingEnvironment.MapPathContentRoot(projFile), GetOutputAssemblyPath(currentHash));
-                    // Delete old assembly file, it's a alot easier to do before we overwrite the dllPathFile
-                    DeleteAssembly(dllPathFile);
                     File.WriteAllText(dllPathFile, assembly.Location);
+                    TryDeleteUnusedAssemblies(dllPathFile);
                 }
                 catch
                 {
@@ -478,10 +477,9 @@ namespace Umbraco.ModelsBuilder.Embedded
             try
             {
                 assembly = RoslynCompiler.GetCompiledAssembly(_hostingEnvironment.MapPathContentRoot(projFile), GetOutputAssemblyPath(currentHash));
-                // Delete old assembly file, it's a alot easier to do before we overwrite the dllPathFile
-                DeleteAssembly(dllPathFile);
                 File.WriteAllText(dllPathFile, assembly.Location);
                 File.WriteAllText(modelsHashFile, currentHash);
+                TryDeleteUnusedAssemblies(dllPathFile);
             }
             catch
             {
@@ -493,7 +491,7 @@ namespace Umbraco.ModelsBuilder.Embedded
             return assembly;
         }
 
-        private static void DeleteAssembly(string dllPathFile)
+        private static void TryDeleteUnusedAssemblies(string dllPathFile)
         {
             // We can't do this because the dllPathFile gets deleted when a new document type is saved
             // But how do we delete the old assembly?
@@ -501,7 +499,23 @@ namespace Umbraco.ModelsBuilder.Embedded
             if (File.Exists(dllPathFile))
             {
                 var dllPath = File.ReadAllText(dllPathFile);
-                File.Delete(dllPath);
+                var dirInfo = new DirectoryInfo(dllPath).Parent;
+                var files = dirInfo.GetFiles().Where(f => f.FullName != dllPath);
+                foreach(var file in files)
+                {
+                    try
+                    {
+                        File.Delete(file.FullName);
+                    }
+                    catch(UnauthorizedAccessException e)
+                    {
+                        // The file is in use, we'll try again next time...
+                        // This is stupid, because as far as I can see files doesn't get released
+                        // untill the IIS server is restarted...
+                        // However, I can't see how I should unload the old assemblies?? :( 
+                    }
+                }
+                
             }
         }
 
