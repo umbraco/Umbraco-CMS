@@ -58,7 +58,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 var contentPublishedElements = new Dictionary<Guid, IPublishedElement>();
                 var settingsPublishedElements = new Dictionary<Guid, IPublishedElement>();
 
-                var layout = new List<BlockListLayoutReference>();
+                var layout = new List<BlockListItem>();
 
                 var value = (string)inter;
                 if (string.IsNullOrWhiteSpace(value)) return BlockListModel.Empty;
@@ -120,11 +120,11 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                             settingsData = null;
                     }
 
-                    var layoutRef = new BlockListLayoutReference(contentGuidUdi, contentData, settingGuidUdi, settingsData);
+                    var layoutRef = new BlockListItem(contentGuidUdi, contentData, settingGuidUdi, settingsData);
                     layout.Add(layoutRef);
                 }
 
-                var model = new BlockListModel(contentPublishedElements.Values, settingsPublishedElements.Values, layout);
+                var model = new BlockListModel(layout);
                 return model;
             }
         }

@@ -51,22 +51,24 @@ function mediaEditController($scope, $routeParams, $location, $http, $q, appStat
 
         $scope.page.loading = true;
 
-        mediaResource.getScaffold(nodeId, $routeParams.doctype)
-            .then(function (data) {
-                $scope.content = data;
+        mediaResource.getScaffold(nodeId, $routeParams.doctype).then(function (data) {
+            $scope.content = data;
 
-                init();
+            init();
 
-                $scope.page.loading = false;
-
-            });
+            $scope.page.loading = false;
+        }, function () {
+            $scope.page.loading = false;
+        });
     }
     else {
         $scope.page.loading = true;
-        loadMedia()
-            .then(function(){
-                $scope.page.loading = false;
-            });
+
+        loadMedia().then(function(){
+            $scope.page.loading = false;
+        }, function () {
+            $scope.page.loading = false;
+        });
     }
 
     function init() {
@@ -121,6 +123,8 @@ function mediaEditController($scope, $routeParams, $location, $http, $q, appStat
             if(args && args.mediaType && args.mediaType.key === $scope.content.contentType.key) {
                 $scope.page.loading = true;
                 loadMedia().then(function() {
+                    $scope.page.loading = false;
+                }, function () {
                     $scope.page.loading = false;
                 });
             }
@@ -204,6 +208,7 @@ function mediaEditController($scope, $routeParams, $location, $http, $q, appStat
 
                 }, function(err) {
 
+                    formHelper.resetForm({ scope: $scope, hasErrors: true });
                     contentEditingHelper.handleSaveError({
                         err: err,
                         rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, err.data)
@@ -258,8 +263,12 @@ function mediaEditController($scope, $routeParams, $location, $http, $q, appStat
                 $scope.page.loading = false;
 
                 $q.resolve($scope.content);
-            });
 
+            }, function (error) {
+                $scope.page.loading = false;
+
+                $q.reject(error);
+            });
     }
 
     $scope.close = function() {
