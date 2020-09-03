@@ -34,9 +34,8 @@ namespace Umbraco.ModelsBuilder.Embedded
             // Might have to do this another way, see
             // see https://github.com/aspnet/RoslynCodeDomProvider/blob/master/src/Microsoft.CodeDom.Providers.DotNetCompilerPlatform/CSharpCompiler.cs:
             // mentions "Bug 913691: Explicitly add System.Runtime as a reference."
-            // and explicitly adds System.Runtime to references before invoking csc.exe
+            // and explicitly adds System.Runtime to references
             _refs.Add(MetadataReference.CreateFromFile(typeof(System.Runtime.AssemblyTargetedPatchBandAttribute).Assembly.Location));
-            _refs.Add(MetadataReference.CreateFromFile(typeof(object).Assembly.Location));
             _refs.Add(MetadataReference.CreateFromFile(typeof(System.CodeDom.Compiler.GeneratedCodeAttribute).Assembly.Location));
         }
 
