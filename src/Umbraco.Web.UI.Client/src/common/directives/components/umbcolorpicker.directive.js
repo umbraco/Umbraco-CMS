@@ -12,9 +12,8 @@
     <div ng-controller="My.ColorController as vm">
         
         <umb-color-picker
-            on-select="vm.selectItem"
-            on-cancel="vm.cancel">
-        </umb-table>
+            on-change="vm.selectItem">
+        </umb-color-picker>
     
     </div>
 </pre>
@@ -30,11 +29,9 @@
     
             vm.change = change;
 
-            function change(item, $index, $event) {
+            function change(color) {
                 
             }
-            
-    
         }
     
         angular.module("umbraco").controller("My.ColorController", Controller);
@@ -42,6 +39,8 @@
     })();
 </pre>
 
+@param {object} ngModel (<code>binding</code>): Value for the color picker.
+@param {object} options (<code>binding</code>): Config object for the color picker.
 @param {function} onBeforeShow (<code>expression</code>): Callback function before color picker is shown.
 @param {function} onChange (<code>expression</code>): Callback function when the color is changed.
 @param {function} onShow (<code>expression</code>): Callback function when color picker is shown.
