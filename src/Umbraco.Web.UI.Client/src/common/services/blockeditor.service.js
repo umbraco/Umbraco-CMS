@@ -49,6 +49,7 @@
                 } else if(k === "settingsUdi") {
                     replaceUdi(obj, k, propValue.settingsData);
                 } else {
+                    // lets crawl through all properties of layout to make sure get captured all `contentUdi` and `settingsUdi` properties.
                     var propType = typeof obj[k];
                     if(propType === "object" || propType === "array") {
                         replaceUdisOfObject(obj[k], propValue)
@@ -56,22 +57,15 @@
                 }
             }
         }
+        function replaceElementTypeBlockListUDIsResolver(obj, propClearingMethod) {
+            replaceRawBlockListUDIsResolver(obj.value, propClearingMethod);
+        }
 
-        function replaceBlockListUDIsResolver(obj, propClearingMethod) {
+        clipboardService.registerPastePropertyResolver(replaceElementTypeBlockListUDIsResolver, clipboardService.TYPES.ELEMENT_TYPE);
 
-            if (typeof obj === "object") {
 
-                // 'obj' can both be a property object or the raw value of a inner property.
-                var value = obj;
-
-                // if we got a property object from a ContentTypeModel we need to look at the value. We check for value and editor to, sort of, ensure this is the case.
-                if(obj.value !== undefined && obj.editor !== undefined) {
-                    value = obj.value;
-                    // If value isnt a object, lets break out.
-                    if(typeof obj.value !== "object") {
-                        return;
-                    }
-                }
+        function replaceRawBlockListUDIsResolver(value, propClearingMethod) {
+            if (typeof value === "object") {
 
                 // we got an object, and it has these three props then we are most likely dealing with a Block Editor.
                 if ((value.layout !== undefined && value.contentData !== undefined && value.settingsData !== undefined)) {
@@ -82,7 +76,7 @@
                     if(value.contentData.length > 0) {
                         value.contentData.forEach((item) => {
                             for (var k in item) {
-                                propClearingMethod(item[k]);
+                                propClearingMethod(item[k], clipboardService.TYPES.RAW);
                             }
                         });
                     }
@@ -90,7 +84,7 @@
                     if(value.settingsData.length > 0) {
                         value.settingsData.forEach((item) => {
                             for (var k in item) {
-                                propClearingMethod(item[k]);
+                                propClearingMethod(item[k], clipboardService.TYPES.RAW);
                             }
                         });
                     }
@@ -99,7 +93,7 @@
             }
         }
 
-        clipboardService.registerPastePropertyResolver(replaceBlockListUDIsResolver)
+        clipboardService.registerPastePropertyResolver(replaceRawBlockListUDIsResolver, clipboardService.TYPES.RAW);
 
     }]);
 

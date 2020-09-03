@@ -745,7 +745,7 @@
              */
             createFromElementType: function (elementTypeDataModel) {
 
-                elementTypeDataModel = clipboardService.parseContentForPaste(elementTypeDataModel);
+                elementTypeDataModel = clipboardService.parseContentForPaste(clipboardService.TYPES.ELEMENT_TYPE, elementTypeDataModel);
 
                 var contentElementTypeKey = elementTypeDataModel.contentTypeKey;
 

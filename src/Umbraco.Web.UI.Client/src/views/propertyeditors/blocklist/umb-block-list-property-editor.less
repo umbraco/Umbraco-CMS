@@ -187,25 +187,29 @@ ng-form.ng-invalid-val-server-match-settings > .umb-block-list__block > .umb-blo
 
     > .__plus {
         position: absolute;
-        pointer-events: none; // lets stop avoiding the mouse values in JS move event.
-        width: 24px;
-        height: 24px;
-        padding: 0;
-        border-radius: 3em;
-        border: 2px solid @blueMid;
         display: flex;
         justify-content: center;
         align-items: center;
+        pointer-events: none; // lets stop avoiding the mouse values in JS move event.
+        box-sizing: border-box;
+        width: 28px;
+        height: 28px;
+        margin-left: -16px - 8px;
+        margin-top: -16px;
+        padding: 0;
+        border-radius: 3em;
+        border: 2px solid @blueMid;
         color: @blueMid;
+        line-height: 22px;
         font-size: 20px;
         font-weight: 800;
         background-color: rgba(255, 255, 255, .96);
         box-shadow: 0 0 0 2px rgba(255, 255, 255, .96);
-        transform: scale(0) translate(-80%, -50%);
+        transform: scale(0);
         transition: transform 240ms ease-in;
-        animation: umb-block-list__block--create-button_after 800ms ease-in-out infinite;
+        animation: umb-block-list__block--create-button__plus 400ms ease-in-out infinite;
 
-        @keyframes umb-block-list__block--create-button_after {
+        @keyframes umb-block-list__block--create-button__plus {
             0%   { color: rgba(@blueMid, 0.8); }
             50% { color: rgba(@blueMid, 1); }
             100% { color: rgba(@blueMid, 0.8); }
@@ -223,7 +227,7 @@ ng-form.ng-invalid-val-server-match-settings > .umb-block-list__block > .umb-blo
         transition-duration: 120ms;
 
         > .__plus {
-            transform: scale(1) translate(-80%, -50%);
+            transform: scale(1);
             transition-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
     }
