@@ -26,7 +26,7 @@ namespace Umbraco.ModelsBuilder.Embedded
             // Making it kind of a waste to convert the Assembly types into MetadataReference
             // every time GetCompiledAssembly is called, so that's why I do it in the ctor
             _refs = new List<MetadataReference>();
-            foreach(var assembly in referenceAssemblies.Where(x => !x.IsDynamic && !string.IsNullOrWhiteSpace(x.Location)))
+            foreach(var assembly in referenceAssemblies.Where(x => !x.IsDynamic && !string.IsNullOrWhiteSpace(x.Location)).Distinct())
             {
                 _refs.Add(MetadataReference.CreateFromFile(assembly.Location));
             };
