@@ -14,6 +14,7 @@ function clipboardService(notificationsService, eventsService, localStorageServi
 
 
     var clearPropertyResolvers = [];
+    var pastePropertyResolvers = [];
 
 
     var STORAGE_KEY = "umbClipboardService";
@@ -95,7 +96,45 @@ function clipboardService(notificationsService, eventsService, localStorageServi
     }
 
 
+
+
+    function resolvePropertyForPaste(prop) {
+        for (var i=0; i<pastePropertyResolvers.length; i++) {
+            pastePropertyResolvers[i](prop, resolvePropertyForPaste);
+        }
+    }
+
+
+
     var service = {};
+
+    /**
+    * @ngdoc method
+    * @name umbraco.services.clipboardService#parseContentForPaste
+    * @methodOf umbraco.services.clipboardService
+    *
+    * @param {object} function The content entry to be cloned and resolved.
+    *
+    * @description
+    * Executed registered property resolvers for inner properties, to be done on pasting a clipbaord content entry.
+    *
+    */
+    service.parseContentForPaste = function(contentEntryData) {
+
+
+        var cloneData = Utilities.copy(contentEntryData);
+
+        // remove keys from sub-entries
+        for (var t = 0; t < cloneData.variants[0].tabs.length; t++) {
+            var tab = cloneData.variants[0].tabs[t];
+            for (var p = 0; p < tab.properties.length; p++) {
+                var prop = tab.properties[p];
+                resolvePropertyForPaste(prop);
+            }
+        }
+
+        return cloneData;
+    }
 
 
     /**
@@ -119,7 +158,7 @@ function clipboardService(notificationsService, eventsService, localStorageServi
     * @name umbraco.services.clipboardService#registerClearPropertyResolver
     * @methodOf umbraco.services.clipboardService
     *
-    * @param {string} function A method executed for every property and inner properties copied.
+    * @param {string} function A method executed for every property and inner properties copied. Notice the method both needs to deal with retriving a property object {alias:..editor:..value:... ,...} and the raw property value as if the property is an inner property of a nested property.
     *
     * @description
     * Executed for all properties including inner properties when performing a copy action.
@@ -128,19 +167,18 @@ function clipboardService(notificationsService, eventsService, localStorageServi
         clearPropertyResolvers.push(resolver);
     };
 
-
     /**
     * @ngdoc method
-    * @name umbraco.services.clipboardService#registrerPropertyClearingResolver
+    * @name umbraco.services.clipboardService#registerPastePropertyResolver
     * @methodOf umbraco.services.clipboardService
     *
-    * @param {string} function A method executed for every property and inner properties copied.
+    * @param {string} function A method executed for every property and inner properties pasted. Notice the method both needs to deal with retriving a property object {alias:..editor:..value:... ,...} and the raw property value as if the property is an inner property of a nested property.
     *
     * @description
-    * Executed for all properties including inner properties when performing a copy action.
+    * Executed for all properties including inner properties when performing a paste action.
     */
-   service.registrerClearPropertyResolver = function(resolver) {
-        clearPropertyResolvers.push(resolver);
+    service.registerPastePropertyResolver = function(resolver) {
+        pastePropertyResolvers.push(resolver);
     };
 
 
