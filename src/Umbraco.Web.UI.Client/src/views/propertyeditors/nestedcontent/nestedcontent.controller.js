@@ -260,7 +260,7 @@
                 });
             });
 
-            vm.overlayMenu.pasteItems.sort( (a, b) => {
+            dialog.pasteItems.sort( (a, b) => {
                 return b.date - a.date
             });
 
