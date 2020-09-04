@@ -39,7 +39,9 @@
 
         function change(color) {
             angularHelper.safeApply($scope, function () {
-                $scope.newColor = color.toHexString().trimStart("#"); // #ff0000
+                if (color) {
+                    $scope.newColor = color.toHexString().trimStart("#");
+                }
             });
         }
 
