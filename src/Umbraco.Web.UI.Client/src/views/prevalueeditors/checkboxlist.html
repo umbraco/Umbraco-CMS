@@ -2,8 +2,8 @@
 
     <ul class="unstyled">
 
-        <li ng-repeat="item in vm.viewItems track by item.key">
-            <umb-checkbox value="{{item.value}}" model="item.checked" text="{{item.value}}" on-change="vm.change(model, value)"></umb-checkbox>
+        <li ng-repeat="item in vm.viewItems track by $id(item)">
+            <umb-checkbox value="{{item.value}}" model="item.checked" text="{{item.label}}" on-change="vm.change(model, value)"></umb-checkbox>
         </li>
 
         {{model.value}}
@@ -16,15 +16,5 @@
 
         </li>-->
     </ul>
-
-    <!--<ul class="unstyled" ng-if="model.config.prevalues">
-        <li ng-repeat="(key, value) in model.config.prevalues">
-
-            <umb-checkbox model="value.checked" value="{{value.value}}" on-change="vm.change(model, value)">
-                {{value.label}}
-            </umb-checkbox>
-
-        </li>
-    </ul>-->
 
 </div>

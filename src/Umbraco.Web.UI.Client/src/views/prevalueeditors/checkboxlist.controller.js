@@ -9,24 +9,26 @@
 
         function init() {
 
-            var prevalues = [];
-            if ($scope.model.config) {
-                prevalues = $scope.model.config.prevalues || [];
-            }
-            else {
-                prevalues = $scope.model.prevalues || [];
-            }
+            var prevalues = ($scope.model.config ? $scope.model.config.prevalues : $scope.model.prevalues) || [];
 
             console.log("prevalues", prevalues);
 
             var items = [];
-            var vals = _.values(prevalues);
-            var keys = _.keys(prevalues);
-            console.log("vals", vals);
-            console.log("keys", keys);
 
-            for (var i = 0; i < vals.length; i++) {
-                items.push({ key: keys[i], value: vals[i].value });
+            for (var i = 0; i < prevalues.length; i++) {
+                console.log("item", prevalues[i]);
+                var item = {};
+
+                if (Utilities.isObject(prevalues[i])) {
+                    item.value = prevalues[i].value;
+                    item.label = prevalues[i].label;
+                }
+                else {
+                    item.value = prevalues[i];
+                    item.label = prevalues[i];
+                }
+
+                items.push({ value: item.value, label: item.label });
             }
 
             console.log("items", items);
@@ -39,7 +41,6 @@
 
             // update view model.
             generateViewModel($scope.model.value);
-
         }
 
         function generateViewModel(newVal) {
@@ -52,8 +53,8 @@
                 var isChecked = _.contains(newVal, iConfigItem.value);
                 vm.viewItems.push({
                     checked: isChecked,
-                    key: iConfigItem.key,
-                    value: iConfigItem.value
+                    value: iConfigItem.value,
+                    label: iConfigItem.label
                 });
             }
 
