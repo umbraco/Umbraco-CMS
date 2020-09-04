@@ -13,6 +13,10 @@
         <umb-editor-container>
             <ng-form name="gridItemConfigEditor" val-form-manager>
 
+                <umb-empty-state position="center" ng-if="model.config.length === 0 && model.styles.length === 0">
+                    <localize key="grid_noConfiguration">No further configuration available</localize>
+                </umb-empty-state>
+
                 <umb-box ng-if="model.config && model.config.length > 0">
                     <umb-box-header title-key="grid_settings"></umb-box-header>
                     <umb-box-content>

@@ -1610,6 +1610,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="addRowConfiguration">Add row configuration</key>
     <key alias="editRowConfiguration">Edit row configuration</key>
     <key alias="addRowConfigurationDetail">Adjust the row by setting cell widths and adding additional cells</key>
+    <key alias="noConfiguration">No further configuration available</key>
     <key alias="columns">Columns</key>
     <key alias="columnsDetails">Total combined number of columns in the grid layout</key>
     <key alias="settings">Settings</key>

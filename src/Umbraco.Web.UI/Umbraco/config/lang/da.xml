@@ -1356,6 +1356,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="rowConfigurationsDetail">Rækker er foruddefinerede celler, der arrangeres vandret</key>
     <key alias="addRowConfiguration">Tilføj rækkekonfiguration</key>
     <key alias="addRowConfigurationDetail">Juster rækken ved at indstille cellebredder og tilføje yderligere celler</key>
+    <key alias="noConfiguration">Ingen yderligere konfiguration tilgængelig</key>
     <key alias="columns">Kolonner</key>
     <key alias="columnsDetails">Det totale antal kolonner i dit grid</key>
     <key alias="settings">Indstillinger</key>
