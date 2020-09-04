@@ -83,7 +83,7 @@
 
         ctrl.$onInit = function() {
             
-            //load the separate css for the editor to avoid it blocking our js loading
+            // load the separate css for the editor to avoid it blocking our js loading
             assetsService.loadCss("lib/spectrum/spectrum.css", $scope);
 
             // load the js file for the color picker
