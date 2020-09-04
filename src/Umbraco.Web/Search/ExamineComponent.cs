@@ -117,7 +117,13 @@ namespace Umbraco.Web.Search
         }
 
         public void Terminate()
-        { }
+        {
+            ContentCacheRefresher.CacheUpdated -= ContentCacheRefresherUpdated;
+            ContentTypeCacheRefresher.CacheUpdated -= ContentTypeCacheRefresherUpdated;
+            MediaCacheRefresher.CacheUpdated -= MediaCacheRefresherUpdated;
+            MemberCacheRefresher.CacheUpdated -= MemberCacheRefresherUpdated;
+            LanguageCacheRefresher.CacheUpdated -= LanguageCacheRefresherUpdated;
+        }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
         [Obsolete("This method should not be used and will be removed in future versions, rebuilding indexes can be done with the IndexRebuilder or the BackgroundIndexRebuilder")]
