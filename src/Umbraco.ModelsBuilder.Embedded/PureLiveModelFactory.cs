@@ -18,13 +18,11 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.ModelsBuilder.Embedded.Building;
 using File = System.IO.File;
 using Umbraco.Core.Composing;
-using System.Runtime.Loader;
 
 namespace Umbraco.ModelsBuilder.Embedded
 {
     internal class PureLiveModelFactory : ILivePublishedModelFactory, IRegisteredObject
     {
-        private Assembly _modelsAssembly;
         private Infos _infos = new Infos { ModelInfos = null, ModelTypeMap = new Dictionary<string, Type>() };
         private readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim();
         private volatile bool _hasModels; // volatile 'cos reading outside lock
@@ -34,6 +32,8 @@ namespace Umbraco.ModelsBuilder.Embedded
         private int _ver, _skipver;
         private readonly int _debugLevel;
         private RoslynCompiler _roslynCompiler;
+        private UmbracoAssemblyLoadContext _currentAssemblyLoadContext;
+        private WeakReference _oldAssemblyLoadContext;
         private readonly Lazy<UmbracoServices> _umbracoServices; // fixme: this is because of circular refs :(
         private UmbracoServices UmbracoServices => _umbracoServices.Value;
 
@@ -247,9 +247,6 @@ namespace Umbraco.ModelsBuilder.Embedded
                         // this is for U4-8043 which is an obvious issue but I cannot replicate
                         //_modelsAssembly = _modelsAssembly ?? assembly;
 
-                        // the one below is the normal one
-                        _modelsAssembly = assembly;
-
                         var types = assembly.ExportedTypes.Where(x => x.Inherits<PublishedContentModel>() || x.Inherits<PublishedElementModel>());
                         _infos = RegisterModels(types);
                         _errors.Clear();
@@ -264,7 +261,6 @@ namespace Umbraco.ModelsBuilder.Embedded
                         }
                         finally
                         {
-                            _modelsAssembly = null;
                             _infos = new Infos { ModelInfos = null, ModelTypeMap = new Dictionary<string, Type>() };
                         }
                     }
@@ -284,6 +280,25 @@ namespace Umbraco.ModelsBuilder.Embedded
                 if (buildManagerLocked)
                     Monitor.Exit(RoslynCompiler);
             }
+        }
+
+        private Assembly ReloadAssembly(string pathToAssembly)
+        {
+            // No AssemblyLoadContext has been loaded yet
+            // Just load assembly and we're done
+            if(_currentAssemblyLoadContext is null)
+            {
+                _currentAssemblyLoadContext = new UmbracoAssemblyLoadContext();
+                return _currentAssemblyLoadContext.LoadFromAssemblyPath(pathToAssembly);
+            }
+
+            // We must create a weak reference to the old assemblycontext in order to make sure later that it's no longer alive
+            _oldAssemblyLoadContext = new WeakReference(_currentAssemblyLoadContext, trackResurrection: true);
+            _currentAssemblyLoadContext.Unload();
+            // We must create a new assembly load context
+            // as long as theres a reference to the assembly load context we can't delete the assembly it loaded
+            _currentAssemblyLoadContext = new UmbracoAssemblyLoadContext();
+            return _currentAssemblyLoadContext.LoadFromAssemblyPath(pathToAssembly);
         }
 
         private Assembly GetModelsAssembly(bool forceRebuild)
@@ -340,9 +355,7 @@ namespace Umbraco.ModelsBuilder.Embedded
 
                     if (File.Exists(dllPath) && !File.Exists(dllPath + ".delete"))
                     {
-                        // TODO: Figure out loading and unloading the assemblies to allow you to delete them.
-                        AssemblyLoadContext assemblyContext = new AssemblyLoadContext("ModelsBuilder");
-                        assembly = assemblyContext.LoadFromAssemblyPath(dllPath);
+                        assembly = ReloadAssembly(dllPath);
                         
                         var attr = assembly.GetCustomAttribute<ModelsBuilderAssemblyAttribute>();
                         if (attr != null && attr.PureLive && attr.SourceHash == currentHash)
@@ -382,7 +395,8 @@ namespace Umbraco.ModelsBuilder.Embedded
                 _ver++;
                 try
                 {
-                    assembly = RoslynCompiler.GetCompiledAssembly(_hostingEnvironment.MapPathContentRoot(projFile), GetOutputAssemblyPath(currentHash));
+                    var assemblyPath = RoslynCompiler.GetCompiledAssembly(_hostingEnvironment.MapPathContentRoot(projFile), GetOutputAssemblyPath(currentHash));
+                    assembly = ReloadAssembly(assemblyPath);
                     File.WriteAllText(dllPathFile, assembly.Location);
                     TryDeleteUnusedAssemblies(dllPathFile);
                 }
@@ -421,7 +435,8 @@ namespace Umbraco.ModelsBuilder.Embedded
             // compile and register
             try
             {
-                assembly = RoslynCompiler.GetCompiledAssembly(_hostingEnvironment.MapPathContentRoot(projFile), GetOutputAssemblyPath(currentHash));
+                var assemblyPath = RoslynCompiler.GetCompiledAssembly(_hostingEnvironment.MapPathContentRoot(projFile), GetOutputAssemblyPath(currentHash));
+                assembly = ReloadAssembly(assemblyPath);
                 File.WriteAllText(dllPathFile, assembly.Location);
                 File.WriteAllText(modelsHashFile, currentHash);
                 TryDeleteUnusedAssemblies(dllPathFile);
@@ -436,11 +451,24 @@ namespace Umbraco.ModelsBuilder.Embedded
             return assembly;
         }
 
-        private static void TryDeleteUnusedAssemblies(string dllPathFile)
+        private void TryDeleteUnusedAssemblies(string dllPathFile)
         {
-            // We can't do this because the dllPathFile gets deleted when a new document type is saved
-            // But how do we delete the old assembly?
-            // It seems like ISS doesn't release it even though a new dll is genrated and loaded.
+            // Try and garbage collect to hopefully kill the old assembly
+            // This might be slow??
+            // I'm doing as mentioned in: https://docs.microsoft.com/en-us/dotnet/standard/assembly/unloadability
+            // The old assembly still doesn't get unloaded properly
+            // My best guess is that there's some some references to the types within the assembly somewhere
+            // which means that the assembly won't unload because it does so in a cooporative manner
+            // but I have no clue how to fix this 
+            if (!(_oldAssemblyLoadContext is null))
+            {
+                for (int i = 0; _oldAssemblyLoadContext.IsAlive && (i < 10); i++)
+                {
+                    GC.Collect();
+                    GC.WaitForPendingFinalizers();
+                }
+            }
+
             if (File.Exists(dllPathFile))
             {
                 var dllPath = File.ReadAllText(dllPathFile);

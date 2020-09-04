@@ -39,7 +39,7 @@ namespace Umbraco.ModelsBuilder.Embedded
             _refs.Add(MetadataReference.CreateFromFile(typeof(System.CodeDom.Compiler.GeneratedCodeAttribute).Assembly.Location));
         }
 
-        public Assembly GetCompiledAssembly(string pathToSourceFile, string saveLocation)
+        public string GetCompiledAssembly(string pathToSourceFile, string saveLocation)
         {
             // TODO: Get proper temp file location/filename
             var sourceCode = File.ReadAllText(pathToSourceFile);
@@ -52,8 +52,8 @@ namespace Umbraco.ModelsBuilder.Embedded
             {
                 CompileToFile(saveLocation, sourceCode, "ModelsGeneratedAssembly", _refs);
             }
-                
-            return Assembly.LoadFile(saveLocation);
+
+            return saveLocation;
 
         } 
 
