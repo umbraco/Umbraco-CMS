@@ -24,6 +24,7 @@
         $scope.options = {
             type: "color",
             color: defaultColor,
+            allowEmpty: false,
             showAlpha: false
         };
 
