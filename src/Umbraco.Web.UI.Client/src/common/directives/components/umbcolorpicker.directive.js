@@ -154,7 +154,7 @@
             if (colorPickerInstance) {
                 // destroy the color picker instance when the dom element is removed
                 elem.on('$destroy', function () {
-                    colorPickerInstance.destroy();
+                    colorPickerInstance.spectrum('destroy');
                 });
             }
 
