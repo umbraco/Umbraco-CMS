@@ -2,7 +2,7 @@
  * @ngdoc controller
  * @name Umbraco.Editors.Content.CreateController
  * @function
- * 
+ *
  * @description
  * The controller for the content creation dialog
  */
@@ -95,8 +95,6 @@ function contentCreateController($scope,
         } else {
             createBlank(docType);
         }
-
-        navigationService.hideDialog();
     }
 
     function createFromBlueprint(blueprintId) {
@@ -130,7 +128,7 @@ function contentCreateController($scope,
     $scope.createOrSelectBlueprintIfAny = createOrSelectBlueprintIfAny;
     $scope.createFromBlueprint = createFromBlueprint;
 
-    // the current node changes behind the scenes when the context menu is clicked without closing 
+    // the current node changes behind the scenes when the context menu is clicked without closing
     // the default menu first, so we must watch the current node and re-initialize accordingly
     var unbindModelWatcher = $scope.$watch("currentNode", initialize);
     $scope.$on('$destroy', function () {
