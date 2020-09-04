@@ -420,23 +420,7 @@
                         blockPickerModel.close();
                     }
                 },
-                submit: function(blockPickerModel, mouseEvent) {
-                    var added = false;
-                    if (blockPickerModel && blockPickerModel.selectedItem) {
-                        added = addNewBlock(createIndex, blockPickerModel.selectedItem.blockConfigModel.contentElementTypeKey);
-                    }
-
-                    if(!(mouseEvent.ctrlKey || mouseEvent.metaKey)) {
-                        editorService.close();
-                        if (added && vm.layout.length > createIndex) {
-                            if (inlineEditing === true) {
-                                activateBlock(vm.layout[createIndex].$block);
-                            } else if (inlineEditing === false && vm.layout[createIndex].$block.hideContentInOverlay !== true) {
-                                editBlock(vm.layout[createIndex].$block, false, createIndex, blockPickerModel.$parentForm);
-                            }
-                        }
-                    }
-                },
+                submit: handleAddNewBlock,
                 close: function() {
                     // if opned by a inline creator button(index less than length), we want to move the focus away, to hide line-creator.
                     if (createIndex < vm.layout.length) {
@@ -444,6 +428,24 @@
                     }
 
                     editorService.close();
+                }
+            };
+
+            function handleAddNewBlock(blockPickerModel, mouseEvent) {
+                var added = false;
+                if (blockPickerModel && blockPickerModel.selectedItem) {
+                    added = addNewBlock(createIndex, blockPickerModel.selectedItem.blockConfigModel.contentElementTypeKey);
+                }
+
+                if (!(mouseEvent.ctrlKey || mouseEvent.metaKey)) {
+                    editorService.close();
+                    if (added && vm.layout.length > createIndex) {
+                        if (inlineEditing === true) {
+                            activateBlock(vm.layout[createIndex].$block);
+                        } else if (inlineEditing === false && vm.layout[createIndex].$block.hideContentInOverlay !== true) {
+                            editBlock(vm.layout[createIndex].$block, false, createIndex, blockPickerModel.$parentForm);
+                        }
+                    }
                 }
             };
 
@@ -490,7 +492,13 @@
                 return b.date - a.date
             });
 
-            // open block picker overlay
+            // if there is only one item type available and nothing in the clipboard, simply add that one item type
+            if (blockPickerModel.availableItems.length === 1 && blockPickerModel.clipboardItems.length === 0) {
+                blockPickerModel.selectedItem = blockPickerModel.availableItems[0];
+                handleAddNewBlock(blockPickerModel, {});
+                return;
+            }
+            // ...otherwise open block picker overlay
             editorService.open(blockPickerModel);
 
         };
