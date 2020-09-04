@@ -2,7 +2,7 @@
 
     <div class="umbracoDialog umb-dialog-body with-footer" ng-cloak>
 
-        <div class="umb-pane" ng-if="!model.creatingFolder">
+        <div class="umb-pane" ng-show="!model.creatingFolder">
             <h5><localize key="create_createUnder">Create an item under</localize> {{currentNode.name}}</h5>
 
             <ul class="umb-actions umb-actions-child">
@@ -24,7 +24,7 @@
             </ul>
         </div>
 
-        <div class="umb-pane" ng-if="model.creatingFolder">
+        <div class="umb-pane" ng-show="model.creatingFolder">
             <form novalidate name="createFolderForm"
                 ng-submit="createContainer()"
                 val-form-manager>
