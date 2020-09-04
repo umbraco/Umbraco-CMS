@@ -16,7 +16,7 @@ function DictionaryCreateController($scope, $location, dictionaryResource, navig
 
     function createItem() {
 
-        if (formHelper.submitForm({ scope: $scope, formCtrl: this.createDictionaryForm })) {
+        if (formHelper.submitForm({ scope: $scope, formCtrl: $scope.createDictionaryForm })) {
 
             var node = $scope.currentNode;
 
@@ -28,14 +28,14 @@ function DictionaryCreateController($scope, $location, dictionaryResource, navig
                 navigationService.syncTree({ tree: "dictionary", path: currPath + "," + data, forceReload: true, activate: true });
 
                 // reset form state
-                formHelper.resetForm({ scope: $scope, formCtrl: this.createDictionaryForm });
+                formHelper.resetForm({ scope: $scope, formCtrl: $scope.createDictionaryForm });
 
                 // navigate to edit view
                 var currentSection = appState.getSectionState("currentSection");
                 $location.path("/" + currentSection + "/dictionary/edit/" + data);
 
             }, function (err) {
-                formHelper.resetForm({ scope: $scope, formCtrl: this.createDictionaryForm, hasErrors: true });
+                formHelper.resetForm({ scope: $scope, formCtrl: $scope.createDictionaryForm, hasErrors: true });
                 if (err.data && err.data.message) {
                     notificationsService.error(err.data.message);
                     navigationService.hideMenu();
