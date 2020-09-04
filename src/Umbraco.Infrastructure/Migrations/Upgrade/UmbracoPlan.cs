@@ -17,17 +17,15 @@ namespace Umbraco.Core.Migrations.Upgrade
     public class UmbracoPlan : MigrationPlan
     {
         private readonly IUmbracoVersion _umbracoVersion;
-        private readonly GlobalSettings _globalSettings;
         private const string InitPrefix = "{init-";
         private const string InitSuffix = "}";
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoPlan"/> class.
         /// </summary>
-        public UmbracoPlan(IUmbracoVersion umbracoVersion, GlobalSettings globalSettings)
+        public UmbracoPlan(IUmbracoVersion umbracoVersion)
             : base(Constants.System.UmbracoUpgradePlanName)
         {
             _umbracoVersion = umbracoVersion;
-            _globalSettings = globalSettings;
             DefinePlan();
         }
 
@@ -192,7 +190,7 @@ namespace Umbraco.Core.Migrations.Upgrade
 
             // to 8.7.0...
             To<MissingDictionaryIndex>("{a78e3369-8ea3-40ec-ad3f-5f76929d2b20}");
-            
+
             //FINAL
         }
     }

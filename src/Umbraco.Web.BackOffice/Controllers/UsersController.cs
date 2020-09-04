@@ -739,11 +739,16 @@ namespace Umbraco.Web.BackOffice.Controllers
         public async Task<IActionResult> PostUnlockUsers([FromQuery]int[] userIds)
         {
             if (userIds.Length <= 0) return Ok();
+            var notFound = new List<int>();
 
             foreach (var u in userIds)
             {
                 var user = await _backOfficeUserManager.FindByIdAsync(u.ToString());
-                if (user == null) throw new InvalidOperationException();
+                if (user == null)
+                {
+                    notFound.Add(u);
+                    continue;
+                }
 
                 var unlockResult = await _backOfficeUserManager.SetLockoutEndDateAsync(user, DateTimeOffset.Now);
                 if (unlockResult.Succeeded == false)
@@ -760,7 +765,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
 
             return new UmbracoNotificationSuccessResponse(
-                _localizedTextService.Localize("speechBubbles/unlockUsersSuccess", new[] {userIds.Length.ToString()}));
+                _localizedTextService.Localize("speechBubbles/unlockUsersSuccess", new[] {(userIds.Length - notFound.Count).ToString()}));
         }
 
         [AdminUsersAuthorize("userIds")]

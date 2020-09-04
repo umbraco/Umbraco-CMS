@@ -139,8 +139,7 @@ namespace Umbraco.Tests.Migrations
         [Test]
         public void ValidateUmbracoPlan()
         {
-            var globalSettings = new GlobalSettingsBuilder().Build();
-            var plan = new UmbracoPlan(TestHelper.GetUmbracoVersion(), globalSettings);
+            var plan = new UmbracoPlan(TestHelper.GetUmbracoVersion());
             plan.Validate();
             Console.WriteLine(plan.FinalState);
             Assert.IsFalse(plan.FinalState.IsNullOrWhiteSpace());

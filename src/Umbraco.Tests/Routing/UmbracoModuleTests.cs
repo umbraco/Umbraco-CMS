@@ -28,7 +28,7 @@ namespace Umbraco.Tests.Routing
             var globalSettings = new GlobalSettingsBuilder()
                 .WithReservedPaths((GlobalSettings.StaticReservedPaths + "~/umbraco"))
                 .Build();
-            var runtime = new RuntimeState(globalSettings, UmbracoVersion);
+            var runtime = Umbraco.Core.RuntimeState.Booting();
 
             _module = new UmbracoInjectedModule
             (

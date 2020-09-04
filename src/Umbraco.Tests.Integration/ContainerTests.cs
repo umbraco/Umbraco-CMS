@@ -83,7 +83,7 @@ namespace Umbraco.Tests.Integration
             // it means the container won't be disposed, and maybe other services? not sure.
             // In cases where we use it can we use IConfigureOptions? https://andrewlock.net/access-services-inside-options-and-startup-using-configureoptions/
 
-            var umbracoContainer = UmbracoIntegrationTest.GetUmbracoContainer(out var serviceProviderFactory);
+            var umbracoContainer = UmbracoIntegrationTest.CreateUmbracoContainer(out var serviceProviderFactory);
 
             IHostApplicationLifetime lifetime1 = null;
 

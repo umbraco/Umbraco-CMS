@@ -24,7 +24,6 @@ namespace Umbraco.Web.Search
         private readonly IValueSetBuilder<IMedia> _mediaValueSetBuilder;
         private readonly IValueSetBuilder<IMember> _memberValueSetBuilder;
         private readonly BackgroundIndexRebuilder _backgroundIndexRebuilder;
-        private static object _isConfiguredLocker = new object();
         private readonly IScopeProvider _scopeProvider;
         private readonly ServiceContext _services;
         private readonly IMainDom _mainDom;
@@ -104,7 +103,13 @@ namespace Umbraco.Web.Search
         }
 
         public void Terminate()
-        { }
+        {
+            ContentCacheRefresher.CacheUpdated -= ContentCacheRefresherUpdated;
+            ContentTypeCacheRefresher.CacheUpdated -= ContentTypeCacheRefresherUpdated;
+            MediaCacheRefresher.CacheUpdated -= MediaCacheRefresherUpdated;
+            MemberCacheRefresher.CacheUpdated -= MemberCacheRefresherUpdated;
+            LanguageCacheRefresher.CacheUpdated -= LanguageCacheRefresherUpdated;
+        }
 
         #region Cache refresher updated event handlers
 

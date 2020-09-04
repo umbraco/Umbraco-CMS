@@ -31,6 +31,7 @@ namespace Umbraco.Core
             TypeLoader typeLoader,
             IRuntimeState state,
             ITypeFinder typeFinder,
+
             IIOHelper ioHelper,
             IUmbracoVersion umbracoVersion,
             IDbProviderFactoryCreator dbProviderFactoryCreator,

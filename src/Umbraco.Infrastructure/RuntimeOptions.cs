@@ -16,7 +16,7 @@ namespace Umbraco.Core
     public static class RuntimeOptions
     {
         private static List<Action<IProfilingLogger>> _onBoot;
-        private static List<Action<IFactory>> _onEssentials;
+        private static List<Action<Composition, AppCaches, TypeLoader, IUmbracoDatabaseFactory>> _onEssentials;
 
         /// <summary>
         /// Executes the RuntimeBoot handlers.
@@ -33,13 +33,13 @@ namespace Umbraco.Core
         /// <summary>
         /// Executes the RuntimeEssentials handlers.
         /// </summary>
-        internal static void DoRuntimeEssentials(IFactory factory)
+        internal static void DoRuntimeEssentials(Composition composition, AppCaches appCaches, TypeLoader typeLoader, IUmbracoDatabaseFactory databaseFactory)
         {
             if (_onEssentials== null)
                 return;
 
             foreach (var action in _onEssentials)
-                action(factory);
+                action(composition, appCaches, typeLoader, databaseFactory);
         }
 
         /// <summary>
@@ -64,10 +64,10 @@ namespace Umbraco.Core
         /// essential things (AppCaches, a TypeLoader, and a database factory) but
         /// before anything else.</para>
         /// </remarks>
-        public static void OnRuntimeEssentials(Action<IFactory> action)
+        public static void OnRuntimeEssentials(Action<Composition, AppCaches, TypeLoader, IUmbracoDatabaseFactory> action)
         {
             if (_onEssentials == null)
-                _onEssentials = new List<Action<IFactory>>();
+                _onEssentials = new List<Action<Composition, AppCaches, TypeLoader, IUmbracoDatabaseFactory>>();
             _onEssentials.Add(action);
         }
     }

@@ -53,7 +53,7 @@ namespace Umbraco.Tests.Routing
         public class TestRuntime : CoreRuntime
         {
             public TestRuntime(Configs configs, GlobalSettings globalSettings, ConnectionStrings connectionStrings, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)
-                : base(configs, globalSettings, connectionStrings, umbracoVersion, ioHelper, Mock.Of<ILogger>(), Mock.Of<IProfiler>(), new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, TestHelper.DbProviderFactoryCreator, TestHelper.MainDom, TestHelper.GetTypeFinder(), NoAppCache.Instance)
+                : base(configs, globalSettings, connectionStrings,umbracoVersion, ioHelper, Mock.Of<ILogger>(), Mock.Of<IProfiler>(), new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, TestHelper.DbProviderFactoryCreator, TestHelper.MainDom, TestHelper.GetTypeFinder(), AppCaches.NoCache)
             {
             }
 

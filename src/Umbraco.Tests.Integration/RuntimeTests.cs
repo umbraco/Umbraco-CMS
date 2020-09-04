@@ -64,7 +64,7 @@ namespace Umbraco.Tests.Integration
             var coreRuntime = new CoreRuntime(configs, globalSettings, connectionStrings, testHelper.GetUmbracoVersion(),
                 testHelper.IOHelper, testHelper.Logger, testHelper.Profiler, testHelper.UmbracoBootPermissionChecker,
                 testHelper.GetHostingEnvironment(), testHelper.GetBackOfficeInfo(), testHelper.DbProviderFactoryCreator,
-                testHelper.MainDom, testHelper.GetTypeFinder(), NoAppCache.Instance);
+                testHelper.MainDom, testHelper.GetTypeFinder(), AppCaches.NoCache);
 
             // boot it!
             var factory = coreRuntime.Configure(umbracoContainer);
@@ -111,7 +111,7 @@ namespace Umbraco.Tests.Integration
         [Test]
         public async Task AddUmbracoCore()
         {
-            var umbracoContainer = UmbracoIntegrationTest.GetUmbracoContainer(out var serviceProviderFactory);
+            var umbracoContainer = UmbracoIntegrationTest.CreateUmbracoContainer(out var serviceProviderFactory);
             var testHelper = new TestHelper();
 
             var hostBuilder = new HostBuilder()
@@ -124,7 +124,7 @@ namespace Umbraco.Tests.Integration
 
                     // Add it!
                     services.AddUmbracoConfiguration(hostContext.Configuration);
-                    services.AddUmbracoCore(webHostEnvironment, umbracoContainer, GetType().Assembly, NoAppCache.Instance,  testHelper.GetLoggingConfiguration(), out _);
+                    services.AddUmbracoCore(webHostEnvironment, umbracoContainer, GetType().Assembly, AppCaches.NoCache, testHelper.GetLoggingConfiguration(), out _);
                 });
 
             var host = await hostBuilder.StartAsync();
@@ -151,7 +151,7 @@ namespace Umbraco.Tests.Integration
         [Test]
         public async Task UseUmbracoCore()
         {
-            var umbracoContainer = UmbracoIntegrationTest.GetUmbracoContainer(out var serviceProviderFactory);
+            var umbracoContainer = UmbracoIntegrationTest.CreateUmbracoContainer(out var serviceProviderFactory);
             var testHelper = new TestHelper();
 
             var hostBuilder = new HostBuilder()
@@ -164,7 +164,7 @@ namespace Umbraco.Tests.Integration
 
                     // Add it!
                     services.AddUmbracoConfiguration(hostContext.Configuration);
-                    services.AddUmbracoCore(webHostEnvironment, umbracoContainer, GetType().Assembly, NoAppCache.Instance, testHelper.GetLoggingConfiguration(), out _);
+                    services.AddUmbracoCore(webHostEnvironment, umbracoContainer, GetType().Assembly, AppCaches.NoCache, testHelper.GetLoggingConfiguration(), out _);
                 });
 
             var host = await hostBuilder.StartAsync();
