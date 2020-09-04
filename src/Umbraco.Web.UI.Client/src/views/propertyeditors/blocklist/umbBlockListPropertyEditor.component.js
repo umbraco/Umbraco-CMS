@@ -326,7 +326,9 @@
             blockObject.active = true;
         }
 
-        function editBlock(blockObject, openSettings, blockIndex, parentForm) {
+        function editBlock(blockObject, openSettings, blockIndex, parentForm, options) {
+
+            options = options || {};
 
             // this must be set
             if (blockIndex === undefined) {
@@ -360,6 +362,7 @@
                 $parentForm: parentForm || vm.propertyForm, // pass in a $parentForm, this maintains the FormController hierarchy with the infinite editing view (if it contains a form)
                 hideContent: blockObject.hideContentInOverlay,
                 openSettings: openSettings === true,
+                createFlow: options.createFlow === true,
                 liveEditing: liveEditing,
                 title: blockObject.label,
                 view: "views/common/infiniteeditors/blockeditor/blockeditor.html",
@@ -374,15 +377,17 @@
                     blockObject.active = false;
                     editorService.close();
                 },
-                close: function() {
-
-                    if (liveEditing === true) {
-                        // revert values when closing in liveediting mode.
-                        blockObject.retrieveValuesFrom(blockContentClone, blockSettingsClone);
-                    }
-
-                    if (wasNotActiveBefore === true) {
-                        blockObject.active = false;
+                close: function(blockEditorModel) {
+                    if (blockEditorModel.createFlow) {
+                        deleteBlock(blockObject);
+                    } else {
+                        if (liveEditing === true) {
+                            // revert values when closing in liveediting mode.
+                            blockObject.retrieveValuesFrom(blockContentClone, blockSettingsClone);
+                        }
+                        if (wasNotActiveBefore === true) {
+                            blockObject.active = false;
+                        }
                     }
                     editorService.close();
                 }
@@ -448,7 +453,7 @@
                             if (inlineEditing === true) {
                                 activateBlock(vm.layout[createIndex].$block);
                             } else if (inlineEditing === false && vm.layout[createIndex].$block.hideContentInOverlay !== true) {
-                                editBlock(vm.layout[createIndex].$block, false, createIndex, blockPickerModel.$parentForm);
+                                editBlock(vm.layout[createIndex].$block, false, createIndex, blockPickerModel.$parentForm, {createFlow: true});
                             }
                         }
                     }
