@@ -505,9 +505,9 @@ namespace Umbraco.Web.Editors
         /// <param name="userSave"></param>
         /// <returns></returns>
         [OutgoingEditorModelEvent]
-        public async Task<UserDisplay> PostSaveUser(UserSave userSave)
+        public UserDisplay PostSaveUser(UserSave userSave)
         {
-            if (userSave == null) throw new ArgumentNullException("userSave");
+            if (userSave == null) throw new ArgumentNullException(nameof(userSave));
 
             if (ModelState.IsValid == false)
             {

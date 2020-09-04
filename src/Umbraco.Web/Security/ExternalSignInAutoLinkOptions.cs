@@ -33,6 +33,12 @@ namespace Umbraco.Web.Security
         private readonly string[] _defaultUserGroups;
 
         /// <summary>
+        /// By default this is true which allows the user to manually link and unlink the external provider, if set to false the back office user
+        /// will not see and cannot perform manual linking or unlinking of the external provider.
+        /// </summary>
+        public bool AllowManualLinking { get; set; } = true;
+
+        /// <summary>
         /// A callback executed during account auto-linking and before the user is persisted
         /// </summary>
         [IgnoreDataMember]

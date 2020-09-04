@@ -27,7 +27,7 @@ namespace Umbraco.Web.Security
         /// Options used to control how users can be auto-linked/created/updated based on the external login provider
         /// </summary>
         [IgnoreDataMember] // we are ignoring this one from serialization for backwards compat since these options are manually incuded in the response separately
-        public ExternalSignInAutoLinkOptions AutoLinkOptions { get; set; }
+        public ExternalSignInAutoLinkOptions AutoLinkOptions { get; set; } = new ExternalSignInAutoLinkOptions();
 
         /// <summary>
         /// When set to true will disable all local user login functionality

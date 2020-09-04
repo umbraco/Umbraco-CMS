@@ -27,6 +27,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Web.Composing;
 using IUser = Umbraco.Core.Models.Membership.IUser;
 using Umbraco.Web.Editors.Filters;
+using Microsoft.Owin.Security;
 
 namespace Umbraco.Web.Editors
 {
@@ -113,7 +114,22 @@ namespace Umbraco.Web.Editors
         [ValidateAngularAntiForgeryToken]
         public async Task<HttpResponseMessage> PostUnLinkLogin(UnLinkLoginModel unlinkLoginModel)
         {
-            // TODO: If DenyLocalLogin is enabled for this provider we cannot unlink
+            var owinContext = TryGetOwinContext().Result;
+            ExternalSignInAutoLinkOptions autoLinkOptions = null;
+            var authType = owinContext.Authentication.GetExternalAuthenticationTypes().FirstOrDefault(x => x.AuthenticationType == unlinkLoginModel.LoginProvider);
+            if (authType == null)
+            {
+                Logger.Warn<BackOfficeController>("Could not find external authentication provider registered: {LoginProvider}", unlinkLoginModel.LoginProvider);
+            }
+            else
+            {
+                autoLinkOptions = authType.GetExternalSignInAutoLinkOptions();
+                if (!autoLinkOptions.AllowManualLinking)
+                {
+                    // If AllowManualLinking is disabled for this provider we cannot unlink
+                    return Request.CreateResponse(HttpStatusCode.BadRequest);
+                }
+            }
 
             var result = await UserManager.RemoveLoginAsync(
                 User.Identity.GetUserId<int>(),
@@ -183,7 +199,6 @@ namespace Umbraco.Web.Editors
         /// </remarks>
         [WebApi.UmbracoAuthorize(requireApproval: false)]
         [SetAngularAntiForgeryTokens]
-        [DenyLocalLoginAuthorization]
         public UserDetail GetCurrentInvitedUser()
         {
             var user = UmbracoContext.Security.CurrentUser;

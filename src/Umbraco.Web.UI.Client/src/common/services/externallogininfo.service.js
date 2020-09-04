@@ -36,11 +36,11 @@ function externalLoginInfoService(externalLoginInfo, umbRequestHelper) {
 
     /**
      * Returns all login providers
-     * @param {any} excludeDenyLocalLogin true to exclude providers the deny local login
+     * @param {any} excludeUnlinkable true to exclude providers that are not manually linkable
      */
-    function getLoginProviders(excludeDenyLocalLogin) {
-        if (excludeDenyLocalLogin) {
-            return _.filter(externalLoginInfo.providers, x => !x.properties.UmbracoBackOfficeExternalLoginOptions.DenyLocalLogin);
+    function getLoginProviders(excludeUnlinkable) {
+        if (excludeUnlinkable) {
+            return _.filter(externalLoginInfo.providers, x => !x.properties.UmbracoBackOfficeExternalLoginOptions.AutoLinkOptions.AllowManualLinking);
         }
         else {
             return externalLoginInfo.providers;
