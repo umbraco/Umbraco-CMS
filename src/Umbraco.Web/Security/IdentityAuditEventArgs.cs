@@ -5,19 +5,6 @@ using Umbraco.Core.Security;
 namespace Umbraco.Web.Security
 {
 
-    public class UserInviteEventArgs : IdentityAuditEventArgs
-    {
-        public UserInviteEventArgs(string ipAddress, int performingUser, string comment = null)
-            : base(AuditEvent.SendingUserInvite, ipAddress, comment, performingUser)
-        {
-        }
-
-        /// <summary>
-        /// If event handler sets this to true it indicates that Umbraco will no try to send the invite itself
-        /// </summary>
-        public bool InviteHandled { get; set; }
-    }
-
     /// <summary>
     /// This class is used by events raised from the BackofficeUserManager
     /// </summary>

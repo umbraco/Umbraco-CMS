@@ -347,25 +347,6 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
             }
 
-            var userMgr = TryGetOwinContext().Result.GetBackOfficeUserManager();
-            var inviteArgs = new UserInviteEventArgs(
-                Request.TryGetHttpContext().Result.GetCurrentRequestIpAddress(),
-                performingUser: Security.GetUserId().Result);
-            userMgr.RaiseSendingUserInvite(inviteArgs);
-
-            if (inviteArgs.InviteHandled)
-            {
-                // TODO: now what? We'll need to return a different response to the back office, i don't think we want to create
-                // a local user since that will be part of the auto-link logic. We should ask lars though since that might be
-                // a requirement for him so might need to make it flexible.
-            }
-
-            if (EmailSender.CanSendRequiredEmail == false)
-            {
-                throw new HttpResponseException(
-                    Request.CreateNotificationValidationErrorResponse("No Email server is configured"));
-            }
-
             IUser user;
             if (Current.Configs.Settings().Security.UsernameIsEmail)
             {
@@ -375,9 +356,47 @@ namespace Umbraco.Web.Editors
             else
             {
                 //first validate the username if we're showing it
-                user = CheckUniqueUsername(userSave.Username, u => u.LastLoginDate != default(DateTime) || u.EmailConfirmedDate.HasValue);
+                user = CheckUniqueUsername(userSave.Username, u => u.LastLoginDate != default || u.EmailConfirmedDate.HasValue);
             }
-            user = CheckUniqueEmail(userSave.Email, u => u.LastLoginDate != default(DateTime) || u.EmailConfirmedDate.HasValue);
+            user = CheckUniqueEmail(userSave.Email, u => u.LastLoginDate != default || u.EmailConfirmedDate.HasValue);
+
+            var userMgr = TryGetOwinContext().Result.GetBackOfficeUserManager();
+            var inviteArgs = new UserInviteEventArgs(
+                Request.TryGetHttpContext().Result.GetCurrentRequestIpAddress(),
+                performingUser: Security.GetUserId().Result,
+                userSave);
+            userMgr.RaiseSendingUserInvite(inviteArgs);
+
+            // If the event is handled then return the data
+            if (inviteArgs.InviteHandled)
+            {
+                // if no local user was created then map the args manually for the UI
+                if (inviteArgs.User == null)
+                {
+                    return new UserDisplay
+                    {
+                        Name = userSave.Name,
+                        Email = userSave.Email,
+                        Username = userSave.Username
+                    };
+                }
+                else
+                {
+                    //map the save info over onto the user
+                    user = Mapper.Map(userSave, user);
+                    //ensure the invited date is set
+                    user.InvitedDate = DateTime.Now;
+                    //Save the updated user
+                    Services.UserService.Save(user);
+                    return Mapper.Map<UserDisplay>(user);
+                }
+            }
+
+            if (EmailSender.CanSendRequiredEmail == false)
+            {
+                throw new HttpResponseException(
+                    Request.CreateNotificationValidationErrorResponse("No Email server is configured"));
+            }
 
             //Perform authorization here to see if the current user can actually save this user with the info being requested
             var authHelper = new UserEditorAuthorizationHelper(Services.ContentService, Services.MediaService, Services.UserService, Services.EntityService);
