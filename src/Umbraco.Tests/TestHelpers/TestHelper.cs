@@ -78,8 +78,6 @@ namespace Umbraco.Tests.TestHelpers
 
         public static Configs GetConfigs() => _testHelperInternal.GetConfigs();
 
-        public static IRuntimeState GetRuntimeState() => _testHelperInternal.GetRuntimeState();
-
         public static IBackOfficeInfo GetBackOfficeInfo() => _testHelperInternal.GetBackOfficeInfo();
 
         public static IConfigsFactory GetConfigsFactory() => _testHelperInternal.GetConfigsFactory();

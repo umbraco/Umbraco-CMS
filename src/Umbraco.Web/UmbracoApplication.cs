@@ -43,9 +43,14 @@ namespace Umbraco.Web
             var mainDom = new MainDom(logger, mainDomLock);
 
             var requestCache = new HttpRequestAppCache(() => HttpContext.Current != null ? HttpContext.Current.Items : null);
+            var appCaches = new AppCaches(
+                new DeepCloneAppCache(new ObjectCacheAppCache()),
+                requestCache,
+                new IsolatedCaches(type => new DeepCloneAppCache(new ObjectCacheAppCache())));
+
             var umbracoBootPermissionChecker = new AspNetUmbracoBootPermissionChecker();
             return new CoreRuntime(configs, umbracoVersion, ioHelper, logger, profiler, umbracoBootPermissionChecker, hostingEnvironment, backOfficeInfo, dbProviderFactoryCreator, mainDom,
-                GetTypeFinder(hostingEnvironment, logger, profiler), requestCache);
+                GetTypeFinder(hostingEnvironment, logger, profiler), appCaches);
         }
 
 

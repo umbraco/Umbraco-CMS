@@ -19,6 +19,7 @@ using Umbraco.Core.Runtime;
 using Umbraco.Tests.Common;
 using Umbraco.Web.Common.AspNetCore;
 using IHostingEnvironment = Umbraco.Core.Hosting.IHostingEnvironment;
+using Microsoft.Extensions.FileProviders;
 
 namespace Umbraco.Tests.Integration.Implementations
 {
@@ -39,11 +40,17 @@ namespace Umbraco.Tests.Integration.Implementations
             _httpContextAccessor = Mock.Of<IHttpContextAccessor>(x => x.HttpContext == httpContext);
             _ipResolver = new AspNetCoreIpResolver(_httpContextAccessor);
 
+            var contentRoot = Assembly.GetExecutingAssembly().GetRootDirectorySafe();
             var hostEnvironment = new Mock<IWebHostEnvironment>();
-            hostEnvironment.Setup(x => x.ApplicationName).Returns("UmbracoIntegrationTests");
-            hostEnvironment.Setup(x => x.ContentRootPath)
-                .Returns(() => Assembly.GetExecutingAssembly().GetRootDirectorySafe());
+            // this must be the assembly name for the WebApplicationFactory to work
+            hostEnvironment.Setup(x => x.ApplicationName).Returns(GetType().Assembly.GetName().Name); 
+            hostEnvironment.Setup(x => x.ContentRootPath).Returns(() => contentRoot);
+            hostEnvironment.Setup(x => x.ContentRootFileProvider).Returns(() => new PhysicalFileProvider(contentRoot));
             hostEnvironment.Setup(x => x.WebRootPath).Returns(() => WorkingDirectory);
+            hostEnvironment.Setup(x => x.WebRootFileProvider).Returns(() => new PhysicalFileProvider(WorkingDirectory));
+            // we also need to expose it as the obsolete interface since netcore's WebApplicationFactory casts it
+            hostEnvironment.As<Microsoft.AspNetCore.Hosting.IHostingEnvironment>();
+
             _hostEnvironment = hostEnvironment.Object;
 
             _hostingLifetime = new AspNetCoreApplicationShutdownRegistry(Mock.Of<IHostApplicationLifetime>());

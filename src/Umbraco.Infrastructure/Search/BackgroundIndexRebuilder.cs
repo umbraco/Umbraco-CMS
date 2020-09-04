@@ -12,7 +12,7 @@ namespace Umbraco.Web.Search
     /// <summary>
     /// Utility to rebuild all indexes on a background thread
     /// </summary>
-    public sealed class BackgroundIndexRebuilder
+    public class BackgroundIndexRebuilder
     {
         private static readonly object RebuildLocker = new object();
         private readonly IndexRebuilder _indexRebuilder;
@@ -34,7 +34,7 @@ namespace Umbraco.Web.Search
         /// </summary>
         /// <param name="onlyEmptyIndexes"></param>
         /// <param name="waitMilliseconds"></param>
-        public void RebuildIndexes(bool onlyEmptyIndexes, int waitMilliseconds = 0)
+        public virtual void RebuildIndexes(bool onlyEmptyIndexes, int waitMilliseconds = 0)
         {
             // TODO: need a way to disable rebuilding on startup
 

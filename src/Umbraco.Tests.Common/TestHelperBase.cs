@@ -47,13 +47,6 @@ namespace Umbraco.Tests.Common
 
         public Configs GetConfigs() => GetConfigsFactory().Create();
 
-        public IRuntimeState GetRuntimeState()
-        {
-            return new RuntimeState(
-                Mock.Of<IGlobalSettings>(),
-                GetUmbracoVersion());
-        }
-
         public abstract IBackOfficeInfo GetBackOfficeInfo();
 
         public IConfigsFactory GetConfigsFactory() => new ConfigsFactory();
@@ -89,7 +82,7 @@ namespace Umbraco.Tests.Common
             get
             {
                 if (_ioHelper == null)
-                    _ioHelper = new IOHelper(GetHostingEnvironment(), SettingsForTests.GenerateMockGlobalSettings());
+                    _ioHelper = new IOHelper(GetHostingEnvironment());
                 return _ioHelper;
             }
         }
