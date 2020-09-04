@@ -3,7 +3,7 @@
  * @name umbraco.resources.trackedReferencesResource
  * @description Loads in data for tracked references
  **/
-function trackedReferencesResource($q, $http, umbDataFormatter, umbRequestHelper) {
+function trackedReferencesResource($q, $http, umbRequestHelper) {
 
 
     return {
@@ -11,7 +11,7 @@ function trackedReferencesResource($q, $http, umbDataFormatter, umbRequestHelper
         /**
          * @ngdoc method
          * @name umbraco.resources.trackedReferencesResource#getPagedReferences
-         * @methodOf umbraco.resources.mediaResource
+        * @methodOf umbraco.resources.trackedReferencesResource
          *
          * @description
          * Get's a page list of tracked references for the current item, so you can see where a item is being used

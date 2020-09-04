@@ -3,7 +3,7 @@
  * @name umbraco.resources.mediaResource
  * @description Loads in data for media
  **/
-function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
+function mediaResource($q, $http, umbDataFormatter, umbRequestHelper, trackedReferencesResource) {
 
     /** internal method process the saving of data and post processing the result */
     function saveMediaItem(content, action, files) {
@@ -550,6 +550,43 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
                         "Search",
                         args)),
                 'Failed to retrieve media items for search: ' + query);
+        },
+
+
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.mediaResource#getPagedReferences
+         * @methodOf umbraco.resources.mediaResource
+         *
+         * @description
+         * Get's a page list of tracked references for the current item, so you can see where a item is being used
+         *
+         * @deprecated
+         * Use umbraco.resources.trackedReferencesResource#getPagedReferences instead
+         *
+         * ##usage
+         * <pre>
+         * var options = {
+         *      pageSize : 25,
+         *      pageNumber : 1,
+         *      entityType : 'DOCUMENT'
+         *  };
+         * trackedReferencesResource.getPagedReferences(1,options)
+         *    .then(function(data) {
+         *        console.log(data);
+         *    });
+         * </pre>
+         *
+         * @param {int} id Id of the  item to query for tracked references
+         * @param {Object} args optional args object
+         * @param {Int} args.pageSize the pagesize of the returned list (default 25)
+         * @param {Int} args.pageNumber the current page index (default 1)
+         * @param {Int} args.entityType the type of tracked entity (default : DOCUMENT). Possible values DOCUMENT, MEDIA
+         * @returns {Promise} resourcePromise object.
+         *
+         */
+        getPagedReferences: function (id, options) {
+            return trackedReferencesResource.getPagedReferences(id, options);
         }
 
     };
