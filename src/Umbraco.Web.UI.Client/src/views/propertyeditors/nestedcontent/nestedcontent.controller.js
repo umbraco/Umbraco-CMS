@@ -28,7 +28,7 @@
             }
         }
 
-        clipboardService.registrerClearPropertyResolver(clearNestedContentPropertiesForStorage)
+        clipboardService.registerClearPropertyResolver(clearNestedContentPropertiesForStorage)
 
 
         function clearInnerNestedContentPropertiesForStorage(prop, propClearingMethod) {
@@ -50,7 +50,7 @@
             }
         }
 
-        clipboardService.registrerClearPropertyResolver(clearInnerNestedContentPropertiesForStorage)
+        clipboardService.registerClearPropertyResolver(clearInnerNestedContentPropertiesForStorage)
     }]);
 
     angular
@@ -473,6 +473,8 @@
             if (newNode === undefined) {
                 return;
             }
+
+            newNode = clipboardService.parseContentForPaste(newNode);
 
             // generate a new key.
             newNode.key = String.CreateGuid();
