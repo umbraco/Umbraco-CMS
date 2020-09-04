@@ -1,27 +1,23 @@
 ﻿<div ng-controller="Umbraco.PrevalueEditors.CheckboxListController as vm">
 
     <ul class="unstyled">
+
         <li ng-repeat="item in vm.viewItems track by item.key">
             <umb-checkbox value="{{item.value}}" model="item.checked" text="{{item.value}}" on-change="vm.change(model, value)"></umb-checkbox>
         </li>
 
+        {{model.value}}
 
-        <li ng-repeat="preval in model.prevalues">
+        <!--<li ng-repeat="preval in model.prevalues">
 
             <umb-checkbox model="preval.value" value="{{preval.value || preval}}" on-change="vm.change(model, value)">
                 {{preval.label || preval.value || preval}}
             </umb-checkbox>
 
-            {{model.value}}
-
-            <!--<label class="checkbox">
-            <input type="checkbox" ng-hide="preval.icon" checklist-model="model.value" checklist-value="preval" value="{{preval.value || preval}}" />
-            <i ng-if="preval.icon" class="icon {{preval.icon}}"></i> <span>{{preval.label || preval.value || preval}}</span>
-        </label>-->
-        </li>
+        </li>-->
     </ul>
 
-    <ul class="unstyled" ng-if="model.config.prevalues">
+    <!--<ul class="unstyled" ng-if="model.config.prevalues">
         <li ng-repeat="(key, value) in model.config.prevalues">
 
             <umb-checkbox model="value.checked" value="{{value.value}}" on-change="vm.change(model, value)">
@@ -29,6 +25,6 @@
             </umb-checkbox>
 
         </li>
-    </ul>
+    </ul>-->
 
 </div>
