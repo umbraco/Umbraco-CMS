@@ -248,6 +248,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="udi">UDI of the entity to fetch URL for</param>
         /// <param name="culture">The culture to fetch the URL for</param>
         /// <returns>The URL or path to the item</returns>
+       [DetermineAmbiguousActionByPassingParameters]
         public HttpResponseMessage GetUrl(Udi udi, string culture = "*")
         {
             var intId = _entityService.GetId(udi);
@@ -281,6 +282,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <remarks>
         /// We are not restricting this with security because there is no sensitive data
         /// </remarks>
+        [DetermineAmbiguousActionByPassingParameters]
         public HttpResponseMessage GetUrl(int id, UmbracoEntityTypes type, string culture = null)
         {
             culture = culture ?? ClientCulture();
