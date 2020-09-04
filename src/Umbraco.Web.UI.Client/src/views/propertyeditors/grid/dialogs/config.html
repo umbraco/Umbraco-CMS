@@ -52,7 +52,8 @@
                             shortcut="esc"
                             action="vm.close()">
                 </umb-button>
-                <umb-button type="button"
+                <umb-button ng-if="(model.config && model.config.length > 0) || (model.styles && model.styles.length > 0)"
+                            type="button"
                             button-style="success"
                             label-key="general_submit"
                             action="vm.submit()">
