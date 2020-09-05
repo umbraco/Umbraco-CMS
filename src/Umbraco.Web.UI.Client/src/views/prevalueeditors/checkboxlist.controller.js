@@ -11,12 +11,9 @@
 
             var prevalues = ($scope.model.config ? $scope.model.config.prevalues : $scope.model.prevalues) || [];
 
-            console.log("prevalues", prevalues);
-
             var items = [];
 
             for (var i = 0; i < prevalues.length; i++) {
-                console.log("item", prevalues[i]);
                 var item = {};
 
                 if (Utilities.isObject(prevalues[i])) {
@@ -30,8 +27,6 @@
 
                 items.push({ value: item.value, label: item.label });
             }
-
-            console.log("items", items);
 
             vm.configItems = items;
 
@@ -61,8 +56,6 @@
         }
 
         function change(model, value) {
-
-            console.log("checkboxlist prevalues", model, value);
 
             var index = $scope.model.value.indexOf(value);
 
