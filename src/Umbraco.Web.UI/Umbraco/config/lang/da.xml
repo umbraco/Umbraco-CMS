@@ -1054,10 +1054,6 @@ Mange hilsner fra Umbraco robotten
     <key alias="contentPublishedFailedInvalid"><![CDATA[
     %0% kunne ikke publiceres da følgende egenskaber :  %1%  ikke overholdte valderingsreglerne.
     ]]></key>
-    <key alias="contentPublishedFailedByEvent"><![CDATA[
-        %0% kunne ikke publiceres, et 3. part tilføjelsesprogram annullerede handlingen.
-    ]]>
-    </key>
     <key alias="contentPublishedFailedByEvent">%0% kunne ikke udgives, fordi et 3. parts modul annullerede handlingen</key>
     <key alias="contentPublishedFailedByMissingName"><![CDATA[%0% kan ikke udgives, fordi det mangler et navn.]]></key>
     <key alias="includeUnpublished">Medtag ikke-udgivede undersider</key>
@@ -1106,7 +1102,6 @@ Mange hilsner fra Umbraco robotten
     <key alias="currentVersion">Nuværende version</key>
     <key alias="diffHelp"><![CDATA[Her vises forskellene mellem den nuværende version og den valgte version<br /><del>Rød</del> tekst vil ikke blive vist i den valgte version. <ins>Grøn betyder tilføjet</ins>]]></key>
     <key alias="documentRolledBack">Dokument tilbagerullet</key>
-    <key alias="headline">Vælg en version at sammenligne med den nuværende version</key>
     <key alias="htmlHelp">Her vises den valgte version som html. Hvis du ønsker at se forskellen mellem de 2 versioner på samme tid, brug 'diff'-oversigten</key>
     <key alias="rollbackTo">Tilbagerulning til</key>
     <key alias="selectVersion">Vælg version</key>

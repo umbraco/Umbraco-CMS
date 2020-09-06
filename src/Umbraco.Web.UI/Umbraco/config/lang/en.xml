@@ -796,7 +796,6 @@
     <key alias="other">Other</key>
     <key alias="articles">Articles</key>
     <key alias="videos">Videos</key>
-    <key alias="clear">Clear</key>
     <key alias="installing">Installing</key>
   </area>
   <area alias="colors">
