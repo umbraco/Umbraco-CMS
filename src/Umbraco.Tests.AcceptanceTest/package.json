@@ -7,7 +7,7 @@
     "cross-env": "^7.0.2",
     "cypress": "^4.12.1",
     "ncp": "^2.0.0",
-    "umbraco-cypress-testhelpers": "^1.0.0-beta-48"
+    "umbraco-cypress-testhelpers": "^1.0.0-beta-49"
   },
   "dependencies": {
     "typescript": "^3.9.2"
