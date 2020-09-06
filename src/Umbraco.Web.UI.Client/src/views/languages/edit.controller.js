@@ -161,7 +161,7 @@
 
             }, function (err) {
                 vm.page.saveButtonState = "error";
-
+                formHelper.resetForm({ scope: $scope, hasErrors: true });
                 formHelper.handleError(err);
 
             });

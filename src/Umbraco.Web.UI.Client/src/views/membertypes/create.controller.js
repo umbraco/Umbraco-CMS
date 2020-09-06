@@ -31,10 +31,10 @@ function MemberTypesCreateController($scope, $location, navigationService, membe
                 var currPath = node.path ? node.path : "-1";
                 navigationService.syncTree({ tree: "membertypes", path: currPath + "," + folderId, forceReload: true, activate: true });
 
-                formHelper.resetForm({ scope: $scope });
+                formHelper.resetForm({ scope: $scope, formCtrl: this.createFolderForm });
 
             }, function(err) {
-
+                formHelper.resetForm({ scope: $scope, formCtrl: this.createFolderForm, hasErrors: true });
                // TODO: Handle errors
             });
         };

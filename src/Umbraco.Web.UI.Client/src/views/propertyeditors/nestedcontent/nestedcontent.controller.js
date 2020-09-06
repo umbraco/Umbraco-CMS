@@ -27,7 +27,7 @@
                 }
             }
         }
-        
+
         clipboardService.registrerClearPropertyResolver(clearNestedContentPropertiesForStorage)
 
 
@@ -49,7 +49,7 @@
                 }
             }
         }
-        
+
         clipboardService.registrerClearPropertyResolver(clearInnerNestedContentPropertiesForStorage)
     }]);
 
@@ -167,8 +167,7 @@
             icon: 'trash',
             method: removeAllEntries,
             isDisabled: true
-        }
-
+        };
         // helper to force the current form into the dirty state
         function setDirty() {
             if ($scope.$parent.$parent.propertyForm) {
@@ -243,6 +242,7 @@
             _.each(singleEntriesForPaste, function (entry) {
                 dialog.pasteItems.push({
                     type: "elementType",
+                    date: entry.date,
                     name: entry.label,
                     data: entry.data,
                     icon: entry.icon
@@ -253,10 +253,15 @@
             _.each(arrayEntriesForPaste, function (entry) {
                 dialog.pasteItems.push({
                     type: "elementTypeArray",
+                    date: entry.date,
                     name: entry.label,
                     data: entry.data,
                     icon: entry.icon
                 });
+            });
+
+            vm.overlayMenu.pasteItems.sort( (a, b) => {
+                return b.date - a.date
             });
 
             dialog.title = dialog.pasteItems.length > 0 ? labels.grid_addElement : labels.content_createEmpty;
@@ -294,7 +299,7 @@
             return (vm.nodes.length > vm.minItems)
                 ? true
                 : model.config.contentTypes.length > 1;
-        }
+        };
 
         function deleteNode(idx) {
             var removed = vm.nodes.splice(idx, 1);
@@ -309,6 +314,7 @@
             updateModel();
             validate();
         };
+
         vm.requestDeleteNode = function (idx) {
             if (!vm.canDeleteNode(idx)) {
                 return;
@@ -396,10 +402,11 @@
 
             var scaffold = getScaffold(model.value[idx].ncContentTypeAlias);
             return scaffold && scaffold.icon ? iconHelper.convertFromLegacyIcon(scaffold.icon) : "icon-folder";
-        }
+        };
 
         vm.sortableOptions = {
             axis: "y",
+            containment: "parent",
             cursor: "move",
             handle: '.umb-nested-content__header-bar',
             distance: 10,
