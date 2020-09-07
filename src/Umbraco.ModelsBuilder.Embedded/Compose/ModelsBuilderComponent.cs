@@ -62,7 +62,11 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
         }
 
         public void Terminate()
-        { }
+        {
+            ServerVariablesParser.Parsing -= ServerVariablesParser_Parsing;
+            ContentModelBinder.ModelBindingException -= ContentModelBinder_ModelBindingException;
+            FileService.SavingTemplate -= FileService_SavingTemplate;
+        }
 
         private void InitializeApplication(object sender, EventArgs args)
         {
@@ -72,24 +76,26 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
         private void InstallServerVars()
         {
             // register our url - for the backoffice api
-            ServerVariablesParser.Parsing += (sender, serverVars) =>
-            {
-                if (!serverVars.ContainsKey("umbracoUrls"))
-                    throw new ArgumentException("Missing umbracoUrls.");
-                var umbracoUrlsObject = serverVars["umbracoUrls"];
-                if (umbracoUrlsObject == null)
-                    throw new ArgumentException("Null umbracoUrls");
-                if (!(umbracoUrlsObject is Dictionary<string, object> umbracoUrls))
-                    throw new ArgumentException("Invalid umbracoUrls");
+            ServerVariablesParser.Parsing += ServerVariablesParser_Parsing;                
+        }
 
-                if (!serverVars.ContainsKey("umbracoPlugins"))
-                    throw new ArgumentException("Missing umbracoPlugins.");
-                if (!(serverVars["umbracoPlugins"] is Dictionary<string, object> umbracoPlugins))
-                    throw new ArgumentException("Invalid umbracoPlugins");
+        private void ServerVariablesParser_Parsing(object sender, Dictionary<string, object> serverVars)
+        {
+            if (!serverVars.ContainsKey("umbracoUrls"))
+                throw new ArgumentException("Missing umbracoUrls.");
+            var umbracoUrlsObject = serverVars["umbracoUrls"];
+            if (umbracoUrlsObject == null)
+                throw new ArgumentException("Null umbracoUrls");
+            if (!(umbracoUrlsObject is Dictionary<string, object> umbracoUrls))
+                throw new ArgumentException("Invalid umbracoUrls");
+
+            if (!serverVars.ContainsKey("umbracoPlugins"))
+                throw new ArgumentException("Missing umbracoPlugins.");
+            if (!(serverVars["umbracoPlugins"] is Dictionary<string, object> umbracoPlugins))
+                throw new ArgumentException("Invalid umbracoPlugins");
 
                 umbracoUrls["modelsBuilderBaseUrl"] = _linkGenerator.GetUmbracoApiServiceBaseUrl<ModelsBuilderDashboardController>(controller => controller.BuildModels());
                 umbracoPlugins["modelsBuilder"] = GetModelsBuilderSettings();
-            };
         }
 
         private Dictionary<string, object> GetModelsBuilderSettings()

@@ -107,16 +107,6 @@ namespace Umbraco.Web.Editors
             }
         }
 
-
-        // TODO: This should be on the CurrentUserController?
-        [WebApi.UmbracoAuthorize]
-        [ValidateAngularAntiForgeryToken]
-        public async Task<Dictionary<string, string>> GetCurrentUserLinkedLogins()
-        {
-            var identityUser = await UserManager.FindByIdAsync(Security.GetUserId().ResultOr(0).ToString());
-            return identityUser.Logins.ToDictionary(x => x.LoginProvider, x => x.ProviderKey);
-        }
-
         /// <summary>
         /// Used to retrieve the 2FA providers for code submission
         /// </summary>

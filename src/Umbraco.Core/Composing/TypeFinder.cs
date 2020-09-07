@@ -156,6 +156,7 @@ namespace Umbraco.Core.Composing
             "MiniProfiler.",
             "Owin,",
             "SQLite",
+            "ReSharperTestRunner32" // used by resharper testrunner
         };
 
         /// <summary>

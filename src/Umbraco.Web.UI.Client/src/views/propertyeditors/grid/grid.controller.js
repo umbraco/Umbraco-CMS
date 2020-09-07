@@ -405,14 +405,16 @@ angular.module("umbraco")
 
                 eventsService.emit("grid.rowAdded", { scope: $scope, element: $element, row: row });
 
-                // TODO: find a nicer way to do this without relying on setTimeout
-                setTimeout(function () {
-                    var newRowEl = $element.find("[data-rowid='" + row.$uniqueId + "']");
+                if (!isInit) {
+                    // TODO: find a nicer way to do this without relying on setTimeout
+                    setTimeout(function () {
+                        var newRowEl = $element.find("[data-rowid='" + row.$uniqueId + "']");
 
-                    if (newRowEl !== null) {
-                        newRowEl.focus();
-                    }
-                }, 0);
+                        if (newRowEl !== null) {
+                            newRowEl.focus();
+                        }
+                    }, 0);
+                }
 
             };
 
@@ -953,7 +955,7 @@ angular.module("umbraco")
                 $scope.availableEditors = response.data;
 
                 //Localize the grid editor names
-                angular.forEach($scope.availableEditors, function (value, key) {
+                $scope.availableEditors.forEach(function (value) {
                     //If no translation is provided, keep using the editor name from the manifest
                     localizationService.localize("grid_" + value.alias, undefined, value.name).then(function (v) {
                         value.name = v;

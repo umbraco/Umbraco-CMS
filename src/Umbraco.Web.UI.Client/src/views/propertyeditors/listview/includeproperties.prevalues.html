@@ -1,10 +1,12 @@
 ﻿<div class="umb-property-editor" ng-controller="Umbraco.PrevalueEditors.IncludePropertiesListViewController">
     <div class="control-group">
-
         <select ng-model="selectedField" ng-change="changeField()" val-highlight="{{hasError}}">
-            <option ng-repeat="field in systemFields" value="_system_{{field.value}}" ng-bind="field.name"></option>
-            <option class="select-dash" disabled="disabled">----</option>
-            <option ng-repeat="alias in propertyAliases" value="{{alias}}" ng-bind="alias"></option>
+            <optgroup label="System Fields">
+                <option ng-repeat="field in systemFields" value="_system_{{field.value}}" ng-bind="field.name"></option>
+            </optgroup>
+            <optgroup label="Custom Fields">
+                <option ng-repeat="alias in propertyAliases" value="{{alias}}" ng-bind="alias"></option>
+            </optgroup>
         </select>
         <button type="button" class="btn" ng-click="addField()">
             <localize key="general_add">Add</localize>
@@ -25,12 +27,11 @@
             <tbody ui-sortable="sortableOptions" ng-model="model.value">
                 <tr ng-repeat="val in model.value">
                     <td>
-                        <i class="icon icon-navigation handle"></i>
+                        <i class="icon icon-navigation handle" aria-hidden="true" aria-label="Sort"></i>
                     </td>
                     <td>
                        <div class="list-view-layout__name flex-column content-start">
-                            <span class="list-view-layout__name-text" ng-if="!val.isSystem" ng-bind="val.alias"></span>
-                            <span class="list-view-layout__name-text" ng-if="val.isSystem == 1" ng-bind="val.alias"></span>
+                            <span class="list-view-layout__name-text" ng-bind="val.alias"></span>
                             <span class="list-view-layout__system" ng-show="val.isSystem == 1">(system field)</span>
                        </div>
                     </td>
@@ -52,7 +53,9 @@
                         </ng-form>
                     </td>
                     <td>
-                        <button type="button" class="btn-icon icon-trash" ng-click="removeField(val)" aria-label="Remove"></button>
+                        <button type="button" class="btn-icon" ng-click="removeField(val)" aria-label="Remove">
+                            <i class="icon-trash" aria-hidden="true"></i>
+                        </button>
                     </td>
                 </tr>
             </tbody>

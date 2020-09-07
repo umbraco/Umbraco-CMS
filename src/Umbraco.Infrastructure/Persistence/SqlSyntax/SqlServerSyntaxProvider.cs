@@ -32,6 +32,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             V2014 = 6,
             V2016 = 7,
             V2017 = 8,
+            V2019 = 9,
             Other = 99
         }
 
@@ -40,7 +41,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             Unknown = 0,
             Desktop = 1,
             Standard = 2,
-            Enterprise = 3,
+            Enterprise = 3,// Also developer edition
             Express = 4,
             Azure = 5
         }
@@ -81,6 +82,8 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             {
                 case "??":
                     return VersionName.Invalid;
+                case "15":
+                    return VersionName.V2019;
                 case "14":
                     return VersionName.V2017;
                 case "13":

@@ -456,6 +456,7 @@
                 blockPickerModel.clipboardItems.push(
                     {
                         type: "elementType",
+                        date: entry.date,
                         pasteData: entry.data,
                         blockConfigModel: modelObject.getScaffoldFromAlias(entry.alias),
                         elementTypeModel: {
@@ -471,6 +472,7 @@
                 blockPickerModel.clipboardItems.push(
                     {
                         type: "elementTypeArray",
+                        date: entry.date,
                         pasteData: entry.data,
                         blockConfigModel: {}, // no block configuration for paste items of elementTypeArray.
                         elementTypeModel: {
@@ -479,6 +481,10 @@
                         }
                     }
                 );
+            });
+
+            blockPickerModel.clipboardItems.sort( (a, b) => {
+                return b.date - a.date
             });
 
             // open block picker overlay

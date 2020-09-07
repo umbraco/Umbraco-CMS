@@ -8,11 +8,12 @@ namespace Umbraco.Core
     /// <summary>
     /// Provides a simple implementation of <see cref="IMainDom"/>.
     /// </summary>
-    public class SimpleMainDom : IMainDom
+    public class SimpleMainDom : IMainDom, IDisposable
     {
         private readonly object _locko = new object();
         private readonly List<KeyValuePair<int, Action>> _callbacks = new List<KeyValuePair<int, Action>>();
         private bool _isStopping;
+        private bool _disposedValue;
 
         /// <inheritdoc />
         public bool IsMainDom { get; private set; } = true;
@@ -58,6 +59,25 @@ namespace Umbraco.Core
                 // in any case...
                 IsMainDom = false;
             }
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposedValue)
+            {
+                if (disposing)
+                {
+                    Stop();
+                }
+                _disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
     }
 }

@@ -19,9 +19,8 @@ namespace Umbraco.Examine
     /// <summary>
     /// An indexer for Umbraco content and media
     /// </summary>
-    public class UmbracoContentIndex : UmbracoExamineIndex, IUmbracoContentIndex
+    public class UmbracoContentIndex : UmbracoExamineIndex, IUmbracoContentIndex, IDisposable
     {
-
         protected ILocalizationService LanguageService { get; }
 
         #region Constructors
@@ -86,7 +85,7 @@ namespace Umbraco.Examine
                         || !validator.ValidateProtectedContent(path, v.Category))
                     ? 0
                     : 1;
-            });
+            }).ToList();
 
             var hasDeletes = false;
             var hasUpdates = false;
@@ -105,7 +104,7 @@ namespace Umbraco.Examine
                 {
                     hasUpdates = true;
                     //these are the valid ones, so just index them all at once
-                    base.PerformIndexItems(group, onComplete);
+                    base.PerformIndexItems(group.ToList(), onComplete);
                 }
             }
 

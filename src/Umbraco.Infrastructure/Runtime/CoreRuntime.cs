@@ -5,6 +5,7 @@ using System.IO;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Events;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
@@ -23,14 +24,14 @@ namespace Umbraco.Core.Runtime
     {
         private ComponentCollection _components;
         private IFactory _factory;
-        private readonly RuntimeState _state;
+        // runtime state, this instance will get replaced again once the essential services are available to run the check
+        private RuntimeState _state = RuntimeState.Booting();
         private readonly IUmbracoBootPermissionChecker _umbracoBootPermissionChecker;
-        private readonly IRequestCache _requestCache;
         private readonly IGlobalSettings _globalSettings;
         private readonly IConnectionStrings _connectionStrings;
 
         public CoreRuntime(
-            Configs configs,
+            Configs configs,            
             IUmbracoVersion umbracoVersion,
             IIOHelper ioHelper,
             ILogger logger,
@@ -41,10 +42,11 @@ namespace Umbraco.Core.Runtime
             IDbProviderFactoryCreator dbProviderFactoryCreator,
             IMainDom mainDom,
             ITypeFinder typeFinder,
-            IRequestCache requestCache)
+            AppCaches appCaches)
         {
             IOHelper = ioHelper;
             Configs = configs;
+            AppCaches = appCaches;
             UmbracoVersion = umbracoVersion ;
             Profiler = profiler;
             HostingEnvironment = hostingEnvironment;
@@ -52,8 +54,7 @@ namespace Umbraco.Core.Runtime
             DbProviderFactoryCreator = dbProviderFactoryCreator;
 
             _umbracoBootPermissionChecker = umbracoBootPermissionChecker;
-            _requestCache = requestCache;
-
+            
             Logger = logger;
             MainDom = mainDom;
             TypeFinder = typeFinder;
@@ -61,14 +62,6 @@ namespace Umbraco.Core.Runtime
             _globalSettings = Configs.Global();
             _connectionStrings = configs.ConnectionStrings();
 
-
-            // runtime state
-            // beware! must use '() => _factory.GetInstance<T>()' and NOT '_factory.GetInstance<T>'
-            // as the second one captures the current value (null) and therefore fails
-           _state = new RuntimeState(Configs.Global(), UmbracoVersion)
-            {
-                Level = RuntimeLevel.Boot
-            };
         }
 
         /// <summary>
@@ -88,7 +81,7 @@ namespace Umbraco.Core.Runtime
         /// <summary>
         /// Gets the profiling logger.
         /// </summary>
-        protected IProfilingLogger ProfilingLogger { get; private set; }
+        public IProfilingLogger ProfilingLogger { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ITypeFinder"/>
@@ -100,8 +93,9 @@ namespace Umbraco.Core.Runtime
         /// </summary>
         protected IIOHelper IOHelper { get; }
         protected IHostingEnvironment HostingEnvironment { get; }
-        protected Configs Configs { get; }
-        protected IUmbracoVersion UmbracoVersion { get; }
+        public Configs Configs { get; }
+        public AppCaches AppCaches { get; }
+        public IUmbracoVersion UmbracoVersion { get; }
 
         /// <inheritdoc />
         public IRuntimeState State => _state;
@@ -164,31 +158,33 @@ namespace Umbraco.Core.Runtime
 
             try
             {
-
-
                 // run handlers
-                RuntimeOptions.DoRuntimeBoot(ProfilingLogger);
-
-                // application caches
-                var appCaches = GetAppCaches();
+                OnRuntimeBoot();
 
                 // database factory
-                var databaseFactory = GetDatabaseFactory();
+                var databaseFactory = CreateDatabaseFactory();
 
                 // type finder/loader
-                var typeLoader = new TypeLoader(TypeFinder, appCaches.RuntimeCache, new DirectoryInfo(HostingEnvironment.LocalTempPath), ProfilingLogger);
+                var typeLoader = new TypeLoader(TypeFinder, AppCaches.RuntimeCache, new DirectoryInfo(HostingEnvironment.LocalTempPath), ProfilingLogger);
+
+                // re-create the state object with the essential services
+                _state = new RuntimeState(Configs.Global(), UmbracoVersion, databaseFactory, Logger);
 
                 // create the composition
-                composition = new Composition(register, typeLoader, ProfilingLogger, _state, Configs, IOHelper, appCaches);
-                composition.RegisterEssentials(Logger, Profiler, ProfilingLogger, MainDom, appCaches, databaseFactory, typeLoader, _state, TypeFinder, IOHelper, UmbracoVersion, DbProviderFactoryCreator, HostingEnvironment, BackOfficeInfo);
+                composition = new Composition(register, typeLoader, ProfilingLogger, _state, Configs, IOHelper, AppCaches);
+
+                composition.RegisterEssentials(Logger, Profiler, ProfilingLogger, MainDom, AppCaches, databaseFactory, typeLoader, _state, TypeFinder, IOHelper, UmbracoVersion, DbProviderFactoryCreator, HostingEnvironment, BackOfficeInfo);
 
                 // register ourselves (TODO: Should we put this in RegisterEssentials?)
                 composition.Register<IRuntime>(_ => this, Lifetime.Singleton);
 
+                // run handlers
+                OnRuntimeEssentials(composition, AppCaches, typeLoader, databaseFactory);
+
                 try
                 {
                     // determine our runtime level
-                    DetermineRuntimeLevel(databaseFactory, ProfilingLogger);
+                    DetermineRuntimeLevel(databaseFactory);
                 }
                 finally
                 {
@@ -243,9 +239,6 @@ namespace Umbraco.Core.Runtime
             // throws if not full-trust
             _umbracoBootPermissionChecker.ThrowIfNotPermissions();
 
-            // run handlers
-            RuntimeOptions.DoRuntimeEssentials(_factory);
-
             var hostingEnvironmentLifetime = _factory.TryGetInstance<IApplicationShutdownRegistry>();
             if (hostingEnvironmentLifetime == null)
                 throw new InvalidOperationException($"An instance of {typeof(IApplicationShutdownRegistry)} could not be resolved from the container, ensure that one if registered in your runtime before calling {nameof(IRuntime)}.{nameof(Start)}");
@@ -256,7 +249,6 @@ namespace Umbraco.Core.Runtime
             // create & initialize the components
             _components = _factory.GetInstance<ComponentCollection>();
             _components.Initialize();
-
 
             // now (and only now) is the time to switch over to perWebRequest scopes.
             // up until that point we may not have a request, and scoped services would
@@ -313,30 +305,28 @@ namespace Umbraco.Core.Runtime
             }
         }
 
-        // internal for tests
-        internal void DetermineRuntimeLevel(IUmbracoDatabaseFactory databaseFactory, IProfilingLogger profilingLogger)
+        private void DetermineRuntimeLevel(IUmbracoDatabaseFactory databaseFactory)
         {
-            using (var timer = profilingLogger.DebugDuration<CoreRuntime>("Determining runtime level.", "Determined."))
+            using var timer = ProfilingLogger.DebugDuration<CoreRuntime>("Determining runtime level.", "Determined.");
+
+            try
             {
-                try
-                {
-                    _state.DetermineRuntimeLevel(databaseFactory, profilingLogger);
+                _state.DetermineRuntimeLevel();
 
-                    profilingLogger.Debug<CoreRuntime>("Runtime level: {RuntimeLevel} - {RuntimeLevelReason}", _state.Level, _state.Reason);
+                ProfilingLogger.Debug<CoreRuntime>("Runtime level: {RuntimeLevel} - {RuntimeLevelReason}", _state.Level, _state.Reason);
 
-                    if (_state.Level == RuntimeLevel.Upgrade)
-                    {
-                        profilingLogger.Debug<CoreRuntime>("Configure database factory for upgrades.");
-                        databaseFactory.ConfigureForUpgrade();
-                    }
-                }
-                catch
+                if (_state.Level == RuntimeLevel.Upgrade)
                 {
-                    _state.Level = RuntimeLevel.BootFailed;
-                    _state.Reason = RuntimeLevelReason.BootFailedOnException;
-                    timer?.Fail();
-                    throw;
+                    ProfilingLogger.Debug<CoreRuntime>("Configure database factory for upgrades.");
+                    databaseFactory.ConfigureForUpgrade();
                 }
+            }
+            catch
+            {
+                _state.Level = RuntimeLevel.BootFailed;
+                _state.Reason = RuntimeLevelReason.BootFailedOnException;
+                timer?.Fail();
+                throw;
             }
         }
 
@@ -374,21 +364,6 @@ namespace Umbraco.Core.Runtime
             => typeLoader.GetTypes<IComposer>();
 
         /// <summary>
-        /// Gets the application caches.
-        /// </summary>
-        protected virtual AppCaches GetAppCaches()
-        {
-            // need the deep clone runtime cache provider to ensure entities are cached properly, ie
-            // are cloned in and cloned out - no request-based cache here since no web-based context,
-            // is overridden by the web runtime
-
-            return new AppCaches(
-                new DeepCloneAppCache(new ObjectCacheAppCache()),
-                _requestCache,
-                new IsolatedCaches(type => new DeepCloneAppCache(new ObjectCacheAppCache())));
-        }
-
-        /// <summary>
         /// Returns the application path of the site/solution
         /// </summary>
         /// <returns></returns>
@@ -400,12 +375,31 @@ namespace Umbraco.Core.Runtime
             => null;
 
         /// <summary>
-        /// Gets the database factory.
+        /// Creates the database factory.
         /// </summary>
         /// <remarks>This is strictly internal, for tests only.</remarks>
-        protected internal virtual IUmbracoDatabaseFactory GetDatabaseFactory()
+        protected internal virtual IUmbracoDatabaseFactory CreateDatabaseFactory()
             => new UmbracoDatabaseFactory(Logger, _globalSettings, _connectionStrings, new Lazy<IMapperCollection>(() => _factory.GetInstance<IMapperCollection>()), DbProviderFactoryCreator);
 
+
+        #endregion
+
+        #region Events
+
+        protected void OnRuntimeBoot()
+        {
+            RuntimeOptions.DoRuntimeBoot(ProfilingLogger);
+            RuntimeBooting?.Invoke(this, ProfilingLogger);
+        }
+
+        protected void OnRuntimeEssentials(Composition composition, AppCaches appCaches, TypeLoader typeLoader, IUmbracoDatabaseFactory databaseFactory)
+        {
+            RuntimeOptions.DoRuntimeEssentials(composition, appCaches, typeLoader, databaseFactory);
+            RuntimeEssentials?.Invoke(this, new RuntimeEssentialsEventArgs(composition, appCaches, typeLoader, databaseFactory));
+        }
+
+        public event TypedEventHandler<CoreRuntime, IProfilingLogger> RuntimeBooting;
+        public event TypedEventHandler<CoreRuntime, RuntimeEssentialsEventArgs> RuntimeEssentials;
 
         #endregion
 

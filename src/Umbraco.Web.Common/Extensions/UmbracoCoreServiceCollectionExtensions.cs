@@ -146,12 +146,17 @@ namespace Umbraco.Extensions
 
             IHttpContextAccessor httpContextAccessor = new HttpContextAccessor();
             services.AddSingleton<IHttpContextAccessor>(httpContextAccessor);
+
             var requestCache = new GenericDictionaryRequestAppCache(() => httpContextAccessor.HttpContext?.Items);
+            var appCaches = new AppCaches(
+                new DeepCloneAppCache(new ObjectCacheAppCache()),
+                requestCache,
+                new IsolatedCaches(type => new DeepCloneAppCache(new ObjectCacheAppCache())));
 
             services.AddUmbracoCore(webHostEnvironment,
                 umbContainer,
                 Assembly.GetEntryAssembly(),
-                requestCache,
+                appCaches,
                 loggingConfig,
                 out factory);
 
@@ -165,7 +170,7 @@ namespace Umbraco.Extensions
         /// <param name="webHostEnvironment"></param>
         /// <param name="umbContainer"></param>
         /// <param name="entryAssembly"></param>
-        /// <param name="requestCache"></param>
+        /// <param name="appCaches"></param>
         /// <param name="httpContextAccessor"></param>
         /// <param name="loggingConfiguration"></param>
         /// <param name="factory"></param>
@@ -175,8 +180,34 @@ namespace Umbraco.Extensions
             IWebHostEnvironment webHostEnvironment,
             IRegister umbContainer,
             Assembly entryAssembly,
-            IRequestCache requestCache,
+            AppCaches appCaches,
             ILoggingConfiguration loggingConfiguration,
+            out IFactory factory)
+            => services.AddUmbracoCore(webHostEnvironment, umbContainer, entryAssembly, appCaches, loggingConfiguration, GetCoreRuntime, out factory);
+
+
+        /// <summary>
+        /// Adds the Umbraco Back Core requirements
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="webHostEnvironment"></param>
+        /// <param name="umbContainer"></param>
+        /// <param name="entryAssembly"></param>
+        /// <param name="appCaches"></param>
+        /// <param name="httpContextAccessor"></param>
+        /// <param name="loggingConfiguration"></param>
+        /// <param name="getRuntime">Delegate to create an <see cref="IRuntime"/></param>
+        /// <param name="factory"></param>
+        /// <returns></returns>
+        public static IServiceCollection AddUmbracoCore(
+            this IServiceCollection services,
+            IWebHostEnvironment webHostEnvironment,
+            IRegister umbContainer,
+            Assembly entryAssembly,
+            AppCaches appCaches,
+            ILoggingConfiguration loggingConfiguration,
+            // TODO: Yep that's extremely ugly
+            Func<Configs, IUmbracoVersion, IIOHelper, Core.Logging.ILogger, IProfiler, Core.Hosting.IHostingEnvironment, IBackOfficeInfo, ITypeFinder, AppCaches, IDbProviderFactoryCreator, IRuntime> getRuntime,
             out IFactory factory)
         {
             if (services is null) throw new ArgumentNullException(nameof(services));
@@ -216,8 +247,8 @@ namespace Umbraco.Extensions
             var umbracoVersion = new UmbracoVersion(globalSettings);
             var typeFinder = CreateTypeFinder(logger, profiler, webHostEnvironment, entryAssembly, configs.TypeFinder());
 
-            var coreRuntime = GetCoreRuntime(
-                configs,
+            var runtime = getRuntime(
+                configs,                
                 umbracoVersion,
                 ioHelper,
                 logger,
@@ -225,10 +256,10 @@ namespace Umbraco.Extensions
                 hostingEnvironment,
                 backOfficeInfo,
                 typeFinder,
-                requestCache,
+                appCaches,
                 dbProviderFactoryCreator);
 
-            factory = coreRuntime.Configure(container);
+            factory = runtime.Configure(container);
 
             return services;
         }
@@ -244,7 +275,7 @@ namespace Umbraco.Extensions
         private static IRuntime GetCoreRuntime(
             Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, Core.Logging.ILogger logger,
             IProfiler profiler, Core.Hosting.IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo,
-            ITypeFinder typeFinder, IRequestCache requestCache, IDbProviderFactoryCreator dbProviderFactoryCreator)
+            ITypeFinder typeFinder, AppCaches appCaches, IDbProviderFactoryCreator dbProviderFactoryCreator)
         {
 
             // Determine if we should use the sql main dom or the default
@@ -260,7 +291,7 @@ namespace Umbraco.Extensions
             var mainDom = new MainDom(logger, mainDomLock);
 
             var coreRuntime = new CoreRuntime(
-                configs,
+                configs,                
                 umbracoVersion,
                 ioHelper,
                 logger,
@@ -271,7 +302,7 @@ namespace Umbraco.Extensions
                 dbProviderFactoryCreator,
                 mainDom,
                 typeFinder,
-                requestCache);
+                appCaches);
 
             return coreRuntime;
         }
@@ -294,7 +325,7 @@ namespace Umbraco.Extensions
             var globalSettings = configs.Global();
 
             hostingEnvironment = new AspNetCoreHostingEnvironment(hostingSettings, webHostEnvironment);
-            ioHelper = new IOHelper(hostingEnvironment, globalSettings);
+            ioHelper = new IOHelper(hostingEnvironment);
             logger = AddLogger(services, hostingEnvironment, loggingConfiguration);
 
             backOfficeInfo = new AspNetCoreBackOfficeInfo(globalSettings);

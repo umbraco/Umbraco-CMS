@@ -24,6 +24,12 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Folder Include="Views" />
+      <Folder Include="wwwroot\Media" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="wwwroot\Umbraco\**" />
         <Compile Remove="App_Data\**" />
     </ItemGroup>
 

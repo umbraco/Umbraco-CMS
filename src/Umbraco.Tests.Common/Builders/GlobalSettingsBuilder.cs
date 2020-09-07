@@ -220,8 +220,12 @@ namespace Umbraco.Tests.Common.Builders
 
         private class TestGlobalSettings : IGlobalSettings
         {
+            private string _iconsPath;
             public string ReservedUrls { get; set; }
             public string ReservedPaths { get; set; }
+
+            public string IconsPath{ get; set; }
+
             public string Path { get; set; }
             public string ConfigurationStatus { get; set; }
             public int TimeOutInMinutes { get; set; }

@@ -34,6 +34,7 @@ using Umbraco.Core.Hosting;
 using Umbraco.Core.Media;
 using Umbraco.Extensions;
 using Umbraco.Web.BackOffice.Filters;
+using Umbraco.Web.BackOffice.ModelBinders;
 using Umbraco.Web.BackOffice.Security;
 using Umbraco.Web.Common.ActionResults;
 using Umbraco.Web.Common.Attributes;
@@ -232,6 +233,33 @@ namespace Umbraco.Web.BackOffice.Controllers
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
             var result = _umbracoMapper.Map<IUser, UserDisplay>(user);
+            return result;
+        }
+
+        /// <summary>
+        /// Get users by integer ids
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(OutgoingEditorModelEventAttribute))]
+        [AdminUsersAuthorize]
+        public IEnumerable<UserDisplay> GetByIds([FromJsonPath]int[] ids)
+        {
+            if (ids == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            if (ids.Length == 0)
+                return Enumerable.Empty<UserDisplay>();
+
+            var users = _userService.GetUsersById(ids);
+            if (users == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            var result = _umbracoMapper.MapEnumerable<IUser, UserDisplay>(users);
             return result;
         }
 
@@ -711,11 +739,16 @@ namespace Umbraco.Web.BackOffice.Controllers
         public async Task<IActionResult> PostUnlockUsers([FromQuery]int[] userIds)
         {
             if (userIds.Length <= 0) return Ok();
+            var notFound = new List<int>();
 
             foreach (var u in userIds)
             {
                 var user = await _backOfficeUserManager.FindByIdAsync(u.ToString());
-                if (user == null) throw new InvalidOperationException();
+                if (user == null)
+                {
+                    notFound.Add(u);
+                    continue;
+                }
 
                 var unlockResult = await _backOfficeUserManager.SetLockoutEndDateAsync(user, DateTimeOffset.Now);
                 if (unlockResult.Succeeded == false)
@@ -732,7 +765,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
 
             return new UmbracoNotificationSuccessResponse(
-                _localizedTextService.Localize("speechBubbles/unlockUsersSuccess", new[] {userIds.Length.ToString()}));
+                _localizedTextService.Localize("speechBubbles/unlockUsersSuccess", new[] {(userIds.Length - notFound.Count).ToString()}));
         }
 
         [AdminUsersAuthorize("userIds")]

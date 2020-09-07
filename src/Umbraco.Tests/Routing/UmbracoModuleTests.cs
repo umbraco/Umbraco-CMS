@@ -32,7 +32,7 @@ namespace Umbraco.Tests.Routing
             //create the module
             var logger = Mock.Of<ILogger>();
             var globalSettings = TestObjects.GetGlobalSettings();
-            var runtime = new RuntimeState(globalSettings, UmbracoVersion);
+            var runtime = Umbraco.Core.RuntimeState.Booting();
 
             _module = new UmbracoInjectedModule
             (

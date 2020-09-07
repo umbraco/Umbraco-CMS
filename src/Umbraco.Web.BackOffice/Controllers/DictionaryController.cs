@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net;
 using System.Linq;
 using System.Net.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
@@ -129,7 +129,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
         }
 
-        /// <summary>
+     /// <summary>
         /// Gets a dictionary item by id
         /// </summary>
         /// <param name="id">
@@ -141,10 +141,58 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <exception cref="HttpResponseException">
         ///  Returns a not found response when dictionary item does not exist
         /// </exception>
+     [DetermineAmbiguousActionByPassingParameters]
         public ActionResult<DictionaryDisplay> GetById(int id)
         {
             var dictionary = _localizationService.GetDictionaryItemById(id);
+            if (dictionary == null)
+                return NotFound();
 
+            return _umbracoMapper.Map<IDictionaryItem, DictionaryDisplay>(dictionary);
+        }
+
+        /// <summary>
+        /// Gets a dictionary item by guid
+        /// </summary>
+        /// <param name="id">
+        /// The id.
+        /// </param>
+        /// <returns>
+        /// The <see cref="DictionaryDisplay"/>.
+        /// </returns>
+        /// <exception cref="HttpResponseException">
+        ///  Returns a not found response when dictionary item does not exist
+        /// </exception>
+        [DetermineAmbiguousActionByPassingParameters]
+        public ActionResult<DictionaryDisplay> GetById(Guid id)
+        {
+            var dictionary = _localizationService.GetDictionaryItemById(id);
+            if (dictionary == null)
+                return NotFound();
+
+            return _umbracoMapper.Map<IDictionaryItem, DictionaryDisplay>(dictionary);
+        }
+
+        /// <summary>
+        /// Gets a dictionary item by udi
+        /// </summary>
+        /// <param name="id">
+        /// The id.
+        /// </param>
+        /// <returns>
+        /// The <see cref="DictionaryDisplay"/>.
+        /// </returns>
+        /// <exception cref="HttpResponseException">
+        ///  Returns a not found response when dictionary item does not exist
+        /// </exception>
+        [DetermineAmbiguousActionByPassingParameters]
+        public ActionResult<DictionaryDisplay> GetById(Udi id)
+        {
+            var guidUdi = id as GuidUdi;
+            if (guidUdi == null)
+                return NotFound();
+
+            var dictionary = _localizationService.GetDictionaryItemById(guidUdi.Guid);
             if (dictionary == null)
                 return NotFound();
 
@@ -222,18 +270,29 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </returns>
         public IEnumerable<DictionaryOverviewDisplay> GetList()
         {
-            var list = new List<DictionaryOverviewDisplay>();
+            var items = _localizationService.GetDictionaryItemDescendants(null).ToArray();
+            var list = new List<DictionaryOverviewDisplay>(items.Length);
 
-            const int level = 0;
-
-            foreach (var dictionaryItem in _localizationService.GetRootDictionaryItems().OrderBy(ItemSort()))
+            // recursive method to build a tree structure from the flat structure returned above
+            void BuildTree(int level = 0, Guid? parentId = null)
             {
-                var item = _umbracoMapper.Map<IDictionaryItem, DictionaryOverviewDisplay>(dictionaryItem);
-                item.Level = 0;
-                list.Add(item);
+                var children = items.Where(t => t.ParentId == parentId).ToArray();
+                if(children.Any() == false)
+                {
+                    return;
+                }
 
-                GetChildItemsForList(dictionaryItem, level + 1, list);
+                foreach(var child in children.OrderBy(ItemSort()))
+                {
+                    var display = _umbracoMapper.Map<IDictionaryItem, DictionaryOverviewDisplay>(child);
+                    display.Level = level;
+                    list.Add(display);
+
+                    BuildTree(level + 1, child.Key);
+                }
             }
+
+            BuildTree();
 
             return list;
         }

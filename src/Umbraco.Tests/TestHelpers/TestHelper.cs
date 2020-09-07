@@ -42,6 +42,8 @@ namespace Umbraco.Tests.TestHelpers
     public static class TestHelper
     {
         private static readonly TestHelperInternal _testHelperInternal = new TestHelperInternal();
+        private static IEmailSender _emailSender;
+
         private class TestHelperInternal : TestHelperBase
         {
             public TestHelperInternal() : base(typeof(TestHelperInternal).Assembly)
@@ -76,8 +78,6 @@ namespace Umbraco.Tests.TestHelpers
 
         public static Configs GetConfigs() => _testHelperInternal.GetConfigs();
 
-        public static IRuntimeState GetRuntimeState() => _testHelperInternal.GetRuntimeState();
-
         public static IBackOfficeInfo GetBackOfficeInfo() => _testHelperInternal.GetBackOfficeInfo();
 
         public static IConfigsFactory GetConfigsFactory() => _testHelperInternal.GetConfigsFactory();
@@ -102,6 +102,8 @@ namespace Umbraco.Tests.TestHelpers
         public static UriUtility UriUtility => _testHelperInternal.UriUtility;
 
         public static IWebRoutingSettings WebRoutingSettings => _testHelperInternal.WebRoutingSettings;
+
+        public static IEmailSender EmailSender { get; } = new EmailSender(SettingsForTests.GenerateMockGlobalSettings());
 
 
         /// <summary>

@@ -435,11 +435,16 @@ function mediaHelper(umbRequestHelper, $http, $log) {
                             imagePath,
                             animationProcessMode: options.animationProcessMode,
                             cacheBusterValue: options.cacheBusterValue,
-                            focalPoint: options.focalPoint,
+                            focalPointLeft: options.focalPoint.left,
+                            focalPointTop: options.focalPoint.top,
                             height: options.height,
                             mode: options.mode,
                             upscale: options.upscale || false,
-                            width: options.width
+                            width: options.width,
+                            cropX1: options.crop.x1,
+                            cropX2: options.crop.x2,
+                            cropY1: options.crop.y1,
+                            cropY2: options.crop.y2
                         })),
                 "Failed to retrieve processed image URL for image: " + imagePath);
         }

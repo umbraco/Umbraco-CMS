@@ -81,7 +81,7 @@ namespace Umbraco.Web.Common.Install
             }
 
             // gen the install base url
-            ViewData.SetInstallApiBaseUrl(Url.GetInstallerApiUrl());
+            ViewData.SetInstallApiBaseUrl(_linkGenerator.GetInstallerApiUrl());
 
             // get the base umbraco folder
             var baseFolder = _hostingEnvironment.ToAbsolute(_globalSettings.UmbracoPath);

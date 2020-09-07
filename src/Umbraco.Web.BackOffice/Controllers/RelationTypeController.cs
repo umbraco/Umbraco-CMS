@@ -49,6 +49,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="id">The relation type ID.</param>
         /// <returns>Returns the <see cref="RelationTypeDisplay"/>.</returns>
+        [DetermineAmbiguousActionByPassingParameters]
         public RelationTypeDisplay GetById(int id)
         {
             var relationType = _relationService.GetRelationTypeById(id);
@@ -61,6 +62,42 @@ namespace Umbraco.Web.BackOffice.Controllers
             var display = _umbracoMapper.Map<IRelationType, RelationTypeDisplay>(relationType);
 
             return display;
+        }
+
+        /// <summary>
+        /// Gets a relation type by guid
+        /// </summary>
+        /// <param name="id">The relation type ID.</param>
+        /// <returns>Returns the <see cref="RelationTypeDisplay"/>.</returns>
+        [DetermineAmbiguousActionByPassingParameters]
+        public RelationTypeDisplay GetById(Guid id)
+        {
+            var relationType = _relationService.GetRelationTypeById(id);
+            if (relationType == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+            return _umbracoMapper.Map<IRelationType, RelationTypeDisplay>(relationType);
+        }
+
+        /// <summary>
+        /// Gets a relation type by udi
+        /// </summary>
+        /// <param name="id">The relation type ID.</param>
+        /// <returns>Returns the <see cref="RelationTypeDisplay"/>.</returns>
+        [DetermineAmbiguousActionByPassingParameters]
+        public RelationTypeDisplay GetById(Udi id)
+        {
+            var guidUdi = id as GuidUdi;
+            if (guidUdi == null)
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            var relationType = _relationService.GetRelationTypeById(guidUdi.Guid);
+            if (relationType == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+            return _umbracoMapper.Map<IRelationType, RelationTypeDisplay>(relationType);
         }
 
         public PagedResult<RelationDisplay> GetPagedResults(int id, int pageNumber = 1, int pageSize = 100)

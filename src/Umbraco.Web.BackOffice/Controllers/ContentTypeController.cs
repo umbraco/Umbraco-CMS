@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Net.Mime;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,30 +11,25 @@ using System.Xml.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Core;
-using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Editors;
 using Umbraco.Core.Packaging;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
 using Umbraco.Core.Mapping;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Editors;
-using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 using ContentType = Umbraco.Core.Models.ContentType;
 
@@ -140,6 +133,12 @@ namespace Umbraco.Web.BackOffice.Controllers
             return _contentTypeService.HasContentNodes(id);
         }
 
+        /// <summary>
+        /// Gets the document type a given id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [DetermineAmbiguousActionByPassingParameters]
         public DocumentTypeDisplay GetById(int id)
         {
             var ct = _contentTypeService.Get(id);
@@ -149,6 +148,46 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
 
             var dto = _umbracoMapper.Map<IContentType, DocumentTypeDisplay>(ct);
+            return dto;
+        }
+
+        /// <summary>
+        /// Gets the document type a given guid
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [DetermineAmbiguousActionByPassingParameters]
+        public DocumentTypeDisplay GetById(Guid id)
+        {
+            var contentType = _contentTypeService.Get(id);
+            if (contentType == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            var dto = _umbracoMapper.Map<IContentType, DocumentTypeDisplay>(contentType);
+            return dto;
+        }
+
+        /// <summary>
+        /// Gets the document type a given udi
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [DetermineAmbiguousActionByPassingParameters]
+        public DocumentTypeDisplay GetById(Udi id)
+        {
+            var guidUdi = id as GuidUdi;
+            if (guidUdi == null)
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            var contentType = _contentTypeService.Get(guidUdi.Guid);
+            if (contentType == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            var dto = _umbracoMapper.Map<IContentType, DocumentTypeDisplay>(contentType);
             return dto;
         }
 
