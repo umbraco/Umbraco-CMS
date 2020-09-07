@@ -18,6 +18,7 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.ModelsBuilder.Embedded.Building;
 using File = System.IO.File;
 using Umbraco.Core.Composing;
+using System.Runtime.Loader;
 
 namespace Umbraco.ModelsBuilder.Embedded
 {
@@ -32,7 +33,7 @@ namespace Umbraco.ModelsBuilder.Embedded
         private int _ver, _skipver;
         private readonly int _debugLevel;
         private RoslynCompiler _roslynCompiler;
-        private UmbracoAssemblyLoadContext _currentAssemblyLoadContext;
+        private AssemblyLoadContext _currentAssemblyLoadContext;
         private WeakReference _oldAssemblyLoadContext;
         private readonly Lazy<UmbracoServices> _umbracoServices; // fixme: this is because of circular refs :(
         private UmbracoServices UmbracoServices => _umbracoServices.Value;
@@ -288,7 +289,7 @@ namespace Umbraco.ModelsBuilder.Embedded
             // Just load assembly and we're done
             if(_currentAssemblyLoadContext is null)
             {
-                _currentAssemblyLoadContext = new UmbracoAssemblyLoadContext();
+                _currentAssemblyLoadContext = AssemblyLoadContext.Default;
                 return _currentAssemblyLoadContext.LoadFromAssemblyPath(pathToAssembly);
             }
 
@@ -297,7 +298,11 @@ namespace Umbraco.ModelsBuilder.Embedded
             _currentAssemblyLoadContext.Unload();
             // We must create a new assembly load context
             // as long as theres a reference to the assembly load context we can't delete the assembly it loaded
-            _currentAssemblyLoadContext = new UmbracoAssemblyLoadContext();
+            _currentAssemblyLoadContext = AssemblyLoadContext.Default;
+            _currentAssemblyLoadContext.Resolving += (name, assembly) =>
+            {
+                return null;
+            };
             return _currentAssemblyLoadContext.LoadFromAssemblyPath(pathToAssembly);
         }
 
