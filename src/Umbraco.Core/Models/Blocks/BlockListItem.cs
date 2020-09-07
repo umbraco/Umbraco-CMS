@@ -25,8 +25,8 @@ namespace Umbraco.Core.Models.Blocks
         {
             ContentUdi = contentUdi ?? throw new ArgumentNullException(nameof(contentUdi));
             Content = content ?? throw new ArgumentNullException(nameof(content));
-            Settings = settings; // can be null
-            SettingsUdi = settingsUdi; // can be null
+            SettingsUdi = settingsUdi;
+            Settings = settings;
         }
 
         /// <summary>
@@ -87,6 +87,12 @@ namespace Umbraco.Core.Models.Blocks
             Content = content;
         }
 
+        /// <summary>
+        /// Gets the content.
+        /// </summary>
+        /// <value>
+        /// The content.
+        /// </value>
         public new T Content { get; }
     }
 
@@ -100,12 +106,25 @@ namespace Umbraco.Core.Models.Blocks
         where TContent : IPublishedElement
         where TSettings : IPublishedElement
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BlockListItem{TContent, TSettings}" /> class.
+        /// </summary>
+        /// <param name="contentUdi">The content udi.</param>
+        /// <param name="content">The content.</param>
+        /// <param name="settingsUdi">The settings udi.</param>
+        /// <param name="settings">The settings.</param>
         public BlockListItem(Udi contentUdi, TContent content, Udi settingsUdi, TSettings settings)
             : base(contentUdi, content, settingsUdi, settings)
         {
             Settings = settings;
         }
 
+        /// <summary>
+        /// Gets the settings.
+        /// </summary>
+        /// <value>
+        /// The settings.
+        /// </value>
         public new TSettings Settings { get; }
     }
 }
