@@ -63,10 +63,11 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
             composition.RegisterUnique<IPublishedModelFactory>(factory =>
             {
                 var typeLoader = factory.GetInstance<TypeLoader>();
+                var publishedValueFallback = factory.GetInstance<IPublishedValueFallback>();
                 var types = typeLoader
                     .GetTypes<PublishedElementModel>() // element models
                     .Concat(typeLoader.GetTypes<PublishedContentModel>()); // content models
-                return new PublishedModelFactory(types);
+                return new PublishedModelFactory(types, publishedValueFallback);
             });
         }
 

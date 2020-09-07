@@ -291,7 +291,6 @@ namespace Umbraco.ModelsBuilder.Embedded
                 GC.Collect();
                 GC.WaitForPendingFinalizers();
             }
-
             
             // We must create a new assembly load context
             // as long as theres a reference to the assembly load context we can't delete the assembly it loaded
