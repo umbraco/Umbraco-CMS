@@ -63,9 +63,9 @@ namespace Umbraco.Core.Composing
         public IRuntimeState RuntimeState { get; }
 
         // TODO: remove this once no longer required for functionality in Umbraco.Web.
-        /// <summary>	
-        /// Gets the configurations.	
-        /// </summary>	
+        /// <summary>
+        /// Gets the configurations.
+        /// </summary>
         public Configs Configs { get; }
 
         #endregion
