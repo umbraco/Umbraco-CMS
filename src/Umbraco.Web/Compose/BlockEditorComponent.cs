@@ -5,13 +5,8 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Events;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.Blocks;
 using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Services;
-using Umbraco.Core.Services.Implement;
-using Umbraco.Web.PropertyEditors;
 
 namespace Umbraco.Web.Compose
 {
@@ -29,15 +24,15 @@ namespace Umbraco.Web.Compose
         {
             _handler = new ComplexPropertyEditorContentEventHandler(
                 Constants.PropertyEditors.Aliases.BlockList,
-                CreateNestedContentKeys);
+                ReplaceBlockListUdis);
         }
 
         public void Terminate() => _handler?.Dispose();
 
-        private string CreateNestedContentKeys(string rawJson, bool onlyMissingKeys) => CreateNestedContentKeys(rawJson, onlyMissingKeys, null);
+        private string ReplaceBlockListUdis(string rawJson, bool onlyMissingUdis) => ReplaceBlockListUdis(rawJson, onlyMissingUdis, null);
 
         // internal for tests
-        internal string CreateNestedContentKeys(string rawJson, bool onlyMissingKeys, Func<Guid> createGuid = null, JsonSerializerSettings serializerSettings = null)
+        internal string ReplaceBlockListUdis(string rawJson, bool onlyMissingUdis, Func<Guid> createGuid = null, JsonSerializerSettings serializerSettings = null)
         {
             // used so we can test nicely
             if (createGuid == null)
@@ -49,7 +44,7 @@ namespace Umbraco.Web.Compose
             // Parse JSON
             var blockListValue = _converter.Deserialize(rawJson);
 
-            UpdateBlockListRecursively(blockListValue, onlyMissingKeys, createGuid, serializerSettings);
+            UpdateBlockListRecursively(blockListValue, onlyMissingUdis, createGuid, serializerSettings);
 
             return JsonConvert.SerializeObject(blockListValue.BlockValue, serializerSettings);
         }
@@ -100,16 +95,6 @@ namespace Umbraco.Web.Compose
                 foreach (var propertyAliasToBlockItemData in new Dictionary<string, object>(data.RawPropertyValues))
                 {
                     var asString = propertyAliasToBlockItemData.Value?.ToString();
-
-                    //// if this is a nested block list
-                    //if (propertyAliasToBlockItemData.Value.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.Aliases.BlockList)
-                    //{
-                    //    // recurse
-                    //    var blockListValue = _converter.Deserialize(asString);
-                    //    UpdateBlockListRecursively(blockListValue, onlyMissingKeys, createGuid);
-                    //    // set new value
-                    //    data.RawPropertyValues[propertyAliasToBlockItemData.Key] = JsonConvert.SerializeObject(blockListValue.BlockValue);
-                    //}
 
                     if (asString != null && asString.DetectIsJson())
                     {

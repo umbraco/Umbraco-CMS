@@ -57,7 +57,7 @@ namespace Umbraco.Tests.PropertyEditors
                 .Replace("48288c21a38a40ef82deb3eda90a58f6", guids[1].ToString("N"));
 
             var component = new BlockEditorComponent();
-            var result = component.CreateNestedContentKeys(json, false, guidFactory);
+            var result = component.ReplaceBlockListUdis(json, false, guidFactory);
 
             var expectedJson = JsonConvert.DeserializeObject(expected, _serializerSettings).ToString();
             var resultJson = JsonConvert.DeserializeObject(result, _serializerSettings).ToString();
@@ -82,6 +82,7 @@ namespace Umbraco.Tests.PropertyEditors
             {
                 ""contentUdi"": ""umb://element/4C44CE6B3A5C4F5F8F15E3DC24819A9E""
             },
+
             {
                 ""contentUdi"": ""umb://element/A062C06D6B0B44AC892B35D90309C7F8""
             }
@@ -145,7 +146,7 @@ namespace Umbraco.Tests.PropertyEditors
                 .Replace("A062C06D6B0B44AC892B35D90309C7F8", guids[3].ToString("N"));
 
             var component = new BlockEditorComponent();
-            var result = component.CreateNestedContentKeys(json, false, guidFactory);
+            var result = component.ReplaceBlockListUdis(json, false, guidFactory);
 
             var expectedJson = JsonConvert.DeserializeObject(expected, _serializerSettings).ToString();
             var resultJson = JsonConvert.DeserializeObject(result, _serializerSettings).ToString();
