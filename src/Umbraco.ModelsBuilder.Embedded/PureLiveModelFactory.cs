@@ -33,8 +33,7 @@ namespace Umbraco.ModelsBuilder.Embedded
         private int _ver, _skipver;
         private readonly int _debugLevel;
         private RoslynCompiler _roslynCompiler;
-        private AssemblyLoadContext _currentAssemblyLoadContext;
-        private WeakReference _oldAssemblyLoadContext;
+        private UmbracoAssemblyLoadContext _currentAssemblyLoadContext;
         private readonly Lazy<UmbracoServices> _umbracoServices; // fixme: this is because of circular refs :(
         private UmbracoServices UmbracoServices => _umbracoServices.Value;
 
@@ -285,25 +284,25 @@ namespace Umbraco.ModelsBuilder.Embedded
 
         private Assembly ReloadAssembly(string pathToAssembly)
         {
-            // No AssemblyLoadContext has been loaded yet
-            // Just load assembly and we're done
-            if(_currentAssemblyLoadContext is null)
+            // If there's a current AssemblyLoadContext, unload it before creating a new one. 
+            if(!(_currentAssemblyLoadContext is null))
             {
-                _currentAssemblyLoadContext = AssemblyLoadContext.Default;
-                return _currentAssemblyLoadContext.LoadFromAssemblyPath(pathToAssembly);
+                _currentAssemblyLoadContext.Unload();
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
             }
 
-            // We must create a weak reference to the old assemblycontext in order to make sure later that it's no longer alive
-            _oldAssemblyLoadContext = new WeakReference(_currentAssemblyLoadContext, trackResurrection: true);
-            _currentAssemblyLoadContext.Unload();
+            
             // We must create a new assembly load context
             // as long as theres a reference to the assembly load context we can't delete the assembly it loaded
-            _currentAssemblyLoadContext = AssemblyLoadContext.Default;
-            _currentAssemblyLoadContext.Resolving += (name, assembly) =>
+            _currentAssemblyLoadContext = new UmbracoAssemblyLoadContext();
+
+            // Use filestream to load in the new assembly, otherwise it'll be locked
+            // See https://www.strathweb.com/2019/01/collectible-assemblies-in-net-core-3-0/ for more info
+            using (var fs = new FileStream(pathToAssembly, FileMode.Open, FileAccess.Read))
             {
-                return null;
-            };
-            return _currentAssemblyLoadContext.LoadFromAssemblyPath(pathToAssembly);
+                return _currentAssemblyLoadContext.LoadFromStream(fs);
+            }
         }
 
         private Assembly GetModelsAssembly(bool forceRebuild)
@@ -442,7 +441,7 @@ namespace Umbraco.ModelsBuilder.Embedded
             {
                 var assemblyPath = RoslynCompiler.GetCompiledAssembly(_hostingEnvironment.MapPathContentRoot(projFile), GetOutputAssemblyPath(currentHash));
                 assembly = ReloadAssembly(assemblyPath);
-                File.WriteAllText(dllPathFile, assembly.Location);
+                File.WriteAllText(dllPathFile, assemblyPath);
                 File.WriteAllText(modelsHashFile, currentHash);
                 TryDeleteUnusedAssemblies(dllPathFile);
             }
@@ -458,22 +457,6 @@ namespace Umbraco.ModelsBuilder.Embedded
 
         private void TryDeleteUnusedAssemblies(string dllPathFile)
         {
-            // Try and garbage collect to hopefully kill the old assembly
-            // This might be slow??
-            // I'm doing as mentioned in: https://docs.microsoft.com/en-us/dotnet/standard/assembly/unloadability
-            // The old assembly still doesn't get unloaded properly
-            // My best guess is that there's some some references to the types within the assembly somewhere
-            // which means that the assembly won't unload because it does so in a cooporative manner
-            // but I have no clue how to fix this 
-            if (!(_oldAssemblyLoadContext is null))
-            {
-                for (int i = 0; _oldAssemblyLoadContext.IsAlive && (i < 10); i++)
-                {
-                    GC.Collect();
-                    GC.WaitForPendingFinalizers();
-                }
-            }
-
             if (File.Exists(dllPathFile))
             {
                 var dllPath = File.ReadAllText(dllPathFile);
@@ -488,9 +471,7 @@ namespace Umbraco.ModelsBuilder.Embedded
                     catch(UnauthorizedAccessException e)
                     {
                         // The file is in use, we'll try again next time...
-                        // This is stupid, because as far as I can see files doesn't get released
-                        // untill the IIS server is restarted...
-                        // However, I can't see how I should unload the old assemblies?? :( 
+                        // This shouldn't happen anymore.
                     }
                 }
                 
