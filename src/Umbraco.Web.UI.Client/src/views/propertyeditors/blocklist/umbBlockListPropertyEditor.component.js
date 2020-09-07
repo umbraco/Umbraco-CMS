@@ -427,7 +427,7 @@
                 size: (amountOfAvailableTypes > 8 ? "medium" : "small"),
                 filter: (amountOfAvailableTypes > 8),
                 clickPasteItem: function(item, mouseEvent) {
-                    if (item.type === "elementTypeArray") {
+                    if (Array.isArray(item.pasteData)) {
                         var indexIncrementor = 0;
                         item.pasteData.forEach(function (entry) {
                             if (requestPasteFromClipboard(createIndex + indexIncrementor, entry)) {
@@ -469,42 +469,28 @@
             };
 
             blockPickerModel.clickClearClipboard = function ($event) {
-                clipboardService.clearEntriesOfType("elementType", vm.availableContentTypesAliases);
-                clipboardService.clearEntriesOfType("elementTypeArray", vm.availableContentTypesAliases);
+                clipboardService.clearEntriesOfType(clipboardService.TYPES.ELEMENT_TYPE, vm.availableContentTypesAliases);
             };
 
             blockPickerModel.clipboardItems = [];
 
-            var singleEntriesForPaste = clipboardService.retriveEntriesOfType("elementType", vm.availableContentTypesAliases);
-            singleEntriesForPaste.forEach(function (entry) {
-                blockPickerModel.clipboardItems.push(
-                    {
-                        type: "elementType",
-                        date: entry.date,
-                        pasteData: entry.data,
-                        blockConfigModel: modelObject.getScaffoldFromAlias(entry.alias),
-                        elementTypeModel: {
-                            name: entry.label,
-                            icon: entry.icon
-                        }
+            var entriesForPaste = clipboardService.retriveEntriesOfType(clipboardService.TYPES.ELEMENT_TYPE, vm.availableContentTypesAliases);
+            entriesForPaste.forEach(function (entry) {
+                var pasteEntry = {
+                    type: clipboardService.TYPES.ELEMENT_TYPE,
+                    date: entry.date,
+                    pasteData: entry.data,
+                    elementTypeModel: {
+                        name: entry.label,
+                        icon: entry.icon
                     }
-                );
-            });
-
-            var arrayEntriesForPaste = clipboardService.retriveEntriesOfType("elementTypeArray", vm.availableContentTypesAliases);
-            arrayEntriesForPaste.forEach(function (entry) {
-                blockPickerModel.clipboardItems.push(
-                    {
-                        type: "elementTypeArray",
-                        date: entry.date,
-                        pasteData: entry.data,
-                        blockConfigModel: {}, // no block configuration for paste items of elementTypeArray.
-                        elementTypeModel: {
-                            name: entry.label,
-                            icon: entry.icon
-                        }
-                    }
-                );
+                }
+                if(Array.isArray(pasteEntry.data) === false) {
+                    pasteEntry.blockConfigModel = modelObject.getScaffoldFromAlias(entry.alias);
+                } else {
+                    pasteEntry.blockConfigModel = {};
+                }
+                blockPickerModel.clipboardItems.push(pasteEntry);
             });
 
             blockPickerModel.clipboardItems.sort( (a, b) => {
@@ -534,11 +520,11 @@
             }
 
             localizationService.localize("clipboard_labelForArrayOfItemsFrom", [vm.model.label, contentNodeName]).then(function(localizedLabel) {
-                clipboardService.copyArray("elementTypeArray", aliases, elementTypesToCopy, localizedLabel, "icon-thumbnail-list", vm.model.id);
+                clipboardService.copyArray(clipboardService.TYPES.ELEMENT_TYPE, aliases, elementTypesToCopy, localizedLabel, "icon-thumbnail-list", vm.model.id);
             });
         }
         function copyBlock(block) {
-            clipboardService.copy("elementType", block.content.contentTypeAlias, block.content, block.label);
+            clipboardService.copy(clipboardService.TYPES.ELEMENT_TYPE, block.content.contentTypeAlias, block.content, block.label);
         }
         function requestPasteFromClipboard(index, pasteEntry) {
 

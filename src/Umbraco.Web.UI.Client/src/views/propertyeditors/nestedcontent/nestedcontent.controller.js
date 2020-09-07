@@ -22,18 +22,18 @@
 
                     // Loop through all inner properties:
                     for (var k in obj) {
-                        propClearingMethod(obj[k]);
+                        propClearingMethod(obj[k], clipboardService.TYPES.RAW);
                     }
                 }
             }
         }
 
-        clipboardService.registerClearPropertyResolver(clearNestedContentPropertiesForStorage)
+        clipboardService.registerClearPropertyResolver(clearNestedContentPropertiesForStorage, clipboardService.TYPES.ELEMENT_TYPE)
 
 
         function clearInnerNestedContentPropertiesForStorage(prop, propClearingMethod) {
 
-            // if we got an array, and it has a entry with ncContentTypeAlias this meants that we are dealing with a NestedContent property inside a NestedContent property.
+            // if we got an array, and it has a entry with ncContentTypeAlias this meants that we are dealing with a NestedContent property data.
             if ((Array.isArray(prop) && prop.length > 0 && prop[0].ncContentTypeAlias !== undefined)) {
 
                 for (var i = 0; i < prop.length; i++) {
@@ -44,13 +44,13 @@
 
                     // Loop through all inner properties:
                     for (var k in obj) {
-                        propClearingMethod(obj[k]);
+                        propClearingMethod(obj[k], clipboardService.TYPES.RAW);
                     }
                 }
             }
         }
 
-        clipboardService.registerClearPropertyResolver(clearInnerNestedContentPropertiesForStorage)
+        clipboardService.registerClearPropertyResolver(clearInnerNestedContentPropertiesForStorage, clipboardService.TYPES.RAW)
     }]);
 
     angular
@@ -128,7 +128,7 @@
             }
 
             localizationService.localize("clipboard_labelForArrayOfItemsFrom", [model.label, nodeName]).then(function (data) {
-                clipboardService.copyArray("elementTypeArray", aliases, vm.nodes, data, "icon-thumbnail-list", model.id, clearNodeForCopy);
+                clipboardService.copyArray(clipboardService.TYPES.ELEMENT_TYPE, aliases, vm.nodes, data, "icon-thumbnail-list", model.id, clearNodeForCopy);
             });
         }
 
@@ -197,7 +197,7 @@
                 view: "itempicker",
                 event: $event,
                 clickPasteItem: function (item) {
-                    if (item.type === "elementTypeArray") {
+                    if (Array.isArray(item.data)) {
                         _.each(item.data, function (entry) {
                             pasteFromClipboard(entry);
                         });
@@ -239,21 +239,9 @@
 
             vm.overlayMenu.pasteItems = [];
 
-            var singleEntriesForPaste = clipboardService.retriveEntriesOfType("elementType", contentTypeAliases);
-            _.each(singleEntriesForPaste, function (entry) {
+            var entriesForPaste = clipboardService.retriveEntriesOfType(clipboardService.TYPES.ELEMENT_TYPE, contentTypeAliases);
+            _.each(entriesForPaste, function (entry) {
                 vm.overlayMenu.pasteItems.push({
-                    type: "elementType",
-                    date: entry.date,
-                    name: entry.label,
-                    data: entry.data,
-                    icon: entry.icon
-                });
-            });
-
-            var arrayEntriesForPaste = clipboardService.retriveEntriesOfType("elementTypeArray", contentTypeAliases);
-            _.each(arrayEntriesForPaste, function (entry) {
-                vm.overlayMenu.pasteItems.push({
-                    type: "elementTypeArray",
                     date: entry.date,
                     name: entry.label,
                     data: entry.data,
@@ -271,8 +259,7 @@
             vm.overlayMenu.clickClearPaste = function ($event) {
                 $event.stopPropagation();
                 $event.preventDefault();
-                clipboardService.clearEntriesOfType("elementType", contentTypeAliases);
-                clipboardService.clearEntriesOfType("elementTypeArray", contentTypeAliases);
+                clipboardService.clearEntriesOfType(clipboardService.TYPES.ELEMENT_TYPE, contentTypeAliases);
                 vm.overlayMenu.pasteItems = [];// This dialog is not connected via the clipboardService events, so we need to update manually.
                 vm.overlayMenu.hideHeader = false;
             };
@@ -463,7 +450,7 @@
 
             syncCurrentNode();
 
-            clipboardService.copy("elementType", node.contentTypeAlias, node, null, null, null, clearNodeForCopy);
+            clipboardService.copy(clipboardService.TYPES.ELEMENT_TYPE, node.contentTypeAlias, node, null, null, null, clearNodeForCopy);
             $event.stopPropagation();
         }
 
@@ -474,7 +461,7 @@
                 return;
             }
 
-            newNode = clipboardService.parseContentForPaste(newNode);
+            newNode = clipboardService.parseContentForPaste(newNode, clipboardService.TYPES.ELEMENT_TYPE);
 
             // generate a new key.
             newNode.key = String.CreateGuid();
@@ -487,7 +474,7 @@
         }
 
         function checkAbilityToPasteContent() {
-            vm.showPaste = clipboardService.hasEntriesOfType("elementType", contentTypeAliases) || clipboardService.hasEntriesOfType("elementTypeArray", contentTypeAliases);
+            vm.showPaste = clipboardService.hasEntriesOfType(clipboardService.TYPES.ELEMENT_TYPE, contentTypeAliases);
         }
 
         eventsService.on("clipboardService.storageUpdate", checkAbilityToPasteContent);
