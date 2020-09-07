@@ -674,11 +674,8 @@
              * @param {Object} blockObject The BlockObject to be removed and destroyed.
              */
             removeDataAndDestroyModel: function (blockObject) {
-                var udi = blockObject.content.udi;
-                var settingsUdi = null;
-                if (blockObject.settings) {
-                    settingsUdi = blockObject.settings.udi;
-                }
+                var udi = blockObject.layout.contentUdi;
+                var settingsUdi = blockObject.layout.settingsUdi || null;
                 this.destroyBlockObject(blockObject);
                 this.removeDataByUdi(udi);
                 if (settingsUdi) {
