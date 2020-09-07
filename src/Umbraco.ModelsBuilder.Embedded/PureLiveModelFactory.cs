@@ -8,17 +8,13 @@ using System.Reflection.Emit;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
-using System.Web;
 using Umbraco.Core.Configuration;
 using Umbraco.Core;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.ModelsBuilder.Embedded.Building;
 using File = System.IO.File;
-using Umbraco.Core.Composing;
-using System.Runtime.Loader;
 
 namespace Umbraco.ModelsBuilder.Embedded
 {
