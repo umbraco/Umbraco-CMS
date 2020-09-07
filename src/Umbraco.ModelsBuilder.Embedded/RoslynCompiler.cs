@@ -1,13 +1,11 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Text;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 
 namespace Umbraco.ModelsBuilder.Embedded
 {
@@ -39,7 +37,7 @@ namespace Umbraco.ModelsBuilder.Embedded
             _refs.Add(MetadataReference.CreateFromFile(typeof(System.CodeDom.Compiler.GeneratedCodeAttribute).Assembly.Location));
         }
 
-        public string GetCompiledAssembly(string pathToSourceFile, string saveLocation)
+        public void CompileToFile(string pathToSourceFile, string saveLocation)
         {
             // TODO: Get proper temp file location/filename
             var sourceCode = File.ReadAllText(pathToSourceFile);
@@ -52,8 +50,6 @@ namespace Umbraco.ModelsBuilder.Embedded
             {
                 CompileToFile(saveLocation, sourceCode, "ModelsGeneratedAssembly", _refs);
             }
-
-            return saveLocation;
 
         } 
 
@@ -71,7 +67,7 @@ namespace Umbraco.ModelsBuilder.Embedded
                 // Not entirely certain that assemblyIdentityComparer is nececary? 
                 assemblyIdentityComparer: DesktopAssemblyIdentityComparer.Default));
 
-            var result = compilation.Emit(outputFile);
+            compilation.Emit(outputFile);
 
         }
     }

@@ -398,7 +398,8 @@ namespace Umbraco.ModelsBuilder.Embedded
                 _ver++;
                 try
                 {
-                    var assemblyPath = RoslynCompiler.GetCompiledAssembly(_hostingEnvironment.MapPathContentRoot(projFile), GetOutputAssemblyPath(currentHash));
+                    var assemblyPath = GetOutputAssemblyPath(currentHash);
+                    RoslynCompiler.CompileToFile(_hostingEnvironment.MapPathContentRoot(projFile), GetOutputAssemblyPath(currentHash));
                     assembly = ReloadAssembly(assemblyPath);
                     File.WriteAllText(dllPathFile, assembly.Location);
                     TryDeleteUnusedAssemblies(dllPathFile);
@@ -438,7 +439,8 @@ namespace Umbraco.ModelsBuilder.Embedded
             // compile and register
             try
             {
-                var assemblyPath = RoslynCompiler.GetCompiledAssembly(_hostingEnvironment.MapPathContentRoot(projFile), GetOutputAssemblyPath(currentHash));
+                var assemblyPath = GetOutputAssemblyPath(currentHash);
+                RoslynCompiler.CompileToFile(_hostingEnvironment.MapPathContentRoot(projFile), GetOutputAssemblyPath(currentHash));
                 assembly = ReloadAssembly(assemblyPath);
                 File.WriteAllText(dllPathFile, assemblyPath);
                 File.WriteAllText(modelsHashFile, currentHash);
