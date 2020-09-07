@@ -39,35 +39,21 @@ namespace Umbraco.ModelsBuilder.Embedded
 
         public void CompileToFile(string pathToSourceFile, string saveLocation)
         {
-            // TODO: Get proper temp file location/filename
             var sourceCode = File.ReadAllText(pathToSourceFile);
 
-            // If someone adds a property to an existing document type, and then later removes it again
-            // The hash of the TypeModel will be the same, and we'll get an error because we can't overwrite the file because it's in use
-            // this will clear the hash file and the assembly will be recompiled for no reason.
-            // TODO: Handle this in a less dumb way.
-            if (!File.Exists(saveLocation))
-            {
-                CompileToFile(saveLocation, sourceCode, "ModelsGeneratedAssembly", _refs);
-            }
-
-        } 
-
-        private void CompileToFile(string outputFile, string sourceCode, string assemblyName, IEnumerable<MetadataReference> references)
-        {
             var sourceText = SourceText.From(sourceCode);
 
             var syntaxTree = SyntaxFactory.ParseSyntaxTree(sourceText, _parseOptions);
 
-            var compilation = CSharpCompilation.Create(assemblyName,
+            var compilation = CSharpCompilation.Create("ModelsGeneratedAssembly",
                 new[] { syntaxTree },
-                references: references,
+                references: _refs,
                 options: new CSharpCompilationOptions(_outputKind,
                 optimizationLevel: OptimizationLevel.Release,
                 // Not entirely certain that assemblyIdentityComparer is nececary? 
                 assemblyIdentityComparer: DesktopAssemblyIdentityComparer.Default));
 
-            compilation.Emit(outputFile);
+            compilation.Emit(saveLocation);
 
         }
     }
