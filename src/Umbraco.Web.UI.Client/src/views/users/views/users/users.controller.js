@@ -88,6 +88,7 @@
         // Don't show the invite button if no email is configured
         if (Umbraco.Sys.ServerVariables.umbracoSettings.showUserInvite) {
             vm.defaultButton = {
+                type: "button",
                 labelKey: "user_inviteUser",
                 handler: function () {
                     vm.setUsersViewState('inviteUser');

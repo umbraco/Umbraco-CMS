@@ -40,7 +40,7 @@ function externalLoginInfoService(externalLoginInfo, umbRequestHelper) {
      */
     function getLoginProviders(excludeUnlinkable) {
         if (excludeUnlinkable) {
-            return _.filter(externalLoginInfo.providers, x => !x.properties.UmbracoBackOfficeExternalLoginOptions.AutoLinkOptions.AllowManualLinking);
+            return _.filter(externalLoginInfo.providers, x => x.properties.ExternalSignInAutoLinkOptions.AllowManualLinking);
         }
         else {
             return externalLoginInfo.providers;

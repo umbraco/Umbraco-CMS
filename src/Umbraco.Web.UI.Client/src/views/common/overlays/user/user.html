@@ -50,7 +50,7 @@
 
         <div ng-repeat="login in externalLoginProviders">
 
-            <div ng-if="!login.properties.UmbracoBackOfficeExternalLoginOptions.DenyLocalLogin">
+            <div ng-if="login.properties.ExternalSignInAutoLinkOptions.AllowManualLinking">
                 <form ng-submit="linkProvider($event)" ng-if="login.linkedProviderKey == undefined" method="POST" action="{{externalLinkLoginFormAction}}" name="oauthloginform" id="oauthloginform-{{login.authType}}">
                     <input type="hidden" name="provider" value="{{login.authType}}" />
                     <button class="btn btn-block btn-social"
