@@ -168,6 +168,9 @@
     <Compile Include="Editors\RelationTypeController.cs" />
     <Compile Include="Editors\TinyMceController.cs" />
     <Compile Include="HealthCheck\Checks\Data\DatabaseIntegrityCheck.cs" />
+    <Compile Include="HtmlHelperPartialsExtensions.cs" />
+    <Compile Include="HtmlHelperPartialsExtensions.Elements.cs" />
+    <Compile Include="HtmlHelperPartialsExtensions.BlockList.cs" />
     <Compile Include="ImageCropperTemplateCoreExtensions.cs" />
     <Compile Include="IUmbracoContextFactory.cs" />
     <Compile Include="Install\ChangesMonitor.cs" />
