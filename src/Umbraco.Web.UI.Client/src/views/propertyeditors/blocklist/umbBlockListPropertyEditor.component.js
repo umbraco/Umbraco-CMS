@@ -294,9 +294,9 @@
 
         function deleteBlock(block) {
 
-            var layoutIndex = vm.layout.findIndex(entry => entry.contentUdi === block.content.udi);
+            var layoutIndex = vm.layout.findIndex(entry => entry.contentUdi === block.layout.contentUdi);
             if (layoutIndex === -1) {
-                throw new Error("Could not find layout entry of block with udi: "+block.content.udi)
+                throw new Error("Could not find layout entry of block with udi: "+block.layout.contentUdi)
             }
 
             setDirty();
