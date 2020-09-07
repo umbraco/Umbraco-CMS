@@ -49,7 +49,7 @@
         }
         unsubscribe.push(eventsService.on("editors.documentType.saved", updateUsedElementTypes));
 
-        vm.requestRemoveBlockByIndex = function (index) {
+        vm.requestRemoveBlockByIndex = function ($event, index) {
             localizationService.localizeMany(["general_delete", "blockEditor_confirmDeleteBlockMessage", "blockEditor_confirmDeleteBlockNotice"]).then(function (data) {
                 var contentElementType = vm.getElementTypeByKey($scope.model.value[index].contentElementTypeKey);
                 overlayService.confirmDelete({
@@ -65,7 +65,10 @@
                     }
                 });
             });
-        }
+
+            $event.stopPropagation();
+            $event.preventDefault();
+        };
 
         vm.removeBlockByIndex = function (index) {
             $scope.model.value.splice(index, 1);
