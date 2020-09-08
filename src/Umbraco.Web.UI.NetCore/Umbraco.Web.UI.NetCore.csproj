@@ -130,12 +130,6 @@
         <None Remove="Umbraco/Models/models.generated.cs"/>
         <Compile Remove="Umbraco/Models/models.generated.cs"/>
     </ItemGroup>
-
-    <PropertyGroup>
-        <RazorCompileOnBuild>false</RazorCompileOnBuild>
-        <RazorCompileOnPublish>false</RazorCompileOnPublish>
-    </PropertyGroup>
-    
     
     <ItemGroup>
       <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.3" />
