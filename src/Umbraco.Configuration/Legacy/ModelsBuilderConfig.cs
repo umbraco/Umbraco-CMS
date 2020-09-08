@@ -32,7 +32,7 @@ namespace Umbraco.Configuration.Legacy
         {
             // giant kill switch, default: false
             // must be explicitely set to true for anything else to happen
-            Enable = true;
+            Enable = ConfigurationManager.AppSettings[Prefix + "Enable"] == "true";
 
             // ensure defaults are initialized for tests
             ModelsNamespace = Constants.ModelsBuilder.DefaultModelsNamespace;
