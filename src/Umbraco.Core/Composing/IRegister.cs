@@ -25,7 +25,7 @@ namespace Umbraco.Core.Composing
         /// <summary>
         /// Registers a service with an implementation factory.
         /// </summary>
-        void Register<TService>(Func<IFactory, TService> factory, Lifetime lifetime = Lifetime.Transient)
+        void Register<TService>(Func<IServiceProvider, TService> factory, Lifetime lifetime = Lifetime.Transient)
             where TService : class;
 
         /// <summary>
@@ -54,16 +54,6 @@ namespace Umbraco.Core.Composing
             where TService : class;
 
         /// <summary>
-        /// Registers a service for a target, with an implementation factory.
-        /// </summary>
-        /// <remarks>
-        /// There can only be one implementation or instanced registered for a service and target;
-        /// what happens if many are registered is not specified.
-        /// </remarks>
-        void RegisterFor<TService, TTarget>(Func<IFactory, TService> factory, Lifetime lifetime = Lifetime.Transient)
-            where TService : class;
-
-        /// <summary>
         /// Registers a service for a target, with an implementing instance.
         /// </summary>
         /// <remarks>
@@ -86,15 +76,6 @@ namespace Umbraco.Core.Composing
         void RegisterAuto(Type serviceBaseType);
 
         #region Control
-
-        /// <summary>
-        /// Configures the container for web support.
-        /// </summary>
-        /// <remarks>
-        /// <para>Enables support for MVC, WebAPI, but *not* per-request scope. This is used early in the boot
-        /// process, where anything "scoped" should not be linked to a web request.</para>
-        /// </remarks>
-        void ConfigureForWeb();  // TODO: Unsure if we need this anymore
 
         /// <summary>
         /// Creates the factory.

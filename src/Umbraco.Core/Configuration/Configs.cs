@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.Configuration
@@ -47,13 +48,13 @@ namespace Umbraco.Core.Configuration
         /// <summary>
         /// Registers configurations in a register.
         /// </summary>
-        public void RegisterWith(IRegister register)
+        public void RegisterWith(IServiceCollection services)
         {
             // do it only once
             if (_registerings == null)
                 throw new InvalidOperationException("Configurations have already been registered.");
 
-            register.Register(this);
+            services.Register(this);
 
             foreach (var registering in _registerings.Values)
                 registering(register);
