@@ -116,18 +116,6 @@ namespace Umbraco.Extensions
         /// <returns></returns>
         public static IServiceCollection AddUmbracoCore(this IServiceCollection services, IWebHostEnvironment webHostEnvironment)
         {
-            return services.AddUmbracoCore(webHostEnvironment, out _);
-        }
-
-        /// <summary>
-        /// Adds the Umbraco Back Core requirements
-        /// </summary>
-        /// <param name="services"></param>
-        /// <param name="webHostEnvironment"></param>
-        /// <param name="factory"></param>
-        /// <returns></returns>
-        public static IServiceCollection AddUmbracoCore(this IServiceCollection services, IWebHostEnvironment webHostEnvironment, out IFactory factory)
-        {
             var loggingConfig = new LoggingConfiguration(
                 Path.Combine(webHostEnvironment.ContentRootPath, "App_Data", "Logs"),
                 Path.Combine(webHostEnvironment.ContentRootPath, "config", "serilog.config"),
@@ -145,8 +133,7 @@ namespace Umbraco.Extensions
             services.AddUmbracoCore(webHostEnvironment,
                 Assembly.GetEntryAssembly(),
                 appCaches,
-                loggingConfig,
-                out factory);
+                loggingConfig);
 
             return services;
         }
@@ -168,9 +155,8 @@ namespace Umbraco.Extensions
             IWebHostEnvironment webHostEnvironment,
             Assembly entryAssembly,
             AppCaches appCaches,
-            ILoggingConfiguration loggingConfiguration,
-            out IFactory factory)
-            => services.AddUmbracoCore(webHostEnvironment, entryAssembly, appCaches, loggingConfiguration, GetCoreRuntime, out factory);
+            ILoggingConfiguration loggingConfiguration)
+            => services.AddUmbracoCore(webHostEnvironment, entryAssembly, appCaches, loggingConfiguration, GetCoreRuntime);
 
 
         /// <summary>
@@ -193,8 +179,7 @@ namespace Umbraco.Extensions
             AppCaches appCaches,
             ILoggingConfiguration loggingConfiguration,
             // TODO: Yep that's extremely ugly
-            Func<Configs, IUmbracoVersion, IIOHelper, Core.Logging.ILogger, IProfiler, Core.Hosting.IHostingEnvironment, IBackOfficeInfo, ITypeFinder, AppCaches, IDbProviderFactoryCreator, IRuntime> getRuntime,
-            out IFactory factory)
+            Func<Configs, IUmbracoVersion, IIOHelper, Core.Logging.ILogger, IProfiler, Core.Hosting.IHostingEnvironment, IBackOfficeInfo, ITypeFinder, AppCaches, IDbProviderFactoryCreator, IRuntime> getRuntime)
         {
             if (services is null) throw new ArgumentNullException(nameof(services));
             if (entryAssembly is null) throw new ArgumentNullException(nameof(entryAssembly));
@@ -243,7 +228,7 @@ namespace Umbraco.Extensions
                 appCaches,
                 dbProviderFactoryCreator);
 
-            factory = runtime.Configure(services);
+            runtime.Configure(services);
 
             return services;
         }

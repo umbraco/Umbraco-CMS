@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 
@@ -12,16 +13,17 @@ namespace Umbraco.Core
         /// <summary>
         /// Boots the runtime.
         /// </summary>
-        /// <param name="services">The service collection.</param>
-        /// <returns>The application factory.</returns>
-        IFactory Configure(IServiceCollection services);
+        /// <remarks>
+        /// Builds a ServiceProvider from the services collection
+        /// </remarks>
+        void Configure(IServiceCollection services);
 
         /// <summary>
         /// Gets the runtime state.
         /// </summary>
         IRuntimeState State { get; }
 
-        void Start();
+        void Start(IServiceProvider serviceProvider);
 
         /// <summary>
         /// Terminates the runtime.

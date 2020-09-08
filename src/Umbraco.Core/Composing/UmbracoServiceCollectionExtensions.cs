@@ -84,21 +84,9 @@ namespace Umbraco.Core.Composing
         }
 
         // TODO: MSDI, this needs to die
-        public static IFactory CreateFactory(this IServiceCollection services)
-        {
-            return new TempMsdiServiceProviderFactoryAdapter(services);
-        }
-
-        // TODO: MSDI, this needs to die
         public static object GetInstance(this IServiceProvider container, Type type)
         {
             return container.GetRequiredService(type);
-        }
-
-        // TODO: MSDI, this needs to die
-        public static object TryGetInstance(this IServiceProvider container, Type type)
-        {
-            return container.GetService(type);
         }
 
         // TODO: MSDI, this needs to die

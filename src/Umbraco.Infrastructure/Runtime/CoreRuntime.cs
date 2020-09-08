@@ -24,12 +24,16 @@ namespace Umbraco.Core.Runtime
     public class CoreRuntime : IRuntime
     {
         private ComponentCollection _components;
-        private IFactory _factory;
         // runtime state, this instance will get replaced again once the essential services are available to run the check
         private RuntimeState _state = RuntimeState.Booting();
         private readonly IUmbracoBootPermissionChecker _umbracoBootPermissionChecker;
         private readonly IGlobalSettings _globalSettings;
         private readonly IConnectionStrings _connectionStrings;
+
+        /* TODO: MSDI This is hopefully a temporary measure
+           CreateDatabaseFactory constructs a UmbracoDatabaseFactory providing a Lazy<IMapperCollection> that resolves from _serviceProvider.
+         */
+        private IServiceProvider _serviceProvider;
 
         public CoreRuntime(
             Configs configs,            
@@ -104,10 +108,9 @@ namespace Umbraco.Core.Runtime
         public IMainDom MainDom { get; }
 
         /// <inheritdoc/>
-        public virtual IFactory Configure(IServiceCollection services)
+        public virtual void Configure(IServiceCollection services)
         {
             if (services is null) throw new ArgumentNullException(nameof(services));
-
 
             // create and register the essential services
             // ie the bare minimum required to boot
@@ -140,22 +143,19 @@ namespace Umbraco.Core.Runtime
 
                 // application environment
                 ConfigureUnhandledException();
-                _factory = Configure(services, timer);
-
-                return _factory;
+                Configure(services, timer);
             }
         }
 
         /// <summary>
         /// Configure the runtime within a timer.
         /// </summary>
-        private IFactory Configure(IServiceCollection services, DisposableTimer timer)
+        private void Configure(IServiceCollection services, DisposableTimer timer)
         {
             if (services is null) throw new ArgumentNullException(nameof(services));
             if (timer is null) throw new ArgumentNullException(nameof(timer));
 
             Composition composition = null;
-            IFactory factory = null;
 
             // TODO: MSDI Find a decent place for this, is it here?
             // NOTE: LightInject had this Lazy resolve setup by default
@@ -197,9 +197,6 @@ namespace Umbraco.Core.Runtime
                     // always run composers
                     RunComposers(typeLoader, composition);
                 }
-
-                // create the factory
-                factory = composition.CreateFactory();
             }
             catch (Exception e)
             {
@@ -213,18 +210,6 @@ namespace Umbraco.Core.Runtime
 
                 timer?.Fail(exception: bfe); // be sure to log the exception - even if we repeat ourselves
 
-                // if something goes wrong above, we may end up with no factory
-                // meaning nothing can get the runtime state, etc - so let's try
-                // to make sure we have a factory
-                if (factory == null)
-                {
-                    try
-                    {
-                        factory = composition?.CreateFactory();
-                    }
-                    catch { /* yea */ }
-                }
-
                 Debugger.Break();
 
                 // throwing here can cause w3wp to hard-crash and we want to avoid it.
@@ -234,10 +219,10 @@ namespace Umbraco.Core.Runtime
                 // throw a BootFailedException for every requests.
             }
 
-            return factory;
+            composition?.RegisterBuildersAndConfigs();
         }
 
-        public void Start()
+        public void Start(IServiceProvider serviceProvider)
         {
             if (_state.Level <= RuntimeLevel.BootFailed)
                 throw new InvalidOperationException($"Cannot start the runtime if the runtime level is less than or equal to {RuntimeLevel.BootFailed}");
@@ -245,22 +230,26 @@ namespace Umbraco.Core.Runtime
             // throws if not full-trust
             _umbracoBootPermissionChecker.ThrowIfNotPermissions();
 
-            var hostingEnvironmentLifetime = _factory.TryGetInstance<IApplicationShutdownRegistry>();
+            var hostingEnvironmentLifetime = serviceProvider.TryGetInstance<IApplicationShutdownRegistry>();
             if (hostingEnvironmentLifetime == null)
                 throw new InvalidOperationException($"An instance of {typeof(IApplicationShutdownRegistry)} could not be resolved from the container, ensure that one if registered in your runtime before calling {nameof(IRuntime)}.{nameof(Start)}");
 
             // acquire the main domain - if this fails then anything that should be registered with MainDom will not operate
-            AcquireMainDom(MainDom, _factory.GetInstance<IApplicationShutdownRegistry>());
+            AcquireMainDom(MainDom, serviceProvider.GetInstance<IApplicationShutdownRegistry>());
 
             // create & initialize the components
-            _components = _factory.GetInstance<ComponentCollection>();
+            _components = serviceProvider.GetInstance<ComponentCollection>();
             _components.Initialize();
 
+            // GROSS: See note on declaration of _serviceProvider above about CreateDatabaseFactory
+            _serviceProvider = serviceProvider;
+
+            // TODO: MSDI is this comment redundant now?
             // now (and only now) is the time to switch over to perWebRequest scopes.
             // up until that point we may not have a request, and scoped services would
             // fail to resolve - but we run Initialize within a factory scope - and then,
             // here, we switch the factory to bind scopes to requests
-            _factory.EnablePerWebRequestScope();
+            //_serviceProvider.EnablePerWebRequestScope();
         }
 
         protected virtual void ConfigureUnhandledException()
@@ -393,7 +382,7 @@ namespace Umbraco.Core.Runtime
         /// </summary>
         /// <remarks>This is strictly internal, for tests only.</remarks>
         protected internal virtual IUmbracoDatabaseFactory CreateDatabaseFactory()
-            => new UmbracoDatabaseFactory(Logger, _globalSettings, _connectionStrings, new Lazy<IMapperCollection>(() => _factory.GetInstance<IMapperCollection>()), DbProviderFactoryCreator);
+            => new UmbracoDatabaseFactory(Logger, _globalSettings, _connectionStrings, new Lazy<IMapperCollection>(() => _serviceProvider.GetInstance<IMapperCollection>()), DbProviderFactoryCreator);
 
 
         #endregion
