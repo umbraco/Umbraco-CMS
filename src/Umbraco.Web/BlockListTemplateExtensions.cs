@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Web.Mvc;
 using System.Web.Mvc.Html;
 using Umbraco.Core.Models.Blocks;
@@ -35,11 +34,5 @@ namespace Umbraco.Web
 
             return GetBlockListHtml(html, prop?.GetValue() as BlockListModel, template);
         }
-
-        public static IHtmlString GetBlockListHtml(this IPublishedProperty property, HtmlHelper html, string template = DefaultTemplate) => GetBlockListHtml(html, property?.GetValue() as BlockListModel, template);
-
-        public static IHtmlString GetBlockListHtml(this IPublishedContent contentItem, HtmlHelper html, string propertyAlias) => GetBlockListHtml(html, contentItem, propertyAlias, DefaultTemplate);
-
-        public static IHtmlString GetBlockListHtml(this IPublishedContent contentItem, HtmlHelper html, string propertyAlias, string template) => GetBlockListHtml(html, contentItem, propertyAlias, template);
     }
 }
