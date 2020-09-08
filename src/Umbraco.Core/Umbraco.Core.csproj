@@ -15,6 +15,9 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <!-- We need this until Composition stops building a ServiceProvider, once that's resolved should be able to drop to just using Abstractions. -->
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.7" />
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.1.7" />
       <PackageReference Include="System.ComponentModel.Annotations" Version="4.7.0" />
       <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.7.0" />
       <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.3.0" />
