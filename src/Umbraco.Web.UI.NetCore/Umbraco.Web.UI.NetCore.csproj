@@ -38,8 +38,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Views" />
-      <Folder Include="wwwroot\Media" />
+        <Folder Include="Views" />
+        <Folder Include="wwwroot\Media" />
       <Folder Include="wwwroot\Umbraco\views\install" />
     </ItemGroup>
 
@@ -122,15 +122,26 @@
         </None>
         <None Remove="App_Data\**" />
     </ItemGroup>
+
+    <!-- We don't want to include the generated files, they will throw a lot of errors -->
+    <ItemGroup>
+        <None Remove="Umbraco/Models/all.generated.cs"/>
+        <Compile Remove="Umbraco/Models/all.generated.cs"/>
+        <None Remove="Umbraco/Models/models.generated.cs"/>
+        <Compile Remove="Umbraco/Models/models.generated.cs"/>
+    </ItemGroup>
+
+    <PropertyGroup>
+        <RazorCompileOnBuild>false</RazorCompileOnBuild>
+        <RazorCompileOnPublish>false</RazorCompileOnPublish>
+    </PropertyGroup>
+    
     
     <ItemGroup>
       <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.3" />
         <!-- TODO: remove the reference to System.Configuration.ConfigurationManager when Examine/lucene dont need it-->
         <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.7.0" />
     </ItemGroup>
-
-
-
-
+    
 
 </Project>
