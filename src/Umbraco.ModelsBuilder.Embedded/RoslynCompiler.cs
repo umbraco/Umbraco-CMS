@@ -15,6 +15,10 @@ namespace Umbraco.ModelsBuilder.Embedded
         private CSharpParseOptions _parseOptions;
         private List<MetadataReference> _refs;
 
+        /// <summary>
+        /// Roslyn compiler which can be used to compile a c# file to a Dll assembly
+        /// </summary>
+        /// <param name="referenceAssemblies">Referenced assemblies used in the source file</param>
         public RoslynCompiler(IEnumerable<Assembly> referenceAssemblies)
         {
             _outputKind = OutputKind.DynamicallyLinkedLibrary;
@@ -37,7 +41,12 @@ namespace Umbraco.ModelsBuilder.Embedded
             _refs.Add(MetadataReference.CreateFromFile(typeof(System.CodeDom.Compiler.GeneratedCodeAttribute).Assembly.Location));
         }
 
-        public void CompileToFile(string pathToSourceFile, string saveLocation)
+        /// <summary>
+        /// Compile a source file to a dll
+        /// </summary>
+        /// <param name="pathToSourceFile">Path to the source file containing the code to be compiled.</param>
+        /// <param name="savePath">The path where the output assembly will be saved.</param>
+        public void CompileToFile(string pathToSourceFile, string savePath)
         {
             var sourceCode = File.ReadAllText(pathToSourceFile);
 
@@ -53,7 +62,7 @@ namespace Umbraco.ModelsBuilder.Embedded
                 // Not entirely certain that assemblyIdentityComparer is nececary? 
                 assemblyIdentityComparer: DesktopAssemblyIdentityComparer.Default));
 
-            compilation.Emit(saveLocation);
+            compilation.Emit(savePath);
 
         }
     }
