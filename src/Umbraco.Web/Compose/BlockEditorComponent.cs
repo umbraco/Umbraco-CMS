@@ -27,7 +27,13 @@ namespace Umbraco.Web.Compose
 
         public void Terminate() => _handler?.Dispose();
 
-        private string ReplaceBlockListUdis(string rawJson, bool onlyMissingUdis) => ReplaceBlockListUdis(rawJson, null);
+        private string ReplaceBlockListUdis(string rawJson, bool onlyMissingUdis)
+        {
+            // the block editor doesn't ever have missing UDIs so when this is true there's nothing to process
+            if (onlyMissingUdis) return rawJson;
+
+            return ReplaceBlockListUdis(rawJson, null);
+        }
 
         // internal for tests
         internal string ReplaceBlockListUdis(string rawJson, Func<Guid> createGuid = null)
