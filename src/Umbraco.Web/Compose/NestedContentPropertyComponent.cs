@@ -42,7 +42,7 @@ namespace Umbraco.Web.Compose
             if (string.IsNullOrWhiteSpace(rawJson) || !rawJson.DetectIsJson())
                 return rawJson;
 
-            // Parse JSON            
+            // Parse JSON
             var complexEditorValue = JToken.Parse(rawJson);
 
             UpdateNestedContentKeysRecursively(complexEditorValue, onlyMissingKeys, createGuid);

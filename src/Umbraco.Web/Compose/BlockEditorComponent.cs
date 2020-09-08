@@ -10,8 +10,6 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.Compose
 {
-
-
     /// <summary>
     /// A component for Block editors used to bind to events
     /// </summary>
@@ -29,10 +27,10 @@ namespace Umbraco.Web.Compose
 
         public void Terminate() => _handler?.Dispose();
 
-        private string ReplaceBlockListUdis(string rawJson, bool onlyMissingUdis) => ReplaceBlockListUdis(rawJson, onlyMissingUdis, null);
+        private string ReplaceBlockListUdis(string rawJson, bool onlyMissingUdis) => ReplaceBlockListUdis(rawJson, null);
 
         // internal for tests
-        internal string ReplaceBlockListUdis(string rawJson, bool onlyMissingUdis, Func<Guid> createGuid = null, JsonSerializerSettings serializerSettings = null)
+        internal string ReplaceBlockListUdis(string rawJson, Func<Guid> createGuid = null)
         {
             // used so we can test nicely
             if (createGuid == null)
@@ -42,18 +40,19 @@ namespace Umbraco.Web.Compose
                 return rawJson;
 
             // Parse JSON
+            // This will throw a FormatException if there are null UDIs (expected)
             var blockListValue = _converter.Deserialize(rawJson);
 
-            UpdateBlockListRecursively(blockListValue, onlyMissingUdis, createGuid, serializerSettings);
+            UpdateBlockListRecursively(blockListValue, createGuid);
 
-            return JsonConvert.SerializeObject(blockListValue.BlockValue, serializerSettings);
+            return JsonConvert.SerializeObject(blockListValue.BlockValue);
         }
 
-        private void UpdateBlockListRecursively(BlockEditorData blockListData, bool onlyMissingKeys, Func<Guid> createGuid, JsonSerializerSettings serializerSettings)
+        private void UpdateBlockListRecursively(BlockEditorData blockListData, Func<Guid> createGuid)
         {
             var oldToNew = new Dictionary<Udi, Udi>();
-            MapOldToNewUdis(oldToNew, blockListData.BlockValue.ContentData, onlyMissingKeys, createGuid);
-            MapOldToNewUdis(oldToNew, blockListData.BlockValue.SettingsData, onlyMissingKeys, createGuid);
+            MapOldToNewUdis(oldToNew, blockListData.BlockValue.ContentData, createGuid);
+            MapOldToNewUdis(oldToNew, blockListData.BlockValue.SettingsData, createGuid);
 
             for (var i = 0; i < blockListData.References.Count; i++)
             {
@@ -83,68 +82,39 @@ namespace Umbraco.Web.Compose
             }
 
 
-            RecursePropertyValues(blockListData.BlockValue.ContentData, onlyMissingKeys, createGuid, serializerSettings);
-            RecursePropertyValues(blockListData.BlockValue.SettingsData, onlyMissingKeys, createGuid, serializerSettings);
+            RecursePropertyValues(blockListData.BlockValue.ContentData, createGuid);
+            RecursePropertyValues(blockListData.BlockValue.SettingsData, createGuid);
         }
 
-        private void RecursePropertyValues(IEnumerable<BlockItemData> blockData, bool onlyMissingKeys, Func<Guid> createGuid, JsonSerializerSettings serializerSettings)
+        private void RecursePropertyValues(IEnumerable<BlockItemData> blockData, Func<Guid> createGuid)
         {
             foreach (var data in blockData)
             {
                 // check if we need to recurse (make a copy of the dictionary since it will be modified)
                 foreach (var propertyAliasToBlockItemData in new Dictionary<string, object>(data.RawPropertyValues))
                 {
-                    var asString = propertyAliasToBlockItemData.Value?.ToString();
-
-                    if (asString != null && asString.DetectIsJson())
+                    if (propertyAliasToBlockItemData.Value is JToken jtoken)
                     {
-                        // this gets a little ugly because there could be some other complex editor that contains another block editor
-                        // and since we would have no idea how to parse that, all we can do is try JSON Path to find another block editor
-                        // of our type
-                        var json = JToken.Parse(asString);
-
-                        // select all tokens (flatten)
-                        var allProperties = json.SelectTokens("$..*").Select(x => x.Parent as JProperty).WhereNotNull().ToList();
-                        foreach (var prop in allProperties)
+                        if (ProcessJToken(jtoken, createGuid, out var result))
                         {
-                            if (prop.Name == Constants.PropertyEditors.Aliases.BlockList)
-                            {
-                                // get it's parent 'layout' and it's parent's container
-                                var layout = prop.Parent?.Parent as JProperty;
-                                if (layout != null && layout.Parent is JObject layoutJson)
-                                {
-                                    // recurse
-                                    var blockListValue = _converter.ConvertFrom(layoutJson);
-                                    UpdateBlockListRecursively(blockListValue, onlyMissingKeys, createGuid, serializerSettings);
+                            // need to re-save this back to the RawPropertyValues
+                            data.RawPropertyValues[propertyAliasToBlockItemData.Key] = result;
+                        }
+                    }
+                    else
+                    {
+                        var asString = propertyAliasToBlockItemData.Value?.ToString();
 
-                                    // set new value
-                                    if (layoutJson.Parent != null)
-                                    {
-                                        // we can replace the sub string
-                                        layoutJson.Replace(JsonConvert.SerializeObject(blockListValue.BlockValue, serializerSettings));
-                                    }
-                                    else
-                                    {
-                                        // this was the root string
-                                        data.RawPropertyValues[propertyAliasToBlockItemData.Key] = JsonConvert.SerializeObject(blockListValue.BlockValue, serializerSettings);
-                                    }
-                                }
-                            }
-                            else if (prop.Name != "layout" && prop.Name != "contentData" && prop.Name != "settingsData" && prop.Name != "contentTypeKey")
+                        if (asString != null && asString.DetectIsJson())
+                        {
+                            // this gets a little ugly because there could be some other complex editor that contains another block editor
+                            // and since we would have no idea how to parse that, all we can do is try JSON Path to find another block editor
+                            // of our type
+                            var json = JToken.Parse(asString);
+                            if (ProcessJToken(json, createGuid, out var result))
                             {
-                                // this is an arbitrary property that could contain a nested complex editor
-                                var propVal = prop.Value?.ToString();
-                                // check if this might contain a nested Block Editor
-                                if (!propVal.IsNullOrWhiteSpace() && propVal.DetectIsJson() && propVal.InvariantContains(Constants.PropertyEditors.Aliases.BlockList))
-                                {
-                                    if (_converter.TryDeserialize(propVal, out var nestedBlockData))
-                                    {
-                                        // recurse
-                                        UpdateBlockListRecursively(nestedBlockData, onlyMissingKeys, createGuid, serializerSettings);
-                                        // set the value to the updated one
-                                        prop.Value = JsonConvert.SerializeObject(nestedBlockData.BlockValue, serializerSettings);
-                                    }
-                                }
+                                // need to re-save this back to the RawPropertyValues
+                                data.RawPropertyValues[propertyAliasToBlockItemData.Key] = result;
                             }
                         }
                     }
@@ -152,20 +122,74 @@ namespace Umbraco.Web.Compose
             }
         }
 
-        private void MapOldToNewUdis(Dictionary<Udi, Udi> oldToNew, IEnumerable<BlockItemData> blockData, bool onlyMissingKeys, Func<Guid> createGuid)
+        private bool ProcessJToken(JToken json, Func<Guid> createGuid, out JToken result)
+        {
+            var updated = false;
+            result = json;
+
+            // select all tokens (flatten)
+            var allProperties = json.SelectTokens("$..*").Select(x => x.Parent as JProperty).WhereNotNull().ToList();
+            foreach (var prop in allProperties)
+            {
+                if (prop.Name == Constants.PropertyEditors.Aliases.BlockList)
+                {
+                    // get it's parent 'layout' and it's parent's container
+                    var layout = prop.Parent?.Parent as JProperty;
+                    if (layout != null && layout.Parent is JObject layoutJson)
+                    {
+                        // recurse
+                        var blockListValue = _converter.ConvertFrom(layoutJson);
+                        UpdateBlockListRecursively(blockListValue, createGuid);
+
+                        // set new value
+                        if (layoutJson.Parent != null)
+                        {
+                            // we can replace the object
+                            layoutJson.Replace(JObject.FromObject(blockListValue.BlockValue));
+                            updated = true;
+                        }
+                        else
+                        {
+                            // if there is no parent it means that this json property was the root, in which case we just return
+                            result = JObject.FromObject(blockListValue.BlockValue);
+                            return true;
+                        }
+                    }
+                }
+                else if (prop.Name != "layout" && prop.Name != "contentData" && prop.Name != "settingsData" && prop.Name != "contentTypeKey")
+                {
+                    // this is an arbitrary property that could contain a nested complex editor
+                    var propVal = prop.Value?.ToString();
+                    // check if this might contain a nested Block Editor
+                    if (!propVal.IsNullOrWhiteSpace() && propVal.DetectIsJson() && propVal.InvariantContains(Constants.PropertyEditors.Aliases.BlockList))
+                    {
+                        if (_converter.TryDeserialize(propVal, out var nestedBlockData))
+                        {
+                            // recurse
+                            UpdateBlockListRecursively(nestedBlockData, createGuid);
+                            // set the value to the updated one
+                            prop.Value = JObject.FromObject(nestedBlockData.BlockValue);
+                            updated = true;
+                        }
+                    }
+                }
+            }
+
+            return updated;
+        }
+
+        private void MapOldToNewUdis(Dictionary<Udi, Udi> oldToNew, IEnumerable<BlockItemData> blockData, Func<Guid> createGuid)
         {
             foreach (var data in blockData)
             {
+                // This should never happen since a FormatException will be thrown if one is empty but we'll keep this here
                 if (data.Udi == null)
                     throw new InvalidOperationException("Block data cannot contain a null UDI");
 
                 // replace the UDIs
-                if (!onlyMissingKeys)
-                {
-                    var newUdi = GuidUdi.Create(Constants.UdiEntityType.Element, createGuid());
-                    oldToNew[data.Udi] = newUdi;
-                    data.Udi = newUdi;
-                }
+                var newUdi = GuidUdi.Create(Constants.UdiEntityType.Element, createGuid());
+                oldToNew[data.Udi] = newUdi;
+                data.Udi = newUdi;
             }
         }
     }
