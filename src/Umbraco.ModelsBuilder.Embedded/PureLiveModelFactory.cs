@@ -34,7 +34,6 @@ namespace Umbraco.ModelsBuilder.Embedded
         private UmbracoServices UmbracoServices => _umbracoServices.Value;
 
         private static readonly Regex AssemblyVersionRegex = new Regex("AssemblyVersion\\(\"[0-9]+.[0-9]+.[0-9]+.[0-9]+\"\\)", RegexOptions.Compiled);
-        private const string CodeGen = "~/App_Data/Models/";
         private static readonly string[] OurFiles = { "models.hash", "models.generated.cs", "all.generated.cs", "all.dll.path", "models.err", "Compiled" };
 
         private readonly IModelsBuilderConfig _config;
@@ -347,7 +346,6 @@ namespace Umbraco.ModelsBuilder.Embedded
                 if (File.Exists(dllPathFile))
                 {
                     var dllPath = File.ReadAllText(dllPathFile);
-                    var codegen = CodeGen;
 
                     _logger.Debug<PureLiveModelFactory>($"Cached models dll at {dllPath}.");
 
@@ -374,8 +372,6 @@ namespace Umbraco.ModelsBuilder.Embedded
                         _logger.Debug<PureLiveModelFactory>("Cached models dll does not exist.");
                     else if (File.Exists(dllPath + ".delete"))
                         _logger.Debug<PureLiveModelFactory>("Cached models dll is marked for deletion.");
-                    else if (!dllPath.StartsWith(codegen))
-                        _logger.Debug<PureLiveModelFactory>("Cached models dll is in a different codegen directory.");
                     else
                         _logger.Debug<PureLiveModelFactory>("Cached models dll cannot be loaded (why?).");
                 }
