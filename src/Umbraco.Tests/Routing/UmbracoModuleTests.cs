@@ -36,7 +36,7 @@ namespace Umbraco.Tests.Routing
                 logger,
                 null, // FIXME: PublishedRouter complexities...
                 Mock.Of<IUmbracoContextFactory>(),
-                new RoutableDocumentFilter(ConfigModelConversionsToLegacy.ConvertGlobalSettings(globalSettings), IOHelper),
+                new RoutableDocumentFilter(globalSettings, IOHelper),
                 UriUtility,
                 AppCaches.RequestCache,
                 ConfigModelConversionsToLegacy.ConvertGlobalSettings(globalSettings),

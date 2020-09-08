@@ -156,11 +156,6 @@ namespace Umbraco.Extensions
                 settings.EnableTours = false;
             });
 
-            // TODO: remove this once no longer requred in Umbraco.Web.
-            var configsFactory = new AspNetCoreConfigsFactory(configuration);
-            var configs = configsFactory.Create();
-            services.AddSingleton(configs);
-
             return services;
         }
 
@@ -235,7 +230,7 @@ namespace Umbraco.Extensions
             AppCaches  appCaches,
             ILoggingConfiguration loggingConfiguration,
             //TODO: Yep that's extremely ugly
-            Func<Configs, GlobalSettings, ConnectionStrings, IUmbracoVersion, IIOHelper, ILogger, IProfiler, IHostingEnvironment, IBackOfficeInfo, ITypeFinder, AppCaches, IDbProviderFactoryCreator, IRuntime> getRuntime,
+            Func<GlobalSettings, ConnectionStrings, IUmbracoVersion, IIOHelper, ILogger, IProfiler, IHostingEnvironment, IBackOfficeInfo, ITypeFinder, AppCaches, IDbProviderFactoryCreator, IRuntime> getRuntime,
             out IFactory factory)
         {
             if (services is null) throw new ArgumentNullException(nameof(services));
@@ -280,9 +275,7 @@ namespace Umbraco.Extensions
             var umbracoVersion = new UmbracoVersion();
             var typeFinder = CreateTypeFinder(logger, profiler, webHostEnvironment, entryAssembly, typeFinderSettings);
 
-            var configs = serviceProvider.GetService<Configs>();
             var coreRuntime = getRuntime(
-                configs,
                 globalSettings.CurrentValue,
                 connectionStrings.Value,
                 umbracoVersion,
@@ -316,8 +309,8 @@ namespace Umbraco.Extensions
         }
 
         private static IRuntime GetCoreRuntime(
-            Configs configs, GlobalSettings globalSettings, ConnectionStrings connectionStrings, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, Core.Logging.ILogger logger,
-            IProfiler profiler, Core.Hosting.IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo,
+           GlobalSettings globalSettings, ConnectionStrings connectionStrings, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger,
+            IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo,
             ITypeFinder typeFinder, AppCaches appCaches, IDbProviderFactoryCreator dbProviderFactoryCreator)
         {
             // Determine if we should use the sql main dom or the default
@@ -331,7 +324,6 @@ namespace Umbraco.Extensions
             var mainDom = new MainDom(logger, mainDomLock);
 
             var coreRuntime = new CoreRuntime(
-                configs,
                 globalSettings,
                 connectionStrings,
                 umbracoVersion,

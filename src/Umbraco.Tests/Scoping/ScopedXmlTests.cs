@@ -51,10 +51,6 @@ namespace Umbraco.Tests.Scoping
             Composition.Register(x => Microsoft.Extensions.Options.Options.Create(contentSettings));
             Composition.Register(x => Microsoft.Extensions.Options.Options.Create(globalSettings));
             Composition.Register(x => Microsoft.Extensions.Options.Options.Create(userPasswordConfigurationSettings));
-
-            // TODO: remove this once legacy config is fully extracted.
-            Composition.Configs.Add(SettingsForTests.GenerateMockContentSettings);
-            Composition.Configs.Add(SettingsForTests.GenerateMockGlobalSettings);
         }
 
         [TearDown]

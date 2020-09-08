@@ -31,7 +31,7 @@ namespace Umbraco.Tests.IO
         {
             _register = TestHelper.GetRegister();
 
-            var composition = new Composition(_register, TestHelper.GetMockedTypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.GetConfigs(), TestHelper.IOHelper, AppCaches.NoCache);
+            var composition = new Composition(_register, TestHelper.GetMockedTypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.IOHelper, AppCaches.NoCache);
 
             composition.Register(_ => Mock.Of<ILogger>());
             composition.Register(_ => Mock.Of<IDataTypeService>());
@@ -42,14 +42,10 @@ namespace Umbraco.Tests.IO
             composition.RegisterUnique(TestHelper.IOHelper);
             composition.RegisterUnique(TestHelper.GetHostingEnvironment());
 
-            composition.Configs.Add(() => SettingsForTests.DefaultGlobalSettings);
-
             var globalSettings = new GlobalSettingsBuilder().Build();
             composition.Register(x => Microsoft.Extensions.Options.Options.Create(globalSettings));
 
             composition.ComposeFileSystems();
-
-            composition.Configs.Add(SettingsForTests.GenerateMockContentSettings);
 
             _factory = composition.CreateFactory();
 

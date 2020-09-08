@@ -188,8 +188,10 @@ namespace Umbraco.Tests.Testing
 
 
 
-            Composition = new Composition(register, typeLoader, proflogger, ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.GetConfigs(), TestHelper.IOHelper, AppCaches.NoCache);
+            Composition = new Composition(register, typeLoader, proflogger, ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.IOHelper, AppCaches.NoCache);
 
+
+            TestHelper.GetConfigs().RegisterWith(register);
 
 
             Composition.RegisterUnique(IOHelper);
@@ -427,16 +429,6 @@ namespace Umbraco.Tests.Testing
             Composition.Register(x => Microsoft.Extensions.Options.Options.Create(requestHandlerSettings));
             Composition.Register(x => Microsoft.Extensions.Options.Options.Create(userPasswordConfigurationSettings));
             Composition.Register(x => Microsoft.Extensions.Options.Options.Create(webRoutingSettings));
-
-            // TODO: remove this once legacy config is fully extracted.
-            Composition.Configs.Add(() => TestHelpers.SettingsForTests.DefaultGlobalSettings);
-            Composition.Configs.Add(() => TestHelpers.SettingsForTests.DefaultHostingSettings);
-            Composition.Configs.Add(TestHelpers.SettingsForTests.GenerateMockRequestHandlerSettings);
-            Composition.Configs.Add(TestHelpers.SettingsForTests.GenerateMockWebRoutingSettings);
-            Composition.Configs.Add(TestHelpers.SettingsForTests.GenerateMockSecuritySettings);
-            Composition.Configs.Add(TestHelpers.SettingsForTests.GenerateMockUserPasswordConfiguration);
-            Composition.Configs.Add(TestHelpers.SettingsForTests.GenerateMockMemberPasswordConfiguration);
-            Composition.Configs.Add(TestHelpers.SettingsForTests.GenerateMockContentSettings);
         }
 
         protected virtual void ComposeApplication(bool withApplication)

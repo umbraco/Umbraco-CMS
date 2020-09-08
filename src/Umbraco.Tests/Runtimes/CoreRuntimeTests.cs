@@ -7,6 +7,7 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Hosting;
@@ -21,6 +22,7 @@ using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Web;
 using Umbraco.Web.Hosting;
 using Umbraco.Web.Runtime;
+using ConnectionStrings = Umbraco.Core.Configuration.Models.ConnectionStrings;
 using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.Runtimes
@@ -82,18 +84,21 @@ namespace Umbraco.Tests.Runtimes
         // test application
         public class TestUmbracoApplication : UmbracoApplicationBase
         {
-            public TestUmbracoApplication() : base(_logger, _configs, _ioHelper, _profiler, new AspNetHostingEnvironment(_hostingSettings), new AspNetBackOfficeInfo(_globalSettings, _ioHelper,  _logger, _settings))
+            public TestUmbracoApplication() : base(_logger,
+                ConfigModelConversionsFromLegacy.ConvertSecuritySettings(SettingsForTests.GenerateMockSecuritySettings()),
+                ConfigModelConversionsFromLegacy.ConvertGlobalSettings(SettingsForTests.DefaultGlobalSettings),
+                new ConnectionStrings(),
+                _ioHelper, _profiler, new AspNetHostingEnvironment(_hostingSettings), new AspNetBackOfficeInfo(_globalSettings, _ioHelper,  _logger, _settings))
             {
             }
 
             private static readonly DebugDiagnosticsLogger _logger = new DebugDiagnosticsLogger(new MessageTemplates());
             private static readonly IIOHelper _ioHelper = TestHelper.IOHelper;
             private static readonly IProfiler _profiler = new TestProfiler();
-            private static readonly Configs _configs = GetConfigs();
             private static readonly IGlobalSettings _globalSettings = SettingsForTests.DefaultGlobalSettings;
             private static readonly IHostingSettings _hostingSettings = SettingsForTests.DefaultHostingSettings;
             private static readonly IContentSettings _contentSettings = SettingsForTests.GenerateMockContentSettings();
-            private static readonly IWebRoutingSettings _settings = _configs.WebRouting();
+            private static readonly IWebRoutingSettings _settings = SettingsForTests.GenerateMockWebRoutingSettings();
 
             private static Configs GetConfigs()
             {
@@ -106,17 +111,17 @@ namespace Umbraco.Tests.Runtimes
 
             public IRuntime Runtime { get; private set; }
 
-            protected override IRuntime GetRuntime(Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)
+            protected override IRuntime GetRuntime(GlobalSettings globalSettings, ConnectionStrings connectionStrings, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)
             {
-                return Runtime = new TestRuntime(configs, umbracoVersion, ioHelper, logger, profiler, hostingEnvironment, backOfficeInfo);
+                return Runtime = new TestRuntime(globalSettings, connectionStrings, umbracoVersion, ioHelper, logger, profiler, hostingEnvironment, backOfficeInfo);
             }
         }
 
         // test runtime
         public class TestRuntime : CoreRuntime
         {
-            public TestRuntime(Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)
-                :base(configs,  ConfigModelConversionsFromLegacy.ConvertGlobalSettings(configs.Global()), ConfigModelConversionsFromLegacy.ConvertConnectionStrings(configs.ConnectionStrings()),umbracoVersion, ioHelper, logger,  profiler, new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, TestHelper.DbProviderFactoryCreator, TestHelper.MainDom, TestHelper.GetTypeFinder(), AppCaches.NoCache)
+            public TestRuntime(GlobalSettings globalSettings, ConnectionStrings connectionStrings, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)
+                :base(globalSettings, connectionStrings,umbracoVersion, ioHelper, logger,  profiler, new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, TestHelper.DbProviderFactoryCreator, TestHelper.MainDom, TestHelper.GetTypeFinder(), AppCaches.NoCache)
             {
 
             }

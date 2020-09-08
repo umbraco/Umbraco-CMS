@@ -8,6 +8,7 @@ using System.Web.Routing;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Strings;
 using Umbraco.Infrastructure.Configuration;
@@ -23,7 +24,7 @@ namespace Umbraco.Web.Runtime
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly SurfaceControllerTypeCollection _surfaceControllerTypes;
         private readonly UmbracoApiControllerTypeCollection _apiControllerTypes;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IShortStringHelper _shortStringHelper;
 
@@ -31,7 +32,7 @@ namespace Umbraco.Web.Runtime
             IUmbracoContextAccessor umbracoContextAccessor,
             SurfaceControllerTypeCollection surfaceControllerTypes,
             UmbracoApiControllerTypeCollection apiControllerTypes,
-            IGlobalSettings globalSettings,
+            GlobalSettings globalSettings,
             IHostingEnvironment hostingEnvironment,
             IShortStringHelper shortStringHelper)
         {
@@ -109,13 +110,13 @@ namespace Umbraco.Web.Runtime
         // internal for tests
         internal static void CreateRoutes(
             IUmbracoContextAccessor umbracoContextAccessor,
-            IGlobalSettings globalSettings,
+            GlobalSettings globalSettings,
             IShortStringHelper shortStringHelper,
             SurfaceControllerTypeCollection surfaceControllerTypes,
             UmbracoApiControllerTypeCollection apiControllerTypes,
             IHostingEnvironment hostingEnvironment)
         {
-            var umbracoPath = ConfigModelConversionsFromLegacy.ConvertGlobalSettings(globalSettings).GetUmbracoMvcArea(hostingEnvironment);
+            var umbracoPath = globalSettings.GetUmbracoMvcArea(hostingEnvironment);
 
             // create the front-end route
             var defaultRoute = RouteTable.Routes.MapRoute(
@@ -147,12 +148,12 @@ namespace Umbraco.Web.Runtime
         }
 
         private static void RoutePluginControllers(
-            IGlobalSettings globalSettings,
+            GlobalSettings globalSettings,
             SurfaceControllerTypeCollection surfaceControllerTypes,
             UmbracoApiControllerTypeCollection apiControllerTypes,
             IHostingEnvironment hostingEnvironment)
         {
-            var umbracoPath = ConfigModelConversionsFromLegacy.ConvertGlobalSettings(globalSettings).GetUmbracoMvcArea(hostingEnvironment);
+            var umbracoPath = globalSettings.GetUmbracoMvcArea(hostingEnvironment);
 
             // need to find the plugin controllers and route them
             var pluginControllers = surfaceControllerTypes.Concat(apiControllerTypes).ToArray();

@@ -75,7 +75,7 @@ namespace Umbraco.Tests.Components
         {
             var register = MockRegister();
             var typeLoader = MockTypeLoader();
-            var composition = new Composition(register, MockTypeLoader(), Mock.Of<IProfilingLogger>(), MockRuntimeState(RuntimeLevel.Unknown), TestHelper.GetConfigs(), TestHelper.IOHelper, AppCaches.NoCache);
+            var composition = new Composition(register, MockTypeLoader(), Mock.Of<IProfilingLogger>(), MockRuntimeState(RuntimeLevel.Unknown), TestHelper.IOHelper, AppCaches.NoCache);
 
             var types = TypeArray<Composer1, Composer2, Composer3, Composer4>();
             var composers = new Composers(composition, types, Enumerable.Empty<Attribute>(), Mock.Of<IProfilingLogger>());
@@ -114,7 +114,7 @@ namespace Umbraco.Tests.Components
         public void Boot1B()
         {
             var register = MockRegister();
-            var composition = new Composition(register, MockTypeLoader(), Mock.Of<IProfilingLogger>(), MockRuntimeState(RuntimeLevel.Run), TestHelper.GetConfigs(), TestHelper.IOHelper, AppCaches.NoCache);
+            var composition = new Composition(register, MockTypeLoader(), Mock.Of<IProfilingLogger>(), MockRuntimeState(RuntimeLevel.Run), TestHelper.IOHelper, AppCaches.NoCache);
 
             var types = TypeArray<Composer1, Composer2, Composer3, Composer4>();
             var composers = new Composers(composition, types, Enumerable.Empty<Attribute>(), Mock.Of<IProfilingLogger>());
@@ -130,7 +130,7 @@ namespace Umbraco.Tests.Components
         public void Boot2()
         {
             var register = MockRegister();
-            var composition = new Composition(register, MockTypeLoader(), Mock.Of<IProfilingLogger>(), MockRuntimeState(RuntimeLevel.Unknown), TestHelper.GetConfigs(), TestHelper.IOHelper, AppCaches.NoCache);
+            var composition = new Composition(register, MockTypeLoader(), Mock.Of<IProfilingLogger>(), MockRuntimeState(RuntimeLevel.Unknown), TestHelper.IOHelper, AppCaches.NoCache);
 
             var types = TypeArray<Composer20, Composer21>();
             var composers = new Composers(composition, types, Enumerable.Empty<Attribute>(), Mock.Of<IProfilingLogger>());
@@ -145,7 +145,7 @@ namespace Umbraco.Tests.Components
         public void Boot3()
         {
             var register = MockRegister();
-            var composition = new Composition(register, MockTypeLoader(), Mock.Of<IProfilingLogger>(), MockRuntimeState(RuntimeLevel.Unknown), TestHelper.GetConfigs(), TestHelper.IOHelper, AppCaches.NoCache);
+            var composition = new Composition(register, MockTypeLoader(), Mock.Of<IProfilingLogger>(), MockRuntimeState(RuntimeLevel.Unknown), TestHelper.IOHelper, AppCaches.NoCache);
 
             var types = TypeArray<Composer22, Composer24, Composer25>();
             var composers = new Composers(composition, types, Enumerable.Empty<Attribute>(), Mock.Of<IProfilingLogger>());
@@ -162,7 +162,7 @@ namespace Umbraco.Tests.Components
         public void BrokenRequire()
         {
             var register = MockRegister();
-            var composition = new Composition(register, MockTypeLoader(), Mock.Of<IProfilingLogger>(), MockRuntimeState(RuntimeLevel.Unknown), TestHelper.GetConfigs(), TestHelper.IOHelper, AppCaches.NoCache);
+            var composition = new Composition(register, MockTypeLoader(), Mock.Of<IProfilingLogger>(), MockRuntimeState(RuntimeLevel.Unknown), TestHelper.IOHelper, AppCaches.NoCache);
 
             var types = TypeArray<Composer1, Composer2, Composer3>();
             var composers = new Composers(composition, types, Enumerable.Empty<Attribute>(), Mock.Of<IProfilingLogger>());
@@ -185,7 +185,7 @@ namespace Umbraco.Tests.Components
         public void BrokenRequired()
         {
             var register = MockRegister();
-            var composition = new Composition(register, MockTypeLoader(), Mock.Of<IProfilingLogger>(), MockRuntimeState(RuntimeLevel.Unknown), TestHelper.GetConfigs(), TestHelper.IOHelper, AppCaches.NoCache);
+            var composition = new Composition(register, MockTypeLoader(), Mock.Of<IProfilingLogger>(), MockRuntimeState(RuntimeLevel.Unknown), TestHelper.IOHelper, AppCaches.NoCache);
 
             var types = TypeArray<Composer2, Composer4, Composer13>();
             var composers = new Composers(composition, types, Enumerable.Empty<Attribute>(), Mock.Of<IProfilingLogger>());
@@ -221,7 +221,7 @@ namespace Umbraco.Tests.Components
                     throw new NotSupportedException(type.FullName);
                 });
             });
-            var composition = new Composition(register, MockTypeLoader(), Mock.Of<IProfilingLogger>(), MockRuntimeState(RuntimeLevel.Unknown), TestHelper.GetConfigs(), TestHelper.IOHelper, AppCaches.NoCache);
+            var composition = new Composition(register, MockTypeLoader(), Mock.Of<IProfilingLogger>(), MockRuntimeState(RuntimeLevel.Unknown), TestHelper.IOHelper, AppCaches.NoCache);
 
             var types = new[] { typeof(Composer1), typeof(Composer5), typeof(Composer5a) };
             var composers = new Composers(composition, types, Enumerable.Empty<Attribute>(), Mock.Of<IProfilingLogger>());
@@ -247,7 +247,7 @@ namespace Umbraco.Tests.Components
         public void Requires1()
         {
             var register = MockRegister();
-            var composition = new Composition(register, MockTypeLoader(), Mock.Of<IProfilingLogger>(), MockRuntimeState(RuntimeLevel.Unknown), TestHelper.GetConfigs(), TestHelper.IOHelper, AppCaches.NoCache);
+            var composition = new Composition(register, MockTypeLoader(), Mock.Of<IProfilingLogger>(), MockRuntimeState(RuntimeLevel.Unknown), TestHelper.IOHelper, AppCaches.NoCache);
 
             var types = new[] { typeof(Composer6), typeof(Composer7), typeof(Composer8) };
             var composers = new Composers(composition, types, Enumerable.Empty<Attribute>(), Mock.Of<IProfilingLogger>());
@@ -262,7 +262,7 @@ namespace Umbraco.Tests.Components
         public void Requires2A()
         {
             var register = MockRegister();
-            var composition = new Composition(register, MockTypeLoader(), Mock.Of<IProfilingLogger>(), MockRuntimeState(RuntimeLevel.Unknown), TestHelper.GetConfigs(), TestHelper.IOHelper, AppCaches.NoCache);
+            var composition = new Composition(register, MockTypeLoader(), Mock.Of<IProfilingLogger>(), MockRuntimeState(RuntimeLevel.Unknown), TestHelper.IOHelper, AppCaches.NoCache);
 
             var types = new[] { typeof(Composer9), typeof(Composer2), typeof(Composer4) };
             var composers = new Composers(composition, types, Enumerable.Empty<Attribute>(), Mock.Of<IProfilingLogger>());
@@ -280,7 +280,7 @@ namespace Umbraco.Tests.Components
             var register = MockRegister();
             var typeLoader = MockTypeLoader();
             var factory = MockFactory();
-            var composition = new Composition(register, MockTypeLoader(), Mock.Of<IProfilingLogger>(), MockRuntimeState(RuntimeLevel.Run), TestHelper.GetConfigs(), TestHelper.IOHelper, AppCaches.NoCache);
+            var composition = new Composition(register, MockTypeLoader(), Mock.Of<IProfilingLogger>(), MockRuntimeState(RuntimeLevel.Run), TestHelper.IOHelper, AppCaches.NoCache);
 
             var types = new[] { typeof(Composer9), typeof(Composer2), typeof(Composer4) };
             var composers = new Composers(composition, types, Enumerable.Empty<Attribute>(), Mock.Of<IProfilingLogger>());
@@ -299,7 +299,7 @@ namespace Umbraco.Tests.Components
         public void WeakDependencies()
         {
             var register = MockRegister();
-            var composition = new Composition(register, MockTypeLoader(), Mock.Of<IProfilingLogger>(), MockRuntimeState(RuntimeLevel.Unknown), TestHelper.GetConfigs(), TestHelper.IOHelper, AppCaches.NoCache);
+            var composition = new Composition(register, MockTypeLoader(), Mock.Of<IProfilingLogger>(), MockRuntimeState(RuntimeLevel.Unknown), TestHelper.IOHelper, AppCaches.NoCache);
 
             var types = new[] { typeof(Composer10) };
             var composers = new Composers(composition, types, Enumerable.Empty<Attribute>(), Mock.Of<IProfilingLogger>());
@@ -338,7 +338,7 @@ namespace Umbraco.Tests.Components
         public void DisableMissing()
         {
             var register = MockRegister();
-            var composition = new Composition(register, MockTypeLoader(), Mock.Of<IProfilingLogger>(), MockRuntimeState(RuntimeLevel.Unknown), TestHelper.GetConfigs(), TestHelper.IOHelper, AppCaches.NoCache);
+            var composition = new Composition(register, MockTypeLoader(), Mock.Of<IProfilingLogger>(), MockRuntimeState(RuntimeLevel.Unknown), TestHelper.IOHelper, AppCaches.NoCache);
 
             var types = new[] { typeof(Composer6), typeof(Composer8) }; // 8 disables 7 which is not in the list
             var composers = new Composers(composition, types, Enumerable.Empty<Attribute>(), Mock.Of<IProfilingLogger>());
@@ -353,7 +353,7 @@ namespace Umbraco.Tests.Components
         public void AttributesPriorities()
         {
             var register = MockRegister();
-            var composition = new Composition(register, MockTypeLoader(), Mock.Of<IProfilingLogger>(), MockRuntimeState(RuntimeLevel.Unknown), TestHelper.GetConfigs(), TestHelper.IOHelper, AppCaches.NoCache);
+            var composition = new Composition(register, MockTypeLoader(), Mock.Of<IProfilingLogger>(), MockRuntimeState(RuntimeLevel.Unknown), TestHelper.IOHelper, AppCaches.NoCache);
 
             var types = new[] { typeof(Composer26) };
             var enableDisableAttributes = new[] { new DisableComposerAttribute(typeof(Composer26)) };
@@ -380,7 +380,7 @@ namespace Umbraco.Tests.Components
 
             var register = MockRegister();
             var composition = new Composition(register, typeLoader, Mock.Of<IProfilingLogger>(),
-                MockRuntimeState(RuntimeLevel.Run), TestHelper.GetConfigs(), TestHelper.IOHelper, AppCaches.NoCache);
+                MockRuntimeState(RuntimeLevel.Run), TestHelper.IOHelper, AppCaches.NoCache);
 
             var allComposers = typeLoader.GetTypes<IComposer>().ToList();
             var types = allComposers.Where(x => x.FullName.StartsWith("Umbraco.Core.") || x.FullName.StartsWith("Umbraco.Web")).ToList();

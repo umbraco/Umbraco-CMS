@@ -3,10 +3,12 @@ using NUnit.Framework;
 using System;
 using System.IO;
 using System.Linq;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -57,7 +59,7 @@ namespace Umbraco.Tests.Integration.Testing
         /// <returns></returns>
         private ILocalizedTextService GetLocalizedTextService(IFactory factory)
         {
-            var configs = factory.GetInstance<Configs>();
+            var globalSettings = factory.GetInstance<IOptions<GlobalSettings>>();
             var logger = factory.GetInstance<ILogger>();
             var appCaches = factory.GetInstance<AppCaches>();
 
@@ -71,7 +73,7 @@ namespace Umbraco.Tests.Integration.Testing
                         currFolder = currFolder.Parent;
                     }
                     var netcoreUI = currFolder.GetDirectories("Umbraco.Web.UI.NetCore", SearchOption.TopDirectoryOnly).First();
-                    var mainLangFolder = new DirectoryInfo(Path.Combine(netcoreUI.FullName, configs.Global().UmbracoPath.TrimStart("~/"), "config", "lang"));
+                    var mainLangFolder = new DirectoryInfo(Path.Combine(netcoreUI.FullName, globalSettings.Value.UmbracoPath.TrimStart("~/"), "config", "lang"));
 
                     return new LocalizedTextServiceFileSources(
                         logger,

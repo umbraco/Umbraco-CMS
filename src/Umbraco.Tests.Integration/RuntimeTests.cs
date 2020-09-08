@@ -56,12 +56,11 @@ namespace Umbraco.Tests.Integration
 
             var testHelper = new TestHelper();
 
-            var configs = testHelper.GetConfigs();
             var globalSettings = new GlobalSettingsBuilder().Build();
             var connectionStrings = new ConnectionStringsBuilder().Build();
 
             // Create the core runtime
-            var coreRuntime = new CoreRuntime(configs, globalSettings, connectionStrings, testHelper.GetUmbracoVersion(),
+            var coreRuntime = new CoreRuntime(globalSettings, connectionStrings, testHelper.GetUmbracoVersion(),
                 testHelper.IOHelper, testHelper.Logger, testHelper.Profiler, testHelper.UmbracoBootPermissionChecker,
                 testHelper.GetHostingEnvironment(), testHelper.GetBackOfficeInfo(), testHelper.DbProviderFactoryCreator,
                 testHelper.MainDom, testHelper.GetTypeFinder(), AppCaches.NoCache);
@@ -92,7 +91,7 @@ namespace Umbraco.Tests.Integration
             umbracoContainer.Register(x => Options.Create(requestHandlerSettings));
             umbracoContainer.Register(x => Options.Create(userPasswordConfigurationSettings));
             umbracoContainer.Register(x => Options.Create(webRoutingSettings));
-            
+
             coreRuntime.Start();
 
             Assert.IsTrue(MyComponent.IsInit);

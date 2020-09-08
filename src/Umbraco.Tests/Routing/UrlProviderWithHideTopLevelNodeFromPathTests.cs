@@ -29,7 +29,7 @@ namespace Umbraco.Tests.Routing
             base.ComposeSettings();
             Composition.RegisterUnique(x => Microsoft.Extensions.Options.Options.Create(_globalSettings));
         }
-        
+
         [TestCase(1046, "/")]
         [TestCase(1173, "/sub1/")]
         [TestCase(1174, "/sub1/sub2/")]
@@ -40,11 +40,10 @@ namespace Umbraco.Tests.Routing
         [TestCase(1172, "/test-page/")] // not hidden because not first root
         public void Get_Url_Hiding_Top_Level(int nodeId, string niceUrlMatch)
         {
-            var globalSettings = Mock.Get(Factory.GetInstance<IGlobalSettings>()); //this will modify the IGlobalSettings instance stored in the container
-            globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(true);
 
             var requestHandlerSettings = new RequestHandlerSettingsBuilder().WithAddTrailingSlash(true).Build();
-            var umbracoContext = GetUmbracoContext("/test", 1111, globalSettings: ConfigModelConversionsToLegacy.ConvertGlobalSettings(_globalSettings));
+            var snapshotService = CreatePublishedSnapshotService(_globalSettings);
+            var umbracoContext = GetUmbracoContext("/test", 1111, globalSettings: _globalSettings,snapshotService:snapshotService);
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
             var urlProvider = new DefaultUrlProvider(
                 Microsoft.Extensions.Options.Options.Create(requestHandlerSettings),

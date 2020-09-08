@@ -2,6 +2,7 @@ using System;
 using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Infrastructure.Configuration;
@@ -18,7 +19,7 @@ namespace Umbraco.Web
     public class UmbracoContext : DisposableObjectSlim, IDisposeOnRequestEnd, IUmbracoContext
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ICookieManager _cookieManager;
         private readonly Lazy<IPublishedSnapshot> _publishedSnapshot;
@@ -32,7 +33,7 @@ namespace Umbraco.Web
         internal UmbracoContext(IHttpContextAccessor httpContextAccessor,
             IPublishedSnapshotService publishedSnapshotService,
             IWebSecurity webSecurity,
-            IGlobalSettings globalSettings,
+            GlobalSettings globalSettings,
             IHostingEnvironment hostingEnvironment,
             IVariationContextAccessor variationContextAccessor,
             UriUtility uriUtility,
@@ -182,7 +183,7 @@ namespace Umbraco.Web
         {
             var request = GetRequestFromContext();
             if (request?.Url != null
-                && request.Url.IsBackOfficeRequest(ConfigModelConversionsFromLegacy.ConvertGlobalSettings(_globalSettings), _hostingEnvironment) == false
+                && request.Url.IsBackOfficeRequest(_globalSettings, _hostingEnvironment) == false
                 && Security.CurrentUser != null)
             {
                 var previewToken = _cookieManager.GetPreviewCookieValue(); // may be null or empty

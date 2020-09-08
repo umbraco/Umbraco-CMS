@@ -123,7 +123,6 @@ namespace Umbraco.Tests.Integration.Testing
         /// <summary>
         /// Creates a <see cref="CoreRuntime"/> instance for testing and registers an event handler for database install
         /// </summary>
-        /// <param name="configs"></param>
         /// <param name="connectionStrings"></param>
         /// <param name="umbracoVersion"></param>
         /// <param name="ioHelper"></param>
@@ -137,14 +136,13 @@ namespace Umbraco.Tests.Integration.Testing
         /// <param name="globalSettings"></param>
         /// <returns></returns>
         public CoreRuntime CreateTestRuntime(
-            Configs configs,
             GlobalSettings globalSettings,
             ConnectionStrings connectionStrings,
             IUmbracoVersion umbracoVersion, IIOHelper ioHelper,
             ILogger logger, IProfiler profiler, Core.Hosting.IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo,
             ITypeFinder typeFinder, AppCaches appCaches, IDbProviderFactoryCreator dbProviderFactoryCreator)
         {
-            var runtime = CreateTestRuntime(configs,
+            var runtime = CreateTestRuntime(
                 globalSettings,
                 connectionStrings,
                 umbracoVersion,
@@ -166,7 +164,6 @@ namespace Umbraco.Tests.Integration.Testing
         /// <summary>
         /// Creates a <see cref="CoreRuntime"/> instance for testing and registers an event handler for database install
         /// </summary>
-        /// <param name="configs"></param>
         /// <param name="connectionStrings"></param>
         /// <param name="umbracoVersion"></param>
         /// <param name="ioHelper"></param>
@@ -182,7 +179,6 @@ namespace Umbraco.Tests.Integration.Testing
         /// <param name="globalSettings"></param>
         /// <returns></returns>
         public static CoreRuntime CreateTestRuntime(
-            Configs configs,
             GlobalSettings globalSettings,
             ConnectionStrings connectionStrings,
             IUmbracoVersion umbracoVersion, IIOHelper ioHelper,
@@ -191,7 +187,6 @@ namespace Umbraco.Tests.Integration.Testing
             IMainDom mainDom, Action<CoreRuntime, RuntimeEssentialsEventArgs> eventHandler)
         {
             var runtime = new CoreRuntime(
-                configs,
                 globalSettings,
                 connectionStrings,
                 umbracoVersion,

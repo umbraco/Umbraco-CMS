@@ -81,11 +81,11 @@ namespace Umbraco.Tests.Runtimes
 
             // create the register and the composition
             var register = TestHelper.GetRegister();
-            var composition = new Composition(register, typeLoader, profilingLogger, runtimeState, configs, ioHelper, appCaches);
+            var composition = new Composition(register, typeLoader, profilingLogger, runtimeState, ioHelper, appCaches);
             composition.RegisterEssentials(logger, profiler, profilingLogger, mainDom, appCaches, databaseFactory, typeLoader, runtimeState, typeFinder, ioHelper, umbracoVersion, TestHelper.DbProviderFactoryCreator, hostingEnvironment, backOfficeInfo);
 
             // create the core runtime and have it compose itself
-            var coreRuntime = new CoreRuntime(configs,  globalSettings, connectionStrings, umbracoVersion, ioHelper, logger, profiler, new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, TestHelper.DbProviderFactoryCreator, TestHelper.MainDom, typeFinder, AppCaches.NoCache);
+            var coreRuntime = new CoreRuntime(globalSettings, connectionStrings, umbracoVersion, ioHelper, logger, profiler, new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, TestHelper.DbProviderFactoryCreator, TestHelper.MainDom, typeFinder, AppCaches.NoCache);
 
             // determine actual runtime level
             runtimeState.DetermineRuntimeLevel();
@@ -289,7 +289,7 @@ namespace Umbraco.Tests.Runtimes
 
             // create the register and the composition
             var register = TestHelper.GetRegister();
-            var composition = new Composition(register, typeLoader, profilingLogger, runtimeState, configs, ioHelper, appCaches);
+            var composition = new Composition(register, typeLoader, profilingLogger, runtimeState, ioHelper, appCaches);
             var umbracoVersion = TestHelper.GetUmbracoVersion();
             composition.RegisterEssentials(logger, profiler, profilingLogger, mainDom, appCaches, databaseFactory, typeLoader, runtimeState, typeFinder, ioHelper, umbracoVersion, TestHelper.DbProviderFactoryCreator, hostingEnvironment, backOfficeInfo);
 
@@ -297,7 +297,7 @@ namespace Umbraco.Tests.Runtimes
             var globalSettings = new GlobalSettingsBuilder().Build();
             var connectionStrings = new ConnectionStringsBuilder().Build();
 
-            var coreRuntime = new CoreRuntime(configs, globalSettings, connectionStrings, umbracoVersion, ioHelper, logger, profiler, new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, TestHelper.DbProviderFactoryCreator, TestHelper.MainDom, typeFinder, AppCaches.NoCache);
+            var coreRuntime = new CoreRuntime(globalSettings, connectionStrings, umbracoVersion, ioHelper, logger, profiler, new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, TestHelper.DbProviderFactoryCreator, TestHelper.MainDom, typeFinder, AppCaches.NoCache);
 
             // get the components
             // all of them?

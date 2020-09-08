@@ -43,7 +43,7 @@ namespace Umbraco.Tests.Routing
             const string url = "http://domain1.com/1001-1/1001-1-1";
 
             // get the nice url for 100111
-            var umbracoContext = GetUmbracoContext(url, 9999, globalSettings: ConfigModelConversionsToLegacy.ConvertGlobalSettings(globalSettings));
+            var umbracoContext = GetUmbracoContext(url, 9999, globalSettings: globalSettings);
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
             var urlProvider = new DefaultUrlProvider(
                 Microsoft.Extensions.Options.Options.Create(requestHandlerSettings),

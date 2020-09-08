@@ -35,16 +35,13 @@ namespace Umbraco.Tests.Scoping
 
             var register = TestHelper.GetRegister();
 
-            var composition = new Composition(register, TestHelper.GetMockedTypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.GetConfigs(), TestHelper.IOHelper, AppCaches.NoCache);
+            var composition = new Composition(register, TestHelper.GetMockedTypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.IOHelper, AppCaches.NoCache);
 
             _testObjects = new TestObjects(register);
 
             var globalSettings = new GlobalSettingsBuilder().Build();
             composition.RegisterUnique(factory => new FileSystems(factory, factory.TryGetInstance<ILogger>(), TestHelper.IOHelper, Microsoft.Extensions.Options.Options.Create(globalSettings), TestHelper.GetHostingEnvironment()));
             composition.WithCollectionBuilder<MapperCollectionBuilder>();
-
-            composition.Configs.Add(() => SettingsForTests.DefaultGlobalSettings);
-            composition.Configs.Add(SettingsForTests.GenerateMockContentSettings);
 
             Current.Reset();
             Current.Factory = composition.CreateFactory();

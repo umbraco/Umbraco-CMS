@@ -182,7 +182,7 @@ namespace Umbraco.Tests.Routing
 
             var globalSettings = new GlobalSettingsBuilder().WithHideTopLevelNodeFromPath(false).Build();
 
-            var umbracoContext = GetUmbracoContext("/test", 1111, globalSettings: ConfigModelConversionsToLegacy.ConvertGlobalSettings(globalSettings));
+            var umbracoContext = GetUmbracoContext("/test", 1111, globalSettings: globalSettings);
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
             var urlProvider = new DefaultUrlProvider(Microsoft.Extensions.Options.Options.Create(requestHandlerSettings),
                 Logger,
@@ -216,7 +216,7 @@ namespace Umbraco.Tests.Routing
             var requestHandlerSettings = new RequestHandlerSettingsBuilder().WithAddTrailingSlash(true).Build();
             var globalSettings = new GlobalSettingsBuilder().WithHideTopLevelNodeFromPath(false).Build();
 
-            var umbracoContext = GetUmbracoContext("/test", 1111, globalSettings: ConfigModelConversionsToLegacy.ConvertGlobalSettings(globalSettings));
+            var umbracoContext = GetUmbracoContext("/test", 1111, globalSettings: globalSettings);
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
             var urlProvider = new DefaultUrlProvider(Microsoft.Extensions.Options.Options.Create(requestHandlerSettings),
                 Logger,
@@ -243,7 +243,7 @@ namespace Umbraco.Tests.Routing
 
             var globalSettings = new GlobalSettingsBuilder().WithHideTopLevelNodeFromPath(false).Build();
 
-            var umbracoContext = GetUmbracoContext("/test", 1111, globalSettings: ConfigModelConversionsToLegacy.ConvertGlobalSettings(globalSettings));
+            var umbracoContext = GetUmbracoContext("/test", 1111, globalSettings: globalSettings);
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
             var urlProvider = new DefaultUrlProvider(Microsoft.Extensions.Options.Options.Create(requestHandlerSettings),
                 Logger,
@@ -276,7 +276,7 @@ namespace Umbraco.Tests.Routing
 
             var globalSettings = new GlobalSettingsBuilder().WithHideTopLevelNodeFromPath(false).Build();
 
-            var umbracoContext = GetUmbracoContext("/test", 1111, globalSettings: ConfigModelConversionsToLegacy.ConvertGlobalSettings(globalSettings));
+            var umbracoContext = GetUmbracoContext("/test", 1111, globalSettings: globalSettings);
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
             var urlProvider = new DefaultUrlProvider(
                 Microsoft.Extensions.Options.Options.Create(requestHandlerSettings),
@@ -300,7 +300,7 @@ namespace Umbraco.Tests.Routing
 
             var globalSettings = new GlobalSettingsBuilder().WithHideTopLevelNodeFromPath(false).Build();
 
-            var umbracoContext = GetUmbracoContext("/test", 1111, globalSettings: ConfigModelConversionsToLegacy.ConvertGlobalSettings(globalSettings));
+            var umbracoContext = GetUmbracoContext("/test", 1111, globalSettings: globalSettings);
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
             var urlProvider = new DefaultUrlProvider(
                 Microsoft.Extensions.Options.Options.Create(requestHandlerSettings),
@@ -366,7 +366,7 @@ namespace Umbraco.Tests.Routing
 
             var globalSettings = new GlobalSettingsBuilder().WithHideTopLevelNodeFromPath(false).Build();
 
-            var umbracoContext = GetUmbracoContext("http://domain1.com/test", 1111, globalSettings: ConfigModelConversionsToLegacy.ConvertGlobalSettings(globalSettings));
+            var umbracoContext = GetUmbracoContext("http://domain1.com/test", 1111, globalSettings: globalSettings);
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
             var urlProvider = new DefaultUrlProvider(
                 Microsoft.Extensions.Options.Options.Create(requestHandlerSettings),
@@ -393,7 +393,7 @@ namespace Umbraco.Tests.Routing
 
             var globalSettings = new GlobalSettingsBuilder().WithHideTopLevelNodeFromPath(false).Build();
 
-            var umbracoContext = GetUmbracoContext("http://domain1.com/en/test", 1111, globalSettings: ConfigModelConversionsToLegacy.ConvertGlobalSettings(globalSettings));
+            var umbracoContext = GetUmbracoContext("http://domain1.com/en/test", 1111, globalSettings: globalSettings);
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
             var urlProvider = new DefaultUrlProvider(
                 Microsoft.Extensions.Options.Options.Create(requestHandlerSettings),

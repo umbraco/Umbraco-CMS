@@ -29,10 +29,6 @@ namespace Umbraco.Tests.Routing
 
             Composition.Register(x => Microsoft.Extensions.Options.Options.Create(contentSettings));
             Composition.Register(x => Microsoft.Extensions.Options.Options.Create(userPasswordConfigurationSettings));
-
-            // TODO: remove this once legacy config is fully extracted.
-            Composition.Configs.Add(TestHelpers.SettingsForTests.GenerateMockContentSettings);
-            Composition.Configs.Add(TestHelpers.SettingsForTests.GenerateMockGlobalSettings);
         }
 
         protected IPublishedUrlProvider GetPublishedUrlProvider(IUmbracoContext umbracoContext, DefaultUrlProvider urlProvider)

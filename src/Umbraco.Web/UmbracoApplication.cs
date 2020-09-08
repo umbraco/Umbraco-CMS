@@ -3,12 +3,13 @@ using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Runtime;
-using Umbraco.Infrastructure.Configuration;
 using Umbraco.Web.Runtime;
+using ConnectionStrings = Umbraco.Core.Configuration.Models.ConnectionStrings;
 
 namespace Umbraco.Web
 {
@@ -17,14 +18,10 @@ namespace Umbraco.Web
     /// </summary>
     public class UmbracoApplication : UmbracoApplicationBase
     {
-        protected override IRuntime GetRuntime(Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)
+        protected override IRuntime GetRuntime(GlobalSettings globalSettings, ConnectionStrings connectionStrings, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)
         {
-            var connectionStringConfig = configs.ConnectionStrings()[Constants.System.UmbracoConnectionName];
-
             var dbProviderFactoryCreator = new UmbracoDbProviderFactoryCreator();
 
-            var globalSettings = ConfigModelConversionsFromLegacy.ConvertGlobalSettings(configs.Global());
-            var connectionStrings = ConfigModelConversionsFromLegacy.ConvertConnectionStrings(configs.ConnectionStrings());
 
             // Determine if we should use the sql main dom or the default
             var appSettingMainDomLock = globalSettings.MainDomLock;
@@ -43,7 +40,7 @@ namespace Umbraco.Web
                 new IsolatedCaches(type => new DeepCloneAppCache(new ObjectCacheAppCache())));
 
             var umbracoBootPermissionChecker = new AspNetUmbracoBootPermissionChecker();
-            return new CoreRuntime(configs, globalSettings, connectionStrings,umbracoVersion, ioHelper, logger, profiler, umbracoBootPermissionChecker, hostingEnvironment, backOfficeInfo, dbProviderFactoryCreator, mainDom,
+            return new CoreRuntime(globalSettings, connectionStrings,umbracoVersion, ioHelper, logger, profiler, umbracoBootPermissionChecker, hostingEnvironment, backOfficeInfo, dbProviderFactoryCreator, mainDom,
                 GetTypeFinder(hostingEnvironment, logger, profiler), appCaches);
         }
 

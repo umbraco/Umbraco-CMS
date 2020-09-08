@@ -8,12 +8,14 @@ using Moq;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Services;
+using Umbraco.Infrastructure.Configuration;
 using Umbraco.Persistance.SqlCe;
 using Umbraco.Tests.Common;
 using Umbraco.Web;
@@ -136,9 +138,9 @@ namespace Umbraco.Tests.TestHelpers
             return umbracoContextFactory.EnsureUmbracoContext().UmbracoContext;
         }
 
-        public IGlobalSettings GetGlobalSettings()
+        public GlobalSettings GetGlobalSettings()
         {
-            return SettingsForTests.DefaultGlobalSettings;
+            return ConfigModelConversionsFromLegacy.ConvertGlobalSettings(SettingsForTests.DefaultGlobalSettings);
         }
         public IFileSystems GetFileSystemsMock()
         {

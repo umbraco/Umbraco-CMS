@@ -116,8 +116,8 @@ namespace Umbraco.Web.Models.Trees
                 //legacy icon path
 
                 // TODO: replace this when we have something other than Current.Configs available
-                //var backOfficePath = Current.Configs.Global().GetUmbracoMvcArea(Current.HostingEnvironment);
-                var backOfficePath = new GlobalSettings().GetUmbracoMvcArea(Current.HostingEnvironment);
+                var backOfficePath = Current.GlobalSettings.GetUmbracoMvcArea(Current.HostingEnvironment);
+
 
                 return string.Format("{0}images/umbraco/{1}", backOfficePath.EnsureEndsWith("/"), Icon);
             }

@@ -29,12 +29,10 @@ namespace Umbraco.Core.Runtime
         // runtime state, this instance will get replaced again once the essential services are available to run the check
         private RuntimeState _state = RuntimeState.Booting();
         private readonly IUmbracoBootPermissionChecker _umbracoBootPermissionChecker;
-        private readonly Configs _configs;
         private readonly GlobalSettings _globalSettings;
         private readonly ConnectionStrings _connectionStrings;
 
         public CoreRuntime(
-            Configs configs, //  TODO: remove this parameter with legacy configuraiton no longer needed in Umbraco.Web and Umbraco.Tests
             GlobalSettings globalSettings,
             ConnectionStrings connectionStrings,
             IUmbracoVersion umbracoVersion,
@@ -49,7 +47,6 @@ namespace Umbraco.Core.Runtime
             ITypeFinder typeFinder,
             AppCaches appCaches)
         {
-            _configs = configs;
             _globalSettings = globalSettings;
             _connectionStrings = connectionStrings;
 
@@ -179,7 +176,7 @@ namespace Umbraco.Core.Runtime
                 _state = new RuntimeState(_globalSettings, UmbracoVersion, databaseFactory, Logger);
 
                 // create the composition
-                composition = new Composition(register, typeLoader, ProfilingLogger, _state, _configs, IOHelper, AppCaches);
+                composition = new Composition(register, typeLoader, ProfilingLogger, _state, IOHelper, AppCaches);
 
                 composition.RegisterEssentials(Logger, Profiler, ProfilingLogger, MainDom, AppCaches, databaseFactory, typeLoader, _state, TypeFinder, IOHelper, UmbracoVersion, DbProviderFactoryCreator, HostingEnvironment, BackOfficeInfo);
 

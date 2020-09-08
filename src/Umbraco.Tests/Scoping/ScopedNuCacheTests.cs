@@ -8,6 +8,7 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Events;
 using Umbraco.Core.Install;
@@ -74,7 +75,7 @@ namespace Umbraco.Tests.Scoping
 
         private Action _onPublishedAssertAction;
 
-        protected override IPublishedSnapshotService CreatePublishedSnapshotService()
+        protected override IPublishedSnapshotService CreatePublishedSnapshotService(GlobalSettings globalSettings = null)
         {
             var options = new PublishedSnapshotServiceOptions { IgnoreLocalDb = true };
             var publishedSnapshotAccessor = new UmbracoContextPublishedSnapshotAccessor(Umbraco.Web.Composing.Current.UmbracoContextAccessor);
@@ -89,7 +90,6 @@ namespace Umbraco.Tests.Scoping
 
             var typeFinder = TestHelper.GetTypeFinder();
 
-            var globalSettings = new GlobalSettingsBuilder().Build();
             var nuCacheSettings = new NuCacheSettingsBuilder().Build();
 
             return new PublishedSnapshotService(
@@ -105,7 +105,7 @@ namespace Umbraco.Tests.Scoping
                 documentRepository, mediaRepository, memberRepository,
                 DefaultCultureAccessor,
                 new DatabaseDataSource(Mock.Of<ILogger>()),
-                Microsoft.Extensions.Options.Options.Create(globalSettings),
+                Microsoft.Extensions.Options.Options.Create(globalSettings ?? new GlobalSettingsBuilder().Build()),
                 Factory.GetInstance<IEntityXmlSerializer>(),
                 new NoopPublishedModelFactory(),
                 new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider(ShortStringHelper) }),

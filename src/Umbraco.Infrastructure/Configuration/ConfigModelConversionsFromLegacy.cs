@@ -1,6 +1,7 @@
 ﻿using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.Configuration.UmbracoSettings;
 
 namespace Umbraco.Infrastructure.Configuration
 {
@@ -67,6 +68,21 @@ namespace Umbraco.Infrastructure.Configuration
                 RequireLowercase = passwordConfiguration.RequireLowercase,
                 RequireNonLetterOrDigit = passwordConfiguration.RequireNonLetterOrDigit,
                 RequireUppercase = passwordConfiguration.RequireUppercase,
+            };
+        }
+
+        public static SecuritySettings ConvertSecuritySettings(ISecuritySettings securitySettings)
+        {
+            return new SecuritySettings
+            {
+                MemberPassword = new MemberPasswordConfigurationSettings(),
+                UserPassword = new UserPasswordConfigurationSettings(),
+                AllowPasswordReset = securitySettings.AllowPasswordReset,
+                AuthCookieDomain = securitySettings.AuthCookieDomain,
+                AuthCookieName = securitySettings.AuthCookieDomain,
+                UsernameIsEmail = securitySettings.UsernameIsEmail,
+                KeepUserLoggedIn = securitySettings.KeepUserLoggedIn,
+                HideDisabledUsersInBackoffice = securitySettings.HideDisabledUsersInBackoffice,
             };
         }
     }

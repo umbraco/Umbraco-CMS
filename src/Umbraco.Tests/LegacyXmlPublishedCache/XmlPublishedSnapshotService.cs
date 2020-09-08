@@ -3,6 +3,7 @@ using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -35,7 +36,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         private readonly IMediaService _mediaService;
         private readonly IUserService _userService;
         private readonly IAppCache _requestCache;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly IDefaultCultureAccessor _defaultCultureAccessor;
         private readonly ISiteDomainHelper _siteDomainHelper;
         private readonly IEntityXmlSerializer _entitySerializer;
@@ -56,7 +57,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository,
             IDefaultCultureAccessor defaultCultureAccessor,
             ILogger logger,
-            IGlobalSettings globalSettings,
+            GlobalSettings globalSettings,
             IHostingEnvironment hostingEnvironment,
             IApplicationShutdownRegistry hostingLifetime,
             IShortStringHelper shortStringHelper,
@@ -84,7 +85,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository,
             IDefaultCultureAccessor defaultCultureAccessor,
             ILogger logger,
-            IGlobalSettings globalSettings,
+            GlobalSettings globalSettings,
             IHostingEnvironment hostingEnvironment,
             IApplicationShutdownRegistry hostingLifetime,
             IShortStringHelper shortStringHelper,

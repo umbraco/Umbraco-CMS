@@ -23,6 +23,7 @@ using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 using Umbraco.Web.WebApi;
 using Umbraco.Core.Logging;
+using Umbraco.Infrastructure.Configuration;
 using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web.Security.Providers;
 using Umbraco.Tests.Strings;
@@ -67,7 +68,7 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
                 contentTypeService: mockedContentTypeService,
                 localizedTextService:Mock.Of<ILocalizedTextService>());
 
-            var globalSettings = SettingsForTests.GenerateMockGlobalSettings();
+            var globalSettings = ConfigModelConversionsFromLegacy.ConvertGlobalSettings(SettingsForTests.GenerateMockGlobalSettings());
 
             // FIXME: v8?
             ////new app context
