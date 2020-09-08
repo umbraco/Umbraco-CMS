@@ -393,6 +393,7 @@ namespace Umbraco.ModelsBuilder.Embedded
                     RoslynCompiler.CompileToFile(_hostingEnvironment.MapPathContentRoot(projFile), assemblyPath);
                     assembly = ReloadAssembly(assemblyPath);
                     File.WriteAllText(dllPathFile, assembly.Location);
+                    File.WriteAllText(modelsHashFile, currentHash);
                     TryDeleteUnusedAssemblies(dllPathFile);
                 }
                 catch
