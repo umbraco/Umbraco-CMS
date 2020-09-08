@@ -133,7 +133,7 @@ namespace Umbraco.Tests.Integration.TestServerTest
             var umbracoBuilder = services.AddUmbraco(TestHelper.GetWebHostEnvironment(), Configuration);
             umbracoBuilder
                 .WithConfiguration()
-                .WithTestCore(TestHelper, UmbracoContainer, UseTestLocalDb) // This is the important one!
+                .WithTestCore(TestHelper, UseTestLocalDb) // This is the important one!
                 .WithWebComponents()
                 .WithRuntimeMinifier()
                 .WithBackOffice()

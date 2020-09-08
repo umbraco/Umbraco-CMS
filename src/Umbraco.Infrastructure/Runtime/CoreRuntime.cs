@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
@@ -103,9 +104,9 @@ namespace Umbraco.Core.Runtime
         public IMainDom MainDom { get; }
 
         /// <inheritdoc/>
-        public virtual IFactory Configure(IRegister register)
+        public virtual IFactory Configure(IServiceCollection services)
         {
-            if (register is null) throw new ArgumentNullException(nameof(register));
+            if (services is null) throw new ArgumentNullException(nameof(services));
 
 
             // create and register the essential services
@@ -139,7 +140,7 @@ namespace Umbraco.Core.Runtime
 
                 // application environment
                 ConfigureUnhandledException();
-                _factory = Configure(register, timer);
+                _factory = Configure(services, timer);
 
                 return _factory;
             }
@@ -148,13 +149,18 @@ namespace Umbraco.Core.Runtime
         /// <summary>
         /// Configure the runtime within a timer.
         /// </summary>
-        private IFactory Configure(IRegister register, DisposableTimer timer)
+        private IFactory Configure(IServiceCollection services, DisposableTimer timer)
         {
-            if (register is null) throw new ArgumentNullException(nameof(register));
+            if (services is null) throw new ArgumentNullException(nameof(services));
             if (timer is null) throw new ArgumentNullException(nameof(timer));
 
             Composition composition = null;
             IFactory factory = null;
+
+            // TODO: MSDI Find a decent place for this, is it here?
+            // NOTE: LightInject had this Lazy resolve setup by default
+            // ServiceContext resolves a bunch of Lazy<T> which aren't registered
+            services.AddTransient(typeof(Lazy<>), typeof(LazilyResolved<>));
 
             try
             {
@@ -171,7 +177,7 @@ namespace Umbraco.Core.Runtime
                 _state = new RuntimeState(Configs.Global(), UmbracoVersion, databaseFactory, Logger);
 
                 // create the composition
-                composition = new Composition(register, typeLoader, ProfilingLogger, _state, Configs, IOHelper, AppCaches);
+                composition = new Composition(services, typeLoader, ProfilingLogger, _state, Configs, IOHelper, AppCaches);
 
                 composition.RegisterEssentials(Logger, Profiler, ProfilingLogger, MainDom, AppCaches, databaseFactory, typeLoader, _state, TypeFinder, IOHelper, UmbracoVersion, DbProviderFactoryCreator, HostingEnvironment, BackOfficeInfo);
 
@@ -192,8 +198,8 @@ namespace Umbraco.Core.Runtime
                     RunComposers(typeLoader, composition);
                 }
 
-                 // create the factory
-                 factory = composition.CreateFactory();
+                // create the factory
+                factory = composition.CreateFactory();
             }
             catch (Exception e)
             {
@@ -350,6 +356,14 @@ namespace Umbraco.Core.Runtime
         public virtual void Terminate()
         {
             _components?.Terminate();
+        }
+
+        private class LazilyResolved<T> : Lazy<T>
+        {
+            public LazilyResolved(IServiceProvider serviceProvider)
+                : base(serviceProvider.GetRequiredService<T>)
+            {
+            }
         }
 
 

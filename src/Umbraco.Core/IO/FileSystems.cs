@@ -11,7 +11,7 @@ namespace Umbraco.Core.IO
 {
     public class FileSystems : IFileSystems
     {
-        private readonly IFactory _container;
+        private readonly IServiceProvider _container;
         private readonly ILogger _logger;
         private readonly IIOHelper _ioHelper;
 
@@ -36,7 +36,7 @@ namespace Umbraco.Core.IO
         #region Constructor
 
         // DI wants a public ctor
-        public FileSystems(IFactory container, ILogger logger, IIOHelper ioHelper, IGlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
+        public FileSystems(IServiceProvider container, ILogger logger, IIOHelper ioHelper, IGlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
         {
             _container = container;
             _logger = logger;
@@ -202,7 +202,7 @@ namespace Umbraco.Core.IO
                 }
 
                 var shadowWrapper = CreateShadowWrapper(supporting, path);
-                return _container.CreateInstance<TFileSystem>(shadowWrapper);
+                return _container.GetInstance<TFileSystem>(shadowWrapper);
             })).Value;
         }
 

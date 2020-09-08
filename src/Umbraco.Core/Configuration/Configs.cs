@@ -15,7 +15,7 @@ namespace Umbraco.Core.Configuration
     public class Configs
     {
         private readonly Dictionary<Type, Lazy<object>> _configs = new Dictionary<Type, Lazy<object>>();
-        private Dictionary<Type, Action<IRegister>> _registerings = new Dictionary<Type, Action<IRegister>>();
+        private Dictionary<Type, Action<IServiceCollection>> _registerings = new Dictionary<Type, Action<IServiceCollection>>();
 
         /// <summary>
         /// Gets a configuration.
@@ -54,10 +54,10 @@ namespace Umbraco.Core.Configuration
             if (_registerings == null)
                 throw new InvalidOperationException("Configurations have already been registered.");
 
-            services.Register(this);
+            services.AddSingleton(this);
 
             foreach (var registering in _registerings.Values)
-                registering(register);
+                registering(services);
 
             // no need to keep them around
             _registerings = null;

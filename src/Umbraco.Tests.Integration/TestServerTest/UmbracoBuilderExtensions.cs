@@ -1,6 +1,5 @@
 ﻿using System;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Composing.LightInject;
 using Umbraco.Core.Runtime;
 using Umbraco.Extensions;
 using Umbraco.Tests.Integration.Implementations;
@@ -16,7 +15,7 @@ namespace Umbraco.Tests.Integration.TestServerTest
         /// </summary>
         /// <param name="builder"></param>
         /// <returns></returns>
-        public static IUmbracoBuilder WithTestCore(this IUmbracoBuilder builder, TestHelper testHelper, LightInjectContainer container,
+        public static IUmbracoBuilder WithTestCore(this IUmbracoBuilder builder, TestHelper testHelper,
             Action<CoreRuntime, RuntimeEssentialsEventArgs> dbInstallEventHandler)
         {
             return builder.AddWith(nameof(global::Umbraco.Web.Common.Builder.UmbracoBuilderExtensions.WithCore),
@@ -24,7 +23,6 @@ namespace Umbraco.Tests.Integration.TestServerTest
                     {
                         builder.Services.AddUmbracoCore(
                             builder.WebHostEnvironment,
-                            container,
                             typeof(UmbracoBuilderExtensions).Assembly,
                             AppCaches.NoCache, // Disable caches in integration tests
                             testHelper.GetLoggingConfiguration(),

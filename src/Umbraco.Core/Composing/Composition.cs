@@ -84,9 +84,9 @@ namespace Umbraco.Core.Composing
             => Services.Register(serviceType, implementingType, lifetime);
 
         /// <inheritdoc />
-        public void Register<TService>(Func<IServiceProvider, TService> factory, Lifetime lifetime = Lifetime.Transient)
+        public void Register<TService>(Func<IServiceProvider, TService> serviceProvider, Lifetime lifetime = Lifetime.Transient)
             where TService : class
-            => Services.Register(factory, lifetime);
+            => Services.Register(serviceProvider, lifetime);
 
         /// <inheritdoc />
         public void Register(Type serviceType, object instance)
@@ -103,9 +103,9 @@ namespace Umbraco.Core.Composing
             => Services.RegisterFor<TService>(implementingType, lifetime);
         
         /// <inheritdoc />
-        public void RegisterFor<TService>(Func<IServiceProvider, TService> factory, Lifetime lifetime = Lifetime.Transient)
+        public void RegisterFor<TService>(Func<IServiceProvider, TService> serviceProvider, Lifetime lifetime = Lifetime.Transient)
             where TService : class
-            => Services.RegisterFor(factory, lifetime);
+            => Services.RegisterFor(serviceProvider, lifetime);
 
         /// <inheritdoc />
         public void RegisterFor<TService, TTarget>(TService instance)
@@ -147,9 +147,9 @@ namespace Umbraco.Core.Composing
         /// Registers a unique service with an implementation factory.
         /// </summary>
         /// <remarks>Unique services have one single implementation, and a Singleton lifetime.</remarks>
-        public void RegisterUnique<TService>(Func<IServiceProvider, TService> factory)
+        public void RegisterUnique<TService>(Func<IServiceProvider, TService> serviceProvider)
             where TService : class
-            => Services.RegisterFor(factory, Lifetime.Singleton);
+            => Services.RegisterFor(serviceProvider, Lifetime.Singleton);
 
         /// <summary>
         /// Registers a unique service with an implementing instance.
@@ -162,9 +162,9 @@ namespace Umbraco.Core.Composing
         /// Registers a unique service for a target, with an implementation factory.
         /// </summary>
         /// <remarks>Unique services have one single implementation, and a Singleton lifetime.</remarks>
-        public void RegisterUniqueFor<TService, TTarget>(Func<IServiceProvider, TService> factory)
+        public void RegisterUniqueFor<TService, TTarget>(Func<IServiceProvider, TService> serviceProvider)
             where TService : class
-            => Services.RegisterFor(factory, Lifetime.Singleton);
+            => Services.RegisterFor(serviceProvider, Lifetime.Singleton);
 
         /// <summary>
         /// Registers a unique service for a target, with an implementing instance.

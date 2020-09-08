@@ -55,11 +55,11 @@ namespace Umbraco.Tests.Integration.Testing
         /// we don't need to copy files
         /// </summary>
         /// <returns></returns>
-        private ILocalizedTextService GetLocalizedTextService(IFactory factory)
+        private ILocalizedTextService GetLocalizedTextService(IServiceProvider serviceProvider)
         {
-            var configs = factory.GetInstance<Configs>();
-            var logger = factory.GetInstance<ILogger>();
-            var appCaches = factory.GetInstance<AppCaches>();
+            var configs = serviceProvider.GetInstance<Configs>();
+            var logger = serviceProvider.GetInstance<ILogger>();
+            var appCaches = serviceProvider.GetInstance<AppCaches>();
 
             var localizedTextService = new LocalizedTextService(
                 new Lazy<LocalizedTextServiceFileSources>(() =>

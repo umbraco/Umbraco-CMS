@@ -120,12 +120,7 @@ namespace Umbraco.Tests.Common
         }
 
         public IUmbracoVersion GetUmbracoVersion() => new UmbracoVersion(GetConfigs().Global());
-
-        public IRegister GetRegister()
-        {
-            return RegisterFactory.Create(GetConfigs().Global());
-        }
-
+        
         public abstract IHostingEnvironment GetHostingEnvironment();
         public abstract IApplicationShutdownRegistry GetHostingEnvironmentLifetime();
 

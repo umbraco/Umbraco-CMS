@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
@@ -11,14 +12,14 @@ namespace Umbraco.Web.Sections
     {
         protected override SectionCollectionBuilder This => this;
 
-        protected override IEnumerable<ISection> CreateItems(IFactory factory)
+        protected override IEnumerable<ISection> CreateItems(IServiceProvider serviceProvider)
         {
             // get the manifest parser just-in-time - injecting it in the ctor would mean that
             // simply getting the builder in order to configure the collection, would require
             // its dependencies too, and that can create cycles or other oddities
-            var manifestParser = factory.GetInstance<IManifestParser>();
+            var manifestParser = serviceProvider.GetInstance<IManifestParser>();
 
-            return base.CreateItems(factory).Concat(manifestParser.Manifest.Sections);
+            return base.CreateItems(serviceProvider).Concat(manifestParser.Manifest.Sections);
         }
     }
 }

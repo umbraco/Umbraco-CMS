@@ -18,21 +18,21 @@ namespace Umbraco.Core.Composing
 
         protected override ComponentCollectionBuilder This => this;
 
-        protected override IEnumerable<IComponent> CreateItems(IFactory factory)
+        protected override IEnumerable<IComponent> CreateItems(IServiceProvider serviceProvider)
         {
-            _logger = factory.GetInstance<IProfilingLogger>();
+            _logger = serviceProvider.GetInstance<IProfilingLogger>();
 
             using (_logger.DebugDuration<ComponentCollectionBuilder>($"Creating components. (log when >{LogThresholdMilliseconds}ms)", "Created."))
             {
-                return base.CreateItems(factory);
+                return base.CreateItems(serviceProvider);
             }
         }
 
-        protected override IComponent CreateItem(IFactory factory, Type itemType)
+        protected override IComponent CreateItem(IServiceProvider serviceProvider, Type itemType)
         {
             using (_logger.DebugDuration<ComponentCollectionBuilder>($"Creating {itemType.FullName}.", $"Created {itemType.FullName}.", thresholdMilliseconds: LogThresholdMilliseconds))
             {
-                return base.CreateItem(factory, itemType);
+                return base.CreateItem(serviceProvider, itemType);
             }
         }
     }

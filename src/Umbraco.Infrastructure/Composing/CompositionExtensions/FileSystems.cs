@@ -75,7 +75,7 @@ namespace Umbraco.Core.Composing.CompositionExtensions
             // it needs to be registered (not only the interface) because it provides additional
             // functionality eg for scoping, and is injected in the scope provider - whereas the
             // interface is really for end-users to get access to filesystems.
-            composition.RegisterUnique(factory => factory.CreateInstance<Core.IO.FileSystems>(factory));
+            composition.RegisterUnique(factory => factory.GetInstance<Core.IO.FileSystems>(factory));
 
             // register IFileSystems, which gives access too all filesystems
             composition.RegisterUnique<IFileSystems>(factory => factory.GetInstance<Core.IO.FileSystems>());

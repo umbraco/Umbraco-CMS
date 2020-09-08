@@ -35,7 +35,7 @@ namespace Umbraco.Web.Compose
 
     public sealed class DatabaseServerRegistrarAndMessengerComposer : ComponentComposer<DatabaseServerRegistrarAndMessengerComponent>, ICoreComposer
     {
-        public static DatabaseServerMessengerOptions GetDefaultOptions(IFactory factory)
+        public static DatabaseServerMessengerOptions GetDefaultOptions(IServiceProvider serviceProvider)
         {
             return new DatabaseServerMessengerOptions
             {
@@ -46,7 +46,7 @@ namespace Umbraco.Web.Compose
                     //rebuild the xml cache file if the server is not synced
                     () =>
                     {
-                        var publishedSnapshotService = factory.GetInstance<IPublishedSnapshotService>();
+                        var publishedSnapshotService = serviceProvider.GetInstance<IPublishedSnapshotService>();
 
                         // rebuild the published snapshot caches entirely, if the server is not synced
                         // this is equivalent to DistributedCache RefreshAll... but local only
@@ -62,7 +62,7 @@ namespace Umbraco.Web.Compose
                     // indexes then they can adjust this logic themselves.
                     () =>
                     {
-                        var indexRebuilder = factory.GetInstance<BackgroundIndexRebuilder>();
+                        var indexRebuilder = serviceProvider.GetInstance<BackgroundIndexRebuilder>();
                         indexRebuilder.RebuildIndexes(false, 5000);
                     }
                 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Umbraco.Core.Composing
 {
@@ -51,14 +52,14 @@ namespace Umbraco.Core.Composing
             return This;
         }
 
-        public TCollection CreateCollection(IFactory factory)
+        public TCollection CreateCollection(IServiceProvider serviceProvider)
         {
-            return factory.CreateInstance<TCollection>(_types);
+            return serviceProvider.GetInstance<TCollection>(_types);
         }
 
-        public void RegisterWith(IRegister register)
+        public void RegisterWith(IServiceCollection services)
         {
-            register.Register(CreateCollection, Lifetime.Singleton);
+            services.Register(CreateCollection, Lifetime.Singleton);
         }
     }
 }

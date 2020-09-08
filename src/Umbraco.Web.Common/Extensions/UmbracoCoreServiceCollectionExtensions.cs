@@ -1,12 +1,9 @@
 using System;
 using System.Data.Common;
 using System.Data.SqlClient;
-using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
@@ -27,13 +24,10 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Runtime;
 using Umbraco.Web.Common.AspNetCore;
-using Umbraco.Web.Common.Extensions;
 using Umbraco.Web.Common.Profiler;
 
 namespace Umbraco.Extensions
 {
-
-
     public static class UmbracoCoreServiceCollectionExtensions
     {
         /// <summary>
@@ -134,11 +128,6 @@ namespace Umbraco.Extensions
         /// <returns></returns>
         public static IServiceCollection AddUmbracoCore(this IServiceCollection services, IWebHostEnvironment webHostEnvironment, out IFactory factory)
         {
-            if (!UmbracoServiceProviderFactory.IsActive)
-                throw new InvalidOperationException("Ensure to add UseUmbraco() in your Program.cs after ConfigureWebHostDefaults to enable Umbraco's service provider factory");
-
-            var umbContainer = UmbracoServiceProviderFactory.UmbracoContainer;
-
             var loggingConfig = new LoggingConfiguration(
                 Path.Combine(webHostEnvironment.ContentRootPath, "App_Data", "Logs"),
                 Path.Combine(webHostEnvironment.ContentRootPath, "config", "serilog.config"),
@@ -154,7 +143,6 @@ namespace Umbraco.Extensions
                 new IsolatedCaches(type => new DeepCloneAppCache(new ObjectCacheAppCache())));
 
             services.AddUmbracoCore(webHostEnvironment,
-                umbContainer,
                 Assembly.GetEntryAssembly(),
                 appCaches,
                 loggingConfig,
@@ -178,12 +166,11 @@ namespace Umbraco.Extensions
         public static IServiceCollection AddUmbracoCore(
             this IServiceCollection services,
             IWebHostEnvironment webHostEnvironment,
-            IRegister umbContainer,
             Assembly entryAssembly,
             AppCaches appCaches,
             ILoggingConfiguration loggingConfiguration,
             out IFactory factory)
-            => services.AddUmbracoCore(webHostEnvironment, umbContainer, entryAssembly, appCaches, loggingConfiguration, GetCoreRuntime, out factory);
+            => services.AddUmbracoCore(webHostEnvironment, entryAssembly, appCaches, loggingConfiguration, GetCoreRuntime, out factory);
 
 
         /// <summary>
@@ -202,7 +189,6 @@ namespace Umbraco.Extensions
         public static IServiceCollection AddUmbracoCore(
             this IServiceCollection services,
             IWebHostEnvironment webHostEnvironment,
-            IRegister umbContainer,
             Assembly entryAssembly,
             AppCaches appCaches,
             ILoggingConfiguration loggingConfiguration,
@@ -211,8 +197,6 @@ namespace Umbraco.Extensions
             out IFactory factory)
         {
             if (services is null) throw new ArgumentNullException(nameof(services));
-            var container = umbContainer;
-            if (container is null) throw new ArgumentNullException(nameof(container));
             if (entryAssembly is null) throw new ArgumentNullException(nameof(entryAssembly));
 
             // Add supported databases
@@ -259,7 +243,7 @@ namespace Umbraco.Extensions
                 appCaches,
                 dbProviderFactoryCreator);
 
-            factory = runtime.Configure(container);
+            factory = runtime.Configure(services);
 
             return services;
         }

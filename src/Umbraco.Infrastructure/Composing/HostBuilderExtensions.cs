@@ -9,24 +9,14 @@ namespace Umbraco.Core.Composing
     public static class HostBuilderExtensions
     {
         /// <summary>
-        /// Assigns a custom service provider factory to use Umbraco's container
+        /// Used to assing a custom service provider factory to use Umbraco's container
         /// </summary>
         /// <param name="builder"></param>
         /// <returns></returns>
+        /// <remarks>Doesn't do much yet bu presumably will in the future.</remarks>
         public static IHostBuilder UseUmbraco(this IHostBuilder builder)
         {
-            return builder
-                .UseUmbraco(new UmbracoServiceProviderFactory());
+            return builder.UseSerilog();
         }
-
-        /// <summary>
-        /// Assigns a custom service provider factory to use Umbraco's container
-        /// </summary>
-        /// <param name="builder"></param>
-        /// <param name="umbracoServiceProviderFactory"></param>
-        /// <returns></returns>
-        public static IHostBuilder UseUmbraco(this IHostBuilder builder, UmbracoServiceProviderFactory umbracoServiceProviderFactory)
-            => builder.UseServiceProviderFactory(umbracoServiceProviderFactory)
-                .UseSerilog();
     }
 }

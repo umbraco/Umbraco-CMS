@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Umbraco.Core.Composing
 {
@@ -24,16 +25,16 @@ namespace Umbraco.Core.Composing
         public IEnumerable<Type> GetTypes() => _types;
 
         /// <inheritdoc />
-        public virtual void RegisterWith(IRegister register)
+        public virtual void RegisterWith(IServiceCollection services)
         {
             if (_registeredTypes != null)
                 throw new InvalidOperationException("This builder has already been registered.");
 
             // register the collection
-            register.Register(CreateCollection, CollectionLifetime);
+            services.Register(CreateCollection, CollectionLifetime);
 
             // register the types
-            RegisterTypes(register);
+            RegisterTypes(services);
         }
 
         /// <summary>
@@ -67,7 +68,7 @@ namespace Umbraco.Core.Composing
             return types;
         }
 
-        private void RegisterTypes(IRegister register)
+        private void RegisterTypes(IServiceCollection services)
         {
             lock (_locker)
             {
@@ -84,7 +85,7 @@ namespace Umbraco.Core.Composing
                 // was a dependency on an individual item, it would resolve a brand new transient instance which isn't what
                 // we would expect to happen. The same item should be resolved from the container as the collection.
                 foreach (var type in types)
-                    register.Register(type, CollectionLifetime);
+                    services.Register(type, CollectionLifetime);
 
                 _registeredTypes = types;
             }
@@ -94,30 +95,30 @@ namespace Umbraco.Core.Composing
         /// Creates the collection items.
         /// </summary>
         /// <returns>The collection items.</returns>
-        protected virtual IEnumerable<TItem> CreateItems(IFactory factory)
+        protected virtual IEnumerable<TItem> CreateItems(IServiceProvider serviceProvider)
         {
             if (_registeredTypes == null)
                 throw new InvalidOperationException("Cannot create items before the collection builder has been registered.");
 
             return _registeredTypes // respect order
-                .Select(x => CreateItem(factory, x))
+                .Select(x => CreateItem(serviceProvider, x))
                 .ToArray(); // safe
         }
 
         /// <summary>
         /// Creates a collection item.
         /// </summary>
-        protected virtual TItem CreateItem(IFactory factory, Type itemType)
-            => (TItem) factory.GetInstance(itemType);
+        protected virtual TItem CreateItem(IServiceProvider serviceProvider, Type itemType)
+            => (TItem) serviceProvider.GetInstance(itemType);
 
         /// <summary>
         /// Creates a collection.
         /// </summary>
         /// <returns>A collection.</returns>
         /// <remarks>Creates a new collection each time it is invoked.</remarks>
-        public virtual TCollection CreateCollection(IFactory factory)
+        public virtual TCollection CreateCollection(IServiceProvider serviceProvider)
         {
-            return factory.CreateInstance<TCollection>(  CreateItems(factory));
+            return serviceProvider.GetInstance<TCollection>(CreateItems(serviceProvider));
         }
 
         protected Type EnsureType(Type type, string action)

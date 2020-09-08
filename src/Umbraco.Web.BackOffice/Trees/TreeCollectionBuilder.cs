@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Web.BackOffice.Trees;
@@ -13,9 +14,9 @@ namespace Umbraco.Web.Trees
     {
         private readonly List<Tree> _trees = new List<Tree>();
 
-        public TreeCollection CreateCollection(IFactory factory) => new TreeCollection(_trees);
+        public TreeCollection CreateCollection(IServiceProvider serviceProvider) => new TreeCollection(_trees);
 
-        public void RegisterWith(IRegister register) => register.Register(CreateCollection, Lifetime.Singleton);
+        public void RegisterWith(IServiceCollection services) => services.Register(CreateCollection, Lifetime.Singleton);
 
         /// <summary>
         /// Registers a custom tree definition

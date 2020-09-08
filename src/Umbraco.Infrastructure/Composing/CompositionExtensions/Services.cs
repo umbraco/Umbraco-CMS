@@ -67,8 +67,8 @@ namespace Umbraco.Core.Composing.CompositionExtensions
 
             composition.RegisterUnique<ConflictingPackageData>();
             composition.RegisterUnique<CompiledPackageXmlParser>();
-            composition.RegisterUnique<ICreatedPackagesRepository>(factory => CreatePackageRepository(factory, "createdPackages.config"));
-            composition.RegisterUnique<IInstalledPackagesRepository>(factory => CreatePackageRepository(factory, "installedPackages.config"));
+            composition.RegisterUnique<ICreatedPackagesRepository>(serviceProvider => CreatePackageRepository(serviceProvider, "createdPackages.config"));
+            composition.RegisterUnique<IInstalledPackagesRepository>(serviceProvider => CreatePackageRepository(serviceProvider, "installedPackages.config"));
             composition.RegisterUnique<PackageDataInstallation>();
             composition.RegisterUnique<PackageFileInstallation>();
             composition.RegisterUnique<IPackageInstallation, PackageInstallation>();
@@ -79,28 +79,28 @@ namespace Umbraco.Core.Composing.CompositionExtensions
         /// <summary>
         /// Creates an instance of PackagesRepository for either the ICreatedPackagesRepository or the IInstalledPackagesRepository
         /// </summary>
-        /// <param name="factory"></param>
+        /// <param name="serviceProvider"></param>
         /// <param name="packageRepoFileName"></param>
         /// <returns></returns>
-        private static PackagesRepository CreatePackageRepository(IFactory factory, string packageRepoFileName)
+        private static PackagesRepository CreatePackageRepository(IServiceProvider serviceProvider, string packageRepoFileName)
             => new PackagesRepository(
-                factory.GetInstance<IContentService>(),
-                factory.GetInstance<IContentTypeService>(),
-                factory.GetInstance<IDataTypeService>(),
-                factory.GetInstance<IFileService>(),
-                factory.GetInstance<IMacroService>(),
-                factory.GetInstance<ILocalizationService>(),
-                factory.GetInstance<IHostingEnvironment>(),
-                factory.GetInstance<IEntityXmlSerializer>(),
-                factory.GetInstance<ILogger>(),
-                factory.GetInstance<IUmbracoVersion>(),
-                factory.GetInstance<IGlobalSettings>(),
+                serviceProvider.GetInstance<IContentService>(),
+                serviceProvider.GetInstance<IContentTypeService>(),
+                serviceProvider.GetInstance<IDataTypeService>(),
+                serviceProvider.GetInstance<IFileService>(),
+                serviceProvider.GetInstance<IMacroService>(),
+                serviceProvider.GetInstance<ILocalizationService>(),
+                serviceProvider.GetInstance<IHostingEnvironment>(),
+                serviceProvider.GetInstance<IEntityXmlSerializer>(),
+                serviceProvider.GetInstance<ILogger>(),
+                serviceProvider.GetInstance<IUmbracoVersion>(),
+                serviceProvider.GetInstance<IGlobalSettings>(),
                 packageRepoFileName);
 
-        private static LocalizedTextServiceFileSources SourcesFactory(IFactory container)
+        private static LocalizedTextServiceFileSources SourcesFactory(IServiceProvider serviceProvider)
         {
-            var hostingEnvironment = container.GetInstance<IHostingEnvironment>();
-            var globalSettings = container.GetInstance<IGlobalSettings>();
+            var hostingEnvironment = serviceProvider.GetInstance<IHostingEnvironment>();
+            var globalSettings = serviceProvider.GetInstance<IGlobalSettings>();
             var mainLangFolder = new DirectoryInfo(hostingEnvironment.MapPathContentRoot(WebPath.Combine(globalSettings.UmbracoPath , "config","lang")));
             var appPlugins = new DirectoryInfo(hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.AppPlugins));
             var configLangFolder = new DirectoryInfo(hostingEnvironment.MapPathContentRoot(WebPath.Combine(Constants.SystemDirectories.Config  ,"lang")));
@@ -120,8 +120,8 @@ namespace Umbraco.Core.Composing.CompositionExtensions
                     .Select(x => new LocalizedTextServiceSupplementaryFileSource(x, true));
 
             return new LocalizedTextServiceFileSources(
-                container.GetInstance<ILogger>(),
-                container.GetInstance<AppCaches>(),
+                serviceProvider.GetInstance<ILogger>(),
+                serviceProvider.GetInstance<AppCaches>(),
                 mainLangFolder,
                 pluginLangFolders.Concat(userLangFolders));
         }
