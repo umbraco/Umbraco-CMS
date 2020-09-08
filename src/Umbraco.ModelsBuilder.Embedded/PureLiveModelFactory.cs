@@ -35,7 +35,7 @@ namespace Umbraco.ModelsBuilder.Embedded
 
         private static readonly Regex AssemblyVersionRegex = new Regex("AssemblyVersion\\(\"[0-9]+.[0-9]+.[0-9]+.[0-9]+\"\\)", RegexOptions.Compiled);
         private const string CodeGen = "~/App_Data/Models/";
-        private static readonly string[] OurFiles = { "models.hash", "models.generated.cs", "all.generated.cs", "all.dll.path", "models.err" };
+        private static readonly string[] OurFiles = { "models.hash", "models.generated.cs", "all.generated.cs", "all.dll.path", "models.err", "Compiled" };
 
         private readonly IModelsBuilderConfig _config;
         private readonly IHostingEnvironment _hostingEnvironment;
@@ -60,7 +60,6 @@ namespace Umbraco.ModelsBuilder.Embedded
             _errors = new ModelsGenerationError(config, _hostingEnvironment);
             _ver = 1; // zero is for when we had no version
             _skipver = -1; // nothing to skip
-
             if (!hostingEnvironment.IsHosted) return;
 
             var modelsDirectory = _config.ModelsDirectoryAbsolute(_hostingEnvironment);
@@ -215,12 +214,12 @@ namespace Umbraco.ModelsBuilder.Embedded
                     _locker.ExitReadLock();
             }
 
-            var buildManagerLocked = false;
+            var roslynLocked = false;
             try
             {
                 // always take the BuildManager lock *before* taking the _locker lock
                 // to avoid possible deadlock situations (see notes above)
-                Monitor.Enter(RoslynCompiler, ref buildManagerLocked);
+                Monitor.Enter(RoslynCompiler, ref roslynLocked);
 
                 _locker.EnterUpgradeableReadLock();
 
@@ -273,7 +272,7 @@ namespace Umbraco.ModelsBuilder.Embedded
                     _locker.ExitWriteLock();
                 if (_locker.IsUpgradeableReadLockHeld)
                     _locker.ExitUpgradeableReadLock();
-                if (buildManagerLocked)
+                if (roslynLocked)
                     Monitor.Exit(RoslynCompiler);
             }
         }
@@ -477,7 +476,7 @@ namespace Umbraco.ModelsBuilder.Embedded
 
         private string GetOutputAssemblyPath(string currentHash)
         {
-            var dirInfo = new DirectoryInfo(Path.Combine(_hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempData), "Models"));
+            var dirInfo = new DirectoryInfo(Path.Combine(_config.ModelsDirectoryAbsolute(_hostingEnvironment), "Compiled"));
             if (!dirInfo.Exists)
                 Directory.CreateDirectory(dirInfo.FullName);
             return Path.Combine(dirInfo.FullName, $"generated.cs{currentHash}.dll");
