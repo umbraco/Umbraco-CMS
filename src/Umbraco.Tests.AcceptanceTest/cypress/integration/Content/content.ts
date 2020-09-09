@@ -254,21 +254,9 @@ context('Content', () => {
         cy.umbracoTreeItem("content", [nodeName]).rightclick({ force: true });
         cy.umbracoContextMenuAction("action-sort").click();
 
-        const offsetFirstElm = cy.get('.ui-sortable .ui-sortable-handle :nth-child(2)').eq(0).then($el => $el.offset());
-        offsetFirstElm.then((offsetFirstElm) => {
-            const pageYFirst = Math.round(offsetFirstElm.top);
-
-            const offsetSecondElm = cy.get('.ui-sortable .ui-sortable-handle :nth-child(2)').eq(1).then($el => $el.offset());
-            offsetSecondElm.then((offset) => {
-                const pageX = Math.round(offset.left);
-                const pageY = Math.round(offset.top);
-
-                cy.get('.table-sortable').find('tbody :nth-child(1)').eq(0)
-                    .trigger('mousedown', { which: 1, pageX: pageX, pageY: pageYFirst })
-                    .trigger('mousemove', { which: 1, pageX: pageX, pageY: pageY })
-                    .trigger('mouseup');
-            })
-        });
+        //Drag and drop
+        cy.get('.ui-sortable .ui-sortable-handle :nth-child(2)').eq(0).trigger('mousedown', { which: 1 })
+        cy.get('.ui-sortable .ui-sortable-handle :nth-child(2)').eq(1).trigger("mousemove").trigger("mouseup")
 
         // Save and close dialog
         cy.get('.umb-modalcolumn .btn-success').click();
