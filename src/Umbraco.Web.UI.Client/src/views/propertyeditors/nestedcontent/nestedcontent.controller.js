@@ -186,7 +186,7 @@
         };
 
         vm.openNodeTypePicker = function ($event) {
-
+            
             if (vm.nodes.length >= vm.maxItems) {
                 return;
             }
@@ -204,6 +204,7 @@
             const dialog = {
                 view: "itempicker",
                 orderBy: "$index",
+                view: "itempicker",
                 event: $event,
                 filter: availableItems.length > 12,
                 size: availableItems.length > 6 ? "medium" : "small",
@@ -239,7 +240,7 @@
 
             var entriesForPaste = clipboardService.retriveEntriesOfType(clipboardService.TYPES.ELEMENT_TYPE, contentTypeAliases);
             _.each(entriesForPaste, function (entry) {
-                vm.overlayMenu.pasteItems.push({
+                dialog.pasteItems.push({
                     date: entry.date,
                     name: entry.label,
                     data: entry.data,
@@ -247,18 +248,19 @@
                 });
             });
 
-            vm.overlayMenu.pasteItems.sort( (a, b) => {
+            dialog.pasteItems.sort( (a, b) => {
                 return b.date - a.date
             });
 
             dialog.title = dialog.pasteItems.length > 0 ? labels.grid_addElement : labels.content_createEmpty;
+            dialog.hideHeader = dialog.pasteItems.length > 0;
 
             dialog.clickClearPaste = function ($event) {
                 $event.stopPropagation();
                 $event.preventDefault();
                 clipboardService.clearEntriesOfType(clipboardService.TYPES.ELEMENT_TYPE, contentTypeAliases);
-                vm.overlayMenu.pasteItems = [];// This dialog is not connected via the clipboardService events, so we need to update manually.
-                vm.overlayMenu.hideHeader = false;
+                dialog.pasteItems = [];// This dialog is not connected via the clipboardService events, so we need to update manually.
+                dialog.hideHeader = false;
             };
 
             if (dialog.availableItems.length === 1 && dialog.pasteItems.length === 0) {
