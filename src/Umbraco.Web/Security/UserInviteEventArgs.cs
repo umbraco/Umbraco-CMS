@@ -5,12 +5,16 @@ namespace Umbraco.Web.Security
 {
     public class UserInviteEventArgs : IdentityAuditEventArgs
     {
-        public UserInviteEventArgs(string ipAddress, int performingUser, UserInvite invitedUser, string comment = null)
+        public UserInviteEventArgs(string ipAddress, int performingUser, UserInvite invitedUser, IUser localUser, string comment = null)
             : base(AuditEvent.SendingUserInvite, ipAddress, comment, performingUser)
         {
             InvitedUser = invitedUser ?? throw new System.ArgumentNullException(nameof(invitedUser));
+            User = localUser;
         }
 
+        /// <summary>
+        /// The model used to invite the user
+        /// </summary>
         public UserInvite InvitedUser { get; }
 
         /// <summary>
@@ -19,12 +23,14 @@ namespace Umbraco.Web.Security
         public bool InviteHandled { get; set; }
 
         /// <summary>
-        /// If the event handler has created a local user then this is the result which is used to return the details to the UI
+        /// The local user that has been created that is pending the invite
+        /// </summary>        
+        public IUser User { get; }
+
+        /// <summary>
+        /// if set to true will show the edit user button in the UI, else it will not be shown
         /// </summary>
-        /// <remarks>
-        /// It is optional to create a local user in this event. In many cases the custom invite flow will be for external logins and then local users will
-        /// be created via the auto-linking process.
-        /// </remarks>
-        public IUser User { get; set; }        
+        public bool ShowUserResult { get; set; }
+
     }
 }

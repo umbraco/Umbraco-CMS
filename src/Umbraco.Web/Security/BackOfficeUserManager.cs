@@ -634,6 +634,7 @@ namespace Umbraco.Web.Security
         }
 
         internal void RaiseSendingUserInvite(UserInviteEventArgs args) => OnSendingUserInvite(args);
+        internal bool HasSendingUserInviteEventHandler => SendingUserInvite != null;
 
         // TODO: Not sure why these are not strongly typed events?? They should be in netcore!
         public static event EventHandler AccountLocked;

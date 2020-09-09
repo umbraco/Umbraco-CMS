@@ -361,38 +361,8 @@ namespace Umbraco.Web.Editors
             user = CheckUniqueEmail(userSave.Email, u => u.LastLoginDate != default || u.EmailConfirmedDate.HasValue);
 
             var userMgr = TryGetOwinContext().Result.GetBackOfficeUserManager();
-            var inviteArgs = new UserInviteEventArgs(
-                Request.TryGetHttpContext().Result.GetCurrentRequestIpAddress(),
-                performingUser: Security.GetUserId().Result,
-                userSave);
-            userMgr.RaiseSendingUserInvite(inviteArgs);
-
-            // If the event is handled then return the data
-            if (inviteArgs.InviteHandled)
-            {
-                // if no local user was created then map the args manually for the UI
-                if (inviteArgs.User == null)
-                {
-                    return new UserDisplay
-                    {
-                        Name = userSave.Name,
-                        Email = userSave.Email,
-                        Username = userSave.Username
-                    };
-                }
-                else
-                {
-                    //map the save info over onto the user
-                    user = Mapper.Map(userSave, user);
-                    //ensure the invited date is set
-                    user.InvitedDate = DateTime.Now;
-                    //Save the updated user
-                    Services.UserService.Save(user);
-                    return Mapper.Map<UserDisplay>(user);
-                }
-            }
-
-            if (EmailSender.CanSendRequiredEmail == false)
+            
+            if (!EmailSender.CanSendRequiredEmail && !userMgr.HasSendingUserInviteEventHandler)
             {
                 throw new HttpResponseException(
                     Request.CreateNotificationValidationErrorResponse("No Email server is configured"));
@@ -430,16 +400,48 @@ namespace Umbraco.Web.Editors
             //ensure the invited date is set
             user.InvitedDate = DateTime.Now;
 
-            //Save the updated user
+            //Save the updated user (which will process the user groups too)
             Services.UserService.Save(user);
             var display = Mapper.Map<UserDisplay>(user);
 
-            //send the email
+            var inviteArgs = new UserInviteEventArgs(
+                Request.TryGetHttpContext().Result.GetCurrentRequestIpAddress(),
+                performingUser: Security.GetUserId().Result,
+                userSave,
+                user);
 
-            await SendUserInviteEmailAsync(display, Security.CurrentUser.Name, Security.CurrentUser.Email, user, userSave.Message);
+            try
+            {
+                userMgr.RaiseSendingUserInvite(inviteArgs);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error<UsersController>(ex, "An error occured in a custom event handler while inviting the user");
+                throw new HttpResponseException(
+                    Request.CreateNotificationValidationErrorResponse($"An error occured inviting the user (check logs for more info): {ex.Message}"));
+            }
+
+            // If the event is handled then no need to send the email
+            if (inviteArgs.InviteHandled)
+            {
+                // if no user result was created then map the minimum args manually for the UI
+                if (!inviteArgs.ShowUserResult)
+                {
+                    display = new UserDisplay
+                    {
+                        Name = userSave.Name,
+                        Email = userSave.Email,
+                        Username = userSave.Username
+                    };
+                }                
+            }
+            else
+            {
+                //send the email
+                await SendUserInviteEmailAsync(display, Security.CurrentUser.Name, Security.CurrentUser.Email, user, userSave.Message);                
+            }
 
             display.AddSuccessNotification(Services.TextService.Localize("speechBubbles/resendInviteHeader"), Services.TextService.Localize("speechBubbles/resendInviteSuccess", new[] { user.Name }));
-
             return display;
         }
 

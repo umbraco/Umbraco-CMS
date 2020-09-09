@@ -78,7 +78,7 @@ namespace Umbraco.Web
             {
                 foreach (var error in externalLoginErrors.Errors)
                 {
-                    sb.AppendFormat(@"errors.push(""{0}"");", error).AppendLine();
+                    sb.AppendFormat(@"errors.push(""{0}"");", error.ToSingleLine()).AppendLine();
                 }
             }
 

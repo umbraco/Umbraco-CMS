@@ -6,19 +6,16 @@ namespace Umbraco.Core.Models.Identity
     {
         /// <summary>
         /// The login provider for the login (i.e. Facebook, Google)
-        ///
         /// </summary>
         string LoginProvider { get; set; }
 
         /// <summary>
         /// Key representing the login for the provider
-        ///
         /// </summary>
         string ProviderKey { get; set; }
 
         /// <summary>
         /// User Id for the user who owns this login
-        ///
         /// </summary>
         int UserId { get; set; }
     }
