@@ -152,6 +152,62 @@ namespace Umbraco.ModelsBuilder.Embedded
         #endregion
 
         #region Compilation
+        // deadlock note
+        //
+        // when RazorBuildProvider_CodeGenerationStarted runs, the thread has Monitor.Enter-ed the BuildManager
+        // singleton instance, through a call to CompilationLock.GetLock in BuildManager.GetVPathBuildResultInternal,
+        // and now wants to lock _locker.
+        // when EnsureModels runs, the thread locks _locker and then wants BuildManager to compile, which in turns
+        // requires that the BuildManager can Monitor.Enter-ed itself.
+        // so:
+        //
+        // T1 - needs to ensure models, locks _locker
+        // T2 - needs to compile a view, locks BuildManager
+        //      hits RazorBuildProvider_CodeGenerationStarted
+        //      wants to lock _locker, wait
+        // T1 - needs to compile models, using BuildManager
+        //      wants to lock itself, wait
+        // <deadlock>
+        //
+        // until ASP.NET kills the long-running request (thread abort)
+        //
+        // problem is, we *want* to suspend views compilation while the models assembly is being changed else we
+        // end up with views compiled and cached with the old assembly, while models come from the new assembly,
+        // which gives more YSOD. so we *have* to lock _locker in RazorBuildProvider_CodeGenerationStarted.
+        //
+        // one "easy" solution consists in locking the BuildManager *before* _locker in EnsureModels, thus ensuring
+        // we always lock in the same order, and getting rid of deadlocks - but that requires having access to the
+        // current BuildManager instance, which is BuildManager.TheBuildManager, which is an internal property.
+        //
+        // well, that's what we are doing in this class' TheBuildManager property, using reflection.
+
+        // private void RazorBuildProvider_CodeGenerationStarted(object sender, EventArgs e)
+        // {
+        //     try
+        //     {
+        //         _locker.EnterReadLock();
+        //
+        //         // just be safe - can happen if the first view is not an Umbraco view,
+        //         // or if something went wrong and we don't have an assembly at all
+        //         if (_modelsAssembly == null) return;
+        //
+        //         if (_debugLevel > 0)
+        //             _logger.Debug<PureLiveModelFactory>("RazorBuildProvider.CodeGenerationStarted");
+        //         if (!(sender is RazorBuildProvider provider)) return;
+        //
+        //         // add the assembly, and add a dependency to a text file that will change on each
+        //         // compilation as in some environments (could not figure which/why) the BuildManager
+        //         // would not re-compile the views when the models assembly is rebuilt.
+        //         provider.AssemblyBuilder.AddAssemblyReference(_modelsAssembly);
+        //         provider.AddVirtualPathDependency(ProjVirt);
+        //     }
+        //     finally
+        //     {
+        //         if (_locker.IsReadLockHeld)
+        //             _locker.ExitReadLock();
+        //     }
+        // }
+
 
         // tells the factory that it should build a new generation of models
         private void ResetModels()
@@ -278,14 +334,14 @@ namespace Umbraco.ModelsBuilder.Embedded
 
         private Assembly ReloadAssembly(string pathToAssembly)
         {
-            // If there's a current AssemblyLoadContext, unload it before creating a new one. 
+            // If there's a current AssemblyLoadContext, unload it before creating a new one.
             if(!(_currentAssemblyLoadContext is null))
             {
                 _currentAssemblyLoadContext.Unload();
                 GC.Collect();
                 GC.WaitForPendingFinalizers();
             }
-            
+
             // We must create a new assembly load context
             // as long as theres a reference to the assembly load context we can't delete the assembly it loaded
             _currentAssemblyLoadContext = new UmbracoAssemblyLoadContext();
@@ -352,7 +408,7 @@ namespace Umbraco.ModelsBuilder.Embedded
                     if (File.Exists(dllPath) && !File.Exists(dllPath + ".delete"))
                     {
                         assembly = ReloadAssembly(dllPath);
-                        
+
                         var attr = assembly.GetCustomAttribute<ModelsBuilderAssemblyAttribute>();
                         if (attr != null && attr.PureLive && attr.SourceHash == currentHash)
                         {
@@ -461,13 +517,13 @@ namespace Umbraco.ModelsBuilder.Embedded
                     {
                         File.Delete(file.FullName);
                     }
-                    catch(UnauthorizedAccessException e)
+                    catch(UnauthorizedAccessException)
                     {
                         // The file is in use, we'll try again next time...
                         // This shouldn't happen anymore.
                     }
                 }
-                
+
             }
         }
 

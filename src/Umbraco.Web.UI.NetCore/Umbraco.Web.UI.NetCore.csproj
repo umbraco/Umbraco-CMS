@@ -13,9 +13,7 @@
         <CopyRazorGenerateFilesToPublishDirectory>true</CopyRazorGenerateFilesToPublishDirectory>
     </PropertyGroup>
     <ItemGroup>
-      <ProjectReference Include="..\Umbraco.Examine.Lucene\Umbraco.Examine.Lucene.csproj" />
       <ProjectReference Include="..\Umbraco.ModelsBuilder.Embedded\Umbraco.ModelsBuilder.Embedded.csproj" />
-      <ProjectReference Include="..\Umbraco.Persistance.SqlCe\Umbraco.Persistance.SqlCe.csproj" />
       <ProjectReference Include="..\Umbraco.PublishedCache.NuCache\Umbraco.PublishedCache.NuCache.csproj" />
       <ProjectReference Include="..\Umbraco.Web.BackOffice\Umbraco.Web.BackOffice.csproj" />
       <ProjectReference Include="..\Umbraco.Web.Common\Umbraco.Web.Common.csproj" />
@@ -24,26 +22,12 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Views" />
-      <Folder Include="wwwroot\Media" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Compile Remove="wwwroot\Umbraco\**" />
-        <Compile Remove="App_Data\**" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <EmbeddedResource Remove="App_Data\**" />
-    </ItemGroup>
-
-    <ItemGroup>
         <Folder Include="Views" />
         <Folder Include="wwwroot\Media" />
-      <Folder Include="wwwroot\Umbraco\views\install" />
     </ItemGroup>
 
     <ItemGroup>
+        <Compile Remove="wwwroot\Umbraco\**" />
         <Compile Remove="App_Data\**" />
     </ItemGroup>
 
@@ -52,63 +36,10 @@
     </ItemGroup>
 
     <ItemGroup>
-        <None Remove="App_Data\**" />
-        <None Include="Config\tinyMceConfig.Release.config">
-          <DependentUpon>tinyMceConfig.config</DependentUpon>
-          <SubType>Designer</SubType>
-        </None>
-        <None Include="Config\umbracoSettings.Release.config">
-          <DependentUpon>umbracoSettings.config</DependentUpon>
-          <SubType>Designer</SubType>
-        </None>
-    </ItemGroup>
-
-    <ItemGroup>
-        <Content Remove="App_Data\**" />
-        <Content Remove="wwwroot\Umbraco\views\install\machinekey.html" />
-        <Content Remove="wwwroot\Umbraco\views\install\permissionsreport.html" />
-        <Content Remove="wwwroot\Umbraco\views\install\starterkit.html" />
-        <Content Remove="wwwroot\Umbraco\views\install\upgrade.html" />
-        <Content Remove="wwwroot\Umbraco\views\install\user.html" />
-        <Content Remove="wwwroot\Umbraco\views\install\version7upgradereport.html" />
-        <Content Remove="wwwroot\Umbraco\views\install\continueinstall.html" />
-        <Content Remove="wwwroot\Umbraco\views\install\database.html" />
-        <Content Remove="wwwroot\Umbraco\views\install\error.html" />
-        <Content Update="Areas\UmbracoInstall\Views\Install\Index.cshtml">
-          <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-          <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-        </Content>
-        <Content Update="Config\tinyMceConfig.config">
-          <SubType>Designer</SubType>
-        </Content>
-        <Content Update="Config\umbracoSettings.config">
-          <SubType>Designer</SubType>
-        </Content>
-        <Content Remove="wwwroot\Web.config" />
-        <Content Remove="Umbraco\PartialViewMacros\Templates\Gallery.cshtml" />
-        <Content Remove="Umbraco\PartialViewMacros\Templates\ListAncestorsFromCurrentPage.cshtml" />
-        <Content Remove="Umbraco\PartialViewMacros\Templates\ListChildPagesFromChangeableSource.cshtml" />
-        <Content Remove="Umbraco\PartialViewMacros\Templates\ListChildPagesFromCurrentPage.cshtml" />
-        <Content Remove="Umbraco\PartialViewMacros\Templates\ListChildPagesOrderedByDate.cshtml" />
-        <Content Remove="Umbraco\PartialViewMacros\Templates\ListChildPagesOrderedByName.cshtml" />
-        <Content Remove="Umbraco\PartialViewMacros\Templates\ListChildPagesOrderedByProperty.cshtml" />
-        <Content Remove="Umbraco\PartialViewMacros\Templates\ListChildPagesWithDoctype.cshtml" />
-        <Content Remove="Umbraco\PartialViewMacros\Templates\ListDescendantsFromCurrentPage.cshtml" />
-        <Content Remove="Umbraco\PartialViewMacros\Templates\ListImagesFromMediaFolder.cshtml" />
-        <Content Remove="Umbraco\PartialViewMacros\Templates\Login.cshtml" />
-        <Content Remove="Umbraco\PartialViewMacros\Templates\LoginStatus.cshtml" />
-        <Content Remove="Umbraco\PartialViewMacros\Templates\MultinodeTree-picker.cshtml" />
-        <Content Remove="Umbraco\PartialViewMacros\Templates\Navigation.cshtml" />
-        <Content Remove="Umbraco\PartialViewMacros\Templates\RegisterMember.cshtml" />
-        <Content Remove="Umbraco\PartialViewMacros\Templates\SiteMap.cshtml" />
-        <Content Remove="Umbraco\PartialViewMacros\Templates\EditProfile.cshtml" />
-    </ItemGroup>
-
-    <ItemGroup>
         <Content Remove="App_Data\**" />
     </ItemGroup>
 
-    
+
     <ItemGroup>
         <None Include="config\**\*.*">
             <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
@@ -135,12 +66,12 @@
         <None Remove="Umbraco/Models/models.hash" />
         <None Remove="Umbraco/Models/models.err" />
     </ItemGroup>
-    
+
     <ItemGroup>
       <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.3" />
         <!-- TODO: remove the reference to System.Configuration.ConfigurationManager when Examine/lucene dont need it-->
         <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.7.0" />
     </ItemGroup>
-    
+
 
 </Project>

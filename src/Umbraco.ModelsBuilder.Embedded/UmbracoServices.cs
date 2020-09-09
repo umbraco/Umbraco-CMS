@@ -189,7 +189,7 @@ namespace Umbraco.ModelsBuilder.Embedded
             return typeModels;
         }
 
-        public static IList<TypeModel> EnsureDistinctAliases(IList<TypeModel> typeModels)
+        internal static IList<TypeModel> EnsureDistinctAliases(IList<TypeModel> typeModels)
         {
             var groups = typeModels.GroupBy(x => x.Alias.ToLowerInvariant());
             foreach (var group in groups.Where(x => x.Count() > 1))
