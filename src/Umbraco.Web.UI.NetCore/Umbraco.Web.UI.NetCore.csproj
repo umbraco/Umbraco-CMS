@@ -24,6 +24,9 @@
     <ItemGroup>
         <Folder Include="Views" />
         <Folder Include="wwwroot\Media" />
+      <Folder Include="umbraco" />
+      <Folder Include="Views" />
+      <Folder Include="wwwroot\Media" />
     </ItemGroup>
 
     <ItemGroup>

@@ -149,6 +149,8 @@
     <Compile Include="Compose\AuditEventsComposer.cs" />
     <Compile Include="Compose\BackOfficeUserAuditEventsComponent.cs" />
     <Compile Include="Compose\BackOfficeUserAuditEventsComposer.cs" />
+    <Compile Include="Compose\BlockEditorComponent.cs" />
+    <Compile Include="Compose\BlockEditorComposer.cs" />
     <Compile Include="Compose\NestedContentPropertyComponent.cs" />
     <Compile Include="Composing\LightInject\LightInjectContainer.cs" />
     <Compile Include="Editors\PasswordChanger.cs" />
@@ -174,6 +176,7 @@
     <Compile Include="Logging\WebProfilerComposer.cs" />
     <Compile Include="Logging\WebProfilerProvider.cs" />
     <Compile Include="Models\Membership\UmbracoMembershipMember.cs" />
+    <Compile Include="Models\IconModel.cs" />
     <Compile Include="Mvc\HttpUmbracoFormRouteStringException.cs" />
     <Compile Include="Mvc\ModelBindingExceptionFilter.cs" />
     <Compile Include="Mvc\StatusCodeFilterAttribute.cs" />

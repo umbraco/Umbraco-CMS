@@ -22,7 +22,7 @@
             <umb-dropdown ng-if="vm.dropdownOpen" on-close="vm.close()" umb-keyboard-list>
                 <umb-dropdown-item
                     ng-repeat="item in vm.items">
-                    <a href="" ng-click="vm.select(item)">{{ item.name }}</a>
+                    <button type="button" class="btn-reset" ng-click="vm.select(item)">{{ item.name }}</button>
                 </umb-dropdown-item>
             </umb-dropdown>
 
@@ -110,7 +110,7 @@
 
             // Stop listening when scope is destroyed.
             scope.$on('$destroy', stopListening);
-            
+
         }
 
         var directive = {

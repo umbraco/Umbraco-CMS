@@ -143,6 +143,7 @@
     <Compile Include="TestHelpers\Entities\MockedPropertyTypes.cs" />
     <Compile Include="TestHelpers\Entities\MockedUser.cs" />
     <Compile Include="UmbracoExamine\ExamineExtensions.cs" />
+    <Compile Include="PropertyEditors\BlockEditorComponentTests.cs" />
     <Compile Include="PropertyEditors\BlockListPropertyValueConverterTests.cs" />
     <Compile Include="PropertyEditors\DataValueReferenceFactoryCollectionTests.cs" />
     <Compile Include="PropertyEditors\NestedContentPropertyComponentTests.cs" />
