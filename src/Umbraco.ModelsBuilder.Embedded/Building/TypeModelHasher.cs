@@ -18,30 +18,30 @@ namespace Umbraco.ModelsBuilder.Embedded.Building
 
             foreach (var typeModel in typeModels.OrderBy(x => x.Alias))
             {
-                builder.Append("--- CONTENT TYPE MODEL ---");
-                builder.Append(typeModel.Id);
-                builder.Append(typeModel.Alias);
-                builder.Append(typeModel.ClrName);
-                builder.Append(typeModel.ParentId);
-                builder.Append(typeModel.Name);
-                builder.Append(typeModel.Description);
-                builder.Append(typeModel.ItemType.ToString());
-                builder.Append("MIXINS:" + string.Join(",", typeModel.MixinTypes.OrderBy(x => x.Id).Select(x => x.Id)));
+                builder.AppendLine("--- CONTENT TYPE MODEL ---");
+                builder.AppendLine(typeModel.Id.ToString());
+                builder.AppendLine(typeModel.Alias);
+                builder.AppendLine(typeModel.ClrName);
+                builder.AppendLine(typeModel.ParentId.ToString());
+                builder.AppendLine(typeModel.Name);
+                builder.AppendLine(typeModel.Description);
+                builder.AppendLine(typeModel.ItemType.ToString());
+                builder.AppendLine("MIXINS:" + string.Join(",", typeModel.MixinTypes.OrderBy(x => x.Id).Select(x => x.Id)));
 
                 foreach (var prop in typeModel.Properties.OrderBy(x => x.Alias))
                 {
-                    builder.Append("--- PROPERTY ---");
-                    builder.Append(prop.Alias);
-                    builder.Append(prop.ClrName);
-                    builder.Append(prop.Name);
-                    builder.Append(prop.Description);
-                    builder.Append(prop.ModelClrType.ToString()); // see ModelType tests, want ToString() not FullName
+                    builder.AppendLine("--- PROPERTY ---");
+                    builder.AppendLine(prop.Alias);
+                    builder.AppendLine(prop.ClrName);
+                    builder.AppendLine(prop.Name);
+                    builder.AppendLine(prop.Description);
+                    builder.AppendLine(prop.ModelClrType.ToString()); // see ModelType tests, want ToString() not FullName
                 }
             }
 
             // Include the MB version in the hash so that if the MB version changes, models are rebuilt
-            builder.Append(ApiVersion.Current.Version.ToString());
-            
+            builder.AppendLine(ApiVersion.Current.Version.ToString());
+
             return builder.ToString().GenerateHash();
         }
     }
