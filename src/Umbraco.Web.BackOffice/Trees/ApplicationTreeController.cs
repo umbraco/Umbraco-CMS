@@ -7,10 +7,12 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Primitives;
 using Umbraco.Core;
 using Umbraco.Core.Services;
+using Umbraco.Extensions;
 using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.BackOffice.Trees;
 using Umbraco.Web.Common.Attributes;
@@ -262,55 +264,24 @@ namespace Umbraco.Web.Trees
             });
 
 
-            var controllerContext = new ControllerContext(
-                new ActionContext(
-                    HttpContext,
-                    routeData,
-                    new ControllerActionDescriptor()
-                    {
-                        ControllerTypeInfo = controllerType.GetTypeInfo()
-                    }
-                ));
-
-            var controller = (TreeController) _controllerFactory.CreateController(controllerContext);
+            //TODO create real proxy of the controller context https://github.com/aspnet/Mvc/issues/5190
+            var actionContext = new ActionContext(
+                HttpContext,
+                routeData,
+                new ControllerActionDescriptor()
+                {
+                    ControllerTypeInfo = controllerType.GetTypeInfo(),
+                    ActionName = action,
+                });
 
 
-            //TODO Refactor trees or reimplement this hacks to check authentication.
-            //https://dev.azure.com/umbraco/D-Team%20Tracker/_workitems/edit/3694
+            var proxyControllerContext = new ControllerContext(actionContext);
 
-            // var context = ControllerContext;
-            //
-            // // get the controller
-            // var controller = (TreeController) DependencyResolver.Current.GetService(controllerType)
-            //                  ?? throw new Exception($"Failed to create controller of type {controllerType.FullName}.");
-            //
-            // // create the proxy URL for the controller action
-            // var proxyUrl = HttpContext.Request.RequestUri.GetLeftPart(UriPartial.Authority)
-            //           + HttpContext.Request.GetUrlHelper().GetUmbracoApiService(action, controllerType)
-            //           + "?" + querystring.ToQueryString();
-            //
-            //
-            //
-            // // create a proxy request
-            // var proxyRequest = new HttpRequestMessage(HttpMethod.Get, proxyUrl);
-            //
-            // // create a proxy controller context
-            // var proxyContext = new HttpControllerContext(context.Configuration, proxyRoute, proxyRequest)
-            // {
-            //     ControllerDescriptor = new HttpControllerDescriptor(context.ControllerDescriptor.Configuration, ControllerExtensions.GetControllerName(controllerType), controllerType),
-            //     RequestContext = context.RequestContext,
-            //     Controller = controller
-            // };
-            //
-            // // wire everything
-            // controller.ControllerContext = proxyContext;
-            // controller.Request = proxyContext.Request;
-            // controller.RequestContext.RouteData = proxyRoute;
-            //
-            // // auth
-            // var authResult = await controller.ControllerContext.InvokeAuthorizationFiltersForRequest();
-            // if (authResult != null)
-            //     throw new HttpResponseException(authResult);
+            var controller = (TreeController) _controllerFactory.CreateController(proxyControllerContext);
+
+             var isAllowed = await controller.ControllerContext.InvokeAuthorizationFiltersForRequest(actionContext);
+             if (!isAllowed)
+                 throw new HttpResponseException();
 
             return controller;
         }
