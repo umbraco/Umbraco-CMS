@@ -42,7 +42,7 @@ namespace Umbraco.Tests.PublishedContent
             _publishedSnapshotAccessorMock = new Mock<IPublishedSnapshotAccessor>();
             Composition.RegisterUnique<IPublishedSnapshotAccessor>(_publishedSnapshotAccessorMock.Object);
 
-            Composition.RegisterUnique<IPublishedModelFactory>(f => new PublishedModelFactory(f.GetInstance<TypeLoader>().GetTypes<PublishedContentModel>()));
+            Composition.RegisterUnique<IPublishedModelFactory>(f => new PublishedModelFactory(f.GetInstance<TypeLoader>().GetTypes<PublishedContentModel>(), f.GetInstance<IPublishedValueFallback>()));
             Composition.RegisterUnique<IPublishedContentTypeFactory, PublishedContentTypeFactory>();
             Composition.RegisterUnique<IPublishedValueFallback, PublishedValueFallback>();
 
@@ -241,7 +241,7 @@ namespace Umbraco.Tests.PublishedContent
         [PublishedModel("Home")]
         internal class Home : PublishedContentModel
         {
-            public Home(IPublishedContent content)
+            public Home(IPublishedContent content, IPublishedValueFallback fallback)
                 : base(content)
             {}
         }
@@ -249,7 +249,7 @@ namespace Umbraco.Tests.PublishedContent
         [PublishedModel("anything")]
         internal class Anything : PublishedContentModel
         {
-            public Anything(IPublishedContent content)
+            public Anything(IPublishedContent content, IPublishedValueFallback fallback)
                 : base(content)
             { }
         }

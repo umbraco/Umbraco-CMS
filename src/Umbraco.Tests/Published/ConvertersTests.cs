@@ -185,14 +185,14 @@ namespace Umbraco.Tests.Published
             var composition = new Composition(register, TestHelper.GetMockedTypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.GetConfigs(), TestHelper.IOHelper, AppCaches.NoCache);
 
             composition.WithCollectionBuilder<PropertyValueConverterCollectionBuilder>()
-                .Append<SimpleConverter3A>()
+                .Append<SimpleConverter3A>()    
                 .Append<SimpleConverter3B>();
 
             IPublishedModelFactory factory = new PublishedModelFactory(new[]
             {
                 typeof (PublishedSnapshotTestObjects.TestElementModel1), typeof (PublishedSnapshotTestObjects.TestElementModel2),
                 typeof (PublishedSnapshotTestObjects.TestContentModel1), typeof (PublishedSnapshotTestObjects.TestContentModel2),
-            });
+            }, Mock.Of<IPublishedValueFallback>());
             register.Register(f => factory);
 
             var registerFactory = composition.CreateFactory();

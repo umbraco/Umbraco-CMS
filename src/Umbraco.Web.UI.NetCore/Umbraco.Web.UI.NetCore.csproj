@@ -13,6 +13,7 @@
         <CopyRazorGenerateFilesToPublishDirectory>true</CopyRazorGenerateFilesToPublishDirectory>
     </PropertyGroup>
     <ItemGroup>
+      <ProjectReference Include="..\Umbraco.ModelsBuilder.Embedded\Umbraco.ModelsBuilder.Embedded.csproj" />
       <ProjectReference Include="..\Umbraco.PublishedCache.NuCache\Umbraco.PublishedCache.NuCache.csproj" />
       <ProjectReference Include="..\Umbraco.Web.BackOffice\Umbraco.Web.BackOffice.csproj" />
       <ProjectReference Include="..\Umbraco.Web.Common\Umbraco.Web.Common.csproj" />
@@ -21,12 +22,12 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Views" />
-      <Folder Include="wwwroot\Media" />
+        <Folder Include="Views" />
+        <Folder Include="wwwroot\Media" />
     </ItemGroup>
 
     <ItemGroup>
-      <Compile Remove="wwwroot\Umbraco\**" />
+        <Compile Remove="wwwroot\Umbraco\**" />
         <Compile Remove="App_Data\**" />
     </ItemGroup>
 
@@ -38,7 +39,7 @@
         <Content Remove="App_Data\**" />
     </ItemGroup>
 
-    
+
     <ItemGroup>
         <None Include="config\**\*.*">
             <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
@@ -52,15 +53,25 @@
         </None>
         <None Remove="App_Data\**" />
     </ItemGroup>
-    
+
+    <!-- We don't want to include the generated files, they will throw a lot of errors -->
+    <ItemGroup>
+        <None Remove="Umbraco/Models/all.generated.cs"/>
+        <Compile Remove="Umbraco/Models/all.generated.cs"/>
+        <None Remove="Umbraco/Models/models.generated.cs"/>
+        <Compile Remove="Umbraco/Models/models.generated.cs" />
+        <Folder Remove="Umbraco/Models/Compiled"/>
+        <None Remove="Umbraco/Models/Compiled/**" />
+        <None Remove="Umbraco/Models/all.dll.path" />
+        <None Remove="Umbraco/Models/models.hash" />
+        <None Remove="Umbraco/Models/models.err" />
+    </ItemGroup>
+
     <ItemGroup>
       <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.3" />
         <!-- TODO: remove the reference to System.Configuration.ConfigurationManager when Examine/lucene dont need it-->
         <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.7.0" />
     </ItemGroup>
-
-
-
 
 
 </Project>

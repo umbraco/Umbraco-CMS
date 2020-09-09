@@ -9,55 +9,23 @@ using Umbraco.ModelsBuilder.Embedded.Building;
 
 namespace Umbraco.ModelsBuilder.Embedded.Compose
 {
-
-
     [ComposeBefore(typeof(IPublishedCacheComposer))]
     [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
     public sealed class ModelsBuilderComposer : ICoreComposer
     {
         public void Compose(Composition composition)
         {
-            var isLegacyModelsBuilderInstalled = IsLegacyModelsBuilderInstalled();
-
-            if (isLegacyModelsBuilderInstalled)
-            {
-                ComposeForLegacyModelsBuilder(composition);
-                return;
-            }
-
             composition.Components().Append<ModelsBuilderComponent>();
             composition.Register<UmbracoServices>(Lifetime.Singleton);
             composition.RegisterUnique<ModelsGenerator>();
             composition.RegisterUnique<LiveModelsProvider>();
             composition.RegisterUnique<OutOfDateModelsStatus>();
             composition.RegisterUnique<ModelsGenerationError>();
-            
+
             if (composition.Configs.ModelsBuilder().ModelsMode == ModelsMode.PureLive)
                 ComposeForLiveModels(composition);
             else if (composition.Configs.ModelsBuilder().EnableFactory)
                 ComposeForDefaultModelsFactory(composition);
-        }
-
-        private static bool IsLegacyModelsBuilderInstalled()
-        {
-            Assembly legacyMbAssembly = null;
-            try
-            {
-                legacyMbAssembly = Assembly.Load("Umbraco.ModelsBuilder");
-            }
-            catch (System.Exception)
-            {
-                //swallow exception, DLL must not be there
-            }
-
-            return legacyMbAssembly != null;
-        }
-
-        private void ComposeForLegacyModelsBuilder(Composition composition)
-        {
-            composition.Logger.Info<ModelsBuilderComposer>("ModelsBuilder.Embedded is disabled, the external ModelsBuilder was detected.");
-            composition.Components().Append<DisabledModelsBuilderComponent>();
-            composition.Dashboards().Remove<ModelsBuilderDashboard>();
         }
 
         private void ComposeForDefaultModelsFactory(Composition composition)
@@ -65,10 +33,11 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
             composition.RegisterUnique<IPublishedModelFactory>(factory =>
             {
                 var typeLoader = factory.GetInstance<TypeLoader>();
+                var publishedValueFallback = factory.GetInstance<IPublishedValueFallback>();
                 var types = typeLoader
                     .GetTypes<PublishedElementModel>() // element models
                     .Concat(typeLoader.GetTypes<PublishedContentModel>()); // content models
-                return new PublishedModelFactory(types);
+                return new PublishedModelFactory(types, publishedValueFallback);
             });
         }
 

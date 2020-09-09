@@ -2,6 +2,7 @@
 using System.IO;
 using System.Text;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 
 namespace Umbraco.ModelsBuilder.Embedded
@@ -9,12 +10,12 @@ namespace Umbraco.ModelsBuilder.Embedded
     public sealed class ModelsGenerationError
     {
         private readonly IModelsBuilderConfig _config;
-        private readonly IIOHelper _ioHelper;
+        private readonly IHostingEnvironment _hostingEnvironment;
 
-        public ModelsGenerationError(IModelsBuilderConfig config, IIOHelper ioHelper)
+        public ModelsGenerationError(IModelsBuilderConfig config, IHostingEnvironment hostingEnvironment)
         {
             _config = config;
-            _ioHelper = ioHelper;
+            _hostingEnvironment = hostingEnvironment;
         }
 
         public void Clear()
@@ -59,7 +60,7 @@ namespace Umbraco.ModelsBuilder.Embedded
 
         private string GetErrFile()
         {
-            var modelsDirectory = _config.ModelsDirectoryAbsolute(_ioHelper);
+            var modelsDirectory = _config.ModelsDirectoryAbsolute(_hostingEnvironment);
             if (!Directory.Exists(modelsDirectory))
                 return null;
 

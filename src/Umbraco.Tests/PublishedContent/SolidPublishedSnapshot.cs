@@ -360,7 +360,7 @@ namespace Umbraco.Tests.PublishedContent
     {
         #region Plumbing
 
-        public ContentType2(IPublishedContent content)
+        public ContentType2(IPublishedContent content, IPublishedValueFallback fallback)
             : base(content)
         { }
 
@@ -374,8 +374,8 @@ namespace Umbraco.Tests.PublishedContent
     {
         #region Plumbing
 
-        public ContentType2Sub(IPublishedContent content)
-            : base(content)
+        public ContentType2Sub(IPublishedContent content, IPublishedValueFallback fallback)
+            : base(content, fallback)
         { }
 
         #endregion
@@ -383,7 +383,7 @@ namespace Umbraco.Tests.PublishedContent
 
     internal class PublishedContentStrong1 : PublishedContentModel
     {
-        public PublishedContentStrong1(IPublishedContent content)
+        public PublishedContentStrong1(IPublishedContent content, IPublishedValueFallback fallback)
             : base(content)
         { }
 
@@ -392,8 +392,8 @@ namespace Umbraco.Tests.PublishedContent
 
     internal class PublishedContentStrong1Sub : PublishedContentStrong1
     {
-        public PublishedContentStrong1Sub(IPublishedContent content)
-            : base(content)
+        public PublishedContentStrong1Sub(IPublishedContent content, IPublishedValueFallback fallback)
+            : base(content, fallback)
         { }
 
         public int AnotherValue => this.Value<int>("anotherValue");
@@ -401,7 +401,7 @@ namespace Umbraco.Tests.PublishedContent
 
     internal class PublishedContentStrong2 : PublishedContentModel
     {
-        public PublishedContentStrong2(IPublishedContent content)
+        public PublishedContentStrong2(IPublishedContent content, IPublishedValueFallback fallback)
             : base(content)
         { }
 

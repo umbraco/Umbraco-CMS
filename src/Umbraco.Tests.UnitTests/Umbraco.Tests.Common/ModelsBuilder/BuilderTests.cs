@@ -61,13 +61,11 @@ namespace Umbraco.Tests.ModelsBuilder
 //------------------------------------------------------------------------------
 
 using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Web;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Web;
+using Umbraco.Web.PublishedCache;
 using Umbraco.ModelsBuilder.Embedded;
+using Umbraco.Core;
 
 namespace Umbraco.Web.PublishedModels
 {
@@ -81,23 +79,27 @@ namespace Umbraco.Web.PublishedModels
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder.Embedded"", """ + version + @""")]
 		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder.Embedded"", """ + version + @""")]
-		public new static IPublishedContentType GetModelContentType()
-			=> PublishedModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);
+		public new static IPublishedContentType GetModelContentType(IPublishedSnapshotAccessor publishedSnapshotAccessor)
+			=> PublishedModelUtility.GetModelContentType(publishedSnapshotAccessor, ModelItemType, ModelTypeAlias);
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder.Embedded"", """ + version + @""")]
-		public static IPublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<Type1, TValue>> selector)
-			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(), selector);
+		public static IPublishedPropertyType GetModelPropertyType<TValue>(IPublishedSnapshotAccessor publishedSnapshotAccessor, Expression<Func<Type1, TValue>> selector)
+			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(publishedSnapshotAccessor), selector);
 #pragma warning restore 0109
 
+		private IPublishedValueFallback _publishedValueFallback;
+
 		// ctor
-		public Type1(IPublishedContent content)
+		public Type1(IPublishedContent content, IPublishedValueFallback publishedValueFallback)
 			: base(content)
-		{ }
+		{
+			_publishedValueFallback = publishedValueFallback; 
+		}
 
 		// properties
 
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder.Embedded"", """ + version + @""")]
 		[ImplementPropertyType(""prop1"")]
-		public string Prop1 => this.Value<string>(""prop1"");
+		public string Prop1 => this.Value<string>(_publishedValueFallback, ""prop1"");
 	}
 }
 ";
@@ -176,13 +178,11 @@ namespace Umbraco.Web.PublishedModels
 //------------------------------------------------------------------------------
 
 using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Web;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Web;
+using Umbraco.Web.PublishedCache;
 using Umbraco.ModelsBuilder.Embedded;
+using Umbraco.Core;
 
 namespace Umbraco.Web.PublishedModels
 {
@@ -196,23 +196,27 @@ namespace Umbraco.Web.PublishedModels
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder.Embedded"", """ + version + @""")]
 		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder.Embedded"", """ + version + @""")]
-		public new static IPublishedContentType GetModelContentType()
-			=> PublishedModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);
+		public new static IPublishedContentType GetModelContentType(IPublishedSnapshotAccessor publishedSnapshotAccessor)
+			=> PublishedModelUtility.GetModelContentType(publishedSnapshotAccessor, ModelItemType, ModelTypeAlias);
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder.Embedded"", """ + version + @""")]
-		public static IPublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<Type1, TValue>> selector)
-			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(), selector);
+		public static IPublishedPropertyType GetModelPropertyType<TValue>(IPublishedSnapshotAccessor publishedSnapshotAccessor, Expression<Func<Type1, TValue>> selector)
+			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(publishedSnapshotAccessor), selector);
 #pragma warning restore 0109
 
+		private IPublishedValueFallback _publishedValueFallback;
+
 		// ctor
-		public Type1(IPublishedContent content)
+		public Type1(IPublishedContent content, IPublishedValueFallback publishedValueFallback)
 			: base(content)
-		{ }
+		{
+			_publishedValueFallback = publishedValueFallback; 
+		}
 
 		// properties
 
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder.Embedded"", """ + version + @""")]
 		[ImplementPropertyType(""foo"")]
-		public global::System.Collections.Generic.IEnumerable<global::Foo> Foo => this.Value<global::System.Collections.Generic.IEnumerable<global::Foo>>(""foo"");
+		public global::System.Collections.Generic.IEnumerable<global::Foo> Foo => this.Value<global::System.Collections.Generic.IEnumerable<global::Foo>>(_publishedValueFallback, ""foo"");
 	}
 }
 ";
