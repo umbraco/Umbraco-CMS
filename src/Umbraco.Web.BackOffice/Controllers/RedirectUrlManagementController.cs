@@ -12,6 +12,7 @@ using Umbraco.Core.Mapping;
 using Umbraco.Core.Services;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Security;
+using Umbraco.Core.Configuration;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -24,13 +25,16 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IRedirectUrlService _redirectUrlService;
         private readonly UmbracoMapper _umbracoMapper;
         private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IConfigManipulator _configManipulator;
 
-        public RedirectUrlManagementController(ILogger logger,
+        public RedirectUrlManagementController(
+            ILogger logger,
             IWebRoutingSettings webRoutingSettings,
             IWebSecurity webSecurity,
             IRedirectUrlService redirectUrlService,
             UmbracoMapper umbracoMapper,
-            IHostingEnvironment hostingEnvironment)
+            IHostingEnvironment hostingEnvironment,
+            IConfigManipulator configManipulator)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _webRoutingSettings = webRoutingSettings ?? throw new ArgumentNullException(nameof(webRoutingSettings));
@@ -38,6 +42,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _redirectUrlService = redirectUrlService ?? throw new ArgumentNullException(nameof(redirectUrlService));
             _umbracoMapper = umbracoMapper ?? throw new ArgumentNullException(nameof(umbracoMapper));
             _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
+            _configManipulator = configManipulator ?? throw new ArgumentNullException(nameof(configManipulator));
         }
 
         /// <summary>
@@ -111,23 +116,10 @@ namespace Umbraco.Web.BackOffice.Controllers
                 _logger.Debug<RedirectUrlManagementController>(errorMessage);
                 throw new SecurityException(errorMessage);
             }
-            var configFilePath =_hostingEnvironment.MapPathContentRoot("~/config/umbracoSettings.config");
 
             var action = disable ? "disable" : "enable";
 
-            if (System.IO.File.Exists(configFilePath) == false)
-                return BadRequest($"Couldn't {action} URL Tracker, the umbracoSettings.config file does not exist.");
-
-            var umbracoConfig = new XmlDocument { PreserveWhitespace = true };
-            umbracoConfig.Load(configFilePath);
-
-            var webRoutingElement = umbracoConfig.SelectSingleNode("//web.routing") as XmlElement;
-            if (webRoutingElement == null)
-                return BadRequest($"Couldn't {action} URL Tracker, the web.routing element was not found in umbracoSettings.config.");
-
-            // note: this adds the attribute if it does not exist
-            webRoutingElement.SetAttribute("disableRedirectUrlTracking", disable.ToString().ToLowerInvariant());
-            umbracoConfig.Save(configFilePath);
+            _configManipulator.SaveDisableRedirectUrlTracking(disable);
 
             return Ok($"URL tracker is now {action}d.");
         }
