@@ -648,6 +648,7 @@
     <key alias="design">Design</key>
     <key alias="dictionary">Ordbog</key>
     <key alias="dimensions">Dimensioner</key>
+    <key alias="discard">Kassér</key>
     <key alias="down">Ned</key>
     <key alias="download">Hent</key>
     <key alias="edit">Rediger</key>
@@ -1844,8 +1845,9 @@ Mange hilsner fra Umbraco robotten
     <key alias="addCustomView">Tilføj speciel visning</key>
     <key alias="addSettingsElementType">Tilføj instillinger</key>
     <key alias="labelTemplatePlaceholder">Overskriv label form</key>
-    <key alias="confirmDeleteBlockMessage"><![CDATA[Er du sikker på at du vil slette denne blok: <strong>%0%</strong>.]]></key>
-    <key alias="confirmDeleteBlockNotice">Indhold der benytter sig af denne blok vil gå bort.</key>
+    <key alias="confirmDeleteBlockMessage"><![CDATA[Er du sikker på at du vil slette dette indhold: <strong>%0%</strong>.]]></key>
+    <key alias="confirmDeleteBlockTypeMessage"><![CDATA[Er du sikker på at du vil slette denne blok konfiguration: <strong>%0%</strong>.]]></key>
+    <key alias="confirmDeleteBlockTypeNotice">Indholdet vil stadigt eksistere, men redigering af dette indhold vil ikke være muligt. Indholdet vil blive vist som ikke understøttet indhold.</key>
     <key alias="blockConfigurationOverlayTitle"><![CDATA[Konfiguration af '%0%']]></key>
     <key alias="thumbnail">Billede</key>
     <key alias="addThumbnail">Tilføj billede</key>
@@ -1854,6 +1856,9 @@ Mange hilsner fra Umbraco robotten
     <key alias="tabBlockSettings">Indstillinger</key>
     <key alias="headlineAdvanced">Avanceret</key>
     <key alias="forceHideContentEditor">Skjuld indholds editoren</key>
+    <key alias="blockHasChanges">Du har lavet ændringer til dette indhold. Er du sikker på at du vil kassere dem?</key>
+    <key alias="confirmCancelBlockCreationHeadline">Annuller oprettelse?</key>
+    <key alias="confirmCancelBlockCreationMessage"><![CDATA[Er du sikker på at du vil annullere oprettelsen.]]></key>
   </area>
 
 </language>

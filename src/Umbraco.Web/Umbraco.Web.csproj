@@ -148,6 +148,8 @@
     <Compile Include="Compose\BackOfficeUserAuditEventsComponent.cs" />
     <Compile Include="BlockListTemplateExtensions.cs" />
     <Compile Include="Compose\BackOfficeUserAuditEventsComposer.cs" />
+    <Compile Include="Compose\BlockEditorComponent.cs" />
+    <Compile Include="Compose\BlockEditorComposer.cs" />
     <Compile Include="Compose\NestedContentPropertyComponent.cs" />
     <Compile Include="Composing\CompositionExtensions\Installer.cs" />
     <Compile Include="Composing\LightInject\LightInjectContainer.cs" />

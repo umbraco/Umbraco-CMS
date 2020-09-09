@@ -22,6 +22,11 @@
                 });
             }
             if (!vm.labels.includeUnpublished) {
+                localizationService.localize("content_includeUnpublished").then(function (value) {
+                    vm.labels.includeUnpublished = value;
+                });
+            }
+            if (!vm.labels.includeUnpublished) {
                 localizationService.localize("content_includeUnpublished").then(value => {
                     vm.labels.includeUnpublished = value;
                 });
