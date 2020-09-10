@@ -57,7 +57,7 @@ namespace Umbraco.Web.Runtime
             composition.RegisterUnique<RoutableDocumentFilter>();
 
             // configure the container for web
-            composition.ConfigureForWeb();
+            //composition.ConfigureForWeb();
 
             composition
                 // TODO: This will depend on if we use ServiceBasedControllerActivator - see notes in Startup.cs
@@ -74,7 +74,7 @@ namespace Umbraco.Web.Runtime
                 .Append<RenderControllerFactory>();
 
             // auto-register views
-            composition.RegisterAuto(typeof(UmbracoViewPage<>));
+            //composition.RegisterAuto(typeof(UmbracoViewPage<>));
 
             // register preview SignalR hub
             composition.RegisterUnique(_ => GlobalHost.ConnectionManager.GetHubContext<PreviewHub>());

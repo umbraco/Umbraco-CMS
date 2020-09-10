@@ -127,7 +127,8 @@ namespace Umbraco.Web
         /// </summary>
         protected virtual IRegister GetRegister(IGlobalSettings globalSettings)
         {
-            return RegisterFactory.Create(globalSettings);
+            throw new NotImplementedException();
+            //return RegisterFactory.Create(globalSettings);
         }
 
         // events - in the order they trigger
@@ -173,14 +174,14 @@ namespace Umbraco.Web
                 Umbraco.Composing.Current.Profiler,
                 Umbraco.Composing.Current.HostingEnvironment,
                 Umbraco.Composing.Current.BackOfficeInfo);
-            _factory = Current.Factory = _runtime.Configure(register);
+            //_factory = Current.Factory = _runtime.Configure(register);
 
             // now we can add our request based logging enrichers (globally, which is what we were doing in netframework before)
             LogContext.Push(new HttpSessionIdEnricher(_factory.GetInstance<ISessionIdResolver>()));
             LogContext.Push(new HttpRequestNumberEnricher(_factory.GetInstance<IRequestCache>()));
             LogContext.Push(new HttpRequestIdEnricher(_factory.GetInstance<IRequestCache>()));
 
-            _runtime.Start();
+            //_runtime.Start();
         }
 
         // called by ASP.NET (auto event wireup) once per app domain
