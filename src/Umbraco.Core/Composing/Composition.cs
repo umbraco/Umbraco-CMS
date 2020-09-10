@@ -69,55 +69,10 @@ namespace Umbraco.Core.Composing
 
         #endregion
 
-        #region IRegister
         public IServiceCollection Services { get; }
 
         [Obsolete("Please use Services instead")]
         public object Concrete => Services;
-
-         // TODO: MDSI Not used in core, Nuke or keep for backwards compatability for user composers?
-        public void Register(Type serviceType, Lifetime lifetime = Lifetime.Transient)
-            => Services.Register(serviceType, lifetime);
-
-         // TODO: MDSI Not used in core, Nuke or keep for backwards compatability for user composers?
-        public void Register(Type serviceType, Type implementingType, Lifetime lifetime = Lifetime.Transient)
-            => Services.Register(serviceType, implementingType, lifetime);
-
-        public void Register<TService>(Lifetime lifetime = Lifetime.Transient)
-            where TService : class
-            => Services.Register<TService>(lifetime);
-
-        public void Register<TService, TTarget>(Lifetime lifetime = Lifetime.Transient)
-            where TService : class
-            => Services.Register<TService, TTarget>(lifetime);
-
-        public void Register<TService>(Func<IServiceProvider, TService> serviceProvider, Lifetime lifetime = Lifetime.Transient)
-            where TService : class
-            => Services.Register(serviceProvider, lifetime);
-
-         // TODO: MDSI Not used in core, Nuke or keep for backwards compatability for user composers?
-        public void Register(Type serviceType, object instance)
-            => Services.Register(serviceType, instance);
-
-         // TODO: MDSI Not used in core, Nuke or keep for backwards compatability for user composers?
-        public void RegisterFor<TService, TTarget>(Lifetime lifetime = Lifetime.Transient)
-            where TService : class
-            => Services.RegisterFor<TService, TTarget>(lifetime);
-
-         // TODO: MDSI Not used in core, Nuke or keep for backwards compatability for user composers?
-        public void RegisterFor<TService, TTarget>(Type implementingType, Lifetime lifetime = Lifetime.Transient)
-            where TService : class
-            => Services.RegisterFor<TService>(implementingType, lifetime);
-
-         // TODO: MDSI Not used in core, Nuke or keep for backwards compatability for user composers?
-        public void RegisterFor<TService>(Func<IServiceProvider, TService> serviceProvider, Lifetime lifetime = Lifetime.Transient)
-            where TService : class
-            => Services.RegisterFor(serviceProvider, lifetime);
-
-         // TODO: MDSI Not used in core, Nuke or keep for backwards compatability for user composers?
-        public void RegisterFor<TService, TTarget>(TService instance)
-            where TService : class
-            => Services.RegisterFor<TService>(instance);
 
         public void RegisterBuildersAndConfigs()
         {
@@ -127,51 +82,6 @@ namespace Umbraco.Core.Composing
 
             Configs.RegisterWith(Services);
         }
-
-        #endregion
-
-        #region Unique
-
-        /// <summary>
-        /// Registers a unique service with an implementation type.
-        /// </summary>
-        /// <remarks>Unique services have one single implementation, and a Singleton lifetime.</remarks>
-        public void RegisterUnique(Type serviceType, Type implementingType)
-            => Services.RegisterFor(serviceType, implementingType, Lifetime.Singleton);
-
-        /// <summary>
-        /// Registers a unique service with an implementation factory.
-        /// </summary>
-        /// <remarks>Unique services have one single implementation, and a Singleton lifetime.</remarks>
-        public void RegisterUnique<TService>(Func<IServiceProvider, TService> serviceProvider)
-            where TService : class
-            => Services.RegisterFor(serviceProvider, Lifetime.Singleton);
-
-        /// <summary>
-        /// Registers a unique service with an implementing instance.
-        /// </summary>
-        /// <remarks>Unique services have one single implementation, and a Singleton lifetime.</remarks>
-        public void RegisterUnique(Type serviceType, object instance)
-            => Services.RegisterFor(serviceType, instance);
-
-        /// <summary>
-        /// Registers a unique service for a target, with an implementation factory.
-        /// </summary>
-        /// <remarks>Unique services have one single implementation, and a Singleton lifetime.</remarks>
-        public void RegisterUniqueFor<TService, TTarget>(Func<IServiceProvider, TService> serviceProvider)
-            where TService : class
-            => Services.RegisterFor(serviceProvider, Lifetime.Singleton);
-
-        /// <summary>
-        /// Registers a unique service for a target, with an implementing instance.
-        /// </summary>
-        /// <remarks>Unique services have one single implementation, and a Singleton lifetime.</remarks>
-        // TODO: MDSI Not used in core, Nuke or keep for backwards compat for user composers?
-        public void RegisterUniqueFor<TService, TTarget>(TService instance)
-            where TService : class
-            => Services.RegisterFor(typeof(TService), instance);
-
-        #endregion
 
         #region Collection Builders
 

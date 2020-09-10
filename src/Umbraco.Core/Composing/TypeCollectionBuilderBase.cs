@@ -54,12 +54,12 @@ namespace Umbraco.Core.Composing
 
         public TCollection CreateCollection(IServiceProvider serviceProvider)
         {
-            return serviceProvider.GetInstance<TCollection>(_types);
+            return ActivatorUtilities.CreateInstance<TCollection>(serviceProvider, _types);
         }
 
         public void RegisterWith(IServiceCollection services)
         {
-            services.Register(CreateCollection, Lifetime.Singleton);
+            services.Add(new ServiceDescriptor(typeof(TCollection), CreateCollection, ServiceLifetime.Singleton));
         }
     }
 }

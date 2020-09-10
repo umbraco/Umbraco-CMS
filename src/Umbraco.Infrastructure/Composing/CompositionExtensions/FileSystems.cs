@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Configuration;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.IO.MediaPathSchemes;
@@ -75,29 +76,29 @@ namespace Umbraco.Core.Composing.CompositionExtensions
             // it needs to be registered (not only the interface) because it provides additional
             // functionality eg for scoping, and is injected in the scope provider - whereas the
             // interface is really for end-users to get access to filesystems.
-            composition.RegisterUnique(factory => factory.GetInstance<Core.IO.FileSystems>(factory));
+            composition.Services.AddUnique(factory => ActivatorUtilities.CreateInstance<Core.IO.FileSystems>(factory));
 
             // register IFileSystems, which gives access too all filesystems
-            composition.RegisterUnique<IFileSystems>(factory => factory.GetInstance<Core.IO.FileSystems>());
+            composition.Services.AddUnique<IFileSystems>(factory => factory.GetRequiredService<Core.IO.FileSystems>());
 
             // register the scheme for media paths
-            composition.RegisterUnique<IMediaPathScheme, UniqueMediaPathScheme>();
+            composition.Services.AddUnique<IMediaPathScheme, UniqueMediaPathScheme>();
 
             // register the IMediaFileSystem implementation
             composition.RegisterFileSystem<IMediaFileSystem, MediaFileSystem>();
 
             // register the supporting filesystems provider
-            composition.Register(factory => new SupportingFileSystems(factory), Lifetime.Singleton);
+            composition.Services.AddSingleton(factory => new SupportingFileSystems(factory));
 
             // register the IFileSystem supporting the IMediaFileSystem
             // THIS IS THE ONLY THING THAT NEEDS TO CHANGE, IN ORDER TO REPLACE THE UNDERLYING FILESYSTEM
             // and, SupportingFileSystem.For<IMediaFileSystem>() returns the underlying filesystem
             composition.SetMediaFileSystem(factory =>
             {
-                var ioHelper = factory.GetInstance<IIOHelper>();
-                var hostingEnvironment = factory.GetInstance<IHostingEnvironment>();
-                var logger = factory.GetInstance<ILogger>();
-                var globalSettings = factory.GetInstance<IGlobalSettings>();
+                var ioHelper = factory.GetRequiredService<IIOHelper>();
+                var hostingEnvironment = factory.GetRequiredService<IHostingEnvironment>();
+                var logger = factory.GetRequiredService<ILogger>();
+                var globalSettings = factory.GetRequiredService<IGlobalSettings>();
 
                 var rootPath = hostingEnvironment.MapPathWebRoot(globalSettings.UmbracoMediaPath);
                 var rootUrl = hostingEnvironment.ToAbsolute(globalSettings.UmbracoMediaPath);

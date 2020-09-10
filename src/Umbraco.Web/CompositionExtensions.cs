@@ -51,7 +51,7 @@ namespace Umbraco.Web
         /// <typeparam name="T">The type of the content last chance finder.</typeparam>
         /// <param name="composition">The composition.</param>
         public static void SetContentLastChanceFinder<T>(this Composition composition)
-            where T : IContentLastChanceFinder
+            where T : class, IContentLastChanceFinder
         {
             composition.RegisterUnique<IContentLastChanceFinder, T>();
         }
@@ -73,7 +73,7 @@ namespace Umbraco.Web
         /// <param name="finder">A last chance finder.</param>
         public static void SetContentLastChanceFinder(this Composition composition, IContentLastChanceFinder finder)
         {
-            composition.RegisterUnique(_ => finder);
+            composition.Services.AddUnique(_ => finder);
         }
 
         /// <summary>
@@ -82,9 +82,9 @@ namespace Umbraco.Web
         /// <typeparam name="T">The type of the site domain helper.</typeparam>
         /// <param name="composition"></param>
         public static void SetSiteDomainHelper<T>(this Composition composition)
-            where T : ISiteDomainHelper
+            where T : class, ISiteDomainHelper
         {
-            composition.RegisterUnique<ISiteDomainHelper, T>();
+            composition.Services.AddUnique<ISiteDomainHelper, T>();
         }
 
         /// <summary>
@@ -94,7 +94,7 @@ namespace Umbraco.Web
         /// <param name="factory">A function creating a helper.</param>
         public static void SetSiteDomainHelper(this Composition composition, Func<IFactory, ISiteDomainHelper> factory)
         {
-            composition.RegisterUnique(factory);
+            composition.Services.AddUnique(factory);
         }
 
         /// <summary>
@@ -104,7 +104,7 @@ namespace Umbraco.Web
         /// <param name="helper">A helper.</param>
         public static void SetSiteDomainHelper(this Composition composition, ISiteDomainHelper helper)
         {
-            composition.RegisterUnique(_ => helper);
+            composition.Services.AddUnique(_ => helper);
         }
 
         /// <summary>

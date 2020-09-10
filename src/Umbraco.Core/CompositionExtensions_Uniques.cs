@@ -1,4 +1,6 @@
-﻿using Umbraco.Core.Composing;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Umbraco.Core.Composing;
 
 namespace Umbraco.Core
 {
@@ -11,19 +13,23 @@ namespace Umbraco.Core
         /// Registers a unique service as its own implementation.
         /// </summary>
         public static void RegisterUnique<TService>(this Composition composition)
-            => composition.RegisterUnique(typeof(TService), typeof(TService));
+            where TService : class
+            => composition.Services.AddUnique<TService>();
 
         /// <summary>
         /// Registers a unique service with an implementation type.
         /// </summary>
         public static void RegisterUnique<TService, TImplementing>(this Composition composition)
-            => composition.RegisterUnique(typeof(TService), typeof(TImplementing));
+            where TService : class
+            where TImplementing : class, TService
+            => composition.Services.AddUnique<TService, TImplementing>();
 
         /// <summary>
         /// Registers a unique service with an implementing instance.
         /// </summary>
         public static void RegisterUnique<TService>(this Composition composition, TService instance)
-            => composition.RegisterUnique(typeof(TService), instance);
+            where TService : class
+            => composition.Services.Replace(ServiceDescriptor.Singleton(instance));
 
 
 
@@ -36,8 +42,8 @@ namespace Umbraco.Core
             where TService2 : class
         {
             composition.RegisterUnique<TImplementing>();
-            composition.RegisterUnique<TService1>(factory => factory.GetInstance<TImplementing>());
-            composition.RegisterUnique<TService2>(factory => factory.GetInstance<TImplementing>());
+            composition.Services.AddUnique<TService1>(factory => factory.GetRequiredService<TImplementing>());
+            composition.Services.AddUnique<TService2>(factory => factory.GetRequiredService<TImplementing>());
         }
     }
 }

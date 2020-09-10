@@ -11,7 +11,7 @@ namespace Umbraco.Web.SignalR
         {
             base.Compose(composition);
 
-            composition.RegisterUnique(_ => GlobalHost.ConnectionManager.GetHubContext<PreviewHub, IPreviewHub>());
+            composition.Services.AddUnique(_ => GlobalHost.ConnectionManager.GetHubContext<PreviewHub, IPreviewHub>());
         }
     }
 }

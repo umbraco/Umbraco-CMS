@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
@@ -19,8 +20,8 @@ namespace Umbraco.Web.ContentApps
         public override ContentAppFactoryCollection CreateCollection(IServiceProvider serviceProvider)
         {
             // get the logger just-in-time - see note below for manifest parser
-            var logger = serviceProvider.GetInstance<ILogger>();
-            var umbracoContextAccessor = serviceProvider.GetInstance<IUmbracoContextAccessor>();
+            var logger = serviceProvider.GetRequiredService<ILogger>();
+            var umbracoContextAccessor = serviceProvider.GetRequiredService<IUmbracoContextAccessor>();
             return new ContentAppFactoryCollection(CreateItems(serviceProvider), logger, umbracoContextAccessor);
         }
 
@@ -29,8 +30,8 @@ namespace Umbraco.Web.ContentApps
             // get the manifest parser just-in-time - injecting it in the ctor would mean that
             // simply getting the builder in order to configure the collection, would require
             // its dependencies too, and that can create cycles or other oddities
-            var manifestParser = serviceProvider.GetInstance<IManifestParser>();
-            var ioHelper = serviceProvider.GetInstance<IIOHelper>();
+            var manifestParser = serviceProvider.GetRequiredService<IManifestParser>();
+            var ioHelper = serviceProvider.GetRequiredService<IIOHelper>();
             return base.CreateItems(serviceProvider).Concat(manifestParser.Manifest.ContentApps.Select(x => new ManifestContentAppFactory(x, ioHelper)));
         }
     }

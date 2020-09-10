@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Reflection;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core.Configuration;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
@@ -26,7 +27,7 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
             }
 
             composition.Components().Append<ModelsBuilderComponent>();
-            composition.Register<UmbracoServices>(Lifetime.Singleton);
+            composition.Services.AddSingleton<UmbracoServices>();
             composition.RegisterUnique<ModelsGenerator>();
             composition.RegisterUnique<LiveModelsProvider>();
             composition.RegisterUnique<OutOfDateModelsStatus>();
@@ -62,9 +63,9 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
 
         private void ComposeForDefaultModelsFactory(Composition composition)
         {
-            composition.RegisterUnique<IPublishedModelFactory>(factory =>
+            composition.Services.AddUnique<IPublishedModelFactory>(factory =>
             {
-                var typeLoader = factory.GetInstance<TypeLoader>();
+                var typeLoader = factory.GetRequiredService<TypeLoader>();
                 var types = typeLoader
                     .GetTypes<PublishedElementModel>() // element models
                     .Concat(typeLoader.GetTypes<PublishedContentModel>()); // content models

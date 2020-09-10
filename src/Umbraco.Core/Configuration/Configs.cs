@@ -42,7 +42,7 @@ namespace Umbraco.Core.Configuration
             var typeOfConfig = typeof(TConfig);
 
             var lazyConfigFactory = _configs[typeOfConfig] = new Lazy<object>(configFactory);
-            _registerings[typeOfConfig] = register => register.Register(_ => (TConfig) lazyConfigFactory.Value, Lifetime.Singleton);
+            _registerings[typeOfConfig] = register =>   register.Add(new ServiceDescriptor(typeof(TConfig), _ => (TConfig) lazyConfigFactory.Value, ServiceLifetime.Singleton));
         }
 
         /// <summary>

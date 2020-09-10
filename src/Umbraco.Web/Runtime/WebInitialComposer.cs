@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Web.Security;
 using Microsoft.AspNet.SignalR;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Dictionary;
@@ -29,14 +30,14 @@ namespace Umbraco.Web.Runtime
         {
             base.Compose(composition);
 
-            composition.Register<UmbracoInjectedModule>();
+            composition.Services.AddTransient<UmbracoInjectedModule>();
 
 
             // register membership stuff
-            composition.Register(factory => MembershipProviderExtensions.GetMembersMembershipProvider());
-            composition.Register(factory => Roles.Enabled ? Roles.Provider : new MembersRoleProvider(factory.GetInstance<IMemberService>()));
-            composition.Register<MembershipHelper>(Lifetime.Request);
-            composition.Register<IPublishedMemberCache>(factory => factory.GetInstance<IUmbracoContext>().PublishedSnapshot.Members);
+            composition.Services.AddTransient(factory => MembershipProviderExtensions.GetMembersMembershipProvider());
+            composition.Services.AddTransient(factory => Roles.Enabled ? Roles.Provider : new MembersRoleProvider(factory.GetRequiredService<IMemberService>()));
+            composition.Services.AddScoped<MembershipHelper>();
+            composition.Services.AddTransient<IPublishedMemberCache>(factory => factory.GetRequiredService<IUmbracoContext>().PublishedSnapshot.Members);
             composition.RegisterUnique<IMemberUserKeyProvider, MemberUserKeyProvider>();
             composition.RegisterUnique<IPublicAccessChecker, PublicAccessChecker>();
 
@@ -45,14 +46,14 @@ namespace Umbraco.Web.Runtime
             // also, if not level.Run, we cannot really use the helper (during upgrade...)
             // so inject a "void" helper (not exactly pretty but...)
             if (composition.RuntimeState.Level == RuntimeLevel.Run)
-                composition.Register<UmbracoHelper>(factory =>
+                composition.Services.AddTransient<UmbracoHelper>(factory =>
                 {
-                    var umbCtx = factory.GetInstance<IUmbracoContext>();
-                    return new UmbracoHelper(umbCtx.IsFrontEndUmbracoRequest ? umbCtx.PublishedRequest?.PublishedContent : null, factory.GetInstance<ICultureDictionaryFactory>(),
-                        factory.GetInstance<IUmbracoComponentRenderer>(), factory.GetInstance<IPublishedContentQuery>());
+                    var umbCtx = factory.GetRequiredService<IUmbracoContext>();
+                    return new UmbracoHelper(umbCtx.IsFrontEndUmbracoRequest ? umbCtx.PublishedRequest?.PublishedContent : null, factory.GetRequiredService<ICultureDictionaryFactory>(),
+                        factory.GetRequiredService<IUmbracoComponentRenderer>(), factory.GetRequiredService<IPublishedContentQuery>());
                 });
             else
-                composition.Register(_ => new UmbracoHelper());
+                composition.Services.AddTransient(_ => new UmbracoHelper());
 
             composition.RegisterUnique<RoutableDocumentFilter>();
 
@@ -77,7 +78,7 @@ namespace Umbraco.Web.Runtime
             //composition.RegisterAuto(typeof(UmbracoViewPage<>));
 
             // register preview SignalR hub
-            composition.RegisterUnique(_ => GlobalHost.ConnectionManager.GetHubContext<PreviewHub>());
+            composition.Services.AddUnique(_ => GlobalHost.ConnectionManager.GetHubContext<PreviewHub>());
         }
     }
 }

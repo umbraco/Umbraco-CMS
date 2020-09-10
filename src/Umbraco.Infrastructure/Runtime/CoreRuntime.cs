@@ -182,7 +182,8 @@ namespace Umbraco.Core.Runtime
                 composition.RegisterEssentials(Logger, Profiler, ProfilingLogger, MainDom, AppCaches, databaseFactory, typeLoader, _state, TypeFinder, IOHelper, UmbracoVersion, DbProviderFactoryCreator, HostingEnvironment, BackOfficeInfo);
 
                 // register ourselves (TODO: Should we put this in RegisterEssentials?)
-                composition.Register<IRuntime>(_ => this, Lifetime.Singleton);
+                // TODO: MSDI, Think we can split Configure and Start such that IRuntime can be resolved and Start can stop ServiceLocating
+                composition.Services.AddSingleton<IRuntime>(_ => this);
 
                 // run handlers
                 OnRuntimeEssentials(composition, AppCaches, typeLoader, databaseFactory);
@@ -230,26 +231,19 @@ namespace Umbraco.Core.Runtime
             // throws if not full-trust
             _umbracoBootPermissionChecker.ThrowIfNotPermissions();
 
-            var hostingEnvironmentLifetime = serviceProvider.TryGetInstance<IApplicationShutdownRegistry>();
+            var hostingEnvironmentLifetime = serviceProvider.GetService<IApplicationShutdownRegistry>();
             if (hostingEnvironmentLifetime == null)
                 throw new InvalidOperationException($"An instance of {typeof(IApplicationShutdownRegistry)} could not be resolved from the container, ensure that one if registered in your runtime before calling {nameof(IRuntime)}.{nameof(Start)}");
 
             // acquire the main domain - if this fails then anything that should be registered with MainDom will not operate
-            AcquireMainDom(MainDom, serviceProvider.GetInstance<IApplicationShutdownRegistry>());
+            AcquireMainDom(MainDom, serviceProvider.GetRequiredService<IApplicationShutdownRegistry>());
 
             // create & initialize the components
-            _components = serviceProvider.GetInstance<ComponentCollection>();
+            _components = serviceProvider.GetRequiredService<ComponentCollection>();
             _components.Initialize();
 
             // GROSS: See note on declaration of _serviceProvider above about CreateDatabaseFactory
             _serviceProvider = serviceProvider;
-
-            // TODO: MSDI is this comment redundant now?
-            // now (and only now) is the time to switch over to perWebRequest scopes.
-            // up until that point we may not have a request, and scoped services would
-            // fail to resolve - but we run Initialize within a factory scope - and then,
-            // here, we switch the factory to bind scopes to requests
-            //_serviceProvider.EnablePerWebRequestScope();
         }
 
         protected virtual void ConfigureUnhandledException()
@@ -382,7 +376,7 @@ namespace Umbraco.Core.Runtime
         /// </summary>
         /// <remarks>This is strictly internal, for tests only.</remarks>
         protected internal virtual IUmbracoDatabaseFactory CreateDatabaseFactory()
-            => new UmbracoDatabaseFactory(Logger, _globalSettings, _connectionStrings, new Lazy<IMapperCollection>(() => _serviceProvider.GetInstance<IMapperCollection>()), DbProviderFactoryCreator);
+            => new UmbracoDatabaseFactory(Logger, _globalSettings, _connectionStrings, new Lazy<IMapperCollection>(() => _serviceProvider.GetRequiredService<IMapperCollection>()), DbProviderFactoryCreator);
 
 
         #endregion

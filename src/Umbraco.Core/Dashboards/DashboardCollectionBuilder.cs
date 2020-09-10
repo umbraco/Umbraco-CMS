@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Dashboards;
@@ -17,7 +18,7 @@ namespace Umbraco.Web.Dashboards
             // get the manifest parser just-in-time - injecting it in the ctor would mean that
             // simply getting the builder in order to configure the collection, would require
             // its dependencies too, and that can create cycles or other oddities
-            var manifestParser = serviceProvider.GetInstance<IManifestParser>();
+            var manifestParser = serviceProvider.GetRequiredService<IManifestParser>();
 
             var dashboardSections = Merge(base.CreateItems(serviceProvider), manifestParser.Manifest.Dashboards);
 

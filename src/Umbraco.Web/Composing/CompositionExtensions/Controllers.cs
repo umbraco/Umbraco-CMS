@@ -79,8 +79,8 @@ namespace Umbraco.Web.Composing.CompositionExtensions
 
         private static void RegisterControllers(this Composition composition, IEnumerable<Type> controllerTypes)
         {
-            foreach (var controllerType in controllerTypes)
-                composition.Register(controllerType, Lifetime.Request);
+            //foreach (var controllerType in controllerTypes)
+            //    composition.Register(controllerType, Lifetime.Request);
         }
     }
 }

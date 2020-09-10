@@ -20,7 +20,7 @@ namespace Umbraco.Web.Trees
             ILocalizedTextService localizedTextService,
             UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
             IMenuItemCollectionFactory menuItemCollectionFactory,
-            IFileSystem fileSystem)
+            IPhysicalFileSystem fileSystem)
             : base(localizedTextService, umbracoApiControllerTypeCollection, menuItemCollectionFactory)
         {
             FileSystem = fileSystem;

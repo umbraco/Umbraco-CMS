@@ -17,6 +17,7 @@ using Umbraco.Web.Common.Profiler;
 using Umbraco.Web.Common.Install;
 using Umbraco.Extensions;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core.Configuration;
 using Umbraco.Web.Common.Controllers;
 using Umbraco.Web.Common.Middleware;
@@ -58,7 +59,7 @@ namespace Umbraco.Web.Common.Runtime
 
 
             composition.RegisterUnique<ICookieManager, AspNetCoreCookieManager>();
-            composition.Register<IIpResolver, AspNetCoreIpResolver>();
+            composition.Services.AddTransient<IIpResolver, AspNetCoreIpResolver>();
             composition.RegisterUnique<IUserAgentProvider, AspNetCoreUserAgentProvider>();
 
             composition.RegisterMultipleUnique<ISessionIdResolver, ISessionManager, AspNetCoreSessionManager>();
@@ -96,7 +97,7 @@ namespace Umbraco.Web.Common.Runtime
 
             composition.RegisterUnique<ITemplateRenderer, TemplateRenderer>();
             composition.RegisterUnique<IPublicAccessChecker, PublicAccessChecker>();
-            composition.RegisterUnique<LegacyPasswordSecurity>(factory => new LegacyPasswordSecurity(factory.GetInstance<IUserPasswordConfiguration>()));
+            composition.Services.AddUnique<LegacyPasswordSecurity>(factory => new LegacyPasswordSecurity(factory.GetRequiredService<IUserPasswordConfiguration>()));
 
 
         }

@@ -16,7 +16,7 @@ namespace Umbraco.Web.Trees
 
         public TreeCollection CreateCollection(IServiceProvider serviceProvider) => new TreeCollection(_trees);
 
-        public void RegisterWith(IServiceCollection services) => services.Register(CreateCollection, Lifetime.Singleton);
+        public void RegisterWith(IServiceCollection services) => services.Add(new ServiceDescriptor(typeof(TreeCollection), CreateCollection, ServiceLifetime.Singleton));
 
         /// <summary>
         /// Registers a custom tree definition

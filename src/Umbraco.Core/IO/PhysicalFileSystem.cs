@@ -10,7 +10,10 @@ using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.IO
 {
-    public class PhysicalFileSystem : IFileSystem
+    // TODO: MSDI, avoid named services this way?
+    public interface IPhysicalFileSystem : IFileSystem {}
+
+    public class PhysicalFileSystem : IPhysicalFileSystem
     {
         private readonly IIOHelper _ioHelper;
         private readonly ILogger _logger;

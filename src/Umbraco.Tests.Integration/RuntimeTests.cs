@@ -46,7 +46,7 @@ namespace Umbraco.Tests.Integration
         {
             var services = new ServiceCollection();
             // Special case since we are not using the Generic Host, we need to manually add an AspNetCore service to the container
-            services.Register(x => Mock.Of<IHostApplicationLifetime>());
+            services.AddTransient(x => Mock.Of<IHostApplicationLifetime>());
 
             var testHelper = new TestHelper();
 

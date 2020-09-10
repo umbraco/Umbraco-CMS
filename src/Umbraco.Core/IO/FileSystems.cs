@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
@@ -202,7 +203,7 @@ namespace Umbraco.Core.IO
                 }
 
                 var shadowWrapper = CreateShadowWrapper(supporting, path);
-                return _container.GetInstance<TFileSystem>(shadowWrapper);
+                return  ActivatorUtilities.CreateInstance<TFileSystem>(_container, shadowWrapper);
             })).Value;
         }
 

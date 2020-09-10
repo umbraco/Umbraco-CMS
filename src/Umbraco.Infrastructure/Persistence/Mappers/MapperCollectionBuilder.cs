@@ -22,12 +22,12 @@ namespace Umbraco.Core.Persistence.Mappers
             // we want to register extra
             // - service IMapperCollection, returns MappersCollectionBuilder's collection
 
-            services.Register<IMapperCollection>(factory => factory.GetInstance<MapperCollection>());
+            services.Add(new ServiceDescriptor(typeof(IMapperCollection),factory => factory.GetRequiredService<MapperCollection>(), ServiceLifetime.Transient));
         }
 
         protected override BaseMapper CreateItem(IServiceProvider serviceProvider, Type itemType)
         {
-            return (BaseMapper) serviceProvider.GetInstance(itemType, _maps);
+            return (BaseMapper) ActivatorUtilities.CreateInstance(serviceProvider, itemType, _maps);
         }
 
         public MapperCollectionBuilder AddCoreMappers()

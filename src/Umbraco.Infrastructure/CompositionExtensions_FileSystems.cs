@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Composing;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 
 namespace Umbraco.Core
@@ -19,10 +20,10 @@ namespace Umbraco.Core
             where TImplementing : FileSystemWrapper, TFileSystem
             where TFileSystem : class
         {
-            composition.RegisterUnique<TFileSystem>(factory =>
+            composition.Services.AddUnique<TFileSystem>(factory =>
             {
-                var fileSystems = factory.GetInstance<FileSystems>();
-                var supporting = factory.GetInstance<SupportingFileSystems>();
+                var fileSystems = factory.GetRequiredService<FileSystems>();
+                var supporting = factory.GetRequiredService<SupportingFileSystems>();
                 return fileSystems.GetFileSystem<TImplementing>(supporting.For<TFileSystem>());
             });
         }
@@ -36,10 +37,10 @@ namespace Umbraco.Core
         public static void RegisterFileSystem<TFileSystem>(this Composition composition)
             where TFileSystem : FileSystemWrapper
         {
-            composition.RegisterUnique(factory =>
+            composition.Services.AddUnique(factory =>
             {
-                var fileSystems = factory.GetInstance<FileSystems>();
-                var supporting = factory.GetInstance<SupportingFileSystems>();
+                var fileSystems = factory.GetRequiredService<FileSystems>();
+                var supporting = factory.GetRequiredService<SupportingFileSystems>();
                 return fileSystems.GetFileSystem<TFileSystem>(supporting.For<TFileSystem>());
             });
         }

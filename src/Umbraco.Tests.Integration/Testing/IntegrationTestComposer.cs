@@ -3,6 +3,7 @@ using NUnit.Framework;
 using System;
 using System.IO;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
@@ -38,16 +39,16 @@ namespace Umbraco.Tests.Integration.Testing
             composition.Components().Remove<SchedulerComponent>();
             composition.Components().Remove<DatabaseServerRegistrarAndMessengerComponent>();
             composition.RegisterUnique<BackgroundIndexRebuilder, TestBackgroundIndexRebuilder>();
-            composition.RegisterUnique<IRuntimeMinifier>(factory => Mock.Of<IRuntimeMinifier>());
+            composition.Services.AddUnique(factory => Mock.Of<IRuntimeMinifier>());
 
             // we don't want persisted nucache files in tests
-            composition.Register(factory => new PublishedSnapshotServiceOptions { IgnoreLocalDb = true });
+            composition.Services.AddTransient(factory => new PublishedSnapshotServiceOptions { IgnoreLocalDb = true });
 
             // ensure all lucene indexes are using RAM directory (no file system)
             composition.RegisterUnique<ILuceneDirectoryFactory, LuceneRAMDirectoryFactory>();
 
             // replace this service so that it can lookup the correct file locations
-            composition.RegisterUnique<ILocalizedTextService>(GetLocalizedTextService);
+            composition.Services.AddUnique(GetLocalizedTextService);
         }
 
         /// <summary>
@@ -57,9 +58,9 @@ namespace Umbraco.Tests.Integration.Testing
         /// <returns></returns>
         private ILocalizedTextService GetLocalizedTextService(IServiceProvider serviceProvider)
         {
-            var configs = serviceProvider.GetInstance<Configs>();
-            var logger = serviceProvider.GetInstance<ILogger>();
-            var appCaches = serviceProvider.GetInstance<AppCaches>();
+            var configs = serviceProvider.GetRequiredService<Configs>();
+            var logger = serviceProvider.GetRequiredService<ILogger>();
+            var appCaches = serviceProvider.GetRequiredService<AppCaches>();
 
             var localizedTextService = new LocalizedTextService(
                 new Lazy<LocalizedTextServiceFileSources>(() =>

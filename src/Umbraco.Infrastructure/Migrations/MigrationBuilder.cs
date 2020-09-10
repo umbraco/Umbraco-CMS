@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.Migrations
@@ -14,7 +15,7 @@ namespace Umbraco.Core.Migrations
 
         public IMigration Build(Type migrationType, IMigrationContext context)
         {
-            return (IMigration) _container.GetInstance(migrationType, context);
+            return (IMigration) ActivatorUtilities.CreateInstance(_container, migrationType, context);
         }
     }
 }
