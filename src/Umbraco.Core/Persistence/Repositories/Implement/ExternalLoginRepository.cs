@@ -25,22 +25,64 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             Database.Execute("DELETE FROM ExternalLogins WHERE UserId=@userId", new { userId = memberId });
         }
 
-        public void SaveUserLogins(int memberId, IEnumerable<UserLoginInfo> logins)
+        public void Save(int userId, IEnumerable<IExternalLogin> logins)
         {
-            //clear out logins for member
-            Database.Execute("DELETE FROM umbracoExternalLogin WHERE userId=@userId", new { userId = memberId });
+            var sql = Sql()
+                .Select<ExternalLoginDto>()
+                .From<ExternalLoginDto>()
+                .Where<ExternalLoginDto>(x => x.UserId == userId)
+                .ForUpdate();
 
-            //add them all
-            foreach (var l in logins)
+            var toUpdate = new Dictionary<int, IExternalLogin>();
+            var toDelete = new List<int>();
+            var toInsert = new List<IExternalLogin>(logins);
+
+            var existingLogins = Database.Fetch<ExternalLoginDto>(sql);
+            foreach (var existing in existingLogins)
             {
-                Database.Insert(new ExternalLoginDto
+                var found = logins.FirstOrDefault(x =>
+                    x.LoginProvider.Equals(existing.LoginProvider, StringComparison.InvariantCultureIgnoreCase)
+                    && x.ProviderKey.Equals(existing.ProviderKey, StringComparison.InvariantCultureIgnoreCase));
+
+                if (found != null)
                 {
-                    LoginProvider = l.LoginProvider,
-                    ProviderKey = l.ProviderKey,
-                    UserId = memberId,
+                    toUpdate.Add(existing.Id, found);
+                    // if it's an update then it's not an insert
+                    toInsert.RemoveAll(x => x.ProviderKey == found.ProviderKey && x.LoginProvider == found.LoginProvider);
+                }
+                else
+                {
+                    toDelete.Add(existing.Id);
+                }
+            }
+
+            // do the deletes (does this syntax work?)
+            Database.DeleteMany<ExternalLoginDto>().Where(x => toDelete.Contains(x.Id)).Execute();
+            foreach (var u in toUpdate)
+            {
+                Database.Update(new ExternalLoginDto
+                {
+                    Id = u.Key,
+                    LoginProvider = u.Value.LoginProvider,
+                    ProviderKey = u.Value.ProviderKey,
+                    UserId = userId,
                     CreateDate = DateTime.Now
                 });
             }
+            // add the inserts
+            Database.InsertBulk(toInsert.Select(i => new ExternalLoginDto
+            {
+                LoginProvider = i.LoginProvider,
+                ProviderKey = i.ProviderKey,
+                UserId = userId,
+                UserData = i.UserData,
+                CreateDate = DateTime.Now
+            }));
+        }
+
+        public void SaveUserLogins(int memberId, IEnumerable<UserLoginInfo> logins)
+        {
+            Save(memberId, logins.Select(x => new ExternalLogin(x.LoginProvider, x.ProviderKey)));
         }
 
         protected override IIdentityUserLogin PerformGet(int id)
@@ -67,7 +109,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 return PerformGetAllOnIds(ids);
             }
 
-            var sql = GetBaseQuery(false);
+            var sql = GetBaseQuery(false).OrderByDescending<ExternalLoginDto>(x => x.CreateDate);
 
             return ConvertFromDtos(Database.Fetch<ExternalLoginDto>(sql))
                 .ToArray();// we don't want to re-iterate again!

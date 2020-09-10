@@ -30,5 +30,13 @@ namespace Umbraco.Core.Persistence.Dtos
         [Column("createDate")]
         [Constraint(Default = SystemMethods.CurrentDateTime)]
         public DateTime CreateDate { get; set; }
+
+        /// <summary>
+        /// Used to store any arbitrary data for the user and external provider - like user tokens returned from the provider
+        /// </summary>
+        [Column("userData")]
+        [Length(4000)]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        public string UserData { get; set; }
     }
 }

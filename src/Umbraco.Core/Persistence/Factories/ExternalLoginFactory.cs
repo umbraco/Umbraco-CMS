@@ -5,9 +5,12 @@ namespace Umbraco.Core.Persistence.Factories
 {
     internal static class ExternalLoginFactory
     {
-        public static IIdentityUserLogin BuildEntity(ExternalLoginDto dto)
+        public static IIdentityUserLoginExtended BuildEntity(ExternalLoginDto dto)
         {
-            var entity = new IdentityUserLogin(dto.Id, dto.LoginProvider, dto.ProviderKey, dto.UserId, dto.CreateDate);
+            var entity = new IdentityUserLogin(dto.Id, dto.LoginProvider, dto.ProviderKey, dto.UserId, dto.CreateDate)
+            {
+                UserData = dto.UserData
+            };
 
             // reset dirty initial properties (U4-1946)
             entity.ResetDirtyProperties(false);
@@ -16,13 +19,15 @@ namespace Umbraco.Core.Persistence.Factories
 
         public static ExternalLoginDto BuildDto(IIdentityUserLogin entity)
         {
+            var asExtended = entity as IIdentityUserLoginExtended;
             var dto = new ExternalLoginDto
             {
                 Id = entity.Id,
                 CreateDate = entity.CreateDate,
                 LoginProvider = entity.LoginProvider,
                 ProviderKey = entity.ProviderKey,
-                UserId = entity.UserId
+                UserId = entity.UserId,
+                UserData = asExtended?.UserData
             };
 
             return dto;
