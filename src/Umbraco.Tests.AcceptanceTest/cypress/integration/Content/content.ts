@@ -6,6 +6,14 @@ context('Content', () => {
         cy.umbracoLogin(Cypress.env('username'), Cypress.env('password'));
     });
 
+    function refreshContentTree(){
+        // Refresh to update the tree
+        cy.get('li .umb-tree-root:contains("Content")').should("be.visible").rightclick();
+        cy.umbracoContextMenuAction("action-refreshNode").click();
+        // We have to wait in case the execution is slow, otherwise we'll try and click the item before it appears in the UI
+        cy.get('.umb-tree-item__inner').should('exist', {timeout: 10000});
+    }
+
     it('Copy content', () => {
         const rootDocTypeName = "Test document type";
         const childDocTypeName = "Child test document type";
@@ -74,8 +82,7 @@ context('Content', () => {
         });
 
         // Refresh to update the tree
-        cy.get('li .umb-tree-root:contains("Content")').should("be.visible").rightclick();
-        cy.umbracoContextMenuAction("action-refreshNode").click();
+        refreshContentTree();
 
         // Copy node
         cy.umbracoTreeItem("content", [nodeName, childNodeName]).rightclick({ force: true });
@@ -159,8 +166,7 @@ context('Content', () => {
         });
 
         // Refresh to update the tree
-        cy.get('li .umb-tree-root:contains("Content")').should("be.visible").rightclick();
-        cy.umbracoContextMenuAction("action-refreshNode").click();
+        refreshContentTree();
 
         // Move node
         cy.umbracoTreeItem("content", [nodeName, childNodeName]).rightclick({ force: true });
@@ -247,8 +253,7 @@ context('Content', () => {
         });
 
         // Refresh to update the tree
-        cy.get('li .umb-tree-root:contains("Content")').should("be.visible").rightclick();
-        cy.umbracoContextMenuAction("action-refreshNode").click();
+        refreshContentTree();
 
         // Sort nodes
         cy.umbracoTreeItem("content", [nodeName]).rightclick({ force: true });
@@ -297,8 +302,7 @@ context('Content', () => {
         });
 
         // Refresh to update the tree
-        cy.get('li .umb-tree-root:contains("Content")').should("be.visible").rightclick();
-        cy.umbracoContextMenuAction("action-refreshNode").click();
+        refreshContentTree();
 
         // Access node
         cy.umbracoTreeItem("content", [initialNodeName]).click();
@@ -326,8 +330,8 @@ context('Content', () => {
         cy.reload();
 
         // Assert
-        cy.get('.history').find('.umb-badge').eq(0).should('contain.text', "Save");
-        cy.get('.history').find('.umb-badge').eq(1).should('contain.text', "Rollback");
+        cy.get('.history').find('.umb-badge').eq(0).should('contain.text', "Rollback");
+        cy.get('.history').find('.umb-badge').eq(1).should('contain.text', "Save");
         cy.get('#headerName').should('have.value', initialNodeName);
 
         // Clean up (content is automatically deleted when document types are gone)
@@ -365,8 +369,7 @@ context('Content', () => {
         });
 
         // Refresh to update the tree
-        cy.get('li .umb-tree-root:contains("Content")').should("be.visible").rightclick();
-        cy.umbracoContextMenuAction("action-refreshNode").click();
+        refreshContentTree();
 
         // Access node
         cy.umbracoTreeItem("content", [nodeName]).click();
@@ -407,8 +410,7 @@ context('Content', () => {
         });
 
         // Refresh to update the tree
-        cy.get('li .umb-tree-root:contains("Content")').should("be.visible").rightclick();
-        cy.umbracoContextMenuAction("action-refreshNode").click();
+        refreshContentTree();
 
         // Access node
         cy.umbracoTreeItem("content", [nodeName]).click();
@@ -446,8 +448,7 @@ context('Content', () => {
         });
 
         // Refresh to update the tree
-        cy.get('li .umb-tree-root:contains("Content")').should("be.visible").rightclick();
-        cy.umbracoContextMenuAction("action-refreshNode").click();
+        refreshContentTree();
 
         // Access node
         cy.umbracoTreeItem("content", [nodeName]).click();
@@ -487,8 +488,7 @@ context('Content', () => {
         });
 
         // Refresh to update the tree
-        cy.get('li .umb-tree-root:contains("Content")').should("be.visible").rightclick();
-        cy.umbracoContextMenuAction("action-refreshNode").click();
+        refreshContentTree();
 
         // Access node
         cy.umbracoTreeItem("content", [nodeName]).click();
