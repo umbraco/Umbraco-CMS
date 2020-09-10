@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Web.Cache;
 
@@ -8,12 +9,12 @@ namespace Umbraco.ModelsBuilder.Embedded
     public sealed class OutOfDateModelsStatus
     {
         private readonly IModelsBuilderConfig _config;
-        private readonly IIOHelper _ioHelper;
+        private readonly IHostingEnvironment _hostingEnvironment;
 
-        public OutOfDateModelsStatus(IModelsBuilderConfig config, IIOHelper ioHelper)
+        public OutOfDateModelsStatus(IModelsBuilderConfig config, IHostingEnvironment hostingEnvironment)
         {
             _config = config;
-            _ioHelper = ioHelper;
+            _hostingEnvironment = hostingEnvironment;
         }
 
         internal void Install()
@@ -28,7 +29,7 @@ namespace Umbraco.ModelsBuilder.Embedded
 
         private string GetFlagPath()
         {
-            var modelsDirectory = _config.ModelsDirectoryAbsolute(_ioHelper);
+            var modelsDirectory = _config.ModelsDirectoryAbsolute(_hostingEnvironment);
             if (!Directory.Exists(modelsDirectory))
                 Directory.CreateDirectory(modelsDirectory);
             return Path.Combine(modelsDirectory, "ood.flag");

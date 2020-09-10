@@ -22,7 +22,7 @@ namespace Umbraco.ModelsBuilder.Embedded.Building
         { }
 
         // internal for unit tests only
-        internal TextBuilder()
+        public TextBuilder()
         { }
 
         /// <summary>
@@ -184,16 +184,17 @@ namespace Umbraco.ModelsBuilder.Embedded.Building
             sb.AppendFormat("\t\tpublic new const PublishedItemType ModelItemType = PublishedItemType.{0};\n",
                 itemType);
             WriteGeneratedCodeAttribute(sb, "\t\t");
-            sb.Append("\t\tpublic new static IPublishedContentType GetModelContentType()\n");
-            sb.Append("\t\t\t=> PublishedModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);\n");
+            sb.Append("\t\tpublic new static IPublishedContentType GetModelContentType(IPublishedSnapshotAccessor publishedSnapshotAccessor)\n");
+            sb.Append("\t\t\t=> PublishedModelUtility.GetModelContentType(publishedSnapshotAccessor, ModelItemType, ModelTypeAlias);\n");
             WriteGeneratedCodeAttribute(sb, "\t\t");
-            sb.AppendFormat("\t\tpublic static IPublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<{0}, TValue>> selector)\n",
+            sb.AppendFormat("\t\tpublic static IPublishedPropertyType GetModelPropertyType<TValue>(IPublishedSnapshotAccessor publishedSnapshotAccessor, Expression<Func<{0}, TValue>> selector)\n",
                 type.ClrName);
-            sb.Append("\t\t\t=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(), selector);\n");
+            sb.Append("\t\t\t=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(publishedSnapshotAccessor), selector);\n");
             sb.Append("#pragma warning restore 0109\n\n");
+            sb.Append("\t\tprivate IPublishedValueFallback _publishedValueFallback;");
 
             // write the ctor
-            sb.AppendFormat("\t\t// ctor\n\t\tpublic {0}(IPublished{1} content)\n\t\t\t: base(content)\n\t\t{{ }}\n\n",
+            sb.AppendFormat("\n\n\t\t// ctor\n\t\tpublic {0}(IPublished{1} content, IPublishedValueFallback publishedValueFallback)\n\t\t\t: base(content)\n\t\t{{\n\t\t\t_publishedValueFallback = publishedValueFallback; \n\t\t}}\n\n",
                 type.ClrName, type.IsElement ? "Element" : "Content");
 
             // write the properties
@@ -324,7 +325,7 @@ namespace Umbraco.ModelsBuilder.Embedded.Building
                     WriteClrType(sb, property.ClrTypeName);
                     sb.Append(">");
                 }
-                sb.AppendFormat("(\"{0}\");\n",
+                sb.AppendFormat("(_publishedValueFallback, \"{0}\");\n",
                     property.Alias);
             }
 
@@ -416,7 +417,7 @@ namespace Umbraco.ModelsBuilder.Embedded.Building
         }
 
         // internal for unit tests
-        internal void WriteClrType(StringBuilder sb, Type type)
+        public void WriteClrType(StringBuilder sb, Type type)
         {
             var s = type.ToString();
 

@@ -89,18 +89,15 @@
             $scope.options.includeProperties.forEach(function (option) {
                 option.isSensitive = false;
 
-                $scope.items.forEach(function (item) {
-
-                    item.properties.forEach(function (property) {
-
+                if ($scope.items && $scope.items.length) {
+                    $scope.items.forEach(function (item) {
+                        item.properties.forEach(function (property) {
                             if (option.alias === property.alias) {
                                 option.isSensitive = property.isSensitive;
                             }
-
-                     });
-
-                });
-
+                         });
+                    });
+                }
             });
         }
 

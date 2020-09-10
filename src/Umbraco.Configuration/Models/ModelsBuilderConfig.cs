@@ -20,7 +20,7 @@ namespace Umbraco.Configuration.Models
             _configuration = configuration;
         }
 
-        public string DefaultModelsDirectory => "~/App_Data/Models";
+        public string DefaultModelsDirectory => "~/Umbraco/Models";
 
         /// <summary>
         ///     Gets a value indicating whether the whole models experience is enabled.
@@ -65,7 +65,7 @@ namespace Umbraco.Configuration.Models
         /// </summary>
         /// <remarks>Default is ~/App_Data/Models but that can be changed.</remarks>
         public string ModelsDirectory =>
-            _configuration.GetValue(Prefix+"ModelsDirectory", "~/App_Data/Models");
+            _configuration.GetValue(Prefix+"ModelsDirectory", "~/Umbraco/Models");
 
         /// <summary>
         ///     Gets a value indicating whether to accept an unsafe value for ModelsDirectory.

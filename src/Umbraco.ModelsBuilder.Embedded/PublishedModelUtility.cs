@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Linq.Expressions;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Web.Composing;
+using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.ModelsBuilder.Embedded
 {
@@ -29,10 +29,10 @@ namespace Umbraco.ModelsBuilder.Embedded
         //    var contentType = PublishedContentType.Get(itemType, alias);
         //    // etc...
         //}
-
-        public static IPublishedContentType GetModelContentType(PublishedItemType itemType, string alias)
+        
+        public static IPublishedContentType GetModelContentType(IPublishedSnapshotAccessor publishedSnapshotAccessor, PublishedItemType itemType, string alias)
         {
-            var facade = Current.UmbracoContext.PublishedSnapshot; // fixme inject!
+            var facade = publishedSnapshotAccessor.PublishedSnapshot;
             switch (itemType)
             {
                 case PublishedItemType.Content:

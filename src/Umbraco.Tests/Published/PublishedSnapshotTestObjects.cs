@@ -11,7 +11,7 @@ namespace Umbraco.Tests.Published
         [PublishedModel("element1")]
         public class TestElementModel1 : PublishedElementModel
         {
-            public TestElementModel1(IPublishedElement content)
+            public TestElementModel1(IPublishedElement content, IPublishedValueFallback fallback)
                 : base(content)
             { }
 
@@ -21,7 +21,7 @@ namespace Umbraco.Tests.Published
         [PublishedModel("element2")]
         public class TestElementModel2 : PublishedElementModel
         {
-            public TestElementModel2(IPublishedElement content)
+            public TestElementModel2(IPublishedElement content, IPublishedValueFallback fallback)
                 : base(content)
             { }
 
@@ -31,7 +31,7 @@ namespace Umbraco.Tests.Published
         [PublishedModel("content1")]
         public class TestContentModel1 : PublishedContentModel
         {
-            public TestContentModel1(IPublishedContent content)
+            public TestContentModel1(IPublishedContent content, IPublishedValueFallback fallback)
                 : base(content)
             { }
 
@@ -41,7 +41,7 @@ namespace Umbraco.Tests.Published
         [PublishedModel("content2")]
         public class TestContentModel2 : PublishedContentModel
         {
-            public TestContentModel2(IPublishedContent content)
+            public TestContentModel2(IPublishedContent content, IPublishedValueFallback fallback)
                 : base(content)
             { }
 

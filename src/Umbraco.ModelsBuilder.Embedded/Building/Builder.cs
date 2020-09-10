@@ -16,11 +16,8 @@ namespace Umbraco.ModelsBuilder.Embedded.Building
     /// <summary>
     /// Provides a base class for all builders.
     /// </summary>
-    internal abstract class Builder
+    public abstract class Builder
     {
-
-
-
         private readonly IList<TypeModel> _typeModels;
 
         protected Dictionary<string, string> ModelsMap { get; } = new Dictionary<string, string>();
@@ -29,13 +26,11 @@ namespace Umbraco.ModelsBuilder.Embedded.Building
         protected readonly IList<string> TypesUsing = new List<string>
         {
             "System",
-            "System.Collections.Generic",
             "System.Linq.Expressions",
-            "System.Web",
-            "Umbraco.Core.Models",
             "Umbraco.Core.Models.PublishedContent",
-            "Umbraco.Web",
-            "Umbraco.ModelsBuilder.Embedded"
+            "Umbraco.Web.PublishedCache",
+            "Umbraco.ModelsBuilder.Embedded",
+            "Umbraco.Core"
         };
 
         /// <summary>
@@ -62,7 +57,7 @@ namespace Umbraco.ModelsBuilder.Embedded.Building
         /// Gets the list of all models.
         /// </summary>
         /// <remarks>Includes those that are ignored.</remarks>
-        internal IList<TypeModel> TypeModels => _typeModels;
+        public IList<TypeModel> TypeModels => _typeModels;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Builder"/> class with a list of models to generate,
@@ -199,7 +194,7 @@ namespace Umbraco.ModelsBuilder.Embedded.Building
             return true;
         }
 
-        internal string ModelsNamespaceForTests;
+        public string ModelsNamespaceForTests;
 
         public string GetModelsNamespace()
         {

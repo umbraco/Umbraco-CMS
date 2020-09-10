@@ -43,7 +43,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             base.Compose();
 
-            Composition.RegisterUnique<IPublishedModelFactory>(f => new PublishedModelFactory(f.GetInstance<TypeLoader>().GetTypes<PublishedContentModel>()));
+            Composition.RegisterUnique<IPublishedModelFactory>(f => new PublishedModelFactory(f.GetInstance<TypeLoader>().GetTypes<PublishedContentModel>(), f.GetInstance<IPublishedValueFallback>()));
         }
 
         protected override TypeLoader CreateTypeLoader(IIOHelper ioHelper, ITypeFinder typeFinder, IAppPolicyCache runtimeCache,IProfilingLogger logger,  IHostingEnvironment hostingEnvironment)

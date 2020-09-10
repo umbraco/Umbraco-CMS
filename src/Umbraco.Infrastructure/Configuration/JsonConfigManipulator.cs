@@ -65,6 +65,40 @@ namespace Umbraco.Core.Configuration
 
         }
 
+        public void SaveDisableRedirectUrlTracking(bool disable)
+        {
+            var provider = GetJsonConfigurationProvider();
+
+            var json = GetJson(provider);
+
+            var item = GetDisableRedirectUrlItem(disable.ToString().ToLowerInvariant());
+
+            json.Merge(item, new JsonMergeSettings());
+
+            SaveJson(provider, json);
+        }
+
+        private JToken GetDisableRedirectUrlItem(string value)
+        {
+            JTokenWriter writer = new JTokenWriter();
+
+            writer.WriteStartObject();
+            writer.WritePropertyName("Umbraco");
+            writer.WriteStartObject();
+            writer.WritePropertyName("CMS");
+            writer.WriteStartObject();
+            writer.WritePropertyName("WebRouting");
+            writer.WriteStartObject();
+            writer.WritePropertyName("DisableRedirectUrlTracking");
+            writer.WriteValue(value);
+            writer.WriteEndObject();
+            writer.WriteEndObject();
+            writer.WriteEndObject();
+            writer.WriteEndObject();
+
+            return writer.Token;
+        }
+
         private JToken GetConnectionItem(string connectionString, string providerName)
         {
             JTokenWriter writer = new JTokenWriter();
@@ -135,7 +169,7 @@ namespace Umbraco.Core.Configuration
             {
                 foreach (var provider in configurationRoot.Providers)
                 {
-                    if(provider is JsonConfigurationProvider jsonConfigurationProvider)
+                    if (provider is JsonConfigurationProvider jsonConfigurationProvider)
                     {
                         if (requiredKey is null || provider.TryGet(requiredKey, out _))
                         {

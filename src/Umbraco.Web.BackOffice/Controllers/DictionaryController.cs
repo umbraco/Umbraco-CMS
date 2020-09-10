@@ -141,7 +141,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <exception cref="HttpResponseException">
         ///  Returns a not found response when dictionary item does not exist
         /// </exception>
-     [DetermineAmbiguousActionByPassingParameters]
+        [DetermineAmbiguousActionByPassingParameters]
         public ActionResult<DictionaryDisplay> GetById(int id)
         {
             var dictionary = _localizationService.GetDictionaryItemById(id);

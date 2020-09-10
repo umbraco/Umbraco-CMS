@@ -95,7 +95,6 @@ namespace Umbraco.Web.PropertyEditors
                 _contentTypes = new Lazy<Dictionary<string, IContentType>>(() =>
                     _contentTypeService.GetAll().ToDictionary(c => c.Alias)
                 );
-
             }
 
             /// <inheritdoc />

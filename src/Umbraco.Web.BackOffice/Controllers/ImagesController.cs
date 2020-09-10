@@ -99,9 +99,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="animationProcessMode"></param>
         /// <param name="mode"></param>
         /// <param name="upscale"></param>
-        /// <param name="cacheBusterValue"></param>
-        /// <param name="crop"></param>
-        /// <param name="center"></param>
         /// <returns></returns>
         /// <remarks>
         /// If there is no media, image property or image file is found then this will return not found.
@@ -112,7 +109,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             decimal? focalPointLeft = null,
             decimal? focalPointTop = null,
             string animationProcessMode = "first",
-                                           ImageCropMode mode = ImageCropMode.Max,
+            ImageCropMode mode = ImageCropMode.Max,
             bool upscale = false,
             string cacheBusterValue = "",
             decimal? cropX1 = null,

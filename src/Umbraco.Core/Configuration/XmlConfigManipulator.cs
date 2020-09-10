@@ -2,8 +2,8 @@
 using System.Configuration;
 using System.IO;
 using System.Linq;
+using System.Xml;
 using System.Xml.Linq;
-using Umbraco.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 
@@ -109,6 +109,26 @@ namespace Umbraco.Core.Configuration
         public void SaveConfigValue(string itemPath, object value)
         {
             throw new NotImplementedException();
+        }
+
+        public void SaveDisableRedirectUrlTracking(bool disable)
+        {
+            var fileName = _ioHelper.MapPath("~/config/umbracoSettings.config");
+
+            var umbracoConfig = new XmlDocument { PreserveWhitespace = true };
+            umbracoConfig.Load(fileName);
+
+            var action = disable ? "disable" : "enable";
+
+            if (File.Exists(fileName) == false)
+                throw new Exception($"Couldn't {action} URL Tracker, the umbracoSettings.config file does not exist.");
+
+            if (!(umbracoConfig.SelectSingleNode("//web.routing") is XmlElement webRoutingElement))
+                throw new Exception($"Couldn't {action} URL Tracker, the web.routing element was not found in umbracoSettings.config.");
+
+            // note: this adds the attribute if it does not exist
+            webRoutingElement.SetAttribute("disableRedirectUrlTracking", disable.ToString().ToLowerInvariant());
+            umbracoConfig.Save(fileName);
         }
 
         private static void AddOrUpdateAttribute(XElement element, string name, string value)

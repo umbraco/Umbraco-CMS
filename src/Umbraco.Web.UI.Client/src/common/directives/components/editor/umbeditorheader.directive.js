@@ -228,6 +228,9 @@ Use this directive to construct a header inside the main editor window.
                 // to make it work for language edit/create
                 setAccessibilityForEditorState();
                 scope.loading = false;
+            } else if (scope.name) {
+                setAccessibilityForName();
+                scope.loading = false;
             } else {
                 scope.loading = false;
             }
@@ -266,6 +269,15 @@ Use this directive to construct a header inside the main editor window.
                 editorService.iconPicker(iconPicker);
             };
 
+            function setAccessibilityForName() {
+                var setTitle = false;
+                if (scope.setpagetitle !== undefined) {
+                    setTitle = scope.setpagetitle;
+                }
+                if (setTitle) {
+                    setAccessibilityHeaderDirective(false, scope.editorfor, scope.nameLocked, scope.name, "", true);
+                }
+            }
             function setAccessibilityForEditorState() {
                 var isNew = editorState.current.id === 0 ||
                     editorState.current.id === "0" ||

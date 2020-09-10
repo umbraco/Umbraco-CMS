@@ -9,9 +9,9 @@
             hide-icon="true"
             hide-description="true">
         </umb-editor-header>
-        
+
         <umb-editor-container>
-            
+
             <umb-load-indicator
                 ng-if="vm.loading">
             </umb-load-indicator>
@@ -31,10 +31,10 @@
                             no-dirty-check />
                     </div>
                     <div class="umb-user-picker-item-list">
-                        <a href="" class="umb-user-picker-list-item" ng-repeat="user in vm.users" ng-click="vm.selectUser(user)">
+                        <button type="button" class="btn-reset umb-user-picker-list-item" ng-repeat="user in vm.users" ng-click="vm.selectUser(user)">
                             <div class="umb-user-picker-list-item__avatar">
                                 <umb-checkmark
-                                    class="umb-user-picker-list-item__checkmark" 
+                                    class="umb-user-picker-list-item__checkmark"
                                     ng-if="user.selected"
                                     checked="user.selected">
                                 </umb-checkmark>
@@ -52,9 +52,9 @@
                                     <span ng-repeat="userGroup in user.userGroups">{{ userGroup.name }}<span ng-if="!$last">, </span></span>
                                 </div>
                             </div>
-                        </a>
+                        </button>
                     </div>
-            
+
                     <div class="flex justify-center">
                         <umb-pagination
                             ng-if="vm.usersOptions.totalPages"
