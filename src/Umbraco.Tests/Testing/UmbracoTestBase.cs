@@ -191,7 +191,7 @@ namespace Umbraco.Tests.Testing
             Composition = new Composition(register, typeLoader, proflogger, ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.IOHelper, AppCaches.NoCache);
 
 
-            TestHelper.GetConfigs().RegisterWith(register);
+            //TestHelper.GetConfigs().RegisterWith(register);
 
 
             Composition.RegisterUnique(IOHelper);

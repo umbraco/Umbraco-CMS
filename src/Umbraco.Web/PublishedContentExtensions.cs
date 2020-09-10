@@ -73,8 +73,10 @@ namespace Umbraco.Web
         {
             return content.IsAllowedTemplate(
                 Current.Services.ContentTypeService,
-                Current.Configs.WebRouting().DisableAlternativeTemplates,
+                /*Current.Configs.WebRouting().DisableAlternativeTemplates,
                 Current.Configs.WebRouting().ValidateAlternativeTemplates,
+                TODO*/
+                 false, false,
                 templateId);
         }
 
@@ -83,8 +85,10 @@ namespace Umbraco.Web
             return content.IsAllowedTemplate(
                 Current.Services.FileService,
                 Current.Services.ContentTypeService,
-                Current.Configs.WebRouting().DisableAlternativeTemplates,
-                Current.Configs.WebRouting().ValidateAlternativeTemplates,
+                /*Current.Configs.WebRouting().DisableAlternativeTemplates,
+                    Current.Configs.WebRouting().ValidateAlternativeTemplates,
+                    TODO*/
+                false, false,
                 templateAlias);
         }
 

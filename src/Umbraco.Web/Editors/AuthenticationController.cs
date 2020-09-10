@@ -111,7 +111,7 @@ namespace Umbraco.Web.Editors
         /// Used to retrieve the 2FA providers for code submission
         /// </summary>
         /// <returns></returns>
-        [SetAngularAntiForgeryTokens]
+        // [SetAngularAntiForgeryTokens] //TODO reintroduce when migrated to netcore
         public async Task<IEnumerable<string>> Get2FAProviders()
         {
             var userId = await SignInManager.GetVerifiedUserIdAsync();
@@ -127,7 +127,7 @@ namespace Umbraco.Web.Editors
             return userFactors;
         }
 
-        [SetAngularAntiForgeryTokens]
+        // [SetAngularAntiForgeryTokens] //TODO reintroduce when migrated to netcore
         public async Task<IHttpActionResult> PostSend2FACode([FromBody]string provider)
         {
             if (provider.IsNullOrWhiteSpace())
@@ -148,7 +148,7 @@ namespace Umbraco.Web.Editors
             return Ok();
         }
 
-        [SetAngularAntiForgeryTokens]
+        // [SetAngularAntiForgeryTokens] //TODO reintroduce when migrated to netcore
         public async Task<HttpResponseMessage> PostVerify2FACode(Verify2FACodeModel model)
         {
             if (ModelState.IsValid == false)

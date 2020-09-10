@@ -4,10 +4,12 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 using Microsoft.Owin.Security;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Logging;
 using Umbraco.Web.Mvc;
 using Umbraco.Core.Services;
@@ -40,7 +42,7 @@ namespace Umbraco.Web.Editors
 
         public BackOfficeController(
             UmbracoFeatures features,
-            IGlobalSettings globalSettings,
+            IOptions<GlobalSettings> globalSettings,
             IUmbracoContextAccessor umbracoContextAccessor,
             ServiceContext services,
             AppCaches appCaches,
@@ -140,7 +142,7 @@ namespace Umbraco.Web.Editors
             if (defaultResponse == null) throw new ArgumentNullException("defaultResponse");
             if (externalSignInResponse == null) throw new ArgumentNullException("externalSignInResponse");
 
-            ViewData.SetUmbracoPath(ConfigModelConversionsFromLegacy.ConvertGlobalSettings(GlobalSettings).GetUmbracoMvcArea(_hostingEnvironment));
+            ViewData.SetUmbracoPath(GlobalSettings.Value.GetUmbracoMvcArea(_hostingEnvironment));
 
             //check if there is the TempData with the any token name specified, if so, assign to view bag and render the view
             if (ViewData.FromTempData(TempData, ViewDataExtensions.TokenExternalSignInError) ||
@@ -254,8 +256,7 @@ namespace Umbraco.Web.Editors
 
                     var groups = Services.UserService.GetUserGroupsByAlias(autoLinkOptions.GetDefaultUserGroups(UmbracoContext, loginInfo));
 
-                    var autoLinkUser = BackOfficeIdentityUser.CreateNew(
-                        ConfigModelConversionsFromLegacy.ConvertGlobalSettings(GlobalSettings),
+                    var autoLinkUser = BackOfficeIdentityUser.CreateNew(GlobalSettings.Value,
                         loginInfo.Email,
                         loginInfo.Email,
                         autoLinkOptions.GetDefaultCulture(UmbracoContext, loginInfo));

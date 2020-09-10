@@ -78,11 +78,11 @@ namespace Umbraco.Tests.TestHelpers
 
         public static TypeLoader GetMockedTypeLoader() => _testHelperInternal.GetMockedTypeLoader();
 
-        public static Configs GetConfigs() => _testHelperInternal.GetConfigs();
+        //public static Configs GetConfigs() => _testHelperInternal.GetConfigs();
 
         public static IBackOfficeInfo GetBackOfficeInfo() => _testHelperInternal.GetBackOfficeInfo();
 
-        public static IConfigsFactory GetConfigsFactory() => _testHelperInternal.GetConfigsFactory();
+      //  public static IConfigsFactory GetConfigsFactory() => _testHelperInternal.GetConfigsFactory();
 
         /// <summary>
         /// Gets the working directory of the test project.

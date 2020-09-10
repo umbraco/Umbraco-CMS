@@ -176,7 +176,6 @@
     <Compile Include="Models\Membership\UmbracoMembershipMember.cs" />
     <Compile Include="Mvc\HttpUmbracoFormRouteStringException.cs" />
     <Compile Include="Mvc\ModelBindingExceptionFilter.cs" />
-    <Compile Include="Mvc\StatusCodeFilterAttribute.cs" />
     <Compile Include="Mvc\SurfaceControllerTypeCollectionBuilder.cs" />
     <Compile Include="Mvc\ValidateUmbracoFormRouteStringAttribute.cs" />
     <Compile Include="AspNet\AspNetBackOfficeInfo.cs" />
@@ -244,7 +243,6 @@
     <Compile Include="UmbracoModule.cs" />
     <Compile Include="WebApi\EnableDetailedErrorsAttribute.cs" />
     <Compile Include="WebApi\Filters\AppendUserModifiedHeaderAttribute.cs" />
-    <Compile Include="WebApi\Filters\CheckIfUserTicketDataIsStaleAttribute.cs" />
     <Compile Include="WebApi\Filters\FeatureAuthorizeAttribute.cs" />
     <Compile Include="WebApi\SessionHttpControllerRouteHandler.cs" />
     <Compile Include="WebApi\UmbracoApiControllerTypeCollectionBuilder.cs" />
@@ -298,7 +296,6 @@
     <Compile Include="WebApi\Filters\AngularAntiForgeryHelper.cs" />
     <Compile Include="WebApi\Filters\DisableBrowserCacheAttribute.cs" />
     <Compile Include="WebApi\Filters\FilterGrouping.cs" />
-    <Compile Include="WebApi\Filters\SetAngularAntiForgeryTokensAttribute.cs" />
     <Compile Include="WebApi\Filters\ValidateAngularAntiForgeryTokenAttribute.cs" />
     <Compile Include="WebApi\HttpControllerContextExtensions.cs" />
     <Compile Include="Controllers\UmbRegisterController.cs" />

@@ -25,7 +25,6 @@ namespace Umbraco.Tests.Components
         private static readonly List<Type> Composed = new List<Type>();
         private static readonly List<Type> Initialized = new List<Type>();
         private static readonly List<Type> Terminated = new List<Type>();
-        private static readonly Configs Configs = TestHelper.GetConfigs();
 
         private static IFactory MockFactory(Action<Mock<IFactory>> setup = null)
         {

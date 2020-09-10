@@ -76,7 +76,6 @@ namespace Umbraco.Tests.Runtimes
             var umbracoVersion = TestHelper.GetUmbracoVersion();
             var backOfficeInfo = TestHelper.GetBackOfficeInfo();
             var runtimeState = new RuntimeState(globalSettings, umbracoVersion, databaseFactory, logger);
-            var configs = TestHelper.GetConfigs();
             var variationContextAccessor = TestHelper.VariationContextAccessor;
 
             // create the register and the composition
@@ -285,7 +284,6 @@ namespace Umbraco.Tests.Runtimes
             Mock.Get(runtimeState).Setup(x => x.Level).Returns(RuntimeLevel.Run);
             var mainDom = Mock.Of<IMainDom>();
             Mock.Get(mainDom).Setup(x => x.IsMainDom).Returns(true);
-            var configs = TestHelper.GetConfigs();
 
             // create the register and the composition
             var register = TestHelper.GetRegister();

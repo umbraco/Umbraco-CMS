@@ -10,7 +10,9 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Legacy;
 using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -22,6 +24,7 @@ using Umbraco.Web.Hosting;
 using Umbraco.Web.Logging;
 using ConnectionStrings = Umbraco.Core.Configuration.Models.ConnectionStrings;
 using Current = Umbraco.Web.Composing.Current;
+using GlobalSettings = Umbraco.Core.Configuration.Models.GlobalSettings;
 
 namespace Umbraco.Web
 {
@@ -40,11 +43,12 @@ namespace Umbraco.Web
         {
             if (!Umbraco.Composing.Current.IsInitialized)
             {
-                var configFactory = new ConfigsFactory();
+                //var configFactory = new ConfigsFactory();
 
-                var hostingSettings = configFactory.HostingSettings;
-                var globalSettings = configFactory.GlobalSettings;
-                var securitySettings = configFactory.SecuritySettings;
+                IHostingSettings hostingSettings = null;
+                IGlobalSettings globalSettings = null;
+                ISecuritySettings securitySettings = null;
+                IWebRoutingSettings webRoutingSettings = null;
 
                 var hostingEnvironment = new AspNetHostingEnvironment(hostingSettings);
                 var loggingConfiguration = new LoggingConfiguration(
@@ -54,10 +58,7 @@ namespace Umbraco.Web
                 var ioHelper = new IOHelper(hostingEnvironment);
                 var logger = SerilogLogger.CreateWithDefaultConfiguration(hostingEnvironment, loggingConfiguration);
 
-                var configs = configFactory.Create();
-
-
-                var backOfficeInfo = new AspNetBackOfficeInfo(globalSettings, ioHelper, logger, configFactory.WebRoutingSettings);
+                var backOfficeInfo = new AspNetBackOfficeInfo(globalSettings, ioHelper, logger, webRoutingSettings);
                 var profiler = GetWebProfiler(hostingEnvironment);
                 Umbraco.Composing.Current.Initialize(logger,
                     ConfigModelConversionsFromLegacy.ConvertSecuritySettings(securitySettings),

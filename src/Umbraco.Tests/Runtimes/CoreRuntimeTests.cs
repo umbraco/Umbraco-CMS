@@ -100,15 +100,6 @@ namespace Umbraco.Tests.Runtimes
             private static readonly IContentSettings _contentSettings = SettingsForTests.GenerateMockContentSettings();
             private static readonly IWebRoutingSettings _settings = SettingsForTests.GenerateMockWebRoutingSettings();
 
-            private static Configs GetConfigs()
-            {
-                var configs = new ConfigsFactory().Create();
-                configs.Add(() => _globalSettings);
-                configs.Add(() => _contentSettings);
-                configs.Add(() => _hostingSettings);
-                return configs;
-            }
-
             public IRuntime Runtime { get; private set; }
 
             protected override IRuntime GetRuntime(GlobalSettings globalSettings, ConnectionStrings connectionStrings, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)

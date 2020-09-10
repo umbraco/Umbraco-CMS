@@ -58,7 +58,6 @@
     <Compile Include="Building\TextHeaderWriter.cs" />
     <Compile Include="Building\TypeModel.cs" />
     <Compile Include="Compose\DisabledModelsBuilderComponent.cs" />
-    <Compile Include="ConfigsExtensions.cs" />
     <Compile Include="BackOffice\DashboardReport.cs" />
     <Compile Include="ImplementPropertyTypeAttribute.cs" />
     <Compile Include="ModelsBuilderAssemblyAttribute.cs" />

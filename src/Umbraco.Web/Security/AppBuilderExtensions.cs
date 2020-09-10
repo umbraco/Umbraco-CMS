@@ -8,6 +8,7 @@ using Owin;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Web.Composing;
 using Constants = Umbraco.Core.Constants;
@@ -68,7 +69,7 @@ namespace Umbraco.Web.Security
                 CookiePath = "/",
                 CookieSecure = globalSettings.UseHttps ? CookieSecureOption.Always : CookieSecureOption.SameAsRequest,
                 CookieHttpOnly = true,
-                CookieDomain = Current.Configs.Security().AuthCookieDomain
+                CookieDomain = new SecuritySettings().AuthCookieDomain // TODO inject settings
             }, stage);
 
             return app;

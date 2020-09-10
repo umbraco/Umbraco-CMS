@@ -6,6 +6,7 @@ using System.Web.Services;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Legacy;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
@@ -31,7 +32,7 @@ namespace Umbraco.Web
         }
 
         protected UmbracoWebService()
-        : this(Current.ProfilingLogger, Current.UmbracoContextAccessor,  Current.Services, Current.Configs.Global())
+        : this(Current.ProfilingLogger, Current.UmbracoContextAccessor,  Current.Services, new GlobalSettings())
         {
         }
 

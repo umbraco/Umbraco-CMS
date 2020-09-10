@@ -56,7 +56,7 @@ namespace Umbraco.Web.Mvc
         {
             if (redirectToUmbracoLogin)
             {
-                _redirectUrl = ConfigModelConversionsFromLegacy.ConvertGlobalSettings(Current.Configs.Global()).GetBackOfficePath(Current.HostingEnvironment).EnsureStartsWith("~");
+                _redirectUrl = ConfigModelConversionsFromLegacy.ConvertGlobalSettings(/*Current.Configs.Global()*/ null).GetBackOfficePath(Current.HostingEnvironment).EnsureStartsWith("~");
             }
         }
 

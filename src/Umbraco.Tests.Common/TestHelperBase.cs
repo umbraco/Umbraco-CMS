@@ -46,11 +46,11 @@ namespace Umbraco.Tests.Common
             return new TypeLoader(Mock.Of<ITypeFinder>(), Mock.Of<IAppPolicyCache>(), new DirectoryInfo(IOHelper.MapPath("~/App_Data/TEMP")), Mock.Of<IProfilingLogger>());
         }
 
-        public Configs GetConfigs() => GetConfigsFactory().Create();
+       // public Configs GetConfigs() => GetConfigsFactory().Create();
 
         public abstract IBackOfficeInfo GetBackOfficeInfo();
 
-        public IConfigsFactory GetConfigsFactory() => new ConfigsFactory();
+        //public IConfigsFactory GetConfigsFactory() => new ConfigsFactory();
 
         /// <summary>
         /// Gets the working directory of the test project.

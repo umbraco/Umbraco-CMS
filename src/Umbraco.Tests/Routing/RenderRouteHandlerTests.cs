@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Web.Mvc;
 using System.Web.Routing;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -153,7 +154,7 @@ namespace Umbraco.Tests.Routing
             var handler = new RenderRouteHandler(umbracoContext, new TestControllerFactory(umbracoContextAccessor, Mock.Of<ILogger>(), context =>
                 {
 
-                  return new CustomDocumentController(Factory.GetInstance<IGlobalSettings>(),
+                  return new CustomDocumentController(Factory.GetInstance<IOptions<GlobalSettings>>(),
                         umbracoContextAccessor,
                         Factory.GetInstance<ServiceContext>(),
                         Factory.GetInstance<AppCaches>(),
@@ -194,7 +195,7 @@ namespace Umbraco.Tests.Routing
         /// </summary>
         public class CustomDocumentController : RenderMvcController
         {
-            public CustomDocumentController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger)
+            public CustomDocumentController(IOptions<GlobalSettings> globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger)
                 : base(globalSettings, umbracoContextAccessor, services, appCaches, profilingLogger)
             {
             }
