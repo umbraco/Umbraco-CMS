@@ -28,6 +28,96 @@ namespace Umbraco.Web
     /// </summary>
     public static class WebCompositionExtensions
     {
+        public static IFactory CreateFactory(this Composition composition)
+        {
+            throw new NotImplementedException("MSDI");
+        }
+
+        public static void RegisterUnique<TService>(this Composition composition, Lifetime lifetime = Lifetime.Transient)
+            where TService : class
+        {
+            throw new NotImplementedException("MSDI");
+        }
+
+        public static void RegisterUnique<TService>(this Composition composition, Func<IFactory, TService> factory, Lifetime lifetime = Lifetime.Transient)
+            where TService : class
+        {
+            throw new NotImplementedException("MSDI");
+        }
+
+        public static void Register<TService>(this Composition composition, Func<IFactory, TService> factory, Lifetime lifetime = Lifetime.Transient)
+            where TService : class
+        {
+            throw new NotImplementedException("MSDI");
+        }
+
+
+        public static void Register<TService, TInstance>(this Composition composition, Func<IFactory, TService> factory, Lifetime lifetime = Lifetime.Transient)
+            where TService : class
+        {
+            throw new NotImplementedException("MSDI");
+        }
+
+        public static void Register<TService, TInstance>(this Composition composition, Lifetime lifetime = Lifetime.Transient)
+            where TService : class
+        {
+            throw new NotImplementedException("MSDI");
+        }
+
+        public static void Register<TService>(this Composition composition, Lifetime lifetime = Lifetime.Transient)
+            where TService : class
+        {
+            throw new NotImplementedException("MSDI");
+        }
+
+        public static void Register(this Composition composition, Type type, Lifetime lifetime = Lifetime.Transient)
+        {
+            throw new NotImplementedException("MSDI");
+        }
+
+        public static void RegisterUnique<TService>(this IRegister composition, Lifetime lifetime = Lifetime.Transient)
+            where TService : class
+        {
+            throw new NotImplementedException("MSDI");
+        }
+
+        public static void RegisterUnique<TService>(this IRegister composition, Func<IFactory, TService> factory, Lifetime lifetime = Lifetime.Transient)
+            where TService : class
+        {
+            throw new NotImplementedException("MSDI");
+        }
+
+        public static void Register<TService>(this IRegister composition, Func<IFactory, TService> factory, Lifetime lifetime = Lifetime.Transient)
+            where TService : class
+        {
+            throw new NotImplementedException("MSDI");
+        }
+
+
+        public static void Register<TService, TInstance>(this IRegister composition, Func<IFactory, TService> factory, Lifetime lifetime = Lifetime.Transient)
+            where TService : class
+        {
+            throw new NotImplementedException("MSDI");
+        }
+
+        public static void Register<TService, TInstance>(this IRegister composition, Lifetime lifetime = Lifetime.Transient)
+            where TService : class
+        {
+            throw new NotImplementedException("MSDI");
+        }
+
+        public static void Register<TService>(this IRegister composition, Lifetime lifetime = Lifetime.Transient)
+            where TService : class
+        {
+            throw new NotImplementedException("MSDI");
+        }
+
+        public static void Register(this IRegister composition, Type type, Lifetime lifetime = Lifetime.Transient)
+        {
+            throw new NotImplementedException("MSDI");
+        }
+
+
         #region Collection Builders
 
 

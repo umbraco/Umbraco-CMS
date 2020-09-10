@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Umbraco.Core.Composing
 {
@@ -9,7 +10,7 @@ namespace Umbraco.Core.Composing
     /// Moved from Umbraco Core to keep the .net 472 projects building.
     /// </remarks>
     [Obsolete("Use IServiceCollection instead")]
-    public interface IRegister
+    public interface IRegister : IServiceCollection
     {
         /// <summary>
         /// Gets the concrete container.

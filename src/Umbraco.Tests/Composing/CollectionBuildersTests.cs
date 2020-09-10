@@ -9,6 +9,7 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Tests.Components;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Web;
 using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.Composing

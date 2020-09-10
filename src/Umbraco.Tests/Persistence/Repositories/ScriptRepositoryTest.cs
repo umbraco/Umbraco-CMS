@@ -15,6 +15,7 @@ using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
+using Umbraco.Web;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {

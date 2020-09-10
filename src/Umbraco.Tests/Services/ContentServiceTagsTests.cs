@@ -9,6 +9,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
+using Umbraco.Web;
 
 namespace Umbraco.Tests.Services
 {

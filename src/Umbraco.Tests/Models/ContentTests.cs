@@ -23,6 +23,7 @@ using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Web;
 
 namespace Umbraco.Tests.Models
 {

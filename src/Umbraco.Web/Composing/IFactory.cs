@@ -7,7 +7,7 @@ namespace Umbraco.Core.Composing
     /// Moved from Umbraco Core to keep the .net 472 projects building.
     /// </remarks>
     [Obsolete("Use IServiceProvider instead")]
-    public interface IFactory
+    public interface IFactory : IServiceProvider
     {
         /// <summary>
         /// Gets the concrete factory.

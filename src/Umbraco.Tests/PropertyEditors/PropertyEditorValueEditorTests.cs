@@ -11,6 +11,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.Components;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Web;
 using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.PropertyEditors

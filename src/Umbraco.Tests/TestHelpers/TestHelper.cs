@@ -323,7 +323,7 @@ namespace Umbraco.Tests.TestHelpers
 
         public static IUmbracoVersion GetUmbracoVersion() => _testHelperInternal.GetUmbracoVersion();
 
-        public static IRegister GetRegister() => _testHelperInternal.GetRegister();
+        public static IRegister GetRegister() => null;/* _testHelperInternal.GetRegister();*/
 
         public static IHostingEnvironment GetHostingEnvironment() => _testHelperInternal.GetHostingEnvironment();
 

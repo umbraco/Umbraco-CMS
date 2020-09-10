@@ -8,6 +8,7 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Web;
 
 namespace Umbraco.Tests.Composing
 {

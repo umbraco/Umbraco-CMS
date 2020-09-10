@@ -15,6 +15,7 @@ using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Components;
+using Umbraco.Web;
 using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.Scoping

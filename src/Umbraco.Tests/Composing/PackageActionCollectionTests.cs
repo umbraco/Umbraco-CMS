@@ -11,6 +11,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.PackageActions;
 using Umbraco.Tests.Components;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Web;
 
 namespace Umbraco.Tests.Composing
 {

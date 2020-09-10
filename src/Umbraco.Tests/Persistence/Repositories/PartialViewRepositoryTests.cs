@@ -10,6 +10,8 @@ using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 using System;
+using Umbraco.Web;
+
 
 namespace Umbraco.Tests.Persistence.Repositories
 {

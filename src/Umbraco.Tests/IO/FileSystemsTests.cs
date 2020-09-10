@@ -16,6 +16,7 @@ using Umbraco.Tests.TestHelpers;
 using Umbraco.Core.Composing.CompositionExtensions;
 using Current = Umbraco.Web.Composing.Current;
 using FileSystems = Umbraco.Core.IO.FileSystems;
+using Umbraco.Web;
 
 namespace Umbraco.Tests.IO
 {

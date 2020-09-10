@@ -12,6 +12,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence;
 using Umbraco.Persistance.SqlCe;
 using Umbraco.Tests.Components;
+using Umbraco.Web;
 using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.TestHelpers

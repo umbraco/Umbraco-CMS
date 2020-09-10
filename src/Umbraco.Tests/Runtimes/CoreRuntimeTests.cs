@@ -133,14 +133,14 @@ namespace Umbraco.Tests.Runtimes
                 return mock.Object;
             }
 
-            public override IFactory Configure(IRegister container)
-            {
-                container.Register<IApplicationShutdownRegistry, AspNetApplicationShutdownRegistry>(Lifetime.Singleton);
-                container.Register<ISessionIdResolver, NullSessionIdResolver>(Lifetime.Singleton);
+            //public override IFactory Configure(IRegister container)
+            //{
+            //    container.Register<IApplicationShutdownRegistry, AspNetApplicationShutdownRegistry>(Lifetime.Singleton);
+            //    container.Register<ISessionIdResolver, NullSessionIdResolver>(Lifetime.Singleton);
 
-                var factory = base.Configure(container);
-                return factory;
-            }
+            //    var factory = base.Configure(container);
+            //    return factory;
+            //}
 
             // runs with only one single component
             // UmbracoCoreComponent will be force-added too

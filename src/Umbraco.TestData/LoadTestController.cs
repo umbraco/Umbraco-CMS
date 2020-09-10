@@ -11,6 +11,7 @@ using System.Diagnostics;
 using Umbraco.Core.Composing;
 using System.Configuration;
 using Umbraco.Core.Strings;
+using Umbraco.Web;
 
 // see https://github.com/Shazwazza/UmbracoScripts/tree/master/src/LoadTesting
 

@@ -6,6 +6,7 @@ using Umbraco.Web.Routing;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Web;
 
 namespace Umbraco.Tests.Routing
 {

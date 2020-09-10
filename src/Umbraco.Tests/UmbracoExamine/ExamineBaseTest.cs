@@ -8,6 +8,7 @@ using Umbraco.Core.Logging.Serilog;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.Components;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Web;
 
 namespace Umbraco.Tests.UmbracoExamine
 {

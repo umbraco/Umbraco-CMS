@@ -5,6 +5,7 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Web;
 
 namespace Umbraco.Tests.Composing
 {

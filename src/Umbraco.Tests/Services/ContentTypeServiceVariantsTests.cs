@@ -26,6 +26,7 @@ using Umbraco.Tests.Testing;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.NuCache;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
+using Umbraco.Web;
 
 namespace Umbraco.Tests.Services
 {

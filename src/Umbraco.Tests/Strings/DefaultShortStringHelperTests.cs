@@ -11,6 +11,7 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
+using Umbraco.Web;
 
 namespace Umbraco.Tests.Strings
 {
