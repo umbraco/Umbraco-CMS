@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Web;
-using System.Web.Mvc;
-using System.Web.Routing;
+using Microsoft.AspNetCore.Routing;
 using Umbraco.Configuration;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Composing;
@@ -11,9 +9,11 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Strings;
+using Umbraco.Extensions;
 using Umbraco.ModelsBuilder.Embedded.BackOffice;
-using Umbraco.Web;
-using Umbraco.Web.Mvc;
+using Umbraco.Net;
+using Umbraco.Web.Common.Lifetime;
+using Umbraco.Web.Common.ModelBinders;
 using Umbraco.Web.WebAssets;
 
 namespace Umbraco.ModelsBuilder.Embedded.Compose
@@ -24,14 +24,22 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
         private readonly IShortStringHelper _shortStringHelper;
         private readonly LiveModelsProvider _liveModelsProvider;
         private readonly OutOfDateModelsStatus _outOfDateModels;
+        private readonly LinkGenerator _linkGenerator;
+        private readonly IUmbracoApplicationLifetime _umbracoApplicationLifetime;
+        private readonly IUmbracoRequestLifetime _umbracoRequestLifetime;
 
-        public ModelsBuilderComponent(IModelsBuilderConfig config, IShortStringHelper shortStringHelper, LiveModelsProvider liveModelsProvider, OutOfDateModelsStatus outOfDateModels)
+        public ModelsBuilderComponent(IModelsBuilderConfig config, IShortStringHelper shortStringHelper,
+            LiveModelsProvider liveModelsProvider, OutOfDateModelsStatus outOfDateModels, LinkGenerator linkGenerator,
+            IUmbracoRequestLifetime umbracoRequestLifetime, IUmbracoApplicationLifetime umbracoApplicationLifetime)
         {
             _config = config;
             _shortStringHelper = shortStringHelper;
             _liveModelsProvider = liveModelsProvider;
             _outOfDateModels = outOfDateModels;
             _shortStringHelper = shortStringHelper;
+            _linkGenerator = linkGenerator;
+            _umbracoRequestLifetime = umbracoRequestLifetime;
+            _umbracoApplicationLifetime = umbracoApplicationLifetime;
         }
 
         public void Initialize()
@@ -39,6 +47,7 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
             // always setup the dashboard
             // note: UmbracoApiController instances are automatically registered
             InstallServerVars();
+            _umbracoApplicationLifetime.ApplicationInit += InitializeApplication;
 
             ContentModelBinder.ModelBindingException += ContentModelBinder_ModelBindingException;
 
@@ -57,6 +66,11 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
             ServerVariablesParser.Parsing -= ServerVariablesParser_Parsing;
             ContentModelBinder.ModelBindingException -= ContentModelBinder_ModelBindingException;
             FileService.SavingTemplate -= FileService_SavingTemplate;
+        }
+
+        private void InitializeApplication(object sender, EventArgs args)
+        {
+            _umbracoRequestLifetime.RequestEnd += (sender, context) => _liveModelsProvider.AppEndRequest(context);
         }
 
         private void InstallServerVars()
@@ -80,11 +94,8 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
             if (!(serverVars["umbracoPlugins"] is Dictionary<string, object> umbracoPlugins))
                 throw new ArgumentException("Invalid umbracoPlugins");
 
-            if (HttpContext.Current == null) throw new InvalidOperationException("HttpContext is null");
-            var urlHelper = new UrlHelper(new RequestContext(new HttpContextWrapper(HttpContext.Current), new RouteData()));
-
-            umbracoUrls["modelsBuilderBaseUrl"] = urlHelper.GetUmbracoApiServiceBaseUrl<ModelsBuilderDashboardController>(controller => controller.BuildModels());
-            umbracoPlugins["modelsBuilder"] = GetModelsBuilderSettings();
+                umbracoUrls["modelsBuilderBaseUrl"] = _linkGenerator.GetUmbracoApiServiceBaseUrl<ModelsBuilderDashboardController>(controller => controller.BuildModels());
+                umbracoPlugins["modelsBuilder"] = GetModelsBuilderSettings();
         }
 
         private Dictionary<string, object> GetModelsBuilderSettings()

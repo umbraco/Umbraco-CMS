@@ -15,7 +15,7 @@
                 <umb-box-content class="block-form">
                     <div ng-switch="wizardStep">
 
-                        <div ng-switch-when="macroSelect">
+                        <div ng-switch-when="macroSelect" class="macro-select">
 
                             <div class="form-search">
                                 <i class="icon-search"></i>
@@ -32,12 +32,12 @@
                             <ul class="umb-card-grid -three-in-row">
                                 <li ng-repeat="availableItem in macros | orderBy:'name' | filter:searchTerm"
                                     ng-click="selectMacro(availableItem)">
-                                    <a class="umb-card-grid-item" href="" title="{{availableItem.name}}">
+                                    <button class="btn-reset umb-card-grid-item" title="{{availableItem.name}}">
                                         <span>
-                                            <i class="icon-settings-alt"></i>
+                                            <i class="icon-settings-alt" aria-hidden="true"></i>
                                             {{availableItem.name}}
                                         </span>
-                                    </a>
+                                    </button>
                                 </li>
                             </ul>
 

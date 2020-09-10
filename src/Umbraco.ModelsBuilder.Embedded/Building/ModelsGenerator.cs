@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
+using Umbraco.Core.Hosting;
 
 namespace Umbraco.ModelsBuilder.Embedded.Building
 {
@@ -12,19 +13,19 @@ namespace Umbraco.ModelsBuilder.Embedded.Building
         private readonly UmbracoServices _umbracoService;
         private readonly ModelsBuilderConfig _config;
         private readonly OutOfDateModelsStatus _outOfDateModels;
-        private readonly IIOHelper _ioHelper;
+        private readonly IHostingEnvironment _hostingEnvironment;
 
-        public ModelsGenerator(UmbracoServices umbracoService, IOptions<ModelsBuilderConfig> config, OutOfDateModelsStatus outOfDateModels, IIOHelper ioHelper)
+        public ModelsGenerator(UmbracoServices umbracoService, IOptions<ModelsBuilderConfig> config, OutOfDateModelsStatus outOfDateModels, IHostingEnvironment hostingEnvironment)
         {
             _umbracoService = umbracoService;
             _config = config.Value;
             _outOfDateModels = outOfDateModels;
-            _ioHelper = ioHelper;
+            _hostingEnvironment = hostingEnvironment;
         }
 
         internal void GenerateModels()
         {
-            var modelsDirectory = _config.ModelsDirectoryAbsolute(_ioHelper);
+            var modelsDirectory = _config.ModelsDirectoryAbsolute(_hostingEnvironment);
             if (!Directory.Exists(modelsDirectory))
                 Directory.CreateDirectory(modelsDirectory);
 

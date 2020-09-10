@@ -118,10 +118,6 @@
       <Project>{0fad7d2a-d7dd-45b1-91fd-488bb6cdacea}</Project>
       <Name>Umbraco.Examine.Lucene</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Umbraco.ModelsBuilder.Embedded\Umbraco.ModelsBuilder.Embedded.csproj">
-      <Project>{52ac0ba8-a60e-4e36-897b-e8b97a54ed1c}</Project>
-      <Name>Umbraco.ModelsBuilder.Embedded</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Umbraco.PublishedCache.NuCache\Umbraco.PublishedCache.NuCache.csproj">
       <Project>{f6de8da0-07cc-4ef2-8a59-2bc81dbb3830}</Project>
       <Name>Umbraco.PublishedCache.NuCache</Name>

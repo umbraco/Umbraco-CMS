@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Threading;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Extensions;
 using Umbraco.Core.Configuration;
 using Umbraco.Configuration;
+using Umbraco.Core;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
 using Umbraco.ModelsBuilder.Embedded.Building;
@@ -71,7 +74,7 @@ namespace Umbraco.ModelsBuilder.Embedded
             Interlocked.Exchange(ref _req, 1);
         }
 
-        public void GenerateModelsIfRequested(object sender, EventArgs args)
+        public void GenerateModelsIfRequested()
         {
             //if (HttpContext.Current.Items[this] == null) return;
             if (Interlocked.Exchange(ref _req, 0) == 0) return;
@@ -110,6 +113,15 @@ namespace Umbraco.ModelsBuilder.Embedded
             _modelGenerator.GenerateModels();
         }
 
+        public void AppEndRequest(HttpContext context)
+        {
+            var requestUri = new Uri(context.Request.GetEncodedUrl(), UriKind.RelativeOrAbsolute);
 
+            if (requestUri.IsClientSideRequest())
+                return;
+
+            if (!IsEnabled) return;
+            GenerateModelsIfRequested();
+        }
     }
 }

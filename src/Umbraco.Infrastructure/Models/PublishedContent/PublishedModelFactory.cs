@@ -12,11 +12,12 @@ namespace Umbraco.Core.Models.PublishedContent
     {
         private readonly Dictionary<string, ModelInfo> _modelInfos;
         private readonly Dictionary<string, Type> _modelTypeMap;
+        private readonly IPublishedValueFallback _publishedValueFallback;
 
         private class ModelInfo
         {
             public Type ParameterType { get; set; }
-            public Func<object, object> Ctor { get; set; }
+            public Func<object, IPublishedValueFallback, object> Ctor { get; set; }
             public Type ModelType { get; set; }
             public Func<IList> ListCtor { get; set; }
         }
@@ -35,7 +36,8 @@ namespace Umbraco.Core.Models.PublishedContent
         /// PublishedContentModelFactoryResolver.Current.SetFactory(factory);
         /// </code>
         /// </remarks>
-        public PublishedModelFactory(IEnumerable<Type> types)
+        public PublishedModelFactory(IEnumerable<Type> types,
+            IPublishedValueFallback publishedValueFallback)
         {
             var modelInfos = new Dictionary<string, ModelInfo>(StringComparer.InvariantCultureIgnoreCase);
             var modelTypeMap = new Dictionary<string, Type>(StringComparer.InvariantCultureIgnoreCase);
@@ -52,7 +54,7 @@ namespace Umbraco.Core.Models.PublishedContent
                 foreach (var ctor in type.GetConstructors())
                 {
                     var parms = ctor.GetParameters();
-                    if (parms.Length == 1 && typeof(IPublishedElement).IsAssignableFrom(parms[0].ParameterType))
+                    if (parms.Length == 2 && typeof(IPublishedElement).IsAssignableFrom(parms[0].ParameterType) && typeof(IPublishedValueFallback).IsAssignableFrom(parms[1].ParameterType))
                     {
                         if (constructor != null)
                             throw new InvalidOperationException($"Type {type.FullName} has more than one public constructor with one argument of type, or implementing, IPublishedElement.");
@@ -71,13 +73,14 @@ namespace Umbraco.Core.Models.PublishedContent
                     throw new InvalidOperationException($"Both types '{type.AssemblyQualifiedName}' and '{modelInfo.ModelType.AssemblyQualifiedName}' want to be a model type for content type with alias \"{typeName}\".");
 
                 // have to use an unsafe ctor because we don't know the types, really
-                var modelCtor = ReflectionUtilities.EmitConstructorUnsafe<Func<object, object>>(constructor);
+                var modelCtor = ReflectionUtilities.EmitConstructorUnsafe<Func<object,IPublishedValueFallback, object>>(constructor);
                 modelInfos[typeName] = new ModelInfo { ParameterType = parameterType, ModelType = type, Ctor = modelCtor };
                 modelTypeMap[typeName] = type;
             }
 
             _modelInfos = modelInfos.Count > 0 ? modelInfos : null;
             _modelTypeMap = modelTypeMap;
+            _publishedValueFallback = publishedValueFallback;
         }
 
         /// <inheritdoc />
@@ -95,7 +98,7 @@ namespace Umbraco.Core.Models.PublishedContent
                 throw new InvalidOperationException($"Model {modelInfo.ModelType} expects argument of type {modelInfo.ParameterType.FullName}, but got {element.GetType().FullName}.");
 
             // can cast, because we checked when creating the ctor
-            return (IPublishedElement) modelInfo.Ctor(element);
+            return (IPublishedElement) modelInfo.Ctor(element, _publishedValueFallback);
         }
 
         /// <inheritdoc />

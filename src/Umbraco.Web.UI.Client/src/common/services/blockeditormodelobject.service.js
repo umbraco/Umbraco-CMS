@@ -13,8 +13,7 @@
 (function () {
     'use strict';
 
-
-    function blockEditorModelObjectFactory($interpolate, $q, udiService, contentResource, localizationService, umbRequestHelper) {
+    function blockEditorModelObjectFactory($interpolate, $q, udiService, contentResource, localizationService, umbRequestHelper, clipboardService) {
 
         /**
          * Simple mapping from property model content entry to editing model,
@@ -231,7 +230,8 @@
         var notSupportedProperties = [
             "Umbraco.Tags",
             "Umbraco.UploadField",
-            "Umbraco.ImageCropper"
+            "Umbraco.ImageCropper",
+            "Umbraco.NestedContent"
         ];
 
 
@@ -524,12 +524,11 @@
                 }
 
                 var blockConfiguration = this.getBlockConfiguration(dataModel.contentTypeKey);
-                var contentScaffold;
+                var contentScaffold = null;
 
                 if (blockConfiguration === null) {
-                    console.error("The block of " + contentUdi + " is not being initialized because its contentTypeKey('" + dataModel.contentTypeKey + "') is not allowed for this PropertyEditor");
-                }
-                else {
+                    console.warn("The block of " + contentUdi + " is not being initialized because its contentTypeKey('" + dataModel.contentTypeKey + "') is not allowed for this PropertyEditor");
+                } else {
                     contentScaffold = this.getScaffoldFromKey(blockConfiguration.contentElementTypeKey);
                     if (contentScaffold === null) {
                         console.error("The block of " + contentUdi + " is not begin initialized cause its Element Type was not loaded.");
@@ -539,11 +538,9 @@
                 if (blockConfiguration === null || contentScaffold === null) {
 
                     blockConfiguration = {
-                        label: "Unsupported Block",
+                        label: "Unsupported",
                         unsupported: true
                     };
-                    contentScaffold = {};
-
                 }
 
                 var blockObject = {};
@@ -568,10 +565,14 @@
                     , 10);
 
                 // make basics from scaffold
-                blockObject.content = Utilities.copy(contentScaffold);
-                ensureUdiAndKey(blockObject.content, contentUdi);
+                if(contentScaffold !== null) {// We might not have contentScaffold
+                    blockObject.content = Utilities.copy(contentScaffold);
+                    ensureUdiAndKey(blockObject.content, contentUdi);
 
-                mapToElementModel(blockObject.content, dataModel);
+                    mapToElementModel(blockObject.content, dataModel);
+                } else {
+                    blockObject.content = null;
+                }
 
                 blockObject.data = dataModel;
                 blockObject.layout = layoutEntry;
@@ -614,8 +615,7 @@
                     if (this.config.settingsElementTypeKey !== null) {
                         mapElementValues(settings, this.settings);
                     }
-                }
-
+                };
 
                 blockObject.sync = function () {
                     if (this.content !== null) {
@@ -624,7 +624,7 @@
                     if (this.config.settingsElementTypeKey !== null) {
                         mapToPropertyModel(this.settings, this.settingsData);
                     }
-                }
+                };
 
                 // first time instant update of label.
                 blockObject.label = getBlockLabel(blockObject);
@@ -663,7 +663,6 @@
                 }
 
                 return blockObject;
-
             },
 
             /**
@@ -675,11 +674,8 @@
              * @param {Object} blockObject The BlockObject to be removed and destroyed.
              */
             removeDataAndDestroyModel: function (blockObject) {
-                var udi = blockObject.content.udi;
-                var settingsUdi = null;
-                if (blockObject.settings) {
-                    settingsUdi = blockObject.settings.udi;
-                }
+                var udi = blockObject.layout.contentUdi;
+                var settingsUdi = blockObject.layout.settingsUdi || null;
                 this.destroyBlockObject(blockObject);
                 this.removeDataByUdi(udi);
                 if (settingsUdi) {
@@ -748,7 +744,7 @@
              */
             createFromElementType: function (elementTypeDataModel) {
 
-                elementTypeDataModel = Utilities.copy(elementTypeDataModel);
+                elementTypeDataModel = clipboardService.parseContentForPaste(elementTypeDataModel, clipboardService.TYPES.ELEMENT_TYPE);
 
                 var contentElementTypeKey = elementTypeDataModel.contentTypeKey;
 

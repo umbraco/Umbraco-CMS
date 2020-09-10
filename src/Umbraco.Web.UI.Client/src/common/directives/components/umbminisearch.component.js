@@ -4,7 +4,7 @@
     angular
         .module('umbraco')
         .component('umbMiniSearch', {
-            templateUrl: 'views/components/umb-mini-search/umb-mini-search.html',
+            templateUrl: 'views/components/umb-mini-search.html',
             controller: UmbMiniSearchController,
             controllerAs: 'vm',
             bindings: {
@@ -18,6 +18,9 @@
     function UmbMiniSearchController($scope) {
         
         var vm = this;
+
+        vm.onKeyDown = onKeyDown;
+        vm.onChange = onChange;
         
         var searchDelay = _.debounce(function () {
             $scope.$apply(function () {
@@ -27,23 +30,23 @@
             });
         }, 500);
     
-        vm.onKeyDown = function (ev) {
+        function onKeyDown(evt) {
             //13: enter
-            switch (ev.keyCode) {
+            switch (evt.keyCode) {
                 case 13:
                     if (vm.onSearch) {
                         vm.onSearch();
                     }
                     break;
             }
-        };
+        }
     
-        vm.onChange = function () {
+        function onChange() {
             if (vm.onStartTyping) {
                 vm.onStartTyping();
             }
             searchDelay();
-        };
+        }
 
     }
 
