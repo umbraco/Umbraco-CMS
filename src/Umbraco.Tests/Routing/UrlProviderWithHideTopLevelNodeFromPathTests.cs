@@ -7,6 +7,7 @@ using Umbraco.Infrastructure.Configuration;
 using Umbraco.Tests.Common;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Testing;
+using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.Routing
@@ -15,11 +16,15 @@ namespace Umbraco.Tests.Routing
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
     public class UrlProviderWithHideTopLevelNodeFromPathTests : BaseUrlProviderTest
     {
-        private readonly GlobalSettings _globalSettings;
+        private GlobalSettings _globalSettings;
 
-        public UrlProviderWithHideTopLevelNodeFromPathTests()
+        public override void SetUp()
         {
             _globalSettings = new GlobalSettingsBuilder().WithHideTopLevelNodeFromPath(HideTopLevelNodeFromPath).Build();
+            base.SetUp();
+            PublishedSnapshotService = CreatePublishedSnapshotService(_globalSettings);
+
+
         }
 
         protected override bool HideTopLevelNodeFromPath => true;
@@ -42,8 +47,8 @@ namespace Umbraco.Tests.Routing
         {
 
             var requestHandlerSettings = new RequestHandlerSettingsBuilder().WithAddTrailingSlash(true).Build();
-            var snapshotService = CreatePublishedSnapshotService(_globalSettings);
-            var umbracoContext = GetUmbracoContext("/test", 1111, globalSettings: _globalSettings,snapshotService:snapshotService);
+
+            var umbracoContext = GetUmbracoContext("/test", 1111, globalSettings: _globalSettings, snapshotService:PublishedSnapshotService);
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
             var urlProvider = new DefaultUrlProvider(
                 Microsoft.Extensions.Options.Options.Create(requestHandlerSettings),

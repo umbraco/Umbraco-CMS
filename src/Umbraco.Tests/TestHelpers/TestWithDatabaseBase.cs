@@ -244,7 +244,7 @@ namespace Umbraco.Tests.TestHelpers
         {
             var cache = NoAppCache.Instance;
 
-            ContentTypesCache = new PublishedContentTypeCache(
+            ContentTypesCache ??= new PublishedContentTypeCache(
                 Factory.GetInstance<IContentTypeService>(),
                 Factory.GetInstance<IMediaTypeService>(),
                 Factory.GetInstance<IMemberTypeService>(),
