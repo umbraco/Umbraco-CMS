@@ -48,7 +48,7 @@
         vm.externalLoginFormAction = Umbraco.Sys.ServerVariables.umbracoUrls.externalLoginsUrl;
         vm.externalLoginProviders = externalLoginInfoService.getLoginProviders();
         vm.externalLoginProviders.forEach(x => {
-            x.customView = externalLoginInfoService.getExternalLoginProviderView(x.authType);
+            x.customView = externalLoginInfoService.getLoginProviderView(x);
             // if there are errors set for this specific provider than assign them directly to the model
             if (externalLoginInfo.errorProvider === x.authType) {
                 x.errors = externalLoginInfo.errors;

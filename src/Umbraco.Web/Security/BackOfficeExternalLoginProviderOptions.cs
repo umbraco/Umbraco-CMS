@@ -44,13 +44,12 @@ namespace Umbraco.Web.Security
         public bool AutoRedirectLoginToExternalProvider { get; set; }
 
         /// <summary>
-        /// A path (can be a virtual path) to a custom angular view that can be used to customize the login page UI
+        /// A virtual path to a custom angular view that is used to replace the entire UI that renders the external login button that the user interacts with
         /// </summary>
         /// <remarks>
-        /// The types of customization used for this view are:
-        /// - Displaying extra information, links, etc... to the user when logging out
-        /// - Displaying extra information, links, etc... to the user when logging in (if auto-login redirect is disabled)
+        /// If this view is specified it is 100% up to the user to render the html responsible for rendering the link/un-link buttons along with showing any errors
+        /// that occur. This overrides what Umbraco normally does by default.
         /// </remarks>
-        public string BackOfficeCustomLoginView { get; set; }
+        public string CustomBackOfficeView { get; set; }
     }
 }

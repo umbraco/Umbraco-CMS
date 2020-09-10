@@ -5,7 +5,7 @@
  **/
 function externalLoginInfoService(externalLoginInfo, umbRequestHelper) {
 
-    function getExternalLoginProvider(provider) {
+    function getLoginProvider(provider) {
         if (provider) {
             var found = _.find(externalLoginInfo.providers, x => x.authType == provider);
             return found;
@@ -13,10 +13,9 @@ function externalLoginInfoService(externalLoginInfo, umbRequestHelper) {
         return null;
     }
 
-    function getExternalLoginProviderView(provider) {
-        var found = getExternalLoginProvider(provider);
-        if (found && found.properties.UmbracoBackOfficeExternalLoginOptions && found.properties.UmbracoBackOfficeExternalLoginOptions.BackOfficeCustomLoginView) {
-            return umbRequestHelper.convertVirtualToAbsolutePath(found.properties.UmbracoBackOfficeExternalLoginOptions.BackOfficeCustomLoginView);
+    function getLoginProviderView(provider) {
+        if (provider && provider.properties.UmbracoBackOfficeExternalLoginOptions && provider.properties.UmbracoBackOfficeExternalLoginOptions.CustomBackOfficeView) {
+            return umbRequestHelper.convertVirtualToAbsolutePath(provider.properties.UmbracoBackOfficeExternalLoginOptions.CustomBackOfficeView);
         }
         return null;
     }
@@ -35,22 +34,34 @@ function externalLoginInfoService(externalLoginInfo, umbRequestHelper) {
     }
 
     /**
-     * Returns all login providers
-     * @param {any} excludeUnlinkable true to exclude providers that are not manually linkable
+     * Returns all login providers    
      */
-    function getLoginProviders(excludeUnlinkable) {
-        if (excludeUnlinkable) {
-            return _.filter(externalLoginInfo.providers, x => x.properties.ExternalSignInAutoLinkOptions.AllowManualLinking);
-        }
-        else {
-            return externalLoginInfo.providers;
-        }
+    function getLoginProviders() {
+        return externalLoginInfo.providers;
+    }
+
+    /** Returns all logins providers that have options that the user can interact with */
+    function getLoginProvidersWithOptions() {
+        // only include providers that allow manual linking or ones that provide a custom view
+        var providers = _.filter(externalLoginInfo.providers, x => {
+            // transform the data and also include the custom view as a nicer property
+            x.customView = getLoginProviderView(x);
+            if (x.customView) {                
+                return true;
+            }
+            else {
+                return x.properties.ExternalSignInAutoLinkOptions.AllowManualLinking;
+            }
+        });        
+        return providers;
     }
 
     return {
         hasDenyLocalLogin: hasDenyLocalLogin,
+        getLoginProvider: getLoginProvider,
         getLoginProviders: getLoginProviders,
-        getExternalLoginProviderView: getExternalLoginProviderView
+        getLoginProvidersWithOptions: getLoginProvidersWithOptions,
+        getLoginProviderView: getLoginProviderView
     };
 }
 angular.module('umbraco.services').factory('externalLoginInfoService', externalLoginInfoService);

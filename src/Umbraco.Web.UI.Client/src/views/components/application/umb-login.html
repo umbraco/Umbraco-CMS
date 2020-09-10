@@ -129,17 +129,20 @@
 
                             <div ng-repeat="login in vm.externalLoginProviders">
 
-                                <button type="submit" class="btn btn-block btn-social"
-                                        ng-class="login.properties.SocialStyle"
-                                        id="{{login.authType}}" name="provider" value="{{login.authType}}"
-                                        title="Log in using your {{login.caption}} account">
-                                    <i class="fa" ng-class="login.properties.SocialIcon"></i>
-                                    <localize key="login_signInWith">Sign in with</localize>&nbsp;{{login.caption}}
-                                </button>
+                                <div ng-if="!login.customView">
+                                    <button type="submit"
+                                            class="btn btn-block btn-social"
+                                            ng-class="login.properties.SocialStyle"
+                                            id="{{login.authType}}" name="provider" value="{{login.authType}}"
+                                            title="Log in using your {{login.caption}} account">
+                                        <i class="fa" ng-class="login.properties.SocialIcon"></i>
+                                        <localize key="login_signInWith">Sign in with</localize>&nbsp;{{login.caption}}
+                                    </button>
 
-                                <div ng-if="login.errors">
-                                    <div class="text-error" ng-repeat="error in login.errors">
-                                        <span>{{error}}</span>
+                                    <div ng-if="login.errors">
+                                        <div class="text-error" ng-repeat="error in login.errors">
+                                            <span>{{error}}</span>
+                                        </div>
                                     </div>
                                 </div>
 

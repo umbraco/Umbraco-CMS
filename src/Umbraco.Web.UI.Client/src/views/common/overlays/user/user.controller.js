@@ -20,8 +20,8 @@ angular.module("umbraco")
 
         // Set flag if any have deny local login, in which case we must disable all password functionality
         $scope.denyLocalLogin = externalLoginInfoService.hasDenyLocalLogin();
-        // Only include login providers that don't deny local login
-        $scope.externalLoginProviders = externalLoginInfoService.getLoginProviders(true);
+        // Only include login providers that have editable options
+        $scope.externalLoginProviders = externalLoginInfoService.getLoginProvidersWithOptions();
 
         $scope.externalLinkLoginFormAction = Umbraco.Sys.ServerVariables.umbracoUrls.externalLinkLoginsUrl;
         var evts = [];
