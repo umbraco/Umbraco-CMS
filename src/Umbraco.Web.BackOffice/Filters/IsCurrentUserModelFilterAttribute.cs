@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Umbraco.Core.Security;
 using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Security;
@@ -15,11 +16,11 @@ namespace Umbraco.Web.BackOffice.Filters
 
         private class IsCurrentUserModelFilter : IActionFilter
         {
-            private readonly IWebSecurity _webSecurity;
+            private readonly IWebSecurityAccessor _webSecurityAccessor;
 
-            public IsCurrentUserModelFilter(IWebSecurity webSecurity)
+            public IsCurrentUserModelFilter(IWebSecurityAccessor webSecurityAccessor)
             {
-                _webSecurity = webSecurity;
+                _webSecurityAccessor = webSecurityAccessor;
             }
 
 
@@ -27,7 +28,7 @@ namespace Umbraco.Web.BackOffice.Filters
             {
                 if (context.Result == null) return;
 
-                var user = _webSecurity.CurrentUser;
+                var user = _webSecurityAccessor.WebSecurity.CurrentUser;
                 if (user == null) return;
 
                 var objectContent = context.Result as ObjectResult;

@@ -8,6 +8,7 @@ using Umbraco.Composing;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Models;
@@ -21,20 +22,20 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IUpgradeService _upgradeService;
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly ICookieManager _cookieManager;
-        private readonly IWebSecurity _webSecurity;
+        private readonly IWebSecurityAccessor _webSecurityAccessor;
         private readonly IGlobalSettings _globalSettings;
 
         public UpdateCheckController(
             IUpgradeService upgradeService,
             IUmbracoVersion umbracoVersion,
             ICookieManager cookieManager,
-            IWebSecurity webSecurity,
+            IWebSecurityAccessor webSecurityAccessor,
             IGlobalSettings globalSettings)
         {
             _upgradeService = upgradeService ?? throw new ArgumentNullException(nameof(upgradeService));
             _umbracoVersion = umbracoVersion ?? throw new ArgumentNullException(nameof(umbracoVersion));
             _cookieManager = cookieManager ?? throw new ArgumentNullException(nameof(cookieManager));
-            _webSecurity = webSecurity ?? throw new ArgumentNullException(nameof(webSecurity));
+            _webSecurityAccessor = webSecurityAccessor ?? throw new ArgumentNullException(nameof(webSecurityAccessor));
             _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
         }
 
@@ -43,7 +44,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         {
             var updChkCookie = _cookieManager.GetCookieValue("UMB_UPDCHK");
             var updateCheckCookie = updChkCookie ?? string.Empty;
-            if (_globalSettings.VersionCheckPeriod > 0 && string.IsNullOrEmpty(updateCheckCookie) && _webSecurity.CurrentUser.IsAdmin())
+            if (_globalSettings.VersionCheckPeriod > 0 && string.IsNullOrEmpty(updateCheckCookie) && _webSecurityAccessor.WebSecurity.CurrentUser.IsAdmin())
             {
                 try
                 {

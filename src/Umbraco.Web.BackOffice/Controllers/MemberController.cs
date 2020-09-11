@@ -54,7 +54,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IMemberTypeService _memberTypeService;
         private readonly IDataTypeService _dataTypeService;
         private readonly ILocalizedTextService _localizedTextService;
-        private readonly IWebSecurity _webSecurity;
+        private readonly IWebSecurityAccessor _webSecurityAccessor;
         private readonly IJsonSerializer _jsonSerializer;
 
         public MemberController(
@@ -70,7 +70,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             IMemberService memberService,
             IMemberTypeService memberTypeService,
             IDataTypeService dataTypeService,
-            IWebSecurity webSecurity,
+            IWebSecurityAccessor webSecurityAccessor,
             IJsonSerializer jsonSerializer)
             : base(cultureDictionary, logger, shortStringHelper, eventMessages, localizedTextService)
         {
@@ -82,7 +82,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _memberTypeService = memberTypeService;
             _dataTypeService = dataTypeService;
             _localizedTextService = localizedTextService;
-            _webSecurity = webSecurity;
+            _webSecurityAccessor = webSecurityAccessor;
             _jsonSerializer = jsonSerializer;
         }
 
@@ -310,7 +310,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 throw new InvalidOperationException($"No member type found with alias {contentItem.ContentTypeAlias}");
             var member = new Member(contentItem.Name, contentItem.Email, contentItem.Username, memberType, true)
             {
-                CreatorId = _webSecurity.CurrentUser.Id,
+                CreatorId = _webSecurityAccessor.WebSecurity.CurrentUser.Id,
                 RawPasswordValue = _passwordSecurity.HashPasswordForStorage(contentItem.Password.NewPassword),
                 Comments = contentItem.Comments,
                 IsApproved = contentItem.IsApproved
@@ -328,13 +328,13 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </returns>
         private void UpdateMemberData(MemberSave contentItem)
         {
-            contentItem.PersistedContent.WriterId = _webSecurity.CurrentUser.Id;
+            contentItem.PersistedContent.WriterId = _webSecurityAccessor.WebSecurity.CurrentUser.Id;
 
             // If the user doesn't have access to sensitive values, then we need to check if any of the built in member property types
             // have been marked as sensitive. If that is the case we cannot change these persisted values no matter what value has been posted.
             // There's only 3 special ones we need to deal with that are part of the MemberSave instance: Comments, IsApproved, IsLockedOut
             // but we will take care of this in a generic way below so that it works for all props.
-            if (!_webSecurity.CurrentUser.HasAccessToSensitiveData())
+            if (!_webSecurityAccessor.WebSecurity.CurrentUser.HasAccessToSensitiveData())
             {
                 var memberType = _memberTypeService.Get(contentItem.PersistedContent.ContentTypeId);
                 var sensitiveProperties = memberType
@@ -458,7 +458,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         [HttpGet]
         public IActionResult ExportMemberData(Guid key)
         {
-            var currentUser = _webSecurity.CurrentUser;
+            var currentUser = _webSecurityAccessor.WebSecurity.CurrentUser;
 
             if (currentUser.HasAccessToSensitiveData() == false)
             {

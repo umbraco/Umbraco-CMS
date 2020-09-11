@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Umbraco.Core;
+using Umbraco.Core.Security;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Security;
 
@@ -13,12 +14,12 @@ namespace Umbraco.Web.WebApi.Filters
     internal sealed class OutgoingEditorModelEventAttribute : ActionFilterAttribute
     {
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
-        private readonly IWebSecurity _webSecurity;
+        private readonly IWebSecurityAccessor _webSecurityAccessor;
 
-        public OutgoingEditorModelEventAttribute(IUmbracoContextAccessor umbracoContextAccessor, IWebSecurity webSecurity)
+        public OutgoingEditorModelEventAttribute(IUmbracoContextAccessor umbracoContextAccessor, IWebSecurityAccessor webSecurityAccessor)
         {
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
-            _webSecurity = webSecurity ?? throw new ArgumentNullException(nameof(webSecurity));
+            _webSecurityAccessor = webSecurityAccessor ?? throw new ArgumentNullException(nameof(webSecurityAccessor));
         }
 
         public override void OnActionExecuted(ActionExecutedContext context)
@@ -26,7 +27,7 @@ namespace Umbraco.Web.WebApi.Filters
             if (context.Result == null) return;
 
             var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
-            var user = _webSecurity.CurrentUser;
+            var user = _webSecurityAccessor.WebSecurity.CurrentUser;
             if (user == null) return;
 
             if (context.Result is ObjectResult objectContent)

@@ -9,6 +9,7 @@ using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Security;
 using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Models.Mapping
@@ -23,7 +24,7 @@ namespace Umbraco.Web.Models.Mapping
     /// </remarks>
     public class MemberTabsAndPropertiesMapper : TabsAndPropertiesMapper<IMember>
     {
-        private readonly IWebSecurity _webSecurity;
+        private readonly IWebSecurityAccessor _webSecurityAccessor;
         private readonly ILocalizedTextService _localizedTextService;
         private readonly IMemberTypeService _memberTypeService;
         private readonly IMemberService _memberService;
@@ -32,7 +33,7 @@ namespace Umbraco.Web.Models.Mapping
         private readonly PropertyEditorCollection _propertyEditorCollection;
 
         public MemberTabsAndPropertiesMapper(ICultureDictionary cultureDictionary,
-            IWebSecurity webSecurity,
+            IWebSecurityAccessor webSecurityAccessor,
             ILocalizedTextService localizedTextService,
             IMemberTypeService memberTypeService,
             IMemberService memberService,
@@ -42,7 +43,7 @@ namespace Umbraco.Web.Models.Mapping
             PropertyEditorCollection propertyEditorCollection)
             : base(cultureDictionary, localizedTextService, contentTypeBaseServiceProvider)
         {
-            _webSecurity = webSecurity ?? throw new ArgumentNullException(nameof(webSecurity));
+            _webSecurityAccessor = webSecurityAccessor ?? throw new ArgumentNullException(nameof(webSecurityAccessor));
             _localizedTextService = localizedTextService ?? throw new ArgumentNullException(nameof(localizedTextService));
             _memberTypeService = memberTypeService ?? throw new ArgumentNullException(nameof(memberTypeService));
             _memberService = memberService ?? throw new ArgumentNullException(nameof(memberService));
@@ -75,8 +76,8 @@ namespace Umbraco.Web.Models.Mapping
                 isLockedOutProperty.Value = _localizedTextService.Localize("general/no");
             }
 
-            if (_webSecurity.CurrentUser != null
-                && _webSecurity.CurrentUser.AllowedSections.Any(x => x.Equals(Constants.Applications.Settings)))
+            if (_webSecurityAccessor.WebSecurity.CurrentUser != null
+                && _webSecurityAccessor.WebSecurity.CurrentUser.AllowedSections.Any(x => x.Equals(Constants.Applications.Settings)))
             {
                 var memberTypeLink = string.Format("#/member/memberTypes/edit/{0}", source.ContentTypeId);
 
@@ -190,7 +191,7 @@ namespace Umbraco.Web.Models.Mapping
                 // check if this property is flagged as sensitive
                 var isSensitiveProperty = memberType.IsSensitiveProperty(prop.Alias);
                 // check permissions for viewing sensitive data
-                if (isSensitiveProperty && (_webSecurity.CurrentUser.HasAccessToSensitiveData() == false))
+                if (isSensitiveProperty && (_webSecurityAccessor.WebSecurity.CurrentUser.HasAccessToSensitiveData() == false))
                 {
                     // mark this property as sensitive
                     prop.IsSensitive = true;

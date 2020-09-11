@@ -7,6 +7,7 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Security;
 using Umbraco.Core.WebAssets;
 using Umbraco.Extensions;
 using Umbraco.Web.Common.Filters;
@@ -23,7 +24,7 @@ namespace Umbraco.Web.Common.Install
     [Area(Umbraco.Core.Constants.Web.Mvc.InstallArea)]
     public class InstallController : Controller
     {
-        private readonly IWebSecurity _webSecurity;
+        private readonly IWebSecurityAccessor _webSecurityAccessor;
         private readonly InstallHelper _installHelper;
         private readonly IRuntimeState _runtime;
         private readonly IGlobalSettings _globalSettings;
@@ -34,7 +35,7 @@ namespace Umbraco.Web.Common.Install
         private readonly IRuntimeMinifier _runtimeMinifier;
 
         public InstallController(
-            IWebSecurity webSecurity,
+            IWebSecurityAccessor webSecurityAccessor,
             InstallHelper installHelper,
             IRuntimeState runtime,
             IGlobalSettings globalSettings,
@@ -44,7 +45,7 @@ namespace Umbraco.Web.Common.Install
             ILogger logger,
             LinkGenerator linkGenerator)
         {
-            _webSecurity = webSecurity;
+            _webSecurityAccessor = webSecurityAccessor;
             _installHelper = installHelper;
             _runtime = runtime;
             _globalSettings = globalSettings;
@@ -70,7 +71,7 @@ namespace Umbraco.Web.Common.Install
                 // Update ClientDependency version and delete its temp directories to make sure we get fresh caches
                 _runtimeMinifier.Reset();
 
-                var result = _webSecurity.ValidateCurrentUser(false);
+                var result = _webSecurityAccessor.WebSecurity.ValidateCurrentUser(false);
 
                 switch (result)
                 {

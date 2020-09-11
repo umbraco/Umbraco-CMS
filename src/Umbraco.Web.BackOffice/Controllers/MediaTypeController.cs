@@ -7,6 +7,7 @@ using Umbraco.Core;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Web.BackOffice.Filters;
@@ -36,7 +37,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IMediaTypeService _mediaTypeService;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly UmbracoMapper _umbracoMapper;
-        private readonly IWebSecurity _webSecurity;
+        private readonly IWebSecurityAccessor _webSecurityAccessor;
 
         public MediaTypeController(ICultureDictionary cultureDictionary,
             EditorValidatorCollection editorValidatorCollection,
@@ -48,7 +49,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             IShortStringHelper shortStringHelper,
             IEntityService entityService,
             IMediaService mediaService,
-            IWebSecurity webSecurity)
+            IWebSecurityAccessor webSecurityAccessor)
             : base(
             cultureDictionary,
             editorValidatorCollection,
@@ -64,7 +65,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _mediaService = mediaService ?? throw new ArgumentNullException(nameof(mediaService));
             _umbracoMapper = umbracoMapper ?? throw new ArgumentNullException(nameof(umbracoMapper));
             _contentTypeService = contentTypeService ?? throw new ArgumentNullException(nameof(contentTypeService));
-            _webSecurity = webSecurity ?? throw new ArgumentNullException(nameof(webSecurity));
+            _webSecurityAccessor = webSecurityAccessor ?? throw new ArgumentNullException(nameof(webSecurityAccessor));
             _localizedTextService =
                 localizedTextService ?? throw new ArgumentNullException(nameof(localizedTextService));
         }
@@ -147,7 +148,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            _mediaTypeService.Delete(foundType, _webSecurity.CurrentUser.Id);
+            _mediaTypeService.Delete(foundType, _webSecurityAccessor.WebSecurity.CurrentUser.Id);
             return Ok();
         }
 
@@ -241,14 +242,14 @@ namespace Umbraco.Web.BackOffice.Controllers
         [HttpPost]
         public IActionResult DeleteContainer(int id)
         {
-            _mediaTypeService.DeleteContainer(id, _webSecurity.CurrentUser.Id);
+            _mediaTypeService.DeleteContainer(id, _webSecurityAccessor.WebSecurity.CurrentUser.Id);
 
             return Ok();
         }
 
         public IActionResult PostCreateContainer(int parentId, string name)
         {
-            var result = _mediaTypeService.CreateContainer(parentId, name, _webSecurity.CurrentUser.Id);
+            var result = _mediaTypeService.CreateContainer(parentId, name, _webSecurityAccessor.WebSecurity.CurrentUser.Id);
 
             return result
                 ? Ok(result.Result) //return the id
@@ -257,7 +258,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
         public IActionResult PostRenameContainer(int id, string name)
         {
-            var result = _mediaTypeService.RenameContainer(id, name, _webSecurity.CurrentUser.Id);
+            var result = _mediaTypeService.RenameContainer(id, name, _webSecurityAccessor.WebSecurity.CurrentUser.Id);
 
             return result
                 ? Ok(result.Result) //return the id

@@ -13,6 +13,7 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Security;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -21,7 +22,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     {
         private readonly ILogger _logger;
         private readonly IWebRoutingSettings _webRoutingSettings;
-        private readonly IWebSecurity _webSecurity;
+        private readonly IWebSecurityAccessor _webSecurityAccessor;
         private readonly IRedirectUrlService _redirectUrlService;
         private readonly UmbracoMapper _umbracoMapper;
         private readonly IHostingEnvironment _hostingEnvironment;
@@ -30,7 +31,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         public RedirectUrlManagementController(
             ILogger logger,
             IWebRoutingSettings webRoutingSettings,
-            IWebSecurity webSecurity,
+            IWebSecurityAccessor webSecurityAccessor,
             IRedirectUrlService redirectUrlService,
             UmbracoMapper umbracoMapper,
             IHostingEnvironment hostingEnvironment,
@@ -38,7 +39,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _webRoutingSettings = webRoutingSettings ?? throw new ArgumentNullException(nameof(webRoutingSettings));
-            _webSecurity = webSecurity ?? throw new ArgumentNullException(nameof(webSecurity));
+            _webSecurityAccessor = webSecurityAccessor ?? throw new ArgumentNullException(nameof(webSecurityAccessor));
             _redirectUrlService = redirectUrlService ?? throw new ArgumentNullException(nameof(redirectUrlService));
             _umbracoMapper = umbracoMapper ?? throw new ArgumentNullException(nameof(umbracoMapper));
             _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
@@ -53,7 +54,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         public IActionResult GetEnableState()
         {
             var enabled = _webRoutingSettings.DisableRedirectUrlTracking == false;
-            var userIsAdmin = _webSecurity.CurrentUser.IsAdmin();
+            var userIsAdmin = _webSecurityAccessor.WebSecurity.CurrentUser.IsAdmin();
             return Ok(new { enabled, userIsAdmin });
         }
 
@@ -109,7 +110,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         [HttpPost]
         public IActionResult ToggleUrlTracker(bool disable)
         {
-            var userIsAdmin = _webSecurity.CurrentUser.IsAdmin();
+            var userIsAdmin = _webSecurityAccessor.WebSecurity.CurrentUser.IsAdmin();
             if (userIsAdmin == false)
             {
                 var errorMessage = "User is not a member of the administrators group and so is not allowed to toggle the URL tracker";

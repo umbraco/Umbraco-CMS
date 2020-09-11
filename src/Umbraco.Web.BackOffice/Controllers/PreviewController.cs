@@ -8,6 +8,7 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Hosting;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Core.WebAssets;
 using Umbraco.Extensions;
@@ -30,8 +31,8 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly UmbracoFeatures _features;
         private readonly IGlobalSettings _globalSettings;
         private readonly IPublishedSnapshotService _publishedSnapshotService;
-        private readonly IWebSecurity _webSecurity;
-        private readonly ILocalizationService _localizationService;        
+        private readonly IWebSecurityAccessor _webSecurityAccessor;
+        private readonly ILocalizationService _localizationService;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ICookieManager _cookieManager;
         private readonly IRuntimeMinifier _runtimeMinifier;
@@ -41,7 +42,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             UmbracoFeatures features,
             IGlobalSettings globalSettings,
             IPublishedSnapshotService publishedSnapshotService,
-            IWebSecurity webSecurity,
+            IWebSecurityAccessor webSecurityAccessor,
             ILocalizationService localizationService,
             IHostingEnvironment hostingEnvironment,
             ICookieManager cookieManager,
@@ -51,7 +52,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _features = features;
             _globalSettings = globalSettings;
             _publishedSnapshotService = publishedSnapshotService;
-            _webSecurity = webSecurity;
+            _webSecurityAccessor = webSecurityAccessor;
             _localizationService = localizationService;
             _hostingEnvironment = hostingEnvironment;
             _cookieManager = cookieManager;
@@ -105,7 +106,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         [UmbracoAuthorize]
         public ActionResult Frame(int id, string culture)
         {
-            var user = _webSecurity.CurrentUser;
+            var user = _webSecurityAccessor.WebSecurity.CurrentUser;
 
             var previewToken = _publishedSnapshotService.EnterPreview(user, id);
 

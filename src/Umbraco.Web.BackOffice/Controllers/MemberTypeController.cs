@@ -16,6 +16,7 @@ using Umbraco.Core.Strings;
 using Umbraco.Web.Models.ContentEditing;
 using Constants = Umbraco.Core.Constants;
 using Umbraco.Core.Mapping;
+using Umbraco.Core.Security;
 using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.Attributes;
@@ -33,7 +34,7 @@ namespace Umbraco.Web.Editors
     public class MemberTypeController : ContentTypeControllerBase<IMemberType>
     {
         private readonly IMemberTypeService _memberTypeService;
-        private readonly IWebSecurity _webSecurity;
+        private readonly IWebSecurityAccessor _webSecurityAccessor;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly UmbracoMapper _umbracoMapper;
         private readonly ILocalizedTextService _localizedTextService;
@@ -46,7 +47,7 @@ namespace Umbraco.Web.Editors
             IMemberTypeService memberTypeService,
             UmbracoMapper umbracoMapper,
             ILocalizedTextService localizedTextService,
-            IWebSecurity webSecurity,
+            IWebSecurityAccessor webSecurityAccessor,
             IShortStringHelper shortStringHelper)
             : base(cultureDictionary,
                 editorValidatorCollection,
@@ -57,7 +58,7 @@ namespace Umbraco.Web.Editors
                 localizedTextService)
         {
             _memberTypeService = memberTypeService ?? throw new ArgumentNullException(nameof(memberTypeService));
-            _webSecurity = webSecurity ?? throw new ArgumentNullException(nameof(webSecurity));
+            _webSecurityAccessor = webSecurityAccessor ?? throw new ArgumentNullException(nameof(webSecurityAccessor));
             _shortStringHelper = shortStringHelper ?? throw new ArgumentNullException(nameof(shortStringHelper));
             _umbracoMapper = umbracoMapper ?? throw new ArgumentNullException(nameof(umbracoMapper));
             _localizedTextService =
@@ -141,7 +142,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            _memberTypeService.Delete(foundType, _webSecurity.CurrentUser.Id);
+            _memberTypeService.Delete(foundType, _webSecurityAccessor.WebSecurity.CurrentUser.Id);
             return Ok();
         }
 
@@ -201,7 +202,7 @@ namespace Umbraco.Web.Editors
             var ctId = Convert.ToInt32(contentTypeSave.Id);
             var ct = ctId > 0 ? _memberTypeService.Get(ctId) : null;
 
-            if (_webSecurity.CurrentUser.HasAccessToSensitiveData() == false)
+            if (_webSecurityAccessor.WebSecurity.CurrentUser.HasAccessToSensitiveData() == false)
             {
                 //We need to validate if any properties on the contentTypeSave have had their IsSensitiveValue changed,
                 //and if so, we need to check if the current user has access to sensitive values. If not, we have to return an error

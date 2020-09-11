@@ -8,6 +8,7 @@ using NUnit.Framework;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Common;
 using Umbraco.Tests.Common.Builders;
@@ -52,7 +53,7 @@ namespace Umbraco.Tests.Integration
                 httpContextAccessor,
                 Mock.Of<ICookieManager>(),
                 Mock.Of<IRequestAccessor>(),
-                Mock.Of<IWebSecurity>());
+                Mock.Of<IWebSecurityAccessor>());
 
             var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext();
             var umbracoContext = umbracoContextReference.UmbracoContext;
@@ -85,7 +86,7 @@ namespace Umbraco.Tests.Integration
                 httpContextAccessor,
                 Mock.Of<ICookieManager>(),
                 Mock.Of<IRequestAccessor>(),
-                Mock.Of<IWebSecurity>());
+                Mock.Of<IWebSecurityAccessor>());
 
             var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext();
             var umbCtx = umbracoContextReference.UmbracoContext;
@@ -122,7 +123,7 @@ namespace Umbraco.Tests.Integration
                 httpContextAccessor,
                 Mock.Of<ICookieManager>(),
                 Mock.Of<IRequestAccessor>(),
-                Mock.Of<IWebSecurity>());
+                Mock.Of<IWebSecurityAccessor>());
 
             var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext();
             var umbracoContext = umbracoContextReference.UmbracoContext;
@@ -159,7 +160,7 @@ namespace Umbraco.Tests.Integration
                 httpContextAccessor,
                 Mock.Of<ICookieManager>(),
                 Mock.Of<IRequestAccessor>(),
-                Mock.Of<IWebSecurity>());
+                Mock.Of<IWebSecurityAccessor>());
 
             var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext();
             var umbracoContext = umbracoContextReference.UmbracoContext;

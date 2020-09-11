@@ -35,12 +35,12 @@ namespace Umbraco.Web.BackOffice.Filters
             private readonly ILogger _logger;
             private readonly ILocalizedTextService _textService;
             private readonly IUserService _userService;
-            private readonly IWebSecurity _webSecurity;
+            private readonly IWebSecurityAccessor _webSecurityAccessor;
 
 
             public ContentSaveValidationFilter(
                 ILogger logger,
-                IWebSecurity webSecurity,
+                IWebSecurityAccessor webSecurityAccessor,
                 ILocalizedTextService textService,
                 IContentService contentService,
                 IUserService userService,
@@ -48,7 +48,7 @@ namespace Umbraco.Web.BackOffice.Filters
                 IPropertyValidationService propertyValidationService)
             {
                 _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-                _webSecurity = webSecurity ?? throw new ArgumentNullException(nameof(webSecurity));
+                _webSecurityAccessor = webSecurityAccessor ?? throw new ArgumentNullException(nameof(webSecurityAccessor));
                 _textService = textService ?? throw new ArgumentNullException(nameof(textService));
                 _contentService = contentService ?? throw new ArgumentNullException(nameof(contentService));
                 _userService = userService ?? throw new ArgumentNullException(nameof(userService));
@@ -59,11 +59,11 @@ namespace Umbraco.Web.BackOffice.Filters
             public void OnActionExecuting(ActionExecutingContext context)
             {
                 var model = (ContentItemSave) context.ActionArguments["contentItem"];
-                var contentItemValidator = new ContentSaveModelValidator(_logger, _webSecurity, _textService, _propertyValidationService);
+                var contentItemValidator = new ContentSaveModelValidator(_logger, _webSecurityAccessor.WebSecurity, _textService, _propertyValidationService);
 
                 if (!ValidateAtLeastOneVariantIsBeingSaved(model, context)) return;
                 if (!contentItemValidator.ValidateExistingContent(model, context)) return;
-                if (!ValidateUserAccess(model, context, _webSecurity)) return;
+                if (!ValidateUserAccess(model, context, _webSecurityAccessor.WebSecurity)) return;
 
                 //validate for each variant that is being updated
                 foreach (var variant in model.Variants.Where(x => x.Save))

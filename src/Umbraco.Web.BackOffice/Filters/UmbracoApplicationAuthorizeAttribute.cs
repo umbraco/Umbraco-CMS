@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Umbraco.Core.Security;
 using Umbraco.Web.Security;
 
 namespace Umbraco.Web.BackOffice.Filters
@@ -22,7 +23,7 @@ namespace Umbraco.Web.BackOffice.Filters
             /// </summary>
             internal static bool Enable = true;
 
-            private readonly IWebSecurity _webSecurity;
+            private readonly IWebSecurityAccessor _webSecurityAccessor;
             private readonly string[] _appNames;
 
             /// <summary>
@@ -32,9 +33,9 @@ namespace Umbraco.Web.BackOffice.Filters
             /// <param name="appName">
             /// If the user has access to any of the specified apps, they will be authorized.
             /// </param>
-            public UmbracoApplicationAuthorizeFilter(IWebSecurity webSecurity, params string[] appName)
+            public UmbracoApplicationAuthorizeFilter(IWebSecurityAccessor webSecurityAccessor, params string[] appName)
             {
-                _webSecurity = webSecurity;
+                _webSecurityAccessor = webSecurityAccessor;
                 _appNames = appName;
             }
 
@@ -54,9 +55,9 @@ namespace Umbraco.Web.BackOffice.Filters
                     return true;
                 }
 
-                var authorized = _webSecurity.CurrentUser != null
-                                 && _appNames.Any(app => _webSecurity.UserHasSectionAccess(
-                                     app, _webSecurity.CurrentUser));
+                var authorized = _webSecurityAccessor.WebSecurity.CurrentUser != null
+                                 && _appNames.Any(app => _webSecurityAccessor.WebSecurity.UserHasSectionAccess(
+                                     app, _webSecurityAccessor.WebSecurity.CurrentUser));
 
                 return authorized;
             }

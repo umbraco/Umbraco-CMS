@@ -8,6 +8,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.Attributes;
@@ -32,7 +33,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     {
         private readonly ILogger _logger;
         private readonly ILocalizationService _localizationService;
-        private readonly IWebSecurity _webSecurity;
+        private readonly IWebSecurityAccessor _webSecurityAccessor;
         private readonly IGlobalSettings _globalSettings;
         private readonly ILocalizedTextService _localizedTextService;
         private readonly UmbracoMapper _umbracoMapper;
@@ -40,7 +41,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         public DictionaryController(
             ILogger logger,
             ILocalizationService localizationService,
-            IWebSecurity webSecurity,
+            IWebSecurityAccessor webSecurityAccessor,
             IGlobalSettings globalSettings,
             ILocalizedTextService localizedTextService,
             UmbracoMapper umbracoMapper
@@ -48,7 +49,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
-            _webSecurity = webSecurity ?? throw new ArgumentNullException(nameof(webSecurity));
+            _webSecurityAccessor = webSecurityAccessor ?? throw new ArgumentNullException(nameof(webSecurityAccessor));
             _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
             _localizedTextService = localizedTextService ?? throw new ArgumentNullException(nameof(localizedTextService));
             _umbracoMapper = umbracoMapper ?? throw new ArgumentNullException(nameof(umbracoMapper));
@@ -72,10 +73,10 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             foreach (var dictionaryItem in foundDictionaryDescendants)
             {
-                _localizationService.Delete(dictionaryItem, _webSecurity.CurrentUser.Id);
+                _localizationService.Delete(dictionaryItem, _webSecurityAccessor.WebSecurity.CurrentUser.Id);
             }
 
-            _localizationService.Delete(foundDictionary, _webSecurity.CurrentUser.Id);
+            _localizationService.Delete(foundDictionary, _webSecurityAccessor.WebSecurity.CurrentUser.Id);
 
             return Ok();
         }
@@ -102,7 +103,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             {
                 var message = _localizedTextService.Localize(
                      "dictionaryItem/changeKeyError",
-                     _webSecurity.CurrentUser.GetUserCulture(_localizedTextService, _globalSettings),
+                     _webSecurityAccessor.WebSecurity.CurrentUser.GetUserCulture(_localizedTextService, _globalSettings),
                      new Dictionary<string, string> { { "0", key } });
                 throw HttpResponseException.CreateNotificationValidationErrorResponse(message);
             }
@@ -216,7 +217,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             if (dictionaryItem == null)
                 throw HttpResponseException.CreateNotificationValidationErrorResponse("Dictionary item does not exist");
 
-            var userCulture = _webSecurity.CurrentUser.GetUserCulture(_localizedTextService, _globalSettings);
+            var userCulture = _webSecurityAccessor.WebSecurity.CurrentUser.GetUserCulture(_localizedTextService, _globalSettings);
 
             if (dictionary.NameIsDirty)
             {

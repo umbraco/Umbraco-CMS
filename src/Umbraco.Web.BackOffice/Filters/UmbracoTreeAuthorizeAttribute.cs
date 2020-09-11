@@ -3,6 +3,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Umbraco.Core;
+using Umbraco.Core.Security;
 using Umbraco.Web.Security;
 using Umbraco.Web.Services;
 
@@ -34,7 +35,7 @@ namespace Umbraco.Web.BackOffice.Filters
             private readonly string[] _treeAliases;
 
             private readonly ITreeService _treeService;
-            private readonly IWebSecurity _webSecurity;
+            private readonly IWebSecurityAccessor _webSecurityAccessor;
 
             /// <summary>
             ///     Constructor to set authorization to be based on a tree alias for which application security will be applied
@@ -45,11 +46,11 @@ namespace Umbraco.Web.BackOffice.Filters
             ///     Multiple trees may be specified.
             /// </param>
             /// <param name="treeService"></param>
-            public UmbracoTreeAuthorizeFilter(ITreeService treeService, IWebSecurity webSecurity,
+            public UmbracoTreeAuthorizeFilter(ITreeService treeService, IWebSecurityAccessor webSecurityAccessor,
                 params string[] treeAliases)
             {
                 _treeService = treeService ?? throw new ArgumentNullException(nameof(treeService));
-                _webSecurity = webSecurity ?? throw new ArgumentNullException(nameof(webSecurity));
+                _webSecurityAccessor = webSecurityAccessor ?? throw new ArgumentNullException(nameof(webSecurityAccessor));
                 _treeAliases = treeAliases;
             }
 
@@ -75,9 +76,9 @@ namespace Umbraco.Web.BackOffice.Filters
                     .Distinct()
                     .ToArray();
 
-                return _webSecurity.CurrentUser != null
-                       && apps.Any(app => _webSecurity.UserHasSectionAccess(
-                           app, _webSecurity.CurrentUser));
+                return _webSecurityAccessor.WebSecurity.CurrentUser != null
+                       && apps.Any(app => _webSecurityAccessor.WebSecurity.UserHasSectionAccess(
+                           app, _webSecurityAccessor.WebSecurity.CurrentUser));
             }
         }
     }

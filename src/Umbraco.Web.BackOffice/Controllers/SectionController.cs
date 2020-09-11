@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.Controllers;
 using Umbraco.Core;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.Common.Attributes;
@@ -27,15 +28,15 @@ namespace Umbraco.Web.Editors
         private readonly ISectionService _sectionService;
         private readonly ITreeService _treeService;
         private readonly UmbracoMapper _umbracoMapper;
-        private readonly IWebSecurity _webSecurity;
+        private readonly IWebSecurityAccessor _webSecurityAccessor;
 
         public SectionController(
-            IWebSecurity webSecurity,
+            IWebSecurityAccessor webSecurityAccessor,
             ILocalizedTextService localizedTextService,
             IDashboardService dashboardService, ISectionService sectionService, ITreeService treeService,
             UmbracoMapper umbracoMapper, IControllerFactory controllerFactory)
         {
-            _webSecurity = webSecurity;
+            _webSecurityAccessor = webSecurityAccessor;
             _localizedTextService = localizedTextService;
             _dashboardService = dashboardService;
             _sectionService = sectionService;
@@ -46,7 +47,7 @@ namespace Umbraco.Web.Editors
 
         public IEnumerable<Section> GetSections()
         {
-            var sections = _sectionService.GetAllowedSections(_webSecurity.GetUserId().ResultOr(0));
+            var sections = _sectionService.GetAllowedSections(_webSecurityAccessor.WebSecurity.GetUserId().ResultOr(0));
 
             var sectionModels = sections.Select(_umbracoMapper.Map<Section>).ToArray();
 
@@ -58,7 +59,7 @@ namespace Umbraco.Web.Editors
                     ControllerContext = ControllerContext
                 };
 
-            var dashboards = _dashboardService.GetDashboards(_webSecurity.CurrentUser);
+            var dashboards = _dashboardService.GetDashboards(_webSecurityAccessor.WebSecurity.CurrentUser);
 
             //now we can add metadata for each section so that the UI knows if there's actually anything at all to render for
             //a dashboard for a given section, then the UI can deal with it accordingly (i.e. redirect to the first tree)
@@ -104,10 +105,10 @@ namespace Umbraco.Web.Editors
         {
             var sections = _sectionService.GetSections();
             var mapped = sections.Select(_umbracoMapper.Map<Section>);
-            if (_webSecurity.CurrentUser.IsAdmin())
+            if (_webSecurityAccessor.WebSecurity.CurrentUser.IsAdmin())
                 return mapped;
 
-            return mapped.Where(x => _webSecurity.CurrentUser.AllowedSections.Contains(x.Alias)).ToArray();
+            return mapped.Where(x => _webSecurityAccessor.WebSecurity.CurrentUser.AllowedSections.Contains(x.Alias)).ToArray();
         }
     }
 }

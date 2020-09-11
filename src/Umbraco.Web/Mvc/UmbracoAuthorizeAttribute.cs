@@ -4,6 +4,7 @@ using System.Web.Mvc;
 using Umbraco.Core;
 using Umbraco.Web.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Security;
 using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Mvc
@@ -13,22 +14,22 @@ namespace Umbraco.Web.Mvc
     public sealed class UmbracoAuthorizeAttribute : AuthorizeAttribute
     {
         // see note in HttpInstallAuthorizeAttribute
-        private readonly IWebSecurity _webSecurity;
+        private readonly IWebSecurityAccessor _webSecurityAccessor;
         private readonly IRuntimeState _runtimeState;
         private readonly string _redirectUrl;
 
         private IRuntimeState RuntimeState => _runtimeState ?? Current.RuntimeState;
 
-        private IWebSecurity WebSecurity => _webSecurity ?? Current.UmbracoContext.Security;
+        private IWebSecurity WebSecurity => _webSecurityAccessor.WebSecurity ?? Current.UmbracoContext.Security;
 
         /// <summary>
         /// THIS SHOULD BE ONLY USED FOR UNIT TESTS
         /// </summary>
-        /// <param name="webSecurity"></param>
+        /// <param name="webSecurityAccessor"></param>
         /// <param name="runtimeState"></param>
-        public UmbracoAuthorizeAttribute(IWebSecurity webSecurity, IRuntimeState runtimeState)
+        public UmbracoAuthorizeAttribute(IWebSecurityAccessor webSecurityAccessor, IRuntimeState runtimeState)
         {
-            _webSecurity = webSecurity ?? throw new ArgumentNullException(nameof(webSecurity));
+            _webSecurityAccessor = _webSecurityAccessor ?? throw new ArgumentNullException(nameof(webSecurityAccessor));
             _runtimeState = runtimeState ?? throw new ArgumentNullException(nameof(runtimeState));
         }
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Web.Http;
 using Umbraco.Core;
+using Umbraco.Core.Security;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Security;
 
@@ -19,21 +20,21 @@ namespace Umbraco.Web.WebApi
         internal static bool Enable = true;
 
         // TODO: inject!
-        private readonly IWebSecurity _webSecurity;
+        private readonly IWebSecurityAccessor _webSecurityAccessor;
         private readonly IRuntimeState _runtimeState;
 
         private IRuntimeState RuntimeState => _runtimeState ?? Current.RuntimeState;
 
-        private IWebSecurity WebSecurity => _webSecurity ?? Current.UmbracoContext.Security;
+        private IWebSecurity WebSecurity => _webSecurityAccessor.WebSecurity ?? Current.UmbracoContext.Security;
 
         /// <summary>
         /// THIS SHOULD BE ONLY USED FOR UNIT TESTS
         /// </summary>
         /// <param name="webSecurity"></param>
         /// <param name="runtimeState"></param>
-        public UmbracoAuthorizeAttribute(IWebSecurity webSecurity, IRuntimeState runtimeState)
+        public UmbracoAuthorizeAttribute(IWebSecurityAccessor webSecurityAccessor, IRuntimeState runtimeState)
         {
-            _webSecurity = webSecurity ?? throw new ArgumentNullException(nameof(webSecurity));
+            _webSecurityAccessor = webSecurityAccessor ?? throw new ArgumentNullException(nameof(webSecurityAccessor));
             _runtimeState = runtimeState ?? throw new ArgumentNullException(nameof(runtimeState));
         }
 

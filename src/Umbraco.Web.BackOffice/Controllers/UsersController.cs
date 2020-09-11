@@ -32,6 +32,7 @@ using Umbraco.Core.Mapping;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Media;
+using Umbraco.Core.Security;
 using Umbraco.Extensions;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.BackOffice.ModelBinders;
@@ -58,7 +59,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly ISecuritySettings _securitySettings;
         private readonly IRequestAccessor _requestAccessor;
         private readonly IEmailSender _emailSender;
-        private readonly IWebSecurity _webSecurity;
+        private readonly IWebSecurityAccessor _webSecurityAccessor;
         private readonly AppCaches _appCaches;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly IUserService _userService;
@@ -81,7 +82,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             ISecuritySettings securitySettings,
             IRequestAccessor requestAccessor,
             IEmailSender emailSender,
-            IWebSecurity webSecurity,
+            IWebSecurityAccessor webSecurityAccessor,
             AppCaches appCaches,
             IShortStringHelper shortStringHelper,
             IUserService userService,
@@ -103,7 +104,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _securitySettings = securitySettings;
             _requestAccessor = requestAccessor;
             _emailSender = emailSender;
-            _webSecurity = webSecurity;
+            _webSecurityAccessor = webSecurityAccessor;
             _appCaches = appCaches;
             _shortStringHelper = shortStringHelper;
             _userService = userService;
@@ -124,7 +125,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <returns></returns>
         public string[] GetCurrentUserAvatarUrls()
         {
-            var urls = _webSecurity.CurrentUser.GetUserAvatarUrls(_appCaches.RuntimeCache, _mediaFileSystem, _imageUrlGenerator);
+            var urls = _webSecurityAccessor.WebSecurity.CurrentUser.GetUserAvatarUrls(_appCaches.RuntimeCache, _mediaFileSystem, _imageUrlGenerator);
             if (urls == null)
                 throw new HttpResponseException(HttpStatusCode.BadRequest, "Could not access Gravatar endpoint");
 
@@ -290,7 +291,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             var hideDisabledUsers = _securitySettings.HideDisabledUsersInBackoffice;
             var excludeUserGroups = new string[0];
-            var isAdmin = _webSecurity.CurrentUser.IsAdmin();
+            var isAdmin = _webSecurityAccessor.WebSecurity.CurrentUser.IsAdmin();
             if (isAdmin == false)
             {
                 //this user is not an admin so in that case we need to exclude all admin users
@@ -299,7 +300,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             var filterQuery = _sqlContext.Query<IUser>();
 
-            if (!_webSecurity.CurrentUser.IsSuper())
+            if (!_webSecurityAccessor.WebSecurity.CurrentUser.IsSuper())
             {
                 // only super can see super - but don't use IsSuper, cannot be mapped to SQL
                 //filterQuery.Where(x => !x.IsSuper());
@@ -360,7 +361,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             //Perform authorization here to see if the current user can actually save this user with the info being requested
             var authHelper = new UserEditorAuthorizationHelper(_contentService,_mediaService, _userService, _entityService);
-            var canSaveUser = authHelper.IsAuthorized(_webSecurity.CurrentUser, null, null, null, userSave.UserGroups);
+            var canSaveUser = authHelper.IsAuthorized(_webSecurityAccessor.WebSecurity.CurrentUser, null, null, null, userSave.UserGroups);
             if (canSaveUser == false)
             {
                 throw new HttpResponseException(HttpStatusCode.Unauthorized, canSaveUser.Result);
@@ -444,7 +445,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             //Perform authorization here to see if the current user can actually save this user with the info being requested
             var authHelper = new UserEditorAuthorizationHelper(_contentService,_mediaService, _userService, _entityService);
-            var canSaveUser = authHelper.IsAuthorized(_webSecurity.CurrentUser, user, null, null, userSave.UserGroups);
+            var canSaveUser = authHelper.IsAuthorized(_webSecurityAccessor.WebSecurity.CurrentUser, user, null, null, userSave.UserGroups);
             if (canSaveUser == false)
             {
                 throw new HttpResponseException(HttpStatusCode.Unauthorized, canSaveUser.Result);
@@ -479,7 +480,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             //send the email
 
-            await SendUserInviteEmailAsync(display, _webSecurity.CurrentUser.Name, _webSecurity.CurrentUser.Email, user, userSave.Message);
+            await SendUserInviteEmailAsync(display, _webSecurityAccessor.WebSecurity.CurrentUser.Name, _webSecurityAccessor.WebSecurity.CurrentUser.Email, user, userSave.Message);
 
             display.AddSuccessNotification(_localizedTextService.Localize("speechBubbles/resendInviteHeader"), _localizedTextService.Localize("speechBubbles/resendInviteSuccess", new[] { user.Name }));
 
@@ -575,7 +576,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             //Perform authorization here to see if the current user can actually save this user with the info being requested
             var authHelper = new UserEditorAuthorizationHelper(_contentService,_mediaService, _userService, _entityService);
-            var canSaveUser = authHelper.IsAuthorized(_webSecurity.CurrentUser, found, userSave.StartContentIds, userSave.StartMediaIds, userSave.UserGroups);
+            var canSaveUser = authHelper.IsAuthorized(_webSecurityAccessor.WebSecurity.CurrentUser, found, userSave.StartContentIds, userSave.StartMediaIds, userSave.UserGroups);
             if (canSaveUser == false)
             {
                 throw new HttpResponseException(HttpStatusCode.Unauthorized, canSaveUser.Result);
@@ -658,7 +659,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
 
             var passwordChanger = new PasswordChanger(_logger);
-            var passwordChangeResult = await passwordChanger.ChangePasswordWithIdentityAsync(_webSecurity.CurrentUser, found, changingPasswordModel, _backOfficeUserManager);
+            var passwordChangeResult = await passwordChanger.ChangePasswordWithIdentityAsync(_webSecurityAccessor.WebSecurity.CurrentUser, found, changingPasswordModel, _backOfficeUserManager);
 
             if (passwordChangeResult.Success)
             {
@@ -683,7 +684,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         [AdminUsersAuthorize("userIds")]
         public IActionResult PostDisableUsers([FromQuery]int[] userIds)
         {
-            var tryGetCurrentUserId = _webSecurity.GetUserId();
+            var tryGetCurrentUserId = _webSecurityAccessor.WebSecurity.GetUserId();
             if (tryGetCurrentUserId && userIds.Contains(tryGetCurrentUserId.Result))
             {
                 throw HttpResponseException.CreateNotificationValidationErrorResponse("The current user cannot disable itself");
