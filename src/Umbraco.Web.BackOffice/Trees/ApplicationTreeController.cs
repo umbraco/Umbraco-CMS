@@ -36,18 +36,22 @@ namespace Umbraco.Web.Trees
         private readonly ISectionService _sectionService;
         private readonly ILocalizedTextService _localizedTextService;
         private readonly IControllerFactory _controllerFactory;
+        private readonly IActionDescriptorCollectionProvider _actionDescriptorCollectionProvider;
+
 
         public ApplicationTreeController(
             ITreeService treeService,
             ISectionService sectionService,
             ILocalizedTextService localizedTextService,
-            IControllerFactory controllerFactory
+            IControllerFactory controllerFactory,
+            IActionDescriptorCollectionProvider actionDescriptorCollectionProvider
             )
               {
             _treeService = treeService;
             _sectionService = sectionService;
             _localizedTextService = localizedTextService;
             _controllerFactory = controllerFactory;
+            _actionDescriptorCollectionProvider = actionDescriptorCollectionProvider;
               }
 
         /// <summary>
@@ -255,24 +259,36 @@ namespace Umbraco.Web.Trees
             // need to "trick" web-api into thinking that it is actually executing the proxied controller.
 
 
+            var controllerName = controllerType.Name.Substring(0, controllerType.Name.Length - 10); // remove controller part of name;
             // create proxy route data specifying the action & controller to execute
             var routeData = new RouteData(new RouteValueDictionary()
             {
                 ["action"] = action,
-                ["controller"] = controllerType.Name.Substring(0,controllerType.Name.Length-10) // remove controller part of name;
+                ["controller"] = controllerName
 
             });
+            if (!(querystring is null))
+            {
+                foreach (var (key,value) in querystring)
+                {
+                    routeData.Values[key] = value;
+                }
+            }
 
+            var actionDescriptor = _actionDescriptorCollectionProvider.ActionDescriptors.Items
+                .Cast<ControllerActionDescriptor>()
+                .First(x =>
+                    x.ControllerName.Equals(controllerName) &&
+                    x.ActionName == action);
+
+            // var actionDescriptorCandidates = _actionSelector.SelectCandidates(routeContext);
+            // var actionDescriptor = _actionSelector.SelectBestCandidate(routeContext, actionDescriptorCandidates);
 
             //TODO create real proxy of the controller context https://github.com/aspnet/Mvc/issues/5190
             var actionContext = new ActionContext(
                 HttpContext,
                 routeData,
-                new ControllerActionDescriptor()
-                {
-                    ControllerTypeInfo = controllerType.GetTypeInfo(),
-                    ActionName = action,
-                });
+                actionDescriptor);
 
 
             var proxyControllerContext = new ControllerContext(actionContext);

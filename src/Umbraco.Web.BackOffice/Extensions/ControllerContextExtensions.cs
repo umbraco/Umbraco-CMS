@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Umbraco.Extensions
 {
@@ -20,7 +21,7 @@ namespace Umbraco.Extensions
             var actionDescriptor = controllerContext.ActionDescriptor;
 
             var filters = actionDescriptor.FilterDescriptors;
-            var filterGrouping = new FilterGrouping(filters);
+            var filterGrouping = new FilterGrouping(filters, controllerContext.HttpContext.RequestServices);
 
             // because the continuation gets built from the inside out we need to reverse the filter list
             // so that least specific filters (Global) get run first and the most specific filters (Action) get run last.
@@ -50,7 +51,7 @@ namespace Umbraco.Extensions
             foreach (var authorizationFilter in authorizationFilters)
             {
                 authorizationFilter.OnAuthorization(authorizationFilterContext);
-                if (authorizationFilterContext.Result == new ForbidResult())
+                if (!(authorizationFilterContext.Result is null))
                 {
                     return false;
                 }
@@ -60,7 +61,7 @@ namespace Umbraco.Extensions
             foreach (var asyncAuthorizationFilter in asyncAuthorizationFilters)
             {
                 await asyncAuthorizationFilter.OnAuthorizationAsync(authorizationFilterContext);
-                if (authorizationFilterContext.Result == new ForbidResult())
+                if (!(authorizationFilterContext.Result is null))
                 {
                     return false;
                 }
@@ -81,18 +82,18 @@ namespace Umbraco.Extensions
             private readonly List<IExceptionFilter> _exceptionFilters = new List<IExceptionFilter>();
             private readonly List<IAsyncExceptionFilter> _asyncExceptionFilters = new List<IAsyncExceptionFilter>();
 
-            public FilterGrouping(IEnumerable<FilterDescriptor> filters)
+            public FilterGrouping(IEnumerable<FilterDescriptor> filters, IServiceProvider serviceProvider)
             {
                 if (filters == null) throw new ArgumentNullException("filters");
 
                 foreach (FilterDescriptor f in filters)
                 {
                     var filter = f.Filter;
-                    Categorize(filter, _actionFilters);
-                    Categorize(filter, _authorizationFilters);
-                    Categorize(filter, _exceptionFilters);
-                    Categorize(filter, _asyncActionFilters);
-                    Categorize(filter, _asyncAuthorizationFilters);
+                    Categorize(filter, _actionFilters, serviceProvider);
+                    Categorize(filter, _authorizationFilters, serviceProvider);
+                    Categorize(filter, _exceptionFilters, serviceProvider);
+                    Categorize(filter, _asyncActionFilters, serviceProvider);
+                    Categorize(filter, _asyncAuthorizationFilters, serviceProvider);
                 }
             }
 
@@ -106,8 +107,13 @@ namespace Umbraco.Extensions
 
             public IEnumerable<IAsyncExceptionFilter> AsyncExceptionFilters => _asyncExceptionFilters;
 
-            private static void Categorize<T>(IFilterMetadata filter, List<T> list) where T : class
+            private static void Categorize<T>(IFilterMetadata filter, List<T> list, IServiceProvider serviceProvider) where T : class
             {
+                if(filter is TypeFilterAttribute typeFilterAttribute)
+                {
+                    filter = typeFilterAttribute.CreateInstance(serviceProvider);
+                }
+
                 T match = filter as T;
                 if (match != null)
                 {
