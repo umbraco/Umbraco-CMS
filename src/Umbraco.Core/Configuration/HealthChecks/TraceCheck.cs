@@ -1,24 +1,22 @@
 ﻿using System.Collections.Generic;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
+using Microsoft.Extensions.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
+using Umbraco.Web.HealthCheck;
+using Umbraco.Web.HealthCheck.Checks.Config;
 
-namespace Umbraco.Web.HealthCheck.Checks.Config
+namespace Umbraco.Core.Configuration.HealthChecks
 {
     [HealthCheck("9BED6EF4-A7F3-457A-8935-B64E9AA8BAB3", "Trace Mode",
         Description = "Leaving trace mode enabled can make valuable information about your system available to hackers.",
         Group = "Live Environment")]
     public class TraceCheck : AbstractConfigCheck
     {
-
-        public TraceCheck(ILocalizedTextService textService, IHostingEnvironment hostingEnvironment, ILogger logger)
-            : base(textService, hostingEnvironment, logger)
+        public TraceCheck(IConfiguration configuration, ILocalizedTextService textService, ILogger logger)
+        : base(configuration, textService, logger)
         { }
 
-        public override string FilePath => "~/Web.config";
-
-        public override string XPath => "/configuration/system.web/trace/@enabled";
+        public override string Key => "/configuration/system.web/trace/@enabled";
 
         public override ValueComparisonType ValueComparisonType => ValueComparisonType.ShouldEqual;
 

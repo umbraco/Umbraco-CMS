@@ -10,6 +10,6 @@ namespace Umbraco.Web.HealthCheck
         public string Name { get; set; }
 
         [DataMember(Name = "checks")]
-        public List<HealthCheck> Checks { get; set; }
+        public List<Core.HealthCheck.HealthCheck> Checks { get; set; }
     }
 }

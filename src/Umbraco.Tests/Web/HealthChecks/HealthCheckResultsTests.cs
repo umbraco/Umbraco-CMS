@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using NUnit.Framework;
 using Umbraco.Core.Configuration.HealthChecks;
+using Umbraco.Core.HealthCheck;
 using Umbraco.Web.HealthCheck;
 
 namespace Umbraco.Tests.Web.HealthChecks

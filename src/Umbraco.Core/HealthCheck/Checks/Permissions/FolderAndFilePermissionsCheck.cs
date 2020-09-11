@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Install;
 using Umbraco.Core.IO;
 using Umbraco.Core.Services;
+using Umbraco.Web.HealthCheck;
 
-namespace Umbraco.Web.HealthCheck.Checks.Permissions
+namespace Umbraco.Core.HealthCheck.Checks.Permissions
 {
     internal enum PermissionCheckRequirement
     {
@@ -26,7 +26,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Permissions
         "Folder & File Permissions",
         Description = "Checks that the web server folder and file permissions are set correctly for Umbraco to run.",
         Group = "Permissions")]
-    public class FolderAndFilePermissionsCheck : HealthCheck
+    public class FolderAndFilePermissionsCheck : Core.HealthCheck.HealthCheck
     {
         private readonly ILocalizedTextService _textService;
         private readonly IGlobalSettings _globalSettings;

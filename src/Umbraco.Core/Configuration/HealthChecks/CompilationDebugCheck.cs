@@ -1,23 +1,22 @@
 ﻿using System.Collections.Generic;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
+using Microsoft.Extensions.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
+using Umbraco.Web.HealthCheck;
+using Umbraco.Web.HealthCheck.Checks.Config;
 
-namespace Umbraco.Web.HealthCheck.Checks.Config
+namespace Umbraco.Core.Configuration.HealthChecks
 {
     [HealthCheck("61214FF3-FC57-4B31-B5CF-1D095C977D6D", "Debug Compilation Mode",
         Description = "Leaving debug compilation mode enabled can severely slow down a website and take up more memory on the server.",
         Group = "Live Environment")]
     public class CompilationDebugCheck : AbstractConfigCheck
     {
-        public CompilationDebugCheck(ILocalizedTextService textService, IHostingEnvironment hostingEnvironment, ILogger logger)
-            : base(textService, hostingEnvironment, logger)
+        public CompilationDebugCheck(IConfiguration configuration, ILocalizedTextService textService, ILogger logger)
+            : base(configuration, textService, logger)
         { }
 
-        public override string FilePath => "~/Web.config";
-
-        public override string XPath => "/configuration/system.web/compilation/@debug";
+        public override string Key => "/configuration/system.web/compilation/@debug";
 
         public override ValueComparisonType ValueComparisonType => ValueComparisonType.ShouldEqual;
 

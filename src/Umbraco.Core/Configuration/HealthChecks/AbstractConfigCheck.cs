@@ -1,38 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
+using Microsoft.Extensions.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
+using Umbraco.Web.HealthCheck;
+using Umbraco.Web.HealthCheck.Checks.Config;
 
-namespace Umbraco.Web.HealthCheck.Checks.Config
+namespace Umbraco.Core.Configuration.HealthChecks
 {
-    public abstract class AbstractConfigCheck : HealthCheck
+    public abstract class AbstractConfigCheck : HealthCheck.HealthCheck
     {
-        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ConfigurationService _configurationService;
 
         protected ILocalizedTextService TextService { get; }
         protected ILogger Logger { get; }
 
         /// <summary>
-        /// Gets the config file path.
+        /// Gets key within the JSON to check, in the colon-delimited format
+        /// https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-3.1
         /// </summary>
-        public abstract string FilePath { get; }
-
-        /// <summary>
-        /// Gets XPath statement to the config element to check.
-        /// </summary>
-        public abstract string XPath { get; }
+        public abstract string Key { get; }
 
         /// <summary>
         /// Gets the values to compare against.
         /// </summary>
         public abstract IEnumerable<AcceptableConfiguration> Values { get; }
 
-        /// <summary>
+        /// <summary>1
         /// Gets the current value
         /// </summary>
         public string CurrentValue { get; set; }
@@ -50,28 +45,15 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         /// <summary>
         /// Gets the flag indicating if the check is considered successful if the config value is missing (defaults to false - an error - if missing)
         /// </summary>
-        public virtual bool ValidIfConfigMissing
-        {
-            get { return false; }
-        }
+        public virtual bool ValidIfConfigMissing => false;
 
-        protected AbstractConfigCheck(ILocalizedTextService textService, IHostingEnvironment hostingEnvironment, ILogger logger)
+        protected AbstractConfigCheck(IConfiguration configuration, ILocalizedTextService textService, ILogger logger)
         {
-            _hostingEnvironment = hostingEnvironment;
             TextService = textService;
             Logger = logger;
-            _configurationService = new ConfigurationService(AbsoluteFilePath, XPath, textService, logger);
+            //TODO: observe virtual member call in constructor
+            _configurationService = new ConfigurationService(configuration, Key, textService, logger);
         }
-
-        /// <summary>
-        /// Gets the name of the file.
-        /// </summary>
-        private string FileName => Path.GetFileName(FilePath);
-
-        /// <summary>
-        /// Gets the absolute file path.
-        /// </summary>
-        private string AbsoluteFilePath => _hostingEnvironment.MapPathContentRoot(FilePath);
 
         /// <summary>
         /// Gets the message for when the check has succeeded.
@@ -81,7 +63,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
             get
             {
                 return TextService.Localize("healthcheck/checkSuccessMessage",
-                    new[] { CurrentValue, Values.First(v => v.IsRecommended).Value, XPath, AbsoluteFilePath  });
+                    new[] { CurrentValue, Values.First(v => v.IsRecommended).Value, Key  });
             }
         }
 
@@ -94,9 +76,9 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
             {
                 return ValueComparisonType == ValueComparisonType.ShouldEqual
                     ? TextService.Localize("healthcheck/checkErrorMessageDifferentExpectedValue",
-                        new[] { CurrentValue, Values.First(v => v.IsRecommended).Value, XPath, AbsoluteFilePath })
+                        new[] { CurrentValue, Values.First(v => v.IsRecommended).Value, Key })
                     : TextService.Localize("healthcheck/checkErrorMessageUnexpectedValue",
-                        new[] { CurrentValue, Values.First(v => v.IsRecommended).Value, XPath, AbsoluteFilePath });
+                        new[] { CurrentValue, Values.First(v => v.IsRecommended).Value, Key });
             }
         }
 
@@ -116,8 +98,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
                     {
                         CurrentValue,
                         rectifiedValue,
-                        XPath,
-                        AbsoluteFilePath
+                        Key
                     });
             }
         }
@@ -134,7 +115,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
 
         public override IEnumerable<HealthCheckStatus> GetStatus()
         {
-            var successMessage = string.Format(CheckSuccessMessage, FileName, XPath, Values);
+            var successMessage = string.Format(CheckSuccessMessage, Key, Values);
 
             var configValue = _configurationService.GetConfigurationValue();
             if (configValue.Success == false)
@@ -151,7 +132,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
             CurrentValue = configValue.Result;
 
             // need to update the successMessage with the CurrentValue
-            successMessage = string.Format(CheckSuccessMessage, FileName, XPath, Values, CurrentValue);
+            successMessage = string.Format(CheckSuccessMessage, Key, Values, CurrentValue);
 
             var valueFound = Values.Any(value => string.Equals(CurrentValue, value.Value, StringComparison.InvariantCultureIgnoreCase));
             if (ValueComparisonType == ValueComparisonType.ShouldEqual && valueFound || ValueComparisonType == ValueComparisonType.ShouldNotEqual && valueFound == false)
@@ -166,7 +147,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
                 ValueRequired = CanRectifyWithValue,
             };
 
-            var resultMessage = string.Format(CheckErrorMessage, FileName, XPath, Values, CurrentValue);
+            string resultMessage = string.Format(CheckErrorMessage, Key, Values, CurrentValue);
             return new[]
             {
                 new HealthCheckStatus(resultMessage)
@@ -219,7 +200,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
                 return new HealthCheckStatus(message) { ResultType = StatusResultType.Error };
             }
 
-            var resultMessage = string.Format(RectifySuccessMessage, FileName, XPath, Values);
+            string resultMessage = string.Format(RectifySuccessMessage, Key, Values);
             return new HealthCheckStatus(resultMessage) { ResultType = StatusResultType.Success };
         }
 

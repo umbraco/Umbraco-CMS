@@ -4,8 +4,9 @@ using System.Linq;
 using System.Text;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
+using Umbraco.Web.HealthCheck;
 
-namespace Umbraco.Web.HealthCheck.Checks.Data
+namespace Umbraco.Core.HealthCheck.Checks.Data
 {
     [HealthCheck(
         "73DD0C1C-E0CA-4C31-9564-1DCA509788AF",

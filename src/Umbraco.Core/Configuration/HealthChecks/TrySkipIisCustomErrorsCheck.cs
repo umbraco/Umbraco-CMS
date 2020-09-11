@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Configuration;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
+using Umbraco.Web.HealthCheck;
+using Umbraco.Web.HealthCheck.Checks.Config;
 
-namespace Umbraco.Web.HealthCheck.Checks.Config
+namespace Umbraco.Core.Configuration.HealthChecks
 {
+    //TODO: this is not currently in the appsettings.JSON
     [HealthCheck("046A066C-4FB2-4937-B931-069964E16C66", "Try Skip IIS Custom Errors",
         Description = "Starting with IIS 7.5, this must be set to true for Umbraco 404 pages to show. Otherwise, IIS will takeover and render its built-in error page.",
         Group = "Configuration")]
@@ -15,16 +18,14 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
     {
         private readonly Version _iisVersion;
 
-        public TrySkipIisCustomErrorsCheck(ILocalizedTextService textService, ILogger logger,
-            IHostingEnvironment hostingEnvironment)
-            : base(textService, hostingEnvironment, logger)
+        public TrySkipIisCustomErrorsCheck
+            (IConfiguration configuration, ILocalizedTextService textService, IHostingEnvironment hostingEnvironment, ILogger logger)
+            : base(configuration, textService, logger)
         {
             _iisVersion = hostingEnvironment.IISVersion;
         }
 
-        public override string FilePath => "~/Config/umbracoSettings.config";
-
-        public override string XPath => "/settings/web.routing/@trySkipIisCustomErrors";
+        public override string Key => "/settings/web.routing/@trySkipIisCustomErrors";
 
         public override ValueComparisonType ValueComparisonType => ValueComparisonType.ShouldEqual;
 

@@ -1,31 +1,30 @@
 ﻿using System;
-using System.IO;
-using System.Xml;
+using Microsoft.Extensions.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
+using Umbraco.Web.HealthCheck.Checks.Config;
 
-namespace Umbraco.Web.HealthCheck.Checks.Config
+namespace Umbraco.Core.Configuration.HealthChecks
 {
-    // TODO: Add config transform for when config with specified XPath is not found
-
     public class ConfigurationService
     {
-        private readonly string _configFilePath;
-        private readonly string _xPath;
+        private readonly string _key;
         private readonly ILocalizedTextService _textService;
         private readonly ILogger _logger;
+        private readonly IConfiguration _config;
+        private string appsettings => "appsettings.json";
 
-        /// <param name="configFilePath">The absolute file location of the configuration file</param>
-        /// <param name="xPath">The XPath to select the value</param>
+        /// <param name="configuration">The configuration (a</param>
+        /// <param name="key">The path to select the value from the JSON</param>
         /// <param name="textService"></param>
         /// <param name="logger"></param>
         /// <returns></returns>
-        public ConfigurationService(string configFilePath, string xPath, ILocalizedTextService textService, ILogger logger)
+        public ConfigurationService(IConfiguration configuration, string key, ILocalizedTextService textService, ILogger logger)
         {
-            _configFilePath = configFilePath;
-            _xPath = xPath;
+            _config = configuration;
             _textService = textService;
             _logger = logger;
+            _key = key;
         }
 
         /// <summary>
@@ -35,28 +34,26 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         {
             try
             {
-                if (File.Exists(_configFilePath) == false)
+                if (_config == null)
+                {
+                    return missingConfigResult();
+                }
+
+                string key = _config[_key];
+                if (key == null)
+                {
                     return new ConfigurationServiceResult
                     {
                         Success = false,
-                        Result = _textService.Localize("healthcheck/configurationServiceFileNotFound", new[] { _configFilePath })
+                        Result = _textService.Localize("healthcheck/configurationServiceNodeNotFound",
+                            new[] { _key, appsettings })
                     };
-
-                var xmlDocument = new XmlDocument();
-                xmlDocument.Load(_configFilePath);
-
-                var xmlNode = xmlDocument.SelectSingleNode(_xPath);
-                if (xmlNode == null)
-                    return new ConfigurationServiceResult
-                    {
-                        Success = false,
-                        Result = _textService.Localize("healthcheck/configurationServiceNodeNotFound", new[] { _xPath, _configFilePath })
-                    };
+                }
 
                 return new ConfigurationServiceResult
                 {
                     Success = true,
-                    Result = string.Format(xmlNode.Value ?? xmlNode.InnerText)
+                    Result = string.Format(key.IsNullOrWhiteSpace() ? _key : key)
                 };
             }
             catch (Exception ex)
@@ -71,6 +68,21 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         }
 
         /// <summary>
+        /// This should never happen since if the apsettings.json is missing, everything would fail
+        /// </summary>
+        /// <returns>File not found result</returns>
+        private ConfigurationServiceResult missingConfigResult()
+        {
+
+            return new ConfigurationServiceResult
+            {
+                Success = false,
+                Result = _textService.Localize("healthcheck/configurationServiceFileNotFound",
+                            new[] { appsettings })
+            };
+        }
+
+        /// <summary>
         /// Updates a value in a given configuration file with the given XPath
         /// </summary>
         /// <param name="value"></param>
@@ -79,35 +91,30 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         {
             try
             {
-                if (File.Exists(_configFilePath) == false)
-                    return new ConfigurationServiceResult
-                    {
-                        Success = false,
-                        Result = _textService.Localize("healthcheck/configurationServiceFileNotFound", new[] { _configFilePath })
-                    };
+                if (_config == null)
+                {
+                    return missingConfigResult();
+                }
 
-                var xmlDocument = new XmlDocument { PreserveWhitespace = true };
-                xmlDocument.Load(_configFilePath);
+                //var node = xmlDocument.SelectSingleNode(_xPath);
+                //if (node == null)
+                //    return new ConfigurationServiceResult
+                //    {
+                //        Success = false,
+                //        Result = _textService.Localize("healthcheck/configurationServiceNodeNotFound", new[] { _xPath, _configFilePath })
+                //    };
 
-                var node = xmlDocument.SelectSingleNode(_xPath);
-                if (node == null)
-                    return new ConfigurationServiceResult
-                    {
-                        Success = false,
-                        Result = _textService.Localize("healthcheck/configurationServiceNodeNotFound", new[] { _xPath, _configFilePath })
-                    };
+                //if (node.NodeType == XmlNodeType.Element)
+                //    node.InnerText = value;
+                //else
+                //    node.Value = value;
 
-                if (node.NodeType == XmlNodeType.Element)
-                    node.InnerText = value;
-                else
-                    node.Value = value;
-
-                xmlDocument.Save(_configFilePath);
+                //xmlDocument.Save(_configFilePath);
                 return new ConfigurationServiceResult { Success = true };
             }
             catch (Exception ex)
             {
-               _logger.Error<ConfigurationService>(ex, "Error trying to update configuration");
+                _logger.Error<ConfigurationService>(ex, "Error trying to update configuration");
                 return new ConfigurationServiceResult
                 {
                     Success = false,

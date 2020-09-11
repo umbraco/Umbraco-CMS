@@ -300,7 +300,7 @@ namespace Umbraco.Core.Runtime
 
             // register *all* checks, except those marked [HideFromTypeFinder] of course
             composition.HealthChecks()
-                .Add(() => composition.TypeLoader.GetTypes<HealthCheck>());
+                .Add(() => composition.TypeLoader.GetTypes<HealthCheck.HealthCheck>());
 
 
             composition.WithCollectionBuilder<HealthCheckNotificationMethodCollectionBuilder>()

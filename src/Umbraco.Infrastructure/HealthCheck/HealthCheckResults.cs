@@ -16,7 +16,7 @@ namespace Umbraco.Web.HealthCheck
 
         private ILogger Logger => Current.Logger; // TODO: inject
 
-        public HealthCheckResults(IEnumerable<HealthCheck> checks)
+        public HealthCheckResults(IEnumerable<Core.HealthCheck.HealthCheck> checks)
         {
             _results = checks.ToDictionary(
                 t => t.Name,

@@ -12,7 +12,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
         "Excessive Headers",
         Description = "Checks to see if your site is revealing information in its headers that gives away unnecessary details about the technology used to build and host it.",
         Group = "Security")]
-    public class ExcessiveHeadersCheck : HealthCheck
+    public class ExcessiveHeadersCheck : Core.HealthCheck.HealthCheck
     {
         private readonly ILocalizedTextService _textService;
         private readonly IRequestAccessor _requestAccessor;

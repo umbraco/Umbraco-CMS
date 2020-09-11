@@ -83,7 +83,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             return check.ExecuteAction(action);
         }
 
-        private HealthCheck.HealthCheck GetCheckById(Guid id)
+        private Core.HealthCheck.HealthCheck GetCheckById(Guid id)
         {
             var check = _checks
                 .Where(x => _disabledCheckIds.Contains(x.Id) == false)

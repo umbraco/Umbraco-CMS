@@ -1,8 +1,9 @@
-﻿using Umbraco.Core;
-using Umbraco.Core.IO;
+﻿using Microsoft.Extensions.Configuration;
 using Umbraco.Core.Services;
+using Umbraco.Web;
+using Umbraco.Web.HealthCheck;
 
-namespace Umbraco.Web.HealthCheck.Checks.Security
+namespace Umbraco.Core.HealthCheck.Checks.Security
 {
     [HealthCheck(
         "ED0D7E40-971E-4BE8-AB6D-8CC5D0A6A5B0",
@@ -11,8 +12,8 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
         Group = "Security")]
     public class ClickJackingCheck : BaseHttpHeaderCheck
     {
-        public ClickJackingCheck(IRequestAccessor requestAccessor, ILocalizedTextService textService, IIOHelper ioHelper)
-            : base(requestAccessor, textService, "X-Frame-Options", "sameorigin", "clickJacking", true, ioHelper)
+        public ClickJackingCheck(IConfiguration configuration, IRequestAccessor requestAccessor, ILocalizedTextService textService)
+            : base(configuration, requestAccessor, textService, "X-Frame-Options", "sameorigin", "clickJacking", true)
         {
         }
     }

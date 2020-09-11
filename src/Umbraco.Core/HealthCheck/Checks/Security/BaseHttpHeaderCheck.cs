@@ -4,13 +4,12 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
-using System.Xml.Linq;
-using System.Xml.XPath;
-using Umbraco.Core;
-using Umbraco.Core.IO;
+using Microsoft.Extensions.Configuration;
 using Umbraco.Core.Services;
+using Umbraco.Web;
+using Umbraco.Web.HealthCheck;
 
-namespace Umbraco.Web.HealthCheck.Checks.Security
+namespace Umbraco.Core.HealthCheck.Checks.Security
 {
     public abstract class BaseHttpHeaderCheck : HealthCheck
     {
@@ -23,16 +22,17 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
         private readonly string _localizedTextPrefix;
         private readonly bool _metaTagOptionAvailable;
         private readonly IRequestAccessor _requestAccessor;
-        private readonly IIOHelper _ioHelper;
+        private readonly IConfiguration _configuration;
 
         protected BaseHttpHeaderCheck(
+            IConfiguration configuration,
             IRequestAccessor requestAccessor,
             ILocalizedTextService textService,
-            string header, string value, string localizedTextPrefix, bool metaTagOptionAvailable, IIOHelper ioHelper)
+            string header, string value, string localizedTextPrefix, bool metaTagOptionAvailable)
         {
             TextService = textService ?? throw new ArgumentNullException(nameof(textService));
+            _configuration = configuration;
             _requestAccessor = requestAccessor;
-            _ioHelper = ioHelper;
             _header = header;
             _value = value;
             _localizedTextPrefix = localizedTextPrefix;
@@ -72,7 +72,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
             var success = false;
 
             // Access the site home page and check for the click-jack protection header or meta tag
-            var url =  _requestAccessor.GetApplicationUrl();
+            var url = _requestAccessor.GetApplicationUrl();
             var request = WebRequest.Create(url);
             request.Method = "GET";
             try
@@ -158,7 +158,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
             }
 
             return
-                new HealthCheckStatus(TextService.Localize("healthcheck/setHeaderInConfigError", new [] { errorMessage }))
+                new HealthCheckStatus(TextService.Localize("healthcheck/setHeaderInConfigError", new[] { errorMessage }))
                 {
                     ResultType = StatusResultType.Error
                 };
@@ -170,43 +170,42 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
             {
                 // There don't look to be any useful classes defined in https://msdn.microsoft.com/en-us/library/system.web.configuration(v=vs.110).aspx
                 // for working with the customHeaders section, so working with the XML directly.
-                var configFile = _ioHelper.MapPath("~/Web.config");
-                var doc = XDocument.Load(configFile);
-                var systemWebServerElement = doc.XPathSelectElement("/configuration/system.webServer");
-                var httpProtocolElement = systemWebServerElement.Element("httpProtocol");
+                //TODO: Custom headers for appsettings
+                //TODO: pass section in instead
+                //TODO: correct logic according to JSON structure
+                IConfigurationSection systemWebServerElement = _configuration.GetSection("system.webServer");
+                string httpProtocolElement = systemWebServerElement["httpProtocol"];
                 if (httpProtocolElement == null)
                 {
-                    httpProtocolElement = new XElement("httpProtocol");
-                    systemWebServerElement.Add(httpProtocolElement);
+                    //TODO: add httpProtocol to JSON
                 }
 
-                var customHeadersElement = httpProtocolElement.Element("customHeaders");
+                var customHeadersElement = systemWebServerElement["customHeaders"];
                 if (customHeadersElement == null)
                 {
-                    customHeadersElement = new XElement("customHeaders");
-                    httpProtocolElement.Add(customHeadersElement);
+                    //TODO: customHeaders to JSON
                 }
 
-                var removeHeaderElement = customHeadersElement.Elements("remove")
-                    .SingleOrDefault(x => x.Attribute("name")?.Value.Equals(_value, StringComparison.InvariantCultureIgnoreCase) == true);
-                if (removeHeaderElement == null)
-                {
-                    customHeadersElement.Add(
-                        new XElement("remove",
-                            new XAttribute("name", _header)));
-                }
+                //var removeHeaderElement = customHeadersElement.Elements("remove")
+                //    .SingleOrDefault(x => x.Attribute("name")?.Value.Equals(_value, StringComparison.InvariantCultureIgnoreCase) == true);
+                //if (removeHeaderElement == null)
+                //{
+                //    customHeadersElement.Add(
+                //        new XElement("remove",
+                //            new XAttribute("name", _header)));
+                //}
 
-                var addHeaderElement = customHeadersElement.Elements("add")
-                    .SingleOrDefault(x => x.Attribute("name")?.Value.Equals(_header, StringComparison.InvariantCultureIgnoreCase) == true);
-                if (addHeaderElement == null)
-                {
-                    customHeadersElement.Add(
-                        new XElement("add",
-                            new XAttribute("name", _header),
-                            new XAttribute("value", _value)));
-                }
+                //var addHeaderElement = customHeadersElement.Elements("add")
+                //    .SingleOrDefault(x => x.Attribute("name")?.Value.Equals(_header, StringComparison.InvariantCultureIgnoreCase) == true);
+                //if (addHeaderElement == null)
+                //{
+                //    customHeadersElement.Add(
+                //        new XElement("add",
+                //            new XAttribute("name", _header),
+                //            new XAttribute("value", _value)));
+                //}
 
-                doc.Save(configFile);
+                //TODO: save config
 
                 errorMessage = string.Empty;
                 return true;
