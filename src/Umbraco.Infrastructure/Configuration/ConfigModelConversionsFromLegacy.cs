@@ -50,14 +50,6 @@ namespace Umbraco.Infrastructure.Configuration
             };
         }
 
-        public static ConnectionStrings ConvertConnectionStrings(IConnectionStrings connectionStrings)
-        {
-            return new ConnectionStrings
-            {
-                UmbracoConnectionString = connectionStrings[Constants.System.UmbracoConnectionName].ConnectionString
-            };
-        }
-
         public static UserPasswordConfigurationSettings ConvertUserPasswordConfiguration(IUserPasswordConfiguration passwordConfiguration)
         {
             return new UserPasswordConfigurationSettings

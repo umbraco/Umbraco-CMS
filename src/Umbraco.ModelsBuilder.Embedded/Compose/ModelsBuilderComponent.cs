@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Reflection;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Options;
 using Umbraco.Configuration;
+using Umbraco.Configuration.Legacy;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
@@ -20,7 +22,7 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
 {
     internal class ModelsBuilderComponent : IComponent
     {
-        private readonly IModelsBuilderConfig _config;
+        private readonly ModelsBuilderConfig _config;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly LiveModelsProvider _liveModelsProvider;
         private readonly OutOfDateModelsStatus _outOfDateModels;
@@ -28,11 +30,11 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
         private readonly IUmbracoApplicationLifetime _umbracoApplicationLifetime;
         private readonly IUmbracoRequestLifetime _umbracoRequestLifetime;
 
-        public ModelsBuilderComponent(IModelsBuilderConfig config, IShortStringHelper shortStringHelper,
+        public ModelsBuilderComponent(IOptions<ModelsBuilderConfig> config, IShortStringHelper shortStringHelper,
             LiveModelsProvider liveModelsProvider, OutOfDateModelsStatus outOfDateModels, LinkGenerator linkGenerator,
             IUmbracoRequestLifetime umbracoRequestLifetime, IUmbracoApplicationLifetime umbracoApplicationLifetime)
         {
-            _config = config;
+            _config = config.Value;
             _shortStringHelper = shortStringHelper;
             _liveModelsProvider = liveModelsProvider;
             _outOfDateModels = outOfDateModels;
@@ -76,7 +78,7 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
         private void InstallServerVars()
         {
             // register our url - for the backoffice api
-            ServerVariablesParser.Parsing += ServerVariablesParser_Parsing;                
+            ServerVariablesParser.Parsing += ServerVariablesParser_Parsing;
         }
 
         private void ServerVariablesParser_Parsing(object sender, Dictionary<string, object> serverVars)

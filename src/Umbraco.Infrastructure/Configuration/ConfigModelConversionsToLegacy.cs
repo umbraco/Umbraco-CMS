@@ -49,13 +49,6 @@ namespace Umbraco.Infrastructure.Configuration
             };
         }
 
-        public static IConnectionStrings ConvertConnectionStrings(ConnectionStrings connectionStrings)
-        {
-            var result = new TestConnectionStrings();
-            result.AddEntry(Constants.System.UmbracoConnectionName, connectionStrings.UmbracoConnectionString);
-            return result;
-        }
-
         public static IUserPasswordConfiguration ConvertUserPasswordConfiguration(UserPasswordConfigurationSettings passwordConfiguration)
         {
             return new TestUserPasswordConfiguration
@@ -131,18 +124,6 @@ namespace Umbraco.Infrastructure.Configuration
             public string Username { get; set; }
 
             public string Password { get; set; }
-        }
-
-        private class TestConnectionStrings : IConnectionStrings
-        {
-            private IDictionary<string, ConfigConnectionString> _dictionary = new Dictionary<string, ConfigConnectionString>();
-
-            public ConfigConnectionString this[string key] => _dictionary[key];
-
-            public void AddEntry(string key, string connectionString)
-            {
-                _dictionary.Add(key, new ConfigConnectionString(connectionString, string.Empty, key));
-            }
         }
 
         private class TestUserPasswordConfiguration : IUserPasswordConfiguration

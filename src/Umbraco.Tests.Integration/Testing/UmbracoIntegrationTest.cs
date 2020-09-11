@@ -87,6 +87,8 @@ namespace Umbraco.Tests.Integration.Testing
             Services = host.Services;
             var app = new ApplicationBuilder(host.Services);
             Configure(app);
+
+            OnFixtureTearDown(() => host.Dispose());
         }
 
         #region Generic Host Builder and Runtime

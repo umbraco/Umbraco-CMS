@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Configuration.Models;
@@ -11,9 +12,9 @@ namespace Umbraco.ModelsBuilder.Embedded
         private readonly ModelsBuilderConfig _config;
         private readonly IHostingEnvironment _hostingEnvironment;
 
-        public OutOfDateModelsStatus(ModelsBuilderConfig config, IHostingEnvironment hostingEnvironment)
+        public OutOfDateModelsStatus(IOptions<ModelsBuilderConfig> config, IHostingEnvironment hostingEnvironment)
         {
-            _config = config;
+            _config = config.Value;
             _hostingEnvironment = hostingEnvironment;
         }
 
