@@ -33,51 +33,49 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 .Where<ExternalLoginDto>(x => x.UserId == userId)
                 .ForUpdate();
 
+            // deduplicate the logins
+            logins = logins.DistinctBy(x => x.ProviderKey + x.LoginProvider).ToList();
+
             var toUpdate = new Dictionary<int, IExternalLogin>();
             var toDelete = new List<int>();
             var toInsert = new List<IExternalLogin>(logins);
 
-            var existingLogins = Database.Fetch<ExternalLoginDto>(sql);
+            var existingLogins = Database.Query<ExternalLoginDto>(sql).OrderByDescending(x => x.CreateDate).ToList();
+            // used to track duplicates so they can be removed
+            var keys = new HashSet<(string, string)>();
+            
             foreach (var existing in existingLogins)
             {
-                var found = logins.FirstOrDefault(x =>
-                    x.LoginProvider.Equals(existing.LoginProvider, StringComparison.InvariantCultureIgnoreCase)
-                    && x.ProviderKey.Equals(existing.ProviderKey, StringComparison.InvariantCultureIgnoreCase));
-
-                if (found != null)
+                if (!keys.Add((existing.ProviderKey, existing.LoginProvider)))
                 {
-                    toUpdate.Add(existing.Id, found);
-                    // if it's an update then it's not an insert
-                    toInsert.RemoveAll(x => x.ProviderKey == found.ProviderKey && x.LoginProvider == found.LoginProvider);
+                    // if it already exists we need to remove this one
+                    toDelete.Add(existing.Id);
                 }
                 else
                 {
-                    toDelete.Add(existing.Id);
+                    var found = logins.FirstOrDefault(x =>
+                    x.LoginProvider.Equals(existing.LoginProvider, StringComparison.InvariantCultureIgnoreCase)
+                    && x.ProviderKey.Equals(existing.ProviderKey, StringComparison.InvariantCultureIgnoreCase));
+
+                    if (found != null)
+                    {
+                        toUpdate.Add(existing.Id, found);
+                        // if it's an update then it's not an insert
+                        toInsert.RemoveAll(x => x.ProviderKey == found.ProviderKey && x.LoginProvider == found.LoginProvider);
+                    }
+                    else
+                    {
+                        toDelete.Add(existing.Id);
+                    }
                 }
             }
 
-            // do the deletes (does this syntax work?)
-            Database.DeleteMany<ExternalLoginDto>().Where(x => toDelete.Contains(x.Id)).Execute();
+            // do the deletes, updates and inserts
+            if (toDelete.Count > 0)
+                Database.DeleteMany<ExternalLoginDto>().Where(x => toDelete.Contains(x.Id)).Execute();
             foreach (var u in toUpdate)
-            {
-                Database.Update(new ExternalLoginDto
-                {
-                    Id = u.Key,
-                    LoginProvider = u.Value.LoginProvider,
-                    ProviderKey = u.Value.ProviderKey,
-                    UserId = userId,
-                    CreateDate = DateTime.Now
-                });
-            }
-            // add the inserts
-            Database.InsertBulk(toInsert.Select(i => new ExternalLoginDto
-            {
-                LoginProvider = i.LoginProvider,
-                ProviderKey = i.ProviderKey,
-                UserId = userId,
-                UserData = i.UserData,
-                CreateDate = DateTime.Now
-            }));
+                Database.Update(ExternalLoginFactory.BuildDto(userId, u.Value, u.Key));
+            Database.InsertBulk(toInsert.Select(i => ExternalLoginFactory.BuildDto(userId, i)));
         }
 
         public void SaveUserLogins(int memberId, IEnumerable<UserLoginInfo> logins)
@@ -145,7 +143,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             foreach (var dto in dtos)
             {
-                yield return Get(dto.Id);
+                yield return ExternalLoginFactory.BuildEntity(dto);
             }
         }
 

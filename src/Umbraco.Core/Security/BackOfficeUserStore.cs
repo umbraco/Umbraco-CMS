@@ -115,7 +115,7 @@ namespace Umbraco.Core.Security
         /// </summary>
         /// <param name="user"/>
         /// <returns/>
-        public async Task UpdateAsync(BackOfficeIdentityUser user)
+        public Task UpdateAsync(BackOfficeIdentityUser user)
         {
             ThrowIfDisposed();
             if (user == null) throw new ArgumentNullException(nameof(user));
@@ -125,6 +125,8 @@ namespace Umbraco.Core.Security
             {
                 throw new InvalidOperationException("The user id must be an integer to work with the Umbraco");
             }
+
+            // TODO: Wrap this in a scope!
 
             var found = _userService.GetUserById(asInt.Result);
             if (found != null)
@@ -139,10 +141,16 @@ namespace Umbraco.Core.Security
 
                 if (isLoginsPropertyDirty)
                 {
-                    var logins = await GetLoginsAsync(user);
-                    _externalLoginService.Save(found.Id, logins.Select(x => new ExternalLogin(x.LoginProvider, x.ProviderKey)));
+                    _externalLoginService.Save(
+                        found.Id,
+                        user.Logins.Select(x => new ExternalLogin(
+                            x.LoginProvider,
+                            x.ProviderKey,
+                            (x is IIdentityUserLoginExtended extended) ? extended.UserData : null)));                    
                 }
             }
+
+            return Task.CompletedTask;
         }
 
         /// <summary>

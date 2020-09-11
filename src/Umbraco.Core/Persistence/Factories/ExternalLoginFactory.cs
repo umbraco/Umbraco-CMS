@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Models.Identity;
+﻿using System;
+using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Persistence.Dtos;
 
 namespace Umbraco.Core.Persistence.Factories
@@ -28,6 +29,21 @@ namespace Umbraco.Core.Persistence.Factories
                 ProviderKey = entity.ProviderKey,
                 UserId = entity.UserId,
                 UserData = asExtended?.UserData
+            };
+
+            return dto;
+        }
+
+        public static ExternalLoginDto BuildDto(int userId, IExternalLogin entity, int? id = null)
+        {
+            var dto = new ExternalLoginDto
+            {
+                Id = id ?? default,
+                UserId = userId,
+                LoginProvider = entity.LoginProvider,
+                ProviderKey = entity.ProviderKey,
+                UserData = entity.UserData,
+                CreateDate = DateTime.Now
             };
 
             return dto;

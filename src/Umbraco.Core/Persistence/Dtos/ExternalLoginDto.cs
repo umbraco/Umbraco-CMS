@@ -17,6 +17,8 @@ namespace Umbraco.Core.Persistence.Dtos
         [Column("userId")]
         public int UserId { get; set; }
 
+        // TODO: There should be an index on both LoginProvider and ProviderKey
+
         [Column("loginProvider")]
         [Length(4000)]
         [NullSetting(NullSetting = NullSettings.NotNull)]
@@ -35,8 +37,8 @@ namespace Umbraco.Core.Persistence.Dtos
         /// Used to store any arbitrary data for the user and external provider - like user tokens returned from the provider
         /// </summary>
         [Column("userData")]
-        [Length(4000)]
         [NullSetting(NullSetting = NullSettings.Null)]
+        [SpecialDbType(SpecialDbTypes.NTEXT)]
         public string UserData { get; set; }
     }
 }

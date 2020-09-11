@@ -390,7 +390,7 @@ namespace Umbraco.Web.Editors
             if (response == null) throw new ArgumentNullException("response");
             ExternalSignInAutoLinkOptions autoLinkOptions = null;
 
-            //Here we can check if the provider associated with the request has been configured to allow
+            // Here we can check if the provider associated with the request has been configured to allow
             // new users (auto-linked external accounts). This would never be used with public providers such as
             // Google, unless you for some reason wanted anybody to be able to access the backend if they have a Google account
             // .... not likely!
@@ -408,12 +408,6 @@ namespace Umbraco.Web.Editors
             var user = await UserManager.FindAsync(loginInfo.Login);
             if (user != null)
             {
-                // TODO: It might be worth keeping some of the claims associated with the ExternalLoginInfo, in which case we
-                // wouldn't necessarily sign the user in here with the standard login, instead we'd update the
-                // UseUmbracoBackOfficeExternalCookieAuthentication extension method to have the correct provider and claims factory,
-                // ticket format, etc.. to create our back office user including the claims assigned and in this method we'd just ensure
-                // that the ticket is created and stored and that the user is logged in.
-
                 var shouldSignIn = true;
                 if (autoLinkOptions != null && autoLinkOptions.OnExternalLogin != null)
                 {
