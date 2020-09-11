@@ -256,8 +256,7 @@ namespace Umbraco.Web.Trees
         private async Task<object> GetApiControllerProxy(Type controllerType, string action, FormCollection querystring)
         {
             // note: this is all required in order to execute the auth-filters for the sub request, we
-            // need to "trick" web-api into thinking that it is actually executing the proxied controller.
-
+            // need to "trick" mvc into thinking that it is actually executing the proxied controller.
 
             var controllerName = controllerType.Name.Substring(0, controllerType.Name.Length - 10); // remove controller part of name;
             // create proxy route data specifying the action & controller to execute
@@ -265,7 +264,6 @@ namespace Umbraco.Web.Trees
             {
                 ["action"] = action,
                 ["controller"] = controllerName
-
             });
             if (!(querystring is null))
             {
@@ -281,18 +279,8 @@ namespace Umbraco.Web.Trees
                     x.ControllerName.Equals(controllerName) &&
                     x.ActionName == action);
 
-            // var actionDescriptorCandidates = _actionSelector.SelectCandidates(routeContext);
-            // var actionDescriptor = _actionSelector.SelectBestCandidate(routeContext, actionDescriptorCandidates);
-
-            //TODO create real proxy of the controller context https://github.com/aspnet/Mvc/issues/5190
-            var actionContext = new ActionContext(
-                HttpContext,
-                routeData,
-                actionDescriptor);
-
-
+            var actionContext = new ActionContext(HttpContext, routeData, actionDescriptor);
             var proxyControllerContext = new ControllerContext(actionContext);
-
             var controller = (TreeController) _controllerFactory.CreateController(proxyControllerContext);
 
              var isAllowed = await controller.ControllerContext.InvokeAuthorizationFiltersForRequest(actionContext);
