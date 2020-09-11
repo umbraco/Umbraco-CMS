@@ -90,6 +90,7 @@ namespace Umbraco.Tests.Integration.TestServerTest
         {
             var url = LinkGenerator.GetUmbracoApiService<T>(methodSelector);
 
+            var webSecurityFactory = GetRequiredService<IWebSecurityFactory>();
             var umbracoContextFactory = GetRequiredService<IUmbracoContextFactory>();
             var httpContextAccessor = GetRequiredService<IHttpContextAccessor>();
 
@@ -104,6 +105,7 @@ namespace Umbraco.Tests.Integration.TestServerTest
                 }
             };
 
+            webSecurityFactory.EnsureWebSecurity();
             umbracoContextFactory.EnsureUmbracoContext();
 
             return url;

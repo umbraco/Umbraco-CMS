@@ -81,7 +81,7 @@ namespace Umbraco.Tests.Integration.Testing
         {
             var hostBuilder = CreateHostBuilder();
             var host = await hostBuilder.StartAsync();
-            Services = host.Services;            
+            Services = host.Services;
             var app = new ApplicationBuilder(host.Services);
             Configure(app);
         }
@@ -141,7 +141,7 @@ namespace Umbraco.Tests.Integration.Testing
                 logger,
                 profiler,
                 hostingEnvironment,
-                backOfficeInfo,                
+                backOfficeInfo,
                 typeFinder,
                 appCaches,
                 dbProviderFactoryCreator,
@@ -181,7 +181,7 @@ namespace Umbraco.Tests.Integration.Testing
                 profiler,
                 Mock.Of<IUmbracoBootPermissionChecker>(),
                 hostingEnvironment,
-                backOfficeInfo, 
+                backOfficeInfo,
                 dbProviderFactoryCreator,
                 mainDom,
                 typeFinder,
@@ -227,6 +227,7 @@ namespace Umbraco.Tests.Integration.Testing
 
         public virtual void Configure(IApplicationBuilder app)
         {
+            Services.GetRequiredService<IWebSecurityFactory>().EnsureWebSecurity();
             Services.GetRequiredService<IUmbracoContextFactory>().EnsureUmbracoContext();
 
             // get the currently set ptions

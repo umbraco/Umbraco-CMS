@@ -18,6 +18,7 @@
  using Umbraco.Core.IO;
  using Umbraco.Core.Mapping;
  using Umbraco.Core.Models;
+ using Umbraco.Core.Security;
  using Umbraco.Core.Strings;
  using Umbraco.Tests.Integration.Testing;
  using Umbraco.Tests.TestHelpers.Entities;
@@ -138,12 +139,14 @@
          public void Validating_ContentItemSave()
          {
              var logger = Services.GetRequiredService<ILogger>();
-             var webSecurity = Services.GetRequiredService<IWebSecurity>();
+             var webSecurityFactory = Services.GetRequiredService<IWebSecurityFactory>();
+             webSecurityFactory.EnsureWebSecurity();
+             var webSecurityAccessor = Services.GetRequiredService<IWebSecurityAccessor>();
              var localizedTextService = Services.GetRequiredService<ILocalizedTextService>();
              var propertyValidationService = Services.GetRequiredService<IPropertyValidationService>();
              var umbracoMapper = Services.GetRequiredService<UmbracoMapper>();
 
-             var validator = new ContentSaveModelValidator(logger, webSecurity, localizedTextService, propertyValidationService);
+             var validator = new ContentSaveModelValidator(logger, webSecurityAccessor.WebSecurity, localizedTextService, propertyValidationService);
 
              var content = MockedContent.CreateTextpageContent(_contentType, "test", -1);
 

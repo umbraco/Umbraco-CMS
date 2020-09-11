@@ -39,6 +39,8 @@ namespace Umbraco.Tests.Integration
         {
             var httpContextAccessor = Mock.Of<IHttpContextAccessor>();
             var hostingEnvironment = Mock.Of<IHostingEnvironment>();
+            var webSecurityAccessor = Mock.Of<IWebSecurityAccessor>();
+            Mock.Get(webSecurityAccessor).Setup(x => x.WebSecurity).Returns(Mock.Of<IWebSecurity>());
             var globalSettings = new GlobalSettingsBuilder().Build();
 
             var umbracoContextFactory = new UmbracoContextFactory(
@@ -53,7 +55,7 @@ namespace Umbraco.Tests.Integration
                 httpContextAccessor,
                 Mock.Of<ICookieManager>(),
                 Mock.Of<IRequestAccessor>(),
-                Mock.Of<IWebSecurityAccessor>());
+                webSecurityAccessor);
 
             var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext();
             var umbracoContext = umbracoContextReference.UmbracoContext;
@@ -73,7 +75,8 @@ namespace Umbraco.Tests.Integration
             var globalSettings = new GlobalSettingsBuilder().Build();
             var httpContextAccessor = Mock.Of<IHttpContextAccessor>();
             var hostingEnvironment = Mock.Of<IHostingEnvironment>();
-
+            var webSecurityAccessor = Mock.Of<IWebSecurityAccessor>();
+            Mock.Get(webSecurityAccessor).Setup(x => x.WebSecurity).Returns(Mock.Of<IWebSecurity>());
             var umbracoContextFactory = new UmbracoContextFactory(
                 _umbracoContextAccessor,
                 Mock.Of<IPublishedSnapshotService>(),
@@ -86,7 +89,7 @@ namespace Umbraco.Tests.Integration
                 httpContextAccessor,
                 Mock.Of<ICookieManager>(),
                 Mock.Of<IRequestAccessor>(),
-                Mock.Of<IWebSecurityAccessor>());
+                webSecurityAccessor);
 
             var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext();
             var umbCtx = umbracoContextReference.UmbracoContext;
@@ -105,7 +108,8 @@ namespace Umbraco.Tests.Integration
             publishedSnapshot.Setup(x => x.Members).Returns(Mock.Of<IPublishedMemberCache>());
             var content = new Mock<IPublishedContent>();
             content.Setup(x => x.Id).Returns(2);
-
+            var webSecurityAccessor = Mock.Of<IWebSecurityAccessor>();
+            Mock.Get(webSecurityAccessor).Setup(x => x.WebSecurity).Returns(Mock.Of<IWebSecurity>());
             var publishedSnapshotService = new Mock<IPublishedSnapshotService>();
             var httpContextAccessor = Mock.Of<IHttpContextAccessor>();
             var hostingEnvironment = Mock.Of<IHostingEnvironment>();
@@ -123,7 +127,7 @@ namespace Umbraco.Tests.Integration
                 httpContextAccessor,
                 Mock.Of<ICookieManager>(),
                 Mock.Of<IRequestAccessor>(),
-                Mock.Of<IWebSecurityAccessor>());
+                webSecurityAccessor);
 
             var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext();
             var umbracoContext = umbracoContextReference.UmbracoContext;
@@ -147,7 +151,8 @@ namespace Umbraco.Tests.Integration
             var globalSettings = new GlobalSettingsBuilder().Build();
             var httpContextAccessor = Mock.Of<IHttpContextAccessor>();
             var hostingEnvironment = Mock.Of<IHostingEnvironment>();
-
+            var webSecurityAccessor = Mock.Of<IWebSecurityAccessor>();
+            Mock.Get(webSecurityAccessor).Setup(x => x.WebSecurity).Returns(Mock.Of<IWebSecurity>());
             var umbracoContextFactory = new UmbracoContextFactory(
                 _umbracoContextAccessor,
                 Mock.Of<IPublishedSnapshotService>(),
@@ -160,7 +165,7 @@ namespace Umbraco.Tests.Integration
                 httpContextAccessor,
                 Mock.Of<ICookieManager>(),
                 Mock.Of<IRequestAccessor>(),
-                Mock.Of<IWebSecurityAccessor>());
+                webSecurityAccessor);
 
             var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext();
             var umbracoContext = umbracoContextReference.UmbracoContext;
