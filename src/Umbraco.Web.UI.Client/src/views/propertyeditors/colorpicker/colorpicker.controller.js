@@ -60,7 +60,7 @@ function ColorPickerController($scope, $timeout) {
             var newColor = color ? color.value : null;
             $scope.propertyForm.selectedColor.$setViewValue(newColor);
         });
-    }
+    };
 
     // Method required by the valPropertyValidator directive (returns true if the property editor has at least one color selected)
     $scope.validateMandatory = function () {
@@ -74,8 +74,7 @@ function ColorPickerController($scope, $timeout) {
             errorMsg: $scope.model.validation.mandatoryMessage || "Value cannot be empty",
             errorKey: "required"
         };
-    }
-    $scope.isConfigured = $scope.model.config && $scope.model.config.items && _.keys($scope.model.config.items).length > 0;
+    };
 
     // Finds the color best matching the model's color,
     // and sets the model color to that one. This is useful when
