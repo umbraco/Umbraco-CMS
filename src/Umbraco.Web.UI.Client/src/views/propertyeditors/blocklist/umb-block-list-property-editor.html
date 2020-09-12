@@ -36,13 +36,13 @@
         <input type="hidden" name="maxCount_{{vm.model.alias}}_{{vm.uniqueId}}" ng-model="vm.layout" val-server="maxCount" />
 
         <div ng-messages="vm.propertyForm['minCount_' + vm.model.alias + '_' + vm.uniqueId].$error" show-validation-on-submit>
-            <div class="help text-error" ng-message="minCount">
+            <div class="help text-error" ng-message="'minCount_' + vm.model.alias + '_' + vm.uniqueId">
                 <localize key="validation_entriesShort" tokens="[vm.validationLimit.min, vm.validationLimit.min - vm.layout.length]" watch-tokens="true">Minimum %0% entries, needs <strong>%1%</strong> more.</localize>
             </div>
             <span class="help-inline" ng-message="valServer" ng-bind-html="vm.propertyForm[minCount + '_' + vm.model.alias + '_' + vm.uniqueId].errorMsg">></span>
         </div>
         <div ng-messages="vm.propertyForm['maxCount _' + vm.model.alias + '_' + vm.uniqueId].$error" show-validation-on-submit>
-            <div class="help text-error" ng-message="maxCount">
+            <div class="help text-error" ng-message="'maxCount_' + vm.model.alias + '_' + vm.uniqueId">
                 <localize key="validation_entriesExceed" tokens="[vm.validationLimit.max, vm.layout.length - vm.validationLimit.max]" watch-tokens="true">Maximum %0% entries, <strong>%1%</strong> too many.</localize>
             </div>
             <span class="help-inline" ng-message="valServer" ng-bind-html="vm.propertyForm[maxCount + '_' + vm.model.alias + '_' + vm.uniqueId].errorMsg"></span>
