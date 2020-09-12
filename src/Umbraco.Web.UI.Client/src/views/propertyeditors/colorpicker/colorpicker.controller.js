@@ -1,5 +1,7 @@
 function ColorPickerController($scope, $timeout) {
 
+    var vm = this;
+
     //setup the default config
     var config = {
         items: [],
@@ -57,7 +59,7 @@ function ColorPickerController($scope, $timeout) {
         $scope.model.config.items = items;
     }
 
-    $scope.selectColor = function (color) {
+    vm.selectColor = function (color) {
         // this is required to re-validate
         $timeout(function () {
             var newColor = color ? color.value : null;
