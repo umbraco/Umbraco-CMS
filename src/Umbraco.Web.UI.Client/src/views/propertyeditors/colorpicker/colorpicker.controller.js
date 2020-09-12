@@ -18,10 +18,13 @@ function ColorPickerController($scope, $timeout) {
 
         for (var key in $scope.model.config.items) {
             if (!$scope.model.config.items[key].hasOwnProperty("value"))
-                $scope.model.config.items[key] = { value: $scope.model.config.items[key], label: $scope.model.config.items[key] };
+                $scope.model.config.items[key] = {
+                    value: $scope.model.config.items[key],
+                    label: $scope.model.config.items[key]
+                };
         }
 
-        $scope.model.useLabel = isTrue($scope.model.config.useLabel);
+        $scope.model.useLabel = Object.toBoolean($scope.model.config.useLabel);
         initActiveColor();
     }
 
@@ -136,11 +139,6 @@ function ColorPickerController($scope, $timeout) {
             $scope.model.value.value = foundItem.value;
             $scope.model.value.label = foundItem.label;
         }
-    }
-
-    // figures out if a value is trueish enough
-    function isTrue(bool) {
-        return !!bool && bool !== "0" && bool.toString().toLowerCase() !== "false";
     }
 }
 
