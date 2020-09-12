@@ -70,7 +70,7 @@
             if (changes.index) {
                 $scope.index = changes.index.currentValue;
             }
-        }
+        };
     }
 
 

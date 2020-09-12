@@ -63,7 +63,10 @@
             vm.labels.content_createEmpty = data[1];
         });
 
-        vm.$onInit = function() {
+        vm.$onInit = function () {
+            
+            vm.uniqueId = String.CreateGuid();
+
             if (vm.umbProperty && !vm.umbVariantContent) {// if we dont have vm.umbProperty, it means we are in the DocumentTypeEditor.
                 // not found, then fallback to searching the scope chain, this may be needed when DOM inheritance isn't maintained but scope
                 // inheritance is (i.e.infinite editing)
@@ -90,14 +93,14 @@
             }
 
             // We need to ensure that the property model value is an object, this is needed for modelObject to recive a reference and keep that updated.
-            if(typeof vm.model.value !== 'object' || vm.model.value === null) {// testing if we have null or undefined value or if the value is set to another type than Object.
+            if (typeof vm.model.value !== 'object' || vm.model.value === null) {// testing if we have null or undefined value or if the value is set to another type than Object.
                 vm.model.value = {};
             }
 
             var scopeOfExistence = $scope;
-            if(vm.umbVariantContentEditors && vm.umbVariantContentEditors.getScope) {
+            if (vm.umbVariantContentEditors && vm.umbVariantContentEditors.getScope) {
                 scopeOfExistence = vm.umbVariantContentEditors.getScope();
-            } else if(vm.umbElementEditorContent && vm.umbElementEditorContent.getScope) {
+            } else if (vm.umbElementEditorContent && vm.umbElementEditorContent.getScope) {
                 scopeOfExistence = vm.umbElementEditorContent.getScope();
             }
 
@@ -190,7 +193,6 @@
             vm.loading = false;
 
             $scope.$evalAsync();
-
         }
 
         function getDefaultViewForBlock(block) {
@@ -599,7 +601,7 @@
             requestDeleteBlock: requestDeleteBlock,
             deleteBlock: deleteBlock,
             openSettingsForBlock: openSettingsForBlock
-        }
+        };
 
         vm.sortableOptions = {
             axis: "y",
@@ -616,7 +618,6 @@
             }
         };
 
-
         function onAmountOfBlocksChanged() {
 
             // enable/disable property actions
@@ -630,11 +631,23 @@
             // validate limits:
             if (vm.propertyForm && vm.validationLimit) {
 
-                var isMinRequirementGood = vm.validationLimit.min === null || vm.layout.length >= vm.validationLimit.min;
-                vm.propertyForm.minCount.$setValidity("minCount", isMinRequirementGood);
+                console.log("vm", vm);
 
-                var isMaxRequirementGood = vm.validationLimit.max === null || vm.layout.length <= vm.validationLimit.max;
-                vm.propertyForm.maxCount.$setValidity("maxCount", isMaxRequirementGood);
+                var minCountField = vm.propertyForm['minCount_' + vm.model.alias + '_' + vm.uniqueId];
+                console.log("minCountField", minCountField);
+                if (minCountField)
+                {
+                    var isMinRequirementGood = vm.validationLimit.min === null || vm.layout.length >= vm.validationLimit.min;
+                    minCountField.$setValidity("minCount", isMinRequirementGood);
+                }
+                
+                var maxCountField = vm.propertyForm['maxCount_' + vm.model.alias + '_' + vm.uniqueId];
+                console.log("maxCountField", maxCountField);
+                if (maxCountField)
+                {
+                    var isMaxRequirementGood = vm.validationLimit.max === null || vm.layout.length <= vm.validationLimit.max;
+                    maxCountField.$setValidity("maxCount", isMaxRequirementGood);
+                }
             }
         }
 
