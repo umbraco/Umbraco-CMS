@@ -631,10 +631,7 @@
             // validate limits:
             if (vm.propertyForm && vm.validationLimit) {
 
-                console.log("vm", vm);
-
                 var minCountField = vm.propertyForm['minCount_' + vm.model.alias + '_' + vm.uniqueId];
-                console.log("minCountField", minCountField);
                 if (minCountField)
                 {
                     var isMinRequirementGood = vm.validationLimit.min === null || vm.layout.length >= vm.validationLimit.min;
@@ -642,7 +639,6 @@
                 }
                 
                 var maxCountField = vm.propertyForm['maxCount_' + vm.model.alias + '_' + vm.uniqueId];
-                console.log("maxCountField", maxCountField);
                 if (maxCountField)
                 {
                     var isMaxRequirementGood = vm.validationLimit.max === null || vm.layout.length <= vm.validationLimit.max;
