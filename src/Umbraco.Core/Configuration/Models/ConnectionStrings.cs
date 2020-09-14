@@ -25,7 +25,11 @@ namespace Umbraco.Core.Configuration.Models
 
         public string UmbracoConnectionString
         {
-            get => ConnectionStringDictionary[Constants.System.UmbracoConnectionName];
+            get
+            {
+                ConnectionStringDictionary.TryGetValue(Constants.System.UmbracoConnectionName, out var value);
+                return value;
+            }
             set => ConnectionStringDictionary[Constants.System.UmbracoConnectionName] = value;
         }
 
@@ -35,7 +39,11 @@ namespace Umbraco.Core.Configuration.Models
         {
             get
             {
-                var connectionString = ConnectionStringDictionary[key];
+                if (!ConnectionStringDictionary.TryGetValue(key, out var connectionString))
+                {
+                    return null;
+                }
+
                 var provider = ParseProvider(connectionString);
                 return new ConfigConnectionString(connectionString, provider, key);
             }
