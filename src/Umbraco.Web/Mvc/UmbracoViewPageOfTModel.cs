@@ -115,6 +115,8 @@ namespace Umbraco.Web.Mvc
 
         protected UmbracoViewPage(ServiceContext services, AppCaches appCaches, IOptions<GlobalSettings> globalSettings, IOptions<ContentSettings> contentSettings)
         {
+            if (globalSettings == null) throw new ArgumentNullException(nameof(globalSettings));
+            if (contentSettings == null) throw new ArgumentNullException(nameof(contentSettings));
             Services = services;
             AppCaches = appCaches;
             _globalSettings = globalSettings.Value;

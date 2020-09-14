@@ -6,6 +6,8 @@ namespace Umbraco.Core.Configuration.Models
 {
     public class ConnectionStrings
     {
+
+
         // Backing field for UmbracoConnectionString to load from configuration value with key umbracoDbDSN.
         // Attributes cannot be applied to map from keys that don't match, and have chosen to retain the key name
         // used in configuration for older Umbraco versions.
@@ -13,21 +15,27 @@ namespace Umbraco.Core.Configuration.Models
         private string umbracoDbDSN
         {
             get => string.Empty;
-            set => UmbracoConnectionString = value;
+            set
+            {
+                UmbracoConnectionString = value;
+
+                ConnectionStringDictionary[Constants.System.UmbracoConnectionName] = value;
+            }
         }
 
-        public string UmbracoConnectionString { get; set; }
+        public string UmbracoConnectionString
+        {
+            get => ConnectionStringDictionary[Constants.System.UmbracoConnectionName];
+            set => ConnectionStringDictionary[Constants.System.UmbracoConnectionName] = value;
+        }
 
-        private Dictionary<string, string> AsDictionary() => new Dictionary<string, string>
-            {
-                { Constants.System.UmbracoConnectionName, UmbracoConnectionString }
-            };
+        private Dictionary<string, string> ConnectionStringDictionary { get; } = new Dictionary<string, string>();
 
         public ConfigConnectionString this[string key]
         {
             get
             {
-                var connectionString = this.AsDictionary()[key];
+                var connectionString = ConnectionStringDictionary[key];
                 var provider = ParseProvider(connectionString);
                 return new ConfigConnectionString(connectionString, provider, key);
             }
