@@ -61,7 +61,7 @@ namespace Umbraco.Web
         /// <remarks>
         /// See: http://issues.umbraco.org/issue/U4-1614
         /// </remarks>
-        public static MvcHtmlString PreviewBadge(this HtmlHelper helper, IHttpContextAccessor httpContextAccessor, IGlobalSettings globalSettings, IIOHelper ioHelper, ContentSettings contentSettings)
+        public static MvcHtmlString PreviewBadge(this HtmlHelper helper, IHttpContextAccessor httpContextAccessor, GlobalSettings globalSettings, IIOHelper ioHelper, ContentSettings contentSettings)
         {
             if (Current.UmbracoContext.InPreviewMode)
             {

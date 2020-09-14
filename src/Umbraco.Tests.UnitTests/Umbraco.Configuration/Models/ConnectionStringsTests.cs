@@ -1,7 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using Moq;
-using NUnit.Framework;
-using Umbraco.Configuration.Models;
+﻿using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
 

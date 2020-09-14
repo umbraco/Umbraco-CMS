@@ -3,17 +3,14 @@ using System.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Routing;
 using Umbraco.Core.Services;
 using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Web;
 using Umbraco.Tests.Common;
 using Umbraco.Tests.Common.Builders;
-using Umbraco.Infrastructure.Configuration;
 
 namespace Umbraco.Tests.Routing
 {

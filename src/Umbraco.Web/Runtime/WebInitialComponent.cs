@@ -11,7 +11,6 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Strings;
-using Umbraco.Infrastructure.Configuration;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using Constants = Umbraco.Core.Constants;

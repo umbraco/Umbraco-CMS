@@ -45,16 +45,12 @@ namespace Umbraco.Tests.Scoping
 
             Current.Reset();
             Current.Factory = composition.CreateFactory();
-
-            SettingsForTests.Reset(); // ensure we have configuration
         }
 
         [TearDown]
         public void TearDown()
         {
             Current.Reset();
-
-            SettingsForTests.Reset();
         }
 
         [TestCase(false, true, true)]

@@ -7,7 +7,6 @@ using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
-using Umbraco.Infrastructure.Configuration;
 using Umbraco.Tests.Common;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.LegacyXmlPublishedCache;

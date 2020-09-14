@@ -9,10 +9,8 @@ using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.WebAssets;
-using Umbraco.Infrastructure.Configuration;
 using Umbraco.Web.Features;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Security;
@@ -29,7 +27,7 @@ namespace Umbraco.Web.Editors
         private readonly UrlHelper _urlHelper;
         private readonly IRuntimeState _runtimeState;
         private readonly UmbracoFeatures _features;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly ContentSettings _contentSettings;
         private readonly TreeCollection _treeCollection;
@@ -43,7 +41,7 @@ namespace Umbraco.Web.Editors
             UrlHelper urlHelper,
             IRuntimeState runtimeState,
             UmbracoFeatures features,
-            IGlobalSettings globalSettings,
+            GlobalSettings globalSettings,
             IUmbracoVersion umbracoVersion,
             IOptions<ContentSettings> contentSettings,
             TreeCollection treeCollection,
@@ -144,7 +142,7 @@ namespace Umbraco.Web.Editors
                 {
                     "umbracoSettings", new Dictionary<string, object>
                     {
-                        {"umbracoPath", ConfigModelConversionsFromLegacy.ConvertGlobalSettings(_globalSettings).GetBackOfficePath(_hostingEnvironment)},
+                        {"umbracoPath", _globalSettings.GetBackOfficePath(_hostingEnvironment)},
                         {"mediaPath", _hostingEnvironment.ToAbsolute(globalSettings.UmbracoMediaPath).TrimEnd('/')},
                         {"appPluginsPath", _hostingEnvironment.ToAbsolute(Constants.SystemDirectories.AppPlugins).TrimEnd('/')},
                         {
@@ -168,8 +166,8 @@ namespace Umbraco.Web.Editors
                         {"cssPath", _hostingEnvironment.ToAbsolute(globalSettings.UmbracoCssPath).TrimEnd('/')},
                         {"allowPasswordReset", _securitySettings.AllowPasswordReset},
                         {"loginBackgroundImage", _contentSettings.LoginBackgroundImage},
-                        {"showUserInvite", EmailSender.CanSendRequiredEmail(ConfigModelConversionsFromLegacy.ConvertGlobalSettings(globalSettings))},
-                        {"canSendRequiredEmail", EmailSender.CanSendRequiredEmail(ConfigModelConversionsFromLegacy.ConvertGlobalSettings(globalSettings))},
+                        {"showUserInvite", EmailSender.CanSendRequiredEmail(globalSettings)},
+                        {"canSendRequiredEmail", EmailSender.CanSendRequiredEmail(globalSettings)},
                         {"showAllowSegmentationForDocumentTypes", false},
                     }
                 },

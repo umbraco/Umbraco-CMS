@@ -35,7 +35,6 @@ namespace Umbraco.Tests.Common
 
         protected TestHelperBase(Assembly entryAssembly)
         {
-            SettingsForTests = new SettingsForTests();
             MainDom = new SimpleMainDom();
             _typeFinder = new TypeFinder(Mock.Of<ILogger>(), new DefaultUmbracoAssemblyProvider(entryAssembly), new VaryingRuntimeHash());
         }
@@ -99,8 +98,6 @@ namespace Umbraco.Tests.Common
                 return _uriUtility;
             }
         }
-
-        public SettingsForTests SettingsForTests { get; }
         /// <summary>
         /// Some test files are copied to the /bin (/bin/debug) on build, this is a utility to return their physical path based on a virtual path name
         /// </summary>

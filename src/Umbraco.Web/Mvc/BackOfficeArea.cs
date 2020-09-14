@@ -2,7 +2,6 @@
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
-using Umbraco.Infrastructure.Configuration;
 using Umbraco.Web.Editors;
 
 namespace Umbraco.Web.Mvc

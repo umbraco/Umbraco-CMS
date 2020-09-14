@@ -9,8 +9,7 @@ using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security;
 using Umbraco.Core;
 using Umbraco.Core.BackOffice;
-using Umbraco.Core.Configuration;
-using Umbraco.Infrastructure.Configuration;
+using Umbraco.Core.Configuration.Models;
 
 namespace Umbraco.Web.Security
 {
@@ -25,7 +24,7 @@ namespace Umbraco.Web.Security
         private readonly IUserClaimsPrincipalFactory<BackOfficeIdentityUser> _claimsPrincipalFactory;
         private readonly IAuthenticationManager _authenticationManager;
         private readonly ILogger _logger;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly IOwinRequest _request;
 
         public BackOfficeSignInManager(
@@ -33,7 +32,7 @@ namespace Umbraco.Web.Security
             IUserClaimsPrincipalFactory<BackOfficeIdentityUser> claimsPrincipalFactory,
             IAuthenticationManager authenticationManager,
             ILogger logger,
-            IGlobalSettings globalSettings,
+            GlobalSettings globalSettings,
             IOwinRequest request)
         {
             _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
@@ -52,7 +51,7 @@ namespace Umbraco.Web.Security
             return claimsPrincipal.Identity as ClaimsIdentity;
         }
 
-        public static BackOfficeSignInManager Create(IOwinContext context, IGlobalSettings globalSettings, ILogger logger)
+        public static BackOfficeSignInManager Create(IOwinContext context, GlobalSettings globalSettings, ILogger logger)
         {
             var userManager = context.GetBackOfficeUserManager();
 
@@ -78,7 +77,7 @@ namespace Umbraco.Web.Security
             var user = await _userManager.FindByNameAsync(userName);
 
             //if the user is null, create an empty one which can be used for auto-linking
-            if (user == null) user = BackOfficeIdentityUser.CreateNew(ConfigModelConversionsFromLegacy.ConvertGlobalSettings(_globalSettings), userName, null, _globalSettings.DefaultUILanguage);
+            if (user == null) user = BackOfficeIdentityUser.CreateNew(_globalSettings, userName, null, _globalSettings.DefaultUILanguage);
 
             //check the password for the user, this will allow a developer to auto-link
             //an account if they have specified an IBackOfficeUserPasswordChecker
@@ -248,7 +247,7 @@ namespace Umbraco.Web.Security
             }
             return null;
         }
-        
+
         /// <summary>
         /// Two factor verification step
         /// </summary>

@@ -7,15 +7,12 @@ using System.Linq.Expressions;
 using Moq;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Services;
-using Umbraco.Infrastructure.Configuration;
 using Umbraco.Persistance.SqlCe;
 using Umbraco.Tests.Common;
 using Umbraco.Web;
@@ -140,7 +137,7 @@ namespace Umbraco.Tests.TestHelpers
 
         public GlobalSettings GetGlobalSettings()
         {
-            return ConfigModelConversionsFromLegacy.ConvertGlobalSettings(SettingsForTests.DefaultGlobalSettings);
+            return new GlobalSettings();
         }
         public IFileSystems GetFileSystemsMock()
         {

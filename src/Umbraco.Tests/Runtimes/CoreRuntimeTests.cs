@@ -9,14 +9,12 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Runtime;
-using Umbraco.Infrastructure.Configuration;
 using Umbraco.Net;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Stubs;
@@ -87,7 +85,7 @@ namespace Umbraco.Tests.Runtimes
         {
             public TestUmbracoApplication() : base(_logger,
                 new SecuritySettings(),
-                ConfigModelConversionsFromLegacy.ConvertGlobalSettings(SettingsForTests.DefaultGlobalSettings),
+                new GlobalSettings(),
                 new ConnectionStrings(),
                 _ioHelper, _profiler, new AspNetHostingEnvironment(Options.Create(new HostingSettings())), new AspNetBackOfficeInfo(_globalSettings, _ioHelper,  _logger, Options.Create(new WebRoutingSettings())))
             {
@@ -96,7 +94,7 @@ namespace Umbraco.Tests.Runtimes
             private static readonly DebugDiagnosticsLogger _logger = new DebugDiagnosticsLogger(new MessageTemplates());
             private static readonly IIOHelper _ioHelper = TestHelper.IOHelper;
             private static readonly IProfiler _profiler = new TestProfiler();
-            private static readonly IGlobalSettings _globalSettings = SettingsForTests.DefaultGlobalSettings;
+            private static readonly GlobalSettings _globalSettings = new GlobalSettings();
 
             public IRuntime Runtime { get; private set; }
 

@@ -8,6 +8,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core.BackOffice;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Web.Security;
@@ -82,7 +83,7 @@ namespace Umbraco.Tests.Security
                 reader.ReadInt64(); // creation time
                 reader.ReadString(); // user ID
                 var purpose = reader.ReadString();
-                
+
                 Assert.AreEqual(expectedPurpose, purpose);
             }
         }
@@ -229,8 +230,6 @@ namespace Umbraco.Tests.Security
             _mockDataProtector.Setup(x => x.Unprotect(It.IsAny<byte[]>())).Returns((byte[] originalBytes) => originalBytes);
 
             var globalSettings = new GlobalSettingsBuilder().Build();
-            var mockGlobalSettings = new Mock<IGlobalSettings>();
-            mockGlobalSettings.Setup(x => x.DefaultUILanguage).Returns("test");
 
             _mockUserManager = new Mock<UserManager<BackOfficeIdentityUser>>(new Mock<IUserStore<BackOfficeIdentityUser>>().Object,
                 null, null, null, null, null, null, null, null);

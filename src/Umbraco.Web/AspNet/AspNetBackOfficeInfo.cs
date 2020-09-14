@@ -11,12 +11,12 @@ namespace Umbraco.Web
 {
     public class AspNetBackOfficeInfo : IBackOfficeInfo
     {
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly IIOHelper _ioHelper;
         private readonly ILogger _logger;
         private readonly WebRoutingSettings _webRoutingSettings;
 
-        public AspNetBackOfficeInfo(IGlobalSettings globalSettings, IIOHelper ioHelper, ILogger logger, IOptions<WebRoutingSettings> webRoutingSettings)
+        public AspNetBackOfficeInfo(GlobalSettings globalSettings, IIOHelper ioHelper, ILogger logger, IOptions<WebRoutingSettings> webRoutingSettings)
         {
             _globalSettings = globalSettings;
             _ioHelper = ioHelper;

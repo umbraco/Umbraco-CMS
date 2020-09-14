@@ -9,6 +9,7 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
@@ -110,7 +111,7 @@ namespace Umbraco.Tests.Testing.TestingTests
             var membershipHelper = new MembershipHelper(Mock.Of<IHttpContextAccessor>(), Mock.Of<IPublishedMemberCache>(), membershipProvider, Mock.Of<RoleProvider>(), memberService, memberTypeService, Mock.Of<IPublicAccessService>(), AppCaches.Disabled, logger, ShortStringHelper, Mock.Of<IEntityService>());
             var umbracoMapper = new UmbracoMapper(new MapDefinitionCollection(new[] { Mock.Of<IMapDefinition>() }));
 
-            var umbracoApiController = new FakeUmbracoApiController(Mock.Of<IGlobalSettings>(), Mock.Of<IUmbracoContextAccessor>(), Mock.Of<ISqlContext>(), ServiceContext.CreatePartial(), AppCaches.NoCache, logger, Mock.Of<IRuntimeState>(), umbracoMapper, Mock.Of<IPublishedUrlProvider>());
+            var umbracoApiController = new FakeUmbracoApiController(new GlobalSettings(), Mock.Of<IUmbracoContextAccessor>(), Mock.Of<ISqlContext>(), ServiceContext.CreatePartial(), AppCaches.NoCache, logger, Mock.Of<IRuntimeState>(), umbracoMapper, Mock.Of<IPublishedUrlProvider>());
 
             Assert.Pass();
         }
@@ -118,7 +119,7 @@ namespace Umbraco.Tests.Testing.TestingTests
 
     internal class FakeUmbracoApiController : UmbracoApiController
     {
-        public FakeUmbracoApiController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoMapper umbracoMapper, IPublishedUrlProvider publishedUrlProvider)
+        public FakeUmbracoApiController(GlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoMapper umbracoMapper, IPublishedUrlProvider publishedUrlProvider)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoMapper, publishedUrlProvider) { }
     }
 }

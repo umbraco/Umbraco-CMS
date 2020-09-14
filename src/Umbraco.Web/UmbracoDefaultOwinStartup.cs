@@ -30,7 +30,7 @@ namespace Umbraco.Web
     public class UmbracoDefaultOwinStartup
     {
         protected IUmbracoContextAccessor UmbracoContextAccessor => Current.UmbracoContextAccessor;
-        protected IGlobalSettings GlobalSettings => Current.Factory.GetInstance<IGlobalSettings>();
+        protected GlobalSettings GlobalSettings => Current.Factory.GetInstance<GlobalSettings>();
         protected SecuritySettings SecuritySettings => Current.Factory.GetInstance<IOptions<SecuritySettings>>().Value;
         protected IUserPasswordConfiguration UserPasswordConfig => Current.Factory.GetInstance<IUserPasswordConfiguration>();
         protected IRuntimeState RuntimeState => Current.RuntimeState;

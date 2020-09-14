@@ -17,12 +17,10 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Extensions
         [OneTimeSetUp]
         public void Setup()
         {
-            _settingsForTests = new SettingsForTests();
             _hostEnvironment = Mock.Of<IWebHostEnvironment>();
             _globalSettings = new GlobalSettingsBuilder().Build();
         }
 
-        private SettingsForTests _settingsForTests;
         private IWebHostEnvironment _hostEnvironment;
         private GlobalSettings _globalSettings;
 

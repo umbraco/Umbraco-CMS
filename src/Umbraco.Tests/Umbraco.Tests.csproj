@@ -391,7 +391,6 @@
     <Compile Include="Web\Controllers\PluginControllerAreaTests.cs" />
     <Compile Include="Cache\DistributedCache\DistributedCacheTests.cs" />
     <Compile Include="TestHelpers\TestWithDatabaseBase.cs" />
-    <Compile Include="TestHelpers\SettingsForTests.cs" />
     <Compile Include="Routing\ContentFinderByAliasTests.cs" />
     <Compile Include="Routing\ContentFinderByIdTests.cs" />
     <Compile Include="Routing\ContentFinderByPageIdQueryTests.cs" />

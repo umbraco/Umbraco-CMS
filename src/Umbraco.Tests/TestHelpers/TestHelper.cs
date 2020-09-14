@@ -62,7 +62,7 @@ namespace Umbraco.Tests.TestHelpers
 
             public override IBackOfficeInfo GetBackOfficeInfo()
                 => new AspNetBackOfficeInfo(
-                    SettingsForTests.GenerateMockGlobalSettings(GetUmbracoVersion()),
+                    new GlobalSettings(),
                     TestHelper.IOHelper, Mock.Of<ILogger>(), Options.Create(new WebRoutingSettings()));
 
             public override IHostingEnvironment GetHostingEnvironment()
@@ -116,12 +116,12 @@ namespace Umbraco.Tests.TestHelpers
 
         public static void InitializeContentDirectories()
         {
-            CreateDirectories(new[] { Constants.SystemDirectories.MvcViews, SettingsForTests.GenerateMockGlobalSettings().UmbracoMediaPath, Constants.SystemDirectories.AppPlugins });
+            CreateDirectories(new[] { Constants.SystemDirectories.MvcViews, new GlobalSettings().UmbracoMediaPath, Constants.SystemDirectories.AppPlugins });
         }
 
         public static void CleanContentDirectories()
         {
-            CleanDirectories(new[] { Constants.SystemDirectories.MvcViews, SettingsForTests.GenerateMockGlobalSettings().UmbracoMediaPath });
+            CleanDirectories(new[] { Constants.SystemDirectories.MvcViews, new GlobalSettings().UmbracoMediaPath });
         }
 
         public static void CreateDirectories(string[] directories)

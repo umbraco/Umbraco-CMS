@@ -55,7 +55,7 @@ namespace Umbraco.Web.Editors
 
         public AuthenticationController(
             IUserPasswordConfiguration passwordConfiguration,
-            IGlobalSettings globalSettings,
+            GlobalSettings globalSettings,
             IHostingEnvironment hostingEnvironment,
             IUmbracoContextAccessor umbracoContextAccessor,
             ISqlContext sqlContext,

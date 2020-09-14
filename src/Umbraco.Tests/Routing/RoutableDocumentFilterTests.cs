@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Web.Mvc;
 using System.Web.Routing;
-using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Infrastructure.Configuration;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;

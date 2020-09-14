@@ -21,11 +21,11 @@ namespace Umbraco.Web.Security
     {
         private readonly IUserService _userService;
         private readonly IRuntimeState _runtimeState;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly SecuritySettings _securitySettings;
 
-        public BackOfficeCookieAuthenticationProvider(IUserService userService, IRuntimeState runtimeState, IGlobalSettings globalSettings, IHostingEnvironment hostingEnvironment, IOptions<SecuritySettings> securitySettings)
+        public BackOfficeCookieAuthenticationProvider(IUserService userService, IRuntimeState runtimeState, GlobalSettings globalSettings, IHostingEnvironment hostingEnvironment, IOptions<SecuritySettings> securitySettings)
         {
             _userService = userService;
             _runtimeState = runtimeState;

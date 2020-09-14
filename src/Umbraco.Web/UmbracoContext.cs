@@ -1,11 +1,9 @@
 using System;
 using System.Web;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Infrastructure.Configuration;
 using Umbraco.Web.Composing;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;

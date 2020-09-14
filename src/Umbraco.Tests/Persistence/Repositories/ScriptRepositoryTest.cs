@@ -7,6 +7,7 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
@@ -31,7 +32,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             base.SetUp();
 
             _fileSystems = Mock.Of<IFileSystems>();
-            _fileSystem = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, SettingsForTests.GenerateMockGlobalSettings().UmbracoScriptsPath);
+            _fileSystem = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, new GlobalSettings().UmbracoScriptsPath);
             Mock.Get(_fileSystems).Setup(x => x.ScriptsFileSystem).Returns(_fileSystem);
             using (var stream = CreateStream("Umbraco.Sys.registerNamespace(\"Umbraco.Utils\");"))
             {

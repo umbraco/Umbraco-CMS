@@ -35,7 +35,7 @@ namespace Umbraco.Web.Security
         /// <remarks>
         /// By default this will be configured to execute on PipelineStage.Authenticate
         /// </remarks>
-        public static IAppBuilder UseUmbracoBackOfficeExternalCookieAuthentication(this IAppBuilder app, IUmbracoContextAccessor umbracoContextAccessor, IRuntimeState runtimeState,IGlobalSettings globalSettings, IHostingEnvironment hostingEnvironment, IRequestCache requestCache)
+        public static IAppBuilder UseUmbracoBackOfficeExternalCookieAuthentication(this IAppBuilder app, IUmbracoContextAccessor umbracoContextAccessor, IRuntimeState runtimeState,GlobalSettings globalSettings, IHostingEnvironment hostingEnvironment, IRequestCache requestCache)
         {
             return app.UseUmbracoBackOfficeExternalCookieAuthentication(umbracoContextAccessor, runtimeState, globalSettings, hostingEnvironment, requestCache, PipelineStage.Authenticate);
         }
@@ -54,7 +54,7 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         public static IAppBuilder UseUmbracoBackOfficeExternalCookieAuthentication(this IAppBuilder app,
             IUmbracoContextAccessor umbracoContextAccessor, IRuntimeState runtimeState,
-            IGlobalSettings globalSettings, IHostingEnvironment hostingEnvironment, IRequestCache requestCache, PipelineStage stage)
+            GlobalSettings globalSettings, IHostingEnvironment hostingEnvironment, IRequestCache requestCache, PipelineStage stage)
         {
             if (app == null) throw new ArgumentNullException(nameof(app));
             if (runtimeState == null) throw new ArgumentNullException(nameof(runtimeState));

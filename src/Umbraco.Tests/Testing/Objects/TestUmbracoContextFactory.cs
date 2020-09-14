@@ -1,10 +1,6 @@
 ﻿using Moq;
-using NUnit.Framework.Internal;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Services;
-using Umbraco.Infrastructure.Configuration;
 using Umbraco.Tests.Common;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
@@ -23,7 +19,7 @@ namespace Umbraco.Tests.Testing.Objects
             IHttpContextAccessor httpContextAccessor = null,
             IPublishedUrlProvider publishedUrlProvider = null)
         {
-            if (globalSettings == null) globalSettings = ConfigModelConversionsFromLegacy.ConvertGlobalSettings(TestHelpers.SettingsForTests.GenerateMockGlobalSettings());
+            if (globalSettings == null) globalSettings = new GlobalSettings();
             if (umbracoContextAccessor == null) umbracoContextAccessor = new TestUmbracoContextAccessor();
             if (httpContextAccessor == null) httpContextAccessor = TestHelper.GetHttpContextAccessor();
             if (publishedUrlProvider == null) publishedUrlProvider = TestHelper.GetPublishedUrlProvider();

@@ -38,7 +38,6 @@ using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Strings;
-using Umbraco.Infrastructure.Configuration;
 using Umbraco.Net;
 using Umbraco.Tests.Common;
 using Umbraco.Tests.Common.Builders;
@@ -177,7 +176,7 @@ namespace Umbraco.Tests.Testing
             var globalSettings = new GlobalSettingsBuilder().Build();
             var settings = new WebRoutingSettings();
 
-            IBackOfficeInfo backOfficeInfo = new AspNetBackOfficeInfo(ConfigModelConversionsToLegacy.ConvertGlobalSettings(globalSettings), IOHelper, logger, Microsoft.Extensions.Options.Options.Create(settings));
+            IBackOfficeInfo backOfficeInfo = new AspNetBackOfficeInfo(globalSettings, IOHelper, logger, Microsoft.Extensions.Options.Options.Create(settings));
             IIpResolver ipResolver = new AspNetIpResolver();
             UmbracoVersion = new UmbracoVersion();
 
@@ -562,7 +561,6 @@ namespace Umbraco.Tests.Testing
 
             // reset all other static things that should not be static ;(
             UriUtility.ResetAppDomainAppVirtualPath(HostingEnvironment);
-            TestHelpers.SettingsForTests.Reset(); // FIXME: should it be optional?
 
             // clear static events
             DocumentRepository.ClearScopeEvents();

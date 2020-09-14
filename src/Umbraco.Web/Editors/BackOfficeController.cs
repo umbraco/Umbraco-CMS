@@ -16,10 +16,8 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Features;
 using Umbraco.Web.Security;
 using Constants = Umbraco.Core.Constants;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Hosting;
 using BackOfficeIdentityUser = Umbraco.Core.BackOffice.BackOfficeIdentityUser;
-using Umbraco.Infrastructure.Configuration;
 
 namespace Umbraco.Web.Editors
 {

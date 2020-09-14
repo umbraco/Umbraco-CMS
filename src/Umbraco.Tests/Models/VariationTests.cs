@@ -23,9 +23,6 @@ namespace Umbraco.Tests.Models
         [SetUp]
         public void SetUp()
         {
-            // annoying, but content type wants short string helper ;(
-            SettingsForTests.Reset();
-
             // well, this is also annoying, but...
             // validating a value is performed by its data editor,
             // based upon the configuration in the data type, so we

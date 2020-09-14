@@ -5,7 +5,6 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Logging;
-using Umbraco.Infrastructure.Configuration;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
@@ -39,7 +38,7 @@ namespace Umbraco.Tests.Routing
                 new RoutableDocumentFilter(globalSettings, IOHelper),
                 UriUtility,
                 AppCaches.RequestCache,
-                ConfigModelConversionsToLegacy.ConvertGlobalSettings(globalSettings),
+                globalSettings,
                 HostingEnvironment
             );
 

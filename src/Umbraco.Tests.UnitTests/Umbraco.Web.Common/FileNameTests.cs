@@ -55,10 +55,10 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common
         [Test]
         [AutoMoqData]
         public void PreviewViewExists(
-            [Frozen] IGlobalSettings globalSettings,
+            [Frozen] IOptions<GlobalSettings> globalSettings,
             PreviewController sut)
         {
-            Mock.Get(globalSettings).Setup(x => x.UmbracoPath).Returns("/");
+            globalSettings.Value.UmbracoPath = "/";
 
             var viewResult = sut.Index() as ViewResult;
             var fileName = GetViewName(viewResult);

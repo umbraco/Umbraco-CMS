@@ -10,15 +10,12 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Legacy;
 using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Logging.Serilog;
 using Umbraco.Core.Logging.Serilog.Enrichers;
-using Umbraco.Infrastructure.Configuration;
 using Umbraco.Net;
 using Umbraco.Web.Hosting;
 using Umbraco.Web.Logging;
@@ -46,7 +43,7 @@ namespace Umbraco.Web
                 //var configFactory = new ConfigsFactory();
 
                 HostingSettings hostingSettings = null;
-                IGlobalSettings globalSettings = null;
+                GlobalSettings globalSettings = null;
                 SecuritySettings securitySettings = null;
                 WebRoutingSettings webRoutingSettings = null;
 
@@ -62,7 +59,7 @@ namespace Umbraco.Web
                 var profiler = GetWebProfiler(hostingEnvironment);
                 Umbraco.Composing.Current.Initialize(logger,
                     securitySettings,
-                    ConfigModelConversionsFromLegacy.ConvertGlobalSettings(globalSettings),
+                    globalSettings,
                     ioHelper, hostingEnvironment, backOfficeInfo, profiler);
                 Logger = logger;
             }

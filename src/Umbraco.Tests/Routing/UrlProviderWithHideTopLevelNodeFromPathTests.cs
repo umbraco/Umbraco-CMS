@@ -1,13 +1,8 @@
-﻿using Moq;
-using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
+﻿using NUnit.Framework;
 using Umbraco.Core.Configuration.Models;
-using Umbraco.Infrastructure.Configuration;
 using Umbraco.Tests.Common;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Testing;
-using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.Routing
