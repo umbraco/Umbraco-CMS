@@ -36,57 +36,33 @@ namespace Umbraco.Core.Logging
         }
 
         /// <inheritdoc/>
-        public void LogError(Type reporting, Exception exception, string message)
-        {
-            System.Diagnostics.Debug.WriteLine(message + Environment.NewLine + exception, reporting.FullName);
-        }
-
-        /// <inheritdoc/>
         public void LogError(Type reporting, Exception exception)
         {
             System.Diagnostics.Debug.WriteLine(Environment.NewLine + exception, reporting.FullName);
         }
 
         /// <inheritdoc/>
-        public void LogError(Type reporting, string message)
+        public void LogError(Exception exception, string messageTemplate, params object[] propertyValues)
         {
-            System.Diagnostics.Debug.WriteLine(message);
+            System.Diagnostics.Debug.WriteLine(_messageTemplates.Render(messageTemplate, propertyValues) + Environment.NewLine + exception, typeof(T).FullName);
         }
 
         /// <inheritdoc/>
-        public void LogError(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues)
-        {
-            System.Diagnostics.Debug.WriteLine(_messageTemplates.Render(messageTemplate, propertyValues) + Environment.NewLine + exception, reporting.FullName);
-        }
-
-        /// <inheritdoc/>
-        public void LogError(Type reporting, string messageTemplate, params object[] propertyValues)
+        public void LogError(string messageTemplate, params object[] propertyValues)
         {
             System.Diagnostics.Debug.WriteLine(messageTemplate, propertyValues);
         }
 
         /// <inheritdoc/>
-        public void LogWarning(Type reporting, string message)
+        public void LogWarning(string message, params object[] propertyValues)
         {
-            System.Diagnostics.Debug.WriteLine(message, reporting.FullName);
+            System.Diagnostics.Debug.WriteLine(_messageTemplates.Render(message, propertyValues), typeof(T).FullName);
         }
 
         /// <inheritdoc/>
-        public void LogWarning(Type reporting, string message, params object[] propertyValues)
+        public void LogWarning(Exception exception, string message, params object[] propertyValues)
         {
-            System.Diagnostics.Debug.WriteLine(_messageTemplates.Render(message, propertyValues), reporting.FullName);
-        }
-
-        /// <inheritdoc/>
-        public void LogWarning(Type reporting, Exception exception, string message)
-        {
-            System.Diagnostics.Debug.WriteLine(message + Environment.NewLine + exception, reporting.FullName);
-        }
-
-        /// <inheritdoc/>
-        public void LogWarning(Type reporting, Exception exception, string message, params object[] propertyValues)
-        {
-            System.Diagnostics.Debug.WriteLine(_messageTemplates.Render(message + Environment.NewLine + exception, propertyValues), reporting.FullName);
+            System.Diagnostics.Debug.WriteLine(_messageTemplates.Render(message + Environment.NewLine + exception, propertyValues), typeof(T).FullName);
         }
 
         /// <inheritdoc/>

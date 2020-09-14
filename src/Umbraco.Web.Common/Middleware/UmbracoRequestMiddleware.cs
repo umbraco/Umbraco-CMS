@@ -65,7 +65,7 @@ namespace Umbraco.Web.Common.Middleware
                 catch (Exception ex)
                 {
                     // try catch so we don't kill everything in all requests
-                    _logger.LogError<UmbracoRequestMiddleware>(ex);
+                    _logger.LogError<UmbracoRequestMiddleware>(ex.Message);
                 }
                 finally
                 {

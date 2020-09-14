@@ -3,7 +3,7 @@
 namespace Umbraco.Core.Logging
 {
 
-    public interface ILogger : ILogger<object>{}
+    public interface ILogger : ILogger<object> { }
 
     /// <summary>
     /// Defines the logging service.
@@ -25,14 +25,6 @@ namespace Umbraco.Core.Logging
         bool IsEnabled(Type reporting, LogLevel level);
 
         /// <summary>
-        /// Logs a fatal exception.
-        /// </summary>
-        /// <param name="reporting">The reporting type.</param>
-        /// <param name="exception">An exception.</param>
-        /// <remarks>The message string is unspecified and is implementation-specific.</remarks>
-        void Fatal(Type reporting, Exception exception);
-
-        /// <summary>
         /// Logs a fatal message with an exception.
         /// </summary>
         /// <param name="exception">An exception.</param>
@@ -50,74 +42,32 @@ namespace Umbraco.Core.Logging
         /// <summary>
         /// Logs an error message with an exception.
         /// </summary>
-        /// <param name="reporting">The reporting type.</param>
         /// <param name="exception">An exception.</param>
-        /// <param name="message">A message.</param>
-        void LogError(Type reporting, Exception exception, string message);
-
-        /// <summary>
-        /// Logs an error exception.
-        /// </summary>
-        /// <param name="reporting">The reporting type.</param>
-        /// <param name="exception">An exception.</param>
-        /// <remarks>The message string is unspecified and is implementation-specific.</remarks>
-        void LogError(Type reporting, Exception exception);
+        /// <param name="messageTemplate">A message template.</param>
+        /// <param name="propertyValues">Property values.</param>
+        void LogError(Exception exception, string messageTemplate, params object[] propertyValues);
 
         /// <summary>
         /// Logs an error message.
         /// </summary>
-        /// <param name="reporting">The reporting type.</param>
-        /// <param name="message">A message.</param>
-        void LogError(Type reporting, string message);
-
-        /// <summary>
-        /// Logs an error message with an exception.
-        /// </summary>
-        /// <param name="reporting">The reporting type.</param>
-        /// <param name="exception">An exception.</param>
         /// <param name="messageTemplate">A message template.</param>
         /// <param name="propertyValues">Property values.</param>
-        void LogError(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues);
-
-        /// <summary>
-        /// Logs an error message.
-        /// </summary>
-        /// <param name="reporting">The reporting type.</param>
-        /// <param name="messageTemplate">A message template.</param>
-        /// <param name="propertyValues">Property values.</param>
-        void LogError(Type reporting, string messageTemplate, params object[] propertyValues);
+        void LogError(string messageTemplate, params object[] propertyValues);
 
         /// <summary>
         /// Logs a warning message.
         /// </summary>
-        /// <param name="reporting">The reporting type.</param>
-        /// <param name="message">A message.</param>
-        void LogWarning(Type reporting, string message);
-
-        /// <summary>
-        /// Logs a warning message.
-        /// </summary>
-        /// <param name="reporting">The reporting type.</param>
         /// <param name="messageTemplate">A message template.</param>
         /// <param name="propertyValues">Property values.</param>
-        void LogWarning(Type reporting, string messageTemplate, params object[] propertyValues);
+        void LogWarning(string messageTemplate, params object[] propertyValues);
 
         /// <summary>
         /// Logs a warning message with an exception.
         /// </summary>
-        /// <param name="reporting">The reporting type.</param>
-        /// <param name="exception">An exception.</param>
-        /// <param name="message">A message.</param>
-        void LogWarning(Type reporting, Exception exception, string message);
-
-        /// <summary>
-        /// Logs a warning message with an exception.
-        /// </summary>
-        /// <param name="reporting">The reporting type.</param>
         /// <param name="exception">An exception.</param>
         /// <param name="messageTemplate">A message template.</param>
         /// <param name="propertyValues">Property values.</param>
-        void LogWarning(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues);
+        void LogWarning(Exception exception, string messageTemplate, params object[] propertyValues);
 
         /// <summary>
         /// Logs an information message.

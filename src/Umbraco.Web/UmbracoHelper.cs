@@ -455,7 +455,7 @@ namespace Umbraco.Web
             }
             catch (Exception ex) when (ex is FormatException || ex is ArgumentException)
             {
-                Current.Logger.LogWarning(typeof(UmbracoHelper), "A value was detected in the ufprt parameter but Umbraco could not decrypt the string");
+                Current.Logger.LogWarning("A value was detected in the ufprt parameter but Umbraco could not decrypt the string");
                 parts = null;
                 return false;
             }

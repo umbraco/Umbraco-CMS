@@ -24,7 +24,7 @@ namespace Umbraco.Core.Logging
         /// <param name="message">A message.</param>
         /// <param name="exception">An exception.</param>
         public static void LogError<T>(this ILogger logger, Exception exception, string message)
-            => logger.LogError(typeof(T), exception, message);
+            => logger.LogError(exception, message);
 
         /// <summary>
         /// Logs an error message with an exception.
@@ -35,16 +35,7 @@ namespace Umbraco.Core.Logging
         /// <param name="messageTemplate">A message template.</param>
         /// <param name="propertyValues">Property values.</param>
         public static void LogError<T>(this ILogger logger, Exception exception, string messageTemplate, params object[] propertyValues)
-            => logger.LogError(typeof(T), exception, messageTemplate, propertyValues);
-
-        /// <summary>
-        /// Logs an error exception.
-        /// </summary>
-        /// <typeparam name="T">The reporting type.</typeparam>
-        /// <param name="logger">The logger.</param>
-        /// <param name="exception">An exception.</param>
-        public static void LogError<T>(this ILogger logger, Exception exception)
-            => logger.LogError(typeof(T), exception);
+            => logger.LogError(exception, messageTemplate, propertyValues);
 
         /// <summary>
         /// Logs an error message.
@@ -53,7 +44,7 @@ namespace Umbraco.Core.Logging
         /// <param name="logger">The logger.</param>
         /// <param name="message">A message.</param>
         public static void LogError<T>(this ILogger logger, string message)
-            => logger.LogError(typeof(T), message);
+            => logger.LogError(message);
 
         /// <summary>
         /// Logs an error message.
@@ -63,7 +54,7 @@ namespace Umbraco.Core.Logging
         /// <param name="messageTemplate">A message template.</param>
         /// <param name="propertyValues">Property values.</param>
         public static void LogError<T>(this ILogger logger, string messageTemplate, params object[] propertyValues)
-            => logger.LogError(typeof(T), messageTemplate, propertyValues);
+            => logger.LogError(messageTemplate, propertyValues);
 
         /// <summary>
         /// Logs a warning message.
@@ -72,7 +63,7 @@ namespace Umbraco.Core.Logging
         /// <param name="logger">The logger.</param>
         /// <param name="message">A message.</param>
         public static void LogWarning<T>(this ILogger logger, string message)
-            => logger.LogWarning(typeof(T), message);
+            => logger.LogWarning(message);
 
         /// <summary>
         /// Logs a warning message.
@@ -82,7 +73,7 @@ namespace Umbraco.Core.Logging
         /// <param name="messageTemplate">A message template.</param>
         /// <param name="propertyValues">Property values.</param>
         public static void LogWarning<T>(this ILogger logger, string messageTemplate, params object[] propertyValues)
-            => logger.LogWarning(typeof(T), messageTemplate, propertyValues);
+            => logger.LogWarning(messageTemplate, propertyValues);
 
         /// <summary>
         /// Logs a warning message with an exception.
@@ -92,7 +83,7 @@ namespace Umbraco.Core.Logging
         /// <param name="exception">An exception.</param>
         /// <param name="message">A message.</param>
         public static void LogWarning<T>(this ILogger logger, Exception exception, string message)
-            => logger.LogWarning(typeof(T), exception, message);
+            => logger.LogWarning(exception, message);
 
         /// <summary>
         /// Logs a warning message with an exception.
@@ -103,7 +94,7 @@ namespace Umbraco.Core.Logging
         /// <param name="messageTemplate">A message template.</param>
         /// <param name="propertyValues">Property values.</param>
         public static void LogWarning<T>(this ILogger logger, Exception exception, string messageTemplate, params object[] propertyValues)
-            => logger.LogWarning(typeof(T), exception, messageTemplate, propertyValues);
+            => logger.LogWarning(exception, messageTemplate, propertyValues);
 
         /// <summary>
         /// Logs an information message.
@@ -170,7 +161,7 @@ namespace Umbraco.Core.Logging
         /// <param name="exception">An exception.</param>
         /// <param name="message">A message.</param>
         public static void Fatal<T>(this ILogger logger, Exception exception, string message)
-            => logger.LogCritical(exception, message, new object[] { });
+            => logger.LogCritical(exception, message);
 
         /// <summary>
         /// Logs a fatal message.

@@ -81,14 +81,6 @@ namespace Umbraco.Core.Logging.Serilog
             => LoggerFor(reporting).IsEnabled(MapLevel(level));
 
         /// <inheritdoc/>
-        public void Fatal(Type reporting, Exception exception)
-        {
-            var logger = LoggerFor(reporting);
-            var message = "Exception.";            
-            logger.Fatal(exception, message);
-        }
-
-        /// <inheritdoc/>
         public void LogCritical(string messageTemplate, params object[] propertyValues)
         {
             LoggerFor(typeof(T)).Fatal(messageTemplate, propertyValues);
@@ -102,13 +94,6 @@ namespace Umbraco.Core.Logging.Serilog
         }
 
         /// <inheritdoc/>
-        public void LogError(Type reporting, Exception exception, string message)
-        {
-            var logger = LoggerFor(reporting);            
-            logger.Error(exception, message);
-        }
-
-        /// <inheritdoc/>
         public void LogError(Type reporting, Exception exception)
         {
             var logger = LoggerFor(reporting);
@@ -117,46 +102,28 @@ namespace Umbraco.Core.Logging.Serilog
         }
 
         /// <inheritdoc/>
-        public void LogError(Type reporting, string message)
+        public void LogError(string messageTemplate, params object[] propertyValues)
         {
-            LoggerFor(reporting).Error(message);
+            LoggerFor(typeof(T)).Error(messageTemplate, propertyValues);
         }
 
         /// <inheritdoc/>
-        public void LogError(Type reporting, string messageTemplate, params object[] propertyValues)
+        public void LogError(Exception exception, string messageTemplate, params object[] propertyValues)
         {
-            LoggerFor(reporting).Error(messageTemplate, propertyValues);
-        }
-
-        /// <inheritdoc/>
-        public void LogError(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues)
-        {
-            var logger = LoggerFor(reporting);
+            var logger = LoggerFor(typeof(T));
             logger.Error(exception, messageTemplate, propertyValues);
         }
 
         /// <inheritdoc/>
-        public void LogWarning(Type reporting, string message)
+        public void LogWarning(string message, params object[] propertyValues)
         {
-            LoggerFor(reporting).Warning(message);
+            LoggerFor(typeof(T)).Warning(message, propertyValues);
         }
 
         /// <inheritdoc/>
-        public void LogWarning(Type reporting, string message, params object[] propertyValues)
+        public void LogWarning(Exception exception, string messageTemplate, params object[] propertyValues)
         {
-            LoggerFor(reporting).Warning(message, propertyValues);
-        }
-
-        /// <inheritdoc/>
-        public void LogWarning(Type reporting, Exception exception, string message)
-        {
-            LoggerFor(reporting).Warning(exception, message);
-        }
-
-        /// <inheritdoc/>
-        public void LogWarning(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues)
-        {
-            LoggerFor(reporting).Warning(exception, messageTemplate, propertyValues);
+            LoggerFor(typeof(T)).Warning(exception, messageTemplate, propertyValues);
         }
 
         /// <inheritdoc/>

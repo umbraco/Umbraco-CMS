@@ -13,8 +13,8 @@ namespace Umbraco.Core.Persistence.Factories
             // Check we have an editor for the data type.
             if (!editors.TryGet(dto.EditorAlias, out var editor))
             {
-                logger.LogWarning(typeof(DataType), "Could not find an editor with alias {EditorAlias}, treating as Label. " +
-                                              "The site may fail to boot and/or load data types and run.", dto.EditorAlias);
+                logger.LogWarning("Could not find an editor with alias {EditorAlias}, treating as Label. " +
+                                  "The site may fail to boot and/or load data types and run.", dto.EditorAlias);
 
                 // Create as special type, which downstream can be handled by converting to a LabelPropertyEditor to make clear
                 // the situation to the user.

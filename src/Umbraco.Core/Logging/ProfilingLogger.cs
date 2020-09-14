@@ -67,41 +67,23 @@ namespace Umbraco.Core.Logging
         public bool IsEnabled(Type reporting, LogLevel level)
             => Logger.IsEnabled(reporting, level);
 
-        public void Fatal(Type reporting, Exception exception)
-            => Logger.Fatal(reporting, exception);
-
         public void LogCritical(Exception exception, string messageTemplate, params object[] propertyValues)
             => Logger.LogCritical(exception, messageTemplate, propertyValues);
 
         public void LogCritical(string messageTemplate, params object[] propertyValues)
             => Logger.LogCritical(messageTemplate, propertyValues);
 
-        public void LogError(Type reporting, Exception exception, string message)
-            => Logger.LogError(reporting, exception, message);
+        public void LogError(Exception exception, string messageTemplate, params object[] propertyValues)
+            => Logger.LogError(exception, messageTemplate, propertyValues);
 
-        public void LogError(Type reporting, Exception exception)
-            => Logger.LogError(reporting, exception);
+        public void LogError(string messageTemplate, params object[] propertyValues)
+            => Logger.LogError(messageTemplate, propertyValues);
 
-        public void LogError(Type reporting, string message)
-            => Logger.LogError(reporting, message);
+        public void LogWarning(string messageTemplate, params object[] propertyValues)
+            => Logger.LogWarning(messageTemplate, propertyValues);
 
-        public void LogError(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues)
-            => Logger.LogError(reporting, exception, messageTemplate, propertyValues);
-
-        public void LogError(Type reporting, string messageTemplate, params object[] propertyValues)
-            => Logger.LogError(reporting, messageTemplate, propertyValues);
-
-        public void LogWarning(Type reporting, string message)
-            => Logger.LogWarning(reporting, message);
-
-        public void LogWarning(Type reporting, string messageTemplate, params object[] propertyValues)
-            => Logger.LogWarning(reporting, messageTemplate, propertyValues);
-
-        public void LogWarning(Type reporting, Exception exception, string message)
-            => Logger.LogWarning(reporting, exception, message);
-
-        public void LogWarning(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues)
-            => Logger.LogWarning(reporting, exception, messageTemplate, propertyValues);
+        public void LogWarning(Exception exception, string messageTemplate, params object[] propertyValues)
+            => Logger.LogWarning(exception, messageTemplate, propertyValues);
 
         public void Info(Type reporting, string message)
             => Logger.Info(reporting, message);
