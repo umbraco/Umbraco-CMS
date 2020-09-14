@@ -154,8 +154,7 @@ namespace Umbraco.Examine
         /// </summary>
         protected override void AddDocument(Document doc, ValueSet valueSet, IndexWriter writer)
         {
-            ProfilingLogger.Debug(GetType(),
-                "Write lucene doc id:{DocumentId}, category:{DocumentCategory}, type:{DocumentItemType}",
+            ProfilingLogger.Debug("Write lucene doc id:{DocumentId}, category:{DocumentCategory}, type:{DocumentItemType}",
                 valueSet.Id,
                 valueSet.Category,
                 valueSet.ItemType);

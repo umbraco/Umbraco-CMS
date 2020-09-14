@@ -59,34 +59,19 @@ namespace Umbraco.Core.Logging
             Console.WriteLine(exception);
         }
 
-        public void Info(Type reporting, string messageTemplate, params object[] propertyValues)
+        public void LogInformation(string messageTemplate, params object[] propertyValues)
         {
-            Console.WriteLine("INFO {0} - {1}", reporting.Name, _messageTemplates.Render(messageTemplate, propertyValues));
+            Console.WriteLine("INFO {0} - {1}", typeof(T).Name, _messageTemplates.Render(messageTemplate, propertyValues));
         }
 
-        public void Info(Type reporting, string message)
+        public void LogDebug(string messageTemplate, params object[] propertyValues)
         {
-            Console.WriteLine("INFO {0} - {1}", reporting.Name, message);
+            Console.WriteLine("DEBUG {0} - {1}", typeof(T).Name, _messageTemplates.Render(messageTemplate, propertyValues));
         }
 
-        public void Debug(Type reporting, string message)
+        public void LogTrace(string messageTemplate, params object[] propertyValues)
         {
-            Console.WriteLine("DEBUG {0} - {1}", reporting.Name, message);
-        }
-
-        public void Debug(Type reporting, string messageTemplate, params object[] propertyValues)
-        {
-            Console.WriteLine("DEBUG {0} - {1}", reporting.Name, _messageTemplates.Render(messageTemplate, propertyValues));
-        }
-
-        public void Verbose(Type reporting, string message)
-        {
-            Console.WriteLine("VERBOSE {0} - {1}", reporting.Name, message);
-        }
-
-        public void Verbose(Type reporting, string messageTemplate, params object[] propertyValues)
-        {
-            Console.WriteLine("VERBOSE {0} - {1}", reporting.Name, _messageTemplates.Render(messageTemplate, propertyValues));
+            Console.WriteLine("VERBOSE {0} - {1}", typeof(T).Name, _messageTemplates.Render(messageTemplate, propertyValues));
         }
     }
 }

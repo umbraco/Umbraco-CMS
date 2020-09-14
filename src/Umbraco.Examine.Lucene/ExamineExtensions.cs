@@ -87,7 +87,7 @@ namespace Umbraco.Examine
                 var dir = luceneIndexer.GetLuceneDirectory();
                 if (IndexWriter.IsLocked(dir))
                 {
-                    logger.Info(typeof(ExamineExtensions), "Forcing index {IndexerName} to be unlocked since it was left in a locked state", luceneIndexer.Name);
+                    logger.Info("Forcing index {IndexerName} to be unlocked since it was left in a locked state", luceneIndexer.Name);
                     IndexWriter.Unlock(dir);
                 }
             }

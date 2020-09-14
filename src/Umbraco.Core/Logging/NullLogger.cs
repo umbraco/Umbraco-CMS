@@ -46,32 +46,32 @@ namespace Umbraco.Core.Logging
 
         }
 
-        public void Info(Type reporting, string message)
+        public void LogInformation(string message, params object[] propertyValues)
         {
 
         }
 
-        public void Info(Type reporting, string messageTemplate, params object[] propertyValues)
+        public void LogInformation(string messageTemplate, params object[] propertyValues)
         {
 
         }
 
-        public void Debug(Type reporting, string message)
+        public void LogDebug(string message, params object[] propertyValues)
         {
 
         }
 
-        public void Debug(Type reporting, string messageTemplate, params object[] propertyValues)
+        public void LogDebug(string messageTemplate, params object[] propertyValues)
         {
 
         }
 
-        public void Verbose(Type reporting, string message)
+        public void LogTrace(string message, params object[] propertyValues)
         {
 
         }
 
-        public void Verbose(Type reporting, string messageTemplate, params object[] propertyValues)
+        public void LogTrace(string messageTemplate, params object[] propertyValues)
         {
 
         }

@@ -70,48 +70,24 @@ namespace Umbraco.Core.Logging
         void LogWarning(Exception exception, string messageTemplate, params object[] propertyValues);
 
         /// <summary>
-        /// Logs an information message.
-        /// </summary>
-        /// <param name="reporting">The reporting type.</param>
-        /// <param name="message">A message.</param>
-        void Info(Type reporting, string message);
-
-        /// <summary>
         /// Logs a info message.
         /// </summary>
-        /// <param name="reporting">The reporting type.</param>
         /// <param name="messageTemplate">A message template.</param>
         /// <param name="propertyValues">Property values.</param>
-        void Info(Type reporting, string messageTemplate, params object[] propertyValues);
-
-        /// <summary>
-        /// Logs a debugging message.
-        /// </summary>
-        /// <param name="reporting">The reporting type.</param>
-        /// <param name="message">A message.</param>
-        void Debug(Type reporting, string message);
+        void LogInformation(string messageTemplate, params object[] propertyValues);
 
         /// <summary>
         /// Logs a debug message.
         /// </summary>
-        /// <param name="reporting">The reporting type.</param>
         /// <param name="messageTemplate">A message template.</param>
         /// <param name="propertyValues">Property values.</param>
-        void Debug(Type reporting, string messageTemplate, params object[] propertyValues);
+        void LogDebug(string messageTemplate, params object[] propertyValues);
 
         /// <summary>
         /// Logs a verbose message.
         /// </summary>
-        /// <param name="reporting">The reporting type.</param>
-        /// <param name="message">A message.</param>
-        void Verbose(Type reporting, string message);
-
-        /// <summary>
-        /// Logs a verbose message.
-        /// </summary>
-        /// <param name="reporting">The reporting type.</param>
         /// <param name="messageTemplate">A message template.</param>
         /// <param name="propertyValues">Property values.</param>
-        void Verbose(Type reporting, string messageTemplate, params object[] propertyValues);
+        void LogTrace(string messageTemplate, params object[] propertyValues);
     }
 }

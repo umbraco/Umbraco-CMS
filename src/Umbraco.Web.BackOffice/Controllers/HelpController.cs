@@ -40,7 +40,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
             catch (HttpRequestException rex)
             {
-                _logger.Info(GetType(), $"Check your network connection, exception: {rex.Message}");
+                _logger.LogInformation($"Check your network connection, exception: {rex.Message}");
             }
 
             return new List<HelpPage>();

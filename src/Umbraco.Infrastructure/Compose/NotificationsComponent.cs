@@ -218,7 +218,7 @@ namespace Umbraco.Web.Compose
                 //if there is no current user, then use the admin
                 if (user == null)
                 {
-                    _logger.Debug(typeof(Notifier), "There is no current Umbraco user logged in, the notifications will be sent from the administrator");
+                    _logger.LogDebug("There is no current Umbraco user logged in, the notifications will be sent from the administrator", TODO);
                     user = _userService.GetUserById(Constants.Security.SuperUserId);
                     if (user == null)
                     {

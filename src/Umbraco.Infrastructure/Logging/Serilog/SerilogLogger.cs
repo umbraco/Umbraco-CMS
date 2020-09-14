@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using Org.BouncyCastle.Asn1.X509.Qualified;
 using Serilog;
 using Serilog.Events;
 using Umbraco.Core.Hosting;
@@ -94,14 +95,6 @@ namespace Umbraco.Core.Logging.Serilog
         }
 
         /// <inheritdoc/>
-        public void LogError(Type reporting, Exception exception)
-        {
-            var logger = LoggerFor(reporting);
-            var message = "Exception";
-            logger.Error(exception, message);
-        }
-
-        /// <inheritdoc/>
         public void LogError(string messageTemplate, params object[] propertyValues)
         {
             LoggerFor(typeof(T)).Error(messageTemplate, propertyValues);
@@ -127,39 +120,21 @@ namespace Umbraco.Core.Logging.Serilog
         }
 
         /// <inheritdoc/>
-        public void Info(Type reporting, string message)
+        public void LogInformation(string messageTemplate, params object[] propertyValues)
         {
-            LoggerFor(reporting).Information(message);
+            LoggerFor(typeof(T)).Information(messageTemplate, propertyValues);
         }
 
         /// <inheritdoc/>
-        public void Info(Type reporting, string messageTemplate, params object[] propertyValues)
+        public void LogDebug(string messageTemplate, params object[] propertyValues)
         {
-            LoggerFor(reporting).Information(messageTemplate, propertyValues);
+            LoggerFor(typeof(T)).Debug(messageTemplate, propertyValues);
         }
 
         /// <inheritdoc/>
-        public void Debug(Type reporting, string message)
+        public void LogTrace(string messageTemplate, params object[] propertyValues)
         {
-            LoggerFor(reporting).Debug(message);
-        }
-
-        /// <inheritdoc/>
-        public void Debug(Type reporting, string messageTemplate, params object[] propertyValues)
-        {
-            LoggerFor(reporting).Debug(messageTemplate, propertyValues);
-        }
-
-        /// <inheritdoc/>
-        public void Verbose(Type reporting, string message)
-        {
-            LoggerFor(reporting).Verbose(message);
-        }
-
-        /// <inheritdoc/>
-        public void Verbose(Type reporting, string messageTemplate, params object[] propertyValues)
-        {
-            LoggerFor(reporting).Verbose(messageTemplate, propertyValues);
+            LoggerFor(typeof(T)).Verbose(messageTemplate, propertyValues);
         }
 
         public void Dispose()

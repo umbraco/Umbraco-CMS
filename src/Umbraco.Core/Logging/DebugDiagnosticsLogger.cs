@@ -66,39 +66,21 @@ namespace Umbraco.Core.Logging
         }
 
         /// <inheritdoc/>
-        public void Info(Type reporting, string message)
+        public void LogInformation(string messageTemplate, params object[] propertyValues)
         {
-            System.Diagnostics.Debug.WriteLine(message, reporting.FullName);
+            System.Diagnostics.Debug.WriteLine(_messageTemplates.Render(messageTemplate, propertyValues), typeof(T).FullName);
         }
 
         /// <inheritdoc/>
-        public void Info(Type reporting, string messageTemplate, params object[] propertyValues)
+        public void LogDebug(string messageTemplate, params object[] propertyValues)
         {
-            System.Diagnostics.Debug.WriteLine(_messageTemplates.Render(messageTemplate, propertyValues), reporting.FullName);
+            System.Diagnostics.Debug.WriteLine(_messageTemplates.Render(messageTemplate, propertyValues), typeof(T).FullName);
         }
 
         /// <inheritdoc/>
-        public void Debug(Type reporting, string message)
+        public void LogTrace(string messageTemplate, params object[] propertyValues)
         {
-            System.Diagnostics.Debug.WriteLine(message, reporting.FullName);
-        }
-
-        /// <inheritdoc/>
-        public void Debug(Type reporting, string messageTemplate, params object[] propertyValues)
-        {
-            System.Diagnostics.Debug.WriteLine(_messageTemplates.Render(messageTemplate, propertyValues), reporting.FullName);
-        }
-
-        /// <inheritdoc/>
-        public void Verbose(Type reporting, string message)
-        {
-            System.Diagnostics.Debug.WriteLine(message, reporting.FullName);
-        }
-
-        /// <inheritdoc/>
-        public void Verbose(Type reporting, string messageTemplate, params object[] propertyValues)
-        {
-            System.Diagnostics.Debug.WriteLine(_messageTemplates.Render(messageTemplate, propertyValues), reporting.FullName);
+            System.Diagnostics.Debug.WriteLine(_messageTemplates.Render(messageTemplate, propertyValues), typeof(T).FullName);
         }
     }
 }
