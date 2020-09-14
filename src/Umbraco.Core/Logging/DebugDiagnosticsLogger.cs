@@ -5,7 +5,7 @@ namespace Umbraco.Core.Logging
     /// <summary>
     /// Implements <see cref="ILogger"/> on top of <see cref="System.Diagnostics"/>.
     /// </summary>
-    public class DebugDiagnosticsLogger : ILogger
+    public class DebugDiagnosticsLogger<T> : ILogger
     {
         private readonly IMessageTemplates _messageTemplates;
 
@@ -18,21 +18,15 @@ namespace Umbraco.Core.Logging
             => true;
 
         /// <inheritdoc/>
-        public void Fatal(Type reporting, Exception exception, string message)
-        {
-            System.Diagnostics.Debug.WriteLine(message + Environment.NewLine + exception, reporting.FullName);
-        }
-
-        /// <inheritdoc/>
         public void Fatal(Type reporting, Exception exception)
         {
             System.Diagnostics.Debug.WriteLine(Environment.NewLine + exception, reporting.FullName);
         }
 
         /// <inheritdoc/>
-        public void Fatal(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues)
+        public void LogCritical(Exception exception, string messageTemplate, params object[] propertyValues)
         {
-            System.Diagnostics.Debug.WriteLine(_messageTemplates.Render(messageTemplate, propertyValues) + Environment.NewLine + exception, reporting.FullName);
+            System.Diagnostics.Debug.WriteLine(_messageTemplates.Render(messageTemplate, propertyValues) + Environment.NewLine + exception, typeof(T).FullName);
         }
 
         /// <inheritdoc/>

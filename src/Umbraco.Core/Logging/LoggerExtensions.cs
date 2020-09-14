@@ -170,7 +170,7 @@ namespace Umbraco.Core.Logging
         /// <param name="exception">An exception.</param>
         /// <param name="message">A message.</param>
         public static void Fatal<T>(this ILogger logger, Exception exception, string message)
-            => logger.Fatal(typeof(T), exception, message);
+            => logger.LogCritical(exception, message, new object[] { });
 
         /// <summary>
         /// Logs a fatal message.
@@ -181,6 +181,6 @@ namespace Umbraco.Core.Logging
         /// <param name="messageTemplate">A message template.</param>
         /// <param name="propertyValues">Property values.</param>
         public static void Fatal<T>(this ILogger logger, Exception exception, string messageTemplate, params object[] propertyValues)
-            => logger.Fatal(typeof(T), exception, messageTemplate, propertyValues);
+            => logger.LogCritical(exception, messageTemplate, propertyValues);
     }
 }

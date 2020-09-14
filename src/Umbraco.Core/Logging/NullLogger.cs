@@ -6,17 +6,12 @@ namespace Umbraco.Core.Logging
     {
         public bool IsEnabled(Type reporting, LogLevel level) => false;
 
-        public void Fatal(Type reporting, Exception exception, string message)
-        {
-
-        }
-
         public void Fatal(Type reporting, Exception exception)
         {
 
         }
 
-        public void Fatal(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues)
+        public void LogCritical(Exception exception, string messageTemplate, params object[] propertyValues)
         {
 
         }

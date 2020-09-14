@@ -14,21 +14,15 @@ namespace Umbraco.Core.Logging
         public bool IsEnabled(Type reporting, LogLevel level)
             => true;
 
-        public void Fatal(Type reporting, Exception exception, string message)
-        {
-            Console.WriteLine("FATAL {0} - {1}", reporting.Name, message);
-            Console.WriteLine(exception);
-        }
-
         public void Fatal(Type reporting, Exception exception)
         {
             Console.WriteLine("FATAL {0}", reporting.Name);
             Console.WriteLine(exception);
         }
 
-        public void Fatal(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues)
+        public void LogCritical(Exception exception, string messageTemplate, params object[] propertyValues)
         {
-            Console.WriteLine("FATAL {0} - {1}", reporting.Name, _messageTemplates.Render(messageTemplate, propertyValues));
+            Console.WriteLine("FATAL {0} - {1}", typeof(T).Name, _messageTemplates.Render(messageTemplate, propertyValues));
             Console.WriteLine(exception);
         }
 

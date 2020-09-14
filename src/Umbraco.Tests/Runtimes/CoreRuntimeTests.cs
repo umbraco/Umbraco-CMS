@@ -70,7 +70,7 @@ namespace Umbraco.Tests.Runtimes
                 Assert.IsTrue(TestComponent.Ctored);
                 Assert.IsNotNull(TestComponent.ProfilingLogger);
                 Assert.IsInstanceOf<ProfilingLogger>(TestComponent.ProfilingLogger);
-                Assert.IsInstanceOf<DebugDiagnosticsLogger>(((ProfilingLogger) TestComponent.ProfilingLogger).Logger);
+                Assert.IsInstanceOf<DebugDiagnosticsLogger<object>>(((ProfilingLogger) TestComponent.ProfilingLogger).Logger);
 
                 // note: components are NOT disposed after boot
 
@@ -88,7 +88,7 @@ namespace Umbraco.Tests.Runtimes
             {
             }
 
-            private static readonly DebugDiagnosticsLogger _logger = new DebugDiagnosticsLogger(new MessageTemplates());
+            private static readonly DebugDiagnosticsLogger<object> _logger = new DebugDiagnosticsLogger<object>(new MessageTemplates());
             private static readonly IIOHelper _ioHelper = TestHelper.IOHelper;
             private static readonly IProfiler _profiler = new TestProfiler();
             private static readonly Configs _configs = GetConfigs();

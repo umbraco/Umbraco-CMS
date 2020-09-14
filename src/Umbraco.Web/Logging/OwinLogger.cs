@@ -27,7 +27,7 @@ namespace Umbraco.Web.Logging
             switch (eventType)
             {
                 case TraceEventType.Critical:
-                    _logger.Fatal(_type.Value, exception, "[{EventType}] Event Id: {EventId}, State: {State}", eventType, eventId, state);
+                    _logger.LogCritical(exception, "[{EventType}] Event Id: {EventId}, State: {State}", eventType, eventId, state);
                     return true;
                 case TraceEventType.Error:
                     _logger.LogError(_type.Value, exception, "[{EventType}] Event Id: {EventId}, State: {State}", eventType, eventId, state);

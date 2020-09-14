@@ -81,13 +81,6 @@ namespace Umbraco.Core.Logging.Serilog
             => LoggerFor(reporting).IsEnabled(MapLevel(level));
 
         /// <inheritdoc/>
-        public void Fatal(Type reporting, Exception exception, string message)
-        {
-            var logger = LoggerFor(reporting);            
-            logger.Fatal(exception, message);
-        }
-
-        /// <inheritdoc/>
         public void Fatal(Type reporting, Exception exception)
         {
             var logger = LoggerFor(reporting);
@@ -102,9 +95,9 @@ namespace Umbraco.Core.Logging.Serilog
         }
 
         /// <inheritdoc/>
-        public void Fatal(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues)
+        public void LogCritical(Exception exception, string messageTemplate, params object[] propertyValues)
         {
-            var logger = LoggerFor(reporting);            
+            var logger = LoggerFor(typeof(T));            
             logger.Fatal(exception, messageTemplate, propertyValues);
         }
 

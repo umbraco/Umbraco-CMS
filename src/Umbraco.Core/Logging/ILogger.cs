@@ -25,14 +25,6 @@ namespace Umbraco.Core.Logging
         bool IsEnabled(Type reporting, LogLevel level);
 
         /// <summary>
-        /// Logs a fatal message with an exception.
-        /// </summary>
-        /// <param name="reporting">The reporting type.</param>
-        /// <param name="exception">An exception.</param>
-        /// <param name="message">A message.</param>
-        void Fatal(Type reporting, Exception exception, string message);
-
-        /// <summary>
         /// Logs a fatal exception.
         /// </summary>
         /// <param name="reporting">The reporting type.</param>
@@ -43,11 +35,10 @@ namespace Umbraco.Core.Logging
         /// <summary>
         /// Logs a fatal message with an exception.
         /// </summary>
-        /// <param name="reporting">The reporting type.</param>
         /// <param name="exception">An exception.</param>
         /// <param name="messageTemplate">A message template.</param>
         /// <param name="propertyValues">Property values.</param>
-        void Fatal(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues);
+        void LogCritical(Exception exception, string messageTemplate, params object[] propertyValues);
 
         /// <summary>
         /// Logs a fatal message.

@@ -21,7 +21,7 @@ namespace Umbraco.Tests.Scheduling
         [Timeout(4000)]
         public async Task ThreadResumeIssue()
         {
-            var logger = new DebugDiagnosticsLogger(new MessageTemplates());
+            var logger = new DebugDiagnosticsLogger<object>(new MessageTemplates());
             var runner = new BackgroundTaskRunner<IBackgroundTask>(new BackgroundTaskRunnerOptions { KeepAlive = true, LongRunning = true }, logger, TestHelper.GetHostingEnvironmentLifetime());
             var work = new ThreadResumeIssueWorkItem();
             runner.Add(work);
@@ -76,7 +76,7 @@ namespace Umbraco.Tests.Scheduling
         [Ignore("Only runs in the debugger.")]
         public async Task DebuggerInterferenceIssue()
         {
-            var logger = new DebugDiagnosticsLogger(new MessageTemplates());
+            var logger = new DebugDiagnosticsLogger<object>(new MessageTemplates());
             var runner = new BackgroundTaskRunner<IBackgroundTask>(new BackgroundTaskRunnerOptions { KeepAlive = true, LongRunning = true }, logger, TestHelper.GetHostingEnvironmentLifetime());
             var taskCompleted = false;
             runner.TaskCompleted += (sender, args) =>
