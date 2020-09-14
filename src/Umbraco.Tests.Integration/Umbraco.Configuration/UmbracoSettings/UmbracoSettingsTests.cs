@@ -35,7 +35,6 @@ namespace Umbraco.Tests.Integration.Umbraco.Configuration.UmbracoSettings
         }
         private UmbracoSettingsSection Settings { get; set; }
 
-        protected ILoggingSettings LoggingSettings => Settings.Logging;
         protected IWebRoutingSettings WebRoutingSettings => Settings.WebRouting;
         protected IRequestHandlerSettings RequestHandlerSettings => Settings.RequestHandler;
         protected ISecuritySettings SecuritySettings => Settings.Security;

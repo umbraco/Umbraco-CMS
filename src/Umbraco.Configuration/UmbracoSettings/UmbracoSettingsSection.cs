@@ -14,9 +14,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         [ConfigurationProperty("requestHandler")]
         public RequestHandlerElement RequestHandler => (RequestHandlerElement)this["requestHandler"];
 
-        [ConfigurationProperty("logging")]
-        public LoggingElement Logging => (LoggingElement)this["logging"];
-
         [ConfigurationProperty("web.routing")]
         public WebRoutingElement WebRouting => (WebRoutingElement)this["web.routing"];
 
