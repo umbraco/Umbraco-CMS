@@ -18,8 +18,7 @@ namespace Umbraco.Core.HealthCheck
             HealthCheckAttribute meta = thisType.GetCustomAttribute<HealthCheckAttribute>(false);
             if (meta == null)
             {
-                throw new InvalidOperationException(
-                    $"The health check {thisType} requires a {typeof(HealthCheckAttribute)}");
+                throw new InvalidOperationException($"The health check {thisType} requires a {typeof(HealthCheckAttribute)}");
             }
 
             Name = meta.Name;

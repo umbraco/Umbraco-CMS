@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Extensions.Configuration;
-using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 using Umbraco.Web.HealthCheck;
@@ -14,11 +12,16 @@ namespace Umbraco.Core.Configuration.HealthChecks
         Group = "Configuration")]
     public class MacroErrorsCheck : AbstractConfigCheck
     {
-        public MacroErrorsCheck(IConfiguration configuration, ILocalizedTextService textService, ILogger logger)
-        : base(configuration, textService, logger)
+        public MacroErrorsCheck(ILocalizedTextService textService, ILogger logger, IConfigurationService configurationService)
+        : base(textService, logger, configurationService)
         { }
 
-        public override string Key => "Umbraco:CMS:Content:MacroErrors";
+        public override IEnumerable<HealthCheckStatus> GetStatus()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override string ItemPath => Constants.Configuration.ConfigContentMacroErrors;
 
         public override ValueComparisonType ValueComparisonType => ValueComparisonType.ShouldEqual;
 

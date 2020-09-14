@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Security.Cryptography.X509Certificates;
-using Microsoft.Extensions.Configuration;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.HealthChecks;
 using Umbraco.Core.Logging;
@@ -23,17 +22,17 @@ namespace Umbraco.Core.HealthCheck.Checks.Security
         private readonly IGlobalSettings _globalSettings;
         private readonly ILogger _logger;
         private readonly IRequestAccessor _requestAccessor;
-        private readonly IConfiguration _configuration;
-
+        private IConfigurationService _configurationService;
         private const string FixHttpsSettingAction = "fixHttpsSetting";
+        string itemPath => Constants.Configuration.ConfigGlobalUseHttps;
 
-        public HttpsCheck(IConfiguration configuration, ILocalizedTextService textService, IGlobalSettings globalSettings, ILogger logger, IRequestAccessor requestAccessor)
+        public HttpsCheck(ILocalizedTextService textService, IGlobalSettings globalSettings, ILogger logger, IRequestAccessor requestAccessor, IConfigurationService configurationService)
         {
-            _configuration = configuration;
             _textService = textService;
             _globalSettings = globalSettings;
             _logger = logger;
             _requestAccessor = requestAccessor;
+            _configurationService = configurationService;
         }
 
         /// <summary>
@@ -152,8 +151,8 @@ namespace Umbraco.Core.HealthCheck.Checks.Security
 
         private HealthCheckStatus CheckHttpsConfigurationSetting()
         {
-            var httpsSettingEnabled = _globalSettings.UseHttps;
-            var uri = _requestAccessor.GetApplicationUrl();
+            bool httpsSettingEnabled = _globalSettings.UseHttps;
+            Uri uri = _requestAccessor.GetApplicationUrl();
             var actions = new List<HealthCheckAction>();
 
             string resultMessage;
@@ -187,9 +186,7 @@ namespace Umbraco.Core.HealthCheck.Checks.Security
 
         private HealthCheckStatus FixHttpsSetting()
         {
-            const string key = "Umbraco.Core.UseHttps";
-            var configurationService = new ConfigurationService(_configuration, key, _textService, _logger);
-            var updateConfigFile = configurationService.UpdateConfigFile("true");
+            var updateConfigFile = _configurationService.UpdateConfigFile("true");
 
             if (updateConfigFile.Success)
             {

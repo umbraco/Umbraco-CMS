@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Microsoft.Extensions.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 using Umbraco.Web.HealthCheck;
@@ -12,11 +11,15 @@ namespace Umbraco.Core.Configuration.HealthChecks
         Group = "Live Environment")]
     public class CompilationDebugCheck : AbstractConfigCheck
     {
-        public CompilationDebugCheck(IConfiguration configuration, ILocalizedTextService textService, ILogger logger)
-            : base(configuration, textService, logger)
+        public CompilationDebugCheck(ILocalizedTextService textService, ILogger logger,IConfigurationService configurationService)
+            : base(textService, logger, configurationService)
         { }
+        public override IEnumerable<HealthCheckStatus> GetStatus()
+        {
+            throw new System.NotImplementedException();
+        }
 
-        public override string Key => "/configuration/system.web/compilation/@debug";
+        public override string ItemPath => Constants.Configuration.ConfigHostingDebug;
 
         public override ValueComparisonType ValueComparisonType => ValueComparisonType.ShouldEqual;
 
@@ -24,7 +27,11 @@ namespace Umbraco.Core.Configuration.HealthChecks
 
         public override IEnumerable<AcceptableConfiguration> Values => new List<AcceptableConfiguration>
         {
-            new AcceptableConfiguration { IsRecommended = true, Value = bool.FalseString.ToLower() }
+            new AcceptableConfiguration
+            {
+                IsRecommended = true,
+                Value = bool.FalseString.ToLower()
+            }
         };
 
         public override string CheckSuccessMessage => TextService.Localize("healthcheck/compilationDebugCheckSuccessMessage");

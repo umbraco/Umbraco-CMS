@@ -2029,7 +2029,6 @@
         <key alias="trySkipIisCustomErrorsCheckErrorMessage">Try Skip IIS Custom Errors je aktuálně nastaveno na '%0%'. Doporučuje se nastavit %1% pro vaši verzi služby IIS (%2%).</key>
         <key alias="trySkipIisCustomErrorsCheckRectifySuccessMessage">Try Skip IIS Custom Errors úspěšně nastaveno na '%0%'.</key>
         <!-- The following keys get predefined tokens passed in that are not all the same, like above -->
-        <key alias="configurationServiceFileNotFound">Soubor neexistuje: '%0%'.</key>
         <key alias="configurationServiceNodeNotFound"><![CDATA[Nelze najít <strong>'% 0%'</strong> v konfiguračním souboru <strong>'% 1%'</strong>.]]></key>
         <key alias="configurationServiceError">Došlo k chybě, zkontrolujte ji v logu: %0%.</key>
         <key alias="databaseSchemaValidationCheckDatabaseOk">Databáze - Databázové schéma je pro tuto verzi Umbraco správné</key>
@@ -2059,6 +2058,10 @@
         <key alias="traceModeCheckErrorMessage">Režim sledování je aktuálně povolen. Před spuštěním se doporučuje toto nastavení deaktivovat.</key>
         <key alias="traceModeCheckRectifySuccessMessage">Režim sledování byl úspěšně deaktivován.</key>
         <key alias="folderPermissionsCheckMessage">Všechny složky mají nastavena správná oprávnění.</key>
+        <!-- The following keys get these tokens passed in:
+	    0: Path to the file not found
+  	    -->
+        <key alias="fileNotFound">Soubor neexistuje: '%0%'.</key>
         <!-- The following keys get these tokens passed in:
             0: Comma delimitted list of failed folder paths
           -->

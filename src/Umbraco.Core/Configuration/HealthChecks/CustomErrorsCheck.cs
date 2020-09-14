@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Extensions.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 using Umbraco.Web.HealthCheck;
@@ -13,11 +12,16 @@ namespace Umbraco.Core.Configuration.HealthChecks
         Group = "Live Environment")]
     public class CustomErrorsCheck : AbstractConfigCheck
     {
-        public CustomErrorsCheck(IConfiguration configuration, ILocalizedTextService textService, ILogger logger)
-            : base(configuration, textService, logger)
+        public CustomErrorsCheck(ILocalizedTextService textService, ILogger logger, IConfigurationService configurationService)
+            : base(textService, logger, configurationService)
         { }
 
-        public override string Key => "/configuration/system.web/customErrors/@mode";
+        public override IEnumerable<HealthCheckStatus> GetStatus()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override string ItemPath => Constants.Configuration.ConfigCustomErrors;
 
         public override ValueComparisonType ValueComparisonType => ValueComparisonType.ShouldEqual;
 

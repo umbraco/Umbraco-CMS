@@ -11,11 +11,22 @@
             /// ":" is used as marker for nested objects in json. E.g. "Umbraco:CMS:" = {"Umbraco":{"CMS":{....}}
             /// </remarks>
             public const string ConfigPrefix = "Umbraco:CMS:";
-            public const string ConfigSecurityPrefix = ConfigPrefix+"Security:";
+            public const string ConfigSecurityPrefix = ConfigPrefix + "Security:";
             public const string ConfigGlobalPrefix = ConfigPrefix + "Global:";
-            public const string ConfigModelsBuilderPrefix = ConfigPrefix+"ModelsBuilder:";
-            public const string ConfigRuntimeMinification = ConfigPrefix+"RuntimeMinification";
-            public const string ConfigRuntimeMinificationVersion = ConfigRuntimeMinification+":Version";
+            public const string ConfigContentPrefix = ConfigPrefix + "Content:";
+            public const string ConfigModelsBuilderPrefix = ConfigPrefix + "ModelsBuilder:";
+            public const string ConfigRuntimeMinification = ConfigPrefix + "RuntimeMinification";
+
+            public const string ConfigRuntimeMinificationVersion = ConfigRuntimeMinification + ":Version";
+            public const string ConfigContentNotificationsPrefix = ConfigContentPrefix + "Notifications:";
+            public const string ConfigContentNotificationsEmail = ConfigContentNotificationsPrefix + "Email";
+            public const string ConfigContentMacroErrors = ConfigContentPrefix + "MacroErrors";
+            public const string ConfigGlobalUseHttps = ConfigGlobalPrefix + "UseHttps";
+
+            public const string ConfigHostingPrefix = ConfigPrefix + "Hosting:";
+            public const string ConfigHostingDebug = ConfigHostingPrefix + "Debug";
+
+            public const string ConfigCustomErrors = ConfigPrefix + "CustomErrors:Mode";
         }
     }
 }

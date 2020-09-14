@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Microsoft.Extensions.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 using Umbraco.Web.HealthCheck;
@@ -12,11 +11,16 @@ namespace Umbraco.Core.Configuration.HealthChecks
         Group = "Live Environment")]
     public class TraceCheck : AbstractConfigCheck
     {
-        public TraceCheck(IConfiguration configuration, ILocalizedTextService textService, ILogger logger)
-        : base(configuration, textService, logger)
+        public TraceCheck(ILocalizedTextService textService, ILogger logger, IConfigurationService configurationService)
+        : base(textService, logger, configurationService)
         { }
 
-        public override string Key => "/configuration/system.web/trace/@enabled";
+        public override IEnumerable<HealthCheckStatus> GetStatus()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override string ItemPath => "/configuration/system.web/trace/@enabled";
 
         public override ValueComparisonType ValueComparisonType => ValueComparisonType.ShouldEqual;
 
@@ -30,5 +34,6 @@ namespace Umbraco.Core.Configuration.HealthChecks
         public override string CheckErrorMessage => TextService.Localize("healthcheck/traceModeCheckErrorMessage");
 
         public override string RectifySuccessMessage => TextService.Localize("healthcheck/traceModeCheckRectifySuccessMessage");
+        
     }
 }

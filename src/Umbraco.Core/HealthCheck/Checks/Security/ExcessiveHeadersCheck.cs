@@ -2,17 +2,18 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using Umbraco.Core;
 using Umbraco.Core.Services;
+using Umbraco.Web;
+using Umbraco.Web.HealthCheck;
 
-namespace Umbraco.Web.HealthCheck.Checks.Security
+namespace Umbraco.Core.HealthCheck.Checks.Security
 {
     [HealthCheck(
         "92ABBAA2-0586-4089-8AE2-9A843439D577",
         "Excessive Headers",
         Description = "Checks to see if your site is revealing information in its headers that gives away unnecessary details about the technology used to build and host it.",
         Group = "Security")]
-    public class ExcessiveHeadersCheck : Core.HealthCheck.HealthCheck
+    public class ExcessiveHeadersCheck : HealthCheck
     {
         private readonly ILocalizedTextService _textService;
         private readonly IRequestAccessor _requestAccessor;

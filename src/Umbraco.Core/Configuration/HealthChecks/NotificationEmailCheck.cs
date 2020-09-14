@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using Microsoft.Extensions.Configuration;
-using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 using Umbraco.Web.HealthCheck;
@@ -15,12 +13,17 @@ namespace Umbraco.Core.Configuration.HealthChecks
     {
         private const string DefaultFromEmail = "your@email.here";
 
-        public NotificationEmailCheck(IConfiguration configuration, ILocalizedTextService textService, ILogger logger)
-            : base(configuration, textService, logger)
+        public NotificationEmailCheck(ILocalizedTextService textService, ILogger logger, IConfigurationService configurationService)
+            : base(textService, logger, configurationService)
         {
         }
 
-        public override string Key => "Umbraco:CMS:Content:Notifications:Email";
+        public override IEnumerable<HealthCheckStatus> GetStatus()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override string ItemPath => Constants.Configuration.ConfigContentNotificationsEmail;
 
         public override ValueComparisonType ValueComparisonType => ValueComparisonType.ShouldNotEqual;
 
@@ -32,5 +35,6 @@ namespace Umbraco.Core.Configuration.HealthChecks
         public override string CheckSuccessMessage => TextService.Localize("healthcheck/notificationEmailsCheckSuccessMessage", new[] { CurrentValue });
 
         public override string CheckErrorMessage => TextService.Localize("healthcheck/notificationEmailsCheckErrorMessage", new[] { DefaultFromEmail });
+       
     }
 }

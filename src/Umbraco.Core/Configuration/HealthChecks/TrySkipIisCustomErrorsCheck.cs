@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Extensions.Configuration;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
@@ -19,13 +18,18 @@ namespace Umbraco.Core.Configuration.HealthChecks
         private readonly Version _iisVersion;
 
         public TrySkipIisCustomErrorsCheck
-            (IConfiguration configuration, ILocalizedTextService textService, IHostingEnvironment hostingEnvironment, ILogger logger)
-            : base(configuration, textService, logger)
+            (ILocalizedTextService textService, IHostingEnvironment hostingEnvironment, ILogger logger, IConfigurationService configurationService)
+            : base(textService, logger, configurationService)
         {
             _iisVersion = hostingEnvironment.IISVersion;
         }
 
-        public override string Key => "/settings/web.routing/@trySkipIisCustomErrors";
+        public override string ItemPath => "/settings/web.routing/@trySkipIisCustomErrors";
+
+        public override IEnumerable<HealthCheckStatus> GetStatus()
+        {
+            throw new NotImplementedException();
+        }
 
         public override ValueComparisonType ValueComparisonType => ValueComparisonType.ShouldEqual;
 

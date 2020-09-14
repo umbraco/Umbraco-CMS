@@ -5,6 +5,7 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Composing.CompositionExtensions;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Grid;
+using Umbraco.Core.Configuration.HealthChecks;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Dashboards;
 using Umbraco.Core.Dictionary;
@@ -200,8 +201,8 @@ namespace Umbraco.Core.Runtime
 
             // Config manipulator
             composition.RegisterUnique<IConfigManipulator, JsonConfigManipulator>();
-
-
+            composition.RegisterUnique<IConfigurationService, ConfigurationService>();
+            
             // register the http context and umbraco context accessors
             // we *should* use the HttpContextUmbracoContextAccessor, however there are cases when
             // we have no http context, eg when booting Umbraco or in background threads, so instead

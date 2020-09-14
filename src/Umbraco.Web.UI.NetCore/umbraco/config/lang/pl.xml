@@ -1403,7 +1403,6 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
     <key alias="trySkipIisCustomErrorsCheckErrorMessage">Try Skip IIS Custom Errors wynosi obecnie '%0%'. Zalecane jest ustawienie go na '%1%' dla Twojego IIS w wersji (%2%).</key>
     <key alias="trySkipIisCustomErrorsCheckRectifySuccessMessage">Try Skip IIS Custom Errors ustawiono z powodzeniem na '%0%'.</key>
     <!-- Następujące klucze przekazują predefiniowane tokeny, nie wszystkie są identyczne jak powyżej -->
-    <key alias="configurationServiceFileNotFound">Plik nie istnieje: '%0%'.</key>
     <key alias="configurationServiceNodeNotFound"><![CDATA[Nie można znaleźć <strong>'%0%'</strong> w pliku konfiguracyjnym <strong>'%1%'</strong>.]]></key>
     <key alias="configurationServiceError">Wystąpił błąd, sprawdź logi, aby wyświetlić pełen opis błędu: %0%.</key>
     <key alias="httpsCheckValidCertificate">Certifikat Twojej strony jest poprawny.</key>
@@ -1436,6 +1435,7 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
     <key alias="requiredFolderPermissionFailed"><![CDATA[Następujące foldery muszą być skonfigurowane z uprawnieniami modyfikującymi, ale nie można uzyskać do nich dostępu: <strong>%0%</strong>.]]></key>
     <key alias="optionalFolderPermissionFailed"><![CDATA[Następujące foldery muszą być skonfigurowane z uprawnieniami modyfikującymi dla pewnych operacji Umbraco, aby funkcjonować, ale nie można uzyskać do nich dostępu: <strong>%0%</strong>. Jeśli nie będzie nic w nich pisane, żadne działania nie muszą być podejmowane.]]></key>
     <key alias="filePermissionsCheckMessage">Wszystkie pliki mają ustawione poprawne uprawnienia.</key>
+    <key alias="fileNotFound">Plik nie istnieje: '%0%'.</key>
     <!-- Następujące klucze spowodują, że tokeny zostaną przekazane:
 	    0: Lista uszkodzonych ścieżek folderów oddzielonych przecinkami
   	-->

@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using Umbraco.Core.IO;
+﻿using Umbraco.Core.Configuration.HealthChecks;
 using Umbraco.Core.Services;
 using Umbraco.Web;
 using Umbraco.Web.HealthCheck;
@@ -13,8 +12,8 @@ namespace Umbraco.Core.HealthCheck.Checks.Security
         Group = "Security")]
     public class NoSniffCheck : BaseHttpHeaderCheck
     {
-        public NoSniffCheck(IConfiguration configuration, IRequestAccessor requestAccessor, ILocalizedTextService textService)
-            : base(configuration, requestAccessor, textService, "X-Content-Type-Options", "nosniff", "noSniff", false)
+        public NoSniffCheck(IConfigurationService configurationService, IRequestAccessor requestAccessor, ILocalizedTextService textService)
+            : base(configurationService, requestAccessor, textService, "X-Content-Type-Options", "nosniff", "noSniff", false)
         {
         }
     }

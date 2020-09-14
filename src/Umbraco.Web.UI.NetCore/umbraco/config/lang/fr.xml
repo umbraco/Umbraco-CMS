@@ -2040,7 +2040,6 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="trySkipIisCustomErrorsCheckErrorMessage">Try Skip IIS Custom Errors est actuellement fixé à '%0%'. Il est recommandé de fixer la valeur à '%1%' pour votre version IIS (%2%).</key>
     <key alias="trySkipIisCustomErrorsCheckRectifySuccessMessage">Try Skip IIS Custom Errors a été rectifié avec succès à la valeur '%0%'.</key>
     <!-- The following keys get predefined tokens passed in that are not all the same, like above -->
-    <key alias="configurationServiceFileNotFound">Le fichier n'existe pas : '%0%'.</key>
     <key alias="configurationServiceNodeNotFound"><![CDATA[Impossible de trouver <strong>'%0%'</strong> dans le fichier config <strong>'%1%'</strong>.]]></key>
     <key alias="configurationServiceError">Une erreur est survenue, consultez le log pour voir l'erreur complète : %0%.</key>
     <key alias="databaseSchemaValidationCheckDatabaseOk">Base de données - Le schéma de la base de données est correct pour cette version de Umbraco</key>
@@ -2070,6 +2069,10 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="traceModeCheckErrorMessage">Le mode tracing est actuellement activé. Il est recommandé de désactiver cette configuration avant la mise en ligne.</key>
     <key alias="traceModeCheckRectifySuccessMessage">Le mode tracing a été désactivé avec succès.</key>
     <key alias="folderPermissionsCheckMessage">Tous les répertoires ont les configurations de permissions adéquates.</key>
+    <!-- The following keys get these tokens passed in:
+	    0: Path to the file not found
+  	-->
+    <key alias="fileNotFound">Le fichier n'existe pas : '%0%'.</key>
     <!-- The following keys get these tokens passed in:
 	    0: Comma delimitted list of failed folder paths
   	-->

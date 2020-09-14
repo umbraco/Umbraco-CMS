@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Configuration;
+using Umbraco.Core.Configuration.HealthChecks;
 using Umbraco.Core.Services;
 using Umbraco.Web;
 using Umbraco.Web.HealthCheck;
@@ -22,16 +23,16 @@ namespace Umbraco.Core.HealthCheck.Checks.Security
         private readonly string _localizedTextPrefix;
         private readonly bool _metaTagOptionAvailable;
         private readonly IRequestAccessor _requestAccessor;
-        private readonly IConfiguration _configuration;
+        private readonly IConfigurationService _configurationService;
 
         protected BaseHttpHeaderCheck(
-            IConfiguration configuration,
+            IConfigurationService configurationService,
             IRequestAccessor requestAccessor,
             ILocalizedTextService textService,
             string header, string value, string localizedTextPrefix, bool metaTagOptionAvailable)
         {
             TextService = textService ?? throw new ArgumentNullException(nameof(textService));
-            _configuration = configuration;
+            _configurationService = configurationService;
             _requestAccessor = requestAccessor;
             _header = header;
             _value = value;
@@ -173,7 +174,8 @@ namespace Umbraco.Core.HealthCheck.Checks.Security
                 //TODO: Custom headers for appsettings
                 //TODO: pass section in instead
                 //TODO: correct logic according to JSON structure
-                IConfigurationSection systemWebServerElement = _configuration.GetSection("system.webServer");
+                IConfigurationSection systemWebServerElement = null;
+                    //_configurationService.GetSection("system.webServer");
                 string httpProtocolElement = systemWebServerElement["httpProtocol"];
                 if (httpProtocolElement == null)
                 {
