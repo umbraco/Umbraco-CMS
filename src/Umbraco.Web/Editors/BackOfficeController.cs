@@ -175,7 +175,7 @@ namespace Umbraco.Web.Editors
             var authType = OwinContext.Authentication.GetExternalAuthenticationTypes().FirstOrDefault(x => x.AuthenticationType == loginInfo.Login.LoginProvider);
             if (authType == null)
             {
-                Logger.Warn<BackOfficeController>("Could not find external authentication provider registered: {LoginProvider}", loginInfo.Login.LoginProvider);
+                Logger.LogWarning<BackOfficeController>("Could not find external authentication provider registered: {LoginProvider}", loginInfo.Login.LoginProvider);
             }
             else
             {
@@ -198,7 +198,7 @@ namespace Umbraco.Web.Editors
                     shouldSignIn = autoLinkOptions.OnExternalLogin(user, loginInfo);
                     if (shouldSignIn == false)
                     {
-                        Logger.Warn<BackOfficeController>("The AutoLinkOptions of the external authentication provider '{LoginProvider}' have refused the login based on the OnExternalLogin method. Affected user id: '{UserId}'", loginInfo.Login.LoginProvider, user.Id);
+                        Logger.LogWarning<BackOfficeController>("The AutoLinkOptions of the external authentication provider '{LoginProvider}' have refused the login based on the OnExternalLogin method. Affected user id: '{UserId}'", loginInfo.Login.LoginProvider, user.Id);
                     }
                 }
 

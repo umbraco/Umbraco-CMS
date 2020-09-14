@@ -222,7 +222,7 @@ namespace Umbraco.Web.Compose
                     user = _userService.GetUserById(Constants.Security.SuperUserId);
                     if (user == null)
                     {
-                        _logger.Warn(typeof(Notifier), "Notifications can not be sent, no admin user with id {SuperUserId} could be resolved", Constants.Security.SuperUserId);
+                        _logger.LogWarning(typeof(Notifier), "Notifications can not be sent, no admin user with id {SuperUserId} could be resolved", Constants.Security.SuperUserId);
                         return;
                     }
                 }
@@ -235,7 +235,7 @@ namespace Umbraco.Web.Compose
                 if (sender == null) throw new ArgumentNullException(nameof(sender));
                 if (siteUri == null)
                 {
-                    _logger.Warn(typeof(Notifier), "Notifications can not be sent, no site url is set (might be during boot process?)");
+                    _logger.LogWarning(typeof(Notifier), "Notifications can not be sent, no site url is set (might be during boot process?)");
                     return;
                 }
 

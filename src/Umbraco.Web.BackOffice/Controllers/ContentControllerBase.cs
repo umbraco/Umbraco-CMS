@@ -78,7 +78,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 // get the property editor
                 if (propertyDto.PropertyEditor == null)
                 {
-                    Logger.Warn<ContentControllerBase>("No property editor found for property {PropertyAlias}", propertyDto.Alias);
+                    Logger.LogWarning<ContentControllerBase>("No property editor found for property {PropertyAlias}", propertyDto.Alias);
                     continue;
                 }
 

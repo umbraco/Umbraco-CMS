@@ -42,7 +42,7 @@ namespace Umbraco.Web.Search
             {
                 if (_rebuildOnStartupRunner != null && _rebuildOnStartupRunner.IsRunning)
                 {
-                    _logger.Warn<BackgroundIndexRebuilder>("Call was made to RebuildIndexes but the task runner for rebuilding is already running");
+                    _logger.LogWarning<BackgroundIndexRebuilder>("Call was made to RebuildIndexes but the task runner for rebuilding is already running");
                     return;
                 }
 

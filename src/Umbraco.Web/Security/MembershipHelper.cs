@@ -305,7 +305,7 @@ namespace Umbraco.Web.Security
             if (member == null)
             {
                 //this should not happen
-                Current.Logger.Warn<MembershipHelper>("The member validated but then no member was returned with the username {Username}", username);
+                Current.Logger.LogWarning<MembershipHelper>("The member validated but then no member was returned with the username {Username}", username);
                 return false;
             }
             //Log them in
@@ -847,7 +847,7 @@ namespace Umbraco.Web.Security
             }
             catch (Exception ex)
             {
-                _logger.Warn<PasswordChanger>(ex, "Could not change member password");
+                _logger.LogWarning<PasswordChanger>(ex, "Could not change member password");
                 return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, error: " + ex.Message + " (see log for full details)", new[] { "value" }) });
             }
 

@@ -99,7 +99,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             if (invite == null)
             {
-                _logger.Warn<BackOfficeController>("VerifyUser endpoint reached with invalid token: NULL");
+                _logger.LogWarning<BackOfficeController>("VerifyUser endpoint reached with invalid token: NULL");
                 return RedirectToAction(nameof(Default));
             }
 
@@ -107,7 +107,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             if (parts.Length != 2)
             {
-                _logger.Warn<BackOfficeController>("VerifyUser endpoint reached with invalid token: {Invite}", invite);
+                _logger.LogWarning<BackOfficeController>("VerifyUser endpoint reached with invalid token: {Invite}", invite);
                 return RedirectToAction(nameof(Default));
             }
 
@@ -116,7 +116,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             var decoded = token.FromUrlBase64();
             if (decoded.IsNullOrWhiteSpace())
             {
-                _logger.Warn<BackOfficeController>("VerifyUser endpoint reached with invalid token: {Invite}", invite);
+                _logger.LogWarning<BackOfficeController>("VerifyUser endpoint reached with invalid token: {Invite}", invite);
                 return RedirectToAction(nameof(Default));
             }
 
@@ -125,7 +125,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             var identityUser = await _userManager.FindByIdAsync(id);
             if (identityUser == null)
             {
-                _logger.Warn<BackOfficeController>("VerifyUser endpoint reached with non existing user: {UserId}", id);
+                _logger.LogWarning<BackOfficeController>("VerifyUser endpoint reached with non existing user: {UserId}", id);
                 return RedirectToAction(nameof(Default));
             }
 
@@ -133,7 +133,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             if (result.Succeeded == false)
             {
-                _logger.Warn<BackOfficeController>("Could not verify email, Error: {Errors}, Token: {Invite}", result.Errors.ToErrorMessage(), invite);
+                _logger.LogWarning<BackOfficeController>("Could not verify email, Error: {Errors}, Token: {Invite}", result.Errors.ToErrorMessage(), invite);
                 return new RedirectResult(Url.Action(nameof(Default)) + "#/login/false?invite=3");
             }
 

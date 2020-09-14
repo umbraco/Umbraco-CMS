@@ -280,7 +280,7 @@ namespace Umbraco.Web.Macros
             }
             catch (Exception e)
             {
-                _plogger.Warn<MacroRenderer>(e, "Failed {MsgIn}", msgIn);
+                _plogger.LogWarning<MacroRenderer>(e, "Failed {MsgIn}", msgIn);
 
                 var macroErrorEventArgs = new MacroErrorEventArgs
                 {

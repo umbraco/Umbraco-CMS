@@ -685,7 +685,7 @@ namespace Umbraco.Web.Routing
                 }
                 else
                 {
-                    _logger.Warn<PublishedRouter>("FindTemplate: Alternative template {TemplateAlias} is not allowed on node {NodeId}, ignoring.", altTemplate, request.PublishedContent.Id);
+                    _logger.LogWarning<PublishedRouter>("FindTemplate: Alternative template {TemplateAlias} is not allowed on node {NodeId}, ignoring.", altTemplate, request.PublishedContent.Id);
 
                     // no allowed, back to default
                     var templateId = request.PublishedContent.TemplateId;

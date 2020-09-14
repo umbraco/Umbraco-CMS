@@ -243,14 +243,14 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 {
                     okContent = LockAndLoadContent(scope => LoadContentFromLocalDbLocked(true));
                     if (!okContent)
-                        _logger.Warn<PublishedSnapshotService>("Loading content from local db raised warnings, will reload from database.");
+                        _logger.LogWarning<PublishedSnapshotService>("Loading content from local db raised warnings, will reload from database.");
                 }
 
                 if (_localMediaDbExists)
                 {
                     okMedia = LockAndLoadMedia(scope => LoadMediaFromLocalDbLocked(true));
                     if (!okMedia)
-                        _logger.Warn<PublishedSnapshotService>("Loading media from local db raised warnings, will reload from database.");
+                        _logger.LogWarning<PublishedSnapshotService>("Loading media from local db raised warnings, will reload from database.");
                 }
 
                 if (!okContent)

@@ -1619,7 +1619,7 @@ namespace Umbraco.Web.Editors
                 var sortResult = contentService.Sort(sorted.IdSortOrder, _webSecurity.CurrentUser.Id);
                 if (!sortResult.Success)
                 {
-                    Logger.Warn<ContentController>("Content sorting failed, this was probably caused by an event being cancelled");
+                    Logger.LogWarning<ContentController>("Content sorting failed, this was probably caused by an event being cancelled");
                     // TODO: Now you can cancel sorting, does the event messages bubble up automatically?
                     throw HttpResponseException.CreateValidationErrorResponse("Content sorting failed, this was probably caused by an event being cancelled");
                 }
@@ -2001,7 +2001,7 @@ namespace Umbraco.Web.Editors
                 if (template == null)
                 {
                     //ModelState.AddModelError("Template", "No template exists with the specified alias: " + contentItem.TemplateAlias);
-                    Logger.Warn<ContentController>("No template exists with the specified alias: {TemplateAlias}", contentSave.TemplateAlias);
+                    Logger.LogWarning<ContentController>("No template exists with the specified alias: {TemplateAlias}", contentSave.TemplateAlias);
                 }
                 else if (template.Id != contentSave.PersistedContent.TemplateId)
                 {

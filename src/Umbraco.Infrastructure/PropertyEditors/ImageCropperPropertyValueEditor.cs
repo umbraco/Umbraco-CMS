@@ -82,7 +82,7 @@ namespace Umbraco.Web.PropertyEditors
             catch (Exception ex)
             {
                 // for some reason the value is invalid so continue as if there was no value there
-                _logger.Warn<ImageCropperPropertyValueEditor>(ex, "Could not parse current db value to a JObject.");
+                _logger.LogWarning<ImageCropperPropertyValueEditor>(ex, "Could not parse current db value to a JObject.");
             }
             if (string.IsNullOrWhiteSpace(currentPath) == false)
                 currentPath = _mediaFileSystem.GetRelativePath(currentPath);

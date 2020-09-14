@@ -521,7 +521,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             parent = GetParentLink(kit.Node, null);
             if (parent == null)
             {
-                _logger.Warn<ContentStore>($"Skip item id={kit.Node.Id}, could not find parent id={kit.Node.ParentContentId}.");
+                _logger.LogWarning<ContentStore>($"Skip item id={kit.Node.Id}, could not find parent id={kit.Node.ParentContentId}.");
                 return false;
             }
 
@@ -530,21 +530,21 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // because the data sort operation is by path.
             if (parent.Value == null)
             {
-                _logger.Warn<ContentStore>($"Skip item id={kit.Node.Id}, no Data assigned for linked node with path {kit.Node.Path} and parent id {kit.Node.ParentContentId}. This can indicate data corruption for the Path value for node {kit.Node.Id}. See the Health Check dashboard in Settings to resolve data integrity issues.");
+                _logger.LogWarning<ContentStore>($"Skip item id={kit.Node.Id}, no Data assigned for linked node with path {kit.Node.Path} and parent id {kit.Node.ParentContentId}. This can indicate data corruption for the Path value for node {kit.Node.Id}. See the Health Check dashboard in Settings to resolve data integrity issues.");
                 return false;
             }
 
             // make sure the kit is valid
             if (kit.DraftData == null && kit.PublishedData == null)
             {
-                _logger.Warn<ContentStore>($"Skip item id={kit.Node.Id}, both draft and published data are null.");
+                _logger.LogWarning<ContentStore>($"Skip item id={kit.Node.Id}, both draft and published data are null.");
                 return false;
             }
 
             // unknown = bad
             if (_contentTypesById.TryGetValue(kit.ContentTypeId, out var link) == false || link.Value == null)
             {
-                _logger.Warn<ContentStore>($"Skip item id={kit.Node.Id}, could not find content type id={kit.ContentTypeId}.");
+                _logger.LogWarning<ContentStore>($"Skip item id={kit.Node.Id}, could not find content type id={kit.ContentTypeId}.");
                 return false;
             }
 

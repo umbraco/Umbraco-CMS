@@ -51,7 +51,7 @@ namespace Umbraco.Core.Services.Implement
 
             if (fileSourceFolder.Exists == false)
             {
-                Current.Logger.Warn<LocalizedTextServiceFileSources>("The folder does not exist: {FileSourceFolder}, therefore no sources will be discovered", fileSourceFolder.FullName);
+                Current.Logger.LogWarning<LocalizedTextServiceFileSources>("The folder does not exist: {FileSourceFolder}, therefore no sources will be discovered", fileSourceFolder.FullName);
             }
             else
             {
@@ -99,7 +99,7 @@ namespace Umbraco.Core.Services.Implement
                                         }
                                         catch (CultureNotFoundException)
                                         {
-                                            Current.Logger.Warn<LocalizedTextServiceFileSources>("The culture {CultureValue} found in the file {CultureFile} is not a valid culture", cultureVal, fileInfo.FullName);
+                                            Current.Logger.LogWarning<LocalizedTextServiceFileSources>("The culture {CultureValue} found in the file {CultureFile} is not a valid culture", cultureVal, fileInfo.FullName);
                                             //If the culture in the file is invalid, we'll just hope the file name is a valid culture below, otherwise
                                             // an exception will be thrown.
                                         }

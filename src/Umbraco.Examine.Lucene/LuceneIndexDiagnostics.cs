@@ -34,7 +34,7 @@ namespace Umbraco.Examine
                 }
                 catch (AlreadyClosedException)
                 {
-                    Logger.Warn(typeof(UmbracoContentIndex), "Cannot get GetIndexDocumentCount, the writer is already closed");
+                    Logger.LogWarning(typeof(UmbracoContentIndex), "Cannot get GetIndexDocumentCount, the writer is already closed");
                     return 0;
                 }
             }
@@ -50,7 +50,7 @@ namespace Umbraco.Examine
                 }
                 catch (AlreadyClosedException)
                 {
-                    Logger.Warn(typeof(UmbracoContentIndex), "Cannot get GetIndexFieldCount, the writer is already closed");
+                    Logger.LogWarning(typeof(UmbracoContentIndex), "Cannot get GetIndexFieldCount, the writer is already closed");
                     return 0;
                 }
             }

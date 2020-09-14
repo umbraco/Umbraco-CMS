@@ -122,7 +122,7 @@ namespace Umbraco.Core
             catch (Exception e)
             {
                 // can connect to the database but cannot check the upgrade state... oops
-                _logger.Warn<RuntimeState>(e, "Could not check the upgrade state.");
+                _logger.LogWarning<RuntimeState>(e, "Could not check the upgrade state.");
 
                 if (_globalSettings.InstallEmptyDatabase)
                 {

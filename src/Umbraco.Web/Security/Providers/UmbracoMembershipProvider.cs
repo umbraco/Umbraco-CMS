@@ -131,7 +131,7 @@ namespace Umbraco.Web.Security.Providers
             if (MemberService.Exists(username))
             {
                 status = MembershipCreateStatus.DuplicateUserName;
-                Current.Logger.Warn<UmbracoMembershipProvider<T, TEntity>>("Cannot create member as username already exists: {Username}", username);
+                Current.Logger.LogWarning<UmbracoMembershipProvider<T, TEntity>>("Cannot create member as username already exists: {Username}", username);
                 return null;
             }
 
@@ -139,7 +139,7 @@ namespace Umbraco.Web.Security.Providers
             if (MemberService.GetByEmail(email) != null && RequiresUniqueEmail)
             {
                 status = MembershipCreateStatus.DuplicateEmail;
-                Current.Logger.Warn<UmbracoMembershipProvider<T, TEntity>>("Cannot create member as a member with the same email address exists: {Email}", email);
+                Current.Logger.LogWarning<UmbracoMembershipProvider<T, TEntity>>("Cannot create member as a member with the same email address exists: {Email}", email);
                 return null;
             }
 

@@ -107,7 +107,7 @@ namespace Umbraco.Core.Logging
         /// </summary>
         /// <param name="reporting">The reporting type.</param>
         /// <param name="message">A message.</param>
-        void Warn(Type reporting, string message);
+        void LogWarning(Type reporting, string message);
 
         /// <summary>
         /// Logs a warning message.
@@ -115,7 +115,7 @@ namespace Umbraco.Core.Logging
         /// <param name="reporting">The reporting type.</param>
         /// <param name="messageTemplate">A message template.</param>
         /// <param name="propertyValues">Property values.</param>
-        void Warn(Type reporting, string messageTemplate, params object[] propertyValues);
+        void LogWarning(Type reporting, string messageTemplate, params object[] propertyValues);
 
         /// <summary>
         /// Logs a warning message with an exception.
@@ -123,7 +123,7 @@ namespace Umbraco.Core.Logging
         /// <param name="reporting">The reporting type.</param>
         /// <param name="exception">An exception.</param>
         /// <param name="message">A message.</param>
-        void Warn(Type reporting, Exception exception, string message);
+        void LogWarning(Type reporting, Exception exception, string message);
 
         /// <summary>
         /// Logs a warning message with an exception.
@@ -132,7 +132,7 @@ namespace Umbraco.Core.Logging
         /// <param name="exception">An exception.</param>
         /// <param name="messageTemplate">A message template.</param>
         /// <param name="propertyValues">Property values.</param>
-        void Warn(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues);
+        void LogWarning(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues);
 
         /// <summary>
         /// Logs an information message.

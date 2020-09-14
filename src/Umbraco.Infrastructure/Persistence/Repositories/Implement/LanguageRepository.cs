@@ -317,7 +317,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (language != null) return language;
 
             // this is an anomaly, the service/repo should ensure it cannot happen
-            Logger.Warn<LanguageRepository>("There is no default language. Fix this anomaly by editing the language table in database and setting one language as the default language.");
+            Logger.LogWarning<LanguageRepository>("There is no default language. Fix this anomaly by editing the language table in database and setting one language as the default language.");
 
             // still, don't kill the site, and return "something"
 

@@ -217,7 +217,7 @@ namespace Umbraco.Core.PropertyEditors
             var result = TryConvertValueToCrlType(editorValue.Value);
             if (result.Success == false)
             {
-                Current.Logger.Warn<DataValueEditor>("The value {EditorValue} cannot be converted to the type {StorageTypeValue}", editorValue.Value, ValueTypes.ToStorageType(ValueType));
+                Current.Logger.LogWarning<DataValueEditor>("The value {EditorValue} cannot be converted to the type {StorageTypeValue}", editorValue.Value, ValueTypes.ToStorageType(ValueType));
                 return null;
             }
             return result.Result;

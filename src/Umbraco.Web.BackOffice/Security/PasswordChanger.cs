@@ -72,7 +72,7 @@ namespace Umbraco.Web.BackOffice.Security
                 if (resetResult.Succeeded == false)
                 {
                     var errors = resetResult.Errors.ToErrorMessage();
-                    _logger.Warn<PasswordChanger>("Could not reset user password {PasswordErrors}", errors);
+                    _logger.LogWarning<PasswordChanger>("Could not reset user password {PasswordErrors}", errors);
                     return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult(errors, new[] { "value" }) });
                 }
 
@@ -92,7 +92,7 @@ namespace Umbraco.Web.BackOffice.Security
             {
                 //no, fail with error messages for "password"
                 var errors = changeResult.Errors.ToErrorMessage();
-                _logger.Warn<PasswordChanger>("Could not change user password {PasswordErrors}", errors);
+                _logger.LogWarning<PasswordChanger>("Could not change user password {PasswordErrors}", errors);
                 return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult(errors, new[] { "password" }) });
             }
             return Attempt.Succeed(new PasswordChangedModel());

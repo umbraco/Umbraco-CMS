@@ -67,17 +67,17 @@ namespace Umbraco.Web.WebApi.Filters
             {
                 if (actionExecutedContext == null)
                 {
-                    Current.Logger.Warn<FileUploadCleanupFilterAttribute>("The actionExecutedContext is null!!??");
+                    Current.Logger.LogWarning<FileUploadCleanupFilterAttribute>("The actionExecutedContext is null!!??");
                     return;
                 }
                 if (actionExecutedContext.Request == null)
                 {
-                    Current.Logger.Warn<FileUploadCleanupFilterAttribute>("The actionExecutedContext.Request is null!!??");
+                    Current.Logger.LogWarning<FileUploadCleanupFilterAttribute>("The actionExecutedContext.Request is null!!??");
                     return;
                 }
                 if (actionExecutedContext.Request.Content == null)
                 {
-                    Current.Logger.Warn<FileUploadCleanupFilterAttribute>("The actionExecutedContext.Request.Content is null!!??");
+                    Current.Logger.LogWarning<FileUploadCleanupFilterAttribute>("The actionExecutedContext.Request.Content is null!!??");
                     return;
                 }
 
@@ -127,23 +127,23 @@ namespace Umbraco.Web.WebApi.Filters
                                 }
                                 else
                                 {
-                                    Current.Logger.Warn<FileUploadCleanupFilterAttribute>("The f.TempFilePath is null or whitespace!!??");
+                                    Current.Logger.LogWarning<FileUploadCleanupFilterAttribute>("The f.TempFilePath is null or whitespace!!??");
                                 }
                             }
                         }
                         else
                         {
-                            Current.Logger.Warn<FileUploadCleanupFilterAttribute>("The uploadedFiles.UploadedFiles is null!!??");
+                            Current.Logger.LogWarning<FileUploadCleanupFilterAttribute>("The uploadedFiles.UploadedFiles is null!!??");
                         }
                     }
                     else
                     {
-                        Current.Logger.Warn<FileUploadCleanupFilterAttribute>("The actionExecutedContext.Request.Content.Value is not IHaveUploadedFiles, it is {ObjectType}", objectContent.Value.GetType());
+                        Current.Logger.LogWarning<FileUploadCleanupFilterAttribute>("The actionExecutedContext.Request.Content.Value is not IHaveUploadedFiles, it is {ObjectType}", objectContent.Value.GetType());
                     }
                 }
                 else
                 {
-                    Current.Logger.Warn<FileUploadCleanupFilterAttribute>("The actionExecutedContext.Request.Content is not ObjectContent, it is {RequestObjectType}", actionExecutedContext.Request.Content.GetType());
+                    Current.Logger.LogWarning<FileUploadCleanupFilterAttribute>("The actionExecutedContext.Request.Content is not ObjectContent, it is {RequestObjectType}", actionExecutedContext.Request.Content.GetType());
                 }
             }
         }

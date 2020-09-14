@@ -215,7 +215,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 {
                     if (Debugger.IsAttached)
                         throw new InvalidOperationException("Missing cmsContentNu edited content for node " + dto.Id + ", consider rebuilding.");
-                    _logger.Warn<DatabaseDataSource>("Missing cmsContentNu edited content for node {NodeId}, consider rebuilding.", dto.Id);
+                    _logger.LogWarning<DatabaseDataSource>("Missing cmsContentNu edited content for node {NodeId}, consider rebuilding.", dto.Id);
                 }
                 else
                 {
@@ -242,7 +242,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 {
                     if (Debugger.IsAttached)
                         throw new InvalidOperationException("Missing cmsContentNu published content for node " + dto.Id + ", consider rebuilding.");
-                    _logger.Warn<DatabaseDataSource>("Missing cmsContentNu published content for node {NodeId}, consider rebuilding.", dto.Id);
+                    _logger.LogWarning<DatabaseDataSource>("Missing cmsContentNu published content for node {NodeId}, consider rebuilding.", dto.Id);
                 }
                 else
                 {

@@ -229,7 +229,7 @@ namespace Umbraco.Web
             if (context.Content.HasContent())
                 return true;
 
-            _logger.Warn<UmbracoModule>("Umbraco has no content");
+            _logger.LogWarning<UmbracoModule>("Umbraco has no content");
 
             if (RouteTable.Routes[Constants.Web.NoContentRouteName] is Route route)
             {

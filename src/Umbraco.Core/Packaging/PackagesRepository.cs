@@ -213,7 +213,7 @@ namespace Umbraco.Core.Packaging
                     }
                     catch (Exception e)
                     {
-                        _logger.Warn<PackagesRepository>(e, "Could not add package actions to the package, the xml did not parse");
+                        _logger.LogWarning<PackagesRepository>(e, "Could not add package actions to the package, the xml did not parse");
                     }
                 }
 

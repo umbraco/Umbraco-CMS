@@ -86,20 +86,20 @@ namespace Umbraco.Web.WebApi.Filters
                 {
                     if (context == null)
                     {
-                        _logger.Warn<FileUploadCleanupFilterAttribute>("The context is null!!??");
+                        _logger.LogWarning<FileUploadCleanupFilterAttribute>("The context is null!!??");
                         return Task.CompletedTask;
                     }
 
                     if (context.Result == null)
                     {
-                        _logger.Warn<FileUploadCleanupFilterAttribute>(
+                        _logger.LogWarning<FileUploadCleanupFilterAttribute>(
                             "The context.Result is null!!??");
                         return Task.CompletedTask;
                     }
 
                     if(!(context.Result is ObjectResult objectResult))
                     {
-                        _logger.Warn<FileUploadCleanupFilterAttribute>(
+                        _logger.LogWarning<FileUploadCleanupFilterAttribute>(
                             "Could not acquire context.Result as ObjectResult");
                         return Task.CompletedTask;
                     }
@@ -138,20 +138,20 @@ namespace Umbraco.Web.WebApi.Filters
                                 }
                                 else
                                 {
-                                    _logger.Warn<FileUploadCleanupFilterAttribute>(
+                                    _logger.LogWarning<FileUploadCleanupFilterAttribute>(
                                         "The f.TempFilePath is null or whitespace!!??");
                                 }
                             }
                         }
                         else
                         {
-                            _logger.Warn<FileUploadCleanupFilterAttribute>(
+                            _logger.LogWarning<FileUploadCleanupFilterAttribute>(
                                 "The uploadedFiles.UploadedFiles is null!!??");
                         }
                     }
                     else
                     {
-                        _logger.Warn<FileUploadCleanupFilterAttribute>(
+                        _logger.LogWarning<FileUploadCleanupFilterAttribute>(
                             "The actionExecutedContext.Request.Content.Value is not IHaveUploadedFiles, it is {ObjectType}",
                             objectResult.Value.GetType());
                     }

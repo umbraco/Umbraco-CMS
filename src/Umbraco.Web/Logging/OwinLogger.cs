@@ -33,7 +33,7 @@ namespace Umbraco.Web.Logging
                     _logger.LogError(_type.Value, exception, "[{EventType}] Event Id: {EventId}, State: {State}", eventType, eventId, state);
                     return true;
                 case TraceEventType.Warning:
-                    _logger.Warn(_type.Value, "[{EventType}] Event Id: {EventId}, State: {State}", eventType, eventId, state);
+                    _logger.LogWarning(_type.Value, "[{EventType}] Event Id: {EventId}, State: {State}", eventType, eventId, state);
                     return true;
                 case TraceEventType.Information:
                     _logger.Info(_type.Value, "[{EventType}] Event Id: {EventId}, State: {State}", eventType, eventId, state);

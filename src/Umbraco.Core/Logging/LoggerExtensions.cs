@@ -71,8 +71,8 @@ namespace Umbraco.Core.Logging
         /// <typeparam name="T">The reporting type.</typeparam>
         /// <param name="logger">The logger.</param>
         /// <param name="message">A message.</param>
-        public static void Warn<T>(this ILogger logger, string message)
-            => logger.Warn(typeof(T), message);
+        public static void LogWarning<T>(this ILogger logger, string message)
+            => logger.LogWarning(typeof(T), message);
 
         /// <summary>
         /// Logs a warning message.
@@ -81,8 +81,8 @@ namespace Umbraco.Core.Logging
         /// <param name="logger">The logger.</param>
         /// <param name="messageTemplate">A message template.</param>
         /// <param name="propertyValues">Property values.</param>
-        public static void Warn<T>(this ILogger logger, string messageTemplate, params object[] propertyValues)
-            => logger.Warn(typeof(T), messageTemplate, propertyValues);
+        public static void LogWarning<T>(this ILogger logger, string messageTemplate, params object[] propertyValues)
+            => logger.LogWarning(typeof(T), messageTemplate, propertyValues);
 
         /// <summary>
         /// Logs a warning message with an exception.
@@ -91,8 +91,8 @@ namespace Umbraco.Core.Logging
         /// <param name="logger">The logger.</param>
         /// <param name="exception">An exception.</param>
         /// <param name="message">A message.</param>
-        public static void Warn<T>(this ILogger logger, Exception exception, string message)
-            => logger.Warn(typeof(T), exception, message);
+        public static void LogWarning<T>(this ILogger logger, Exception exception, string message)
+            => logger.LogWarning(typeof(T), exception, message);
 
         /// <summary>
         /// Logs a warning message with an exception.
@@ -102,8 +102,8 @@ namespace Umbraco.Core.Logging
         /// <param name="exception">An exception.</param>
         /// <param name="messageTemplate">A message template.</param>
         /// <param name="propertyValues">Property values.</param>
-        public static void Warn<T>(this ILogger logger, Exception exception, string messageTemplate, params object[] propertyValues)
-            => logger.Warn(typeof(T), exception, messageTemplate, propertyValues);
+        public static void LogWarning<T>(this ILogger logger, Exception exception, string messageTemplate, params object[] propertyValues)
+            => logger.LogWarning(typeof(T), exception, messageTemplate, propertyValues);
 
         /// <summary>
         /// Logs an information message.

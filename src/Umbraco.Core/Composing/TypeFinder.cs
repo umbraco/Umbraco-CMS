@@ -442,7 +442,7 @@ namespace Umbraco.Core.Composing
                     if (_notifiedLoadExceptionAssemblies.Contains(a.FullName) == false)
                     {
                         _notifiedLoadExceptionAssemblies.Add(a.FullName);
-                        _logger.Warn(typeof (TypeFinder), ex, "Could not load all types from {TypeName}.", a.GetName().Name);
+                        _logger.LogWarning(typeof (TypeFinder), ex, "Could not load all types from {TypeName}.", a.GetName().Name);
                     }
                 }
                 return rex.Types.WhereNotNull().ToArray();

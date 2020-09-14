@@ -461,7 +461,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 var tryCreateTemplate = _fileService.CreateTemplateForContentType(contentTypeAlias, contentTypeName);
                 if (tryCreateTemplate == false)
                 {
-                    _logger.Warn<ContentTypeController>("Could not create a template for Content Type: \"{ContentTypeAlias}\", status: {Status}",
+                    _logger.LogWarning<ContentTypeController>("Could not create a template for Content Type: \"{ContentTypeAlias}\", status: {Status}",
                         contentTypeAlias, tryCreateTemplate.Result.Result);
                 }
 

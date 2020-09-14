@@ -56,22 +56,22 @@ namespace Umbraco.Core.Logging
 
         }
 
-        public void Warn(Type reporting, string message)
+        public void LogWarning(Type reporting, string message)
         {
 
         }
 
-        public void Warn(Type reporting, string messageTemplate, params object[] propertyValues)
+        public void LogWarning(Type reporting, string messageTemplate, params object[] propertyValues)
         {
 
         }
 
-        public void Warn(Type reporting, Exception exception, string message)
+        public void LogWarning(Type reporting, Exception exception, string message)
         {
 
         }
 
-        public void Warn(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues)
+        public void LogWarning(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues)
         {
 
         }

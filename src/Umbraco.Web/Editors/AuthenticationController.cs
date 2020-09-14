@@ -117,7 +117,7 @@ namespace Umbraco.Web.Editors
             var userId = await SignInManager.GetVerifiedUserIdAsync();
             if (string.IsNullOrWhiteSpace(userId))
             {
-                Logger.Warn<AuthenticationController>("Get2FAProviders :: No verified user found, returning 404");
+                Logger.LogWarning<AuthenticationController>("Get2FAProviders :: No verified user found, returning 404");
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
@@ -136,7 +136,7 @@ namespace Umbraco.Web.Editors
             var userId = await SignInManager.GetVerifiedUserIdAsync();
             if (string.IsNullOrWhiteSpace(userId))
             {
-                Logger.Warn<AuthenticationController>("Get2FAProviders :: No verified user found, returning 404");
+                Logger.LogWarning<AuthenticationController>("Get2FAProviders :: No verified user found, returning 404");
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
@@ -159,7 +159,7 @@ namespace Umbraco.Web.Editors
             var userName = await SignInManager.GetVerifiedUserNameAsync();
             if (userName == null)
             {
-                Logger.Warn<AuthenticationController>("Get2FAProviders :: No verified user found, returning 404");
+                Logger.LogWarning<AuthenticationController>("Get2FAProviders :: No verified user found, returning 404");
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 

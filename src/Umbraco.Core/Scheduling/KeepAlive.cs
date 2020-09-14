@@ -61,7 +61,7 @@ namespace Umbraco.Web.Scheduling
                         var umbracoAppUrl = _requestAccessor.GetApplicationUrl().ToString();
                         if (umbracoAppUrl.IsNullOrWhiteSpace())
                         {
-                            _logger.Warn<KeepAlive>("No umbracoApplicationUrl for service (yet), skip.");
+                            _logger.LogWarning<KeepAlive>("No umbracoApplicationUrl for service (yet), skip.");
                             return true; // repeat
                         }
 

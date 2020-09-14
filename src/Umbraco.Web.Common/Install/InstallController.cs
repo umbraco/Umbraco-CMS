@@ -118,7 +118,7 @@ namespace Umbraco.Web.Common.Install
             if (_reported && _reportedLevel == level) return;
             _reported = true;
             _reportedLevel = level;
-            logger.Warn(typeof(UmbracoInstallApplicationBuilderExtensions), message);
+            logger.LogWarning(typeof(UmbracoInstallApplicationBuilderExtensions), message);
         }
     }
 }

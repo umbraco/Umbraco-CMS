@@ -31,7 +31,7 @@ namespace Umbraco.Web
 
         public void Warn(string msg)
         {
-            _logger.Warn<CdfLogger>(msg);
+            _logger.LogWarning<CdfLogger>(msg);
         }
 
         public void Error(string msg, Exception ex)

@@ -135,7 +135,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
 
             if (runNow)
                 //Run();
-                _logger.Warn<XmlStoreFilePersister>("Cannot write now because we are going down, changes may be lost.");
+                _logger.LogWarning<XmlStoreFilePersister>("Cannot write now because we are going down, changes may be lost.");
 
             return ret; // this, by default, unless we created a new one
         }

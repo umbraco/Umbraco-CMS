@@ -70,23 +70,23 @@ namespace Umbraco.Core.Logging
             Console.WriteLine("ERROR {0} - {1}", reporting.Name, _messageTemplates.Render(messageTemplate, propertyValues));
         }
 
-        public void Warn(Type reporting, string message)
+        public void LogWarning(Type reporting, string message)
         {
             Console.WriteLine("WARN {0} - {1}", reporting.Name, message);
         }
 
-        public void Warn(Type reporting, string message, params object[] propertyValues)
+        public void LogWarning(Type reporting, string message, params object[] propertyValues)
         {
             Console.WriteLine("WARN {0} - {1}", reporting.Name, _messageTemplates.Render(message, propertyValues));
         }
 
-        public void Warn(Type reporting, Exception exception, string message)
+        public void LogWarning(Type reporting, Exception exception, string message)
         {
             Console.WriteLine("WARN {0} - {1}", reporting.Name, message);
             Console.WriteLine(exception);
         }
 
-        public void Warn(Type reporting, Exception exception, string message, params object[] propertyValues)
+        public void LogWarning(Type reporting, Exception exception, string message, params object[] propertyValues)
         {
             Console.WriteLine("WARN {0} - {1}", reporting.Name, _messageTemplates.Render(message, propertyValues));
             Console.WriteLine(exception);

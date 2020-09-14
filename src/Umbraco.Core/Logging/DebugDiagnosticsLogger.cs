@@ -78,25 +78,25 @@ namespace Umbraco.Core.Logging
         }
 
         /// <inheritdoc/>
-        public void Warn(Type reporting, string message)
+        public void LogWarning(Type reporting, string message)
         {
             System.Diagnostics.Debug.WriteLine(message, reporting.FullName);
         }
 
         /// <inheritdoc/>
-        public void Warn(Type reporting, string message, params object[] propertyValues)
+        public void LogWarning(Type reporting, string message, params object[] propertyValues)
         {
             System.Diagnostics.Debug.WriteLine(_messageTemplates.Render(message, propertyValues), reporting.FullName);
         }
 
         /// <inheritdoc/>
-        public void Warn(Type reporting, Exception exception, string message)
+        public void LogWarning(Type reporting, Exception exception, string message)
         {
             System.Diagnostics.Debug.WriteLine(message + Environment.NewLine + exception, reporting.FullName);
         }
 
         /// <inheritdoc/>
-        public void Warn(Type reporting, Exception exception, string message, params object[] propertyValues)
+        public void LogWarning(Type reporting, Exception exception, string message, params object[] propertyValues)
         {
             System.Diagnostics.Debug.WriteLine(_messageTemplates.Render(message + Environment.NewLine + exception, propertyValues), reporting.FullName);
         }
