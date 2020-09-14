@@ -1,5 +1,6 @@
 ﻿using System.Text.RegularExpressions;
-using Umbraco.Core.Configuration.UmbracoSettings;
+using Microsoft.Extensions.Options;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 
@@ -7,16 +8,16 @@ namespace Umbraco.Web.Templates
 {
     public sealed class HtmlUrlParser
     {
-        private readonly IContentSettings _contentSettings;
+        private readonly ContentSettings _contentSettings;
         private readonly IIOHelper _ioHelper;
         private readonly IProfilingLogger _logger;
 
         private static readonly Regex ResolveUrlPattern = new Regex("(=[\"\']?)(\\W?\\~(?:.(?![\"\']?\\s+(?:\\S+)=|[>\"\']))+.)[\"\']?",
             RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
 
-        public HtmlUrlParser(IContentSettings contentSettings, IProfilingLogger logger, IIOHelper ioHelper)
+        public HtmlUrlParser(IOptions<ContentSettings> contentSettings, IProfilingLogger logger, IIOHelper ioHelper)
         {
-            _contentSettings = contentSettings;
+            _contentSettings = contentSettings.Value;
             _ioHelper = ioHelper;
             _logger = logger;
         }

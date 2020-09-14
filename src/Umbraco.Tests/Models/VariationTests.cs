@@ -23,9 +23,6 @@ namespace Umbraco.Tests.Models
         [SetUp]
         public void SetUp()
         {
-            // annoying, but content type wants short string helper ;(
-            SettingsForTests.Reset();
-
             // well, this is also annoying, but...
             // validating a value is performed by its data editor,
             // based upon the configuration in the data type, so we
@@ -33,9 +30,9 @@ namespace Umbraco.Tests.Models
 
             Current.Reset();
 
-            var configs = TestHelper.GetConfigs();
-            configs.Add(() => SettingsForTests.DefaultGlobalSettings);
-            configs.Add(SettingsForTests.GenerateMockContentSettings);
+            // var configs = TestHelper.GetConfigs();
+            // configs.Add(() => SettingsForTests.DefaultGlobalSettings);
+            // configs.Add(SettingsForTests.GenerateMockContentSettings);
 
             _factory = Mock.Of<IFactory>();
 
@@ -65,7 +62,7 @@ namespace Umbraco.Tests.Models
                 .Setup(x => x.GetInstance(It.IsAny<Type>()))
                 .Returns<Type>(x =>
                 {
-                    if (x == typeof(Configs)) return configs;
+                    //if (x == typeof(Configs)) return configs;
                     if (x == typeof(PropertyEditorCollection)) return propertyEditors;
                     if (x == typeof(ServiceContext)) return serviceContext;
                     if (x == typeof(ILocalizedTextService)) return serviceContext.LocalizationService;

@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Manifest;
@@ -25,7 +27,7 @@ namespace Umbraco.Web.WebAssets
 
         private readonly IRuntimeMinifier _runtimeMinifier;
         private readonly IManifestParser _parser;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly PropertyEditorCollection _propertyEditorCollection;
 
@@ -34,13 +36,13 @@ namespace Umbraco.Web.WebAssets
             IManifestParser parser,
             PropertyEditorCollection propertyEditorCollection,
             IHostingEnvironment hostingEnvironment,
-            IGlobalSettings globalSettings)
+            IOptions<GlobalSettings> globalSettings)
         {
             _runtimeMinifier = runtimeMinifier;
             _parser = parser;
             _propertyEditorCollection = propertyEditorCollection;
             _hostingEnvironment = hostingEnvironment;
-            _globalSettings = globalSettings;
+            _globalSettings = globalSettings.Value;
         }
 
         public void CreateBundles()

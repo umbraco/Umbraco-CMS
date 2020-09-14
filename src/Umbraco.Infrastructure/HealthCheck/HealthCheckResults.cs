@@ -71,7 +71,7 @@ namespace Umbraco.Web.HealthCheck
 
                 foreach (var checkResult in checkResults)
                 {
-                    Logger.Info<HealthCheckResults>("Result for {HealthCheckName}: {HealthCheckResult}, Message: '{HealthCheckMessage}'", checkName, checkResult.ResultType, checkResult.Message);
+                    Logger.Info<HealthCheckResults>("'Result for {HealthCheckName}: {HealthCheckResult}, Message: '{HealthCheckMessage}'", checkName, checkResult.ResultType, checkResult.Message);
                 }
             }
         }

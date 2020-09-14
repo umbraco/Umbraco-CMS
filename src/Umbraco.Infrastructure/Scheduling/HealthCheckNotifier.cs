@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Umbraco.Core;
-using Umbraco.Core.Configuration.HealthChecks;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Sync;
@@ -17,7 +17,7 @@ namespace Umbraco.Web.Scheduling
         private readonly HealthCheckNotificationMethodCollection _notifications;
         private readonly IScopeProvider _scopeProvider;
         private readonly IProfilingLogger _logger;
-        private readonly IHealthChecksSettings _healthChecksSettingsConfig;
+        private readonly HealthChecksSettings _healthChecksSettings;
         private readonly IServerRegistrar _serverRegistrar;
         private readonly IRuntimeState _runtimeState;
 
@@ -29,7 +29,7 @@ namespace Umbraco.Web.Scheduling
             HealthCheckNotificationMethodCollection notifications,
             IMainDom mainDom,
             IProfilingLogger logger,
-            IHealthChecksSettings healthChecksSettingsConfig,
+            HealthChecksSettings healthChecksSettings,
             IServerRegistrar serverRegistrar,
             IRuntimeState runtimeState,
             IScopeProvider scopeProvider)
@@ -41,7 +41,7 @@ namespace Umbraco.Web.Scheduling
             _scopeProvider = scopeProvider;
             _runtimeState = runtimeState;
             _logger = logger;
-            _healthChecksSettingsConfig = healthChecksSettingsConfig;
+            _healthChecksSettings = healthChecksSettings;
             _serverRegistrar = serverRegistrar;
             _runtimeState = runtimeState;
         }
@@ -74,7 +74,7 @@ namespace Umbraco.Web.Scheduling
             using (var scope = _scopeProvider.CreateScope())
             using (_logger.DebugDuration<HealthCheckNotifier>("Health checks executing", "Health checks complete"))
             {
-                var healthCheckConfig = _healthChecksSettingsConfig;
+                var healthCheckConfig = _healthChecksSettings;
 
                 // Don't notify for any checks that are disabled, nor for any disabled
                 // just for notifications

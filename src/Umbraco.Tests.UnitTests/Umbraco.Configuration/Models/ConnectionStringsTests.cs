@@ -1,8 +1,6 @@
-﻿using Microsoft.Extensions.Configuration;
-using Moq;
-using NUnit.Framework;
-using Umbraco.Configuration.Models;
+﻿using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Configuration.Models;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Configuration.Models
 {
@@ -16,17 +14,11 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Configuration.Models
         public string ParseProviderName(string connectionString)
         {
             var key = Constants.System.UmbracoConnectionName;
-            var configuration = new Mock<IConfiguration>();
 
-
-            //This is the underlying method that is called by Configuration.GetConnectionString(string)
-            if (connectionString != null)
+            var connectionStrings = new ConnectionStrings
             {
-                configuration.Setup(x => x.GetSection("ConnectionStrings")[key]).Returns(connectionString);
-            }
-
-
-            var connectionStrings = new ConnectionStrings(configuration.Object);
+                UmbracoConnectionString = connectionString
+            };
 
             var actual = connectionStrings[key];
 

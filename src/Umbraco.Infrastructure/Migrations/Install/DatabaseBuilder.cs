@@ -2,7 +2,9 @@
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
+using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -21,7 +23,6 @@ namespace Umbraco.Core.Migrations.Install
     {
         private readonly IUmbracoDatabaseFactory _databaseFactory;
         private readonly IScopeProvider _scopeProvider;
-        private readonly IGlobalSettings _globalSettings;
         private readonly IRuntimeState _runtime;
         private readonly IMigrationBuilder _migrationBuilder;
         private readonly IKeyValueService _keyValueService;
@@ -38,7 +39,6 @@ namespace Umbraco.Core.Migrations.Install
         /// </summary>
         public DatabaseBuilder(
             IScopeProvider scopeProvider,
-            IGlobalSettings globalSettings,
             IUmbracoDatabaseFactory databaseFactory,
             IRuntimeState runtime,
             ILogger logger,
@@ -50,7 +50,6 @@ namespace Umbraco.Core.Migrations.Install
             IConfigManipulator configManipulator)
         {
             _scopeProvider = scopeProvider;
-            _globalSettings = globalSettings;
             _databaseFactory = databaseFactory;
             _runtime = runtime;
             _logger = logger;
@@ -319,7 +318,7 @@ namespace Umbraco.Core.Migrations.Install
                 return _databaseSchemaValidationResult;
 
             var database = scope.Database;
-            var dbSchema = new DatabaseSchemaCreator(database, _logger, _umbracoVersion, _globalSettings);
+            var dbSchema = new DatabaseSchemaCreator(database, _logger, _umbracoVersion);
             _databaseSchemaValidationResult = dbSchema.ValidateSchema();
             return _databaseSchemaValidationResult;
         }
@@ -367,7 +366,7 @@ namespace Umbraco.Core.Migrations.Install
                     if (_runtime.Level == RuntimeLevel.Run)
                         throw new Exception("Umbraco is already configured!");
 
-                    var creator = new DatabaseSchemaCreator(database, _logger, _umbracoVersion, _globalSettings);
+                    var creator = new DatabaseSchemaCreator(database, _logger, _umbracoVersion);
                     creator.InitializeDatabaseSchema();
 
                     message = message + "<p>Installation completed!</p>";

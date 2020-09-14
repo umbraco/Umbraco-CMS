@@ -9,6 +9,8 @@ using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
+using Umbraco.Core.Configuration.Models;
+using Microsoft.Extensions.Options;
 
 namespace Umbraco.Examine
 {
@@ -29,7 +31,7 @@ namespace Umbraco.Examine
             IUmbracoIndexConfig umbracoIndexConfig,
             IHostingEnvironment hostingEnvironment,
             IRuntimeState runtimeState,
-            IIndexCreatorSettings settings,
+            IOptions<IndexCreatorSettings> settings,
             ILuceneDirectoryFactory directoryFactory) : base(typeFinder, hostingEnvironment, settings)
         {
             ProfilingLogger = profilingLogger ?? throw new System.ArgumentNullException(nameof(profilingLogger));

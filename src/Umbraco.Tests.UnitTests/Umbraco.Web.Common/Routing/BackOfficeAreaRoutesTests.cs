@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using System.Linq;
@@ -7,6 +8,7 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
 using Umbraco.Extensions;
+using Umbraco.Tests.Common.Builders;
 using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.BackOffice.Routing;
 using Umbraco.Web.Common.Attributes;
@@ -94,8 +96,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Routing
 
         private BackOfficeAreaRoutes GetBackOfficeAreaRoutes(RuntimeLevel level)
         {
+            var globalSettings = new GlobalSettingsBuilder().Build();
             var routes = new BackOfficeAreaRoutes(
-                Mock.Of<IGlobalSettings>(x => x.UmbracoPath == "~/umbraco"),
+                Options.Create(globalSettings),
                 Mock.Of<IHostingEnvironment>(x => x.ToAbsolute(It.IsAny<string>()) == "/umbraco" && x.ApplicationVirtualPath == string.Empty),
                 Mock.Of<IRuntimeState>(x => x.Level == level),
                 new UmbracoApiControllerTypeCollection(new[] { typeof(Testing1Controller) }));

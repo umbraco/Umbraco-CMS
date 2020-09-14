@@ -8,6 +8,7 @@ using Microsoft.Owin.Security.DataProtection;
 using Umbraco.Core;
 using Umbraco.Core.BackOffice;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
@@ -20,7 +21,7 @@ namespace Umbraco.Web.Security
         public const string OwinMarkerKey = "Umbraco.Web.Security.Identity.BackOfficeUserManagerMarker";
 
         public BackOfficeOwinUserManager(
-            IUserPasswordConfiguration passwordConfiguration,
+            IOptions<UserPasswordConfigurationSettings> passwordConfiguration,
             IIpResolver ipResolver,
             IUserStore<BackOfficeIdentityUser> store,
             IOptions<BackOfficeIdentityOptions> optionsAccessor,
@@ -32,7 +33,7 @@ namespace Umbraco.Web.Security
             ILogger<UserManager<BackOfficeIdentityUser>> logger)
             : base(ipResolver, store, optionsAccessor, null, userValidators, passwordValidators, keyNormalizer, errors, null, logger, passwordConfiguration)
         {
-            PasswordConfiguration = passwordConfiguration;
+            PasswordConfiguration = passwordConfiguration.Value;
             InitUserManager(this, dataProtectionProvider);
         }
 
@@ -45,9 +46,9 @@ namespace Umbraco.Web.Security
             IUserService userService,
             IEntityService entityService,
             IExternalLoginService externalLoginService,
-            IGlobalSettings globalSettings,
+            IOptions<GlobalSettings> globalSettings,
             UmbracoMapper mapper,
-            IUserPasswordConfiguration passwordConfiguration,
+            IOptions<UserPasswordConfigurationSettings> passwordConfiguration,
             IIpResolver ipResolver,
             BackOfficeIdentityErrorDescriber errors,
             IDataProtectionProvider dataProtectionProvider,
@@ -68,7 +69,7 @@ namespace Umbraco.Web.Security
         /// Creates a BackOfficeUserManager instance with all default options and a custom BackOfficeUserManager instance
         /// </summary>
         public static BackOfficeOwinUserManager Create(
-            IUserPasswordConfiguration passwordConfiguration,
+            IOptions<UserPasswordConfigurationSettings> passwordConfiguration,
             IIpResolver ipResolver,
             IUserStore<BackOfficeIdentityUser> customUserStore,
             BackOfficeIdentityErrorDescriber errors,
@@ -83,11 +84,11 @@ namespace Umbraco.Web.Security
 
             // Configure validation logic for passwords
             var passwordValidators = new List<IPasswordValidator<BackOfficeIdentityUser>> { new PasswordValidator<BackOfficeIdentityUser>() };
-            options.Password.RequiredLength = passwordConfiguration.RequiredLength;
-            options.Password.RequireNonAlphanumeric = passwordConfiguration.RequireNonLetterOrDigit;
-            options.Password.RequireDigit = passwordConfiguration.RequireDigit;
-            options.Password.RequireLowercase = passwordConfiguration.RequireLowercase;
-            options.Password.RequireUppercase = passwordConfiguration.RequireUppercase;
+            options.Password.RequiredLength = passwordConfiguration.Value.RequiredLength;
+            options.Password.RequireNonAlphanumeric = passwordConfiguration.Value.RequireNonLetterOrDigit;
+            options.Password.RequireDigit = passwordConfiguration.Value.RequireDigit;
+            options.Password.RequireLowercase = passwordConfiguration.Value.RequireLowercase;
+            options.Password.RequireUppercase = passwordConfiguration.Value.RequireUppercase;
 
             // Ensure Umbraco security stamp claim type is used
             options.ClaimsIdentity.UserIdClaimType = ClaimTypes.NameIdentifier;
@@ -96,7 +97,7 @@ namespace Umbraco.Web.Security
             options.ClaimsIdentity.SecurityStampClaimType = Constants.Security.SecurityStampClaimType;
 
             options.Lockout.AllowedForNewUsers = true;
-            options.Lockout.MaxFailedAccessAttempts = passwordConfiguration.MaxFailedAccessAttemptsBeforeLockout;
+            options.Lockout.MaxFailedAccessAttempts = passwordConfiguration.Value.MaxFailedAccessAttemptsBeforeLockout;
             //NOTE: This just needs to be in the future, we currently don't support a lockout timespan, it's either they are locked
             // or they are not locked, but this determines what is set on the account lockout date which corresponds to whether they are
             // locked out or not.

@@ -6,8 +6,8 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.HealthChecks;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
-using Umbraco.Web;
-using Umbraco.Web.HealthCheck;
+using Umbraco.Core.Configuration.Models;
+using Microsoft.Extensions.Options;
 
 namespace Umbraco.Core.HealthCheck.Checks.Security
 {
@@ -19,17 +19,17 @@ namespace Umbraco.Core.HealthCheck.Checks.Security
     public class HttpsCheck : HealthCheck
     {
         private readonly ILocalizedTextService _textService;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly ILogger _logger;
         private readonly IRequestAccessor _requestAccessor;
         private IConfigurationService _configurationService;
         private const string FixHttpsSettingAction = "fixHttpsSetting";
         string itemPath => Constants.Configuration.ConfigGlobalUseHttps;
 
-        public HttpsCheck(ILocalizedTextService textService, IGlobalSettings globalSettings, ILogger logger, IRequestAccessor requestAccessor, IConfigurationService configurationService)
+        public HttpsCheck(ILocalizedTextService textService, IOptions<GlobalSettings> globalSettings, IIOHelper ioHelper, ILogger logger, IRequestAccessor requestAccessor)
         {
             _textService = textService;
-            _globalSettings = globalSettings;
+            _globalSettings = globalSettings.Value;
             _logger = logger;
             _requestAccessor = requestAccessor;
             _configurationService = configurationService;

@@ -4,6 +4,8 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
+using Microsoft.CodeAnalysis.Options;
+using Microsoft.Extensions.Options;
 using Moq;
 using Newtonsoft.Json;
 using Umbraco.Core;
@@ -39,7 +41,6 @@ namespace Umbraco.Tests.Models
             Composition.ComposeFileSystems();
 
             Composition.Register(_ => Mock.Of<IDataTypeService>());
-            Composition.Register(_ => Mock.Of<IContentSettings>());
 
             // all this is required so we can validate properties...
             var editor = new TextboxPropertyEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), IOHelper, ShortStringHelper, LocalizedTextService) { Alias = "test" };

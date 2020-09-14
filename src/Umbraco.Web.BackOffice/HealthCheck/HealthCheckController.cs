@@ -8,6 +8,8 @@ using Umbraco.Core.Configuration.HealthChecks;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.HealthCheck;
 using Umbraco.Web.Common.Attributes;
+using Umbraco.Core.Configuration.Models;
+using Microsoft.Extensions.Options;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -22,12 +24,12 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IList<Guid> _disabledCheckIds;
         private readonly ILogger _logger;
 
-        public HealthCheckController(HealthCheckCollection checks, ILogger logger, IHealthChecksSettings healthChecksSettings)
+        public HealthCheckController(HealthCheckCollection checks, ILogger logger, IOptions<HealthChecksSettings> healthChecksSettings)
         {
             _checks = checks ?? throw new ArgumentNullException(nameof(checks));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-            var healthCheckConfig = healthChecksSettings ?? throw new ArgumentNullException(nameof(healthChecksSettings));
+            var healthCheckConfig = healthChecksSettings.Value ?? throw new ArgumentNullException(nameof(healthChecksSettings));
             _disabledCheckIds = healthCheckConfig.DisabledChecks
                 .Select(x => x.Id)
                 .ToList();

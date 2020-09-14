@@ -41,7 +41,7 @@ namespace Umbraco.Tests.Composing
             var typeFinder = TestHelper.GetTypeFinder();
             var ioHelper = TestHelper.IOHelper;
             var typeLoader = new TypeLoader(typeFinder, Mock.Of<IAppPolicyCache>(), new DirectoryInfo(ioHelper.MapPath("~/App_Data/TEMP")), logger);
-            var composition = new Composition(mockedRegister, typeLoader, logger, Mock.Of<IRuntimeState>(), TestHelper.GetConfigs(), TestHelper.IOHelper, AppCaches.NoCache);
+            var composition = new Composition(mockedRegister, typeLoader, logger, Mock.Of<IRuntimeState>(), TestHelper.IOHelper, AppCaches.NoCache);
 
             // create the factory, ensure it is the mocked factory
             var factory = composition.CreateFactory();

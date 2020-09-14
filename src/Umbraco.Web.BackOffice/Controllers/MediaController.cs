@@ -3,35 +3,30 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Net.Mime;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
-using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Services;
-using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Events;
 using Umbraco.Core.Hosting;
+using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Mapping;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.ContentEditing;
-using Umbraco.Core.Models.Editors;
 using Umbraco.Core.Models.Entities;
+using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Validation;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.PropertyEditors;
-using Umbraco.Web.ContentApps;
-using Umbraco.Web.WebApi.Filters;
-using Constants = Umbraco.Core.Constants;
-using Umbraco.Core.Mapping;
+using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Extensions;
 using Umbraco.Web.BackOffice.Filters;
@@ -39,7 +34,11 @@ using Umbraco.Web.BackOffice.ModelBinders;
 using Umbraco.Web.Common.ActionResults;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Exceptions;
+using Umbraco.Web.ContentApps;
+using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Security;
+using Umbraco.Web.WebApi.Filters;
+using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -52,7 +51,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     public class MediaController : ContentControllerBase
     {
         private readonly IShortStringHelper _shortStringHelper;
-        private readonly IContentSettings _contentSettings;
+        private readonly ContentSettings _contentSettings;
         private readonly IMediaTypeService _mediaTypeService;
         private readonly IMediaService _mediaService;
         private readonly IEntityService _entityService;
@@ -69,7 +68,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             IShortStringHelper shortStringHelper,
             IEventMessagesFactory eventMessages,
             ILocalizedTextService localizedTextService,
-            IContentSettings contentSettings,
+            IOptions<ContentSettings> contentSettings,
             IMediaTypeService mediaTypeService,
             IMediaService mediaService,
             IEntityService entityService,
@@ -85,7 +84,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             : base(cultureDictionary, logger, shortStringHelper, eventMessages, localizedTextService)
         {
             _shortStringHelper = shortStringHelper;
-            _contentSettings = contentSettings;
+            _contentSettings = contentSettings.Value;
             _mediaTypeService = mediaTypeService;
             _mediaService = mediaService;
             _entityService = entityService;
@@ -742,7 +741,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
                     if (contentTypeAlias == Constants.Conventions.MediaTypes.AutoSelect)
                     {
-                        if (_contentSettings.ImageFileTypes.Contains(ext))
+                        if (_contentSettings.Imaging.ImageFileTypes.Contains(ext))
                         {
                             mediaType = Constants.Conventions.MediaTypes.Image;
                         }
