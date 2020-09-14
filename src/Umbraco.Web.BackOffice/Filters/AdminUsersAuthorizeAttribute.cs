@@ -35,7 +35,7 @@ namespace Umbraco.Web.BackOffice.Filters
             private readonly IContentService _contentService;
             private readonly IMediaService _mediaService;
             private readonly IEntityService _entityService;
-            private readonly IWebSecurityAccessor _webSecurityAccessor;
+            private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
 
             public AdminUsersAuthorizeFilter(
                 IRequestAccessor requestAccessor,
@@ -43,7 +43,7 @@ namespace Umbraco.Web.BackOffice.Filters
                 IContentService contentService,
                 IMediaService mediaService,
                 IEntityService entityService,
-                IWebSecurityAccessor webSecurityAccessor,
+                IBackofficeSecurityAccessor backofficeSecurityAccessor,
                 string parameterName)
             {
                 _requestAccessor = requestAccessor;
@@ -51,7 +51,7 @@ namespace Umbraco.Web.BackOffice.Filters
                 _contentService = contentService;
                 _mediaService = mediaService;
                 _entityService = entityService;
-                _webSecurityAccessor = webSecurityAccessor;
+                _backofficeSecurityAccessor = backofficeSecurityAccessor;
                 _parameterName = parameterName;
             }
 
@@ -87,7 +87,7 @@ namespace Umbraco.Web.BackOffice.Filters
 
                 var users = _userService.GetUsersById(userIds);
                 var authHelper = new UserEditorAuthorizationHelper(_contentService, _mediaService, _userService, _entityService);
-                return users.All(user => authHelper.IsAuthorized(_webSecurityAccessor.WebSecurity.CurrentUser, user, null, null, null) != false);
+                return users.All(user => authHelper.IsAuthorized(_backofficeSecurityAccessor.BackofficeSecurity.CurrentUser, user, null, null, null) != false);
             }
         }
 

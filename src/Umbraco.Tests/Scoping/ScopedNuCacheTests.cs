@@ -123,7 +123,7 @@ namespace Umbraco.Tests.Scoping
             var umbracoContext = new UmbracoContext(
                 httpContextAccessor,
                 service,
-                Mock.Of<IWebSecurity>(),
+                Mock.Of<IBackofficeSecurity>(),
                 globalSettings,
                 HostingEnvironment,
                 new TestVariationContextAccessor(),

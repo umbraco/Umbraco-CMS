@@ -30,18 +30,18 @@ namespace Umbraco.Web.BackOffice.Filters
             private readonly ILogger _logger;
             private readonly IMediaService _mediaService;
             private readonly ILocalizedTextService _textService;
-            private readonly IWebSecurityAccessor _webSecurityAccessor;
+            private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
 
             public MediaItemSaveValidationFilter(
                 ILogger logger,
-                IWebSecurityAccessor webSecurityAccessor,
+                IBackofficeSecurityAccessor backofficeSecurityAccessor,
                 ILocalizedTextService textService,
                 IMediaService mediaService,
                 IEntityService entityService,
                 IPropertyValidationService propertyValidationService)
             {
                 _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-                _webSecurityAccessor = webSecurityAccessor ?? throw new ArgumentNullException(nameof(webSecurityAccessor));
+                _backofficeSecurityAccessor = backofficeSecurityAccessor ?? throw new ArgumentNullException(nameof(backofficeSecurityAccessor));
                 _textService = textService ?? throw new ArgumentNullException(nameof(textService));
                 _mediaService = mediaService ?? throw new ArgumentNullException(nameof(mediaService));
                 _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
@@ -51,7 +51,7 @@ namespace Umbraco.Web.BackOffice.Filters
             public void OnActionExecuting(ActionExecutingContext context)
             {
                 var model = (MediaItemSave) context.ActionArguments["contentItem"];
-                var contentItemValidator = new MediaSaveModelValidator(_logger, _webSecurityAccessor.WebSecurity, _textService, _propertyValidationService);
+                var contentItemValidator = new MediaSaveModelValidator(_logger, _backofficeSecurityAccessor.BackofficeSecurity, _textService, _propertyValidationService);
 
                 if (ValidateUserAccess(model, context))
                 {
@@ -102,7 +102,7 @@ namespace Umbraco.Web.BackOffice.Filters
 
                 if (MediaController.CheckPermissions(
                     actionContext.HttpContext.Items,
-                    _webSecurityAccessor.WebSecurity.CurrentUser,
+                    _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser,
                     _mediaService, _entityService,
                     contentIdToCheck, contentToCheck) == false)
                 {

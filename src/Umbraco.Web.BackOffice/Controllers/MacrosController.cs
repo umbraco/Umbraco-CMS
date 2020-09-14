@@ -33,7 +33,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly ParameterEditorCollection _parameterEditorCollection;
         private readonly IMacroService _macroService;
         private readonly IShortStringHelper _shortStringHelper;
-        private readonly IWebSecurityAccessor _webSecurityAccessor;
+        private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly ILogger _logger;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly UmbracoMapper _umbracoMapper;
@@ -42,7 +42,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             ParameterEditorCollection parameterEditorCollection,
             IMacroService macroService,
             IShortStringHelper shortStringHelper,
-            IWebSecurityAccessor webSecurityAccessor,
+            IBackofficeSecurityAccessor backofficeSecurityAccessor,
             ILogger logger,
             IHostingEnvironment hostingEnvironment,
             UmbracoMapper umbracoMapper
@@ -51,7 +51,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _parameterEditorCollection = parameterEditorCollection ?? throw new ArgumentNullException(nameof(parameterEditorCollection));
             _macroService = macroService ?? throw new ArgumentNullException(nameof(macroService));
             _shortStringHelper = shortStringHelper ?? throw new ArgumentNullException(nameof(shortStringHelper));
-            _webSecurityAccessor = webSecurityAccessor ?? throw new ArgumentNullException(nameof(_webSecurityAccessor));
+            _backofficeSecurityAccessor = backofficeSecurityAccessor ?? throw new ArgumentNullException(nameof(_backofficeSecurityAccessor));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
             _umbracoMapper = umbracoMapper ?? throw new ArgumentNullException(nameof(umbracoMapper));
@@ -96,7 +96,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                     MacroSource = string.Empty
                 };
 
-                _macroService.Save(macro, _webSecurityAccessor.WebSecurity.CurrentUser.Id);
+                _macroService.Save(macro, _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.Id);
 
                 return macro.Id;
             }
@@ -216,7 +216,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             try
             {
-                _macroService.Save(macro, _webSecurityAccessor.WebSecurity.CurrentUser.Id);
+                _macroService.Save(macro, _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.Id);
 
                 macroDisplay.Notifications.Clear();
 

@@ -14,22 +14,22 @@ namespace Umbraco.Web.Mvc
     public sealed class UmbracoAuthorizeAttribute : AuthorizeAttribute
     {
         // see note in HttpInstallAuthorizeAttribute
-        private readonly IWebSecurityAccessor _webSecurityAccessor;
+        private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly IRuntimeState _runtimeState;
         private readonly string _redirectUrl;
 
         private IRuntimeState RuntimeState => _runtimeState ?? Current.RuntimeState;
 
-        private IWebSecurity WebSecurity => _webSecurityAccessor.WebSecurity ?? Current.UmbracoContext.Security;
+        private IBackofficeSecurity BackofficeSecurity => _backofficeSecurityAccessor.BackofficeSecurity ?? Current.UmbracoContext.Security;
 
         /// <summary>
         /// THIS SHOULD BE ONLY USED FOR UNIT TESTS
         /// </summary>
-        /// <param name="webSecurityAccessor"></param>
+        /// <param name="backofficeSecurityAccessor"></param>
         /// <param name="runtimeState"></param>
-        public UmbracoAuthorizeAttribute(IWebSecurityAccessor webSecurityAccessor, IRuntimeState runtimeState)
+        public UmbracoAuthorizeAttribute(IBackofficeSecurityAccessor backofficeSecurityAccessor, IRuntimeState runtimeState)
         {
-            _webSecurityAccessor = _webSecurityAccessor ?? throw new ArgumentNullException(nameof(webSecurityAccessor));
+            _backofficeSecurityAccessor = _backofficeSecurityAccessor ?? throw new ArgumentNullException(nameof(backofficeSecurityAccessor));
             _runtimeState = runtimeState ?? throw new ArgumentNullException(nameof(runtimeState));
         }
 
@@ -75,7 +75,7 @@ namespace Umbraco.Web.Mvc
                 // otherwise we need to ensure that a user is logged in
                 return RuntimeState.Level == RuntimeLevel.Install
                     || RuntimeState.Level == RuntimeLevel.Upgrade
-                    || WebSecurity.ValidateCurrentUser();
+                    || BackofficeSecurity.ValidateCurrentUser();
             }
             catch (Exception)
             {

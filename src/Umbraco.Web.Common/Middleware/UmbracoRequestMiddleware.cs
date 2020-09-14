@@ -25,20 +25,20 @@ namespace Umbraco.Web.Common.Middleware
         private readonly IUmbracoRequestLifetimeManager _umbracoRequestLifetimeManager;
         private readonly IUmbracoContextFactory _umbracoContextFactory;
         private readonly IRequestCache _requestCache;
-        private readonly IWebSecurityFactory _webSecurityFactory;
+        private readonly IBackofficeSecurityFactory _backofficeSecurityFactory;
 
         public UmbracoRequestMiddleware(
             ILogger logger,
             IUmbracoRequestLifetimeManager umbracoRequestLifetimeManager,
             IUmbracoContextFactory umbracoContextFactory,
             IRequestCache requestCache,
-            IWebSecurityFactory webSecurityFactory)
+            IBackofficeSecurityFactory backofficeSecurityFactory)
         {
             _logger = logger;
             _umbracoRequestLifetimeManager = umbracoRequestLifetimeManager;
             _umbracoContextFactory = umbracoContextFactory;
             _requestCache = requestCache;
-            _webSecurityFactory = webSecurityFactory;
+            _backofficeSecurityFactory = backofficeSecurityFactory;
         }
 
         public async Task InvokeAsync(HttpContext context, RequestDelegate next)
@@ -51,7 +51,7 @@ namespace Umbraco.Web.Common.Middleware
                 await next(context);
                 return;
             }
-            _webSecurityFactory.EnsureWebSecurity();  // Needs to be before UmbracoContext
+            _backofficeSecurityFactory.EnsureBackofficeSecurity();  // Needs to be before UmbracoContext
             var umbracoContextReference = _umbracoContextFactory.EnsureUmbracoContext();
 
 

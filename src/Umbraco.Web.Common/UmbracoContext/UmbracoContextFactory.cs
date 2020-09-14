@@ -29,7 +29,7 @@ namespace Umbraco.Web
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ICookieManager _cookieManager;
         private readonly IRequestAccessor _requestAccessor;
-        private readonly IWebSecurityAccessor _webSecurityAccessor;
+        private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly UriUtility _uriUtility;
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace Umbraco.Web
             IHttpContextAccessor httpContextAccessor,
             ICookieManager cookieManager,
             IRequestAccessor requestAccessor,
-             IWebSecurityAccessor webSecurityAccessor)
+             IBackofficeSecurityAccessor backofficeSecurityAccessor)
         {
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
             _publishedSnapshotService = publishedSnapshotService ?? throw new ArgumentNullException(nameof(publishedSnapshotService));
@@ -60,7 +60,7 @@ namespace Umbraco.Web
             _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
             _cookieManager = cookieManager ?? throw new ArgumentNullException(nameof(cookieManager));
             _requestAccessor = requestAccessor ?? throw new ArgumentNullException(nameof(requestAccessor));
-            _webSecurityAccessor = webSecurityAccessor ?? throw new ArgumentNullException(nameof(webSecurityAccessor));
+            _backofficeSecurityAccessor = backofficeSecurityAccessor ?? throw new ArgumentNullException(nameof(backofficeSecurityAccessor));
         }
 
         private IUmbracoContext CreateUmbracoContext()
@@ -78,7 +78,7 @@ namespace Umbraco.Web
 
             return new UmbracoContext(
                 _publishedSnapshotService,
-                _webSecurityAccessor.WebSecurity,
+                _backofficeSecurityAccessor.BackofficeSecurity,
                 _globalSettings,
                 _hostingEnvironment,
                 _variationContextAccessor,

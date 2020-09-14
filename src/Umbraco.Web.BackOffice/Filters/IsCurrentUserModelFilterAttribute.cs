@@ -16,11 +16,11 @@ namespace Umbraco.Web.BackOffice.Filters
 
         private class IsCurrentUserModelFilter : IActionFilter
         {
-            private readonly IWebSecurityAccessor _webSecurityAccessor;
+            private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
 
-            public IsCurrentUserModelFilter(IWebSecurityAccessor webSecurityAccessor)
+            public IsCurrentUserModelFilter(IBackofficeSecurityAccessor backofficeSecurityAccessor)
             {
-                _webSecurityAccessor = webSecurityAccessor;
+                _backofficeSecurityAccessor = backofficeSecurityAccessor;
             }
 
 
@@ -28,7 +28,7 @@ namespace Umbraco.Web.BackOffice.Filters
             {
                 if (context.Result == null) return;
 
-                var user = _webSecurityAccessor.WebSecurity.CurrentUser;
+                var user = _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser;
                 if (user == null) return;
 
                 var objectContent = context.Result as ObjectResult;

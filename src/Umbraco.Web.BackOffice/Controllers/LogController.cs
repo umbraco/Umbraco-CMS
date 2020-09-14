@@ -27,7 +27,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IImageUrlGenerator _imageUrlGenerator;
         private readonly IAuditService _auditService;
         private readonly UmbracoMapper _umbracoMapper;
-        private readonly IWebSecurityAccessor _webSecurityAccessor;
+        private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly IUserService _userService;
         private readonly AppCaches _appCaches;
         private readonly ISqlContext _sqlContext;
@@ -37,7 +37,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             IImageUrlGenerator imageUrlGenerator,
             IAuditService auditService,
             UmbracoMapper umbracoMapper,
-            IWebSecurityAccessor webSecurityAccessor,
+            IBackofficeSecurityAccessor backofficeSecurityAccessor,
             IUserService userService,
             AppCaches appCaches,
             ISqlContext sqlContext)
@@ -46,7 +46,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _imageUrlGenerator = imageUrlGenerator ?? throw new ArgumentNullException(nameof(imageUrlGenerator));
             _auditService = auditService ?? throw new ArgumentNullException(nameof(auditService));
             _umbracoMapper = umbracoMapper ?? throw new ArgumentNullException(nameof(umbracoMapper));
-            _webSecurityAccessor = webSecurityAccessor ?? throw new ArgumentNullException(nameof(webSecurityAccessor));
+            _backofficeSecurityAccessor = backofficeSecurityAccessor ?? throw new ArgumentNullException(nameof(backofficeSecurityAccessor));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _appCaches = appCaches ?? throw new ArgumentNullException(nameof(appCaches));
             _sqlContext = sqlContext ?? throw new ArgumentNullException(nameof(sqlContext));
@@ -90,7 +90,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             long totalRecords;
             var dateQuery = sinceDate.HasValue ? _sqlContext.Query<IAuditItem>().Where(x => x.CreateDate >= sinceDate) : null;
-            var userId = _webSecurityAccessor.WebSecurity.GetUserId().ResultOr(0);
+            var userId = _backofficeSecurityAccessor.BackofficeSecurity.GetUserId().ResultOr(0);
             var result = _auditService.GetPagedItemsByUser(userId, pageNumber - 1, pageSize, out totalRecords, orderDirection, customFilter:dateQuery);
             var mapped = _umbracoMapper.MapEnumerable<IAuditItem, AuditLog>(result);
             return new PagedResult<AuditLog>(totalRecords, pageNumber, pageSize)

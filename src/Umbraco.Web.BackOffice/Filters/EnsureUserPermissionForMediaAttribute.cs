@@ -41,7 +41,7 @@ namespace Umbraco.Web.WebApi.Filters
         {
             private readonly int? _nodeId;
             private readonly string _paramName;
-            private readonly IWebSecurityAccessor _webSecurityAccessor;
+            private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
             private readonly IEntityService _entityService;
             private readonly IMediaService _mediaService;
 
@@ -49,21 +49,21 @@ namespace Umbraco.Web.WebApi.Filters
             /// This constructor will only be able to test the start node access
             /// </summary>
             public EnsureUserPermissionForMediaFilter(
-                IWebSecurityAccessor webSecurityAccessor,
+                IBackofficeSecurityAccessor backofficeSecurityAccessor,
                 IEntityService entityService,
                 IMediaService mediaService,
                 int nodeId)
-                :this(webSecurityAccessor, entityService, mediaService, nodeId, null)
+                :this(backofficeSecurityAccessor, entityService, mediaService, nodeId, null)
             {
                 _nodeId = nodeId;
             }
 
             public EnsureUserPermissionForMediaFilter(
-                IWebSecurityAccessor webSecurityAccessor,
+                IBackofficeSecurityAccessor backofficeSecurityAccessor,
                 IEntityService entityService,
                 IMediaService mediaService,
                 string paramName)
-                :this(webSecurityAccessor, entityService, mediaService,null, paramName)
+                :this(backofficeSecurityAccessor, entityService, mediaService,null, paramName)
             {
                 if (paramName == null) throw new ArgumentNullException(nameof(paramName));
                 if (string.IsNullOrEmpty(paramName))
@@ -71,12 +71,12 @@ namespace Umbraco.Web.WebApi.Filters
             }
 
             private EnsureUserPermissionForMediaFilter(
-                IWebSecurityAccessor webSecurityAccessor,
+                IBackofficeSecurityAccessor backofficeSecurityAccessor,
                 IEntityService entityService,
                 IMediaService mediaService,
                 int? nodeId, string paramName)
             {
-                _webSecurityAccessor = webSecurityAccessor ?? throw new ArgumentNullException(nameof(webSecurityAccessor));
+                _backofficeSecurityAccessor = backofficeSecurityAccessor ?? throw new ArgumentNullException(nameof(backofficeSecurityAccessor));
                 _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
                 _mediaService = mediaService ?? throw new ArgumentNullException(nameof(mediaService));
 
@@ -118,7 +118,7 @@ namespace Umbraco.Web.WebApi.Filters
 
             public void OnActionExecuting(ActionExecutingContext context)
             {
-                if (_webSecurityAccessor.WebSecurity.CurrentUser == null)
+                if (_backofficeSecurityAccessor.BackofficeSecurity.CurrentUser == null)
                 {
                     throw new HttpResponseException(System.Net.HttpStatusCode.Unauthorized);
                 }
@@ -159,7 +159,7 @@ namespace Umbraco.Web.WebApi.Filters
 
                 if (MediaController.CheckPermissions(
                     context.HttpContext.Items,
-                    _webSecurityAccessor.WebSecurity.CurrentUser,
+                    _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser,
                     _mediaService,
                     _entityService,
                     nodeId))

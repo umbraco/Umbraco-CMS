@@ -6,22 +6,22 @@ using Umbraco.Web.Security;
 namespace Umbraco.Core
 {
 
-    public class HybridWebSecurityAccessor : HybridAccessorBase<IWebSecurity>, IWebSecurityAccessor
+    public class HybridBackofficeSecurityAccessor : HybridAccessorBase<IBackofficeSecurity>, IBackofficeSecurityAccessor
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="HybridUmbracoContextAccessor"/> class.
         /// </summary>
-        public HybridWebSecurityAccessor(IRequestCache requestCache)
+        public HybridBackofficeSecurityAccessor(IRequestCache requestCache)
             : base(requestCache)
         { }
 
         /// <inheritdoc />
-        protected override string ItemKey => "Umbraco.Web.HybridWebSecurityAccessor";
+        protected override string ItemKey => "Umbraco.Web.HybridBackofficeSecurityAccessor";
 
         /// <summary>
-        /// Gets or sets the <see cref="WebSecurity"/> object.
+        /// Gets or sets the <see cref="BackofficeSecurity"/> object.
         /// </summary>
-        public IWebSecurity WebSecurity
+        public IBackofficeSecurity BackofficeSecurity
         {
             get => Value;
             set => Value = value;

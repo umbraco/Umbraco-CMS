@@ -13,14 +13,14 @@ using Umbraco.Core.Models;
 namespace Umbraco.Web.Common.Security
 {
 
-    public class WebSecurity : IWebSecurity
+    public class BackofficeSecurity : IBackofficeSecurity
     {
         private readonly IUserService _userService;
         private readonly IGlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public WebSecurity(
+        public BackofficeSecurity(
             IUserService userService,
             IGlobalSettings globalSettings,
             IHostingEnvironment hostingEnvironment,

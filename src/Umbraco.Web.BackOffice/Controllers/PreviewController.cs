@@ -31,7 +31,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly UmbracoFeatures _features;
         private readonly IGlobalSettings _globalSettings;
         private readonly IPublishedSnapshotService _publishedSnapshotService;
-        private readonly IWebSecurityAccessor _webSecurityAccessor;
+        private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly ILocalizationService _localizationService;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ICookieManager _cookieManager;
@@ -42,7 +42,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             UmbracoFeatures features,
             IGlobalSettings globalSettings,
             IPublishedSnapshotService publishedSnapshotService,
-            IWebSecurityAccessor webSecurityAccessor,
+            IBackofficeSecurityAccessor backofficeSecurityAccessor,
             ILocalizationService localizationService,
             IHostingEnvironment hostingEnvironment,
             ICookieManager cookieManager,
@@ -52,7 +52,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _features = features;
             _globalSettings = globalSettings;
             _publishedSnapshotService = publishedSnapshotService;
-            _webSecurityAccessor = webSecurityAccessor;
+            _backofficeSecurityAccessor = backofficeSecurityAccessor;
             _localizationService = localizationService;
             _hostingEnvironment = hostingEnvironment;
             _cookieManager = cookieManager;
@@ -106,7 +106,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         [UmbracoAuthorize]
         public ActionResult Frame(int id, string culture)
         {
-            var user = _webSecurityAccessor.WebSecurity.CurrentUser;
+            var user = _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser;
 
             var previewToken = _publishedSnapshotService.EnterPreview(user, id);
 

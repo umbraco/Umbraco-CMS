@@ -139,14 +139,14 @@
          public void Validating_ContentItemSave()
          {
              var logger = Services.GetRequiredService<ILogger>();
-             var webSecurityFactory = Services.GetRequiredService<IWebSecurityFactory>();
-             webSecurityFactory.EnsureWebSecurity();
-             var webSecurityAccessor = Services.GetRequiredService<IWebSecurityAccessor>();
+             var backofficeSecurityFactory = Services.GetRequiredService<IBackofficeSecurityFactory>();
+             backofficeSecurityFactory.EnsureBackofficeSecurity();
+             var backofficeSecurityAccessor = Services.GetRequiredService<IBackofficeSecurityAccessor>();
              var localizedTextService = Services.GetRequiredService<ILocalizedTextService>();
              var propertyValidationService = Services.GetRequiredService<IPropertyValidationService>();
              var umbracoMapper = Services.GetRequiredService<UmbracoMapper>();
 
-             var validator = new ContentSaveModelValidator(logger, webSecurityAccessor.WebSecurity, localizedTextService, propertyValidationService);
+             var validator = new ContentSaveModelValidator(logger, backofficeSecurityAccessor.BackofficeSecurity, localizedTextService, propertyValidationService);
 
              var content = MockedContent.CreateTextpageContent(_contentType, "test", -1);
 

@@ -74,8 +74,8 @@ namespace Umbraco.Web.Common.Runtime
 
             // register the umbraco context factory
             composition.RegisterUnique<IUmbracoContextFactory, UmbracoContextFactory>();
-            composition.RegisterUnique<IWebSecurityFactory, WebSecurityFactory>();
-            composition.RegisterUnique<IWebSecurityAccessor, HybridWebSecurityAccessor>();
+            composition.RegisterUnique<IBackofficeSecurityFactory, BackofficeSecurityFactory>();
+            composition.RegisterUnique<IBackofficeSecurityAccessor, HybridBackofficeSecurityAccessor>();
 
             //register the install components
             //NOTE: i tried to not have these registered if we weren't installing or upgrading but post install when the site restarts

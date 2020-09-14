@@ -28,15 +28,15 @@ namespace Umbraco.Web.Editors
         private readonly ISectionService _sectionService;
         private readonly ITreeService _treeService;
         private readonly UmbracoMapper _umbracoMapper;
-        private readonly IWebSecurityAccessor _webSecurityAccessor;
+        private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
 
         public SectionController(
-            IWebSecurityAccessor webSecurityAccessor,
+            IBackofficeSecurityAccessor backofficeSecurityAccessor,
             ILocalizedTextService localizedTextService,
             IDashboardService dashboardService, ISectionService sectionService, ITreeService treeService,
             UmbracoMapper umbracoMapper, IControllerFactory controllerFactory)
         {
-            _webSecurityAccessor = webSecurityAccessor;
+            _backofficeSecurityAccessor = backofficeSecurityAccessor;
             _localizedTextService = localizedTextService;
             _dashboardService = dashboardService;
             _sectionService = sectionService;
@@ -47,7 +47,7 @@ namespace Umbraco.Web.Editors
 
         public IEnumerable<Section> GetSections()
         {
-            var sections = _sectionService.GetAllowedSections(_webSecurityAccessor.WebSecurity.GetUserId().ResultOr(0));
+            var sections = _sectionService.GetAllowedSections(_backofficeSecurityAccessor.BackofficeSecurity.GetUserId().ResultOr(0));
 
             var sectionModels = sections.Select(_umbracoMapper.Map<Section>).ToArray();
 
@@ -59,7 +59,7 @@ namespace Umbraco.Web.Editors
                     ControllerContext = ControllerContext
                 };
 
-            var dashboards = _dashboardService.GetDashboards(_webSecurityAccessor.WebSecurity.CurrentUser);
+            var dashboards = _dashboardService.GetDashboards(_backofficeSecurityAccessor.BackofficeSecurity.CurrentUser);
 
             //now we can add metadata for each section so that the UI knows if there's actually anything at all to render for
             //a dashboard for a given section, then the UI can deal with it accordingly (i.e. redirect to the first tree)
@@ -105,10 +105,10 @@ namespace Umbraco.Web.Editors
         {
             var sections = _sectionService.GetSections();
             var mapped = sections.Select(_umbracoMapper.Map<Section>);
-            if (_webSecurityAccessor.WebSecurity.CurrentUser.IsAdmin())
+            if (_backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.IsAdmin())
                 return mapped;
 
-            return mapped.Where(x => _webSecurityAccessor.WebSecurity.CurrentUser.AllowedSections.Contains(x.Alias)).ToArray();
+            return mapped.Where(x => _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.AllowedSections.Contains(x.Alias)).ToArray();
         }
     }
 }

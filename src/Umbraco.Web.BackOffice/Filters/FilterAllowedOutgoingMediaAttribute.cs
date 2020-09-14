@@ -34,13 +34,13 @@ namespace Umbraco.Web.WebApi.Filters
     {
         private readonly Type _outgoingType;
         private readonly IEntityService _entityService;
-        private readonly IWebSecurityAccessor _webSecurityAccessor;
+        private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly string _propertyName;
 
-        public FilterAllowedOutgoingMediaFilter(IEntityService entityService, IWebSecurityAccessor webSecurityAccessor, Type outgoingType, string propertyName)
+        public FilterAllowedOutgoingMediaFilter(IEntityService entityService, IBackofficeSecurityAccessor backofficeSecurityAccessor, Type outgoingType, string propertyName)
         {
             _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
-            _webSecurityAccessor = webSecurityAccessor ?? throw new ArgumentNullException(nameof(webSecurityAccessor));
+            _backofficeSecurityAccessor = backofficeSecurityAccessor ?? throw new ArgumentNullException(nameof(backofficeSecurityAccessor));
 
             _propertyName = propertyName;
             _outgoingType = outgoingType;
@@ -57,7 +57,7 @@ namespace Umbraco.Web.WebApi.Filters
         {
             if (context.Result == null) return;
 
-            var user = _webSecurityAccessor.WebSecurity.CurrentUser;
+            var user = _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser;
             if (user == null) return;
 
             var objectContent = context.Result as ObjectResult;

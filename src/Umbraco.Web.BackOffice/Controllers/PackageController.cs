@@ -28,16 +28,16 @@ namespace Umbraco.Web.BackOffice.Controllers
     {
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IPackagingService _packagingService;
-        private readonly IWebSecurityAccessor _webSecurityAccessor;
+        private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
 
         public PackageController(
             IHostingEnvironment hostingEnvironment,
             IPackagingService packagingService,
-            IWebSecurityAccessor webSecurityAccessor)
+            IBackofficeSecurityAccessor backofficeSecurityAccessor)
         {
             _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
             _packagingService = packagingService ?? throw new ArgumentNullException(nameof(packagingService));
-            _webSecurityAccessor = webSecurityAccessor ?? throw new ArgumentNullException(nameof(webSecurityAccessor));
+            _backofficeSecurityAccessor = backofficeSecurityAccessor ?? throw new ArgumentNullException(nameof(backofficeSecurityAccessor));
         }
 
         public IEnumerable<PackageDefinition> GetCreatedPackages()
@@ -91,7 +91,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         [HttpDelete]
         public IActionResult DeleteCreatedPackage(int packageId)
         {
-            _packagingService.DeleteCreatedPackage(packageId, _webSecurityAccessor.WebSecurity.GetUserId().ResultOr(0));
+            _packagingService.DeleteCreatedPackage(packageId, _backofficeSecurityAccessor.BackofficeSecurity.GetUserId().ResultOr(0));
 
             return Ok();
         }

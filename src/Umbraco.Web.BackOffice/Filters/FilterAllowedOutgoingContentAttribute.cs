@@ -61,8 +61,8 @@ namespace Umbraco.Web.BackOffice.Filters
 
 
 
-        public FilterAllowedOutgoingContentFilter(Type outgoingType, string propertyName, char permissionToCheck,  IUserService userService, IEntityService entityService, IWebSecurityAccessor webSecurityAccessor)
-            : base(entityService, webSecurityAccessor, outgoingType, propertyName)
+        public FilterAllowedOutgoingContentFilter(Type outgoingType, string propertyName, char permissionToCheck,  IUserService userService, IEntityService entityService, IBackofficeSecurityAccessor backofficeSecurityAccessor)
+            : base(entityService, backofficeSecurityAccessor, outgoingType, propertyName)
         {
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));

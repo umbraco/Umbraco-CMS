@@ -22,20 +22,20 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IUpgradeService _upgradeService;
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly ICookieManager _cookieManager;
-        private readonly IWebSecurityAccessor _webSecurityAccessor;
+        private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly IGlobalSettings _globalSettings;
 
         public UpdateCheckController(
             IUpgradeService upgradeService,
             IUmbracoVersion umbracoVersion,
             ICookieManager cookieManager,
-            IWebSecurityAccessor webSecurityAccessor,
+            IBackofficeSecurityAccessor backofficeSecurityAccessor,
             IGlobalSettings globalSettings)
         {
             _upgradeService = upgradeService ?? throw new ArgumentNullException(nameof(upgradeService));
             _umbracoVersion = umbracoVersion ?? throw new ArgumentNullException(nameof(umbracoVersion));
             _cookieManager = cookieManager ?? throw new ArgumentNullException(nameof(cookieManager));
-            _webSecurityAccessor = webSecurityAccessor ?? throw new ArgumentNullException(nameof(webSecurityAccessor));
+            _backofficeSecurityAccessor = backofficeSecurityAccessor ?? throw new ArgumentNullException(nameof(backofficeSecurityAccessor));
             _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
         }
 
@@ -44,7 +44,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         {
             var updChkCookie = _cookieManager.GetCookieValue("UMB_UPDCHK");
             var updateCheckCookie = updChkCookie ?? string.Empty;
-            if (_globalSettings.VersionCheckPeriod > 0 && string.IsNullOrEmpty(updateCheckCookie) && _webSecurityAccessor.WebSecurity.CurrentUser.IsAdmin())
+            if (_globalSettings.VersionCheckPeriod > 0 && string.IsNullOrEmpty(updateCheckCookie) && _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.IsAdmin())
             {
                 try
                 {

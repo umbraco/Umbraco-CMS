@@ -35,22 +35,22 @@ namespace Umbraco.Web.BackOffice.Filters
             private readonly string[] _treeAliases;
 
             private readonly ITreeService _treeService;
-            private readonly IWebSecurityAccessor _webSecurityAccessor;
+            private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
 
             /// <summary>
             ///     Constructor to set authorization to be based on a tree alias for which application security will be applied
             /// </summary>
-            /// <param name="webSecurity"></param>
+            /// <param name="treeService"></param>
+            /// <param name="backofficeSecurityAccessor"></param>
             /// <param name="treeAliases">
             ///     If the user has access to the application that the treeAlias is specified in, they will be authorized.
             ///     Multiple trees may be specified.
             /// </param>
-            /// <param name="treeService"></param>
-            public UmbracoTreeAuthorizeFilter(ITreeService treeService, IWebSecurityAccessor webSecurityAccessor,
+            public UmbracoTreeAuthorizeFilter(ITreeService treeService, IBackofficeSecurityAccessor backofficeSecurityAccessor,
                 params string[] treeAliases)
             {
                 _treeService = treeService ?? throw new ArgumentNullException(nameof(treeService));
-                _webSecurityAccessor = webSecurityAccessor ?? throw new ArgumentNullException(nameof(webSecurityAccessor));
+                _backofficeSecurityAccessor = backofficeSecurityAccessor ?? throw new ArgumentNullException(nameof(backofficeSecurityAccessor));
                 _treeAliases = treeAliases;
             }
 
@@ -76,9 +76,9 @@ namespace Umbraco.Web.BackOffice.Filters
                     .Distinct()
                     .ToArray();
 
-                return _webSecurityAccessor.WebSecurity.CurrentUser != null
-                       && apps.Any(app => _webSecurityAccessor.WebSecurity.UserHasSectionAccess(
-                           app, _webSecurityAccessor.WebSecurity.CurrentUser));
+                return _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser != null
+                       && apps.Any(app => _backofficeSecurityAccessor.BackofficeSecurity.UserHasSectionAccess(
+                           app, _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser));
             }
         }
     }

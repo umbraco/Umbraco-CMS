@@ -40,7 +40,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     [IsBackOffice] // TODO: This could be applied with our Application Model conventions
     public class AuthenticationController : UmbracoApiControllerBase
     {
-        private readonly IWebSecurityAccessor _webSecurityAccessor;
+        private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly BackOfficeUserManager _userManager;
         private readonly BackOfficeSignInManager _signInManager;
         private readonly IUserService _userService;
@@ -59,7 +59,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         // TODO: We need to review all _userManager.Raise calls since many/most should be on the usermanager or signinmanager, very few should be here
 
         public AuthenticationController(
-            IWebSecurityAccessor webSecurityAccessor,
+            IBackofficeSecurityAccessor backofficeSecurityAccessor,
             BackOfficeUserManager backOfficeUserManager,
             BackOfficeSignInManager signInManager,
             IUserService userService,
@@ -74,7 +74,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             Core.Hosting.IHostingEnvironment hostingEnvironment,
             IRequestAccessor requestAccessor)
         {
-            _webSecurityAccessor = webSecurityAccessor;
+            _backofficeSecurityAccessor = backofficeSecurityAccessor;
             _userManager = backOfficeUserManager;
             _signInManager = signInManager;
             _userService = userService;
@@ -97,7 +97,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         [UmbracoAuthorize]
         public IDictionary<string, object> GetPasswordConfig(int userId)
         {
-            return _passwordConfiguration.GetConfiguration(userId != _webSecurityAccessor.WebSecurity.CurrentUser.Id);
+            return _passwordConfiguration.GetConfiguration(userId != _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.Id);
         }
 
         /// <summary>
@@ -165,7 +165,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         [HttpGet]
         public bool IsAuthenticated()
         {
-            var attempt = _webSecurityAccessor.WebSecurity.AuthorizeRequest();
+            var attempt = _backofficeSecurityAccessor.BackofficeSecurity.AuthorizeRequest();
             if (attempt == ValidateRequestAttempt.Success)
             {
                 return true;
@@ -187,7 +187,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         //[CheckIfUserTicketDataIsStale] // TODO: Migrate this, though it will need to be done differently at the cookie auth level
         public UserDetail GetCurrentUser()
         {
-            var user = _webSecurityAccessor.WebSecurity.CurrentUser;
+            var user = _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser;
             var result = _umbracoMapper.Map<UserDetail>(user);
 
             //set their remaining seconds
@@ -208,7 +208,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         [SetAngularAntiForgeryTokens]
         public ActionResult<UserDetail> GetCurrentInvitedUser()
         {
-            var user = _webSecurityAccessor.WebSecurity.CurrentUser;
+            var user = _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser;
 
             if (user.IsApproved)
             {

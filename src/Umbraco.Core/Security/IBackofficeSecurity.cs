@@ -4,7 +4,7 @@ using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Web.Security
 {
-    public interface IWebSecurity
+    public interface IBackofficeSecurity
     {
         /// <summary>
         /// Gets the current user.

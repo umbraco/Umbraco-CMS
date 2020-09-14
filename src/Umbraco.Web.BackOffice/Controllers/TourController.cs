@@ -21,21 +21,21 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly TourFilterCollection _filters;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ITourSettings _tourSettings;
-        private readonly IWebSecurityAccessor _webSecurityAccessor;
+        private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly IContentTypeService _contentTypeService;
 
         public TourController(
             TourFilterCollection filters,
             IHostingEnvironment hostingEnvironment,
             ITourSettings tourSettings,
-            IWebSecurityAccessor webSecurityAccessor,
+            IBackofficeSecurityAccessor backofficeSecurityAccessor,
             IContentTypeService contentTypeService)
         {
             _filters = filters;
             _hostingEnvironment = hostingEnvironment;
 
             _tourSettings = tourSettings;
-            _webSecurityAccessor = webSecurityAccessor;
+            _backofficeSecurityAccessor = backofficeSecurityAccessor;
             _contentTypeService = contentTypeService;
         }
 
@@ -46,7 +46,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             if (_tourSettings.EnableTours == false)
                 return result;
 
-            var user = _webSecurityAccessor.WebSecurity.CurrentUser;
+            var user = _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser;
             if (user == null)
                 return result;
 
@@ -188,7 +188,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 var backOfficeTours = tours.Where(x =>
                     aliasFilters.Count == 0 || aliasFilters.All(filter => filter.IsMatch(x.Alias)) == false);
 
-                var user = _webSecurityAccessor.WebSecurity.CurrentUser;
+                var user = _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser;
 
                 var localizedTours = backOfficeTours.Where(x =>
                     string.IsNullOrWhiteSpace(x.Culture) || x.Culture.Equals(user.Language,

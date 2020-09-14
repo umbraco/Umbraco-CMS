@@ -75,7 +75,7 @@ namespace Umbraco.Web.BackOffice.Filters
         private sealed class EnsureUserPermissionForContentFilter : IActionFilter
         {
             private readonly int? _nodeId;
-            private readonly IWebSecurityAccessor _webSecurityAccessor;
+            private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
             private readonly IEntityService _entityService;
             private readonly IUserService _userService;
             private readonly IContentService _contentService;
@@ -83,58 +83,58 @@ namespace Umbraco.Web.BackOffice.Filters
             private readonly char? _permissionToCheck;
 
             public EnsureUserPermissionForContentFilter(
-                IWebSecurityAccessor webSecurityAccessor,
+                IBackofficeSecurityAccessor backofficeSecurityAccessor,
                 IEntityService entityService,
                 IUserService userService,
                 IContentService contentService,
                 string paramName)
-                :this(webSecurityAccessor, entityService, userService, contentService, null, paramName, ActionBrowse.ActionLetter)
+                :this(backofficeSecurityAccessor, entityService, userService, contentService, null, paramName, ActionBrowse.ActionLetter)
             {
 
             }
 
             public EnsureUserPermissionForContentFilter(
-                IWebSecurityAccessor webSecurityAccessor,
+                IBackofficeSecurityAccessor backofficeSecurityAccessor,
                 IEntityService entityService,
                 IUserService userService,
                 IContentService contentService,
                 int nodeId,
                 char permissionToCheck)
-                :this(webSecurityAccessor, entityService, userService, contentService, nodeId, null, permissionToCheck)
+                :this(backofficeSecurityAccessor, entityService, userService, contentService, nodeId, null, permissionToCheck)
             {
 
             }
 
             public EnsureUserPermissionForContentFilter(
-                IWebSecurityAccessor webSecurityAccessor,
+                IBackofficeSecurityAccessor backofficeSecurityAccessor,
                 IEntityService entityService,
                 IUserService userService,
                 IContentService contentService,
                 int nodeId)
-                :this(webSecurityAccessor, entityService, userService, contentService, nodeId, null, null)
+                :this(backofficeSecurityAccessor, entityService, userService, contentService, nodeId, null, null)
             {
 
             }
             public EnsureUserPermissionForContentFilter(
-                    IWebSecurityAccessor webSecurityAccessor,
+                    IBackofficeSecurityAccessor backofficeSecurityAccessor,
                     IEntityService entityService,
                     IUserService userService,
                     IContentService contentService,
                     string paramName, char permissionToCheck)
-                :this(webSecurityAccessor, entityService, userService, contentService, null, paramName, permissionToCheck)
+                :this(backofficeSecurityAccessor, entityService, userService, contentService, null, paramName, permissionToCheck)
             {
 
             }
 
 
             private EnsureUserPermissionForContentFilter(
-                IWebSecurityAccessor webSecurityAccessor,
+                IBackofficeSecurityAccessor backofficeSecurityAccessor,
                 IEntityService entityService,
                 IUserService userService,
                 IContentService contentService,
                 int? nodeId, string paramName, char? permissionToCheck)
             {
-                _webSecurityAccessor = webSecurityAccessor ?? throw new ArgumentNullException(nameof(webSecurityAccessor));
+                _backofficeSecurityAccessor = backofficeSecurityAccessor ?? throw new ArgumentNullException(nameof(backofficeSecurityAccessor));
                 _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
                 _userService = userService ?? throw new ArgumentNullException(nameof(userService));
                 _contentService = contentService ?? throw new ArgumentNullException(nameof(contentService));
@@ -156,7 +156,7 @@ namespace Umbraco.Web.BackOffice.Filters
 
             public void OnActionExecuting(ActionExecutingContext context)
             {
-                if (_webSecurityAccessor.WebSecurity.CurrentUser == null)
+                if (_backofficeSecurityAccessor.BackofficeSecurity.CurrentUser == null)
                 {
                     //not logged in
                     throw new HttpResponseException(HttpStatusCode.Unauthorized);
@@ -213,7 +213,7 @@ namespace Umbraco.Web.BackOffice.Filters
                 }
 
                 var permissionResult = ContentPermissionsHelper.CheckPermissions(nodeId,
-                    _webSecurityAccessor.WebSecurity.CurrentUser,
+                    _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser,
                     _userService,
                     _contentService,
                     _entityService,
