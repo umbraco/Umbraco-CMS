@@ -62,20 +62,5 @@ namespace Umbraco.Infrastructure.Configuration
                 RequireUppercase = passwordConfiguration.RequireUppercase,
             };
         }
-
-        public static SecuritySettings ConvertSecuritySettings(ISecuritySettings securitySettings)
-        {
-            return new SecuritySettings
-            {
-                MemberPassword = new MemberPasswordConfigurationSettings(),
-                UserPassword = new UserPasswordConfigurationSettings(),
-                AllowPasswordReset = securitySettings.AllowPasswordReset,
-                AuthCookieDomain = securitySettings.AuthCookieDomain,
-                AuthCookieName = securitySettings.AuthCookieDomain,
-                UsernameIsEmail = securitySettings.UsernameIsEmail,
-                KeepUserLoggedIn = securitySettings.KeepUserLoggedIn,
-                HideDisabledUsersInBackoffice = securitySettings.HideDisabledUsersInBackoffice,
-            };
-        }
     }
 }

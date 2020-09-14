@@ -28,7 +28,7 @@ namespace Umbraco.Infrastructure.Configuration
                 RegisterType = globalSettings.RegisterType,
                 ReservedPaths = globalSettings.ReservedPaths,
                 ReservedUrls = globalSettings.ReservedUrls,
-                SmtpSettings = new TestSmtpSettings
+                SmtpSettings = new SmtpSettings
                 {
                     DeliveryMethod = globalSettings.Smtp.DeliveryMethod,
                     From = globalSettings.Smtp.From,
@@ -88,7 +88,7 @@ namespace Umbraco.Infrastructure.Configuration
 
             public bool IsSmtpServerConfigured { get; set; }
 
-            public ISmtpSettings SmtpSettings { get; set; }
+            public SmtpSettings SmtpSettings { get; set; }
 
             public bool InstallMissingDatabase { get; set; }
 
@@ -109,22 +109,6 @@ namespace Umbraco.Infrastructure.Configuration
             public string ConfigurationStatus { get; set; }
         }
 
-        private class TestSmtpSettings : ISmtpSettings
-        {
-            public string From { get; set; }
-
-            public string Host { get; set; }
-
-            public int Port { get; set; }
-
-            public string PickupDirectoryLocation { get; set; }
-
-            public SmtpDeliveryMethod DeliveryMethod { get; set; }
-
-            public string Username { get; set; }
-
-            public string Password { get; set; }
-        }
 
         private class TestUserPasswordConfiguration : IUserPasswordConfiguration
         {

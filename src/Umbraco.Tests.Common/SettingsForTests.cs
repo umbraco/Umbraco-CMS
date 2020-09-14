@@ -101,11 +101,9 @@ namespace Umbraco.Tests.Common
         private void ResetSettings()
         {
             _defaultGlobalSettings.Clear();
-            _defaultHostingSettings = null;
         }
 
         private readonly Dictionary<SemVersion, IGlobalSettings> _defaultGlobalSettings = new Dictionary<SemVersion, IGlobalSettings>();
-        private IHostingSettings _defaultHostingSettings;
 
         public IGlobalSettings GetDefaultGlobalSettings(IUmbracoVersion umbVersion)
         {
@@ -115,48 +113,6 @@ namespace Umbraco.Tests.Common
             settings = GenerateMockGlobalSettings(umbVersion);
             _defaultGlobalSettings[umbVersion.SemanticVersion] = settings;
             return settings;
-        }
-
-        public IHostingSettings DefaultHostingSettings => _defaultHostingSettings ?? (_defaultHostingSettings = GenerateMockHostingSettings());
-
-        public IHostingSettings GenerateMockHostingSettings()
-        {
-            var config = Mock.Of<IHostingSettings>(
-                settings =>
-                    settings.LocalTempStorageLocation == LocalTempStorage.EnvironmentTemp &&
-                    settings.DebugMode == false
-            );
-            return config;
-        }
-
-        public IWebRoutingSettings GenerateMockWebRoutingSettings()
-        {
-            var mock = new Mock<IWebRoutingSettings>();
-
-            mock.Setup(x => x.DisableRedirectUrlTracking).Returns(false);
-            mock.Setup(x => x.InternalRedirectPreservesTemplate).Returns(false);
-            mock.Setup(x => x.UrlProviderMode).Returns(UrlMode.Auto.ToString());
-
-            return mock.Object;
-        }
-
-        public IRequestHandlerSettings GenerateMockRequestHandlerSettings()
-        {
-            var mock = new Mock<IRequestHandlerSettings>();
-
-            mock.Setup(x => x.AddTrailingSlash).Returns(true);
-            mock.Setup(x => x.ConvertUrlsToAscii).Returns(false);
-            mock.Setup(x => x.TryConvertUrlsToAscii).Returns(false);
-            mock.Setup(x => x.CharCollection).Returns(RequestHandlerElement.GetDefaultCharReplacements);
-
-            return mock.Object;
-        }
-
-        public ISecuritySettings GenerateMockSecuritySettings()
-        {
-            var security = new Mock<ISecuritySettings>();
-
-            return security.Object;
         }
 
         public IUserPasswordConfiguration GenerateMockUserPasswordConfiguration()

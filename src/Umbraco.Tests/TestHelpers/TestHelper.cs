@@ -35,6 +35,7 @@ using Umbraco.Web.Routing;
 using File = System.IO.File;
 using Umbraco.Tests.Common.Builders;
 using Microsoft.Extensions.Options;
+using Umbraco.Core.Configuration.Models;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -62,10 +63,10 @@ namespace Umbraco.Tests.TestHelpers
             public override IBackOfficeInfo GetBackOfficeInfo()
                 => new AspNetBackOfficeInfo(
                     SettingsForTests.GenerateMockGlobalSettings(GetUmbracoVersion()),
-                    TestHelper.IOHelper, Mock.Of<ILogger>(), SettingsForTests.GenerateMockWebRoutingSettings());
+                    TestHelper.IOHelper, Mock.Of<ILogger>(), Options.Create(new WebRoutingSettings()));
 
             public override IHostingEnvironment GetHostingEnvironment()
-                => new AspNetHostingEnvironment(SettingsForTests.DefaultHostingSettings);
+                => new AspNetHostingEnvironment(Options.Create(new HostingSettings()));
 
             public override IApplicationShutdownRegistry GetHostingEnvironmentLifetime()
                 => new AspNetApplicationShutdownRegistry();
@@ -96,14 +97,12 @@ namespace Umbraco.Tests.TestHelpers
         public static IDbProviderFactoryCreator DbProviderFactoryCreator => _testHelperInternal.DbProviderFactoryCreator;
         public static IBulkSqlInsertProvider BulkSqlInsertProvider => _testHelperInternal.BulkSqlInsertProvider;
         public static IMarchal Marchal => _testHelperInternal.Marchal;
-        public static ICoreDebugSettings CoreDebugSettings => _testHelperInternal.CoreDebugSettings;
+        public static CoreDebugSettings CoreDebugSettings => _testHelperInternal.CoreDebugSettings;
 
 
         public static IIOHelper IOHelper => _testHelperInternal.IOHelper;
         public static IMainDom MainDom => _testHelperInternal.MainDom;
         public static UriUtility UriUtility => _testHelperInternal.UriUtility;
-
-        public static IWebRoutingSettings WebRoutingSettings => _testHelperInternal.WebRoutingSettings;
 
         public static IEmailSender EmailSender { get; } = new EmailSender(Options.Create(new GlobalSettingsBuilder().Build()));
 

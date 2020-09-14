@@ -5,6 +5,7 @@ using System.Net.Mail;
 using System.Xml.Linq;
 using Umbraco.Composing;
 using Umbraco.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
 
 namespace Umbraco.Core.Configuration.Legacy
@@ -61,7 +62,7 @@ namespace Umbraco.Core.Configuration.Legacy
             }
         }
 
-        public ISmtpSettings SmtpSettings
+        public SmtpSettings SmtpSettings
         {
             get
             {

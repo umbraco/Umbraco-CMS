@@ -1,4 +1,6 @@
-﻿namespace Umbraco.Core.Configuration
+﻿using Umbraco.Core.Configuration.Models;
+
+namespace Umbraco.Core.Configuration
 {
     /// <summary>
     /// Contains general settings information for the entire Umbraco instance based on information from  web.config appsettings
@@ -70,7 +72,7 @@
         string UmbracoMediaPath { get; }
 
         bool IsSmtpServerConfigured { get; }
-        ISmtpSettings SmtpSettings { get; }
+        SmtpSettings SmtpSettings { get; }
 
         /// <summary>
         /// Gets a value indicating whether the runtime should enter Install level when the database is missing.

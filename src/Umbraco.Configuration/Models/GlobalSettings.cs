@@ -4,6 +4,7 @@ using System.Net.Mail;
 using Microsoft.Extensions.Configuration;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 
 namespace Umbraco.Configuration.Models
 {
@@ -77,27 +78,6 @@ namespace Umbraco.Configuration.Models
         public bool IsSmtpServerConfigured =>
             _configuration.GetSection(Constants.Configuration.ConfigGlobalPrefix + "Smtp")?.GetChildren().Any() ?? false;
 
-        public ISmtpSettings SmtpSettings =>
-            new SmtpSettingsImpl(_configuration.GetSection(Constants.Configuration.ConfigGlobalPrefix + "Smtp"));
-
-        private class SmtpSettingsImpl : ISmtpSettings
-        {
-            private readonly IConfigurationSection _configurationSection;
-
-            public SmtpSettingsImpl(IConfigurationSection configurationSection)
-            {
-                _configurationSection = configurationSection;
-            }
-
-            public string From => _configurationSection.GetValue<string>("From");
-            public string Host => _configurationSection.GetValue<string>("Host");
-            public int Port => _configurationSection.GetValue<int>("Port");
-            public string PickupDirectoryLocation => _configurationSection.GetValue<string>("PickupDirectoryLocation");
-            public SmtpDeliveryMethod DeliveryMethod => _configurationSection.GetValue<SmtpDeliveryMethod>("DeliveryMethod");
-
-            public string Username => _configurationSection.GetValue<string>("Username");
-
-            public string Password => _configurationSection.GetValue<string>("Password");
-        }
+        public SmtpSettings SmtpSettings => new SmtpSettings();
     }
 }

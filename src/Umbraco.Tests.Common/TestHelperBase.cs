@@ -6,6 +6,7 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Diagnostics;
 using Umbraco.Core.Hosting;
@@ -76,7 +77,7 @@ namespace Umbraco.Tests.Common
         public abstract IDbProviderFactoryCreator DbProviderFactoryCreator { get; }
         public abstract IBulkSqlInsertProvider BulkSqlInsertProvider { get; }
         public abstract IMarchal Marchal { get; }
-        public ICoreDebugSettings CoreDebugSettings { get; } =  new CoreDebugSettings();
+        public CoreDebugSettings CoreDebugSettings { get; } =  new CoreDebugSettings();
 
         public IIOHelper IOHelper
         {
@@ -100,8 +101,6 @@ namespace Umbraco.Tests.Common
         }
 
         public SettingsForTests SettingsForTests { get; }
-        public IWebRoutingSettings WebRoutingSettings => SettingsForTests.GenerateMockWebRoutingSettings();
-
         /// <summary>
         /// Some test files are copied to the /bin (/bin/debug) on build, this is a utility to return their physical path based on a virtual path name
         /// </summary>

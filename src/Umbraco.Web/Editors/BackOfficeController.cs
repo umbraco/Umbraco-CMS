@@ -37,8 +37,8 @@ namespace Umbraco.Web.Editors
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly IContentSettings _contentSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
-        private readonly IRuntimeSettings _runtimeSettings;
-        private readonly ISecuritySettings _securitySettings;
+        private readonly RuntimeSettings _runtimeSettings;
+        private readonly SecuritySettings _securitySettings;
 
         public BackOfficeController(
             UmbracoFeatures features,
@@ -50,8 +50,8 @@ namespace Umbraco.Web.Editors
             IUmbracoVersion umbracoVersion,
             IContentSettings contentSettings,
             IHostingEnvironment hostingEnvironment,
-            IRuntimeSettings settings,
-            ISecuritySettings securitySettings)
+            IOptions<RuntimeSettings> settings,
+            IOptions<SecuritySettings> securitySettings)
             : base(globalSettings, umbracoContextAccessor, services, appCaches, profilingLogger)
 
         {
@@ -59,8 +59,8 @@ namespace Umbraco.Web.Editors
             _umbracoVersion = umbracoVersion;
             _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
             _hostingEnvironment = hostingEnvironment;
-            _runtimeSettings = settings;
-            _securitySettings = securitySettings;
+            _runtimeSettings = settings.Value;
+            _securitySettings = securitySettings.Value;
         }
 
         protected BackOfficeSignInManager SignInManager => _signInManager ?? (_signInManager = OwinContext.GetBackOfficeSignInManager());

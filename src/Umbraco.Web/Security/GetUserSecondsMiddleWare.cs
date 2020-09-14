@@ -3,10 +3,12 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Threading.Tasks;
 using System.Web;
+using Microsoft.Extensions.Options;
 using Microsoft.Owin;
 using Microsoft.Owin.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Hosting;
 using Umbraco.Infrastructure.Configuration;
@@ -25,7 +27,7 @@ namespace Umbraco.Web.Security
     {
         private readonly UmbracoBackOfficeCookieAuthOptions _authOptions;
         private readonly IGlobalSettings _globalSettings;
-        private readonly ISecuritySettings _security;
+        private readonly SecuritySettings _security;
         private readonly ILogger _logger;
         private readonly IHostingEnvironment _hostingEnvironment;
 
@@ -33,14 +35,14 @@ namespace Umbraco.Web.Security
             OwinMiddleware next,
             UmbracoBackOfficeCookieAuthOptions authOptions,
             IGlobalSettings globalSettings,
-            ISecuritySettings security,
+            IOptions<SecuritySettings> security,
             ILogger logger,
             IHostingEnvironment hostingEnvironment)
             : base(next)
         {
             _authOptions = authOptions ?? throw new ArgumentNullException(nameof(authOptions));
             _globalSettings = globalSettings;
-            _security = security;
+            _security = security.Value;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _hostingEnvironment = hostingEnvironment;
         }

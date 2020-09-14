@@ -72,8 +72,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Routing
             // Arrange
             var sourceUri = new Uri(sourceUrl, UriKind.Relative);
             var requestHandlerSettings = new RequestHandlerSettingsBuilder().WithAddTrailingSlash(trailingSlash).Build();
-            var mockRequestHandlerSettings = new Mock<IRequestHandlerSettings>();
-            mockRequestHandlerSettings.Setup(x => x.AddTrailingSlash).Returns(trailingSlash);
             var uriUtility = BuildUriUtility("/");
 
             // Act

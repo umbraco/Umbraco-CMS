@@ -45,12 +45,12 @@ namespace Umbraco.Web
             {
                 //var configFactory = new ConfigsFactory();
 
-                IHostingSettings hostingSettings = null;
+                HostingSettings hostingSettings = null;
                 IGlobalSettings globalSettings = null;
-                ISecuritySettings securitySettings = null;
-                IWebRoutingSettings webRoutingSettings = null;
+                SecuritySettings securitySettings = null;
+                WebRoutingSettings webRoutingSettings = null;
 
-                var hostingEnvironment = new AspNetHostingEnvironment(hostingSettings);
+                var hostingEnvironment = new AspNetHostingEnvironment(Options.Create(hostingSettings));
                 var loggingConfiguration = new LoggingConfiguration(
                     Path.Combine(hostingEnvironment.ApplicationPhysicalPath, "App_Data\\Logs"),
                     Path.Combine(hostingEnvironment.ApplicationPhysicalPath, "config\\serilog.config"),
@@ -58,10 +58,10 @@ namespace Umbraco.Web
                 var ioHelper = new IOHelper(hostingEnvironment);
                 var logger = SerilogLogger.CreateWithDefaultConfiguration(hostingEnvironment, loggingConfiguration);
 
-                var backOfficeInfo = new AspNetBackOfficeInfo(globalSettings, ioHelper, logger, webRoutingSettings);
+                var backOfficeInfo = new AspNetBackOfficeInfo(globalSettings, ioHelper, logger, Options.Create(webRoutingSettings));
                 var profiler = GetWebProfiler(hostingEnvironment);
                 Umbraco.Composing.Current.Initialize(logger,
-                    ConfigModelConversionsFromLegacy.ConvertSecuritySettings(securitySettings),
+                    securitySettings,
                     ConfigModelConversionsFromLegacy.ConvertGlobalSettings(globalSettings),
                     ioHelper, hostingEnvironment, backOfficeInfo, profiler);
                 Logger = logger;

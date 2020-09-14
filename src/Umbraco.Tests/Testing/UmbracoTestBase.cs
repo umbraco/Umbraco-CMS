@@ -15,6 +15,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Composing.CompositionExtensions;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Events;
 using Umbraco.Core.Hosting;
@@ -137,7 +138,7 @@ namespace Umbraco.Tests.Testing
 
         protected virtual IProfilingLogger ProfilingLogger => Factory.GetInstance<IProfilingLogger>();
 
-        protected IHostingEnvironment HostingEnvironment { get; } = new AspNetHostingEnvironment(TestHelpers.SettingsForTests.DefaultHostingSettings);
+        protected IHostingEnvironment HostingEnvironment { get; } = new AspNetHostingEnvironment(Microsoft.Extensions.Options.Options.Create(new HostingSettings()));
         protected IApplicationShutdownRegistry HostingLifetime { get; } = new AspNetApplicationShutdownRegistry();
         protected IIpResolver IpResolver => Factory.GetInstance<IIpResolver>();
         protected IBackOfficeInfo BackOfficeInfo => Factory.GetInstance<IBackOfficeInfo>();
@@ -174,9 +175,9 @@ namespace Umbraco.Tests.Testing
             TypeFinder = new TypeFinder(logger, new DefaultUmbracoAssemblyProvider(GetType().Assembly), new VaryingRuntimeHash());
             var appCaches = GetAppCaches();
             var globalSettings = new GlobalSettingsBuilder().Build();
-            var settings = TestHelpers.SettingsForTests.GenerateMockWebRoutingSettings();
+            var settings = new WebRoutingSettings();
 
-            IBackOfficeInfo backOfficeInfo = new AspNetBackOfficeInfo(ConfigModelConversionsToLegacy.ConvertGlobalSettings(globalSettings), IOHelper, logger, settings);
+            IBackOfficeInfo backOfficeInfo = new AspNetBackOfficeInfo(ConfigModelConversionsToLegacy.ConvertGlobalSettings(globalSettings), IOHelper, logger, Microsoft.Extensions.Options.Options.Create(settings));
             IIpResolver ipResolver = new AspNetIpResolver();
             UmbracoVersion = new UmbracoVersion();
 

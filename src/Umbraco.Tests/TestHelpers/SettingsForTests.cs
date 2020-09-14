@@ -1,4 +1,5 @@
 ﻿using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Configuration.UmbracoSettings;
 
 namespace Umbraco.Tests.TestHelpers
@@ -46,16 +47,6 @@ namespace Umbraco.Tests.TestHelpers
         public static void Reset() => _settingsForTests.Reset();
 
         internal static IGlobalSettings DefaultGlobalSettings => _settingsForTests.GetDefaultGlobalSettings(TestHelper.GetUmbracoVersion());
-
-        internal static IHostingSettings DefaultHostingSettings => _settingsForTests.DefaultHostingSettings;
-
-        public static IHostingSettings GenerateMockHostingSettings() => _settingsForTests.GenerateMockHostingSettings();
-
-        public static IWebRoutingSettings GenerateMockWebRoutingSettings() => _settingsForTests.GenerateMockWebRoutingSettings();
-
-        public static IRequestHandlerSettings GenerateMockRequestHandlerSettings() => _settingsForTests.GenerateMockRequestHandlerSettings();
-
-        public static ISecuritySettings GenerateMockSecuritySettings() => _settingsForTests.GenerateMockSecuritySettings();
 
         public static IUserPasswordConfiguration GenerateMockUserPasswordConfiguration() => _settingsForTests.GenerateMockUserPasswordConfiguration();
 

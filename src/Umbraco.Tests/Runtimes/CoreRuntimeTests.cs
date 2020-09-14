@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Examine;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -85,10 +86,10 @@ namespace Umbraco.Tests.Runtimes
         public class TestUmbracoApplication : UmbracoApplicationBase
         {
             public TestUmbracoApplication() : base(_logger,
-                ConfigModelConversionsFromLegacy.ConvertSecuritySettings(SettingsForTests.GenerateMockSecuritySettings()),
+                new SecuritySettings(),
                 ConfigModelConversionsFromLegacy.ConvertGlobalSettings(SettingsForTests.DefaultGlobalSettings),
                 new ConnectionStrings(),
-                _ioHelper, _profiler, new AspNetHostingEnvironment(_hostingSettings), new AspNetBackOfficeInfo(_globalSettings, _ioHelper,  _logger, _settings))
+                _ioHelper, _profiler, new AspNetHostingEnvironment(Options.Create(new HostingSettings())), new AspNetBackOfficeInfo(_globalSettings, _ioHelper,  _logger, Options.Create(new WebRoutingSettings())))
             {
             }
 
@@ -96,9 +97,6 @@ namespace Umbraco.Tests.Runtimes
             private static readonly IIOHelper _ioHelper = TestHelper.IOHelper;
             private static readonly IProfiler _profiler = new TestProfiler();
             private static readonly IGlobalSettings _globalSettings = SettingsForTests.DefaultGlobalSettings;
-            private static readonly IHostingSettings _hostingSettings = SettingsForTests.DefaultHostingSettings;
-            private static readonly IContentSettings _contentSettings = SettingsForTests.GenerateMockContentSettings();
-            private static readonly IWebRoutingSettings _settings = SettingsForTests.GenerateMockWebRoutingSettings();
 
             public IRuntime Runtime { get; private set; }
 
