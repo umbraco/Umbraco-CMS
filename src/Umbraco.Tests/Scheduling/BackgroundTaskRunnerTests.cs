@@ -24,7 +24,7 @@ namespace Umbraco.Tests.Scheduling
         [OneTimeSetUp]
         public void InitializeFixture()
         {
-            _logger = new ConsoleLogger(new MessageTemplates());
+            _logger = new ConsoleLogger<object>(new MessageTemplates());
             _hostingEnvironment = TestHelper.GetHostingEnvironmentLifetime();
         }
 

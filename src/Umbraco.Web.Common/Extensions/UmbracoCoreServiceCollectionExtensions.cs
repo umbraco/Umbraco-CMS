@@ -341,7 +341,7 @@ namespace Umbraco.Extensions
         private static Core.Logging.ILogger AddLogger(IServiceCollection services, Core.Hosting.IHostingEnvironment hostingEnvironment, ILoggingConfiguration loggingConfiguration)
         {
             // Create a serilog logger
-            var logger = SerilogLogger.CreateWithDefaultConfiguration(hostingEnvironment, loggingConfiguration);
+            var logger = SerilogLogger<object>.CreateWithDefaultConfiguration(hostingEnvironment, loggingConfiguration);
 
             // Wire up all the bits that serilog needs. We need to use our own code since the Serilog ext methods don't cater to our needs since
             // we don't want to use the global serilog `Log` object and we don't have our own ILogger implementation before the HostBuilder runs which

@@ -264,11 +264,11 @@ namespace Umbraco.Tests.Testing
                     profiler = Mock.Of<IProfiler>();
                     break;
                 case UmbracoTestOptions.Logger.Serilog:
-                    logger = new SerilogLogger(new FileInfo(TestHelper.MapPathForTestFiles("~/unit-test.config")));
+                    logger = new SerilogLogger<object>(new FileInfo(TestHelper.MapPathForTestFiles("~/unit-test.config")));
                     profiler = new LogProfiler(logger);
                     break;
                 case UmbracoTestOptions.Logger.Console:
-                    logger = new ConsoleLogger(new MessageTemplates());
+                    logger = new ConsoleLogger<object>(new MessageTemplates());
                     profiler = new LogProfiler(logger);
                     break;
                 default:

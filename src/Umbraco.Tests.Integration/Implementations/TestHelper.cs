@@ -55,7 +55,7 @@ namespace Umbraco.Tests.Integration.Implementations
 
             _hostingLifetime = new AspNetCoreApplicationShutdownRegistry(Mock.Of<IHostApplicationLifetime>());
 
-            Logger = new ProfilingLogger(new ConsoleLogger(new MessageTemplates()), Profiler);
+            Logger = new ProfilingLogger(new ConsoleLogger<object>(new MessageTemplates()), Profiler);
         }
 
 

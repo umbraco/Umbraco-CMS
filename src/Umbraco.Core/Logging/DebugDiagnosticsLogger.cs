@@ -30,19 +30,13 @@ namespace Umbraco.Core.Logging
         }
 
         /// <inheritdoc/>
-        public void Fatal(Type reporting, string message)
-        {
-            System.Diagnostics.Debug.WriteLine(message);
-        }
-
-        /// <inheritdoc/>
         public void Fatal(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues)
         {
             System.Diagnostics.Debug.WriteLine(_messageTemplates.Render(messageTemplate, propertyValues) + Environment.NewLine + exception, reporting.FullName);
         }
 
         /// <inheritdoc/>
-        public void Fatal(Type reporting, string messageTemplate, params object[] propertyValues)
+        public void LogCritical(string messageTemplate, params object[] propertyValues)
         {
             System.Diagnostics.Debug.WriteLine(messageTemplate, propertyValues);
         }

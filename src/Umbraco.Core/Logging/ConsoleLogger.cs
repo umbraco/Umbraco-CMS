@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Logging
 {
-    public class ConsoleLogger : ILogger
+    public class ConsoleLogger<T> : ILogger
     {
         private readonly IMessageTemplates _messageTemplates;
 
@@ -26,20 +26,15 @@ namespace Umbraco.Core.Logging
             Console.WriteLine(exception);
         }
 
-        public void Fatal(Type reporting, string message)
-        {
-            Console.WriteLine("FATAL {0} - {1}", reporting.Name, message);
-        }
-
         public void Fatal(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues)
         {
             Console.WriteLine("FATAL {0} - {1}", reporting.Name, _messageTemplates.Render(messageTemplate, propertyValues));
             Console.WriteLine(exception);
         }
 
-        public void Fatal(Type reporting, string messageTemplate, params object[] propertyValues)
+        public void LogCritical(string messageTemplate, params object[] propertyValues)
         {
-            Console.WriteLine("FATAL {0} - {1}", reporting.Name, _messageTemplates.Render(messageTemplate, propertyValues));
+            Console.WriteLine("FATAL {0} - {1}", typeof(T).Name, _messageTemplates.Render(messageTemplate, propertyValues));
         }
 
         public void LogError(Type reporting, Exception exception, string message)

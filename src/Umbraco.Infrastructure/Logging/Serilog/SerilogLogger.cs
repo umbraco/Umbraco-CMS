@@ -10,12 +10,12 @@ namespace Umbraco.Core.Logging.Serilog
     ///<summary>
     /// Implements <see cref="ILogger"/> on top of Serilog.
     ///</summary>
-    public class SerilogLogger : ILogger, IDisposable
+    public class SerilogLogger<T> : ILogger, IDisposable
     {
         public global::Serilog.ILogger SerilogLog { get; }
 
         /// <summary>
-        /// Initialize a new instance of the <see cref="SerilogLogger"/> class with a configuration file.
+        /// Initialize a new instance of the <see cref="SerilogLogger<T>"/> class with a configuration file.
         /// </summary>
         /// <param name="logConfigFile"></param>
         public SerilogLogger(FileInfo logConfigFile)
@@ -35,7 +35,7 @@ namespace Umbraco.Core.Logging.Serilog
         /// Creates a logger with some pre-defined configuration and remainder from config file
         /// </summary>
         /// <remarks>Used by UmbracoApplicationBase to get its logger.</remarks>
-        public static SerilogLogger CreateWithDefaultConfiguration(IHostingEnvironment hostingEnvironment, ILoggingConfiguration loggingConfiguration)
+        public static SerilogLogger<T> CreateWithDefaultConfiguration(IHostingEnvironment hostingEnvironment, ILoggingConfiguration loggingConfiguration)
         {
             var loggerConfig = new LoggerConfiguration();
             loggerConfig
@@ -43,7 +43,7 @@ namespace Umbraco.Core.Logging.Serilog
                 .ReadFromConfigFile(loggingConfiguration)
                 .ReadFromUserConfigFile(loggingConfiguration);
 
-            return new SerilogLogger(loggerConfig);
+            return new SerilogLogger<T>(loggerConfig);
         }
 
         /// <summary>
@@ -96,15 +96,9 @@ namespace Umbraco.Core.Logging.Serilog
         }
 
         /// <inheritdoc/>
-        public void Fatal(Type reporting, string message)
+        public void LogCritical(string messageTemplate, params object[] propertyValues)
         {
-            LoggerFor(reporting).Fatal(message);
-        }
-
-        /// <inheritdoc/>
-        public void Fatal(Type reporting, string messageTemplate, params object[] propertyValues)
-        {
-            LoggerFor(reporting).Fatal(messageTemplate, propertyValues);
+            LoggerFor(typeof(T)).Fatal(messageTemplate, propertyValues);
         }
 
         /// <inheritdoc/>
@@ -149,25 +143,25 @@ namespace Umbraco.Core.Logging.Serilog
         }
 
         /// <inheritdoc/>
-        public void Warn(Type reporting, string message)
+        public void LogWarning(Type reporting, string message)
         {
             LoggerFor(reporting).Warning(message);
         }
 
         /// <inheritdoc/>
-        public void Warn(Type reporting, string message, params object[] propertyValues)
+        public void LogWarning(Type reporting, string message, params object[] propertyValues)
         {
             LoggerFor(reporting).Warning(message, propertyValues);
         }
 
         /// <inheritdoc/>
-        public void Warn(Type reporting, Exception exception, string message)
+        public void LogWarning(Type reporting, Exception exception, string message)
         {
             LoggerFor(reporting).Warning(exception, message);
         }
 
         /// <inheritdoc/>
-        public void Warn(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues)
+        public void LogWarning(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues)
         {
             LoggerFor(reporting).Warning(exception, messageTemplate, propertyValues);
         }

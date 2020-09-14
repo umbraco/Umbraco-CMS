@@ -16,17 +16,12 @@ namespace Umbraco.Core.Logging
 
         }
 
-        public void Fatal(Type reporting, string message)
-        {
-
-        }
-
         public void Fatal(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues)
         {
 
         }
 
-        public void Fatal(Type reporting, string messageTemplate, params object[] propertyValues)
+        public void LogCritical(string messageTemplate, params object[] propertyValues)
         {
 
         }

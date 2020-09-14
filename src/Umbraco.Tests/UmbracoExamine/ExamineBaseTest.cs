@@ -18,7 +18,7 @@ namespace Umbraco.Tests.UmbracoExamine
         public void InitializeFixture()
         {
             
-            var logger = new SerilogLogger(new FileInfo(TestHelper.MapPathForTestFiles("~/unit-test.config")));
+            var logger = new SerilogLogger<object>(new FileInfo(TestHelper.MapPathForTestFiles("~/unit-test.config")));
             _profilingLogger = new ProfilingLogger(logger, new LogProfiler(logger));
         }
 

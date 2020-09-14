@@ -73,14 +73,11 @@ namespace Umbraco.Core.Logging
         public void Fatal(Type reporting, Exception exception)
             => Logger.Fatal(reporting, exception);
 
-        public void Fatal(Type reporting, string message)
-            => Logger.Fatal(reporting, message);
-
         public void Fatal(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues)
             => Logger.Fatal(reporting, exception, messageTemplate, propertyValues);
 
-        public void Fatal(Type reporting, string messageTemplate, params object[] propertyValues)
-            => Logger.Fatal(reporting, messageTemplate, propertyValues);
+        public void LogCritical(string messageTemplate, params object[] propertyValues)
+            => Logger.LogCritical(messageTemplate, propertyValues);
 
         public void LogError(Type reporting, Exception exception, string message)
             => Logger.LogError(reporting, exception, message);

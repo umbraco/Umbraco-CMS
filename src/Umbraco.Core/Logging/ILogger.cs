@@ -3,6 +3,8 @@
 namespace Umbraco.Core.Logging
 {
 
+    public interface ILogger : ILogger<object>{}
+
     /// <summary>
     /// Defines the logging service.
     /// </summary>
@@ -13,7 +15,7 @@ namespace Umbraco.Core.Logging
     /// specification includes support for traditional C# numeric placeholders.</para>
     /// <para>For instance, "Processed {Input} in {Time}ms."</para>
     /// </remarks>
-    public interface ILogger
+    public interface ILogger<T>
     {
         /// <summary>
         /// Determines if logging is enabled at a specified level, for a reporting type.
@@ -39,13 +41,6 @@ namespace Umbraco.Core.Logging
         void Fatal(Type reporting, Exception exception);
 
         /// <summary>
-        /// Logs a fatal message.
-        /// </summary>
-        /// <param name="reporting">The reporting type.</param>
-        /// <param name="message">A message.</param>
-        void Fatal(Type reporting, string message);
-
-        /// <summary>
         /// Logs a fatal message with an exception.
         /// </summary>
         /// <param name="reporting">The reporting type.</param>
@@ -57,10 +52,9 @@ namespace Umbraco.Core.Logging
         /// <summary>
         /// Logs a fatal message.
         /// </summary>
-        /// <param name="reporting">The reporting type.</param>
         /// <param name="messageTemplate">A message template.</param>
         /// <param name="propertyValues">Property values.</param>
-        void Fatal(Type reporting, string messageTemplate, params object[] propertyValues);
+        void LogCritical(string messageTemplate, params object[] propertyValues);
 
         /// <summary>
         /// Logs an error message with an exception.

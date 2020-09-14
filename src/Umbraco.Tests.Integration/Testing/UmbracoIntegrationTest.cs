@@ -220,7 +220,7 @@ namespace Umbraco.Tests.Integration.Testing
 
             services.AddMvc();
 
-            services.AddSingleton<ILogger>(new ConsoleLogger(new MessageTemplates()));
+            services.AddSingleton<ILogger>(new ConsoleLogger<object>(new MessageTemplates()));
 
             CustomTestSetup(services);
         }
