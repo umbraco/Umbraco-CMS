@@ -39,21 +39,6 @@ namespace Umbraco.Tests.Common
             return config;
         }
 
-        /// <summary>
-        /// Returns generated settings which can be stubbed to return whatever values necessary
-        /// </summary>
-        /// <returns></returns>
-        public IContentSettings GenerateMockContentSettings()
-        {
-
-            var content = new Mock<IContentSettings>();
-
-            //Now configure some defaults - the defaults in the config section classes do NOT pertain to the mocked data!!
-            content.Setup(x => x.ImageAutoFillProperties).Returns(ContentImagingElement.GetDefaultImageAutoFillProperties());
-            content.Setup(x => x.ImageFileTypes).Returns(ContentImagingElement.GetDefaultImageFileTypes());
-            return content.Object;
-        }
-
         //// from appSettings
 
         //private readonly IDictionary<string, string> SavedAppSettings = new Dictionary<string, string>();

@@ -31,7 +31,7 @@ namespace Umbraco.Web.Editors
         private readonly UmbracoFeatures _features;
         private readonly IGlobalSettings _globalSettings;
         private readonly IUmbracoVersion _umbracoVersion;
-        private readonly IContentSettings _contentSettings;
+        private readonly ContentSettings _contentSettings;
         private readonly TreeCollection _treeCollection;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IHostingEnvironment _hostingEnvironment;
@@ -45,7 +45,7 @@ namespace Umbraco.Web.Editors
             UmbracoFeatures features,
             IGlobalSettings globalSettings,
             IUmbracoVersion umbracoVersion,
-            IContentSettings contentSettings,
+            IOptions<ContentSettings> contentSettings,
             TreeCollection treeCollection,
             IHostingEnvironment hostingEnvironment,
             IOptions<RuntimeSettings> settings,
@@ -57,7 +57,7 @@ namespace Umbraco.Web.Editors
             _features = features;
             _globalSettings = globalSettings;
             _umbracoVersion = umbracoVersion;
-            _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
+            _contentSettings = contentSettings.Value ?? throw new ArgumentNullException(nameof(contentSettings));
             _treeCollection = treeCollection ?? throw new ArgumentNullException(nameof(treeCollection));
             _hostingEnvironment = hostingEnvironment;
             _settings = settings.Value;
@@ -149,7 +149,7 @@ namespace Umbraco.Web.Editors
                         {"appPluginsPath", _hostingEnvironment.ToAbsolute(Constants.SystemDirectories.AppPlugins).TrimEnd('/')},
                         {
                             "imageFileTypes",
-                            string.Join(",", _contentSettings.ImageFileTypes)
+                            string.Join(",", _contentSettings.Imaging.ImageFileTypes)
                         },
                         {
                             "disallowedUploadFiles",

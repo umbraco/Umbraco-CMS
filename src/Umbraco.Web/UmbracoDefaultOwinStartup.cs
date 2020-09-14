@@ -31,7 +31,6 @@ namespace Umbraco.Web
     {
         protected IUmbracoContextAccessor UmbracoContextAccessor => Current.UmbracoContextAccessor;
         protected IGlobalSettings GlobalSettings => Current.Factory.GetInstance<IGlobalSettings>();
-        protected IContentSettings ContentSettings => Current.Factory.GetInstance<IContentSettings>();
         protected SecuritySettings SecuritySettings => Current.Factory.GetInstance<IOptions<SecuritySettings>>().Value;
         protected IUserPasswordConfiguration UserPasswordConfig => Current.Factory.GetInstance<IUserPasswordConfiguration>();
         protected IRuntimeState RuntimeState => Current.RuntimeState;

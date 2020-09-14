@@ -162,7 +162,6 @@ namespace Umbraco.Tests.Runtimes
 
             public void Compose(Composition composition)
             {
-                composition.Register(factory => SettingsForTests.GenerateMockContentSettings());
                 composition.RegisterUnique<IExamineManager, TestExamineManager>();
                 composition.Components().Append<TestComponent>();
 

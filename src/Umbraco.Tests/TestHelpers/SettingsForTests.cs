@@ -10,12 +10,6 @@ namespace Umbraco.Tests.TestHelpers
 
         public static IGlobalSettings GenerateMockGlobalSettings() => _settingsForTests.GenerateMockGlobalSettings(TestHelper.GetUmbracoVersion());
 
-        /// <summary>
-        /// Returns generated settings which can be stubbed to return whatever values necessary
-        /// </summary>
-        /// <returns></returns>
-        public static IContentSettings GenerateMockContentSettings() => _settingsForTests.GenerateMockContentSettings();
-
         //// from appSettings
 
         //private static readonly IDictionary<string, string> SavedAppSettings = new Dictionary<string, string>();

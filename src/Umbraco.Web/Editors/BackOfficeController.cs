@@ -35,7 +35,7 @@ namespace Umbraco.Web.Editors
         private BackOfficeOwinUserManager _userManager;
         private BackOfficeSignInManager _signInManager;
         private readonly IUmbracoVersion _umbracoVersion;
-        private readonly IContentSettings _contentSettings;
+        private readonly ContentSettings _contentSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly RuntimeSettings _runtimeSettings;
         private readonly SecuritySettings _securitySettings;
@@ -48,7 +48,7 @@ namespace Umbraco.Web.Editors
             AppCaches appCaches,
             IProfilingLogger profilingLogger,
             IUmbracoVersion umbracoVersion,
-            IContentSettings contentSettings,
+            IOptions<ContentSettings> contentSettings,
             IHostingEnvironment hostingEnvironment,
             IOptions<RuntimeSettings> settings,
             IOptions<SecuritySettings> securitySettings)
@@ -57,7 +57,7 @@ namespace Umbraco.Web.Editors
         {
             _features = features;
             _umbracoVersion = umbracoVersion;
-            _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
+            _contentSettings = contentSettings.Value;
             _hostingEnvironment = hostingEnvironment;
             _runtimeSettings = settings.Value;
             _securitySettings = securitySettings.Value;
