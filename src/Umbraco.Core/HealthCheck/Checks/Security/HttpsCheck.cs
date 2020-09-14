@@ -8,6 +8,9 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 using Umbraco.Core.Configuration.Models;
 using Microsoft.Extensions.Options;
+using Umbraco.Core.IO;
+using Umbraco.Web;
+using Umbraco.Web.HealthCheck;
 
 namespace Umbraco.Core.HealthCheck.Checks.Security
 {
@@ -22,11 +25,11 @@ namespace Umbraco.Core.HealthCheck.Checks.Security
         private readonly GlobalSettings _globalSettings;
         private readonly ILogger _logger;
         private readonly IRequestAccessor _requestAccessor;
-        private IConfigurationService _configurationService;
+        private readonly IConfigurationService _configurationService;
         private const string FixHttpsSettingAction = "fixHttpsSetting";
         string itemPath => Constants.Configuration.ConfigGlobalUseHttps;
 
-        public HttpsCheck(ILocalizedTextService textService, IOptions<GlobalSettings> globalSettings, IIOHelper ioHelper, ILogger logger, IRequestAccessor requestAccessor)
+        public HttpsCheck(ILocalizedTextService textService, IOptions<GlobalSettings> globalSettings, IIOHelper ioHelper, ILogger logger, IRequestAccessor requestAccessor, IConfigurationService configurationService)
         {
             _textService = textService;
             _globalSettings = globalSettings.Value;
