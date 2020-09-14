@@ -184,7 +184,7 @@ namespace Umbraco.Core.Composing
             {
                 // in case of an error, force-dump everything to log
                 _logger.Info<Composers>("Composer Report:\r\n{ComposerReport}", GetComposersReport(requirements));
-                _logger.Error<Composers>(e, "Failed to sort composers.");
+                _logger.LogError<Composers>(e, "Failed to sort composers.");
                 throw;
             }
 

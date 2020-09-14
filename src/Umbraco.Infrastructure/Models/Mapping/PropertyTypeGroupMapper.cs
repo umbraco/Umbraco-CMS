@@ -210,7 +210,7 @@ namespace Umbraco.Web.Models.Mapping
                 //fixme: Don't explode if we can't find this, log an error and change this to a label
                 if (propertyEditor == null)
                 {
-                    _logger.Error(GetType(),
+                    _logger.LogError(GetType(),
                         "No property editor could be resolved with the alias: {PropertyEditorAlias}, defaulting to label", p.PropertyEditorAlias);
                     propertyEditorAlias = Constants.PropertyEditors.Aliases.Label;
                     propertyEditor = _propertyEditors[propertyEditorAlias];

@@ -523,7 +523,7 @@ namespace Umbraco.Core.Services.Implement
                         }
                         catch (Exception ex)
                         {
-                            _logger.Error<NotificationService>(ex, "An error occurred sending notification");
+                            _logger.LogError<NotificationService>(ex, "An error occurred sending notification");
                         }
                         finally
                         {

@@ -66,7 +66,7 @@ namespace Umbraco.Web.Scheduling
                     }
                     catch (Exception ex)
                     {
-                        _logger.Error<TempFileCleanup>(ex, "Could not delete temp file {FileName}", file.FullName);
+                        _logger.LogError<TempFileCleanup>(ex, "Could not delete temp file {FileName}", file.FullName);
                     }
                 }
             }

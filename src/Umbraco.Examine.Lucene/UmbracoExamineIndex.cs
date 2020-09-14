@@ -118,7 +118,7 @@ namespace Umbraco.Examine
         /// <param name="ex"></param>
         protected override void OnIndexingError(IndexingErrorEventArgs ex)
         {
-            ProfilingLogger.Error(GetType(), ex.InnerException, ex.Message);
+            ProfilingLogger.LogError(GetType(), ex.InnerException, ex.Message);
             base.OnIndexingError(ex);
         }
 

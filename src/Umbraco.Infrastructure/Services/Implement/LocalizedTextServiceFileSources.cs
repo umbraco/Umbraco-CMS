@@ -206,7 +206,7 @@ namespace Umbraco.Core.Services.Implement
                         }
                         catch (Exception ex)
                         {
-                            _logger.Error<LocalizedTextServiceFileSources>(ex, "Could not load file into XML {File}", supplementaryFile.File.FullName);
+                            _logger.LogError<LocalizedTextServiceFileSources>(ex, "Could not load file into XML {File}", supplementaryFile.File.FullName);
                             continue;
                         }
 

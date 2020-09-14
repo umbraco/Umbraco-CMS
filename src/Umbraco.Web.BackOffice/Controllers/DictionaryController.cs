@@ -124,7 +124,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
             catch (Exception ex)
             {
-                _logger.Error(GetType(), ex, "Error creating dictionary with {Name} under {ParentId}", key, parentId);
+                _logger.LogError(GetType(), ex, "Error creating dictionary with {Name} under {ParentId}", key, parentId);
                 throw HttpResponseException.CreateNotificationValidationErrorResponse("Error creating dictionary item");
             }
         }
@@ -257,7 +257,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
             catch (Exception ex)
             {
-                _logger.Error(GetType(), ex, "Error saving dictionary with {Name} under {ParentId}", dictionary.Name, dictionary.ParentId);
+                _logger.LogError(GetType(), ex, "Error saving dictionary with {Name} under {ParentId}", dictionary.Name, dictionary.ParentId);
                 throw HttpResponseException.CreateNotificationValidationErrorResponse("Something went wrong saving dictionary");
             }
         }

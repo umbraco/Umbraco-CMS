@@ -344,7 +344,7 @@ namespace Umbraco.Tests.TestHelpers
             }
             catch (Exception ex)
             {
-                Logger.Error<TestWithDatabaseBase>(ex, "Could not remove the old database file");
+                Logger.LogError<TestWithDatabaseBase>(ex, "Could not remove the old database file");
 
                 // swallow this exception - that's because a sub class might require further teardown logic
                 onFail?.Invoke(ex);

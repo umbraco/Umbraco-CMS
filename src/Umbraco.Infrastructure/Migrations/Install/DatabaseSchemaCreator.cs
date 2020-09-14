@@ -111,7 +111,7 @@ namespace Umbraco.Core.Migrations.Install
                 {
                     //swallow this for now, not sure how best to handle this with diff databases... though this is internal
                     // and only used for unit tests. If this fails its because the table doesn't exist... generally!
-                    _logger.Error<DatabaseSchemaCreator>(ex, "Could not drop table {TableName}", tableName);
+                    _logger.LogError<DatabaseSchemaCreator>(ex, "Could not drop table {TableName}", tableName);
                 }
             }
         }

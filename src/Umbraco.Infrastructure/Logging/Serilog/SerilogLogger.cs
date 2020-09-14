@@ -115,14 +115,14 @@ namespace Umbraco.Core.Logging.Serilog
         }
 
         /// <inheritdoc/>
-        public void Error(Type reporting, Exception exception, string message)
+        public void LogError(Type reporting, Exception exception, string message)
         {
             var logger = LoggerFor(reporting);            
             logger.Error(exception, message);
         }
 
         /// <inheritdoc/>
-        public void Error(Type reporting, Exception exception)
+        public void LogError(Type reporting, Exception exception)
         {
             var logger = LoggerFor(reporting);
             var message = "Exception";
@@ -130,19 +130,19 @@ namespace Umbraco.Core.Logging.Serilog
         }
 
         /// <inheritdoc/>
-        public void Error(Type reporting, string message)
+        public void LogError(Type reporting, string message)
         {
             LoggerFor(reporting).Error(message);
         }
 
         /// <inheritdoc/>
-        public void Error(Type reporting, string messageTemplate, params object[] propertyValues)
+        public void LogError(Type reporting, string messageTemplate, params object[] propertyValues)
         {
             LoggerFor(reporting).Error(messageTemplate, propertyValues);
         }
 
         /// <inheritdoc/>
-        public void Error(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues)
+        public void LogError(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues)
         {
             var logger = LoggerFor(reporting);
             logger.Error(exception, messageTemplate, propertyValues);

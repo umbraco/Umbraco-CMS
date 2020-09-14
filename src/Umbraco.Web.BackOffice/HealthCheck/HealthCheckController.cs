@@ -71,7 +71,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
             catch (Exception ex)
             {
-                _logger.Error<HealthCheckController>(ex, "Exception in health check: {HealthCheckName}", check.Name);
+                _logger.LogError<HealthCheckController>(ex, "Exception in health check: {HealthCheckName}", check.Name);
                 throw;
             }
         }

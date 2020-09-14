@@ -61,7 +61,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
             }
             catch (Exception ex)
             {
-                _logger.Error<ConfigurationService>(ex, "Error trying to get configuration value");
+                _logger.LogError<ConfigurationService>(ex, "Error trying to get configuration value");
                 return new ConfigurationServiceResult
                 {
                     Success = false,
@@ -107,7 +107,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
             }
             catch (Exception ex)
             {
-               _logger.Error<ConfigurationService>(ex, "Error trying to update configuration");
+               _logger.LogError<ConfigurationService>(ex, "Error trying to update configuration");
                 return new ConfigurationServiceResult
                 {
                     Success = false,

@@ -31,27 +31,27 @@ namespace Umbraco.Core.Logging
 
         }
 
-        public void Error(Type reporting, Exception exception, string message)
+        public void LogError(Type reporting, Exception exception, string message)
         {
 
         }
 
-        public void Error(Type reporting, Exception exception)
+        public void LogError(Type reporting, Exception exception)
         {
 
         }
 
-        public void Error(Type reporting, string message)
+        public void LogError(Type reporting, string message)
         {
 
         }
 
-        public void Error(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues)
+        public void LogError(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues)
         {
 
         }
 
-        public void Error(Type reporting, string messageTemplate, params object[] propertyValues)
+        public void LogError(Type reporting, string messageTemplate, params object[] propertyValues)
         {
 
         }

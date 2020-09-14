@@ -154,7 +154,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
             catch (Exception ex)
             {
-                _logger.Error(GetType(), ex, "Error creating relation type with {Name}", relationType.Name);
+                _logger.LogError(GetType(), ex, "Error creating relation type with {Name}", relationType.Name);
                 throw HttpResponseException.CreateNotificationValidationErrorResponse("Error creating relation type.");
             }
         }
@@ -185,7 +185,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
             catch (Exception ex)
             {
-                _logger.Error(GetType(), ex, "Error saving relation type with {Id}", relationType.Id);
+                _logger.LogError(GetType(), ex, "Error saving relation type with {Id}", relationType.Id);
                 throw HttpResponseException.CreateNotificationValidationErrorResponse("Something went wrong when saving the relation type");
             }
         }

@@ -414,7 +414,7 @@ namespace Umbraco.Web.Scheduling
                         }
                         catch (Exception ex)
                         {
-                            _logger.Error<BackgroundTaskRunner>(ex, "{LogPrefix} Task runner exception", _logPrefix);
+                            _logger.LogError<BackgroundTaskRunner>(ex, "{LogPrefix} Task runner exception", _logPrefix);
                         }
                     }
                 }
@@ -573,7 +573,7 @@ namespace Umbraco.Web.Scheduling
             catch (Exception ex)
             {
 
-                _logger.Error<BackgroundTaskRunner>(ex, "{LogPrefix} Task has failed", _logPrefix);
+                _logger.LogError<BackgroundTaskRunner>(ex, "{LogPrefix} Task has failed", _logPrefix);
             }
         }
 
@@ -617,7 +617,7 @@ namespace Umbraco.Web.Scheduling
             }
             catch (Exception ex)
             {
-                _logger.Error<BackgroundTaskRunner>(ex, "{LogPrefix} {Name} exception occurred", _logPrefix, name);
+                _logger.LogError<BackgroundTaskRunner>(ex, "{LogPrefix} {Name} exception occurred", _logPrefix, name);
             }
         }
 

@@ -629,7 +629,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
             catch (Exception ex)
             {
-                Logger.Error<MediaController>(ex, "Could not update media sort order");
+                Logger.LogError<MediaController>(ex, "Could not update media sort order");
                 throw;
             }
         }

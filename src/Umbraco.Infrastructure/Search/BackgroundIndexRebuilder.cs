@@ -95,7 +95,7 @@ namespace Umbraco.Web.Search
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error<RebuildOnStartupTask>(ex, "Failed to rebuild empty indexes.");
+                    _logger.LogError<RebuildOnStartupTask>(ex, "Failed to rebuild empty indexes.");
                 }
             }
 

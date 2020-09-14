@@ -65,7 +65,7 @@ namespace Umbraco.Web.Common.Middleware
                 catch (Exception ex)
                 {
                     // try catch so we don't kill everything in all requests
-                    _logger.Error<UmbracoRequestMiddleware>(ex);
+                    _logger.LogError<UmbracoRequestMiddleware>(ex);
                 }
                 finally
                 {
@@ -128,7 +128,7 @@ namespace Umbraco.Web.Common.Middleware
                 }
                 catch (Exception ex)
                 {
-                    logger.Error<UmbracoRequestMiddleware>("Could not dispose item with key " + k, ex);
+                    logger.LogError<UmbracoRequestMiddleware>("Could not dispose item with key " + k, ex);
                 }
                 try
                 {
@@ -136,7 +136,7 @@ namespace Umbraco.Web.Common.Middleware
                 }
                 catch (Exception ex)
                 {
-                    logger.Error<UmbracoRequestMiddleware>("Could not dispose item key " + k, ex);
+                    logger.LogError<UmbracoRequestMiddleware>("Could not dispose item key " + k, ex);
                 }
             }
         }

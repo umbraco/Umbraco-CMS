@@ -73,7 +73,7 @@ namespace Umbraco.Web.Scheduling
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error<KeepAlive>(ex, "Keep alive failed (at '{keepAlivePingUrl}').", keepAlivePingUrl);
+                    _logger.LogError<KeepAlive>(ex, "Keep alive failed (at '{keepAlivePingUrl}').", keepAlivePingUrl);
                 }
             }
 

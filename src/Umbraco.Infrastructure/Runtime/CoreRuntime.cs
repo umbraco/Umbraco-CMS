@@ -270,7 +270,7 @@ namespace Umbraco.Core.Runtime
                 var msg = "Unhandled exception in AppDomain";
                 if (isTerminating) msg += " (terminating)";
                 msg += ".";
-                Logger.Error<CoreRuntime>(exception, msg);
+                Logger.LogError<CoreRuntime>(exception, msg);
             };
         }
 

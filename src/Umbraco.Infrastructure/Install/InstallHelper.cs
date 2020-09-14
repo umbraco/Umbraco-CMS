@@ -103,7 +103,7 @@ namespace Umbraco.Web.Install
             }
             catch (Exception ex)
             {
-                _logger.Error<InstallHelper>(ex, "An error occurred in InstallStatus trying to check upgrades");
+                _logger.LogError<InstallHelper>(ex, "An error occurred in InstallStatus trying to check upgrades");
             }
         }
 
@@ -154,7 +154,7 @@ namespace Umbraco.Web.Install
             }
             catch (AggregateException ex)
             {
-                _logger.Error<InstallHelper>(ex, "Could not download list of available starter kits");
+                _logger.LogError<InstallHelper>(ex, "Could not download list of available starter kits");
             }
 
             return packages;

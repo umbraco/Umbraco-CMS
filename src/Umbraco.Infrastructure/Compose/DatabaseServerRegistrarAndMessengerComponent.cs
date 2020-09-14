@@ -225,7 +225,7 @@ namespace Umbraco.Web.Compose
                 }
                 catch (Exception e)
                 {
-                    _logger.Error<InstructionProcessTask>(e, "Failed (will repeat).");
+                    _logger.LogError<InstructionProcessTask>(e, "Failed (will repeat).");
                 }
                 return true; // repeat
             }
@@ -268,7 +268,7 @@ namespace Umbraco.Web.Compose
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error<DatabaseServerRegistrarAndMessengerComponent>(ex, "Failed to update server record in database.");
+                    _logger.LogError<DatabaseServerRegistrarAndMessengerComponent>(ex, "Failed to update server record in database.");
                     return false; // probably stop if we have an error
                 }
             }

@@ -632,7 +632,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
             catch (Exception ex)
             {
-                _logger.Error<ContentTypeController>(ex, "Error cleaning up temporary udt file in App_Data: {File}", filePath);
+                _logger.LogError<ContentTypeController>(ex, "Error cleaning up temporary udt file in App_Data: {File}", filePath);
             }
 
             return Ok();

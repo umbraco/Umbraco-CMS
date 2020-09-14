@@ -45,7 +45,7 @@ namespace Umbraco.Web.Common.Install
                 }
                 catch (Exception ex)
                 {
-                    logger.Error<InstallAuthorizeAttribute>(ex, "An error occurred determining authorization");
+                    logger.LogError<InstallAuthorizeAttribute>(ex, "An error occurred determining authorization");
                     return false;
                 }
             }

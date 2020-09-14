@@ -128,7 +128,7 @@ namespace Umbraco.Core.Logging.Viewer
             {
                 // As we are reading/streaming one line at a time in the JSON file
                 // Thus we can not report the line number, as it will always be 1
-                _logger.Error<SerilogJsonLogViewer>(ex, "Unable to parse a line in the JSON log file");
+                _logger.LogError<SerilogJsonLogViewer>(ex, "Unable to parse a line in the JSON log file");
 
                 evt = null;
                 return true;

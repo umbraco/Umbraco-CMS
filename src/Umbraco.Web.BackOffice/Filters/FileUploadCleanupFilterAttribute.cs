@@ -75,7 +75,7 @@ namespace Umbraco.Web.WebApi.Filters
                                 }
                                 catch (Exception ex)
                                 {
-                                    _logger.Error<FileUploadCleanupFilterAttribute>(ex,
+                                    _logger.LogError<FileUploadCleanupFilterAttribute>(ex,
                                         "Could not delete temp file {FileName}", f.TempFilePath);
                                 }
                             }
@@ -129,7 +129,7 @@ namespace Umbraco.Web.WebApi.Filters
                                     }
                                     catch (Exception ex)
                                     {
-                                        _logger.Error<FileUploadCleanupFilterAttribute>(ex,
+                                        _logger.LogError<FileUploadCleanupFilterAttribute>(ex,
                                             "Could not delete temp file {FileName}", f.TempFilePath);
                                     }
 

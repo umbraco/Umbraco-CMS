@@ -109,7 +109,7 @@ namespace Umbraco.Web.Security
                 }
                 catch (System.Exception ex)
                 {
-                    Current.Logger.Error(typeof (AuthenticationOptionsExtensions), ex, "Could not read AuthenticationOptions properties");
+                    Current.Logger.LogError(typeof (AuthenticationOptionsExtensions), ex, "Could not read AuthenticationOptions properties");
                 }
             }
             else

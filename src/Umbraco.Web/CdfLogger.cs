@@ -36,12 +36,12 @@ namespace Umbraco.Web
 
         public void Error(string msg, Exception ex)
         {
-            _logger.Error<CdfLogger>(ex, msg);
+            _logger.LogError<CdfLogger>(ex, msg);
         }
 
         public void Fatal(string msg, Exception ex)
         {
-            _logger.Error<CdfLogger>(ex, msg);
+            _logger.LogError<CdfLogger>(ex, msg);
         }
     }
 }

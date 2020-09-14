@@ -98,7 +98,7 @@ namespace Umbraco.Web.Scheduling
             catch (Exception ex)
             {
                 // important to catch *everything* to ensure the task repeats
-                _logger.Error<ScheduledPublishing>(ex, "Failed.");
+                _logger.LogError<ScheduledPublishing>(ex, "Failed.");
             }
 
             return true; // repeat

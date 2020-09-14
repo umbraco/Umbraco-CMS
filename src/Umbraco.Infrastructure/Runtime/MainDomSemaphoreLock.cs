@@ -52,7 +52,7 @@ namespace Umbraco.Core.Runtime
             }
             catch (TimeoutException ex)
             {
-                _logger.Error<MainDomSemaphoreLock>(ex);
+                _logger.LogError<MainDomSemaphoreLock>(ex);
                 return Task.FromResult(false);
             }
             finally

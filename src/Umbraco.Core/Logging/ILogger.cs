@@ -68,7 +68,7 @@ namespace Umbraco.Core.Logging
         /// <param name="reporting">The reporting type.</param>
         /// <param name="exception">An exception.</param>
         /// <param name="message">A message.</param>
-        void Error(Type reporting, Exception exception, string message);
+        void LogError(Type reporting, Exception exception, string message);
 
         /// <summary>
         /// Logs an error exception.
@@ -76,14 +76,14 @@ namespace Umbraco.Core.Logging
         /// <param name="reporting">The reporting type.</param>
         /// <param name="exception">An exception.</param>
         /// <remarks>The message string is unspecified and is implementation-specific.</remarks>
-        void Error(Type reporting, Exception exception);
+        void LogError(Type reporting, Exception exception);
 
         /// <summary>
         /// Logs an error message.
         /// </summary>
         /// <param name="reporting">The reporting type.</param>
         /// <param name="message">A message.</param>
-        void Error(Type reporting, string message);
+        void LogError(Type reporting, string message);
 
         /// <summary>
         /// Logs an error message with an exception.
@@ -92,7 +92,7 @@ namespace Umbraco.Core.Logging
         /// <param name="exception">An exception.</param>
         /// <param name="messageTemplate">A message template.</param>
         /// <param name="propertyValues">Property values.</param>
-        void Error(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues);
+        void LogError(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues);
 
         /// <summary>
         /// Logs an error message.
@@ -100,7 +100,7 @@ namespace Umbraco.Core.Logging
         /// <param name="reporting">The reporting type.</param>
         /// <param name="messageTemplate">A message template.</param>
         /// <param name="propertyValues">Property values.</param>
-        void Error(Type reporting, string messageTemplate, params object[] propertyValues);
+        void LogError(Type reporting, string messageTemplate, params object[] propertyValues);
 
         /// <summary>
         /// Logs a warning message.

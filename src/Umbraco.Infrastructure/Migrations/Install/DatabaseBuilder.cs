@@ -449,7 +449,7 @@ namespace Umbraco.Core.Migrations.Install
 
         private Result HandleInstallException(Exception ex)
         {
-            _logger.Error<DatabaseBuilder>(ex, "Database configuration failed");
+            _logger.LogError<DatabaseBuilder>(ex, "Database configuration failed");
 
             if (_databaseSchemaValidationResult != null)
             {

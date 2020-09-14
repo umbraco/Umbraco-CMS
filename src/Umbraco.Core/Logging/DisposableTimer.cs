@@ -84,7 +84,7 @@ namespace Umbraco.Core.Logging
             {
                 if (_failed)
                 {
-                    _logger.Error(_loggerType, _failException, "{FailMessage} ({Duration}ms) [Timing {TimingId}]", _failMessage, Stopwatch.ElapsedMilliseconds, _timingId);
+                    _logger.LogError(_loggerType, _failException, "{FailMessage} ({Duration}ms) [Timing {TimingId}]", _failMessage, Stopwatch.ElapsedMilliseconds, _timingId);
                 }
                 else switch (_level)
                 {

@@ -78,7 +78,7 @@ namespace Umbraco.Core.Runtime
                 {
                     if (IsLockTimeoutException(ex))
                     {
-                        _logger.Error<SqlMainDomLock>(ex, "Sql timeout occurred, could not acquire MainDom.");
+                        _logger.LogError<SqlMainDomLock>(ex, "Sql timeout occurred, could not acquire MainDom.");
                         _errorDuringAcquiring = true;
                         return false;
                     }
@@ -103,7 +103,7 @@ namespace Umbraco.Core.Runtime
             catch (Exception ex)
             {
                 // unexpected
-                _logger.Error<SqlMainDomLock>(ex, "Unexpected error, cannot acquire MainDom");
+                _logger.LogError<SqlMainDomLock>(ex, "Unexpected error, cannot acquire MainDom");
                 _errorDuringAcquiring = true;
                 return false;
             }
@@ -186,7 +186,7 @@ namespace Umbraco.Core.Runtime
                     }
                     catch (Exception ex)
                     {
-                        _logger.Error<SqlMainDomLock>(ex, "Unexpected error during listening.");
+                        _logger.LogError<SqlMainDomLock>(ex, "Unexpected error during listening.");
 
                         // We need to keep on listening unless we've been notified by our own AppDomain to shutdown since
                         // we don't want to shutdown resources controlled by MainDom inadvertently. We'll just keep listening otherwise.
@@ -277,12 +277,12 @@ namespace Umbraco.Core.Runtime
             {
                 if (IsLockTimeoutException(ex as SqlException))
                 {
-                    _logger.Error<SqlMainDomLock>(ex, "Sql timeout occurred, waiting for existing MainDom is canceled.");
+                    _logger.LogError<SqlMainDomLock>(ex, "Sql timeout occurred, waiting for existing MainDom is canceled.");
                     _errorDuringAcquiring = true;
                     return false;
                 }
                 // unexpected
-                _logger.Error<SqlMainDomLock>(ex, "Unexpected error, waiting for existing MainDom is canceled.");
+                _logger.LogError<SqlMainDomLock>(ex, "Unexpected error, waiting for existing MainDom is canceled.");
                 _errorDuringAcquiring = true;
                 return false;
             }
@@ -321,11 +321,11 @@ namespace Umbraco.Core.Runtime
                 if (IsLockTimeoutException(ex as SqlException))
                 {
                     // something is wrong, we cannot acquire, not much we can do
-                    _logger.Error<SqlMainDomLock>(ex, "Sql timeout occurred, could not forcibly acquire MainDom.");
+                    _logger.LogError<SqlMainDomLock>(ex, "Sql timeout occurred, could not forcibly acquire MainDom.");
                     _errorDuringAcquiring = true;
                     return false;
                 }
-                _logger.Error<SqlMainDomLock>(ex, "Unexpected error, could not forcibly acquire MainDom.");
+                _logger.LogError<SqlMainDomLock>(ex, "Unexpected error, could not forcibly acquire MainDom.");
                 _errorDuringAcquiring = true;
                 return false;
             }
@@ -409,7 +409,7 @@ namespace Umbraco.Core.Runtime
                             }
                             catch (Exception ex)
                             {
-                                _logger.Error<SqlMainDomLock>(ex, "Unexpected error during dipsose.");
+                                _logger.LogError<SqlMainDomLock>(ex, "Unexpected error during dipsose.");
                             }
                             finally
                             {

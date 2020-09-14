@@ -253,7 +253,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     catch (Exception ex)
                     {
                         /* TBD: May already be throwing so don't throw again */
-                        _logger.Error<ContentStore>(ex, "Error trying to release DB");
+                        _logger.LogError<ContentStore>(ex, "Error trying to release DB");
                     }
                     finally
                     {
@@ -264,7 +264,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
             catch (Exception ex)
             {
-                _logger.Error<ContentStore>(ex, "Error trying to lock");
+                _logger.LogError<ContentStore>(ex, "Error trying to lock");
                 throw;
             }
             finally

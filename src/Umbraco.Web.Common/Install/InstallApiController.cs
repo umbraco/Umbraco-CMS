@@ -155,7 +155,7 @@ namespace Umbraco.Web.Common.Install
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error<InstallApiController>(ex, "An error occurred during installation step {Step}",
+                    _logger.LogError<InstallApiController>(ex, "An error occurred during installation step {Step}",
                         step.Name);
 
                     if (ex is TargetInvocationException && ex.InnerException != null)
@@ -268,7 +268,7 @@ namespace Umbraco.Web.Common.Install
             }
             catch (Exception ex)
             {
-                _logger.Error<InstallApiController>(ex, "Checking if step requires execution ({Step}) failed.",
+                _logger.LogError<InstallApiController>(ex, "Checking if step requires execution ({Step}) failed.",
                     step.Name);
                 throw;
             }
@@ -299,7 +299,7 @@ namespace Umbraco.Web.Common.Install
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error<InstallApiController>(ex, "Installation step {Step} failed.", step.Name);
+                    _logger.LogError<InstallApiController>(ex, "Installation step {Step} failed.", step.Name);
                     throw;
                 }
             }

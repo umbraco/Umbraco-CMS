@@ -134,13 +134,13 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
                         //See this thread: http://examine.cdodeplex.com/discussions/264341
                         //Catch the exception here for the time being, and just fallback to GetMedia
                         // TODO: Need to fix examine in LB scenarios!
-                        Current.Logger.Error<PublishedMediaCache>(ex, "Could not load data from Examine index for media");
+                        Current.Logger.LogError<PublishedMediaCache>(ex, "Could not load data from Examine index for media");
                     }
                     else if (ex is AlreadyClosedException)
                     {
                         //If the app domain is shutting down and the site is under heavy load the index reader will be closed and it really cannot
                         //be re-opened since the app domain is shutting down. In this case we have no option but to try to load the data from the db.
-                        Current.Logger.Error<PublishedMediaCache>(ex, "Could not load data from Examine index for media, the app domain is most likely in a shutdown state");
+                        Current.Logger.LogError<PublishedMediaCache>(ex, "Could not load data from Examine index for media, the app domain is most likely in a shutdown state");
                     }
                     else throw;
                 }
@@ -302,13 +302,13 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
                         //See this thread: http://examine.cdodeplex.com/discussions/264341
                         //Catch the exception here for the time being, and just fallback to GetMedia
                         // TODO: Need to fix examine in LB scenarios!
-                        Current.Logger.Error<PublishedMediaCache>(ex, "Could not load data from Examine index for media");
+                        Current.Logger.LogError<PublishedMediaCache>(ex, "Could not load data from Examine index for media");
                     }
                     else if (ex is AlreadyClosedException)
                     {
                         //If the app domain is shutting down and the site is under heavy load the index reader will be closed and it really cannot
                         //be re-opened since the app domain is shutting down. In this case we have no option but to try to load the data from the db.
-                        Current.Logger.Error<PublishedMediaCache>(ex, "Could not load data from Examine index for media, the app domain is most likely in a shutdown state");
+                        Current.Logger.LogError<PublishedMediaCache>(ex, "Could not load data from Examine index for media, the app domain is most likely in a shutdown state");
                     }
                     else throw;
                 }

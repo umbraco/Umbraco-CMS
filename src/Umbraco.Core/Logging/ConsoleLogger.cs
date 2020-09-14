@@ -42,30 +42,30 @@ namespace Umbraco.Core.Logging
             Console.WriteLine("FATAL {0} - {1}", reporting.Name, _messageTemplates.Render(messageTemplate, propertyValues));
         }
 
-        public void Error(Type reporting, Exception exception, string message)
+        public void LogError(Type reporting, Exception exception, string message)
         {
             Console.WriteLine("ERROR {0} - {1}", reporting.Name, message);
             Console.WriteLine(exception);
         }
 
-        public void Error(Type reporting, Exception exception)
+        public void LogError(Type reporting, Exception exception)
         {
             Console.WriteLine("ERROR {0}", reporting.Name);
             Console.WriteLine(exception);
         }
 
-        public void Error(Type reporting, string message)
+        public void LogError(Type reporting, string message)
         {
             Console.WriteLine("ERROR {0} - {1}", reporting.Name, message);
         }
 
-        public void Error(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues)
+        public void LogError(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues)
         {
             Console.WriteLine("ERROR {0} - {1}", reporting.Name, _messageTemplates.Render(messageTemplate, propertyValues));
             Console.WriteLine(exception);
         }
 
-        public void Error(Type reporting, string messageTemplate, params object[] propertyValues)
+        public void LogError(Type reporting, string messageTemplate, params object[] propertyValues)
         {
             Console.WriteLine("ERROR {0} - {1}", reporting.Name, _messageTemplates.Render(messageTemplate, propertyValues));
         }
