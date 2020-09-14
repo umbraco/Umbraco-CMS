@@ -33,8 +33,15 @@ function umbPropEditor(umbPropEditorHelper) {
                    scope.model.alias = Math.random().toString(36).slice(2);
                 }
 
-                scope.propertyEditorView = umbPropEditorHelper.getViewPath(scope.model.view, scope.isPreValue);
-                
+                var unbindWatcher = scope.$watch("model.view",
+                    function() {
+                        scope.propertyEditorView = umbPropEditorHelper.getViewPath(scope.model.view, scope.isPreValue);
+                    }
+                );
+
+                scope.$on("$destroy", function () {
+                    unbindWatcher();
+                });
             }
         };
     };

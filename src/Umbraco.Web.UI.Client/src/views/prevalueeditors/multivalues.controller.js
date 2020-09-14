@@ -7,7 +7,7 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.MultiValuesControl
         $scope.hasError = false;
         $scope.focusOnNew = false;
        
-        if (!angular.isArray($scope.model.value)) {
+        if (!Utilities.isArray($scope.model.value)) {
 
             //make an array from the dictionary
             var items = [];
@@ -37,7 +37,6 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.MultiValuesControl
 
         $scope.add = function (evt) {
             evt.preventDefault();
-            
             
             if ($scope.newItem) {
                 if (!_.contains($scope.model.value, $scope.newItem)) {                
@@ -79,7 +78,7 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.MultiValuesControl
             if (event.keyCode == 13) {
                 $scope.add(event);
             }
-        }
+        };
 
         function getElementIndexByPrevalueText(value) {
             for (var i = 0; i < $scope.model.value.length; i++) {

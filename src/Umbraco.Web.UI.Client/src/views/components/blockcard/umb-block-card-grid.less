@@ -1,0 +1,15 @@
+.umb-block-card-grid {
+    /* FlexBox Fallback */
+    display: flex;
+    flex-wrap: wrap;
+    > * {
+        flex: 1 1 240px;
+    }
+
+    /* Grid Setup */
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-auto-rows: minmax(160px, auto);
+    grid-gap: 20px;
+    
+}

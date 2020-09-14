@@ -72,16 +72,16 @@
                                             content-start-node="userGroup.contentStartNode"
                                             media-start-node="userGroup.mediaStartNode"
                                             allow-remove="true"
+                                            allow-edit="model.allowGroupEdit(userGroup)"
+                                            on-edit="model.editSelectedItem($index, model.user.userGroups)"
                                             on-remove="model.removeSelectedItem($index, model.user.userGroups)">
                     </umb-user-group-preview>
 
-                    <a href=""
-                       style="max-width: 100%;"
-                       class="umb-node-preview-add"
-                       ng-click="model.openUserGroupPicker()"
-                       prevent-default>
+                    <button type="button"
+                            class="umb-node-preview-add"
+                            ng-click="model.openUserGroupPicker()">
                         <localize key="general_add">Add</localize>
-                    </a>
+                    </button>
 
                 </umb-control-group>
 
@@ -100,13 +100,12 @@
                                       name="model.labels.noStartNodes">
                     </umb-node-preview>
 
-                    <a href=""
-                       class="umb-node-preview-add"
-                       id="content-start-add"
-                       ng-click="model.openContentPicker()"
-                       prevent-default>
+                    <button type="button"
+                            class="umb-node-preview-add"
+                            id="content-start-add"
+                            ng-click="model.openContentPicker()">
                         <localize key="general_add">Add</localize>
-                    </a>
+                    </button>
 
                 </umb-control-group>
 
@@ -125,13 +124,12 @@
                                       name="model.labels.noStartNodes">
                     </umb-node-preview>
 
-                    <a href=""
-                       class="umb-node-preview-add"
-                       ng-click="model.openMediaPicker()"
-                       id="media-start-add"
-                       prevent-default>
+                    <button type="button"
+                            class="umb-node-preview-add"
+                            ng-click="model.openMediaPicker()"
+                            id="media-start-add">
                         <localize key="general_add">Add</localize>
-                    </a>
+                    </button>
 
                 </umb-control-group>
 

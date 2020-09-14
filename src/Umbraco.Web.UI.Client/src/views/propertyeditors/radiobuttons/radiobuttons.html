@@ -3,11 +3,16 @@
 
         <ul class="unstyled">
             <li ng-repeat="item in vm.viewItems track by item.key">
-                <umb-radiobutton name="{{model.alias}}" value="{{item.value}}" model="model.value" text="{{item.value}}" required="model.validation.mandatory && model.value == ''"></umb-radiobutton>
+                <umb-radiobutton name="{{model.alias}}_{{vm.uniqueId}}"
+                                 value="{{item.value}}"
+                                 model="model.value"
+                                 text="{{item.value}}"
+                                 required="model.validation.mandatory && model.value == ''">
+                </umb-radiobutton>
             </li>
         </ul>
 
-        <div ng-messages="radioButtonsFieldForm[model.alias].$error" show-validation-on-submit>
+        <div ng-messages="radioButtonsFieldForm[model.alias + '_' + vm.uniqueId].$error" show-validation-on-submit>
             <p class="help-inline" ng-message="required">{{mandatoryMessage}}</p>
         </div>
 

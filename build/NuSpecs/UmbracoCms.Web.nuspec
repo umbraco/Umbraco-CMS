@@ -25,7 +25,7 @@
                   not want this to happen as the alpha of the next major is, really, the next major already.
                 -->
                 <dependency id="UmbracoCms.Core" version="[$version$]" />
-                <dependency id="ClientDependency" version="[1.9.8,1.999999)" />
+                <dependency id="ClientDependency" version="[1.9.9,1.999999)" />
                 <dependency id="ClientDependency-Mvc5" version="[1.9.3,1.999999)" />
                 <dependency id="CSharpTest.Net.Collections" version="[14.906.1403.1082,14.999999)" />
                 <dependency id="Examine" version="[1.0.2,1.999999)" />
@@ -42,6 +42,7 @@
                 <dependency id="Microsoft.Owin.Security.Cookies" version="[4.0.1,4.999999)" />
                 <dependency id="Microsoft.Owin.Security.OAuth" version="[4.0.1,4.999999)" />
                 <dependency id="System.Threading.Tasks.Dataflow" version="[4.9.0,4.999999)" />
+                <dependency id="HtmlSanitizer" version="[4.0.217,4.999999)" />
 
             </group>
 

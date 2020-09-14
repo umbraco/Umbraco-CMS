@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function LogViewerSearchController($location, logViewerResource, overlayService) {
+    function LogViewerSearchController($location, logViewerResource, overlayService, localizationService) {
 
         var vm = this;
 
@@ -16,11 +16,11 @@
         vm.logLevels = [
             {
                 name: 'Verbose',
-                logTypeColor: ''
+                logTypeColor: 'gray'
             },
             {
                 name: 'Debug',
-                logTypeColor: 'gray'
+                logTypeColor: 'info'
             },
             {
                 name: 'Information',
@@ -28,15 +28,15 @@
             },
             {
                 name: 'Warning',
-                logTypeColor: 'primary'
-            },
-            {
-                name: 'Error',
                 logTypeColor: 'warning'
             },
             {
-                name: 'Fatal',
+                name: 'Error',
                 logTypeColor: 'danger'
+            },
+            {
+                name: 'Fatal',
+                logTypeColor: 'dark'
             }
         ];
 
@@ -138,11 +138,12 @@
                         "name": "Find all logs that use a specific log message template",
                         "query": "@MessageTemplate = '[Timing {TimingId}] {EndMessage} ({TimingDuration}ms)'"
                     }
-                ]
+                ];
             });
 
             //Get all logs on init load
             getLogs();
+
         }
 
 
@@ -181,7 +182,7 @@
         function getFilterName(array) {
             var name = "All";
             var found = false;
-            angular.forEach(array, function (item) {
+            array.forEach(function (item) {
                 if (item.selected) {
                     if (!found) {
                         name = item.name
@@ -255,9 +256,8 @@
 
         function addToSavedSearches(){
 
-            var overlay = {
+            const overlay = {
                 title: "Save Search",
-                subtitle: "Enter a friendly name for your search query",
                 closeButtonLabel: "Cancel",
                 submitButtonLabel: "Save Search",
                 disableSubmitButton: true,
@@ -266,28 +266,37 @@
                 submit: function (model) {
                     //Resource call with two params (name & query)
                     //API that opens the JSON and adds it to the bottom
-                    logViewerResource.postSavedSearch(model.name, model.query).then(function(data){
+                    logViewerResource.postSavedSearch(model.queryName, model.query).then(function(data){
                         vm.searches = data;
                         overlayService.close();
                     });
                 },
-                close: function() {
-                    overlayService.close();
-                }
+                close: () => overlayService.close()
             };
 
-            overlayService.open(overlay);
+            var labelKeys = [
+                "general_cancel",
+                "logViewer_saveSearch",
+                "logViewer_saveSearchDescription"
+            ];
+
+            localizationService.localizeMany(labelKeys).then(values => {
+                overlay.title = values[1];
+                overlay.subtitle = values[2],
+                overlay.submitButtonLabel = values[1],
+                overlay.closeButtonLabel = values[0],
+
+                overlayService.open(overlay);
+            });
         }
 
         function deleteSavedSearch(searchItem) {
 
-            var overlay = {
+            const overlay = {
                 title: "Delete Saved Search",
-                subtitle: "Are you sure you wish to delete?",
                 closeButtonLabel: "Cancel",
                 submitButtonLabel: "Delete Saved Search",
                 submitButtonStyle: "danger",
-                view: "default",
                 submit: function (model) {
                     //Resource call with two params (name & query)
                     //API that opens the JSON and adds it to the bottom
@@ -296,12 +305,23 @@
                         overlayService.close();
                     });
                 },
-                close: function() {
-                    overlayService.close();
-                }
+                close: () => overlayService.close()
             };
 
-            overlayService.open(overlay);
+            var labelKeys = [
+                "general_cancel",
+                "defaultdialogs_confirmdelete",
+                "logViewer_deleteSavedSearch"
+            ];
+
+            localizationService.localizeMany(labelKeys).then(values => {
+                overlay.title = values[2];
+                overlay.subtitle = values[1];
+                overlay.submitButtonLabel = values[2];
+                overlay.closeButtonLabel = values[0];
+
+                overlayService.open(overlay);
+            });
         }
 
         function back() {
@@ -309,7 +329,6 @@
         }
 
         init();
-
     }
 
     angular.module("umbraco").controller("Umbraco.Editors.LogViewer.SearchController", LogViewerSearchController);

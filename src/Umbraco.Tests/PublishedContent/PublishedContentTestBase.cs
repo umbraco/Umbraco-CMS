@@ -12,6 +12,8 @@ using Umbraco.Web.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Web;
 using Umbraco.Web.Templates;
+using Umbraco.Web.Models;
+using System;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -46,7 +48,7 @@ namespace Umbraco.Tests.PublishedContent
             var pastedImages = new RichTextEditorPastedImages(umbracoContextAccessor, logger, Mock.Of<IMediaService>(), Mock.Of<IContentTypeBaseServiceProvider>());
             var localLinkParser = new HtmlLocalLinkParser(umbracoContextAccessor);
             var dataTypeService = new TestObjects.TestDataTypeService(
-                new DataType(new RichTextPropertyEditor(logger, umbracoContextAccessor, imageSourceParser, localLinkParser, pastedImages)) { Id = 1 });
+                new DataType(new RichTextPropertyEditor(logger, umbracoContextAccessor, imageSourceParser, localLinkParser, pastedImages, Mock.Of<IImageUrlGenerator>())) { Id = 1 });
 
             var publishedContentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters, dataTypeService);
 
@@ -55,7 +57,7 @@ namespace Umbraco.Tests.PublishedContent
                 yield return publishedContentTypeFactory.CreatePropertyType(contentType, "content", 1);
             }
 
-            var type = new AutoPublishedContentType(0, "anything", CreatePropertyTypes);
+            var type = new AutoPublishedContentType(Guid.NewGuid(), 0, "anything", CreatePropertyTypes);
             ContentTypesCache.GetPublishedContentTypeByAlias = alias => type;
 
             var umbracoContext = GetUmbracoContext("/test");

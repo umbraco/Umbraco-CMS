@@ -22,6 +22,7 @@ using Umbraco.Tests.Testing;
 using Umbraco.Web.Models.PublishedContent;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.Templates;
+using Umbraco.Web.Models;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -53,7 +54,7 @@ namespace Umbraco.Tests.PublishedContent
             var dataTypeService = new TestObjects.TestDataTypeService(
                 new DataType(new VoidEditor(logger)) { Id = 1 },
                 new DataType(new TrueFalsePropertyEditor(logger)) { Id = 1001 },
-                new DataType(new RichTextPropertyEditor(logger, umbracoContextAccessor, imageSourceParser, linkParser, pastedImages)) { Id = 1002 },
+                new DataType(new RichTextPropertyEditor(logger, umbracoContextAccessor, imageSourceParser, linkParser, pastedImages, Mock.Of<IImageUrlGenerator>())) { Id = 1002 },
                 new DataType(new IntegerPropertyEditor(logger)) { Id = 1003 },
                 new DataType(new TextboxPropertyEditor(logger)) { Id = 1004 },
                 new DataType(new MediaPickerPropertyEditor(logger)) { Id = 1005 });
@@ -82,8 +83,8 @@ namespace Umbraco.Tests.PublishedContent
             }
 
             var compositionAliases = new[] { "MyCompositionAlias" };
-            var anythingType = new AutoPublishedContentType(0, "anything", compositionAliases, CreatePropertyTypes);
-            var homeType = new AutoPublishedContentType(0, "home", compositionAliases, CreatePropertyTypes);
+            var anythingType = new AutoPublishedContentType(Guid.NewGuid(), 0, "anything", compositionAliases, CreatePropertyTypes);
+            var homeType = new AutoPublishedContentType(Guid.NewGuid(), 0, "home", compositionAliases, CreatePropertyTypes);
             ContentTypesCache.GetPublishedContentTypeByAlias = alias => alias.InvariantEquals("home") ? homeType : anythingType;
         }
 
@@ -397,8 +398,8 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void Children_GroupBy_DocumentTypeAlias()
         {
-            var home = new AutoPublishedContentType(22, "Home", new PublishedPropertyType[] { });
-            var custom = new AutoPublishedContentType(23, "CustomDocument", new PublishedPropertyType[] { });
+            var home = new AutoPublishedContentType(Guid.NewGuid(), 22, "Home", new PublishedPropertyType[] { });
+            var custom = new AutoPublishedContentType(Guid.NewGuid(), 23, "CustomDocument", new PublishedPropertyType[] { });
             var contentTypes = new Dictionary<string, PublishedContentType>
             {
                 { home.Alias, home },
@@ -418,8 +419,8 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void Children_Where_DocumentTypeAlias()
         {
-            var home = new AutoPublishedContentType(22, "Home", new PublishedPropertyType[] { });
-            var custom = new AutoPublishedContentType(23, "CustomDocument", new PublishedPropertyType[] { });
+            var home = new AutoPublishedContentType(Guid.NewGuid(), 22, "Home", new PublishedPropertyType[] { });
+            var custom = new AutoPublishedContentType(Guid.NewGuid(), 23, "CustomDocument", new PublishedPropertyType[] { });
             var contentTypes = new Dictionary<string, PublishedContentType>
             {
                 { home.Alias, home },
@@ -902,7 +903,7 @@ namespace Umbraco.Tests.PublishedContent
                 yield return factory.CreatePropertyType(contentType, "detached", 1003);
             }
 
-            var ct = factory.CreateContentType(0, "alias", CreatePropertyTypes);
+            var ct = factory.CreateContentType(Guid.NewGuid(), 0, "alias", CreatePropertyTypes);
             var pt = ct.GetPropertyType("detached");
             var prop = new PublishedElementPropertyBase(pt, null, false, PropertyCacheLevel.None, 5548);
             Assert.IsInstanceOf<int>(prop.GetValue());
@@ -934,7 +935,7 @@ namespace Umbraco.Tests.PublishedContent
 
             var guid = Guid.NewGuid();
 
-            var ct = factory.CreateContentType(0, "alias", CreatePropertyTypes);
+            var ct = factory.CreateContentType(Guid.NewGuid(), 0, "alias", CreatePropertyTypes);
 
             var c = new ImageWithLegendModel(ct, guid, new Dictionary<string, object>
             {

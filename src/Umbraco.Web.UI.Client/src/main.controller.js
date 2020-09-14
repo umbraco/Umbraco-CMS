@@ -1,19 +1,18 @@
-
-/**
+/** 
  * @ngdoc controller
- * @name Umbraco.MainController
+ * @name Umbraco.MainController  
  * @function
  * 
- * @description
+ * @description  
  * The main application controller
  * 
  */
 function MainController($scope, $location, appState, treeService, notificationsService, 
     userService, historyService, updateChecker, navigationService, eventsService, 
     tmhDynamicLocale, localStorageService, editorService, overlayService, assetsService, tinyMceAssets) {
-
+ 
     //the null is important because we do an explicit bool check on this in the view
-    $scope.authenticated = null;
+    $scope.authenticated = null; 
     $scope.touchDevice = appState.getGlobalState("touchDevice");
     $scope.infiniteMode = false;
     $scope.overlay = {};
@@ -32,13 +31,17 @@ function MainController($scope, $location, appState, treeService, notificationsS
     // For more information about this approach, see https://hackernoon.com/removing-that-ugly-focus-ring-and-keeping-it-too-6c8727fefcd2
     function handleFirstTab(evt) {
         if (evt.keyCode === 9) {
-            $scope.tabbingActive = true;
-            $scope.$digest();
-            window.removeEventListener('keydown', handleFirstTab);
-            window.addEventListener('mousedown', disableTabbingActive);
+            enableTabbingActive();
         }
     }
     
+    function enableTabbingActive() {
+        $scope.tabbingActive = true;
+        $scope.$digest();
+        window.addEventListener('mousedown', disableTabbingActive);
+        window.removeEventListener("keydown", handleFirstTab);
+    }
+
     function disableTabbingActive(evt) {
         $scope.tabbingActive = false;
         $scope.$digest();
@@ -47,6 +50,12 @@ function MainController($scope, $location, appState, treeService, notificationsS
     }
 
     window.addEventListener("keydown", handleFirstTab);
+
+    $scope.$on("showFocusOutline", function() {
+        $scope.tabbingActive = true;
+        window.addEventListener('mousedown', disableTabbingActive);
+        window.removeEventListener("keydown", handleFirstTab);
+    });
 
 
     $scope.removeNotification = function (index) {
@@ -57,12 +66,14 @@ function MainController($scope, $location, appState, treeService, notificationsS
         appState.setSearchState("show", false);
     };
 
-    $scope.showLoginScreen = function(isTimedOut) {
+    $scope.showLoginScreen = function (isTimedOut) {
+        $scope.login.pageTitle = $scope.$root.locationTitle;
         $scope.login.isTimedOut = isTimedOut;
         $scope.login.show = true;
     };
 
-    $scope.hideLoginScreen = function() {
+    $scope.hideLoginScreen = function () {
+        $scope.$root.locationTitle = $scope.login.pageTitle;
         $scope.login.show = false;
     };
 
@@ -73,6 +84,7 @@ function MainController($scope, $location, appState, treeService, notificationsS
         $scope.authenticated = null;
         $scope.user = null;
         const isTimedOut = data && data.isTimedOut ? true : false;
+
         $scope.showLoginScreen(isTimedOut);
 
         // Remove the localstorage items for tours shown

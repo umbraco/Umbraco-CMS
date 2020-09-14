@@ -13,6 +13,9 @@ namespace Umbraco.Web.Models.ContentEditing
             Notifications = new List<Notification>();
         }
 
+        [DataMember(Name = "isSystemRelationType")]
+        public bool IsSystemRelationType { get; set; }
+
         /// <summary>
         /// Gets or sets a boolean indicating whether the RelationType is Bidirectional (true) or Parent to Child (false)
         /// </summary>
