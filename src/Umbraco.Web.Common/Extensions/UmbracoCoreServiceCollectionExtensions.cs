@@ -149,11 +149,6 @@ namespace Umbraco.Extensions
             services.Configure<UserPasswordConfigurationSettings>(configuration.GetSection(Constants.Configuration.ConfigSecurityPrefix + "UserPassword"));
             services.Configure<WebRoutingSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "WebRouting"));
 
-            //services.Configure<TourSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "Tours"));
-            services.Configure<TourSettings>(settings =>
-            {
-                settings.EnableTours = false;
-            });
 
             return services;
         }
