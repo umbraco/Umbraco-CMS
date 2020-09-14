@@ -13,7 +13,6 @@ using Microsoft.Extensions.Options;
 using Serilog;
 using Serilog.Extensions.Hosting;
 using Serilog.Extensions.Logging;
-using Umbraco.Configuration;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;

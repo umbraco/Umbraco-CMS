@@ -4,8 +4,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 {
     internal class UmbracoSettingsSection : ConfigurationSection
     {
-        [ConfigurationProperty("backOffice")]
-        public BackOfficeElement BackOffice => (BackOfficeElement)this["backOffice"];
 
         [ConfigurationProperty("content")]
         public ContentElement Content => (ContentElement)this["content"];
@@ -22,7 +20,5 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         [ConfigurationProperty("web.routing")]
         public WebRoutingElement WebRouting => (WebRoutingElement)this["web.routing"];
 
-        [ConfigurationProperty("keepAlive")]
-        internal KeepAliveElement KeepAlive => (KeepAliveElement)this["keepAlive"];
     }
 }

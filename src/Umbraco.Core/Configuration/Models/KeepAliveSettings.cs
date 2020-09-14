@@ -1,11 +1,9 @@
-﻿using Umbraco.Core.Configuration.UmbracoSettings;
-
 namespace Umbraco.Core.Configuration.Models
 {
-    public class KeepAliveSettings : IKeepAliveSettings
+    public class KeepAliveSettings
     {
-        public bool DisableKeepAliveTask { get; set; } = false;
+        public bool DisableKeepAliveTask => false;
 
-        public string KeepAlivePingUrl { get; set; } = "{umbracoApplicationUrl}/api/keepalive/ping";
+        public string KeepAlivePingUrl => "{umbracoApplicationUrl}/api/keepalive/ping";
     }
 }
