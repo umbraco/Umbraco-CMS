@@ -102,8 +102,7 @@ Use this directive to render an umbraco button. The directive can be used to gen
                 showCaret: "@?",
                 autoFocus: "@?",
                 hasPopup: "@?",
-                isExpanded: "<?",
-                submitValue: "@?"
+                isExpanded: "<?"
             }
         });
 

@@ -16,9 +16,7 @@ namespace Umbraco.Web.Security
         /// When specified this will be called to retrieve the <see cref="AuthenticationProperties"/> used during the authentication Challenge response.
         /// </summary>
         /// <remarks>
-        /// For example, when trying to implement an Azure AD B2C provider or other OAuth provider that requires a customized Challenge Result in order to work then
-        /// this must be used.
-        /// See: http://issues.umbraco.org/issue/U4-7353
+        /// This will generally not be needed since OpenIdConnect.RedirectToIdentityProvider options should be used instead
         /// </remarks>
         [IgnoreDataMember]
         public Func<IOwinContext, AuthenticationProperties> OnChallenge { get; set; }
