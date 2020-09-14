@@ -1,4 +1,4 @@
-﻿using Umbraco.Core.Configuration;
+﻿using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Web.Models.ContentEditing;
 
@@ -11,7 +11,7 @@ namespace Umbraco.ModelsBuilder.Embedded.BackOffice
     // ReSharper disable once UnusedMember.Global - This is typed scanned
     public class ContentTypeModelValidator : ContentTypeModelValidatorBase<DocumentTypeSave, PropertyTypeBasic>
     {
-        public ContentTypeModelValidator(ModelsBuilderConfig config) : base(config)
+        public ContentTypeModelValidator(IOptions<ModelsBuilderConfig> config) : base(config)
         {
         }
     }

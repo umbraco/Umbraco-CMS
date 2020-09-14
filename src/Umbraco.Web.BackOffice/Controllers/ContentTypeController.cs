@@ -71,7 +71,6 @@ namespace Umbraco.Web.BackOffice.Controllers
 
         public ContentTypeController(
             ICultureDictionary cultureDictionary,
-            EditorValidatorCollection editorValidatorCollection,
             IContentTypeService contentTypeService,
             IMediaTypeService mediaTypeService,
             IMemberTypeService memberTypeService,
@@ -92,7 +91,8 @@ namespace Umbraco.Web.BackOffice.Controllers
             ILocalizationService localizationService,
             IMacroService macroService,
             IEntityService entityService,
-            IHostingEnvironment hostingEnvironment)
+            IHostingEnvironment hostingEnvironment,
+            EditorValidatorCollection editorValidatorCollection)
             : base(cultureDictionary,
                 editorValidatorCollection,
                 contentTypeService,
