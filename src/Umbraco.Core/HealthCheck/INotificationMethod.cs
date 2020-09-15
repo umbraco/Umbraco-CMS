@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Umbraco.Core.Configuration.HealthChecks
+namespace Umbraco.Core.HealthCheck
 {
     public interface INotificationMethod
     {

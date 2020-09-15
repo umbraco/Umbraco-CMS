@@ -4,8 +4,8 @@ using System.Linq;
 using System.Text;
 using HeyRed.MarkdownSharp;
 using Umbraco.Composing;
-using Umbraco.Core.Configuration.HealthChecks;
 using Umbraco.Core.HealthCheck;
+using Umbraco.Core.HealthCheck.Checks;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Web.HealthCheck

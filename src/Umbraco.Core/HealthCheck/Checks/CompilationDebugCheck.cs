@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
-using Umbraco.Core.HealthCheck;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 
-namespace Umbraco.Core.Configuration.HealthChecks
+namespace Umbraco.Core.HealthCheck.Checks
 {
     [HealthCheck("61214FF3-FC57-4B31-B5CF-1D095C977D6D", "Debug Compilation Mode",
         Description = "Leaving debug compilation mode enabled can severely slow down a website and take up more memory on the server.",
@@ -22,8 +21,6 @@ namespace Umbraco.Core.Configuration.HealthChecks
 
         public override ValueComparisonType ValueComparisonType => ValueComparisonType.ShouldEqual;
 
-        public override bool ValidIfConfigMissing => true;
-
         public override IEnumerable<AcceptableConfiguration> Values => new List<AcceptableConfiguration>
         {
             new AcceptableConfiguration
@@ -32,6 +29,8 @@ namespace Umbraco.Core.Configuration.HealthChecks
                 Value = bool.FalseString.ToLower()
             }
         };
+
+        public override string CurrentValue { get; set; }
 
         public override string CheckSuccessMessage => TextService.Localize("healthcheck/compilationDebugCheckSuccessMessage");
 

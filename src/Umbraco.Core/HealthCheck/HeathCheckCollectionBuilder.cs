@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.HealthCheck
 {
-    public class HealthCheckCollectionBuilder : LazyCollectionBuilderBase<HealthCheckCollectionBuilder, HealthCheckCollection, Core.HealthCheck.HealthCheck>
+    public class HealthCheckCollectionBuilder : LazyCollectionBuilderBase<HealthCheckCollectionBuilder, HealthCheckCollection, HealthCheck>
     {
         protected override HealthCheckCollectionBuilder This => this;
 

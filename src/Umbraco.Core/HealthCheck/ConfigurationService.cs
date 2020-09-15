@@ -1,8 +1,9 @@
 ﻿using System;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 
-namespace Umbraco.Core.Configuration.HealthChecks
+namespace Umbraco.Core.HealthCheck
 {
     public class ConfigurationService : IConfigurationService
     {

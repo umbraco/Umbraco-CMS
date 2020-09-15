@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core.HealthCheck;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 
-namespace Umbraco.Core.Configuration.HealthChecks
+namespace Umbraco.Core.HealthCheck.Checks.Security
 {
     [HealthCheck("4090C0A1-2C52-4124-92DD-F028FD066A64", "Custom Errors",
         Description = "Leaving custom errors off will display a complete stack trace to your visitors if an exception occurs.",
@@ -29,6 +28,8 @@ namespace Umbraco.Core.Configuration.HealthChecks
             new AcceptableConfiguration { IsRecommended = true, Value = "RemoteOnly" },
             new AcceptableConfiguration { IsRecommended = false, Value = "On" }
         };
+
+        public override string CurrentValue { get; set; }
 
         public override string CheckSuccessMessage
         {

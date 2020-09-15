@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core.HealthCheck;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 
-namespace Umbraco.Core.Configuration.HealthChecks
+namespace Umbraco.Core.HealthCheck.Checks
 {
-    public abstract class AbstractSettingsCheck : HealthCheck.HealthCheck
+    public abstract class AbstractSettingsCheck : HealthCheck
     {
         protected IConfigurationService ConfigurationService { get; }
-
         protected ILocalizedTextService TextService { get; }
         protected ILogger Logger { get; }
 
@@ -26,9 +24,9 @@ namespace Umbraco.Core.Configuration.HealthChecks
         public abstract IEnumerable<AcceptableConfiguration> Values { get; }
 
         /// <summary>
-        /// Gets the current value
+        /// Gets the current value of the config setting
         /// </summary>
-        public string CurrentValue { get; set; }
+        public abstract string CurrentValue { get; set; }
 
         /// <summary>
         /// Gets the provided value
@@ -39,11 +37,6 @@ namespace Umbraco.Core.Configuration.HealthChecks
         /// Gets the comparison type for checking the value.
         /// </summary>
         public abstract ValueComparisonType ValueComparisonType { get; }
-
-        /// <summary>
-        /// Gets the flag indicating if the check is considered successful if the config value is missing (defaults to false - an error - if missing)
-        /// </summary>
-        public virtual bool ValidIfConfigMissing => false;
 
         protected AbstractSettingsCheck(ILocalizedTextService textService, ILogger logger, IConfigurationService configurationService)
         {
@@ -59,8 +52,7 @@ namespace Umbraco.Core.Configuration.HealthChecks
         {
             get
             {
-                return TextService.Localize("healthcheck/checkSuccessMessage",
-                    new[] { CurrentValue, Values.First(v => v.IsRecommended).Value, ItemPath });
+                return TextService.Localize("healthcheck/checkSuccessMessage", new[] { CurrentValue, Values.First(v => v.IsRecommended).Value, ItemPath });
             }
         }
 
@@ -86,10 +78,8 @@ namespace Umbraco.Core.Configuration.HealthChecks
         {
             get
             {
-                var recommendedValue = Values.FirstOrDefault(v => v.IsRecommended);
-                var rectifiedValue = recommendedValue != null
-                    ? recommendedValue.Value
-                    : ProvidedValue;
+                AcceptableConfiguration recommendedValue = Values.FirstOrDefault(v => v.IsRecommended);
+                string rectifiedValue = recommendedValue != null ? recommendedValue.Value : ProvidedValue;
                 return TextService.Localize("healthcheck/rectifySuccessMessage",
                     new[]
                     {
@@ -112,33 +102,28 @@ namespace Umbraco.Core.Configuration.HealthChecks
 
         public override IEnumerable<HealthCheckStatus> GetStatus()
         {
-            string successMessage = string.Format(CheckSuccessMessage, ItemPath, Values);
+            //if (ValidIfConfigMissing)
+            //{
+            //    return new[]
+            //    {
+            //        new HealthCheckStatus(successMessage) { ResultType = StatusResultType.Success }
+            //    };
+            //}
 
-            var configValue = new ConfigurationServiceResult();
-            //TODO: _configurationService.GetConfigurationValue();
-            if (configValue.Success == false)
-            {
-                if (ValidIfConfigMissing)
-                {
-                    return new[]
-                    {
-                        new HealthCheckStatus(successMessage) { ResultType = StatusResultType.Success }
-                    };
-                }
+            //string errorMessage;
+            //return new[]
+            //{
+            //    new HealthCheckStatus(errorMessage) { ResultType = StatusResultType.Error }
+            //};
 
-                var errorMessage = configValue.Result;
-                return new[]
-                {
-                    new HealthCheckStatus(errorMessage) { ResultType = StatusResultType.Error }
-                };
-            }
 
-            CurrentValue = configValue.Result;
+            //remove configurationServiceNodeNotFound from dictionary
+            //remove configurationServiceError from dictionary
 
-            // need to update the successMessage with the CurrentValue
-            successMessage = string.Format(CheckSuccessMessage, ItemPath, Values, CurrentValue);
-
+            // update the successMessage with the CurrentValue
+            var successMessage = string.Format(CheckSuccessMessage, ItemPath, Values, CurrentValue);
             bool valueFound = Values.Any(value => string.Equals(CurrentValue, value.Value, StringComparison.InvariantCultureIgnoreCase));
+
             if (ValueComparisonType == ValueComparisonType.ShouldEqual && valueFound || ValueComparisonType == ValueComparisonType.ShouldNotEqual && valueFound == false)
             {
                 return new[]

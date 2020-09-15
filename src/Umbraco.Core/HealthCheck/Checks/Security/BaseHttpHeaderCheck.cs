@@ -5,7 +5,6 @@ using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Configuration;
-using Umbraco.Core.Configuration.HealthChecks;
 using Umbraco.Core.Services;
 using Umbraco.Web;
 

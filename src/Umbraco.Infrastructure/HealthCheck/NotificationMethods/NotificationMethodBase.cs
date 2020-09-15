@@ -3,9 +3,9 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
-using Umbraco.Core.Configuration.HealthChecks;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.HealthCheck;
+using Umbraco.Core.HealthCheck.Checks;
 
 namespace Umbraco.Web.HealthCheck.NotificationMethods
 {

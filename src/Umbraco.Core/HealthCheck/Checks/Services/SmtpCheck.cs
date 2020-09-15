@@ -13,7 +13,7 @@ namespace Umbraco.Core.HealthCheck.Checks.Services
         "SMTP Settings",
         Description = "Checks that valid settings for sending emails are in place.",
         Group = "Services")]
-    public class SmtpCheck : Core.HealthCheck.HealthCheck
+    public class SmtpCheck : HealthCheck
     {
         private readonly ILocalizedTextService _textService;
         private readonly GlobalSettings _globalSettings;

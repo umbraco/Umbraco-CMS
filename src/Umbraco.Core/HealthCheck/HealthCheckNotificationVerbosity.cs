@@ -1,6 +1,4 @@
-﻿using System.Runtime.Serialization;
-
-namespace Umbraco.Core.Configuration.HealthChecks
+﻿namespace Umbraco.Core.HealthCheck
 {
     public enum HealthCheckNotificationVerbosity
     {

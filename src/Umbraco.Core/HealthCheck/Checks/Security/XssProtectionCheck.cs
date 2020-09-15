@@ -1,5 +1,4 @@
-﻿using Umbraco.Core.Configuration.HealthChecks;
-using Umbraco.Core.Services;
+﻿using Umbraco.Core.Services;
 using Umbraco.Web;
 
 namespace Umbraco.Core.HealthCheck.Checks.Security

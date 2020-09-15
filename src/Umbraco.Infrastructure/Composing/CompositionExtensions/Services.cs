@@ -4,7 +4,6 @@ using System.Linq;
 using Microsoft.Extensions.Options;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.HealthChecks;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Events;
 using Umbraco.Core.Hosting;

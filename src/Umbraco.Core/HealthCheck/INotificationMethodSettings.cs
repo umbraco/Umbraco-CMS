@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Configuration.HealthChecks
+﻿namespace Umbraco.Core.HealthCheck
 {
     public interface INotificationMethodSettings
     {

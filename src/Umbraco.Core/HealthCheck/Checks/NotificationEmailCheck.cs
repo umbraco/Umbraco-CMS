@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
-using Umbraco.Core.HealthCheck;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 
-namespace Umbraco.Core.Configuration.HealthChecks
+namespace Umbraco.Core.HealthCheck.Checks
 {
     [HealthCheck("3E2F7B14-4B41-452B-9A30-E67FBC8E1206", "Notification Email Settings",
         Description = "If notifications are used, the 'from' email address should be specified and changed from the default value.",
@@ -30,6 +29,8 @@ namespace Umbraco.Core.Configuration.HealthChecks
         {
             new AcceptableConfiguration { IsRecommended = false, Value = DefaultFromEmail }
         };
+
+        public override string CurrentValue { get; set; }
 
         public override string CheckSuccessMessage => TextService.Localize("healthcheck/notificationEmailsCheckSuccessMessage", new[] { CurrentValue });
 

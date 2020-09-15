@@ -5,7 +5,6 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Composing.CompositionExtensions;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Grid;
-using Umbraco.Core.Configuration.HealthChecks;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Dashboards;
 using Umbraco.Core.Dictionary;
@@ -58,6 +57,8 @@ using IntegerValidator = Umbraco.Core.PropertyEditors.Validators.IntegerValidato
 using TextStringValueConverter = Umbraco.Core.PropertyEditors.ValueConverters.TextStringValueConverter;
 using Umbraco.Core.Configuration.Models;
 using Microsoft.Extensions.Options;
+using Umbraco.Core.HealthCheck;
+using Umbraco.Core.HealthCheck.Checks;
 
 namespace Umbraco.Core.Runtime
 {

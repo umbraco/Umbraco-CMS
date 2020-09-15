@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Security.Cryptography.X509Certificates;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.HealthChecks;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 using Umbraco.Core.Configuration.Models;
@@ -128,12 +126,11 @@ namespace Umbraco.Core.HealthCheck.Checks.Security
 
             var actions = new List<HealthCheckAction>();
 
-            return
-                new HealthCheckStatus(message)
-                {
-                    ResultType = result,
-                    Actions = actions
-                };
+            return new HealthCheckStatus(message)
+            {
+                ResultType = result,
+                Actions = actions
+            };
         }
 
         private HealthCheckStatus CheckIfCurrentSchemeIsHttps()
@@ -143,12 +140,11 @@ namespace Umbraco.Core.HealthCheck.Checks.Security
 
             var actions = new List<HealthCheckAction>();
 
-            return
-                new HealthCheckStatus(_textService.Localize("healthcheck/httpsCheckIsCurrentSchemeHttps", new[] { success ? string.Empty : "not" }))
-                {
-                    ResultType = success ? StatusResultType.Success : StatusResultType.Error,
-                    Actions = actions
-                };
+            return new HealthCheckStatus(_textService.Localize("healthcheck/httpsCheckIsCurrentSchemeHttps", new[] { success ? string.Empty : "not" }))
+            {
+                ResultType = success ? StatusResultType.Success : StatusResultType.Error,
+                Actions = actions
+            };
         }
 
         private HealthCheckStatus CheckHttpsConfigurationSetting()
@@ -167,43 +163,42 @@ namespace Umbraco.Core.HealthCheck.Checks.Security
             else
             {
                 if (httpsSettingEnabled == false)
+                {
                     actions.Add(new HealthCheckAction(FixHttpsSettingAction, Id)
                     {
                         Name = _textService.Localize("healthcheck/httpsCheckEnableHttpsButton"),
                         Description = _textService.Localize("healthcheck/httpsCheckEnableHttpsDescription")
                     });
+                }
 
                 resultMessage = _textService.Localize("healthcheck/httpsCheckConfigurationCheckResult",
                     new[] { httpsSettingEnabled.ToString(), httpsSettingEnabled ? string.Empty : "not" });
                 resultType = httpsSettingEnabled ? StatusResultType.Success : StatusResultType.Error;
             }
 
-            return
-                new HealthCheckStatus(resultMessage)
-                {
-                    ResultType = resultType,
-                    Actions = actions
-                };
+            return new HealthCheckStatus(resultMessage)
+            {
+                ResultType = resultType,
+                Actions = actions
+            };
         }
 
         private HealthCheckStatus FixHttpsSetting()
         {
-            var updateConfigFile = _configurationService.UpdateConfigFile("true");
+            ConfigurationServiceResult updateConfigFile = _configurationService.UpdateConfigFile("true");
 
             if (updateConfigFile.Success)
             {
-                return
-                    new HealthCheckStatus(_textService.Localize("healthcheck/httpsCheckEnableHttpsSuccess"))
-                    {
-                        ResultType = StatusResultType.Success
-                    };
+                return new HealthCheckStatus(_textService.Localize("healthcheck/httpsCheckEnableHttpsSuccess"))
+                {
+                    ResultType = StatusResultType.Success
+                };
             }
 
-            return
-                new HealthCheckStatus(_textService.Localize("healthcheck/httpsCheckEnableHttpsError", new[] { updateConfigFile.Result }))
-                {
-                    ResultType = StatusResultType.Error
-                };
+            return new HealthCheckStatus(_textService.Localize("healthcheck/httpsCheckEnableHttpsError", new[] { updateConfigFile.Result }))
+            {
+                ResultType = StatusResultType.Error
+            };
         }
     }
 }
