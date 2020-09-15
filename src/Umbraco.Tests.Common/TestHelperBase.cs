@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
@@ -129,6 +130,21 @@ namespace Umbraco.Tests.Common
         public IRequestCache GetRequestCache()
         {
             return new DictionaryAppCache();
+        }
+
+        public IServiceCollection GetRegister()
+        {
+            var services = new ServiceCollection();
+            services.AddTransient(typeof(Lazy<>), typeof(LazilyResolved<>));
+            return services;
+        }
+
+        private class LazilyResolved<T> : Lazy<T>
+        {
+            public LazilyResolved(IServiceProvider serviceProvider)
+                : base(serviceProvider.GetRequiredService<T>)
+            {
+            }
         }
 
         public IPublishedUrlProvider GetPublishedUrlProvider()

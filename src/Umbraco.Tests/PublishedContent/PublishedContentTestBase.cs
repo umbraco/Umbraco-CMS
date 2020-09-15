@@ -15,6 +15,7 @@ using Umbraco.Web.Templates;
 using Umbraco.Web.Routing;
 using Umbraco.Core.Media;
 using System;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Tests.PublishedContent
 {

@@ -10,6 +10,7 @@ using System.Web.Routing;
 using System.Diagnostics;
 using Umbraco.Core.Composing;
 using System.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core.Strings;
 using Umbraco.Web;
 
@@ -369,7 +370,7 @@ namespace Umbraco.TestData
             if (ConfigurationManager.AppSettings["Umbraco.TestData.Enabled"] != "true")
                 return;
 
-            composition.Register(typeof(LoadTestController), Lifetime.Request);
+            composition.Services.AddScoped(typeof(LoadTestController));
         }
     }
 }

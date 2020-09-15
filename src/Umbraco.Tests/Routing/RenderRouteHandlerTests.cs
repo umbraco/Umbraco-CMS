@@ -27,6 +27,7 @@ using Umbraco.Web.Runtime;
 using Current = Umbraco.Web.Composing.Current;
 using ILogger = Umbraco.Core.Logging.ILogger;
 using Umbraco.Tests.Common;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Tests.Routing
 {

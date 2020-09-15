@@ -7,6 +7,7 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Security;
 using Umbraco.Web.WebApi;
 using Current = Umbraco.Web.Composing.Current;

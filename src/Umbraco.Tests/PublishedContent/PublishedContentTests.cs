@@ -26,6 +26,7 @@ using Umbraco.Web.Models;
 using Umbraco.Web.Routing;
 using Current = Umbraco.Web.Composing.Current;
 using Umbraco.Core.Media;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Tests.PublishedContent
 {

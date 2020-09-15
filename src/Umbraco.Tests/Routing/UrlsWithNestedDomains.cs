@@ -12,6 +12,7 @@ using Umbraco.Core.Services;
 using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Web;
 using Umbraco.Tests.Common;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Tests.Routing
 {

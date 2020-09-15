@@ -69,7 +69,7 @@ namespace Umbraco.Web.Mvc
         internal class OverridenDefaultControllerFactory : ContainerControllerFactory
         {
             public OverridenDefaultControllerFactory()
-                : base(new Lazy<IFactory>(() => Current.Factory))
+                : base(new Lazy<IServiceProvider>(() => Current.Factory))
             { }
 
             public new IController GetControllerInstance(RequestContext requestContext, Type controllerType)

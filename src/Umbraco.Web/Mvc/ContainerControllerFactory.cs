@@ -2,14 +2,15 @@
 using System.Web.Mvc;
 using System.Web.Routing;
 using Umbraco.Core.Composing;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Mvc
 {
     public class ContainerControllerFactory : DefaultControllerFactory
     {
-        private readonly Lazy<IFactory> _factory;
+        private readonly Lazy<IServiceProvider> _factory;
 
-        public ContainerControllerFactory(Lazy<IFactory> factory)
+        public ContainerControllerFactory(Lazy<IServiceProvider> factory)
         {
             _factory = factory;
         }
@@ -28,7 +29,7 @@ namespace Umbraco.Web.Mvc
 
         public override void ReleaseController(IController controller)
         {
-            _factory.Value.Release(controller);
+            //_factory.Value.Release(controller);
         }
     }
 }

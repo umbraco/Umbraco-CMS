@@ -10,6 +10,7 @@ using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Web;
+using Umbraco.Web.Composing;
 using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.TestHelpers.Stubs

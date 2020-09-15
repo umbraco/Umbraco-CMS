@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -28,7 +29,7 @@ namespace Umbraco.Tests.PropertyEditors
             var register = TestHelper.GetRegister();
             var composition = new Composition(register, TestHelper.GetMockedTypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.GetConfigs(), TestHelper.IOHelper, AppCaches.NoCache);
 
-            register.Register<IShortStringHelper>(_
+            register.AddTransient<IShortStringHelper>(_
                 => new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(SettingsForTests.GenerateMockRequestHandlerSettings())));
 
             Current.Factory = composition.CreateFactory();

@@ -24,6 +24,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Tests.Common;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Tests.PublishedContent
 {

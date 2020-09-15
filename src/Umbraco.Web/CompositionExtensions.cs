@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Web.Actions;
@@ -28,95 +29,78 @@ namespace Umbraco.Web
     /// </summary>
     public static class WebCompositionExtensions
     {
-        public static IFactory CreateFactory(this Composition composition)
+        public static IServiceProvider CreateFactory(this Composition composition)
         {
-            throw new NotImplementedException("MSDI");
+            composition.RegisterBuildersAndConfigs();
+            return composition.Services.BuildServiceProvider();
         }
 
-        public static void RegisterUnique<TService>(this Composition composition, Lifetime lifetime = Lifetime.Transient)
+        public static void RegisterUnique<TService>(this Composition composition, Func<IServiceProvider, TService> factory)
             where TService : class
         {
-            throw new NotImplementedException("MSDI");
+            composition.Services.AddUnique<TService>(factory);
         }
 
-        public static void RegisterUnique<TService>(this Composition composition, Func<IFactory, TService> factory, Lifetime lifetime = Lifetime.Transient)
+        public static void Register<TService>(this Composition composition, Func<IServiceProvider, TService> factory, Lifetime lifetime = Lifetime.Transient)
             where TService : class
         {
-            throw new NotImplementedException("MSDI");
+            switch (lifetime)
+            {
+                case Lifetime.Request:
+                case Lifetime.Scope:
+                    composition.Services.AddScoped<TService>(factory);
+                    return;
+                case Lifetime.Singleton:
+                    composition.Services.AddSingleton<TService>(factory);
+                    return;
+                case Lifetime.Transient:
+                    composition.Services.AddTransient<TService>(factory);
+                    return;
+            }
+            throw new NotImplementedException();
         }
 
-        public static void Register<TService>(this Composition composition, Func<IFactory, TService> factory, Lifetime lifetime = Lifetime.Transient)
-            where TService : class
-        {
-            throw new NotImplementedException("MSDI");
-        }
-
-
-        public static void Register<TService, TInstance>(this Composition composition, Func<IFactory, TService> factory, Lifetime lifetime = Lifetime.Transient)
-            where TService : class
-        {
-            throw new NotImplementedException("MSDI");
-        }
 
         public static void Register<TService, TInstance>(this Composition composition, Lifetime lifetime = Lifetime.Transient)
             where TService : class
+            where TInstance : class, TService
         {
-            throw new NotImplementedException("MSDI");
+            switch (lifetime)
+            {
+                case Lifetime.Request:
+                case Lifetime.Scope:
+                    composition.Services.AddScoped<TService, TInstance>();
+                    return;
+                case Lifetime.Singleton:
+                    composition.Services.AddSingleton<TService, TInstance>();
+                    return;
+                case Lifetime.Transient:
+                    composition.Services.AddTransient<TService, TInstance>();
+                    return;
+            }
+            throw new NotImplementedException();
         }
 
         public static void Register<TService>(this Composition composition, Lifetime lifetime = Lifetime.Transient)
             where TService : class
         {
-            throw new NotImplementedException("MSDI");
+            switch (lifetime)
+            {
+                case Lifetime.Request:
+                case Lifetime.Scope:
+                    composition.Services.AddScoped<TService>();
+                    return;
+                case Lifetime.Singleton:
+                    composition.Services.AddSingleton<TService>();
+                    return;
+                case Lifetime.Transient:
+                    composition.Services.AddTransient<TService>();
+                    return;
+            }
+            throw new NotImplementedException();
         }
 
-        public static void Register(this Composition composition, Type type, Lifetime lifetime = Lifetime.Transient)
-        {
-            throw new NotImplementedException("MSDI");
-        }
-
-        public static void RegisterUnique<TService>(this IRegister composition, Lifetime lifetime = Lifetime.Transient)
-            where TService : class
-        {
-            throw new NotImplementedException("MSDI");
-        }
-
-        public static void RegisterUnique<TService>(this IRegister composition, Func<IFactory, TService> factory, Lifetime lifetime = Lifetime.Transient)
-            where TService : class
-        {
-            throw new NotImplementedException("MSDI");
-        }
-
-        public static void Register<TService>(this IRegister composition, Func<IFactory, TService> factory, Lifetime lifetime = Lifetime.Transient)
-            where TService : class
-        {
-            throw new NotImplementedException("MSDI");
-        }
-
-
-        public static void Register<TService, TInstance>(this IRegister composition, Func<IFactory, TService> factory, Lifetime lifetime = Lifetime.Transient)
-            where TService : class
-        {
-            throw new NotImplementedException("MSDI");
-        }
-
-        public static void Register<TService, TInstance>(this IRegister composition, Lifetime lifetime = Lifetime.Transient)
-            where TService : class
-        {
-            throw new NotImplementedException("MSDI");
-        }
-
-        public static void Register<TService>(this IRegister composition, Lifetime lifetime = Lifetime.Transient)
-            where TService : class
-        {
-            throw new NotImplementedException("MSDI");
-        }
-
-        public static void Register(this IRegister composition, Type type, Lifetime lifetime = Lifetime.Transient)
-        {
-            throw new NotImplementedException("MSDI");
-        }
-
+        
 
         #region Collection Builders
 
@@ -151,7 +135,7 @@ namespace Umbraco.Web
         /// </summary>
         /// <param name="composition">The composition.</param>
         /// <param name="factory">A function creating a last chance finder.</param>
-        public static void SetContentLastChanceFinder(this Composition composition, Func<IFactory, IContentLastChanceFinder> factory)
+        public static void SetContentLastChanceFinder(this Composition composition, Func<IServiceProvider, IContentLastChanceFinder> factory)
         {
             composition.RegisterUnique(factory);
         }
@@ -182,7 +166,7 @@ namespace Umbraco.Web
         /// </summary>
         /// <param name="composition">The composition.</param>
         /// <param name="factory">A function creating a helper.</param>
-        public static void SetSiteDomainHelper(this Composition composition, Func<IFactory, ISiteDomainHelper> factory)
+        public static void SetSiteDomainHelper(this Composition composition, Func<IServiceProvider, ISiteDomainHelper> factory)
         {
             composition.Services.AddUnique(factory);
         }

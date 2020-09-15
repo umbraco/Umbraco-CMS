@@ -12,6 +12,7 @@ using Umbraco.Tests.Strings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
+using Umbraco.Web.Composing;
 using Umbraco.Web.PropertyEditors;
 
 namespace Umbraco.Tests.Models

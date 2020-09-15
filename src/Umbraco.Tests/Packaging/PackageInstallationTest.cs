@@ -18,6 +18,7 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
+using Umbraco.Web.Composing;
 using File = System.IO.File;
 
 namespace Umbraco.Tests.Packaging

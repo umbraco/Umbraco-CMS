@@ -9,6 +9,7 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
+using Umbraco.Web.Composing;
 using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.Web
@@ -27,7 +28,7 @@ namespace Umbraco.Tests.Web
         private void SetUpDependencyContainer()
         {
             // FIXME: bad in a unit test - but Udi has a static ctor that wants it?!
-            var container = new Mock<IFactory>();
+            var container = new Mock<IServiceProvider>();
             var typeFinder = TestHelper.GetTypeFinder();
             var ioHelper = TestHelper.IOHelper;
             container

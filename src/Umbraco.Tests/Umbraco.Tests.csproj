@@ -95,6 +95,8 @@
     <PackageReference Include="Microsoft.AspNet.WebApi.SelfHost" Version="5.2.7" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Tracing" Version="5.2.7" />
     <PackageReference Include="Microsoft.AspNet.WebApi.WebHost" Version="5.2.7" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection"  Version="3.1.7" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.1.7" />
     <PackageReference Include="Microsoft.Owin" Version="4.0.1" />
     <PackageReference Include="Microsoft.Owin.Hosting" Version="4.0.1" />
     <PackageReference Include="Microsoft.Owin.Security" Version="4.0.1" />
@@ -118,8 +120,6 @@
     <Compile Include="Cache\DistributedCacheBinderTests.cs" />
     <Compile Include="Cache\RefresherTests.cs" />
     <Compile Include="Cache\SnapDictionaryTests.cs" />
-    <Compile Include="Composing\CompositionTests.cs" />
-    <Compile Include="Composing\ContainerConformingTests.cs" />
     <Compile Include="Configurations\GlobalSettingsTests.cs" />
     <Compile Include="CoreThings\CallContextTests.cs" />
     <Compile Include="Components\ComponentTests.cs" />

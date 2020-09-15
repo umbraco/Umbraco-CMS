@@ -27,6 +27,7 @@ using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing.Objects;
 using Umbraco.Web;
 using Umbraco.Web.Cache;
+using Umbraco.Web.Composing;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.NuCache;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
@@ -57,17 +58,17 @@ namespace Umbraco.Tests.PublishedContent
         {
             Current.Reset();
 
-            var factory = Mock.Of<IFactory>();
+            var factory = Mock.Of<IServiceProvider>();
             Current.Factory = factory;
 
             var configs = TestHelper.GetConfigs();
-            Mock.Get(factory).Setup(x => x.GetInstance(typeof(Configs))).Returns(configs);
+            Mock.Get(factory).Setup(x => x.GetService(typeof(Configs))).Returns(configs);
             var globalSettings = new GlobalSettings();
             var hostingEnvironment = Mock.Of<IHostingEnvironment>();
             configs.Add(TestHelpers.SettingsForTests.GenerateMockContentSettings);
             configs.Add<IGlobalSettings>(() => globalSettings);
 
-            Mock.Get(factory).Setup(x => x.GetInstance(typeof(IPublishedModelFactory))).Returns(PublishedModelFactory);
+            Mock.Get(factory).Setup(x => x.GetService(typeof(IPublishedModelFactory))).Returns(PublishedModelFactory);
 
             var runtime = Mock.Of<IRuntimeState>();
             Mock.Get(runtime).Setup(x => x.Level).Returns(RuntimeLevel.Run);
@@ -176,7 +177,7 @@ namespace Umbraco.Tests.PublishedContent
             // invariant is the current default
             _variationAccesor.VariationContext = new VariationContext();
 
-            Mock.Get(factory).Setup(x => x.GetInstance(typeof(IVariationContextAccessor))).Returns(_variationAccesor);
+            Mock.Get(factory).Setup(x => x.GetService(typeof(IVariationContextAccessor))).Returns(_variationAccesor);
         }
 
         private IEnumerable<ContentNodeKit> GetNestedVariantKits()

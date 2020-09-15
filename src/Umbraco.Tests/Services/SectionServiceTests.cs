@@ -6,6 +6,8 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.Services;
+using Umbraco.Web;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Tests.Services
 {

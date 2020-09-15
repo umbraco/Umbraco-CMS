@@ -10,6 +10,7 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Models;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;

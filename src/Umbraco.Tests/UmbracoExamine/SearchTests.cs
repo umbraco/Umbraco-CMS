@@ -13,6 +13,7 @@ using Umbraco.Tests.Testing;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Composing;
 using Umbraco.Examine;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Tests.UmbracoExamine
 {

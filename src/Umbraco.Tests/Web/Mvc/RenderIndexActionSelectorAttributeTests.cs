@@ -33,7 +33,7 @@ namespace Umbraco.Tests.Web.Mvc
         public void SetUp()
         {
             Current.UmbracoContextAccessor = new TestUmbracoContextAccessor();
-            Current.Factory = Mock.Of<IFactory>();
+            Current.Factory = Mock.Of<IServiceProvider>();
         }
 
         [TearDown]
@@ -42,7 +42,7 @@ namespace Umbraco.Tests.Web.Mvc
             Current.Reset();
         }
 
-        private TestObjects TestObjects = new TestObjects(null);
+        private TestObjects TestObjects = new TestObjects();
 
         private MethodInfo GetRenderMvcControllerIndexMethodFromCurrentType(Type currType)
         {

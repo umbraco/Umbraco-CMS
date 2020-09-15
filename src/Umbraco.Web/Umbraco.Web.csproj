@@ -152,11 +152,9 @@
     <Compile Include="Compose\BlockEditorComponent.cs" />
     <Compile Include="Compose\BlockEditorComposer.cs" />
     <Compile Include="Compose\NestedContentPropertyComponent.cs" />
-    <Compile Include="Composing\FactoryExtensions.cs" />
-    <Compile Include="Composing\IRegister.cs" />
+    <Compile Include="Composing\ServiceProviderExtensions.cs" />
     <Compile Include="Editors\PasswordChanger.cs" />
     <Compile Include="HttpContextExtensions.cs" />
-    <Compile Include="Composing\IFactory.cs" />
     <Compile Include="Macros\MacroRenderer.cs" />
     <Compile Include="Macros\MemberUserKeyProvider.cs" />
     <Compile Include="Macros\PartialViewMacroController.cs" />

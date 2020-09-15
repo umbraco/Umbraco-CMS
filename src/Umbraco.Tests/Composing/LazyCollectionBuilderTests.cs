@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -10,6 +11,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Tests.Components;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
+using Umbraco.Web.Composing;
 using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.Composing
@@ -29,7 +31,7 @@ namespace Umbraco.Tests.Composing
             Current.Reset();
         }
 
-        private IRegister CreateRegister()
+        private IServiceCollection CreateRegister()
         {
             return TestHelper.GetRegister();
         }

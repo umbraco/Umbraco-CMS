@@ -89,12 +89,12 @@ namespace Umbraco.Tests.TestHelpers
 </root>";
         }
 
-        internal PublishedRouter CreatePublishedRouter(IFactory container = null, ContentFinderCollection contentFinders = null)
+        internal PublishedRouter CreatePublishedRouter(IServiceProvider container = null, ContentFinderCollection contentFinders = null)
         {
             return CreatePublishedRouter(SettingsForTests.GenerateMockWebRoutingSettings(), container ?? Factory, contentFinders);
         }
 
-        internal static PublishedRouter CreatePublishedRouter(IWebRoutingSettings webRoutingSettings, IFactory container = null, ContentFinderCollection contentFinders = null)
+        internal static PublishedRouter CreatePublishedRouter(IWebRoutingSettings webRoutingSettings, IServiceProvider container = null, ContentFinderCollection contentFinders = null)
         {
             return new PublishedRouter(
                 webRoutingSettings,

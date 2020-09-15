@@ -9,6 +9,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Web.Composing;
 using ILogger = Umbraco.Core.Logging.ILogger;
 using Current = Umbraco.Web.Composing.Current;
 
@@ -17,7 +18,7 @@ namespace Umbraco.Tests.Models
     [TestFixture]
     public class VariationTests
     {
-        private IFactory _factory;
+        private IServiceProvider _factory;
         private IShortStringHelper ShortStringHelper { get; } = TestHelper.ShortStringHelper;
 
         [SetUp]
@@ -37,7 +38,7 @@ namespace Umbraco.Tests.Models
             configs.Add(() => SettingsForTests.DefaultGlobalSettings);
             configs.Add(SettingsForTests.GenerateMockContentSettings);
 
-            _factory = Mock.Of<IFactory>();
+            _factory = Mock.Of<IServiceProvider>();
 
             var dataTypeService = Mock.Of<IDataTypeService>();
             var localizationService = Mock.Of<ILocalizationService>();
@@ -62,7 +63,7 @@ namespace Umbraco.Tests.Models
                 localizedTextService: Mock.Of<ILocalizedTextService>());
 
             Mock.Get(_factory)
-                .Setup(x => x.GetInstance(It.IsAny<Type>()))
+                .Setup(x => x.GetService(It.IsAny<Type>()))
                 .Returns<Type>(x =>
                 {
                     if (x == typeof(Configs)) return configs;

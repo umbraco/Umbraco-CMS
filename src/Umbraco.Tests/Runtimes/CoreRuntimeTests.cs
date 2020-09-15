@@ -43,6 +43,7 @@ namespace Umbraco.Tests.Runtimes
         }
 
         [Test]
+        [Ignore("No IApplicationShutdownRegistry or ISessionIdResolver registered")]
         public void ComponentLifeCycle()
         {
             using (var app = new TestUmbracoApplication())

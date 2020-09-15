@@ -8,6 +8,7 @@ using System.Web.Routing;
 using System.Web.Security;
 using System.Xml.Linq;
 using Examine;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -60,6 +61,7 @@ using Umbraco.Web.Trees;
 using Current = Umbraco.Web.Composing.Current;
 using Umbraco.Tests.Common;
 using Umbraco.Core.Media;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Tests.Testing
 {
@@ -99,7 +101,7 @@ namespace Umbraco.Tests.Testing
 
         protected Composition Composition { get; private set; }
 
-        protected IFactory Factory { get; private set; }
+        protected IServiceProvider Factory { get; private set; }
 
         protected UmbracoTestAttribute Options { get; private set; }
 
@@ -127,7 +129,7 @@ namespace Umbraco.Tests.Testing
         protected Lazy<PropertyEditorCollection> PropertyEditorCollection => new Lazy<PropertyEditorCollection>(() => Factory.GetInstance<PropertyEditorCollection>());
         protected ILocalizationService LocalizationService => Factory.GetInstance<ILocalizationService>();
         protected ILocalizedTextService LocalizedTextService  { get; private set; }
-        protected IShortStringHelper ShortStringHelper => Factory?.GetInstance<IShortStringHelper>() ?? TestHelper.ShortStringHelper;
+        protected IShortStringHelper ShortStringHelper => Factory?.TryGetInstance<IShortStringHelper>() ?? TestHelper.ShortStringHelper;
         protected IUmbracoVersion UmbracoVersion { get; private set; }
 
         protected ITypeFinder TypeFinder { get; private set; }
@@ -220,9 +222,10 @@ namespace Umbraco.Tests.Testing
 
 
 
-            TestObjects = new TestObjects(register);
+            TestObjects = new TestObjects();
             Compose();
-            Current.Factory = Factory = Composition.CreateFactory();
+            Composition.RegisterBuildersAndConfigs();
+            Current.Factory = Factory = register.BuildServiceProvider();
             Initialize();
         }
 
@@ -241,7 +244,9 @@ namespace Umbraco.Tests.Testing
         }
 
         protected virtual void Compose(Composition composition)
-        { }
+        {
+
+        }
 
         protected virtual void Initialize()
         {

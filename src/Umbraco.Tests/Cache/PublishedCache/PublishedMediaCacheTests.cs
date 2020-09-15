@@ -17,6 +17,7 @@ using Umbraco.Core.Services;
 using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Tests.PublishedContent;
 using Umbraco.Web;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Tests.Cache.PublishedCache
 {

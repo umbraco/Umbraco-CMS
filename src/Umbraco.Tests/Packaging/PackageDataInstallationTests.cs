@@ -18,6 +18,7 @@ using Umbraco.Tests.Services.Importing;
 using Umbraco.Tests.Testing;
 using Umbraco.Core.Composing.CompositionExtensions;
 using Umbraco.Core.Strings;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Tests.Packaging
 {

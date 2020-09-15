@@ -23,7 +23,7 @@ namespace Umbraco.Web.Mvc
         /// </summary>
         /// <param name="factoriesAccessor">The factories accessor.</param>
         public MasterControllerFactory(Func<FilteredControllerFactoryCollection> factoriesAccessor)
-            :  base(new Lazy<IFactory>(() => Current.Factory))
+            :  base(new Lazy<IServiceProvider>(() => Current.Factory))
         {
             // note
             // because the MasterControllerFactory needs to be ctored to be assigned to

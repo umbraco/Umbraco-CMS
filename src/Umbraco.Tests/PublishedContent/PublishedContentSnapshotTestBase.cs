@@ -22,6 +22,7 @@ using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing.Objects.Accessors;
 using Current = Umbraco.Web.Composing.Current;
 using Umbraco.Tests.Common;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Tests.PublishedContent
 {

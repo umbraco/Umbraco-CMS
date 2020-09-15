@@ -6,6 +6,7 @@ using Umbraco.Tests.Testing;
 using Umbraco.Core;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Composing;
+using Umbraco.Web;
 
 namespace Umbraco.Tests.Issues
 {

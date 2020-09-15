@@ -5,6 +5,7 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.Testing;
 using Umbraco.Web;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Tests.CoreThings
 {

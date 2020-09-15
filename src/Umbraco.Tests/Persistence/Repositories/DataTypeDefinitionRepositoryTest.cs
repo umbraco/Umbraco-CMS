@@ -10,6 +10,7 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
+using Umbraco.Web.Composing;
 using Umbraco.Web.PropertyEditors;
 
 namespace Umbraco.Tests.Persistence.Repositories

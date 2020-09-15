@@ -16,6 +16,7 @@ using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Components;
 using Umbraco.Web;
+using Umbraco.Web.Composing;
 using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.Scoping
@@ -37,7 +38,7 @@ namespace Umbraco.Tests.Scoping
 
             var composition = new Composition(register, TestHelper.GetMockedTypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.GetConfigs(), TestHelper.IOHelper, AppCaches.NoCache);
 
-            _testObjects = new TestObjects(register);
+            _testObjects = new TestObjects();
 
             composition.RegisterUnique(factory => new FileSystems(factory, factory.TryGetInstance<ILogger>(), TestHelper.IOHelper, SettingsForTests.GenerateMockGlobalSettings(), TestHelper.GetHostingEnvironment()));
             composition.WithCollectionBuilder<MapperCollectionBuilder>();

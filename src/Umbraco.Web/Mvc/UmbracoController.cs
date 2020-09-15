@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Web;
 using System.Web.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Owin;
 using Umbraco.Core.Cache;
 using Umbraco.Web.Composing;
@@ -69,11 +70,11 @@ namespace Umbraco.Web.Mvc
 
         protected UmbracoController()
             : this(
-                  Current.Factory.GetInstance<IGlobalSettings>(),
-                  Current.Factory.GetInstance<IUmbracoContextAccessor>(),
-                  Current.Factory.GetInstance<ServiceContext>(),
-                  Current.Factory.GetInstance<AppCaches>(),
-                  Current.Factory.GetInstance<IProfilingLogger>()
+                  Current.Factory.GetService<IGlobalSettings>(),
+                  Current.Factory.GetService<IUmbracoContextAccessor>(),
+                  Current.Factory.GetService<ServiceContext>(),
+                  Current.Factory.GetService<AppCaches>(),
+                  Current.Factory.GetService<IProfilingLogger>()
             )
         {
         }

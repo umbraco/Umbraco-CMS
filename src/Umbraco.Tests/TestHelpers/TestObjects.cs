@@ -13,6 +13,8 @@ using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Scoping;
 using Umbraco.Persistance.SqlCe;
 using Current = Umbraco.Web.Composing.Current;
+using Umbraco.Web;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -21,12 +23,6 @@ namespace Umbraco.Tests.TestHelpers
     /// </summary>
     internal partial class TestObjects
     {
-        private readonly IRegister _register;
-
-        public TestObjects(IRegister register)
-        {
-            _register = register;
-        }
 
         /// <summary>
         /// Gets an UmbracoDatabase.
@@ -56,18 +52,6 @@ namespace Umbraco.Tests.TestHelpers
             var connection = GetDbConnection();
             var sqlContext = new SqlContext(syntax, DatabaseType.SqlServer2008, Mock.Of<IPocoDataFactory>());
             return new UmbracoDatabase(connection, sqlContext, logger, TestHelper.BulkSqlInsertProvider);
-        }
-
-        private Lazy<T> GetLazyService<T>(IFactory container, Func<IFactory, T> ctor)
-            where T : class
-        {
-            return new Lazy<T>(() => container?.TryGetInstance<T>() ?? ctor(container));
-        }
-
-        private T GetRepo<T>(IFactory container)
-            where T : class, IRepository
-        {
-            return container?.TryGetInstance<T>() ?? Mock.Of<T>();
         }
 
         public IScopeProvider GetScopeProvider(ILogger logger, ITypeFinder typeFinder = null, FileSystems fileSystems = null, IUmbracoDatabaseFactory databaseFactory = null)

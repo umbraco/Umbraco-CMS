@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Threading;
 using System.Web;
 using System.Web.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
@@ -16,6 +17,7 @@ using Umbraco.Core.Logging.Serilog;
 using Umbraco.Core.Logging.Serilog.Enrichers;
 using Umbraco.Net;
 using Umbraco.Web.AspNet;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Hosting;
 using Umbraco.Web.Logging;
 using Current = Umbraco.Web.Composing.Current;
@@ -28,7 +30,7 @@ namespace Umbraco.Web
     public abstract class UmbracoApplicationBase : HttpApplication
     {
         private IRuntime _runtime;
-        private IFactory _factory;
+        private IServiceProvider _factory;
 
         protected UmbracoApplicationBase()
         {
@@ -122,14 +124,6 @@ namespace Umbraco.Web
         /// </summary>
         protected abstract IRuntime GetRuntime(Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo);
 
-        /// <summary>
-        /// Gets the application register.
-        /// </summary>
-        protected virtual IRegister GetRegister(IGlobalSettings globalSettings)
-        {
-            throw new NotImplementedException();
-            //return RegisterFactory.Create(globalSettings);
-        }
 
         // events - in the order they trigger
 
@@ -160,12 +154,15 @@ namespace Umbraco.Web
             // ******** THIS IS WHERE EVERYTHING BEGINS ********
 
 
+        
             var globalSettings =  Umbraco.Composing.Current.Configs.Global();
             var umbracoVersion = new UmbracoVersion(globalSettings);
 
             // create the register for the application, and boot
             // the boot manager is responsible for registrations
-            var register = GetRegister(globalSettings);
+            var services = new ServiceCollection();
+            services.AddSingleton(globalSettings);
+
             _runtime = GetRuntime(
                 Umbraco.Composing.Current.Configs,
                 umbracoVersion,
@@ -174,14 +171,16 @@ namespace Umbraco.Web
                 Umbraco.Composing.Current.Profiler,
                 Umbraco.Composing.Current.HostingEnvironment,
                 Umbraco.Composing.Current.BackOfficeInfo);
-            //_factory = Current.Factory = _runtime.Configure(register);
+             _runtime.Configure(services);
+
+             _factory = services.BuildServiceProvider();
 
             // now we can add our request based logging enrichers (globally, which is what we were doing in netframework before)
             LogContext.Push(new HttpSessionIdEnricher(_factory.GetInstance<ISessionIdResolver>()));
             LogContext.Push(new HttpRequestNumberEnricher(_factory.GetInstance<IRequestCache>()));
             LogContext.Push(new HttpRequestIdEnricher(_factory.GetInstance<IRequestCache>()));
 
-            //_runtime.Start();
+            _runtime.Start(_factory);
         }
 
         // called by ASP.NET (auto event wireup) once per app domain

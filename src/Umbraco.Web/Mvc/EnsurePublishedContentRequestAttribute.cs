@@ -4,6 +4,7 @@ using Umbraco.Web.Routing;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Web.Composing;
 using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web.Mvc

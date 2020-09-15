@@ -12,6 +12,7 @@ using Umbraco.Core.PackageActions;
 using Umbraco.Tests.Components;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Tests.Composing
 {

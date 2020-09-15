@@ -8,6 +8,7 @@ using Umbraco.Core.Models;
 using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Tests.Routing
 {

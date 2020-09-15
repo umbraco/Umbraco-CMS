@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core.Composing;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -10,6 +11,7 @@ using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
 using Umbraco.Web;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Tests.Services
 {
@@ -39,7 +41,11 @@ namespace Umbraco.Tests.Services
             base.Compose();
 
             // FIXME: do it differently
-            Composition.Register(factory => factory.GetInstance<ServiceContext>().TextService);
+            //Composition.Register(factory =>
+            //{
+            //    var serviceContext = factory.GetService<ServiceContext>();
+            //    return serviceContext.TextService;
+            //});
         }
 
         [Test]

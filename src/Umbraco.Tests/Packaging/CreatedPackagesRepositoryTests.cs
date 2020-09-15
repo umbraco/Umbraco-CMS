@@ -15,6 +15,7 @@ using Umbraco.Core.Services;
 using Umbraco.Tests.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Tests.Packaging
 {

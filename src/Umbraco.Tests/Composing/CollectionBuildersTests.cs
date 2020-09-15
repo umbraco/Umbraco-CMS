@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -350,12 +351,12 @@ namespace Umbraco.Tests.Composing
 
             var factory = _composition.CreateFactory();
 
-            using (factory.BeginScope())
+            using (factory.CreateScope())
             {
-                var col1 = factory.GetInstance<TestCollection>();
+                var col1 = factory.GetService<TestCollection>();
                 AssertCollection(col1, typeof(Resolved1), typeof(Resolved2));
 
-                var col2 = factory.GetInstance<TestCollection>();
+                var col2 = factory.GetService<TestCollection>();
                 AssertCollection(col2, typeof(Resolved1), typeof(Resolved2));
 
                 AssertSameCollection(factory, col1, col2);
@@ -376,10 +377,10 @@ namespace Umbraco.Tests.Composing
 
             var factory = _composition.CreateFactory();
 
-            var col1 = factory.GetInstance<TestCollection>();
+            var col1 = factory.GetService<TestCollection>();
             AssertCollection(col1, typeof(Resolved1), typeof(Resolved2));
 
-            var col2 = factory.GetInstance<TestCollection>();
+            var col2 = factory.GetService<TestCollection>();
             AssertCollection(col1, typeof(Resolved1), typeof(Resolved2));
 
             AssertNotSameCollection(col1, col2);
@@ -413,10 +414,10 @@ namespace Umbraco.Tests.Composing
 
             var factory = _composition.CreateFactory();
 
-            using (factory.BeginScope())
+            using (var scope = factory.CreateScope())
             {
-                col1A = factory.GetInstance<TestCollection>();
-                col1B = factory.GetInstance<TestCollection>();
+                col1A = scope.ServiceProvider.GetService<TestCollection>();
+                col1B = scope.ServiceProvider.GetService<TestCollection>();
 
                 AssertCollection(col1A, typeof(Resolved1), typeof(Resolved2));
                 AssertCollection(col1B, typeof(Resolved1), typeof(Resolved2));
@@ -425,9 +426,9 @@ namespace Umbraco.Tests.Composing
 
             TestCollection col2;
 
-            using (factory.BeginScope())
+            using (var scope = factory.CreateScope())
             {
-                col2 = factory.GetInstance<TestCollection>();
+                col2 = scope.ServiceProvider.GetService<TestCollection>();
             }
 
             AssertCollection(col2, typeof(Resolved1), typeof(Resolved2));
@@ -456,7 +457,7 @@ namespace Umbraco.Tests.Composing
                 Assert.IsInstanceOf(expected[i], colA[i]);
         }
 
-        private static void AssertSameCollection(IFactory factory, IEnumerable<Resolved> col1, IEnumerable<Resolved> col2)
+        private static void AssertSameCollection(IServiceProvider factory, IEnumerable<Resolved> col1, IEnumerable<Resolved> col2)
         {
             Assert.AreSame(col1, col2);
 
@@ -472,8 +473,8 @@ namespace Umbraco.Tests.Composing
             {
                 Assert.AreSame(col1A[i], col2A[i]);
 
-                var itemA = factory.GetInstance(col1A[i].GetType());
-                var itemB = factory.GetInstance(col2A[i].GetType());
+                var itemA = factory.GetService(col1A[i].GetType());
+                var itemB = factory.GetService(col2A[i].GetType());
 
                 Assert.AreSame(itemA, itemB);
             }

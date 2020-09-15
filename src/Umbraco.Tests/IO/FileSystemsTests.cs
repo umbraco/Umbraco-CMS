@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -17,14 +18,15 @@ using Umbraco.Core.Composing.CompositionExtensions;
 using Current = Umbraco.Web.Composing.Current;
 using FileSystems = Umbraco.Core.IO.FileSystems;
 using Umbraco.Web;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Tests.IO
 {
     [TestFixture]
     public class FileSystemsTests
     {
-        private IRegister _register;
-        private IFactory _factory;
+        private IServiceCollection _register;
+        private IServiceProvider _factory;
 
         [SetUp]
         public void Setup()

@@ -41,12 +41,12 @@ namespace Umbraco.Web.Composing
     {
         private static readonly object Locker = new object();
 
-        private static IFactory _factory;
+        private static IServiceProvider _factory;
 
         /// <summary>
         /// Gets or sets the factory.
         /// </summary>
-        public static IFactory Factory
+        public static IServiceProvider Factory
         {
             get
             {

@@ -9,6 +9,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Services.Importing;
 using Umbraco.Tests.Testing;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Tests.Services
 {

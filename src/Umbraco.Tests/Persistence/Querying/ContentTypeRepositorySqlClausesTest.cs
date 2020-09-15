@@ -110,7 +110,7 @@ namespace Umbraco.Tests.Persistence.Querying
         }
 
         [Test]
-        public void Can_Verify_AllowedContentTypeIds_Clause()
+            public void Can_Verify_AllowedContentTypeIds_Clause()
         {
             var expected = Sql();
             expected.SelectAll()

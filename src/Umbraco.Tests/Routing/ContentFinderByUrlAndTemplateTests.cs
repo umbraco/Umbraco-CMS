@@ -7,6 +7,7 @@ using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Routing;
 using Umbraco.Core.Models;
 using Umbraco.Tests.Testing;
+using Umbraco.Web.Composing;
 using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.Routing
