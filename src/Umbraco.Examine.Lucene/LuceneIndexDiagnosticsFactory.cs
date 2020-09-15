@@ -12,10 +12,10 @@ namespace Umbraco.Examine
     /// </summary>
     public class LuceneIndexDiagnosticsFactory : IndexDiagnosticsFactory
     {
-        private readonly ILogger _logger;
+        private readonly ILogger<LuceneIndexDiagnostics> _logger;
         private readonly IHostingEnvironment _hostingEnvironment;
 
-        public LuceneIndexDiagnosticsFactory(ILogger logger, IHostingEnvironment hostingEnvironment)
+        public LuceneIndexDiagnosticsFactory(ILogger<LuceneIndexDiagnostics> logger, IHostingEnvironment hostingEnvironment)
         {
             _logger = logger;
             _hostingEnvironment = hostingEnvironment;
