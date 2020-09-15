@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.HealthCheck;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
-using Umbraco.Web.HealthCheck;
-using Umbraco.Web.HealthCheck.Checks.Config;
 
 namespace Umbraco.Core.Configuration.HealthChecks
 {
@@ -26,7 +25,7 @@ namespace Umbraco.Core.Configuration.HealthChecks
         /// </summary>
         public abstract IEnumerable<AcceptableConfiguration> Values { get; }
 
-        /// <summary>1
+        /// <summary>
         /// Gets the current value
         /// </summary>
         public string CurrentValue { get; set; }

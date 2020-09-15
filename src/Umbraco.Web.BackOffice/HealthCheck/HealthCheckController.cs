@@ -2,16 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Core;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Configuration.HealthChecks;
-using Umbraco.Web.BackOffice.Filters;
-using Umbraco.Web.HealthCheck;
-using Umbraco.Web.Common.Attributes;
-using Umbraco.Core.Configuration.Models;
 using Microsoft.Extensions.Options;
+using Umbraco.Core;
+using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.HealthCheck;
+using Umbraco.Core.Logging;
+using Umbraco.Web.BackOffice.Controllers;
+using Umbraco.Web.BackOffice.Filters;
+using Umbraco.Web.Common.Attributes;
 
-namespace Umbraco.Web.BackOffice.Controllers
+namespace Umbraco.Web.BackOffice.HealthCheck
 {
     /// <summary>
     /// The API controller used to display the health check info and execute any actions

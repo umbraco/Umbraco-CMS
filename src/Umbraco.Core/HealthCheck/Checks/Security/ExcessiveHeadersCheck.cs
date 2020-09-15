@@ -4,7 +4,6 @@ using System.Linq;
 using System.Net;
 using Umbraco.Core.Services;
 using Umbraco.Web;
-using Umbraco.Web.HealthCheck;
 
 namespace Umbraco.Core.HealthCheck.Checks.Security
 {

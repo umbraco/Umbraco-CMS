@@ -13,6 +13,7 @@ using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.WebAssets;
 using Umbraco.Extensions;
+using Umbraco.Web.BackOffice.HealthCheck;
 using Umbraco.Web.BackOffice.Profiling;
 using Umbraco.Web.BackOffice.PropertyEditors;
 using Umbraco.Web.Common.Attributes;

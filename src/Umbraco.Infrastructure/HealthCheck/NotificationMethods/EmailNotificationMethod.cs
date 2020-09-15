@@ -7,6 +7,7 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.HealthChecks;
 using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.HealthCheck;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Web.HealthCheck.NotificationMethods

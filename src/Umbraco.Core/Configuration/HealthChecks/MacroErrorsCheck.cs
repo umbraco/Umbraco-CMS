@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.HealthCheck;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
-using Umbraco.Web.HealthCheck;
-using Umbraco.Web.HealthCheck.Checks.Config;
 
 namespace Umbraco.Core.Configuration.HealthChecks
 {

@@ -5,6 +5,7 @@ using System.Text;
 using HeyRed.MarkdownSharp;
 using Umbraco.Composing;
 using Umbraco.Core.Configuration.HealthChecks;
+using Umbraco.Core.HealthCheck;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Web.HealthCheck

@@ -3,12 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Sockets;
 using Microsoft.Extensions.Options;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Services;
 
-namespace Umbraco.Web.HealthCheck.Checks.Services
+namespace Umbraco.Core.HealthCheck.Checks.Services
 {
     [HealthCheck(
         "1B5D221B-CE99-4193-97CB-5F3261EC73DF",

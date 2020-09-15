@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.HealthCheck;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Sync;

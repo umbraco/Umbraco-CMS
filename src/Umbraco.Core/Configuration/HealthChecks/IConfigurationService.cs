@@ -1,6 +1,4 @@
-﻿using Umbraco.Web.HealthCheck.Checks.Config;
-
-namespace Umbraco.Core.Configuration.HealthChecks
+﻿namespace Umbraco.Core.Configuration.HealthChecks
 {
     public interface IConfigurationService
     {

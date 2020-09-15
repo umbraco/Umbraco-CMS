@@ -1,10 +1,10 @@
 ﻿using Umbraco.Core.Composing;
+using Umbraco.Core.HealthCheck;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Actions;
 using Umbraco.Web.ContentApps;
 using Umbraco.Web.Dashboards;
 using Umbraco.Web.Editors;
-using Umbraco.Web.HealthCheck;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Sections;
 using Umbraco.Web.Tour;

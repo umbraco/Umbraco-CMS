@@ -7,7 +7,6 @@ using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Install;
 using Umbraco.Core.IO;
 using Umbraco.Core.Services;
-using Umbraco.Web.HealthCheck;
 
 namespace Umbraco.Core.HealthCheck.Checks.Permissions
 {

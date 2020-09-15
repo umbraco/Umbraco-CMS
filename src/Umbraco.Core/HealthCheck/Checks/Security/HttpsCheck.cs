@@ -10,7 +10,6 @@ using Umbraco.Core.Configuration.Models;
 using Microsoft.Extensions.Options;
 using Umbraco.Core.IO;
 using Umbraco.Web;
-using Umbraco.Web.HealthCheck;
 
 namespace Umbraco.Core.HealthCheck.Checks.Security
 {

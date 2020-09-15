@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Web.HealthCheck
+﻿namespace Umbraco.Core.HealthCheck
 {
     public enum StatusResultType
     {

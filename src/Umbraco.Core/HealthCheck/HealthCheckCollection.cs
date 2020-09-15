@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Umbraco.Core.Composing;
 
-namespace Umbraco.Web.HealthCheck
+namespace Umbraco.Core.HealthCheck
 {
     public class HealthCheckCollection : BuilderCollectionBase<Core.HealthCheck.HealthCheck>
     {

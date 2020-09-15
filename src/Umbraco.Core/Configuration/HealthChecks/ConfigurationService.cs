@@ -1,7 +1,6 @@
 ﻿using System;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
-using Umbraco.Web.HealthCheck.Checks.Config;
 
 namespace Umbraco.Core.Configuration.HealthChecks
 {

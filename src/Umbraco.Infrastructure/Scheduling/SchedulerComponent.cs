@@ -8,6 +8,7 @@ using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.HealthChecks;
 using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.HealthCheck;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Scoping;

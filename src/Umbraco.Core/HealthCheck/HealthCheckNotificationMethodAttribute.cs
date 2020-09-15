@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Umbraco.Web.HealthCheck
+namespace Umbraco.Core.HealthCheck
 {
     /// <summary>
     /// Metadata attribute for health check notification methods
