@@ -5,6 +5,8 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Sync;
+using Microsoft.Extensions.Logging;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Umbraco.Web.Scheduling
 {
@@ -16,11 +18,11 @@ namespace Umbraco.Web.Scheduling
         private readonly IAuditService _auditService;
         private readonly ILoggingSettings _settings;
         private readonly IProfilingLogger _pLogger;
-        private readonly ILogger _logger;
+        private readonly Microsoft.Extensions.Logging.ILogger<LogScrubber> _logger;
         private readonly IScopeProvider _scopeProvider;
 
         public LogScrubber(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
-            IMainDom mainDom, IServerRegistrar serverRegistrar, IAuditService auditService, ILoggingSettings settings, IScopeProvider scopeProvider, IProfilingLogger pLogger, ILogger logger)
+            IMainDom mainDom, IServerRegistrar serverRegistrar, IAuditService auditService, ILoggingSettings settings, IScopeProvider scopeProvider, IProfilingLogger pLogger, Microsoft.Extensions.Logging.ILogger<LogScrubber> logger)
             : base(runner, delayMilliseconds, periodMilliseconds)
         {
             _mainDom = mainDom;

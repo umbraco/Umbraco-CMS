@@ -14,13 +14,13 @@ namespace Umbraco.Web
         private UrlHelper _url;
 
         protected UmbracoHttpHandler()
-            : this(Current.UmbracoContextAccessor, Current.Services, Current.ProfilingLogger)
+            : this(Current.UmbracoContextAccessor, Current.Services, Current.Logger, Current.ProfilingLogger)
         { }
 
-        protected UmbracoHttpHandler(IUmbracoContextAccessor umbracoContextAccessor,ServiceContext service, IProfilingLogger plogger)
+        protected UmbracoHttpHandler(IUmbracoContextAccessor umbracoContextAccessor,ServiceContext service, ILogger logger, IProfilingLogger plogger)
         {
             UmbracoContextAccessor = umbracoContextAccessor;
-            Logger = plogger;
+            Logger = logger;
             ProfilingLogger = plogger;
             Services = service;
         }

@@ -6,6 +6,7 @@ using Examine.LuceneEngine.Providers;
 using Lucene.Net.Analysis;
 using Lucene.Net.Analysis.Standard;
 using Lucene.Net.Store;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Umbraco.Core;
 using Umbraco.Core.Hosting;
@@ -23,6 +24,7 @@ using Umbraco.Core.Strings;
 using Umbraco.Examine;
 using Umbraco.Tests.TestHelpers;
 using IContentService = Umbraco.Core.Services.IContentService;
+using ILogger = Umbraco.Core.Logging.ILogger;
 using IMediaService = Umbraco.Core.Services.IMediaService;
 using Version = Lucene.Net.Util.Version;
 
@@ -161,9 +163,9 @@ namespace Umbraco.Tests.UmbracoExamine
             return new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>());
         }
 
-        public static ILogger<T> GetMockLogger<T>()
+        public static Core.Logging.ILogger<T> GetMockLogger<T>()
         {
-            return Mock.Of<ILogger<T>>();
+            return Mock.Of<Core.Logging.ILogger<T>>();
         }
 
         public static UmbracoContentIndex GetUmbracoIndexer(
@@ -190,10 +192,9 @@ namespace Umbraco.Tests.UmbracoExamine
                 new UmbracoFieldDefinitionCollection(),
                 analyzer,
                 profilingLogger,
-                GetMockLogger<UmbracoContentIndex>(),
-                GetMockLogger<UmbracoExamineIndex>(),
-                GetMockLogger<UmbracoExamineIndexDiagnostics>(),
-                hostingEnvironment,
+                Mock.Of<Microsoft.Extensions.Logging.ILogger>(),
+                Mock.Of<ILoggerFactory>(),
+            hostingEnvironment,
                 runtimeState,
                 languageService,
                 validator);

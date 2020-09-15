@@ -29,6 +29,7 @@ using Microsoft.Extensions.Configuration;
 using System.Data.SqlClient;
 using System.Data.Common;
 using System.IO;
+using Microsoft.Extensions.Logging;
 
 namespace Umbraco.Tests.Integration.Testing
 {
@@ -124,6 +125,7 @@ namespace Umbraco.Tests.Integration.Testing
         /// <param name="umbracoVersion"></param>
         /// <param name="ioHelper"></param>
         /// <param name="logger"></param>
+        /// <param name="loggerFactory"></param>
         /// <param name="profiler"></param>
         /// <param name="hostingEnvironment"></param>
         /// <param name="backOfficeInfo"></param>
@@ -132,13 +134,14 @@ namespace Umbraco.Tests.Integration.Testing
         /// <param name="dbProviderFactoryCreator"></param>
         /// <returns></returns>
         public CoreRuntime CreateTestRuntime(Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper,
-            ILogger logger, IProfiler profiler, Core.Hosting.IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo,
+            ILogger logger, ILoggerFactory loggerFactory, IProfiler profiler, Core.Hosting.IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo,
             ITypeFinder typeFinder, AppCaches appCaches, IDbProviderFactoryCreator dbProviderFactoryCreator)
         {
             var runtime = CreateTestRuntime(configs,
                 umbracoVersion,
                 ioHelper,
                 logger,
+                loggerFactory,
                 profiler,
                 hostingEnvironment,
                 backOfficeInfo,                
@@ -159,17 +162,18 @@ namespace Umbraco.Tests.Integration.Testing
         /// <param name="umbracoVersion"></param>
         /// <param name="ioHelper"></param>
         /// <param name="logger"></param>
+        /// <param name="loggerFactory"></param>
         /// <param name="profiler"></param>
         /// <param name="hostingEnvironment"></param>
         /// <param name="backOfficeInfo"></param>
         /// <param name="typeFinder"></param>
-        /// <param name="requestCache"></param>
+        /// <param name="appCaches"></param>
         /// <param name="dbProviderFactoryCreator"></param>
         /// <param name="mainDom"></param>
         /// <param name="eventHandler">The event handler used for DB installation</param>
         /// <returns></returns>
         public static CoreRuntime CreateTestRuntime(Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper,
-            ILogger logger, IProfiler profiler, Core.Hosting.IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo,
+            ILogger logger, ILoggerFactory loggerFactory, IProfiler profiler, Core.Hosting.IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo,
             ITypeFinder typeFinder, AppCaches appCaches, IDbProviderFactoryCreator dbProviderFactoryCreator,
             IMainDom mainDom, Action<CoreRuntime, RuntimeEssentialsEventArgs> eventHandler)
         {
@@ -178,6 +182,7 @@ namespace Umbraco.Tests.Integration.Testing
                 umbracoVersion,
                 ioHelper,
                 logger,
+                loggerFactory,
                 profiler,
                 Mock.Of<IUmbracoBootPermissionChecker>(),
                 hostingEnvironment,

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
@@ -12,6 +13,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
+using ILogger = Umbraco.Core.Logging.ILogger;
 
 namespace Umbraco.Core.Runtime
 {
@@ -26,8 +28,7 @@ namespace Umbraco.Core.Runtime
         private IFactory _factory;
         // runtime state, this instance will get replaced again once the essential services are available to run the check
         private RuntimeState _state = RuntimeState.Booting();
-        private readonly ILogger<TypeLoader> _typeLoaderLogger;
-        private readonly ILogger<Composers> _composerLogger;
+        private readonly ILoggerFactory _loggerFactory;
         private readonly IUmbracoBootPermissionChecker _umbracoBootPermissionChecker;
         private readonly IGlobalSettings _globalSettings;
         private readonly IConnectionStrings _connectionStrings;
@@ -37,8 +38,7 @@ namespace Umbraco.Core.Runtime
             IUmbracoVersion umbracoVersion,
             IIOHelper ioHelper,
             ILogger logger,
-            ILogger<TypeLoader> typeLoaderLogger,
-            ILogger<Composers> composerLogger,
+            ILoggerFactory loggerFactory,
             IProfiler profiler,
             IUmbracoBootPermissionChecker umbracoBootPermissionChecker,
             IHostingEnvironment hostingEnvironment,
@@ -57,8 +57,7 @@ namespace Umbraco.Core.Runtime
             BackOfficeInfo = backOfficeInfo;
             DbProviderFactoryCreator = dbProviderFactoryCreator;
 
-            _typeLoaderLogger = typeLoaderLogger;
-            _composerLogger = composerLogger;
+            _loggerFactory = loggerFactory;
             _umbracoBootPermissionChecker = umbracoBootPermissionChecker;
             
             Logger = logger;
@@ -171,7 +170,7 @@ namespace Umbraco.Core.Runtime
                 var databaseFactory = CreateDatabaseFactory();
 
                 // type finder/loader
-                var typeLoader = new TypeLoader(TypeFinder, AppCaches.RuntimeCache, new DirectoryInfo(HostingEnvironment.LocalTempPath), _typeLoaderLogger, ProfilingLogger);
+                var typeLoader = new TypeLoader(TypeFinder, AppCaches.RuntimeCache, new DirectoryInfo(HostingEnvironment.LocalTempPath), _loggerFactory.CreateLogger("TypeLoader"), ProfilingLogger);
 
                 // re-create the state object with the essential services
                 _state = new RuntimeState(Configs.Global(), UmbracoVersion, databaseFactory, Logger);
@@ -291,7 +290,7 @@ namespace Umbraco.Core.Runtime
                 enableDisableAttributes = typeLoader.GetAssemblyAttributes(typeof(EnableComposerAttribute), typeof(DisableComposerAttribute));
             }
 
-            var composers = new Composers(composition, composerTypes, enableDisableAttributes, _composerLogger, ProfilingLogger);
+            var composers = new Composers(composition, composerTypes, enableDisableAttributes, _loggerFactory.CreateLogger("Composers"), ProfilingLogger);
             composers.Compose();
         }
 

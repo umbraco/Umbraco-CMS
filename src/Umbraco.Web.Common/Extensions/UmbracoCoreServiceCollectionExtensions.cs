@@ -207,7 +207,7 @@ namespace Umbraco.Extensions
             AppCaches appCaches,
             ILoggingConfiguration loggingConfiguration,
             // TODO: Yep that's extremely ugly
-            Func<Configs, IUmbracoVersion, IIOHelper, Core.Logging.ILogger, IProfiler, Core.Hosting.IHostingEnvironment, IBackOfficeInfo, ITypeFinder, AppCaches, IDbProviderFactoryCreator, IRuntime> getRuntime,
+            Func<Configs, IUmbracoVersion, IIOHelper, Core.Logging.ILogger, ILoggerFactory, IProfiler, Core.Hosting.IHostingEnvironment, IBackOfficeInfo, ITypeFinder, AppCaches, IDbProviderFactoryCreator, IRuntime> getRuntime,
             out IFactory factory)
         {
             if (services is null) throw new ArgumentNullException(nameof(services));
@@ -234,7 +234,9 @@ namespace Umbraco.Extensions
             // into the container. This is not true for `Configs` but we should do that too, see comments in
             // `RegisterEssentials`.
             var serviceProvider = services.BuildServiceProvider();
+
             var configs = serviceProvider.GetService<Configs>();
+            var loggerFactory = serviceProvider.GetService<ILoggerFactory>();
             var dbProviderFactoryCreator = serviceProvider.GetRequiredService<IDbProviderFactoryCreator>();
 
             CreateCompositionRoot(services,
@@ -252,6 +254,7 @@ namespace Umbraco.Extensions
                 umbracoVersion,
                 ioHelper,
                 logger,
+                loggerFactory,
                 profiler,
                 hostingEnvironment,
                 backOfficeInfo,
@@ -273,7 +276,7 @@ namespace Umbraco.Extensions
         }
 
         private static IRuntime GetCoreRuntime(
-            Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, Core.Logging.ILogger logger,
+            Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, Core.Logging.ILogger logger, ILoggerFactory loggerFactory,
             IProfiler profiler, Core.Hosting.IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo,
             ITypeFinder typeFinder, AppCaches appCaches, IDbProviderFactoryCreator dbProviderFactoryCreator)
         {
@@ -295,6 +298,7 @@ namespace Umbraco.Extensions
                 umbracoVersion,
                 ioHelper,
                 logger,
+                loggerFactory,
                 profiler,
                 new AspNetCoreBootPermissionsChecker(),
                 hostingEnvironment,

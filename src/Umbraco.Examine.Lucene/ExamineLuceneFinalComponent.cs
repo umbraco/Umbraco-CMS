@@ -7,11 +7,11 @@ namespace Umbraco.Examine
 {
     public class ExamineLuceneFinalComponent : IComponent
     {
-        private readonly IProfilingLogger _logger;
+        private readonly ILogger _logger;
         private readonly IExamineManager _examineManager;
         private readonly IMainDom _mainDom;
 
-        public ExamineLuceneFinalComponent(IProfilingLogger logger, IExamineManager examineManager, IMainDom mainDom)
+        public ExamineLuceneFinalComponent(ILogger logger, IExamineManager examineManager, IMainDom mainDom)
         {
             _logger = logger;
             _examineManager = examineManager;

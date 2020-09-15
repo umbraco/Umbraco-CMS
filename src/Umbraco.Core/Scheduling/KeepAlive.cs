@@ -6,6 +6,7 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Sync;
+using Microsoft.Extensions.Logging;
 
 namespace Umbraco.Web.Scheduling
 {
@@ -14,13 +15,13 @@ namespace Umbraco.Web.Scheduling
         private readonly IRequestAccessor _requestAccessor;
         private readonly IMainDom _mainDom;
         private readonly IKeepAliveSettings _keepAliveSettings;
-        private readonly ILogger<KeepAlive> _logger;
-        private readonly ProfilingLogger _profilingLogger;
+        private readonly Microsoft.Extensions.Logging.ILogger<KeepAlive> _logger;
+        private readonly IProfilingLogger _profilingLogger;
         private readonly IServerRegistrar _serverRegistrar;
         private static HttpClient _httpClient;
 
         public KeepAlive(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
-            IRequestAccessor requestAccessor, IMainDom mainDom, IKeepAliveSettings keepAliveSettings, ILogger<KeepAlive> logger, ProfilingLogger profilingLogger, IServerRegistrar serverRegistrar)
+            IRequestAccessor requestAccessor, IMainDom mainDom, IKeepAliveSettings keepAliveSettings, Microsoft.Extensions.Logging.ILogger<KeepAlive> logger, IProfilingLogger profilingLogger, IServerRegistrar serverRegistrar)
             : base(runner, delayMilliseconds, periodMilliseconds)
         {
             _requestAccessor = requestAccessor;

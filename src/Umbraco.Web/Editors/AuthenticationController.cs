@@ -46,6 +46,7 @@ namespace Umbraco.Web.Editors
         private BackOfficeSignInManager _signInManager;
         private readonly IUserPasswordConfiguration _passwordConfiguration;
         private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly ILogger<AuthenticationController> _logger;
         private readonly IRuntimeState _runtimeState;
         private readonly ISecuritySettings _securitySettings;
         private readonly IRequestAccessor _requestAccessor;
@@ -59,17 +60,19 @@ namespace Umbraco.Web.Editors
             ISqlContext sqlContext,
             ServiceContext services,
             AppCaches appCaches,
-            IProfilingLogger logger,
+            IProfilingLogger pLogger,
+            ILogger<AuthenticationController> logger,
             IRuntimeState runtimeState,
             UmbracoMapper umbracoMapper,
             ISecuritySettings securitySettings,
             IPublishedUrlProvider publishedUrlProvider,
             IRequestAccessor requestAccessor,
             IEmailSender emailSender)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoMapper, publishedUrlProvider)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, pLogger, runtimeState, umbracoMapper, publishedUrlProvider)
         {
             _passwordConfiguration = passwordConfiguration ?? throw new ArgumentNullException(nameof(passwordConfiguration));
             _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
+            _logger = logger;
             _runtimeState = runtimeState ?? throw new ArgumentNullException(nameof(runtimeState));
             _securitySettings = securitySettings ?? throw new ArgumentNullException(nameof(securitySettings));
             _requestAccessor = requestAccessor ?? throw new ArgumentNullException(nameof(securitySettings));
@@ -117,7 +120,7 @@ namespace Umbraco.Web.Editors
             var userId = await SignInManager.GetVerifiedUserIdAsync();
             if (string.IsNullOrWhiteSpace(userId))
             {
-                Logger.LogWarning<AuthenticationController>("Get2FAProviders :: No verified user found, returning 404");
+                _logger.LogDebug("Get2FAProviders :: No verified user found, returning 404");
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
@@ -136,7 +139,7 @@ namespace Umbraco.Web.Editors
             var userId = await SignInManager.GetVerifiedUserIdAsync();
             if (string.IsNullOrWhiteSpace(userId))
             {
-                Logger.LogWarning<AuthenticationController>("Get2FAProviders :: No verified user found, returning 404");
+                _logger.LogDebug("Get2FAProviders :: No verified user found, returning 404");
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
@@ -159,7 +162,7 @@ namespace Umbraco.Web.Editors
             var userName = await SignInManager.GetVerifiedUserNameAsync();
             if (userName == null)
             {
-                Logger.LogWarning<AuthenticationController>("Get2FAProviders :: No verified user found, returning 404");
+                _logger.LogDebug("Get2FAProviders :: No verified user found, returning 404");
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 

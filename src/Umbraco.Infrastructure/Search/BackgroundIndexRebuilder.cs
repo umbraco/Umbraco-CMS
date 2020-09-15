@@ -17,13 +17,15 @@ namespace Umbraco.Web.Search
         private static readonly object RebuildLocker = new object();
         private readonly IndexRebuilder _indexRebuilder;
         private readonly IMainDom _mainDom;
-        private readonly IProfilingLogger _logger;
+        private readonly IProfilingLogger _pLogger;
+        private readonly ILogger<BackgroundIndexRebuilder> _logger;
         private readonly IApplicationShutdownRegistry _hostingEnvironment;
         private static BackgroundTaskRunner<IBackgroundTask> _rebuildOnStartupRunner;
 
-        public BackgroundIndexRebuilder(IMainDom mainDom, IProfilingLogger logger, IApplicationShutdownRegistry hostingEnvironment, IndexRebuilder indexRebuilder)
+        public BackgroundIndexRebuilder(IMainDom mainDom, IProfilingLogger pLogger, ILogger<BackgroundIndexRebuilder> logger, IApplicationShutdownRegistry hostingEnvironment, IndexRebuilder indexRebuilder)
         {
             _mainDom = mainDom;
+            _pLogger = pLogger;
             _logger = logger;
             _hostingEnvironment = hostingEnvironment;
             _indexRebuilder = indexRebuilder;
@@ -42,17 +44,17 @@ namespace Umbraco.Web.Search
             {
                 if (_rebuildOnStartupRunner != null && _rebuildOnStartupRunner.IsRunning)
                 {
-                    _logger.LogWarning<BackgroundIndexRebuilder>("Call was made to RebuildIndexes but the task runner for rebuilding is already running");
+                    _logger.LogWarning("Call was made to RebuildIndexes but the task runner for rebuilding is already running");
                     return;
                 }
 
                 _logger.LogInformation("Starting initialize async background thread.");
                 //do the rebuild on a managed background thread
-                var task = new RebuildOnStartupTask(_mainDom, _indexRebuilder, _logger, onlyEmptyIndexes, waitMilliseconds);
+                var task = new RebuildOnStartupTask(_mainDom, _indexRebuilder, _logger as ILogger, onlyEmptyIndexes, waitMilliseconds);
 
                 _rebuildOnStartupRunner = new BackgroundTaskRunner<IBackgroundTask>(
                     "RebuildIndexesOnStartup",
-                    _logger, _hostingEnvironment);
+                    _logger as ILogger, _hostingEnvironment);
 
                 _rebuildOnStartupRunner.TryAdd(task);
             }

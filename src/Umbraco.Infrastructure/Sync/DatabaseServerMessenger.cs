@@ -47,7 +47,7 @@ namespace Umbraco.Core.Sync
         public DatabaseServerMessengerOptions Options { get; }
 
         public DatabaseServerMessenger(
-            IMainDom mainDom, IScopeProvider scopeProvider, ISqlContext sqlContext, IProfilingLogger proflog, IServerRegistrar serverRegistrar,
+            IMainDom mainDom, IScopeProvider scopeProvider, ISqlContext sqlContext, IProfilingLogger proflog, ILogger logger, IServerRegistrar serverRegistrar,
             bool distributedEnabled, DatabaseServerMessengerOptions options,  IHostingEnvironment hostingEnvironment, CacheRefresherCollection cacheRefreshers)
             : base(distributedEnabled)
         {
@@ -58,7 +58,7 @@ namespace Umbraco.Core.Sync
             _serverRegistrar = serverRegistrar;
             _hostingEnvironment = hostingEnvironment;
             _cacheRefreshers = cacheRefreshers;
-            Logger = proflog;
+            Logger = logger;
             Options = options ?? throw new ArgumentNullException(nameof(options));
             _lastPruned = _lastSync = DateTime.UtcNow;
             _syncIdle = new ManualResetEvent(true);

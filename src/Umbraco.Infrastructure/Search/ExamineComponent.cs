@@ -27,7 +27,8 @@ namespace Umbraco.Web.Search
         private readonly IScopeProvider _scopeProvider;
         private readonly ServiceContext _services;
         private readonly IMainDom _mainDom;
-        private readonly IProfilingLogger _logger;
+        private readonly IProfilingLogger _pLogger;
+        private readonly ILogger<ExamineComponent> _logger;
         private readonly IUmbracoIndexesCreator _indexCreator;
 
 
@@ -38,6 +39,7 @@ namespace Umbraco.Web.Search
 
         public ExamineComponent(IMainDom mainDom,
             IExamineManager examineManager, IProfilingLogger profilingLogger,
+            ILogger<ExamineComponent> logger,
             IScopeProvider scopeProvider, IUmbracoIndexesCreator indexCreator,
             ServiceContext services,
             IContentValueSetBuilder contentValueSetBuilder,
@@ -55,7 +57,8 @@ namespace Umbraco.Web.Search
             _memberValueSetBuilder = memberValueSetBuilder;
             _backgroundIndexRebuilder = backgroundIndexRebuilder;
             _mainDom = mainDom;
-            _logger = profilingLogger;
+            _pLogger = profilingLogger;
+            _logger = logger;
             _indexCreator = indexCreator;
         }
 
@@ -64,7 +67,7 @@ namespace Umbraco.Web.Search
             //let's deal with shutting down Examine with MainDom
             var examineShutdownRegistered = _mainDom.Register(() =>
             {
-                using (_logger.TraceDuration<ExamineComponent>("Examine shutting down"))
+                using (_pLogger.TraceDuration<ExamineComponent>("Examine shutting down"))
                 {
                     _examineManager.Dispose();
                 }
@@ -75,7 +78,7 @@ namespace Umbraco.Web.Search
                 _logger.LogInformation("Examine shutdown not registered, this AppDomain is not the MainDom, Examine will be disabled");
 
                 //if we could not register the shutdown examine ourselves, it means we are not maindom! in this case all of examine should be disabled!
-                Suspendable.ExamineEvents.SuspendIndexers(_logger);
+                Suspendable.ExamineEvents.SuspendIndexers(_logger as ILogger);
                 return; //exit, do not continue
             }
 
@@ -83,7 +86,7 @@ namespace Umbraco.Web.Search
             foreach(var index in _indexCreator.Create())
                 _examineManager.AddIndex(index);
 
-            _logger.Debug<ExamineComponent>("Examine shutdown registered with MainDom");
+            _logger.LogDebug("Examine shutdown registered with MainDom");
 
             var registeredIndexers = _examineManager.Indexes.OfType<IUmbracoIndex>().Count(x => x.EnableDefaultEventHandler);
 

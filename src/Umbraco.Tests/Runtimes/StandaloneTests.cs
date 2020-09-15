@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Text;
 using System.Web;
 using Examine;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -58,6 +59,7 @@ namespace Umbraco.Tests.Runtimes
             ConfigurationManager.AppSettings[Constants.AppSettings.ConfigurationStatus] = "";
             // FIXME: we need a better management of settings here (and, true config files?)
 
+            var loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
             // create the very basic and essential things we need
             var logger = new ConsoleLogger<object>(new MessageTemplates());
             var profiler = new LogProfiler(logger);
@@ -69,7 +71,7 @@ namespace Umbraco.Tests.Runtimes
             var databaseFactory = new UmbracoDatabaseFactory(logger,globalSettings, connectionStrings, new Lazy<IMapperCollection>(() => factory.GetInstance<IMapperCollection>()),  TestHelper.DbProviderFactoryCreator);
             var ioHelper = TestHelper.IOHelper;
             var hostingEnvironment = Mock.Of<IHostingEnvironment>();
-            var typeLoader = new TypeLoader(typeFinder, appCaches.RuntimeCache, new DirectoryInfo(ioHelper.MapPath("~/App_Data/TEMP")), profilingLogger);
+            var typeLoader = new TypeLoader(typeFinder, appCaches.RuntimeCache, new DirectoryInfo(ioHelper.MapPath("~/App_Data/TEMP")), loggerFactory.CreateLogger("TypeLoader"), profilingLogger);
             var mainDom = new SimpleMainDom();
             var umbracoVersion = TestHelper.GetUmbracoVersion();
             var backOfficeInfo = TestHelper.GetBackOfficeInfo();
@@ -84,7 +86,7 @@ namespace Umbraco.Tests.Runtimes
             composition.RegisterEssentials(logger, profiler, profilingLogger, mainDom, appCaches, databaseFactory, typeLoader, runtimeState, typeFinder, ioHelper, umbracoVersion, TestHelper.DbProviderFactoryCreator, hostingEnvironment, backOfficeInfo);
 
             // create the core runtime and have it compose itself
-            var coreRuntime = new CoreRuntime(configs, umbracoVersion, ioHelper, logger, profiler, new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, TestHelper.DbProviderFactoryCreator, TestHelper.MainDom, typeFinder, AppCaches.NoCache);
+            var coreRuntime = new CoreRuntime(configs, umbracoVersion, ioHelper, logger, loggerFactory, profiler, new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, TestHelper.DbProviderFactoryCreator, TestHelper.MainDom, typeFinder, AppCaches.NoCache);
 
             // determine actual runtime level
             runtimeState.DetermineRuntimeLevel();
@@ -95,7 +97,7 @@ namespace Umbraco.Tests.Runtimes
             var composerTypes = typeLoader.GetTypes<IComposer>() // all of them
                 .Where(x => !x.FullName.StartsWith("Umbraco.Tests.")) // exclude test components
                 .Where(x => x != typeof(WebInitialComposer) && x != typeof(WebFinalComposer)); // exclude web runtime
-            var composers = new Composers(composition, composerTypes, Enumerable.Empty<Attribute>(), profilingLogger);
+            var composers = new Composers(composition, composerTypes, Enumerable.Empty<Attribute>(), loggerFactory.CreateLogger("Composers"), profilingLogger);
             composers.Compose();
 
             // must registers stuff that WebRuntimeComponent would register otherwise
@@ -255,16 +257,15 @@ namespace Umbraco.Tests.Runtimes
             // - assigning the factory to Current.Factory
 
             // create the very basic and essential things we need
+            var loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
             var logger = new ConsoleLogger<StandaloneTests>(new MessageTemplates());
-            var composerLogger = new ConsoleLogger<Composers>(new MessageTemplates());
-            var typeLoaderLogger = new ConsoleLogger<TypeLoader>(new MessageTemplates());
             var profiler = Mock.Of<IProfiler>();
             var profilingLogger = new ProfilingLogger(logger, profiler);
             var appCaches = AppCaches.Disabled;
             var databaseFactory = Mock.Of<IUmbracoDatabaseFactory>();
             var typeFinder = TestHelper.GetTypeFinder();
             var ioHelper = TestHelper.IOHelper;
-            var typeLoader = new TypeLoader(typeFinder, appCaches.RuntimeCache, new DirectoryInfo(ioHelper.MapPath("~/App_Data/TEMP")), typeLoaderLogger, profilingLogger);
+            var typeLoader = new TypeLoader(typeFinder, appCaches.RuntimeCache, new DirectoryInfo(ioHelper.MapPath("~/App_Data/TEMP")), loggerFactory.CreateLogger("TypeLoader"), profilingLogger);
             var runtimeState = Mock.Of<IRuntimeState>();
             var hostingEnvironment = Mock.Of<IHostingEnvironment>();
             var backOfficeInfo = TestHelper.GetBackOfficeInfo();
@@ -280,7 +281,7 @@ namespace Umbraco.Tests.Runtimes
             composition.RegisterEssentials(logger, profiler, profilingLogger, mainDom, appCaches, databaseFactory, typeLoader, runtimeState, typeFinder, ioHelper, umbracoVersion, TestHelper.DbProviderFactoryCreator, hostingEnvironment, backOfficeInfo);
 
             // create the core runtime and have it compose itself
-            var coreRuntime = new CoreRuntime(configs, umbracoVersion, ioHelper, logger, profiler, new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, TestHelper.DbProviderFactoryCreator, TestHelper.MainDom, typeFinder, AppCaches.NoCache);
+            var coreRuntime = new CoreRuntime(configs, umbracoVersion, ioHelper, logger, loggerFactory, profiler, new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, TestHelper.DbProviderFactoryCreator, TestHelper.MainDom, typeFinder, AppCaches.NoCache);
 
             // get the components
             // all of them?
@@ -290,7 +291,7 @@ namespace Umbraco.Tests.Runtimes
                 .Where(x => !x.FullName.StartsWith("Umbraco.Tests"));
             // single?
             //var componentTypes = new[] { typeof(CoreRuntimeComponent) };
-            var composers = new Composers(composition, composerTypes, Enumerable.Empty<Attribute>(), profilingLogger);
+            var composers = new Composers(composition, composerTypes, Enumerable.Empty<Attribute>(), loggerFactory.CreateLogger("Composers"), profilingLogger);
 
             // get components to compose themselves
             composers.Compose();

@@ -1289,7 +1289,7 @@ namespace Umbraco.Core.Packaging
                 else if (string.IsNullOrEmpty((string)elementCopy.Element("Master")) == false &&
                          templateElements.Any(x => (string)x.Element("Alias") == (string)elementCopy.Element("Master")) == false)
                 {
-                    _logger.Info<PackageDataInstallation>(
+                    _logger.LogInformation(
                         "Template '{TemplateAlias}' has an invalid Master '{TemplateMaster}', so the reference has been ignored.",
                         (string)elementCopy.Element("Alias"),
                         (string)elementCopy.Element("Master"));

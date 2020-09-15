@@ -95,6 +95,9 @@
     <PackageReference Include="Microsoft.AspNet.WebApi.SelfHost" Version="5.2.7" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Tracing" Version="5.2.7" />
     <PackageReference Include="Microsoft.AspNet.WebApi.WebHost" Version="5.2.7" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console">
+      <Version>3.1.8</Version>
+    </PackageReference>
     <PackageReference Include="Microsoft.Owin" Version="4.0.1" />
     <PackageReference Include="Microsoft.Owin.Hosting" Version="4.0.1" />
     <PackageReference Include="Microsoft.Owin.Security" Version="4.0.1" />

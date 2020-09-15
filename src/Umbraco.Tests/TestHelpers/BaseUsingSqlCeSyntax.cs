@@ -42,7 +42,7 @@ namespace Umbraco.Tests.TestHelpers
             var typeFinder = TestHelper.GetTypeFinder();
             var typeLoader = new TypeLoader(typeFinder, NoAppCache.Instance,
                 new DirectoryInfo(ioHelper.MapPath("~/App_Data/TEMP")),
-                Mock.Of<ILogger<TypeLoader>>(),
+                Mock.Of<Microsoft.Extensions.Logging.ILogger>(),
                 logger,
                 false);
 

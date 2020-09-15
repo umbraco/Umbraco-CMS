@@ -5,11 +5,11 @@ using NUnit.Framework;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using Smidge;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Runtime;
 using Umbraco.Tests.Common;
 using Umbraco.Tests.Integration.Extensions;
@@ -17,6 +17,7 @@ using Umbraco.Tests.Integration.Implementations;
 using Umbraco.Tests.Integration.Testing;
 using Umbraco.Web.Common.AspNetCore;
 using Umbraco.Extensions;
+using ILogger = Umbraco.Core.Logging.ILogger;
 
 namespace Umbraco.Tests.Integration
 {
@@ -56,7 +57,7 @@ namespace Umbraco.Tests.Integration
 
             // Create the core runtime
             var coreRuntime = new CoreRuntime(testHelper.GetConfigs(), testHelper.GetUmbracoVersion(),
-                testHelper.IOHelper, testHelper.Logger, testHelper.Profiler, testHelper.UmbracoBootPermissionChecker,
+                testHelper.IOHelper, testHelper.Logger, Mock.Of<ILoggerFactory>(), testHelper.Profiler, testHelper.UmbracoBootPermissionChecker,
                 testHelper.GetHostingEnvironment(), testHelper.GetBackOfficeInfo(), testHelper.DbProviderFactoryCreator,
                 testHelper.MainDom, testHelper.GetTypeFinder(), AppCaches.NoCache);
 

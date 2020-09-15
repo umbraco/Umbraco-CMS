@@ -5,6 +5,8 @@ using System.Reflection;
 using System.Text;
 using Umbraco.Core.Collections;
 using Umbraco.Core.Logging;
+using Microsoft.Extensions.Logging;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Umbraco.Core.Composing
 {
@@ -16,7 +18,7 @@ namespace Umbraco.Core.Composing
     public class Composers
     {
         private readonly Composition _composition;
-        private readonly ILogger<Composers> _logger;
+        private readonly ILogger _logger;
         private readonly IProfilingLogger _profileLogger;
         private readonly IEnumerable<Type> _composerTypes;
         private readonly IEnumerable<Attribute> _enableDisableAttributes;
@@ -38,7 +40,7 @@ namespace Umbraco.Core.Composing
         /// enableDisableAttributes
         /// or
         /// logger</exception>
-        public Composers(Composition composition, IEnumerable<Type> composerTypes, IEnumerable<Attribute> enableDisableAttributes, ILogger<Composers> logger, IProfilingLogger profileLogger)
+        public Composers(Composition composition, IEnumerable<Type> composerTypes, IEnumerable<Attribute> enableDisableAttributes, ILogger logger, IProfilingLogger profileLogger)
         {
             _composition = composition ?? throw new ArgumentNullException(nameof(composition));
             _composerTypes = composerTypes ?? throw new ArgumentNullException(nameof(composerTypes));

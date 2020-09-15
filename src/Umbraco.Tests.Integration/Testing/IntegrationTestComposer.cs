@@ -87,8 +87,8 @@ namespace Umbraco.Tests.Integration.Testing
         // replace the default so there is no background index rebuilder
         private class TestBackgroundIndexRebuilder : BackgroundIndexRebuilder
         {
-            public TestBackgroundIndexRebuilder(IMainDom mainDom, IProfilingLogger logger, IApplicationShutdownRegistry hostingEnvironment, IndexRebuilder indexRebuilder)
-                : base(mainDom, logger, hostingEnvironment, indexRebuilder)
+            public TestBackgroundIndexRebuilder(IMainDom mainDom, IProfilingLogger pLogger, IApplicationShutdownRegistry hostingEnvironment, IndexRebuilder indexRebuilder)
+                : base(mainDom, pLogger, hostingEnvironment, indexRebuilder)
             {
             }
 

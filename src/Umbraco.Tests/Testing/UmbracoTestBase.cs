@@ -4,12 +4,15 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Web.Http.Validation;
 using System.Web.Routing;
 using System.Web.Security;
 using System.Xml.Linq;
 using Examine;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
+using Serilog;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
@@ -60,6 +63,7 @@ using Umbraco.Web.Trees;
 using Current = Umbraco.Web.Composing.Current;
 using Umbraco.Tests.Common;
 using Umbraco.Core.Media;
+using ILogger = Umbraco.Core.Logging.ILogger;
 
 namespace Umbraco.Tests.Testing
 {
@@ -166,7 +170,7 @@ namespace Umbraco.Tests.Testing
 
             // FIXME: align to runtimes & components - don't redo everything here !!!! Yes this is getting painful
 
-            var (logger, profiler) = GetLoggers(Options.Logger);
+            var (logger, msLogger, profiler) = GetLoggers(Options.Logger);
             var proflogger = new ProfilingLogger(logger, profiler);
             IOHelper = TestHelper.IOHelper;
 
@@ -181,7 +185,7 @@ namespace Umbraco.Tests.Testing
 
 
             LocalizedTextService = new LocalizedTextService(new Dictionary<CultureInfo, Lazy<XDocument>>(), logger);
-            var typeLoader = GetTypeLoader(IOHelper, TypeFinder, appCaches.RuntimeCache, HostingEnvironment, logger, proflogger, Options.TypeLoader);
+            var typeLoader = GetTypeLoader(IOHelper, TypeFinder, appCaches.RuntimeCache, HostingEnvironment, msLogger, proflogger, Options.TypeLoader);
 
             var register = TestHelper.GetRegister();
 
@@ -252,30 +256,35 @@ namespace Umbraco.Tests.Testing
 
         #region Compose
 
-        protected virtual (ILogger, IProfiler) GetLoggers(UmbracoTestOptions.Logger option)
+        protected virtual (ILogger, Microsoft.Extensions.Logging.ILogger, IProfiler) GetLoggers(UmbracoTestOptions.Logger option)
         {
+            // TODO: Fix this, give the microsoft loggers a name
             ILogger logger;
+            Microsoft.Extensions.Logging.ILogger msLogger;
             IProfiler profiler;
 
             switch (option)
             {
                 case UmbracoTestOptions.Logger.Mock:
                     logger = Mock.Of<ILogger>();
+                    msLogger = Mock.Of<Microsoft.Extensions.Logging.ILogger>();
                     profiler = Mock.Of<IProfiler>();
                     break;
                 case UmbracoTestOptions.Logger.Serilog:
                     logger = new SerilogLogger<object>(new FileInfo(TestHelper.MapPathForTestFiles("~/unit-test.config")));
+                    msLogger = LoggerFactory.Create(builder => builder.AddSerilog()).CreateLogger("");
                     profiler = new LogProfiler(logger);
                     break;
                 case UmbracoTestOptions.Logger.Console:
                     logger = new ConsoleLogger<object>(new MessageTemplates());
+                    msLogger = LoggerFactory.Create(builder => builder.AddConsole()).CreateLogger("");
                     profiler = new LogProfiler(logger);
                     break;
                 default:
                     throw new NotSupportedException($"Logger option {option} is not supported.");
             }
 
-            return (logger, profiler);
+            return (logger, msLogger, profiler);
         }
 
         protected virtual AppCaches GetAppCaches()
@@ -369,7 +378,7 @@ namespace Umbraco.Tests.Testing
                 .ComposeCoreMappingProfiles();
         }
 
-        protected virtual TypeLoader GetTypeLoader(IIOHelper ioHelper, ITypeFinder typeFinder, IAppPolicyCache runtimeCache, IHostingEnvironment hostingEnvironment, ILogger<TypeLoader> logger, IProfilingLogger pLogger, UmbracoTestOptions.TypeLoader option)
+        protected virtual TypeLoader GetTypeLoader(IIOHelper ioHelper, ITypeFinder typeFinder, IAppPolicyCache runtimeCache, IHostingEnvironment hostingEnvironment, Microsoft.Extensions.Logging.ILogger logger, IProfilingLogger pLogger, UmbracoTestOptions.TypeLoader option)
         {
             switch (option)
             {
@@ -384,13 +393,13 @@ namespace Umbraco.Tests.Testing
             }
         }
 
-        protected virtual TypeLoader CreateTypeLoader(IIOHelper ioHelper, ITypeFinder typeFinder, IAppPolicyCache runtimeCache, ILogger<TypeLoader> logger, IProfilingLogger pLogger, IHostingEnvironment hostingEnvironment)
+        protected virtual TypeLoader CreateTypeLoader(IIOHelper ioHelper, ITypeFinder typeFinder, IAppPolicyCache runtimeCache, Microsoft.Extensions.Logging.ILogger logger, IProfilingLogger pLogger, IHostingEnvironment hostingEnvironment)
         {
             return CreateCommonTypeLoader(typeFinder, runtimeCache, logger, pLogger, hostingEnvironment);
         }
 
         // common to all tests = cannot be overriden
-        private static TypeLoader CreateCommonTypeLoader(ITypeFinder typeFinder, IAppPolicyCache runtimeCache, ILogger<TypeLoader> logger, IProfilingLogger pLogger, IHostingEnvironment hostingEnvironment)
+        private static TypeLoader CreateCommonTypeLoader(ITypeFinder typeFinder, IAppPolicyCache runtimeCache, Microsoft.Extensions.Logging.ILogger logger, IProfilingLogger pLogger, IHostingEnvironment hostingEnvironment)
         {
             return new TypeLoader(typeFinder, runtimeCache, new DirectoryInfo(hostingEnvironment.LocalTempPath), logger, pLogger, false, new[]
             {

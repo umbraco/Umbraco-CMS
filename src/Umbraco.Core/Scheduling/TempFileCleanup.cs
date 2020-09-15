@@ -4,6 +4,8 @@ using System.IO;
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
+using Microsoft.Extensions.Logging;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Umbraco.Web.Scheduling
 {
@@ -16,11 +18,11 @@ namespace Umbraco.Web.Scheduling
         private readonly TimeSpan _age;
         private readonly IMainDom _mainDom;
         private readonly IProfilingLogger _profilingLogger;
-        private readonly ILogger<TempFileCleanup> _logger;
+        private readonly ILogger _logger;
 
         public TempFileCleanup(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
             IEnumerable<DirectoryInfo> tempFolders, TimeSpan age,
-            IMainDom mainDom, IProfilingLogger profilingLogger, ILogger<TempFileCleanup> logger)
+            IMainDom mainDom, IProfilingLogger profilingLogger, ILogger logger)
             : base(runner, delayMilliseconds, periodMilliseconds)
         {
             //SystemDirectories.TempFileUploads
