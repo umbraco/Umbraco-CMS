@@ -21,8 +21,8 @@ namespace Umbraco.Web.Mvc
         {
         }
 
-        protected UmbracoAuthorizedController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger)
-            : base(globalSettings, umbracoContextAccessor, services, appCaches, profilingLogger)
+        protected UmbracoAuthorizedController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger, ILogger logger)
+            : base(globalSettings, umbracoContextAccessor, services, appCaches, profilingLogger, logger)
         {
         }
     }

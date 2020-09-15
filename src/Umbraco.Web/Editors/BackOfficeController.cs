@@ -44,12 +44,13 @@ namespace Umbraco.Web.Editors
             ServiceContext services,
             AppCaches appCaches,
             IProfilingLogger profilingLogger,
+            ILogger logger,
             IUmbracoVersion umbracoVersion,
             IContentSettings contentSettings,
             IHostingEnvironment hostingEnvironment,
             IRuntimeSettings settings,
             ISecuritySettings securitySettings)
-            : base(globalSettings, umbracoContextAccessor, services, appCaches, profilingLogger)
+            : base(globalSettings, umbracoContextAccessor, services, appCaches, profilingLogger, logger)
 
         {
             _features = features;

@@ -29,13 +29,14 @@ namespace Umbraco.Tests.Integration.TestServerTest
                             AppCaches.NoCache, // Disable caches in integration tests
                             testHelper.GetLoggingConfiguration(),
                             // TODO: Yep that's extremely ugly
-                            (configs, umbVersion, ioHelper, logger, profiler, hostingEnv, backOfficeInfo, typeFinder, appCaches, dbProviderFactoryCreator) =>
+                            (configs, umbVersion, ioHelper, logger, factory, profiler, hostingEnv, backOfficeInfo, typeFinder, appCaches, dbProviderFactoryCreator) =>
                             {
                                 var runtime = UmbracoIntegrationTest.CreateTestRuntime(
                                     configs,
                                     umbVersion,
                                     ioHelper,
                                     logger,
+                                    factory,
                                     profiler,
                                     hostingEnv,
                                     backOfficeInfo,
