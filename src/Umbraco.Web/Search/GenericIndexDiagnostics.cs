@@ -34,7 +34,8 @@ namespace Umbraco.Web.Search
             try
             {
                 var searcher = _index.GetSearcher();
-                var result = searcher.Search("test");
+                var testQuery = searcher.CreateQuery().SelectFirstFieldOnly().And().ManagedQuery("test");
+                var result = testQuery.Execute(1,0);
                 return Attempt<string>.Succeed(); //if we can search we'll assume it's healthy
             }
             catch (Exception e)
