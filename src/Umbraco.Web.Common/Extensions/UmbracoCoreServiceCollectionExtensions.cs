@@ -143,7 +143,7 @@ namespace Umbraco.Extensions
             services.Configure<NuCacheSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "NuCache"));
             services.Configure<RequestHandlerSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "RequestHandler"));
             services.Configure<RuntimeSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "Runtime"));
-            services.Configure<SecuritySettings>(configuration.GetSection(Constants.Configuration.ConfigSecurityPrefix));
+            services.Configure<SecuritySettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "Security"));
             services.Configure<TourSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "Tours"));
             services.Configure<TypeFinderSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "TypeFinder"));
             services.Configure<UserPasswordConfigurationSettings>(configuration.GetSection(Constants.Configuration.ConfigSecurityPrefix + "UserPassword"));
@@ -213,7 +213,7 @@ namespace Umbraco.Extensions
         /// <param name="requestCache"></param>
         /// <param name="httpContextAccessor"></param>
         /// <param name="loggingConfiguration"></param>
-        /// <param name="getRuntime">Delegate to create ana <see cref="IRuntime"/></param>
+        /// <param name="getRuntime">Delegate to create an <see cref="IRuntime"/></param>
         /// <param name="factory"></param>
         /// <returns></returns>
         public static IServiceCollection AddUmbracoCore(

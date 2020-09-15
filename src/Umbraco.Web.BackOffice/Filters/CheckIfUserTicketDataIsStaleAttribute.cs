@@ -66,19 +66,24 @@ namespace Umbraco.Web.BackOffice.Filters
 
                 await CheckStaleData(actionContext);
 
-                //we need new tokens and append the custom header if changes have been made
+                //return if nothing is updated
                 if (_requestCache.Get(nameof(CheckIfUserTicketDataIsStaleFilter)) is null)
                     return;
 
+                await UpdateTokesAndAppendCustomHeaders(actionContext);
+            }
+
+            private async Task UpdateTokesAndAppendCustomHeaders(ActionExecutingContext actionContext)
+            {
                 var tokenFilter =
                     new SetAngularAntiForgeryTokensAttribute.SetAngularAntiForgeryTokensFilter(_backOfficeAntiforgery,
                         _globalSettings);
-                await tokenFilter.OnActionExecutionAsync(actionContext, () => Task.FromResult(new ActionExecutedContext(actionContext, new List<IFilterMetadata>(), null)));
+                await tokenFilter.OnActionExecutionAsync(actionContext,
+                    () => Task.FromResult(new ActionExecutedContext(actionContext, new List<IFilterMetadata>(), null)));
 
                 //add the header
                 AppendUserModifiedHeaderAttribute.AppendHeader(actionContext);
             }
-
 
 
             private async Task CheckStaleData(ActionExecutingContext actionContext)

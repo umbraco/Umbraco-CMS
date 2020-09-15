@@ -164,7 +164,7 @@ namespace Umbraco.Web.Security
         public static AuthenticationTicket GetUmbracoAuthTicket(this IOwinContext ctx)
         {
             if (ctx == null) throw new ArgumentNullException(nameof(ctx));
-            return GetAuthTicket(ctx, /*Current.Configs.Security() TODO*/new SecuritySettings().AuthCookieName);
+            return GetAuthTicket(ctx, /*Current.Configs.Security() TODO introduce injection instead of default value*/new SecuritySettings().AuthCookieName);
         }
 
         private static AuthenticationTicket GetAuthTicket(this IOwinContext owinCtx, string cookieName)

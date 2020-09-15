@@ -4,7 +4,7 @@ namespace Umbraco.Core.Configuration.Models
 {
     public class ContentErrorPage
     {
-        //TODO introduce valiation, to check only one of key/id/xPath is used.
+        //TODO introduce validation, to check only one of key/id/xPath is used.
         public int ContentId { get; }
         public Guid ContentKey { get; }
         public string ContentXPath { get; }
