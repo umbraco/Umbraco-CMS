@@ -48,15 +48,18 @@ namespace Umbraco.Web.Editors
         public List<IconModel> GetAllIcons()
         {
             var icons = new List<IconModel>();
-            var directory = new DirectoryInfo(IOHelper.MapPath($"{GlobalSettings.IconsPath}/"));
-            var iconNames = directory.GetFiles("*.svg");
 
+            // add icons from plugins
             var appPlugins = new DirectoryInfo(IOHelper.MapPath(SystemDirectories.AppPlugins));
             var pluginIcons = appPlugins.Exists == false
-                ? Array.Empty<FileInfo>()
+                ? new List<FileInfo>()
                 : appPlugins.GetDirectories()
                     .SelectMany(x => x.GetDirectories("Icons", SearchOption.AllDirectories))
-                    .SelectMany(x => x.GetFiles("*.svg", SearchOption.TopDirectoryOnly));
+                    .SelectMany(x => x.GetFiles("*.svg", SearchOption.TopDirectoryOnly)).ToList();
+
+            // add icons from IconsPath if not already added from plugins
+            var directory = new DirectoryInfo(IOHelper.MapPath($"{GlobalSettings.IconsPath}/"));
+            var iconNames = directory.GetFiles("*.svg").Where(x => !pluginIcons.Any(i => i.Name == x.Name));
 
             iconNames = iconNames.Concat(pluginIcons).ToArray();
 
@@ -88,18 +91,18 @@ namespace Umbraco.Web.Editors
 
             if (iconPath.IsNullOrWhiteSpace())
             {
-                iconPath = IOHelper.MapPath($"{GlobalSettings.IconsPath}/{iconName}.svg");
-                if (!File.Exists(iconPath))
+                var appPlugins = new DirectoryInfo(IOHelper.MapPath(SystemDirectories.AppPlugins));
+                var pluginIcons = appPlugins.Exists == false
+                    ? Array.Empty<FileInfo>()
+                    : appPlugins.GetDirectories()
+                        .SelectMany(x => x.GetDirectories("Icons", SearchOption.AllDirectories))
+                        .SelectMany(x => x.GetFiles($"{iconName}.svg", SearchOption.TopDirectoryOnly));
+
+                iconPath = pluginIcons.FirstOrDefault()?.FullName;
+
+                if (iconPath.IsNullOrWhiteSpace())
                 {
-
-                    var appPlugins = new DirectoryInfo(IOHelper.MapPath(SystemDirectories.AppPlugins));
-                    var pluginIcons = appPlugins.Exists == false
-                        ? Array.Empty<FileInfo>()
-                        : appPlugins.GetDirectories()
-                            .SelectMany(x => x.GetDirectories("Icons", SearchOption.AllDirectories))
-                            .SelectMany(x => x.GetFiles($"{iconName}.svg", SearchOption.TopDirectoryOnly));
-
-                    iconPath = pluginIcons.FirstOrDefault()?.FullName;
+                    iconPath = IOHelper.MapPath($"{GlobalSettings.IconsPath}/{iconName}.svg");
                 }
             }
 
