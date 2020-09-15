@@ -49,19 +49,7 @@ namespace Umbraco.Web.Editors
         {
             var icons = new List<IconModel>();
 
-            // add icons from plugins
-            var appPlugins = new DirectoryInfo(IOHelper.MapPath(SystemDirectories.AppPlugins));
-            var pluginIcons = appPlugins.Exists == false
-                ? new List<FileInfo>()
-                : appPlugins.GetDirectories()
-                    .SelectMany(x => x.GetDirectories("Icons", SearchOption.AllDirectories))
-                    .SelectMany(x => x.GetFiles("*.svg", SearchOption.TopDirectoryOnly)).ToList();
-
-            // add icons from IconsPath if not already added from plugins
-            var directory = new DirectoryInfo(IOHelper.MapPath($"{GlobalSettings.IconsPath}/"));
-            var iconNames = directory.GetFiles("*.svg").Where(x => !pluginIcons.Any(i => i.Name == x.Name));
-
-            iconNames = iconNames.Concat(pluginIcons).ToArray();
+            var iconNames = GetAllIconNames();
 
             iconNames.OrderBy(f => f.Name).ToList().ForEach(iconInfo =>
             {
@@ -91,19 +79,8 @@ namespace Umbraco.Web.Editors
 
             if (iconPath.IsNullOrWhiteSpace())
             {
-                var appPlugins = new DirectoryInfo(IOHelper.MapPath(SystemDirectories.AppPlugins));
-                var pluginIcons = appPlugins.Exists == false
-                    ? Array.Empty<FileInfo>()
-                    : appPlugins.GetDirectories()
-                        .SelectMany(x => x.GetDirectories("Icons", SearchOption.AllDirectories))
-                        .SelectMany(x => x.GetFiles($"{iconName}.svg", SearchOption.TopDirectoryOnly));
-
-                iconPath = pluginIcons.FirstOrDefault()?.FullName;
-
-                if (iconPath.IsNullOrWhiteSpace())
-                {
-                    iconPath = IOHelper.MapPath($"{GlobalSettings.IconsPath}/{iconName}.svg");
-                }
+                var iconNames = GetAllIconNames();
+                iconPath = iconNames.FirstOrDefault(x => x.Name.InvariantEquals($"{iconName}.svg"))?.FullName;
             }
 
             if (!File.Exists(iconPath))
@@ -128,6 +105,26 @@ namespace Umbraco.Web.Editors
             {
                 return null;
             }
+        }
+
+        private List<FileInfo> GetAllIconNames()
+        {
+
+            // add icons from plugins
+            var appPlugins = new DirectoryInfo(IOHelper.MapPath(SystemDirectories.AppPlugins));
+            var pluginIcons = appPlugins.Exists == false
+                ? new List<FileInfo>()
+                : appPlugins.GetDirectories()
+                    .SelectMany(x => x.GetDirectories("Icons", SearchOption.AllDirectories))
+                    .SelectMany(x => x.GetFiles("*.svg", SearchOption.TopDirectoryOnly)).ToList();
+
+            // add icons from IconsPath if not already added from plugins
+            var directory = new DirectoryInfo(IOHelper.MapPath($"{GlobalSettings.IconsPath}/"));
+            var iconNames = directory.GetFiles("*.svg").Where(x => !pluginIcons.Any(i => i.Name == x.Name)).ToList();
+
+            iconNames = iconNames.Concat(pluginIcons).ToList();
+
+            return iconNames;
         }
     }
 }
