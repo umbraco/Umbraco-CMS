@@ -60,7 +60,6 @@ namespace Umbraco.Web.Cache
 
             // TODO: not sure I like these?
             TagsValueConverter.ClearCaches();
-            SliderValueConverter.ClearCaches();
 
             // refresh the models and cache
 
