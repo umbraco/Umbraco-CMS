@@ -139,8 +139,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         : $scope.model.config.startNode.type === "media"
             ? "Media"
             : "Document";
-    $scope.allowOpenButton = entityType === "Document";
-    $scope.allowEditButton = entityType === "Document";
+    $scope.allowOpenButton = entityType !== "Member";
     $scope.allowRemoveButton = true;
 
     //the dialog options for the picker
@@ -273,21 +272,6 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         }
     };
 
-    $scope.showNode = function (index) {
-        var item = $scope.renderModel[index];
-        var id = item.id;
-        var section = $scope.model.config.startNode.type.toLowerCase();
-
-        entityResource.getPath(id, entityType).then(function (path) {
-            navigationService.changeSection(section);
-            navigationService.showTree(section, {
-                tree: section, path: path, forceReload: false, activate: true
-            });
-            var routePath = section + "/" + section + "/edit/" + id.toString();
-            $location.path(routePath).search("");
-        });
-    }
-
     $scope.add = function (item) {
         var currIds = $scope.model.value ? $scope.model.value.split(',') : [];
 
@@ -303,7 +287,16 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         $scope.model.value = null;
     };
 
-    $scope.openContentEditor = function (node) {
+
+    $scope.openItemEditor = function (node) {
+        if (entityType === "Document") {
+            openContentEditor(node);
+        } else if (entityType === "Media") {
+            openMediaEditor(node);
+        }
+    };
+
+    function openContentEditor(node) {
         var contentEditor = {
             id: node.id,
             submit: function (model) {
@@ -322,6 +315,35 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
             }
         };
         editorService.contentEditor(contentEditor);
+    };
+
+    function openMediaEditor(node) {
+        var mediaEditor = {
+            id: node.id,
+            submit: function (model) {
+                // update the selected media item to match the saved media item
+                // the media picker is using media entities so we get the
+                // entity so we easily can format it for use in the media grid
+                if (model && model.mediaNode) {
+                    entityResource.getById(model.mediaNode.id, "Media")
+                        .then(function (mediaEntity) {
+                            // if an image is selecting more than once 
+                            // we need to update all the media items
+                            $scope.mediaItems.forEach(media => {
+                                if (media.id === model.mediaNode.id) {
+                                    angular.extend(media, mediaEntity);
+                                    media.thumbnail = mediaHelper.resolveFileFromEntity(media, true);
+                                }
+                            });
+                        });
+                }
+                editorService.close();
+            },
+            close: function () {
+                editorService.close();
+            }
+        };
+        editorService.mediaEditor(mediaEditor);
     };
 
     //when the scope is destroyed we need to unsubscribe
