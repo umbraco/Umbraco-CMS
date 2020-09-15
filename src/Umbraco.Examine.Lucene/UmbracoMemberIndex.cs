@@ -31,10 +31,12 @@ namespace Umbraco.Examine
             Directory luceneDirectory,
             Analyzer analyzer,
             IProfilingLogger profilingLogger,
+            ILogger<UmbracoExamineIndex> indexLogger,
+            ILogger<UmbracoExamineIndexDiagnostics> indexDiagnosticsLogger,
             IHostingEnvironment hostingEnvironment,
             IRuntimeState runtimeState,
             IValueSetValidator validator = null) :
-            base(name, luceneDirectory, fieldDefinitions, analyzer, profilingLogger, hostingEnvironment, runtimeState, validator)
+            base(name, luceneDirectory, fieldDefinitions, analyzer, profilingLogger, indexLogger, indexDiagnosticsLogger, hostingEnvironment, runtimeState, validator)
         {
         }
 
