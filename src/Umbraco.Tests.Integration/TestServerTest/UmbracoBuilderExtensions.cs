@@ -30,7 +30,6 @@ namespace Umbraco.Tests.Integration.TestServerTest
                         typeof(UmbracoBuilderExtensions).Assembly,
                         AppCaches.NoCache, // Disable caches in integration tests
                         testHelper.GetLoggingConfiguration(),
-                        // TODO: Yep that's extremely ugly
                         (globalSettings, connectionStrings, umbVersion, ioHelper, logger, profiler, hostingEnv,
                             backOfficeInfo, typeFinder, appCaches, dbProviderFactoryCreator) =>
                         {

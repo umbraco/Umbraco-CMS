@@ -40,8 +40,6 @@ namespace Umbraco.Web
         {
             if (!Umbraco.Composing.Current.IsInitialized)
             {
-                //var configFactory = new ConfigsFactory();
-
                 HostingSettings hostingSettings = null;
                 GlobalSettings globalSettings = null;
                 SecuritySettings securitySettings = null;
