@@ -30,7 +30,7 @@ namespace Umbraco.Core.HealthCheck.Checks
             new AcceptableConfiguration { IsRecommended = false, Value = DefaultFromEmail }
         };
 
-        public override string CurrentValue { get; set; }
+        public override string CurrentValue { get; }
 
         public override string CheckSuccessMessage => TextService.Localize("healthcheck/notificationEmailsCheckSuccessMessage", new[] { CurrentValue });
 

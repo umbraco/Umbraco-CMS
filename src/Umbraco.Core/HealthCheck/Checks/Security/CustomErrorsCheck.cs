@@ -29,7 +29,7 @@ namespace Umbraco.Core.HealthCheck.Checks.Security
             new AcceptableConfiguration { IsRecommended = false, Value = "On" }
         };
 
-        public override string CurrentValue { get; set; }
+        public override string CurrentValue { get; }
 
         public override string CheckSuccessMessage
         {

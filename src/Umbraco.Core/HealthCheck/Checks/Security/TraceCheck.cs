@@ -27,7 +27,7 @@ namespace Umbraco.Core.HealthCheck.Checks.Security
             new AcceptableConfiguration { IsRecommended = true, Value = bool.FalseString.ToLower() }
         };
 
-        public override string CurrentValue { get; set; }
+        public override string CurrentValue { get; }
 
         public override string CheckSuccessMessage => TextService.Localize("healthcheck/traceModeCheckSuccessMessage");
 

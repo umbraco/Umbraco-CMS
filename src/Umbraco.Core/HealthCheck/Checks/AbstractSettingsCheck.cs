@@ -26,7 +26,7 @@ namespace Umbraco.Core.HealthCheck.Checks
         /// <summary>
         /// Gets the current value of the config setting
         /// </summary>
-        public abstract string CurrentValue { get; set; }
+        public abstract string CurrentValue { get; }
 
         /// <summary>
         /// Gets the provided value
@@ -102,29 +102,13 @@ namespace Umbraco.Core.HealthCheck.Checks
 
         public override IEnumerable<HealthCheckStatus> GetStatus()
         {
-            //if (ValidIfConfigMissing)
-            //{
-            //    return new[]
-            //    {
-            //        new HealthCheckStatus(successMessage) { ResultType = StatusResultType.Success }
-            //    };
-            //}
-
-            //string errorMessage;
-            //return new[]
-            //{
-            //    new HealthCheckStatus(errorMessage) { ResultType = StatusResultType.Error }
-            //};
-
-
-            //remove configurationServiceNodeNotFound from dictionary
-            //remove configurationServiceError from dictionary
-
             // update the successMessage with the CurrentValue
             var successMessage = string.Format(CheckSuccessMessage, ItemPath, Values, CurrentValue);
             bool valueFound = Values.Any(value => string.Equals(CurrentValue, value.Value, StringComparison.InvariantCultureIgnoreCase));
 
-            if (ValueComparisonType == ValueComparisonType.ShouldEqual && valueFound || ValueComparisonType == ValueComparisonType.ShouldNotEqual && valueFound == false)
+            if (ValueComparisonType == ValueComparisonType.ShouldEqual
+                && valueFound || ValueComparisonType == ValueComparisonType.ShouldNotEqual
+                && valueFound == false)
             {
                 return new[]
                 {

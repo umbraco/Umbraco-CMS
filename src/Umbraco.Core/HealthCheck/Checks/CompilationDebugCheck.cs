@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using Microsoft.Extensions.Options;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 
@@ -9,12 +11,35 @@ namespace Umbraco.Core.HealthCheck.Checks
         Group = "Live Environment")]
     public class CompilationDebugCheck : AbstractSettingsCheck
     {
-        public CompilationDebugCheck(ILocalizedTextService textService, ILogger logger,IConfigurationService configurationService)
+        private readonly HostingSettings _hostingSettings;
+
+        public CompilationDebugCheck(ILocalizedTextService textService, ILogger logger,IConfigurationService configurationService, IOptions<HostingSettings> hostingSettings)
             : base(textService, logger, configurationService)
-        { }
+        {
+            _hostingSettings = hostingSettings.Value;
+        }
         public override IEnumerable<HealthCheckStatus> GetStatus()
         {
-            throw new System.NotImplementedException();
+            var status = new List<HealthCheckStatus>();
+            var actions = new List<HealthCheckAction>();
+
+            if (_hostingSettings.Debug == false)
+            {
+                status.Add(new HealthCheckStatus("Success")
+                {
+                    ResultType = StatusResultType.Success,
+                    Actions = actions
+                });
+            }
+            else
+            {
+                status.Add(new HealthCheckStatus("Error")
+                {
+                    ResultType = StatusResultType.Error,
+                    Actions = actions
+                });
+            }
+            return status;
         }
 
         public override string ItemPath => Constants.Configuration.ConfigHostingDebug;
@@ -30,7 +55,7 @@ namespace Umbraco.Core.HealthCheck.Checks
             }
         };
 
-        public override string CurrentValue { get; set; }
+        public override string CurrentValue => _hostingSettings.Debug.ToString();
 
         public override string CheckSuccessMessage => TextService.Localize("healthcheck/compilationDebugCheckSuccessMessage");
 

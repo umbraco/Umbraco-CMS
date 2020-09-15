@@ -10,13 +10,13 @@ using Umbraco.Core.Services;
 namespace Umbraco.Core.HealthCheck.Checks
 {
     [HealthCheck("D0F7599E-9B2A-4D9E-9883-81C7EDC5616F", "Macro errors",
-        Description = "Checks to make sure macro errors are not set to throw a YSOD (yellow screen of death), which would prevent certain or all pages from loading completely.",
+        Description =
+            "Checks to make sure macro errors are not set to throw a YSOD (yellow screen of death), which would prevent certain or all pages from loading completely.",
         Group = "Configuration")]
-    public class MacroErrorsCheck : HealthCheck
+    public class MacroErrorsCheck : AbstractSettingsCheck
     {
         private readonly ILocalizedTextService _textService;
         private readonly ILogger _logger;
-        private readonly IConfigurationService _configurationService;
         private readonly ContentSettings _contentSettings;
 
         /// <summary>
@@ -24,10 +24,12 @@ namespace Umbraco.Core.HealthCheck.Checks
         /// </summary>
         private string _currentValue = "MacroErrors";
 
+        public override string ItemPath { get; }
+
         /// <summary>
         /// Gets the values to compare against.
         /// </summary>
-        public IEnumerable<AcceptableConfiguration> Values
+        public override IEnumerable<AcceptableConfiguration> Values
         {
             get
             {
@@ -49,100 +51,19 @@ namespace Umbraco.Core.HealthCheck.Checks
             }
         }
 
-        public string CurrentValue { get; set; }
-
-        /// <summary>
-        /// Gets the provided value
-        /// </summary>
-        public string ProvidedValue { get; set; }
-
-        /// <summary>
-        /// Gets the comparison type for checking the value.
-        /// </summary>
-        public ValueComparisonType ValueComparisonType { get; }
-
-        public MacroErrorsCheck(ILocalizedTextService textService, ILogger logger, IConfigurationService configurationService, IOptions<ContentSettings> contentSettings)
+        public MacroErrorsCheck(ILocalizedTextService textService, ILogger logger,
+            IConfigurationService configurationService, IOptions<ContentSettings> contentSettings)
+            : base(textService, logger, configurationService)
         {
             _textService = textService;
             _logger = logger;
-            _configurationService = configurationService;
-            _contentSettings = contentSettings.Value;
+            _contentSettings = contentSettings != null
+                ? contentSettings.Value
+                : throw new ArgumentNullException(nameof(contentSettings));
         }
 
-        public override IEnumerable<HealthCheckStatus> GetStatus()
-        {
-            var status = new List<HealthCheckStatus>();
-            var actions = new List<HealthCheckAction>();
+        public override string CurrentValue => _contentSettings.MacroErrors.ToString();
 
-            if (_contentSettings.MacroErrors != MacroErrorBehaviour.Throw)
-            {
-                status.Add(new HealthCheckStatus("Success")
-                {
-                    ResultType = StatusResultType.Success,
-                    Actions = actions
-                });
-            }
-            else
-            {
-                status.Add(new HealthCheckStatus("Error")
-                {
-                    ResultType = StatusResultType.Error,
-                    Actions = actions
-                });
-            }
-            return status;
-
-
-            //if (ValidIfConfigMissing)
-            //{
-            //    return new[]
-            //    {
-            //        new HealthCheckStatus(successMessage) { ResultType = StatusResultType.Success }
-            //    };
-            //}
-
-            //string errorMessage;
-            //return new[]
-            //{
-            //    new HealthCheckStatus(errorMessage) { ResultType = StatusResultType.Error }
-            //};
-
-
-            //remove configurationServiceNodeNotFound from dictionary
-            //remove configurationServiceError from dictionary
-
-            // update the successMessage with the CurrentValue
-            var successMessage = string.Format(CheckSuccessMessage, Values, _currentValue);
-            bool valueFound = Values.Any(value => string.Equals(_currentValue, value.Value, StringComparison.InvariantCultureIgnoreCase));
-
-            if (ValueComparisonType == ValueComparisonType.ShouldEqual && valueFound || ValueComparisonType == ValueComparisonType.ShouldNotEqual && valueFound == false)
-            {
-                return new[]
-                {
-                    new HealthCheckStatus(successMessage)
-                    {
-                        ResultType = StatusResultType.Success
-                    }
-                };
-            }
-
-            // Declare the action for rectifying the config value
-            var rectifyAction = new HealthCheckAction("rectify", Id)
-            {
-                Name = _textService.Localize("healthcheck/rectifyButton"),
-                ValueRequired = CanRectifyWithValue
-            };
-
-            string resultMessage = string.Format(CheckErrorMessage, Values, _currentValue);
-            return new[]
-            {
-                new HealthCheckStatus(resultMessage)
-                {
-                    ResultType = StatusResultType.Error,
-                    Actions = CanRectify || CanRectifyWithValue ? new[] { rectifyAction } : new HealthCheckAction[0]
-                }
-            };
-        }
 
         public override HealthCheckStatus ExecuteAction(HealthCheckAction action)
         {
@@ -152,118 +73,44 @@ namespace Umbraco.Core.HealthCheck.Checks
         }
 
 
+        public override ValueComparisonType ValueComparisonType { get; }
+
         /// <summary>
         /// Gets the message for when the check has succeeded.
         /// </summary>
-        public virtual string CheckSuccessMessage
+        public override string CheckSuccessMessage
         {
             get
             {
-                return _textService.Localize("healthcheck/checkSuccessMessage", new[] { _currentValue, Values.First(v => v.IsRecommended).Value });
-
                 return _textService.Localize("healthcheck/macroErrorModeCheckSuccessMessage",
-                    new[] { _currentValue, Values.First(v => v.IsRecommended).Value });
+                    new[] {_currentValue, Values.First(v => v.IsRecommended).Value});
             }
         }
 
         /// <summary>
         /// Gets the message for when the check has failed.
         /// </summary>
-        public virtual string CheckErrorMessage
+        public override string CheckErrorMessage
         {
             get
             {
-                return ValueComparisonType == ValueComparisonType.ShouldEqual
-                    ? _textService.Localize("healthcheck/checkErrorMessageDifferentExpectedValue",
-                        new[] { _currentValue, Values.First(v => v.IsRecommended).Value })
-                    : _textService.Localize("healthcheck/checkErrorMessageUnexpectedValue",
-                        new[] { _currentValue, Values.First(v => v.IsRecommended).Value });
-
                 return _textService.Localize("healthcheck/macroErrorModeCheckErrorMessage",
-                    new[] { _currentValue, Values.First(v => v.IsRecommended).Value });
+                    new[] {_currentValue, Values.First(v => v.IsRecommended).Value});
             }
         }
 
         /// <summary>
         /// Gets the rectify success message.
         /// </summary>
-        public virtual string RectifySuccessMessage
+        public override string RectifySuccessMessage
         {
             get
             {
-                AcceptableConfiguration recommendedValue = Values.FirstOrDefault(v => v.IsRecommended);
-                string rectifiedValue = recommendedValue != null ? recommendedValue.Value : ProvidedValue;
-                return _textService.Localize("healthcheck/rectifySuccessMessage", new[] { _currentValue, rectifiedValue });
-
+                var recommendedValue = Values.FirstOrDefault(v => v.IsRecommended);
+                var rectifiedValue = recommendedValue != null ? recommendedValue.Value : ProvidedValue;
                 return _textService.Localize("healthcheck/macroErrorModeCheckRectifySuccessMessage",
-                    new[] { Values.First(v => v.IsRecommended).Value });
+                    new[] {Values.First(v => v.IsRecommended).Value});
             }
-        }
-
-        /// <summary>
-        /// Gets a value indicating whether this check can be rectified automatically.
-        /// </summary>
-        public virtual bool CanRectify => ValueComparisonType == ValueComparisonType.ShouldEqual;
-
-        /// <summary>
-        /// Gets a value indicating whether this check can be rectified automatically if a value is provided.
-        /// </summary>
-        public virtual bool CanRectifyWithValue => ValueComparisonType == ValueComparisonType.ShouldNotEqual;
-
-   
-
-        /// <summary>
-        /// Rectifies this check.
-        /// </summary>
-        /// <returns></returns>
-        public virtual HealthCheckStatus Rectify()
-        {
-            if (ValueComparisonType == ValueComparisonType.ShouldNotEqual)
-            {
-                throw new InvalidOperationException(_textService.Localize("healthcheck/cannotRectifyShouldNotEqual"));
-            }
-
-            var recommendedValue = Values.First(v => v.IsRecommended).Value;
-            return UpdateConfigurationValue(recommendedValue);
-        }
-
-        /// <summary>
-        /// Rectifies this check with a provided value.
-        /// </summary>
-        /// <param name="value">Value provided</param>
-        /// <returns></returns>
-        public virtual HealthCheckStatus Rectify(string value)
-        {
-            if (ValueComparisonType == ValueComparisonType.ShouldEqual)
-            {
-                throw new InvalidOperationException(
-                    _textService.Localize("healthcheck/cannotRectifyShouldEqualWithValue"));
-            }
-
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                throw new InvalidOperationException(_textService.Localize("healthcheck/valueToRectifyNotProvided"));
-            }
-
-            // Need to track provided value in order to correctly put together the rectify message
-            ProvidedValue = value;
-
-            return UpdateConfigurationValue(value);
-        }
-
-        //TODO: share code amongst health checks
-        private HealthCheckStatus UpdateConfigurationValue(string value)
-        {
-            ConfigurationServiceResult updateConfigFile = _configurationService.UpdateConfigFile(value);
-
-            if (updateConfigFile.Success == false)
-            {
-                var message = updateConfigFile.Result;
-                return new HealthCheckStatus(message) { ResultType = StatusResultType.Error };
-            }
-
-            string resultMessage = string.Format(RectifySuccessMessage, Values);
-            return new HealthCheckStatus(resultMessage) { ResultType = StatusResultType.Success };
         }
     }
 }
