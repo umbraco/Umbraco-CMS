@@ -132,7 +132,7 @@ namespace Umbraco.Web.Install.InstallSteps
         public override bool RequiresExecution(UserModel model)
         {
             //now we have to check if this is really a new install, the db might be configured and might contain data
-            var databaseSettings = _connectionStrings[Constants.System.UmbracoConnectionName];
+            var databaseSettings = _connectionStrings.UmbracoConnectionString;
             if (databaseSettings.IsConnectionStringConfigured() && _databaseBuilder.IsDatabaseConfigured)
                 return _databaseBuilder.HasSomeNonDefaultUser() == false;
 

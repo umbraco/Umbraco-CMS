@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Configuration.Models
@@ -13,19 +14,17 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Configuration.Models
         [TestCase(@"Server=(LocalDb)\Umbraco;Database=NetCore;Integrated Security=true", ExpectedResult = Constants.DbProviderNames.SqlServer)]
         public string ParseProviderName(string connectionString)
         {
-            var key = Constants.System.UmbracoConnectionName;
-
             var connectionStrings = new ConnectionStrings
             {
-                UmbracoConnectionString = connectionString
+                UmbracoConnectionString = new ConfigConnectionString(Constants.System.UmbracoConnectionName, connectionString)
             };
 
-            var actual = connectionStrings[key];
+            var actual = connectionStrings.UmbracoConnectionString;
 
             Assert.AreEqual(connectionString, actual.ConnectionString);
-            Assert.AreEqual(key, actual.Name);
+            Assert.AreEqual(Constants.System.UmbracoConnectionName, actual.Name);
 
-            return connectionStrings[key].ProviderName;
+            return connectionStrings.UmbracoConnectionString.ProviderName;
         }
     }
 }

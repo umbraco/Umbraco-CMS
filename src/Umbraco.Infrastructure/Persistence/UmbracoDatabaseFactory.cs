@@ -70,7 +70,7 @@ namespace Umbraco.Core.Persistence
         /// </summary>
         /// <remarks>Used by core runtime.</remarks>
         public UmbracoDatabaseFactory(ILogger logger, IOptions<GlobalSettings> globalSettings, IOptions<ConnectionStrings> connectionStrings, Lazy<IMapperCollection> mappers,IDbProviderFactoryCreator dbProviderFactoryCreator)
-            : this(logger, globalSettings.Value, connectionStrings.Value, Constants.System.UmbracoConnectionName, mappers, dbProviderFactoryCreator)
+            : this(logger, globalSettings.Value, connectionStrings.Value, mappers, dbProviderFactoryCreator)
         {
 
         }
@@ -79,17 +79,15 @@ namespace Umbraco.Core.Persistence
         /// Initializes a new instance of the <see cref="UmbracoDatabaseFactory"/>.
         /// </summary>
         /// <remarks>Used by the other ctor and in tests.</remarks>
-        public UmbracoDatabaseFactory(ILogger logger, GlobalSettings globalSettings, ConnectionStrings connectionStrings, string connectionStringName, Lazy<IMapperCollection> mappers, IDbProviderFactoryCreator dbProviderFactoryCreator)
+        public UmbracoDatabaseFactory(ILogger logger, GlobalSettings globalSettings, ConnectionStrings connectionStrings,  Lazy<IMapperCollection> mappers, IDbProviderFactoryCreator dbProviderFactoryCreator)
         {
-            if (connectionStringName == null) throw new ArgumentNullException(nameof(connectionStringName));
-            if (string.IsNullOrWhiteSpace(connectionStringName)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(connectionStringName));
 
             _globalSettings = globalSettings;
             _mappers = mappers ?? throw new ArgumentNullException(nameof(mappers));
             _dbProviderFactoryCreator = dbProviderFactoryCreator  ?? throw new ArgumentNullException(nameof(dbProviderFactoryCreator));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-            var settings = connectionStrings[connectionStringName];
+            var settings = connectionStrings.UmbracoConnectionString;
 
             if (settings == null)
             {

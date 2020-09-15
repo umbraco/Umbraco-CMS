@@ -471,7 +471,6 @@ namespace Umbraco.Tests.Testing
             Composition.RegisterUnique<IUmbracoDatabaseFactory>(f => new UmbracoDatabaseFactory(Logger,
                 globalSettings,
                 connectionStrings,
-                Constants.System.UmbracoConnectionName,
                 new Lazy<IMapperCollection>(f.GetInstance<IMapperCollection>),
                 TestHelper.DbProviderFactoryCreator));
 
