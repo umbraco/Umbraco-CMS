@@ -8,7 +8,7 @@ namespace Umbraco.Core.Configuration.HealthChecks
     [HealthCheck("9BED6EF4-A7F3-457A-8935-B64E9AA8BAB3", "Trace Mode",
         Description = "Leaving trace mode enabled can make valuable information about your system available to hackers.",
         Group = "Live Environment")]
-    public class TraceCheck : AbstractConfigCheck
+    public class TraceCheck : AbstractSettingsCheck
     {
         public TraceCheck(ILocalizedTextService textService, ILogger logger, IConfigurationService configurationService)
         : base(textService, logger, configurationService)

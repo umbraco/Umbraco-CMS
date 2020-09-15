@@ -7,7 +7,7 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Configuration.HealthChecks
 {
-    public abstract class AbstractConfigCheck : HealthCheck.HealthCheck
+    public abstract class AbstractSettingsCheck : HealthCheck.HealthCheck
     {
         protected IConfigurationService ConfigurationService { get; }
 
@@ -45,7 +45,7 @@ namespace Umbraco.Core.Configuration.HealthChecks
         /// </summary>
         public virtual bool ValidIfConfigMissing => false;
 
-        protected AbstractConfigCheck(ILocalizedTextService textService, ILogger logger, IConfigurationService configurationService)
+        protected AbstractSettingsCheck(ILocalizedTextService textService, ILogger logger, IConfigurationService configurationService)
         {
             TextService = textService;
             Logger = logger;

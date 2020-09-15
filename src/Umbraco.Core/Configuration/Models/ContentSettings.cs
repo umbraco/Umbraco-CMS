@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Macros;
 
 namespace Umbraco.Core.Configuration.Models

@@ -8,7 +8,7 @@ namespace Umbraco.Core.Configuration.HealthChecks
     [HealthCheck("3E2F7B14-4B41-452B-9A30-E67FBC8E1206", "Notification Email Settings",
         Description = "If notifications are used, the 'from' email address should be specified and changed from the default value.",
         Group = "Configuration")]
-    public class NotificationEmailCheck : AbstractConfigCheck
+    public class NotificationEmailCheck : AbstractSettingsCheck
     {
         private const string DefaultFromEmail = "your@email.here";
 

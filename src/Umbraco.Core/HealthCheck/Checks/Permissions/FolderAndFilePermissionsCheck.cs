@@ -96,7 +96,7 @@ namespace Umbraco.Core.HealthCheck.Checks.Permissions
 
             //now check the special folders
             var requiredPathCheckResult2 = _filePermissionHelper.EnsureDirectories(
-                GetPathsToCheck(pathsToCheckWithRestarts, PermissionCheckRequirement.Required), out var requiredFailedPaths2, writeCausesRestart:true);
+                GetPathsToCheck(pathsToCheckWithRestarts, PermissionCheckRequirement.Required), out var requiredFailedPaths2, writeCausesRestart: true);
             var optionalPathCheckResult2 = _filePermissionHelper.EnsureDirectories(
                 GetPathsToCheck(pathsToCheckWithRestarts, PermissionCheckRequirement.Optional), out var optionalFailedPaths2, writeCausesRestart: true);
 
@@ -138,9 +138,7 @@ namespace Umbraco.Core.HealthCheck.Checks.Permissions
                 .ToArray();
         }
 
-        private HealthCheckStatus GetStatus(bool requiredPathCheckResult, IEnumerable<string> requiredFailedPaths,
-            bool optionalPathCheckResult, IEnumerable<string> optionalFailedPaths,
-            PermissionCheckFor checkingFor)
+        private HealthCheckStatus GetStatus(bool requiredPathCheckResult, IEnumerable<string> requiredFailedPaths, bool optionalPathCheckResult, IEnumerable<string> optionalFailedPaths, PermissionCheckFor checkingFor)
         {
             // Return error if any required paths fail the check, or warning if any optional ones do
             var resultType = StatusResultType.Success;
@@ -163,12 +161,11 @@ namespace Umbraco.Core.HealthCheck.Checks.Permissions
             }
 
             var actions = new List<HealthCheckAction>();
-            return
-                new HealthCheckStatus(message)
-                {
-                    ResultType = resultType,
-                    Actions = actions
-                };
+            return new HealthCheckStatus(message)
+            {
+                ResultType = resultType,
+                Actions = actions
+            };
         }
 
         private string GetMessageForPathCheckFailure(string messageKey, IEnumerable<string> failedPaths)

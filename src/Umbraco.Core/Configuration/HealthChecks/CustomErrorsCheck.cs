@@ -9,7 +9,7 @@ namespace Umbraco.Core.Configuration.HealthChecks
     [HealthCheck("4090C0A1-2C52-4124-92DD-F028FD066A64", "Custom Errors",
         Description = "Leaving custom errors off will display a complete stack trace to your visitors if an exception occurs.",
         Group = "Live Environment")]
-    public class CustomErrorsCheck : AbstractConfigCheck
+    public class CustomErrorsCheck : AbstractSettingsCheck
     {
         public CustomErrorsCheck(ILocalizedTextService textService, ILogger logger, IConfigurationService configurationService)
             : base(textService, logger, configurationService)
