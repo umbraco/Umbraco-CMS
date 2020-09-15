@@ -6,67 +6,32 @@ using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Web.PropertyEditors;
 
 namespace Umbraco.Web.Compose
 {
+
+    /// <summary>
+    /// A component for NestedContent used to bind to events
+    /// </summary>
     public class NestedContentPropertyComponent : IComponent
     {
+        private ComplexPropertyEditorContentEventHandler _handler;
+
         public void Initialize()
         {
-            ContentService.Copying += ContentService_Copying;
-            ContentService.Saving += ContentService_Saving;
+            _handler = new ComplexPropertyEditorContentEventHandler(
+                Constants.PropertyEditors.Aliases.NestedContent,
+                CreateNestedContentKeys);
         }
 
-        private void ContentService_Copying(IContentService sender, CopyEventArgs<IContent> e)
-        {
-            // When a content node contains nested content property
-            // Check if the copied node contains a nested content
-            var nestedContentProps = e.Copy.Properties.Where(x => x.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.Aliases.NestedContent);
-            UpdateNestedContentProperties(nestedContentProps, false);
-        }
+        public void Terminate() => _handler?.Dispose();
 
-        private void ContentService_Saving(IContentService sender, ContentSavingEventArgs e)
-        {
-            // One or more content nodes could be saved in a bulk publish
-            foreach (var entity in e.SavedEntities)
-            {
-                // When a content node contains nested content property
-                // Check if the copied node contains a nested content
-                var nestedContentProps = entity.Properties.Where(x => x.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.Aliases.NestedContent);
-                UpdateNestedContentProperties(nestedContentProps, true);
-            }
-        }
+        private string CreateNestedContentKeys(string rawJson, bool onlyMissingKeys) => CreateNestedContentKeys(rawJson, onlyMissingKeys, null);
 
-        public void Terminate()
-        {
-            ContentService.Copying -= ContentService_Copying;
-            ContentService.Saving -= ContentService_Saving;
-        }
-
-        private void UpdateNestedContentProperties(IEnumerable<Property> nestedContentProps, bool onlyMissingKeys)
-        {
-            // Each NC Property on a doctype
-            foreach (var nestedContentProp in nestedContentProps)
-            {
-                // A NC Prop may have one or more values due to cultures
-                var propVals = nestedContentProp.Values;
-                foreach (var cultureVal in propVals)
-                {
-                    // Remove keys from published value & any nested NC's
-                    var updatedPublishedVal = CreateNestedContentKeys(cultureVal.PublishedValue?.ToString(), onlyMissingKeys);
-                    cultureVal.PublishedValue = updatedPublishedVal;
-
-                    // Remove keys from edited/draft value & any nested NC's
-                    var updatedEditedVal = CreateNestedContentKeys(cultureVal.EditedValue?.ToString(), onlyMissingKeys);
-                    cultureVal.EditedValue = updatedEditedVal;
-                }
-            }
-        }
-
-        
         // internal for tests
         internal string CreateNestedContentKeys(string rawJson, bool onlyMissingKeys, Func<Guid> createGuid = null)
         {
@@ -77,7 +42,7 @@ namespace Umbraco.Web.Compose
             if (string.IsNullOrWhiteSpace(rawJson) || !rawJson.DetectIsJson())
                 return rawJson;
 
-            // Parse JSON            
+            // Parse JSON
             var complexEditorValue = JToken.Parse(rawJson);
 
             UpdateNestedContentKeysRecursively(complexEditorValue, onlyMissingKeys, createGuid);
@@ -98,7 +63,6 @@ namespace Umbraco.Web.Compose
                 {
                     // get it's sibling 'key' property
                     var ncKeyVal = prop.Parent["key"] as JValue;
-                    // TODO: This bool seems odd, if the key is null, shouldn't we fill it in regardless of onlyMissingKeys?
                     if ((onlyMissingKeys && ncKeyVal == null) || (!onlyMissingKeys && ncKeyVal != null))
                     {
                         // create or replace
