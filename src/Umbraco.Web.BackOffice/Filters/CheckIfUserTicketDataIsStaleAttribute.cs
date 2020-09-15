@@ -67,7 +67,7 @@ namespace Umbraco.Web.BackOffice.Filters
                 await CheckStaleData(actionContext);
 
                 //we need new tokens and append the custom header if changes have been made
-                if (!(_requestCache.Get(nameof(CheckIfUserTicketDataIsStaleFilter)) is null))
+                if (_requestCache.Get(nameof(CheckIfUserTicketDataIsStaleFilter)) is null)
                     return;
 
                 var tokenFilter =
@@ -83,10 +83,7 @@ namespace Umbraco.Web.BackOffice.Filters
 
             private async Task CheckStaleData(ActionExecutingContext actionContext)
             {
-                if (actionContext == null
-                    || actionContext.HttpContext.Request == null
-                    || actionContext.HttpContext.User == null
-                    || actionContext.HttpContext.User.Identity == null)
+                if (actionContext?.HttpContext.Request == null || actionContext.HttpContext.User?.Identity == null)
                 {
                     return;
                 }
