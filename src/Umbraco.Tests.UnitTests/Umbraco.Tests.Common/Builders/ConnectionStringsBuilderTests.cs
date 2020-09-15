@@ -10,7 +10,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Tests.Common.Builders
         public void Is_Built_Correctly()
         {
             // Arrange
-            const string umbracoConnectionString = "connection string";
+            const string umbracoConnectionString = "Server=(LocalDB)\\Umbraco;Database=FakeName;Integrated Security=true";
 
             var builder = new ConnectionStringsBuilder();
 
@@ -20,7 +20,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Tests.Common.Builders
                 .Build();
 
             // Assert
-            Assert.AreEqual(umbracoConnectionString, connectionStrings.UmbracoConnectionString);
+            Assert.AreEqual(umbracoConnectionString, connectionStrings.UmbracoConnectionString.ConnectionString);
         }
     }
 }
