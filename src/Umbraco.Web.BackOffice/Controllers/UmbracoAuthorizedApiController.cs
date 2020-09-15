@@ -18,7 +18,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     [UmbracoAuthorize]
     [DisableBrowserCache]
     [UmbracoWebApiRequireHttps]
-    //[CheckIfUserTicketDataIsStale] //TODO reintroduce
+    [CheckIfUserTicketDataIsStale]
     //[UnhandedExceptionLoggerConfiguration] //TODO reintroduce
     //[EnableDetailedErrors] //TODO reintroduce
     public abstract class UmbracoAuthorizedApiController : UmbracoApiController
