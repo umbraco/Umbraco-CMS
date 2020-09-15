@@ -13,6 +13,8 @@ using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Directory = Lucene.Net.Store.Directory;
+using Microsoft.Extensions.Logging;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Umbraco.Examine
 {
@@ -22,7 +24,8 @@ namespace Umbraco.Examine
     /// </summary>
     public abstract class UmbracoExamineIndex : LuceneIndex, IUmbracoIndex, IIndexDiagnostics
     {
-        private readonly ILogger<UmbracoExamineIndex> _logger;
+        private readonly ILogger _logger;
+        private readonly ILoggerFactory _loggerFactory;
 
         private readonly IRuntimeState _runtimeState;
         // note
@@ -40,7 +43,8 @@ namespace Umbraco.Examine
         /// <param name="luceneDirectory"></param>
         /// <param name="defaultAnalyzer"></param>
         /// <param name="profilingLogger"></param>
-        /// <param name="_logger"></param>
+        /// <param name="logger"></param>
+        /// <param name="loggerFactory"></param>
         /// <param name="hostingEnvironment"></param>
         /// <param name="runtimeState"></param>
         /// <param name="validator"></param>
@@ -51,15 +55,16 @@ namespace Umbraco.Examine
             FieldDefinitionCollection fieldDefinitions,
             Analyzer defaultAnalyzer,
             IProfilingLogger profilingLogger,
-            ILogger<UmbracoExamineIndex> _logger,
-            ILogger<UmbracoExamineIndexDiagnostics> _examineIndexLogger,
+            ILogger logger,
+            ILoggerFactory loggerFactory,
             IHostingEnvironment hostingEnvironment,
             IRuntimeState runtimeState,
             IValueSetValidator validator = null,
             IReadOnlyDictionary<string, IFieldValueTypeFactory> indexValueTypes = null)
             : base(name, luceneDirectory, fieldDefinitions, defaultAnalyzer, validator, indexValueTypes)
         {
-            this._logger = _logger;
+            _logger = logger;
+            _loggerFactory = loggerFactory;
             _runtimeState = runtimeState;
             ProfilingLogger = profilingLogger ?? throw new ArgumentNullException(nameof(profilingLogger));
 
@@ -67,7 +72,7 @@ namespace Umbraco.Examine
             if (luceneDirectory is FSDirectory fsDir)
                 LuceneIndexFolder = fsDir.Directory;
 
-            _diagnostics = new UmbracoExamineIndexDiagnostics(this, _examineIndexLogger, hostingEnvironment);
+            _diagnostics = new UmbracoExamineIndexDiagnostics(this, _loggerFactory.CreateLogger("UmbracoExamineIndexDiagnostics"), hostingEnvironment);
         }
 
         private readonly bool _configBased = false;

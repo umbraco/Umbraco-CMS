@@ -1,10 +1,12 @@
 ﻿using Examine;
 using Lucene.Net.Analysis;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Directory = Lucene.Net.Store.Directory;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Umbraco.Examine
 {
@@ -31,12 +33,12 @@ namespace Umbraco.Examine
             Directory luceneDirectory,
             Analyzer analyzer,
             IProfilingLogger profilingLogger,
-            ILogger<UmbracoExamineIndex> indexLogger,
-            ILogger<UmbracoExamineIndexDiagnostics> indexDiagnosticsLogger,
+            ILogger logger,
+            ILoggerFactory loggerFactory,
             IHostingEnvironment hostingEnvironment,
             IRuntimeState runtimeState,
             IValueSetValidator validator = null) :
-            base(name, luceneDirectory, fieldDefinitions, analyzer, profilingLogger, indexLogger, indexDiagnosticsLogger, hostingEnvironment, runtimeState, validator)
+            base(name, luceneDirectory, fieldDefinitions, analyzer, profilingLogger, logger, loggerFactory, hostingEnvironment, runtimeState, validator)
         {
         }
 

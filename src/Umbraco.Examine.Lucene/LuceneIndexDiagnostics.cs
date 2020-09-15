@@ -7,6 +7,8 @@ using Umbraco.Core.IO;
 using System.Linq;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Hosting;
+using Microsoft.Extensions.Logging;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Umbraco.Examine
 {
@@ -14,7 +16,7 @@ namespace Umbraco.Examine
     {
         private readonly IHostingEnvironment _hostingEnvironment;
 
-        public LuceneIndexDiagnostics(LuceneIndex index, ILogger<LuceneIndexDiagnostics> logger, IHostingEnvironment hostingEnvironment)
+        public LuceneIndexDiagnostics(LuceneIndex index, ILogger logger, IHostingEnvironment hostingEnvironment)
         {
             _hostingEnvironment = hostingEnvironment;
             Index = index;
@@ -22,7 +24,7 @@ namespace Umbraco.Examine
         }
 
         public LuceneIndex Index { get; }
-        public ILogger<LuceneIndexDiagnostics> Logger { get; }
+        public ILogger Logger { get; }
 
         public int DocumentCount
         {
