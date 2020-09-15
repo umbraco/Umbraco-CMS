@@ -53,7 +53,6 @@
         testCases.forEach(function(test){
             
             it('Expects \'' + test.input + '\' to be truncated as \''+ test.expectedResult + '\', when noOfChars=' + test.noOfChars + ', and appendDots=' + test.appendDots, function() {
-                console.log($truncate(test.input, test.noOfChars, test.appendDots));
                 expect($truncate(test.input, test.noOfChars, test.appendDots)).toBe(test.expectedResult);
             });
         });
