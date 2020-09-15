@@ -256,13 +256,15 @@ namespace Umbraco.Tests.Runtimes
 
             // create the very basic and essential things we need
             var logger = new ConsoleLogger<StandaloneTests>(new MessageTemplates());
+            var composerLogger = new ConsoleLogger<Composers>(new MessageTemplates());
+            var typeLoaderLogger = new ConsoleLogger<TypeLoader>(new MessageTemplates());
             var profiler = Mock.Of<IProfiler>();
             var profilingLogger = new ProfilingLogger(logger, profiler);
             var appCaches = AppCaches.Disabled;
             var databaseFactory = Mock.Of<IUmbracoDatabaseFactory>();
             var typeFinder = TestHelper.GetTypeFinder();
             var ioHelper = TestHelper.IOHelper;
-            var typeLoader = new TypeLoader(typeFinder, appCaches.RuntimeCache, new DirectoryInfo(ioHelper.MapPath("~/App_Data/TEMP")), profilingLogger);
+            var typeLoader = new TypeLoader(typeFinder, appCaches.RuntimeCache, new DirectoryInfo(ioHelper.MapPath("~/App_Data/TEMP")), typeLoaderLogger, profilingLogger);
             var runtimeState = Mock.Of<IRuntimeState>();
             var hostingEnvironment = Mock.Of<IHostingEnvironment>();
             var backOfficeInfo = TestHelper.GetBackOfficeInfo();

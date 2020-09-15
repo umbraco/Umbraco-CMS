@@ -256,7 +256,7 @@ namespace Umbraco.Tests.Integration.Testing
             OnTestTearDown(() => runtime.Terminate());
 
             // This will create a db, install the schema and ensure the app is configured to run
-            InstallTestLocalDb(args.DatabaseFactory, runtime.ProfilingLogger, runtime.Configs.Global(), runtime.State, TestHelper.WorkingDirectory, out var connectionString);
+            InstallTestLocalDb(args.DatabaseFactory, runtime.Logger, runtime.Configs.Global(), runtime.State, TestHelper.WorkingDirectory, out var connectionString);
             TestDBConnectionString = connectionString;
             InMemoryConfiguration["ConnectionStrings:" + Constants.System.UmbracoConnectionName] = TestDBConnectionString;
         }

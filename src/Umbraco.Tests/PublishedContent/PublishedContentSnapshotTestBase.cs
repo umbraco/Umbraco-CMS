@@ -46,11 +46,11 @@ namespace Umbraco.Tests.PublishedContent
             Composition.RegisterUnique<IPublishedModelFactory>(f => new PublishedModelFactory(f.GetInstance<TypeLoader>().GetTypes<PublishedContentModel>(), f.GetInstance<IPublishedValueFallback>()));
         }
 
-        protected override TypeLoader CreateTypeLoader(IIOHelper ioHelper, ITypeFinder typeFinder, IAppPolicyCache runtimeCache,IProfilingLogger logger,  IHostingEnvironment hostingEnvironment)
+        protected override TypeLoader CreateTypeLoader(IIOHelper ioHelper, ITypeFinder typeFinder, IAppPolicyCache runtimeCache,IProfilingLogger pLogger,  IHostingEnvironment hostingEnvironment)
         {
-            var baseLoader = base.CreateTypeLoader(ioHelper, typeFinder, runtimeCache, logger, hostingEnvironment);
+            var baseLoader = base.CreateTypeLoader(ioHelper, typeFinder, runtimeCache, pLogger, hostingEnvironment);
 
-            return new TypeLoader(typeFinder, runtimeCache, new DirectoryInfo(hostingEnvironment.LocalTempPath), logger, false,
+            return new TypeLoader(typeFinder, runtimeCache, new DirectoryInfo(hostingEnvironment.LocalTempPath), pLogger, false,
                 // this is so the model factory looks into the test assembly
                 baseLoader.AssembliesToScan
                     .Union(new[] {typeof(PublishedContentMoreTests).Assembly})

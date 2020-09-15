@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -11,6 +12,8 @@ using Umbraco.Core.Collections;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using File = System.IO.File;
+using Microsoft.Extensions.Logging;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Umbraco.Core.Composing
 {
@@ -28,7 +31,7 @@ namespace Umbraco.Core.Composing
         private const string CacheKey = "umbraco-types.list";
 
         private readonly IAppPolicyCache _runtimeCache;
-        private readonly ILogger<TypeLoader> _logger;
+        private readonly ILogger _logger;
         private readonly IProfilingLogger _profilingLogger;
 
         private readonly Dictionary<CompositeTypeTypeKey, TypeList> _types = new Dictionary<CompositeTypeTypeKey, TypeList>();
@@ -52,7 +55,7 @@ namespace Umbraco.Core.Composing
         /// <param name="localTempPath">Files storage location.</param>
         /// <param name="logger">A profiling logger.</param>
         /// <param name="assembliesToScan"></param>
-        public TypeLoader(ITypeFinder typeFinder, IAppPolicyCache runtimeCache, DirectoryInfo localTempPath, ILogger<TypeLoader> logger, IProfilingLogger profilingLogger, IEnumerable<Assembly> assembliesToScan = null)
+        public TypeLoader(ITypeFinder typeFinder, IAppPolicyCache runtimeCache, DirectoryInfo localTempPath, ILogger logger, IProfilingLogger profilingLogger, IEnumerable<Assembly> assembliesToScan = null)
             : this(typeFinder, runtimeCache, localTempPath, logger, profilingLogger, true, assembliesToScan)
         { }
 
@@ -65,7 +68,7 @@ namespace Umbraco.Core.Composing
         /// <param name="logger">A profiling logger.</param>
         /// <param name="detectChanges">Whether to detect changes using hashes.</param>
         /// <param name="assembliesToScan"></param>
-        public TypeLoader(ITypeFinder typeFinder, IAppPolicyCache runtimeCache, DirectoryInfo localTempPath, ILogger<TypeLoader> logger, IProfilingLogger profilingLogger, bool detectChanges, IEnumerable<Assembly> assembliesToScan = null)
+        public TypeLoader(ITypeFinder typeFinder, IAppPolicyCache runtimeCache, DirectoryInfo localTempPath, ILogger logger, IProfilingLogger profilingLogger, bool detectChanges, IEnumerable<Assembly> assembliesToScan = null)
         {
             TypeFinder = typeFinder ?? throw new ArgumentNullException(nameof(typeFinder));
             _runtimeCache = runtimeCache ?? throw new ArgumentNullException(nameof(runtimeCache));

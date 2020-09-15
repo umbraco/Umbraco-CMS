@@ -6,6 +6,8 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
+using Microsoft.Extensions.Logging;
+using ILogger =  Microsoft.Extensions.Logging.ILogger;
 
 namespace Umbraco.Web.PublishedCache
 {
@@ -23,11 +25,11 @@ namespace Umbraco.Web.PublishedCache
         private readonly IMediaTypeService _mediaTypeService;
         private readonly IMemberTypeService _memberTypeService;
         private readonly IPublishedContentTypeFactory _publishedContentTypeFactory;
-        private readonly ILogger<PublishedContentTypeCache> _logger;
+        private readonly ILogger _logger;
         private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
 
         // default ctor
-        public PublishedContentTypeCache(IContentTypeService contentTypeService, IMediaTypeService mediaTypeService, IMemberTypeService memberTypeService, IPublishedContentTypeFactory publishedContentTypeFactory, ILogger<PublishedContentTypeCache> logger)
+        public PublishedContentTypeCache(IContentTypeService contentTypeService, IMediaTypeService mediaTypeService, IMemberTypeService memberTypeService, IPublishedContentTypeFactory publishedContentTypeFactory, ILogger logger)
         {
             _contentTypeService = contentTypeService;
             _mediaTypeService = mediaTypeService;
@@ -37,7 +39,7 @@ namespace Umbraco.Web.PublishedCache
         }
 
         // for unit tests ONLY
-        internal PublishedContentTypeCache(ILogger<PublishedContentTypeCache> logger, IPublishedContentTypeFactory publishedContentTypeFactory)
+        internal PublishedContentTypeCache(ILogger logger, IPublishedContentTypeFactory publishedContentTypeFactory)
         {
             _logger = logger;
             _publishedContentTypeFactory = publishedContentTypeFactory;

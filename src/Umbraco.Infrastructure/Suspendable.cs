@@ -38,7 +38,7 @@ namespace Umbraco.Web
             {
                 _suspended = false;
 
-                LoggerExtensions.LogInformation(Current.Logger, "Resume document cache (reload:{Tried}).", _tried);
+                Current.Logger.LogInformation("Resume document cache (reload:{Tried}).", _tried);
 
                 if (_tried == false) return;
                 _tried = false;
@@ -74,7 +74,7 @@ namespace Umbraco.Web
             {
                 _suspended = false;
 
-                LoggerExtensions.LogInformation(logger, "Resume indexers (rebuild:{Tried}).", _tried);
+                Current.Logger.LogInformation("Resume indexers (rebuild:{Tried}).", _tried);
 
                 if (_tried == false) return;
                 _tried = false;

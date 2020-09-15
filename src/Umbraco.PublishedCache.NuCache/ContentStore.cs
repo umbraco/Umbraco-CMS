@@ -5,12 +5,13 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpTest.Net.Collections;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Exceptions;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Scoping;
 using Umbraco.Web.PublishedCache.NuCache.Snap;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Umbraco.Web.PublishedCache.NuCache
 {
@@ -35,6 +36,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
         private readonly IVariationContextAccessor _variationContextAccessor;
+        private readonly ILogger _logger;
+        private readonly ILoggerFactory _loggerFactory;
         private readonly ConcurrentDictionary<int, LinkedNode<ContentNode>> _contentNodes;
         private LinkedNode<ContentNode> _root;
 
@@ -46,8 +49,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly ConcurrentDictionary<Guid, int> _contentTypeKeyToIdMap;
         private readonly ConcurrentDictionary<Guid, int> _contentKeyToIdMap;
 
-        private readonly ILogger<ContentStore> _logger;
-        private readonly ILogger<Snapshot> _snapShotLogger;
         private readonly IPublishedModelFactory _publishedModelFactory;
         private BPlusTree<int, ContentNodeKit> _localDb;
         private readonly ConcurrentQueue<GenObj> _genObjs;
@@ -68,15 +69,15 @@ namespace Umbraco.Web.PublishedCache.NuCache
         public ContentStore(
             IPublishedSnapshotAccessor publishedSnapshotAccessor,
             IVariationContextAccessor variationContextAccessor,
-            ILogger<ContentStore> logger,
-            ILogger<Snapshot> snapShotLogger,
+            ILogger logger,
+            ILoggerFactory loggerFactory,
             IPublishedModelFactory publishedModelFactory,
             BPlusTree<int, ContentNodeKit> localDb = null)
         {
             _publishedSnapshotAccessor = publishedSnapshotAccessor;
             _variationContextAccessor = variationContextAccessor;
             _logger = logger;
-            _snapShotLogger = snapShotLogger;
+            _loggerFactory = loggerFactory;
             _publishedModelFactory = publishedModelFactory;
             _localDb = localDb;
 
@@ -1311,7 +1312,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 if (_nextGen == false && _genObj != null)
                     return new Snapshot(this, _genObj.GetGenRef()
 #if DEBUG
-                        , _snapShotLogger
+                        , _loggerFactory.CreateLogger("Snapshot")
 #endif
                         );
 
@@ -1347,7 +1348,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
                 var snapshot = new Snapshot(this, _genObj.GetGenRef()
 #if DEBUG
-                    , _snapShotLogger
+                    , _loggerFactory.CreateLogger("Snapshot")
 #endif
                     );
 
@@ -1361,7 +1362,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public Snapshot LiveSnapshot => new Snapshot(this, _liveGen
 #if DEBUG
-            , _snapShotLogger
+            , _loggerFactory.CreateLogger("Snapshot")
 #endif
         );
 
@@ -1549,7 +1550,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             private readonly GenRef _genRef;
             private long _gen;
 #if DEBUG
-            private readonly ILogger<Snapshot> _logger;
+            private readonly ILogger _logger;
 #endif
 
             //private static int _count;
@@ -1557,7 +1558,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             internal Snapshot(ContentStore store, GenRef genRef
 #if DEBUG
-                    , ILogger<Snapshot> logger
+                    , ILogger logger
 #endif
                 )
             {
@@ -1575,7 +1576,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             internal Snapshot(ContentStore store, long gen
 #if DEBUG
-                , ILogger<Snapshot> logger
+                , ILogger logger
 #endif
                 )
             {

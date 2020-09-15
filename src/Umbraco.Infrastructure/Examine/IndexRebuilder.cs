@@ -14,12 +14,14 @@ namespace Umbraco.Examine
     /// </summary>
     public class IndexRebuilder
     {
-        private readonly IProfilingLogger _logger;
+        private readonly IProfilingLogger _pLogger;
+        private readonly ILogger<IndexRebuilder> _logger;
         private readonly IEnumerable<IIndexPopulator> _populators;
         public IExamineManager ExamineManager { get; }
 
-        public IndexRebuilder(IProfilingLogger logger, IExamineManager examineManager, IEnumerable<IIndexPopulator> populators)
+        public IndexRebuilder(IProfilingLogger pLogger, ILogger<IndexRebuilder> logger, IExamineManager examineManager, IEnumerable<IIndexPopulator> populators)
         {
+            _pLogger = pLogger;
             _populators = populators;
             _logger = logger;
             ExamineManager = examineManager;
@@ -65,7 +67,7 @@ namespace Umbraco.Examine
                 }
                 catch (Exception e)
                 {
-                    _logger.LogError<IndexRebuilder>(e, "Index populating failed for populator {Populator}", populator.GetType());
+                    _logger.LogError("Index populating failed for populator {Populator}", populator.GetType());
                 }
             }
         }

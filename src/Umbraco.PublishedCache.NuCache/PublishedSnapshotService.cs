@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpTest.Net.Collections;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
@@ -42,8 +43,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly IProfilingLogger _profilingLogger;
         private readonly IScopeProvider _scopeProvider;
         private readonly IDataSource _dataSource;
-        private readonly ILogger<PublishedSnapshotService> _logger;
-        private readonly ILogger<PublishedContentTypeCache> _publishedContentTypeCacheLogger;
+        private readonly Core.Logging.ILogger<PublishedSnapshotService> _logger;
+        private readonly ILoggerFactory _loggerFactory;
         private readonly IDocumentRepository _documentRepository;
         private readonly IMediaRepository _mediaRepository;
         private readonly IMemberRepository _memberRepository;
@@ -84,7 +85,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
         public PublishedSnapshotService(PublishedSnapshotServiceOptions options, IMainDom mainDom, IRuntimeState runtime,
             ServiceContext serviceContext, IPublishedContentTypeFactory publishedContentTypeFactory,
             IPublishedSnapshotAccessor publishedSnapshotAccessor, IVariationContextAccessor variationContextAccessor,
-            IProfilingLogger profilingLogger, ILogger<PublishedSnapshotService> logger, ILogger<ContentStore> contentLogger, ILogger<ContentStore.Snapshot> snapshotLogger, ILogger<PublishedContentTypeCache> publishedContentTypeCacheLogger,
+            IProfilingLogger profilingLogger, Core.Logging.ILogger<PublishedSnapshotService> logger,
+            ILoggerFactory loggerFactory,
             IScopeProvider scopeProvider,
             IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository,
             IDefaultCultureAccessor defaultCultureAccessor,
@@ -106,7 +108,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _profilingLogger = profilingLogger;
             _dataSource = dataSource;
             _logger = logger;
-            _publishedContentTypeCacheLogger = publishedContentTypeCacheLogger;
+            _loggerFactory = loggerFactory;
             _scopeProvider = scopeProvider;
             _documentRepository = documentRepository;
             _mediaRepository = mediaRepository;
@@ -152,16 +154,16 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     // figure out whether it can read the databases or it should populate them from sql
                     
                     _logger.LogInformation("Creating the content store, localContentDbExists? {LocalContentDbExists}", _localContentDbExists);
-                    _contentStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, contentLogger, snapshotLogger,  publishedModelFactory, _localContentDb);
+                    _contentStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, _loggerFactory.CreateLogger("ContentStore"), _loggerFactory,  publishedModelFactory, _localContentDb);
                     _logger.LogInformation("Creating the media store, localMediaDbExists? {LocalMediaDbExists}", _localMediaDbExists);
-                    _mediaStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, contentLogger, snapshotLogger, publishedModelFactory, _localMediaDb);
+                    _mediaStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, _loggerFactory.CreateLogger("ContentStore"), _loggerFactory, publishedModelFactory, _localMediaDb);
                 }
                 else
                 {
                     _logger.LogInformation("Creating the content store (local db ignored)");
-                    _contentStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, contentLogger, snapshotLogger, publishedModelFactory);
+                    _contentStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, _loggerFactory.CreateLogger("ContentStore"), _loggerFactory, publishedModelFactory);
                     _logger.LogInformation("Creating the media store (local db ignored)");
-                    _mediaStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, contentLogger, snapshotLogger, publishedModelFactory);
+                    _mediaStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, _loggerFactory.CreateLogger("ContentStore"), _loggerFactory, publishedModelFactory);
                 }
 
                 _domainStore = new SnapDictionary<int, Domain>();
@@ -1235,7 +1237,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             var snapshotCache = new DictionaryAppCache();
 
-            var memberTypeCache = new PublishedContentTypeCache(null, null, _serviceContext.MemberTypeService, _publishedContentTypeFactory, _publishedContentTypeCacheLogger);
+            var memberTypeCache = new PublishedContentTypeCache(null, null, _serviceContext.MemberTypeService, _publishedContentTypeFactory, _loggerFactory.CreateLogger("PublishedContentTypeCache"));
 
             var defaultCulture = _defaultCultureAccessor.DefaultCulture;
             var domainCache = new DomainCache(domainSnap, defaultCulture);
