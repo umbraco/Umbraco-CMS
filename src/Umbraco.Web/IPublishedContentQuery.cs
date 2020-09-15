@@ -60,6 +60,7 @@ namespace Umbraco.Web
         /// <param name="totalRecords">The total amount of records.</param>
         /// <param name="culture">The culture (defaults to a culture insensitive search).</param>
         /// <param name="indexName">The name of the index to search (defaults to <see cref="Constants.UmbracoIndexes.ExternalIndexName" />).</param>
+        /// <param name="loadedFields">The fields to load in the results of the search (defaults to all fields loaded).</param>
         /// <returns>
         /// The search results.
         /// </returns>
@@ -71,7 +72,7 @@ namespace Umbraco.Web
         /// </para>
         /// <para>While enumerating results, the ambient culture is changed to be the searched culture.</para>
         /// </remarks>
-        IEnumerable<PublishedSearchResult> Search(string term, int skip, int take, out long totalRecords, string culture = "*", string indexName = Constants.UmbracoIndexes.ExternalIndexName);
+        IEnumerable<PublishedSearchResult> Search(string term, int skip, int take, out long totalRecords, string culture = "*", string indexName = Constants.UmbracoIndexes.ExternalIndexName, ISet<string> loadedFields = null);
 
         /// <summary>
         /// Executes the query and converts the results to <see cref="PublishedSearchResult" />.

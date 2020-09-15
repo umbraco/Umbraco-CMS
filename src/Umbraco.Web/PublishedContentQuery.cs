@@ -189,7 +189,7 @@ namespace Umbraco.Web
         }
 
         /// <inheritdoc />
-        public IEnumerable<PublishedSearchResult> Search(string term, int skip, int take, out long totalRecords, string culture = "*", string indexName = Constants.UmbracoIndexes.ExternalIndexName)
+        public IEnumerable<PublishedSearchResult> Search(string term, int skip, int take, out long totalRecords, string culture = "*", string indexName = Constants.UmbracoIndexes.ExternalIndexName,ISet<string> loadedFields = null)
         {
             if (skip < 0)
             {
@@ -212,6 +212,10 @@ namespace Umbraco.Web
             }
 
             var query = umbIndex.GetSearcher().CreateQuery(IndexTypes.Content);
+            if(loadedFields != null)
+            {
+                query.SelectFields(loadedFields);
+            }
 
             IQueryExecutor queryExecutor;
             if (culture == "*")

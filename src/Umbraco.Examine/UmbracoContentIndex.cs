@@ -110,6 +110,8 @@ namespace Umbraco.Examine
             }
         }
 
+        private readonly ISet<string> _idOnlyFieldSet = new HashSet<string> { "id" };
+
         /// <inheritdoc />
         /// <summary>
         /// Deletes a node from the index.
@@ -130,7 +132,7 @@ namespace Umbraco.Examine
                 var rawQuery = $"{IndexPathFieldName}:{descendantPath}";
                 var searcher = GetSearcher();
                 var c = searcher.CreateQuery();
-                var filtered = c.NativeQuery(rawQuery);
+                var filtered = c.NativeQuery(rawQuery, _idOnlyFieldSet);
                 var results = filtered.Execute();
 
                 ProfilingLogger.Debug(GetType(), "DeleteFromIndex with query: {Query} (found {TotalItems} results)", rawQuery, results.TotalItemCount);

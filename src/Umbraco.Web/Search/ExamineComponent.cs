@@ -41,6 +41,8 @@ namespace Umbraco.Web.Search
         private readonly BackgroundTaskRunner<IBackgroundTask> _indexItemTaskRunner;
 
 
+        private readonly ISet<string> _idOnlyFieldSet = new HashSet<string> { "id" };
+
         // the default enlist priority is 100
         // enlist with a lower priority to ensure that anything "default" runs after us
         // but greater that SafeXmlReaderWriter priority which is 60
@@ -425,7 +427,8 @@ namespace Umbraco.Web.Search
                         while (page * pageSize < total)
                         {
                             //paging with examine, see https://shazwazza.com/post/paging-with-examine/
-                            var results = searcher.CreateQuery().Field("nodeType", id.ToInvariantString()).Execute(maxResults: pageSize * (page + 1));
+                            var query = searcher.CreateQuery().Field("nodeType", id.ToInvariantString()).And().SelectFields(_idOnlyFieldSet);
+                            var results = query.Execute(maxResults: pageSize * (page + 1));
                             total = results.TotalItemCount;
                             var paged = results.Skip(page * pageSize);
 

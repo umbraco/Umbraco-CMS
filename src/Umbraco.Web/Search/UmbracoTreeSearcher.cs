@@ -82,6 +82,7 @@ namespace Umbraco.Web.Search
             string type;
             var indexName = Constants.UmbracoIndexes.InternalIndexName;
             var fields = _umbracoTreeSearcherFields.GetBackOfficeFields().ToList();
+            ISet<string> fieldsToLoad;
 
             // TODO: WE should try to allow passing in a lucene raw query, however we will still need to do some manual string
             // manipulation for things like start paths, member types, etc...
@@ -102,6 +103,7 @@ namespace Umbraco.Web.Search
                     indexName = Constants.UmbracoIndexes.MembersIndexName;
                     type = "member";
                     fields.AddRange(_umbracoTreeSearcherFields.GetBackOfficeMembersFields());
+                    fieldsToLoad = _umbracoTreeSearcherFields.GetBackOfficeMembersFieldsToLoad();
                     if (searchFrom != null && searchFrom != Constants.Conventions.MemberTypes.AllMembersListId && searchFrom.Trim() != "-1")
                     {
                         sb.Append("+__NodeTypeAlias:");
@@ -112,12 +114,14 @@ namespace Umbraco.Web.Search
                 case UmbracoEntityTypes.Media:
                     type = "media";
                     fields.AddRange(_umbracoTreeSearcherFields.GetBackOfficeMediaFields());
+                    fieldsToLoad = _umbracoTreeSearcherFields.GetBackOfficeMediaFieldsToLoad();
                     var allMediaStartNodes = _umbracoContext.Security.CurrentUser.CalculateMediaStartNodeIds(_entityService);
                     AppendPath(sb, UmbracoObjectTypes.Media, allMediaStartNodes, searchFrom, ignoreUserStartNodes, _entityService);
                     break;
                 case UmbracoEntityTypes.Document:
                     type = "content";
                     fields.AddRange(_umbracoTreeSearcherFields.GetBackOfficeDocumentFields());
+                    fieldsToLoad = _umbracoTreeSearcherFields.GetBackOfficeDocumentFieldsToLoad();
                     var allContentStartNodes = _umbracoContext.Security.CurrentUser.CalculateContentStartNodeIds(_entityService);
                     AppendPath(sb, UmbracoObjectTypes.Document, allContentStartNodes, searchFrom, ignoreUserStartNodes, _entityService);
                     break;
@@ -136,7 +140,7 @@ namespace Umbraco.Web.Search
                 return Enumerable.Empty<SearchResultEntity>();
             }
 
-            var result = internalSearcher.CreateQuery().NativeQuery(sb.ToString())
+            var result = internalSearcher.CreateQuery().NativeQuery(sb.ToString(), fieldsToLoad)
                 //only return the number of items specified to read up to the amount of records to fill from 0 -> the number of items on the page requested
                 .Execute(Convert.ToInt32(pageSize * (pageIndex + 1)));
 
@@ -177,7 +181,7 @@ namespace Umbraco.Web.Search
             return _mapper.MapEnumerable<IEntitySlim, SearchResultEntity>(results);
         }
 
-        private bool BuildQuery(StringBuilder sb, string query, string searchFrom, List<string> fields, string type)
+        private bool BuildQuery(StringBuilder sb, string query, string searchFrom, List<string> queryFields, string type)
         {
             //build a lucene query:
             // the nodeName will be boosted 10x without wildcards
@@ -216,7 +220,7 @@ namespace Umbraco.Web.Search
 
                     AppendNodeNamePhraseWithBoost(sb, query, allLangs);
 
-                    foreach (var f in fields)
+                    foreach (var f in queryFields)
                     {
                         //additional fields normally
                         sb.Append(f);
@@ -251,7 +255,7 @@ namespace Umbraco.Web.Search
 
                     AppendNodeNameWithWildcards(sb, querywords, allLangs);
 
-                    foreach (var f in fields)
+                    foreach (var f in queryFields)
                     {
                         var queryWordsReplaced = new string[querywords.Length];
 
