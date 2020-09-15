@@ -44,8 +44,8 @@ namespace Umbraco.Tests.Integration
 
             // Register in the container
             var composition = new Composition(umbracoContainer, typeLoader,
-                testHelper.Logger, runtimeState, testHelper.GetConfigs(), testHelper.IOHelper, testHelper.AppCaches);
-            composition.RegisterEssentials(testHelper.Logger, testHelper.Profiler, testHelper.Logger, testHelper.MainDom,
+                testHelper.ProfilingLogger, runtimeState, testHelper.GetConfigs(), testHelper.IOHelper, testHelper.AppCaches);
+            composition.RegisterEssentials(testHelper.Logger, testHelper.Profiler, testHelper.ProfilingLogger, testHelper.MainDom,
                 testHelper.AppCaches, umbracoDatabaseFactory, typeLoader, runtimeState, testHelper.GetTypeFinder(),
                 testHelper.IOHelper, testHelper.GetUmbracoVersion(), dbProviderFactoryCreator,
                 testHelper.GetHostingEnvironment(), testHelper.GetBackOfficeInfo());

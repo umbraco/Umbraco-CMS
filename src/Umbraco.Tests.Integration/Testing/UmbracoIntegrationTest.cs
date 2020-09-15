@@ -295,7 +295,7 @@ namespace Umbraco.Tests.Integration.Testing
         /// <param name="connectionString"></param>
         /// <returns></returns>
         private void InstallTestLocalDb(
-            IUmbracoDatabaseFactory databaseFactory, IProfilingLogger logger, IGlobalSettings globalSettings,
+            IUmbracoDatabaseFactory databaseFactory, ILogger logger, IGlobalSettings globalSettings,
             IRuntimeState runtimeState, string workingDirectory, out string connectionString)
         {
             connectionString = null;

@@ -39,7 +39,7 @@ namespace Umbraco.Tests.Composing
         [Test]
         public void Find_Class_Of_Type_With_Attribute()
         {
-            var typeFinder = new TypeFinder(GetTestProfilingLogger(), new DefaultUmbracoAssemblyProvider(GetType().Assembly), new VaryingRuntimeHash());
+            var typeFinder = new TypeFinder(GetLogger(), new DefaultUmbracoAssemblyProvider(GetType().Assembly), new VaryingRuntimeHash());
             var typesFound = typeFinder.FindClassesOfTypeWithAttribute<TestEditor, MyTestAttribute>(_assemblies);
             Assert.AreEqual(2, typesFound.Count());
         }
@@ -47,7 +47,7 @@ namespace Umbraco.Tests.Composing
         [Test]
         public void Find_Classes_With_Attribute()
         {
-            var typeFinder = new TypeFinder(GetTestProfilingLogger(), new DefaultUmbracoAssemblyProvider(GetType().Assembly), new VaryingRuntimeHash());
+            var typeFinder = new TypeFinder(GetLogger(), new DefaultUmbracoAssemblyProvider(GetType().Assembly), new VaryingRuntimeHash());
             var typesFound = typeFinder.FindClassesWithAttribute<TreeAttribute>(_assemblies);
             Assert.AreEqual(0, typesFound.Count()); // 0 classes in _assemblies are marked with [Tree]
 
@@ -63,6 +63,12 @@ namespace Umbraco.Tests.Composing
             var logger = new DebugDiagnosticsLogger<object>(new MessageTemplates());
             var profiler = new TestProfiler();
             return new ProfilingLogger(logger, profiler);
+        }
+
+        private static ILogger GetLogger()
+        {
+            // TODO: return some sort of actual logger.
+            return new NullLogger();
         }
 
         [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]

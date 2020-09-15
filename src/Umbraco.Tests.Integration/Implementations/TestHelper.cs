@@ -55,7 +55,8 @@ namespace Umbraco.Tests.Integration.Implementations
 
             _hostingLifetime = new AspNetCoreApplicationShutdownRegistry(Mock.Of<IHostApplicationLifetime>());
 
-            Logger = new ProfilingLogger(new ConsoleLogger<object>(new MessageTemplates()), Profiler);
+            Logger = new ConsoleLogger<object>(new MessageTemplates());
+            ProfilingLogger = new ProfilingLogger(new ConsoleLogger<object>(new MessageTemplates()), Profiler);
         }
 
 
@@ -91,7 +92,8 @@ namespace Umbraco.Tests.Integration.Implementations
         public AppCaches AppCaches { get; } = new AppCaches(NoAppCache.Instance, NoAppCache.Instance,
             new IsolatedCaches(type => NoAppCache.Instance));
 
-        public IProfilingLogger Logger { get; private set; }
+        public ILogger Logger { get; private set; }
+        public IProfilingLogger ProfilingLogger { get; private set; }
 
         public IProfiler Profiler { get; } = new VoidProfiler();
 
