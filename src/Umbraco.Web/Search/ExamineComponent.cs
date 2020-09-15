@@ -34,7 +34,7 @@ namespace Umbraco.Web.Search
         private readonly IMainDom _mainDom;
         private readonly IProfilingLogger _logger;
         private readonly IUmbracoIndexesCreator _indexCreator;
-        
+        private readonly ISet<string> _idOnlyFieldSet = new HashSet<string> { "id" };
 
         // the default enlist priority is 100
         // enlist with a lower priority to ensure that anything "default" runs after us
@@ -405,7 +405,8 @@ namespace Umbraco.Web.Search
                         while (page * pageSize < total)
                         {
                             //paging with examine, see https://shazwazza.com/post/paging-with-examine/
-                            var results = searcher.CreateQuery().Field("nodeType", id.ToInvariantString()).Execute(maxResults: pageSize * (page + 1));
+                            var query = searcher.CreateQuery().Field("nodeType", id.ToInvariantString()).And().SelectFields(_idOnlyFieldSet);
+                            var results = query.Execute(maxResults: pageSize * (page + 1));
                             total = results.TotalItemCount;
                             var paged = results.Skip(page * pageSize);
 
