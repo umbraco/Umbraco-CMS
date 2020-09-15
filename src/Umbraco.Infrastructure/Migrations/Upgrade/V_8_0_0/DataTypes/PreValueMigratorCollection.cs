@@ -13,7 +13,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0.DataTypes
             : base(items)
         {
             _logger = logger;
-            _logger.LogDebug("Migrators: " + string.Join(", ", items.Select(x => x.GetType().Name)), TODO);
+            _logger.LogDebug("Migrators: " + string.Join(", ", items.Select(x => x.GetType().Name)));
         }
 
         public IPreValueMigrator GetMigrator(string editorAlias)

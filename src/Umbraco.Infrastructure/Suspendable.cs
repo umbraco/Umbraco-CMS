@@ -30,7 +30,7 @@ namespace Umbraco.Web
 
             public static void SuspendDocumentCache()
             {
-                Current.Logger.LogInformation("Suspend document cache.", TODO);
+                Current.Logger.LogInformation("Suspend document cache.");
                 _suspended = true;
             }
 
@@ -66,7 +66,7 @@ namespace Umbraco.Web
 
             public static void SuspendIndexers(ILogger logger)
             {
-                logger.LogInformation("Suspend indexers.", TODO);
+                logger.LogInformation("Suspend indexers.");
                 _suspended = true;
             }
 
@@ -91,13 +91,13 @@ namespace Umbraco.Web
 
             public static void Suspend()
             {
-                Current.Logger.LogInformation("Suspend scheduled publishing.", TODO);
+                Current.Logger.LogInformation("Suspend scheduled publishing.");
                 _suspended = true;
             }
 
             public static void Resume()
             {
-                Current.Logger.LogInformation("Resume scheduled publishing.", TODO);
+                Current.Logger.LogInformation("Resume scheduled publishing.");
                 _suspended = false;
             }
         }
