@@ -27,13 +27,14 @@ function DictionaryCreateController($scope, $location, dictionaryResource, navig
                 navigationService.syncTree({ tree: "dictionary", path: currPath + "," + data, forceReload: true, activate: true });
 
                 // reset form state
-                formHelper.resetForm({ scope: $scope });
+                formHelper.resetForm({ scope: $scope, formCtrl: this.createDictionaryForm });
 
                 // navigate to edit view
                 var currentSection = appState.getSectionState("currentSection");
                 $location.path("/" + currentSection + "/dictionary/edit/" + data);
 
             }, function (err) {
+                formHelper.resetForm({ scope: $scope, formCtrl: this.createDictionaryForm, hasErrors: true });
                 if (err.data && err.data.message) {
                     notificationsService.error(err.data.message);
                     navigationService.hideMenu();

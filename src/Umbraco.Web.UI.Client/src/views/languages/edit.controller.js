@@ -129,7 +129,7 @@
                 vm.isNew = false;
             }, function (err) {
                 vm.saveButtonState = "error";
-
+                formHelper.resetForm({ scope: $scope, hasErrors: true });
                 formHelper.handleError(err);
             });
         }
