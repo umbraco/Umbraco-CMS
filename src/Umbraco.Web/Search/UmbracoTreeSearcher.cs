@@ -141,12 +141,12 @@ namespace Umbraco.Web.Search
             }
 
             var result = internalSearcher.CreateQuery().NativeQuery(sb.ToString(), fieldsToLoad)
-                //only return the number of items specified to read up to the amount of records to fill from 0 -> the number of items on the page requested
-                .Execute(Convert.ToInt32(pageSize * (pageIndex + 1)));
+                //only return the number of items specified to read
+                .Execute(pageSize,Convert.ToInt32(pageIndex) * pageSize);
 
             totalFound = result.TotalItemCount;
 
-            var pagedResult = result.Skip(Convert.ToInt32(pageIndex));
+            var pagedResult = result.Skip(0);
 
             switch (entityType)
             {

@@ -238,11 +238,11 @@ namespace Umbraco.Web
 
             var results = skip == 0 && take == 0
                 ? queryExecutor.Execute()
-                : queryExecutor.Execute(skip + take);
+                : queryExecutor.Execute(take,skip);
 
             totalRecords = results.TotalItemCount;
 
-            return new CultureContextualSearchResults(results.Skip(skip).ToPublishedSearchResults(_publishedSnapshot.Content), _variationContextAccessor, culture);
+            return new CultureContextualSearchResults(results.Skip(0).ToPublishedSearchResults(_publishedSnapshot.Content), _variationContextAccessor, culture);
         }
 
         /// <inheritdoc />

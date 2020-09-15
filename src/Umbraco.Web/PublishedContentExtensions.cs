@@ -205,7 +205,7 @@ namespace Umbraco.Web
         #endregion
 
         #region Search
-
+        private static ISet<string> _idFieldNameOnly = new HashSet<string> { "id" };
         public static IEnumerable<PublishedSearchResult> SearchDescendants(this IPublishedContent content, string term, string indexName = null)
         {
             // TODO: inject examine manager
@@ -221,6 +221,8 @@ namespace Umbraco.Web
 
             var query = searcher.CreateQuery()
                 .Field(UmbracoExamineIndex.IndexPathFieldName, (content.Path + ",").MultipleCharacterWildcard())
+                .And()
+                .SelectFields(_idFieldNameOnly)
                 .And()
                 .ManagedQuery(term);
 
@@ -242,6 +244,8 @@ namespace Umbraco.Web
 
             var query = searcher.CreateQuery()
                 .Field("parentID", content.Id)
+                .And()
+                .SelectFields(_idFieldNameOnly)
                 .And()
                 .ManagedQuery(term);
 

@@ -426,11 +426,10 @@ namespace Umbraco.Web.Search
                         var total = long.MaxValue;
                         while (page * pageSize < total)
                         {
-                            //paging with examine, see https://shazwazza.com/post/paging-with-examine/
                             var query = searcher.CreateQuery().Field("nodeType", id.ToInvariantString()).And().SelectFields(_idOnlyFieldSet);
-                            var results = query.Execute(maxResults: pageSize * (page + 1));
+                            var results = query.Execute(pageSize,pageSize * page);
                             total = results.TotalItemCount;
-                            var paged = results.Skip(page * pageSize);
+                            var paged = results.Skip(0);
 
                             foreach (var item in paged)
                                 if (int.TryParse(item.Id, out var contentId))
