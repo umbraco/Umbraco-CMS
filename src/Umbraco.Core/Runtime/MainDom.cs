@@ -112,7 +112,7 @@ namespace Umbraco.Core.Runtime
 
                 try
                 {
-                    _logger.Info<MainDom>("Stopping ({SignalSource})", source);
+                    _logger.LogInformation("Stopping ({SignalSource})", source);
                     foreach (var callback in _callbacks.OrderBy(x => x.Key).Select(x => x.Value))
                     {
                         try
@@ -133,7 +133,7 @@ namespace Umbraco.Core.Runtime
                     // in any case...
                     _isMainDom = false;
                     _mainDomLock.Dispose();
-                    _logger.Info<MainDom>("Released ({SignalSource})", source);
+                    _logger.LogInformation("Released ({SignalSource})", source);
                 }
 
             }
@@ -146,18 +146,18 @@ namespace Umbraco.Core.Runtime
             // the handler is not installed so that would be the hosting environment
             if (_signaled)
             {
-                _logger.Info<MainDom>("Cannot acquire (signaled).");
+                _logger.LogInformation("Cannot acquire (signaled).");
                 return false;
             }
 
-            _logger.Info<MainDom>("Acquiring.");
+            _logger.LogInformation("Acquiring.");
 
             // Get the lock
             var acquired = _mainDomLock.AcquireLockAsync(LockTimeoutMilliseconds).GetAwaiter().GetResult();
 
             if (!acquired)
             {
-                _logger.Info<MainDom>("Cannot acquire (timeout).");
+                _logger.LogInformation("Cannot acquire (timeout).");
 
                 // In previous versions we'd let a TimeoutException be thrown
                 // and the appdomain would not start. We have the opportunity to allow it to
@@ -180,7 +180,7 @@ namespace Umbraco.Core.Runtime
                 _logger.LogWarning<MainDom>(ex, ex.Message);
             }
 
-            _logger.Info<MainDom>("Acquired.");
+            _logger.LogInformation("Acquired.");
             return true;
         }
 

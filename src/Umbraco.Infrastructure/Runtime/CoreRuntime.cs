@@ -128,7 +128,7 @@ namespace Umbraco.Core.Runtime
                 "Boot failed."))
             {
 
-                Logger.Info<CoreRuntime>("Booting site '{HostingSiteName}', app '{HostingApplicationId}', path '{HostingPhysicalPath}', server '{MachineName}'.",
+                Logger.LogInformation("Booting site '{HostingSiteName}', app '{HostingApplicationId}', path '{HostingPhysicalPath}', server '{MachineName}'.",
                     HostingEnvironment?.SiteName,
                     HostingEnvironment?.ApplicationId,
                     HostingEnvironment?.ApplicationPhysicalPath,

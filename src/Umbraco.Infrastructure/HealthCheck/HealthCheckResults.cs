@@ -54,7 +54,7 @@ namespace Umbraco.Web.HealthCheck
 
         public void LogResults()
         {
-            Logger.Info<HealthCheckResults>("Scheduled health check results:");
+            Logger.LogInformation("Scheduled health check results:");
             foreach (var result in _results)
             {
                 var checkName = result.Key;
@@ -62,7 +62,7 @@ namespace Umbraco.Web.HealthCheck
                 var checkIsSuccess = result.Value.All(x => x.ResultType == StatusResultType.Success);
                 if (checkIsSuccess)
                 {
-                    Logger.Info<HealthCheckResults>("Checks for '{HealthCheckName}' all completed successfully.", checkName);
+                    Logger.LogInformation("Checks for '{HealthCheckName}' all completed successfully.", checkName);
                 }
                 else
                 {
@@ -71,7 +71,7 @@ namespace Umbraco.Web.HealthCheck
 
                 foreach (var checkResult in checkResults)
                 {
-                    Logger.Info<HealthCheckResults>("Result for {HealthCheckName}: {HealthCheckResult}, Message: '{HealthCheckMessage}'", checkName, checkResult.ResultType, checkResult.Message);
+                    Logger.LogInformation("Result for {HealthCheckName}: {HealthCheckResult}, Message: '{HealthCheckMessage}'", checkName, checkResult.ResultType, checkResult.Message);
                 }
             }
         }

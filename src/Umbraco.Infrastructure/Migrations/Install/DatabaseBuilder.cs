@@ -351,7 +351,7 @@ namespace Umbraco.Core.Migrations.Install
                     return readyForInstall.Result;
                 }
 
-                _logger.Info<DatabaseBuilder>("Database configuration status: Started");
+                _logger.LogInformation("Database configuration status: Started");
 
                 var database = scope.Database;
 
@@ -373,12 +373,12 @@ namespace Umbraco.Core.Migrations.Install
                     message = message + "<p>Installation completed!</p>";
 
                     //now that everything is done, we need to determine the version of SQL server that is executing
-                    _logger.Info<DatabaseBuilder>("Database configuration status: {DbConfigStatus}", message);
+                    _logger.LogInformation("Database configuration status: {DbConfigStatus}", message);
                     return new Result { Message = message, Success = true, Percentage = "100" };
                 }
 
                 //we need to do an upgrade so return a new status message and it will need to be done during the next step
-                _logger.Info<DatabaseBuilder>("Database requires upgrade");
+                _logger.LogInformation("Database requires upgrade");
                 message = "<p>Upgrading database, this may take some time...</p>";
                 return new Result
                 {
@@ -412,7 +412,7 @@ namespace Umbraco.Core.Migrations.Install
                     return readyForInstall.Result;
                 }
 
-                _logger.Info<DatabaseBuilder>("Database upgrade started");
+                _logger.LogInformation("Database upgrade started");
 
                 // upgrade
                 var upgrader = new Upgrader(plan);
@@ -422,7 +422,7 @@ namespace Umbraco.Core.Migrations.Install
 
                 //now that everything is done, we need to determine the version of SQL server that is executing
 
-                _logger.Info<DatabaseBuilder>("Database configuration status: {DbConfigStatus}", message);
+                _logger.LogInformation("Database configuration status: {DbConfigStatus}", message);
 
                 return new Result { Message = message, Success = true, Percentage = "100" };
             }
@@ -453,7 +453,7 @@ namespace Umbraco.Core.Migrations.Install
 
             if (_databaseSchemaValidationResult != null)
             {
-                _logger.Info<DatabaseBuilder>("The database schema validation produced the following summary: {DbSchemaSummary}", _databaseSchemaValidationResult.GetSummary());
+                _logger.LogInformation("The database schema validation produced the following summary: {DbSchemaSummary}", _databaseSchemaValidationResult.GetSummary());
             }
 
             return new Result

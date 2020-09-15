@@ -36,25 +36,25 @@ namespace Umbraco.Web.Logging
                     _logger.LogWarning("[{EventType}] Event Id: {EventId}, State: {State}", eventType, eventId, state);
                     return true;
                 case TraceEventType.Information:
-                    _logger.Info("[{EventType}] Event Id: {EventId}, State: {State}", eventType, eventId, state);
+                    _logger.LogInformation("[{EventType}] Event Id: {EventId}, State: {State}", eventType, eventId, state);
                     return true;
                 case TraceEventType.Verbose:
-                    _logger.Debug("[{EventType}] Event Id: {EventId}, State: {State}", eventType, eventId, state);
+                    _logger.LogDebug("[{EventType}] Event Id: {EventId}, State: {State}", eventType, eventId, state);
                     return true;
                 case TraceEventType.Start:
-                    _logger.Debug("[{EventType}] Event Id: {EventId}, State: {State}", eventType, eventId, state);
+                    _logger.LogDebug("[{EventType}] Event Id: {EventId}, State: {State}", eventType, eventId, state);
                     return true;
                 case TraceEventType.Stop:
-                    _logger.Debug("[{EventType}] Event Id: {EventId}, State: {State}", eventType, eventId, state);
+                    _logger.LogDebug("[{EventType}] Event Id: {EventId}, State: {State}", eventType, eventId, state);
                     return true;
                 case TraceEventType.Suspend:
-                    _logger.Debug("[{EventType}] Event Id: {EventId}, State: {State}", eventType, eventId, state);
+                    _logger.LogDebug("[{EventType}] Event Id: {EventId}, State: {State}", eventType, eventId, state);
                     return true;
                 case TraceEventType.Resume:
-                    _logger.Debug("[{EventType}] Event Id: {EventId}, State: {State}", eventType, eventId, state);
+                    _logger.LogDebug("[{EventType}] Event Id: {EventId}, State: {State}", eventType, eventId, state);
                     return true;
                 case TraceEventType.Transfer:
-                    _logger.Debug("[{EventType}] Event Id: {EventId}, State: {State}", eventType, eventId, state);
+                    _logger.LogDebug("[{EventType}] Event Id: {EventId}, State: {State}", eventType, eventId, state);
                     return true;
                 default:
                     throw new ArgumentOutOfRangeException("eventType");

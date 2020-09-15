@@ -12,7 +12,7 @@ namespace Umbraco.Examine
     {
         private readonly UmbracoExamineIndex _index;
 
-        public UmbracoExamineIndexDiagnostics(UmbracoExamineIndex index, ILogger logger, IHostingEnvironment hostingEnvironment)
+        public UmbracoExamineIndexDiagnostics(UmbracoExamineIndex index, ILogger<UmbracoExamineIndexDiagnostics> logger, IHostingEnvironment hostingEnvironment)
             : base(index, logger, hostingEnvironment)
         {
             _index = index;

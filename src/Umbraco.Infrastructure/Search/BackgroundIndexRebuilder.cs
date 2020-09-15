@@ -46,7 +46,7 @@ namespace Umbraco.Web.Search
                     return;
                 }
 
-                _logger.Info<BackgroundIndexRebuilder>("Starting initialize async background thread.");
+                _logger.LogInformation("Starting initialize async background thread.");
                 //do the rebuild on a managed background thread
                 var task = new RebuildOnStartupTask(_mainDom, _indexRebuilder, _logger, onlyEmptyIndexes, waitMilliseconds);
 

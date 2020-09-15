@@ -377,7 +377,7 @@ namespace Umbraco.Core.Sync
                 //if they couldn't be all processed (i.e. we're shutting down) then exit
                 if (success == false)
                 {
-                    Logger.Info<DatabaseServerMessenger>("The current batch of instructions was not processed, app is shutting down");
+                    Logger.LogInformation("The current batch of instructions was not processed, app is shutting down");
                     break;
                 }
 

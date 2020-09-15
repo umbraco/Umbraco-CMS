@@ -46,7 +46,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly ConcurrentDictionary<Guid, int> _contentTypeKeyToIdMap;
         private readonly ConcurrentDictionary<Guid, int> _contentKeyToIdMap;
 
-        private readonly ILogger _logger;
+        private readonly ILogger<ContentStore> _logger;
+        private readonly ILogger<Snapshot> _snapShotLogger;
         private readonly IPublishedModelFactory _publishedModelFactory;
         private BPlusTree<int, ContentNodeKit> _localDb;
         private readonly ConcurrentQueue<GenObj> _genObjs;
@@ -67,13 +68,15 @@ namespace Umbraco.Web.PublishedCache.NuCache
         public ContentStore(
             IPublishedSnapshotAccessor publishedSnapshotAccessor,
             IVariationContextAccessor variationContextAccessor,
-            ILogger logger,
+            ILogger<ContentStore> logger,
+            ILogger<Snapshot> snapShotLogger,
             IPublishedModelFactory publishedModelFactory,
             BPlusTree<int, ContentNodeKit> localDb = null)
         {
             _publishedSnapshotAccessor = publishedSnapshotAccessor;
             _variationContextAccessor = variationContextAccessor;
             _logger = logger;
+            _snapShotLogger = snapShotLogger;
             _publishedModelFactory = publishedModelFactory;
             _localDb = localDb;
 
@@ -253,7 +256,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     catch (Exception ex)
                     {
                         /* TBD: May already be throwing so don't throw again */
-                        _logger.LogError<ContentStore>(ex, "Error trying to release DB");
+                        _logger.LogError(ex, "Error trying to release DB");
                     }
                     finally
                     {
@@ -264,7 +267,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
             catch (Exception ex)
             {
-                _logger.LogError<ContentStore>(ex, "Error trying to lock");
+                _logger.LogError(ex, "Error trying to lock");
                 throw;
             }
             finally
@@ -521,7 +524,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             parent = GetParentLink(kit.Node, null);
             if (parent == null)
             {
-                _logger.LogWarning<ContentStore>($"Skip item id={kit.Node.Id}, could not find parent id={kit.Node.ParentContentId}.");
+                _logger.LogWarning($"Skip item id={kit.Node.Id}, could not find parent id={kit.Node.ParentContentId}.");
                 return false;
             }
 
@@ -530,21 +533,21 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // because the data sort operation is by path.
             if (parent.Value == null)
             {
-                _logger.LogWarning<ContentStore>($"Skip item id={kit.Node.Id}, no Data assigned for linked node with path {kit.Node.Path} and parent id {kit.Node.ParentContentId}. This can indicate data corruption for the Path value for node {kit.Node.Id}. See the Health Check dashboard in Settings to resolve data integrity issues.");
+                _logger.LogWarning($"Skip item id={kit.Node.Id}, no Data assigned for linked node with path {kit.Node.Path} and parent id {kit.Node.ParentContentId}. This can indicate data corruption for the Path value for node {kit.Node.Id}. See the Health Check dashboard in Settings to resolve data integrity issues.");
                 return false;
             }
 
             // make sure the kit is valid
             if (kit.DraftData == null && kit.PublishedData == null)
             {
-                _logger.LogWarning<ContentStore>($"Skip item id={kit.Node.Id}, both draft and published data are null.");
+                _logger.LogWarning($"Skip item id={kit.Node.Id}, both draft and published data are null.");
                 return false;
             }
 
             // unknown = bad
             if (_contentTypesById.TryGetValue(kit.ContentTypeId, out var link) == false || link.Value == null)
             {
-                _logger.LogWarning<ContentStore>($"Skip item id={kit.Node.Id}, could not find content type id={kit.ContentTypeId}.");
+                _logger.LogWarning($"Skip item id={kit.Node.Id}, could not find content type id={kit.ContentTypeId}.");
                 return false;
             }
 
@@ -601,7 +604,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 throw new ArgumentException("Kit content cannot have children.", nameof(kit));
             // ReSharper restore LocalizableElement
 
-            _logger.Debug<ContentStore>("Set content ID: {KitNodeId}", kit.Node.Id);
+            _logger.LogDebug("Set content ID: {KitNodeId}", kit.Node.Id);
 
             // get existing
             _contentNodes.TryGetValue(kit.Node.Id, out var link);
@@ -720,7 +723,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     previousNode = null; // there is no previous sibling
                 }
 
-                _logger.Debug<ContentStore>($"Set {thisNode.Id} with parent {thisNode.ParentContentId}");
+                _logger.LogDebug($"Set {thisNode.Id} with parent {thisNode.ParentContentId}");
                 SetValueLocked(_contentNodes, thisNode.Id, thisNode);
 
                 // if we are initializing from the database source ensure the local db is updated
@@ -777,7 +780,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     ok = false;
                     continue; // skip that one
                 }
-                _logger.Debug<ContentStore>($"Set {kit.Node.Id} with parent {kit.Node.ParentContentId}");
+                _logger.LogDebug($"Set {kit.Node.Id} with parent {kit.Node.ParentContentId}");
                 SetValueLocked(_contentNodes, kit.Node.Id, kit.Node);
 
                 if (_localDb != null) RegisterChange(kit.Node.Id, kit);
@@ -866,7 +869,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             if (link?.Value == null) return false;
 
             var content = link.Value;
-            _logger.Debug<ContentStore>("Clear content ID: {ContentId}", content.Id);
+            _logger.LogDebug("Clear content ID: {ContentId}", content.Id);
 
             // clear the entire branch
             ClearBranchLocked(content);
@@ -1308,7 +1311,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 if (_nextGen == false && _genObj != null)
                     return new Snapshot(this, _genObj.GetGenRef()
 #if DEBUG
-                        , _logger
+                        , _snapShotLogger
 #endif
                         );
 
@@ -1344,7 +1347,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
                 var snapshot = new Snapshot(this, _genObj.GetGenRef()
 #if DEBUG
-                    , _logger
+                    , _snapShotLogger
 #endif
                     );
 
@@ -1358,7 +1361,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public Snapshot LiveSnapshot => new Snapshot(this, _liveGen
 #if DEBUG
-            , _logger
+            , _snapShotLogger
 #endif
         );
 
@@ -1393,14 +1396,14 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
             // see notes in CreateSnapshot
 #if DEBUG
-            _logger.Debug<ContentStore>("Collect.");
+            _logger.LogDebug("Collect.");
 #endif
             while (_genObjs.TryPeek(out var genObj) && (genObj.Count == 0 || genObj.WeakGenRef.IsAlive == false))
             {
                 _genObjs.TryDequeue(out genObj); // cannot fail since TryPeek has succeeded
                 _floorGen = genObj.Gen;
 #if DEBUG
-                //_logger.Debug<ContentStore>("_floorGen=" + _floorGen + ", _liveGen=" + _liveGen);
+                //_logger.LogDebug("_floorGen=" + _floorGen + ", _liveGen=" + _liveGen);
 #endif
             }
 
@@ -1438,7 +1441,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 var link = kvp.Value;
 
 #if DEBUG
-                //_logger.Debug<ContentStore>("Collect id:" + kvp.Key + ", gen:" + link.Gen +
+                //_logger.LogDebug("Collect id:" + kvp.Key + ", gen:" + link.Gen +
                 //    ", nxt:" + (link.Next == null ? "null" : "link") +
                 //    ", val:" + (link.Value == null ? "null" : "value"));
 #endif
@@ -1546,7 +1549,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             private readonly GenRef _genRef;
             private long _gen;
 #if DEBUG
-            private readonly ILogger _logger;
+            private readonly ILogger<Snapshot> _logger;
 #endif
 
             //private static int _count;
@@ -1554,7 +1557,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             internal Snapshot(ContentStore store, GenRef genRef
 #if DEBUG
-                    , ILogger logger
+                    , ILogger<Snapshot> logger
 #endif
                 )
             {
@@ -1566,13 +1569,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
 #if DEBUG
                 _logger = logger;
-                _logger.Debug<Snapshot>("Creating snapshot.");
+                _logger.LogDebug("Creating snapshot.");
 #endif
             }
 
             internal Snapshot(ContentStore store, long gen
 #if DEBUG
-                , ILogger logger
+                , ILogger<Snapshot> logger
 #endif
                 )
             {
@@ -1581,7 +1584,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
 #if DEBUG
                 _logger = logger;
-                _logger.Debug<Snapshot>("Creating live.");
+                _logger.LogDebug("Creating live.");
 #endif
             }
 
@@ -1669,7 +1672,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             {
                 if (_gen < 0) return;
 #if DEBUG
-                _logger.Debug<Snapshot>("Dispose snapshot ({Snapshot})", _genRef?.GenObj.Count.ToString() ?? "live");
+                _logger.LogDebug("Dispose snapshot ({Snapshot})", _genRef?.GenObj.Count.ToString() ?? "live");
 #endif
                 _gen = -1;
                 if (_genRef != null)

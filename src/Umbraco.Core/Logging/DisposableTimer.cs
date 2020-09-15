@@ -37,10 +37,10 @@ namespace Umbraco.Core.Logging
                 switch (_level)
                 {
                     case LogLevel.Debug:
-                        logger.Debug("{StartMessage} [Timing {TimingId}]", startMessage, _timingId);
+                        logger.LogDebug("{StartMessage} [Timing {TimingId}]", startMessage, _timingId);
                         break;
                     case LogLevel.Information:
-                        logger.Info("{StartMessage} [Timing {TimingId}]", startMessage, _timingId);
+                        logger.LogInformation("{StartMessage} [Timing {TimingId}]", startMessage, _timingId);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(level));
@@ -89,10 +89,10 @@ namespace Umbraco.Core.Logging
                 else switch (_level)
                 {
                     case LogLevel.Debug:
-                        _logger.Debug("{EndMessage} ({Duration}ms) [Timing {TimingId}]", _endMessage, Stopwatch.ElapsedMilliseconds, _timingId);
+                        _logger.LogDebug("{EndMessage} ({Duration}ms) [Timing {TimingId}]", _endMessage, Stopwatch.ElapsedMilliseconds, _timingId);
                         break;
                     case LogLevel.Information:
-                        _logger.Info("{EndMessage} ({Duration}ms) [Timing {TimingId}]", _endMessage, Stopwatch.ElapsedMilliseconds, _timingId);
+                        _logger.LogInformation("{EndMessage} ({Duration}ms) [Timing {TimingId}]", _endMessage, Stopwatch.ElapsedMilliseconds, _timingId);
                         break;
                     // filtered in the ctor
                     //default:

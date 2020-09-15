@@ -148,7 +148,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 //NOTE: We are using 30 seconds because that is what is coded into angular to force logout to give some headway in
                 // the timeout process.
 
-                _logger.Info<AuthenticationController>(
+                _logger.LogInformation(
                     "User logged will be logged out due to timeout: {Username}, IP Address: {IPAddress}",
                     backOfficeIdentity.Name,
                     _ipResolver.GetCurrentRequestIpAddress());
@@ -351,7 +351,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 var lockedOut = await _userManager.IsLockedOutAsync(identityUser);
                 if (lockedOut)
                 {
-                    _logger.Info<AuthenticationController>("User {UserId} is currently locked out, unlocking and resetting AccessFailedCount", model.UserId);
+                    _logger.LogInformation("User {UserId} is currently locked out, unlocking and resetting AccessFailedCount", model.UserId);
 
                     //// var user = await UserManager.FindByIdAsync(model.UserId);
                     var unlockResult = await _userManager.SetLockoutEndDateAsync(identityUser, DateTimeOffset.Now);
@@ -409,7 +409,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         {
             HttpContext.SignOutAsync(Core.Constants.Security.BackOfficeAuthenticationType);
 
-            _logger.Info<AuthenticationController>("User {UserName} from IP address {RemoteIpAddress} has logged out", User.Identity == null ? "UNKNOWN" : User.Identity.Name, HttpContext.Connection.RemoteIpAddress);
+            _logger.LogInformation("User {UserName} from IP address {RemoteIpAddress} has logged out", User.Identity == null ? "UNKNOWN" : User.Identity.Name, HttpContext.Connection.RemoteIpAddress);
 
             _userManager.RaiseLogoutSuccessEvent(User, int.Parse(User.Identity.GetUserId()));
 

@@ -85,10 +85,10 @@ namespace Umbraco.ModelsBuilder.Embedded
                 _logger.Debug<LiveModelsProvider>("Generate models...");
                 const int timeout = 2 * 60 * 1000; // 2 mins
                 _mutex.WaitOne(timeout); // wait until it is safe, and acquire
-                _logger.Info<LiveModelsProvider>("Generate models now.");
+                _logger.LogInformation("Generate models now.");
                 GenerateModels();
                 _mbErrors.Clear();
-                _logger.Info<LiveModelsProvider>("Generated.");
+                _logger.LogInformation("Generated.");
             }
             catch (TimeoutException)
             {

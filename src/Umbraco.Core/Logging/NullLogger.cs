@@ -46,27 +46,12 @@ namespace Umbraco.Core.Logging
 
         }
 
-        public void LogInformation(string message, params object[] propertyValues)
-        {
-
-        }
-
         public void LogInformation(string messageTemplate, params object[] propertyValues)
         {
 
         }
 
-        public void LogDebug(string message, params object[] propertyValues)
-        {
-
-        }
-
         public void LogDebug(string messageTemplate, params object[] propertyValues)
-        {
-
-        }
-
-        public void LogTrace(string message, params object[] propertyValues)
         {
 
         }

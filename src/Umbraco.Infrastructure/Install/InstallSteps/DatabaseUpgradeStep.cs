@@ -53,7 +53,7 @@ namespace Umbraco.Web.Install.InstallSteps
 
             if (upgrade)
             {
-                _logger.Info<DatabaseUpgradeStep>("Running 'Upgrade' service");
+                _logger.LogInformation("Running 'Upgrade' service");
 
                 var plan = new UmbracoPlan(_umbracoVersion, _globalSettings);
                 plan.AddPostMigration<ClearCsrfCookies>(); // needed when running installer (back-office)

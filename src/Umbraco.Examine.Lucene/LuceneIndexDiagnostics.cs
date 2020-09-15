@@ -14,7 +14,7 @@ namespace Umbraco.Examine
     {
         private readonly IHostingEnvironment _hostingEnvironment;
 
-        public LuceneIndexDiagnostics(LuceneIndex index, ILogger logger, IHostingEnvironment hostingEnvironment)
+        public LuceneIndexDiagnostics(LuceneIndex index, ILogger<LuceneIndexDiagnostics> logger, IHostingEnvironment hostingEnvironment)
         {
             _hostingEnvironment = hostingEnvironment;
             Index = index;
@@ -22,7 +22,7 @@ namespace Umbraco.Examine
         }
 
         public LuceneIndex Index { get; }
-        public ILogger Logger { get; }
+        public ILogger<LuceneIndexDiagnostics> Logger { get; }
 
         public int DocumentCount
         {

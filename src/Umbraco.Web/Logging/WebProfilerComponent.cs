@@ -21,7 +21,7 @@ namespace Umbraco.Web.Logging
 
             // if VoidProfiler was registered, let it be known
             if (profiler is VoidProfiler)
-                logger.Info<WebProfilerComponent>("Profiler is VoidProfiler, not profiling (must run debug mode to profile).");
+                logger.LogInformation("Profiler is VoidProfiler, not profiling (must run debug mode to profile).");
             _profile = false;
         }
 

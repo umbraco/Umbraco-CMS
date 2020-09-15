@@ -674,7 +674,7 @@ AND (umbracoNode.id=@id)";
         // (no need to test _released)
         internal void SaveXmlToFile()
         {
-            Current.Logger.Info<XmlStore>("Save Xml to file...");
+            Current.Logger.LogInformation("Save Xml to file...");
 
             try
             {
@@ -698,7 +698,7 @@ AND (umbracoNode.id=@id)";
                     fs.Write(bytes, 0, bytes.Length);
                 }
 
-                Current.Logger.Info<XmlStore>("Saved Xml to file.");
+                Current.Logger.LogInformation("Saved Xml to file.");
             }
             catch (Exception ex)
             {
@@ -714,7 +714,7 @@ AND (umbracoNode.id=@id)";
         // (no need to test _released)
         internal async Task SaveXmlToFileAsync()
         {
-            Current.Logger.Info<XmlStore>("Save Xml to file...");
+            Current.Logger.LogInformation("Save Xml to file...");
 
             try
             {
@@ -738,7 +738,7 @@ AND (umbracoNode.id=@id)";
                     await fs.WriteAsync(bytes, 0, bytes.Length);
                 }
 
-                Current.Logger.Info<XmlStore>("Saved Xml to file.");
+                Current.Logger.LogInformation("Saved Xml to file.");
             }
             catch (Exception ex)
             {
@@ -782,7 +782,7 @@ AND (umbracoNode.id=@id)";
             // do NOT try to load if we are not the main domain anymore
             if (_released) return null;
 
-            Current.Logger.Info<XmlStore>("Load Xml from file...");
+            Current.Logger.LogInformation("Load Xml from file...");
 
             try
             {
@@ -792,7 +792,7 @@ AND (umbracoNode.id=@id)";
                     xml.Load(fs);
                 }
                 _lastFileRead = DateTime.UtcNow;
-                Current.Logger.Info<XmlStore>("Loaded Xml from file.");
+                Current.Logger.LogInformation("Loaded Xml from file.");
                 return xml;
             }
             catch (FileNotFoundException)

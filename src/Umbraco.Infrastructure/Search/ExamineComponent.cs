@@ -72,7 +72,7 @@ namespace Umbraco.Web.Search
 
             if (!examineShutdownRegistered)
             {
-                _logger.Info<ExamineComponent>("Examine shutdown not registered, this AppDomain is not the MainDom, Examine will be disabled");
+                _logger.LogInformation("Examine shutdown not registered, this AppDomain is not the MainDom, Examine will be disabled");
 
                 //if we could not register the shutdown examine ourselves, it means we are not maindom! in this case all of examine should be disabled!
                 Suspendable.ExamineEvents.SuspendIndexers(_logger);
@@ -87,7 +87,7 @@ namespace Umbraco.Web.Search
 
             var registeredIndexers = _examineManager.Indexes.OfType<IUmbracoIndex>().Count(x => x.EnableDefaultEventHandler);
 
-            _logger.Info<ExamineComponent>("Adding examine event handlers for {RegisteredIndexers} index providers.", registeredIndexers);
+            _logger.LogInformation("Adding examine event handlers for {RegisteredIndexers} index providers.", registeredIndexers);
 
             // don't bind event handlers if we're not suppose to listen
             if (registeredIndexers == 0)

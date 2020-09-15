@@ -21,6 +21,7 @@ namespace Umbraco.Examine
     /// </summary>
     public class UmbracoContentIndex : UmbracoExamineIndex, IUmbracoContentIndex, IDisposable
     {
+        private readonly ILogger<UmbracoContentIndex> _logger;
         protected ILocalizationService LanguageService { get; }
 
         #region Constructors
@@ -33,6 +34,7 @@ namespace Umbraco.Examine
         /// <param name="luceneDirectory"></param>
         /// <param name="defaultAnalyzer"></param>
         /// <param name="profilingLogger"></param>
+        /// <param name="logger"></param>
         /// <param name="hostingEnvironment"></param>
         /// <param name="runtimeState"></param>
         /// <param name="languageService"></param>
@@ -44,14 +46,18 @@ namespace Umbraco.Examine
             FieldDefinitionCollection fieldDefinitions,
             Analyzer defaultAnalyzer,
             IProfilingLogger profilingLogger,
+            ILogger<UmbracoContentIndex> logger,
+            ILogger<UmbracoExamineIndex> examineIndexLogger,
+            ILogger<UmbracoExamineIndexDiagnostics> examineIndexDiagnosticsLogger,
             IHostingEnvironment hostingEnvironment,
             IRuntimeState runtimeState,
             ILocalizationService languageService,
             IContentValueSetValidator validator,
             IReadOnlyDictionary<string, IFieldValueTypeFactory> indexValueTypes = null)
-            : base(name, luceneDirectory, fieldDefinitions, defaultAnalyzer, profilingLogger, hostingEnvironment, runtimeState, validator, indexValueTypes)
+            : base(name, luceneDirectory, fieldDefinitions, defaultAnalyzer, profilingLogger, examineIndexLogger, examineIndexDiagnosticsLogger ,hostingEnvironment, runtimeState, validator, indexValueTypes)
         {
             if (validator == null) throw new ArgumentNullException(nameof(validator));
+            _logger = logger;
             LanguageService = languageService ?? throw new ArgumentNullException(nameof(languageService));
 
             if (validator is IContentValueSetValidator contentValueSetValidator)
@@ -138,7 +144,7 @@ namespace Umbraco.Examine
                 var filtered = c.NativeQuery(rawQuery);
                 var results = filtered.Execute();
 
-                ProfilingLogger.Debug("DeleteFromIndex with query: {Query} (found {TotalItems} results)", rawQuery, results.TotalItemCount);
+                _logger.LogDebug("DeleteFromIndex with query: {Query} (found {TotalItems} results)", rawQuery, results.TotalItemCount);
 
                 //need to queue a delete item for each one found
                 QueueIndexOperation(results.Select(r => new IndexOperation(new ValueSet(r.Id), IndexOperationType.Delete)));

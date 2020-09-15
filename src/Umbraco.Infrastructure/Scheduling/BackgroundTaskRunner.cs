@@ -348,7 +348,7 @@ namespace Umbraco.Web.Scheduling
             var hasTasks = TaskCount > 0;
 
             if (!force && hasTasks)
-                _logger.Info<BackgroundTaskRunner>("{LogPrefix} Waiting for tasks to complete", _logPrefix);
+                _logger.LogInformation("{LogPrefix} Waiting for tasks to complete", _logPrefix);
 
             // complete the queue
             // will stop waiting on the queue or on a latch
@@ -704,7 +704,7 @@ namespace Umbraco.Web.Scheduling
                 if (_terminating == false)
                 {
                     _terminating = true;
-                    _logger.Info<BackgroundTaskRunner>("{LogPrefix} Terminating {Immediate}", _logPrefix, immediate ? immediate.ToString() : string.Empty);
+                    _logger.LogInformation("{LogPrefix} Terminating {Immediate}", _logPrefix, immediate ? immediate.ToString() : string.Empty);
                     onTerminating = true;
                 }
             }
@@ -789,7 +789,7 @@ namespace Umbraco.Web.Scheduling
         /// </remarks>
         private void StopImmediate()
         {
-            _logger.Info<BackgroundTaskRunner>("{LogPrefix} Canceling tasks", _logPrefix);
+            _logger.LogInformation("{LogPrefix} Canceling tasks", _logPrefix);
             try
             {
                 Shutdown(true, true); // cancel all tasks, wait for the current one to end
@@ -823,7 +823,7 @@ namespace Umbraco.Web.Scheduling
                 terminatedSource = _terminatedSource;
             }
 
-            _logger.Info<BackgroundTaskRunner>("{LogPrefix} Tasks {TaskStatus}, terminated",
+            _logger.LogInformation("{LogPrefix} Tasks {TaskStatus}, terminated",
                 _logPrefix,
                 immediate ? "cancelled" : "completed");
 

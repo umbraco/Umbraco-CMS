@@ -102,7 +102,7 @@ namespace Umbraco.Core.Logging
         /// <typeparam name="T">The reporting type.</typeparam>
         /// <param name="logger">The logger.</param>
         /// <param name="message">A message.</param>
-        public static void Info<T>(this ILogger logger, string message)
+        public static void LogInformation<T>(this ILogger logger, string message)
             => logger.LogInformation(message);
 
         /// <summary>
@@ -112,7 +112,7 @@ namespace Umbraco.Core.Logging
         /// <param name="logger">The logger.</param>
         /// <param name="messageTemplate">A message template.</param>
         /// <param name="propertyValues">Property values.</param>
-        public static void Info<T>(this ILogger logger, string messageTemplate, params object[] propertyValues)
+        public static void LogInformation<T>(this ILogger logger, string messageTemplate, params object[] propertyValues)
             => logger.LogInformation(messageTemplate, propertyValues);
 
         /// <summary>

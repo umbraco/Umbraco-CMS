@@ -15,7 +15,7 @@ namespace Umbraco.Core.Logging
     /// specification includes support for traditional C# numeric placeholders.</para>
     /// <para>For instance, "Processed {Input} in {Time}ms."</para>
     /// </remarks>
-    public interface ILogger<T>
+    public interface ILogger<out T>
     {
         /// <summary>
         /// Determines if logging is enabled at a specified level, for a reporting type.

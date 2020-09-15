@@ -136,7 +136,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             if (!validate.IsSuccessStatusCode())
                 throw new HttpResponseException(validate);
 
-            _logger.Info<ExamineManagementController>("Rebuilding index '{IndexName}'", indexName);
+            _logger.LogInformation("Rebuilding index '{IndexName}'", indexName);
 
             //remove it in case there's a handler there already
             index.IndexOperationComplete -= Indexer_IndexOperationComplete;
@@ -250,9 +250,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             //ensure it's not listening anymore
             indexer.IndexOperationComplete -= Indexer_IndexOperationComplete;
 
-            _logger
-                .Info<ExamineManagementController
-                >($"Rebuilding index '{indexer.Name}' done.");
+            _logger.LogInformation($"Rebuilding index '{indexer.Name}' done.");
 
             var cacheKey = "temp_indexing_op_" + indexer.Name;
             _runtimeCache.Clear(cacheKey);

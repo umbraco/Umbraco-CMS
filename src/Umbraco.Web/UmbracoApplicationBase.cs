@@ -251,7 +251,7 @@ namespace Umbraco.Web
                     BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.GetField,
                     null, runtime, null);
 
-                Current.Logger.Info<UmbracoApplicationBase>("Application shutdown. Details: {ShutdownReason}\r\n\r\n_shutDownMessage={ShutdownMessage}\r\n\r\n_shutDownStack={ShutdownStack}",
+                Current.Logger.LogInformation("Application shutdown. Details: {ShutdownReason}\r\n\r\n_shutDownMessage={ShutdownMessage}\r\n\r\n_shutDownStack={ShutdownStack}",
                     HostingEnvironment.ShutdownReason,
                     shutDownMessage,
                     shutDownStack);
@@ -259,7 +259,7 @@ namespace Umbraco.Web
             catch (Exception)
             {
                 //if for some reason that fails, then log the normal output
-                Current.Logger.Info<UmbracoApplicationBase>("Application shutdown. Reason: {ShutdownReason}", HostingEnvironment.ShutdownReason);
+                Current.Logger.LogInformation("Application shutdown. Reason: {ShutdownReason}", HostingEnvironment.ShutdownReason);
             }
 
             Current.Logger.DisposeIfDisposable();

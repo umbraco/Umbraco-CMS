@@ -83,7 +83,7 @@ namespace Umbraco.Web.Scheduling
                         // run
                         var result = _contentService.PerformScheduledPublish(DateTime.Now);
                         foreach (var grouped in result.GroupBy(x => x.Result))
-                            _logger.Info<ScheduledPublishing>(
+                            _logger.LogInformation(
                                 "Scheduled publishing result: '{StatusCount}' items with status {Status}",
                                 grouped.Count(), grouped.Key);
                     }

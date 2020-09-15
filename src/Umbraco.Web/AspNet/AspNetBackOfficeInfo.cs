@@ -31,7 +31,7 @@ namespace Umbraco.Web
             if (url.IsNullOrWhiteSpace() == false)
             {
                 var umbracoApplicationUrl = url.TrimEnd('/');
-                _logger.Info<AspNetBackOfficeInfo>("ApplicationUrl: {UmbracoAppUrl} (using web.routing/@umbracoApplicationUrl)", umbracoApplicationUrl);
+                _logger.LogInformation("ApplicationUrl: {UmbracoAppUrl} (using web.routing/@umbracoApplicationUrl)", umbracoApplicationUrl);
                 return umbracoApplicationUrl;
             }
 

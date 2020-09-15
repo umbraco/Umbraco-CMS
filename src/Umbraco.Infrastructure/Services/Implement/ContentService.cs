@@ -2635,7 +2635,7 @@ namespace Umbraco.Core.Services.Implement
             // raise Publishing event
             if (scope.Events.DispatchCancelable(Publishing, this, savingEventArgs.ToContentPublishingEventArgs()))
             {
-                Logger.Info<ContentService>("Document {ContentName} (id={ContentId}) cannot be published: {Reason}", content.Name, content.Id, "publishing was cancelled");
+                Logger.LogInformation("Document {ContentName} (id={ContentId}) cannot be published: {Reason}", content.Name, content.Id, "publishing was cancelled");
                 return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, content);
             }
 
@@ -2687,7 +2687,7 @@ namespace Umbraco.Core.Services.Implement
             // either because it is 'publishing' or because it already has a published version
             if (content.PublishedState != PublishedState.Publishing && content.PublishedVersionId == 0)
             {
-                Logger.Info<ContentService>("Document {ContentName} (id={ContentId}) cannot be published: {Reason}", content.Name, content.Id, "document does not have published values");
+                Logger.LogInformation("Document {ContentName} (id={ContentId}) cannot be published: {Reason}", content.Name, content.Id, "document does not have published values");
                 return new PublishResult(PublishResultType.FailedPublishNothingToPublish, evtMsgs, content);
             }
 
@@ -2700,20 +2700,20 @@ namespace Umbraco.Core.Services.Implement
                 {
                     case ContentStatus.Expired:
                         if (!variesByCulture)
-                            Logger.Info<ContentService>("Document {ContentName} (id={ContentId}) cannot be published: {Reason}", content.Name, content.Id, "document has expired");
+                            Logger.LogInformation("Document {ContentName} (id={ContentId}) cannot be published: {Reason}", content.Name, content.Id, "document has expired");
                         else
-                            Logger.Info<ContentService>("Document {ContentName} (id={ContentId}) culture {Culture} cannot be published: {Reason}", content.Name, content.Id, culture, "document culture has expired");
+                            Logger.LogInformation("Document {ContentName} (id={ContentId}) culture {Culture} cannot be published: {Reason}", content.Name, content.Id, culture, "document culture has expired");
                         return new PublishResult(!variesByCulture ? PublishResultType.FailedPublishHasExpired : PublishResultType.FailedPublishCultureHasExpired, evtMsgs, content);
 
                     case ContentStatus.AwaitingRelease:
                         if (!variesByCulture)
-                            Logger.Info<ContentService>("Document {ContentName} (id={ContentId}) cannot be published: {Reason}", content.Name, content.Id, "document is awaiting release");
+                            Logger.LogInformation("Document {ContentName} (id={ContentId}) cannot be published: {Reason}", content.Name, content.Id, "document is awaiting release");
                         else
-                            Logger.Info<ContentService>("Document {ContentName} (id={ContentId}) culture {Culture} cannot be published: {Reason}", content.Name, content.Id, culture, "document is culture awaiting release");
+                            Logger.LogInformation("Document {ContentName} (id={ContentId}) culture {Culture} cannot be published: {Reason}", content.Name, content.Id, culture, "document is culture awaiting release");
                         return new PublishResult(!variesByCulture ? PublishResultType.FailedPublishAwaitingRelease : PublishResultType.FailedPublishCultureAwaitingRelease, evtMsgs, content);
 
                     case ContentStatus.Trashed:
-                        Logger.Info<ContentService>("Document {ContentName} (id={ContentId}) cannot be published: {Reason}", content.Name, content.Id, "document is trashed");
+                        Logger.LogInformation("Document {ContentName} (id={ContentId}) cannot be published: {Reason}", content.Name, content.Id, "document is trashed");
                         return new PublishResult(PublishResultType.FailedPublishIsTrashed, evtMsgs, content);
                 }
             }
@@ -2726,7 +2726,7 @@ namespace Umbraco.Core.Services.Implement
                 var pathIsOk = content.ParentId == Constants.System.Root || IsPathPublished(GetParent(content));
                 if (!pathIsOk)
                 {
-                    Logger.Info<ContentService>("Document {ContentName} (id={ContentId}) cannot be published: {Reason}", content.Name, content.Id, "parent is not published");
+                    Logger.LogInformation("Document {ContentName} (id={ContentId}) cannot be published: {Reason}", content.Name, content.Id, "parent is not published");
                     return new PublishResult(PublishResultType.FailedPublishPathNotPublished, evtMsgs, content);
                 }
             }
@@ -2763,11 +2763,11 @@ namespace Umbraco.Core.Services.Implement
                     return new PublishResult(PublishResultType.FailedPublishNothingToPublish, evtMsgs, content);
 
                 if (culturesUnpublishing.Count > 0)
-                    Logger.Info<ContentService>("Document {ContentName} (id={ContentId}) cultures: {Cultures} have been unpublished.",
+                    Logger.LogInformation("Document {ContentName} (id={ContentId}) cultures: {Cultures} have been unpublished.",
                         content.Name, content.Id, string.Join(",", culturesUnpublishing));
 
                 if (culturesPublishing.Count > 0)
-                    Logger.Info<ContentService>("Document {ContentName} (id={ContentId}) cultures: {Cultures} have been published.",
+                    Logger.LogInformation("Document {ContentName} (id={ContentId}) cultures: {Cultures} have been published.",
                         content.Name, content.Id, string.Join(",", culturesPublishing));
 
                 if (culturesUnpublishing.Count > 0 && culturesPublishing.Count > 0)
@@ -2779,7 +2779,7 @@ namespace Umbraco.Core.Services.Implement
                 return new PublishResult(PublishResultType.SuccessPublishCulture, evtMsgs, content);
             }
 
-            Logger.Info<ContentService>("Document {ContentName} (id={ContentId}) has been published.", content.Name, content.Id);
+            Logger.LogInformation("Document {ContentName} (id={ContentId}) has been published.", content.Name, content.Id);
             return new PublishResult(evtMsgs, content);
         }
 
@@ -2795,7 +2795,7 @@ namespace Umbraco.Core.Services.Implement
             // raise Unpublishing event
             if (scope.Events.DispatchCancelable(Unpublishing, this, new PublishEventArgs<IContent>(content, evtMsgs)))
             {
-                Logger.Info<ContentService>("Document {ContentName} (id={ContentId}) cannot be unpublished: unpublishing was cancelled.", content.Name, content.Id);
+                Logger.LogInformation("Document {ContentName} (id={ContentId}) cannot be unpublished: unpublishing was cancelled.", content.Name, content.Id);
                 return new PublishResult(PublishResultType.FailedUnpublishCancelledByEvent, evtMsgs, content);
             }
 
@@ -2827,12 +2827,12 @@ namespace Umbraco.Core.Services.Implement
             foreach (var p in pastReleases)
                 content.ContentSchedule.Remove(p);
             if (pastReleases.Count > 0)
-                Logger.Info<ContentService>("Document {ContentName} (id={ContentId}) had its release date removed, because it was unpublished.", content.Name, content.Id);
+                Logger.LogInformation("Document {ContentName} (id={ContentId}) had its release date removed, because it was unpublished.", content.Name, content.Id);
 
             // change state to unpublishing
             content.PublishedState = PublishedState.Unpublishing;
 
-            Logger.Info<ContentService>("Document {ContentName} (id={ContentId}) has been unpublished.", content.Name, content.Id);
+            Logger.LogInformation("Document {ContentName} (id={ContentId}) has been unpublished.", content.Name, content.Id);
             return attempt;
         }
 
@@ -3173,7 +3173,7 @@ namespace Umbraco.Core.Services.Implement
                     scope.Events.Dispatch(RolledBack, this, rollbackEventArgs);
 
                     //Logging & Audit message
-                    Logger.Info<ContentService>("User '{UserId}' rolled back content '{ContentId}' to version '{VersionId}'", userId, id, versionId);
+                    Logger.LogInformation("User '{UserId}' rolled back content '{ContentId}' to version '{VersionId}'", userId, id, versionId);
                     Audit(AuditType.RollBack, userId, id, $"Content '{content.Name}' was rolled back to version '{versionId}'");
                 }
 

@@ -85,23 +85,14 @@ namespace Umbraco.Core.Logging
         public void LogWarning(Exception exception, string messageTemplate, params object[] propertyValues)
             => Logger.LogWarning(exception, messageTemplate, propertyValues);
 
-        public void LogInformation(string message, params object[] propertyValues)
-            => Logger.LogInformation(message, propertyValues);
-
         public void LogInformation(string messageTemplate, params object[] propertyValues)
-            => Logger.Info(messageTemplate, propertyValues);
-
-        public void LogDebug(string message, params object[] propertyValues)
-            => Logger.LogDebug(message, propertyValues);
+            => Logger.LogInformation(messageTemplate, propertyValues);
 
         public void LogDebug(string messageTemplate, params object[] propertyValues)
-            => Logger.Debug(messageTemplate, propertyValues);
-
-        public void LogTrace(string message, params object[] propertyValues)
-            => Logger.LogTrace(message, propertyValues);
+            => Logger.LogDebug(messageTemplate, propertyValues);
 
         public void LogTrace(string messageTemplate, params object[] propertyValues)
-            => Logger.Verbose(messageTemplate, propertyValues);
+            => Logger.LogTrace(messageTemplate, propertyValues);
 
         #endregion
     }
