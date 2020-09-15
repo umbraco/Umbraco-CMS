@@ -1,3 +1,5 @@
+using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using ConnectionStrings = Umbraco.Core.Configuration.Models.ConnectionStrings;
 
 namespace Umbraco.Tests.Common.Builders
@@ -18,7 +20,7 @@ namespace Umbraco.Tests.Common.Builders
 
             return new ConnectionStrings
             {
-                UmbracoConnectionString = umbracoConnectionString,             
+                UmbracoConnectionString = new ConfigConnectionString(Constants.System.UmbracoConnectionName, umbracoConnectionString),
             };
         }
     }

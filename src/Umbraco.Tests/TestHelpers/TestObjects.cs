@@ -96,7 +96,6 @@ namespace Umbraco.Tests.TestHelpers
                 databaseFactory = new UmbracoDatabaseFactory(logger,
                     globalSettings,
                     connectionStrings,
-                    Constants.System.UmbracoConnectionName,
                     new Lazy<IMapperCollection>(() => mappers),
                     TestHelper.DbProviderFactoryCreator);
             }

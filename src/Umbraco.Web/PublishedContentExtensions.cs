@@ -75,7 +75,7 @@ namespace Umbraco.Web
                 Current.Services.ContentTypeService,
                 /*Current.Configs.WebRouting().DisableAlternativeTemplates,
                 Current.Configs.WebRouting().ValidateAlternativeTemplates,
-                TODO*/
+                TODO get values from config*/
                  false, false,
                 templateId);
         }
@@ -87,7 +87,7 @@ namespace Umbraco.Web
                 Current.Services.ContentTypeService,
                 /*Current.Configs.WebRouting().DisableAlternativeTemplates,
                     Current.Configs.WebRouting().ValidateAlternativeTemplates,
-                    TODO*/
+                    TODO get values from config*/
                 false, false,
                 templateAlias);
         }

@@ -41,7 +41,6 @@ namespace Umbraco.Core.Runtime
             _dbFactory = new UmbracoDatabaseFactory(_logger,
                globalSettings,
                connectionStrings,
-               Constants.System.UmbracoConnectionName,
                new Lazy<IMapperCollection>(() => new MapperCollection(Enumerable.Empty<BaseMapper>())),
                dbProviderFactoryCreator);
 

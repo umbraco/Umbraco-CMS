@@ -11,6 +11,9 @@
       <Compile Remove="TEMP\**" />
       <EmbeddedResource Remove="TEMP\**" />
       <None Remove="TEMP\**" />
+      <Compile Remove="Views\**" />
+      <EmbeddedResource Remove="Views\**" />
+      <None Remove="Views\**" />
     </ItemGroup>
 
     <ItemGroup>

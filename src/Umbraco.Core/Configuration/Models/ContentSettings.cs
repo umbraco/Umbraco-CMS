@@ -16,15 +16,7 @@ namespace Umbraco.Core.Configuration.Models
 
         public bool ResolveUrlsFromTextString { get; set; } = false;
 
-        // TODO: to retain previous configuration structure, this should come from a nested collection,
-        // "Errors:Error404".  Although we can use JsonPropertyName to map when the JSON field name differs
-        // from the one in this class, not sure how we'd "flatten" a collection like this.
-        public IEnumerable<IContentErrorPage> Error404Collection { get; set; }
-
-        // public IEnumerable<IContentErrorPage> Error404Collection => _configuration
-        //     .GetSection(Prefix + "Errors:Error404")
-        //     .GetChildren()
-        //     .Select(x => new ContentErrorPage(x));
+        public IEnumerable<ContentErrorPage> Error404Collection { get; set; } = Array.Empty<ContentErrorPage>();
 
         public string PreviewBadge { get; set; } = DefaultPreviewBadge;
 
@@ -38,38 +30,6 @@ namespace Umbraco.Core.Configuration.Models
 
         public string LoginBackgroundImage { get; set; } = "assets/img/login.jpg";
 
-        /*
-        private class ContentErrorPage : IContentErrorPage
-        {
-            public ContentErrorPage(IConfigurationSection configurationSection)
-            {
-                Culture = configurationSection.Key;
 
-                var value = configurationSection.Value;
-
-                if (int.TryParse(value, out var contentId))
-                {
-                    HasContentId = true;
-                    ContentId = contentId;
-                }
-                else if (Guid.TryParse(value, out var contentKey))
-                {
-                    HasContentKey = true;
-                    ContentKey = contentKey;
-                }
-                else
-                {
-                    ContentXPath = value;
-                }
-            }
-
-            public int ContentId { get; }
-            public Guid ContentKey { get; }
-            public string ContentXPath { get; }
-            public bool HasContentId { get; }
-            public bool HasContentKey { get; }
-            public string Culture { get; set; }
-        }
-        */
     }
 }
