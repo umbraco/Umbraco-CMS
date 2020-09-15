@@ -276,6 +276,7 @@
     <Compile Include="PropertyEditors\ValueConverters\BlockListPropertyValueConverter.cs" />
     <Compile Include="PublishedCache\NuCache\BPlusTreeTransactableDictionaryFactory.cs" />
     <Compile Include="PublishedCache\NuCache\BPlusTreeTransactableDictionary.cs" />
+    <Compile Include="PublishedCache\NuCache\IKey.cs" />
     <Compile Include="PublishedCache\NuCache\ITransactable.cs" />
     <Compile Include="PublishedCache\NuCache\ITransactableDictionary.cs" />
     <Compile Include="PublishedCache\NuCache\ITransactableDictionaryFactory.cs" />

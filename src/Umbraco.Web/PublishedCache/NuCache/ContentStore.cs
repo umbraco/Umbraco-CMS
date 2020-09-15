@@ -185,6 +185,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 }
                 else if (_localDb != null && _wchanges != null)
                 {
+                    _localDb.BeginTransaction();
                     foreach (var change in _wchanges)
                     {
                         if (change.Value.IsNull)

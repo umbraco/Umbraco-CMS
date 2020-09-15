@@ -6,7 +6,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
 {
     public interface ITransactableDictionary<TKey, TValue> :
         ITransactable,
-        CSharpTest.Net.Collections.IConcurrentDictionary<TKey, TValue>,
         IDictionary<TKey, TValue>,
         ICollection<KeyValuePair<TKey, TValue>>,
         IEnumerable<KeyValuePair<TKey, TValue>>,
@@ -23,6 +22,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         /// Delete the local files
         /// </summary>
         void DeleteLocalFiles();
+        bool TryRemove(TKey key, out TValue unused);
     }
     
 }

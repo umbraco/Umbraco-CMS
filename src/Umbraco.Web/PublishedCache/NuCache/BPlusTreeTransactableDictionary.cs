@@ -208,6 +208,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
             if (File.Exists(_filePath))
                 File.Delete(_filePath);
         }
+
+        public void BeginTransaction()
+        {
+        }
+
         #endregion
     }
 }
