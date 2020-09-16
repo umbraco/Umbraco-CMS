@@ -36,7 +36,9 @@
 
 @helper renderRow(dynamic row, bool singleColumn){
     <div @RenderElementAttributes(row)>
-        @Html.If(singleColumn, "<div class='container'>")
+        @if (singleColumn) {
+            @:<div class="container">
+        }
         <div class="row clearfix">
             @foreach ( var area in row.areas ) {
             <div class="col-md-@area.grid column">
@@ -49,7 +51,9 @@
                 </div>
             </div>}
         </div>
-        @Html.If(singleColumn, "</div>")
+        @if (singleColumn) {
+            @:</div>
+        }
     </div>
 }
 

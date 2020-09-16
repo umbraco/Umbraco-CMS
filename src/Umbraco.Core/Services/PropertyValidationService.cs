@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Umbraco.Core.Collections;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
@@ -15,17 +13,71 @@ namespace Umbraco.Core.Services
     {
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly IDataTypeService _dataTypeService;
+        private readonly ILocalizedTextService _textService;
 
-        public PropertyValidationService(PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService)
+        public PropertyValidationService(PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, ILocalizedTextService textService)
         {
             _propertyEditors = propertyEditors;
             _dataTypeService = dataTypeService;
+            _textService = textService;
         }
 
         //TODO: Remove this method in favor of the overload specifying all dependencies
         public PropertyValidationService()
-            : this(Current.PropertyEditors, Current.Services.DataTypeService)
+            : this(Current.PropertyEditors, Current.Services.DataTypeService, Current.Services.TextService)
         {
+        }
+
+        public IEnumerable<ValidationResult> ValidatePropertyValue(
+           PropertyType propertyType,
+           object postedValue)
+        {
+            if (propertyType is null) throw new ArgumentNullException(nameof(propertyType));
+            var dataType = _dataTypeService.GetDataType(propertyType.DataTypeId);
+            if (dataType == null) throw new InvalidOperationException("No data type found by id " + propertyType.DataTypeId);
+
+            var editor = _propertyEditors[propertyType.PropertyEditorAlias];
+            if (editor == null) throw new InvalidOperationException("No property editor found by alias " + propertyType.PropertyEditorAlias);
+
+            return ValidatePropertyValue(_textService, editor, dataType, postedValue, propertyType.Mandatory, propertyType.ValidationRegExp, propertyType.MandatoryMessage, propertyType.ValidationRegExpMessage);
+        }
+
+        internal static IEnumerable<ValidationResult> ValidatePropertyValue(
+            ILocalizedTextService textService,
+            IDataEditor editor,
+            IDataType dataType,
+            object postedValue,
+            bool isRequired,
+            string validationRegExp,
+            string isRequiredMessage,
+            string validationRegExpMessage)
+        {
+            // Retrieve default messages used for required and regex validatation.  We'll replace these
+            // if set with custom ones if they've been provided for a given property.
+            var requiredDefaultMessages = new[]
+                {
+                    textService.Localize("validation", "invalidNull"),
+                    textService.Localize("validation", "invalidEmpty")
+                };
+            var formatDefaultMessages = new[]
+                {
+                    textService.Localize("validation", "invalidPattern"),
+                };
+
+            var valueEditor = editor.GetValueEditor(dataType.Configuration);
+            foreach (var validationResult in valueEditor.Validate(postedValue, isRequired, validationRegExp))
+            {
+                // If we've got custom error messages, we'll replace the default ones that will have been applied in the call to Validate().
+                if (isRequired && !string.IsNullOrWhiteSpace(isRequiredMessage) && requiredDefaultMessages.Contains(validationResult.ErrorMessage, StringComparer.OrdinalIgnoreCase))
+                {
+                    validationResult.ErrorMessage = isRequiredMessage;
+                }
+                if (!string.IsNullOrWhiteSpace(validationRegExp) && !string.IsNullOrWhiteSpace(validationRegExpMessage) && formatDefaultMessages.Contains(validationResult.ErrorMessage, StringComparer.OrdinalIgnoreCase))
+                {
+                    validationResult.ErrorMessage = validationRegExpMessage;
+                }
+                yield return validationResult;
+            }
         }
 
         /// <summary>

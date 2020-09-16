@@ -228,7 +228,7 @@ function MemberEditController($scope, $routeParams, $location, $http, $q, appSta
                     }
 
                 }, function(err) {
-
+                    formHelper.resetForm({ scope: $scope, hasErrors: true });
                     contentEditingHelper.handleSaveError({
                         err: err,
                         rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, err.data)

@@ -13,7 +13,7 @@ using Umbraco.Web.PublishedCache.NuCache.Navigable;
 
 namespace Umbraco.Web.PublishedCache.NuCache
 {
-    internal class ContentCache : PublishedCacheBase, IPublishedContentCache, INavigableData, IDisposable
+    internal class ContentCache : PublishedCacheBase, IPublishedContentCache2, INavigableData, IDisposable
     {
         private readonly ContentStore.Snapshot _snapshot;
         private readonly IAppCache _snapshotCache;
@@ -384,15 +384,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         #region Content types
 
-        public override IPublishedContentType GetContentType(int id)
-        {
-            return _snapshot.GetContentType(id);
-        }
+        public override IPublishedContentType GetContentType(int id) => _snapshot.GetContentType(id);
 
-        public override IPublishedContentType GetContentType(string alias)
-        {
-            return _snapshot.GetContentType(alias);
-        }
+        public override IPublishedContentType GetContentType(string alias) => _snapshot.GetContentType(alias);
+
+        public override IPublishedContentType GetContentType(Guid key) => _snapshot.GetContentType(key);
 
         #endregion
 
