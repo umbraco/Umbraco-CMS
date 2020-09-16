@@ -58,5 +58,11 @@ namespace Umbraco.Core.Scoping
         /// </summary>
         /// <param name="lockIds">The lock object identifiers.</param>
         void WriteLock(params int[] lockIds);
+
+        /// <summary>
+        /// Write-locks some lock objects.
+        /// </summary>
+        /// <param name="lockId">The lock object identifier.</param>
+        void WriteLock(int lockId);
     }
 }

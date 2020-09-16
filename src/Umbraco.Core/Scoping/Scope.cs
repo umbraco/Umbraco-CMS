@@ -490,5 +490,9 @@ namespace Umbraco.Core.Scoping
 
         /// <inheritdoc />
         public void WriteLock(params int[] lockIds) => Database.SqlContext.SqlSyntax.WriteLock(Database, lockIds);
+
+        /// <inheritdoc />
+        public void WriteLock(int lockId) => Database.SqlContext.SqlSyntax.WriteLock(Database, lockId);
+
     }
 }

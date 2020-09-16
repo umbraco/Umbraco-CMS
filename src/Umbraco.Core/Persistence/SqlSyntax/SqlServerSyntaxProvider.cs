@@ -268,13 +268,35 @@ where tbl.[name]=@0 and col.[name]=@1;", tableName, columnName)
             // *not* using a unique 'WHERE IN' query here because the *order* of lockIds is important to avoid deadlocks
             foreach (var lockId in lockIds)
             {
-                db.Execute($"SET LOCK_TIMEOUT {timeout.TotalMilliseconds};");
-                var i = db.Execute(@"UPDATE umbracoLock WITH (REPEATABLEREAD) SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id=@id", new { id = lockId });
-                if (i == 0) // ensure we are actually locking!
-                    throw new ArgumentException($"LockObject with id={lockId} does not exist.");
+                timeout = ObtainWriteLock(db, timeout, lockId);
             }
         }
 
+        private static TimeSpan ObtainWriteLock(IDatabase db, TimeSpan timeout, int lockId)
+        {
+            db.Execute($"SET LOCK_TIMEOUT {timeout.TotalMilliseconds};");
+            var i = db.Execute(@"UPDATE umbracoLock WITH (REPEATABLEREAD) SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id=@id", new { id = lockId });
+            if (i == 0) // ensure we are actually locking!
+                throw new ArgumentException($"LockObject with id={lockId} does not exist.");
+            return timeout;
+        }
+
+        public override void WriteLock(IDatabase db, int lockId)
+        {
+            WriteLock(db, TimeSpan.FromMilliseconds(1800), lockId);
+        }
+
+        public void WriteLock(IDatabase db, TimeSpan timeout, int lockId)
+        {
+            // soon as we get Database, a transaction is started
+
+            if (db.Transaction.IsolationLevel < IsolationLevel.ReadCommitted)
+                throw new InvalidOperationException("A transaction with minimum ReadCommitted isolation level is required.");
+
+
+            // *not* using a unique 'WHERE IN' query here because the *order* of lockIds is important to avoid deadlocks
+            timeout = ObtainWriteLock(db, timeout, lockId);
+        }
 
         public override void ReadLock(IDatabase db, params int[] lockIds)
         {
