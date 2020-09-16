@@ -19,7 +19,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     public class RedirectUrlManagementController : UmbracoAuthorizedApiController
     {
-        private readonly ILogger _logger;
+        private readonly ILogger<RedirectUrlManagementController> _logger;
         private readonly IWebRoutingSettings _webRoutingSettings;
         private readonly IWebSecurity _webSecurity;
         private readonly IRedirectUrlService _redirectUrlService;
@@ -28,7 +28,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IConfigManipulator _configManipulator;
 
         public RedirectUrlManagementController(
-            ILogger logger,
+            ILogger<RedirectUrlManagementController> logger,
             IWebRoutingSettings webRoutingSettings,
             IWebSecurity webSecurity,
             IRedirectUrlService redirectUrlService,

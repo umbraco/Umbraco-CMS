@@ -48,7 +48,7 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Gets or sets the logger.
         /// </summary>
-        public ILogger Logger { get; }
+        public ILogger<UmbracoController> Logger { get; }
 
         /// <summary>
         /// Gets or sets the profiling logger.
@@ -74,12 +74,12 @@ namespace Umbraco.Web.Mvc
                   Current.Factory.GetInstance<ServiceContext>(),
                   Current.Factory.GetInstance<AppCaches>(),
                   Current.Factory.GetInstance<IProfilingLogger>(),
-                  Current.Factory.GetInstance<ILogger>()
+                  Current.Factory.GetInstance<ILogger<UmbracoController>>()
             )
         {
         }
 
-        protected UmbracoController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger, ILogger logger)
+        protected UmbracoController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger, ILogger<UmbracoController> logger)
         {
             GlobalSettings = globalSettings;
             UmbracoContextAccessor = umbracoContextAccessor;

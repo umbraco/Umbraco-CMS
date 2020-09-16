@@ -44,7 +44,7 @@ namespace Umbraco.Web.Editors
             ServiceContext services,
             AppCaches appCaches,
             IProfilingLogger profilingLogger,
-            ILogger logger,
+            ILogger<BackOfficeController> logger,
             IUmbracoVersion umbracoVersion,
             IContentSettings contentSettings,
             IHostingEnvironment hostingEnvironment,

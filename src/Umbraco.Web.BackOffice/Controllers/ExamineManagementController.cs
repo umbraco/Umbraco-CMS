@@ -22,14 +22,14 @@ namespace Umbraco.Web.BackOffice.Controllers
     public class ExamineManagementController : UmbracoAuthorizedJsonController
     {
         private readonly IExamineManager _examineManager;
-        private readonly ILogger _logger;
+        private readonly ILogger<ExamineManagementController> _logger;
         private readonly IIOHelper _ioHelper;
         private readonly IIndexDiagnosticsFactory _indexDiagnosticsFactory;
         private readonly IAppPolicyCache _runtimeCache;
         private readonly IndexRebuilder _indexRebuilder;
 
 
-        public ExamineManagementController(IExamineManager examineManager, ILogger logger, IIOHelper ioHelper, IIndexDiagnosticsFactory indexDiagnosticsFactory,
+        public ExamineManagementController(IExamineManager examineManager, ILogger<ExamineManagementController> logger, IIOHelper ioHelper, IIndexDiagnosticsFactory indexDiagnosticsFactory,
             AppCaches appCaches,
             IndexRebuilder indexRebuilder)
         {
