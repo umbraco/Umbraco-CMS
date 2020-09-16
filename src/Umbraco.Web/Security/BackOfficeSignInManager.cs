@@ -21,7 +21,7 @@ namespace Umbraco.Web.Security
     /// </summary>
     public class BackOfficeSignInManager : IDisposable
     {
-        private readonly BackOfficeUserManager<BackOfficeIdentityUser> _userManager;
+        private readonly IBackOfficeUserManager _userManager;
         private readonly IUserClaimsPrincipalFactory<BackOfficeIdentityUser> _claimsPrincipalFactory;
         private readonly IAuthenticationManager _authenticationManager;
         private readonly ILogger _logger;
@@ -29,7 +29,7 @@ namespace Umbraco.Web.Security
         private readonly IOwinRequest _request;
 
         public BackOfficeSignInManager(
-            BackOfficeUserManager<BackOfficeIdentityUser> userManager,
+            IBackOfficeUserManager userManager,
             IUserClaimsPrincipalFactory<BackOfficeIdentityUser> claimsPrincipalFactory,
             IAuthenticationManager authenticationManager,
             ILogger logger,
@@ -248,7 +248,7 @@ namespace Umbraco.Web.Security
             }
             return null;
         }
-        
+
         /// <summary>
         /// Two factor verification step
         /// </summary>

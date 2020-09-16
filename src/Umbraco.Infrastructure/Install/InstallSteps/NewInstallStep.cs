@@ -34,9 +34,9 @@ namespace Umbraco.Web.Install.InstallSteps
         private readonly ISecuritySettings _securitySettings;
         private readonly IConnectionStrings _connectionStrings;
         private readonly ICookieManager _cookieManager;
-        private readonly BackOfficeUserManager _userManager;
+        private readonly IBackOfficeUserManager _userManager;
 
-        public NewInstallStep(IUserService userService, DatabaseBuilder databaseBuilder, IGlobalSettings globalSettings, IUserPasswordConfiguration passwordConfiguration, ISecuritySettings securitySettings, IConnectionStrings connectionStrings, ICookieManager cookieManager, BackOfficeUserManager userManager)
+        public NewInstallStep(IUserService userService, DatabaseBuilder databaseBuilder, IGlobalSettings globalSettings, IUserPasswordConfiguration passwordConfiguration, ISecuritySettings securitySettings, IConnectionStrings connectionStrings, ICookieManager cookieManager, IBackOfficeUserManager userManager)
         {
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _databaseBuilder = databaseBuilder ?? throw new ArgumentNullException(nameof(databaseBuilder));

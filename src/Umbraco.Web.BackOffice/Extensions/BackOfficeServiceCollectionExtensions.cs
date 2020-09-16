@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -56,7 +57,7 @@ namespace Umbraco.Extensions
             services.BuildUmbracoBackOfficeIdentity()
                 .AddDefaultTokenProviders()
                 .AddUserStore<BackOfficeUserStore>()
-                .AddUserManager<BackOfficeUserManager>()
+                .AddUserManager<IBackOfficeUserManager, BackOfficeUserManager>()
                 .AddSignInManager<BackOfficeSignInManager>()
                 .AddClaimsPrincipalFactory<BackOfficeClaimsPrincipalFactory<BackOfficeIdentityUser>>();
 
@@ -92,4 +93,23 @@ namespace Umbraco.Extensions
             return new IdentityBuilder(typeof(BackOfficeIdentityUser), services);
         }
     }
+
+
+    public static class IdentityBuilderExtensions
+    {
+        /// <summary>
+        /// Adds a <see cref="UserManager{TUser}"/> for the <seealso cref="UserType"/>.
+        /// </summary>
+        /// <typeparam name="TUserManager">The type of the user manager to add.</typeparam>
+        /// <typeparam name="TInterface"></typeparam>
+        /// <returns>The current <see cref="IdentityBuilder"/> instance.</returns>
+        public static IdentityBuilder AddUserManager<TInterface, TUserManager>(this IdentityBuilder identityBuilder) where TUserManager : UserManager<BackOfficeIdentityUser>, TInterface
+        {
+            identityBuilder.AddUserManager<TUserManager>();
+            identityBuilder.Services.AddScoped(typeof(TInterface), typeof(TUserManager));
+            return identityBuilder;
+        }
+    }
+
+
 }

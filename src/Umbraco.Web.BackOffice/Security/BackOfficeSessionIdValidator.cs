@@ -39,9 +39,9 @@ namespace Umbraco.Web.BackOffice.Security
         private readonly ISystemClock _systemClock;
         private readonly IGlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
-        private readonly BackOfficeUserManager _userManager;
+        private readonly IBackOfficeUserManager _userManager;
 
-        public BackOfficeSessionIdValidator(ISystemClock systemClock, IGlobalSettings globalSettings, IHostingEnvironment hostingEnvironment, BackOfficeUserManager userManager)
+        public BackOfficeSessionIdValidator(ISystemClock systemClock, IGlobalSettings globalSettings, IHostingEnvironment hostingEnvironment, IBackOfficeUserManager userManager)
         {
             _systemClock = systemClock;
             _globalSettings = globalSettings;

@@ -33,11 +33,10 @@ namespace Umbraco.Web.BackOffice.Controllers
     [PluginController(Constants.Web.Mvc.BackOfficeArea)]
     public class BackOfficeController : Controller
     {
-        private readonly BackOfficeUserManager _userManager;
+        private readonly IBackOfficeUserManager _userManager;
         private readonly IRuntimeMinifier _runtimeMinifier;
         private readonly IGlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
-        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly ILocalizedTextService _textService;
         private readonly IGridConfig _gridConfig;
         private readonly BackOfficeServerVariables _backOfficeServerVariables;
@@ -47,11 +46,10 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly ILogger _logger;
 
         public BackOfficeController(
-            BackOfficeUserManager userManager,
+            IBackOfficeUserManager userManager,
             IRuntimeMinifier runtimeMinifier,
             IGlobalSettings globalSettings,
             IHostingEnvironment hostingEnvironment,
-            IUmbracoContextAccessor umbracoContextAccessor,
             ILocalizedTextService textService,
             IGridConfig gridConfig,
             BackOfficeServerVariables backOfficeServerVariables,
@@ -65,7 +63,6 @@ namespace Umbraco.Web.BackOffice.Controllers
             _runtimeMinifier = runtimeMinifier;
             _globalSettings = globalSettings;
             _hostingEnvironment = hostingEnvironment;
-            _umbracoContextAccessor = umbracoContextAccessor;
             _textService = textService;
             _gridConfig = gridConfig ?? throw new ArgumentNullException(nameof(gridConfig));
             _backOfficeServerVariables = backOfficeServerVariables;
@@ -80,7 +77,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         {
             var viewPath = Path.Combine(_globalSettings.UmbracoPath , Constants.Web.Mvc.BackOfficeArea, nameof(Default) + ".cshtml")
                 .Replace("\\", "/"); // convert to forward slashes since it's a virtual path
-            
+
             return await RenderDefaultOrProcessExternalLoginAsync(
                 () => View(viewPath),
                 () => View(viewPath));

@@ -40,7 +40,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     public class AuthenticationController : UmbracoApiControllerBase
     {
         private readonly IWebSecurity _webSecurity;
-        private readonly BackOfficeUserManager _userManager;
+        private readonly IBackOfficeUserManager _userManager;
         private readonly BackOfficeSignInManager _signInManager;
         private readonly IUserService _userService;
         private readonly ILocalizedTextService _textService;
@@ -59,7 +59,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
         public AuthenticationController(
             IWebSecurity webSecurity,
-            BackOfficeUserManager backOfficeUserManager,
+            IBackOfficeUserManager backOfficeUserManager,
             BackOfficeSignInManager signInManager,
             IUserService userService,
             ILocalizedTextService textService,

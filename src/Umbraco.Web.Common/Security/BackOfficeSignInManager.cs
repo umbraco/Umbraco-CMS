@@ -20,7 +20,7 @@ namespace Umbraco.Web.Common.Security
 
     public class BackOfficeSignInManager : SignInManager<BackOfficeIdentityUser>
     {
-        private readonly BackOfficeUserManager _userManager;
+        private readonly IBackOfficeUserManager _userManager;
 
         public BackOfficeSignInManager(
             BackOfficeUserManager userManager,
