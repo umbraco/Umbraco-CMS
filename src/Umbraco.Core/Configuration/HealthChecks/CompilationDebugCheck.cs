@@ -18,29 +18,6 @@ namespace Umbraco.Core.HealthCheck.Checks.LiveEnvironment
         {
             _hostingSettings = hostingSettings.Value;
         }
-        public override IEnumerable<HealthCheckStatus> GetStatus()
-        {
-            var status = new List<HealthCheckStatus>();
-            var actions = new List<HealthCheckAction>();
-
-            if (_hostingSettings.Debug == false)
-            {
-                status.Add(new HealthCheckStatus("Success")
-                {
-                    ResultType = StatusResultType.Success,
-                    Actions = actions
-                });
-            }
-            else
-            {
-                status.Add(new HealthCheckStatus("Error")
-                {
-                    ResultType = StatusResultType.Error,
-                    Actions = actions
-                });
-            }
-            return status;
-        }
 
         public override string ItemPath => Constants.Configuration.ConfigHostingDebug;
 
