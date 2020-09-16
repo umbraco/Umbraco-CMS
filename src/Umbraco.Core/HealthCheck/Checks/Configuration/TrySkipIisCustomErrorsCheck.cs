@@ -7,7 +7,7 @@ using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 
-namespace Umbraco.Core.HealthCheck.Checks
+namespace Umbraco.Core.HealthCheck.Checks.Configuration
 {
     [Obsolete("This is not currently in the appsettings.JSON and so can either be removed, or rewritten in .NET Core fashion")]
     [HealthCheck("046A066C-4FB2-4937-B931-069964E16C66", "Try Skip IIS Custom Errors",

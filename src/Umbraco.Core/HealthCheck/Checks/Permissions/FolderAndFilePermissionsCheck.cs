@@ -9,24 +9,12 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Core.HealthCheck.Checks.Permissions
 {
-    internal enum PermissionCheckRequirement
-    {
-        Required,
-        Optional
-    }
-
-    internal enum PermissionCheckFor
-    {
-        Folder,
-        File
-    }
-
     [HealthCheck(
         "53DBA282-4A79-4B67-B958-B29EC40FCC23",
         "Folder & File Permissions",
         Description = "Checks that the web server folder and file permissions are set correctly for Umbraco to run.",
         Group = "Permissions")]
-    public class FolderAndFilePermissionsCheck : Core.HealthCheck.HealthCheck
+    public class FolderAndFilePermissionsCheck : HealthCheck
     {
         private readonly ILocalizedTextService _textService;
         private readonly GlobalSettings _globalSettings;

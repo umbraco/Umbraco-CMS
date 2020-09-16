@@ -2,7 +2,7 @@
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 
-namespace Umbraco.Core.HealthCheck.Checks.Security
+namespace Umbraco.Core.HealthCheck.Checks.LiveEnvironment
 {
     [HealthCheck("9BED6EF4-A7F3-457A-8935-B64E9AA8BAB3", "Trace Mode",
         Description = "Leaving trace mode enabled can make valuable information about your system available to hackers.",

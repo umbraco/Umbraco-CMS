@@ -3,7 +3,7 @@ using System.Linq;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 
-namespace Umbraco.Core.HealthCheck.Checks.Security
+namespace Umbraco.Core.HealthCheck.Checks.LiveEnvironment
 {
     [HealthCheck("4090C0A1-2C52-4124-92DD-F028FD066A64", "Custom Errors",
         Description = "Leaving custom errors off will display a complete stack trace to your visitors if an exception occurs.",

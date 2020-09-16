@@ -4,7 +4,7 @@ using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 
-namespace Umbraco.Core.HealthCheck.Checks
+namespace Umbraco.Core.HealthCheck.Checks.LiveEnvironment
 {
     [HealthCheck("61214FF3-FC57-4B31-B5CF-1D095C977D6D", "Debug Compilation Mode",
         Description = "Leaving debug compilation mode enabled can severely slow down a website and take up more memory on the server.",
