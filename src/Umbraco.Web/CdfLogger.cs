@@ -21,7 +21,7 @@ namespace Umbraco.Web
 
         public void Debug(string msg)
         {
-            _logger.Debug<CdfLogger>(msg);
+            _logger.LogDebug(msg);
         }
 
         public void Info(string msg)

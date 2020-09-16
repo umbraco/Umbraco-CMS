@@ -51,7 +51,7 @@ namespace Umbraco.Web.Routing
 
                 if (nodeId > 0)
                 {
-                    _logger.Debug<ContentFinderByIdPath>("Id={NodeId}", nodeId);
+                    _logger.LogDebug("Id={NodeId}", nodeId);
                     node = frequest.UmbracoContext.Content.GetById(nodeId);
 
                     if (node != null)
@@ -67,7 +67,7 @@ namespace Umbraco.Web.Routing
                         }
 
                         frequest.PublishedContent = node;
-                        _logger.Debug<ContentFinderByIdPath>("Found node with id={PublishedContentId}", frequest.PublishedContent.Id);
+                        _logger.LogDebug("Found node with id={PublishedContentId}", frequest.PublishedContent.Id);
                     }
                     else
                     {
@@ -77,7 +77,7 @@ namespace Umbraco.Web.Routing
             }
 
             if (nodeId == -1)
-                _logger.Debug<ContentFinderByIdPath>("Not a node id");
+                _logger.LogDebug("Not a node id");
 
             return node != null;
         }

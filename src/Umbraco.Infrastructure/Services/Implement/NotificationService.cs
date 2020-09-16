@@ -510,7 +510,7 @@ namespace Umbraco.Core.Services.Implement
         {
             ThreadPool.QueueUserWorkItem(state =>
             {
-                _logger.Debug<NotificationService>("Begin processing notifications.");
+                _logger.LogDebug("Begin processing notifications.");
                 while (true)
                 {
                     NotificationRequest request;
@@ -519,7 +519,7 @@ namespace Umbraco.Core.Services.Implement
                         try
                         {
                             _emailSender.SendAsync(request.Mail).GetAwaiter().GetResult();
-                            _logger.Debug<NotificationService>("Notification '{Action}' sent to {Username} ({Email})", request.Action, request.UserName, request.Email);
+                            _logger.LogDebug("Notification '{Action}' sent to {Username} ({Email})", request.Action, request.UserName, request.Email);
                         }
                         catch (Exception ex)
                         {
@@ -538,7 +538,7 @@ namespace Umbraco.Core.Services.Implement
                     }
                 }
 
-                _logger.Debug<NotificationService>("Done processing notifications.");
+                _logger.LogDebug("Done processing notifications.");
             });
         }
 

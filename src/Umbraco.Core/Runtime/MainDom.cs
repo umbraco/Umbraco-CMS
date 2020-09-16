@@ -105,7 +105,7 @@ namespace Umbraco.Core.Runtime
 
             lock (_locko)
             {
-                _logger.Debug<MainDom>("Signaled ({Signaled}) ({SignalSource})", _signaled ? "again" : "first", source);
+                _logger.LogDebug("Signaled ({Signaled}) ({SignalSource})", _signaled ? "again" : "first", source);
                 if (_signaled) return;
                 if (_isMainDom == false) return; // probably not needed
                 _signaled = true;
@@ -126,7 +126,7 @@ namespace Umbraco.Core.Runtime
                         }
                     }
 
-                    _logger.Debug<MainDom>("Stopped ({SignalSource})", source);
+                    _logger.LogDebug("Stopped ({SignalSource})", source);
                 }
                 finally
                 {

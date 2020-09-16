@@ -71,7 +71,7 @@ namespace Umbraco.Core
             {
                 // local version *does* match code version, but the database is not configured
                 // install - may happen with Deploy/Cloud/etc
-                _logger.Debug<RuntimeState>("Database is not configured, need to install Umbraco.");
+                _logger.LogDebug("Database is not configured, need to install Umbraco.");
                 Level = RuntimeLevel.Install;
                 Reason = RuntimeLevelReason.InstallNoDatabase;
                 return;
@@ -86,14 +86,14 @@ namespace Umbraco.Core
             {
                 connect = _databaseFactory.CanConnect;
                 if (connect || ++i == tries) break;
-                _logger.Debug<RuntimeState>("Could not immediately connect to database, trying again.");
+                _logger.LogDebug("Could not immediately connect to database, trying again.");
                 Thread.Sleep(1000);
             }
 
             if (connect == false)
             {
                 // cannot connect to configured database, this is bad, fail
-                _logger.Debug<RuntimeState>("Could not connect to database.");
+                _logger.LogDebug("Could not connect to database.");
 
                 if (_globalSettings.InstallMissingDatabase)
                 {
@@ -154,7 +154,7 @@ namespace Umbraco.Core
 
             // although the files version matches the code version, the database version does not
             // which means the local files have been upgraded but not the database - need to upgrade
-            _logger.Debug<RuntimeState>("Has not reached the final upgrade step, need to upgrade Umbraco.");
+            _logger.LogDebug("Has not reached the final upgrade step, need to upgrade Umbraco.");
             Level = RuntimeLevel.Upgrade;
             Reason = RuntimeLevelReason.UpgradeMigrations;
         }
@@ -171,7 +171,7 @@ namespace Umbraco.Core
                 FinalMigrationState = upgrader.Plan.FinalState;
             }
 
-            logger.Debug<RuntimeState>("Final upgrade state is {FinalMigrationState}, database contains {DatabaseState}", FinalMigrationState, CurrentMigrationState ?? "<null>");
+            logger.LogDebug("Final upgrade state is {FinalMigrationState}, database contains {DatabaseState}", FinalMigrationState, CurrentMigrationState ?? "<null>");
 
             return CurrentMigrationState == FinalMigrationState;
         }

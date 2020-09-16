@@ -113,7 +113,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             if (userIsAdmin == false)
             {
                 var errorMessage = "User is not a member of the administrators group and so is not allowed to toggle the URL tracker";
-                _logger.Debug<RedirectUrlManagementController>(errorMessage);
+                _logger.LogDebug(errorMessage);
                 throw new SecurityException(errorMessage);
             }
 

@@ -227,9 +227,9 @@ namespace Umbraco.Core.Persistence
         protected override void OnException(Exception ex)
         {
             _logger.LogError(ex, "Exception ({InstanceId}).", InstanceId);
-            _logger.Debug<UmbracoDatabase>("At:\r\n{StackTrace}", Environment.StackTrace);
+            _logger.LogDebug("At:\r\n{StackTrace}", Environment.StackTrace);
             if (EnableSqlTrace == false)
-                _logger.Debug<UmbracoDatabase>("Sql:\r\n{Sql}", CommandToString(LastSQL, LastArgs));
+                _logger.LogDebug("Sql:\r\n{Sql}", CommandToString(LastSQL, LastArgs));
             base.OnException(ex);
         }
 
@@ -242,13 +242,13 @@ namespace Umbraco.Core.Persistence
                 cmd.CommandTimeout = cmd.Connection.ConnectionTimeout;
 
             if (EnableSqlTrace)
-                _logger.Debug<UmbracoDatabase>("SQL Trace:\r\n{Sql}", CommandToString(cmd).Replace("{", "{{").Replace("}", "}}")); // TODO: these escapes should be builtin
+                _logger.LogDebug("SQL Trace:\r\n{Sql}", CommandToString(cmd).Replace("{", "{{").Replace("}", "}}")); // TODO: these escapes should be builtin
 
 #if DEBUG_DATABASES
             // detects whether the command is already in use (eg still has an open reader...)
             DatabaseDebugHelper.SetCommand(cmd, InstanceId + " [T" + System.Threading.Thread.CurrentThread.ManagedThreadId + "]");
             var refsobj = DatabaseDebugHelper.GetReferencedObjects(cmd.Connection);
-            if (refsobj != null) _logger.Debug<UmbracoDatabase>("Oops!" + Environment.NewLine + refsobj);
+            if (refsobj != null) _logger.LogDebug("Oops!" + Environment.NewLine + refsobj);
 #endif
 
             _cmd = cmd;

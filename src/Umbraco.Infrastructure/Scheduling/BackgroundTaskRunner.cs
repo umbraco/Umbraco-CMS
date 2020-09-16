@@ -245,7 +245,7 @@ namespace Umbraco.Web.Scheduling
                     throw new InvalidOperationException("The task runner has completed.");
 
                 // add task
-                _logger.Debug<BackgroundTaskRunner>("{LogPrefix} Task Added {TaskType}", _logPrefix , task.GetType().FullName);
+                _logger.LogDebug("{LogPrefix} Task Added {TaskType}", _logPrefix , task.GetType().FullName);
                 _tasks.Post(task);
 
                 // start
@@ -265,12 +265,12 @@ namespace Umbraco.Web.Scheduling
             {
                 if (_completed)
                 {
-                    _logger.Debug<BackgroundTaskRunner>("{LogPrefix} Task cannot be added {TaskType}, the task runner has already shutdown", _logPrefix, task.GetType().FullName);
+                    _logger.LogDebug("{LogPrefix} Task cannot be added {TaskType}, the task runner has already shutdown", _logPrefix, task.GetType().FullName);
                     return false;
                 }
 
                 // add task
-                _logger.Debug<BackgroundTaskRunner>("{LogPrefix} Task added {TaskType}", _logPrefix, task.GetType().FullName);
+                _logger.LogDebug("{LogPrefix} Task added {TaskType}", _logPrefix, task.GetType().FullName);
                 _tasks.Post(task);
 
                 // start
@@ -327,7 +327,7 @@ namespace Umbraco.Web.Scheduling
             _shutdownToken = _shutdownTokenSource.Token;
             _runningTask = Task.Run(async () => await Pump().ConfigureAwait(false), _shutdownToken);
 
-            _logger.Debug<BackgroundTaskRunner>("{LogPrefix} Starting", _logPrefix);
+            _logger.LogDebug("{LogPrefix} Starting", _logPrefix);
         }
 
         /// <summary>
@@ -446,7 +446,7 @@ namespace Umbraco.Web.Scheduling
                     if (_shutdownToken.IsCancellationRequested == false && TaskCount > 0) continue;
 
                     // if we really have nothing to do, stop
-                    _logger.Debug<BackgroundTaskRunner>("{LogPrefix} Stopping", _logPrefix);
+                    _logger.LogDebug("{LogPrefix} Stopping", _logPrefix);
 
                     if (_options.PreserveRunningTask == false)
                         _runningTask = null;
@@ -607,7 +607,7 @@ namespace Umbraco.Web.Scheduling
 
         private void OnEvent<TArgs>(TypedEventHandler<BackgroundTaskRunner<T>, TArgs> handler, string name, TArgs e)
         {
-            _logger.Debug<BackgroundTaskRunner>("{LogPrefix} OnEvent {EventName}", _logPrefix, name);
+            _logger.LogDebug("{LogPrefix} OnEvent {EventName}", _logPrefix, name);
 
             if (handler == null) return;
 

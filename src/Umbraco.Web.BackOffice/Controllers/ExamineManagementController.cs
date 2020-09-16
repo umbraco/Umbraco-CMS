@@ -245,7 +245,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         {
             var indexer = (IIndex)sender;
 
-            _logger.Debug<ExamineManagementController>("Logging operation completed for index {IndexName}", indexer.Name);
+            _logger.LogDebug("Logging operation completed for index {IndexName}", indexer.Name);
 
             //ensure it's not listening anymore
             indexer.IndexOperationComplete -= Indexer_IndexOperationComplete;

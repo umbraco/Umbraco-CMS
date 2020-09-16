@@ -94,7 +94,7 @@ namespace Umbraco.Tests.Integration
         {
             _events = new List<EventInstance>();
             _msgCount = 0;
-            Current.Logger.Debug<ContentEventsTests>("RESET EVENTS");
+            Current.Logger.LogDebug("RESET EVENTS");
         }
 
         private IContent CreateContent(int parentId = -1)

@@ -426,7 +426,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         // assumes xml lock (file is always locked)
         private void LoadXmlLocked(SafeXmlReaderWriter safeXml, out bool registerXmlChange)
         {
-            Current.Logger.Debug<XmlStore>("Loading Xml...");
+            Current.Logger.LogDebug("Loading Xml...");
 
             // try to get it from the file
             if (XmlFileEnabled && (safeXml.Xml = LoadXmlFromFile()) != null)
@@ -834,7 +834,7 @@ AND (umbracoNode.id=@id)";
             _nextFileCheck = now.AddSeconds(1); // check every 1s
             if (XmlFileLastWriteTime <= _lastFileRead) return;
 
-            Current.Logger.Debug<XmlStore>("Xml file change detected, reloading.");
+            Current.Logger.LogDebug("Xml file change detected, reloading.");
 
             // time to read
 
@@ -1042,7 +1042,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
             {
                 foreach (var payload in payloads)
                 {
-                    Current.Logger.Debug<XmlStore>("Notified {ChangeTypes} for content {ContentId}", payload.ChangeTypes, payload.Id);
+                    Current.Logger.LogDebug("Notified {ChangeTypes} for content {ContentId}", payload.ChangeTypes, payload.Id);
 
                     if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshAll))
                     {
@@ -1075,7 +1075,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
                     if (content == null || content.Published == false || content.Trashed)
                     {
                         // no published version
-                        Current.Logger.Debug<XmlStore>("Notified, content {ContentId} has no published version.", payload.Id);
+                        Current.Logger.LogDebug("Notified, content {ContentId} has no published version.", payload.Id);
 
                         if (current != null)
                         {
@@ -1114,7 +1114,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
                             if (dtos.MoveNext() == false)
                             {
                                 // gone fishing, remove (possible race condition)
-                                Current.Logger.Debug<XmlStore>("Notified, content {ContentId} gone fishing.", payload.Id);
+                                Current.Logger.LogDebug("Notified, content {ContentId} gone fishing.", payload.Id);
 
                                 if (current != null)
                                 {
@@ -1228,7 +1228,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
                 .ToArray();
 
             foreach (var payload in payloads)
-                Current.Logger.Debug<XmlStore>("Notified {ChangeTypes} for content type {ContentTypeId}", payload.ChangeTypes, payload.Id);
+                Current.Logger.LogDebug("Notified {ChangeTypes} for content type {ContentTypeId}", payload.ChangeTypes, payload.Id);
 
             if (ids.Length > 0) // must have refreshes, not only removes
                 RefreshContentTypes(ids);
@@ -1247,7 +1247,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
                 _contentTypeCache.ClearDataType(payload.Id);
 
             foreach (var payload in payloads)
-                Current.Logger.Debug<XmlStore>("Notified {RemovedStatus} for data type {payload.Id}",
+                Current.Logger.LogDebug("Notified {RemovedStatus} for data type {payload.Id}",
                     payload.Removed ? "Removed" : "Refreshed",
                     payload.Id);
 

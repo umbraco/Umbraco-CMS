@@ -138,7 +138,7 @@ namespace Umbraco.Core.Runtime
                     HostingEnvironment?.ApplicationId,
                     HostingEnvironment?.ApplicationPhysicalPath,
                     NetworkHelper.MachineName);
-                Logger.Debug<CoreRuntime>("Runtime: {Runtime}", GetType().FullName);
+                Logger.LogDebug("Runtime: {Runtime}", GetType().FullName);
 
                 AppDomain.CurrentDomain.SetData("DataDirectory", HostingEnvironment?.MapPathContentRoot(Constants.SystemDirectories.Data));
 

@@ -68,7 +68,7 @@ namespace Umbraco.ModelsBuilder.Embedded
         private void RequestModelsGeneration(object sender, EventArgs args)
         {
             //HttpContext.Current.Items[this] = true;
-            _logger.Debug<LiveModelsProvider>("Requested to generate models.");
+            _logger.LogDebug("Requested to generate models.");
             Interlocked.Exchange(ref _req, 1);
         }
 
@@ -82,7 +82,7 @@ namespace Umbraco.ModelsBuilder.Embedded
 
             try
             {
-                _logger.Debug<LiveModelsProvider>("Generate models...");
+                _logger.LogDebug("Generate models...");
                 const int timeout = 2 * 60 * 1000; // 2 mins
                 _mutex.WaitOne(timeout); // wait until it is safe, and acquire
                 _logger.LogInformation("Generate models now.");

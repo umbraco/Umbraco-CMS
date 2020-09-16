@@ -46,7 +46,7 @@ namespace Umbraco.Web.Routing
             // no template if "/"
             if (path == "/")
             {
-                Logger.Debug<ContentFinderByUrlAndTemplate>("No template in path '/'");
+                Logger.LogDebug("No template in path '/'");
                 return false;
             }
 
@@ -59,11 +59,11 @@ namespace Umbraco.Web.Routing
 
             if (template == null)
             {
-                Logger.Debug<ContentFinderByUrlAndTemplate>("Not a valid template: '{TemplateAlias}'", templateAlias);
+                Logger.LogDebug("Not a valid template: '{TemplateAlias}'", templateAlias);
                 return false;
             }
 
-            Logger.Debug<ContentFinderByUrlAndTemplate>("Valid template: '{TemplateAlias}'", templateAlias);
+            Logger.LogDebug("Valid template: '{TemplateAlias}'", templateAlias);
 
             // look for node corresponding to the rest of the route
             var route = frequest.HasDomain ? (frequest.Domain.ContentId + path) : path;
@@ -71,7 +71,7 @@ namespace Umbraco.Web.Routing
 
             if (node == null)
             {
-                Logger.Debug<ContentFinderByUrlAndTemplate>("Not a valid route to node: '{Route}'", route);
+                Logger.LogDebug("Not a valid route to node: '{Route}'", route);
                 return false;
             }
 

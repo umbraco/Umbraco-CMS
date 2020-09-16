@@ -94,7 +94,7 @@ namespace Umbraco.Core.Persistence
 
             if (settings == null)
             {
-                logger.Debug<UmbracoDatabaseFactory>("Missing connection string, defer configuration.");
+                logger.LogDebug("Missing connection string, defer configuration.");
                 return; // not configured
             }
 
@@ -104,7 +104,7 @@ namespace Umbraco.Core.Persistence
             var providerName = settings.ProviderName;
             if (string.IsNullOrWhiteSpace(connectionString) || string.IsNullOrWhiteSpace(providerName))
             {
-                logger.Debug<UmbracoDatabaseFactory>("Empty connection string or provider name, defer configuration.");
+                logger.LogDebug("Empty connection string or provider name, defer configuration.");
                 return; // not configured
             }
 
@@ -123,7 +123,7 @@ namespace Umbraco.Core.Persistence
 
             if (string.IsNullOrWhiteSpace(connectionString) || string.IsNullOrWhiteSpace(providerName))
             {
-                logger.Debug<UmbracoDatabaseFactory>("Missing connection string or provider name, defer configuration.");
+                logger.LogDebug("Missing connection string or provider name, defer configuration.");
                 return; // not configured
             }
 
@@ -188,7 +188,7 @@ namespace Umbraco.Core.Persistence
                 // else leave unchanged
             }
 
-            _logger.Debug<UmbracoDatabaseFactory>("SqlServer {SqlServerVersion}, DatabaseType is {DatabaseType} ({Source}).",
+            _logger.LogDebug("SqlServer {SqlServerVersion}, DatabaseType is {DatabaseType} ({Source}).",
                 versionName, _databaseType, fromSettings ? "settings" : "detected");
         }
 
@@ -245,7 +245,7 @@ namespace Umbraco.Core.Persistence
 
         private SqlContext Initialize()
         {
-            _logger.Debug<UmbracoDatabaseFactory>("Initializing.");
+            _logger.LogDebug("Initializing.");
 
             if (ConnectionString.IsNullOrWhiteSpace()) throw new InvalidOperationException("The factory has not been configured with a proper connection string.");
             if (_providerName.IsNullOrWhiteSpace()) throw new InvalidOperationException("The factory has not been configured with a proper provider name.");
@@ -290,7 +290,7 @@ namespace Umbraco.Core.Persistence
             if (_npocoDatabaseFactory == null)
                 throw new NullReferenceException("The call to UmbracoDatabaseFactory.Config yielded a null UmbracoDatabaseFactory instance.");
 
-            _logger.Debug<UmbracoDatabaseFactory>("Initialized.");
+            _logger.LogDebug("Initialized.");
 
             return new SqlContext(_sqlSyntax, _databaseType, _pocoDataFactory, _mappers);
         }

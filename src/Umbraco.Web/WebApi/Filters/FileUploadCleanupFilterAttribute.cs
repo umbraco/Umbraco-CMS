@@ -111,7 +111,7 @@ namespace Umbraco.Web.WebApi.Filters
                                         tempFolders.Add(dir);
                                     }
 
-                                    Current.Logger.Debug<FileUploadCleanupFilterAttribute>("Removing temp file {FileName}", f.TempFilePath);
+                                    Current.Logger.LogDebug("Removing temp file {FileName}", f.TempFilePath);
 
                                     try
                                     {
