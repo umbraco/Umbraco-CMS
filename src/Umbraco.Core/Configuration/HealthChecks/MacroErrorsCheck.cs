@@ -18,11 +18,6 @@ namespace Umbraco.Core.HealthCheck.Checks.Configuration
         private readonly ILogger _logger;
         private readonly ContentSettings _contentSettings;
 
-        /// <summary>
-        /// Gets the current value of the config setting
-        /// </summary>
-        private string _currentValue = "MacroErrors";
-
         public MacroErrorsCheck(ILocalizedTextService textService, ILogger logger,
             IConfigurationService configurationService, IOptions<ContentSettings> contentSettings)
             : base(textService, logger, configurationService)
@@ -74,7 +69,7 @@ namespace Umbraco.Core.HealthCheck.Checks.Configuration
             get
             {
                 return _textService.Localize("healthcheck/macroErrorModeCheckSuccessMessage",
-                    new[] {_currentValue, Values.First(v => v.IsRecommended).Value});
+                    new[] { CurrentValue, Values.First(v => v.IsRecommended).Value });
             }
         }
 
@@ -86,7 +81,7 @@ namespace Umbraco.Core.HealthCheck.Checks.Configuration
             get
             {
                 return _textService.Localize("healthcheck/macroErrorModeCheckErrorMessage",
-                    new[] {_currentValue, Values.First(v => v.IsRecommended).Value});
+                    new[] { CurrentValue, Values.First(v => v.IsRecommended).Value });
             }
         }
 
@@ -97,10 +92,8 @@ namespace Umbraco.Core.HealthCheck.Checks.Configuration
         {
             get
             {
-                var recommendedValue = Values.FirstOrDefault(v => v.IsRecommended);
-                var rectifiedValue = recommendedValue != null ? recommendedValue.Value : ProvidedValue;
-                return _textService.Localize("healthcheck/macroErrorModeCheckRectifySuccessMessage",
-                    new[] {Values.First(v => v.IsRecommended).Value});
+                return TextService.Localize("healthcheck/macroErrorModeCheckRectifySuccessMessage",
+                    new[] { Values.First(v => v.IsRecommended).Value });
             }
         }
     }
