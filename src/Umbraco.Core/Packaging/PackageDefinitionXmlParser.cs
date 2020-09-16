@@ -68,7 +68,7 @@ namespace Umbraco.Core.Packaging
             }
             catch (Exception e)
             {
-                _logger.LogWarning<PackageDefinitionXmlParser>(e, "Could not add package actions to the package xml definition, the xml did not parse");
+                _logger.LogWarning(e, "Could not add package actions to the package xml definition, the xml did not parse");
             }
 
             var packageXml = new XElement("package",

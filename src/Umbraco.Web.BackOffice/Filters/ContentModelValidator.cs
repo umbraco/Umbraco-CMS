@@ -144,7 +144,7 @@ namespace Umbraco.Web.BackOffice.Filters
                 {
                     var message = $"Could not find property editor \"{p.DataType.EditorAlias}\" for property with id {p.Id}.";
 
-                    Logger.LogWarning<ContentModelValidator>(message);
+                    Logger.LogWarning(message);
                     continue;
                 }
 

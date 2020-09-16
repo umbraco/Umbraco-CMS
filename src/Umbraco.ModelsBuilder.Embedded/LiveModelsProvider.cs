@@ -92,7 +92,7 @@ namespace Umbraco.ModelsBuilder.Embedded
             }
             catch (TimeoutException)
             {
-                _logger.LogWarning<LiveModelsProvider>("Timeout, models were NOT generated.");
+                _logger.LogWarning("Timeout, models were NOT generated.");
             }
             catch (Exception e)
             {

@@ -86,7 +86,7 @@ namespace Umbraco.Core.Runtime
                 if (_signaled) return false;
                 if (_isMainDom == false)
                 {
-                    _logger.LogWarning<MainDom>("Register called when MainDom has not been acquired");
+                    _logger.LogWarning("Register called when MainDom has not been acquired");
                     return false;
                 }
 
@@ -177,7 +177,7 @@ namespace Umbraco.Core.Runtime
             catch (OperationCanceledException ex)
             {
                 // the waiting task could be canceled if this appdomain is naturally shutting down, we'll just swallow this exception
-                _logger.LogWarning<MainDom>(ex, ex.Message);
+                _logger.LogWarning(ex, ex.Message);
             }
 
             _logger.LogInformation("Acquired.");

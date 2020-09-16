@@ -51,7 +51,7 @@ namespace Umbraco.Web.ContentApps
                 // dying is not user-friendly, so let's write to log instead, and wish people read logs...
 
                 //throw new InvalidOperationException($"Duplicate content app aliases found: {string.Join(",", dups)}");
-                _logger.LogWarning<ContentAppFactoryCollection>("Duplicate content app aliases found: {DuplicateAliases}", string.Join(",", dups));
+                _logger.LogWarning("Duplicate content app aliases found: {DuplicateAliases}", string.Join(",", dups));
             }
 
             return apps;

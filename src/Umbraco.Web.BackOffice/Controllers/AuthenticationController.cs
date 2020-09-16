@@ -357,13 +357,13 @@ namespace Umbraco.Web.BackOffice.Controllers
                     var unlockResult = await _userManager.SetLockoutEndDateAsync(identityUser, DateTimeOffset.Now);
                     if (unlockResult.Succeeded == false)
                     {
-                        _logger.LogWarning<AuthenticationController>("Could not unlock for user {UserId} - error {UnlockError}", model.UserId, unlockResult.Errors.First().Description);
+                        _logger.LogWarning("Could not unlock for user {UserId} - error {UnlockError}", model.UserId, unlockResult.Errors.First().Description);
                     }
 
                     var resetAccessFailedCountResult = await _userManager.ResetAccessFailedCountAsync(identityUser);
                     if (resetAccessFailedCountResult.Succeeded == false)
                     {
-                        _logger.LogWarning<AuthenticationController>("Could not reset access failed count {UserId} - error {UnlockError}", model.UserId, unlockResult.Errors.First().Description);
+                        _logger.LogWarning("Could not reset access failed count {UserId} - error {UnlockError}", model.UserId, unlockResult.Errors.First().Description);
                     }
                 }
 

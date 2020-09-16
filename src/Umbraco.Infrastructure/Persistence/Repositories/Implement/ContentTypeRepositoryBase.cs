@@ -1261,7 +1261,7 @@ AND umbracoNode.id <> @id",
                 }
                 else
                 {
-                    Logger.LogWarning<ContentTypeRepositoryBase<TEntity>>("Could not assign a data type for the property type {PropertyTypeAlias} since no data type was found with a property editor {PropertyEditorAlias}", propertyType.Alias, propertyType.PropertyEditorAlias);
+                    Logger.LogWarning("Could not assign a data type for the property type {PropertyTypeAlias} since no data type was found with a property editor {PropertyEditorAlias}", propertyType.Alias, propertyType.PropertyEditorAlias);
                 }
             }
         }

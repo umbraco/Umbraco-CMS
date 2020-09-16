@@ -287,7 +287,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
 
             if (XmlIsImmutable == false)
                 //Current.Logger.LogWarning<XmlStore>("Running with CloneXmlContent being false is a bad idea.");
-                Current.Logger.LogWarning<XmlStore>("CloneXmlContent is false - ignored, we always clone.");
+                Current.Logger.LogWarning("CloneXmlContent is false - ignored, we always clone.");
 
             // note: if SyncFromXmlFile then we should also disable / warn that local edits are going to cause issues...
         }
@@ -797,7 +797,7 @@ AND (umbracoNode.id=@id)";
             }
             catch (FileNotFoundException)
             {
-                Current.Logger.LogWarning<XmlStore>("Failed to load Xml, file does not exist.");
+                Current.Logger.LogWarning("Failed to load Xml, file does not exist.");
                 return null;
             }
             catch (Exception ex)

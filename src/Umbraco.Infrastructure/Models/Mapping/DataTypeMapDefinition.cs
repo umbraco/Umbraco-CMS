@@ -174,7 +174,7 @@ namespace Umbraco.Web.Models.Mapping
                 else
                 {
                     // weird - just leave the field without a value - but warn
-                    _logger.LogWarning<DataTypeMapDefinition>("Could not find a value for configuration field '{ConfigField}'", field.Key);
+                    _logger.LogWarning("Could not find a value for configuration field '{ConfigField}'", field.Key);
                 }
             }
         }

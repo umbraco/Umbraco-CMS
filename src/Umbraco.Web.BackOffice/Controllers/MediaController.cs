@@ -622,7 +622,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 // Save Media with new sort order and update content xml in db accordingly
                 if (mediaService.Sort(sortedMedia) == false)
                 {
-                    Logger.LogWarning<MediaController>("Media sorting failed, this was probably caused by an event being cancelled");
+                    Logger.LogWarning("Media sorting failed, this was probably caused by an event being cancelled");
                     throw HttpResponseException.CreateValidationErrorResponse("Media sorting failed, this was probably caused by an event being cancelled");
                 }
                 return Ok();

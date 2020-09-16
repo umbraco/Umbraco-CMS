@@ -55,7 +55,7 @@ namespace Umbraco.Web.Common.Middleware
                 if (umbracoContextReference.UmbracoContext.IsFrontEndUmbracoRequest)
                 {
                     LogHttpRequest.TryGetCurrentHttpRequestId(out var httpRequestId, _requestCache);
-                   _logger.Verbose<UmbracoRequestMiddleware>("Begin request [{HttpRequestId}]: {RequestUrl}", httpRequestId, requestUri);
+                   _logger.LogTrace("Begin request [{HttpRequestId}]: {RequestUrl}", httpRequestId, requestUri);
                 }
 
                 try
@@ -84,7 +84,7 @@ namespace Umbraco.Web.Common.Middleware
                 if (umbracoContextReference.UmbracoContext.IsFrontEndUmbracoRequest)
                 {
                     LogHttpRequest.TryGetCurrentHttpRequestId(out var httpRequestId, _requestCache);
-                    _logger.Verbose<UmbracoRequestMiddleware>("End Request [{HttpRequestId}]: {RequestUrl} ({RequestDuration}ms)", httpRequestId, requestUri, DateTime.Now.Subtract(umbracoContextReference.UmbracoContext.ObjectCreated).TotalMilliseconds);
+                    _logger.LogTrace("End Request [{HttpRequestId}]: {RequestUrl} ({RequestDuration}ms)", httpRequestId, requestUri, DateTime.Now.Subtract(umbracoContextReference.UmbracoContext.ObjectCreated).TotalMilliseconds);
                 }
 
                 try

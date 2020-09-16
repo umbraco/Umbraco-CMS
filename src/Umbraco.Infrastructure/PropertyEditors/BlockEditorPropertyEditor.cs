@@ -156,7 +156,7 @@ namespace Umbraco.Web.PropertyEditors
                         {
                             // deal with weird situations by ignoring them (no comment)
                             row.PropertyValues.Remove(prop.Key);
-                            _logger.LogWarning<BlockEditorPropertyValueEditor>(
+                            _logger.LogWarning(
                                 "ToEditor removed property value {PropertyKey} in row {RowId} for property type {PropertyTypeAlias}",
                                 prop.Key, row.Key, property.PropertyType.Alias);
                             continue;
@@ -405,7 +405,7 @@ namespace Umbraco.Web.PropertyEditors
                     if (!propertyTypes.TryGetValue(prop.Key, out var propType))
                     {
                         block.RawPropertyValues.Remove(prop.Key);
-                        _logger.LogWarning<BlockEditorValues>("The property {PropertyKey} for block {BlockKey} was removed because the property type {PropertyTypeAlias} was not found on {ContentTypeAlias}",
+                        _logger.LogWarning("The property {PropertyKey} for block {BlockKey} was removed because the property type {PropertyTypeAlias} was not found on {ContentTypeAlias}",
                             prop.Key, block.Key, prop.Key, contentType.Alias);
                     }
                     else

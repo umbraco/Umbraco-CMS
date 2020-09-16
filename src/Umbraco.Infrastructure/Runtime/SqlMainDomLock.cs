@@ -120,7 +120,7 @@ namespace Umbraco.Core.Runtime
         {
             if (_errorDuringAcquiring)
             {
-                _logger.LogWarning<SqlMainDomLock>("Could not acquire MainDom, listening is canceled.");
+                _logger.LogWarning("Could not acquire MainDom, listening is canceled.");
                 return Task.CompletedTask;
             }
 

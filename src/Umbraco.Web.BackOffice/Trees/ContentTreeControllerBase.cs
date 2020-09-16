@@ -196,7 +196,7 @@ namespace Umbraco.Web.Trees
                 // TODO: in the future we could return a validation statement so we can have some UI to notify the user they don't have access
                 if (ignoreUserStartNodes == false && HasPathAccess(id, queryStrings) == false)
                 {
-                    _logger.LogWarning<ContentTreeControllerBase>("User {Username} does not have access to node with id {Id}", _webSecurity.CurrentUser.Username, id);
+                    _logger.LogWarning("User {Username} does not have access to node with id {Id}", _webSecurity.CurrentUser.Username, id);
                     return nodes;
                 }
 

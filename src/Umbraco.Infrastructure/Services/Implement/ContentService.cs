@@ -1481,7 +1481,7 @@ namespace Umbraco.Core.Services.Implement
                             var impact = CultureImpact.Explicit(culture, IsDefaultCulture(allLangs.Value, culture));
                             var tryPublish = d.PublishCulture(impact) && _propertyValidationService.Value.IsPropertyDataValid(d, out invalidProperties, impact);
                             if (invalidProperties != null && invalidProperties.Length > 0)
-                                Logger.LogWarning<ContentService>("Scheduled publishing will fail for document {DocumentId} and culture {Culture} because of invalid properties {InvalidProperties}",
+                                Logger.LogWarning("Scheduled publishing will fail for document {DocumentId} and culture {Culture} because of invalid properties {InvalidProperties}",
                                     d.Id, culture, string.Join(",", invalidProperties.Select(x => x.Alias)));
 
                             publishing &= tryPublish; //set the culture to be published

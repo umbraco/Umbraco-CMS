@@ -143,7 +143,7 @@ namespace Umbraco.Web.PropertyEditors
                         {
                             // deal with weird situations by ignoring them (no comment)
                             row.RawPropertyValues.Remove(prop.Key);
-                            _logger.LogWarning<NestedContentPropertyValueEditor>(
+                            _logger.LogWarning(
                                 ex,
                                 "ConvertDbToString removed property value {PropertyKey} in row {RowId} for property type {PropertyTypeAlias}",
                                 prop.Key, row.Id, propertyType.Alias);
@@ -212,7 +212,7 @@ namespace Umbraco.Web.PropertyEditors
                         {
                             // deal with weird situations by ignoring them (no comment)
                             row.RawPropertyValues.Remove(prop.Key);
-                            _logger.LogWarning<NestedContentPropertyValueEditor>(
+                            _logger.LogWarning(
                                 ex,
                                 "ToEditor removed property value {PropertyKey} in row {RowId} for property type {PropertyTypeAlias}",
                                 prop.Key, row.Id, property.PropertyType.Alias);

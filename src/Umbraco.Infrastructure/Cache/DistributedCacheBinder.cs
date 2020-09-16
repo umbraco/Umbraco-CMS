@@ -73,7 +73,7 @@ namespace Umbraco.Web.Cache
                     {
                         // TODO: should this be fatal (ie, an exception)?
                         var name = e.Sender.GetType().Name + "_" + e.EventName;
-                        _logger.LogWarning<DistributedCacheBinder>("Dropping event {EventName} because no corresponding handler was found.", name);
+                        _logger.LogWarning("Dropping event {EventName} because no corresponding handler was found.", name);
                         continue;
                     }
 
