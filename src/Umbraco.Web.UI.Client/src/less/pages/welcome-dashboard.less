@@ -39,20 +39,19 @@
     text-decoration: none;
     display: block;
     margin: 10px;
-}
 
-.welcome-dashboard__info-box:hover {
-    border: 2px solid @turquoise;
-    cursor: pointer;
-    transition: border-color 150ms ease-in-out;
-    text-decoration: none;
-}
+    &:hover {
+        border: 2px solid @turquoise;
+        cursor: pointer;
+        transition: border-color 150ms ease-in-out;
+        text-decoration: none;
+    }
 
-.welcome-dashboard__info-box:active,
-.welcome-dashboard__info-box:focus {
-    text-decoration: none;
+    &:active,
+    &:focus {
+        text-decoration: none;
+    }
 }
-
 
 .welcome-dashboard__info-box-title {
     color: @turquoise-d1;
@@ -74,7 +73,7 @@
 }
 
 .welcome-dashboard__card {
-    background-color: @gray-10;
+    background-color: @grayLighter;
     border-radius: 3px;
     margin: 10px;
     display: flex;
@@ -113,6 +112,6 @@
 }
 
 .welcome-dashboard__card-teaser {
-    font-size: 14px;
+    font-size: 13px;
     margin-bottom: 15px;
 }

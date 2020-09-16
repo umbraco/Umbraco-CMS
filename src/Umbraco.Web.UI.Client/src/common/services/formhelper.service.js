@@ -33,6 +33,7 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
             if (!args.scope) {
                 throw "args.scope cannot be null";
             }
+
             if (!args.formCtrl) {
                 //try to get the closest form controller
                 currentForm = angularHelper.getRequiredCurrentForm(args.scope);
@@ -44,6 +45,8 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
             //the first thing any form must do is broadcast the formSubmitting event
             args.scope.$broadcast("formSubmitting", { scope: args.scope, action: args.action });
 
+            this.focusOnFirstError(currentForm);
+            
             // Some property editors need to perform an action after all property editors have reacted to the formSubmitting.
             args.scope.$broadcast("formSubmittingFinalPhase", { scope: args.scope, action: args.action });
 
@@ -53,6 +56,7 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
             //then check if the form is valid
             if (!args.skipValidation) {
                 if (currentForm.$invalid) {
+
                     return false;
                 }
             }
@@ -66,6 +70,32 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
             }
 
             return true;
+        },
+
+         /**
+         * @ngdoc function
+         * @name umbraco.services.formHelper#focusOnFirstError
+         * @methodOf umbraco.services.formHelper
+         * @function
+         *
+         * @description
+         * Called by submitForm when a form has been submitted, it will fire a focus on the first found invalid umb-property it finds in the form..
+         * 
+         * @param {object} form Pass in a form object.
+         */
+        focusOnFirstError: function(form) {
+            var invalidNgForms = form.$$element.find(`.umb-property ng-form.ng-invalid, .umb-property-editor ng-form.ng-invalid-required`);
+            var firstInvalidNgForm = invalidNgForms.first();
+
+            if(firstInvalidNgForm.length !== 0) {
+                var focusableFields = [...firstInvalidNgForm.find("umb-range-slider .noUi-handle,input,textarea,select,button")];
+                if(focusableFields.length !== 0) { 
+                    var firstErrorEl = focusableFields.find(el => el.type !== "hidden" && el.hasAttribute("readonly") === false);
+                    if(firstErrorEl.length !== 0) {
+                        firstErrorEl.focus();
+                    }
+                }
+            }
         },
 
         /**

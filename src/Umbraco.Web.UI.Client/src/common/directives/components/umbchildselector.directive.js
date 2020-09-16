@@ -21,14 +21,6 @@ Use this directive to render a ui component for selecting child items to a paren
                 on-remove="vm.removeChild">
         </umb-child-selector>
 
-        <!-- use overlay to select children from -->
-        <umb-overlay
-           ng-if="vm.overlay.show"
-           model="vm.overlay"
-           position="target"
-           view="vm.overlay.view">
-        </umb-overlay>
-
 	</div>
 </pre>
 
@@ -37,7 +29,7 @@ Use this directive to render a ui component for selecting child items to a paren
 	(function () {
 		"use strict";
 
-		function Controller() {
+		function Controller(overlayService) {
 
             var vm = this;
 
@@ -64,23 +56,29 @@ Use this directive to render a ui component for selecting child items to a paren
             vm.removeChild = removeChild;
 
             function addChild($event) {
-                vm.overlay = {
+                
+                const dialog = {
                     view: "itempicker",
                     title: "Choose child",
                     availableItems: vm.availableChildren,
                     selectedItems: vm.selectedChildren,
                     event: $event,
-                    show: true,
                     submit: function(model) {
-
-                        // add selected child
-                        vm.selectedChildren.push(model.selectedItem);
+                        
+                        if (model.selectedItem) {
+                            // add selected child
+                            vm.selectedChildren.push(model.selectedItem);
+                        }
 
                         // close overlay
-                        vm.overlay.show = false;
-                        vm.overlay = null;
+                        overlayService.close();
+                    },
+                    close: function() {
+                        overlayService.close();
                     }
                 };
+
+                overlayService.open(dialog);
             }
 
             function removeChild($index) {
