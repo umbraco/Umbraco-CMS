@@ -1,4 +1,6 @@
 ﻿using System;
+using Microsoft.Extensions.Logging;
+
 
 namespace Umbraco.Core.Logging
 {
@@ -10,7 +12,7 @@ namespace Umbraco.Core.Logging
         /// <summary>
         /// Gets the underlying <see cref="ILogger"/> implementation.
         /// </summary>
-        public ILogger Logger { get; }
+        public Microsoft.Extensions.Logging.ILogger Logger { get; }
 
         /// <summary>
         /// Gets the underlying <see cref="IProfiler"/> implementation.
@@ -20,7 +22,7 @@ namespace Umbraco.Core.Logging
         /// <summary>
         /// Initializes a new instance of the <see cref="ProfilingLogger"/> class.
         /// </summary>
-        public ProfilingLogger(ILogger logger, IProfiler profiler)
+        public ProfilingLogger(Microsoft.Extensions.Logging.ILogger logger, IProfiler profiler)
         {
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
             Profiler = profiler ?? throw new ArgumentNullException(nameof(profiler));
@@ -43,29 +45,29 @@ namespace Umbraco.Core.Logging
 
         public DisposableTimer DebugDuration<T>(string startMessage)
         {
-            return Logger.IsEnabled(typeof(T), LogLevel.Debug)
+            return Logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug)
                 ? DebugDuration<T>(startMessage, "Completed.")
                 : null;
         }
 
         public DisposableTimer DebugDuration<T>(string startMessage, string completeMessage, string failMessage = null, int thresholdMilliseconds = 0)
         {
-            return Logger.IsEnabled(typeof(T), LogLevel.Debug)
+            return Logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug)
                 ? new DisposableTimer(Logger, LogLevel.Debug, Profiler, typeof(T), startMessage, completeMessage, failMessage, thresholdMilliseconds)
                 : null;
         }
 
         public DisposableTimer DebugDuration(Type loggerType, string startMessage, string completeMessage, string failMessage = null, int thresholdMilliseconds = 0)
         {
-            return Logger.IsEnabled(loggerType, LogLevel.Debug)
+            return Logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug)
                 ? new DisposableTimer(Logger, LogLevel.Debug, Profiler, loggerType, startMessage, completeMessage, failMessage, thresholdMilliseconds)
                 : null;
         }
 
         #region ILogger
 
-        public bool IsEnabled(Type reporting, LogLevel level)
-            => Logger.IsEnabled(reporting, level);
+        public bool IsEnabled(Microsoft.Extensions.Logging.LogLevel level)
+            => Logger.IsEnabled(level);
 
         public void LogCritical(Exception exception, string messageTemplate, params object[] propertyValues)
             => Logger.LogCritical(exception, messageTemplate, propertyValues);

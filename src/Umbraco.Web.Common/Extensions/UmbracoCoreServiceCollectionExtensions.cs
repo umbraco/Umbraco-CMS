@@ -30,6 +30,7 @@ using Umbraco.Core.Runtime;
 using Umbraco.Web.Common.AspNetCore;
 using Umbraco.Web.Common.Extensions;
 using Umbraco.Web.Common.Profiler;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Umbraco.Extensions
 {
@@ -208,7 +209,7 @@ namespace Umbraco.Extensions
             AppCaches appCaches,
             ILoggingConfiguration loggingConfiguration,
             // TODO: Yep that's extremely ugly
-            Func<Configs, IUmbracoVersion, IIOHelper, Core.Logging.ILogger, ILoggerFactory, IProfiler, Core.Hosting.IHostingEnvironment, IBackOfficeInfo, ITypeFinder, AppCaches, IDbProviderFactoryCreator, IRuntime> getRuntime,
+            Func<Configs, IUmbracoVersion, IIOHelper, ILogger, ILoggerFactory, IProfiler, Core.Hosting.IHostingEnvironment, IBackOfficeInfo, ITypeFinder, AppCaches, IDbProviderFactoryCreator, IRuntime> getRuntime,
             out IFactory factory)
         {
             if (services is null) throw new ArgumentNullException(nameof(services));
@@ -248,7 +249,7 @@ namespace Umbraco.Extensions
 
             var globalSettings = configs.Global();
             var umbracoVersion = new UmbracoVersion(globalSettings);
-            var typeFinder = CreateTypeFinder(logger, Current.LoggerFactory, profiler, webHostEnvironment, entryAssembly, configs.TypeFinder());
+            var typeFinder = CreateTypeFinder(Current.LoggerFactory, profiler, webHostEnvironment, entryAssembly, configs.TypeFinder());
 
             var runtime = getRuntime(
                 configs,
@@ -268,16 +269,16 @@ namespace Umbraco.Extensions
             return services;
         }
 
-        private static ITypeFinder CreateTypeFinder(Core.Logging.ILogger logger, ILoggerFactory loggerFactory, IProfiler profiler, IWebHostEnvironment webHostEnvironment, Assembly entryAssembly, ITypeFinderSettings typeFinderSettings)
+        private static ITypeFinder CreateTypeFinder(ILoggerFactory loggerFactory, IProfiler profiler, IWebHostEnvironment webHostEnvironment, Assembly entryAssembly, ITypeFinderSettings typeFinderSettings)
         {
             var runtimeHashPaths = new RuntimeHashPaths();
             runtimeHashPaths.AddFolder(new DirectoryInfo(Path.Combine(webHostEnvironment.ContentRootPath, "bin")));
-            var runtimeHash = new RuntimeHash(new ProfilingLogger(logger, profiler), runtimeHashPaths);
+            var runtimeHash = new RuntimeHash(new ProfilingLogger(loggerFactory.CreateLogger("RuntimeHash"), profiler), runtimeHashPaths);
             return new TypeFinder(loggerFactory.CreateLogger<TypeFinder>(), new DefaultUmbracoAssemblyProvider(entryAssembly), runtimeHash, new TypeFinderConfig(typeFinderSettings));
         }
 
         private static IRuntime GetCoreRuntime(
-            Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, Core.Logging.ILogger logger, ILoggerFactory loggerFactory,
+            Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, ILoggerFactory loggerFactory,
             IProfiler profiler, Core.Hosting.IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo,
             ITypeFinder typeFinder, AppCaches appCaches, IDbProviderFactoryCreator dbProviderFactoryCreator)
         {
@@ -289,10 +290,10 @@ namespace Umbraco.Extensions
 
             var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
             var mainDomLock = appSettingMainDomLock == "SqlMainDomLock" || isWindows == false
-                ? (IMainDomLock)new SqlMainDomLock(logger, globalSettings, connStrings, dbProviderFactoryCreator, hostingEnvironment)
-                : new MainDomSemaphoreLock(logger, hostingEnvironment);
+                ? (IMainDomLock)new SqlMainDomLock(loggerFactory.CreateLogger<SqlMainDomLock>(), loggerFactory, globalSettings, connStrings, dbProviderFactoryCreator, hostingEnvironment)
+                : new MainDomSemaphoreLock(loggerFactory.CreateLogger<MainDomSemaphoreLock>(), hostingEnvironment);
 
-            var mainDom = new MainDom(logger, mainDomLock);
+            var mainDom = new MainDom(loggerFactory.CreateLogger<MainDom>(), mainDomLock);
 
             var coreRuntime = new CoreRuntime(
                 configs,
@@ -317,7 +318,7 @@ namespace Umbraco.Extensions
             Configs configs,
             IWebHostEnvironment webHostEnvironment,
             ILoggingConfiguration loggingConfiguration,
-            out Core.Logging.ILogger logger,
+            out ILogger logger,
             out IIOHelper ioHelper,
             out Core.Hosting.IHostingEnvironment hostingEnvironment,
             out IBackOfficeInfo backOfficeInfo,
@@ -343,32 +344,37 @@ namespace Umbraco.Extensions
         /// Create and configure the logger
         /// </summary>
         /// <param name="hostingEnvironment"></param>
-        private static Core.Logging.ILogger AddLogger(IServiceCollection services, Core.Hosting.IHostingEnvironment hostingEnvironment, ILoggingConfiguration loggingConfiguration)
+        private static ILogger AddLogger(IServiceCollection services, Core.Hosting.IHostingEnvironment hostingEnvironment, ILoggingConfiguration loggingConfiguration)
         {
-            // Create a serilog logger
-            var logger = SerilogLogger<object>.CreateWithDefaultConfiguration(hostingEnvironment, loggingConfiguration);
+            // // Create a serilog logger
+            // var logger = SerilogLogger<object>.CreateWithDefaultConfiguration(hostingEnvironment, loggingConfiguration);
+            //
+            // // Wire up all the bits that serilog needs. We need to use our own code since the Serilog ext methods don't cater to our needs since
+            // // we don't want to use the global serilog `Log` object and we don't have our own ILogger implementation before the HostBuilder runs which
+            // // is the only other option that these ext methods allow.
+            // // I have created a PR to make this nicer https://github.com/serilog/serilog-extensions-hosting/pull/19 but we'll need to wait for that.
+            // // Also see : https://github.com/serilog/serilog-extensions-hosting/blob/dev/src/Serilog.Extensions.Hosting/SerilogHostBuilderExtensions.cs
+            //
+            // services.AddSingleton<ILoggerFactory>(services => new SerilogLoggerFactory(logger.SerilogLog, false));
 
-            // Wire up all the bits that serilog needs. We need to use our own code since the Serilog ext methods don't cater to our needs since
-            // we don't want to use the global serilog `Log` object and we don't have our own ILogger implementation before the HostBuilder runs which
-            // is the only other option that these ext methods allow.
-            // I have created a PR to make this nicer https://github.com/serilog/serilog-extensions-hosting/pull/19 but we'll need to wait for that.
-            // Also see : https://github.com/serilog/serilog-extensions-hosting/blob/dev/src/Serilog.Extensions.Hosting/SerilogHostBuilderExtensions.cs
+            var factory = LoggerFactory.Create(builder =>
+            {
+                builder.AddSerilog();
+            });
 
-            services.AddSingleton<ILoggerFactory>(services => new SerilogLoggerFactory(logger.SerilogLog, false));
+            // // This won't (and shouldn't) take ownership of the logger.
+            // services.AddSingleton(logger.SerilogLog);
+            //
+            // // Registered to provide two services...
+            // var diagnosticContext = new DiagnosticContext(logger.SerilogLog);
+            //
+            // // Consumed by e.g. middleware
+            // services.AddSingleton(diagnosticContext);
+            //
+            // // Consumed by user code
+            // services.AddSingleton<IDiagnosticContext>(diagnosticContext);
 
-            // This won't (and shouldn't) take ownership of the logger.
-            services.AddSingleton(logger.SerilogLog);
-
-            // Registered to provide two services...
-            var diagnosticContext = new DiagnosticContext(logger.SerilogLog);
-
-            // Consumed by e.g. middleware
-            services.AddSingleton(diagnosticContext);
-
-            // Consumed by user code
-            services.AddSingleton<IDiagnosticContext>(diagnosticContext);
-
-            return logger;
+            return factory.CreateLogger("FakeSiriLogger");
         }
 
         private static IProfiler GetWebProfiler(Umbraco.Core.Hosting.IHostingEnvironment hostingEnvironment)

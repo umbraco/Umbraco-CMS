@@ -173,7 +173,7 @@ namespace Umbraco.Core.Runtime
                 var typeLoader = new TypeLoader(TypeFinder, AppCaches.RuntimeCache, new DirectoryInfo(HostingEnvironment.LocalTempPath), _loggerFactory.CreateLogger("TypeLoader"), ProfilingLogger);
 
                 // re-create the state object with the essential services
-                _state = new RuntimeState(Configs.Global(), UmbracoVersion, databaseFactory, Logger);
+                _state = new RuntimeState(Configs.Global(), UmbracoVersion, databaseFactory, _loggerFactory.CreateLogger<RuntimeState>());
 
                 // create the composition
                 composition = new Composition(register, typeLoader, ProfilingLogger, _state, Configs, IOHelper, AppCaches);
@@ -384,7 +384,7 @@ namespace Umbraco.Core.Runtime
         /// </summary>
         /// <remarks>This is strictly internal, for tests only.</remarks>
         protected internal virtual IUmbracoDatabaseFactory CreateDatabaseFactory()
-            => new UmbracoDatabaseFactory(Logger, _globalSettings, _connectionStrings, new Lazy<IMapperCollection>(() => _factory.GetInstance<IMapperCollection>()), DbProviderFactoryCreator);
+            => new UmbracoDatabaseFactory(_loggerFactory.CreateLogger<UmbracoDatabaseFactory>(), _loggerFactory, _globalSettings, _connectionStrings, new Lazy<IMapperCollection>(() => _factory.GetInstance<IMapperCollection>()), DbProviderFactoryCreator);
 
 
         #endregion

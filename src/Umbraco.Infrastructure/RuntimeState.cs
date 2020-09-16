@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Threading;
 using Semver;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Exceptions;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Upgrade;
 using Umbraco.Core.Persistence;
 
@@ -17,7 +17,7 @@ namespace Umbraco.Core
         private readonly IGlobalSettings _globalSettings;
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly IUmbracoDatabaseFactory _databaseFactory;
-        private readonly ILogger _logger;
+        private readonly ILogger<RuntimeState> _logger;
 
         /// <summary>
         /// The initial <see cref="RuntimeState"/>
@@ -31,7 +31,7 @@ namespace Umbraco.Core
         /// <summary>
         /// Initializes a new instance of the <see cref="RuntimeState"/> class.
         /// </summary>
-        public RuntimeState(IGlobalSettings globalSettings, IUmbracoVersion umbracoVersion, IUmbracoDatabaseFactory databaseFactory, ILogger logger)
+        public RuntimeState(IGlobalSettings globalSettings, IUmbracoVersion umbracoVersion, IUmbracoDatabaseFactory databaseFactory, ILogger<RuntimeState> logger)
         {
             _globalSettings = globalSettings;
             _umbracoVersion = umbracoVersion;

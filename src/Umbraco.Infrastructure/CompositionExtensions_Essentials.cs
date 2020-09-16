@@ -1,10 +1,12 @@
-﻿using Umbraco.Core.Cache;
+﻿using Microsoft.Extensions.Logging;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Umbraco.Core
 {
@@ -37,7 +39,7 @@ namespace Umbraco.Core
             IDbProviderFactoryCreator dbProviderFactoryCreator,
             IHostingEnvironment hostingEnvironment,
             IBackOfficeInfo backOfficeInfo)
-        {            
+        {
             composition.RegisterUnique(logger);
             composition.RegisterUnique(profiler);
             composition.RegisterUnique(profilingLogger);

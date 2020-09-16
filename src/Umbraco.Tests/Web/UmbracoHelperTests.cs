@@ -38,7 +38,7 @@ namespace Umbraco.Tests.Web
                     NoAppCache.Instance,
                     new DirectoryInfo(ioHelper.MapPath("~/App_Data/TEMP")),
                     Mock.Of<Microsoft.Extensions.Logging.ILogger>(),
-                    new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>())
+                    new ProfilingLogger(Mock.Of<Microsoft.Extensions.Logging.ILogger>(), Mock.Of<IProfiler>())
                     )
                 );
 

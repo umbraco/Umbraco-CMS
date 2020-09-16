@@ -13,6 +13,7 @@ using Umbraco.Core.Services.Changes;
 using Umbraco.Core.Sync;
 using Umbraco.Web.Cache;
 using Umbraco.Examine;
+using Microsoft.Extensions.Logging;
 
 namespace Umbraco.Web.Search
 {
@@ -28,7 +29,7 @@ namespace Umbraco.Web.Search
         private readonly ServiceContext _services;
         private readonly IMainDom _mainDom;
         private readonly IProfilingLogger _pLogger;
-        private readonly ILogger<ExamineComponent> _logger;
+        private readonly Microsoft.Extensions.Logging.ILogger<ExamineComponent> _logger;
         private readonly IUmbracoIndexesCreator _indexCreator;
 
 
@@ -39,7 +40,7 @@ namespace Umbraco.Web.Search
 
         public ExamineComponent(IMainDom mainDom,
             IExamineManager examineManager, IProfilingLogger profilingLogger,
-            ILogger<ExamineComponent> logger,
+            Microsoft.Extensions.Logging.ILogger<ExamineComponent> logger,
             IScopeProvider scopeProvider, IUmbracoIndexesCreator indexCreator,
             ServiceContext services,
             IContentValueSetBuilder contentValueSetBuilder,
@@ -78,7 +79,7 @@ namespace Umbraco.Web.Search
                 _logger.LogInformation("Examine shutdown not registered, this AppDomain is not the MainDom, Examine will be disabled");
 
                 //if we could not register the shutdown examine ourselves, it means we are not maindom! in this case all of examine should be disabled!
-                Suspendable.ExamineEvents.SuspendIndexers(_logger as ILogger);
+                Suspendable.ExamineEvents.SuspendIndexers(_logger);
                 return; //exit, do not continue
             }
 
