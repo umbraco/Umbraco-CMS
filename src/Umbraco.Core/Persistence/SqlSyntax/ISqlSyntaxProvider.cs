@@ -130,7 +130,6 @@ namespace Umbraco.Core.Persistence.SqlSyntax
 
         void ReadLock(IDatabase db, params int[] lockIds);
         void WriteLock(IDatabase db, params int[] lockIds);
-        void WriteLock(IDatabase db, int lockId0, int lockId1);
         void WriteLock(IDatabase db, int lockId);
     }
 }
