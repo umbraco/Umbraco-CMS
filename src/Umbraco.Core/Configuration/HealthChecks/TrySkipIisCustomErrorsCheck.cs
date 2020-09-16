@@ -29,11 +29,11 @@ namespace Umbraco.Core.HealthCheck.Checks.Configuration
             _globalSettings = globalSettings.Value;
         }
 
+        public override string ItemPath => "TODO";
+
         public override ValueComparisonType ValueComparisonType => ValueComparisonType.ShouldEqual;
 
         public override string CurrentValue => null;
-
-        public override string ItemPath => "TODO";
 
         public override IEnumerable<AcceptableConfiguration> Values
         {
