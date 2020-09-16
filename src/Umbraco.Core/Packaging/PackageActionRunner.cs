@@ -34,7 +34,7 @@ namespace Umbraco.Core.Packaging
                 catch (Exception ex)
                 {
                     e.Add($"{ipa.Alias()} - {ex.Message}");
-                    _logger.LogError<PackageActionRunner>(ex, "Error loading package action '{PackageActionAlias}' for package {PackageName}", ipa.Alias(), packageName);
+                    _logger.LogError(ex, "Error loading package action '{PackageActionAlias}' for package {PackageName}", ipa.Alias(), packageName);
                 }
             }
 
@@ -56,7 +56,7 @@ namespace Umbraco.Core.Packaging
                 catch (Exception ex)
                 {
                     e.Add($"{ipa.Alias()} - {ex.Message}");
-                    _logger.LogError<PackageActionRunner>(ex, "Error undoing package action '{PackageActionAlias}' for package {PackageName}", ipa.Alias(), packageName);
+                    _logger.LogError(ex, "Error undoing package action '{PackageActionAlias}' for package {PackageName}", ipa.Alias(), packageName);
                 }
             }
             errors = e;

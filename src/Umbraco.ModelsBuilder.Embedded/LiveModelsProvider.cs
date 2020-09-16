@@ -97,7 +97,7 @@ namespace Umbraco.ModelsBuilder.Embedded
             catch (Exception e)
             {
                 _mbErrors.Report("Failed to build Live models.", e);
-                _logger.LogError<LiveModelsProvider>("Failed to generate models.", e);
+                _logger.LogError("Failed to generate models.", e);
             }
             finally
             {

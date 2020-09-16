@@ -27,7 +27,7 @@ namespace Umbraco.Web.HealthCheck
                     }
                     catch (Exception ex)
                     {
-                        Logger.LogError<HealthCheckResults>(ex, "Error running scheduled health check: {HealthCheckName}", t.Name);
+                        Logger.LogError(ex, "Error running scheduled health check: {HealthCheckName}", t.Name);
                         var message = $"Health check failed with exception: {ex.Message}. See logs for details.";
                         return new List<HealthCheckStatus>
                         {

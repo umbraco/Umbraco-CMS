@@ -34,7 +34,7 @@ namespace Umbraco.Core.Runtime
         private readonly IConnectionStrings _connectionStrings;
 
         public CoreRuntime(
-            Configs configs,            
+            Configs configs,
             IUmbracoVersion umbracoVersion,
             IIOHelper ioHelper,
             ILogger logger,
@@ -59,7 +59,7 @@ namespace Umbraco.Core.Runtime
 
             _loggerFactory = loggerFactory;
             _umbracoBootPermissionChecker = umbracoBootPermissionChecker;
-            
+
             Logger = logger;
             MainDom = mainDom;
             TypeFinder = typeFinder;
@@ -275,7 +275,7 @@ namespace Umbraco.Core.Runtime
                 var msg = "Unhandled exception in AppDomain";
                 if (isTerminating) msg += " (terminating)";
                 msg += ".";
-                Logger.LogError<CoreRuntime>(exception, msg);
+                Logger.LogError(exception, msg);
             };
         }
 

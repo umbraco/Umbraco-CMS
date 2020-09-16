@@ -103,7 +103,7 @@ namespace Umbraco.Web.PropertyEditors
             catch (Exception ex)
             {
                 if (writeLog)
-                    Logger.LogError<ImageCropperPropertyEditor>(ex, "Could not parse image cropper value '{Json}'", value);
+                    Logger.LogError(ex, "Could not parse image cropper value '{Json}'", value);
                 return null;
             }
         }

@@ -92,7 +92,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
                 }
                 catch (Exception ex)
                 {
-                    Current.Logger.LogError<GridValueConverter>(ex, "Could not parse the string '{JsonString}' to a json object", sourceString);
+                    Current.Logger.LogError(ex, "Could not parse the string '{JsonString}' to a json object", sourceString);
                 }
             }
 

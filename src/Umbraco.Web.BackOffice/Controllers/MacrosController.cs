@@ -102,7 +102,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             catch (Exception exception)
             {
                 const string errorMessage = "Error creating macro";
-                _logger.LogError<MacrosController>(exception, errorMessage);
+                _logger.LogError(exception, errorMessage);
                 throw HttpResponseException.CreateNotificationValidationErrorResponse(errorMessage);
             }
         }
@@ -226,7 +226,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             catch (Exception exception)
             {
                 const string errorMessage = "Error creating macro";
-                _logger.LogError<MacrosController>(exception, errorMessage);
+                _logger.LogError(exception, errorMessage);
                 throw HttpResponseException.CreateNotificationValidationErrorResponse(errorMessage);
             }
         }

@@ -53,7 +53,7 @@ namespace Umbraco.Web.Common.Middleware
             try
             {
                 if (umbracoContextReference.UmbracoContext.IsFrontEndUmbracoRequest)
-                { 
+                {
                     LogHttpRequest.TryGetCurrentHttpRequestId(out var httpRequestId, _requestCache);
                    _logger.Verbose<UmbracoRequestMiddleware>("Begin request [{HttpRequestId}]: {RequestUrl}", httpRequestId, requestUri);
                 }
@@ -65,7 +65,7 @@ namespace Umbraco.Web.Common.Middleware
                 catch (Exception ex)
                 {
                     // try catch so we don't kill everything in all requests
-                    _logger.LogError<UmbracoRequestMiddleware>(ex.Message);
+                    _logger.LogError(ex.Message);
                 }
                 finally
                 {
@@ -128,7 +128,7 @@ namespace Umbraco.Web.Common.Middleware
                 }
                 catch (Exception ex)
                 {
-                    logger.LogError<UmbracoRequestMiddleware>("Could not dispose item with key " + k, ex);
+                    logger.LogError("Could not dispose item with key " + k, ex);
                 }
                 try
                 {
@@ -136,7 +136,7 @@ namespace Umbraco.Web.Common.Middleware
                 }
                 catch (Exception ex)
                 {
-                    logger.LogError<UmbracoRequestMiddleware>("Could not dispose item key " + k, ex);
+                    logger.LogError("Could not dispose item key " + k, ex);
                 }
             }
         }

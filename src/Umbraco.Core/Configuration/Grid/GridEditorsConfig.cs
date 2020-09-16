@@ -47,7 +47,7 @@ namespace Umbraco.Core.Configuration.Grid
                         }
                         catch (Exception ex)
                         {
-                            _logger.LogError<GridEditorsConfig>(ex, "Could not parse the contents of grid.editors.config.js into a JSON array '{Json}", sourceString);
+                            _logger.LogError(ex, "Could not parse the contents of grid.editors.config.js into a JSON array '{Json}", sourceString);
                         }
                     }
 

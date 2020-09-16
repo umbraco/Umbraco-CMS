@@ -119,7 +119,7 @@ namespace Umbraco.Web.Mvc
             }
             catch (Exception ex)
             {
-                Logger.LogError<AdminTokenAuthorizeAttribute>(ex, "Failed to format passed in token value");
+                Logger.LogError(ex, "Failed to format passed in token value");
                 return false;
             }
         }

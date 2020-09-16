@@ -121,7 +121,7 @@ namespace Umbraco.Core.Runtime
                         }
                         catch (Exception e)
                         {
-                            _logger.LogError<MainDom>(e, "Error while running callback");
+                            _logger.LogError(e, "Error while running callback");
                             continue;
                         }
                     }

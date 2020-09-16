@@ -162,7 +162,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             {
                 //ensure it's not listening
                 index.IndexOperationComplete -= Indexer_IndexOperationComplete;
-                _logger.LogError<ExamineManagementController>(ex, "An error occurred rebuilding index");
+                _logger.LogError(ex, "An error occurred rebuilding index");
                 var response = new ConflictObjectResult("The index could not be rebuilt at this time, most likely there is another thread currently writing to the index. Error: {ex}");
 
                 HttpContext.SetReasonPhrase("Could Not Rebuild");

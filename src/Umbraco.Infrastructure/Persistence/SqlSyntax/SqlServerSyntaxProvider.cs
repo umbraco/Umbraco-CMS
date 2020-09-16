@@ -161,7 +161,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
                 }
                 catch (Exception e)
                 {
-                    logger.LogError<UmbracoDatabaseFactory>(e, "Failed to detected SqlServer version.");
+                    logger.LogError(e, "Failed to detected SqlServer version.");
                     version = new ServerVersionInfo(); // all unknown
                 }
             }

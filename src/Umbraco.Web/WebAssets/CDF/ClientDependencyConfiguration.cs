@@ -91,7 +91,7 @@ namespace Umbraco.Web.WebAssets.CDF
             }
             catch (Exception ex)
             {
-                _logger.LogError<ClientDependencyConfiguration>(ex, "Couldn't update ClientDependency version number");
+                _logger.LogError(ex, "Couldn't update ClientDependency version number");
             }
 
             return false;
@@ -124,7 +124,7 @@ namespace Umbraco.Web.WebAssets.CDF
             catch (Exception ex)
             {
                 //invalid path format or something... try/catch to be safe
-                _logger.LogError<ClientDependencyConfiguration>(ex, "Could not get path from ClientDependency.config");
+                _logger.LogError(ex, "Could not get path from ClientDependency.config");
             }
 
             var success = true;
@@ -140,7 +140,7 @@ namespace Umbraco.Web.WebAssets.CDF
                 catch (Exception ex)
                 {
                     // Something could be locking the directory or the was another error, making sure we don't break the upgrade installer
-                    _logger.LogError<ClientDependencyConfiguration>(ex, "Could not clear temp files");
+                    _logger.LogError(ex, "Could not clear temp files");
                     success = false;
                 }
             }

@@ -1417,7 +1417,7 @@ namespace Umbraco.Core.Services.Implement
 
                         var result = CommitDocumentChangesInternal(scope, d, saveEventArgs, allLangs.Value, d.WriterId);
                         if (result.Success == false)
-                            Logger.LogError<ContentService>(null, "Failed to publish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
+                            Logger.LogError(null, "Failed to publish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
                         results.Add(result);
 
                     }
@@ -1427,7 +1427,7 @@ namespace Umbraco.Core.Services.Implement
                         d.ContentSchedule.Clear(ContentScheduleAction.Expire, date);
                         var result = Unpublish(d, userId: d.WriterId);
                         if (result.Success == false)
-                            Logger.LogError<ContentService>(null, "Failed to unpublish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
+                            Logger.LogError(null, "Failed to unpublish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
                         results.Add(result);
                     }
                 }
@@ -1498,7 +1498,7 @@ namespace Umbraco.Core.Services.Implement
                             result = CommitDocumentChangesInternal(scope, d, saveEventArgs, allLangs.Value, d.WriterId);
 
                         if (result.Success == false)
-                            Logger.LogError<ContentService>(null, "Failed to publish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
+                            Logger.LogError(null, "Failed to publish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
 
                         results.Add(result);
                     }
@@ -1512,7 +1512,7 @@ namespace Umbraco.Core.Services.Implement
                             : SaveAndPublish(d, userId: d.WriterId);
 
                         if (result.Success == false)
-                            Logger.LogError<ContentService>(null, "Failed to publish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
+                            Logger.LogError(null, "Failed to publish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
 
                         results.Add(result);
                     }
@@ -3164,7 +3164,7 @@ namespace Umbraco.Core.Services.Implement
                 if (rollbackSaveResult.Success == false)
                 {
                     //Log the error/warning
-                    Logger.LogError<ContentService>("User '{UserId}' was unable to rollback content '{ContentId}' to version '{VersionId}'", userId, id, versionId);
+                    Logger.LogError("User '{UserId}' was unable to rollback content '{ContentId}' to version '{VersionId}'", userId, id, versionId);
                 }
                 else
                 {

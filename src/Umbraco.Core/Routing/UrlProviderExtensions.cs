@@ -123,7 +123,7 @@ namespace Umbraco.Web.Routing
                 }
                 catch (Exception ex)
                 {
-                    logger.LogError<UrlProvider>(ex, "GetUrl exception.");
+                    logger.LogError(ex, "GetUrl exception.");
                     url = "#ex";
                 }
 

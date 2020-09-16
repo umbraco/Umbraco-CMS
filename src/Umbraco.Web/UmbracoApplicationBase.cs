@@ -294,7 +294,7 @@ namespace Umbraco.Web
             // ignore HTTP errors
             if (exception.GetType() == typeof(HttpException)) return;
 
-            Current.Logger.LogError<UmbracoApplicationBase>(exception, "An unhandled exception occurred");
+            Current.Logger.LogError(exception, "An unhandled exception occurred");
         }
 
         // called by ASP.NET (auto event wireup) at any phase in the application life cycle
@@ -317,7 +317,7 @@ namespace Umbraco.Web
             }
             catch (Exception ex)
             {
-                Current.Logger.LogError<UmbracoApplicationBase>(ex, "Error in {Name} handler.", name);
+                Current.Logger.LogError(ex, "Error in {Name} handler.", name);
                 throw;
             }
         }

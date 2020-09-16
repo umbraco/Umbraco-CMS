@@ -51,7 +51,7 @@ namespace Umbraco.Core.IO
                 }
                 catch (Exception e)
                 {
-                    _logger.LogError<MediaFileSystem>(e, "Failed to delete media file '{File}'.", file);
+                    _logger.LogError(e, "Failed to delete media file '{File}'.", file);
                 }
             });
         }

@@ -99,7 +99,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError<PackageInstallController>(ex, "Failed to uninstall.");
+                _logger.LogError(ex, "Failed to uninstall.");
                 throw;
             }
 

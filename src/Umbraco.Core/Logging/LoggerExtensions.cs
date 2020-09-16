@@ -17,46 +17,6 @@ namespace Umbraco.Core.Logging
             => logger.IsEnabled(typeof(T), level);
 
         /// <summary>
-        /// Logs an error message with an exception.
-        /// </summary>
-        /// <typeparam name="T">The reporting type.</typeparam>
-        /// <param name="logger">The logger.</param>
-        /// <param name="message">A message.</param>
-        /// <param name="exception">An exception.</param>
-        public static void LogError<T>(this ILogger logger, Exception exception, string message)
-            => logger.LogError(exception, message);
-
-        /// <summary>
-        /// Logs an error message with an exception.
-        /// </summary>
-        /// <typeparam name="T">The reporting type.</typeparam>
-        /// <param name="logger">The logger.</param>
-        /// <param name="exception">An exception.</param>
-        /// <param name="messageTemplate">A message template.</param>
-        /// <param name="propertyValues">Property values.</param>
-        public static void LogError<T>(this ILogger logger, Exception exception, string messageTemplate, params object[] propertyValues)
-            => logger.LogError(exception, messageTemplate, propertyValues);
-
-        /// <summary>
-        /// Logs an error message.
-        /// </summary>
-        /// <typeparam name="T">The reporting type.</typeparam>
-        /// <param name="logger">The logger.</param>
-        /// <param name="message">A message.</param>
-        public static void LogError<T>(this ILogger logger, string message)
-            => logger.LogError(message);
-
-        /// <summary>
-        /// Logs an error message.
-        /// </summary>
-        /// <typeparam name="T">The reporting type.</typeparam>
-        /// <param name="logger">The logger.</param>
-        /// <param name="messageTemplate">A message template.</param>
-        /// <param name="propertyValues">Property values.</param>
-        public static void LogError<T>(this ILogger logger, string messageTemplate, params object[] propertyValues)
-            => logger.LogError(messageTemplate, propertyValues);
-
-        /// <summary>
         /// Logs a warning message.
         /// </summary>
         /// <typeparam name="T">The reporting type.</typeparam>
@@ -97,25 +57,6 @@ namespace Umbraco.Core.Logging
             => logger.LogWarning(exception, messageTemplate, propertyValues);
 
         /// <summary>
-        /// Logs an information message.
-        /// </summary>
-        /// <typeparam name="T">The reporting type.</typeparam>
-        /// <param name="logger">The logger.</param>
-        /// <param name="message">A message.</param>
-        public static void LogInformation<T>(this ILogger logger, string message)
-            => logger.LogInformation(message);
-
-        /// <summary>
-        /// Logs a information message.
-        /// </summary>
-        /// <typeparam name="T">The reporting type</typeparam>
-        /// <param name="logger">The logger.</param>
-        /// <param name="messageTemplate">A message template.</param>
-        /// <param name="propertyValues">Property values.</param>
-        public static void LogInformation<T>(this ILogger logger, string messageTemplate, params object[] propertyValues)
-            => logger.LogInformation(messageTemplate, propertyValues);
-
-        /// <summary>
         /// Logs a debugging message.
         /// </summary>
         /// <typeparam name="T">The reporting type.</typeparam>
@@ -143,26 +84,5 @@ namespace Umbraco.Core.Logging
         /// <param name="propertyValues">Property values.</param>
         public static void Verbose<T>(this ILogger logger, string messageTemplate, params object[] propertyValues)
             => logger.LogTrace(messageTemplate, propertyValues);
-
-        /// <summary>
-        /// Logs a fatal message.
-        /// </summary>
-        /// <typeparam name="T">The reporting type.</typeparam>
-        /// <param name="logger">The logger.</param>
-        /// <param name="exception">An exception.</param>
-        /// <param name="message">A message.</param>
-        public static void Fatal<T>(this ILogger logger, Exception exception, string message)
-            => logger.LogCritical(exception, message);
-
-        /// <summary>
-        /// Logs a fatal message.
-        /// </summary>
-        /// <typeparam name="T">The reporting type.</typeparam>
-        /// <param name="logger">The logger.</param>
-        /// <param name="exception">An exception.</param>
-        /// <param name="messageTemplate">A message template.</param>
-        /// <param name="propertyValues">Property values.</param>
-        public static void Fatal<T>(this ILogger logger, Exception exception, string messageTemplate, params object[] propertyValues)
-            => logger.LogCritical(exception, messageTemplate, propertyValues);
     }
 }

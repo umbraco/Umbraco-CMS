@@ -55,7 +55,7 @@ namespace Umbraco.Examine
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError<MediaValueSetBuilder>(ex, $"Could not Deserialize ImageCropperValue for item with key {m.Key} ");
+                        _logger.LogError(ex, $"Could not Deserialize ImageCropperValue for item with key {m.Key} ");
                     }
 
                     if (cropper != null)

@@ -28,7 +28,7 @@ namespace Umbraco.Web
         {
             // Using LogHelper since the ImageProcessor logger expects a parameterless constructor.
             var message = $"{callerName} {lineNumber} : {text}";
-            Current.Logger.LogError<T>(new ImageProcessingException(message).Message);
+            Current.Logger.LogError(new ImageProcessingException(message).Message);
         }
 
         /// <summary>

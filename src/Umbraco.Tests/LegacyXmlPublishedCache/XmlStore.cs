@@ -415,7 +415,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             }
             catch (Exception ex)
             {
-                Current.Logger.LogError<ContentTypeService>(ex, "Failed to build a DTD for the Xml cache.");
+                Current.Logger.LogError(ex, "Failed to build a DTD for the Xml cache.");
             }
 
             dtd.AppendLine("]>");
@@ -705,7 +705,7 @@ AND (umbracoNode.id=@id)";
                 // if something goes wrong remove the file
                 DeleteXmlFile();
 
-                Current.Logger.LogError<XmlStore>(ex, "Failed to save Xml to file '{FileName}'.", _xmlFileName);
+                Current.Logger.LogError(ex, "Failed to save Xml to file '{FileName}'.", _xmlFileName);
             }
         }
 
@@ -745,7 +745,7 @@ AND (umbracoNode.id=@id)";
                 // if something goes wrong remove the file
                 DeleteXmlFile();
 
-                Current.Logger.LogError<XmlStore>(ex, "Failed to save Xml to file '{FileName}'.", _xmlFileName);
+                Current.Logger.LogError(ex, "Failed to save Xml to file '{FileName}'.", _xmlFileName);
             }
         }
 
@@ -802,7 +802,7 @@ AND (umbracoNode.id=@id)";
             }
             catch (Exception ex)
             {
-                Current.Logger.LogError<XmlStore>(ex, "Failed to load Xml from file '{FileName}'.", _xmlFileName);
+                Current.Logger.LogError(ex, "Failed to load Xml from file '{FileName}'.", _xmlFileName);
                 try
                 {
                     DeleteXmlFile();
