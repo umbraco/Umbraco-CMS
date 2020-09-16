@@ -13,15 +13,16 @@ umb-property-info-button {
         align-items: center;
         justify-content: center;
 
-        width: 16px;
-        height: 16px;
+        width: 15px;
+        height: 15px;
+        padding-top: 1px;
         padding-left: 1px;
+        margin-top: -1px;
         font-size: 12px;
         font-weight: 700;
 
         border-radius: 50%;
         border: 1px solid @ui-option-type;
-        box-shadow: 0 0 2px @ui-option-type;
         color: @ui-option-type;
         &:hover {
             border-color: @ui-option-type-hover;
@@ -34,17 +35,18 @@ umb-property-info-button {
         position: absolute;
         z-index: 1000;
         top: 26px;
-        left: -6px;
-        font-size: @fontSizeSmall;
+        left: -8px;
+        font-size: 13px;
 
         border-radius: 6px;
         
         min-width: 240px;
         max-width: 320px;
-        padding: 5px 10px;
-        background-color: @blueExtraDark;
+        padding: 10px 16px;
+        background-color:@blueExtraDark;
+        border: 1px solid @blueExtraDark;
         color: white;
-        box-shadow: 0 3px 6px rgba(@blueDark, .24);
+        box-shadow: 0 2px 6px rgba(@blueExtraDark, .6);
 
         a {
             color: white;
@@ -57,14 +59,14 @@ umb-property-info-button {
         &::before {
             content:'';
             position: absolute;
-            color: @blueExtraDark;
-            top: -4px;
+            transform: rotate(45deg);
+            background-color:@blueExtraDark;
+            top: -5px;
             left: 10px;
-            width: 0;
-            height: 0;
-            border-left: 4px solid transparent;
-            border-right: 4px solid transparent;
-            border-bottom: 4px solid;
+            width: 8px;
+            height: 8px;
+            border-left: 1px solid @blueExtraDark;
+            border-top: 1px solid @blueExtraDark;
         }
     }
 
