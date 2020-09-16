@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Web.Security;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models;
 using Umbraco.Web.PublishedCache;
@@ -16,6 +16,7 @@ using Umbraco.Core.Strings;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Security.Providers;
 using System.ComponentModel.DataAnnotations;
+using ILogger = Umbraco.Core.Logging.ILogger;
 
 namespace Umbraco.Web.Security
 {

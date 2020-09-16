@@ -7,14 +7,13 @@ using System.Web;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Logging.Serilog;
 using Umbraco.Core.Runtime;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Web.Runtime;
-using ILogger = Umbraco.Core.Logging.ILogger;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Umbraco.Web
 {
@@ -38,10 +37,10 @@ namespace Umbraco.Web
 
             var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
             var mainDomLock = appSettingMainDomLock == "SqlMainDomLock" || isWindows == false
-                ? (IMainDomLock)new SqlMainDomLock(logger, globalSettings, connectionStrings, dbProviderFactoryCreator, hostingEnvironment)
-                : new MainDomSemaphoreLock(logger, hostingEnvironment);
+                ? (IMainDomLock)new SqlMainDomLock(loggerFactory.CreateLogger<SqlMainDomLock>(), loggerFactory, globalSettings, connectionStrings, dbProviderFactoryCreator, hostingEnvironment)
+                : new MainDomSemaphoreLock(loggerFactory.CreateLogger<MainDomSemaphoreLock>(), hostingEnvironment);
 
-            var mainDom = new MainDom(logger, mainDomLock);
+            var mainDom = new MainDom(loggerFactory.CreateLogger<MainDom>(), mainDomLock);
 
             var requestCache = new HttpRequestAppCache(() => HttpContext.Current != null ? HttpContext.Current.Items : null);
             var appCaches = new AppCaches(

@@ -11,6 +11,7 @@ using Umbraco.Core.Templates;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Xml;
 using Umbraco.Web.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace Umbraco.Web
 {

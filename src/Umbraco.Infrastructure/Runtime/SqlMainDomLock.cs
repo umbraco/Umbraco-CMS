@@ -6,9 +6,9 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Mappers;
@@ -21,7 +21,7 @@ namespace Umbraco.Core.Runtime
         private string _lockId;
         private const string MainDomKeyPrefix = "Umbraco.Core.Runtime.SqlMainDom";
         private const string UpdatedSuffix = "_updated";
-        private readonly ILogger _logger;
+        private readonly ILogger<SqlMainDomLock> _logger;
         private readonly IHostingEnvironment _hostingEnvironment;
         private IUmbracoDatabase _db;
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
@@ -31,13 +31,14 @@ namespace Umbraco.Core.Runtime
         private bool _errorDuringAcquiring;
         private object _locker = new object();
 
-        public SqlMainDomLock(ILogger logger, IGlobalSettings globalSettings, IConnectionStrings connectionStrings, IDbProviderFactoryCreator dbProviderFactoryCreator, IHostingEnvironment hostingEnvironment)
+        public SqlMainDomLock(ILogger<SqlMainDomLock> logger, ILoggerFactory loggerFactory, IGlobalSettings globalSettings, IConnectionStrings connectionStrings, IDbProviderFactoryCreator dbProviderFactoryCreator, IHostingEnvironment hostingEnvironment)
         {
             // unique id for our appdomain, this is more unique than the appdomain id which is just an INT counter to its safer
             _lockId = Guid.NewGuid().ToString();
             _logger = logger;
             _hostingEnvironment = hostingEnvironment;
-            _dbFactory = new UmbracoDatabaseFactory(_logger,
+            _dbFactory = new UmbracoDatabaseFactory(loggerFactory.CreateLogger<UmbracoDatabaseFactory>(),
+                loggerFactory,
                globalSettings,
                connectionStrings,
                Constants.System.UmbracoConnectionName,

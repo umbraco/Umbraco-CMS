@@ -3,9 +3,9 @@ using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using StackExchange.Profiling.Data;
 using Umbraco.Composing;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.FaultHandling;
 
 namespace Umbraco.Core.Persistence

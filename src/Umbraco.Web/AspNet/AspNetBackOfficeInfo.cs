@@ -3,7 +3,7 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
+using Microsoft.Extensions.Logging;
 
 namespace Umbraco.Web
 {
@@ -11,10 +11,10 @@ namespace Umbraco.Web
     {
         private readonly IGlobalSettings _globalSettings;
         private readonly IIOHelper _ioHelper;
-        private readonly ILogger _logger;
+        private readonly ILogger<AspNetBackOfficeInfo> _logger;
         private readonly IWebRoutingSettings _webRoutingSettings;
 
-        public AspNetBackOfficeInfo(IGlobalSettings globalSettings, IIOHelper ioHelper, ILogger logger, IWebRoutingSettings webRoutingSettings)
+        public AspNetBackOfficeInfo(IGlobalSettings globalSettings, IIOHelper ioHelper, ILogger<AspNetBackOfficeInfo> logger, IWebRoutingSettings webRoutingSettings)
         {
             _globalSettings = globalSettings;
             _ioHelper = ioHelper;

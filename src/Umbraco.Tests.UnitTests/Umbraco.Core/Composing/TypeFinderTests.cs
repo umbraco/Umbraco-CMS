@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Web.BackOffice.Trees;
+using ILogger = Umbraco.Core.Logging.ILogger;
 
 namespace Umbraco.Tests.Composing
 {
@@ -65,10 +67,11 @@ namespace Umbraco.Tests.Composing
             return new ProfilingLogger(logger, profiler);
         }
 
-        private static ILogger GetLogger()
+        // TODO: Is console logger the type of logger we want?
+        private static ILoggerFactory _factory = LoggerFactory.Create(builder => { builder.AddConsole(); });
+        private static Microsoft.Extensions.Logging.ILogger<TypeFinder> GetLogger()
         {
-            // TODO: return some sort of actual logger.
-            return new NullLogger();
+            return _factory.CreateLogger<TypeFinder>();
         }
 
         [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]

@@ -5,9 +5,9 @@ using System.Data.Common;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
+using Microsoft.Extensions.Logging;
 using NPoco;
 using StackExchange.Profiling;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.FaultHandling;
 using Umbraco.Core.Persistence.SqlSyntax;
 
@@ -23,7 +23,7 @@ namespace Umbraco.Core.Persistence
     /// </remarks>
     public class UmbracoDatabase : Database, IUmbracoDatabase
     {
-        private readonly ILogger _logger;
+        private readonly ILogger<UmbracoDatabase> _logger;
         private readonly IBulkSqlInsertProvider _bulkSqlInsertProvider;
         private readonly RetryPolicy _connectionRetryPolicy;
         private readonly RetryPolicy _commandRetryPolicy;
@@ -39,7 +39,7 @@ namespace Umbraco.Core.Persistence
         /// <para>Used by UmbracoDatabaseFactory to create databases.</para>
         /// <para>Also used by DatabaseBuilder for creating databases and installing/upgrading.</para>
         /// </remarks>
-        public UmbracoDatabase(string connectionString, ISqlContext sqlContext, DbProviderFactory provider, ILogger logger, IBulkSqlInsertProvider bulkSqlInsertProvider, RetryPolicy connectionRetryPolicy = null, RetryPolicy commandRetryPolicy = null)
+        public UmbracoDatabase(string connectionString, ISqlContext sqlContext, DbProviderFactory provider, ILogger<UmbracoDatabase> logger, IBulkSqlInsertProvider bulkSqlInsertProvider, RetryPolicy connectionRetryPolicy = null, RetryPolicy commandRetryPolicy = null)
             : base(connectionString, sqlContext.DatabaseType, provider, sqlContext.SqlSyntax.DefaultIsolationLevel)
         {
             SqlContext = sqlContext;
@@ -58,7 +58,7 @@ namespace Umbraco.Core.Persistence
         /// Initializes a new instance of the <see cref="UmbracoDatabase"/> class.
         /// </summary>
         /// <remarks>Internal for unit tests only.</remarks>
-        internal UmbracoDatabase(DbConnection connection, ISqlContext sqlContext, ILogger logger, IBulkSqlInsertProvider bulkSqlInsertProvider)
+        internal UmbracoDatabase(DbConnection connection, ISqlContext sqlContext, ILogger<UmbracoDatabase> logger, IBulkSqlInsertProvider bulkSqlInsertProvider)
             : base(connection, sqlContext.DatabaseType, sqlContext.SqlSyntax.DefaultIsolationLevel)
         {
             SqlContext = sqlContext;

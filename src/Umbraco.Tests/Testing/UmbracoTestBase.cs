@@ -171,15 +171,16 @@ namespace Umbraco.Tests.Testing
             // FIXME: align to runtimes & components - don't redo everything here !!!! Yes this is getting painful
 
             var (logger, msLogger, profiler) = GetLoggers(Options.Logger);
+            var loggerFactoy = GetLoggerFactory(Options.Logger);
             var proflogger = new ProfilingLogger(logger, profiler);
             IOHelper = TestHelper.IOHelper;
 
-            TypeFinder = new TypeFinder(logger, new DefaultUmbracoAssemblyProvider(GetType().Assembly), new VaryingRuntimeHash());
+            TypeFinder = new TypeFinder(loggerFactoy.CreateLogger<TypeFinder>(), new DefaultUmbracoAssemblyProvider(GetType().Assembly), new VaryingRuntimeHash());
             var appCaches = GetAppCaches();
             var globalSettings = TestHelpers.SettingsForTests.DefaultGlobalSettings;
             var settings = TestHelpers.SettingsForTests.GenerateMockWebRoutingSettings();
 
-            IBackOfficeInfo backOfficeInfo = new AspNetBackOfficeInfo(globalSettings, IOHelper, logger, settings);
+            IBackOfficeInfo backOfficeInfo = new AspNetBackOfficeInfo(globalSettings, IOHelper, loggerFactoy.CreateLogger<AspNetBackOfficeInfo>(), settings);
             IIpResolver ipResolver = new AspNetIpResolver();
             UmbracoVersion = new UmbracoVersion(globalSettings);
 
@@ -255,6 +256,29 @@ namespace Umbraco.Tests.Testing
         #endregion
 
         #region Compose
+
+        protected virtual ILoggerFactory GetLoggerFactory(UmbracoTestOptions.Logger option)
+        {
+            ILoggerFactory factory;
+
+            switch (option)
+            {
+                case UmbracoTestOptions.Logger.Mock:
+                    // TODO: Make factory return mock of ILogger
+                    factory = Mock.Of<ILoggerFactory>();
+                    break;
+                case UmbracoTestOptions.Logger.Serilog:
+                    factory = LoggerFactory.Create(builder => { builder.AddSerilog(); });
+                    break;
+                case UmbracoTestOptions.Logger.Console:
+                    factory = LoggerFactory.Create(builder => { builder.AddConsole(); });
+                    break;
+                default:
+                    throw new NotSupportedException($"Logger option {option} is not supported.");
+            }
+
+            return factory;
+        }
 
         protected virtual (ILogger, Microsoft.Extensions.Logging.ILogger, IProfiler) GetLoggers(UmbracoTestOptions.Logger option)
         {

@@ -4,6 +4,7 @@ using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
@@ -105,7 +106,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             }
         }
 
-        internal ServerVersionInfo GetSetVersion(string connectionString, string providerName, ILogger logger)
+        internal ServerVersionInfo GetSetVersion(string connectionString, string providerName, Microsoft.Extensions.Logging.ILogger logger)
         {
             //var factory = DbProviderFactories.GetFactory(providerName);
             var factory = SqlClientFactory.Instance;

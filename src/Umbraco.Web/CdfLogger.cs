@@ -1,5 +1,5 @@
 ﻿using System;
-using Umbraco.Core.Logging;
+using Microsoft.Extensions.Logging;
 using Umbraco.Web.Composing;
 using ICdfLogger = ClientDependency.Core.Logging.ILogger;
 using ICoreLogger = Umbraco.Core.Logging.ILogger;
@@ -11,7 +11,7 @@ namespace Umbraco.Web
     /// </summary>
     public class CdfLogger : ICdfLogger
     {
-        private readonly ICoreLogger _logger;
+        private readonly ILogger<object> _logger;
 
         // Client Dependency doesn't know how to inject
         public CdfLogger(/*ICoreLogger logger*/)

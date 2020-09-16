@@ -9,6 +9,8 @@ using Umbraco.Composing;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
+using Microsoft.Extensions.Logging;
+using ILogger = Umbraco.Core.Logging.ILogger;
 
 namespace Umbraco.Core.Services.Implement
 {

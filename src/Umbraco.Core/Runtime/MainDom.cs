@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Threading;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Runtime
 {
@@ -20,7 +20,7 @@ namespace Umbraco.Core.Runtime
     {
         #region Vars
 
-        private readonly ILogger _logger;
+        private readonly ILogger<MainDom> _logger;
         private IApplicationShutdownRegistry _hostingEnvironment;
         private readonly IMainDomLock _mainDomLock;
 
@@ -42,7 +42,7 @@ namespace Umbraco.Core.Runtime
         #region Ctor
 
         // initializes a new instance of MainDom
-        public MainDom(ILogger logger, IMainDomLock systemLock)
+        public MainDom(ILogger<MainDom> logger, IMainDomLock systemLock)
         {
             _logger = logger;
             _mainDomLock = systemLock;

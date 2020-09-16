@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Web;
 using System.Web.Routing;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Security;
 using Umbraco.Core.Cache;
@@ -9,7 +10,6 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;

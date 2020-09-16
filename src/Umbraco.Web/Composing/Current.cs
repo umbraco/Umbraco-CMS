@@ -247,7 +247,7 @@ namespace Umbraco.Web.Composing
 
         public static IShortStringHelper ShortStringHelper => Factory.GetInstance<IShortStringHelper>();
 
-        public static ILogger Logger => Umbraco.Composing.Current.Logger;
+        public static Microsoft.Extensions.Logging.ILogger<object> Logger => Umbraco.Composing.Current.Logger;
 
         public static ILoggerFactory LoggerFactory => Umbraco.Composing.Current.LoggerFactory;
 

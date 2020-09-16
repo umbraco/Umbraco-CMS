@@ -15,6 +15,7 @@ using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Extensions.Hosting;
 using Serilog.Extensions.Logging;
+using Umbraco.Composing;
 using Umbraco.Configuration;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
@@ -247,10 +248,10 @@ namespace Umbraco.Extensions
 
             var globalSettings = configs.Global();
             var umbracoVersion = new UmbracoVersion(globalSettings);
-            var typeFinder = CreateTypeFinder(logger, profiler, webHostEnvironment, entryAssembly, configs.TypeFinder());
+            var typeFinder = CreateTypeFinder(logger, Current.LoggerFactory, profiler, webHostEnvironment, entryAssembly, configs.TypeFinder());
 
             var runtime = getRuntime(
-                configs,                
+                configs,
                 umbracoVersion,
                 ioHelper,
                 logger,
@@ -267,12 +268,12 @@ namespace Umbraco.Extensions
             return services;
         }
 
-        private static ITypeFinder CreateTypeFinder(Core.Logging.ILogger logger, IProfiler profiler, IWebHostEnvironment webHostEnvironment, Assembly entryAssembly, ITypeFinderSettings typeFinderSettings)
+        private static ITypeFinder CreateTypeFinder(Core.Logging.ILogger logger, ILoggerFactory loggerFactory, IProfiler profiler, IWebHostEnvironment webHostEnvironment, Assembly entryAssembly, ITypeFinderSettings typeFinderSettings)
         {
             var runtimeHashPaths = new RuntimeHashPaths();
             runtimeHashPaths.AddFolder(new DirectoryInfo(Path.Combine(webHostEnvironment.ContentRootPath, "bin")));
             var runtimeHash = new RuntimeHash(new ProfilingLogger(logger, profiler), runtimeHashPaths);
-            return new TypeFinder(logger, new DefaultUmbracoAssemblyProvider(entryAssembly), runtimeHash, new TypeFinderConfig(typeFinderSettings));
+            return new TypeFinder(loggerFactory.CreateLogger<TypeFinder>(), new DefaultUmbracoAssemblyProvider(entryAssembly), runtimeHash, new TypeFinderConfig(typeFinderSettings));
         }
 
         private static IRuntime GetCoreRuntime(
@@ -294,7 +295,7 @@ namespace Umbraco.Extensions
             var mainDom = new MainDom(logger, mainDomLock);
 
             var coreRuntime = new CoreRuntime(
-                configs,                
+                configs,
                 umbracoVersion,
                 ioHelper,
                 logger,

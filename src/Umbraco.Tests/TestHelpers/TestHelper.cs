@@ -60,7 +60,7 @@ namespace Umbraco.Tests.TestHelpers
             public override IBackOfficeInfo GetBackOfficeInfo()
                 => new AspNetBackOfficeInfo(
                     SettingsForTests.GenerateMockGlobalSettings(GetUmbracoVersion()),
-                    TestHelper.IOHelper, Mock.Of<ILogger>(), SettingsForTests.GenerateMockWebRoutingSettings());
+                    TestHelper.IOHelper, Mock.Of<Microsoft.Extensions.Logging.ILogger<AspNetBackOfficeInfo>>(), SettingsForTests.GenerateMockWebRoutingSettings());
 
             public override IHostingEnvironment GetHostingEnvironment()
                 => new AspNetHostingEnvironment(SettingsForTests.DefaultHostingSettings);

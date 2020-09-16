@@ -35,7 +35,7 @@ namespace Umbraco.Tests.Common
         {
             SettingsForTests = new SettingsForTests();
             MainDom = new SimpleMainDom();
-            _typeFinder = new TypeFinder(Mock.Of<ILogger>(), new DefaultUmbracoAssemblyProvider(entryAssembly), new VaryingRuntimeHash());
+            _typeFinder = new TypeFinder(Mock.Of<Microsoft.Extensions.Logging.ILogger<TypeFinder>>(), new DefaultUmbracoAssemblyProvider(entryAssembly), new VaryingRuntimeHash());
         }
 
         public ITypeFinder GetTypeFinder() => _typeFinder;

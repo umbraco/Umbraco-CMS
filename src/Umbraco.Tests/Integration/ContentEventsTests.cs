@@ -6,7 +6,7 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Web.Composing;
-using Umbraco.Core.Logging;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Sync;
@@ -33,7 +33,7 @@ namespace Umbraco.Tests.Integration
         {
             base.SetUp();
 
-            _h1 = new DistributedCacheBinder(new DistributedCache(Current.ServerMessenger, Current.CacheRefreshers), Mock.Of<IUmbracoContextFactory>(), Mock.Of<ILogger>());
+            _h1 = new DistributedCacheBinder(new DistributedCache(Current.ServerMessenger, Current.CacheRefreshers), Mock.Of<IUmbracoContextFactory>(), Mock.Of<Umbraco.Core.Logging.ILogger>());
             _h1.BindEvents(true);
 
             _events = new List<EventInstance>();

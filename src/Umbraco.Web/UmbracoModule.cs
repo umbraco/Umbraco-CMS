@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Web;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Routing;
 

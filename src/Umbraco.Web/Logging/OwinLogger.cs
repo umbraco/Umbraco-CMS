@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
-using Umbraco.Core.Logging;
+using Microsoft.Extensions.Logging;
 
 namespace Umbraco.Web.Logging
 {

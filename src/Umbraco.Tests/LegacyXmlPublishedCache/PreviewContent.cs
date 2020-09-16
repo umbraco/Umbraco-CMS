@@ -2,9 +2,9 @@
 using System.IO;
 using System.Linq;
 using System.Xml;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Composing;
 

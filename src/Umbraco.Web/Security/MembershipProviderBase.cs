@@ -8,10 +8,10 @@ using System.Web;
 using System.Web.Hosting;
 using System.Web.Configuration;
 using System.Web.Security;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Web.Composing;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Security;
 
 namespace Umbraco.Web.Security

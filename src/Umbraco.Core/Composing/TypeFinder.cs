@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Security;
 using System.Text;
 using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.Logging;
+using Microsoft.Extensions.Logging;
 
 namespace Umbraco.Core.Composing
 {
@@ -14,7 +14,7 @@ namespace Umbraco.Core.Composing
     /// <inheritdoc cref="ITypeFinder"/>
     public class TypeFinder : ITypeFinder
     {
-        private readonly ILogger _logger;
+        private readonly ILogger<TypeFinder> _logger;
         private readonly IAssemblyProvider _assemblyProvider;
         private readonly IRuntimeHash _runtimeHash;
         private volatile HashSet<Assembly> _localFilteredAssemblyCache;
@@ -26,7 +26,7 @@ namespace Umbraco.Core.Composing
         // used for benchmark tests
         internal bool QueryWithReferencingAssemblies = true;
 
-        public TypeFinder(ILogger logger, IAssemblyProvider assemblyProvider, IRuntimeHash runtimeHash, ITypeFinderConfig typeFinderConfig = null)
+        public TypeFinder(ILogger<TypeFinder> logger, IAssemblyProvider assemblyProvider, IRuntimeHash runtimeHash, ITypeFinderConfig typeFinderConfig = null)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _assemblyProvider = assemblyProvider;

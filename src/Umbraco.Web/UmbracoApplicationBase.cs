@@ -6,6 +6,7 @@ using System.Threading;
 using System.Web;
 using System.Web.Hosting;
 using Microsoft.Extensions.Logging;
+using Serilog;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
@@ -20,7 +21,7 @@ using Umbraco.Web.AspNet;
 using Umbraco.Web.Hosting;
 using Umbraco.Web.Logging;
 using Current = Umbraco.Web.Composing.Current;
-using ILogger = Umbraco.Core.Logging.ILogger;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Umbraco.Web
 {
@@ -31,6 +32,7 @@ namespace Umbraco.Web
     {
         private IRuntime _runtime;
         private IFactory _factory;
+        private ILoggerFactory _loggerFactory;
 
         protected UmbracoApplicationBase()
         {
@@ -47,11 +49,25 @@ namespace Umbraco.Web
                     Path.Combine(hostingEnvironment.ApplicationPhysicalPath, "config\\serilog.config"),
                     Path.Combine(hostingEnvironment.ApplicationPhysicalPath, "config\\serilog.user.config"));
                 var ioHelper = new IOHelper(hostingEnvironment);
-                var logger = SerilogLogger<object>.CreateWithDefaultConfiguration(hostingEnvironment, loggingConfiguration);
+
+                // TODO: Configure Serilog somewhere else
+                var loggerConfig = new LoggerConfiguration();
+                loggerConfig
+                    .MinimalConfiguration(hostingEnvironment, loggingConfiguration)
+                    .ReadFromConfigFile(loggingConfiguration)
+                    .ReadFromUserConfigFile(loggingConfiguration);
+                Log.Logger = loggerConfig.CreateLogger();
+
+                _loggerFactory = LoggerFactory.Create(builder =>
+                {
+                    builder.AddSerilog();
+                });
+
+                var logger = _loggerFactory.CreateLogger<UmbracoApplicationBase>();
 
                 var configs = configFactory.Create();
 
-                var backOfficeInfo = new AspNetBackOfficeInfo(globalSettings, ioHelper, logger, configFactory.WebRoutingSettings);
+                var backOfficeInfo = new AspNetBackOfficeInfo(globalSettings, ioHelper, _loggerFactory.CreateLogger<AspNetBackOfficeInfo>(), configFactory.WebRoutingSettings);
                 var profiler = GetWebProfiler(hostingEnvironment);
                 Umbraco.Composing.Current.Initialize(logger, configs, ioHelper, hostingEnvironment, backOfficeInfo, profiler);
                 Logger = logger;
@@ -74,7 +90,7 @@ namespace Umbraco.Web
             return webProfiler;
         }
 
-        protected UmbracoApplicationBase(ILogger logger, Configs configs, IIOHelper ioHelper, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)
+        protected UmbracoApplicationBase(Microsoft.Extensions.Logging.ILogger<UmbracoApplicationBase> logger, Configs configs, IIOHelper ioHelper, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)
         {
             if (!Umbraco.Composing.Current.IsInitialized)
             {
@@ -83,7 +99,7 @@ namespace Umbraco.Web
             }
         }
 
-        protected ILogger Logger { get; }
+        protected Microsoft.Extensions.Logging.ILogger<UmbracoApplicationBase> Logger { get; }
 
         /// <summary>
         /// Gets a <see cref="ITypeFinder"/>
@@ -104,7 +120,7 @@ namespace Umbraco.Web
             // global.asax (the app domain also monitors this, if it changes will do a full restart)
             runtimeHashPaths.AddFile(new FileInfo(hostingEnvironment.MapPathContentRoot("~/global.asax")));
             var runtimeHash = new RuntimeHash(new ProfilingLogger(logger, profiler), runtimeHashPaths);
-            return new TypeFinder(Logger, new DefaultUmbracoAssemblyProvider(
+            return new TypeFinder(_loggerFactory.CreateLogger<TypeFinder>(), new DefaultUmbracoAssemblyProvider(
                 // GetEntryAssembly was actually an exposed API by request of the aspnetcore team which works in aspnet core because a website
                 // in that case is essentially an exe. However in netframework there is no entry assembly, things don't really work that way since
                 // the process that is running the site is iisexpress, so this returns null. The best we can do is fallback to GetExecutingAssembly()

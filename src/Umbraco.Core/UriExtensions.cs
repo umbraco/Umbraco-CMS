@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Umbraco.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;

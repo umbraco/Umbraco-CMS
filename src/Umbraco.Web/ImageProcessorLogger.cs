@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
+using Microsoft.Extensions.Logging;
 using ImageProcessor.Common.Exceptions;
 using Umbraco.Web.Composing;
-using Umbraco.Core.Logging;
 
 namespace Umbraco.Web
 {

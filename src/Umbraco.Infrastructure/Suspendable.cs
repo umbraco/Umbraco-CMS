@@ -1,6 +1,6 @@
-﻿using Umbraco.Composing;
+﻿using Microsoft.Extensions.Logging;
+using Umbraco.Composing;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Logging;
 using Umbraco.Examine;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Search;
