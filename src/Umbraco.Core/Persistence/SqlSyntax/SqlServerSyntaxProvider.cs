@@ -314,6 +314,18 @@ where tbl.[name]=@0 and col.[name]=@1;", tableName, columnName)
             }
         }
 
+        public override void ReadLock(IDatabase db, int lockId)
+        {
+            // soon as we get Database, a transaction is started
+
+            if (db.Transaction.IsolationLevel < IsolationLevel.ReadCommitted)
+                throw new InvalidOperationException("A transaction with minimum ReadCommitted isolation level is required.");
+
+                var i = db.ExecuteScalar<int?>("SELECT value FROM umbracoLock WITH (REPEATABLEREAD) WHERE id=@id", new { id = lockId });
+                if (i == null) // ensure we are actually locking!
+                    throw new ArgumentException($"LockObject with id={lockId} does not exist.", nameof(lockId));
+        }
+
         public override string FormatColumnRename(string tableName, string oldName, string newName)
         {
             return string.Format(RenameColumn, tableName, oldName, newName);

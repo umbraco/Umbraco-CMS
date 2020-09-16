@@ -203,6 +203,18 @@ where table_name=@0 and column_name=@1", tableName, columnName).FirstOrDefault()
             }
         }
 
+        public override void ReadLock(IDatabase db, int lockId)
+        {
+            // soon as we get Database, a transaction is started
+
+            if (db.Transaction.IsolationLevel < IsolationLevel.RepeatableRead)
+                throw new InvalidOperationException("A transaction with minimum RepeatableRead isolation level is required.");
+
+                var i = db.ExecuteScalar<int?>("SELECT value FROM umbracoLock WHERE id=@id", new { id = lockId });
+                if (i == null) // ensure we are actually locking!
+                    throw new ArgumentException($"LockObject with id={lockId} does not exist.");
+        }
+
         protected override string FormatIdentity(ColumnDefinition column)
         {
             return column.IsIdentity ? GetIdentityString(column) : string.Empty;

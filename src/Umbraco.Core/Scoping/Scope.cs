@@ -489,6 +489,9 @@ namespace Umbraco.Core.Scoping
         public void ReadLock(params int[] lockIds) => Database.SqlContext.SqlSyntax.ReadLock(Database, lockIds);
 
         /// <inheritdoc />
+        public void ReadLock(int lockId) => Database.SqlContext.SqlSyntax.ReadLock(Database, lockId);
+
+        /// <inheritdoc />
         public void WriteLock(params int[] lockIds) => Database.SqlContext.SqlSyntax.WriteLock(Database, lockIds);
 
         /// <inheritdoc />

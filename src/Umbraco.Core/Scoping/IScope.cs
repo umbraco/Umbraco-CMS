@@ -54,6 +54,12 @@ namespace Umbraco.Core.Scoping
         void ReadLock(params int[] lockIds);
 
         /// <summary>
+        /// Read-locks some lock objects.
+        /// </summary>
+        /// <param name="lockId">The lock object identifier.</param>
+        void ReadLock(int lockId);
+
+        /// <summary>
         /// Write-locks some lock objects.
         /// </summary>
         /// <param name="lockIds">The lock object identifiers.</param>
