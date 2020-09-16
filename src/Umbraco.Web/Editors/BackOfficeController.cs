@@ -465,6 +465,22 @@ namespace Umbraco.Web.Editors
                 var autoLinkUser = UserManager.FindByEmail(loginInfo.Email);
                 if (autoLinkUser != null)
                 {
+                    try
+                    {
+                        //call the callback if one is assigned
+                        autoLinkOptions.OnAutoLinking?.Invoke(autoLinkUser, loginInfo);
+                    }
+                    catch (Exception ex)
+                    {
+                        var msg = "Could not link login provider " + loginInfo.Login.LoginProvider + ".";
+                        Logger.Error<BackOfficeController>(ex, msg);
+                        ViewData.SetExternalSignInProviderErrors(
+                            new BackOfficeExternalLoginProviderErrors(
+                                loginInfo.Login.LoginProvider,
+                                new[] { msg + " " + ex.Message }));
+                        return true;
+                    }
+
                     await LinkUser(autoLinkUser, loginInfo);
                 }
                 else
@@ -485,7 +501,20 @@ namespace Umbraco.Web.Editors
                     }
 
                     //call the callback if one is assigned
-                    autoLinkOptions.OnAutoLinking?.Invoke(autoLinkUser, loginInfo);
+                    try
+                    {
+                        autoLinkOptions.OnAutoLinking?.Invoke(autoLinkUser, loginInfo);
+                    }
+                    catch (Exception ex)
+                    {
+                        var msg = "Could not link login provider " + loginInfo.Login.LoginProvider + ".";
+                        Logger.Error<BackOfficeController>(ex, msg);
+                        ViewData.SetExternalSignInProviderErrors(
+                            new BackOfficeExternalLoginProviderErrors(
+                                loginInfo.Login.LoginProvider,
+                                new[] { msg + " " + ex.Message }));
+                        return true;
+                    }
 
                     var userCreationResult = await UserManager.CreateAsync(autoLinkUser);
 
