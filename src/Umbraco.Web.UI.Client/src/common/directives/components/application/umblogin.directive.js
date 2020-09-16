@@ -82,6 +82,8 @@
         
         vm.twoFactor = {};
 
+        vm.loginSuccess = loginSuccess;
+
         function onInit() {
 
             // Check if it is a new user
@@ -203,6 +205,14 @@
             SetTitle();
         }
 
+        function loginSuccess() {
+            vm.loginStates.submitButton = "success";
+            userService._retryRequestQueue(true);
+            if (vm.onLogin) {
+                vm.onLogin();
+            }
+        }
+
         function loginSubmit() {
             
             // make sure that we are returning to the login view.
@@ -227,11 +237,7 @@
 
             userService.authenticate(vm.login, vm.password)
                 .then(function (data) {
-                    vm.loginStates.submitButton = "success";
-                    userService._retryRequestQueue(true);
-                    if(vm.onLogin) {
-                        vm.onLogin();
-                    }
+                    loginSuccess();
                 },
                 function (reason) {
 
