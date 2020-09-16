@@ -246,7 +246,7 @@ namespace Umbraco.Tests.TestHelpers
                 Factory.GetInstance<IMediaTypeService>(),
                 Factory.GetInstance<IMemberTypeService>(),
                 Factory.GetInstance<IPublishedContentTypeFactory>(),
-                Logger);
+                Factory.GetInstance<Microsoft.Extensions.Logging.ILogger>());
 
             // testing=true so XmlStore will not use the file nor the database
 
@@ -260,7 +260,7 @@ namespace Umbraco.Tests.TestHelpers
                 Factory.GetInstance<IUmbracoContextAccessor>(),
                 Factory.GetInstance<IDocumentRepository>(), Factory.GetInstance<IMediaRepository>(), Factory.GetInstance<IMemberRepository>(),
                 DefaultCultureAccessor,
-                Logger,
+                Factory.GetInstance<Microsoft.Extensions.Logging.ILogger>(),
                 Factory.GetInstance<IGlobalSettings>(),
                 HostingEnvironment,
                 HostingLifetime,

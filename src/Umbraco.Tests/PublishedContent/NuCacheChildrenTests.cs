@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -31,6 +32,7 @@ using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.NuCache;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
 using Current = Umbraco.Web.Composing.Current;
+using ILogger = Umbraco.Core.Logging.ILogger;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -158,6 +160,8 @@ namespace Umbraco.Tests.PublishedContent
                 _snapshotAccessor,
                 _variationAccesor,
                 Mock.Of<IProfilingLogger>(),
+                Mock.Of<Umbraco.Core.Logging.ILogger<PublishedSnapshotService>>(),
+                Mock.Of<ILoggerFactory>(),
                 scopeProvider.Object,
                 Mock.Of<IDocumentRepository>(),
                 Mock.Of<IMediaRepository>(),

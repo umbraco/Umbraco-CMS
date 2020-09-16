@@ -32,13 +32,14 @@ namespace Umbraco.Web
             IScopeProvider scopeProvider,
             ISqlContext sqlContext,
             IProfilingLogger proflog,
+            ILogger logger,
             IServerRegistrar serverRegistrar,
             DatabaseServerMessengerOptions options,
             IHostingEnvironment hostingEnvironment,
             CacheRefresherCollection cacheRefreshers,
             IRequestCache requestCache,
             IRequestAccessor requestAccessor)
-            : base(mainDom, scopeProvider, sqlContext, proflog, serverRegistrar, true, options, hostingEnvironment, cacheRefreshers)
+            : base(mainDom, scopeProvider, sqlContext, proflog, logger, serverRegistrar, true, options, hostingEnvironment, cacheRefreshers)
         {
             _databaseFactory = databaseFactory;
             _requestCache = requestCache;

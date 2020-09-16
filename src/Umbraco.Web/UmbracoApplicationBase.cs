@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Threading;
 using System.Web;
 using System.Web.Hosting;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
@@ -19,6 +20,7 @@ using Umbraco.Web.AspNet;
 using Umbraco.Web.Hosting;
 using Umbraco.Web.Logging;
 using Current = Umbraco.Web.Composing.Current;
+using ILogger = Umbraco.Core.Logging.ILogger;
 
 namespace Umbraco.Web
 {
@@ -120,7 +122,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets a runtime.
         /// </summary>
-        protected abstract IRuntime GetRuntime(Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo);
+        protected abstract IRuntime GetRuntime(Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, ILoggerFactory loggerFactory, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo);
 
         /// <summary>
         /// Gets the application register.
@@ -170,6 +172,7 @@ namespace Umbraco.Web
                 umbracoVersion,
                 Umbraco.Composing.Current.IOHelper,
                 Umbraco.Composing.Current.Logger,
+                Umbraco.Composing.Current.LoggerFactory,
                 Umbraco.Composing.Current.Profiler,
                 Umbraco.Composing.Current.HostingEnvironment,
                 Umbraco.Composing.Current.BackOfficeInfo);

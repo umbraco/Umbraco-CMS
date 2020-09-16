@@ -98,6 +98,8 @@ namespace Umbraco.Tests.Scoping
                 publishedSnapshotAccessor,
                 Mock.Of<IVariationContextAccessor>(),
                 ProfilingLogger,
+                Mock.Of<ILogger<PublishedSnapshotService>>(),
+                Mock.Of<Microsoft.Extensions.Logging.LoggerFactory>(),
                 ScopeProvider,
                 documentRepository, mediaRepository, memberRepository,
                 DefaultCultureAccessor,

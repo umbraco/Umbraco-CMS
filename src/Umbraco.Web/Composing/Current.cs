@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Dictionary;
@@ -33,6 +34,7 @@ using Umbraco.Web.Security;
 using Umbraco.Web.Services;
 using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
+using ILogger = Umbraco.Core.Logging.ILogger;
 
 namespace Umbraco.Web.Composing
 {
@@ -246,6 +248,8 @@ namespace Umbraco.Web.Composing
         public static IShortStringHelper ShortStringHelper => Factory.GetInstance<IShortStringHelper>();
 
         public static ILogger Logger => Umbraco.Composing.Current.Logger;
+
+        public static ILoggerFactory LoggerFactory => Umbraco.Composing.Current.LoggerFactory;
 
         public static IProfiler Profiler => Factory.GetInstance<IProfiler>();
 
