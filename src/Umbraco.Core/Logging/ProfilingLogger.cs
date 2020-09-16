@@ -43,14 +43,14 @@ namespace Umbraco.Core.Logging
 
         public DisposableTimer DebugDuration<T>(string startMessage)
         {
-            return Logger.IsEnabled<T>(LogLevel.Debug)
+            return Logger.IsEnabled(typeof(T), LogLevel.Debug)
                 ? DebugDuration<T>(startMessage, "Completed.")
                 : null;
         }
 
         public DisposableTimer DebugDuration<T>(string startMessage, string completeMessage, string failMessage = null, int thresholdMilliseconds = 0)
         {
-            return Logger.IsEnabled<T>(LogLevel.Debug)
+            return Logger.IsEnabled(typeof(T), LogLevel.Debug)
                 ? new DisposableTimer(Logger, LogLevel.Debug, Profiler, typeof(T), startMessage, completeMessage, failMessage, thresholdMilliseconds)
                 : null;
         }
