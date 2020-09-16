@@ -4,10 +4,9 @@ using System.Linq;
 using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Macros;
 using Umbraco.Core.Services;
 
-namespace Umbraco.Core.HealthCheck.Checks
+namespace Umbraco.Core.HealthCheck.Checks.Configuration
 {
     [HealthCheck("D0F7599E-9B2A-4D9E-9883-81C7EDC5616F", "Macro errors",
         Description =
