@@ -70,10 +70,10 @@ namespace Umbraco.Web.BackOffice.Filters
                 if (_requestCache.Get(nameof(CheckIfUserTicketDataIsStaleFilter)) is null)
                     return;
 
-                await UpdateTokesAndAppendCustomHeaders(actionContext);
+                await UpdateTokensAndAppendCustomHeaders(actionContext);
             }
 
-            private async Task UpdateTokesAndAppendCustomHeaders(ActionExecutingContext actionContext)
+            private async Task UpdateTokensAndAppendCustomHeaders(ActionExecutingContext actionContext)
             {
                 var tokenFilter =
                     new SetAngularAntiForgeryTokensAttribute.SetAngularAntiForgeryTokensFilter(_backOfficeAntiforgery,
