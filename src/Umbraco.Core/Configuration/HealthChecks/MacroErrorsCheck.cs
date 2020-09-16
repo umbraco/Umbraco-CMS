@@ -23,7 +23,21 @@ namespace Umbraco.Core.HealthCheck.Checks.Configuration
         /// </summary>
         private string _currentValue = "MacroErrors";
 
-        public override string ItemPath { get; }
+        public MacroErrorsCheck(ILocalizedTextService textService, ILogger logger,
+            IConfigurationService configurationService, IOptions<ContentSettings> contentSettings)
+            : base(textService, logger, configurationService)
+        {
+            _textService = textService;
+            _logger = logger;
+            _contentSettings = contentSettings != null
+                ? contentSettings.Value
+                : throw new ArgumentNullException(nameof(contentSettings));
+        }
+
+        public override ValueComparisonType ValueComparisonType => ValueComparisonType.ShouldEqual;
+
+        public override string ItemPath => Constants.Configuration.ConfigContentMacroErrors;
+
 
         /// <summary>
         /// Gets the values to compare against.
@@ -50,29 +64,7 @@ namespace Umbraco.Core.HealthCheck.Checks.Configuration
             }
         }
 
-        public MacroErrorsCheck(ILocalizedTextService textService, ILogger logger,
-            IConfigurationService configurationService, IOptions<ContentSettings> contentSettings)
-            : base(textService, logger, configurationService)
-        {
-            _textService = textService;
-            _logger = logger;
-            _contentSettings = contentSettings != null
-                ? contentSettings.Value
-                : throw new ArgumentNullException(nameof(contentSettings));
-        }
-
         public override string CurrentValue => _contentSettings.MacroErrors.ToString();
-
-
-        public override HealthCheckStatus ExecuteAction(HealthCheckAction action)
-        {
-            return string.IsNullOrEmpty(action.ProvidedValue)
-                ? Rectify()
-                : Rectify(action.ProvidedValue);
-        }
-
-
-        public override ValueComparisonType ValueComparisonType { get; }
 
         /// <summary>
         /// Gets the message for when the check has succeeded.

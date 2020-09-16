@@ -15,18 +15,17 @@
             public const string ConfigGlobalPrefix = ConfigPrefix + "Global:";
             public const string ConfigContentPrefix = ConfigPrefix + "Content:";
             public const string ConfigModelsBuilderPrefix = ConfigPrefix + "ModelsBuilder:";
-            public const string ConfigRuntimeMinification = ConfigPrefix + "RuntimeMinification";
-
-            public const string ConfigRuntimeMinificationVersion = ConfigRuntimeMinification + ":Version";
             public const string ConfigContentNotificationsPrefix = ConfigContentPrefix + "Notifications:";
+            public const string ConfigHostingPrefix = ConfigPrefix + "Hosting:";
+            public const string ConfigCustomErrorsPrefix = ConfigPrefix + "CustomErrors:";
+
+            public const string ConfigRuntimeMinification = ConfigPrefix + "RuntimeMinification:";
+            public const string ConfigRuntimeMinificationVersion = ConfigRuntimeMinification + "Version";
             public const string ConfigContentNotificationsEmail = ConfigContentNotificationsPrefix + "Email";
             public const string ConfigContentMacroErrors = ConfigContentPrefix + "MacroErrors";
             public const string ConfigGlobalUseHttps = ConfigGlobalPrefix + "UseHttps";
-
-            public const string ConfigHostingPrefix = ConfigPrefix + "Hosting:";
             public const string ConfigHostingDebug = ConfigHostingPrefix + "Debug";
-
-            public const string ConfigCustomErrors = ConfigPrefix + "CustomErrors:Mode";
+            public const string ConfigCustomErrorsMode = ConfigCustomErrorsPrefix + "Mode";
         }
     }
 }

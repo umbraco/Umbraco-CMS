@@ -19,7 +19,7 @@ namespace Umbraco.Core.HealthCheck.Checks.LiveEnvironment
             throw new System.NotImplementedException();
         }
 
-        public override string ItemPath => Constants.Configuration.ConfigCustomErrors;
+        public override string ItemPath => Constants.Configuration.ConfigCustomErrorsMode;
 
         public override ValueComparisonType ValueComparisonType => ValueComparisonType.ShouldEqual;
 
