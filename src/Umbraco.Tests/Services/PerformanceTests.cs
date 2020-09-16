@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
+using Microsoft.Extensions.Logging;
 using NPoco;
 using NUnit.Framework;
 using Umbraco.Core;

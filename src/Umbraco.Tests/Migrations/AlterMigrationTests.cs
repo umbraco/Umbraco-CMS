@@ -32,7 +32,7 @@ namespace Umbraco.Tests.Migrations
 
             var dbProviderFactory = DbProviderFactories.GetFactory(Constants.DbProviderNames.SqlServer);
             var sqlContext = new SqlContext(_sqlSyntax, DatabaseType.SqlServer2008, Mock.Of<IPocoDataFactory>());
-            _database = new UmbracoDatabase("cstr", sqlContext, dbProviderFactory, _logger, TestHelper.BulkSqlInsertProvider);
+            _database = new UmbracoDatabase("cstr", sqlContext, dbProviderFactory, Mock.Of<Microsoft.Extensions.Logging.Logger<UmbracoDatabase>>(), TestHelper.BulkSqlInsertProvider);
         }
 
         [Test]

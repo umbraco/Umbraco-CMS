@@ -8,6 +8,7 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Tests.TestHelpers;
 using Current = Umbraco.Web.Composing.Current;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Umbraco.Tests.Composing
 {

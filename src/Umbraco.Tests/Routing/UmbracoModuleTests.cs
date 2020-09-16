@@ -30,7 +30,7 @@ namespace Umbraco.Tests.Routing
 
             // FIXME: be able to get the UmbracoModule from the container. any reason settings were from testobjects?
             //create the module
-            var logger = Mock.Of<ILogger>();
+            var logger = Mock.Of<Microsoft.Extensions.Logging.ILogger>();
             var globalSettings = TestObjects.GetGlobalSettings();
             var runtime = Umbraco.Core.RuntimeState.Booting();
 

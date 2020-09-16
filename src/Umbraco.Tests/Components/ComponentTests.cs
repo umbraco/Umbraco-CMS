@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -35,14 +36,14 @@ namespace Umbraco.Tests.Components
             var logger = Mock.Of<ILogger>();
             var umbLogger = Mock.Of<Core.Logging.ILogger>();
             var typeFinder = TestHelper.GetTypeFinder();
-            var f = new UmbracoDatabaseFactory(umbLogger, SettingsForTests.DefaultGlobalSettings, Mock.Of<IConnectionStrings>(), new Lazy<IMapperCollection>(() => new MapperCollection(Enumerable.Empty<BaseMapper>())), TestHelper.DbProviderFactoryCreator);
+            var f = new UmbracoDatabaseFactory(Mock.Of<Microsoft.Extensions.Logging.ILogger<UmbracoDatabaseFactory>>(), Mock.Of<ILoggerFactory>(), SettingsForTests.DefaultGlobalSettings, Mock.Of<IConnectionStrings>(), new Lazy<IMapperCollection>(() => new MapperCollection(Enumerable.Empty<BaseMapper>())), TestHelper.DbProviderFactoryCreator);
             var fs = new FileSystems(mock.Object, umbLogger, TestHelper.IOHelper, SettingsForTests.GenerateMockGlobalSettings(), TestHelper.GetHostingEnvironment());
             var coreDebug = Mock.Of<ICoreDebugSettings>();
             var mediaFileSystem = Mock.Of<IMediaFileSystem>();
             var p = new ScopeProvider(f, fs, coreDebug, mediaFileSystem, umbLogger, typeFinder, NoAppCache.Instance);
 
             mock.Setup(x => x.GetInstance(typeof (ILogger))).Returns(logger);
-            mock.Setup(x => x.GetInstance(typeof (IProfilingLogger))).Returns(new ProfilingLogger(Mock.Of<Core.Logging.ILogger>(), Mock.Of<IProfiler>()));
+            mock.Setup(x => x.GetInstance(typeof (IProfilingLogger))).Returns(new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
             mock.Setup(x => x.GetInstance(typeof (IUmbracoDatabaseFactory))).Returns(f);
             mock.Setup(x => x.GetInstance(typeof (IScopeProvider))).Returns(p);
 
@@ -92,7 +93,7 @@ namespace Umbraco.Tests.Components
                     if (type == typeof(Composer1)) return new Composer1();
                     if (type == typeof(Composer5)) return new Composer5();
                     if (type == typeof(Component5)) return new Component5(new SomeResource());
-                    if (type == typeof(IProfilingLogger)) return new ProfilingLogger(Mock.Of<Core.Logging.ILogger>(), Mock.Of<IProfiler>());
+                    if (type == typeof(IProfilingLogger)) return new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>());
                     throw new NotSupportedException(type.FullName);
                 });
             });
@@ -215,7 +216,7 @@ namespace Umbraco.Tests.Components
                     if (type == typeof(Composer5a)) return new Composer5a();
                     if (type == typeof(Component5)) return new Component5(new SomeResource());
                     if (type == typeof(Component5a)) return new Component5a();
-                    if (type == typeof(IProfilingLogger)) return new ProfilingLogger(Mock.Of<Core.Logging.ILogger>(), Mock.Of<IProfiler>());
+                    if (type == typeof(IProfilingLogger)) return new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>());
                     throw new NotSupportedException(type.FullName);
                 });
             });

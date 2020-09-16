@@ -3,6 +3,7 @@ using System.Configuration;
 using System.Data.SqlServerCe;
 using System.IO;
 using System.Threading;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NPoco;
 using NUnit.Framework;
@@ -25,7 +26,8 @@ namespace Umbraco.Tests.Persistence
     public class DatabaseContextTests
     {
         private IUmbracoDatabaseFactory _databaseFactory;
-        private ILogger _logger;
+        private Microsoft.Extensions.Logging.ILogger<UmbracoDatabaseFactory> _logger;
+        private ILoggerFactory _loggerFactory;
         private SqlCeSyntaxProvider _sqlCeSyntaxProvider;
         private ISqlSyntaxProvider[] _sqlSyntaxProviders;
         private IUmbracoVersion _umbracoVersion;
@@ -36,11 +38,12 @@ namespace Umbraco.Tests.Persistence
             // create the database factory and database context
             _sqlCeSyntaxProvider = new SqlCeSyntaxProvider();
             _sqlSyntaxProviders = new[] { (ISqlSyntaxProvider) _sqlCeSyntaxProvider };
-            _logger = Mock.Of<ILogger>();
+            _logger = Mock.Of<Microsoft.Extensions.Logging.ILogger<UmbracoDatabaseFactory>>();
+            _loggerFactory = Mock.Of<LoggerFactory>();
             _umbracoVersion = TestHelper.GetUmbracoVersion();
             var globalSettings = TestHelper.GetConfigs().Global();
             var connectionStrings = TestHelper.GetConfigs().ConnectionStrings();
-            _databaseFactory = new UmbracoDatabaseFactory(_logger, globalSettings, connectionStrings,  new Lazy<IMapperCollection>(() => Mock.Of<IMapperCollection>()), TestHelper.DbProviderFactoryCreator);
+            _databaseFactory = new UmbracoDatabaseFactory(_logger, _loggerFactory, globalSettings, connectionStrings,  new Lazy<IMapperCollection>(() => Mock.Of<IMapperCollection>()), TestHelper.DbProviderFactoryCreator);
         }
 
         [TearDown]
@@ -94,7 +97,7 @@ namespace Umbraco.Tests.Persistence
             using (var database = _databaseFactory.CreateDatabase())
             using (var transaction = database.GetTransaction())
             {
-                schemaHelper = new DatabaseSchemaCreator(database, _logger, _umbracoVersion, SettingsForTests.GenerateMockGlobalSettings());
+                schemaHelper = new DatabaseSchemaCreator(database, Mock.Of<Core.Logging.ILogger>(), _umbracoVersion, SettingsForTests.GenerateMockGlobalSettings());
                 schemaHelper.InitializeDatabaseSchema();
                 transaction.Complete();
             }

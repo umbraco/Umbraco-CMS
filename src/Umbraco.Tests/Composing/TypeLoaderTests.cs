@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using Moq;
 using NUnit.Framework;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
@@ -15,6 +16,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using Umbraco.Web.PropertyEditors;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Umbraco.Tests.Composing
 {

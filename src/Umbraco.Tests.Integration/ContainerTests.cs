@@ -36,16 +36,16 @@ namespace Umbraco.Tests.Integration
             serviceProviderFactory.CreateBuilder(services); // called during Host Builder, needed to capture services
 
             // Dependencies needed for creating composition/register essentials
-            var testHelper = new TestHelper();           
+            var testHelper = new TestHelper();
             var runtimeState = Mock.Of<IRuntimeState>();
             var umbracoDatabaseFactory = Mock.Of<IUmbracoDatabaseFactory>();
-            var dbProviderFactoryCreator = Mock.Of<IDbProviderFactoryCreator>();            
+            var dbProviderFactoryCreator = Mock.Of<IDbProviderFactoryCreator>();
             var typeLoader = testHelper.GetMockedTypeLoader();
 
             // Register in the container
             var composition = new Composition(umbracoContainer, typeLoader,
                 testHelper.ProfilingLogger, runtimeState, testHelper.GetConfigs(), testHelper.IOHelper, testHelper.AppCaches);
-            composition.RegisterEssentials(testHelper.Logger, testHelper.Profiler, testHelper.ProfilingLogger, testHelper.MainDom,
+            composition.RegisterEssentials(testHelper.ConsoleLoggerFactory.CreateLogger("RegisterEssentials"), testHelper.Profiler, testHelper.ProfilingLogger, testHelper.MainDom,
                 testHelper.AppCaches, umbracoDatabaseFactory, typeLoader, runtimeState, testHelper.GetTypeFinder(),
                 testHelper.IOHelper, testHelper.GetUmbracoVersion(), dbProviderFactoryCreator,
                 testHelper.GetHostingEnvironment(), testHelper.GetBackOfficeInfo());

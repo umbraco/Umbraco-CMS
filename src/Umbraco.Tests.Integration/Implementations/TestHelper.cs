@@ -20,6 +20,8 @@ using Umbraco.Tests.Common;
 using Umbraco.Web.Common.AspNetCore;
 using IHostingEnvironment = Umbraco.Core.Hosting.IHostingEnvironment;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Logging;
+using ILogger = Umbraco.Core.Logging.ILogger;
 
 namespace Umbraco.Tests.Integration.Implementations
 {
@@ -43,7 +45,7 @@ namespace Umbraco.Tests.Integration.Implementations
             var contentRoot = Assembly.GetExecutingAssembly().GetRootDirectorySafe();
             var hostEnvironment = new Mock<IWebHostEnvironment>();
             // this must be the assembly name for the WebApplicationFactory to work
-            hostEnvironment.Setup(x => x.ApplicationName).Returns(GetType().Assembly.GetName().Name); 
+            hostEnvironment.Setup(x => x.ApplicationName).Returns(GetType().Assembly.GetName().Name);
             hostEnvironment.Setup(x => x.ContentRootPath).Returns(() => contentRoot);
             hostEnvironment.Setup(x => x.ContentRootFileProvider).Returns(() => new PhysicalFileProvider(contentRoot));
             hostEnvironment.Setup(x => x.WebRootPath).Returns(() => WorkingDirectory);
@@ -54,8 +56,9 @@ namespace Umbraco.Tests.Integration.Implementations
             _hostEnvironment = hostEnvironment.Object;
 
             _hostingLifetime = new AspNetCoreApplicationShutdownRegistry(Mock.Of<IHostApplicationLifetime>());
+            ConsoleLoggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
             Logger = new ConsoleLogger<object>(new MessageTemplates());
-            ProfilingLogger = new ProfilingLogger(new ConsoleLogger<object>(new MessageTemplates()), Profiler);
+            ProfilingLogger = new ProfilingLogger(ConsoleLoggerFactory.CreateLogger("ProfilingLogger"), Profiler);
         }
 
 
@@ -92,6 +95,7 @@ namespace Umbraco.Tests.Integration.Implementations
             new IsolatedCaches(type => NoAppCache.Instance));
 
         public ILogger Logger { get; private set; }
+        public ILoggerFactory ConsoleLoggerFactory { get; private set; }
         public IProfilingLogger ProfilingLogger { get; private set; }
 
         public IProfiler Profiler { get; } = new VoidProfiler();

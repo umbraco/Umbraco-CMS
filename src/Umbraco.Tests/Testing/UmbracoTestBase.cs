@@ -121,6 +121,8 @@ namespace Umbraco.Tests.Testing
         protected ServiceContext ServiceContext => Factory.GetInstance<ServiceContext>();
 
         protected ILogger Logger => Factory.GetInstance<ILogger>();
+        // TODO: We probably need to do something different with LoggerFactory, but for now this should be ok, and find a better name
+        protected ILoggerFactory LoggerFactory_ => Factory.GetInstance<ILoggerFactory>();
         protected IJsonSerializer JsonNetSerializer { get; } = new JsonNetSerializer();
 
         protected IIOHelper IOHelper { get; private set; }
@@ -172,7 +174,7 @@ namespace Umbraco.Tests.Testing
 
             var (logger, msLogger, profiler) = GetLoggers(Options.Logger);
             var loggerFactoy = GetLoggerFactory(Options.Logger);
-            var proflogger = new ProfilingLogger(logger, profiler);
+            var proflogger = new ProfilingLogger(loggerFactoy.CreateLogger("ProfilingLogger"), profiler);
             IOHelper = TestHelper.IOHelper;
 
             TypeFinder = new TypeFinder(loggerFactoy.CreateLogger<TypeFinder>(), new DefaultUmbracoAssemblyProvider(GetType().Assembly), new VaryingRuntimeHash());
@@ -493,7 +495,8 @@ namespace Umbraco.Tests.Testing
             var globalSettings = TestHelper.GetConfigs().Global();
             var connectionStrings = TestHelper.GetConfigs().ConnectionStrings();
 
-            Composition.RegisterUnique<IUmbracoDatabaseFactory>(f => new UmbracoDatabaseFactory(Logger,
+            Composition.RegisterUnique<IUmbracoDatabaseFactory>(f => new UmbracoDatabaseFactory(LoggerFactory_.CreateLogger<UmbracoDatabaseFactory>(),
+                LoggerFactory_,
                 globalSettings,
                 connectionStrings,
                 Constants.System.UmbracoConnectionName,
