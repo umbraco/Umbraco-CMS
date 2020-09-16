@@ -13,58 +13,29 @@ namespace Umbraco.Core.HealthCheck.Checks.Configuration
     [HealthCheck("046A066C-4FB2-4937-B931-069964E16C66", "Try Skip IIS Custom Errors",
         Description = "Starting with IIS 7.5, this must be set to true for Umbraco 404 pages to show. Otherwise, IIS will takeover and render its built-in error page.",
         Group = "Configuration")]
-    public class TrySkipIisCustomErrorsCheck : HealthCheck
+    public class TrySkipIisCustomErrorsCheck : AbstractSettingsCheck
     {
         private readonly ILocalizedTextService _textService;
         private readonly ILogger _logger;
-        private readonly IConfigurationService _configurationService;
         private readonly Version _iisVersion;
         private readonly GlobalSettings _globalSettings;
-        private string _currentValue = "TrySkipCustomErrorsCheck";
-
 
         public TrySkipIisCustomErrorsCheck(ILocalizedTextService textService, IHostingEnvironment hostingEnvironment, ILogger logger, IConfigurationService configurationService, IOptions<GlobalSettings> globalSettings)
+            : base(textService, logger, configurationService)
         {
             _textService = textService;
             _logger = logger;
-            _configurationService = configurationService;
             _iisVersion = hostingEnvironment.IISVersion;
             _globalSettings = globalSettings.Value;
         }
 
+        public override ValueComparisonType ValueComparisonType => ValueComparisonType.ShouldEqual;
 
-        public override IEnumerable<HealthCheckStatus> GetStatus()
-        {
-            var status = new List<HealthCheckStatus>();
-            var actions = new List<HealthCheckAction>();
+        public override string CurrentValue => null;
 
-            if (_globalSettings.UseHttps != true)
-            {
-                status.Add(new HealthCheckStatus("Success")
-                {
-                    ResultType = StatusResultType.Success,
-                    Actions = actions
-                });
-            }
-            else
-            {
-                status.Add(new HealthCheckStatus("Error")
-                {
-                    ResultType = StatusResultType.Error,
-                    Actions = actions
-                });
-            }
-            return status;
-        }
+        public override string ItemPath => "TODO";
 
-        public override HealthCheckStatus ExecuteAction(HealthCheckAction action)
-        {
-            throw new NotImplementedException();
-        }
-
-        public ValueComparisonType ValueComparisonType => ValueComparisonType.ShouldEqual;
-
-        public IEnumerable<AcceptableConfiguration> Values
+        public override IEnumerable<AcceptableConfiguration> Values
         {
             get
             {
@@ -76,7 +47,7 @@ namespace Umbraco.Core.HealthCheck.Checks.Configuration
             }
         }
 
-        public string CheckSuccessMessage
+        public override string CheckSuccessMessage
         {
             get
             {
@@ -85,16 +56,16 @@ namespace Umbraco.Core.HealthCheck.Checks.Configuration
             }
         }
 
-        public string CheckErrorMessage
+        public override string CheckErrorMessage
         {
             get
             {
                 return _textService.Localize("healthcheck/trySkipIisCustomErrorsCheckErrorMessage",
-                    new[] { _currentValue, Values.First(v => v.IsRecommended).Value, _iisVersion.ToString() });
+                    new[] { CurrentValue, Values.First(v => v.IsRecommended).Value, _iisVersion.ToString() });
             }
         }
 
-        public string RectifySuccessMessage
+        public override string RectifySuccessMessage
         {
             get
             {
