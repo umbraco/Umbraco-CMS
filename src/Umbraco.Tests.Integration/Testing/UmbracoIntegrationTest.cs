@@ -20,7 +20,6 @@ using Umbraco.Tests.Integration.Implementations;
 using Umbraco.Extensions;
 using Umbraco.Tests.Testing;
 using Umbraco.Web;
-using ILogger = Umbraco.Core.Logging.ILogger;
 using Umbraco.Core.Runtime;
 using Umbraco.Core;
 using Moq;
@@ -30,6 +29,7 @@ using System.Data.SqlClient;
 using System.Data.Common;
 using System.IO;
 using Microsoft.Extensions.Logging;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Umbraco.Tests.Integration.Testing
 {
@@ -82,7 +82,7 @@ namespace Umbraco.Tests.Integration.Testing
         {
             var hostBuilder = CreateHostBuilder();
             var host = await hostBuilder.StartAsync();
-            Services = host.Services;            
+            Services = host.Services;
             var app = new ApplicationBuilder(host.Services);
             Configure(app);
         }
@@ -144,7 +144,7 @@ namespace Umbraco.Tests.Integration.Testing
                 loggerFactory,
                 profiler,
                 hostingEnvironment,
-                backOfficeInfo,                
+                backOfficeInfo,
                 typeFinder,
                 appCaches,
                 dbProviderFactoryCreator,
@@ -186,7 +186,7 @@ namespace Umbraco.Tests.Integration.Testing
                 profiler,
                 Mock.Of<IUmbracoBootPermissionChecker>(),
                 hostingEnvironment,
-                backOfficeInfo, 
+                backOfficeInfo,
                 dbProviderFactoryCreator,
                 mainDom,
                 typeFinder,
@@ -225,7 +225,8 @@ namespace Umbraco.Tests.Integration.Testing
 
             services.AddMvc();
 
-            services.AddSingleton<ILogger>(new ConsoleLogger<object>(new MessageTemplates()));
+            services.AddSingleton<ILogger>(LoggerFactory.Create(builder => builder.AddConsole()).CreateLogger("ConsoleLogger"));
+            services.AddSingleton<ILoggerFactory>(LoggerFactory.Create(builder => builder.AddConsole()));
 
             CustomTestSetup(services);
         }
@@ -412,6 +413,11 @@ namespace Umbraco.Tests.Integration.Testing
         /// Returns the <see cref="ILogger"/>
         /// </summary>
         protected ILogger Logger => Services.GetRequiredService<ILogger>();
+
+        /// <summary>
+        /// Returns the <see cref="ILoggerFactory"/>
+        /// </summary>
+        protected ILoggerFactory ConsoleLoggerFactory => Services.GetRequiredService<ILoggerFactory>();
 
         protected AppCaches AppCaches => Services.GetRequiredService<AppCaches>();
         protected IIOHelper IOHelper => Services.GetRequiredService<IIOHelper>();

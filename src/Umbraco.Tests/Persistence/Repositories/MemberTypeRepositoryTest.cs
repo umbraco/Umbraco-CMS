@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Linq;
 using Moq;
+using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Repositories;
@@ -24,8 +24,8 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             var templateRepository = Mock.Of<ITemplateRepository>();
             var commonRepository = new ContentTypeCommonRepository((IScopeAccessor)provider, templateRepository, AppCaches, ShortStringHelper);
-            var languageRepository = new LanguageRepository((IScopeAccessor)provider, AppCaches.Disabled, Mock.Of<ILogger>(), TestObjects.GetGlobalSettings());
-            return new MemberTypeRepository((IScopeAccessor) provider, AppCaches.Disabled, Mock.Of<ILogger>(), commonRepository, languageRepository, ShortStringHelper);
+            var languageRepository = new LanguageRepository((IScopeAccessor)provider, AppCaches.Disabled, Mock.Of<ILogger<LanguageRepository>>(), TestObjects.GetGlobalSettings());
+            return new MemberTypeRepository((IScopeAccessor) provider, AppCaches.Disabled, Mock.Of<ILogger<MemberTypeRepository>>(), commonRepository, languageRepository, ShortStringHelper);
         }
 
         [Test]

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
@@ -21,15 +22,15 @@ namespace Umbraco.Tests.Persistence.Repositories
         private MediaTypeRepository CreateRepository(IScopeProvider provider)
         {
             var cacheHelper = AppCaches.Disabled;
-            var templateRepository = new TemplateRepository((IScopeAccessor)provider, cacheHelper, Logger, TestObjects.GetFileSystemsMock(), IOHelper, ShortStringHelper);
+            var templateRepository = new TemplateRepository((IScopeAccessor)provider, cacheHelper, LoggerFactory_.CreateLogger<TemplateRepository>(), TestObjects.GetFileSystemsMock(), IOHelper, ShortStringHelper);
             var commonRepository = new ContentTypeCommonRepository((IScopeAccessor)provider, templateRepository, AppCaches, ShortStringHelper);
-            var languageRepository = new LanguageRepository((IScopeAccessor)provider, AppCaches, Logger, TestObjects.GetGlobalSettings());
-            return new MediaTypeRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger, commonRepository, languageRepository, ShortStringHelper);
+            var languageRepository = new LanguageRepository((IScopeAccessor)provider, AppCaches, LoggerFactory_.CreateLogger<LanguageRepository>(), TestObjects.GetGlobalSettings());
+            return new MediaTypeRepository((IScopeAccessor) provider, AppCaches.Disabled, LoggerFactory_.CreateLogger<MediaTypeRepository>(), commonRepository, languageRepository, ShortStringHelper);
         }
 
         private EntityContainerRepository CreateContainerRepository(IScopeProvider provider)
         {
-            return new EntityContainerRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger, Constants.ObjectTypes.MediaTypeContainer);
+            return new EntityContainerRepository((IScopeAccessor) provider, AppCaches.Disabled, LoggerFactory_.CreateLogger<EntityContainerRepository>(), Constants.ObjectTypes.MediaTypeContainer);
 
         }
 

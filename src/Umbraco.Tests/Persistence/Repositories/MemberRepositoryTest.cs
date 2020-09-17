@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Linq;
 using System.Xml.Linq;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NPoco;
 using NUnit.Framework;
@@ -32,16 +33,16 @@ namespace Umbraco.Tests.Persistence.Repositories
             var accessor = (IScopeAccessor) provider;
             var templateRepository = Mock.Of<ITemplateRepository>();
             var commonRepository = new ContentTypeCommonRepository(accessor, templateRepository, AppCaches, ShortStringHelper);
-            var languageRepository = new LanguageRepository(accessor, AppCaches.Disabled, Logger, TestObjects.GetGlobalSettings());
-            memberTypeRepository = new MemberTypeRepository(accessor, AppCaches.Disabled, Logger, commonRepository, languageRepository, ShortStringHelper);
-            memberGroupRepository = new MemberGroupRepository(accessor, AppCaches.Disabled, Logger);
-            var tagRepo = new TagRepository(accessor, AppCaches.Disabled, Logger);
-            var relationTypeRepository = new RelationTypeRepository(accessor, AppCaches.Disabled, Logger);
+            var languageRepository = new LanguageRepository(accessor, AppCaches.Disabled, LoggerFactory_.CreateLogger<LanguageRepository>(), TestObjects.GetGlobalSettings());
+            memberTypeRepository = new MemberTypeRepository(accessor, AppCaches.Disabled, LoggerFactory_.CreateLogger<MemberTypeRepository>(), commonRepository, languageRepository, ShortStringHelper);
+            memberGroupRepository = new MemberGroupRepository(accessor, AppCaches.Disabled, LoggerFactory_.CreateLogger<MemberGroupRepository>());
+            var tagRepo = new TagRepository(accessor, AppCaches.Disabled, LoggerFactory_.CreateLogger<TagRepository>());
+            var relationTypeRepository = new RelationTypeRepository(accessor, AppCaches.Disabled, LoggerFactory_.CreateLogger<RelationTypeRepository>());
             var entityRepository = new EntityRepository(accessor);
-            var relationRepository = new RelationRepository(accessor, Logger, relationTypeRepository, entityRepository);
+            var relationRepository = new RelationRepository(accessor, LoggerFactory_.CreateLogger<RelationRepository>(), relationTypeRepository, entityRepository);
             var propertyEditors = new Lazy<PropertyEditorCollection>(() => new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>())));
             var dataValueReferences = new DataValueReferenceFactoryCollection(Enumerable.Empty<IDataValueReferenceFactory>());
-            var repository = new MemberRepository(accessor, AppCaches.Disabled, Logger, memberTypeRepository, memberGroupRepository, tagRepo, Mock.Of<ILanguageRepository>(), relationRepository, relationTypeRepository,  PasswordHasher, propertyEditors, dataValueReferences, DataTypeService);
+            var repository = new MemberRepository(accessor, AppCaches.Disabled, LoggerFactory_.CreateLogger<MemberRepository>(), memberTypeRepository, memberGroupRepository, tagRepo, Mock.Of<ILanguageRepository>(), relationRepository, relationTypeRepository,  PasswordHasher, propertyEditors, dataValueReferences, DataTypeService);
             return repository;
         }
 

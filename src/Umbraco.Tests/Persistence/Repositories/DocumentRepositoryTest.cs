@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -50,7 +51,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             TemplateRepository tr;
             var ctRepository = CreateRepository(scopeAccessor, out contentTypeRepository, out tr);
             var editors = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>()));
-            dtdRepository = new DataTypeRepository(scopeAccessor, appCaches, new Lazy<PropertyEditorCollection>(() => editors), Logger);
+            dtdRepository = new DataTypeRepository(scopeAccessor, appCaches, new Lazy<PropertyEditorCollection>(() => editors), LoggerFactory_.CreateLogger<DataTypeRepository>(), LoggerFactory_);
             return ctRepository;
         }
 
@@ -64,17 +65,17 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             appCaches = appCaches ?? AppCaches;
 
-            templateRepository = new TemplateRepository(scopeAccessor, appCaches, Logger, TestObjects.GetFileSystemsMock(), IOHelper, ShortStringHelper);
-            var tagRepository = new TagRepository(scopeAccessor, appCaches, Logger);
+            templateRepository = new TemplateRepository(scopeAccessor, appCaches, LoggerFactory_.CreateLogger<TemplateRepository>(), TestObjects.GetFileSystemsMock(), IOHelper, ShortStringHelper);
+            var tagRepository = new TagRepository(scopeAccessor, appCaches, LoggerFactory_.CreateLogger<TagRepository>());
             var commonRepository = new ContentTypeCommonRepository(scopeAccessor, templateRepository, appCaches, ShortStringHelper);
-            var languageRepository = new LanguageRepository(scopeAccessor, appCaches, Logger, TestObjects.GetGlobalSettings());
-            contentTypeRepository = new ContentTypeRepository(scopeAccessor, appCaches, Logger, commonRepository, languageRepository, ShortStringHelper);
-            var relationTypeRepository = new RelationTypeRepository(scopeAccessor, AppCaches.Disabled, Logger);
+            var languageRepository = new LanguageRepository(scopeAccessor, appCaches, LoggerFactory_.CreateLogger<LanguageRepository>(), TestObjects.GetGlobalSettings());
+            contentTypeRepository = new ContentTypeRepository(scopeAccessor, appCaches, LoggerFactory_.CreateLogger<ContentTypeRepository>(), commonRepository, languageRepository, ShortStringHelper);
+            var relationTypeRepository = new RelationTypeRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory_.CreateLogger<RelationTypeRepository>());
             var entityRepository = new EntityRepository(scopeAccessor);
-            var relationRepository = new RelationRepository(scopeAccessor, Logger, relationTypeRepository, entityRepository);
+            var relationRepository = new RelationRepository(scopeAccessor, LoggerFactory_.CreateLogger<RelationRepository>(), relationTypeRepository, entityRepository);
             var propertyEditors = new Lazy<PropertyEditorCollection>(() => new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>())));
             var dataValueReferences = new DataValueReferenceFactoryCollection(Enumerable.Empty<IDataValueReferenceFactory>());
-            var repository = new DocumentRepository(scopeAccessor, appCaches, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, relationRepository,
+            var repository = new DocumentRepository(scopeAccessor, appCaches, LoggerFactory_.CreateLogger<DocumentRepository>(), LoggerFactory_, contentTypeRepository, templateRepository, tagRepository, languageRepository, relationRepository,
                 relationTypeRepository, propertyEditors, dataValueReferences, DataTypeService);
             return repository;
         }

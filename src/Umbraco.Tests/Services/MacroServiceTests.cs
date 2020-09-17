@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Linq;
 using System.Threading;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 
 using Umbraco.Core.Persistence.Repositories;
@@ -26,7 +26,7 @@ namespace Umbraco.Tests.Services
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = provider.CreateScope())
             {
-                var repository = new MacroRepository((IScopeAccessor) provider, AppCaches.Disabled, Mock.Of<ILogger>(), ShortStringHelper);
+                var repository = new MacroRepository((IScopeAccessor) provider, AppCaches.Disabled, Mock.Of<ILogger<MacroRepository>>(), ShortStringHelper);
 
                 repository.Save(new Macro(ShortStringHelper, "test1", "Test1", "~/views/macropartials/test1.cshtml"));
                 repository.Save(new Macro(ShortStringHelper, "test2", "Test2", "~/views/macropartials/test2.cshtml"));

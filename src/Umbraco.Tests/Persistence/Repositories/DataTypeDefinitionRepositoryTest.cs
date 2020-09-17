@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
@@ -25,7 +26,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private EntityContainerRepository CreateContainerRepository(IScopeAccessor scopeAccessor)
         {
-            return new EntityContainerRepository(scopeAccessor, AppCaches.Disabled, Logger, Constants.ObjectTypes.DataTypeContainer);
+            return new EntityContainerRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory_.CreateLogger<EntityContainerRepository>(), Constants.ObjectTypes.DataTypeContainer);
         }
 
         [Test]

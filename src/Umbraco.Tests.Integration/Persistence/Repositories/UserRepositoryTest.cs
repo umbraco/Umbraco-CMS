@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -25,14 +26,14 @@ namespace Umbraco.Tests.Persistence.Repositories
         private UserRepository CreateRepository(IScopeProvider provider)
         {
             var accessor = (IScopeAccessor) provider;
-            var repository = new UserRepository(accessor, AppCaches.Disabled, Logger, Mappers, GlobalSettings, Mock.Of<IUserPasswordConfiguration>(), new JsonNetSerializer());
+            var repository = new UserRepository(accessor, AppCaches.Disabled, ConsoleLoggerFactory.CreateLogger<UserRepository>(), Mappers, GlobalSettings, Mock.Of<IUserPasswordConfiguration>(), new JsonNetSerializer());
             return repository;
         }
 
         private UserGroupRepository CreateUserGroupRepository(IScopeProvider provider)
         {
             var accessor = (IScopeAccessor) provider;
-            return new UserGroupRepository(accessor, AppCaches.Disabled, Logger, ShortStringHelper);
+            return new UserGroupRepository(accessor, AppCaches.Disabled, ConsoleLoggerFactory.CreateLogger<UserGroupRepository>(), ConsoleLoggerFactory, ShortStringHelper);
         }
 
         [Test]
@@ -117,7 +118,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var id = user.Id;
 
-                var repository2 = new UserRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger, Mock.Of<IMapperCollection>(),GlobalSettings, Mock.Of<IUserPasswordConfiguration>(), new JsonNetSerializer());
+                var repository2 = new UserRepository((IScopeAccessor) provider, AppCaches.Disabled, ConsoleLoggerFactory.CreateLogger<UserRepository>(), Mock.Of<IMapperCollection>(),GlobalSettings, Mock.Of<IUserPasswordConfiguration>(), new JsonNetSerializer());
 
                 repository2.Delete(user);
 

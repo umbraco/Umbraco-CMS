@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Configuration.UmbracoSettings;
@@ -28,7 +29,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = provider.CreateScope())
             {
-                var repo = new PublicAccessRepository((IScopeAccessor) provider, AppCaches, Logger);
+                var repo = new PublicAccessRepository((IScopeAccessor) provider, AppCaches, LoggerFactory_.CreateLogger<PublicAccessRepository>());
 
                 var entry = new PublicAccessEntry(content[0], content[1], content[2], new[]
                 {
@@ -58,7 +59,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var scope = provider.CreateScope())
             {
                 scope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
-                var repo = new PublicAccessRepository((IScopeAccessor) provider, AppCaches, Logger);
+                var repo = new PublicAccessRepository((IScopeAccessor) provider, AppCaches, LoggerFactory_.CreateLogger<PublicAccessRepository>());
 
                 var entry = new PublicAccessEntry(content[0], content[1], content[2], new[]
                 {
@@ -98,7 +99,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var scope = provider.CreateScope())
             {
                 scope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
-                var repo = new PublicAccessRepository((IScopeAccessor) provider, AppCaches, Logger);
+                var repo = new PublicAccessRepository((IScopeAccessor) provider, AppCaches, LoggerFactory_.CreateLogger<PublicAccessRepository>());
 
                 var entry = new PublicAccessEntry(content[0], content[1], content[2], new[]
                 {
@@ -143,7 +144,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = provider.CreateScope())
             {
-                var repo = new PublicAccessRepository((IScopeAccessor) provider, AppCaches, Logger);
+                var repo = new PublicAccessRepository((IScopeAccessor) provider, AppCaches, LoggerFactory_.CreateLogger<PublicAccessRepository>());
 
                 var entry = new PublicAccessEntry(content[0], content[1], content[2], new[]
                 {
@@ -181,7 +182,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = provider.CreateScope())
             {
-                var repo = new PublicAccessRepository((IScopeAccessor) provider, AppCaches, Logger);
+                var repo = new PublicAccessRepository((IScopeAccessor) provider, AppCaches, LoggerFactory_.CreateLogger<PublicAccessRepository>());
 
                 var entry = new PublicAccessEntry(content[0], content[1], content[2], new[]
                 {
@@ -209,7 +210,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = provider.CreateScope())
             {
-                var repo = new PublicAccessRepository((IScopeAccessor) provider, AppCaches, Logger);
+                var repo = new PublicAccessRepository((IScopeAccessor) provider, AppCaches, LoggerFactory_.CreateLogger<PublicAccessRepository>());
 
                 var allEntries = new List<PublicAccessEntry>();
                 for (int i = 0; i < 10; i++)
@@ -273,7 +274,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = provider.CreateScope())
             {
-                var repo = new PublicAccessRepository((IScopeAccessor) provider, AppCaches, Logger);
+                var repo = new PublicAccessRepository((IScopeAccessor) provider, AppCaches, LoggerFactory_.CreateLogger<PublicAccessRepository>());
 
                 var entry1 = new PublicAccessEntry(content[0], content[1], content[2], new[]
                 {
@@ -306,17 +307,17 @@ namespace Umbraco.Tests.Persistence.Repositories
         private DocumentRepository CreateRepository(IScopeProvider provider, out ContentTypeRepository contentTypeRepository)
         {
             var accessor = (IScopeAccessor) provider;
-            var templateRepository = new TemplateRepository(accessor, AppCaches, Logger, TestObjects.GetFileSystemsMock(), IOHelper, ShortStringHelper);
-            var tagRepository = new TagRepository(accessor, AppCaches, Logger);
+            var templateRepository = new TemplateRepository(accessor, AppCaches, LoggerFactory_.CreateLogger<TemplateRepository>(), TestObjects.GetFileSystemsMock(), IOHelper, ShortStringHelper);
+            var tagRepository = new TagRepository(accessor, AppCaches, LoggerFactory_.CreateLogger<TagRepository>());
             var commonRepository = new ContentTypeCommonRepository(accessor, templateRepository, AppCaches, ShortStringHelper);
-            var languageRepository = new LanguageRepository(accessor, AppCaches, Logger, TestObjects.GetGlobalSettings());
-            contentTypeRepository = new ContentTypeRepository(accessor, AppCaches, Logger, commonRepository, languageRepository, ShortStringHelper);
-            var relationTypeRepository = new RelationTypeRepository(accessor, AppCaches, Logger);
+            var languageRepository = new LanguageRepository(accessor, AppCaches, LoggerFactory_.CreateLogger<LanguageRepository>(), TestObjects.GetGlobalSettings());
+            contentTypeRepository = new ContentTypeRepository(accessor, AppCaches, LoggerFactory_.CreateLogger<ContentTypeRepository>(), commonRepository, languageRepository, ShortStringHelper);
+            var relationTypeRepository = new RelationTypeRepository(accessor, AppCaches, LoggerFactory_.CreateLogger<RelationTypeRepository>());
             var entityRepository = new EntityRepository(accessor);
-            var relationRepository = new RelationRepository(accessor, Logger, relationTypeRepository, entityRepository);
+            var relationRepository = new RelationRepository(accessor, LoggerFactory_.CreateLogger<RelationRepository>(), relationTypeRepository, entityRepository);
             var propertyEditors = new Lazy<PropertyEditorCollection>(() => new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>())));
             var dataValueReferences = new DataValueReferenceFactoryCollection(Enumerable.Empty<IDataValueReferenceFactory>());
-            var repository = new DocumentRepository(accessor, AppCaches, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, relationRepository, relationTypeRepository, propertyEditors, dataValueReferences, DataTypeService);
+            var repository = new DocumentRepository(accessor, AppCaches, LoggerFactory_.CreateLogger<DocumentRepository>(), LoggerFactory_, contentTypeRepository, templateRepository, tagRepository, languageRepository, relationRepository, relationTypeRepository, propertyEditors, dataValueReferences, DataTypeService);
             return repository;
         }
 

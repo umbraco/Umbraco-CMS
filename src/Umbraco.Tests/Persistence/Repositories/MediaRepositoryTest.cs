@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Cache;
@@ -35,18 +36,18 @@ namespace Umbraco.Tests.Persistence.Repositories
             appCaches = appCaches ?? AppCaches;
             var scopeAccessor = (IScopeAccessor) provider;
 
-            var templateRepository = new TemplateRepository(scopeAccessor, appCaches, Logger, TestObjects.GetFileSystemsMock(), IOHelper, ShortStringHelper);
+            var templateRepository = new TemplateRepository(scopeAccessor, appCaches, LoggerFactory_.CreateLogger<TemplateRepository>(), TestObjects.GetFileSystemsMock(), IOHelper, ShortStringHelper);
             var commonRepository = new ContentTypeCommonRepository(scopeAccessor, templateRepository, appCaches, ShortStringHelper);
-            var languageRepository = new LanguageRepository(scopeAccessor, appCaches, Logger, TestObjects.GetGlobalSettings());
-            mediaTypeRepository = new MediaTypeRepository(scopeAccessor, appCaches, Logger, commonRepository, languageRepository, ShortStringHelper);
-            var tagRepository = new TagRepository(scopeAccessor, appCaches, Logger);
-            var relationTypeRepository = new RelationTypeRepository(scopeAccessor, AppCaches.Disabled, Logger);
+            var languageRepository = new LanguageRepository(scopeAccessor, appCaches, LoggerFactory_.CreateLogger<LanguageRepository>(), TestObjects.GetGlobalSettings());
+            mediaTypeRepository = new MediaTypeRepository(scopeAccessor, appCaches, LoggerFactory_.CreateLogger<MediaTypeRepository>(), commonRepository, languageRepository, ShortStringHelper);
+            var tagRepository = new TagRepository(scopeAccessor, appCaches, LoggerFactory_.CreateLogger<TagRepository>());
+            var relationTypeRepository = new RelationTypeRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory_.CreateLogger<RelationTypeRepository>());
             var entityRepository = new EntityRepository(scopeAccessor);
-            var relationRepository = new RelationRepository(scopeAccessor, Logger, relationTypeRepository, entityRepository);
+            var relationRepository = new RelationRepository(scopeAccessor, LoggerFactory_.CreateLogger<RelationRepository>(), relationTypeRepository, entityRepository);
             var propertyEditors = new Lazy<PropertyEditorCollection>(() => new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>())));
             var mediaUrlGenerators = new MediaUrlGeneratorCollection(Enumerable.Empty<IMediaUrlGenerator>());
             var dataValueReferences = new DataValueReferenceFactoryCollection(Enumerable.Empty<IDataValueReferenceFactory>());
-            var repository = new MediaRepository(scopeAccessor, appCaches, Logger, mediaTypeRepository, tagRepository, Mock.Of<ILanguageRepository>(), relationRepository, relationTypeRepository, propertyEditors, mediaUrlGenerators, dataValueReferences, DataTypeService);
+            var repository = new MediaRepository(scopeAccessor, appCaches, LoggerFactory_.CreateLogger<MediaRepository>(), LoggerFactory_, mediaTypeRepository, tagRepository, Mock.Of<ILanguageRepository>(), relationRepository, relationTypeRepository, propertyEditors, mediaUrlGenerators, dataValueReferences, DataTypeService);
             return repository;
         }
 
