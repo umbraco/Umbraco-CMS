@@ -54,7 +54,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Instantiate_Repository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = ScopeProvider.CreateScope())
             {
                 // Act
@@ -69,7 +69,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Add_On_ScriptRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = ScopeProvider.CreateScope())
             {
                 var repository = CreateRepository();
@@ -88,7 +88,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Update_On_ScriptRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = ScopeProvider.CreateScope())
             {
                 var repository = CreateRepository();
@@ -114,7 +114,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Delete_On_ScriptRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = ScopeProvider.CreateScope())
             {
                 var repository = CreateRepository();
@@ -134,7 +134,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Get_On_ScriptRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = ScopeProvider.CreateScope())
             {
                 var repository = CreateRepository();
@@ -153,7 +153,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetAll_On_ScriptRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = ScopeProvider.CreateScope())
             {
                 var repository = CreateRepository();
@@ -181,7 +181,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetAll_With_Params_On_ScriptRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = ScopeProvider.CreateScope())
             {
                 var repository = CreateRepository();
@@ -209,7 +209,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Exists_On_ScriptRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = ScopeProvider.CreateScope())
             {
                 var repository = CreateRepository();
@@ -228,7 +228,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             const string content = "/// <reference name=\"MicrosoftAjax.js\"/>";
 
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = ScopeProvider.CreateScope())
             {
                 var repository = CreateRepository();
@@ -261,7 +261,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // unless noted otherwise, no changes / 7.2.8
 
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = ScopeProvider.CreateScope())
             {
                 var repository = CreateRepository();

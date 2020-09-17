@@ -41,7 +41,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var fileSystems = Mock.Of<IFileSystems>();
             Mock.Get(fileSystems).Setup(x => x.PartialViewsFileSystem).Returns(_fileSystem);
 
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 var repository = new PartialViewRepository(fileSystems, IOHelper);

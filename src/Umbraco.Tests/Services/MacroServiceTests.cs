@@ -23,7 +23,7 @@ namespace Umbraco.Tests.Services
         {
             base.CreateTestData();
 
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 var repository = new MacroRepository((IScopeAccessor) provider, AppCaches.Disabled, Mock.Of<ILogger<MacroRepository>>(), ShortStringHelper);

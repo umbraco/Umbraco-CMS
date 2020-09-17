@@ -88,7 +88,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 new DictionaryAppCache(),
                 new IsolatedCaches(t => new ObjectCacheAppCache()));
 
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, appCaches: realCache);
@@ -129,7 +129,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void CreateVersions()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, out DataTypeRepository _);
@@ -303,7 +303,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void PropertyDataAssignedCorrectly()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, out DataTypeRepository _);
@@ -355,7 +355,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void PropertyValuesWithSpecialTypes()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, out DataTypeRepository dataTypeDefinitionRepository);
@@ -402,7 +402,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void SaveContent()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository);
@@ -423,7 +423,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void SaveContentWithDefaultTemplate()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, out TemplateRepository templateRepository);
@@ -458,7 +458,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void SaveContentWithAtSignInName()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository);
@@ -491,7 +491,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void SaveContentMultiple()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository);
@@ -520,7 +520,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void GetContentIsNotDirty()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository((IScopeAccessor)provider, out _);
@@ -535,7 +535,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void UpdateContent()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository((IScopeAccessor)provider, out _);
@@ -564,7 +564,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void UpdateContentWithNullTemplate()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository((IScopeAccessor)provider, out _);
@@ -583,7 +583,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void DeleteContent()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository);
@@ -607,7 +607,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void GetContent()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository((IScopeAccessor)provider, out _);
@@ -628,7 +628,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void QueryContent()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository((IScopeAccessor)provider, out _);
@@ -645,7 +645,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             IContent[] result;
 
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository((IScopeAccessor)provider, out _);
@@ -758,7 +758,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             Assert.IsTrue(child1.Name.StartsWith("VAR"));
             Assert.IsTrue(child1.GetCultureName("en-US").StartsWith("VAR"));
 
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository((IScopeAccessor)provider, out _);
@@ -805,7 +805,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void GetPagedResultsByQuery_CustomPropertySort()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository((IScopeAccessor)provider, out _);
@@ -837,7 +837,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void GetPagedResultsByQuery_FirstPage()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository((IScopeAccessor)provider, out _);
@@ -866,7 +866,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void GetPagedResultsByQuery_SecondPage()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository((IScopeAccessor)provider, out _);
@@ -883,7 +883,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void GetPagedResultsByQuery_SinglePage()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository((IScopeAccessor)provider, out _);
@@ -900,7 +900,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void GetPagedResultsByQuery_DescendingOrder()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository((IScopeAccessor)provider, out _);
@@ -917,7 +917,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void GetPagedResultsByQuery_FilterMatchingSome()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository((IScopeAccessor)provider, out _);
@@ -936,7 +936,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void GetPagedResultsByQuery_FilterMatchingAll()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository((IScopeAccessor)provider, out _);
@@ -955,7 +955,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void GetAllContentByIds()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository((IScopeAccessor)provider, out _);
@@ -972,7 +972,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void GetAllContent()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository((IScopeAccessor)provider, out _);
@@ -998,7 +998,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void ExistContent()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository((IScopeAccessor)provider, out _);
@@ -1012,7 +1012,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void CountContent()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository((IScopeAccessor)provider, out _);
@@ -1027,7 +1027,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void QueryContentByUniqueId()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository((IScopeAccessor)provider, out _);

@@ -40,7 +40,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private int CreateTestData(string isoName, out ContentType ct)
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 DocumentRepository documentRepo;
@@ -67,7 +67,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             ContentType ct;
             var contentId = CreateTestData("en-AU", out ct);
 
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 DocumentRepository documentRepo;
@@ -101,7 +101,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             ContentType ct;
             var contentId = CreateTestData("en-AU", out ct);
 
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 DocumentRepository documentRepo;
@@ -133,7 +133,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             ContentType ct;
             var contentId = CreateTestData("en-AU", out ct);
 
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 DocumentRepository documentRepo;
@@ -160,7 +160,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             ContentType ct;
             var contentId = CreateTestData("en-AU", out ct);
 
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 DocumentRepository documentRepo;
@@ -191,7 +191,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             ContentType ct;
             var contentId1 = CreateTestData("en-AU", out ct);
 
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 DocumentRepository documentRepo;
@@ -238,7 +238,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             ContentType ct;
             var contentId = CreateTestData("en-AU", out ct);
 
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 DocumentRepository documentRepo;
@@ -268,7 +268,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             ContentType ct;
             var contentId = CreateTestData("en-AU", out ct);
 
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 DocumentRepository documentRepo;
@@ -298,7 +298,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             ContentType ct;
             var contentId = CreateTestData("en-AU", out ct);
 
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 DocumentRepository documentRepo;
@@ -328,7 +328,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             ContentType ct;
             var contentId = CreateTestData("en-AU", out ct);
 
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 DocumentRepository documentRepo;
@@ -360,7 +360,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             ContentType ct;
             var contentId = CreateTestData("en-AU", out ct);
 
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 DocumentRepository documentRepo;
@@ -394,7 +394,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             ContentType ct;
             var contentId = CreateTestData("en-AU", out ct);
 
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 DocumentRepository documentRepo;
@@ -443,7 +443,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             ContentType ct;
             var contentId = CreateTestData("en-AU", out ct);
 
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 DocumentRepository documentRepo;

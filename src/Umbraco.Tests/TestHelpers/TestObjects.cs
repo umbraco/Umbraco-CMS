@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NPoco;
 using Umbraco.Core;
@@ -6,7 +7,6 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -35,7 +35,7 @@ namespace Umbraco.Tests.TestHelpers
         /// <returns>An UmbracoDatabase.</returns>
         /// <remarks>This is just a void database that has no actual database but pretends to have an open connection
         /// that can begin a transaction.</remarks>
-        public UmbracoDatabase GetUmbracoSqlCeDatabase(ILogger logger)
+        public UmbracoDatabase GetUmbracoSqlCeDatabase(ILogger<UmbracoDatabase> logger)
         {
             var syntax = new SqlCeSyntaxProvider();
             var connection = GetDbConnection();
@@ -50,7 +50,7 @@ namespace Umbraco.Tests.TestHelpers
         /// <returns>An UmbracoDatabase.</returns>
         /// <remarks>This is just a void database that has no actual database but pretends to have an open connection
         /// that can begin a transaction.</remarks>
-        public UmbracoDatabase GetUmbracoSqlServerDatabase(ILogger logger)
+        public UmbracoDatabase GetUmbracoSqlServerDatabase(ILogger<UmbracoDatabase> logger)
         {
             var syntax = new SqlServerSyntaxProvider(); // do NOT try to get the server's version!
             var connection = GetDbConnection();
@@ -70,7 +70,7 @@ namespace Umbraco.Tests.TestHelpers
             return container?.TryGetInstance<T>() ?? Mock.Of<T>();
         }
 
-        public IScopeProvider GetScopeProvider(ILogger logger, ITypeFinder typeFinder = null, FileSystems fileSystems = null, IUmbracoDatabaseFactory databaseFactory = null)
+        public IScopeProvider GetScopeProvider(ILoggerFactory loggerFactory, ITypeFinder typeFinder = null, FileSystems fileSystems = null, IUmbracoDatabaseFactory databaseFactory = null)
         {
             if (databaseFactory == null)
             {
@@ -78,7 +78,8 @@ namespace Umbraco.Tests.TestHelpers
                 // mappersBuilder.AddCore();
                 // var mappers = mappersBuilder.CreateCollection();
                 var mappers = Current.Factory.GetInstance<IMapperCollection>();
-                databaseFactory = new UmbracoDatabaseFactory(logger,
+                databaseFactory = new UmbracoDatabaseFactory(loggerFactory.CreateLogger<UmbracoDatabaseFactory>(),
+                    loggerFactory,
                     SettingsForTests.DefaultGlobalSettings,
                     new ConnectionStrings(),
                     Constants.System.UmbracoConnectionName,
@@ -86,11 +87,11 @@ namespace Umbraco.Tests.TestHelpers
                     TestHelper.DbProviderFactoryCreator);
             }
 
-            typeFinder ??= new TypeFinder(logger, new DefaultUmbracoAssemblyProvider(GetType().Assembly), new VaryingRuntimeHash());
-            fileSystems ??= new FileSystems(Current.Factory, logger, TestHelper.IOHelper, SettingsForTests.GenerateMockGlobalSettings(), TestHelper.GetHostingEnvironment());
+            typeFinder ??= new TypeFinder(loggerFactory.CreateLogger<TypeFinder>(), new DefaultUmbracoAssemblyProvider(GetType().Assembly), new VaryingRuntimeHash());
+            fileSystems ??= new FileSystems(Current.Factory, loggerFactory.CreateLogger<FileSystems>(), TestHelper.IOHelper, SettingsForTests.GenerateMockGlobalSettings(), TestHelper.GetHostingEnvironment());
             var coreDebug = TestHelper.CoreDebugSettings;
             var mediaFileSystem = Mock.Of<IMediaFileSystem>();
-            var scopeProvider = new ScopeProvider(databaseFactory, fileSystems, coreDebug, mediaFileSystem, logger, typeFinder, NoAppCache.Instance);
+            var scopeProvider = new ScopeProvider(databaseFactory, fileSystems, coreDebug, mediaFileSystem, loggerFactory.CreateLogger<ScopeProvider>(), typeFinder, NoAppCache.Instance);
             return scopeProvider;
         }
 

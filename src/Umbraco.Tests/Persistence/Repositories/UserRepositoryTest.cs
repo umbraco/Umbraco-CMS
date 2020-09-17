@@ -86,7 +86,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var mt = MockedContentTypes.CreateSimpleMediaType("testmedia", "TestMedia");
 
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 var userRepository = CreateRepository(provider);

@@ -26,7 +26,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             var content = CreateTestData(3).ToArray();
 
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 var repo = new PublicAccessRepository((IScopeAccessor) provider, AppCaches, LoggerFactory_.CreateLogger<PublicAccessRepository>());
@@ -55,7 +55,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             var content = CreateTestData(3).ToArray();
 
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 scope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
@@ -95,7 +95,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             var content = CreateTestData(3).ToArray();
 
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 scope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
@@ -141,7 +141,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             var content = CreateTestData(3).ToArray();
 
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 var repo = new PublicAccessRepository((IScopeAccessor) provider, AppCaches, LoggerFactory_.CreateLogger<PublicAccessRepository>());
@@ -179,7 +179,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             var content = CreateTestData(3).ToArray();
 
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 var repo = new PublicAccessRepository((IScopeAccessor) provider, AppCaches, LoggerFactory_.CreateLogger<PublicAccessRepository>());
@@ -207,7 +207,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             var content = CreateTestData(30).ToArray();
 
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 var repo = new PublicAccessRepository((IScopeAccessor) provider, AppCaches, LoggerFactory_.CreateLogger<PublicAccessRepository>());
@@ -271,7 +271,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             var content = CreateTestData(3).ToArray();
 
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 var repo = new PublicAccessRepository((IScopeAccessor) provider, AppCaches, LoggerFactory_.CreateLogger<PublicAccessRepository>());
@@ -323,7 +323,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private IEnumerable<IContent> CreateTestData(int count)
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 ContentTypeRepository ctRepo;

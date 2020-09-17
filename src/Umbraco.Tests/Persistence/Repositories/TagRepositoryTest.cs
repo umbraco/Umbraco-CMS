@@ -24,7 +24,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Perform_Add_On_Repository()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (ScopeProvider.CreateScope())
             {
                 var repository = CreateRepository(provider);
@@ -44,7 +44,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Perform_Multiple_Adds_On_Repository()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (ScopeProvider.CreateScope())
             {
                 var repository = CreateRepository(provider);
@@ -74,7 +74,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Create_Tag_Relations()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (ScopeProvider.CreateScope())
             {
                 var contentRepository = CreateDocumentRepository(provider, out var contentTypeRepository);
@@ -104,7 +104,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Append_Tag_Relations()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (ScopeProvider.CreateScope())
             {
                 var contentRepository = CreateDocumentRepository(provider, out var contentTypeRepository);
@@ -143,7 +143,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Replace_Tag_Relations()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (ScopeProvider.CreateScope())
             {
                 var contentRepository = CreateDocumentRepository(provider, out var contentTypeRepository);
@@ -185,7 +185,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Merge_Tag_Relations()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (ScopeProvider.CreateScope())
             {
                 var contentRepository = CreateDocumentRepository(provider, out var contentTypeRepository);
@@ -225,7 +225,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Clear_Tag_Relations()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (ScopeProvider.CreateScope())
             {
                 var contentRepository = CreateDocumentRepository(provider, out var contentTypeRepository);
@@ -261,7 +261,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Remove_Specific_Tags_From_Property()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (ScopeProvider.CreateScope())
             {
                 var contentRepository = CreateDocumentRepository(provider, out var contentTypeRepository);
@@ -305,7 +305,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Get_Tags_For_Content_By_Id()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (ScopeProvider.CreateScope())
             {
                 var contentRepository = CreateDocumentRepository(provider, out var contentTypeRepository);
@@ -349,7 +349,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Get_Tags_For_Content_By_Key()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (ScopeProvider.CreateScope())
             {
                 var contentRepository = CreateDocumentRepository(provider, out var contentTypeRepository);
@@ -394,7 +394,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Get_All()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (ScopeProvider.CreateScope())
             {
                 var contentRepository = CreateDocumentRepository(provider, out var contentTypeRepository);
@@ -429,7 +429,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Get_All_With_Ids()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (ScopeProvider.CreateScope())
             {
                 var contentRepository = CreateDocumentRepository(provider, out var contentTypeRepository);
@@ -469,7 +469,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Get_Tags_For_Content_For_Group()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (ScopeProvider.CreateScope())
             {
                 var contentRepository = CreateDocumentRepository(provider, out var contentTypeRepository);
@@ -513,7 +513,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Get_Tags_For_Property_By_Id()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (ScopeProvider.CreateScope())
             {
                 var contentRepository = CreateDocumentRepository(provider, out var contentTypeRepository);
@@ -557,7 +557,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Get_Tags_For_Property_By_Key()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (ScopeProvider.CreateScope())
             {
                 var contentRepository = CreateDocumentRepository(provider, out var contentTypeRepository);
@@ -601,7 +601,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Get_Tags_For_Property_For_Group()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (ScopeProvider.CreateScope())
             {
                 var contentRepository = CreateDocumentRepository(provider, out var contentTypeRepository);
@@ -646,7 +646,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Get_Tags_For_Entity_Type()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (ScopeProvider.CreateScope())
             {
                 var contentRepository = CreateDocumentRepository(provider, out var contentTypeRepository);
@@ -703,7 +703,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Get_Tags_For_Entity_Type_For_Group()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (ScopeProvider.CreateScope())
             {
                 var contentRepository = CreateDocumentRepository(provider, out var contentTypeRepository);
@@ -755,7 +755,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Cascade_Deletes_Tag_Relations()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = ScopeProvider.CreateScope())
             {
                 var contentRepository = CreateDocumentRepository(provider, out var contentTypeRepository);
@@ -791,7 +791,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Get_Tagged_Entities_For_Tag_Group()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (ScopeProvider.CreateScope())
             {
                 var contentRepository = CreateDocumentRepository(provider, out var contentTypeRepository);
@@ -871,7 +871,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Get_Tagged_Entities_For_Tag()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (ScopeProvider.CreateScope())
             {
                 var contentRepository = CreateDocumentRepository(provider, out var contentTypeRepository);

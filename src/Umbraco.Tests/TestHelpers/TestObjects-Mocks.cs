@@ -9,7 +9,6 @@ using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -46,7 +45,7 @@ namespace Umbraco.Tests.TestHelpers
 
             // can create a database - but don't try to use it!
             if (configured && canConnect)
-                databaseFactoryMock.Setup(x => x.CreateDatabase()).Returns(GetUmbracoSqlCeDatabase(Mock.Of<ILogger>()));
+                databaseFactoryMock.Setup(x => x.CreateDatabase()).Returns(GetUmbracoSqlCeDatabase(Mock.Of<Microsoft.Extensions.Logging.ILogger<UmbracoDatabase>>()));
 
             return databaseFactoryMock.Object;
         }

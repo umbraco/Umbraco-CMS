@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Linq;
 using System.Web.Mvc;
 using System.Web.Routing;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -414,7 +415,7 @@ namespace Umbraco.Tests.Web.Mvc
 
             var cache = NoAppCache.Instance;
             //var provider = new ScopeUnitOfWorkProvider(databaseFactory, new RepositoryFactory(Mock.Of<IServiceContainer>()));
-            var scopeProvider = TestObjects.GetScopeProvider(Mock.Of<ILogger>());
+            var scopeProvider = TestObjects.GetScopeProvider(NullLoggerFactory.Instance);
             var factory = Mock.Of<IPublishedContentTypeFactory>();
             var umbracoContextAccessor = Mock.Of<IUmbracoContextAccessor>();
             _service = new XmlPublishedSnapshotService(svcCtx, factory, scopeProvider, cache,

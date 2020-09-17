@@ -508,7 +508,7 @@ namespace Umbraco.Tests.Testing
             Composition.WithCollectionBuilder<UrlSegmentProviderCollectionBuilder>(); // empty
 
             Composition.RegisterUnique(factory
-                => TestObjects.GetScopeProvider(factory.TryGetInstance<ILogger>(), factory.TryGetInstance<ITypeFinder>(), factory.TryGetInstance<FileSystems>(), factory.TryGetInstance<IUmbracoDatabaseFactory>()));
+                => TestObjects.GetScopeProvider(factory.TryGetInstance<ILoggerFactory>(), factory.TryGetInstance<ITypeFinder>(), factory.TryGetInstance<FileSystems>(), factory.TryGetInstance<IUmbracoDatabaseFactory>()));
             Composition.RegisterUnique(factory => (IScopeAccessor) factory.GetInstance<IScopeProvider>());
 
             Composition.ComposeServices();

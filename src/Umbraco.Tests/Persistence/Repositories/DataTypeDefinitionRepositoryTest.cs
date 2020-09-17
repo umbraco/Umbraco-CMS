@@ -32,7 +32,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Find_Usages()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
 
             using (provider.CreateScope())
             {
@@ -94,7 +94,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Move()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             var accessor = (IScopeAccessor) provider;
 
             using (provider.CreateScope())
@@ -137,7 +137,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Create_Container()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             var accessor = (IScopeAccessor) provider;
 
             using (provider.CreateScope())
@@ -156,7 +156,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Delete_Container()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             var accessor = (IScopeAccessor) provider;
 
             using (provider.CreateScope())
@@ -176,7 +176,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Create_Container_Containing_Data_Types()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             var accessor = (IScopeAccessor) provider;
 
             using (provider.CreateScope())
@@ -196,7 +196,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Delete_Container_Containing_Data_Types()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             var accessor = (IScopeAccessor) provider;
 
             using (provider.CreateScope())
@@ -224,7 +224,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Create()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
 
             using (provider.CreateScope())
             {
@@ -249,7 +249,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Perform_Get_On_DataTypeDefinitionRepository()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
 
             using (provider.CreateScope())
             {
@@ -267,7 +267,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Perform_GetAll_On_DataTypeDefinitionRepository()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
 
             using (provider.CreateScope())
             {
@@ -287,7 +287,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Perform_GetAll_With_Params_On_DataTypeDefinitionRepository()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
 
             using (provider.CreateScope())
             {
@@ -307,7 +307,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Perform_GetByQuery_On_DataTypeDefinitionRepository()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
 
             using (var scope = provider.CreateScope())
             {
@@ -327,7 +327,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Perform_Count_On_DataTypeDefinitionRepository()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
 
             using (var scope = provider.CreateScope())
             {
@@ -345,7 +345,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Perform_Add_On_DataTypeDefinitionRepository()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
 
             using (provider.CreateScope())
             {
@@ -383,7 +383,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Perform_Update_On_DataTypeDefinitionRepository()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
 
             using (provider.CreateScope())
             {
@@ -414,7 +414,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Perform_Delete_On_DataTypeDefinitionRepository()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
 
             using (provider.CreateScope())
             {
@@ -444,7 +444,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Perform_Exists_On_DataTypeDefinitionRepository()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
 
             using (provider.CreateScope())
             {

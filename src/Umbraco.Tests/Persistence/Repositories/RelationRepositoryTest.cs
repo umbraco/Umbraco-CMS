@@ -42,7 +42,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Add_On_RelationRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 RelationTypeRepository repositoryType;
@@ -64,7 +64,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Update_On_RelationRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 RelationTypeRepository repositoryType;
@@ -89,7 +89,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Delete_On_RelationRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 RelationTypeRepository repositoryType;
@@ -111,7 +111,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Get_On_RelationRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 RelationTypeRepository repositoryType;
@@ -133,7 +133,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetAll_On_RelationRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 RelationTypeRepository repositoryType;
@@ -154,7 +154,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetAll_With_Params_On_RelationRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 RelationTypeRepository repositoryType;
@@ -176,7 +176,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             CreateTestDataForPagingTests(out var createdContent, out var createdMembers, out var createdMedia);
 
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository(provider, out var relationTypeRepository);
@@ -222,7 +222,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var relType = ServiceContext.RelationService.GetRelationTypeByAlias(Constants.Conventions.RelationTypes.RelatedMediaAlias);
             ServiceContext.RelationService.Relate(media.Id, media.Id, relType);
 
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository(provider, out var relationTypeRepository);
@@ -244,7 +244,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             CreateTestDataForPagingTests(out var createdContent, out var createdMembers, out var createdMedia);
 
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository(provider, out var relationTypeRepository);
@@ -325,7 +325,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Exists_On_RelationRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 RelationTypeRepository repositoryType;
@@ -345,7 +345,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Count_On_RelationRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 RelationTypeRepository repositoryType;
@@ -364,7 +364,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetByQuery_On_RelationRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 RelationTypeRepository repositoryType;
@@ -386,7 +386,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Delete_Content_And_Verify_Relation_Is_Removed()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 RelationTypeRepository repositoryType;
@@ -424,7 +424,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Constants.ObjectTypes.DocumentType,
                 new Guid("A2CB7800-F571-4787-9638-BC48539A0EFB"));
 
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
             using (var scope = provider.CreateScope())
             {
                 var accessor = (IScopeAccessor)provider;
