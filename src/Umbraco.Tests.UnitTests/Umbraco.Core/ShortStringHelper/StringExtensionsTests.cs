@@ -3,17 +3,16 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Web.Composing;
+using Umbraco.Core.IO;
 using Umbraco.Core.Strings;
-using Umbraco.Tests.Testing;
-using Umbraco.Web;
 
 namespace Umbraco.Tests.Strings
 {
     [TestFixture]
-    public class StringExtensionsTests : UmbracoTestBase
+    public class StringExtensionsTests
     {
         private readonly IShortStringHelper _mockShortStringHelper = new MockShortStringHelper();
 
@@ -46,7 +45,7 @@ namespace Umbraco.Tests.Strings
         [TestCase("/Test.js function(){return true;}", false)]
         public void Detect_Is_JavaScript_Path(string input, bool result)
         {
-            var output = input.DetectIsJavaScriptPath(IOHelper);
+            var output = input.DetectIsJavaScriptPath(Mock.Of<IIOHelper>());
             Assert.AreEqual(result, output.Success);
         }
 
@@ -87,37 +86,6 @@ namespace Umbraco.Tests.Strings
         {
             var cleaned = input.CleanForXss();
             Assert.AreEqual(cleaned, result);
-        }
-
-        [TestCase("This is a string to encrypt")]
-        [TestCase("This is a string to encrypt\nThis is a second line")]
-        [TestCase("    White space is preserved    ")]
-        [TestCase("\nWhite space is preserved\n")]
-        public void Encrypt_And_Decrypt(string input)
-        {
-            var encrypted = input.EncryptWithMachineKey();
-            var decrypted = encrypted.DecryptWithMachineKey();
-            Assert.AreNotEqual(input, encrypted);
-            Assert.AreEqual(input, decrypted);
-        }
-
-        [Test()]
-        public void Encrypt_And_Decrypt_Long_Value()
-        {
-            // Generate a really long string
-            char[] chars = { 'a', 'b', 'c', '1', '2', '3', '\n' };
-
-            string valueToTest = string.Empty;
-
-            // Create a string 7035 chars long
-            for (int i = 0; i < 1005; i++)
-                for (int j = 0; j < chars.Length; j++)
-                    valueToTest += chars[j].ToString();
-
-            var encrypted = valueToTest.EncryptWithMachineKey();
-            var decrypted = encrypted.DecryptWithMachineKey();
-            Assert.AreNotEqual(valueToTest, encrypted);
-            Assert.AreEqual(valueToTest, decrypted);
         }
 
         [TestCase("Hello this is my string", " string", "Hello this is my")]

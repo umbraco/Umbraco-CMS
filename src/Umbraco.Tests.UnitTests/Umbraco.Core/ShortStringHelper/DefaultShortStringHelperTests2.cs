@@ -1,100 +1,21 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Strings;
-using Umbraco.Tests.TestHelpers;
-using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Strings
 {
     [TestFixture]
-    public class DefaultShortStringHelperTests : UmbracoTestBase
+    public class DefaultShortStringHelperTests2
     {
-        private DefaultShortStringHelper _helper;
-
-        public override void SetUp()
-        {
-            base.SetUp();
-
-            // NOTE pre-filters runs _before_ Recode takes place
-            // so there still may be utf8 chars even though you want ascii
-
-            _helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(SettingsForTests.GenerateMockRequestHandlerSettings())
-                .WithConfig(CleanStringType.FileName, new DefaultShortStringHelperConfig.Config
-                {
-                    //PreFilter = ClearFileChars, // done in IsTerm
-                    IsTerm = (c, leading) => (char.IsLetterOrDigit(c) || c == '_') && DefaultShortStringHelper.IsValidFileNameChar(c),
-                    StringType = CleanStringType.LowerCase | CleanStringType.Ascii,
-                    Separator = '-'
-                })
-                .WithConfig(CleanStringType.UrlSegment, new DefaultShortStringHelperConfig.Config
-                {
-                    PreFilter = StripQuotes,
-                    IsTerm = (c, leading) => char.IsLetterOrDigit(c) || c == '_',
-                    StringType = CleanStringType.LowerCase | CleanStringType.Ascii,
-                    Separator = '-'
-                })
-                .WithConfig("fr-FR", CleanStringType.UrlSegment, new DefaultShortStringHelperConfig.Config
-                {
-                    PreFilter = FilterFrenchElisions,
-                    IsTerm = (c, leading) => leading ? char.IsLetter(c) : (char.IsLetterOrDigit(c) || c == '_'),
-                    StringType = CleanStringType.LowerCase | CleanStringType.Ascii,
-                    Separator = '-'
-                })
-                .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
-                {
-                    PreFilter = StripQuotes,
-                    IsTerm = (c, leading) => leading ? char.IsLetter(c) : char.IsLetterOrDigit(c),
-                    StringType = CleanStringType.UmbracoCase | CleanStringType.Ascii
-                })
-                .WithConfig("fr-FR", CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
-                {
-                    PreFilter = WhiteQuotes,
-                    IsTerm = (c, leading) => leading ? char.IsLetter(c) : char.IsLetterOrDigit(c),
-                    StringType = CleanStringType.UmbracoCase | CleanStringType.Ascii
-                })
-                .WithConfig(CleanStringType.ConvertCase, new DefaultShortStringHelperConfig.Config
-                {
-                    PreFilter = null,
-                    IsTerm = (c, leading) => char.IsLetterOrDigit(c) || c == '_', // letter, digit or underscore
-                    StringType = CleanStringType.Ascii,
-                    BreakTermsOnUpper = true
-                }));
-
-            // FIXME: move to a "compose" thing?
-            Composition.RegisterUnique<IShortStringHelper>(f => _helper);
-        }
-
-        private static readonly Regex FrenchElisionsRegex = new Regex("\\b(c|d|j|l|m|n|qu|s|t)('|\u8217)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-
-        private static string FilterFrenchElisions(string s)
-        {
-            return FrenchElisionsRegex.Replace(s, "");
-        }
-
-        private static string StripQuotes(string s)
-        {
-            s = s.ReplaceMany(new Dictionary<string, string> {{"'", ""}, {"\u8217", ""}});
-            return s;
-        }
-
-        private static string WhiteQuotes(string s)
-        {
-            s = s.ReplaceMany(new Dictionary<string, string> { { "'", " " }, { "\u8217", " " } });
-            return s;
-        }
-
+        
         [Test]
         public void U4_4056()
         {
-            var settings = SettingsForTests.GenerateMockRequestHandlerSettings();
+            var settings = Mock.Of<IRequestHandlerSettings>();
             var contentMock = Mock.Get(settings);
             contentMock.Setup(x => x.CharCollection).Returns(Enumerable.Empty<IChar>());
             contentMock.Setup(x => x.ConvertUrlsToAscii).Returns(false);
@@ -119,7 +40,7 @@ namespace Umbraco.Tests.Strings
         [Test]
         public void U4_4056_TryAscii()
         {
-            var settings = SettingsForTests.GenerateMockRequestHandlerSettings();
+            var settings = Mock.Of<IRequestHandlerSettings>();
             var contentMock = Mock.Get(settings);
             contentMock.Setup(x => x.CharCollection).Returns(Enumerable.Empty<IChar>());
             contentMock.Setup(x => x.ConvertUrlsToAscii).Returns(false);
@@ -145,7 +66,7 @@ namespace Umbraco.Tests.Strings
         [Test]
         public void CleanStringUnderscoreInTerm()
         {
-            var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(SettingsForTests.GenerateMockRequestHandlerSettings())
+            var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(Mock.Of<IRequestHandlerSettings>())
                 .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
                     // underscore is accepted within terms
@@ -155,7 +76,7 @@ namespace Umbraco.Tests.Strings
                 }));
             Assert.AreEqual("foo_bar*nil", helper.CleanString("foo_bar nil", CleanStringType.Alias));
 
-            helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(SettingsForTests.GenerateMockRequestHandlerSettings())
+            helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(Mock.Of<IRequestHandlerSettings>())
                 .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
                     // underscore is not accepted within terms
@@ -169,7 +90,7 @@ namespace Umbraco.Tests.Strings
         [Test]
         public void CleanStringLeadingChars()
         {
-            var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(SettingsForTests.GenerateMockRequestHandlerSettings())
+            var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(Mock.Of<IRequestHandlerSettings>())
                 .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
                     // letters and digits are valid leading chars
@@ -179,7 +100,7 @@ namespace Umbraco.Tests.Strings
                 }));
             Assert.AreEqual("0123foo*bar*543*nil*321", helper.CleanString("0123foo_bar 543 nil 321", CleanStringType.Alias));
 
-            helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(SettingsForTests.GenerateMockRequestHandlerSettings())
+            helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(Mock.Of<IRequestHandlerSettings>())
                 .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
                     // only letters are valid leading chars
@@ -190,14 +111,14 @@ namespace Umbraco.Tests.Strings
             Assert.AreEqual("foo*bar*543*nil*321", helper.CleanString("0123foo_bar 543 nil 321", CleanStringType.Alias));
             Assert.AreEqual("foo*bar*543*nil*321", helper.CleanString("0123 foo_bar 543 nil 321", CleanStringType.Alias));
 
-            helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(SettingsForTests.GenerateMockRequestHandlerSettings()));
+            helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(Mock.Of<IRequestHandlerSettings>()));
             Assert.AreEqual("child2", helper.CleanStringForSafeAlias("1child2"));
         }
 
         [Test]
         public void CleanStringTermOnUpper()
         {
-            var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(SettingsForTests.GenerateMockRequestHandlerSettings())
+            var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(Mock.Of<IRequestHandlerSettings>())
                 .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
@@ -207,7 +128,7 @@ namespace Umbraco.Tests.Strings
                 }));
             Assert.AreEqual("foo*Bar", helper.CleanString("fooBar", CleanStringType.Alias));
 
-            helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(SettingsForTests.GenerateMockRequestHandlerSettings())
+            helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(Mock.Of<IRequestHandlerSettings>())
                 .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
@@ -221,7 +142,7 @@ namespace Umbraco.Tests.Strings
         [Test]
         public void CleanStringAcronymOnNonUpper()
         {
-            var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(SettingsForTests.GenerateMockRequestHandlerSettings())
+            var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(Mock.Of<IRequestHandlerSettings>())
                 .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
@@ -234,7 +155,7 @@ namespace Umbraco.Tests.Strings
             Assert.AreEqual("foo*BAnil", helper.CleanString("foo BAnil", CleanStringType.Alias));
             Assert.AreEqual("foo*Bnil", helper.CleanString("foo Bnil", CleanStringType.Alias));
 
-            helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(SettingsForTests.GenerateMockRequestHandlerSettings())
+            helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(Mock.Of<IRequestHandlerSettings>())
                 .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
@@ -251,7 +172,7 @@ namespace Umbraco.Tests.Strings
         [Test]
         public void CleanStringGreedyAcronyms()
         {
-            var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(SettingsForTests.GenerateMockRequestHandlerSettings())
+            var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(Mock.Of<IRequestHandlerSettings>())
                 .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
@@ -264,7 +185,7 @@ namespace Umbraco.Tests.Strings
             Assert.AreEqual("foo*BA*nil", helper.CleanString("foo BAnil", CleanStringType.Alias));
             Assert.AreEqual("foo*Bnil", helper.CleanString("foo Bnil", CleanStringType.Alias));
 
-            helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(SettingsForTests.GenerateMockRequestHandlerSettings())
+            helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(Mock.Of<IRequestHandlerSettings>())
                 .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
@@ -281,7 +202,7 @@ namespace Umbraco.Tests.Strings
         [Test]
         public void CleanStringWhiteSpace()
         {
-            var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(SettingsForTests.GenerateMockRequestHandlerSettings())
+            var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(Mock.Of<IRequestHandlerSettings>())
                 .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
@@ -294,7 +215,7 @@ namespace Umbraco.Tests.Strings
         [Test]
         public void CleanStringSeparator()
         {
-            var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(SettingsForTests.GenerateMockRequestHandlerSettings())
+            var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(Mock.Of<IRequestHandlerSettings>())
                 .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
@@ -302,7 +223,7 @@ namespace Umbraco.Tests.Strings
                 }));
             Assert.AreEqual("foo*bar", helper.CleanString("foo bar", CleanStringType.Alias));
 
-            helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(SettingsForTests.GenerateMockRequestHandlerSettings())
+            helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(Mock.Of<IRequestHandlerSettings>())
                 .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
@@ -310,14 +231,14 @@ namespace Umbraco.Tests.Strings
                 }));
             Assert.AreEqual("foo bar", helper.CleanString("foo bar", CleanStringType.Alias));
 
-            helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(SettingsForTests.GenerateMockRequestHandlerSettings())
+            helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(Mock.Of<IRequestHandlerSettings>())
                 .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged
                 }));
             Assert.AreEqual("foobar", helper.CleanString("foo bar", CleanStringType.Alias));
 
-            helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(SettingsForTests.GenerateMockRequestHandlerSettings())
+            helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(Mock.Of<IRequestHandlerSettings>())
                 .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
@@ -329,7 +250,7 @@ namespace Umbraco.Tests.Strings
         [Test]
         public void CleanStringSymbols()
         {
-            var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(SettingsForTests.GenerateMockRequestHandlerSettings())
+            var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(Mock.Of<IRequestHandlerSettings>())
                 .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
@@ -383,7 +304,7 @@ namespace Umbraco.Tests.Strings
         [Test]
         public void CleanStringEncoding()
         {
-            var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(SettingsForTests.GenerateMockRequestHandlerSettings())
+            var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(Mock.Of<IRequestHandlerSettings>())
                 .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
@@ -392,7 +313,7 @@ namespace Umbraco.Tests.Strings
             Assert.AreEqual("中文测试", helper.CleanString("中文测试", CleanStringType.Alias));
             Assert.AreEqual("léger*中文测试*ZÔRG", helper.CleanString("léger 中文测试 ZÔRG", CleanStringType.Alias));
 
-            helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(SettingsForTests.GenerateMockRequestHandlerSettings())
+            helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(Mock.Of<IRequestHandlerSettings>())
                 .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
                     StringType = CleanStringType.Ascii | CleanStringType.Unchanged,
@@ -405,7 +326,7 @@ namespace Umbraco.Tests.Strings
         [Test]
         public void CleanStringDefaultConfig()
         {
-            var settings = SettingsForTests.GenerateMockRequestHandlerSettings();
+            var settings = Mock.Of<IRequestHandlerSettings>();
             var contentMock = Mock.Get(settings);
             contentMock.Setup(x => x.CharCollection).Returns(Enumerable.Empty<IChar>());
             contentMock.Setup(x => x.ConvertUrlsToAscii).Returns(false);
@@ -431,7 +352,7 @@ namespace Umbraco.Tests.Strings
         [Test]
         public void CleanStringCasing()
         {
-            var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(SettingsForTests.GenerateMockRequestHandlerSettings())
+            var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(Mock.Of<IRequestHandlerSettings>())
                 .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
@@ -477,138 +398,29 @@ namespace Umbraco.Tests.Strings
             Assert.AreEqual("Special Xml Writer", helper.CleanString("special XML writer", CleanStringType.Alias | CleanStringType.PascalCase));
         }
 
-        #region Cases
-        [TestCase("foo", "foo")]
-        [TestCase("    foo    ", "foo")]
-        [TestCase("Foo", "Foo")]
-        [TestCase("FoO", "FoO")]
-        [TestCase("FoO bar", "FoOBar")]
-        [TestCase("FoO bar NIL", "FoOBarNIL")]
-        [TestCase("FoO 33bar 22NIL", "FoO33bar22NIL")]
-        [TestCase("FoO 33bar 22NI", "FoO33bar22NI")]
-        [TestCase("0foo", "foo")]
-        [TestCase("2foo bar", "fooBar")]
-        [TestCase("9FOO", "FOO")]
-        [TestCase("foo-BAR", "fooBAR")]
-        [TestCase("foo-BA-dang", "fooBADang")]
-        [TestCase("foo_BAR", "fooBAR")]
-        [TestCase("foo'BAR", "fooBAR")]
-        [TestCase("sauté dans l'espace", "sauteDansLespace")]
-        [TestCase("foo\"\"bar", "fooBar")]
-        [TestCase("-foo-", "foo")]
-        [TestCase("_foo_", "foo")]
-        [TestCase("spécial", "special")]
-        [TestCase("brô dëk ", "broDek")]
-        [TestCase("1235brô dëk ", "broDek")]
-        [TestCase("汉#字*/漢?字", "")]
-        [TestCase("aa DB cd EFG X KLMN OP qrst", "aaDBCdEFGXKLMNOPQrst")]
-        [TestCase("AA db cd EFG X KLMN OP qrst", "AADbCdEFGXKLMNOPQrst")]
-        [TestCase("AAA db cd EFG X KLMN OP qrst", "AAADbCdEFGXKLMNOPQrst")]
-        [TestCase("4 ways selector", "waysSelector")]
-        [TestCase("WhatIfWeDoItAgain", "WhatIfWeDoItAgain")]
-        [TestCase("whatIfWeDoItAgain", "whatIfWeDoItAgain")]
-        [TestCase("WhatIfWEDOITAgain", "WhatIfWEDOITAgain")]
-        [TestCase("WhatIfWe doItAgain", "WhatIfWeDoItAgain")]
-        #endregion
-        public void CleanStringForSafeAlias(string input, string expected)
-        {
-            var output = _helper.CleanStringForSafeAlias(input);
-            Assert.AreEqual(expected, output);
-        }
+        // #region Cases
+        // [TestCase("This is my_little_house so cute.", "thisIsMyLittleHouseSoCute", false)]
+        // [TestCase("This is my_little_house so cute.", "thisIsMy_little_houseSoCute", true)]
+        // [TestCase("This is my_Little_House so cute.", "thisIsMyLittleHouseSoCute", false)]
+        // [TestCase("This is my_Little_House so cute.", "thisIsMy_Little_HouseSoCute", true)]
+        // [TestCase("An UPPER_CASE_TEST to check", "anUpperCaseTestToCheck", false)]
+        // [TestCase("An UPPER_CASE_TEST to check", "anUpper_case_testToCheck", true)]
+        // [TestCase("Trailing_", "trailing", false)]
+        // [TestCase("Trailing_", "trailing_", true)]
+        // [TestCase("_Leading", "leading", false)]
+        // [TestCase("_Leading", "leading", true)]
+        // [TestCase("Repeat___Repeat", "repeatRepeat", false)]
+        // [TestCase("Repeat___Repeat", "repeat___Repeat", true)]
+        // [TestCase("Repeat___repeat", "repeatRepeat", false)]
+        // [TestCase("Repeat___repeat", "repeat___repeat", true)]
+        // #endregion
+        // public void CleanStringWithUnderscore(string input, string expected, bool allowUnderscoreInTerm)
+        // {
+        //     var helper = new DefaultShortStringHelper(SettingsForTests.GetDefault())
+        //         .WithConfig(allowUnderscoreInTerm: allowUnderscoreInTerm);
+        //     var output = helper.CleanString(input, CleanStringType.Alias | CleanStringType.Ascii | CleanStringType.CamelCase);
+        //     Assert.AreEqual(expected, output);
+        // }
 
-        //#region Cases
-        //[TestCase("This is my_little_house so cute.", "thisIsMyLittleHouseSoCute", false)]
-        //[TestCase("This is my_little_house so cute.", "thisIsMy_little_houseSoCute", true)]
-        //[TestCase("This is my_Little_House so cute.", "thisIsMyLittleHouseSoCute", false)]
-        //[TestCase("This is my_Little_House so cute.", "thisIsMy_Little_HouseSoCute", true)]
-        //[TestCase("An UPPER_CASE_TEST to check", "anUpperCaseTestToCheck", false)]
-        //[TestCase("An UPPER_CASE_TEST to check", "anUpper_case_testToCheck", true)]
-        //[TestCase("Trailing_", "trailing", false)]
-        //[TestCase("Trailing_", "trailing_", true)]
-        //[TestCase("_Leading", "leading", false)]
-        //[TestCase("_Leading", "leading", true)]
-        //[TestCase("Repeat___Repeat", "repeatRepeat", false)]
-        //[TestCase("Repeat___Repeat", "repeat___Repeat", true)]
-        //[TestCase("Repeat___repeat", "repeatRepeat", false)]
-        //[TestCase("Repeat___repeat", "repeat___repeat", true)]
-        //#endregion
-        //public void CleanStringWithUnderscore(string input, string expected, bool allowUnderscoreInTerm)
-        //{
-        //    var helper = new DefaultShortStringHelper(SettingsForTests.GetDefault())
-        //        .WithConfig(allowUnderscoreInTerm: allowUnderscoreInTerm);
-        //    var output = helper.CleanString(input, CleanStringType.Alias | CleanStringType.Ascii | CleanStringType.CamelCase);
-        //    Assert.AreEqual(expected, output);
-        //}
-
-        #region Cases
-        [TestCase("Home Page", "home-page")]
-        [TestCase("Shannon's Home Page!", "shannons-home-page")]
-        [TestCase("#Someones's Twitter $h1z%n", "someoness-twitter-h1z-n")]
-        [TestCase("Räksmörgås", "raksmorgas")]
-        [TestCase("'em guys-over there, are#goin' a \"little\"bit crazy eh!! :)", "em-guys-over-there-are-goin-a-little-bit-crazy-eh")]
-        [TestCase("汉#字*/漢?字", "")]
-        [TestCase("Réalösk fix bran#lo'sk", "realosk-fix-bran-losk")]
-        [TestCase("200 ways to be happy", "200-ways-to-be-happy")]
-        #endregion
-        public void CleanStringForUrlSegment(string input, string expected)
-        {
-            var output = _helper.CleanStringForUrlSegment(input);
-            Assert.AreEqual(expected, output);
-        }
-
-        #region Cases
-        [TestCase("ThisIsTheEndMyFriend", "This Is The End My Friend")]
-        [TestCase("ThisIsTHEEndMyFriend", "This Is THE End My Friend")]
-        [TestCase("THISIsTHEEndMyFriend", "THIS Is THE End My Friend")]
-        [TestCase("This33I33sThe33EndMyFriend", "This33 I33s The33 End My Friend")] // works!
-        [TestCase("ThisIsTHEEndMyFriendX", "This Is THE End My Friend X")]
-        [TestCase("ThisIsTHEEndMyFriendXYZ", "This Is THE End My Friend XYZ")]
-        [TestCase("ThisIsTHEEndMyFriendXYZt", "This Is THE End My Friend XY Zt")]
-        [TestCase("UneÉlévationÀPartir", "Une Élévation À Partir")]
-        #endregion
-        public void SplitPascalCasing(string input, string expected)
-        {
-            var output = _helper.SplitPascalCasing(input, ' ');
-            Assert.AreEqual(expected, output);
-
-            output = _helper.SplitPascalCasing(input, '*');
-            expected = expected.Replace(' ', '*');
-            Assert.AreEqual(expected, output);
-        }
-
-        #region Cases
-        [TestCase("sauté dans l'espace", "saute-dans-espace", "fr-FR", CleanStringType.UrlSegment | CleanStringType.Ascii | CleanStringType.LowerCase)]
-        [TestCase("sauté dans l'espace", "sauté-dans-espace", "fr-FR", CleanStringType.UrlSegment | CleanStringType.Utf8 | CleanStringType.LowerCase)]
-        [TestCase("sauté dans l'espace", "SauteDansLEspace", "fr-FR", CleanStringType.Alias | CleanStringType.Ascii | CleanStringType.PascalCase)]
-        [TestCase("he doesn't want", "he-doesnt-want", null, CleanStringType.UrlSegment | CleanStringType.Ascii | CleanStringType.LowerCase)]
-        [TestCase("he doesn't want", "heDoesntWant", null, CleanStringType.Alias | CleanStringType.Ascii | CleanStringType.CamelCase)]
-        #endregion
-        public void CleanStringWithTypeAndCulture(string input, string expected, string culture, CleanStringType stringType)
-        {
-            // picks the proper config per culture
-            // and overrides some stringType params (ascii...)
-            var output = _helper.CleanString(input, stringType, culture);
-            Assert.AreEqual(expected, output);
-        }
-
-        #region Cases
-        [TestCase("foo.txt", "foo.txt")]
-        [TestCase("foo", "foo")]
-        [TestCase(".txt", ".txt")]
-        [TestCase("nag*dog/poo:xit.txt", "nag-dog-poo-xit.txt")]
-        [TestCase("the dog is in the house.txt", "the-dog-is-in-the-house.txt")]
-        [TestCase("nil.nil.nil.txt", "nil-nil-nil.txt")]
-        [TestCase("taradabum", "taradabum")]
-        [TestCase("tara$$da:b/u<m", "tara-da-b-u-m")]
-        [TestCase("Straße Zvöskî.yop", "strasse-zvoski.yop")]
-        [TestCase("yop.Straße Zvöskî", "yop.strasse-zvoski")]
-        [TestCase("yop.Straße Zvös--kî", "yop.strasse-zvos-ki")]
-        [TestCase("ma--ma---ma.ma-----ma", "ma-ma-ma.ma-ma")]
-        #endregion
-        public void CleanStringForSafeFileName(string input, string expected)
-        {
-            var output = _helper.CleanStringForSafeFileName(input);
-            Assert.AreEqual(expected, output);
-        }
     }
 }

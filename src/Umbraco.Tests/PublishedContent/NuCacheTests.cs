@@ -9,7 +9,6 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Legacy;
 using Umbraco.Core.Events;
-using Umbraco.Core.Install;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
@@ -20,7 +19,6 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.Common;
-using Umbraco.Tests.Strings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing.Objects;
 using Umbraco.Web;
@@ -209,7 +207,7 @@ namespace Umbraco.Tests.PublishedContent
                 publishedModelFactory,
                 new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider(TestHelper.ShortStringHelper) }),
                 TestHelper.GetHostingEnvironment(),
-                new MockShortStringHelper(),
+                Mock.Of<IShortStringHelper>(),
                 TestHelper.IOHelper,
                 settings);
 

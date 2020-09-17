@@ -252,8 +252,6 @@
     <Compile Include="Services\ContentTypeServiceExtensionsTests.cs" />
     <Compile Include="Services\PublicAccessServiceTests.cs" />
     <Compile Include="StringNewlineExtensions.cs" />
-    <Compile Include="Strings\StylesheetHelperTests.cs" />
-    <Compile Include="Strings\StringValidationTests.cs" />
     <Compile Include="Web\Mvc\RenderNoContentControllerTests.cs" />
     <Compile Include="Web\Mvc\ValidateUmbracoFormRouteStringAttributeTests.cs" />
     <Compile Include="Web\PublishedContentQueryTests.cs" />
@@ -311,9 +309,6 @@
     <Compile Include="Templates\ViewHelperTests.cs" />
     <Compile Include="CoreXml\NavigableNavigatorTests.cs" />
     <Compile Include="Cache\PublishedCache\PublishedMediaCacheTests.cs" />
-    <Compile Include="Strings\CmsHelperCasingTests.cs" />
-    <Compile Include="Strings\DefaultShortStringHelperTests.cs" />
-    <Compile Include="Strings\MockShortStringHelper.cs" />
     <Compile Include="Migrations\AlterMigrationTests.cs" />
     <Compile Include="Migrations\SqlScripts\SqlResources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -420,7 +415,6 @@
     <Compile Include="IO\FileSystemsTests.cs" />
     <Compile Include="IO\PhysicalFileSystemTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Strings\StringExtensionsTests.cs" />
     <Compile Include="TestHelpers\FakeHttpContextFactory.cs" />
     <Compile Include="Routing\UmbracoModuleTests.cs" />
     <Compile Include="Web\UrlHelperExtensionTests.cs" />
