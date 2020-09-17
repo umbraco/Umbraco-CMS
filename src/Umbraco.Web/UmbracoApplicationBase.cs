@@ -1,10 +1,12 @@
 ﻿using Serilog.Context;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Threading;
 using System.Web;
 using System.Web.Hosting;
+using Microsoft.Extensions.Configuration;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
@@ -41,11 +43,9 @@ namespace Umbraco.Web
 
                 var hostingEnvironment = new AspNetHostingEnvironment(hostingSettings);
                 var loggingConfiguration = new LoggingConfiguration(
-                    Path.Combine(hostingEnvironment.ApplicationPhysicalPath, "App_Data\\Logs"),
-                    Path.Combine(hostingEnvironment.ApplicationPhysicalPath, "config\\serilog.config"),
-                    Path.Combine(hostingEnvironment.ApplicationPhysicalPath, "config\\serilog.user.config"));
+                    Path.Combine(hostingEnvironment.ApplicationPhysicalPath, "App_Data\\Logs"));
                 var ioHelper = new IOHelper(hostingEnvironment);
-                var logger = SerilogLogger.CreateWithDefaultConfiguration(hostingEnvironment, loggingConfiguration);
+                var logger = SerilogLogger.CreateWithDefaultConfiguration(hostingEnvironment, loggingConfiguration, new ConfigurationRoot(new List<IConfigurationProvider>()));
 
                 var configs = configFactory.Create();
 

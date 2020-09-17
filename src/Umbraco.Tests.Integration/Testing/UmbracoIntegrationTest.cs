@@ -81,7 +81,7 @@ namespace Umbraco.Tests.Integration.Testing
         {
             var hostBuilder = CreateHostBuilder();
             var host = await hostBuilder.StartAsync();
-            Services = host.Services;            
+            Services = host.Services;
             var app = new ApplicationBuilder(host.Services);
             Configure(app);
         }
@@ -141,7 +141,7 @@ namespace Umbraco.Tests.Integration.Testing
                 logger,
                 profiler,
                 hostingEnvironment,
-                backOfficeInfo,                
+                backOfficeInfo,
                 typeFinder,
                 appCaches,
                 dbProviderFactoryCreator,
@@ -181,7 +181,7 @@ namespace Umbraco.Tests.Integration.Testing
                 profiler,
                 Mock.Of<IUmbracoBootPermissionChecker>(),
                 hostingEnvironment,
-                backOfficeInfo, 
+                backOfficeInfo,
                 dbProviderFactoryCreator,
                 mainDom,
                 typeFinder,
@@ -210,6 +210,7 @@ namespace Umbraco.Tests.Integration.Testing
                 GetType().Assembly,
                 AppCaches.NoCache, // Disable caches for integration tests
                 TestHelper.GetLoggingConfiguration(),
+                Configuration,
                 CreateTestRuntime,
                 out _);
 
