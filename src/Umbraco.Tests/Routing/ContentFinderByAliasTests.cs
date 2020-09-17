@@ -3,9 +3,12 @@ using System.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.Routing
@@ -49,7 +52,11 @@ namespace Umbraco.Tests.Routing
             var umbracoContext = GetUmbracoContext(urlAsString);
             var publishedRouter = CreatePublishedRouter();
             var frequest = publishedRouter.CreateRequest(umbracoContext);
-            var lookup = new ContentFinderByUrlAlias(Logger);
+            var globalSettings = new GlobalSettings();
+            var snapshotAccessor = umbracoContext.PublishedSnapshotAccessor;
+            var contentRouter = new ContentCacheContentRouter(snapshotAccessor, globalSettings,
+                new FastDictionaryAppCache(), new FastDictionaryAppCache());
+            var lookup = new ContentFinderByUrlAlias(Logger, contentRouter);
 
             var result = lookup.TryFindContent(frequest);
 

@@ -141,7 +141,8 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
                 Enumerable.Empty<IUrlProvider>(),
                 Enumerable.Empty<IMediaUrlProvider>(),
                 globalSettings,
-                new TestVariationContextAccessor());
+                new TestVariationContextAccessor(),
+                Mock.Of<IPublishedSnapshotAccessor>());
 
             //replace it
             umbracoContextAccessor.UmbracoContext = umbCtx;

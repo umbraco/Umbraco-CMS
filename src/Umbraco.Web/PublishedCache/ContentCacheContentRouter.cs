@@ -192,5 +192,76 @@ namespace Umbraco.Web.PublishedCache
                 segments.RemoveAt(segments.Count - 1);
             }
         }
+
+        public ContentRoutingResult GetIdByAlias(bool preview, int rootNodeId, string culture, string alias)
+        {
+            var content = FindContentByAlias(_snapshot.PublishedSnapshot.Content, rootNodeId, culture, alias,preview);
+            return new ContentRoutingResult
+            {
+                Id = content?.Id ?? 0,
+                Outcome = content != null ? RoutingOutcome.Found : RoutingOutcome.NotFound
+            };
+        }
+        private static IPublishedContent FindContentByAlias(IPublishedContentCache cache, int rootNodeId, string culture, string alias,bool preview)
+        {
+            if (alias == null) throw new ArgumentNullException(nameof(alias));
+
+            // the alias may be "foo/bar" or "/foo/bar"
+            // there may be spaces as in "/foo/bar,  /foo/nil"
+            // these should probably be taken care of earlier on
+
+            // TODO: can we normalize the values so that they contain no whitespaces, and no leading slashes?
+            // and then the comparisons in IsMatch can be way faster - and allocate way less strings
+
+            const string propertyAlias = Constants.Conventions.Content.UrlAlias;
+
+            var test1 = alias.TrimStart('/') + ",";
+            var test2 = ",/" + test1; // test2 is ",/alias,"
+            test1 = "," + test1; // test1 is ",alias,"
+
+            bool IsMatch(IPublishedContent c, string a1, string a2)
+            {
+                // this basically implements the original XPath query ;-(
+                //
+                // "//* [@isDoc and (" +
+                // "contains(concat(',',translate(umbracoUrlAlias, ' ', ''),','),',{0},')" +
+                // " or contains(concat(',',translate(umbracoUrlAlias, ' ', ''),','),',/{0},')" +
+                // ")]"
+
+                if (!c.HasProperty(propertyAlias)) return false;
+                var p = c.GetProperty(propertyAlias);
+                var varies = p.PropertyType.VariesByCulture();
+                string v;
+                if (varies)
+                {
+                    if (!c.HasCulture(culture)) return false;
+                    v = c.Value<string>(propertyAlias, culture);
+                }
+                else
+                {
+                    v = c.Value<string>(propertyAlias);
+                }
+                if (string.IsNullOrWhiteSpace(v)) return false;
+                v = "," + v.Replace(" ", "") + ",";
+                return v.InvariantContains(a1) || v.InvariantContains(a2);
+            }
+
+            // TODO: even with Linq, what happens below has to be horribly slow
+            // but the only solution is to entirely refactor url providers to stop being dynamic
+
+            if (rootNodeId > 0)
+            {
+                var rootNode = cache.GetById(preview,rootNodeId);
+                return rootNode?.Descendants().FirstOrDefault(x => IsMatch(x, test1, test2));
+            }
+
+            foreach (var rootContent in cache.GetAtRoot())
+            {
+                var c = rootContent.DescendantsOrSelf().FirstOrDefault(x => IsMatch(x, test1, test2));
+                if (c != null) return c;
+            }
+
+            return null;
+        }
     }
 }

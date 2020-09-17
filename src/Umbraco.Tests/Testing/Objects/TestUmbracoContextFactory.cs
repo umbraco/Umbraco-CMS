@@ -41,7 +41,8 @@ namespace Umbraco.Tests.Testing.Objects
                 globalSettings,
                 new UrlProviderCollection(new[] { urlProvider }),
                 new MediaUrlProviderCollection(new[] { mediaUrlProvider }),
-                Mock.Of<IUserService>());
+                Mock.Of<IUserService>(),
+                Mock.Of<IPublishedSnapshotAccessor>());
 
             return umbracoContextFactory;
         }
