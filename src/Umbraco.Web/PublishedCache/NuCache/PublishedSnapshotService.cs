@@ -47,6 +47,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly IEntityXmlSerializer _entitySerializer;
         private readonly IPublishedModelFactory _publishedModelFactory;
         private readonly IDefaultCultureAccessor _defaultCultureAccessor;
+        private readonly IContentRouter _contentRouter;
+        private readonly SnapshotGetStrategy _snapshotByIdStrategy;
+        private readonly IContentSnapshotAccessor _snapshotAcessor;
         private readonly UrlSegmentProviderCollection _urlSegmentProviders;
 
         // volatile because we read it with no lock
@@ -57,6 +60,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly SnapDictionary<int, Domain> _domainStore;
         private readonly object _storesLock = new object();
         private readonly object _elementsLock = new object();
+
 
         private BPlusTree<int, ContentNodeKit> _localContentDb;
         private BPlusTree<int, ContentNodeKit> _localMediaDb;
@@ -81,7 +85,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             IDataSource dataSource, IGlobalSettings globalSettings,
             IEntityXmlSerializer entitySerializer,
             IPublishedModelFactory publishedModelFactory,
-            UrlSegmentProviderCollection urlSegmentProviders)
+            UrlSegmentProviderCollection urlSegmentProviders, IContentRouter contentRouter, SnapshotGetStrategy snapshotByIdStrategy, IContentSnapshotAccessor snapshotAcessor)
             : base(publishedSnapshotAccessor, variationContextAccessor)
         {
             //if (Interlocked.Increment(ref _singletonCheck) > 1)
@@ -98,6 +102,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _defaultCultureAccessor = defaultCultureAccessor;
             _globalSettings = globalSettings;
             _urlSegmentProviders = urlSegmentProviders;
+            _contentRouter = contentRouter;
+            _snapshotByIdStrategy = snapshotByIdStrategy;
+            _snapshotAcessor = snapshotAcessor;
 
             // we need an Xml serializer here so that the member cache can support XPath,
             // for members this is done by navigating the serialized-to-xml member
@@ -1217,7 +1224,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             return new PublishedSnapshot.PublishedSnapshotElements
             {
-                ContentCache = new ContentCache(previewDefault, contentSnap, snapshotCache, elementsCache, domainCache, _globalSettings, VariationContextAccessor),
+                ContentCache = new ContentCacheAdapter(new ContentCache(previewDefault, contentSnap, _snapshotByIdStrategy, _snapshotAcessor),_contentRouter),
                 MediaCache = new MediaCache(previewDefault, mediaSnap, VariationContextAccessor),
                 MemberCache = new MemberCache(previewDefault, snapshotCache, _serviceContext.MemberService, memberTypeCache, PublishedSnapshotAccessor, VariationContextAccessor, _entitySerializer),
                 DomainCache = domainCache,

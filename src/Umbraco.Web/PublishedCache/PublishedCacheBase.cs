@@ -100,5 +100,7 @@ namespace Umbraco.Web.PublishedCache
                 .SelectMany(x => x.DescendantsOrSelf())
                 .Where(x => x.ContentType.Id == contentType.Id);
         }
+
+        public abstract void Dispose();
     }
 }

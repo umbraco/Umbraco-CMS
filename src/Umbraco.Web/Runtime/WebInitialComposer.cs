@@ -40,6 +40,7 @@ using Current = Umbraco.Web.Composing.Current;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models;
+using Umbraco.Web.PublishedCache.NuCache;
 
 namespace Umbraco.Web.Runtime
 {
@@ -228,6 +229,18 @@ namespace Umbraco.Web.Runtime
             // register published router
             composition.RegisterUnique<IPublishedRouter, PublishedRouter>();
             composition.Register(_ => Current.Configs.Settings().WebRouting);
+
+            // register content router
+            composition.RegisterUnique<IContentRouter, ContentCacheContentRouter>();
+
+            // register snapshot accessor
+            composition.RegisterUnique<IContentSnapshotAccessor, PublishedSnapshotAccessor>();
+            composition.RegisterUnique<IDomainSnapshotAccessor, PublishedSnapshotAccessor>();
+
+            // register snapshot strategy
+            composition.RegisterUnique<SnapshotGetStrategy, SnapshotGetStrategy>();
+
+            
 
             // register preview SignalR hub
             composition.RegisterUnique(_ => GlobalHost.ConnectionManager.GetHubContext<PreviewHub>());

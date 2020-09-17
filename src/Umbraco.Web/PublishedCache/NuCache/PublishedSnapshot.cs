@@ -21,7 +21,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public class PublishedSnapshotElements : IDisposable
         {
-            public ContentCache ContentCache;
+            public ContentCacheAdapter ContentCache;
             public MediaCache MediaCache;
             public MemberCache MemberCache;
             public DomainCache DomainCache;

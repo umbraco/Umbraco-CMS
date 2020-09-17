@@ -5,6 +5,7 @@ using System.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
@@ -180,6 +181,11 @@ namespace Umbraco.Tests.PublishedContent
 
             // create a variation accessor
             _variationAccesor = new TestVariationContextAccessor();
+
+            var snapshotAccessor = new PublishedSnapshotAccessor();
+            var snapshotGetStrategy = new SnapshotGetStrategy(snapshotAccessor, _variationAccesor);
+            var contentRouter = new ContentCacheContentRouter(snapshotGetStrategy, globalSettings,
+                new FastDictionaryAppCache(), new FastDictionaryAppCache(), new DomainCache(null,null), false);
 
             // at last, create the complete NuCache snapshot service!
             var options = new PublishedSnapshotServiceOptions { IgnoreLocalDb = true };
