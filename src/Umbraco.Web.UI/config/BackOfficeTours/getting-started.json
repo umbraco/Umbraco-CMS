@@ -14,6 +14,10 @@
                 "content": "<p>Thank you for using Umbraco! Would you like to stay up-to-date with Umbraco product updates, security advisories, community news and special offers? Sign up for our newsletter and never miss out on the latest Umbraco news.</p> <p class='notice'>By signing up, you agree that we can use your info according to our <a href='https://umbraco.com/about-us/privacy/'>privacy policy</a>.</p>",
                 "view": "emails",
                 "type": "promotion"
+            },
+            {
+                "title": "Thank you for subscribing to our mailing list",
+                "view": "confirm"
             }
         ]
     },
@@ -184,27 +188,21 @@
                 "event": "click"
             },
             {
-                "element": "[data-element~='editor-data-type-picker']",
+                "element": "[ng-controller*='Umbraco.Editors.DataTypePickerController'] [data-element='editor-data-type-picker']",
                 "elementPreventClick": true,
                 "title": "Editor picker",
-                "content": "<p>In the editor picker dialog we can pick one of the many built-in editors.</p><p><em>You can choose from preconfigured data types (Reuse) or create a new configuration (Available editors)</em>.</p>"
+                "content": "<p>In the editor picker dialog we can pick one of the many built-in editors.</p>"
             },
             {
-                "element": "[data-element~='editor-data-type-picker'] [data-element='editor-Textarea']",
+                "element": "[data-element~='editor-data-type-picker'] [data-element='datatype-Textarea']",
                 "title": "Select editor",
                 "content": "Select the <b>Textarea</b> editor. This will add a textarea to the Welcome Text property.",
                 "event": "click"
             },
             {
-                "element": "[data-element~='editor-data-type-settings']",
-                "elementPreventClick": true,
+                "element": "[data-element='editor-data-type-picker'] [data-element='datatypeconfig-Textarea']",
                 "title": "Editor settings",
-                "content": "Each property editor can have individual settings. For the textarea editor you can set a character limit but in this case it is not needed."
-            },
-            {
-                "element": "[data-element~='editor-data-type-settings'] [data-element='button-submit']",
-                "title": "Save editor",
-                "content": "Click <b>Submit</b> to save the changes.",
+                "content": "Each property editor can have individual settings. For the textarea editor you can set a character limit but in this case it is not needed.",
                 "event": "click"
             },
             {
@@ -313,7 +311,8 @@
                 "content": "<p>To see all our templates click the <b>small triangle</b> to the left of the templates node.</p>",
                 "event": "click",
                 "eventElement": "#tree [data-element='tree-item-templates'] [data-element='tree-item-expand']",
-                "view": "templatetree"
+                "view": "templatetree",
+                "skipStepIfVisible": "#tree [data-element='tree-item-templates'] > div > button[data-element=tree-item-expand].icon-navigation-down"
             },
             {
                 "element": "#tree [data-element='tree-item-templates'] [data-element='tree-item-Home Page']",

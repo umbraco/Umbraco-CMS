@@ -1,15 +1,19 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.ModelBinding;
+using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Web.PropertyEditors.Validation;
 
 namespace Umbraco.Web.Editors.Filters
 {
@@ -125,18 +129,6 @@ namespace Umbraco.Web.Editors.Filters
         {
             var properties = modelWithProperties.Properties.ToDictionary(x => x.Alias, x => x);
 
-            // Retrieve default messages used for required and regex validatation.  We'll replace these
-            // if set with custom ones if they've been provided for a given property.
-            var requiredDefaultMessages = new[]
-                {
-                    _textService.Localize("validation", "invalidNull"),
-                    _textService.Localize("validation", "invalidEmpty")
-                };
-            var formatDefaultMessages = new[]
-                {
-                    _textService.Localize("validation", "invalidPattern"),
-                };
-
             foreach (var p in dto.Properties)
             {
                 var editor = p.PropertyEditor;
@@ -156,7 +148,7 @@ namespace Umbraco.Web.Editors.Filters
 
                 var postedValue = postedProp.Value;
 
-                ValidatePropertyValue(model, modelWithProperties, editor, p, postedValue, modelState, requiredDefaultMessages, formatDefaultMessages);
+                ValidatePropertyValue(model, modelWithProperties, editor, p, postedValue, modelState);
     
             }
 
@@ -180,26 +172,29 @@ namespace Umbraco.Web.Editors.Filters
             IDataEditor editor,
             ContentPropertyDto property,
             object postedValue,
-            ModelStateDictionary modelState,
-            string[] requiredDefaultMessages,
-            string[] formatDefaultMessages)
+            ModelStateDictionary modelState)
         {
-            var valueEditor = editor.GetValueEditor(property.DataType.Configuration);
-            foreach (var r in valueEditor.Validate(postedValue, property.IsRequired, property.ValidationRegExp))
+            if (property is null) throw new ArgumentNullException(nameof(property));
+            if (property.DataType is null) throw new InvalidOperationException($"{nameof(property)}.{nameof(property.DataType)} cannot be null");
+
+            foreach (var validationResult in PropertyValidationService.ValidatePropertyValue(
+                _textService,  editor, property.DataType, postedValue, property.IsRequired,
+                property.ValidationRegExp, property.IsRequiredMessage, property.ValidationRegExpMessage))
             {
-                // If we've got custom error messages, we'll replace the default ones that will have been applied in the call to Validate().
-                if (property.IsRequired && !string.IsNullOrWhiteSpace(property.IsRequiredMessage) && requiredDefaultMessages.Contains(r.ErrorMessage, StringComparer.OrdinalIgnoreCase))
-                {
-                    r.ErrorMessage = property.IsRequiredMessage;
-                }
-
-                if (!string.IsNullOrWhiteSpace(property.ValidationRegExp) && !string.IsNullOrWhiteSpace(property.ValidationRegExpMessage) && formatDefaultMessages.Contains(r.ErrorMessage, StringComparer.OrdinalIgnoreCase))
-                {
-                    r.ErrorMessage = property.ValidationRegExpMessage;
-                }
-
-                modelState.AddPropertyError(r, property.Alias, property.Culture);
+                AddPropertyError(model, modelWithProperties, editor, property, validationResult, modelState);
             }
         }
+
+        protected virtual void AddPropertyError(
+            TModelSave model,
+            TModelWithProperties modelWithProperties,
+            IDataEditor editor,
+            ContentPropertyDto property,
+            ValidationResult validationResult,
+            ModelStateDictionary modelState)
+        {
+            modelState.AddPropertyError(validationResult, property.Alias, property.Culture, property.Segment);
+        }
+
     }
 }

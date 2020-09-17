@@ -103,21 +103,21 @@
         </umb-editor-sub-header>
 
         <!-- Filters -->
-        <div style="margin-bottom: 20px;" class="flex items-center">
+        <div class="flex items-center mb3">
 
             <div style="font-size: 16px;">
                 <span class="bold"><localize key="sections_users">Users</localize></span> <span ng-if="vm.usersOptions.totalItems">({{vm.usersOptions.totalItems}})</span>
             </div>
 
-            <div class="flex" style="margin-left: auto;">
+            <div class="flex ml-auto">
 
                 <!-- State filter -->
-                <div style="position: relative;" ng-if="vm.userStatesFilter.length > 0">
-                    <a class="btn btn-link dropdown-toggle flex" href="" ng-click="vm.toggleFilter('state')">
+                <div class="umb-filter" ng-if="vm.userStatesFilter.length > 0">
+                    <button type="button" class="btn btn-link dropdown-toggle umb-filter__toggle" ng-click="vm.toggleFilter('state')">
                         <span><localize key="general_status">Status</localize>:</span>
-                        <span class="bold truncate dib" style="margin-left: 5px; margin-right: 3px; max-width: 150px;">{{ vm.getFilterName(vm.userStatesFilter) }}</span>
-                        <span class="caret"></span>
-                    </a>
+                        <span class="bold truncate dib umb-filter__label">{{ vm.getFilterName(vm.userStatesFilter) }}</span>
+                        <span class="caret" aria-hidden="true"></span>
+                    </button>
                     <umb-dropdown class="pull-right" ng-if="vm.page.showStatusFilter" on-close="vm.page.showStatusFilter = false;">
                         <umb-dropdown-item ng-repeat="userState in vm.userStatesFilter | filter:{ key: '!All'}" ng-show="userState.count > 0" style="padding: 8px 20px 8px 16px;">
                             <umb-checkbox model="userState.selected"
@@ -129,12 +129,12 @@
                 </div>
 
                 <!-- Groups filter -->
-                <div style="position: relative;">
-                    <a class="btn btn-link dropdown-toggle flex" href="" ng-click="vm.toggleFilter('group')">
-                        <span><localize key="general_groups"></localize>:</span>
-                        <span class="bold truncate dib" style="margin-left: 5px; margin-right: 3px; max-width: 150px;">{{ vm.getFilterName(vm.userGroups) }}</span>
-                        <span class="caret"></span>
-                    </a>
+                <div class="umb-filter">
+                    <button type="button" class="btn btn-link dropdown-toggle umb-filter__toggle" ng-click="vm.toggleFilter('group')">
+                        <span><localize key="general_groups">Groups</localize>:</span>
+                        <span class="bold truncate dib umb-filter__label">{{ vm.getFilterName(vm.userGroups) }}</span>
+                        <span class="caret" aria-hidden="true"></span>
+                    </button>
                     <umb-dropdown class="pull-right" ng-if="vm.page.showGroupFilter" on-close="vm.page.showGroupFilter = false;">
                         <umb-dropdown-item ng-repeat="userGroup in vm.userGroups" style="padding: 8px 20px 8px 16px;">
                             <umb-checkbox model="userGroup.selected"
@@ -146,15 +146,15 @@
                 </div>
 
                 <!-- Order By -->
-                <div style="position: relative;">
-                    <a class="btn btn-link dropdown-toggle flex" href="" ng-click="vm.toggleFilter('orderBy')">
+                <div class="umb-filter">
+                    <button type="button" class="btn btn-link dropdown-toggle umb-filter__toggle" ng-click="vm.toggleFilter('orderBy')">
                         <span><localize key="general_orderBy">Order by</localize>:</span>
-                        <span class="bold" style="margin-left: 2px;">{{ vm.getSortLabel(vm.usersOptions.orderBy, vm.usersOptions.orderDirection) }} </span>
-                        <span class="caret"></span>
-                    </a>
+                        <span class="bold truncate dib umb-filter__label">{{ vm.getSortLabel(vm.usersOptions.orderBy, vm.usersOptions.orderDirection) }} </span>
+                        <span class="caret" aria-hidden="true"></span>
+                    </button>
                     <umb-dropdown class="pull-right" ng-if="vm.page.showOrderByFilter" on-close="vm.page.showOrderByFilter = false;" umb-keyboard-list>
                         <umb-dropdown-item ng-repeat="sortData in vm.userSortData">
-                            <a href="#" ng-click="vm.setOrderByFilter(sortData.key, sortData.direction)" prevent-default>{{sortData.label}}</a>
+                            <button type="button" ng-click="vm.setOrderByFilter(sortData.key, sortData.direction)">{{sortData.label}}</button>
                         </umb-dropdown-item>
                     </umb-dropdown>
                 </div>
@@ -211,9 +211,9 @@
                 <div class="umb-table-head">
                     <div class="umb-table-row">
                         <div class="umb-table-cell umb-user-table-col-avatar not-fixed" style="width: 70px; padding:10px 15px;">
-                            <a href="" style="text-decoration: none;" ng-click="vm.selectAll()">
+                            <button type="button" class="btn-reset umb-checkmark__action" style="outline: none;" ng-click="vm.selectAll()">
                                 <umb-checkmark checked="vm.areAllSelected()" size="xs"></umb-checkmark>
-                            </a>
+                            </button>
                         </div>
                         <div class="umb-table-cell umb-table__name"><localize key="general_name">Name</localize></div>
                         <div class="umb-table-cell"><localize key="user_usergroup">User group</localize></div>
@@ -347,9 +347,9 @@
                                 on-remove="vm.removeSelectedUserGroup($index, vm.newUser.userGroups)">
                             </umb-user-group-preview>
 
-                            <a href="" style="max-width: 100%;" class="umb-node-preview-add" ng-click="vm.openUserGroupPicker($event)" prevent-default>
+                            <button type="button" style="max-width: 100%;" class="btn-reset umb-node-preview-add" ng-click="vm.openUserGroupPicker($event)">
                                 <localize key="general_add">Add</localize>
-                            </a>
+                            </button>
 
                             <input type="hidden" ng-model="vm.newUser.userGroupsValidation" ng-required="!vm.newUser.userGroups.length" />
 
