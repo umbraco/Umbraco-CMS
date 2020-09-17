@@ -57,5 +57,7 @@ namespace Umbraco.Web.PublishedCache
         /// otherwise the snapshot keeps previewing according to whatever settings it is using already.</para>
         /// <para>Stops forcing preview when disposed.</para></remarks>
         IDisposable ForcedPreview(bool preview, Action<bool> callback = null);
+
+        bool DefaultPreview { get; }
     }
 }

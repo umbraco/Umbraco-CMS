@@ -64,6 +64,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public IDomainCache Domains => Elements.DomainCache;
 
+        public bool DefaultPreview  => _defaultPreview;
+
         public IDisposable ForcedPreview(bool preview, Action<bool> callback = null)
         {
             return new ForcedPreviewObject(this, preview, callback);

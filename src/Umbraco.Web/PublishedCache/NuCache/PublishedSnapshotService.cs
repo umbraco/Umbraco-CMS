@@ -48,8 +48,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly IPublishedModelFactory _publishedModelFactory;
         private readonly IDefaultCultureAccessor _defaultCultureAccessor;
         private readonly IContentRouter _contentRouter;
-        private readonly SnapshotGetStrategy _snapshotByIdStrategy;
-        private readonly IContentSnapshotAccessor _snapshotAcessor;
         private readonly UrlSegmentProviderCollection _urlSegmentProviders;
 
         // volatile because we read it with no lock
@@ -85,7 +83,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             IDataSource dataSource, IGlobalSettings globalSettings,
             IEntityXmlSerializer entitySerializer,
             IPublishedModelFactory publishedModelFactory,
-            UrlSegmentProviderCollection urlSegmentProviders, IContentRouter contentRouter, SnapshotGetStrategy snapshotByIdStrategy, IContentSnapshotAccessor snapshotAcessor)
+            UrlSegmentProviderCollection urlSegmentProviders, IContentRouter contentRouter)
             : base(publishedSnapshotAccessor, variationContextAccessor)
         {
             //if (Interlocked.Increment(ref _singletonCheck) > 1)
@@ -103,8 +101,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _globalSettings = globalSettings;
             _urlSegmentProviders = urlSegmentProviders;
             _contentRouter = contentRouter;
-            _snapshotByIdStrategy = snapshotByIdStrategy;
-            _snapshotAcessor = snapshotAcessor;
 
             // we need an Xml serializer here so that the member cache can support XPath,
             // for members this is done by navigating the serialized-to-xml member
@@ -1224,7 +1220,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             return new PublishedSnapshot.PublishedSnapshotElements
             {
-                ContentCache = new ContentCacheAdapter(new ContentCache(previewDefault, contentSnap, _snapshotByIdStrategy, _snapshotAcessor),_contentRouter),
+                ContentCache = new ContentCacheAdapter(new ContentCache(previewDefault, contentSnap, VariationContextAccessor),_contentRouter),
                 MediaCache = new MediaCache(previewDefault, mediaSnap, VariationContextAccessor),
                 MemberCache = new MemberCache(previewDefault, snapshotCache, _serviceContext.MemberService, memberTypeCache, PublishedSnapshotAccessor, VariationContextAccessor, _entitySerializer),
                 DomainCache = domainCache,

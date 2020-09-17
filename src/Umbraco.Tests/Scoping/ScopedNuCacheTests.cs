@@ -81,6 +81,8 @@ namespace Umbraco.Tests.Scoping
             var documentRepository = Mock.Of<IDocumentRepository>();
             var mediaRepository = Mock.Of<IMediaRepository>();
             var memberRepository = Mock.Of<IMemberRepository>();
+            var contentRouter = new ContentCacheContentRouter(publishedSnapshotAccessor, Factory.GetInstance<IGlobalSettings>(),
+                new FastDictionaryAppCache(), new FastDictionaryAppCache());
 
             return new PublishedSnapshotService(
                 options,
@@ -99,7 +101,7 @@ namespace Umbraco.Tests.Scoping
                 Factory.GetInstance<IGlobalSettings>(),
                 Factory.GetInstance<IEntityXmlSerializer>(),
                 Mock.Of<IPublishedModelFactory>(),
-                new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() }));
+                new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() }), contentRouter);
         }
 
         protected UmbracoContext GetUmbracoContextNu(string url, int templateId = 1234, RouteData routeData = null, bool setSingleton = false, IUmbracoSettingsSection umbracoSettings = null, IEnumerable<IUrlProvider> urlProviders = null)

@@ -233,15 +233,6 @@ namespace Umbraco.Web.Runtime
             // register content router
             composition.RegisterUnique<IContentRouter, ContentCacheContentRouter>();
 
-            // register snapshot accessor
-            composition.RegisterUnique<IContentSnapshotAccessor, PublishedSnapshotAccessor>();
-            composition.RegisterUnique<IDomainSnapshotAccessor, PublishedSnapshotAccessor>();
-
-            // register snapshot strategy
-            composition.RegisterUnique<SnapshotGetStrategy, SnapshotGetStrategy>();
-
-            
-
             // register preview SignalR hub
             composition.RegisterUnique(_ => GlobalHost.ConnectionManager.GetHubContext<PreviewHub>());
 

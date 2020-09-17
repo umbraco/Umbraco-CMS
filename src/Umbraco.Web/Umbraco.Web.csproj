@@ -269,11 +269,8 @@
     <Compile Include="PublishedCache\ContentCacheContentRouter.cs" />
     <Compile Include="PublishedCache\IContentRouter.cs" />
     <Compile Include="PublishedCache\ContentRoutingResult.cs" />
-    <Compile Include="PublishedCache\NuCache\IContentSnapshotAccessor.cs" />
-    <Compile Include="PublishedCache\NuCache\IDomainSnapshotAccessor.cs" />
-    <Compile Include="PublishedCache\NuCache\PublishedSnapshotAccessor.cs" />
+    <Compile Include="PublishedCache\IPublishedSnapshotAccessor.cs" />
     <Compile Include="PublishedCache\NuCache\PublishedSnapshotServiceOptions.cs" />
-    <Compile Include="PublishedCache\NuCache\SnapshotGetStrategy.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\GenObj.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\GenRef.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\LinkedNode.cs" />
@@ -595,7 +592,6 @@
     <Compile Include="PropertyEditors\ValueConverters\ContentPickerValueConverter.cs" />
     <Compile Include="PublishedCache\PublishedSnapshotServiceBase.cs" />
     <Compile Include="PublishedCache\IDomainCache.cs" />
-    <Compile Include="PublishedCache\IPublishedSnapshotAccessor.cs" />
     <Compile Include="PublishedCache\IPublishedSnapshotService.cs" />
     <Compile Include="PublishedCache\IPublishedMemberCache.cs" />
     <Compile Include="PublishedCache\NuCache\CacheKeys.cs" />

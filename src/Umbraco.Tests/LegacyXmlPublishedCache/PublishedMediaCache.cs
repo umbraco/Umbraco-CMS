@@ -714,5 +714,8 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             var ignored = keys.Any(x => d.TryGetValue(x, out value));
             return value ?? "";
         }
+        public override void Dispose()
+        {
+        }
     }
 }

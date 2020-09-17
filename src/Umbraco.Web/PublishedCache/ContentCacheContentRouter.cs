@@ -13,27 +13,23 @@ namespace Umbraco.Web.PublishedCache
 {
     internal class ContentCacheContentRouter : IContentRouter
     {
-        private readonly SnapshotGetStrategy _navigableData;
+        private readonly IPublishedSnapshotAccessor _snapshot;
         private readonly IGlobalSettings _globalSettings;
         private readonly IAppCache _snapshotCache;
         private readonly IAppCache _elementsCache;
-        private readonly IDomainCache _domainCache;
-        private readonly bool _previewDefault;
 
-        public ContentCacheContentRouter(SnapshotGetStrategy snapshotByIdStrategy, IGlobalSettings globalSettings, IAppCache snapshotCache,
-            IAppCache elementsCache, IDomainCache domainCache, bool previewDefault)
+        public ContentCacheContentRouter(IPublishedSnapshotAccessor snapshot, IGlobalSettings globalSettings,
+            IAppCache snapshotCache, IAppCache elementsCache)
         {
-            _navigableData = snapshotByIdStrategy;
+            _snapshot = snapshot;
             _globalSettings = globalSettings;
             _snapshotCache = snapshotCache;
             _elementsCache = elementsCache;
-            _domainCache = domainCache;
-            _previewDefault = previewDefault;
         }
 
         public ContentRoutingResult GetIdByRoute(string route, bool? hideTopLevelNode = null, string culture = null)
         {
-            return GetIdByRoute(_previewDefault, route, hideTopLevelNode, culture);
+            return GetIdByRoute(_snapshot.PublishedSnapshot.DefaultPreview, route, hideTopLevelNode, culture);
         }
 
         public ContentRoutingResult GetIdByRoute(bool preview, string route, bool? hideTopLevelNode = null, string culture = null)
@@ -65,14 +61,14 @@ namespace Umbraco.Web.PublishedCache
                 // and follow the path
                 // note: if domain has a path (eg example.com/en) which is not recommended anymore
                 //  then /en part of the domain is basically ignored here...
-                content = _navigableData.GetById(preview, startNodeId);
+                content = _snapshot.PublishedSnapshot.Content.GetById(preview, startNodeId);
                 content = FollowRoute(content, parts, 0, culture);
             }
             else if (parts.Length == 0)
             {
                 // if not in a domain, and path is empty - what is the default page?
                 // let's say it is the first one in the tree, if any -- order by sortOrder
-                content = _navigableData.GetAtRoot(preview).FirstOrDefault();
+                content = _snapshot.PublishedSnapshot.Content.GetAtRoot(preview).FirstOrDefault();
             }
             else
             {
@@ -80,8 +76,8 @@ namespace Umbraco.Web.PublishedCache
                 // hideTopLevelNode = support legacy stuff, look for /*/path/to/node
                 // else normal, look for /path/to/node
                 content = hideTopLevelNode.Value
-                    ? _navigableData.GetAtRoot(preview).SelectMany(x => x.Children(culture)).FirstOrDefault(x => x.UrlSegment(culture) == parts[0])
-                    : _navigableData.GetAtRoot(preview).FirstOrDefault(x => x.UrlSegment(culture) == parts[0]);
+                    ? _snapshot.PublishedSnapshot.Content.GetAtRoot(preview).SelectMany(x => x.Children(culture)).FirstOrDefault(x => x.UrlSegment(culture) == parts[0])
+                    : _snapshot.PublishedSnapshot.Content.GetAtRoot(preview).FirstOrDefault(x => x.UrlSegment(culture) == parts[0]);
                 content = FollowRoute(content, parts, 1, culture);
             }
 
@@ -90,7 +86,7 @@ namespace Umbraco.Web.PublishedCache
             // have to look for /foo (see note in ApplyHideTopLevelNodeFromPath).
             if (content == null && hideTopLevelNode.Value && parts.Length == 1)
             {
-                content = _navigableData.GetAtRoot(preview).FirstOrDefault(x => x.UrlSegment(culture) == parts[0]);
+                content = _snapshot.PublishedSnapshot.Content.GetAtRoot(preview).FirstOrDefault(x => x.UrlSegment(culture) == parts[0]);
             }
             ContentRoutingResult result = new ContentRoutingResult
             {
@@ -117,7 +113,7 @@ namespace Umbraco.Web.PublishedCache
 
         public string GetRouteById(int contentId, string culture = null)
         {
-            return GetRouteById(_previewDefault, contentId, culture);
+            return GetRouteById(_snapshot.PublishedSnapshot.DefaultPreview, contentId, culture);
         }
 
         public string GetRouteById(bool preview, int contentId, string culture = null)
@@ -129,7 +125,7 @@ namespace Umbraco.Web.PublishedCache
 
         private string GetRouteByIdInternal(bool preview, int contentId, bool? hideTopLevelNode, string culture)
         {
-            var node = _navigableData.GetById(preview, contentId);
+            var node = _snapshot.PublishedSnapshot.Content.GetById(preview, contentId);
             if (node == null)
                 return null;
 
@@ -140,7 +136,7 @@ namespace Umbraco.Web.PublishedCache
             var pathParts = new List<string>();
             var n = node;
             var urlSegment = n.UrlSegment(culture);
-            var hasDomains = _domainCache.HasAssigned(n.Id);
+            var hasDomains = _snapshot.PublishedSnapshot.Domains.HasAssigned(n.Id);
             while (hasDomains == false && n != null) // n is null at root
             {
                 // no segment indicates this is not published when this is a variant
@@ -153,7 +149,7 @@ namespace Umbraco.Web.PublishedCache
                 if (n != null)
                     urlSegment = n.UrlSegment(culture);
 
-                hasDomains = n != null && _domainCache.HasAssigned(n.Id);
+                hasDomains = n != null && _snapshot.PublishedSnapshot.Domains.HasAssigned(n.Id);
             }
 
             // at this point this will be the urlSegment of the root, no segment indicates this is not published when this is a variant
@@ -185,7 +181,7 @@ namespace Umbraco.Web.PublishedCache
             // that's the way it works pre-4.10 and we try to be backward compat for the time being
             if (content.Parent == null)
             {
-                var rootNode = _navigableData.GetById(preview, GetIdByRoute(preview, "/", true).Id);
+                var rootNode = _snapshot.PublishedSnapshot.Content.GetById(preview, GetIdByRoute(preview, "/", true).Id);
                 if (rootNode == null)
                     throw new Exception("Failed to get node at /.");
                 if (rootNode.Id == content.Id) // remove only if we're the default node
