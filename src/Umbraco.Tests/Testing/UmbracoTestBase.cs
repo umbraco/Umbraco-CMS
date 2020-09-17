@@ -10,6 +10,7 @@ using System.Web.Security;
 using System.Xml.Linq;
 using Examine;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
 using Serilog;
@@ -172,8 +173,9 @@ namespace Umbraco.Tests.Testing
 
             // FIXME: align to runtimes & components - don't redo everything here !!!! Yes this is getting painful
 
-            var (logger, msLogger, profiler) = GetLoggers(Options.Logger);
+            var (logger, profiler) = GetLoggers(Options.Logger);
             var loggerFactoy = GetLoggerFactory(Options.Logger);
+            var msLogger = loggerFactoy.CreateLogger("msLogger");
             var proflogger = new ProfilingLogger(loggerFactoy.CreateLogger("ProfilingLogger"), profiler);
             IOHelper = TestHelper.IOHelper;
 
@@ -266,8 +268,7 @@ namespace Umbraco.Tests.Testing
             switch (option)
             {
                 case UmbracoTestOptions.Logger.Mock:
-                    // TODO: Make factory return mock of ILogger
-                    factory = Mock.Of<ILoggerFactory>();
+                    factory = NullLoggerFactory.Instance;
                     break;
                 case UmbracoTestOptions.Logger.Serilog:
                     factory = LoggerFactory.Create(builder => { builder.AddSerilog(); });
@@ -282,35 +283,31 @@ namespace Umbraco.Tests.Testing
             return factory;
         }
 
-        protected virtual (ILogger, Microsoft.Extensions.Logging.ILogger, IProfiler) GetLoggers(UmbracoTestOptions.Logger option)
+        protected virtual (ILogger, IProfiler) GetLoggers(UmbracoTestOptions.Logger option)
         {
             // TODO: Fix this, give the microsoft loggers a name
             ILogger logger;
-            Microsoft.Extensions.Logging.ILogger msLogger;
             IProfiler profiler;
 
             switch (option)
             {
                 case UmbracoTestOptions.Logger.Mock:
                     logger = Mock.Of<ILogger>();
-                    msLogger = Mock.Of<Microsoft.Extensions.Logging.ILogger>();
                     profiler = Mock.Of<IProfiler>();
                     break;
                 case UmbracoTestOptions.Logger.Serilog:
                     logger = new SerilogLogger<object>(new FileInfo(TestHelper.MapPathForTestFiles("~/unit-test.config")));
-                    msLogger = LoggerFactory.Create(builder => builder.AddSerilog()).CreateLogger("");
                     profiler = new LogProfiler(logger);
                     break;
                 case UmbracoTestOptions.Logger.Console:
                     logger = new ConsoleLogger<object>(new MessageTemplates());
-                    msLogger = LoggerFactory.Create(builder => builder.AddConsole()).CreateLogger("");
                     profiler = new LogProfiler(logger);
                     break;
                 default:
                     throw new NotSupportedException($"Logger option {option} is not supported.");
             }
 
-            return (logger, msLogger, profiler);
+            return (logger, profiler);
         }
 
         protected virtual AppCaches GetAppCaches()
@@ -432,7 +429,7 @@ namespace Umbraco.Tests.Testing
                 Assembly.Load("Umbraco.Core"),
                 Assembly.Load("Umbraco.Web"),
                 Assembly.Load("Umbraco.Tests"),
-                Assembly.Load("Umbraco.Infrastructure")
+                Assembly.Load("Umbraco.Infrastructure"),
             });
         }
 

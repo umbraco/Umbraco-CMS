@@ -18,8 +18,8 @@
       <PackageReference Include="MailKit" Version="2.6.0" />
       <PackageReference Include="Markdown" Version="2.2.1" />
       <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-      <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.2" />
-      <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="3.1.2" />
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.8" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="3.1.8" />
       <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.2" />
       <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="3.1.2" />
       <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" />

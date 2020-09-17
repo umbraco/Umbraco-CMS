@@ -2,11 +2,11 @@
 using System.Diagnostics;
 using System.Data.Common;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NPoco;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -20,14 +20,14 @@ namespace Umbraco.Tests.Migrations
     [TestFixture]
     public class AlterMigrationTests
     {
-        private ILogger _logger;
+        private ILogger<MigrationContext> _logger;
         private ISqlSyntaxProvider _sqlSyntax;
         private IUmbracoDatabase _database;
 
         [SetUp]
         public void Setup()
         {
-            _logger = Mock.Of<ILogger>();
+            _logger = Mock.Of<ILogger<MigrationContext>>();
             _sqlSyntax = new SqlCeSyntaxProvider();
 
             var dbProviderFactory = DbProviderFactories.GetFactory(Constants.DbProviderNames.SqlServer);
