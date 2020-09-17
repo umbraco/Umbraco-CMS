@@ -174,6 +174,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         public IEnumerable<IUmbracoEntity> GetPagedParentEntitiesByChildId(int childId, long pageIndex, int pageSize, out long totalRecords, params Guid[] entityTypes)
         {
+            return GetPagedParentEntitiesByChildId(childId, pageIndex, pageSize, out totalRecords, new int[0], entityTypes);
+        }
+
+        public IEnumerable<IUmbracoEntity> GetPagedParentEntitiesByChildId(int childId, long pageIndex, int pageSize, out long totalRecords,
+            int[] relationTypes, params Guid[] entityTypes)
+        {
             // var contentObjectTypes = new[] { Constants.ObjectTypes.Document, Constants.ObjectTypes.Media, Constants.ObjectTypes.Member }
             // we could pass in the contentObjectTypes so that the entity repository sql is configured to do full entity lookups so that we get the full data
             // required to populate content, media or members, else we get the bare minimum data needed to populate an entity. BUT if we do this it
@@ -190,6 +196,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         }
 
         public IEnumerable<IUmbracoEntity> GetPagedChildEntitiesByParentId(int parentId, long pageIndex, int pageSize, out long totalRecords, params Guid[] entityTypes)
+        {
+            return GetPagedChildEntitiesByParentId(parentId, pageIndex, pageSize, out totalRecords, new int[0], entityTypes);
+        }
+
+        public IEnumerable<IUmbracoEntity> GetPagedChildEntitiesByParentId(int parentId, long pageIndex, int pageSize, out long totalRecords,
+            int[] relationTypes, params Guid[] entityTypes)
         {
             // var contentObjectTypes = new[] { Constants.ObjectTypes.Document, Constants.ObjectTypes.Media, Constants.ObjectTypes.Member }
             // we could pass in the contentObjectTypes so that the entity repository sql is configured to do full entity lookups so that we get the full data
