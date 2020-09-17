@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Dtos;
@@ -15,7 +15,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 {
     internal class PublicAccessRepository : NPocoRepositoryBase<Guid, PublicAccessEntry>, IPublicAccessRepository
     {
-        public PublicAccessRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger)
+        public PublicAccessRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<PublicAccessRepository> logger)
             : base(scopeAccessor, cache, logger)
         { }
 
@@ -40,7 +40,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
 
             sql.OrderBy<AccessDto>(x => x.NodeId);
-            
+
             var dtos = Database.FetchOneToMany<AccessDto>(x => x.Rules, sql);
             return dtos.Select(PublicAccessEntryFactory.BuildEntity);
         }
@@ -50,7 +50,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var sqlClause = GetBaseQuery(false);
             var translator = new SqlTranslator<PublicAccessEntry>(sqlClause, query);
             var sql = translator.Translate();
-            
+
             var dtos = Database.FetchOneToMany<AccessDto>(x => x.Rules, sql);
             return dtos.Select(PublicAccessEntryFactory.BuildEntity);
         }
@@ -86,7 +86,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             entity.AddingEntity();
             foreach (var rule in entity.Rules)
                 rule.AddingEntity();
-            
+
             var dto = PublicAccessEntryFactory.BuildDto(entity);
 
             Database.Insert(dto);
@@ -116,7 +116,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 else
                     rule.AddingEntity();
             }
-            
+
             var dto = PublicAccessEntryFactory.BuildDto(entity);
 
             Database.Update(dto);

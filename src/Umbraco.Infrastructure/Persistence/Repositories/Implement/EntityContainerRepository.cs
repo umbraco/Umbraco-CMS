@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Querying;
@@ -18,7 +18,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     {
         private readonly Guid _containerObjectType;
 
-        public EntityContainerRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger, Guid containerObjectType)
+        public EntityContainerRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<EntityContainerRepository> logger, Guid containerObjectType)
             : base(scopeAccessor, cache, logger)
         {
             var allowedContainers = new[] { Constants.ObjectTypes.DocumentTypeContainer, Constants.ObjectTypes.MediaTypeContainer, Constants.ObjectTypes.DataTypeContainer };

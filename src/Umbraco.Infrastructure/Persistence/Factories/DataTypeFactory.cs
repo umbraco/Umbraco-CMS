@@ -1,5 +1,5 @@
 ﻿using System;
-using Umbraco.Core.Logging;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.PropertyEditors;
@@ -8,7 +8,7 @@ namespace Umbraco.Core.Persistence.Factories
 {
     internal static class DataTypeFactory
     {
-        public static IDataType BuildEntity(DataTypeDto dto, PropertyEditorCollection editors, ILogger logger)
+        public static IDataType BuildEntity(DataTypeDto dto, PropertyEditorCollection editors, ILogger<IDataType> logger)
         {
             // Check we have an editor for the data type.
             if (!editors.TryGet(dto.EditorAlias, out var editor))

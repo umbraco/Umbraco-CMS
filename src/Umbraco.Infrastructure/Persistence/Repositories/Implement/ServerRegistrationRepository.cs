@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Dtos;
@@ -15,7 +15,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 {
     internal class ServerRegistrationRepository : NPocoRepositoryBase<int, IServerRegistration>, IServerRegistrationRepository
     {
-        public ServerRegistrationRepository(IScopeAccessor scopeAccessor, ILogger logger)
+        public ServerRegistrationRepository(IScopeAccessor scopeAccessor, ILogger<ServerRegistrationRepository> logger)
             : base(scopeAccessor, AppCaches.NoCache, logger)
         { }
 
@@ -110,7 +110,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         protected override void PersistUpdatedItem(IServerRegistration entity)
         {
             entity.UpdatingEntity();
-            
+
             var dto = ServerRegistrationFactory.BuildDto(entity);
 
             Database.Update(dto);

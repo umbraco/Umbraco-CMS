@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Events;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.Models.Entities;
@@ -49,8 +49,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// </param>
         protected ContentRepositoryBase(
             IScopeAccessor scopeAccessor,
-            AppCaches cache
-            , ILogger logger,
+            AppCaches cache,
+            ILogger<NPocoRepositoryBase<TId, TEntity>> logger,
             ILanguageRepository languageRepository,
             IRelationRepository relationRepository,
             IRelationTypeRepository relationTypeRepository,

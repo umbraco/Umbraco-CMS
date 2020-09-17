@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Membership;
@@ -24,12 +24,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         private readonly UserGroupWithUsersRepository _userGroupWithUsersRepository;
         private readonly PermissionRepository<IContent> _permissionRepository;
 
-        public UserGroupRepository(IScopeAccessor scopeAccessor, AppCaches appCaches, ILogger logger, IShortStringHelper shortStringHelper)
+        public UserGroupRepository(IScopeAccessor scopeAccessor, AppCaches appCaches, ILogger<UserGroupRepository> logger, ILoggerFactory loggerFactory, IShortStringHelper shortStringHelper)
             : base(scopeAccessor, appCaches, logger)
         {
             _shortStringHelper = shortStringHelper;
-            _userGroupWithUsersRepository = new UserGroupWithUsersRepository(this, scopeAccessor, appCaches, logger);
-            _permissionRepository = new PermissionRepository<IContent>(scopeAccessor, appCaches, logger);
+            _userGroupWithUsersRepository = new UserGroupWithUsersRepository(this, scopeAccessor, appCaches, loggerFactory.CreateLogger<UserGroupWithUsersRepository>());
+            _permissionRepository = new PermissionRepository<IContent>(scopeAccessor, appCaches, loggerFactory.CreateLogger<PermissionRepository<IContent>>());
         }
 
 
@@ -362,7 +362,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             private readonly UserGroupRepository _userGroupRepo;
 
-            public UserGroupWithUsersRepository(UserGroupRepository userGroupRepo, IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger)
+            public UserGroupWithUsersRepository(UserGroupRepository userGroupRepo, IScopeAccessor scopeAccessor, AppCaches cache, ILogger<UserGroupWithUsersRepository> logger)
                 : base(scopeAccessor, cache, logger)
             {
                 _userGroupRepo = userGroupRepo;

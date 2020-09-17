@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Querying;
@@ -20,7 +20,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// <summary>
         /// Initializes a new instance of the <see cref="ConsentRepository"/> class.
         /// </summary>
-        public ConsentRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger)
+        public ConsentRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<ConsentRepository> logger)
             : base(scopeAccessor, cache, logger)
         { }
 

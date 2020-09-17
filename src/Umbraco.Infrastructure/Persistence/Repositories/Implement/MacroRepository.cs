@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Dtos;
@@ -18,7 +18,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     {
         private readonly IShortStringHelper _shortStringHelper;
 
-        public MacroRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger, IShortStringHelper shortStringHelper)
+        public MacroRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<MacroRepository> logger, IShortStringHelper shortStringHelper)
             : base(scopeAccessor, cache, logger)
         {
             _shortStringHelper = shortStringHelper;

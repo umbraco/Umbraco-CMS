@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Scoping;
@@ -19,14 +19,14 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     {
         private IRepositoryCachePolicy<TEntity, TId> _cachePolicy;
 
-        protected RepositoryBase(IScopeAccessor scopeAccessor, AppCaches appCaches, ILogger logger)
+        protected RepositoryBase(IScopeAccessor scopeAccessor, AppCaches appCaches, ILogger<RepositoryBase<TId, TEntity>> logger)
         {
             ScopeAccessor = scopeAccessor ?? throw new ArgumentNullException(nameof(scopeAccessor));
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
             AppCaches = appCaches ?? throw new ArgumentNullException(nameof(appCaches));
         }
 
-        protected ILogger Logger { get; }
+        protected ILogger<RepositoryBase<TId, TEntity>> Logger { get; }
 
         protected AppCaches AppCaches { get; }
 
