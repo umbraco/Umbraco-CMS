@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Web.Routing;
 using System.Xml;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -301,7 +302,7 @@ namespace Umbraco.Tests.TestHelpers
             {
                 using (var scope = ScopeProvider.CreateScope())
                 {
-                    var schemaHelper = new DatabaseSchemaCreator(scope.Database, Logger, UmbracoVersion, TestObjects.GetGlobalSettings());
+                    var schemaHelper = new DatabaseSchemaCreator(scope.Database, LoggerFactory_.CreateLogger<DatabaseSchemaCreator>(), LoggerFactory_, UmbracoVersion, TestObjects.GetGlobalSettings());
                     //Create the umbraco database and its base data
                     schemaHelper.InitializeDatabaseSchema();
 

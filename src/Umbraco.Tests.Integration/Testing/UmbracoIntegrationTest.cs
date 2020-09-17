@@ -262,7 +262,7 @@ namespace Umbraco.Tests.Integration.Testing
             OnTestTearDown(() => runtime.Terminate());
 
             // This will create a db, install the schema and ensure the app is configured to run
-            InstallTestLocalDb(args.DatabaseFactory, runtime.Logger, runtime.Configs.Global(), runtime.State, TestHelper.WorkingDirectory, out var connectionString);
+            InstallTestLocalDb(args.DatabaseFactory, runtime.RuntimeLoggerFactory, runtime.Configs.Global(), runtime.State, TestHelper.WorkingDirectory, out var connectionString);
             TestDBConnectionString = connectionString;
             InMemoryConfiguration["ConnectionStrings:" + Constants.System.UmbracoConnectionName] = TestDBConnectionString;
         }
@@ -272,13 +272,14 @@ namespace Umbraco.Tests.Integration.Testing
         /// </summary>
         /// <param name="filesPath"></param>
         /// <param name="logger"></param>
+        /// <param name="loggerFactory"></param>
         /// <param name="globalSettings"></param>
         /// <param name="dbFactory"></param>
         /// <returns></returns>
         /// <remarks>
         /// There must only be ONE instance shared between all tests in a session
         /// </remarks>
-        private static LocalDbTestDatabase GetOrCreateDatabase(string filesPath, ILogger logger, IGlobalSettings globalSettings, IUmbracoDatabaseFactory dbFactory)
+        private static LocalDbTestDatabase GetOrCreateDatabase(string filesPath, ILoggerFactory loggerFactory, IGlobalSettings globalSettings, IUmbracoDatabaseFactory dbFactory)
         {
             lock (_dbLocker)
             {
@@ -287,7 +288,7 @@ namespace Umbraco.Tests.Integration.Testing
                 var localDb = new LocalDb();
                 if (localDb.IsAvailable == false)
                     throw new InvalidOperationException("LocalDB is not available.");
-                _dbInstance = new LocalDbTestDatabase(logger, globalSettings, localDb, filesPath, dbFactory);
+                _dbInstance = new LocalDbTestDatabase(loggerFactory, globalSettings, localDb, filesPath, dbFactory);
                 return _dbInstance;
             }
         }
@@ -295,13 +296,15 @@ namespace Umbraco.Tests.Integration.Testing
         /// <summary>
         /// Creates a LocalDb instance to use for the test
         /// </summary>
-        /// <param name="serviceProvider"></param>
+        /// <param name="runtimeState"></param>
         /// <param name="workingDirectory"></param>
-        /// <param name="integrationTest"></param>
         /// <param name="connectionString"></param>
+        /// <param name="databaseFactory"></param>
+        /// <param name="loggerFactory"></param>
+        /// <param name="globalSettings"></param>
         /// <returns></returns>
         private void InstallTestLocalDb(
-            IUmbracoDatabaseFactory databaseFactory, ILogger logger, IGlobalSettings globalSettings,
+            IUmbracoDatabaseFactory databaseFactory, ILoggerFactory loggerFactory, IGlobalSettings globalSettings,
             IRuntimeState runtimeState, string workingDirectory, out string connectionString)
         {
             connectionString = null;
@@ -319,7 +322,7 @@ namespace Umbraco.Tests.Integration.Testing
             if (!Directory.Exists(dbFilePath))
                 Directory.CreateDirectory(dbFilePath);
 
-            var db = GetOrCreateDatabase(dbFilePath, logger, globalSettings, databaseFactory);
+            var db = GetOrCreateDatabase(dbFilePath, loggerFactory, globalSettings, databaseFactory);
 
             switch (testOptions.Database)
             {

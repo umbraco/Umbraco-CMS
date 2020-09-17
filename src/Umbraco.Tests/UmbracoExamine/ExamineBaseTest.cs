@@ -8,6 +8,7 @@ using Umbraco.Core.Logging.Serilog;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.Components;
 using Umbraco.Tests.TestHelpers;
+using NullLogger = Microsoft.Extensions.Logging.Abstractions.NullLogger;
 
 namespace Umbraco.Tests.UmbracoExamine
 {
@@ -17,9 +18,9 @@ namespace Umbraco.Tests.UmbracoExamine
         [OneTimeSetUp]
         public void InitializeFixture()
         {
-            
+
             var logger = new SerilogLogger<object>(new FileInfo(TestHelper.MapPathForTestFiles("~/unit-test.config")));
-            _profilingLogger = new ProfilingLogger(logger, new LogProfiler(logger));
+            _profilingLogger = new ProfilingLogger(NullLogger.Instance, new LogProfiler(logger));
         }
 
         private IProfilingLogger _profilingLogger;

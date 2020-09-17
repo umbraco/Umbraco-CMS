@@ -2,10 +2,10 @@
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Upgrade;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
@@ -26,7 +26,8 @@ namespace Umbraco.Core.Migrations.Install
         private readonly IMigrationBuilder _migrationBuilder;
         private readonly IKeyValueService _keyValueService;
         private readonly IHostingEnvironment _hostingEnvironment;
-        private readonly ILogger _logger;
+        private readonly ILogger<DatabaseBuilder> _logger;
+        private readonly ILoggerFactory _loggerFactory;
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly IDbProviderFactoryCreator _dbProviderFactoryCreator;
         private readonly IConfigManipulator _configManipulator;
@@ -41,7 +42,8 @@ namespace Umbraco.Core.Migrations.Install
             IGlobalSettings globalSettings,
             IUmbracoDatabaseFactory databaseFactory,
             IRuntimeState runtime,
-            ILogger logger,
+            ILogger<DatabaseBuilder> logger,
+            ILoggerFactory loggerFactory,
             IMigrationBuilder migrationBuilder,
             IKeyValueService keyValueService,
             IHostingEnvironment hostingEnvironment,
@@ -54,6 +56,7 @@ namespace Umbraco.Core.Migrations.Install
             _databaseFactory = databaseFactory;
             _runtime = runtime;
             _logger = logger;
+            _loggerFactory = loggerFactory;
             _migrationBuilder = migrationBuilder;
             _keyValueService = keyValueService;
             _hostingEnvironment = hostingEnvironment;
@@ -319,7 +322,7 @@ namespace Umbraco.Core.Migrations.Install
                 return _databaseSchemaValidationResult;
 
             var database = scope.Database;
-            var dbSchema = new DatabaseSchemaCreator(database, _logger, _umbracoVersion, _globalSettings);
+            var dbSchema = new DatabaseSchemaCreator(database, _loggerFactory.CreateLogger<DatabaseSchemaCreator>(), _loggerFactory, _umbracoVersion, _globalSettings);
             _databaseSchemaValidationResult = dbSchema.ValidateSchema();
             return _databaseSchemaValidationResult;
         }
@@ -367,7 +370,7 @@ namespace Umbraco.Core.Migrations.Install
                     if (_runtime.Level == RuntimeLevel.Run)
                         throw new Exception("Umbraco is already configured!");
 
-                    var creator = new DatabaseSchemaCreator(database, _logger, _umbracoVersion, _globalSettings);
+                    var creator = new DatabaseSchemaCreator(database, _loggerFactory.CreateLogger<DatabaseSchemaCreator>(), _loggerFactory, _umbracoVersion, _globalSettings);
                     creator.InitializeDatabaseSchema();
 
                     message = message + "<p>Installation completed!</p>";

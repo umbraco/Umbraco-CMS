@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Dtos;
@@ -18,14 +18,16 @@ namespace Umbraco.Core.Migrations.Install
     public class DatabaseSchemaCreator
     {
         private readonly IUmbracoDatabase _database;
-        private readonly ILogger _logger;
+        private readonly ILogger<DatabaseSchemaCreator> _logger;
+        private readonly ILoggerFactory _loggerFactory;
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly IGlobalSettings _globalSettings;
 
-        public DatabaseSchemaCreator(IUmbracoDatabase database, ILogger logger, IUmbracoVersion umbracoVersion, IGlobalSettings globalSettings)
+        public DatabaseSchemaCreator(IUmbracoDatabase database, ILogger<DatabaseSchemaCreator> logger, ILoggerFactory loggerFactory, IUmbracoVersion umbracoVersion, IGlobalSettings globalSettings)
         {
             _database = database;
             _logger = logger;
+            _loggerFactory = loggerFactory;
             _umbracoVersion = umbracoVersion;
             _globalSettings = globalSettings;
         }
@@ -130,7 +132,7 @@ namespace Umbraco.Core.Migrations.Install
 
             if (e.Cancel == false)
             {
-                var dataCreation = new DatabaseDataCreator(_database, _logger, _umbracoVersion, _globalSettings);
+                var dataCreation = new DatabaseDataCreator(_database, _loggerFactory.CreateLogger<DatabaseDataCreator>(), _umbracoVersion, _globalSettings);
                 foreach (var table in OrderedTables)
                     CreateTable(false, table, dataCreation);
             }
@@ -400,7 +402,7 @@ namespace Umbraco.Core.Migrations.Install
             where T : new()
         {
             var tableType = typeof(T);
-            CreateTable(overwrite, tableType, new DatabaseDataCreator(_database, _logger, _umbracoVersion, _globalSettings));
+            CreateTable(overwrite, tableType, new DatabaseDataCreator(_database, _loggerFactory.CreateLogger<DatabaseDataCreator>(), _umbracoVersion, _globalSettings));
         }
 
         /// <summary>

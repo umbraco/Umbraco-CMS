@@ -4,12 +4,12 @@ using System.Data.SqlServerCe;
 using System.IO;
 using System.Threading;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NPoco;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
@@ -39,7 +39,7 @@ namespace Umbraco.Tests.Persistence
             _sqlCeSyntaxProvider = new SqlCeSyntaxProvider();
             _sqlSyntaxProviders = new[] { (ISqlSyntaxProvider) _sqlCeSyntaxProvider };
             _logger = Mock.Of<Microsoft.Extensions.Logging.ILogger<UmbracoDatabaseFactory>>();
-            _loggerFactory = Mock.Of<LoggerFactory>();
+            _loggerFactory = NullLoggerFactory.Instance;
             _umbracoVersion = TestHelper.GetUmbracoVersion();
             var globalSettings = TestHelper.GetConfigs().Global();
             var connectionStrings = TestHelper.GetConfigs().ConnectionStrings();
@@ -97,7 +97,7 @@ namespace Umbraco.Tests.Persistence
             using (var database = _databaseFactory.CreateDatabase())
             using (var transaction = database.GetTransaction())
             {
-                schemaHelper = new DatabaseSchemaCreator(database, Mock.Of<Core.Logging.ILogger>(), _umbracoVersion, SettingsForTests.GenerateMockGlobalSettings());
+                schemaHelper = new DatabaseSchemaCreator(database, _loggerFactory.CreateLogger<DatabaseSchemaCreator>(), _loggerFactory, _umbracoVersion, SettingsForTests.GenerateMockGlobalSettings());
                 schemaHelper.InitializeDatabaseSchema();
                 transaction.Complete();
             }

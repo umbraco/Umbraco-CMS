@@ -28,7 +28,6 @@ namespace Umbraco.Core.Runtime
         private IFactory _factory;
         // runtime state, this instance will get replaced again once the essential services are available to run the check
         private RuntimeState _state = RuntimeState.Booting();
-        private readonly ILoggerFactory _loggerFactory;
         private readonly IUmbracoBootPermissionChecker _umbracoBootPermissionChecker;
         private readonly IGlobalSettings _globalSettings;
         private readonly IConnectionStrings _connectionStrings;
@@ -57,7 +56,7 @@ namespace Umbraco.Core.Runtime
             BackOfficeInfo = backOfficeInfo;
             DbProviderFactoryCreator = dbProviderFactoryCreator;
 
-            _loggerFactory = loggerFactory;
+            RuntimeLoggerFactory = loggerFactory;
             _umbracoBootPermissionChecker = umbracoBootPermissionChecker;
 
             Logger = logger;
@@ -73,6 +72,8 @@ namespace Umbraco.Core.Runtime
         /// Gets the logger.
         /// </summary>
         public ILogger Logger { get; }
+
+        public ILoggerFactory RuntimeLoggerFactory { get; }
 
         protected IBackOfficeInfo BackOfficeInfo { get; }
 
@@ -170,10 +171,10 @@ namespace Umbraco.Core.Runtime
                 var databaseFactory = CreateDatabaseFactory();
 
                 // type finder/loader
-                var typeLoader = new TypeLoader(TypeFinder, AppCaches.RuntimeCache, new DirectoryInfo(HostingEnvironment.LocalTempPath), _loggerFactory.CreateLogger("TypeLoader"), ProfilingLogger);
+                var typeLoader = new TypeLoader(TypeFinder, AppCaches.RuntimeCache, new DirectoryInfo(HostingEnvironment.LocalTempPath), RuntimeLoggerFactory.CreateLogger("TypeLoader"), ProfilingLogger);
 
                 // re-create the state object with the essential services
-                _state = new RuntimeState(Configs.Global(), UmbracoVersion, databaseFactory, _loggerFactory.CreateLogger<RuntimeState>());
+                _state = new RuntimeState(Configs.Global(), UmbracoVersion, databaseFactory, RuntimeLoggerFactory.CreateLogger<RuntimeState>());
 
                 // create the composition
                 composition = new Composition(register, typeLoader, ProfilingLogger, _state, Configs, IOHelper, AppCaches);
@@ -290,7 +291,7 @@ namespace Umbraco.Core.Runtime
                 enableDisableAttributes = typeLoader.GetAssemblyAttributes(typeof(EnableComposerAttribute), typeof(DisableComposerAttribute));
             }
 
-            var composers = new Composers(composition, composerTypes, enableDisableAttributes, _loggerFactory.CreateLogger("Composers"), ProfilingLogger);
+            var composers = new Composers(composition, composerTypes, enableDisableAttributes, RuntimeLoggerFactory.CreateLogger("Composers"), ProfilingLogger);
             composers.Compose();
         }
 
@@ -384,7 +385,7 @@ namespace Umbraco.Core.Runtime
         /// </summary>
         /// <remarks>This is strictly internal, for tests only.</remarks>
         protected internal virtual IUmbracoDatabaseFactory CreateDatabaseFactory()
-            => new UmbracoDatabaseFactory(_loggerFactory.CreateLogger<UmbracoDatabaseFactory>(), _loggerFactory, _globalSettings, _connectionStrings, new Lazy<IMapperCollection>(() => _factory.GetInstance<IMapperCollection>()), DbProviderFactoryCreator);
+            => new UmbracoDatabaseFactory(RuntimeLoggerFactory.CreateLogger<UmbracoDatabaseFactory>(), RuntimeLoggerFactory, _globalSettings, _connectionStrings, new Lazy<IMapperCollection>(() => _factory.GetInstance<IMapperCollection>()), DbProviderFactoryCreator);
 
 
         #endregion
