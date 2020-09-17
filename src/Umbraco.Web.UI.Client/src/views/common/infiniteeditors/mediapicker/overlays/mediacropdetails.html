@@ -26,7 +26,7 @@
 
             <div class="umb-control-group" ng-if="model.target">
 
-                <div ng-if="vm.cropNotSet()">
+                <div ng-if="vm.cropSet() === false">
                     <h5>
                         <localize key="general_preview">Preview</localize>
                     </h5>
