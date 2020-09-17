@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Semver;
@@ -10,7 +11,6 @@ using Umbraco.Core.Migrations.Upgrade;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
-using ILogger = Umbraco.Core.Logging.ILogger;
 
 namespace Umbraco.Tests.Migrations
 {
@@ -46,7 +46,7 @@ namespace Umbraco.Tests.Migrations
                 throw new NotImplementedException();
             }
 
-            
+
 
             public IScopeContext Context { get; set; }
             public ISqlContext SqlContext { get; set;  }
@@ -63,7 +63,7 @@ namespace Umbraco.Tests.Migrations
         [Test]
         public void RunGoodMigration()
         {
-            var migrationContext = new MigrationContext(Mock.Of<IUmbracoDatabase>(), Mock.Of<ILogger>());
+            var migrationContext = new MigrationContext(Mock.Of<IUmbracoDatabase>(), Mock.Of<ILogger<MigrationContext>>());
             IMigration migration = new GoodMigration(migrationContext);
             migration.Migrate();
         }
@@ -71,7 +71,7 @@ namespace Umbraco.Tests.Migrations
         [Test]
         public void DetectBadMigration1()
         {
-            var migrationContext = new MigrationContext(Mock.Of<IUmbracoDatabase>(), Mock.Of<ILogger>());
+            var migrationContext = new MigrationContext(Mock.Of<IUmbracoDatabase>(), Mock.Of<ILogger<MigrationContext>>());
             IMigration migration = new BadMigration1(migrationContext);
             Assert.Throws<IncompleteMigrationExpressionException>(() => migration.Migrate());
         }
@@ -79,7 +79,7 @@ namespace Umbraco.Tests.Migrations
         [Test]
         public void DetectBadMigration2()
         {
-            var migrationContext = new MigrationContext(Mock.Of<IUmbracoDatabase>(), Mock.Of<ILogger>());
+            var migrationContext = new MigrationContext(Mock.Of<IUmbracoDatabase>(), Mock.Of<ILogger<MigrationContext>>());
             IMigration migration = new BadMigration2(migrationContext);
             Assert.Throws<IncompleteMigrationExpressionException>(() => migration.Migrate());
         }

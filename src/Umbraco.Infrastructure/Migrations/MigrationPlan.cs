@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core.Logging;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Scoping;
 using Type = System.Type;
 
@@ -285,9 +285,10 @@ namespace Umbraco.Core.Migrations
         /// <param name="fromState">The state to start execution at.</param>
         /// <param name="migrationBuilder">A migration builder.</param>
         /// <param name="logger">A logger.</param>
+        /// <param name="loggerFactory"></param>
         /// <returns>The final state.</returns>
         /// <remarks>The plan executes within the scope, which must then be completed.</remarks>
-        public string Execute(IScope scope, string fromState, IMigrationBuilder migrationBuilder, ILogger logger)
+        public string Execute(IScope scope, string fromState, IMigrationBuilder migrationBuilder, ILogger<MigrationPlan> logger, ILoggerFactory loggerFactory)
         {
             Validate();
 
@@ -303,7 +304,7 @@ namespace Umbraco.Core.Migrations
             if (!_transitions.TryGetValue(origState, out var transition))
                 ThrowOnUnknownInitialState(origState);
 
-            var context = new MigrationContext(scope.Database, logger);
+            var context = new MigrationContext(scope.Database, loggerFactory.CreateLogger<MigrationContext>());
             context.PostMigrations.AddRange(_postMigrationTypes);
 
             while (transition != null)

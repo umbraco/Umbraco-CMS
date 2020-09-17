@@ -1,5 +1,5 @@
 ﻿using System;
-using Umbraco.Core.Logging;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 
@@ -40,7 +40,8 @@ namespace Umbraco.Core.Migrations.Upgrade
         /// <param name="migrationBuilder">A migration builder.</param>
         /// <param name="keyValueService">A key-value service.</param>
         /// <param name="logger">A logger.</param>
-        public void Execute(IScopeProvider scopeProvider, IMigrationBuilder migrationBuilder, IKeyValueService keyValueService, ILogger logger)
+        /// <param name="loggerFactory">A logger factory</param>
+        public void Execute(IScopeProvider scopeProvider, IMigrationBuilder migrationBuilder, IKeyValueService keyValueService, ILogger<Upgrader> logger, ILoggerFactory loggerFactory)
         {
             if (scopeProvider == null) throw new ArgumentNullException(nameof(scopeProvider));
             if (migrationBuilder == null) throw new ArgumentNullException(nameof(migrationBuilder));
@@ -64,7 +65,7 @@ namespace Umbraco.Core.Migrations.Upgrade
                 }
 
                 // execute plan
-                var state = plan.Execute(scope, currentState, migrationBuilder, logger);
+                var state = plan.Execute(scope, currentState, migrationBuilder, loggerFactory.CreateLogger<MigrationPlan>(), loggerFactory);
                 if (string.IsNullOrWhiteSpace(state))
                     throw new Exception("Plan execution returned an invalid null or empty state.");
 
@@ -83,13 +84,13 @@ namespace Umbraco.Core.Migrations.Upgrade
         /// <summary>
         /// Executes as part of the upgrade scope and before all migrations have executed.
         /// </summary>
-        public virtual void BeforeMigrations(IScope scope, ILogger logger)
+        public virtual void BeforeMigrations(IScope scope, ILogger<Upgrader> logger)
         { }
 
         /// <summary>
         /// Executes as part of the upgrade scope and after all migrations have executed.
         /// </summary>
-        public virtual void AfterMigrations(IScope scope, ILogger logger)
+        public virtual void AfterMigrations(IScope scope, ILogger<Upgrader> logger)
         { }
 
     }

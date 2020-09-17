@@ -419,7 +419,7 @@ namespace Umbraco.Core.Migrations.Install
 
                 // upgrade
                 var upgrader = new Upgrader(plan);
-                upgrader.Execute(_scopeProvider, _migrationBuilder, _keyValueService, _logger);
+                upgrader.Execute(_scopeProvider, _migrationBuilder, _keyValueService, _loggerFactory.CreateLogger<Upgrader>(), _loggerFactory);
 
                 var message = "<p>Upgrade completed!</p>";
 
