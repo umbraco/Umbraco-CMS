@@ -64,8 +64,6 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                             trashed: true
                         };
 
-                        mediaItem.found = found ? true : false;
-
                         return mediaItem;
                     });
 
@@ -200,7 +198,6 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                 multiPicker: multiPicker,
                 onlyImages: onlyImages,
                 disableFolderSelect: disableFolderSelect,
-
                 submit: function (model) {
 
                     editorService.close();
@@ -221,6 +218,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                         }
 
                     });
+
                     sync();
                     reloadUpdatedMediaItems(model.updatedMediaNodes);
                     setDirty();
