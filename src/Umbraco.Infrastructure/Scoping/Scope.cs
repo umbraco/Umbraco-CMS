@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Data;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 
 namespace Umbraco.Core.Scoping
@@ -19,7 +19,7 @@ namespace Umbraco.Core.Scoping
         private readonly ScopeProvider _scopeProvider;
         private readonly ICoreDebugSettings _coreDebugSettings;
         private readonly IMediaFileSystem _mediaFileSystem;
-        private readonly ILogger _logger;
+        private readonly ILogger<Scope> _logger;
         private readonly ITypeFinder _typeFinder;
 
         private readonly IsolationLevel _isolationLevel;
@@ -41,7 +41,7 @@ namespace Umbraco.Core.Scoping
         private Scope(ScopeProvider scopeProvider,
             ICoreDebugSettings coreDebugSettings,
             IMediaFileSystem mediaFileSystem,
-            ILogger logger, ITypeFinder typeFinder, FileSystems fileSystems, Scope parent, IScopeContext scopeContext, bool detachable,
+            ILogger<Scope> logger, ITypeFinder typeFinder, FileSystems fileSystems, Scope parent, IScopeContext scopeContext, bool detachable,
             IsolationLevel isolationLevel = IsolationLevel.Unspecified,
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
             IEventDispatcher eventDispatcher = null,
@@ -120,7 +120,7 @@ namespace Umbraco.Core.Scoping
         public Scope(ScopeProvider scopeProvider,
             ICoreDebugSettings coreDebugSettings,
             IMediaFileSystem mediaFileSystem,
-            ILogger logger, ITypeFinder typeFinder, FileSystems fileSystems, bool detachable, IScopeContext scopeContext,
+            ILogger<Scope> logger, ITypeFinder typeFinder, FileSystems fileSystems, bool detachable, IScopeContext scopeContext,
             IsolationLevel isolationLevel = IsolationLevel.Unspecified,
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
             IEventDispatcher eventDispatcher = null,
@@ -134,7 +134,7 @@ namespace Umbraco.Core.Scoping
         public Scope(ScopeProvider scopeProvider,
             ICoreDebugSettings coreDebugSettings,
             IMediaFileSystem mediaFileSystem,
-            ILogger logger, ITypeFinder typeFinder, FileSystems fileSystems, Scope parent,
+            ILogger<Scope> logger, ITypeFinder typeFinder, FileSystems fileSystems, Scope parent,
             IsolationLevel isolationLevel = IsolationLevel.Unspecified,
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
             IEventDispatcher eventDispatcher = null,

@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -23,7 +24,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             base.SetUp();
 
-            _fileSystem = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, Constants.SystemDirectories.MvcViews + "/Partials/");
+            _fileSystem = new PhysicalFileSystem(IOHelper, HostingEnvironment, LoggerFactory_.CreateLogger<PhysicalFileSystem>(), Constants.SystemDirectories.MvcViews + "/Partials/");
         }
 
         protected override void Compose()

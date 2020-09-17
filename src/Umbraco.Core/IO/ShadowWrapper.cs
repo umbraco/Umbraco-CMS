@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.IO
 {
@@ -19,14 +19,14 @@ namespace Umbraco.Core.IO
         private string _shadowDir;
         private readonly IIOHelper _ioHelper;
         private readonly IHostingEnvironment _hostingEnvironment;
-        private readonly ILogger _logger;
+        private readonly ILoggerFactory _loggerFactory;
 
-        public ShadowWrapper(IFileSystem innerFileSystem, IIOHelper ioHelper, IHostingEnvironment hostingEnvironment, ILogger logger, string shadowPath, Func<bool> isScoped = null)
+        public ShadowWrapper(IFileSystem innerFileSystem, IIOHelper ioHelper, IHostingEnvironment hostingEnvironment, ILoggerFactory loggerFactory, string shadowPath, Func<bool> isScoped = null)
         {
             _innerFileSystem = innerFileSystem;
             _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
             _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _loggerFactory = loggerFactory;
             _shadowPath = shadowPath;
             _isScoped = isScoped;
         }
@@ -66,7 +66,7 @@ namespace Umbraco.Core.IO
             var virt = ShadowFsPath + "/" + id + "/" + _shadowPath;
             _shadowDir = _ioHelper.MapPath(virt);
             Directory.CreateDirectory(_shadowDir);
-            var tempfs = new PhysicalFileSystem(_ioHelper, _hostingEnvironment, _logger, virt);
+            var tempfs = new PhysicalFileSystem(_ioHelper, _hostingEnvironment, _loggerFactory.CreateLogger<PhysicalFileSystem>(), virt);
             _shadowFileSystem = new ShadowFileSystem(_innerFileSystem, tempfs);
         }
 

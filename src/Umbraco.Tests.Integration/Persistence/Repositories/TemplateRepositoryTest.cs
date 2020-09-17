@@ -38,7 +38,7 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
         {
             var testHelper = new TestHelper();
             _fileSystems = Mock.Of<IFileSystems>();
-            var viewsFileSystem = new PhysicalFileSystem(IOHelper, testHelper.GetHostingEnvironment(), Logger, Constants.SystemDirectories.MvcViews);
+            var viewsFileSystem = new PhysicalFileSystem(IOHelper, testHelper.GetHostingEnvironment(), ConsoleLoggerFactory.CreateLogger<PhysicalFileSystem>(), Constants.SystemDirectories.MvcViews);
             Mock.Get(_fileSystems).Setup(x => x.MvcViewsFileSystem).Returns(viewsFileSystem);
         }
 
@@ -570,7 +570,7 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
             _fileSystems  = null;
 
             //Delete all files
-            var fsViews = new PhysicalFileSystem(IOHelper, testHelper.GetHostingEnvironment(), Logger, Constants.SystemDirectories.MvcViews);
+            var fsViews = new PhysicalFileSystem(IOHelper, testHelper.GetHostingEnvironment(), ConsoleLoggerFactory.CreateLogger<PhysicalFileSystem>(), Constants.SystemDirectories.MvcViews);
             var views = fsViews.GetFiles("", "*.cshtml");
             foreach (var file in views)
                 fsViews.DeleteFile(file);
