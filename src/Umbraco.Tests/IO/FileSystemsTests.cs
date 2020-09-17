@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -16,6 +18,7 @@ using Umbraco.Tests.TestHelpers;
 using Umbraco.Core.Composing.CompositionExtensions;
 using Current = Umbraco.Web.Composing.Current;
 using FileSystems = Umbraco.Core.IO.FileSystems;
+using ILogger = Umbraco.Core.Logging.ILogger;
 
 namespace Umbraco.Tests.IO
 {
@@ -35,6 +38,10 @@ namespace Umbraco.Tests.IO
             composition.Register(_ => Mock.Of<ILogger>());
             composition.Register(_ => Mock.Of<IDataTypeService>());
             composition.Register(_ => Mock.Of<IContentSettings>());
+
+            composition.Register<ILoggerFactory>(new NullLoggerFactory());
+            composition.Register(typeof(Microsoft.Extensions.Logging.ILogger<>), typeof(Logger<>));
+
             composition.Register(_ => TestHelper.ShortStringHelper);
             composition.Register(_ => TestHelper.IOHelper);
             composition.RegisterUnique<IMediaPathScheme, UniqueMediaPathScheme>();
@@ -43,6 +50,7 @@ namespace Umbraco.Tests.IO
 
             composition.Configs.Add(() => SettingsForTests.DefaultGlobalSettings);
             composition.Configs.Add(SettingsForTests.GenerateMockContentSettings);
+
 
             composition.ComposeFileSystems();
 

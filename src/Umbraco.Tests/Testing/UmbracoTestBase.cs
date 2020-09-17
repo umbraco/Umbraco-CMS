@@ -198,7 +198,8 @@ namespace Umbraco.Tests.Testing
 
             Composition = new Composition(register, typeLoader, proflogger, ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.GetConfigs(), TestHelper.IOHelper, AppCaches.NoCache);
 
-
+            Composition.Register<ILoggerFactory>(new NullLoggerFactory());
+            Composition.Register(typeof(Microsoft.Extensions.Logging.ILogger<>), typeof(Logger<>));
 
             Composition.RegisterUnique(IOHelper);
             Composition.RegisterUnique(UriUtility);
