@@ -3,9 +3,11 @@ using System.Threading;
 using Umbraco.Core.Logging;
 using Umbraco.Examine;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Hosting;
 using Umbraco.Web.Scheduling;
+using ILogger = Umbraco.Core.Logging.ILogger;
 
 namespace Umbraco.Web.Search
 {
@@ -17,16 +19,19 @@ namespace Umbraco.Web.Search
         private static readonly object RebuildLocker = new object();
         private readonly IndexRebuilder _indexRebuilder;
         private readonly IMainDom _mainDom;
+        // TODO: Remove unused ProfilingLogger?
         private readonly IProfilingLogger _pLogger;
-        private readonly ILogger<BackgroundIndexRebuilder> _logger;
+        private readonly Core.Logging.ILogger<BackgroundIndexRebuilder> _logger;
+        private readonly ILoggerFactory _loggerFactory;
         private readonly IApplicationShutdownRegistry _hostingEnvironment;
         private static BackgroundTaskRunner<IBackgroundTask> _rebuildOnStartupRunner;
 
-        public BackgroundIndexRebuilder(IMainDom mainDom, IProfilingLogger pLogger, ILogger<BackgroundIndexRebuilder> logger, IApplicationShutdownRegistry hostingEnvironment, IndexRebuilder indexRebuilder)
+        public BackgroundIndexRebuilder(IMainDom mainDom, IProfilingLogger pLogger, Core.Logging.ILogger<BackgroundIndexRebuilder> logger, ILoggerFactory loggerFactory, IApplicationShutdownRegistry hostingEnvironment, IndexRebuilder indexRebuilder)
         {
             _mainDom = mainDom;
             _pLogger = pLogger;
             _logger = logger;
+            _loggerFactory = loggerFactory;
             _hostingEnvironment = hostingEnvironment;
             _indexRebuilder = indexRebuilder;
         }
@@ -54,7 +59,7 @@ namespace Umbraco.Web.Search
 
                 _rebuildOnStartupRunner = new BackgroundTaskRunner<IBackgroundTask>(
                     "RebuildIndexesOnStartup",
-                    _logger as ILogger, _hostingEnvironment);
+                    _loggerFactory.CreateLogger<BackgroundTaskRunner<IBackgroundTask>>(), _hostingEnvironment);
 
                 _rebuildOnStartupRunner.TryAdd(task);
             }

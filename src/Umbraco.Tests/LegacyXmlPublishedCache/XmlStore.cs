@@ -138,7 +138,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         {
             if (SyncToXmlFile == false) return;
 
-            var logger = Current.Logger;
+            var loggerFactory = Current.LoggerFactory;
 
             // there's always be one task keeping a ref to the runner
             // so it's safe to just create it as a local var here
@@ -147,10 +147,10 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
                 LongRunning = true,
                 KeepAlive = true,
                 Hosted = false // main domain will take care of stopping the runner (see below)
-            }, logger, _hostingLifetime);
+            }, loggerFactory.CreateLogger<BackgroundTaskRunner<XmlStoreFilePersister>>(), _hostingLifetime);
 
             // create (and add to runner)
-            _persisterTask = new XmlStoreFilePersister(runner, this, logger);
+            _persisterTask = new XmlStoreFilePersister(runner, this, loggerFactory.CreateLogger<XmlStoreFilePersister>());
 
             var registered = mainDom.Register(
                 null,

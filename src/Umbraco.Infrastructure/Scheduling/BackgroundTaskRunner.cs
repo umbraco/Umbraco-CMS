@@ -2,10 +2,10 @@
 using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Events;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.Logging;
 
 namespace Umbraco.Web.Scheduling
 {
@@ -80,7 +80,7 @@ namespace Umbraco.Web.Scheduling
 
         private readonly string _logPrefix;
         private readonly BackgroundTaskRunnerOptions _options;
-        private readonly ILogger _logger;
+        private readonly ILogger<BackgroundTaskRunner<T>> _logger;
         private readonly IApplicationShutdownRegistry _applicationShutdownRegistry;
         private readonly object _locker = new object();
 
@@ -105,7 +105,7 @@ namespace Umbraco.Web.Scheduling
         /// <param name="logger">A logger.</param>
         /// <param name="applicationShutdownRegistry">The application shutdown registry</param>
         /// <param name="hook">An optional main domain hook.</param>
-        public BackgroundTaskRunner(ILogger logger, IApplicationShutdownRegistry applicationShutdownRegistry, MainDomHook hook = null)
+        public BackgroundTaskRunner(ILogger<BackgroundTaskRunner<T>> logger, IApplicationShutdownRegistry applicationShutdownRegistry, MainDomHook hook = null)
             : this(typeof(T).FullName, new BackgroundTaskRunnerOptions(), logger, applicationShutdownRegistry, hook)
         { }
 
@@ -116,7 +116,7 @@ namespace Umbraco.Web.Scheduling
         /// <param name="logger">A logger.</param>
         /// <param name="applicationShutdownRegistry">The application shutdown registry</param>
         /// <param name="hook">An optional main domain hook.</param>
-        public BackgroundTaskRunner(string name, ILogger logger, IApplicationShutdownRegistry applicationShutdownRegistry, MainDomHook hook = null)
+        public BackgroundTaskRunner(string name, ILogger<BackgroundTaskRunner<T>> logger, IApplicationShutdownRegistry applicationShutdownRegistry, MainDomHook hook = null)
             : this(name, new BackgroundTaskRunnerOptions(), logger, applicationShutdownRegistry, hook)
         { }
 
@@ -127,7 +127,7 @@ namespace Umbraco.Web.Scheduling
         /// <param name="logger">A logger.</param>
         /// <param name="applicationShutdownRegistry">The application shutdown registry</param>
         /// <param name="hook">An optional main domain hook.</param>
-        public BackgroundTaskRunner(BackgroundTaskRunnerOptions options, ILogger logger, IApplicationShutdownRegistry applicationShutdownRegistry, MainDomHook hook = null)
+        public BackgroundTaskRunner(BackgroundTaskRunnerOptions options, ILogger<BackgroundTaskRunner<T>> logger, IApplicationShutdownRegistry applicationShutdownRegistry, MainDomHook hook = null)
             : this(typeof(T).FullName, options, logger, applicationShutdownRegistry, hook)
         { }
 
@@ -139,7 +139,7 @@ namespace Umbraco.Web.Scheduling
         /// <param name="logger">A logger.</param>
         /// <param name="applicationShutdownRegistry">The application shutdown registry</param>
         /// <param name="hook">An optional main domain hook.</param>
-        public BackgroundTaskRunner(string name, BackgroundTaskRunnerOptions options, ILogger logger, IApplicationShutdownRegistry applicationShutdownRegistry, MainDomHook hook = null)
+        public BackgroundTaskRunner(string name, BackgroundTaskRunnerOptions options, ILogger<BackgroundTaskRunner<T>> logger, IApplicationShutdownRegistry applicationShutdownRegistry, MainDomHook hook = null)
         {
             _options = options ?? throw new ArgumentNullException(nameof(options));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Web.Scheduling;
 
 namespace Umbraco.Tests.LegacyXmlPublishedCache
@@ -18,7 +18,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
     internal class XmlStoreFilePersister : LatchedBackgroundTaskBase
     {
         private readonly IBackgroundTaskRunner<XmlStoreFilePersister> _runner;
-        private readonly ILogger _logger;
+        private readonly ILogger<XmlStoreFilePersister> _logger;
         private readonly XmlStore _store;
         private readonly object _locko = new object();
         private bool _released;
@@ -39,12 +39,12 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         public override bool RunsOnShutdown => _timer != null;
 
         // initialize the first instance, which is inactive (not touched yet)
-        public XmlStoreFilePersister(IBackgroundTaskRunner<XmlStoreFilePersister> runner, XmlStore store, ILogger logger)
+        public XmlStoreFilePersister(IBackgroundTaskRunner<XmlStoreFilePersister> runner, XmlStore store, ILogger<XmlStoreFilePersister> logger)
             : this(runner, store, logger, false)
         { }
 
         // initialize further instances, which are active (touched)
-        private XmlStoreFilePersister(IBackgroundTaskRunner<XmlStoreFilePersister> runner, XmlStore store, ILogger logger, bool touched)
+        private XmlStoreFilePersister(IBackgroundTaskRunner<XmlStoreFilePersister> runner, XmlStore store, ILogger<XmlStoreFilePersister> logger, bool touched)
         {
             _runner = runner;
             _store = store;

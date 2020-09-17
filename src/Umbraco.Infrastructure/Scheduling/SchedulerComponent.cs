@@ -90,13 +90,13 @@ namespace Umbraco.Web.Scheduling
 
         public void Initialize()
         {
-            var backGroundTaskLogger = _loggerFactory.CreateLogger("BackgroundTaskRunner");
+            var logger = _loggerFactory.CreateLogger<BackgroundTaskRunner<IBackgroundTask>>();
             // backgrounds runners are web aware, if the app domain dies, these tasks will wind down correctly
-            _keepAliveRunner = new BackgroundTaskRunner<IBackgroundTask>("KeepAlive", _logger, _applicationShutdownRegistry);
-            _publishingRunner = new BackgroundTaskRunner<IBackgroundTask>("ScheduledPublishing", _logger, _applicationShutdownRegistry);
-            _scrubberRunner = new BackgroundTaskRunner<IBackgroundTask>("LogScrubber", _logger, _applicationShutdownRegistry);
-            _fileCleanupRunner = new BackgroundTaskRunner<IBackgroundTask>("TempFileCleanup", _logger, _applicationShutdownRegistry);
-            _healthCheckRunner = new BackgroundTaskRunner<IBackgroundTask>("HealthCheckNotifier", _logger, _applicationShutdownRegistry);
+            _keepAliveRunner = new BackgroundTaskRunner<IBackgroundTask>("KeepAlive", logger, _applicationShutdownRegistry);
+            _publishingRunner = new BackgroundTaskRunner<IBackgroundTask>("ScheduledPublishing", logger, _applicationShutdownRegistry);
+            _scrubberRunner = new BackgroundTaskRunner<IBackgroundTask>("LogScrubber", logger, _applicationShutdownRegistry);
+            _fileCleanupRunner = new BackgroundTaskRunner<IBackgroundTask>("TempFileCleanup", logger, _applicationShutdownRegistry);
+            _healthCheckRunner = new BackgroundTaskRunner<IBackgroundTask>("HealthCheckNotifier", logger, _applicationShutdownRegistry);
 
             // we will start the whole process when a successful request is made
             _requestAccessor.RouteAttempt += RegisterBackgroundTasksOnce;

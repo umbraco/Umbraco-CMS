@@ -3,6 +3,7 @@ using NUnit.Framework;
 using System;
 using System.IO;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
@@ -18,6 +19,7 @@ using Umbraco.Web.Compose;
 using Umbraco.Web.PublishedCache.NuCache;
 using Umbraco.Web.Scheduling;
 using Umbraco.Web.Search;
+using ILogger = Umbraco.Core.Logging.ILogger;
 
 namespace Umbraco.Tests.Integration.Testing
 {
@@ -87,8 +89,8 @@ namespace Umbraco.Tests.Integration.Testing
         // replace the default so there is no background index rebuilder
         private class TestBackgroundIndexRebuilder : BackgroundIndexRebuilder
         {
-            public TestBackgroundIndexRebuilder(IMainDom mainDom, IProfilingLogger pLogger, ILogger<BackgroundIndexRebuilder> logger, IApplicationShutdownRegistry hostingEnvironment, IndexRebuilder indexRebuilder)
-                : base(mainDom, pLogger, logger, hostingEnvironment, indexRebuilder)
+            public TestBackgroundIndexRebuilder(IMainDom mainDom, IProfilingLogger pLogger, Core.Logging.ILogger<BackgroundIndexRebuilder> logger, ILoggerFactory loggerFactory, IApplicationShutdownRegistry hostingEnvironment, IndexRebuilder indexRebuilder)
+                : base(mainDom, pLogger, logger, loggerFactory, hostingEnvironment, indexRebuilder)
             {
             }
 
