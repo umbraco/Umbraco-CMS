@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Newtonsoft.Json;
 using Umbraco.Core;
@@ -23,6 +24,7 @@ using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Tests.TestHelpers;
+using ILogger = Umbraco.Core.Logging.ILogger;
 
 namespace Umbraco.Tests.Models
 {
@@ -237,7 +239,7 @@ namespace Umbraco.Tests.Models
 
         private static IProfilingLogger GetTestProfilingLogger()
         {
-            var logger = new DebugDiagnosticsLogger<object>(new MessageTemplates());
+            var logger = LoggerFactory.Create(builder => builder.AddDebug()).CreateLogger("ProfilingLogger");
             var profiler = new TestProfiler();
             return new ProfilingLogger(logger, profiler);
         }

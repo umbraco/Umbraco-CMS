@@ -59,7 +59,8 @@ namespace Umbraco.Tests.Services
 
         private static IProfilingLogger GetTestProfilingLogger()
         {
-            var logger = new DebugDiagnosticsLogger<object>(new MessageTemplates());
+            var factory = LoggerFactory.Create(builder => builder.AddDebug());
+            var logger = factory.CreateLogger("ProfilingLogger");
             var profiler = new TestProfiler();
             return new ProfilingLogger(logger, profiler);
         }
