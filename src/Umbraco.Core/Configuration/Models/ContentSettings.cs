@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Macros;
 
 namespace Umbraco.Core.Configuration.Models
@@ -16,11 +15,21 @@ namespace Umbraco.Core.Configuration.Models
 
         public bool ResolveUrlsFromTextString { get; set; } = false;
 
-        public IEnumerable<ContentErrorPage> Error404Collection { get; set; } = Array.Empty<ContentErrorPage>();
+        public ContentErrorPage[] Error404Collection { get; set; } = Array.Empty<ContentErrorPage>();
 
         public string PreviewBadge { get; set; } = DefaultPreviewBadge;
 
-        public MacroErrorBehaviour MacroErrors { get; set; } = MacroErrorBehaviour.Inline;
+        public string MacroErrors { get; set; } = MacroErrorBehaviour.Inline.ToString();
+
+        public MacroErrorBehaviour MacroErrorsBehaviour
+        {
+            get
+            {
+                return Enum.TryParse<MacroErrorBehaviour>(MacroErrors, true, out var value)
+                    ? value
+                    : MacroErrorBehaviour.Inline;
+            }
+        }
 
         public IEnumerable<string> DisallowedUploadFiles { get; set; } = new[] { "ashx", "aspx", "ascx", "config", "cshtml", "vbhtml", "asmx", "air", "axd" };
 

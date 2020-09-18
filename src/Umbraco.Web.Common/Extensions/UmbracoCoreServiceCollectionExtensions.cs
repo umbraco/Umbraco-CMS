@@ -18,6 +18,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.Configuration.Models.Validation;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Logging.Serilog;
@@ -126,6 +127,9 @@ namespace Umbraco.Extensions
         {
             if (configuration == null) throw new ArgumentNullException(nameof(configuration));
 
+            services.AddSingleton<IValidateOptions<ContentSettings>, ContentSettingsValidation>();
+            services.AddSingleton<IValidateOptions<RequestHandlerSettings>, RequestHandlerSettingsValidation>();
+
             services.Configure<ActiveDirectorySettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "ActiveDirectory"));
             services.Configure<ConnectionStrings>(configuration.GetSection("ConnectionStrings"), o => o.BindNonPublicProperties = true);
             services.Configure<ContentSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "Content"));
@@ -148,7 +152,6 @@ namespace Umbraco.Extensions
             services.Configure<TypeFinderSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "TypeFinder"));
             services.Configure<UserPasswordConfigurationSettings>(configuration.GetSection(Constants.Configuration.ConfigSecurityPrefix + "UserPassword"));
             services.Configure<WebRoutingSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "WebRouting"));
-
 
             return services;
         }

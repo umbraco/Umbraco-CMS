@@ -290,7 +290,7 @@ namespace Umbraco.Web.Macros
                     Alias = macro.Alias,
                     MacroSource = macro.MacroSource,
                     Exception = e,
-                    Behaviour = _contentSettings.MacroErrors
+                    Behaviour = _contentSettings.MacroErrorsBehaviour
                 };
 
                 switch (macroErrorEventArgs.Behaviour)

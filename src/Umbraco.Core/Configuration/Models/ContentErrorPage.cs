@@ -4,12 +4,25 @@ namespace Umbraco.Core.Configuration.Models
 {
     public class ContentErrorPage
     {
-        //TODO introduce validation, to check only one of key/id/xPath is used.
-        public int ContentId { get; }
-        public Guid ContentKey { get; }
-        public string ContentXPath { get; }
-        public bool HasContentId { get; }
-        public bool HasContentKey { get; }
+        public int ContentId { get; set; }
+
+        public Guid ContentKey { get; set; }
+
+        public string ContentXPath { get; set; }
+
+        public bool HasContentId => ContentId != 0;
+
+        public bool HasContentKey => ContentKey != Guid.Empty;
+
+        public bool HasContentXPath => !string.IsNullOrEmpty(ContentXPath);
+
         public string Culture { get; set; }
+
+        public bool IsValid()
+        {
+            // Entry is valid if Culture and one and only one of ContentId, ContentKey or ContentXPath is provided.
+            return !string.IsNullOrWhiteSpace(Culture) &&
+                ((HasContentId ? 1 : 0) + (HasContentKey ? 1 : 0) + (HasContentXPath ? 1 : 0) == 1);
+        }
     }
 }

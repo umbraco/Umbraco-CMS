@@ -24,9 +24,13 @@ namespace Umbraco.Core.Configuration.Models
         private class ImagingAutoFillUploadField : IImagingAutoFillUploadField
         {
             public string Alias { get; set; }
+
             public string WidthFieldAlias { get; set; }
+
             public string HeightFieldAlias { get; set; }
+
             public string LengthFieldAlias { get; set; }
+
             public string ExtensionFieldAlias { get; set; }
         }
     }
