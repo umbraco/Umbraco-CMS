@@ -47,6 +47,11 @@ namespace Umbraco.Core.Logging.Serilog
                 .Enrich.With<Log4NetLevelMapperEnricher>()
                 .Enrich.FromLogContext(); // allows us to dynamically enrich
 
+
+            logConfig.WriteTo.UmbracoFile(
+                Path.Combine(loggingConfiguration.LogDirectory, $"UmbracoTraceLog.{Environment.MachineName}..json")
+                );
+
             return logConfig;
         }
 
