@@ -49,16 +49,16 @@ namespace Umbraco.Web.PropertyEditors
 
         #region Value Editor
 
-        protected override IDataValueEditor CreateValueEditor() => new BlockEditorPropertyValueEditor(Attribute, PropertyEditors, _dataTypeService, _contentTypeService, _localizedTextService, Logger, LocalizationService,ShortStringHelper);
+        protected override IDataValueEditor CreateValueEditor() => new BlockEditorPropertyValueEditor(Attribute, PropertyEditors, _dataTypeService, _contentTypeService, _localizedTextService, LoggerFactory.CreateLogger<BlockEditorPropertyValueEditor>(), LocalizationService,ShortStringHelper);
 
         internal class BlockEditorPropertyValueEditor : DataValueEditor, IDataValueReference
         {
             private readonly PropertyEditorCollection _propertyEditors;
             private readonly IDataTypeService _dataTypeService;
-            private readonly ILogger _logger;
+            private readonly ILogger<BlockEditorPropertyValueEditor> _logger;
             private readonly BlockEditorValues _blockEditorValues;
 
-            public BlockEditorPropertyValueEditor(DataEditorAttribute attribute, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IContentTypeService contentTypeService, ILocalizedTextService textService, ILogger logger, ILocalizationService localizationService, IShortStringHelper shortStringHelper)
+            public BlockEditorPropertyValueEditor(DataEditorAttribute attribute, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IContentTypeService contentTypeService, ILocalizedTextService textService, ILogger<BlockEditorPropertyValueEditor> logger, ILocalizationService localizationService, IShortStringHelper shortStringHelper)
                 : base(dataTypeService, localizationService, textService, shortStringHelper, attribute)
             {
                 _propertyEditors = propertyEditors;

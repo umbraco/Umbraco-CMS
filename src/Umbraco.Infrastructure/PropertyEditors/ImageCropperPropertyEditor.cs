@@ -36,6 +36,7 @@ namespace Umbraco.Web.PropertyEditors
         private readonly ILocalizationService _localizationService;
         private readonly IIOHelper _ioHelper;
         private readonly UploadAutoFillProperties _autoFillProperties;
+        private readonly ILogger<ImageCropperPropertyEditor> _logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ImageCropperPropertyEditor"/> class.
@@ -56,6 +57,7 @@ namespace Umbraco.Web.PropertyEditors
             _dataTypeService = dataTypeService;
             _localizationService = localizationService;
             _ioHelper = ioHelper;
+            _logger = loggerFactory.CreateLogger<ImageCropperPropertyEditor>();
 
             // TODO: inject?
             _autoFillProperties = new UploadAutoFillProperties(_mediaFileSystem, loggerFactory.CreateLogger<UploadAutoFillProperties>(), contentSettings);
@@ -113,7 +115,7 @@ namespace Umbraco.Web.PropertyEditors
             catch (Exception ex)
             {
                 if (writeLog)
-                    Logger.LogError(ex, "Could not parse image cropper value '{Json}'", value);
+                    _logger.LogError(ex, "Could not parse image cropper value '{Json}'", value);
                 return null;
             }
         }

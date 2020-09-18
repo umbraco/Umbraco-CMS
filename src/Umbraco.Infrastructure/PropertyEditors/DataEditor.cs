@@ -34,7 +34,6 @@ namespace Umbraco.Core.PropertyEditors
             LocalizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
             LocalizedTextService = localizedTextService  ?? throw new ArgumentNullException(nameof(localizedTextService));
             ShortStringHelper = shortStringHelper ?? throw new ArgumentNullException(nameof(shortStringHelper));
-            Logger = LoggerFactory.CreateLogger<DataEditor>();
 
 
             // defaults
@@ -64,11 +63,6 @@ namespace Umbraco.Core.PropertyEditors
         protected ILocalizationService LocalizationService { get; }
         protected ILoggerFactory LoggerFactory { get; }
         protected IDataTypeService DataTypeService { get; }
-
-        /// <summary>
-        /// Gets a logger.
-        /// </summary>
-        protected ILogger<DataEditor> Logger { get; }
 
         /// <inheritdoc />
         [DataMember(Name = "alias", IsRequired = true)]
