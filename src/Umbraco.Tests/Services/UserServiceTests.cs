@@ -6,19 +6,16 @@ using System.Text;
 using System.Threading;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
-using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
-using Umbraco.Tests.Common.TestHelpers.Entities;
+using Umbraco.Tests.Common.Builders;
+using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.Actions;
 using MockedUser = Umbraco.Tests.TestHelpers.Entities.MockedUser;
-
 
 namespace Umbraco.Tests.Services
 {
@@ -724,7 +721,8 @@ namespace Umbraco.Tests.Services
             var hash = new HMACSHA1();
             hash.Key = Encoding.Unicode.GetBytes(password);
             var encodedPassword = Convert.ToBase64String(hash.ComputeHash(Encoding.Unicode.GetBytes(password)));
-            var membershipUser = new User(TestObjects.GetGlobalSettings(), "JohnDoe", "john@umbraco.io", encodedPassword, encodedPassword);
+            var globalSettings = new GlobalSettingsBuilder().Build();
+            var membershipUser = new User(globalSettings, "JohnDoe", "john@umbraco.io", encodedPassword, encodedPassword);
             userService.Save(membershipUser);
 
             // Assert

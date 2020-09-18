@@ -4,12 +4,13 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
+using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;
 
@@ -19,15 +20,18 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class LanguageRepositoryTest : UmbracoIntegrationTest
     {
+        private GlobalSettings _globalSettings;
+
         [SetUp]
         public void SetUp()
         {
             CreateTestData();
+            _globalSettings = new GlobalSettingsBuilder().Build();
         }
 
         private LanguageRepository CreateRepository(IScopeProvider provider)
         {
-            return new LanguageRepository((IScopeAccessor) provider, AppCaches.Disabled, ConsoleLoggerFactory.CreateLogger<LanguageRepository>(), GlobalSettings);
+            return new LanguageRepository((IScopeAccessor) provider, AppCaches.Disabled, ConsoleLoggerFactory.CreateLogger<LanguageRepository>(), Microsoft.Extensions.Options.Options.Create(_globalSettings));
         }
 
         [Test]
@@ -61,7 +65,7 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
                 var repository = CreateRepository(provider);
 
                 var au = CultureInfo.GetCultureInfo("en-AU");
-                var language = (ILanguage)new Language(GlobalSettings, au.Name)
+                var language = (ILanguage)new Language(_globalSettings, au.Name)
                 {
                     CultureName = au.DisplayName,
                     FallbackLanguageId = 1
@@ -185,7 +189,7 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
                 var repository = CreateRepository(provider);
 
                 // Act
-                var languageBR = new Language(GlobalSettings, "pt-BR") { CultureName = "pt-BR" };
+                var languageBR = new Language(_globalSettings, "pt-BR") { CultureName = "pt-BR" };
                 repository.Save(languageBR);
 
                 // Assert
@@ -207,7 +211,7 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
                 var repository = CreateRepository(provider);
 
                 // Act
-                var languageBR = new Language(GlobalSettings, "pt-BR") { CultureName = "pt-BR", IsDefault = true, IsMandatory = true };
+                var languageBR = new Language(_globalSettings, "pt-BR") { CultureName = "pt-BR", IsDefault = true, IsMandatory = true };
                 repository.Save(languageBR);
 
                 // Assert
@@ -229,7 +233,7 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
                 var repository = CreateRepository(provider);
 
                 // Act
-                var languageBR = new Language(GlobalSettings, "pt-BR")
+                var languageBR = new Language(_globalSettings, "pt-BR")
                 {
                     CultureName = "pt-BR",
                     FallbackLanguageId = 1
@@ -252,16 +256,16 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
             {
                 var repository = CreateRepository(provider);
 
-                var languageBR = (ILanguage)new Language(GlobalSettings, "pt-BR") { CultureName = "pt-BR", IsDefault = true, IsMandatory = true };
+                var languageBR = (ILanguage)new Language(_globalSettings, "pt-BR") { CultureName = "pt-BR", IsDefault = true, IsMandatory = true };
                 repository.Save(languageBR);
-                var languageEN = new Language(GlobalSettings, "en-AU") { CultureName = "en-AU" };
+                var languageEN = new Language(_globalSettings, "en-AU") { CultureName = "en-AU" };
                 repository.Save(languageEN);
 
                 Assert.IsTrue(languageBR.IsDefault);
                 Assert.IsTrue(languageBR.IsMandatory);
 
                 // Act
-                var languageNZ = new Language(GlobalSettings, "en-NZ") { CultureName = "en-NZ", IsDefault = true, IsMandatory = true };
+                var languageNZ = new Language(_globalSettings, "en-NZ") { CultureName = "en-NZ", IsDefault = true, IsMandatory = true };
                 repository.Save(languageNZ);
                 languageBR = repository.Get(languageBR.Id);
 
@@ -384,16 +388,16 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
             //Id 1 is en-US - when Umbraco is installed
 
             var localizationService = GetRequiredService<ILocalizationService>();
-            var languageDK = new Language(GlobalSettings, "da-DK") { CultureName = "da-DK" };
+            var languageDK = new Language(_globalSettings, "da-DK") { CultureName = "da-DK" };
             localizationService.Save(languageDK);//Id 2
 
-            var languageSE = new Language(GlobalSettings, "sv-SE") { CultureName = "sv-SE" };
+            var languageSE = new Language(_globalSettings, "sv-SE") { CultureName = "sv-SE" };
             localizationService.Save(languageSE);//Id 3
 
-            var languageDE = new Language(GlobalSettings, "de-DE") { CultureName = "de-DE" };
+            var languageDE = new Language(_globalSettings, "de-DE") { CultureName = "de-DE" };
             localizationService.Save(languageDE);//Id 4
 
-            var languagePT = new Language(GlobalSettings, "pt-PT") { CultureName = "pt-PT" };
+            var languagePT = new Language(_globalSettings, "pt-PT") { CultureName = "pt-PT" };
             localizationService.Save(languagePT);//Id 5
         }
     }

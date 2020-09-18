@@ -1,6 +1,7 @@
 ﻿using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Strings;
+using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 
@@ -30,7 +31,8 @@ namespace Umbraco.Tests.Strings
         [TestCase("WhoIsNumber6InTheVillage", "Who Is Number6 In The Village")] // issue is fixed
         public void CompatibleDefaultReplacement(string input, string expected)
         {
-            var helper = new DefaultShortStringHelper(SettingsForTests.GenerateMockRequestHandlerSettings());
+            var requestHandlerSettings = new RequestHandlerSettingsBuilder().Build();
+            var helper = new DefaultShortStringHelper(Microsoft.Extensions.Options.Options.Create(requestHandlerSettings));
             var output = input.Length < 2 ? input : helper.SplitPascalCasing(input, ' ').ToFirstUpperInvariant();
             Assert.AreEqual(expected, output);
         }

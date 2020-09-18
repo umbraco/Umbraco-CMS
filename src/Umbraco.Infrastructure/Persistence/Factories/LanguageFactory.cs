@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
 
@@ -7,7 +8,7 @@ namespace Umbraco.Core.Persistence.Factories
 {
     internal static class LanguageFactory
     {
-        public static ILanguage BuildEntity(IGlobalSettings globalSettings, LanguageDto dto)
+        public static ILanguage BuildEntity(GlobalSettings globalSettings, LanguageDto dto)
         {
             var lang = new Language(globalSettings, dto.IsoCode)
             {

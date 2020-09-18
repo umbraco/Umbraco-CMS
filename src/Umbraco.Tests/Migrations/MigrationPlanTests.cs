@@ -10,10 +10,10 @@ using Umbraco.Core;
 using Umbraco.Core.Migrations;
 using Umbraco.Core.Migrations.Upgrade;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Persistance.SqlCe;
+using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 
@@ -140,7 +140,7 @@ namespace Umbraco.Tests.Migrations
         [Test]
         public void ValidateUmbracoPlan()
         {
-            var plan = new UmbracoPlan(TestHelper.GetUmbracoVersion(), SettingsForTests.GenerateMockGlobalSettings());
+            var plan = new UmbracoPlan(TestHelper.GetUmbracoVersion());
             plan.Validate();
             Console.WriteLine(plan.FinalState);
             Assert.IsFalse(plan.FinalState.IsNullOrWhiteSpace());

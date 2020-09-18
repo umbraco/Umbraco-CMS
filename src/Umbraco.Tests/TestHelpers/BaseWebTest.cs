@@ -5,6 +5,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -13,6 +14,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.Common;
+using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.PublishedContent;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Web;
@@ -91,13 +93,14 @@ namespace Umbraco.Tests.TestHelpers
 
         internal PublishedRouter CreatePublishedRouter(IFactory container = null, ContentFinderCollection contentFinders = null)
         {
-            return CreatePublishedRouter(SettingsForTests.GenerateMockWebRoutingSettings(), container ?? Factory, contentFinders);
+            var webRoutingSettings = new WebRoutingSettingsBuilder().Build();
+            return CreatePublishedRouter(webRoutingSettings, container ?? Factory, contentFinders);
         }
 
-        internal static PublishedRouter CreatePublishedRouter(IWebRoutingSettings webRoutingSettings, IFactory container = null, ContentFinderCollection contentFinders = null)
+        internal static PublishedRouter CreatePublishedRouter(WebRoutingSettings webRoutingSettings, IFactory container = null, ContentFinderCollection contentFinders = null)
         {
             return new PublishedRouter(
-                webRoutingSettings,
+                Microsoft.Extensions.Options.Options.Create(webRoutingSettings),
                 contentFinders ?? new ContentFinderCollection(Enumerable.Empty<IContentFinder>()),
                 new TestLastChanceFinder(),
                 new TestVariationContextAccessor(),

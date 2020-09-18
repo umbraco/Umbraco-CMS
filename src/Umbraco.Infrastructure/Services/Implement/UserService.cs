@@ -4,7 +4,9 @@ using System.Data.Common;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
+using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Membership;
@@ -22,16 +24,16 @@ namespace Umbraco.Core.Services.Implement
     {
         private readonly IUserRepository _userRepository;
         private readonly IUserGroupRepository _userGroupRepository;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly bool _isUpgrading;
 
         public UserService(IScopeProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory, IRuntimeState runtimeState,
-            IUserRepository userRepository, IUserGroupRepository userGroupRepository, IGlobalSettings globalSettings)
+            IUserRepository userRepository, IUserGroupRepository userGroupRepository, IOptions<GlobalSettings> globalSettings)
             : base(provider, logger, eventMessagesFactory)
         {
             _userRepository = userRepository;
             _userGroupRepository = userGroupRepository;
-            _globalSettings = globalSettings;
+            _globalSettings = globalSettings.Value;
             _isUpgrading = runtimeState.Level == RuntimeLevel.Install || runtimeState.Level == RuntimeLevel.Upgrade;
         }
 

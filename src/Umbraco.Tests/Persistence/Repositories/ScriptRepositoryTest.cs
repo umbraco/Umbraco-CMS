@@ -8,12 +8,14 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 
@@ -31,7 +33,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             base.SetUp();
 
             _fileSystems = Mock.Of<IFileSystems>();
-            _fileSystem = new PhysicalFileSystem(IOHelper, HostingEnvironment, LoggerFactory_.CreateLogger<PhysicalFileSystem>(), SettingsForTests.GenerateMockGlobalSettings().UmbracoScriptsPath);
+            _fileSystem = new PhysicalFileSystem(IOHelper, HostingEnvironment, LoggerFactory_.CreateLogger<PhysicalFileSystem>(), new GlobalSettings().UmbracoScriptsPath);
             Mock.Get(_fileSystems).Setup(x => x.ScriptsFileSystem).Returns(_fileSystem);
             using (var stream = CreateStream("Umbraco.Sys.registerNamespace(\"Umbraco.Utils\");"))
             {
@@ -41,7 +43,8 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private IScriptRepository CreateRepository()
         {
-            return new ScriptRepository(_fileSystems, IOHelper, TestObjects.GetGlobalSettings());
+            var globalSettings = new GlobalSettingsBuilder().Build();
+            return new ScriptRepository(_fileSystems, IOHelper, Microsoft.Extensions.Options.Options.Create(globalSettings));
         }
 
         protected override void Compose()

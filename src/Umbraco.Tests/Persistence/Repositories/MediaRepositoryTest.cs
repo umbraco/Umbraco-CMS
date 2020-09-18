@@ -17,6 +17,7 @@ using Umbraco.Tests.Testing;
 using Umbraco.Core.Services;
 using Umbraco.Core;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Tests.Common.Builders;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
@@ -35,10 +36,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             appCaches = appCaches ?? AppCaches;
             var scopeAccessor = (IScopeAccessor) provider;
-
+            var globalSettings = new GlobalSettingsBuilder().Build();
             var templateRepository = new TemplateRepository(scopeAccessor, appCaches, LoggerFactory_.CreateLogger<TemplateRepository>(), TestObjects.GetFileSystemsMock(), IOHelper, ShortStringHelper);
             var commonRepository = new ContentTypeCommonRepository(scopeAccessor, templateRepository, appCaches, ShortStringHelper);
-            var languageRepository = new LanguageRepository(scopeAccessor, appCaches, LoggerFactory_.CreateLogger<LanguageRepository>(), TestObjects.GetGlobalSettings());
+            var languageRepository = new LanguageRepository(scopeAccessor, appCaches, LoggerFactory_.CreateLogger<LanguageRepository>(), Microsoft.Extensions.Options.Options.Create(globalSettings));
             mediaTypeRepository = new MediaTypeRepository(scopeAccessor, appCaches, LoggerFactory_.CreateLogger<MediaTypeRepository>(), commonRepository, languageRepository, ShortStringHelper);
             var tagRepository = new TagRepository(scopeAccessor, appCaches, LoggerFactory_.CreateLogger<TagRepository>());
             var relationTypeRepository = new RelationTypeRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory_.CreateLogger<RelationTypeRepository>());

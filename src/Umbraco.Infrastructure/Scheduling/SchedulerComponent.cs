@@ -4,12 +4,12 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.HealthChecks;
-using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
@@ -40,11 +40,11 @@ namespace Umbraco.Web.Scheduling
         private readonly HealthCheckCollection _healthChecks;
         private readonly HealthCheckNotificationMethodCollection _notifications;
         private readonly IUmbracoContextFactory _umbracoContextFactory;
-        private readonly IHealthChecksSettings _healthChecksSettingsConfig;
+        private readonly HealthChecksSettings _healthChecksSettings;
         private readonly IServerMessenger _serverMessenger;
         private readonly IRequestAccessor _requestAccessor;
-        private readonly ILoggingSettings _loggingSettings;
-        private readonly IKeepAliveSettings _keepAliveSettings;
+        private readonly LoggingSettings _loggingSettings;
+        private readonly KeepAliveSettings _keepAliveSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
 
         private BackgroundTaskRunner<IBackgroundTask> _keepAliveRunner;
@@ -61,9 +61,9 @@ namespace Umbraco.Web.Scheduling
             IContentService contentService, IAuditService auditService,
             HealthCheckCollection healthChecks, HealthCheckNotificationMethodCollection notifications,
             IScopeProvider scopeProvider, IUmbracoContextFactory umbracoContextFactory, IProfilingLogger pLogger, Core.Logging.ILogger logger, ILoggerFactory loggerFactory,
-            IApplicationShutdownRegistry applicationShutdownRegistry, IHealthChecksSettings healthChecksSettingsConfig,
+            IApplicationShutdownRegistry applicationShutdownRegistry, IOptions<HealthChecksSettings> healthChecksSettings,
             IServerMessenger serverMessenger, IRequestAccessor requestAccessor,
-            ILoggingSettings loggingSettings, IKeepAliveSettings keepAliveSettings,
+            IOptions<LoggingSettings> loggingSettings, IOptions<KeepAliveSettings> keepAliveSettings,
             IHostingEnvironment hostingEnvironment)
         {
             _runtime = runtime;
@@ -80,11 +80,11 @@ namespace Umbraco.Web.Scheduling
 
             _healthChecks = healthChecks;
             _notifications = notifications;
-            _healthChecksSettingsConfig = healthChecksSettingsConfig ?? throw new ArgumentNullException(nameof(healthChecksSettingsConfig));
+            _healthChecksSettings = healthChecksSettings.Value ?? throw new ArgumentNullException(nameof(healthChecksSettings));
             _serverMessenger = serverMessenger;
             _requestAccessor = requestAccessor;
-            _loggingSettings = loggingSettings;
-            _keepAliveSettings = keepAliveSettings;
+            _loggingSettings = loggingSettings.Value;
+            _keepAliveSettings = keepAliveSettings.Value;
             _hostingEnvironment = hostingEnvironment;
         }
 
@@ -136,7 +136,7 @@ namespace Umbraco.Web.Scheduling
                 tasks.Add(RegisterLogScrubber(_loggingSettings));
                 tasks.Add(RegisterTempFileCleanup());
 
-                var healthCheckConfig = _healthChecksSettingsConfig;
+                var healthCheckConfig = _healthChecksSettings;
                 if (healthCheckConfig.NotificationSettings.Enabled)
                     tasks.Add(RegisterHealthCheckNotifier(healthCheckConfig, _healthChecks, _notifications, _pLogger));
 
@@ -144,11 +144,11 @@ namespace Umbraco.Web.Scheduling
             });
         }
 
-        private IBackgroundTask RegisterKeepAlive(IKeepAliveSettings keepAliveSettings)
+        private IBackgroundTask RegisterKeepAlive(KeepAliveSettings keepAliveSettings)
         {
             // ping/keepalive
             // on all servers
-            var task = new KeepAlive(_keepAliveRunner, DefaultDelayMilliseconds, FiveMinuteMilliseconds, _requestAccessor, _mainDom, keepAliveSettings, _loggerFactory.CreateLogger<KeepAlive>(), _pLogger, _serverRegistrar);
+            var task = new KeepAlive(_keepAliveRunner, DefaultDelayMilliseconds, FiveMinuteMilliseconds, _requestAccessor, _mainDom, Options.Create(keepAliveSettings), _loggerFactory.CreateLogger<KeepAlive>(), _pLogger, _serverRegistrar);
             _keepAliveRunner.TryAdd(task);
             return task;
         }
@@ -162,7 +162,7 @@ namespace Umbraco.Web.Scheduling
             return task;
         }
 
-        private IBackgroundTask RegisterHealthCheckNotifier(IHealthChecksSettings healthCheckSettingsConfig,
+        private IBackgroundTask RegisterHealthCheckNotifier(HealthChecksSettings healthCheckSettingsConfig,
             HealthCheckCollection healthChecks, HealthCheckNotificationMethodCollection notifications,
             IProfilingLogger logger)
         {
@@ -183,16 +183,16 @@ namespace Umbraco.Web.Scheduling
             }
 
             var periodInMilliseconds = healthCheckSettingsConfig.NotificationSettings.PeriodInHours * 60 * 60 * 1000;
-            var task = new HealthCheckNotifier(_healthCheckRunner, delayInMilliseconds, periodInMilliseconds, healthChecks, notifications, _mainDom, logger, _loggerFactory.CreateLogger<HealthCheckNotifier>(), _healthChecksSettingsConfig, _serverRegistrar, _runtime, _scopeProvider);
+            var task = new HealthCheckNotifier(_healthCheckRunner, delayInMilliseconds, periodInMilliseconds, healthChecks, notifications, _mainDom, logger, _loggerFactory.CreateLogger<HealthCheckNotifier>(), _healthChecksSettings, _serverRegistrar, _runtime, _scopeProvider);
             _healthCheckRunner.TryAdd(task);
             return task;
         }
 
-        private IBackgroundTask RegisterLogScrubber(ILoggingSettings settings)
+        private IBackgroundTask RegisterLogScrubber(LoggingSettings settings)
         {
             // log scrubbing
             // install on all, will only run on non-replica servers
-            var task = new LogScrubber(_scrubberRunner, DefaultDelayMilliseconds, LogScrubber.GetLogScrubbingInterval(), _mainDom, _serverRegistrar, _auditService, settings, _scopeProvider, _pLogger, _loggerFactory.CreateLogger<LogScrubber>());
+            var task = new LogScrubber(_scrubberRunner, DefaultDelayMilliseconds, LogScrubber.GetLogScrubbingInterval(), _mainDom, _serverRegistrar, _auditService, Options.Create(settings), _scopeProvider, _pLogger, _loggerFactory.CreateLogger<LogScrubber>());
             _scrubberRunner.TryAdd(task);
             return task;
         }

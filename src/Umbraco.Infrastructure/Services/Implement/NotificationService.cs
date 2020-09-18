@@ -3,12 +3,11 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Net;
 using System.Net.Mail;
 using System.Text;
 using System.Threading;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.UmbracoSettings;
+using Microsoft.Extensions.Options;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -26,18 +25,18 @@ namespace Umbraco.Core.Services.Implement
         private readonly IContentService _contentService;
         private readonly ILocalizationService _localizationService;
         private readonly INotificationsRepository _notificationsRepository;
-        private readonly IGlobalSettings _globalSettings;
-        private readonly IContentSettings _contentSettings;
+        private readonly GlobalSettings _globalSettings;
+        private readonly ContentSettings _contentSettings;
         private readonly IEmailSender _emailSender;
         private readonly ILogger _logger;
         private readonly IIOHelper _ioHelper;
 
         public NotificationService(IScopeProvider provider, IUserService userService, IContentService contentService, ILocalizationService localizationService,
-            ILogger logger, IIOHelper ioHelper, INotificationsRepository notificationsRepository, IGlobalSettings globalSettings, IContentSettings contentSettings, IEmailSender emailSender)
+            ILogger logger, IIOHelper ioHelper, INotificationsRepository notificationsRepository, IOptions<GlobalSettings> globalSettings, IOptions<ContentSettings> contentSettings, IEmailSender emailSender)
         {
             _notificationsRepository = notificationsRepository;
-            _globalSettings = globalSettings;
-            _contentSettings = contentSettings;
+            _globalSettings = globalSettings.Value;
+            _contentSettings = contentSettings.Value;
             _emailSender = emailSender;
             _uowProvider = provider ?? throw new ArgumentNullException(nameof(provider));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
@@ -303,7 +302,7 @@ namespace Umbraco.Core.Services.Implement
 
             if (content.ContentType.VariesByNothing())
             {
-                if (!_contentSettings.DisableHtmlEmail)
+                if (!_contentSettings.Notifications.DisableHtmlEmail)
                 {
                     //create the HTML summary for invariant content
 
@@ -345,7 +344,7 @@ namespace Umbraco.Core.Services.Implement
             {
                 //it's variant, so detect what cultures have changed
 
-                if (!_contentSettings.DisableHtmlEmail)
+                if (!_contentSettings.Notifications.DisableHtmlEmail)
                 {
                     //Create the HTML based summary (ul of culture names)
 
@@ -406,15 +405,15 @@ namespace Umbraco.Core.Services.Implement
                 string.Concat(siteUri.Authority, _ioHelper.ResolveUrl(_globalSettings.UmbracoPath)),
                 summary.ToString());
 
-            var fromMail = _contentSettings.NotificationEmailAddress ?? _globalSettings.SmtpSettings.From;
+            var fromMail = _contentSettings.Notifications.Email ?? _globalSettings.Smtp.From;
             // create the mail message
-            var mail = new MailMessage(fromMail, mailingUser.Email);
+            var mail = new MailMessage(fromMail, fromMail);
 
             // populate the message
 
 
             mail.Subject = createSubject((mailingUser, subjectVars));
-            if (_contentSettings.DisableHtmlEmail)
+            if (_contentSettings.Notifications.DisableHtmlEmail)
             {
                 mail.IsBodyHtml = false;
                 mail.Body = createBody((user: mailingUser, body: bodyVars, false));

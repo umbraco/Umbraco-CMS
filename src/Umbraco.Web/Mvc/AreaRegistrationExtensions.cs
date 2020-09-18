@@ -6,10 +6,8 @@ using System.Web.Routing;
 using System.Web.SessionState;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Exceptions;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
-using Umbraco.Web.Composing;
 using Umbraco.Web.WebApi;
 
 namespace Umbraco.Web.Mvc
@@ -44,7 +42,7 @@ namespace Umbraco.Web.Mvc
         /// <remarks>
         /// </remarks>
         internal static Route RouteControllerPlugin(this AreaRegistration area,
-            IGlobalSettings globalSettings, IHostingEnvironment hostingEnvironment,
+            GlobalSettings globalSettings, IHostingEnvironment hostingEnvironment,
             string controllerName, Type controllerType, RouteCollection routes,
             string controllerSuffixName, string defaultAction, object defaultId,
             string umbracoTokenValue = "backoffice",

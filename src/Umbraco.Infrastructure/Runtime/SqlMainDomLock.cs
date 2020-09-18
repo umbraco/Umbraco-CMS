@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
@@ -31,7 +32,7 @@ namespace Umbraco.Core.Runtime
         private bool _errorDuringAcquiring;
         private object _locker = new object();
 
-        public SqlMainDomLock(ILogger<SqlMainDomLock> logger, ILoggerFactory loggerFactory, IGlobalSettings globalSettings, IConnectionStrings connectionStrings, IDbProviderFactoryCreator dbProviderFactoryCreator, IHostingEnvironment hostingEnvironment)
+        public SqlMainDomLock(ILogger<SqlMainDomLock> logger, ILoggerFactory loggerFactory, GlobalSettings globalSettings, ConnectionStrings connectionStrings, IDbProviderFactoryCreator dbProviderFactoryCreator, IHostingEnvironment hostingEnvironment)
         {
             // unique id for our appdomain, this is more unique than the appdomain id which is just an INT counter to its safer
             _lockId = Guid.NewGuid().ToString();
@@ -41,7 +42,6 @@ namespace Umbraco.Core.Runtime
                 loggerFactory,
                globalSettings,
                connectionStrings,
-               Constants.System.UmbracoConnectionName,
                new Lazy<IMapperCollection>(() => new MapperCollection(Enumerable.Empty<BaseMapper>())),
                dbProviderFactoryCreator);
 

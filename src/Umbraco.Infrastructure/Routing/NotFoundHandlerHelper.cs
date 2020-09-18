@@ -4,6 +4,7 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using Umbraco.Composing;
 using Umbraco.Core;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
@@ -28,7 +29,7 @@ namespace Umbraco.Web.Routing
         /// <param name="domainService"></param>
         /// <returns></returns>
         internal static int? GetCurrentNotFoundPageId(
-            IContentErrorPage[] error404Collection,
+            ContentErrorPage[] error404Collection,
             string requestServerName,
             IEntityService entityService,
             IPublishedContentQuery publishedContentQuery,
@@ -38,7 +39,7 @@ namespace Umbraco.Web.Routing
         }
 
         internal static int? GetCurrentNotFoundPageId(
-            IContentErrorPage[] error404Collection,
+            ContentErrorPage[] error404Collection,
             IEntityService entityService,
             IPublishedContentQuery publishedContentQuery,
             CultureInfo errorCulture)
@@ -67,7 +68,7 @@ namespace Umbraco.Web.Routing
         /// <param name="entityService"></param>
         /// <param name="publishedContentQuery"></param>
         /// <returns></returns>
-        internal static int? GetContentIdFromErrorPageConfig(IContentErrorPage errorPage, IEntityService entityService, IPublishedContentQuery publishedContentQuery)
+        internal static int? GetContentIdFromErrorPageConfig(ContentErrorPage errorPage, IEntityService entityService, IPublishedContentQuery publishedContentQuery)
         {
             if (errorPage.HasContentId) return errorPage.ContentId;
 

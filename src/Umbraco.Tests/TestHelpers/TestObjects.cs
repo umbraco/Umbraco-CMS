@@ -1,4 +1,8 @@
 ﻿using System;
+using System.Configuration;
+using System.IO;
+using System.Linq;
+using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NPoco;
@@ -6,12 +10,18 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Events;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Scoping;
 using Umbraco.Persistance.SqlCe;
+using Umbraco.Tests.Common.Builders;
+using Umbraco.Tests.TestHelpers.Stubs;
 using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.TestHelpers
@@ -72,27 +82,31 @@ namespace Umbraco.Tests.TestHelpers
 
         public IScopeProvider GetScopeProvider(ILoggerFactory loggerFactory, ITypeFinder typeFinder = null, FileSystems fileSystems = null, IUmbracoDatabaseFactory databaseFactory = null)
         {
+            var globalSettings = new GlobalSettingsBuilder().Build();
+            var connectionString = ConfigurationManager.ConnectionStrings[Constants.System.UmbracoConnectionName].ConnectionString;
+            var connectionStrings = new ConnectionStringsBuilder().WithUmbracoConnectionString(connectionString).Build();
+            var coreDebugSettings = new CoreDebugSettingsBuilder().Build();
+
             if (databaseFactory == null)
             {
                 // var mappersBuilder = new MapperCollectionBuilder(Current.Container); // FIXME:
                 // mappersBuilder.AddCore();
                 // var mappers = mappersBuilder.CreateCollection();
                 var mappers = Current.Factory.GetInstance<IMapperCollection>();
-                databaseFactory = new UmbracoDatabaseFactory(loggerFactory.CreateLogger<UmbracoDatabaseFactory>(),
+                databaseFactory = new UmbracoDatabaseFactory(
+                    loggerFactory.CreateLogger<UmbracoDatabaseFactory>(),
                     loggerFactory,
-                    SettingsForTests.DefaultGlobalSettings,
-                    new ConnectionStrings(),
-                    Constants.System.UmbracoConnectionName,
+                    globalSettings,
+                    connectionStrings,
                     new Lazy<IMapperCollection>(() => mappers),
                     TestHelper.DbProviderFactoryCreator);
             }
 
             typeFinder ??= new TypeFinder(loggerFactory.CreateLogger<TypeFinder>(), new DefaultUmbracoAssemblyProvider(GetType().Assembly), new VaryingRuntimeHash());
-            fileSystems ??= new FileSystems(Current.Factory, loggerFactory.CreateLogger<FileSystems>(), loggerFactory, TestHelper.IOHelper, SettingsForTests.GenerateMockGlobalSettings(), TestHelper.GetHostingEnvironment());
+            fileSystems ??= new FileSystems(Current.Factory, loggerFactory.CreateLogger<FileSystems>(), loggerFactory, TestHelper.IOHelper, Options.Create(globalSettings), TestHelper.GetHostingEnvironment());
             var coreDebug = TestHelper.CoreDebugSettings;
             var mediaFileSystem = Mock.Of<IMediaFileSystem>();
-            var scopeProvider = new ScopeProvider(databaseFactory, fileSystems, coreDebug, mediaFileSystem, loggerFactory.CreateLogger<ScopeProvider>(), loggerFactory, typeFinder, NoAppCache.Instance);
-            return scopeProvider;
+            return new ScopeProvider(databaseFactory, fileSystems, Microsoft.Extensions.Options.Options.Create(coreDebugSettings), mediaFileSystem, loggerFactory.CreateLogger<ScopeProvider>(), loggerFactory, typeFinder, NoAppCache.Instance);
         }
 
     }

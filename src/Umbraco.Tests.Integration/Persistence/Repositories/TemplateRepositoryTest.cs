@@ -15,6 +15,7 @@ using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
+using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Integration.Implementations;
 using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.TestHelpers.Entities;
@@ -260,10 +261,10 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
             using (provider.CreateScope())
             {
                 var templateRepository = CreateRepository(provider);
-
+                var globalSettings = new GlobalSettingsBuilder().Build();
                 var tagRepository = new TagRepository(scopeAccessor, AppCaches.Disabled, ConsoleLoggerFactory.CreateLogger<TagRepository>());
                 var commonRepository = new ContentTypeCommonRepository(scopeAccessor, templateRepository, AppCaches, ShortStringHelper);
-                var languageRepository = new LanguageRepository(scopeAccessor, AppCaches.Disabled, ConsoleLoggerFactory.CreateLogger<LanguageRepository>(), GlobalSettings);
+                var languageRepository = new LanguageRepository(scopeAccessor, AppCaches.Disabled, ConsoleLoggerFactory.CreateLogger<LanguageRepository>(), Microsoft.Extensions.Options.Options.Create(globalSettings));
                 var contentTypeRepository = new ContentTypeRepository(scopeAccessor, AppCaches.Disabled, ConsoleLoggerFactory.CreateLogger<ContentTypeRepository>(), commonRepository, languageRepository, ShortStringHelper);
                 var relationTypeRepository = new RelationTypeRepository(scopeAccessor, AppCaches.Disabled, ConsoleLoggerFactory.CreateLogger<RelationTypeRepository>());
                 var entityRepository = new EntityRepository(scopeAccessor);

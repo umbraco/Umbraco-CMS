@@ -32,6 +32,8 @@ using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Security;
 using ContentType = Umbraco.Core.Models.ContentType;
+using Umbraco.Core.Configuration.Models;
+using Microsoft.Extensions.Options;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -48,7 +50,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     public class ContentTypeController : ContentTypeControllerBase<IContentType>
     {
         private readonly IEntityXmlSerializer _serializer;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly IScopeProvider _scopeProvider;
         private readonly IIOHelper _ioHelper;
@@ -67,17 +69,15 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IEntityService _entityService;
         private readonly IHostingEnvironment _hostingEnvironment;
 
-
         public ContentTypeController(
             ICultureDictionary cultureDictionary,
-            EditorValidatorCollection editorValidatorCollection,
             IContentTypeService contentTypeService,
             IMediaTypeService mediaTypeService,
             IMemberTypeService memberTypeService,
             UmbracoMapper umbracoMapper,
             ILocalizedTextService localizedTextService,
             IEntityXmlSerializer serializer,
-            IGlobalSettings globalSettings,
+            IOptions<GlobalSettings> globalSettings,
             PropertyEditorCollection propertyEditors,
             IScopeProvider scopeProvider,
             IIOHelper ioHelper,
@@ -91,7 +91,8 @@ namespace Umbraco.Web.BackOffice.Controllers
             ILocalizationService localizationService,
             IMacroService macroService,
             IEntityService entityService,
-            IHostingEnvironment hostingEnvironment)
+            IHostingEnvironment hostingEnvironment,
+            EditorValidatorCollection editorValidatorCollection)
             : base(cultureDictionary,
                 editorValidatorCollection,
                 contentTypeService,
@@ -101,7 +102,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 localizedTextService)
         {
             _serializer = serializer;
-            _globalSettings = globalSettings;
+            _globalSettings = globalSettings.Value;
             _propertyEditors = propertyEditors;
             _scopeProvider = scopeProvider;
             _ioHelper = ioHelper;
@@ -616,7 +617,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
 
             var dataInstaller = new PackageDataInstallation(_logger, _fileService, _macroService, _LocalizationService,
-                _dataTypeService, _entityService, _contentTypeService, _contentService, _propertyEditors, _scopeProvider, _shortStringHelper, _globalSettings, _localizedTextService);
+                _dataTypeService, _entityService, _contentTypeService, _contentService, _propertyEditors, _scopeProvider, _shortStringHelper, Options.Create(_globalSettings), _localizedTextService);
 
             var xd = new XmlDocument {XmlResolver = null};
             xd.Load(filePath);

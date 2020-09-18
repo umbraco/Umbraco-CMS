@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Umbraco.Core;
-using Umbraco.Core.Configuration.HealthChecks;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Sync;
@@ -20,7 +20,7 @@ namespace Umbraco.Web.Scheduling
         private readonly IScopeProvider _scopeProvider;
         private readonly IProfilingLogger _pLogger;
         private readonly Microsoft.Extensions.Logging.ILogger<HealthCheckNotifier> _logger;
-        private readonly IHealthChecksSettings _healthChecksSettingsConfig;
+        private readonly HealthChecksSettings _healthChecksSettings;
         private readonly IServerRegistrar _serverRegistrar;
         private readonly IRuntimeState _runtimeState;
 
@@ -33,7 +33,7 @@ namespace Umbraco.Web.Scheduling
             IMainDom mainDom,
             IProfilingLogger pLogger,
             Microsoft.Extensions.Logging.ILogger<HealthCheckNotifier> logger,
-            IHealthChecksSettings healthChecksSettingsConfig,
+            HealthChecksSettings healthChecksSettings,
             IServerRegistrar serverRegistrar,
             IRuntimeState runtimeState,
             IScopeProvider scopeProvider)
@@ -46,7 +46,7 @@ namespace Umbraco.Web.Scheduling
             _runtimeState = runtimeState;
             _pLogger = pLogger;
             _logger = logger;
-            _healthChecksSettingsConfig = healthChecksSettingsConfig;
+            _healthChecksSettings = healthChecksSettings;
             _serverRegistrar = serverRegistrar;
             _runtimeState = runtimeState;
         }
@@ -79,7 +79,7 @@ namespace Umbraco.Web.Scheduling
             using (var scope = _scopeProvider.CreateScope())
             using (_pLogger.DebugDuration<HealthCheckNotifier>("Health checks executing", "Health checks complete"))
             {
-                var healthCheckConfig = _healthChecksSettingsConfig;
+                var healthCheckConfig = _healthChecksSettings;
 
                 // Don't notify for any checks that are disabled, nor for any disabled
                 // just for notifications

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Drawing;
 using System.IO;
-using System.Linq;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -17,13 +19,16 @@ namespace Umbraco.Web.Media
     {
         private readonly IMediaFileSystem _mediaFileSystem;
         private readonly ILogger _logger;
-        private readonly IContentSettings _contentSettings;
+        private readonly ContentSettings _contentSettings;
 
-        public UploadAutoFillProperties(IMediaFileSystem mediaFileSystem, ILogger logger, IContentSettings contentSettings)
+        public UploadAutoFillProperties(
+            IMediaFileSystem mediaFileSystem,
+            ILogger logger,
+            IOptions<ContentSettings> contentSettings)
         {
             _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
+            _contentSettings = contentSettings.Value ?? throw new ArgumentNullException(nameof(contentSettings));
         }
 
         /// <summary>

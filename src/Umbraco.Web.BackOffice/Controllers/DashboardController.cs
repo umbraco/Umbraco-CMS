@@ -43,7 +43,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// Initializes a new instance of the <see cref="DashboardController"/> with all its dependencies.
         /// </summary>
         public DashboardController(
-            IGlobalSettings globalSettings,
             IUmbracoContextAccessor umbracoContextAccessor,
             ISqlContext sqlContext,
             ServiceContext services,

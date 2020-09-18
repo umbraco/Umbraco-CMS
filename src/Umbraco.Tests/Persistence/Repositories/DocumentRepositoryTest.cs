@@ -21,6 +21,7 @@ using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.PropertyEditors;
+using Umbraco.Tests.Common.Builders;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
@@ -63,12 +64,14 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private DocumentRepository CreateRepository(IScopeAccessor scopeAccessor, out ContentTypeRepository contentTypeRepository, out TemplateRepository templateRepository, AppCaches appCaches = null)
         {
+            var globalSettings = Microsoft.Extensions.Options.Options.Create(new GlobalSettingsBuilder().Build());
+
             appCaches = appCaches ?? AppCaches;
 
             templateRepository = new TemplateRepository(scopeAccessor, appCaches, LoggerFactory_.CreateLogger<TemplateRepository>(), TestObjects.GetFileSystemsMock(), IOHelper, ShortStringHelper);
             var tagRepository = new TagRepository(scopeAccessor, appCaches, LoggerFactory_.CreateLogger<TagRepository>());
             var commonRepository = new ContentTypeCommonRepository(scopeAccessor, templateRepository, appCaches, ShortStringHelper);
-            var languageRepository = new LanguageRepository(scopeAccessor, appCaches, LoggerFactory_.CreateLogger<LanguageRepository>(), TestObjects.GetGlobalSettings());
+            var languageRepository = new LanguageRepository(scopeAccessor, appCaches, LoggerFactory_.CreateLogger<LanguageRepository>(), globalSettings);
             contentTypeRepository = new ContentTypeRepository(scopeAccessor, appCaches, LoggerFactory_.CreateLogger<ContentTypeRepository>(), commonRepository, languageRepository, ShortStringHelper);
             var relationTypeRepository = new RelationTypeRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory_.CreateLogger<RelationTypeRepository>());
             var entityRepository = new EntityRepository(scopeAccessor);

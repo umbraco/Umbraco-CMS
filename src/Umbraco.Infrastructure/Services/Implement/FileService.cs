@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.Options;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Events;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
@@ -29,7 +31,7 @@ namespace Umbraco.Core.Services.Implement
         private readonly IPartialViewMacroRepository _partialViewMacroRepository;
         private readonly IAuditRepository _auditRepository;
         private readonly IShortStringHelper _shortStringHelper;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
 
         private const string PartialViewHeader = "@inherits Umbraco.Web.Common.AspNetCore.UmbracoViewPage";
@@ -38,7 +40,7 @@ namespace Umbraco.Core.Services.Implement
         public FileService(IScopeProvider uowProvider, ILogger logger, IEventMessagesFactory eventMessagesFactory,
             IStylesheetRepository stylesheetRepository, IScriptRepository scriptRepository, ITemplateRepository templateRepository,
             IPartialViewRepository partialViewRepository, IPartialViewMacroRepository partialViewMacroRepository,
-            IAuditRepository auditRepository, IShortStringHelper shortStringHelper, IGlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
+            IAuditRepository auditRepository, IShortStringHelper shortStringHelper, IOptions<GlobalSettings> globalSettings, IHostingEnvironment hostingEnvironment)
             : base(uowProvider, logger, eventMessagesFactory)
         {
             _stylesheetRepository = stylesheetRepository;
@@ -48,7 +50,7 @@ namespace Umbraco.Core.Services.Implement
             _partialViewMacroRepository = partialViewMacroRepository;
             _auditRepository = auditRepository;
             _shortStringHelper = shortStringHelper;
-            _globalSettings = globalSettings;
+            _globalSettings = globalSettings.Value;
             _hostingEnvironment = hostingEnvironment;
         }
 

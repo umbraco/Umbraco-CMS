@@ -15,6 +15,8 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.ModelsBuilder.Embedded.Building;
 using File = System.IO.File;
+using Umbraco.Core.Configuration.Models;
+using Microsoft.Extensions.Options;
 
 namespace Umbraco.ModelsBuilder.Embedded
 {
@@ -37,7 +39,7 @@ namespace Umbraco.ModelsBuilder.Embedded
         private static readonly Regex AssemblyVersionRegex = new Regex("AssemblyVersion\\(\"[0-9]+.[0-9]+.[0-9]+.[0-9]+\"\\)", RegexOptions.Compiled);
         private static readonly string[] OurFiles = { "models.hash", "models.generated.cs", "all.generated.cs", "all.dll.path", "models.err", "Compiled" };
 
-        private readonly IModelsBuilderConfig _config;
+        private readonly ModelsBuilderConfig _config;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IApplicationShutdownRegistry _hostingLifetime;
         private readonly ModelsGenerationError _errors;
@@ -47,7 +49,7 @@ namespace Umbraco.ModelsBuilder.Embedded
             Lazy<UmbracoServices> umbracoServices,
             IProfilingLogger profilingLogger,
             ILogger<PureLiveModelFactory> logger,
-            IModelsBuilderConfig config,
+            IOptions<ModelsBuilderConfig> config,
             IHostingEnvironment hostingEnvironment,
             IApplicationShutdownRegistry hostingLifetime,
             IPublishedValueFallback publishedValueFallback)
@@ -55,7 +57,7 @@ namespace Umbraco.ModelsBuilder.Embedded
             _umbracoServices = umbracoServices;
             _profilingLogger = profilingLogger;
             _logger = logger;
-            _config = config;
+            _config = config.Value;
             _hostingEnvironment = hostingEnvironment;
             _hostingLifetime = hostingLifetime;
             _publishedValueFallback = publishedValueFallback;

@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 
@@ -13,13 +15,13 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     internal class StylesheetRepository : FileRepository<string, IStylesheet>, IStylesheetRepository
     {
         private readonly IIOHelper _ioHelper;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
 
-        public StylesheetRepository(IFileSystems fileSystems, IIOHelper ioHelper, IGlobalSettings globalSettings)
+        public StylesheetRepository(IFileSystems fileSystems, IIOHelper ioHelper, IOptions<GlobalSettings> globalSettings)
             : base(fileSystems.StylesheetsFileSystem)
         {
             _ioHelper = ioHelper;
-            _globalSettings = globalSettings;
+            _globalSettings = globalSettings.Value;
         }
 
         #region Overrides of FileRepository<string,Stylesheet>

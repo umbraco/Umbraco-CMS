@@ -2,8 +2,9 @@
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
-using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Sync;
 using Microsoft.Extensions.Logging;
@@ -14,24 +15,26 @@ namespace Umbraco.Web.Scheduling
     {
         private readonly IRequestAccessor _requestAccessor;
         private readonly IMainDom _mainDom;
-        private readonly IKeepAliveSettings _keepAliveSettings;
+        private readonly KeepAliveSettings _keepAliveSettings;
         private readonly Microsoft.Extensions.Logging.ILogger<KeepAlive> _logger;
         private readonly IProfilingLogger _profilingLogger;
         private readonly IServerRegistrar _serverRegistrar;
         private static HttpClient _httpClient;
 
         public KeepAlive(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
-            IRequestAccessor requestAccessor, IMainDom mainDom, IKeepAliveSettings keepAliveSettings, Microsoft.Extensions.Logging.ILogger<KeepAlive> logger, IProfilingLogger profilingLogger, IServerRegistrar serverRegistrar)
+            IRequestAccessor requestAccessor, IMainDom mainDom, IOptions<KeepAliveSettings> keepAliveSettings, Microsoft.Extensions.Logging.ILogger<KeepAlive> logger, IProfilingLogger profilingLogger, IServerRegistrar serverRegistrar)
             : base(runner, delayMilliseconds, periodMilliseconds)
         {
             _requestAccessor = requestAccessor;
             _mainDom = mainDom;
-            _keepAliveSettings = keepAliveSettings;
+            _keepAliveSettings = keepAliveSettings.Value;
             _logger = logger;
             _profilingLogger = profilingLogger;
             _serverRegistrar = serverRegistrar;
             if (_httpClient == null)
+            {
                 _httpClient = new HttpClient();
+            }
         }
 
         public override async Task<bool> PerformRunAsync(CancellationToken token)

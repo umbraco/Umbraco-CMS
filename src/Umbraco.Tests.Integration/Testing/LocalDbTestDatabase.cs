@@ -11,6 +11,7 @@ using System.Threading;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Persistence;
 
@@ -25,7 +26,6 @@ namespace Umbraco.Tests.Integration.Testing
         public const string DatabaseName = "UmbracoTests";
 
         private readonly ILoggerFactory _loggerFactory;
-        private readonly IGlobalSettings _globalSettings;
         private readonly LocalDb _localDb;
         private readonly IUmbracoVersion _umbracoVersion;
         private static LocalDb.Instance _instance;
@@ -38,11 +38,10 @@ namespace Umbraco.Tests.Integration.Testing
         private DatabasePool _currentPool;
 
         //It's internal because `Umbraco.Core.Persistence.LocalDb` is internal
-        internal LocalDbTestDatabase(ILoggerFactory loggerFactory, IGlobalSettings globalSettings, LocalDb localDb, string filesPath, IUmbracoDatabaseFactory dbFactory)
+        internal LocalDbTestDatabase(ILoggerFactory loggerFactory, LocalDb localDb, string filesPath, IUmbracoDatabaseFactory dbFactory)
         {
             _umbracoVersion = new UmbracoVersion();
             _loggerFactory = loggerFactory;
-            _globalSettings = globalSettings;
             _localDb = localDb;
             _filesPath = filesPath;
             _dbFactory = dbFactory;
@@ -130,7 +129,7 @@ namespace Umbraco.Tests.Integration.Testing
 
                 using var trans = database.GetTransaction();
 
-                var creator = new DatabaseSchemaCreator(database, _loggerFactory.CreateLogger<DatabaseSchemaCreator>(), _loggerFactory, _umbracoVersion, _globalSettings);
+                var creator = new DatabaseSchemaCreator(database, _loggerFactory.CreateLogger<DatabaseSchemaCreator>(), _loggerFactory, _umbracoVersion);
                 creator.InitializeDatabaseSchema();
 
                 trans.Complete(); // commit it

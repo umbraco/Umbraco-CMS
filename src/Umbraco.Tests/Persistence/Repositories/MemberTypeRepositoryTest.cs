@@ -10,6 +10,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Scoping;
+using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
@@ -23,8 +24,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         private MemberTypeRepository CreateRepository(IScopeProvider provider)
         {
             var templateRepository = Mock.Of<ITemplateRepository>();
+            var globalSettings = new GlobalSettingsBuilder().Build();
             var commonRepository = new ContentTypeCommonRepository((IScopeAccessor)provider, templateRepository, AppCaches, ShortStringHelper);
-            var languageRepository = new LanguageRepository((IScopeAccessor)provider, AppCaches.Disabled, Mock.Of<ILogger<LanguageRepository>>(), TestObjects.GetGlobalSettings());
+            var languageRepository = new LanguageRepository((IScopeAccessor)provider, AppCaches.Disabled, Mock.Of<ILogger<LanguageRepository>>(), Microsoft.Extensions.Options.Options.Create(globalSettings));
             return new MemberTypeRepository((IScopeAccessor) provider, AppCaches.Disabled, Mock.Of<ILogger<MemberTypeRepository>>(), commonRepository, languageRepository, ShortStringHelper);
         }
 

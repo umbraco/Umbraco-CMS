@@ -11,6 +11,7 @@ using Umbraco.Core.Migrations.Upgrade;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Services;
+using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 
@@ -44,7 +45,7 @@ namespace Umbraco.Tests.Migrations
 
                 upgrader.Execute(ScopeProvider, builder, Mock.Of<IKeyValueService>(), _loggerFactory.CreateLogger<Upgrader>(), _loggerFactory);
 
-                var helper = new DatabaseSchemaCreator(scope.Database, LoggerFactory_.CreateLogger<DatabaseSchemaCreator>(), LoggerFactory_, UmbracoVersion, TestObjects.GetGlobalSettings());
+                var helper = new DatabaseSchemaCreator(scope.Database, LoggerFactory_.CreateLogger<DatabaseSchemaCreator>(), LoggerFactory_, UmbracoVersion);
                 var exists = helper.TableExists("umbracoUser");
                 Assert.IsTrue(exists);
 

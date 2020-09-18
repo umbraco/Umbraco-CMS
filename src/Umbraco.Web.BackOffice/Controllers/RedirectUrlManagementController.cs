@@ -13,6 +13,8 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Security;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
+using Microsoft.Extensions.Options;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -20,7 +22,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     public class RedirectUrlManagementController : UmbracoAuthorizedApiController
     {
         private readonly ILogger<RedirectUrlManagementController> _logger;
-        private readonly IWebRoutingSettings _webRoutingSettings;
+        private readonly WebRoutingSettings _webRoutingSettings;
         private readonly IWebSecurity _webSecurity;
         private readonly IRedirectUrlService _redirectUrlService;
         private readonly UmbracoMapper _umbracoMapper;
@@ -29,7 +31,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
         public RedirectUrlManagementController(
             ILogger<RedirectUrlManagementController> logger,
-            IWebRoutingSettings webRoutingSettings,
+            IOptions<WebRoutingSettings> webRoutingSettings,
             IWebSecurity webSecurity,
             IRedirectUrlService redirectUrlService,
             UmbracoMapper umbracoMapper,
@@ -37,7 +39,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             IConfigManipulator configManipulator)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _webRoutingSettings = webRoutingSettings ?? throw new ArgumentNullException(nameof(webRoutingSettings));
+            _webRoutingSettings = webRoutingSettings.Value ?? throw new ArgumentNullException(nameof(webRoutingSettings));
             _webSecurity = webSecurity ?? throw new ArgumentNullException(nameof(webSecurity));
             _redirectUrlService = redirectUrlService ?? throw new ArgumentNullException(nameof(redirectUrlService));
             _umbracoMapper = umbracoMapper ?? throw new ArgumentNullException(nameof(umbracoMapper));

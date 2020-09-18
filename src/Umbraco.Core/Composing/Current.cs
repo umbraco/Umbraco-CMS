@@ -1,8 +1,10 @@
 using System;
 using System.Runtime.CompilerServices;
+using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -15,18 +17,20 @@ namespace Umbraco.Composing
     {
         private static Microsoft.Extensions.Logging.ILogger<object> _logger = new NullLogger<object>();
         private static ILoggerFactory _loggerFactory;
-        private static Configs _configs;
         private static IIOHelper _ioHelper;
         private static IHostingEnvironment _hostingEnvironment;
         private static IBackOfficeInfo _backOfficeInfo;
         private static IProfiler _profiler;
+        private static SecuritySettings _securitySettings;
+        private static GlobalSettings _globalSettings;
 
         public static Microsoft.Extensions.Logging.ILogger<object> Logger => EnsureInitialized(_logger);
-        public static Configs Configs => EnsureInitialized(_configs);
         public static IIOHelper IOHelper => EnsureInitialized(_ioHelper);
         public static IHostingEnvironment HostingEnvironment => EnsureInitialized(_hostingEnvironment);
         public static IBackOfficeInfo BackOfficeInfo => EnsureInitialized(_backOfficeInfo);
         public static IProfiler Profiler => EnsureInitialized(_profiler);
+        public static SecuritySettings SecuritySettings => EnsureInitialized(_securitySettings);
+        public static GlobalSettings GlobalSettings => EnsureInitialized(_globalSettings);
         public static ILoggerFactory LoggerFactory => EnsureInitialized(_loggerFactory);
 
         public static bool IsInitialized { get; internal set; }
@@ -42,7 +46,8 @@ namespace Umbraco.Composing
 
         public static void Initialize(
             Microsoft.Extensions.Logging.ILogger<object> logger,
-            Configs configs,
+            SecuritySettings securitySettings,
+            GlobalSettings globalSettings,
             IIOHelper ioHelper,
             IHostingEnvironment hostingEnvironment,
             IBackOfficeInfo backOfficeInfo,
@@ -54,13 +59,15 @@ namespace Umbraco.Composing
             }
 
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _configs = configs ?? throw new ArgumentNullException(nameof(configs));
             _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
             _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
             _backOfficeInfo = backOfficeInfo ?? throw new ArgumentNullException(nameof(backOfficeInfo));
             _profiler = profiler ?? throw new ArgumentNullException(nameof(profiler));
+            _securitySettings = securitySettings ?? throw new ArgumentNullException(nameof(securitySettings));
+            _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
 
             IsInitialized = true;
         }
+
     }
 }

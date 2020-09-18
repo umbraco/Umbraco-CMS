@@ -6,6 +6,7 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Logging.Serilog;
 using Umbraco.Core.Strings;
+using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Components;
 using Umbraco.Tests.TestHelpers;
 using NullLogger = Microsoft.Extensions.Logging.Abstractions.NullLogger;
@@ -34,8 +35,8 @@ namespace Umbraco.Tests.UmbracoExamine
         protected override void Compose()
         {
             base.Compose();
-
-            Composition.RegisterUnique<IShortStringHelper>(_ => new DefaultShortStringHelper(SettingsForTests.GenerateMockRequestHandlerSettings()));
+            var requestHandlerSettings = new RequestHandlerSettingsBuilder().Build();
+            Composition.RegisterUnique<IShortStringHelper>(_ => new DefaultShortStringHelper(Microsoft.Extensions.Options.Options.Create(requestHandlerSettings)));
         }
     }
 }

@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
@@ -187,7 +188,7 @@ namespace Umbraco.Web.Compose
             private readonly INotificationService _notificationService;
             private readonly IUserService _userService;
             private readonly ILocalizedTextService _textService;
-            private readonly IGlobalSettings _globalSettings;
+            private readonly GlobalSettings _globalSettings;
             private readonly ILogger _logger;
 
             /// <summary>
@@ -200,14 +201,21 @@ namespace Umbraco.Web.Compose
             /// <param name="globalSettings"></param>
             /// <param name="contentConfig"></param>
             /// <param name="logger"></param>
-            public Notifier(IUmbracoContextAccessor umbracoContextAccessor, IRequestAccessor requestAccessor, INotificationService notificationService, IUserService userService, ILocalizedTextService textService, IGlobalSettings globalSettings, ILogger logger)
+            public Notifier(
+                IUmbracoContextAccessor umbracoContextAccessor,
+                IRequestAccessor requestAccessor,
+                INotificationService notificationService,
+                IUserService userService,
+                ILocalizedTextService textService,
+                IOptions<GlobalSettings> globalSettings,
+                ILogger logger)
             {
                 _umbracoContextAccessor = umbracoContextAccessor;
                 _requestAccessor = requestAccessor;
                 _notificationService = notificationService;
                 _userService = userService;
                 _textService = textService;
-                _globalSettings = globalSettings;
+                _globalSettings = globalSettings.Value;
                 _logger = logger;
             }
 

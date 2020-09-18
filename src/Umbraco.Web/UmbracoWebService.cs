@@ -1,14 +1,7 @@
-﻿using System;
-using System.Web;
-using System.Web.Mvc;
-using System.Web.Routing;
+﻿using System.Web.Mvc;
 using System.Web.Services;
-using Microsoft.Extensions.Logging;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Security;
@@ -23,7 +16,7 @@ namespace Umbraco.Web
     {
         private UrlHelper _url;
 
-        protected UmbracoWebService(ILogger logger, IProfilingLogger profilingLogger, IUmbracoContextAccessor umbracoContextAccessor, ServiceContext services, IGlobalSettings globalSettings)
+        protected UmbracoWebService(ILogger logger, IProfilingLogger profilingLogger, IUmbracoContextAccessor umbracoContextAccessor, ServiceContext services, GlobalSettings globalSettings)
         {
             Logger = logger;
             ProfilingLogger = profilingLogger;
@@ -33,7 +26,7 @@ namespace Umbraco.Web
         }
 
         protected UmbracoWebService()
-        : this(Current.Logger, Current.ProfilingLogger, Current.UmbracoContextAccessor,  Current.Services, Current.Configs.Global())
+        : this(Current.Logger, Current.ProfilingLogger, Current.UmbracoContextAccessor,  Current.Services, new GlobalSettings())
         {
         }
 
@@ -65,7 +58,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets the global settings.
         /// </summary>
-        public IGlobalSettings GlobalSettings { get; }
+        public GlobalSettings GlobalSettings { get; }
 
         /// <summary>
         /// Gets the web security helper.

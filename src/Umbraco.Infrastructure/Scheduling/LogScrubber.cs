@@ -1,5 +1,7 @@
 ﻿using System;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Scoping;
@@ -10,32 +12,31 @@ using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Umbraco.Web.Scheduling
 {
-
     public class LogScrubber : RecurringTaskBase
     {
         private readonly IMainDom _mainDom;
         private readonly IServerRegistrar _serverRegistrar;
         private readonly IAuditService _auditService;
-        private readonly ILoggingSettings _settings;
+        private readonly LoggingSettings _settings;
         private readonly IProfilingLogger _pLogger;
         private readonly Microsoft.Extensions.Logging.ILogger<LogScrubber> _logger;
         private readonly IScopeProvider _scopeProvider;
 
         public LogScrubber(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
-            IMainDom mainDom, IServerRegistrar serverRegistrar, IAuditService auditService, ILoggingSettings settings, IScopeProvider scopeProvider, IProfilingLogger pLogger, Microsoft.Extensions.Logging.ILogger<LogScrubber> logger)
+            IMainDom mainDom, IServerRegistrar serverRegistrar, IAuditService auditService, IOptions<LoggingSettings> settings, IScopeProvider scopeProvider, IProfilingLogger pLogger, Microsoft.Extensions.Logging.ILogger<LogScrubber> logger)
             : base(runner, delayMilliseconds, periodMilliseconds)
         {
             _mainDom = mainDom;
             _serverRegistrar = serverRegistrar;
             _auditService = auditService;
-            _settings = settings;
+            _settings = settings.Value;
             _scopeProvider = scopeProvider;
             _pLogger = pLogger;
             _logger = logger;
         }
 
         // maximum age, in minutes
-        private int GetLogScrubbingMaximumAge(ILoggingSettings settings)
+        private int GetLogScrubbingMaximumAge(LoggingSettings settings)
         {
             var maximumAge = 24 * 60; // 24 hours, in minutes
             try

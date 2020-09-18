@@ -3,6 +3,8 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
+using Umbraco.Core.Configuration.Models;
+using Microsoft.Extensions.Options;
 
 namespace Umbraco.Web.Routing
 {
@@ -19,14 +21,14 @@ namespace Umbraco.Web.Routing
         private readonly IFileService _fileService;
 
         private readonly IContentTypeService _contentTypeService;
-        private readonly IWebRoutingSettings _webRoutingSettings;
+        private readonly WebRoutingSettings _webRoutingSettings;
 
-        public ContentFinderByUrlAndTemplate(ILogger logger, IFileService fileService, IContentTypeService contentTypeService, IWebRoutingSettings webRoutingSettings)
+        public ContentFinderByUrlAndTemplate(ILogger logger, IFileService fileService, IContentTypeService contentTypeService, IOptions<WebRoutingSettings> webRoutingSettings)
             : base(logger)
         {
             _fileService = fileService;
             _contentTypeService = contentTypeService;
-            _webRoutingSettings = webRoutingSettings;
+            _webRoutingSettings = webRoutingSettings.Value;
         }
 
         /// <summary>

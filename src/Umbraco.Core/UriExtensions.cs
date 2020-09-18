@@ -4,8 +4,8 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using Umbraco.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
 
 namespace Umbraco.Core
 {
@@ -39,7 +39,7 @@ namespace Umbraco.Core
         ///      But if we've got this far we'll just have to assume it's front-end anyways.
         ///
         ///  </remarks>
-        public static bool IsBackOfficeRequest(this Uri url, IGlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
+        public static bool IsBackOfficeRequest(this Uri url, GlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
         {
             var applicationPath = hostingEnvironment.ApplicationVirtualPath;
 
@@ -129,7 +129,7 @@ namespace Umbraco.Core
         /// <param name="globalSettings"></param>
         /// <param name="hostingEnvironment"></param>
         /// <returns></returns>
-        internal static bool IsDefaultBackOfficeRequest(this Uri url, IGlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
+        internal static bool IsDefaultBackOfficeRequest(this Uri url, GlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
         {
             var backOfficePath = globalSettings.GetBackOfficePath(hostingEnvironment);
             if (url.AbsolutePath.InvariantEquals(backOfficePath.TrimEnd("/"))

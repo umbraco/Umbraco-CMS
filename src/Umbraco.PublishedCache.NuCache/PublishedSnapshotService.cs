@@ -6,12 +6,14 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CSharpTest.Net.Collections;
+using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Install;
 using Umbraco.Core.IO;
@@ -48,7 +50,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly IDocumentRepository _documentRepository;
         private readonly IMediaRepository _mediaRepository;
         private readonly IMemberRepository _memberRepository;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly IEntityXmlSerializer _entitySerializer;
         private readonly IPublishedModelFactory _publishedModelFactory;
         private readonly IDefaultCultureAccessor _defaultCultureAccessor;
@@ -56,7 +58,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly IIOHelper _ioHelper;
-        private readonly INuCacheSettings _config;
+        private readonly NuCacheSettings _config;
 
         // volatile because we read it with no lock
         private volatile bool _isReady;
@@ -90,14 +92,15 @@ namespace Umbraco.Web.PublishedCache.NuCache
             IScopeProvider scopeProvider,
             IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository,
             IDefaultCultureAccessor defaultCultureAccessor,
-            IDataSource dataSource, IGlobalSettings globalSettings,
+            IDataSource dataSource,
+            IOptions<GlobalSettings> globalSettings,
             IEntityXmlSerializer entitySerializer,
             IPublishedModelFactory publishedModelFactory,
             UrlSegmentProviderCollection urlSegmentProviders,
             IHostingEnvironment hostingEnvironment,
             IShortStringHelper shortStringHelper,
             IIOHelper ioHelper,
-            INuCacheSettings config)
+            IOptions<NuCacheSettings> config)
             : base(publishedSnapshotAccessor, variationContextAccessor)
         {
             //if (Interlocked.Increment(ref _singletonCheck) > 1)
@@ -114,12 +117,12 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _mediaRepository = mediaRepository;
             _memberRepository = memberRepository;
             _defaultCultureAccessor = defaultCultureAccessor;
-            _globalSettings = globalSettings;
+            _globalSettings = globalSettings.Value;
             _urlSegmentProviders = urlSegmentProviders;
             _hostingEnvironment = hostingEnvironment;
             _shortStringHelper = shortStringHelper;
             _ioHelper = ioHelper;
-            _config = config;
+            _config = config.Value;
 
             // we need an Xml serializer here so that the member cache can support XPath,
             // for members this is done by navigating the serialized-to-xml member
@@ -152,7 +155,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     // stores are created with a db so they can write to it, but they do not read from it,
                     // stores need to be populated, happens in OnResolutionFrozen which uses _localDbExists to
                     // figure out whether it can read the databases or it should populate them from sql
-                    
+
                     _logger.LogInformation("Creating the content store, localContentDbExists? {LocalContentDbExists}", _localContentDbExists);
                     _contentStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, _loggerFactory.CreateLogger("ContentStore"), _loggerFactory,  publishedModelFactory, _localContentDb);
                     _logger.LogInformation("Creating the media store, localMediaDbExists? {LocalMediaDbExists}", _localMediaDbExists);
@@ -1244,7 +1247,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             return new PublishedSnapshot.PublishedSnapshotElements
             {
-                ContentCache = new ContentCache(previewDefault, contentSnap, snapshotCache, elementsCache, domainCache, _globalSettings, VariationContextAccessor),
+                ContentCache = new ContentCache(previewDefault, contentSnap, snapshotCache, elementsCache, domainCache, Options.Create(_globalSettings), VariationContextAccessor),
                 MediaCache = new MediaCache(previewDefault, mediaSnap, VariationContextAccessor),
                 MemberCache = new MemberCache(previewDefault, snapshotCache, _serviceContext.MemberService, memberTypeCache, PublishedSnapshotAccessor, VariationContextAccessor, _entitySerializer, _publishedModelFactory),
                 DomainCache = domainCache,

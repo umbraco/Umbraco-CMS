@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.Extensions.Options;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Extensions;
 using Umbraco.Web.Common.Lifetime;
@@ -13,18 +15,18 @@ namespace Umbraco.Web.Common.AspNetCore
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
-        private readonly IWebRoutingSettings _webRoutingSettings;
+        private readonly WebRoutingSettings _webRoutingSettings;
         private readonly ISet<string> _applicationUrls = new HashSet<string>();
         private Uri _currentApplicationUrl;
 
         public AspNetCoreRequestAccessor(IHttpContextAccessor httpContextAccessor,
             IUmbracoRequestLifetime umbracoRequestLifetime,
             IUmbracoContextAccessor umbracoContextAccessor,
-            IWebRoutingSettings webRoutingSettings)
+            IOptions<WebRoutingSettings> webRoutingSettings)
         {
             _httpContextAccessor = httpContextAccessor;
             _umbracoContextAccessor = umbracoContextAccessor;
-            _webRoutingSettings = webRoutingSettings;
+            _webRoutingSettings = webRoutingSettings.Value;
 
             umbracoRequestLifetime.RequestStart += RequestStart;
             umbracoRequestLifetime.RequestEnd += RequestEnd;

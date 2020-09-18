@@ -10,6 +10,7 @@ using System.Web;
 using System.Web.Http;
 using System.Web.Mvc;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
@@ -21,6 +22,7 @@ using Umbraco.Web.Security;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using IUser = Umbraco.Core.Models.Membership.IUser;
@@ -48,13 +50,13 @@ namespace Umbraco.Web.Editors
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ILogger<AuthenticationController> _logger;
         private readonly IRuntimeState _runtimeState;
-        private readonly ISecuritySettings _securitySettings;
+        private readonly SecuritySettings _securitySettings;
         private readonly IRequestAccessor _requestAccessor;
         private readonly IEmailSender _emailSender;
 
         public AuthenticationController(
             IUserPasswordConfiguration passwordConfiguration,
-            IGlobalSettings globalSettings,
+            GlobalSettings globalSettings,
             IHostingEnvironment hostingEnvironment,
             IUmbracoContextAccessor umbracoContextAccessor,
             ISqlContext sqlContext,
@@ -64,7 +66,7 @@ namespace Umbraco.Web.Editors
             ILogger<AuthenticationController> logger,
             IRuntimeState runtimeState,
             UmbracoMapper umbracoMapper,
-            ISecuritySettings securitySettings,
+            IOptions<SecuritySettings> securitySettings,
             IPublishedUrlProvider publishedUrlProvider,
             IRequestAccessor requestAccessor,
             IEmailSender emailSender)
@@ -74,7 +76,7 @@ namespace Umbraco.Web.Editors
             _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
             _logger = logger;
             _runtimeState = runtimeState ?? throw new ArgumentNullException(nameof(runtimeState));
-            _securitySettings = securitySettings ?? throw new ArgumentNullException(nameof(securitySettings));
+            _securitySettings = securitySettings.Value ?? throw new ArgumentNullException(nameof(securitySettings));
             _requestAccessor = requestAccessor ?? throw new ArgumentNullException(nameof(securitySettings));
             _emailSender = emailSender;
         }
@@ -114,7 +116,7 @@ namespace Umbraco.Web.Editors
         /// Used to retrieve the 2FA providers for code submission
         /// </summary>
         /// <returns></returns>
-        [SetAngularAntiForgeryTokens]
+        // [SetAngularAntiForgeryTokens] //TODO reintroduce when migrated to netcore
         public async Task<IEnumerable<string>> Get2FAProviders()
         {
             var userId = await SignInManager.GetVerifiedUserIdAsync();
@@ -130,7 +132,7 @@ namespace Umbraco.Web.Editors
             return userFactors;
         }
 
-        [SetAngularAntiForgeryTokens]
+        // [SetAngularAntiForgeryTokens] //TODO reintroduce when migrated to netcore
         public async Task<IHttpActionResult> PostSend2FACode([FromBody]string provider)
         {
             if (provider.IsNullOrWhiteSpace())
@@ -151,7 +153,7 @@ namespace Umbraco.Web.Editors
             return Ok();
         }
 
-        [SetAngularAntiForgeryTokens]
+        // [SetAngularAntiForgeryTokens] //TODO reintroduce when migrated to netcore
         public async Task<HttpResponseMessage> PostVerify2FACode(Verify2FACodeModel model)
         {
             if (ModelState.IsValid == false)

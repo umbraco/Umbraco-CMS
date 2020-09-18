@@ -3,6 +3,7 @@ using System.Configuration;
 using System.Data.SqlServerCe;
 using System.IO;
 using System.Threading;
+using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -16,6 +17,7 @@ using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Services;
 using Umbraco.Persistance.SqlCe;
+using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Security;
 
@@ -41,9 +43,9 @@ namespace Umbraco.Tests.Persistence
             _logger = Mock.Of<Microsoft.Extensions.Logging.ILogger<UmbracoDatabaseFactory>>();
             _loggerFactory = NullLoggerFactory.Instance;
             _umbracoVersion = TestHelper.GetUmbracoVersion();
-            var globalSettings = TestHelper.GetConfigs().Global();
-            var connectionStrings = TestHelper.GetConfigs().ConnectionStrings();
-            _databaseFactory = new UmbracoDatabaseFactory(_logger, _loggerFactory, globalSettings, connectionStrings,  new Lazy<IMapperCollection>(() => Mock.Of<IMapperCollection>()), TestHelper.DbProviderFactoryCreator);
+            var globalSettings = new GlobalSettingsBuilder().Build();
+            var connectionStrings = new ConnectionStringsBuilder().Build();
+            _databaseFactory = new UmbracoDatabaseFactory(_logger, _loggerFactory, Options.Create(globalSettings), Options.Create(connectionStrings),  new Lazy<IMapperCollection>(() => Mock.Of<IMapperCollection>()), TestHelper.DbProviderFactoryCreator);
         }
 
         [TearDown]
@@ -97,7 +99,7 @@ namespace Umbraco.Tests.Persistence
             using (var database = _databaseFactory.CreateDatabase())
             using (var transaction = database.GetTransaction())
             {
-                schemaHelper = new DatabaseSchemaCreator(database, _loggerFactory.CreateLogger<DatabaseSchemaCreator>(), _loggerFactory, _umbracoVersion, SettingsForTests.GenerateMockGlobalSettings());
+                schemaHelper = new DatabaseSchemaCreator(database, _loggerFactory.CreateLogger<DatabaseSchemaCreator>(), _loggerFactory, _umbracoVersion);
                 schemaHelper.InitializeDatabaseSchema();
                 transaction.Complete();
             }
