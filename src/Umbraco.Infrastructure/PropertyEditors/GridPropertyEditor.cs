@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Media;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
@@ -36,7 +36,7 @@ namespace Umbraco.Web.PropertyEditors
         private readonly IImageUrlGenerator _imageUrlGenerator;
 
         public GridPropertyEditor(
-            ILogger logger,
+            ILoggerFactory loggerFactory,
             IUmbracoContextAccessor umbracoContextAccessor,
             IDataTypeService dataTypeService,
             ILocalizationService localizationService,
@@ -47,7 +47,7 @@ namespace Umbraco.Web.PropertyEditors
             IIOHelper ioHelper,
             IShortStringHelper shortStringHelper,
             IImageUrlGenerator imageUrlGenerator)
-            : base(logger, dataTypeService, localizationService, localizedTextService, shortStringHelper)
+            : base(loggerFactory, dataTypeService, localizationService, localizedTextService, shortStringHelper)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
             _ioHelper = ioHelper;

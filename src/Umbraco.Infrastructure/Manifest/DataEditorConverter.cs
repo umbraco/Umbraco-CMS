@@ -1,9 +1,9 @@
 ﻿using System;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
@@ -16,7 +16,7 @@ namespace Umbraco.Core.Manifest
     /// </summary>
     internal class DataEditorConverter : JsonReadConverter<IDataEditor>
     {
-        private readonly ILogger _logger;
+        private readonly ILoggerFactory _loggerFactory;
         private readonly IIOHelper _ioHelper;
         private readonly IDataTypeService _dataTypeService;
         private readonly ILocalizationService _localizationService;
@@ -26,9 +26,9 @@ namespace Umbraco.Core.Manifest
         /// <summary>
         /// Initializes a new instance of the <see cref="DataEditorConverter"/> class.
         /// </summary>
-        public DataEditorConverter(ILogger logger, IIOHelper ioHelper, IDataTypeService dataTypeService, ILocalizationService localizationService, ILocalizedTextService textService, IShortStringHelper shortStringHelper)
+        public DataEditorConverter(ILoggerFactory loggerFactory, IIOHelper ioHelper, IDataTypeService dataTypeService, ILocalizationService localizationService, ILocalizedTextService textService, IShortStringHelper shortStringHelper)
         {
-            _logger = logger;
+            _loggerFactory = loggerFactory;
             _ioHelper = ioHelper;
             _dataTypeService = dataTypeService;
             _localizationService = localizationService;
@@ -61,7 +61,7 @@ namespace Umbraco.Core.Manifest
                 type = EditorType.MacroParameter;
             }
 
-            return new DataEditor(_logger, _dataTypeService, _localizationService, _textService, _shortStringHelper, type);
+            return new DataEditor(_loggerFactory, _dataTypeService, _localizationService, _textService, _shortStringHelper, type);
         }
 
         /// <inheritdoc />

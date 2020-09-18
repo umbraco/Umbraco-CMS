@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
@@ -29,13 +29,13 @@ namespace Umbraco.Web.PropertyEditors
 
         public TagsPropertyEditor(
             ManifestValueValidatorCollection validators,
-            ILogger logger,
+            ILoggerFactory loggerFactory,
             IIOHelper ioHelper,
             IDataTypeService dataTypeService,
             ILocalizationService localizationService,
             ILocalizedTextService localizedTextService,
             IShortStringHelper shortStringHelper)
-            : base(logger, dataTypeService, localizationService, localizedTextService, shortStringHelper)
+            : base(loggerFactory, dataTypeService, localizationService, localizedTextService, shortStringHelper)
         {
             _validators = validators;
             _ioHelper = ioHelper;

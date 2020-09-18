@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
@@ -30,10 +30,10 @@ namespace Umbraco.Web.PropertyEditors
             IDataTypeService dataTypeService,
             ILocalizationService localizationService,
             ILocalizedTextService localizedTextService,
-            ILogger logger,
+            ILoggerFactory loggerFactory,
             IIOHelper ioHelper,
             IShortStringHelper shortStringHelper)
-            : base(logger, dataTypeService,localizationService,localizedTextService, shortStringHelper)
+            : base(loggerFactory, dataTypeService,localizationService,localizedTextService, shortStringHelper)
         {
             _dataTypeService = dataTypeService;
             _localizationService = localizationService;

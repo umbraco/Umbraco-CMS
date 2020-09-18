@@ -4,6 +4,7 @@ using System.Data;
 using System.Linq;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -68,7 +69,7 @@ namespace Umbraco.Tests.PublishedContent
             Mock.Get(runtime).Setup(x => x.Level).Returns(RuntimeLevel.Run);
 
             // create data types, property types and content types
-            var dataType = new DataType(new VoidEditor("Editor", Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(),  Mock.Of<ILocalizationService>(),   Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>())) { Id = 3 };
+            var dataType = new DataType(new VoidEditor("Editor", NullLoggerFactory.Instance, Mock.Of<IDataTypeService>(),  Mock.Of<ILocalizationService>(),   Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>())) { Id = 3 };
 
             var dataTypes = new[]
             {

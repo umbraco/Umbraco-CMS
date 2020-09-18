@@ -3,8 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Blocks;
 using Umbraco.Core.Models.Editors;
@@ -29,14 +29,14 @@ namespace Umbraco.Web.PropertyEditors
         private readonly IContentTypeService _contentTypeService;
 
         public BlockEditorPropertyEditor(
-            ILogger logger,
+            ILoggerFactory loggerFactory,
             Lazy<PropertyEditorCollection> propertyEditors,
             IDataTypeService dataTypeService,
             IContentTypeService contentTypeService,
             ILocalizedTextService localizedTextService,
             ILocalizationService localizationService,
             IShortStringHelper shortStringHelper)
-            : base(logger, dataTypeService,localizationService,localizedTextService, shortStringHelper)
+            : base(loggerFactory, dataTypeService,localizationService,localizedTextService, shortStringHelper)
         {
             _localizedTextService = localizedTextService;
             _propertyEditors = propertyEditors;

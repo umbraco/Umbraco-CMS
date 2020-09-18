@@ -1,6 +1,6 @@
-﻿using Umbraco.Core;
+﻿using Microsoft.Extensions.Logging;
+using Umbraco.Core;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
@@ -24,15 +24,15 @@ namespace Umbraco.Web.PropertyEditors
         /// <summary>
         /// Initializes a new instance of the <see cref="ListViewPropertyEditor"/> class.
         /// </summary>
-        /// <param name="logger"></param>
+        /// <param name="loggerFactory"></param>
         public ListViewPropertyEditor(
-            ILogger logger,
+            ILoggerFactory loggerFactory,
             IIOHelper iioHelper,
             IDataTypeService dataTypeService,
             ILocalizationService localizationService,
             ILocalizedTextService localizedTextService,
             IShortStringHelper shortStringHelper)
-            : base(logger, dataTypeService, localizationService, localizedTextService, shortStringHelper)
+            : base(loggerFactory, dataTypeService, localizationService, localizedTextService, shortStringHelper)
         {
             _iioHelper = iioHelper;
         }

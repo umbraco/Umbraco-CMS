@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Web.Routing;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
@@ -94,7 +95,7 @@ namespace Umbraco.Tests.PublishedContent
         private SolidPublishedSnapshot CreatePublishedSnapshot()
         {
             var dataTypeService = new TestObjects.TestDataTypeService(
-                new DataType(new VoidEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(),  Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>())) { Id = 1 });
+                new DataType(new VoidEditor(NullLoggerFactory.Instance, Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(),  Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>())) { Id = 1 });
 
             var factory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), new PropertyValueConverterCollection(Array.Empty<IPropertyValueConverter>()), dataTypeService);
             var caches = new SolidPublishedSnapshot();

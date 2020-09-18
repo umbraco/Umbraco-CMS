@@ -5,11 +5,11 @@ using System.Linq;
 using System.Net;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Core.Collections;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Packaging;
@@ -23,7 +23,8 @@ namespace Umbraco.Core.Packaging
 {
     public class PackageDataInstallation
     {
-        private readonly ILogger _logger;
+        private readonly ILogger<PackageDataInstallation> _logger;
+        private readonly ILoggerFactory _loggerFactory;
         private readonly IFileService _fileService;
         private readonly IMacroService _macroService;
         private readonly ILocalizationService _localizationService;
@@ -37,12 +38,13 @@ namespace Umbraco.Core.Packaging
         private readonly IContentTypeService _contentTypeService;
         private readonly IContentService _contentService;
 
-        public PackageDataInstallation(ILogger logger, IFileService fileService, IMacroService macroService, ILocalizationService localizationService,
+        public PackageDataInstallation(ILogger<PackageDataInstallation> logger, ILoggerFactory loggerFactory, IFileService fileService, IMacroService macroService, ILocalizationService localizationService,
             IDataTypeService dataTypeService, IEntityService entityService, IContentTypeService contentTypeService,
             IContentService contentService, PropertyEditorCollection propertyEditors, IScopeProvider scopeProvider, IShortStringHelper shortStringHelper, IOptions<GlobalSettings> globalSettings,
             ILocalizedTextService localizedTextService)
         {
             _logger = logger;
+            _loggerFactory = loggerFactory;
             _fileService = fileService;
             _macroService = macroService;
             _localizationService = localizationService;
@@ -904,7 +906,7 @@ namespace Umbraco.Core.Packaging
 
                     var editorAlias = dataTypeElement.Attribute("Id")?.Value?.Trim();
                     if (!_propertyEditors.TryGet(editorAlias, out var editor))
-                        editor = new VoidEditor(_logger, _dataTypeService, _localizationService, _localizedTextService, _shortStringHelper) { Alias = editorAlias };
+                        editor = new VoidEditor(_loggerFactory, _dataTypeService, _localizationService, _localizedTextService, _shortStringHelper) { Alias = editorAlias };
 
                     var dataType = new DataType(editor)
                     {

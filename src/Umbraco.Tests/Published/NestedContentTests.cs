@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -27,13 +28,13 @@ namespace Umbraco.Tests.Published
         private (IPublishedContentType, IPublishedContentType) CreateContentTypes()
         {
             var logger = Mock.Of<Microsoft.Extensions.Logging.ILogger>();
-            var coreLogger = Mock.Of<ILogger>();
+            var loggerFactory = NullLoggerFactory.Instance;
             var profiler = Mock.Of<IProfiler>();
             var proflog = new ProfilingLogger(logger, profiler);
             var localizationService = Mock.Of<ILocalizationService>();
 
             PropertyEditorCollection editors = null;
-            var editor = new NestedContentPropertyEditor(coreLogger, new Lazy<PropertyEditorCollection>(() => editors), Mock.Of<IDataTypeService>(),localizationService, Mock.Of<IContentTypeService>(), TestHelper.IOHelper, TestHelper.ShortStringHelper, Mock.Of<ILocalizedTextService>());
+            var editor = new NestedContentPropertyEditor(loggerFactory, new Lazy<PropertyEditorCollection>(() => editors), Mock.Of<IDataTypeService>(),localizationService, Mock.Of<IContentTypeService>(), TestHelper.IOHelper, TestHelper.ShortStringHelper, Mock.Of<ILocalizedTextService>());
             editors = new PropertyEditorCollection(new DataEditorCollection(new DataEditor[] { editor }));
 
             var dataType1 = new DataType(editor)
@@ -64,7 +65,7 @@ namespace Umbraco.Tests.Published
                 }
             };
 
-            var dataType3 = new DataType(new TextboxPropertyEditor(coreLogger, Mock.Of<IDataTypeService>(), localizationService, TestHelper.IOHelper, TestHelper.ShortStringHelper, Mock.Of<ILocalizedTextService>()))
+            var dataType3 = new DataType(new TextboxPropertyEditor(loggerFactory, Mock.Of<IDataTypeService>(), localizationService, TestHelper.IOHelper, TestHelper.ShortStringHelper, Mock.Of<ILocalizedTextService>()))
             {
                 Id = 3
             };

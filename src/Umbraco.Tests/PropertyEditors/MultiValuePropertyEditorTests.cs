@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Newtonsoft.Json;
 using NUnit.Framework;
@@ -31,7 +32,7 @@ namespace Umbraco.Tests.PropertyEditors
         [Test]
         public void DropDownMultipleValueEditor_Format_Data_For_Cache()
         {
-            var dataType = new DataType(new CheckBoxListPropertyEditor(Mock.Of<ILogger>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<IShortStringHelper>(), TestHelper.IOHelper, Mock.Of<ILocalizedTextService>()))
+            var dataType = new DataType(new CheckBoxListPropertyEditor(NullLoggerFactory.Instance, Mock.Of<ILocalizedTextService>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<IShortStringHelper>(), TestHelper.IOHelper, Mock.Of<ILocalizedTextService>()))
             {
                 Configuration = new ValueListConfiguration
                 {
@@ -60,7 +61,7 @@ namespace Umbraco.Tests.PropertyEditors
         [Test]
         public void DropDownValueEditor_Format_Data_For_Cache()
         {
-            var dataType = new DataType(new CheckBoxListPropertyEditor(Mock.Of<ILogger>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<IShortStringHelper>(), TestHelper.IOHelper, Mock.Of<ILocalizedTextService>()))
+            var dataType = new DataType(new CheckBoxListPropertyEditor(NullLoggerFactory.Instance, Mock.Of<ILocalizedTextService>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<IShortStringHelper>(), TestHelper.IOHelper, Mock.Of<ILocalizedTextService>()))
             {
                 Configuration = new ValueListConfiguration
                 {

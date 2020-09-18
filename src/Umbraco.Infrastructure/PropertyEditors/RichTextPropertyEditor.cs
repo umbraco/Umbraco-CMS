@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Media;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
@@ -39,7 +39,7 @@ namespace Umbraco.Web.PropertyEditors
         /// The constructor will setup the property editor based on the attribute if one is found
         /// </summary>
         public RichTextPropertyEditor(
-            ILogger logger,
+            ILoggerFactory loggerFactory,
             IUmbracoContextAccessor umbracoContextAccessor,
             IDataTypeService dataTypeService,
             ILocalizationService localizationService,
@@ -50,7 +50,7 @@ namespace Umbraco.Web.PropertyEditors
             IIOHelper ioHelper,
             ILocalizedTextService localizedTextService,
             IImageUrlGenerator imageUrlGenerator)
-            : base(logger, dataTypeService, localizationService, localizedTextService, shortStringHelper)
+            : base(loggerFactory, dataTypeService, localizationService, localizedTextService, shortStringHelper)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
             _imageSourceParser = imageSourceParser;

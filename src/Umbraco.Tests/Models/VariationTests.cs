@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -37,7 +38,7 @@ namespace Umbraco.Tests.Models
 
             var dataEditors = new DataEditorCollection(new IDataEditor[]
             {
-                new DataEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>()) { Alias = "editor", ExplicitValueEditor = TestHelper.CreateDataValueEditor("view") }
+                new DataEditor(NullLoggerFactory.Instance, Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>()) { Alias = "editor", ExplicitValueEditor = TestHelper.CreateDataValueEditor("view") }
             });
             var propertyEditors = new PropertyEditorCollection(dataEditors);
 

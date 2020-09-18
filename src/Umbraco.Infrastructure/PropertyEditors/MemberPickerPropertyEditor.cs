@@ -1,5 +1,5 @@
-﻿using Umbraco.Core;
-using Umbraco.Core.Logging;
+﻿using Microsoft.Extensions.Logging;
+using Umbraco.Core;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
@@ -16,12 +16,12 @@ namespace Umbraco.Web.PropertyEditors
     public class MemberPickerPropertyEditor : DataEditor
     {
         public MemberPickerPropertyEditor(
-            ILogger logger,
+            ILoggerFactory loggerFactory,
             IDataTypeService dataTypeService,
             ILocalizationService localizationService,
             ILocalizedTextService localizedTextService,
             IShortStringHelper shortStringHelper)
-            : base(logger, dataTypeService, localizationService, localizedTextService, shortStringHelper)
+            : base(loggerFactory, dataTypeService, localizationService, localizedTextService, shortStringHelper)
         { }
 
         protected override IConfigurationEditor CreateConfigurationEditor() => new MemberPickerConfiguration();

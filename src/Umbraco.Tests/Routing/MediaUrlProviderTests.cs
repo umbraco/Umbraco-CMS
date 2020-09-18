@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Newtonsoft.Json;
 using NUnit.Framework;
@@ -33,14 +34,14 @@ namespace Umbraco.Tests.Routing
         {
             base.SetUp();
 
-            var logger = Mock.Of<ILogger>();
+            var loggerFactory = NullLoggerFactory.Instance;
             var mediaFileSystemMock = Mock.Of<IMediaFileSystem>();
             var contentSettings = new ContentSettingsBuilder().Build();
             var dataTypeService = Mock.Of<IDataTypeService>();
             var propertyEditors = new MediaUrlGeneratorCollection(new IMediaUrlGenerator[]
             {
-                new FileUploadPropertyEditor(logger, mediaFileSystemMock, Microsoft.Extensions.Options.Options.Create(contentSettings), dataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper),
-                new ImageCropperPropertyEditor(logger, mediaFileSystemMock, Microsoft.Extensions.Options.Options.Create(contentSettings), dataTypeService, LocalizationService, IOHelper, ShortStringHelper, LocalizedTextService),
+                new FileUploadPropertyEditor(loggerFactory, mediaFileSystemMock, Microsoft.Extensions.Options.Options.Create(contentSettings), dataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper),
+                new ImageCropperPropertyEditor(loggerFactory, mediaFileSystemMock, Microsoft.Extensions.Options.Options.Create(contentSettings), dataTypeService, LocalizationService, IOHelper, ShortStringHelper, LocalizedTextService),
             });
             _mediaUrlProvider = new DefaultMediaUrlProvider(propertyEditors, UriUtility);
         }

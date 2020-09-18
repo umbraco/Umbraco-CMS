@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
@@ -41,7 +41,7 @@ namespace Umbraco.Web.PropertyEditors
         /// Initializes a new instance of the <see cref="ImageCropperPropertyEditor"/> class.
         /// </summary>
         public ImageCropperPropertyEditor(
-            ILogger logger,
+            ILoggerFactory loggerFactory,
             IMediaFileSystem mediaFileSystem,
             IOptions<ContentSettings> contentSettings,
             IDataTypeService dataTypeService,
@@ -49,7 +49,7 @@ namespace Umbraco.Web.PropertyEditors
             IIOHelper ioHelper,
             IShortStringHelper shortStringHelper,
             ILocalizedTextService localizedTextService)
-            : base(logger, dataTypeService, localizationService, localizedTextService, shortStringHelper)
+            : base(loggerFactory, dataTypeService, localizationService, localizedTextService, shortStringHelper)
         {
             _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
             _contentSettings = contentSettings.Value ?? throw new ArgumentNullException(nameof(contentSettings));
@@ -58,7 +58,7 @@ namespace Umbraco.Web.PropertyEditors
             _ioHelper = ioHelper;
 
             // TODO: inject?
-            _autoFillProperties = new UploadAutoFillProperties(_mediaFileSystem, logger, contentSettings);
+            _autoFillProperties = new UploadAutoFillProperties(_mediaFileSystem, loggerFactory.CreateLogger<UploadAutoFillProperties>(), contentSettings);
         }
 
         public bool TryGetMediaPath(string alias, object value, out string mediaPath)
@@ -76,7 +76,7 @@ namespace Umbraco.Web.PropertyEditors
         /// Creates the corresponding property value editor.
         /// </summary>
         /// <returns>The corresponding property value editor.</returns>
-        protected override IDataValueEditor CreateValueEditor() => new ImageCropperPropertyValueEditor(Attribute, Logger, _mediaFileSystem, DataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper, _contentSettings);
+        protected override IDataValueEditor CreateValueEditor() => new ImageCropperPropertyValueEditor(Attribute, LoggerFactory.CreateLogger<ImageCropperPropertyValueEditor>(), _mediaFileSystem, DataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper, _contentSettings);
 
         /// <summary>
         /// Creates the corresponding preValue editor.

@@ -2,9 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Blocks;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
@@ -27,7 +27,7 @@ namespace Umbraco.Web.PropertyEditors
         private readonly IIOHelper _ioHelper;
 
         public BlockListPropertyEditor(
-            ILogger logger,
+            ILoggerFactory loggerFactory,
             Lazy<PropertyEditorCollection> propertyEditors,
             IDataTypeService dataTypeService,
             IContentTypeService contentTypeService,
@@ -35,7 +35,7 @@ namespace Umbraco.Web.PropertyEditors
             IIOHelper ioHelper,
             ILocalizationService localizationService,
             IShortStringHelper shortStringHelper)
-            : base(logger, propertyEditors, dataTypeService, contentTypeService, localizedTextService, localizationService, shortStringHelper)
+            : base(loggerFactory, propertyEditors, dataTypeService, contentTypeService, localizedTextService, localizationService, shortStringHelper)
         {
             _ioHelper = ioHelper;
         }
