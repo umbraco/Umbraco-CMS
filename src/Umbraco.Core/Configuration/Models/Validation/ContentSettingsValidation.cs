@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Options;
 using Umbraco.Core.Macros;
@@ -20,6 +21,11 @@ namespace Umbraco.Core.Configuration.Models.Validation
                 return ValidateOptionsResult.Fail(message);
             }
 
+            if (!ValidateAutoFillImageProperties(options.Imaging.AutoFillImageProperties, out message))
+            {
+                return ValidateOptionsResult.Fail(message);
+            }
+
             return ValidateOptionsResult.Success;
         }
 
@@ -30,14 +36,12 @@ namespace Umbraco.Core.Configuration.Models.Validation
 
         private bool ValidateError404Collection(IEnumerable<ContentErrorPage> values, out string message)
         {
-            if (values.Any(x => !x.IsValid()))
-            {
-                message = $"Configuration entry Content:Error404Collection contains one or more invalid values.  Culture and one and only one of ContentId, ContentKey and ContentXPath must be specified for each entry.";
-                return false;
-            }
+            return ValidateCollection("Content:Error404Collection", values, "Culture and one and only one of ContentId, ContentKey and ContentXPath must be specified for each entry", out message);
+        }
 
-            message = string.Empty;
-            return true;
+        private bool ValidateAutoFillImageProperties(IEnumerable<ImagingAutoFillUploadField> values, out string message)
+        {
+            return ValidateCollection("Content:Imaging:AutoFillImageProperties", values, "Alias, WidthFieldAlias, HeightFieldAlias, LengthFieldAlias and ExtensionFieldAlias must be specified for each entry", out message);
         }
     }
 }

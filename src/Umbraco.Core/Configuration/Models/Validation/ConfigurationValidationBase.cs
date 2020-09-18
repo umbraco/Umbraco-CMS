@@ -23,5 +23,17 @@ namespace Umbraco.Core.Configuration.Models.Validation
             var validValues = Enum.GetValues(enumType).OfType<object>().Select(x => x.ToString().ToFirstLowerInvariant());
             return ValidateStringIsOneOfValidValues(configPath, value, validValues, out message);
         }
+
+        public bool ValidateCollection(string configPath, IEnumerable<ValidatableEntryBase> values, string validationDescription, out string message)
+        {
+            if (values.Any(x => !x.IsValid()))
+            {
+                message = $"Configuration entry {configPath} contains one or more invalid values. {validationDescription}.";
+                return false;
+            }
+
+            message = string.Empty;
+            return true;
+        }
     }
 }

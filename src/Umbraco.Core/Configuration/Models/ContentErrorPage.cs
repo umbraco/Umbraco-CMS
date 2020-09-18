@@ -1,8 +1,10 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
+using Umbraco.Core.Configuration.Models.Validation;
 
 namespace Umbraco.Core.Configuration.Models
 {
-    public class ContentErrorPage
+    public class ContentErrorPage : ValidatableEntryBase
     {
         public int ContentId { get; set; }
 
@@ -16,12 +18,12 @@ namespace Umbraco.Core.Configuration.Models
 
         public bool HasContentXPath => !string.IsNullOrEmpty(ContentXPath);
 
+        [Required]
         public string Culture { get; set; }
 
-        public bool IsValid()
+        internal override bool IsValid()
         {
-            // Entry is valid if Culture and one and only one of ContentId, ContentKey or ContentXPath is provided.
-            return !string.IsNullOrWhiteSpace(Culture) &&
+            return base.IsValid() &&
                 ((HasContentId ? 1 : 0) + (HasContentKey ? 1 : 0) + (HasContentXPath ? 1 : 0) == 1);
         }
     }
