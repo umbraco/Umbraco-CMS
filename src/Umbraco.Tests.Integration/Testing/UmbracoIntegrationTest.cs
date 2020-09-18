@@ -29,6 +29,9 @@ using Microsoft.Extensions.Configuration;
 using System.Data.SqlClient;
 using System.Data.Common;
 using System.IO;
+using Umbraco.Core.Configuration.Models;
+using Microsoft.Extensions.Options;
+using ConnectionStrings = Umbraco.Core.Configuration.Models.ConnectionStrings;
 
 namespace Umbraco.Tests.Integration.Testing
 {
@@ -81,9 +84,11 @@ namespace Umbraco.Tests.Integration.Testing
         {
             var hostBuilder = CreateHostBuilder();
             var host = await hostBuilder.StartAsync();
-            Services = host.Services;            
+            Services = host.Services;
             var app = new ApplicationBuilder(host.Services);
             Configure(app);
+
+            OnFixtureTearDown(() => host.Dispose());
         }
 
         #region Generic Host Builder and Runtime
@@ -120,7 +125,7 @@ namespace Umbraco.Tests.Integration.Testing
         /// <summary>
         /// Creates a <see cref="CoreRuntime"/> instance for testing and registers an event handler for database install
         /// </summary>
-        /// <param name="configs"></param>
+        /// <param name="connectionStrings"></param>
         /// <param name="umbracoVersion"></param>
         /// <param name="ioHelper"></param>
         /// <param name="logger"></param>
@@ -130,18 +135,24 @@ namespace Umbraco.Tests.Integration.Testing
         /// <param name="typeFinder"></param>
         /// <param name="appCaches"></param>
         /// <param name="dbProviderFactoryCreator"></param>
+        /// <param name="globalSettings"></param>
         /// <returns></returns>
-        public CoreRuntime CreateTestRuntime(Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper,
+        public CoreRuntime CreateTestRuntime(
+            GlobalSettings globalSettings,
+            ConnectionStrings connectionStrings,
+            IUmbracoVersion umbracoVersion, IIOHelper ioHelper,
             ILogger logger, IProfiler profiler, Core.Hosting.IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo,
             ITypeFinder typeFinder, AppCaches appCaches, IDbProviderFactoryCreator dbProviderFactoryCreator)
         {
-            var runtime = CreateTestRuntime(configs,
+            var runtime = CreateTestRuntime(
+                globalSettings,
+                connectionStrings,
                 umbracoVersion,
                 ioHelper,
                 logger,
                 profiler,
                 hostingEnvironment,
-                backOfficeInfo,                
+                backOfficeInfo,
                 typeFinder,
                 appCaches,
                 dbProviderFactoryCreator,
@@ -155,7 +166,7 @@ namespace Umbraco.Tests.Integration.Testing
         /// <summary>
         /// Creates a <see cref="CoreRuntime"/> instance for testing and registers an event handler for database install
         /// </summary>
-        /// <param name="configs"></param>
+        /// <param name="connectionStrings"></param>
         /// <param name="umbracoVersion"></param>
         /// <param name="ioHelper"></param>
         /// <param name="logger"></param>
@@ -163,25 +174,30 @@ namespace Umbraco.Tests.Integration.Testing
         /// <param name="hostingEnvironment"></param>
         /// <param name="backOfficeInfo"></param>
         /// <param name="typeFinder"></param>
-        /// <param name="requestCache"></param>
+        /// <param name="appCaches"></param>
         /// <param name="dbProviderFactoryCreator"></param>
         /// <param name="mainDom"></param>
         /// <param name="eventHandler">The event handler used for DB installation</param>
+        /// <param name="globalSettings"></param>
         /// <returns></returns>
-        public static CoreRuntime CreateTestRuntime(Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper,
+        public static CoreRuntime CreateTestRuntime(
+            GlobalSettings globalSettings,
+            ConnectionStrings connectionStrings,
+            IUmbracoVersion umbracoVersion, IIOHelper ioHelper,
             ILogger logger, IProfiler profiler, Core.Hosting.IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo,
             ITypeFinder typeFinder, AppCaches appCaches, IDbProviderFactoryCreator dbProviderFactoryCreator,
             IMainDom mainDom, Action<CoreRuntime, RuntimeEssentialsEventArgs> eventHandler)
         {
             var runtime = new CoreRuntime(
-                configs,
+                globalSettings,
+                connectionStrings,
                 umbracoVersion,
                 ioHelper,
                 logger,
                 profiler,
                 Mock.Of<IUmbracoBootPermissionChecker>(),
                 hostingEnvironment,
-                backOfficeInfo, 
+                backOfficeInfo,
                 dbProviderFactoryCreator,
                 mainDom,
                 typeFinder,
@@ -256,7 +272,7 @@ namespace Umbraco.Tests.Integration.Testing
             OnTestTearDown(() => runtime.Terminate());
 
             // This will create a db, install the schema and ensure the app is configured to run
-            InstallTestLocalDb(args.DatabaseFactory, runtime.ProfilingLogger, runtime.Configs.Global(), runtime.State, TestHelper.WorkingDirectory, out var connectionString);
+            InstallTestLocalDb(args.DatabaseFactory, runtime.ProfilingLogger, runtime.State, TestHelper.WorkingDirectory, out var connectionString);
             TestDBConnectionString = connectionString;
             InMemoryConfiguration["ConnectionStrings:" + Constants.System.UmbracoConnectionName] = TestDBConnectionString;
         }
@@ -272,7 +288,7 @@ namespace Umbraco.Tests.Integration.Testing
         /// <remarks>
         /// There must only be ONE instance shared between all tests in a session
         /// </remarks>
-        private static LocalDbTestDatabase GetOrCreateDatabase(string filesPath, ILogger logger, IGlobalSettings globalSettings, IUmbracoDatabaseFactory dbFactory)
+        private static LocalDbTestDatabase GetOrCreateDatabase(string filesPath, ILogger logger, IUmbracoDatabaseFactory dbFactory)
         {
             lock (_dbLocker)
             {
@@ -281,7 +297,7 @@ namespace Umbraco.Tests.Integration.Testing
                 var localDb = new LocalDb();
                 if (localDb.IsAvailable == false)
                     throw new InvalidOperationException("LocalDB is not available.");
-                _dbInstance = new LocalDbTestDatabase(logger, globalSettings, localDb, filesPath, dbFactory);
+                _dbInstance = new LocalDbTestDatabase(logger, localDb, filesPath, dbFactory);
                 return _dbInstance;
             }
         }
@@ -295,7 +311,7 @@ namespace Umbraco.Tests.Integration.Testing
         /// <param name="connectionString"></param>
         /// <returns></returns>
         private void InstallTestLocalDb(
-            IUmbracoDatabaseFactory databaseFactory, IProfilingLogger logger, IGlobalSettings globalSettings,
+            IUmbracoDatabaseFactory databaseFactory, IProfilingLogger logger,
             IRuntimeState runtimeState, string workingDirectory, out string connectionString)
         {
             connectionString = null;
@@ -313,7 +329,7 @@ namespace Umbraco.Tests.Integration.Testing
             if (!Directory.Exists(dbFilePath))
                 Directory.CreateDirectory(dbFilePath);
 
-            var db = GetOrCreateDatabase(dbFilePath, logger, globalSettings, databaseFactory);
+            var db = GetOrCreateDatabase(dbFilePath, logger, databaseFactory);
 
             switch (testOptions.Database)
             {
@@ -411,7 +427,7 @@ namespace Umbraco.Tests.Integration.Testing
         protected AppCaches AppCaches => Services.GetRequiredService<AppCaches>();
         protected IIOHelper IOHelper => Services.GetRequiredService<IIOHelper>();
         protected IShortStringHelper ShortStringHelper => Services.GetRequiredService<IShortStringHelper>();
-        protected IGlobalSettings GlobalSettings => Services.GetRequiredService<IGlobalSettings>();
+        protected GlobalSettings GlobalSettings => Services.GetRequiredService<IOptions<GlobalSettings>>().Value;
         protected IMapperCollection Mappers => Services.GetRequiredService<IMapperCollection>();
 
         #endregion

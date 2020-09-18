@@ -18,6 +18,7 @@ using Umbraco.Tests.Services.Importing;
 using Umbraco.Tests.Testing;
 using Umbraco.Core.Composing.CompositionExtensions;
 using Umbraco.Core.Strings;
+using Umbraco.Tests.Common.Builders;
 
 namespace Umbraco.Tests.Packaging
 {
@@ -712,8 +713,9 @@ namespace Umbraco.Tests.Packaging
 
         private void AddLanguages()
         {
-            var norwegian = new Core.Models.Language(TestObjects.GetGlobalSettings(), "nb-NO");
-            var english = new Core.Models.Language(TestObjects.GetGlobalSettings(), "en-GB");
+            var globalSettings = new GlobalSettingsBuilder().Build();
+            var norwegian = new Core.Models.Language(globalSettings, "nb-NO");
+            var english = new Core.Models.Language(globalSettings, "en-GB");
             ServiceContext.LocalizationService.Save(norwegian, 0);
             ServiceContext.LocalizationService.Save(english, 0);
         }

@@ -2,31 +2,35 @@
 using System.Linq;
 using System.Web.Mvc;
 using System.Web.Routing;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Models;
-using Umbraco.Tests.TestHelpers;
-using Umbraco.Tests.TestHelpers.Stubs;
-using Umbraco.Web;
-using Umbraco.Web.Models;
-using Umbraco.Web.Mvc;
-using Umbraco.Web.WebApi;
-using Umbraco.Core.Strings;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Runtime;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
+using Umbraco.Tests.Common;
+using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.PublishedContent;
+using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Tests.Testing;
+using Umbraco.Web;
+using Umbraco.Web.Models;
+using Umbraco.Web.Mvc;
 using Umbraco.Web.Runtime;
+using Umbraco.Web.WebApi;
+using ConnectionStrings = Umbraco.Core.Configuration.Models.ConnectionStrings;
 using Current = Umbraco.Web.Composing.Current;
 using ILogger = Umbraco.Core.Logging.ILogger;
-using Umbraco.Tests.Common;
 
 namespace Umbraco.Tests.Routing
 {
@@ -49,8 +53,8 @@ namespace Umbraco.Tests.Routing
 
         public class TestRuntime : CoreRuntime
         {
-            public TestRuntime(Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)
-                : base(configs, umbracoVersion, ioHelper, Mock.Of<ILogger>(), Mock.Of<IProfiler>(), new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, TestHelper.DbProviderFactoryCreator, TestHelper.MainDom, TestHelper.GetTypeFinder(), AppCaches.NoCache)
+            public TestRuntime(GlobalSettings globalSettings, ConnectionStrings connectionStrings, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)
+                : base(globalSettings, connectionStrings,umbracoVersion, ioHelper, Mock.Of<ILogger>(), Mock.Of<IProfiler>(), new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, TestHelper.DbProviderFactoryCreator, TestHelper.MainDom, TestHelper.GetTypeFinder(), AppCaches.NoCache)
             {
             }
 
@@ -69,7 +73,8 @@ namespace Umbraco.Tests.Routing
             var umbracoApiControllerTypes = new UmbracoApiControllerTypeCollection(Composition.TypeLoader.GetUmbracoApiControllers());
             Composition.RegisterUnique(umbracoApiControllerTypes);
 
-            Composition.RegisterUnique<IShortStringHelper>(_ => new DefaultShortStringHelper(TestHelpers.SettingsForTests.GenerateMockRequestHandlerSettings()));
+            var requestHandlerSettings = new RequestHandlerSettingsBuilder().Build();
+            Composition.RegisterUnique<IShortStringHelper>(_ => new DefaultShortStringHelper(Microsoft.Extensions.Options.Options.Create(requestHandlerSettings)));
         }
 
         public override void TearDown()
@@ -149,7 +154,7 @@ namespace Umbraco.Tests.Routing
             var handler = new RenderRouteHandler(umbracoContext, new TestControllerFactory(umbracoContextAccessor, Mock.Of<ILogger>(), context =>
                 {
 
-                  return new CustomDocumentController(Factory.GetInstance<IGlobalSettings>(),
+                  return new CustomDocumentController(Factory.GetInstance<IOptions<GlobalSettings>>(),
                         umbracoContextAccessor,
                         Factory.GetInstance<ServiceContext>(),
                         Factory.GetInstance<AppCaches>(),
@@ -190,7 +195,7 @@ namespace Umbraco.Tests.Routing
         /// </summary>
         public class CustomDocumentController : RenderMvcController
         {
-            public CustomDocumentController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger)
+            public CustomDocumentController(IOptions<GlobalSettings> globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger)
                 : base(globalSettings, umbracoContextAccessor, services, appCaches, profilingLogger)
             {
             }

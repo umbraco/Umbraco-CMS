@@ -2,11 +2,11 @@
 using System.Net.Mail;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.HealthChecks;
-using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.Logging;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Web.HealthCheck.NotificationMethods
@@ -17,10 +17,16 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
         private readonly ILocalizedTextService _textService;
         private readonly IRequestAccessor _requestAccessor;
 
-        private readonly IGlobalSettings _globalSettings;
-        private readonly IContentSettings _contentSettings;
+        private readonly GlobalSettings _globalSettings;
+        private readonly ContentSettings _contentSettings;
 
-        public EmailNotificationMethod(ILocalizedTextService textService, IRequestAccessor requestAccessor, IGlobalSettings globalSettings, IHealthChecksSettings healthChecksSettings, IContentSettings contentSettings) : base(healthChecksSettings)
+        public EmailNotificationMethod(
+            ILocalizedTextService textService,
+            IRequestAccessor requestAccessor,
+            IOptions<GlobalSettings> globalSettings,
+            IOptions<HealthChecksSettings> healthChecksSettings,
+            IOptions<ContentSettings> contentSettings)
+            : base(healthChecksSettings)
         {
             var recipientEmail = Settings?["recipientEmail"]?.Value;
             if (string.IsNullOrWhiteSpace(recipientEmail))
@@ -33,8 +39,8 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
 
             _textService = textService ?? throw new ArgumentNullException(nameof(textService));
             _requestAccessor = requestAccessor;
-            _globalSettings = globalSettings;
-            _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
+            _globalSettings = globalSettings.Value;
+            _contentSettings = contentSettings.Value ?? throw new ArgumentNullException(nameof(contentSettings));
         }
 
         public string RecipientEmail { get; }
@@ -64,7 +70,7 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
 
             var subject = _textService.Localize("healthcheck/scheduledHealthCheckEmailSubject", new[] { host.ToString() });
 
-            var mailSender = new EmailSender(_globalSettings);
+            var mailSender = new EmailSender(Options.Create(_globalSettings));
             using (var mailMessage = CreateMailMessage(subject, message))
             {
                 await mailSender.SendAsync(mailMessage);
@@ -73,7 +79,7 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
 
         private MailMessage CreateMailMessage(string subject, string message)
         {
-            var to = _contentSettings.NotificationEmailAddress;
+            var to = _contentSettings.Notifications.Email;
 
             if (string.IsNullOrWhiteSpace(subject))
                 subject = "Umbraco Health Check Status";

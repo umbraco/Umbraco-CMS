@@ -3,6 +3,7 @@ using System.Configuration;
 using System.Data.SqlServerCe;
 using System.IO;
 using System.Threading;
+using Microsoft.Extensions.Options;
 using Moq;
 using NPoco;
 using NUnit.Framework;
@@ -15,6 +16,7 @@ using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Services;
 using Umbraco.Persistance.SqlCe;
+using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Security;
 
@@ -38,9 +40,9 @@ namespace Umbraco.Tests.Persistence
             _sqlSyntaxProviders = new[] { (ISqlSyntaxProvider) _sqlCeSyntaxProvider };
             _logger = Mock.Of<ILogger>();
             _umbracoVersion = TestHelper.GetUmbracoVersion();
-            var globalSettings = TestHelper.GetConfigs().Global();
-            var connectionStrings = TestHelper.GetConfigs().ConnectionStrings();
-            _databaseFactory = new UmbracoDatabaseFactory(_logger, globalSettings, connectionStrings,  new Lazy<IMapperCollection>(() => Mock.Of<IMapperCollection>()), TestHelper.DbProviderFactoryCreator);
+            var globalSettings = new GlobalSettingsBuilder().Build();
+            var connectionStrings = new ConnectionStringsBuilder().Build();
+            _databaseFactory = new UmbracoDatabaseFactory(_logger, Options.Create(globalSettings), Options.Create(connectionStrings),  new Lazy<IMapperCollection>(() => Mock.Of<IMapperCollection>()), TestHelper.DbProviderFactoryCreator);
         }
 
         [TearDown]
@@ -94,7 +96,7 @@ namespace Umbraco.Tests.Persistence
             using (var database = _databaseFactory.CreateDatabase())
             using (var transaction = database.GetTransaction())
             {
-                schemaHelper = new DatabaseSchemaCreator(database, _logger, _umbracoVersion, SettingsForTests.GenerateMockGlobalSettings());
+                schemaHelper = new DatabaseSchemaCreator(database, _logger, _umbracoVersion);
                 schemaHelper.InitializeDatabaseSchema();
                 transaction.Complete();
             }

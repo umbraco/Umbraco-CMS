@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
-using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
@@ -15,13 +16,13 @@ namespace Umbraco.Web.Models.Mapping
     {
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly ILogger _logger;
-        private readonly IContentSettings _contentSettings;
+        private readonly ContentSettings _contentSettings;
 
-        public DataTypeMapDefinition(PropertyEditorCollection propertyEditors, ILogger logger, IContentSettings contentSettings)
+        public DataTypeMapDefinition(PropertyEditorCollection propertyEditors, ILogger logger, IOptions<ContentSettings> contentSettings)
         {
             _propertyEditors = propertyEditors;
             _logger = logger;
-            _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
+            _contentSettings = contentSettings.Value ?? throw new ArgumentNullException(nameof(contentSettings));
         }
 
         private static readonly int[] SystemIds =

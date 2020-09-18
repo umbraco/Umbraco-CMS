@@ -4,7 +4,9 @@ using Umbraco.Web.Models;
 using System.IO;
 using Umbraco.Core;
 using Ganss.XSS;
+using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.Common.Attributes;
@@ -16,11 +18,11 @@ namespace Umbraco.Web.Editors
     public class IconController : UmbracoAuthorizedApiController
     {
         private readonly IHostingEnvironment _hostingEnvironment;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly IOptions<GlobalSettings> _globalSettings;
 
         public IconController(
             IHostingEnvironment hostingEnvironment,
-            IGlobalSettings globalSettings)
+            IOptions<GlobalSettings> globalSettings)
         {
             _hostingEnvironment = hostingEnvironment;
             _globalSettings = globalSettings;
@@ -37,7 +39,7 @@ namespace Umbraco.Web.Editors
             return string.IsNullOrWhiteSpace(iconName)
                 ? null
                 : CreateIconModel(iconName.StripFileExtension(),
-                    _hostingEnvironment.MapPathWebRoot($"{_globalSettings.IconsPath}/{iconName}.svg"));
+                    _hostingEnvironment.MapPathWebRoot($"{_globalSettings.Value.IconsPath}/{iconName}.svg"));
         }
 
         /// <summary>
@@ -60,7 +62,7 @@ namespace Umbraco.Web.Editors
         public List<IconModel> GetAllIcons()
         {
             var icons = new List<IconModel>();
-            var directory = new DirectoryInfo(_hostingEnvironment.MapPathWebRoot($"{_globalSettings.IconsPath}/"));
+            var directory = new DirectoryInfo(_hostingEnvironment.MapPathWebRoot($"{_globalSettings.Value.IconsPath}/"));
             var iconNames = directory.GetFiles("*.svg");
 
             iconNames.OrderBy(f => f.Name).ToList().ForEach(iconInfo =>

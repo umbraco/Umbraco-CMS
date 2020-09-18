@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
+using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.Dictionary;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Core.Dictionary;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Models.Mapping
@@ -28,7 +29,7 @@ namespace Umbraco.Web.Models.Mapping
         private readonly IMemberTypeService _memberTypeService;
         private readonly IMemberService _memberService;
         private readonly IMemberGroupService _memberGroupService;
-        private readonly IMemberPasswordConfiguration _memberPasswordConfiguration;
+        private readonly MemberPasswordConfigurationSettings _memberPasswordConfiguration;
         private readonly PropertyEditorCollection _propertyEditorCollection;
 
         public MemberTabsAndPropertiesMapper(ICultureDictionary cultureDictionary,
@@ -37,7 +38,7 @@ namespace Umbraco.Web.Models.Mapping
             IMemberTypeService memberTypeService,
             IMemberService memberService,
             IMemberGroupService memberGroupService,
-            IMemberPasswordConfiguration memberPasswordConfiguration,
+            IOptions<MemberPasswordConfigurationSettings> memberPasswordConfiguration,
             IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
             PropertyEditorCollection propertyEditorCollection)
             : base(cultureDictionary, localizedTextService, contentTypeBaseServiceProvider)
@@ -47,7 +48,7 @@ namespace Umbraco.Web.Models.Mapping
             _memberTypeService = memberTypeService ?? throw new ArgumentNullException(nameof(memberTypeService));
             _memberService = memberService ?? throw new ArgumentNullException(nameof(memberService));
             _memberGroupService = memberGroupService ?? throw new ArgumentNullException(nameof(memberGroupService));
-            _memberPasswordConfiguration = memberPasswordConfiguration;
+            _memberPasswordConfiguration = memberPasswordConfiguration.Value;
             _propertyEditorCollection = propertyEditorCollection;
         }
 

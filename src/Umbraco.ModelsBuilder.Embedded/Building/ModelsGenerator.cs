@@ -1,6 +1,9 @@
 ﻿using System.IO;
 using System.Text;
+using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.IO;
 using Umbraco.Core.Hosting;
 
 namespace Umbraco.ModelsBuilder.Embedded.Building
@@ -8,14 +11,14 @@ namespace Umbraco.ModelsBuilder.Embedded.Building
     public class ModelsGenerator
     {
         private readonly UmbracoServices _umbracoService;
-        private readonly IModelsBuilderConfig _config;
+        private readonly ModelsBuilderConfig _config;
         private readonly OutOfDateModelsStatus _outOfDateModels;
         private readonly IHostingEnvironment _hostingEnvironment;
 
-        public ModelsGenerator(UmbracoServices umbracoService, IModelsBuilderConfig config, OutOfDateModelsStatus outOfDateModels, IHostingEnvironment hostingEnvironment)
+        public ModelsGenerator(UmbracoServices umbracoService, IOptions<ModelsBuilderConfig> config, OutOfDateModelsStatus outOfDateModels, IHostingEnvironment hostingEnvironment)
         {
             _umbracoService = umbracoService;
-            _config = config;
+            _config = config.Value;
             _outOfDateModels = outOfDateModels;
             _hostingEnvironment = hostingEnvironment;
         }

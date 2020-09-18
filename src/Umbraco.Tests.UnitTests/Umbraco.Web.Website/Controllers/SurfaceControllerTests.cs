@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Cache;
@@ -45,7 +46,7 @@ namespace Umbraco.Tests.Integration
                 Mock.Of<IPublishedSnapshotService>(),
                 new TestVariationContextAccessor(),
                 new TestDefaultCultureAccessor(),
-                globalSettings,
+                Options.Create(globalSettings),
                 Mock.Of<IUserService>(),
                 hostingEnvironment,
                 new UriUtility(hostingEnvironment),
@@ -78,7 +79,7 @@ namespace Umbraco.Tests.Integration
                 Mock.Of<IPublishedSnapshotService>(),
                 new TestVariationContextAccessor(),
                 new TestDefaultCultureAccessor(),
-                globalSettings,
+                Options.Create(globalSettings),
                 Mock.Of<IUserService>(),
                 hostingEnvironment,
                 new UriUtility(hostingEnvironment),
@@ -115,7 +116,7 @@ namespace Umbraco.Tests.Integration
                 publishedSnapshotService.Object,
                 new TestVariationContextAccessor(),
                 new TestDefaultCultureAccessor(),
-                globalSettings,
+                Options.Create(globalSettings),
                 Mock.Of<IUserService>(),
                 hostingEnvironment,
                 new UriUtility(hostingEnvironment),
@@ -152,7 +153,7 @@ namespace Umbraco.Tests.Integration
                 Mock.Of<IPublishedSnapshotService>(),
                 new TestVariationContextAccessor(),
                 new TestDefaultCultureAccessor(),
-                globalSettings,
+                Options.Create(globalSettings),
                 Mock.Of<IUserService>(),
                 hostingEnvironment,
                 new UriUtility(hostingEnvironment),

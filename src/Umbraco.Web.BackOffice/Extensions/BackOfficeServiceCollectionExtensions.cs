@@ -8,9 +8,10 @@ using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.BackOffice;
-using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Security;
 using Umbraco.Core.Serialization;
 using Umbraco.Net;
@@ -80,7 +81,7 @@ namespace Umbraco.Extensions
             services.TryAddScoped<IPasswordValidator<BackOfficeIdentityUser>, PasswordValidator<BackOfficeIdentityUser>>();
             services.TryAddScoped<IPasswordHasher<BackOfficeIdentityUser>>(
                 services => new BackOfficePasswordHasher(
-                    new LegacyPasswordSecurity(services.GetRequiredService<IUserPasswordConfiguration>()),
+                    new LegacyPasswordSecurity(services.GetRequiredService<IOptions<UserPasswordConfigurationSettings>>().Value),
                     services.GetRequiredService<IJsonSerializer>()));
             services.TryAddScoped<IUserConfirmation<BackOfficeIdentityUser>, DefaultUserConfirmation<BackOfficeIdentityUser>>();
             services.TryAddScoped<IUserClaimsPrincipalFactory<BackOfficeIdentityUser>, UserClaimsPrincipalFactory<BackOfficeIdentityUser>>();

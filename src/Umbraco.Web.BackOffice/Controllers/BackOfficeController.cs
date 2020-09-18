@@ -5,13 +5,14 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.BackOffice;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Grid;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
@@ -29,13 +30,14 @@ using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
-
+    //[UmbracoRequireHttps] //TODO Reintroduce
+    [DisableBrowserCache]
     [PluginController(Constants.Web.Mvc.BackOfficeArea)]
     public class BackOfficeController : Controller
     {
         private readonly IBackOfficeUserManager _userManager;
         private readonly IRuntimeMinifier _runtimeMinifier;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ILocalizedTextService _textService;
         private readonly IGridConfig _gridConfig;
@@ -48,7 +50,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         public BackOfficeController(
             IBackOfficeUserManager userManager,
             IRuntimeMinifier runtimeMinifier,
-            IGlobalSettings globalSettings,
+            IOptions<GlobalSettings> globalSettings,
             IHostingEnvironment hostingEnvironment,
             ILocalizedTextService textService,
             IGridConfig gridConfig,
@@ -57,11 +59,10 @@ namespace Umbraco.Web.BackOffice.Controllers
             BackOfficeSignInManager signInManager,
             IWebSecurity webSecurity,
             ILogger logger)
-
         {
             _userManager = userManager;
             _runtimeMinifier = runtimeMinifier;
-            _globalSettings = globalSettings;
+            _globalSettings = globalSettings.Value;
             _hostingEnvironment = hostingEnvironment;
             _textService = textService;
             _gridConfig = gridConfig ?? throw new ArgumentNullException(nameof(gridConfig));

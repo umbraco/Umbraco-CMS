@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.BackOffice;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 
 namespace Umbraco.Web.BackOffice.Security
 {
@@ -13,11 +14,11 @@ namespace Umbraco.Web.BackOffice.Security
     /// </summary>
     public class ConfigureBackOfficeIdentityOptions : IConfigureOptions<BackOfficeIdentityOptions>
     {
-        private readonly IUserPasswordConfiguration _userPasswordConfiguration;
+        private readonly UserPasswordConfigurationSettings _userPasswordConfiguration;
 
-        public ConfigureBackOfficeIdentityOptions(IUserPasswordConfiguration userPasswordConfiguration)
+        public ConfigureBackOfficeIdentityOptions(IOptions<UserPasswordConfigurationSettings> userPasswordConfiguration)
         {
-            _userPasswordConfiguration = userPasswordConfiguration;
+            _userPasswordConfiguration = userPasswordConfiguration.Value;
         }
 
         public void Configure(BackOfficeIdentityOptions options)
