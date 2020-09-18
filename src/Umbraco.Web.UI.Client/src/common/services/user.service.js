@@ -241,9 +241,9 @@ angular.module('umbraco.services')
                         setCurrentUser(data);
 
                         deferred.resolve(currentUser);
-                    }, function () {
+                    }, function (err) {
                         //it failed, so they are not logged in
-                        deferred.reject();
+                        deferred.reject(err);
                     });
 
                 return deferred.promise;
@@ -266,9 +266,9 @@ angular.module('umbraco.services')
                             setCurrentUser(data);
 
                             return $q.when(currentUser);
-                        }, function () {
+                        }, function (err) {
                             //it failed, so they are not logged in
-                            return $q.reject(currentUser);
+                            return $q.reject(err);
                         });
 
                 }
