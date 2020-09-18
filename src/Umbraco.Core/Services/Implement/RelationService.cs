@@ -278,6 +278,14 @@ namespace Umbraco.Core.Services.Implement
         /// <inheritdoc />
         public IEnumerable<IUmbracoEntity> GetPagedParentEntitiesByChildId(int id, long pageIndex, int pageSize, out long totalChildren, params UmbracoObjectTypes[] entityTypes)
         {
+            return this.GetPagedParentEntitiesByChildId(id, pageIndex, pageSize, out totalChildren, new string[0],
+                entityTypes);
+        }
+
+        /// <inheritdoc />
+        public IEnumerable<IUmbracoEntity> GetPagedParentEntitiesByChildId(int id, long pageIndex, int pageSize, out long totalChildren,
+            string[] relationTypes, params UmbracoObjectTypes[] entityTypes)
+        {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _relationRepository.GetPagedParentEntitiesByChildId(id, pageIndex, pageSize, out totalChildren, entityTypes.Select(x => x.GetGuid()).ToArray());
@@ -286,6 +294,14 @@ namespace Umbraco.Core.Services.Implement
 
         /// <inheritdoc />
         public IEnumerable<IUmbracoEntity> GetPagedChildEntitiesByParentId(int id, long pageIndex, int pageSize, out long totalChildren, params UmbracoObjectTypes[] entityTypes)
+        {
+            return this.GetPagedChildEntitiesByParentId(id, pageIndex, pageSize, out totalChildren, new string[0],
+                entityTypes);
+        }
+
+        /// <inheritdoc />
+        public IEnumerable<IUmbracoEntity> GetPagedChildEntitiesByParentId(int id, long pageIndex, int pageSize, out long totalChildren,
+            string[] relationTypes, params UmbracoObjectTypes[] entityTypes)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {

@@ -210,6 +210,17 @@ namespace Umbraco.Core.Services
         IEnumerable<IUmbracoEntity> GetPagedParentEntitiesByChildId(int id, long pageIndex, int pageSize, out long totalChildren, params UmbracoObjectTypes[] entityTypes);
 
         /// <summary>
+        /// Returns paged parent entities for a related child id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="pageIndex"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="totalChildren"></param>
+        /// <param name="relationTypes">A list of relation types to filter</param>
+        /// <returns></returns>
+        IEnumerable<IUmbracoEntity> GetPagedParentEntitiesByChildId(int id, long pageIndex, int pageSize, out long totalChildren, string[] relationTypes, params UmbracoObjectTypes[] entityTypes);
+
+        /// <summary>
         /// Returns paged child entities for a related parent id
         /// </summary>
         /// <param name="id"></param>
@@ -218,6 +229,17 @@ namespace Umbraco.Core.Services
         /// <param name="totalChildren"></param>
         /// <returns></returns>
         IEnumerable<IUmbracoEntity> GetPagedChildEntitiesByParentId(int id, long pageIndex, int pageSize, out long totalChildren, params UmbracoObjectTypes[] entityTypes);
+
+        /// <summary>
+        /// Returns paged child entities for a related parent id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="pageIndex"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="totalChildren"></param>
+        /// <param name="relationTypes">A list of relation types to filter</param>
+        /// <returns></returns>
+        IEnumerable<IUmbracoEntity> GetPagedChildEntitiesByParentId(int id, long pageIndex, int pageSize, out long totalChildren, string[] relationTypes, params UmbracoObjectTypes[] entityTypes);
 
         /// <summary>
         /// Gets the Parent and Child objects from a list of Relations as a list of <see cref="IUmbracoEntity"/> objects.
