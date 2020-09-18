@@ -36,8 +36,13 @@ namespace Umbraco.Web.Editors
 
             var objectType = ObjectTypes.GetUmbracoObjectType(entityType);
             var udiType = ObjectTypes.GetUdiType(objectType);
+            var relationTypes = new string[]
+            {
+                Constants.Conventions.RelationTypes.RelatedDocumentAlias,
+                Constants.Conventions.RelationTypes.RelatedMediaAlias
+            };
 
-            var relations = Services.RelationService.GetPagedParentEntitiesByChildId(id, pageNumber - 1, pageSize, out var totalRecords, objectType);
+            var relations = Services.RelationService.GetPagedParentEntitiesByChildId(id, pageNumber - 1, pageSize, out var totalRecords, relationTypes, objectType);
 
             return new PagedResult<EntityBasic>(totalRecords, pageNumber, pageSize)
             {
