@@ -2,6 +2,6 @@
 {
     public class NuCacheSettings 
     {
-        public string BTreeBlockSize { get; set; }
+        public int? BTreeBlockSize { get; set; }
     }
 }
