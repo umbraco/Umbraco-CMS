@@ -192,6 +192,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
                 sql.Where<RelationDto>(rel => rel.ChildId == childId);
                 sql.Where<RelationDto, NodeDto>((rel, node) => rel.ParentId == childId || node.NodeId != childId);
+
+                if (relationTypes != null && relationTypes.Any())
+                {
+                    sql.WhereIn<RelationDto>(rel => rel.RelationType, relationTypes);
+                }
             });
         }
 
@@ -215,6 +220,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
                 sql.Where<RelationDto>(rel => rel.ParentId == parentId);
                 sql.Where<RelationDto, NodeDto>((rel, node) => rel.ChildId == parentId || node.NodeId != parentId);
+
+
+                if (relationTypes != null && relationTypes.Any())
+                {
+                    sql.WhereIn<RelationDto>(rel => rel.RelationType, relationTypes);
+                }
             });
         }
 
