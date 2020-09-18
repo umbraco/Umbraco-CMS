@@ -5,6 +5,7 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
+using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 
@@ -425,11 +426,13 @@ namespace Umbraco.Tests.Services
 
         private void CreateTypes(out IContentType iContentType, out IContentType vContentType)
         {
-            var langDe = new Language(TestObjects.GetGlobalSettings(), "de") { IsDefault = true };
+            var globalSettings = new GlobalSettingsBuilder().Build();
+
+            var langDe = new Language(globalSettings, "de") { IsDefault = true };
             ServiceContext.LocalizationService.Save(langDe);
-            var langRu = new Language(TestObjects.GetGlobalSettings(), "ru");
+            var langRu = new Language(globalSettings, "ru");
             ServiceContext.LocalizationService.Save(langRu);
-            var langEs = new Language(TestObjects.GetGlobalSettings(), "es");
+            var langEs = new Language(globalSettings, "es");
             ServiceContext.LocalizationService.Save(langEs);
 
             iContentType = new ContentType(ShortStringHelper, -1)

@@ -4,6 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Globalization;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Configuration.Models;
+using Microsoft.Extensions.Options;
 
 namespace Umbraco.Core.Strings
 {
@@ -19,9 +21,9 @@ namespace Umbraco.Core.Strings
     {
         #region Ctor, consts and vars
 
-        public DefaultShortStringHelper(IRequestHandlerSettings settings)
+        public DefaultShortStringHelper(IOptions<RequestHandlerSettings> settings)
         {
-            _config = new DefaultShortStringHelperConfig().WithDefault(settings);
+            _config = new DefaultShortStringHelperConfig().WithDefault(settings.Value);
         }
 
         // clones the config so it cannot be changed at runtime

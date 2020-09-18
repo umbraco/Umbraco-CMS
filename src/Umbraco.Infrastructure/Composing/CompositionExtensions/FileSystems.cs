@@ -1,4 +1,6 @@
-﻿using Umbraco.Core.Configuration;
+﻿using Microsoft.Extensions.Options;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.IO.MediaPathSchemes;
@@ -97,7 +99,7 @@ namespace Umbraco.Core.Composing.CompositionExtensions
                 var ioHelper = factory.GetInstance<IIOHelper>();
                 var hostingEnvironment = factory.GetInstance<IHostingEnvironment>();
                 var logger = factory.GetInstance<ILogger>();
-                var globalSettings = factory.GetInstance<IGlobalSettings>();
+                var globalSettings = factory.GetInstance<IOptions<GlobalSettings>>().Value;
 
                 var rootPath = hostingEnvironment.MapPathWebRoot(globalSettings.UmbracoMediaPath);
                 var rootUrl = hostingEnvironment.ToAbsolute(globalSettings.UmbracoMediaPath);

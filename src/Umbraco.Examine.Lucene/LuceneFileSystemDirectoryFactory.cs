@@ -6,6 +6,8 @@ using Lucene.Net.Store;
 using System.IO;
 using System;
 using Examine.LuceneEngine.Directories;
+using Microsoft.Extensions.Options;
+using Umbraco.Core.Configuration.Models;
 
 namespace Umbraco.Examine
 {
@@ -14,13 +16,13 @@ namespace Umbraco.Examine
     {
         private readonly ITypeFinder _typeFinder;
         private readonly IHostingEnvironment _hostingEnvironment;
-        private readonly IIndexCreatorSettings _settings;
+        private readonly IndexCreatorSettings _settings;
 
-        public LuceneFileSystemDirectoryFactory(ITypeFinder typeFinder, IHostingEnvironment hostingEnvironment, IIndexCreatorSettings settings)
+        public LuceneFileSystemDirectoryFactory(ITypeFinder typeFinder, IHostingEnvironment hostingEnvironment, IOptions<IndexCreatorSettings> settings)
         {
             _typeFinder = typeFinder;
             _hostingEnvironment = hostingEnvironment;
-            _settings = settings;
+            _settings = settings.Value;
         }
 
         public Lucene.Net.Store.Directory CreateDirectory(string indexName) => CreateFileSystemLuceneDirectory(indexName);

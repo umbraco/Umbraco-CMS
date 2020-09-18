@@ -1,7 +1,9 @@
 ﻿using System;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Persistence;
@@ -31,7 +33,7 @@ namespace Umbraco.Web.Editors
         }
 
         protected UmbracoAuthorizedJsonController(
-            IGlobalSettings globalSettings,
+            GlobalSettings globalSettings,
             IUmbracoContextAccessor umbracoContextAccessor,
             ISqlContext sqlContext,
             ServiceContext services,

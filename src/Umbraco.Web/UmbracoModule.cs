@@ -75,7 +75,7 @@ namespace Umbraco.Web
             else if (pcr.Is404)
             {
                 response.StatusCode = 404;
-                response.TrySkipIisCustomErrors = Current.Configs.WebRouting().TrySkipIisCustomErrors;
+                response.TrySkipIisCustomErrors = /*Current.Configs.WebRouting().TrySkipIisCustomErrors; TODO introduce from config*/ false;
 
                 if (response.TrySkipIisCustomErrors == false)
                     logger.Warn<UmbracoModule>("Status code is 404 yet TrySkipIisCustomErrors is false - IIS will take over.");

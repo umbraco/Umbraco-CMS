@@ -8,6 +8,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
+using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Strings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
@@ -31,10 +32,10 @@ namespace Umbraco.Tests.Models
             // and then, this will reset the width, height... because the file does not exist, of course ;-(
             var logger = Mock.Of<ILogger>();
             var scheme = Mock.Of<IMediaPathScheme>();
-            var config = Mock.Of<IContentSettings>();
+            var contentSettings = new ContentSettingsBuilder().Build();
 
             var mediaFileSystem = new MediaFileSystem(Mock.Of<IFileSystem>(), scheme, logger, ShortStringHelper);
-            var ignored = new FileUploadPropertyEditor(Mock.Of<ILogger>(), mediaFileSystem, config, DataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper);
+            var ignored = new FileUploadPropertyEditor(Mock.Of<ILogger>(), mediaFileSystem, Microsoft.Extensions.Options.Options.Create(contentSettings), DataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper);
 
             var media = MockedMedia.CreateMediaImage(mediaType, -1);
             media.WriterId = -1; // else it's zero and that's not a user and it breaks the tests

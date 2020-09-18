@@ -1,7 +1,5 @@
 ﻿using Moq;
-using NUnit.Framework.Internal;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Common;
 using Umbraco.Tests.TestHelpers;
@@ -16,12 +14,12 @@ namespace Umbraco.Tests.Testing.Objects
     /// </summary>
     public class TestUmbracoContextFactory
     {
-        public static IUmbracoContextFactory Create(IGlobalSettings globalSettings = null,
+        public static IUmbracoContextFactory Create(GlobalSettings globalSettings = null,
             IUmbracoContextAccessor umbracoContextAccessor = null,
             IHttpContextAccessor httpContextAccessor = null,
             IPublishedUrlProvider publishedUrlProvider = null)
         {
-            if (globalSettings == null) globalSettings = TestHelpers.SettingsForTests.GenerateMockGlobalSettings();
+            if (globalSettings == null) globalSettings = new GlobalSettings();
             if (umbracoContextAccessor == null) umbracoContextAccessor = new TestUmbracoContextAccessor();
             if (httpContextAccessor == null) httpContextAccessor = TestHelper.GetHttpContextAccessor();
             if (publishedUrlProvider == null) publishedUrlProvider = TestHelper.GetPublishedUrlProvider();

@@ -28,7 +28,6 @@ namespace Umbraco.Core.Packaging
         public PackageInstallation(PackageDataInstallation packageDataInstallation, PackageFileInstallation packageFileInstallation, CompiledPackageXmlParser parser, IPackageActionRunner packageActionRunner,
             IHostingEnvironment hostingEnvironment)
         {
-
             _packageExtraction = new PackageExtraction();
             _packageFileInstallation = packageFileInstallation ?? throw new ArgumentNullException(nameof(packageFileInstallation));
             _packageDataInstallation = packageDataInstallation ?? throw new ArgumentNullException(nameof(packageDataInstallation));

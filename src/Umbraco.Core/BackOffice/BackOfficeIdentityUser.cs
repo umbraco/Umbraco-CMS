@@ -5,6 +5,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Models.Membership;
@@ -39,7 +40,7 @@ namespace Umbraco.Core.BackOffice
         /// <param name="email">This is allowed to be null (but would need to be filled in if trying to persist this instance)</param>
         /// <param name="culture"></param>
         /// <returns></returns>
-        public static BackOfficeIdentityUser CreateNew(IGlobalSettings globalSettings, string username, string email, string culture)
+        public static BackOfficeIdentityUser CreateNew(GlobalSettings globalSettings, string username, string email, string culture)
         {
             if (string.IsNullOrWhiteSpace(username)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(username));
             if (string.IsNullOrWhiteSpace(culture)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(culture));
@@ -57,7 +58,7 @@ namespace Umbraco.Core.BackOffice
             return user;
         }
 
-        private BackOfficeIdentityUser(IGlobalSettings globalSettings, IReadOnlyUserGroup[] groups)
+        private BackOfficeIdentityUser(GlobalSettings globalSettings, IReadOnlyUserGroup[] groups)
         {
             _startMediaIds = Array.Empty<int>();
             _startContentIds = Array.Empty<int>();
@@ -78,7 +79,7 @@ namespace Umbraco.Core.BackOffice
         /// <param name="globalSettings"></param>
         /// <param name="userId"></param>
         /// <param name="groups"></param>
-        public BackOfficeIdentityUser(IGlobalSettings globalSettings, int userId, IEnumerable<IReadOnlyUserGroup> groups)
+        public BackOfficeIdentityUser(GlobalSettings globalSettings, int userId, IEnumerable<IReadOnlyUserGroup> groups)
             : this(globalSettings, groups.ToArray())
         {
             // use the property setters - they do more than just setting a field

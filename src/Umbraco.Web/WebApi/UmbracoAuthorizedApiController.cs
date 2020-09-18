@@ -1,6 +1,7 @@
 ﻿using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Logging;
 using Umbraco.Web.WebApi.Filters;
 using Umbraco.Core.Persistence;
@@ -24,7 +25,7 @@ namespace Umbraco.Web.WebApi
     [UmbracoAuthorize]
     [DisableBrowserCache]
    // [UmbracoWebApiRequireHttps]
-    [CheckIfUserTicketDataIsStale]
+   // [CheckIfUserTicketDataIsStale]
     [UnhandedExceptionLoggerConfiguration]
     [EnableDetailedErrors]
     public abstract class UmbracoAuthorizedApiController : UmbracoApiController
@@ -35,7 +36,7 @@ namespace Umbraco.Web.WebApi
         {
         }
 
-        protected UmbracoAuthorizedApiController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoMapper umbracoMapper, IPublishedUrlProvider publishedUrlProvider)
+        protected UmbracoAuthorizedApiController(GlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoMapper umbracoMapper, IPublishedUrlProvider publishedUrlProvider)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoMapper, publishedUrlProvider)
         {
         }

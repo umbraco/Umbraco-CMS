@@ -10,6 +10,8 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Web.Security;
+using Umbraco.Core.Configuration.Models;
+using Microsoft.Extensions.Options;
 
 namespace Umbraco.Web.Routing
 {
@@ -18,7 +20,7 @@ namespace Umbraco.Web.Routing
     /// </summary>
     public class PublishedRouter : IPublishedRouter
     {
-        private readonly IWebRoutingSettings _webRoutingSettings;
+        private readonly WebRoutingSettings _webRoutingSettings;
         private readonly ContentFinderCollection _contentFinders;
         private readonly IContentLastChanceFinder _contentLastChanceFinder;
         private readonly IProfilingLogger _profilingLogger;
@@ -36,7 +38,7 @@ namespace Umbraco.Web.Routing
         /// Initializes a new instance of the <see cref="PublishedRouter"/> class.
         /// </summary>
         public PublishedRouter(
-            IWebRoutingSettings webRoutingSettings,
+            IOptions<WebRoutingSettings> webRoutingSettings,
             ContentFinderCollection contentFinders,
             IContentLastChanceFinder contentLastChanceFinder,
             IVariationContextAccessor variationContextAccessor,
@@ -49,7 +51,7 @@ namespace Umbraco.Web.Routing
             IContentTypeService contentTypeService,
             IPublicAccessService publicAccessService)
         {
-            _webRoutingSettings = webRoutingSettings ?? throw new ArgumentNullException(nameof(webRoutingSettings));
+            _webRoutingSettings = webRoutingSettings.Value ?? throw new ArgumentNullException(nameof(webRoutingSettings));
             _contentFinders = contentFinders ?? throw new ArgumentNullException(nameof(contentFinders));
             _contentLastChanceFinder = contentLastChanceFinder ?? throw new ArgumentNullException(nameof(contentLastChanceFinder));
             _profilingLogger = proflog ?? throw new ArgumentNullException(nameof(proflog));
@@ -67,7 +69,7 @@ namespace Umbraco.Web.Routing
         /// <inheritdoc />
         public IPublishedRequest CreateRequest(IUmbracoContext umbracoContext, Uri uri = null)
         {
-            return new PublishedRequest(this, umbracoContext, _webRoutingSettings, uri ?? umbracoContext.CleanedUmbracoUrl);
+            return new PublishedRequest(this, umbracoContext, Options.Create(_webRoutingSettings), uri ?? umbracoContext.CleanedUmbracoUrl);
         }
 
         #region Request
