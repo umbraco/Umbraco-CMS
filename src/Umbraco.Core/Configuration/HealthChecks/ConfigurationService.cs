@@ -7,7 +7,6 @@ namespace Umbraco.Core.HealthCheck
 {
     public class ConfigurationService : IConfigurationService
     {
-        private readonly string _itemPath;
         private readonly ILocalizedTextService _textService;
         private readonly ILogger _logger;
         private readonly IConfigManipulator _configManipulator;
@@ -37,21 +36,22 @@ namespace Umbraco.Core.HealthCheck
         /// Updates a value in a given configuration file with the given path
         /// </summary>
         /// <param name="value"></param>
+        /// <param name="itemPath"></param>
         /// <returns></returns>
-        public ConfigurationServiceResult UpdateConfigFile(string value)
+        public ConfigurationServiceResult UpdateConfigFile(string value, string itemPath)
         {
             try
             {
-                if (_itemPath == null)
+                if (itemPath == null)
                 {
                     return new ConfigurationServiceResult
                     {
                         Success = false,
-                        Result = _textService.Localize("healthcheck/configurationServiceNodeNotFound", new[] { _itemPath, value })
+                        Result = _textService.Localize("healthcheck/configurationServiceNodeNotFound", new[] { itemPath, value })
                     };
                 }
 
-                _configManipulator.SaveConfigValue(_itemPath, value);
+                _configManipulator.SaveConfigValue(itemPath, value);
                 return new ConfigurationServiceResult
                 {
                     Success = true

@@ -185,7 +185,7 @@ namespace Umbraco.Core.HealthCheck.Checks.Security
 
         private HealthCheckStatus FixHttpsSetting()
         {
-            ConfigurationServiceResult updateConfigFile = _configurationService.UpdateConfigFile("true");
+            ConfigurationServiceResult updateConfigFile = _configurationService.UpdateConfigFile("true", itemPath);
 
             if (updateConfigFile.Success)
             {

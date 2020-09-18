@@ -148,7 +148,7 @@ namespace Umbraco.Core.HealthCheck.Checks
                 throw new InvalidOperationException(TextService.Localize("healthcheck/cannotRectifyShouldNotEqual"));
             }
 
-            var recommendedValue = Values.First(v => v.IsRecommended).Value;
+            string recommendedValue = Values.First(v => v.IsRecommended).Value;
             return UpdateConfigurationValue(recommendedValue);
         }
 
@@ -178,7 +178,7 @@ namespace Umbraco.Core.HealthCheck.Checks
 
         private HealthCheckStatus UpdateConfigurationValue(string value)
         {
-            ConfigurationServiceResult updateConfigFile = ConfigurationService.UpdateConfigFile(value);
+            ConfigurationServiceResult updateConfigFile = ConfigurationService.UpdateConfigFile(value, ItemPath);
 
             if (updateConfigFile.Success == false)
             {

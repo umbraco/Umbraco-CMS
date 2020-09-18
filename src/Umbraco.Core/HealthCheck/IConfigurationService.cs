@@ -2,6 +2,6 @@
 {
     public interface IConfigurationService
     {
-        ConfigurationServiceResult UpdateConfigFile(string value);
+        ConfigurationServiceResult UpdateConfigFile(string value, string itemPath);
     }
 }

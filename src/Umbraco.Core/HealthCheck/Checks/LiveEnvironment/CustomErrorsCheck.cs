@@ -14,11 +14,6 @@ namespace Umbraco.Core.HealthCheck.Checks.LiveEnvironment
             : base(textService, logger, configurationService)
         { }
 
-        public override IEnumerable<HealthCheckStatus> GetStatus()
-        {
-            throw new System.NotImplementedException();
-        }
-
         public override string ItemPath => Constants.Configuration.ConfigCustomErrorsMode;
 
         public override ValueComparisonType ValueComparisonType => ValueComparisonType.ShouldEqual;

@@ -16,11 +16,6 @@ namespace Umbraco.Core.HealthCheck.Checks.Configuration
         {
         }
 
-        public override IEnumerable<HealthCheckStatus> GetStatus()
-        {
-            throw new System.NotImplementedException();
-        }
-
         public override string ItemPath => Constants.Configuration.ConfigContentNotificationsEmail;
 
         public override ValueComparisonType ValueComparisonType => ValueComparisonType.ShouldNotEqual;
