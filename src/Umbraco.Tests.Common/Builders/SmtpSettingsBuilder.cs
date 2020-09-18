@@ -1,6 +1,5 @@
 ﻿using System.Net.Mail;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Configuration.Models;
 
 namespace Umbraco.Tests.Common.Builders
 {
@@ -12,7 +11,7 @@ namespace Umbraco.Tests.Common.Builders
     }
 
     public class SmtpSettingsBuilder<TParent>
-       : ChildBuilderBase<TParent, ISmtpSettings>
+       : ChildBuilderBase<TParent, SmtpSettings>
     {
         private string _from;
         private string _host;
@@ -68,7 +67,7 @@ namespace Umbraco.Tests.Common.Builders
             return this;
         }
 
-        public override ISmtpSettings Build()
+        public override SmtpSettings Build()
         {
             var from = _from ?? null;
             var host = _host ?? null;
@@ -78,7 +77,7 @@ namespace Umbraco.Tests.Common.Builders
             var username = _username ?? null;
             var password = _password ?? null;
 
-            return new TestSmtpSettings()
+            return new SmtpSettings()
             {
                 From = from,
                 Host = host,
@@ -88,17 +87,6 @@ namespace Umbraco.Tests.Common.Builders
                 Username = username,
                 Password = password,
             };
-        }
-
-        private class TestSmtpSettings : ISmtpSettings
-        {
-            public string From { get; set; }
-            public string Host { get; set; }
-            public int Port { get; set; }
-            public string PickupDirectoryLocation { get; set; }
-            public SmtpDeliveryMethod DeliveryMethod { get; set; }
-            public string Username { get; set; }
-            public string Password { get; set; }
         }
     }
 }

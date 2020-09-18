@@ -1,5 +1,5 @@
 ﻿using System.Linq;
-using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Core.Models
@@ -27,9 +27,9 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets the urls of a media item.
         /// </summary>
-        public static string[] GetUrls(this IMedia media, IContentSettings contentSettings, MediaUrlGeneratorCollection mediaUrlGenerators)
+        public static string[] GetUrls(this IMedia media, ContentSettings contentSettings, MediaUrlGeneratorCollection mediaUrlGenerators)
         {
-            return contentSettings.ImageAutoFillProperties
+            return contentSettings.Imaging.AutoFillImageProperties
                 .Select(field => media.GetUrl(field.Alias, mediaUrlGenerators))
                 .Where(link => string.IsNullOrWhiteSpace(link) == false)
                 .ToArray();

@@ -1,8 +1,11 @@
-﻿using Moq;
+﻿using Microsoft.Extensions.Options;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Strings;
+using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 
@@ -11,7 +14,7 @@ namespace Umbraco.Tests.Strings
     [TestFixture]
     public class CmsHelperCasingTests
     {
-        private IShortStringHelper ShortStringHelper => new DefaultShortStringHelper(Mock.Of<IRequestHandlerSettings>());
+        private IShortStringHelper ShortStringHelper => new DefaultShortStringHelper(Options.Create(new RequestHandlerSettings()));
 
         [TestCase("thisIsTheEnd", "This Is The End")]
         [TestCase("th", "Th")]

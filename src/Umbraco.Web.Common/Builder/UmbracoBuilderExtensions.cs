@@ -34,7 +34,7 @@ namespace Umbraco.Web.Common.Builder
             {
                 options.ShouldProfile = request => false; // WebProfiler determine and start profiling. We should not use the MiniProfilerMiddleware to also profile
             }));
-        
+
         public static IUmbracoBuilder WithMvcAndRazor(this IUmbracoBuilder builder, Action<MvcOptions> mvcOptions = null, Action<IMvcBuilder> mvcBuilding = null)
             => builder.AddWith(nameof(WithMvcAndRazor), () =>
             {

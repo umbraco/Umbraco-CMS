@@ -7,6 +7,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
@@ -26,7 +27,7 @@ namespace Umbraco.Tests.Strings
             // NOTE pre-filters runs _before_ Recode takes place
             // so there still may be utf8 chars even though you want ascii
 
-            ShortStringHelper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(Mock.Of<IRequestHandlerSettings>())
+            ShortStringHelper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(new RequestHandlerSettings())
                 .WithConfig(CleanStringType.FileName, new DefaultShortStringHelperConfig.Config
                 {
                     //PreFilter = ClearFileChars, // done in IsTerm

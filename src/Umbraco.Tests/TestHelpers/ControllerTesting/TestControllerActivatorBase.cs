@@ -7,6 +7,7 @@ using System.Web.Http.Controllers;
 using System.Web.Http.Dispatcher;
 using Moq;
 using Umbraco.Core.BackOffice;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
@@ -56,7 +57,7 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
                 contentTypeService: mockedContentTypeService,
                 localizedTextService:Mock.Of<ILocalizedTextService>());
 
-            var globalSettings = SettingsForTests.GenerateMockGlobalSettings();
+            var globalSettings = new GlobalSettings();
 
             // FIXME: v8?
             ////new app context

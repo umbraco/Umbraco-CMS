@@ -4,6 +4,7 @@ using NUnit.Framework;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Hosting;
+using Umbraco.Tests.Common.Builders;
 using Umbraco.Web;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.Routing
@@ -70,12 +71,11 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Routing
         {
             // Arrange
             var sourceUri = new Uri(sourceUrl, UriKind.Relative);
-            var mockRequestHandlerSettings = new Mock<IRequestHandlerSettings>();
-            mockRequestHandlerSettings.Setup(x => x.AddTrailingSlash).Returns(trailingSlash);
+            var requestHandlerSettings = new RequestHandlerSettingsBuilder().WithAddTrailingSlash(trailingSlash).Build();
             var uriUtility = BuildUriUtility("/");
 
             // Act
-            var resultUri = uriUtility.UriFromUmbraco(sourceUri, Mock.Of<IGlobalSettings>(), mockRequestHandlerSettings.Object);
+            var resultUri = uriUtility.UriFromUmbraco(sourceUri, requestHandlerSettings);
 
             // Assert
             var expectedUri = new Uri(expectedUrl, UriKind.Relative);

@@ -3,6 +3,7 @@ using System.Linq;
 using System.Text;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Strings;
 
@@ -11,22 +12,23 @@ namespace Umbraco.Tests.Strings
     [TestFixture]
     public class DefaultShortStringHelperTests2
     {
-        
+
         [Test]
         public void U4_4056()
         {
-            var settings = Mock.Of<IRequestHandlerSettings>();
-            var contentMock = Mock.Get(settings);
-            contentMock.Setup(x => x.CharCollection).Returns(Enumerable.Empty<IChar>());
-            contentMock.Setup(x => x.ConvertUrlsToAscii).Returns(false);
+            var requestHandlerSettings = new RequestHandlerSettings()
+            {
+                CharCollection = Enumerable.Empty<IChar>(),
+                ConvertUrlsToAscii = "false"
+            };
 
             const string input = "ÆØÅ and æøå and 中文测试 and  אודות האתר and größer БбДдЖж page";
 
-            var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(settings)); // unicode
+            var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(requestHandlerSettings)); // unicode
             var output = helper.CleanStringForUrlSegment(input);
             Assert.AreEqual("æøå-and-æøå-and-中文测试-and-אודות-האתר-and-größer-ббдджж-page", output);
 
-            helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(settings)
+            helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(requestHandlerSettings)
                 .WithConfig(CleanStringType.UrlSegment, new DefaultShortStringHelperConfig.Config
                 {
                     IsTerm = (c, leading) => char.IsLetterOrDigit(c) || c == '_',
@@ -40,19 +42,20 @@ namespace Umbraco.Tests.Strings
         [Test]
         public void U4_4056_TryAscii()
         {
-            var settings = Mock.Of<IRequestHandlerSettings>();
-            var contentMock = Mock.Get(settings);
-            contentMock.Setup(x => x.CharCollection).Returns(Enumerable.Empty<IChar>());
-            contentMock.Setup(x => x.ConvertUrlsToAscii).Returns(false);
+            var requestHandlerSettings = new RequestHandlerSettings()
+            {
+                CharCollection = Enumerable.Empty<IChar>(),
+                ConvertUrlsToAscii = "false"
+            };
 
             const string input1 = "ÆØÅ and æøå and 中文测试 and  אודות האתר and größer БбДдЖж page";
             const string input2 = "ÆØÅ and æøå and größer БбДдЖж page";
 
-            var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(settings)); // unicode
+            var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(requestHandlerSettings)); // unicode
             Assert.AreEqual("æøå-and-æøå-and-中文测试-and-אודות-האתר-and-größer-ббдджж-page", helper.CleanStringForUrlSegment(input1));
             Assert.AreEqual("æøå-and-æøå-and-größer-ббдджж-page", helper.CleanStringForUrlSegment(input2));
 
-            helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(settings)
+            helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(requestHandlerSettings)
                 .WithConfig(CleanStringType.UrlSegment, new DefaultShortStringHelperConfig.Config
                 {
                     IsTerm = (c, leading) => char.IsLetterOrDigit(c) || c == '_',
@@ -66,7 +69,7 @@ namespace Umbraco.Tests.Strings
         [Test]
         public void CleanStringUnderscoreInTerm()
         {
-            var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(Mock.Of<IRequestHandlerSettings>())
+            var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(new RequestHandlerSettings())
                 .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
                     // underscore is accepted within terms
@@ -76,7 +79,7 @@ namespace Umbraco.Tests.Strings
                 }));
             Assert.AreEqual("foo_bar*nil", helper.CleanString("foo_bar nil", CleanStringType.Alias));
 
-            helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(Mock.Of<IRequestHandlerSettings>())
+            helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(new RequestHandlerSettings())
                 .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
                     // underscore is not accepted within terms
@@ -90,7 +93,7 @@ namespace Umbraco.Tests.Strings
         [Test]
         public void CleanStringLeadingChars()
         {
-            var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(Mock.Of<IRequestHandlerSettings>())
+            var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(new RequestHandlerSettings())
                 .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
                     // letters and digits are valid leading chars
@@ -100,7 +103,7 @@ namespace Umbraco.Tests.Strings
                 }));
             Assert.AreEqual("0123foo*bar*543*nil*321", helper.CleanString("0123foo_bar 543 nil 321", CleanStringType.Alias));
 
-            helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(Mock.Of<IRequestHandlerSettings>())
+            helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(new RequestHandlerSettings())
                 .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
                     // only letters are valid leading chars
@@ -111,14 +114,14 @@ namespace Umbraco.Tests.Strings
             Assert.AreEqual("foo*bar*543*nil*321", helper.CleanString("0123foo_bar 543 nil 321", CleanStringType.Alias));
             Assert.AreEqual("foo*bar*543*nil*321", helper.CleanString("0123 foo_bar 543 nil 321", CleanStringType.Alias));
 
-            helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(Mock.Of<IRequestHandlerSettings>()));
+            helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(new RequestHandlerSettings() ));
             Assert.AreEqual("child2", helper.CleanStringForSafeAlias("1child2"));
         }
 
         [Test]
         public void CleanStringTermOnUpper()
         {
-            var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(Mock.Of<IRequestHandlerSettings>())
+            var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(new RequestHandlerSettings())
                 .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
@@ -128,7 +131,7 @@ namespace Umbraco.Tests.Strings
                 }));
             Assert.AreEqual("foo*Bar", helper.CleanString("fooBar", CleanStringType.Alias));
 
-            helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(Mock.Of<IRequestHandlerSettings>())
+            helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(new RequestHandlerSettings())
                 .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
@@ -142,7 +145,7 @@ namespace Umbraco.Tests.Strings
         [Test]
         public void CleanStringAcronymOnNonUpper()
         {
-            var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(Mock.Of<IRequestHandlerSettings>())
+            var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(new RequestHandlerSettings())
                 .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
@@ -155,7 +158,7 @@ namespace Umbraco.Tests.Strings
             Assert.AreEqual("foo*BAnil", helper.CleanString("foo BAnil", CleanStringType.Alias));
             Assert.AreEqual("foo*Bnil", helper.CleanString("foo Bnil", CleanStringType.Alias));
 
-            helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(Mock.Of<IRequestHandlerSettings>())
+            helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(new RequestHandlerSettings())
                 .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
@@ -172,7 +175,7 @@ namespace Umbraco.Tests.Strings
         [Test]
         public void CleanStringGreedyAcronyms()
         {
-            var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(Mock.Of<IRequestHandlerSettings>())
+            var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(new RequestHandlerSettings())
                 .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
@@ -185,7 +188,7 @@ namespace Umbraco.Tests.Strings
             Assert.AreEqual("foo*BA*nil", helper.CleanString("foo BAnil", CleanStringType.Alias));
             Assert.AreEqual("foo*Bnil", helper.CleanString("foo Bnil", CleanStringType.Alias));
 
-            helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(Mock.Of<IRequestHandlerSettings>())
+            helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(new RequestHandlerSettings())
                 .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
@@ -202,7 +205,7 @@ namespace Umbraco.Tests.Strings
         [Test]
         public void CleanStringWhiteSpace()
         {
-            var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(Mock.Of<IRequestHandlerSettings>())
+            var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(new RequestHandlerSettings())
                 .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
@@ -215,7 +218,7 @@ namespace Umbraco.Tests.Strings
         [Test]
         public void CleanStringSeparator()
         {
-            var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(Mock.Of<IRequestHandlerSettings>())
+            var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(new RequestHandlerSettings())
                 .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
@@ -223,7 +226,7 @@ namespace Umbraco.Tests.Strings
                 }));
             Assert.AreEqual("foo*bar", helper.CleanString("foo bar", CleanStringType.Alias));
 
-            helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(Mock.Of<IRequestHandlerSettings>())
+            helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(new RequestHandlerSettings())
                 .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
@@ -231,14 +234,14 @@ namespace Umbraco.Tests.Strings
                 }));
             Assert.AreEqual("foo bar", helper.CleanString("foo bar", CleanStringType.Alias));
 
-            helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(Mock.Of<IRequestHandlerSettings>())
+            helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(new RequestHandlerSettings())
                 .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged
                 }));
             Assert.AreEqual("foobar", helper.CleanString("foo bar", CleanStringType.Alias));
 
-            helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(Mock.Of<IRequestHandlerSettings>())
+            helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(new RequestHandlerSettings())
                 .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
@@ -250,7 +253,7 @@ namespace Umbraco.Tests.Strings
         [Test]
         public void CleanStringSymbols()
         {
-            var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(Mock.Of<IRequestHandlerSettings>())
+            var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(new RequestHandlerSettings())
                 .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
@@ -304,7 +307,7 @@ namespace Umbraco.Tests.Strings
         [Test]
         public void CleanStringEncoding()
         {
-            var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(Mock.Of<IRequestHandlerSettings>())
+            var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(new RequestHandlerSettings())
                 .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
@@ -313,7 +316,7 @@ namespace Umbraco.Tests.Strings
             Assert.AreEqual("中文测试", helper.CleanString("中文测试", CleanStringType.Alias));
             Assert.AreEqual("léger*中文测试*ZÔRG", helper.CleanString("léger 中文测试 ZÔRG", CleanStringType.Alias));
 
-            helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(Mock.Of<IRequestHandlerSettings>())
+            helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(new RequestHandlerSettings())
                 .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
                     StringType = CleanStringType.Ascii | CleanStringType.Unchanged,
@@ -326,12 +329,13 @@ namespace Umbraco.Tests.Strings
         [Test]
         public void CleanStringDefaultConfig()
         {
-            var settings = Mock.Of<IRequestHandlerSettings>();
-            var contentMock = Mock.Get(settings);
-            contentMock.Setup(x => x.CharCollection).Returns(Enumerable.Empty<IChar>());
-            contentMock.Setup(x => x.ConvertUrlsToAscii).Returns(false);
+            var requestHandlerSettings = new RequestHandlerSettings()
+            {
+                CharCollection = Enumerable.Empty<IChar>(),
+                ConvertUrlsToAscii = "false"
+            };
 
-            var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(settings));
+            var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(requestHandlerSettings));
 
             const string input = "0123 中文测试 中文测试 léger ZÔRG (2) a?? *x";
 
@@ -352,7 +356,7 @@ namespace Umbraco.Tests.Strings
         [Test]
         public void CleanStringCasing()
         {
-            var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(Mock.Of<IRequestHandlerSettings>())
+            var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(new RequestHandlerSettings())
                 .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,

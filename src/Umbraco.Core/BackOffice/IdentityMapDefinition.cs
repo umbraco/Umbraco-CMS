@@ -1,5 +1,7 @@
 ﻿using System;
+using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
@@ -11,13 +13,13 @@ namespace Umbraco.Core.BackOffice
     {
         private readonly ILocalizedTextService _textService;
         private readonly IEntityService _entityService;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
 
-        public IdentityMapDefinition(ILocalizedTextService textService, IEntityService entityService, IGlobalSettings globalSettings)
+        public IdentityMapDefinition(ILocalizedTextService textService, IEntityService entityService, IOptions<GlobalSettings> globalSettings)
         {
             _textService = textService;
             _entityService = entityService;
-            _globalSettings = globalSettings;
+            _globalSettings = globalSettings.Value;
         }
 
         public void DefineMaps(UmbracoMapper mapper)

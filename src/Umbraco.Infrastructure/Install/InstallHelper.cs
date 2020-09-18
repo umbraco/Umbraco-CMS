@@ -13,6 +13,8 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Web.Install.Models;
+using Microsoft.Extensions.Options;
+using Umbraco.Core.Configuration.Models;
 
 namespace Umbraco.Web.Install
 {
@@ -22,7 +24,7 @@ namespace Umbraco.Web.Install
         private readonly DatabaseBuilder _databaseBuilder;
         private readonly ILogger _logger;
         private readonly IUmbracoVersion _umbracoVersion;
-        private readonly IConnectionStrings _connectionStrings;
+        private readonly ConnectionStrings _connectionStrings;
         private readonly IInstallationService _installationService;
         private readonly ICookieManager _cookieManager;
         private readonly IUserAgentProvider _userAgentProvider;
@@ -33,7 +35,7 @@ namespace Umbraco.Web.Install
         public InstallHelper(DatabaseBuilder databaseBuilder,
             ILogger logger,
             IUmbracoVersion umbracoVersion,
-            IConnectionStrings connectionStrings,
+            IOptions<ConnectionStrings> connectionStrings,
             IInstallationService installationService,
             ICookieManager cookieManager,
             IUserAgentProvider userAgentProvider,
@@ -43,7 +45,7 @@ namespace Umbraco.Web.Install
             _logger = logger;
             _umbracoVersion = umbracoVersion;
             _databaseBuilder = databaseBuilder;
-            _connectionStrings = connectionStrings ?? throw new ArgumentNullException(nameof(connectionStrings));
+            _connectionStrings = connectionStrings.Value ?? throw new ArgumentNullException(nameof(connectionStrings));
             _installationService = installationService;
             _cookieManager = cookieManager;
             _userAgentProvider = userAgentProvider;
@@ -114,7 +116,7 @@ namespace Umbraco.Web.Install
         {
             get
             {
-                var databaseSettings = _connectionStrings[Constants.System.UmbracoConnectionName];
+                var databaseSettings = _connectionStrings.UmbracoConnectionString;
                 if (databaseSettings.IsConnectionStringConfigured() == false)
                 {
                     //no version or conn string configured, must be a brand new install
