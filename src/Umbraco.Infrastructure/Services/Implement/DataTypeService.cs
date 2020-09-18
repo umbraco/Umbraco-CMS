@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Events;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Repositories;
@@ -30,11 +30,11 @@ namespace Umbraco.Core.Services.Implement
         private readonly ILocalizationService _localizationService;
         private readonly IShortStringHelper _shortStringHelper;
 
-        public DataTypeService(IScopeProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory,
+        public DataTypeService(IScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory,
             IDataTypeRepository dataTypeRepository, IDataTypeContainerRepository dataTypeContainerRepository,
             IAuditRepository auditRepository, IEntityRepository entityRepository, IContentTypeRepository contentTypeRepository,
             IIOHelper ioHelper, ILocalizedTextService localizedTextService, ILocalizationService localizationService, IShortStringHelper shortStringHelper)
-            : base(provider, logger, eventMessagesFactory)
+            : base(provider, loggerFactory, eventMessagesFactory)
         {
             _dataTypeRepository = dataTypeRepository;
             _dataTypeContainerRepository = dataTypeContainerRepository;
@@ -324,7 +324,7 @@ namespace Umbraco.Core.Services.Implement
                 .Where(x => x.Editor is MissingPropertyEditor);
             foreach (var dataType in dataTypesWithMissingEditors)
             {
-                dataType.Editor = new LabelPropertyEditor(Logger, _ioHelper, this, _localizedTextService, _localizationService, _shortStringHelper);
+                dataType.Editor = new LabelPropertyEditor(LoggerFactory, _ioHelper, this, _localizedTextService, _localizationService, _shortStringHelper);
             }
         }
 

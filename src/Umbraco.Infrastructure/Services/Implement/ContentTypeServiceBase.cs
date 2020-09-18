@@ -1,13 +1,13 @@
-﻿using Umbraco.Core.Events;
-using Umbraco.Core.Logging;
+﻿using Microsoft.Extensions.Logging;
+using Umbraco.Core.Events;
 using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Services.Implement
 {
     public abstract class ContentTypeServiceBase : ScopeRepositoryService
     {
-        protected ContentTypeServiceBase(IScopeProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory)
-            : base(provider, logger, eventMessagesFactory)
+        protected ContentTypeServiceBase(IScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory)
+            : base(provider, loggerFactory, eventMessagesFactory)
         { }
     }
 }

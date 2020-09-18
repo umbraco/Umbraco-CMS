@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Events;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Scoping;
@@ -18,8 +18,8 @@ namespace Umbraco.Core.Services.Implement
         /// <summary>
         /// Initializes a new instance of the <see cref="ContentService"/> class.
         /// </summary>
-        public ConsentService(IScopeProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory, IConsentRepository consentRepository)
-            : base(provider, logger, eventMessagesFactory)
+        public ConsentService(IScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory, IConsentRepository consentRepository)
+            : base(provider, loggerFactory, eventMessagesFactory)
         {
             _consentRepository = consentRepository;
         }

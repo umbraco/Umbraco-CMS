@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Events;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Scoping;
@@ -12,9 +12,9 @@ namespace Umbraco.Core.Services.Implement
     {
         private readonly IMemberTypeRepository _memberTypeRepository;
 
-        public MemberTypeService(IScopeProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory, IMemberService memberService,
+        public MemberTypeService(IScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory, IMemberService memberService,
             IMemberTypeRepository memberTypeRepository, IAuditRepository auditRepository, IEntityRepository entityRepository)
-            : base(provider, logger, eventMessagesFactory, memberTypeRepository, auditRepository, null, entityRepository)
+            : base(provider, loggerFactory, eventMessagesFactory, memberTypeRepository, auditRepository, null, entityRepository)
         {
             MemberService = memberService;
             _memberTypeRepository = memberTypeRepository;

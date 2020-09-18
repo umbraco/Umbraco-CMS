@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Events;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Scoping;
@@ -12,9 +12,9 @@ namespace Umbraco.Core.Services.Implement
     {
         private readonly IExternalLoginRepository _externalLoginRepository;
 
-        public ExternalLoginService(IScopeProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory,
+        public ExternalLoginService(IScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory,
             IExternalLoginRepository externalLoginRepository)
-            : base(provider, logger, eventMessagesFactory)
+            : base(provider, loggerFactory, eventMessagesFactory)
         {
             _externalLoginRepository = externalLoginRepository;
         }

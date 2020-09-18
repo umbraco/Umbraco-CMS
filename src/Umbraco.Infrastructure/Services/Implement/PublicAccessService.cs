@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Events;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Scoping;
@@ -13,9 +13,9 @@ namespace Umbraco.Core.Services.Implement
     {
         private readonly IPublicAccessRepository _publicAccessRepository;
 
-        public PublicAccessService(IScopeProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory,
+        public PublicAccessService(IScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory,
             IPublicAccessRepository publicAccessRepository)
-            : base(provider, logger, eventMessagesFactory)
+            : base(provider, loggerFactory, eventMessagesFactory)
         {
             _publicAccessRepository = publicAccessRepository;
         }

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Events;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
@@ -27,11 +27,11 @@ namespace Umbraco.Core.Services.Implement
         /// Initializes a new instance of the <see cref="ServerRegistrationService"/> class.
         /// </summary>
         /// <param name="scopeProvider">A UnitOfWork provider.</param>
-        /// <param name="logger">A logger.</param>
+        /// <param name="loggerFactory">A logger factory</param>
         /// <param name="eventMessagesFactory"></param>
-        public ServerRegistrationService(IScopeProvider scopeProvider, ILogger logger, IEventMessagesFactory eventMessagesFactory,
+        public ServerRegistrationService(IScopeProvider scopeProvider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory,
             IServerRegistrationRepository serverRegistrationRepository, IHostingEnvironment hostingEnvironment)
-            : base(scopeProvider, logger, eventMessagesFactory)
+            : base(scopeProvider, loggerFactory, eventMessagesFactory)
         {
             _serverRegistrationRepository = serverRegistrationRepository;
             _hostingEnvironment = hostingEnvironment;

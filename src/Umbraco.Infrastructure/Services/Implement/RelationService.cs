@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Events;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Repositories;
@@ -17,9 +17,9 @@ namespace Umbraco.Core.Services.Implement
         private readonly IRelationTypeRepository _relationTypeRepository;
         private readonly IAuditRepository _auditRepository;
 
-        public RelationService(IScopeProvider uowProvider, ILogger logger, IEventMessagesFactory eventMessagesFactory, IEntityService entityService,
+        public RelationService(IScopeProvider uowProvider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory, IEntityService entityService,
             IRelationRepository relationRepository, IRelationTypeRepository relationTypeRepository, IAuditRepository auditRepository)
-            : base(uowProvider, logger, eventMessagesFactory)
+            : base(uowProvider, loggerFactory, eventMessagesFactory)
         {
             _relationRepository = relationRepository;
             _relationTypeRepository = relationTypeRepository;
@@ -193,7 +193,7 @@ namespace Umbraco.Core.Services.Implement
         public IEnumerable<IRelation> GetByRelationTypeAlias(string relationTypeAlias)
         {
             var relationType = GetRelationType(relationTypeAlias);
-            
+
             return relationType == null
                 ? Enumerable.Empty<IRelation>()
                 : GetRelationsByListOfTypeIds(new[] { relationType.Id });
@@ -296,7 +296,7 @@ namespace Umbraco.Core.Services.Implement
         /// <inheritdoc />
         public IEnumerable<Tuple<IUmbracoEntity, IUmbracoEntity>> GetEntitiesFromRelations(IEnumerable<IRelation> relations)
         {
-            //TODO: Argh! N+1 
+            //TODO: Argh! N+1
 
             foreach (var relation in relations)
             {

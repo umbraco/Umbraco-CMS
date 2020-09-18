@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Events;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence;
@@ -21,8 +21,8 @@ namespace Umbraco.Core.Services.Implement
         private IQuery<IUmbracoEntity> _queryRootEntity;
         private readonly IIdKeyMap _idKeyMap;
 
-        public EntityService(IScopeProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory, IIdKeyMap idKeyMap, IEntityRepository entityRepository)
-            : base(provider, logger, eventMessagesFactory)
+        public EntityService(IScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory, IIdKeyMap idKeyMap, IEntityRepository entityRepository)
+            : base(provider, loggerFactory, eventMessagesFactory)
         {
             _idKeyMap = idKeyMap;
             _entityRepository = entityRepository;

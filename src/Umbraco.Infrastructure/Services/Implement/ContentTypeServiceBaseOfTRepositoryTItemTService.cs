@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Events;
 using Umbraco.Core.Exceptions;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Repositories;
@@ -22,9 +22,9 @@ namespace Umbraco.Core.Services.Implement
         private readonly IEntityContainerRepository _containerRepository;
         private readonly IEntityRepository _entityRepository;
 
-        protected ContentTypeServiceBase(IScopeProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory,
+        protected ContentTypeServiceBase(IScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory,
             TRepository repository, IAuditRepository auditRepository, IEntityContainerRepository containerRepository, IEntityRepository entityRepository)
-            : base(provider, logger, eventMessagesFactory)
+            : base(provider, loggerFactory, eventMessagesFactory)
         {
             Repository = repository;
             _auditRepository = auditRepository;
@@ -508,15 +508,15 @@ namespace Umbraco.Core.Services.Implement
 
                 // delete content
                 DeleteItemsOfTypes(descendantsAndSelf.Select(x => x.Id));
-                
+
                 // Next find all other document types that have a reference to this content type
                 var referenceToAllowedContentTypes = GetAll().Where(q => q.AllowedContentTypes.Any(p=>p.Id.Value==item.Id));
                 foreach (var reference in referenceToAllowedContentTypes)
-                {                                        
-                    reference.AllowedContentTypes = reference.AllowedContentTypes.Where(p => p.Id.Value != item.Id);                   
+                {
+                    reference.AllowedContentTypes = reference.AllowedContentTypes.Where(p => p.Id.Value != item.Id);
                     var changedRef = new List<ContentTypeChange<TItem>>() { new ContentTypeChange<TItem>(reference, ContentTypeChangeTypes.RefreshMain) };
                     // Fire change event
-                    OnChanged(scope, changedRef.ToEventArgs());                  
+                    OnChanged(scope, changedRef.ToEventArgs());
                 }
 
                 // finally delete the content type
@@ -525,7 +525,7 @@ namespace Umbraco.Core.Services.Implement
                 //  (contents of any descendant type have been deleted but
                 //   contents of any composed (impacted) type remain but
                 //   need to have their property data cleared)
-                Repository.Delete(item);                               
+                Repository.Delete(item);
 
                 //...
                 var changes = descendantsAndSelf.Select(x => new ContentTypeChange<TItem>(x, ContentTypeChangeTypes.Remove))

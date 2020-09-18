@@ -1,5 +1,5 @@
-﻿using Umbraco.Core.Events;
-using Umbraco.Core.Logging;
+﻿using Microsoft.Extensions.Logging;
+using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services.Changes;
@@ -10,8 +10,8 @@ namespace Umbraco.Core.Services.Implement
         where TItem : class, IContentTypeComposition
         where TService : class, IContentTypeBaseService<TItem>
     {
-        protected ContentTypeServiceBase(IScopeProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory)
-            : base(provider, logger, eventMessagesFactory)
+        protected ContentTypeServiceBase(IScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory)
+            : base(provider, loggerFactory, eventMessagesFactory)
         { }
 
         protected abstract TService This { get; }
