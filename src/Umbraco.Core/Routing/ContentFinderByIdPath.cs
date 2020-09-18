@@ -4,6 +4,8 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Models.PublishedContent;
 using System.Globalization;
+using Umbraco.Core.Configuration.Models;
+using Microsoft.Extensions.Options;
 
 namespace Umbraco.Web.Routing
 {
@@ -17,11 +19,11 @@ namespace Umbraco.Web.Routing
     {
         private readonly ILogger _logger;
         private readonly IRequestAccessor _requestAccessor;
-        private readonly IWebRoutingSettings _webRoutingSettings;
+        private readonly WebRoutingSettings _webRoutingSettings;
 
-        public ContentFinderByIdPath(IWebRoutingSettings webRoutingSettings, ILogger logger, IRequestAccessor requestAccessor)
+        public ContentFinderByIdPath(IOptions<WebRoutingSettings> webRoutingSettings, ILogger logger, IRequestAccessor requestAccessor)
         {
-            _webRoutingSettings = webRoutingSettings ?? throw new System.ArgumentNullException(nameof(webRoutingSettings));
+            _webRoutingSettings = webRoutingSettings.Value ?? throw new System.ArgumentNullException(nameof(webRoutingSettings));
             _logger = logger ?? throw new System.ArgumentNullException(nameof(logger));
             _requestAccessor = requestAccessor;
         }

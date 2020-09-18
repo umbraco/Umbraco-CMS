@@ -12,6 +12,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Common;
+using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 using Umbraco.Web;
@@ -155,8 +156,8 @@ namespace Umbraco.Tests.Web.Mvc
 
             var content = Mock.Of<IPublishedContent>(publishedContent => publishedContent.Id == 12345);
 
-
-            var publishedRouter = BaseWebTest.CreatePublishedRouter(TestHelpers.SettingsForTests.GenerateMockWebRoutingSettings());
+            var webRoutingSettings = new WebRoutingSettingsBuilder().Build();
+            var publishedRouter = BaseWebTest.CreatePublishedRouter(webRoutingSettings);
             var frequest = publishedRouter.CreateRequest(umbracoContext, new Uri("http://localhost/test"));
             frequest.PublishedContent = content;
 

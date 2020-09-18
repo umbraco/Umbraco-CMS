@@ -5,13 +5,14 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.BackOffice;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Grid;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Security;
@@ -30,13 +31,14 @@ using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
-
+    //[UmbracoRequireHttps] //TODO Reintroduce
+    [DisableBrowserCache]
     [PluginController(Constants.Web.Mvc.BackOfficeArea)]
     public class BackOfficeController : Controller
     {
         private readonly BackOfficeUserManager _userManager;
         private readonly IRuntimeMinifier _runtimeMinifier;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly ILocalizedTextService _textService;
@@ -50,7 +52,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         public BackOfficeController(
             BackOfficeUserManager userManager,
             IRuntimeMinifier runtimeMinifier,
-            IGlobalSettings globalSettings,
+            IOptions<GlobalSettings> globalSettings,
             IHostingEnvironment hostingEnvironment,
             IUmbracoContextAccessor umbracoContextAccessor,
             ILocalizedTextService textService,
@@ -60,11 +62,10 @@ namespace Umbraco.Web.BackOffice.Controllers
             BackOfficeSignInManager signInManager,
             IBackofficeSecurityAccessor backofficeSecurityAccessor,
             ILogger logger)
-
         {
             _userManager = userManager;
             _runtimeMinifier = runtimeMinifier;
-            _globalSettings = globalSettings;
+            _globalSettings = globalSettings.Value;
             _hostingEnvironment = hostingEnvironment;
             _umbracoContextAccessor = umbracoContextAccessor;
             _textService = textService;

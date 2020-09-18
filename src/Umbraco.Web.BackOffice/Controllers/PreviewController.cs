@@ -1,11 +1,13 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
+using Microsoft.Extensions.Options;
 using System;
 using System.IO;
 using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Security;
@@ -29,7 +31,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     public class PreviewController : Controller
     {
         private readonly UmbracoFeatures _features;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly IPublishedSnapshotService _publishedSnapshotService;
         private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly ILocalizationService _localizationService;
@@ -40,7 +42,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
         public PreviewController(
             UmbracoFeatures features,
-            IGlobalSettings globalSettings,
+            IOptions<GlobalSettings> globalSettings,
             IPublishedSnapshotService publishedSnapshotService,
             IBackofficeSecurityAccessor backofficeSecurityAccessor,
             ILocalizationService localizationService,
@@ -50,7 +52,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             ICompositeViewEngine viewEngines)
         {
             _features = features;
-            _globalSettings = globalSettings;
+            _globalSettings = globalSettings.Value;
             _publishedSnapshotService = publishedSnapshotService;
             _backofficeSecurityAccessor = backofficeSecurityAccessor;
             _localizationService = localizationService;

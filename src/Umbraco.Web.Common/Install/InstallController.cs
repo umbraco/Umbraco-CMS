@@ -13,6 +13,8 @@ using Umbraco.Extensions;
 using Umbraco.Web.Common.Filters;
 using Umbraco.Web.Install;
 using Umbraco.Web.Security;
+using Umbraco.Core.Configuration.Models;
+using Microsoft.Extensions.Options;
 
 namespace Umbraco.Web.Common.Install
 {
@@ -27,7 +29,7 @@ namespace Umbraco.Web.Common.Install
         private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly InstallHelper _installHelper;
         private readonly IRuntimeState _runtime;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly ILogger _logger;
@@ -38,7 +40,7 @@ namespace Umbraco.Web.Common.Install
             IBackofficeSecurityAccessor backofficeSecurityAccessor,
             InstallHelper installHelper,
             IRuntimeState runtime,
-            IGlobalSettings globalSettings,
+            IOptions<GlobalSettings> globalSettings,
             IRuntimeMinifier runtimeMinifier,
             IHostingEnvironment hostingEnvironment,
             IUmbracoVersion umbracoVersion,
@@ -48,7 +50,7 @@ namespace Umbraco.Web.Common.Install
             _backofficeSecurityAccessor = backofficeSecurityAccessor;
             _installHelper = installHelper;
             _runtime = runtime;
-            _globalSettings = globalSettings;
+            _globalSettings = globalSettings.Value;
             _runtimeMinifier = runtimeMinifier;
             _hostingEnvironment = hostingEnvironment;
             _umbracoVersion = umbracoVersion;

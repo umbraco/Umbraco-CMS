@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using Microsoft.Extensions.Options;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Events;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Hosting;
@@ -27,11 +29,12 @@ namespace Umbraco.Core.Runtime
         // runtime state, this instance will get replaced again once the essential services are available to run the check
         private RuntimeState _state = RuntimeState.Booting();
         private readonly IUmbracoBootPermissionChecker _umbracoBootPermissionChecker;
-        private readonly IGlobalSettings _globalSettings;
-        private readonly IConnectionStrings _connectionStrings;
+        private readonly GlobalSettings _globalSettings;
+        private readonly ConnectionStrings _connectionStrings;
 
         public CoreRuntime(
-            Configs configs,            
+            GlobalSettings globalSettings,
+            ConnectionStrings connectionStrings,
             IUmbracoVersion umbracoVersion,
             IIOHelper ioHelper,
             ILogger logger,
@@ -44,23 +47,25 @@ namespace Umbraco.Core.Runtime
             ITypeFinder typeFinder,
             AppCaches appCaches)
         {
+            _globalSettings = globalSettings;
+            _connectionStrings = connectionStrings;
+
             IOHelper = ioHelper;
-            Configs = configs;
             AppCaches = appCaches;
-            UmbracoVersion = umbracoVersion ;
+            UmbracoVersion = umbracoVersion;
             Profiler = profiler;
             HostingEnvironment = hostingEnvironment;
             BackOfficeInfo = backOfficeInfo;
             DbProviderFactoryCreator = dbProviderFactoryCreator;
 
             _umbracoBootPermissionChecker = umbracoBootPermissionChecker;
-            
+
             Logger = logger;
             MainDom = mainDom;
             TypeFinder = typeFinder;
 
-            _globalSettings = Configs.Global();
-            _connectionStrings = configs.ConnectionStrings();
+            _globalSettings = globalSettings;
+            _connectionStrings = connectionStrings;
 
         }
 
@@ -92,8 +97,8 @@ namespace Umbraco.Core.Runtime
         /// Gets the <see cref="IIOHelper"/>
         /// </summary>
         protected IIOHelper IOHelper { get; }
+
         protected IHostingEnvironment HostingEnvironment { get; }
-        public Configs Configs { get; }
         public AppCaches AppCaches { get; }
         public IUmbracoVersion UmbracoVersion { get; }
 
@@ -168,10 +173,10 @@ namespace Umbraco.Core.Runtime
                 var typeLoader = new TypeLoader(TypeFinder, AppCaches.RuntimeCache, new DirectoryInfo(HostingEnvironment.LocalTempPath), ProfilingLogger);
 
                 // re-create the state object with the essential services
-                _state = new RuntimeState(Configs.Global(), UmbracoVersion, databaseFactory, Logger);
+                _state = new RuntimeState(_globalSettings, UmbracoVersion, databaseFactory, Logger);
 
                 // create the composition
-                composition = new Composition(register, typeLoader, ProfilingLogger, _state, Configs, IOHelper, AppCaches);
+                composition = new Composition(register, typeLoader, ProfilingLogger, _state, IOHelper, AppCaches);
 
                 composition.RegisterEssentials(Logger, Profiler, ProfilingLogger, MainDom, AppCaches, databaseFactory, typeLoader, _state, TypeFinder, IOHelper, UmbracoVersion, DbProviderFactoryCreator, HostingEnvironment, BackOfficeInfo);
 
@@ -379,7 +384,7 @@ namespace Umbraco.Core.Runtime
         /// </summary>
         /// <remarks>This is strictly internal, for tests only.</remarks>
         protected internal virtual IUmbracoDatabaseFactory CreateDatabaseFactory()
-            => new UmbracoDatabaseFactory(Logger, _globalSettings, _connectionStrings, new Lazy<IMapperCollection>(() => _factory.GetInstance<IMapperCollection>()), DbProviderFactoryCreator);
+            => new UmbracoDatabaseFactory(Logger, Options.Create(_globalSettings), Options.Create(_connectionStrings), new Lazy<IMapperCollection>(() => _factory.GetInstance<IMapperCollection>()), DbProviderFactoryCreator);
 
 
         #endregion

@@ -21,6 +21,8 @@ using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Security;
 using Umbraco.Web.WebApi;
+using Umbraco.Core.Configuration.Models;
+using Microsoft.Extensions.Options;
 
 namespace Umbraco.Web.Trees
 {
@@ -41,7 +43,7 @@ namespace Umbraco.Web.Trees
     {
         private readonly UmbracoTreeSearcher _treeSearcher;
         private readonly ActionCollection _actions;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly IMenuItemCollectionFactory _menuItemCollectionFactory;
         private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly IContentService _contentService;
@@ -49,7 +51,6 @@ namespace Umbraco.Web.Trees
         private readonly IPublicAccessService _publicAccessService;
         private readonly IUserService _userService;
         private readonly ILocalizationService _localizationService;
-
 
         public ContentTreeController(
             ILocalizedTextService localizedTextService,
@@ -63,7 +64,7 @@ namespace Umbraco.Web.Trees
             IDataTypeService dataTypeService,
             UmbracoTreeSearcher treeSearcher,
             ActionCollection actions,
-            IGlobalSettings globalSettings,
+            IOptions<GlobalSettings> globalSettings,
             IContentService contentService,
             IPublicAccessService publicAccessService,
             ILocalizationService localizationService)
@@ -71,7 +72,7 @@ namespace Umbraco.Web.Trees
         {
             _treeSearcher = treeSearcher;
             _actions = actions;
-            _globalSettings = globalSettings;
+            _globalSettings = globalSettings.Value;
             _menuItemCollectionFactory = menuItemCollectionFactory;
             _backofficeSecurityAccessor = backofficeSecurityAccessor;
             _contentService = contentService;

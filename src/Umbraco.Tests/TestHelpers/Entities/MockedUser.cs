@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Tests.Common.Builders;
 
 namespace Umbraco.Tests.TestHelpers.Entities
 {
@@ -23,7 +24,8 @@ namespace Umbraco.Tests.TestHelpers.Entities
 
         internal static User CreateUser(string suffix = "")
         {
-            var user = new User(SettingsForTests.GenerateMockGlobalSettings())
+            var globalSettings = new GlobalSettingsBuilder().Build();
+            var user = new User(globalSettings)
             {
                 Language = "en",
                 IsApproved = true,
@@ -41,10 +43,11 @@ namespace Umbraco.Tests.TestHelpers.Entities
         {
             var list = new List<IUser>();
 
+            var globalSettings = new GlobalSettingsBuilder().Build();
             for (int i = 0; i < amount; i++)
             {
                 var name = "Member No-" + i;
-                var user = new User(SettingsForTests.GenerateMockGlobalSettings(), name, "test" + i + "@test.com", "test" + i, "test" + i);
+                var user = new User(globalSettings, name, "test" + i + "@test.com", "test" + i, "test" + i);
 
                 onCreating?.Invoke(i, user);
 

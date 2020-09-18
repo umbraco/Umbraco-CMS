@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Security;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 using Umbraco.Extensions;
 using Umbraco.Web.Security;
-using Umbraco.Core.Models;
 
 namespace Umbraco.Web.Common.Security
 {
@@ -16,18 +17,18 @@ namespace Umbraco.Web.Common.Security
     public class BackofficeSecurity : IBackofficeSecurity
     {
         private readonly IUserService _userService;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
         public BackofficeSecurity(
             IUserService userService,
-            IGlobalSettings globalSettings,
+            IOptions<GlobalSettings> globalSettings,
             IHostingEnvironment hostingEnvironment,
             IHttpContextAccessor httpContextAccessor)
         {
             _userService = userService;
-            _globalSettings = globalSettings;
+            _globalSettings = globalSettings.Value;
             _hostingEnvironment = hostingEnvironment;
             _httpContextAccessor = httpContextAccessor;
         }
@@ -113,7 +114,7 @@ namespace Umbraco.Web.Common.Security
             return ValidateRequestAttempt.Success;
         }
 
-        private static bool RequestIsInUmbracoApplication(IHttpContextAccessor httpContextAccessor, IGlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
+        private static bool RequestIsInUmbracoApplication(IHttpContextAccessor httpContextAccessor, GlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
         {
             return httpContextAccessor.GetRequiredHttpContext().Request.Path.ToString().IndexOf(hostingEnvironment.ToAbsolute(globalSettings.UmbracoPath), StringComparison.InvariantCultureIgnoreCase) > -1;
         }

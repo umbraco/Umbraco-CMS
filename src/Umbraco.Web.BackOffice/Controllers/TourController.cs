@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Umbraco.Core;
-using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
@@ -20,21 +21,21 @@ namespace Umbraco.Web.BackOffice.Controllers
     {
         private readonly TourFilterCollection _filters;
         private readonly IHostingEnvironment _hostingEnvironment;
-        private readonly ITourSettings _tourSettings;
+        private readonly TourSettings _tourSettings;
         private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly IContentTypeService _contentTypeService;
 
         public TourController(
             TourFilterCollection filters,
             IHostingEnvironment hostingEnvironment,
-            ITourSettings tourSettings,
+            IOptions<TourSettings> tourSettings,
             IBackofficeSecurityAccessor backofficeSecurityAccessor,
             IContentTypeService contentTypeService)
         {
             _filters = filters;
             _hostingEnvironment = hostingEnvironment;
 
-            _tourSettings = tourSettings;
+            _tourSettings = tourSettings.Value;
             _backofficeSecurityAccessor = backofficeSecurityAccessor;
             _contentTypeService = contentTypeService;
         }

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
@@ -24,15 +26,14 @@ namespace Umbraco.Web.Routing
     {
         private const string _eventStateKey = "Umbraco.Web.Redirects.RedirectTrackingEventHandler";
 
-
-        private readonly IWebRoutingSettings _webRoutingSettings;
+        private readonly WebRoutingSettings _webRoutingSettings;
         private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
         private readonly IRedirectUrlService _redirectUrlService;
         private readonly IVariationContextAccessor _variationContextAccessor;
 
-        public RedirectTrackingComponent(IWebRoutingSettings webRoutingSettings, IPublishedSnapshotAccessor publishedSnapshotAccessor, IRedirectUrlService redirectUrlService, IVariationContextAccessor variationContextAccessor)
+        public RedirectTrackingComponent(IOptions<WebRoutingSettings> webRoutingSettings, IPublishedSnapshotAccessor publishedSnapshotAccessor, IRedirectUrlService redirectUrlService, IVariationContextAccessor variationContextAccessor)
         {
-            _webRoutingSettings = webRoutingSettings;
+            _webRoutingSettings = webRoutingSettings.Value;
             _publishedSnapshotAccessor = publishedSnapshotAccessor;
             _redirectUrlService = redirectUrlService;
             _variationContextAccessor = variationContextAccessor;

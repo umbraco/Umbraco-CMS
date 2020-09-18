@@ -1,7 +1,9 @@
 ﻿using System;
+using Microsoft.Extensions.Options;
 using Umbraco.Composing;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.PublishedCache;
@@ -15,7 +17,7 @@ namespace Umbraco.Web
     /// </summary>
     public class UmbracoContext : DisposableObjectSlim, IDisposeOnRequestEnd, IUmbracoContext
     {
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ICookieManager _cookieManager;
         private readonly IRequestAccessor _requestAccessor;
@@ -30,7 +32,7 @@ namespace Umbraco.Web
         internal UmbracoContext(
             IPublishedSnapshotService publishedSnapshotService,
             IBackofficeSecurity backofficeSecurity,
-            IGlobalSettings globalSettings,
+            GlobalSettings globalSettings,
             IHostingEnvironment hostingEnvironment,
             IVariationContextAccessor variationContextAccessor,
             UriUtility uriUtility,

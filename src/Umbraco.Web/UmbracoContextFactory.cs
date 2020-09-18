@@ -2,6 +2,7 @@
 using System.IO;
 using System.Text;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
@@ -20,7 +21,7 @@ namespace Umbraco.Web
         private readonly IVariationContextAccessor _variationContextAccessor;
         private readonly IDefaultCultureAccessor _defaultCultureAccessor;
 
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly IUserService _userService;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IHttpContextAccessor _httpContextAccessor;
@@ -35,7 +36,7 @@ namespace Umbraco.Web
             IPublishedSnapshotService publishedSnapshotService,
             IVariationContextAccessor variationContextAccessor,
             IDefaultCultureAccessor defaultCultureAccessor,
-            IGlobalSettings globalSettings,
+            GlobalSettings globalSettings,
             IUserService userService,
             IHostingEnvironment hostingEnvironment,
             UriUtility uriUtility,

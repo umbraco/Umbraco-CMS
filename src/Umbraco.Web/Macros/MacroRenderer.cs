@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
@@ -20,7 +22,7 @@ namespace Umbraco.Web.Macros
     {
         private readonly IProfilingLogger _plogger;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
-        private readonly IContentSettings _contentSettings;
+        private readonly ContentSettings _contentSettings;
         private readonly ILocalizedTextService _textService;
         private readonly AppCaches _appCaches;
         private readonly IMacroService _macroService;
@@ -35,7 +37,7 @@ namespace Umbraco.Web.Macros
         public MacroRenderer(
             IProfilingLogger plogger,
             IUmbracoContextAccessor umbracoContextAccessor,
-            IContentSettings contentSettings,
+            IOptions<ContentSettings> contentSettings,
             ILocalizedTextService textService,
             AppCaches appCaches,
             IMacroService macroService,
@@ -48,7 +50,7 @@ namespace Umbraco.Web.Macros
         {
             _plogger = plogger ?? throw new ArgumentNullException(nameof(plogger));
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
-            _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
+            _contentSettings = contentSettings.Value ?? throw new ArgumentNullException(nameof(contentSettings));
             _textService = textService;
             _appCaches = appCaches ?? throw new ArgumentNullException(nameof(appCaches));
             _macroService = macroService ?? throw new ArgumentNullException(nameof(macroService));
@@ -288,7 +290,7 @@ namespace Umbraco.Web.Macros
                     Alias = macro.Alias,
                     MacroSource = macro.MacroSource,
                     Exception = e,
-                    Behaviour = _contentSettings.MacroErrorBehaviour
+                    Behaviour = _contentSettings.MacroErrors
                 };
 
                 switch (macroErrorEventArgs.Behaviour)

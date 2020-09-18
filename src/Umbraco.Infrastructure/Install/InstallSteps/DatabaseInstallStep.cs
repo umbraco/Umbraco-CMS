@@ -16,19 +16,11 @@ namespace Umbraco.Web.Install.InstallSteps
     {
         private readonly DatabaseBuilder _databaseBuilder;
         private readonly IRuntimeState _runtime;
-        private readonly ILogger _logger;
-        private readonly IIOHelper _ioHelper;
-        private readonly IConnectionStrings _connectionStrings;
-        private readonly IConfigManipulator _configManipulator;
 
-        public DatabaseInstallStep(DatabaseBuilder databaseBuilder, IRuntimeState runtime, ILogger logger, IIOHelper ioHelper, IConnectionStrings connectionStrings, IConfigManipulator configManipulator)
+        public DatabaseInstallStep(DatabaseBuilder databaseBuilder, IRuntimeState runtime)
         {
             _databaseBuilder = databaseBuilder;
             _runtime = runtime;
-            _logger = logger;
-            _ioHelper = ioHelper;
-            _connectionStrings = connectionStrings;
-            _configManipulator = configManipulator;
         }
 
         public override Task<InstallSetupResult> ExecuteAsync(object model)

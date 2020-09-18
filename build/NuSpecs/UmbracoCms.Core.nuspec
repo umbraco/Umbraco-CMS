@@ -71,7 +71,6 @@
         <file src="$BuildTmp$\bin\Lucene.Net.dll" target="lib\netstandard2.0\Lucene.Net.dll" />
 
         <!-- libs -->
-        <file src="$BuildTmp$\bin\Umbraco.Configuration.dll" target="lib\netstandard2.0\Umbraco.Configuration.dll" />
         <file src="$BuildTmp$\bin\Umbraco.Core.dll" target="lib\netstandard2.0\Umbraco.Core.dll" />
         <file src="$BuildTmp$\bin\Umbraco.Examine.Lucene.dll" target="lib\net472\Umbraco.Examine.Lucene.dll" />
         <file src="$BuildTmp$\bin\Umbraco.Examine.Lucene.dll" target="lib\netstandard2.0\Umbraco.Examine.Lucene.dll" />
@@ -79,7 +78,6 @@
         <file src="$BuildTmp$\bin\Umbraco.PublishedCache.NuCache.dll" target="lib\netstandard2.0\Umbraco.PublishedCache.NuCache.dll" />
 
         <!-- docs -->
-        <file src="$BuildTmp$\bin\Umbraco.Configuration.xml" target="lib\netstandard2.0\Umbraco.Configuration.xml" />
         <file src="$BuildTmp$\bin\Umbraco.Core.xml" target="lib\netstandard2.0\Umbraco.Core.xml" />
         <file src="$BuildTmp$\bin\Umbraco.Examine.Lucene.xml" target="lib\net472\Umbraco.Examine.Lucene.xml" />
         <file src="$BuildTmp$\bin\Umbraco.Examine.Lucene.xml" target="lib\netstandard2.0\Umbraco.Examine.Lucene.xml" />
@@ -87,7 +85,6 @@
         <file src="$BuildTmp$\bin\Umbraco.PublishedCache.NuCache.xml" target="lib\netstandard2.0\Umbraco.PublishedCache.NuCache.xml" />
 
         <!-- symbols -->
-        <file src="$BuildTmp$\bin\Umbraco.Configuration.pdb" target="lib\netstandard2.0\Umbraco.Configuration.pdb" />
         <file src="$BuildTmp$\bin\Umbraco.Core.pdb" target="lib\netstandard2.0\Umbraco.Core.pdb" />
         <file src="$BuildTmp$\bin\Umbraco.Examine.Lucene.pdb" target="lib\net472\Umbraco.Examine.Lucene.pdb" />
         <file src="$BuildTmp$\bin\Umbraco.Examine.Lucene.pdb" target="lib\netstandard2.0\Umbraco.Examine.Lucene.pdb" />

@@ -16,6 +16,8 @@ using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Security;
 using Constants = Umbraco.Core.Constants;
+using Umbraco.Core.Configuration.Models;
+using Microsoft.Extensions.Options;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -34,7 +36,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly ILogger _logger;
         private readonly ILocalizationService _localizationService;
         private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly ILocalizedTextService _localizedTextService;
         private readonly UmbracoMapper _umbracoMapper;
 
@@ -42,7 +44,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             ILogger logger,
             ILocalizationService localizationService,
             IBackofficeSecurityAccessor backofficeSecurityAccessor,
-            IGlobalSettings globalSettings,
+            IOptions<GlobalSettings> globalSettings,
             ILocalizedTextService localizedTextService,
             UmbracoMapper umbracoMapper
             )
@@ -50,7 +52,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
             _backofficeSecurityAccessor = backofficeSecurityAccessor ?? throw new ArgumentNullException(nameof(backofficeSecurityAccessor));
-            _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
+            _globalSettings = globalSettings.Value ?? throw new ArgumentNullException(nameof(globalSettings));
             _localizedTextService = localizedTextService ?? throw new ArgumentNullException(nameof(localizedTextService));
             _umbracoMapper = umbracoMapper ?? throw new ArgumentNullException(nameof(umbracoMapper));
         }

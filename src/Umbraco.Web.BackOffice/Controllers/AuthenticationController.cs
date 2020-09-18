@@ -1,17 +1,17 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Routing;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Mail;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Routing;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.BackOffice;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
@@ -46,11 +46,11 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IUserService _userService;
         private readonly ILocalizedTextService _textService;
         private readonly UmbracoMapper _umbracoMapper;
-        private readonly IGlobalSettings _globalSettings;
-        private readonly ISecuritySettings _securitySettings;
+        private readonly GlobalSettings _globalSettings;
+        private readonly SecuritySettings _securitySettings;
         private readonly ILogger _logger;
         private readonly IIpResolver _ipResolver;
-        private readonly IUserPasswordConfiguration _passwordConfiguration;
+        private readonly UserPasswordConfigurationSettings _passwordConfiguration;
         private readonly IEmailSender _emailSender;
         private readonly Core.Hosting.IHostingEnvironment _hostingEnvironment;
         private readonly IRequestAccessor _requestAccessor;
@@ -65,11 +65,11 @@ namespace Umbraco.Web.BackOffice.Controllers
             IUserService userService,
             ILocalizedTextService textService,
             UmbracoMapper umbracoMapper,
-            IGlobalSettings globalSettings,
-            ISecuritySettings securitySettings,
+            IOptions<GlobalSettings> globalSettings,
+            IOptions<SecuritySettings> securitySettings,
             ILogger logger,
             IIpResolver ipResolver,
-            IUserPasswordConfiguration passwordConfiguration,
+            IOptions<UserPasswordConfigurationSettings> passwordConfiguration,
             IEmailSender emailSender,
             Core.Hosting.IHostingEnvironment hostingEnvironment,
             IRequestAccessor requestAccessor)
@@ -80,11 +80,11 @@ namespace Umbraco.Web.BackOffice.Controllers
             _userService = userService;
             _textService = textService;
             _umbracoMapper = umbracoMapper;
-            _globalSettings = globalSettings;
-            _securitySettings = securitySettings;
+            _globalSettings = globalSettings.Value;
+            _securitySettings = securitySettings.Value;
             _logger = logger;
             _ipResolver = ipResolver;
-            _passwordConfiguration = passwordConfiguration;
+            _passwordConfiguration = passwordConfiguration.Value;
             _emailSender = emailSender;
             _hostingEnvironment = hostingEnvironment;
             _requestAccessor = requestAccessor;
