@@ -33,17 +33,19 @@ namespace Umbraco.Tests.Components
             // FIXME: use IUmbracoDatabaseFactory vs UmbracoDatabaseFactory, clean it all up!
 
             var mock = new Mock<IFactory>();
-
-            var logger = Mock.Of<ILogger>();
+            var loggerFactory = NullLoggerFactory.Instance;
+            var logger = loggerFactory.CreateLogger("GenericLogger");
             var typeFinder = TestHelper.GetTypeFinder();
-            var f = new UmbracoDatabaseFactory(Mock.Of<Microsoft.Extensions.Logging.ILogger<UmbracoDatabaseFactory>>(), Mock.Of<ILoggerFactory>(), SettingsForTests.DefaultGlobalSettings, Mock.Of<IConnectionStrings>(), new Lazy<IMapperCollection>(() => new MapperCollection(Enumerable.Empty<BaseMapper>())), TestHelper.DbProviderFactoryCreator);
-            var fs = new FileSystems(mock.Object, Mock.Of<Microsoft.Extensions.Logging.ILogger<FileSystems>>(), NullLoggerFactory.Instance, TestHelper.IOHelper, SettingsForTests.GenerateMockGlobalSettings(), TestHelper.GetHostingEnvironment());
+            var f = new UmbracoDatabaseFactory(loggerFactory.CreateLogger<UmbracoDatabaseFactory>(), loggerFactory, SettingsForTests.DefaultGlobalSettings, Mock.Of<IConnectionStrings>(), new Lazy<IMapperCollection>(() => new MapperCollection(Enumerable.Empty<BaseMapper>())), TestHelper.DbProviderFactoryCreator);
+            var fs = new FileSystems(mock.Object, loggerFactory.CreateLogger<FileSystems>(), loggerFactory, TestHelper.IOHelper, SettingsForTests.GenerateMockGlobalSettings(), TestHelper.GetHostingEnvironment());
             var coreDebug = Mock.Of<ICoreDebugSettings>();
             var mediaFileSystem = Mock.Of<IMediaFileSystem>();
-            var p = new ScopeProvider(f, fs, coreDebug, mediaFileSystem, Mock.Of<Microsoft.Extensions.Logging.ILogger<ScopeProvider>>(), Mock.Of<ILoggerFactory>(), typeFinder, NoAppCache.Instance);
+            var p = new ScopeProvider(f, fs, coreDebug, mediaFileSystem, loggerFactory.CreateLogger<ScopeProvider>(), loggerFactory, typeFinder, NoAppCache.Instance);
 
             mock.Setup(x => x.GetInstance(typeof (ILogger))).Returns(logger);
-            mock.Setup(x => x.GetInstance(typeof (IProfilingLogger))).Returns(new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
+            mock.Setup(x => x.GetInstance(typeof (Umbraco.Core.Logging.ILogger))).Returns(Mock.Of<Umbraco.Core.Logging.ILogger>());
+            mock.Setup(x => x.GetInstance(typeof(ILoggerFactory))).Returns(loggerFactory);
+            mock.Setup(x => x.GetInstance(typeof (IProfilingLogger))).Returns(new ProfilingLogger(logger, Mock.Of<IProfiler>()));
             mock.Setup(x => x.GetInstance(typeof (IUmbracoDatabaseFactory))).Returns(f);
             mock.Setup(x => x.GetInstance(typeof (IScopeProvider))).Returns(p);
 
@@ -94,6 +96,7 @@ namespace Umbraco.Tests.Components
                     if (type == typeof(Composer5)) return new Composer5();
                     if (type == typeof(Component5)) return new Component5(new SomeResource());
                     if (type == typeof(IProfilingLogger)) return new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>());
+                    if (type == typeof(Core.Logging.ILogger)) return Mock.Of<Core.Logging.ILogger>();
                     throw new NotSupportedException(type.FullName);
                 });
             });

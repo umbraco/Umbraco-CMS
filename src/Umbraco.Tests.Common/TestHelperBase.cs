@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
@@ -35,7 +37,7 @@ namespace Umbraco.Tests.Common
         {
             SettingsForTests = new SettingsForTests();
             MainDom = new SimpleMainDom();
-            _typeFinder = new TypeFinder(Mock.Of<Microsoft.Extensions.Logging.ILogger<TypeFinder>>(), new DefaultUmbracoAssemblyProvider(entryAssembly), new VaryingRuntimeHash());
+            _typeFinder = new TypeFinder(NullLoggerFactory.Instance.CreateLogger<TypeFinder>(), new DefaultUmbracoAssemblyProvider(entryAssembly), new VaryingRuntimeHash());
         }
 
         public ITypeFinder GetTypeFinder() => _typeFinder;
