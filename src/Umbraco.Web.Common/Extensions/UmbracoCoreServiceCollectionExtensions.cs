@@ -17,6 +17,7 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Logging.Serilog;
@@ -101,19 +102,20 @@ namespace Umbraco.Extensions
         /// <param name="umbContainer"></param>
         /// <param name="entryAssembly"></param>
         /// <param name="appCaches"></param>
-        /// <param name="httpContextAccessor"></param>
         /// <param name="loggingConfiguration"></param>
         /// <param name="factory"></param>
+        /// <param name="configuration"></param>
+        /// <param name="httpContextAccessor"></param>
         /// <returns></returns>
-        public static IServiceCollection AddUmbracoCore(
-            this IServiceCollection services,
+        public static IServiceCollection AddUmbracoCore(this IServiceCollection services,
             IWebHostEnvironment webHostEnvironment,
             IRegister umbContainer,
             Assembly entryAssembly,
             AppCaches appCaches,
             ILoggingConfiguration loggingConfiguration,
+            IConfiguration configuration,
             out IFactory factory)
-            => services.AddUmbracoCore(webHostEnvironment, umbContainer, entryAssembly, appCaches, loggingConfiguration, GetCoreRuntime, out factory);
+            => services.AddUmbracoCore(webHostEnvironment, umbContainer, entryAssembly, appCaches, loggingConfiguration, configuration, GetCoreRuntime, out factory);
 
         /// <summary>
         /// Adds the Umbraco Configuration requirements
@@ -197,7 +199,7 @@ namespace Umbraco.Extensions
                 Assembly.GetEntryAssembly(),
                 appCaches,
                 loggingConfig,
-                configuration
+                configuration,
                 GetCoreRuntime,
                 out factory);
 
