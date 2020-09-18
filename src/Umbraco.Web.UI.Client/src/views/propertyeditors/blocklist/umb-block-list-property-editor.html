@@ -25,6 +25,7 @@
         </div>
 
         <button ng-if="vm.loading !== true"
+                ng-hide="vm.validationLimit.max && vm.layout.length === vm.validationLimit.max"
                 id="{{vm.model.alias}}"
                 type="button"
                 class="btn-reset umb-block-list__create-button umb-outline"
