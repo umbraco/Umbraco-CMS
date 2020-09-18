@@ -10,15 +10,8 @@ using Umbraco.Tests.Testing;
 namespace Umbraco.Tests.CoreThings
 {
     [TestFixture]
-    public class TryConvertToTests : UmbracoTestBase
+    public class TryConvertToTests
     {
-        protected void Compose()
-        {
-            base.Compose();
-
-            Composition.RegisterUnique<IShortStringHelper>(f => new DefaultShortStringHelper(f.GetInstance<IOptions<RequestHandlerSettings>>()));
-        }
-
         [Test]
         public void ConvertToIntegerTest()
         {
