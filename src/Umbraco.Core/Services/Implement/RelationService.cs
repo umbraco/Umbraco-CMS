@@ -286,9 +286,11 @@ namespace Umbraco.Core.Services.Implement
         public IEnumerable<IUmbracoEntity> GetPagedParentEntitiesByChildId(int id, long pageIndex, int pageSize, out long totalChildren,
             string[] relationTypes, params UmbracoObjectTypes[] entityTypes)
         {
+            var relationTypeIds = this.GetRelationTypeIdsFromAliases(relationTypes);
+
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                return _relationRepository.GetPagedParentEntitiesByChildId(id, pageIndex, pageSize, out totalChildren, entityTypes.Select(x => x.GetGuid()).ToArray());
+                return _relationRepository.GetPagedParentEntitiesByChildId(id, pageIndex, pageSize, out totalChildren, relationTypeIds, entityTypes.Select(x => x.GetGuid()).ToArray());
             }
         }
 
@@ -303,9 +305,11 @@ namespace Umbraco.Core.Services.Implement
         public IEnumerable<IUmbracoEntity> GetPagedChildEntitiesByParentId(int id, long pageIndex, int pageSize, out long totalChildren,
             string[] relationTypes, params UmbracoObjectTypes[] entityTypes)
         {
+            var relationTypeIds = this.GetRelationTypeIdsFromAliases(relationTypes);
+
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                return _relationRepository.GetPagedChildEntitiesByParentId(id, pageIndex, pageSize, out totalChildren, entityTypes.Select(x => x.GetGuid()).ToArray());
+                return _relationRepository.GetPagedChildEntitiesByParentId(id, pageIndex, pageSize, out totalChildren, relationTypeIds, entityTypes.Select(x => x.GetGuid()).ToArray());
             }
         }
 
@@ -589,6 +593,27 @@ namespace Umbraco.Core.Services.Implement
         {
             _auditRepository.Save(new AuditItem(objectId, type, userId, ObjectTypes.GetName(UmbracoObjectTypes.RelationType), message));
         }
+
+        private int[] GetRelationTypeIdsFromAliases(string[] aliases)
+        {
+            var relationTypeIds = new List<int>();
+
+            if (aliases != null && aliases.Any())
+            {
+                foreach (var relType in aliases)
+                {
+                    var relationType = this.GetRelationTypeByAlias(relType);
+
+                    if (relationType != null)
+                    {
+                        relationTypeIds.Add(relationType.Id);
+                    }
+                }
+            }
+
+            return relationTypeIds.ToArray();
+        }
+
         #endregion
 
         #region Events Handlers
