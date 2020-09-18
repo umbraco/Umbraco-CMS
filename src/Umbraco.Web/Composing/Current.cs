@@ -213,8 +213,6 @@ namespace Umbraco.Web.Composing
 
         public static TypeLoader TypeLoader => Factory.GetInstance<TypeLoader>();
 
-        public static Configs Configs => Factory.GetInstance<Configs>();
-
         public static UrlSegmentProviderCollection UrlSegmentProviders => Factory.GetInstance<UrlSegmentProviderCollection>();
 
         public static CacheRefresherCollection CacheRefreshers => Factory.GetInstance<CacheRefresherCollection>();

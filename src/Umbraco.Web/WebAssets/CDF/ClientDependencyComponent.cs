@@ -3,9 +3,11 @@ using System.Collections.Specialized;
 using System.IO;
 using ClientDependency.Core.CompositeFiles.Providers;
 using ClientDependency.Core.Config;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Web.Runtime;
 
@@ -14,18 +16,18 @@ namespace Umbraco.Web.WebAssets.CDF
     [ComposeAfter(typeof(WebInitialComponent))]
     public sealed class ClientDependencyComponent : IComponent
     {
-        private readonly IHostingSettings _hostingSettings;
+        private readonly HostingSettings _hostingSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
-        private readonly IRuntimeSettings _settings;
+        private readonly RuntimeSettings _settings;
 
         public ClientDependencyComponent(
-            IHostingSettings hostingSettings,
+            IOptions<HostingSettings> hostingSettings,
             IHostingEnvironment hostingEnvironment,
-            IRuntimeSettings settings)
+            IOptions<RuntimeSettings> settings)
         {
-            _hostingSettings = hostingSettings;
+            _hostingSettings = hostingSettings.Value;
             _hostingEnvironment = hostingEnvironment;
-            _settings = settings;
+            _settings = settings.Value;
         }
 
         public void Initialize()

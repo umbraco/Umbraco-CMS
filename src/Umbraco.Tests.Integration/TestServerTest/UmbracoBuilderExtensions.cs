@@ -1,6 +1,7 @@
 ﻿using System;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing.LightInject;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Runtime;
 using Umbraco.Extensions;
 using Umbraco.Tests.Integration.Implementations;
@@ -16,7 +17,8 @@ namespace Umbraco.Tests.Integration.TestServerTest
         /// </summary>
         /// <param name="builder"></param>
         /// <returns></returns>
-        public static IUmbracoBuilder WithTestCore(this IUmbracoBuilder builder, TestHelper testHelper, LightInjectContainer container,
+        public static IUmbracoBuilder WithTestCore(this IUmbracoBuilder builder, TestHelper testHelper,
+            LightInjectContainer container,
             Action<CoreRuntime, RuntimeEssentialsEventArgs> dbInstallEventHandler)
         {
             return builder.AddWith(nameof(global::Umbraco.Web.Common.Builder.UmbracoBuilderExtensions.WithCore),
@@ -30,10 +32,11 @@ namespace Umbraco.Tests.Integration.TestServerTest
                             testHelper.GetLoggingConfiguration(),
                             builder.Config,
                             // TODO: Yep that's extremely ugly
-                            (configs, umbVersion, ioHelper, logger, profiler, hostingEnv, backOfficeInfo, typeFinder, appCaches, dbProviderFactoryCreator) =>
+                            (globalSettings, connectionStrings,, umbVersion, ioHelper, logger, profiler, hostingEnv, backOfficeInfo, typeFinder, appCaches, dbProviderFactoryCreator) =>
                             {
                                 var runtime = UmbracoIntegrationTest.CreateTestRuntime(
-                                    configs,
+                                    globalSettings,
+                                    connectionStrings,
                                     umbVersion,
                                     ioHelper,
                                     logger,

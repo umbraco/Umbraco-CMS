@@ -16,6 +16,7 @@ using Umbraco.Tests.TestHelpers;
 using Umbraco.Core.Composing.CompositionExtensions;
 using Current = Umbraco.Web.Composing.Current;
 using FileSystems = Umbraco.Core.IO.FileSystems;
+using Umbraco.Tests.Common.Builders;
 
 namespace Umbraco.Tests.IO
 {
@@ -30,23 +31,20 @@ namespace Umbraco.Tests.IO
         {
             _register = TestHelper.GetRegister();
 
-            var composition = new Composition(_register, TestHelper.GetMockedTypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.GetConfigs(), TestHelper.IOHelper, AppCaches.NoCache);
+            var composition = new Composition(_register, TestHelper.GetMockedTypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.IOHelper, AppCaches.NoCache);
 
             composition.Register(_ => Mock.Of<ILogger>());
             composition.Register(_ => Mock.Of<IDataTypeService>());
-            composition.Register(_ => Mock.Of<IContentSettings>());
             composition.Register(_ => TestHelper.ShortStringHelper);
             composition.Register(_ => TestHelper.IOHelper);
             composition.RegisterUnique<IMediaPathScheme, UniqueMediaPathScheme>();
             composition.RegisterUnique(TestHelper.IOHelper);
             composition.RegisterUnique(TestHelper.GetHostingEnvironment());
 
-            composition.Configs.Add(() => SettingsForTests.DefaultGlobalSettings);
-            composition.Configs.Add(SettingsForTests.GenerateMockContentSettings);
+            var globalSettings = new GlobalSettingsBuilder().Build();
+            composition.Register(x => Microsoft.Extensions.Options.Options.Create(globalSettings));
 
             composition.ComposeFileSystems();
-
-            composition.Configs.Add(SettingsForTests.GenerateMockContentSettings);
 
             _factory = composition.CreateFactory();
 

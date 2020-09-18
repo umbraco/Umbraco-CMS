@@ -5,7 +5,6 @@ using Umbraco.Core.Configuration;
 
 namespace Umbraco.Core
 {
-
     public static class ConfigConnectionStringExtensions
     {
         public static bool IsConnectionStringConfigured(this ConfigConnectionString databaseSettings)

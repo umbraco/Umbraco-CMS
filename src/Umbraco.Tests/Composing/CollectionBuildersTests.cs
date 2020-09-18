@@ -24,7 +24,7 @@ namespace Umbraco.Tests.Composing
             Current.Reset();
 
             var register = TestHelper.GetRegister();
-            _composition = new Composition(register, TestHelper.GetMockedTypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.GetConfigs(), TestHelper.IOHelper, AppCaches.NoCache);
+            _composition = new Composition(register, TestHelper.GetMockedTypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.IOHelper, AppCaches.NoCache);
         }
 
         [TearDown]
@@ -490,7 +490,7 @@ namespace Umbraco.Tests.Composing
             for (var i = 0; i < col1A.Length; i++)
             {
                 Assert.AreNotSame(col1A[i], col2A[i]);
-            }   
+            }
         }
 
         #endregion

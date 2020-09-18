@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Options;
 using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
@@ -19,14 +21,14 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// </summary>
     internal class LanguageRepository : NPocoRepositoryBase<int, ILanguage>, ILanguageRepository
     {
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly Dictionary<string, int> _codeIdMap = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<int, string> _idCodeMap = new Dictionary<int, string>();
 
-        public LanguageRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger, IGlobalSettings globalSettings)
+        public LanguageRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger, IOptions<GlobalSettings> globalSettings)
             : base(scopeAccessor, cache, logger)
         {
-            _globalSettings = globalSettings;
+            _globalSettings = globalSettings.Value;
         }
 
         protected override IRepositoryCachePolicy<ILanguage, int> CreateCachePolicy()

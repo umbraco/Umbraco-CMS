@@ -1,16 +1,15 @@
-﻿using Microsoft.AspNetCore.Authentication.Cookies;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Routing;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Umbraco.Core;
-using Umbraco.Extensions;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
-using Umbraco.Web.BackOffice.Controllers;
+using Umbraco.Extensions;
 
 namespace Umbraco.Web.BackOffice.Security
 {
@@ -28,7 +27,7 @@ namespace Umbraco.Web.BackOffice.Security
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly IRuntimeState _runtime;
         private readonly IHostingEnvironment _hostingEnvironment;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly IRequestCache _requestCache;
         private readonly string[] _explicitPaths;
 
@@ -36,7 +35,7 @@ namespace Umbraco.Web.BackOffice.Security
             IUmbracoContextAccessor umbracoContextAccessor,
             IRuntimeState runtime,
             IHostingEnvironment hostingEnvironment,
-            IGlobalSettings globalSettings,
+            GlobalSettings globalSettings,
             IRequestCache requestCache,
             LinkGenerator linkGenerator)
             : this(umbracoContextAccessor, runtime, hostingEnvironment, globalSettings, requestCache, linkGenerator, null)
@@ -46,7 +45,7 @@ namespace Umbraco.Web.BackOffice.Security
             IUmbracoContextAccessor umbracoContextAccessor,
             IRuntimeState runtime,
             IHostingEnvironment hostingEnvironment,
-            IGlobalSettings globalSettings,
+            GlobalSettings globalSettings,
             IRequestCache requestCache,
             LinkGenerator linkGenerator,
             IEnumerable<string> explicitPaths)

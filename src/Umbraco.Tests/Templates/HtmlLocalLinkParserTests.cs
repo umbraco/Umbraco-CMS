@@ -7,6 +7,7 @@ using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Tests.Common;
+using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing.Objects;
 using Umbraco.Web;
@@ -72,8 +73,9 @@ namespace Umbraco.Tests.Templates
             var umbracoContextFactory = TestUmbracoContextFactory.Create(
                 umbracoContextAccessor: umbracoContextAccessor);
 
+            var webRoutingSettings = new WebRoutingSettingsBuilder().Build();
             var publishedUrlProvider = new UrlProvider(umbracoContextAccessor,
-                TestHelper.WebRoutingSettings,
+                Microsoft.Extensions.Options.Options.Create(webRoutingSettings),
                 new UrlProviderCollection(new []{contentUrlProvider.Object}),
                 new MediaUrlProviderCollection(new []{mediaUrlProvider.Object}),
                 Mock.Of<IVariationContextAccessor>()

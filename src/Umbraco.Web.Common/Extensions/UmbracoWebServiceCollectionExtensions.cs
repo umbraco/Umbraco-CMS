@@ -19,6 +19,7 @@ using Smidge;
 using Smidge.Nuglify;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Web.Common.ApplicationModels;
 using Umbraco.Web.Common.Middleware;
 using Umbraco.Web.Common.ModelBinding;
@@ -40,8 +41,7 @@ namespace Umbraco.Extensions
 
             // TODO: We need to avoid this, surely there's a way? See ContainerTests.BuildServiceProvider_Before_Host_Is_Configured
             var serviceProvider = services.BuildServiceProvider();
-            var configs = serviceProvider.GetService<Configs>();
-            var imagingSettings = configs.Imaging();
+            var imagingSettings = serviceProvider.GetService<IOptions<ImagingSettings>>().Value;
             services.AddUmbracoImageSharp(imagingSettings);
 
             return services;
@@ -53,19 +53,19 @@ namespace Umbraco.Extensions
         /// <param name="services"></param>
         /// <param name="imagingSettings"></param>
         /// <returns></returns>
-        public static IServiceCollection AddUmbracoImageSharp(this IServiceCollection services, IImagingSettings imagingSettings)
+        public static IServiceCollection AddUmbracoImageSharp(this IServiceCollection services, ImagingSettings imagingSettings)
         {
             services.AddImageSharpCore(
                     options =>
                     {
                         options.Configuration = SixLabors.ImageSharp.Configuration.Default;
-                        options.MaxBrowserCacheDays = imagingSettings.MaxBrowserCacheDays;
-                        options.MaxCacheDays = imagingSettings.MaxCacheDays;
-                        options.CachedNameLength = imagingSettings.CachedNameLength;
+                        options.MaxBrowserCacheDays = imagingSettings.Cache.MaxBrowserCacheDays;
+                        options.MaxCacheDays = imagingSettings.Cache.MaxCacheDays;
+                        options.CachedNameLength = imagingSettings.Cache.CachedNameLength;
                         options.OnParseCommands = context =>
                         {
-                            RemoveIntParamenterIfValueGreatherThen(context.Commands, ResizeWebProcessor.Width, imagingSettings.MaxResizeWidth);
-                            RemoveIntParamenterIfValueGreatherThen(context.Commands, ResizeWebProcessor.Height, imagingSettings.MaxResizeHeight);
+                            RemoveIntParamenterIfValueGreatherThen(context.Commands, ResizeWebProcessor.Width, imagingSettings.Resize.MaxWidth);
+                            RemoveIntParamenterIfValueGreatherThen(context.Commands, ResizeWebProcessor.Height, imagingSettings.Resize.MaxHeight);
                         };
                         options.OnBeforeSave = _ => { };
                         options.OnProcessed = _ => { };
@@ -75,7 +75,7 @@ namespace Umbraco.Extensions
                 .SetMemoryAllocator(provider => ArrayPoolMemoryAllocator.CreateWithMinimalPooling())
                 .Configure<PhysicalFileSystemCacheOptions>(options =>
                 {
-                    options.CacheFolder = imagingSettings.CacheFolder;
+                    options.CacheFolder = imagingSettings.Cache.CacheFolder;
                 })
                 .SetCache<PhysicalFileSystemCache>()
                 .SetCacheHash<CacheHash>()

@@ -5,9 +5,10 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Xml.Linq;
+using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Packaging;
@@ -61,7 +62,7 @@ namespace Umbraco.Core.Packaging
             IHostingEnvironment hostingEnvironment,
             IEntityXmlSerializer serializer, ILogger logger,
             IUmbracoVersion umbracoVersion,
-            IGlobalSettings globalSettings,
+            IOptions<GlobalSettings> globalSettings,
             string packageRepositoryFileName,
             string tempFolderPath = null, string packagesFolderPath = null, string mediaFolderPath = null)
         {
@@ -79,7 +80,7 @@ namespace Umbraco.Core.Packaging
 
             _tempFolderPath = tempFolderPath ?? Constants.SystemDirectories.TempData.EnsureEndsWith('/') + "PackageFiles";
             _packagesFolderPath = packagesFolderPath ?? Constants.SystemDirectories.Packages;
-            _mediaFolderPath = mediaFolderPath ?? globalSettings.UmbracoMediaPath + "/created-packages";
+            _mediaFolderPath = mediaFolderPath ?? globalSettings.Value.UmbracoMediaPath + "/created-packages";
 
             _parser = new PackageDefinitionXmlParser(logger, umbracoVersion);
             _umbracoVersion = umbracoVersion;
