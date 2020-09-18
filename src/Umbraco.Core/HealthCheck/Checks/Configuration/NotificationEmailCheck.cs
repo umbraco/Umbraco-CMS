@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using Microsoft.Extensions.Options;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 
@@ -9,11 +11,14 @@ namespace Umbraco.Core.HealthCheck.Checks.Configuration
         Group = "Configuration")]
     public class NotificationEmailCheck : AbstractSettingsCheck
     {
+        private readonly ContentSettings _contentSettings;
         private const string DefaultFromEmail = "your@email.here";
 
-        public NotificationEmailCheck(ILocalizedTextService textService, ILogger logger, IConfigurationService configurationService)
+        public NotificationEmailCheck(ILocalizedTextService textService, ILogger logger, IConfigurationService configurationService,
+            IOptions<ContentSettings> contentSettings)
             : base(textService, logger, configurationService)
         {
+            _contentSettings = contentSettings.Value;
         }
 
         public override string ItemPath => Constants.Configuration.ConfigContentNotificationsEmail;
@@ -25,7 +30,7 @@ namespace Umbraco.Core.HealthCheck.Checks.Configuration
             new AcceptableConfiguration { IsRecommended = false, Value = DefaultFromEmail }
         };
 
-        public override string CurrentValue { get; }
+        public override string CurrentValue => _contentSettings.Notifications.Email;
 
         public override string CheckSuccessMessage => TextService.Localize("healthcheck/notificationEmailsCheckSuccessMessage", new[] { CurrentValue });
 

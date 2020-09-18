@@ -29,7 +29,7 @@ namespace Umbraco.Core.HealthCheck.Checks.Configuration
             _globalSettings = globalSettings.Value;
         }
 
-        public override string ItemPath => "TODO";
+        public override string ItemPath => "TBC";
 
         public override ValueComparisonType ValueComparisonType => ValueComparisonType.ShouldEqual;
 
@@ -70,7 +70,9 @@ namespace Umbraco.Core.HealthCheck.Checks.Configuration
             get
             {
                 return _textService.Localize("healthcheck/trySkipIisCustomErrorsCheckRectifySuccessMessage",
-                    new[] { Values.First(v => v.IsRecommended).Value, _iisVersion.ToString() });
+                new[] { "Not implemented" });
+
+                //new[] { Values.First(v => v.IsRecommended).Value, _iisVersion.ToString() });
             }
         }
     }
