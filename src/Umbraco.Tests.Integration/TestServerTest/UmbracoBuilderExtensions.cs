@@ -32,7 +32,7 @@ namespace Umbraco.Tests.Integration.TestServerTest
                             testHelper.GetLoggingConfiguration(),
                             builder.Config,
                             // TODO: Yep that's extremely ugly
-                            (globalSettings, connectionStrings,, umbVersion, ioHelper, logger, profiler, hostingEnv, backOfficeInfo, typeFinder, appCaches, dbProviderFactoryCreator) =>
+                            (globalSettings, connectionStrings, umbVersion, ioHelper, logger, profiler, hostingEnv, backOfficeInfo, typeFinder, appCaches, dbProviderFactoryCreator) =>
                             {
                                 var runtime = UmbracoIntegrationTest.CreateTestRuntime(
                                     globalSettings,
