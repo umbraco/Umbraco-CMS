@@ -144,10 +144,6 @@
     <Compile Include="TestHelpers\Entities\MockedPropertyTypes.cs" />
     <Compile Include="TestHelpers\Entities\MockedUser.cs" />
     <Compile Include="UmbracoExamine\ExamineExtensions.cs" />
-    <Compile Include="PropertyEditors\BlockEditorComponentTests.cs" />
-    <Compile Include="PropertyEditors\BlockListPropertyValueConverterTests.cs" />
-    <Compile Include="PropertyEditors\DataValueReferenceFactoryCollectionTests.cs" />
-    <Compile Include="PropertyEditors\NestedContentPropertyComponentTests.cs" />
     <Compile Include="PublishedContent\NuCacheChildrenTests.cs" />
     <Compile Include="PublishedContent\PublishedContentLanguageVariantTests.cs" />
     <Compile Include="PublishedContent\PublishedContentSnapshotTestBase.cs" />
@@ -284,10 +280,6 @@
     <Compile Include="Persistence\Repositories\MemberTypeRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\TagRepositoryTest.cs" />
     <Compile Include="PublishedContent\PublishedContentExtensionTests.cs" />
-    <Compile Include="PropertyEditors\ColorListValidatorTest.cs" />
-    <Compile Include="PropertyEditors\MultiValuePropertyEditorTests.cs" />
-    <Compile Include="PropertyEditors\EnsureUniqueValuesValidatorTest.cs" />
-    <Compile Include="PropertyEditors\PropertyEditorValueEditorTests.cs" />
     <Compile Include="PublishedContent\PublishedRouterTests.cs" />
     <Compile Include="PublishedContent\RootNodeTests.cs" />
     <Compile Include="Scheduling\BackgroundTaskRunnerTests.cs" />
@@ -333,7 +325,6 @@
     <Compile Include="PublishedContent\PublishedMediaTests.cs" />
     <Compile Include="Web\Mvc\HtmlHelperExtensionMethodsTests.cs" />
     <Compile Include="IO\IoHelperTests.cs" />
-    <Compile Include="PropertyEditors\PropertyEditorValueConverterTests.cs" />
     <Compile Include="Models\ContentTests.cs" />
     <Compile Include="Persistence\SqlCeTableByTableTest.cs" />
     <Compile Include="Persistence\DatabaseContextTests.cs" />

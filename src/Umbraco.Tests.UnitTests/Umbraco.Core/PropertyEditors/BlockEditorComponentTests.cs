@@ -15,7 +15,7 @@ namespace Umbraco.Tests.PropertyEditors
         {
             Formatting = Formatting.None,
             NullValueHandling = NullValueHandling.Ignore,
-            
+
         };
 
         private const string _contentGuid1 = "036ce82586a64dfba2d523a99ed80f58";

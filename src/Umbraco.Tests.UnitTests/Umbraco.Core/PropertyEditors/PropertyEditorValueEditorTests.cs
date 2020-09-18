@@ -1,54 +1,24 @@
 ﻿using System;
-using System.Threading;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Strings;
-using Umbraco.Tests.Common.Builders;
-using Umbraco.Tests.Components;
-using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
-using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.PropertyEditors
 {
     [TestFixture]
     public class PropertyEditorValueEditorTests
     {
-        [SetUp]
-        public virtual void TestSetup()
-        {
-            //normalize culture
-            Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture;
-
-            var register = TestHelper.GetRegister();
-            var composition = new Composition(register, TestHelper.GetMockedTypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.IOHelper, AppCaches.NoCache);
-
-            var requestHandlerSettings = new RequestHandlerSettingsBuilder().Build();
-            register.Register<IShortStringHelper>(_
-                => new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(requestHandlerSettings)));
-
-            Current.Factory = composition.CreateFactory();
-        }
-
-        [TearDown]
-        public virtual void TestTearDown()
-        {
-            Current.Reset();
-        }
-
         [TestCase("{prop1: 'val1', prop2: 'val2'}", true)]
         [TestCase("{1,2,3,4}", false)]
         [TestCase("[1,2,3,4]", true)]
         [TestCase("hello world", false)]
         public void Value_Editor_Can_Convert_To_Json_Object_For_Editor(string value, bool isOk)
         {
-            var prop = new Property(1, new PropertyType(TestHelper.ShortStringHelper, "test", ValueStorageType.Nvarchar));
+            var prop = new Property(1, new PropertyType(Mock.Of<IShortStringHelper>(), "test", ValueStorageType.Nvarchar));
             prop.SetValue(value);
 
             var valueEditor = MockedValueEditors.CreateDataValueEditor(ValueTypes.String);
@@ -120,7 +90,7 @@ namespace Umbraco.Tests.PropertyEditors
         [TestCase(ValueTypes.DateTime, "", "")] //test empty string for date
         public void Value_Editor_Can_Serialize_Value(string valueType, object val, string expected)
         {
-            var prop = new Property(1, new PropertyType(TestHelper.ShortStringHelper, "test", ValueStorageType.Nvarchar));
+            var prop = new Property(1, new PropertyType(Mock.Of<IShortStringHelper>(), "test", ValueStorageType.Nvarchar));
             prop.SetValue(val);
 
             var valueEditor = MockedValueEditors.CreateDataValueEditor(valueType);
@@ -135,7 +105,7 @@ namespace Umbraco.Tests.PropertyEditors
             var value = 12.34M;
             var valueEditor = MockedValueEditors.CreateDataValueEditor(ValueTypes.Decimal);
 
-            var prop = new Property(1, new PropertyType(TestHelper.ShortStringHelper, "test", ValueStorageType.Decimal));
+            var prop = new Property(1, new PropertyType(Mock.Of<IShortStringHelper>(), "test", ValueStorageType.Decimal));
             prop.SetValue(value);
 
             var result = valueEditor.ToEditor(prop);
@@ -147,7 +117,7 @@ namespace Umbraco.Tests.PropertyEditors
         {
             var valueEditor = MockedValueEditors.CreateDataValueEditor(ValueTypes.Decimal);
 
-            var prop = new Property(1, new PropertyType(TestHelper.ShortStringHelper, "test", ValueStorageType.Decimal));
+            var prop = new Property(1, new PropertyType(Mock.Of<IShortStringHelper>(), "test", ValueStorageType.Decimal));
             prop.SetValue(string.Empty);
 
             var result = valueEditor.ToEditor(prop);
@@ -160,7 +130,7 @@ namespace Umbraco.Tests.PropertyEditors
             var now = DateTime.Now;
             var valueEditor = MockedValueEditors.CreateDataValueEditor(ValueTypes.Date);
 
-            var prop = new Property(1, new PropertyType(TestHelper.ShortStringHelper, "test", ValueStorageType.Date));
+            var prop = new Property(1, new PropertyType(Mock.Of<IShortStringHelper>(), "test", ValueStorageType.Date));
             prop.SetValue(now);
 
             var result = valueEditor.ToEditor(prop);

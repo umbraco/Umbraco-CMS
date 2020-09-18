@@ -1,18 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Globalization;
 using Moq;
 using Newtonsoft.Json;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
-using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.PropertyEditors;
 
 namespace Umbraco.Tests.PropertyEditors
@@ -31,7 +27,7 @@ namespace Umbraco.Tests.PropertyEditors
         [Test]
         public void DropDownMultipleValueEditor_Format_Data_For_Cache()
         {
-            var dataType = new DataType(new CheckBoxListPropertyEditor(Mock.Of<ILogger>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<IShortStringHelper>(), TestHelper.IOHelper, Mock.Of<ILocalizedTextService>()))
+            var dataType = new DataType(new CheckBoxListPropertyEditor(Mock.Of<ILogger>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<IShortStringHelper>(), Mock.Of<IIOHelper>(), Mock.Of<ILocalizedTextService>()))
             {
                 Configuration = new ValueListConfiguration
                 {
@@ -45,14 +41,17 @@ namespace Umbraco.Tests.PropertyEditors
                 Id = 1
             };
 
-            var dataTypeService = new TestObjects.TestDataTypeService(dataType);
+            var dataTypeServiceMock = new Mock<IDataTypeService>();
+            dataTypeServiceMock
+                .Setup(x=>x.GetDataType(It.IsAny<int>()))
+                .Returns(dataType);
 
-            var prop = new Property(1, new PropertyType(TestHelper.ShortStringHelper, dataType));
+            var prop = new Property(1, new PropertyType(Mock.Of<IShortStringHelper>(), dataType));
             prop.SetValue("Value 1,Value 2,Value 3");
 
             var valueEditor = dataType.Editor.GetValueEditor();
             ((DataValueEditor) valueEditor).Configuration = dataType.Configuration;
-            var result = valueEditor.ConvertDbToString(prop.PropertyType, prop.GetValue(), dataTypeService);
+            var result = valueEditor.ConvertDbToString(prop.PropertyType, prop.GetValue(), dataTypeServiceMock.Object);
 
             Assert.AreEqual("Value 1,Value 2,Value 3", result);
         }
@@ -60,7 +59,7 @@ namespace Umbraco.Tests.PropertyEditors
         [Test]
         public void DropDownValueEditor_Format_Data_For_Cache()
         {
-            var dataType = new DataType(new CheckBoxListPropertyEditor(Mock.Of<ILogger>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<IShortStringHelper>(), TestHelper.IOHelper, Mock.Of<ILocalizedTextService>()))
+            var dataType = new DataType(new CheckBoxListPropertyEditor(Mock.Of<ILogger>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<IShortStringHelper>(), Mock.Of<IIOHelper>(), Mock.Of<ILocalizedTextService>()))
             {
                 Configuration = new ValueListConfiguration
                 {
@@ -74,12 +73,15 @@ namespace Umbraco.Tests.PropertyEditors
                 Id = 1
             };
 
-            var dataTypeService = new TestObjects.TestDataTypeService(dataType);
+            var dataTypeServiceMock = new Mock<IDataTypeService>();
+                dataTypeServiceMock
+                    .Setup(x=>x.GetDataType(It.IsAny<int>()))
+                    .Returns(dataType);
 
-            var prop = new Property(1, new PropertyType(TestHelper.ShortStringHelper, dataType));
+            var prop = new Property(1, new PropertyType(Mock.Of<IShortStringHelper>(), dataType));
             prop.SetValue("Value 2");
 
-            var result = dataType.Editor.GetValueEditor().ConvertDbToString(prop.PropertyType, prop.GetValue(), dataTypeService);
+            var result = dataType.Editor.GetValueEditor().ConvertDbToString(prop.PropertyType, prop.GetValue(), dataTypeServiceMock.Object);
 
             Assert.AreEqual("Value 2", result);
         }
@@ -114,7 +116,7 @@ namespace Umbraco.Tests.PropertyEditors
                 }
             };
 
-            var editor = new ValueListConfigurationEditor(Mock.Of<ILocalizedTextService>(), TestHelper.IOHelper);
+            var editor = new ValueListConfigurationEditor(Mock.Of<ILocalizedTextService>(), Mock.Of<IIOHelper>());
 
             var result = editor.ToConfigurationEditor(configuration);
 
