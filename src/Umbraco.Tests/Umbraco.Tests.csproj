@@ -135,6 +135,8 @@
     <Compile Include="Models\VariationTests.cs" />
     <Compile Include="Persistence\Mappers\MapperTestBase.cs" />
     <Compile Include="Persistence\Repositories\DocumentRepositoryTest.cs" />
+    <Compile Include="Routing\BaseUrlProviderTest.cs" />
+    <Compile Include="Routing\UrlProviderWithHideTopLevelNodeFromPathTests.cs" />
     <Compile Include="Security\BackOfficeOwinUserManagerTests.cs" />
     <Compile Include="Security\OwinDataProtectorTokenProviderTests.cs" />
     <Compile Include="Services\KeyValueServiceTests.cs" />
@@ -185,7 +187,7 @@
     <Compile Include="Routing\ContentFinderByUrlAndTemplateTests.cs" />
     <Compile Include="Routing\ContentFinderByUrlTests.cs" />
     <Compile Include="Routing\ContentFinderByUrlWithDomainsTests.cs" />
-    <Compile Include="Routing\UrlProviderTests.cs" />
+    <Compile Include="Routing\UrlProviderWithoutHideTopLevelNodeFromPathTests.cs" />
     <Compile Include="Routing\UrlRoutesTests.cs" />
     <Compile Include="Routing\UrlsProviderWithDomainsTests.cs" />
     <Compile Include="Scheduling\BackgroundTaskRunnerTests2.cs" />
@@ -389,7 +391,6 @@
     <Compile Include="Web\Controllers\PluginControllerAreaTests.cs" />
     <Compile Include="Cache\DistributedCache\DistributedCacheTests.cs" />
     <Compile Include="TestHelpers\TestWithDatabaseBase.cs" />
-    <Compile Include="TestHelpers\SettingsForTests.cs" />
     <Compile Include="Routing\ContentFinderByAliasTests.cs" />
     <Compile Include="Routing\ContentFinderByIdTests.cs" />
     <Compile Include="Routing\ContentFinderByPageIdQueryTests.cs" />
@@ -455,10 +456,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Umbraco.Configuration\Umbraco.Configuration.csproj">
-      <Project>{fbe7c065-dac0-4025-a78b-63b24d3ab00b}</Project>
-      <Name>Umbraco.Configuration</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj">
       <Project>{29aa69d9-b597-4395-8d42-43b1263c240a}</Project>
       <Name>Umbraco.Core</Name>

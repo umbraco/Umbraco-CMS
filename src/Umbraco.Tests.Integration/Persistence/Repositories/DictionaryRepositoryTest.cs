@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Services;
+using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;
 
@@ -288,7 +288,8 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
             {
                 var repository = CreateRepository();
 
-                var languageNo = new Language(GlobalSettings, "nb-NO") { CultureName = "nb-NO" };
+                var globalSettings = new GlobalSettingsBuilder().Build();
+                var languageNo = new Language(globalSettings, "nb-NO") { CultureName = "nb-NO" };
                 localizationService.Save(languageNo);
 
                 // Act
@@ -368,7 +369,8 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
             var localizationService = GetRequiredService<ILocalizationService>();
             var language = localizationService.GetLanguageByIsoCode("en-US");
 
-            var languageDK = new Language(GlobalSettings, "da-DK") { CultureName = "da-DK" };
+            var globalSettings = new GlobalSettingsBuilder().Build();
+            var languageDK = new Language(globalSettings, "da-DK") { CultureName = "da-DK" };
             localizationService.Save(languageDK);//Id 2
 
             var readMore = new DictionaryItem("Read More");

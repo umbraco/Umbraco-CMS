@@ -3,12 +3,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 using Microsoft.Owin.Security.DataProtection;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.BackOffice;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Net;
 using Umbraco.Web.Security;
@@ -23,28 +25,32 @@ namespace Umbraco.Tests.Security
             const string v7Hash = "7Uob6fMTTxDIhWGebYiSxg==P+hgvWlXLbDd4cFLADn811KOaVI/9pg1PNvTuG5NklY=";
             const string plaintext = "4XxzH3s3&J";
 
-            var mockPasswordConfiguration = new Mock<IUserPasswordConfiguration>();
+            var userPasswordConfiguration = new UserPasswordConfigurationSettings()
+            {
+                HashAlgorithmType = Constants.Security.AspNetUmbraco8PasswordHashAlgorithmName
+            };
             var mockIpResolver = new Mock<IIpResolver>();
             var mockUserStore = new Mock<IUserPasswordStore<BackOfficeIdentityUser>>();
             var mockDataProtectionProvider = new Mock<IDataProtectionProvider>();
 
             mockDataProtectionProvider.Setup(x => x.Create(It.IsAny<string>()))
                 .Returns(new Mock<IDataProtector>().Object);
-            mockPasswordConfiguration.Setup(x => x.HashAlgorithmType)
-                .Returns(Constants.Security.AspNetUmbraco8PasswordHashAlgorithmName);
+
 
             var userManager = BackOfficeOwinUserManager.Create(
-                mockPasswordConfiguration.Object,
+                Options.Create(userPasswordConfiguration),
                 mockIpResolver.Object,
                 mockUserStore.Object,
                 null,
                 mockDataProtectionProvider.Object,
                 new NullLogger<UserManager<BackOfficeIdentityUser>>());
 
-            var mockGlobalSettings = new Mock<IGlobalSettings>();
-            mockGlobalSettings.Setup(x => x.DefaultUILanguage).Returns("test");
+            var globalSettings = new GlobalSettings()
+            {
+                DefaultUILanguage = "test"
+            };
 
-            var user = new BackOfficeIdentityUser(mockGlobalSettings.Object, 2, new List<IReadOnlyUserGroup>())
+            var user = new BackOfficeIdentityUser(globalSettings, 2, new List<IReadOnlyUserGroup>())
             {
                 UserName = "alice",
                 Name = "Alice",

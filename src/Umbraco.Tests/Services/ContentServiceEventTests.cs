@@ -1,11 +1,13 @@
 ﻿using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
+using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
 
@@ -18,10 +20,13 @@ namespace Umbraco.Tests.Services
         Logger = UmbracoTestOptions.Logger.Console)]
     public class ContentServiceEventTests : TestWithSomeContentBase
     {
+        private GlobalSettings _globalSettings;
+
         public override void SetUp()
         {
             base.SetUp();
             ContentRepositoryBase.ThrowOnWarning = true;
+            _globalSettings = new GlobalSettingsBuilder().Build();
         }
 
         public override void TearDown()
@@ -35,7 +40,7 @@ namespace Umbraco.Tests.Services
         {
             var languageService = ServiceContext.LocalizationService;
 
-            languageService.Save(new Language(TestObjects.GetGlobalSettings(), "fr-FR"));
+            languageService.Save(new Language(_globalSettings, "fr-FR"));
 
             var contentTypeService = ServiceContext.ContentTypeService;
 
@@ -146,7 +151,7 @@ namespace Umbraco.Tests.Services
         {
             var languageService = ServiceContext.LocalizationService;
 
-            languageService.Save(new Language(TestObjects.GetGlobalSettings(), "fr-FR"));
+            languageService.Save(new Language(_globalSettings, "fr-FR"));
 
             var contentTypeService = ServiceContext.ContentTypeService;
 
@@ -312,7 +317,7 @@ namespace Umbraco.Tests.Services
         {
             var languageService = ServiceContext.LocalizationService;
 
-            languageService.Save(new Language(TestObjects.GetGlobalSettings(), "fr-FR"));
+            languageService.Save(new Language(_globalSettings, "fr-FR"));
 
             var contentTypeService = ServiceContext.ContentTypeService;
 

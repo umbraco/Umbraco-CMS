@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Configuration.UmbracoSettings;
 
 namespace Umbraco.Web.Common.Filters
@@ -26,7 +28,7 @@ namespace Umbraco.Web.Common.Filters
 
             httpContext.Response.StatusCode = (int)_statusCode;
 
-            var disableIisCustomErrors = httpContext.RequestServices.GetService<IWebRoutingSettings>().TrySkipIisCustomErrors;
+            var disableIisCustomErrors = httpContext.RequestServices.GetService<IOptions<WebRoutingSettings>>().Value.TrySkipIisCustomErrors;
             var statusCodePagesFeature = httpContext.Features.Get<IStatusCodePagesFeature>();
 
             if (statusCodePagesFeature != null)

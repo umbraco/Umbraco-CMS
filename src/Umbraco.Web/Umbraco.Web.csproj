@@ -91,6 +91,9 @@
     <PackageReference Include="Microsoft.Owin.Host.SystemWeb" Version="4.1.1" />
     <PackageReference Include="Microsoft.Owin.Security.Cookies" Version="4.1.1" />
     <PackageReference Include="Microsoft.Owin.Security.OAuth" Version="4.1.1" />
+    <PackageReference Include="Microsoft.Owin.Host.SystemWeb" Version="4.0.1" />
+    <PackageReference Include="Microsoft.Owin.Security.Cookies" Version="4.0.1" />
+    <PackageReference Include="Microsoft.Owin.Security.OAuth" Version="4.0.1" />
     <PackageReference Include="Microsoft.SourceLink.GitHub">
       <Version>1.0.0</Version>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -110,10 +113,6 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Umbraco.Configuration\Umbraco.Configuration.csproj">
-      <Project>{fbe7c065-dac0-4025-a78b-63b24d3ab00b}</Project>
-      <Name>Umbraco.Configuration</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj">
       <Project>{29aa69d9-b597-4395-8d42-43b1263c240a}</Project>
       <Name>Umbraco.Core</Name>
@@ -179,7 +178,6 @@
     <Compile Include="Models\IconModel.cs" />
     <Compile Include="Mvc\HttpUmbracoFormRouteStringException.cs" />
     <Compile Include="Mvc\ModelBindingExceptionFilter.cs" />
-    <Compile Include="Mvc\StatusCodeFilterAttribute.cs" />
     <Compile Include="Mvc\SurfaceControllerTypeCollectionBuilder.cs" />
     <Compile Include="Mvc\ValidateUmbracoFormRouteStringAttribute.cs" />
     <Compile Include="AspNet\AspNetBackOfficeInfo.cs" />
@@ -247,7 +245,6 @@
     <Compile Include="UmbracoModule.cs" />
     <Compile Include="WebApi\EnableDetailedErrorsAttribute.cs" />
     <Compile Include="WebApi\Filters\AppendUserModifiedHeaderAttribute.cs" />
-    <Compile Include="WebApi\Filters\CheckIfUserTicketDataIsStaleAttribute.cs" />
     <Compile Include="WebApi\Filters\FeatureAuthorizeAttribute.cs" />
     <Compile Include="WebApi\SessionHttpControllerRouteHandler.cs" />
     <Compile Include="WebApi\UmbracoApiControllerTypeCollectionBuilder.cs" />
@@ -301,7 +298,6 @@
     <Compile Include="WebApi\Filters\AngularAntiForgeryHelper.cs" />
     <Compile Include="WebApi\Filters\DisableBrowserCacheAttribute.cs" />
     <Compile Include="WebApi\Filters\FilterGrouping.cs" />
-    <Compile Include="WebApi\Filters\SetAngularAntiForgeryTokensAttribute.cs" />
     <Compile Include="WebApi\Filters\ValidateAngularAntiForgeryTokenAttribute.cs" />
     <Compile Include="WebApi\HttpControllerContextExtensions.cs" />
     <Compile Include="Controllers\UmbRegisterController.cs" />

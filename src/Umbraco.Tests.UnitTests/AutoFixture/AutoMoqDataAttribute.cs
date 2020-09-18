@@ -1,14 +1,19 @@
 ﻿using System;
+using System.Linq;
+using System.Reflection;
 using AutoFixture;
 using AutoFixture.AutoMoq;
 using AutoFixture.Kernel;
 using AutoFixture.NUnit3;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 using Moq;
+using Umbraco.Core;
 using Umbraco.Core.BackOffice;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
+using Umbraco.Tests.Common.Builders;
 using Umbraco.Web.BackOffice.Controllers;
-using Umbraco.Core;
 using Umbraco.Web.Common.Install;
 
 namespace Umbraco.Tests.UnitTests.AutoFixture
@@ -35,15 +40,15 @@ namespace Umbraco.Tests.UnitTests.AutoFixture
                 {
                     fixture.Customize<BackOfficeIdentityUser>(
                         u => u.FromFactory<string ,string, string>(
-                            (a,b,c) => BackOfficeIdentityUser.CreateNew(Mock.Of<IGlobalSettings>(),a,b,c)));
+                            (a,b,c) => BackOfficeIdentityUser.CreateNew(new GlobalSettingsBuilder().Build(),a,b,c)));
                     fixture
                         .Customize(new ConstructorCustomization(typeof(UsersController), new GreedyConstructorQuery()))
                         .Customize(new ConstructorCustomization(typeof(InstallController), new GreedyConstructorQuery()))
                         .Customize(new ConstructorCustomization(typeof(PreviewController), new GreedyConstructorQuery()))
                         .Customize(new ConstructorCustomization(typeof(BackOfficeController), new GreedyConstructorQuery()))
-                        .Customize(new ConstructorCustomization(typeof(BackOfficeUserManager), new GreedyConstructorQuery()))
-                        .Customize(new AutoMoqCustomization());
+                        .Customize(new ConstructorCustomization(typeof(BackOfficeUserManager), new GreedyConstructorQuery()));
 
+                    fixture.Customize(new AutoMoqCustomization());
                     // When requesting an IUserStore ensure we actually uses a IUserLockoutStore
                     fixture.Customize<IUserStore<BackOfficeIdentityUser>>(cc => cc.FromFactory(() => Mock.Of<IUserLockoutStore<BackOfficeIdentityUser>>()));
 
@@ -55,9 +60,9 @@ namespace Umbraco.Tests.UnitTests.AutoFixture
                         u => u.FromFactory(
                             () => new UmbracoVersion()));
 
-                    var connectionStrings = Mock.Of<IConnectionStrings>();
-                    Mock.Get(connectionStrings).Setup(x => x[Constants.System.UmbracoConnectionName]).Returns((ConfigConnectionString)new ConfigConnectionString(string.Empty, string.Empty, string.Empty));
-                    fixture.Customize<IConnectionStrings>(x => x.FromFactory(() => connectionStrings ));
+                    var connectionStrings = new ConnectionStrings();
+                    fixture.Customize<ConnectionStrings>(x => x.FromFactory(() => connectionStrings ));
+
 
 
 

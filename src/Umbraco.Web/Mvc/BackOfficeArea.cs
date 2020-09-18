@@ -1,8 +1,7 @@
 ﻿using System.Web.Mvc;
-using Umbraco.Web.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
 using Umbraco.Web.Editors;
 
 namespace Umbraco.Web.Mvc
@@ -10,10 +9,10 @@ namespace Umbraco.Web.Mvc
     // TODO: This has been ported to netcore, can be removed
     internal class BackOfficeArea : AreaRegistration
     {
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
 
-        public BackOfficeArea(IGlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
+        public BackOfficeArea(GlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
         {
             _globalSettings = globalSettings;
             _hostingEnvironment = hostingEnvironment;

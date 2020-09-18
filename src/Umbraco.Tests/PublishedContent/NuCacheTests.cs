@@ -6,10 +6,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Legacy;
 using Umbraco.Core.Events;
-using Umbraco.Core.Install;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
@@ -20,6 +17,7 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.Common;
+using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Strings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing.Objects;
@@ -52,12 +50,6 @@ namespace Umbraco.Tests.PublishedContent
 
             var factory = Mock.Of<IFactory>();
             Current.Factory = factory;
-
-            var configs = TestHelper.GetConfigs();
-            Mock.Get(factory).Setup(x => x.GetInstance(typeof(Configs))).Returns(configs);
-            var globalSettings = new GlobalSettings();
-            configs.Add(TestHelpers.SettingsForTests.GenerateMockContentSettings);
-            configs.Add<IGlobalSettings>(() => globalSettings);
 
             var publishedModelFactory = new NoopPublishedModelFactory();
             Mock.Get(factory).Setup(x => x.GetInstance(typeof(IPublishedModelFactory))).Returns(publishedModelFactory);
@@ -186,7 +178,9 @@ namespace Umbraco.Tests.PublishedContent
             _variationAccesor = new TestVariationContextAccessor();
 
             var typeFinder = TestHelper.GetTypeFinder();
-            var settings = Mock.Of<INuCacheSettings>();
+
+            var globalSettings = new GlobalSettingsBuilder().Build();
+            var nuCacheSettings = new NuCacheSettingsBuilder().Build();
 
             // at last, create the complete NuCache snapshot service!
             var options = new PublishedSnapshotServiceOptions { IgnoreLocalDb = true };
@@ -204,14 +198,14 @@ namespace Umbraco.Tests.PublishedContent
                 Mock.Of<IMemberRepository>(),
                 new TestDefaultCultureAccessor(),
                 dataSource,
-                globalSettings,
+                Microsoft.Extensions.Options.Options.Create(globalSettings),
                 Mock.Of<IEntityXmlSerializer>(),
                 publishedModelFactory,
                 new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider(TestHelper.ShortStringHelper) }),
                 TestHelper.GetHostingEnvironment(),
                 new MockShortStringHelper(),
                 TestHelper.IOHelper,
-                settings);
+                Microsoft.Extensions.Options.Options.Create(nuCacheSettings));
 
             // invariant is the current default
             _variationAccesor.VariationContext = new VariationContext();

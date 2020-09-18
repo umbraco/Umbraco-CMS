@@ -11,6 +11,9 @@
       <Compile Remove="TEMP\**" />
       <EmbeddedResource Remove="TEMP\**" />
       <None Remove="TEMP\**" />
+      <Compile Remove="Views\**" />
+      <EmbeddedResource Remove="Views\**" />
+      <None Remove="Views\**" />
     </ItemGroup>
 
     <ItemGroup>
@@ -20,6 +23,8 @@
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="3.1.8" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.1" />
         <PackageReference Include="Moq" Version="4.14.5" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.6.1" />
+        <PackageReference Include="Moq" Version="4.13.1" />
         <PackageReference Include="nunit" Version="3.12.0" />
         <PackageReference Include="NUnit3TestAdapter" Version="3.17.0">
             <PrivateAssets>all</PrivateAssets>

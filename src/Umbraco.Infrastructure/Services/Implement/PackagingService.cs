@@ -21,7 +21,6 @@ namespace Umbraco.Core.Services.Implement
     /// </summary>
     public class PackagingService : IPackagingService
     {
-
         private readonly IPackageInstallation _packageInstallation;
         private readonly IIOHelper _ioHelper;
         private readonly IAuditService _auditService;

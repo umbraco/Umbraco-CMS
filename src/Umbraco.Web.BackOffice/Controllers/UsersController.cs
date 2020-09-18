@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Net.Mail;
 using System.Runtime.Serialization;
 using System.Security.Cryptography;
@@ -11,27 +10,22 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.BackOffice;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Mapping;
+using Umbraco.Core.Media;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
-using Umbraco.Web.Models;
-using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.WebApi.Filters;
-using Constants = Umbraco.Core.Constants;
-using IUser = Umbraco.Core.Models.Membership.IUser;
-using Task = System.Threading.Tasks.Task;
-using Umbraco.Core.Mapping;
-using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.Media;
 using Umbraco.Extensions;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.BackOffice.ModelBinders;
@@ -40,7 +34,13 @@ using Umbraco.Web.Common.ActionResults;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Editors;
+using Umbraco.Web.Models;
+using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Security;
+using Umbraco.Web.WebApi.Filters;
+using Constants = Umbraco.Core.Constants;
+using IUser = Umbraco.Core.Models.Membership.IUser;
+using Task = System.Threading.Tasks.Task;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -51,11 +51,11 @@ namespace Umbraco.Web.BackOffice.Controllers
     public class UsersController : UmbracoAuthorizedJsonController
     {
         private readonly IMediaFileSystem _mediaFileSystem;
-        private readonly IContentSettings _contentSettings;
+        private readonly ContentSettings _contentSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ISqlContext _sqlContext;
         private readonly IImageUrlGenerator _imageUrlGenerator;
-        private readonly ISecuritySettings _securitySettings;
+        private readonly SecuritySettings _securitySettings;
         private readonly IRequestAccessor _requestAccessor;
         private readonly IEmailSender _emailSender;
         private readonly IWebSecurity _webSecurity;
@@ -67,18 +67,18 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IEntityService _entityService;
         private readonly IMediaService _mediaService;
         private readonly IContentService _contentService;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly BackOfficeUserManager _backOfficeUserManager;
         private readonly ILogger _logger;
         private readonly LinkGenerator _linkGenerator;
 
         public UsersController(
             IMediaFileSystem mediaFileSystem,
-            IContentSettings contentSettings,
+            IOptions<ContentSettings> contentSettings,
             IHostingEnvironment hostingEnvironment,
             ISqlContext sqlContext,
             IImageUrlGenerator imageUrlGenerator,
-            ISecuritySettings securitySettings,
+            IOptions<SecuritySettings> securitySettings,
             IRequestAccessor requestAccessor,
             IEmailSender emailSender,
             IWebSecurity webSecurity,
@@ -90,17 +90,17 @@ namespace Umbraco.Web.BackOffice.Controllers
             IEntityService entityService,
             IMediaService mediaService,
             IContentService contentService,
-            IGlobalSettings globalSettings,
+            IOptions<GlobalSettings> globalSettings,
             BackOfficeUserManager backOfficeUserManager,
             ILogger logger,
             LinkGenerator linkGenerator)
         {
             _mediaFileSystem = mediaFileSystem;
-            _contentSettings = contentSettings;
+            _contentSettings = contentSettings.Value;
             _hostingEnvironment = hostingEnvironment;
             _sqlContext = sqlContext;
             _imageUrlGenerator = imageUrlGenerator;
-            _securitySettings = securitySettings;
+            _securitySettings = securitySettings.Value;
             _requestAccessor = requestAccessor;
             _emailSender = emailSender;
             _webSecurity = webSecurity;
@@ -112,7 +112,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _entityService = entityService;
             _mediaService = mediaService;
             _contentService = contentService;
-            _globalSettings = globalSettings;
+            _globalSettings = globalSettings.Value;
             _backOfficeUserManager = backOfficeUserManager;
             _logger = logger;
             _linkGenerator = linkGenerator;
@@ -138,7 +138,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             return await PostSetAvatarInternal(files, _userService, _appCaches.RuntimeCache, _mediaFileSystem, _shortStringHelper, _contentSettings, _hostingEnvironment, _imageUrlGenerator, id);
         }
 
-        internal static async Task<IActionResult> PostSetAvatarInternal(IList<IFormFile> files, IUserService userService, IAppCache cache, IMediaFileSystem mediaFileSystem, IShortStringHelper shortStringHelper, IContentSettings contentSettings, IHostingEnvironment hostingEnvironment, IImageUrlGenerator imageUrlGenerator, int id)
+        internal static async Task<IActionResult> PostSetAvatarInternal(IList<IFormFile> files, IUserService userService, IAppCache cache, IMediaFileSystem mediaFileSystem, IShortStringHelper shortStringHelper, ContentSettings contentSettings, IHostingEnvironment hostingEnvironment, IImageUrlGenerator imageUrlGenerator, int id)
         {
             if (files is null)
             {

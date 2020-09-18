@@ -1,8 +1,7 @@
-﻿using Microsoft.Extensions.Configuration;
-using Moq;
-using NUnit.Framework;
-using Umbraco.Configuration.Models;
+﻿using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Configuration.Models
 {
@@ -15,25 +14,17 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Configuration.Models
         [TestCase(@"Server=(LocalDb)\Umbraco;Database=NetCore;Integrated Security=true", ExpectedResult = Constants.DbProviderNames.SqlServer)]
         public string ParseProviderName(string connectionString)
         {
-            var key = Constants.System.UmbracoConnectionName;
-            var configuration = new Mock<IConfiguration>();
-
-
-            //This is the underlying method that is called by Configuration.GetConnectionString(string)
-            if (connectionString != null)
+            var connectionStrings = new ConnectionStrings
             {
-                configuration.Setup(x => x.GetSection("ConnectionStrings")[key]).Returns(connectionString);
-            }
+                UmbracoConnectionString = new ConfigConnectionString(Constants.System.UmbracoConnectionName, connectionString)
+            };
 
-
-            var connectionStrings = new ConnectionStrings(configuration.Object);
-
-            var actual = connectionStrings[key];
+            var actual = connectionStrings.UmbracoConnectionString;
 
             Assert.AreEqual(connectionString, actual.ConnectionString);
-            Assert.AreEqual(key, actual.Name);
+            Assert.AreEqual(Constants.System.UmbracoConnectionName, actual.Name);
 
-            return connectionStrings[key].ProviderName;
+            return connectionStrings.UmbracoConnectionString.ProviderName;
         }
     }
 }

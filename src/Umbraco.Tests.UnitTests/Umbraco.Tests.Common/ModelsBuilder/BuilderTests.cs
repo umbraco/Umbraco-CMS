@@ -8,6 +8,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.ModelsBuilder.Embedded;
 using Umbraco.ModelsBuilder.Embedded.Building;
+using Umbraco.Tests.Common.Builders;
 
 namespace Umbraco.Tests.ModelsBuilder
 {
@@ -42,7 +43,8 @@ namespace Umbraco.Tests.ModelsBuilder
             {
             };
 
-            var builder = new TextBuilder(Mock.Of<IModelsBuilderConfig>(), types);
+            var modelsBuilderConfig = new ModelsBuilderConfigBuilder().Build();
+            var builder = new TextBuilder(modelsBuilderConfig, types);
             var btypes = builder.TypeModels;
 
             var sb = new StringBuilder();
@@ -152,7 +154,8 @@ namespace Umbraco.Web.PublishedModels
 " }
             };
 
-            var builder = new TextBuilder(Mock.Of<IModelsBuilderConfig>(), types);
+            var modelsBuilderConfig = new ModelsBuilderConfigBuilder().Build();
+            var builder = new TextBuilder(modelsBuilderConfig, types);
             var btypes = builder.TypeModels;
 
             builder.ModelsNamespace = "Umbraco.Web.PublishedModels";
@@ -263,7 +266,8 @@ namespace Umbraco.Web.PublishedModels
             {
             };
 
-            var builder = new TextBuilder(Mock.Of<IModelsBuilderConfig>(), types);
+            var modelsBuilderConfig = new ModelsBuilderConfigBuilder().Build();
+            var builder = new TextBuilder(modelsBuilderConfig, types);
             builder.ModelsNamespace = "Umbraco.ModelsBuilder.Models"; // forces conflict with Umbraco.ModelsBuilder.Umbraco
             var btypes = builder.TypeModels;
 

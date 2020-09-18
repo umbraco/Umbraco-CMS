@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Install;
 using Umbraco.Core.IO;
 using Umbraco.Core.Services;
@@ -29,14 +31,14 @@ namespace Umbraco.Web.HealthCheck.Checks.Permissions
     public class FolderAndFilePermissionsCheck : HealthCheck
     {
         private readonly ILocalizedTextService _textService;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly IFilePermissionHelper _filePermissionHelper;
         private readonly IIOHelper _ioHelper;
 
-        public FolderAndFilePermissionsCheck(ILocalizedTextService textService, IGlobalSettings globalSettings, IFilePermissionHelper filePermissionHelper, IIOHelper ioHelper)
+        public FolderAndFilePermissionsCheck(ILocalizedTextService textService, IOptions<GlobalSettings> globalSettings, IFilePermissionHelper filePermissionHelper, IIOHelper ioHelper)
         {
             _textService = textService;
-            _globalSettings = globalSettings;
+            _globalSettings = globalSettings.Value;
             _filePermissionHelper = filePermissionHelper;
             _ioHelper = ioHelper;
         }
