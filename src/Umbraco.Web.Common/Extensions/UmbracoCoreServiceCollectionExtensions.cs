@@ -128,22 +128,25 @@ namespace Umbraco.Extensions
             if (configuration == null) throw new ArgumentNullException(nameof(configuration));
 
             services.AddSingleton<IValidateOptions<ContentSettings>, ContentSettingsValidation>();
+            services.AddSingleton<IValidateOptions<GlobalSettings>, GlobalSettingsValidation>();
+            services.AddSingleton<IValidateOptions<HostingSettings>, HostingSettingsValidation>();
+            services.AddSingleton<IValidateOptions<ModelsBuilderSettings>, ModelsBuilderSettingsValidation>();
             services.AddSingleton<IValidateOptions<RequestHandlerSettings>, RequestHandlerSettingsValidation>();
 
             services.Configure<ActiveDirectorySettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "ActiveDirectory"));
             services.Configure<ConnectionStrings>(configuration.GetSection("ConnectionStrings"), o => o.BindNonPublicProperties = true);
-            services.Configure<ContentSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "Content"));
+            services.Configure<ContentSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "Content"), o => o.BindNonPublicProperties = true);
             services.Configure<CoreDebugSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "Core:Debug"));
             services.Configure<ExceptionFilterSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "ExceptionFilter"));
             services.Configure<GlobalSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "Global"));
             services.Configure<HealthChecksSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "HealthChecks"));
-            services.Configure<HostingSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "Hosting"));
+            services.Configure<HostingSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "Hosting"), o => o.BindNonPublicProperties = true);
             services.Configure<ImagingSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "Imaging"));
             services.Configure<IndexCreatorSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "Examine"));
             services.Configure<KeepAliveSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "KeepAlive"));
             services.Configure<LoggingSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "Logging"));
             services.Configure<MemberPasswordConfigurationSettings>(configuration.GetSection(Constants.Configuration.ConfigSecurityPrefix + "MemberPassword"));
-            services.Configure<ModelsBuilderConfig>(configuration.GetSection(Constants.Configuration.ConfigGlobalPrefix + "ModelsBuilder"));
+            services.Configure<ModelsBuilderSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "ModelsBuilder"), o => o.BindNonPublicProperties = true);
             services.Configure<NuCacheSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "NuCache"));
             services.Configure<RequestHandlerSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "RequestHandler"));
             services.Configure<RuntimeSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "Runtime"));

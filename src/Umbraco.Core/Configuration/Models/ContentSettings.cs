@@ -19,7 +19,11 @@ namespace Umbraco.Core.Configuration.Models
 
         public string PreviewBadge { get; set; } = DefaultPreviewBadge;
 
-        public string MacroErrors { get; set; } = MacroErrorBehaviour.Inline.ToString();
+        // We could bind the enum MacroErrorsBehaviour directly from configuration, but we're doing so
+        // via this string to allow for validation to occur on start-up that the configured value does
+        // match one of the enum values.
+        // Without this it'll fail on first use, and we'd have less control over the error message.
+        internal string MacroErrors { get; set; } = MacroErrorBehaviour.Inline.ToString();
 
         public MacroErrorBehaviour MacroErrorsBehaviour
         {

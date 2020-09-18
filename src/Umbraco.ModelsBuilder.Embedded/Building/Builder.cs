@@ -66,7 +66,7 @@ namespace Umbraco.ModelsBuilder.Embedded.Building
         /// </summary>
         /// <param name="typeModels">The list of models to generate.</param>
         /// <param name="modelsNamespace">The models namespace.</param>
-        protected Builder(ModelsBuilderConfig config, IList<TypeModel> typeModels)
+        protected Builder(ModelsBuilderSettings config, IList<TypeModel> typeModels)
         {
             _typeModels = typeModels ?? throw new ArgumentNullException(nameof(typeModels));
 
@@ -83,7 +83,7 @@ namespace Umbraco.ModelsBuilder.Embedded.Building
         protected Builder()
         { }
 
-        protected ModelsBuilderConfig Config { get; }
+        protected ModelsBuilderSettings Config { get; }
 
         /// <summary>
         /// Prepares generation by processing the result of code parsing.
@@ -92,7 +92,7 @@ namespace Umbraco.ModelsBuilder.Embedded.Building
         {
             TypeModel.MapModelTypes(_typeModels, ModelsNamespace);
 
-            var pureLive = Config.ModelsMode == ModelsMode.PureLive;
+            var pureLive = Config.ModelsModeValue == ModelsMode.PureLive;
 
             // for the first two of these two tests,
             //  always throw, even in purelive: cannot happen unless ppl start fidling with attributes to rename

@@ -27,8 +27,8 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
 
             composition.RegisterUnique<IPublishedModelFactory>(factory =>
             {
-                var config = factory.GetInstance<IOptions<ModelsBuilderConfig>>().Value;
-                if (config.ModelsMode == ModelsMode.PureLive)
+                var config = factory.GetInstance<IOptions<ModelsBuilderSettings>>().Value;
+                if (config.ModelsModeValue == ModelsMode.PureLive)
                 {
                     composition.RegisterUnique<IPublishedModelFactory, PureLiveModelFactory>();
 

@@ -1,11 +1,12 @@
-﻿using Umbraco.Configuration;
+﻿using System;
+using Umbraco.Configuration;
 
 namespace Umbraco.Core.Configuration.Models
 {
     /// <summary>
     ///     Represents the models builder configuration.
     /// </summary>
-    public class ModelsBuilderConfig 
+    public class ModelsBuilderSettings 
     {
         public static string DefaultModelsDirectory => "~/App_Data/Models";
 
@@ -18,10 +19,21 @@ namespace Umbraco.Core.Configuration.Models
         /// </remarks>
         public bool Enable { get; set; } = false;
 
+        // See note on ContentSettings.MacroErrors
+        internal string ModelsMode { get; set; } = Configuration.ModelsMode.Nothing.ToString();
+
         /// <summary>
         ///     Gets the models mode.
         /// </summary>
-        public ModelsMode ModelsMode { get; set; } = ModelsMode.Nothing;
+        public ModelsMode ModelsModeValue
+        {
+            get
+            {
+                return Enum.TryParse<ModelsMode>(ModelsMode, true, out var value)
+                    ? value
+                    : Configuration.ModelsMode.Nothing;
+            }
+        }
 
         /// <summary>
         ///     Gets the models namespace.
@@ -51,7 +63,7 @@ namespace Umbraco.Core.Configuration.Models
 
             set
             {
-                if (!ModelsMode.IsLive())
+                if (!ModelsModeValue.IsLive())
                 {
                     _flagOutOfDateModels = false;
                 }

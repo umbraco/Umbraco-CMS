@@ -2,11 +2,11 @@ using Umbraco.Core.Configuration.Models;
 
 namespace Umbraco.Tests.Common.Builders
 {
-    public class ModelsBuilderConfigBuilder : BuilderBase<ModelsBuilderConfig>
+    public class ModelsBuilderConfigBuilder : BuilderBase<ModelsBuilderSettings>
     {
-        public override ModelsBuilderConfig Build()
+        public override ModelsBuilderSettings Build()
         {
-            return new ModelsBuilderConfig();
+            return new ModelsBuilderSettings();
         }
     }
 }

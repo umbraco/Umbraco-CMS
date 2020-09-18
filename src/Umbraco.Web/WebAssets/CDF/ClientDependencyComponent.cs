@@ -46,7 +46,7 @@ namespace Umbraco.Web.WebAssets.CDF
 
             // Now we need to detect if we are running 'Umbraco.Core.LocalTempStorage' as EnvironmentTemp and in that case we want to change the CDF file
             // location to be there
-            if (_hostingSettings.LocalTempStorageLocation == LocalTempStorage.EnvironmentTemp)
+            if (_hostingSettings.LocalTempStorageLocationValue == LocalTempStorage.EnvironmentTemp)
             {
                 var cachePath = _hostingEnvironment.LocalTempPath;
 

@@ -1,9 +1,13 @@
-﻿using System.Net.Mail;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Net.Mail;
+using Umbraco.Core.Configuration.Models.Validation;
 
 namespace Umbraco.Core.Configuration.Models
 {
-    public class SmtpSettings
+    public class SmtpSettings : ValidatableEntryBase
     {
+        [Required]
+        [EmailAddress]
         public string From { get; set; }
 
         public string Host { get; set; }

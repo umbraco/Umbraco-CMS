@@ -7,7 +7,7 @@ namespace Umbraco.Tests.Common.Builders
     {
         private string _applicationVirtualPath;
         private bool? _debug;
-        private LocalTempStorage? _localTempStorageLocation;
+        private string _localTempStorageLocation;
 
         public HostingSettingsBuilder WithApplicationVirtualPath(string applicationVirtualPath)
         {
@@ -23,14 +23,14 @@ namespace Umbraco.Tests.Common.Builders
 
         public HostingSettingsBuilder WithLocalTempStorageLocation(LocalTempStorage localTempStorageLocation)
         {
-            _localTempStorageLocation = localTempStorageLocation;
+            _localTempStorageLocation = localTempStorageLocation.ToString();
             return this;
         }
 
         public override HostingSettings Build()
         {
             var debug = _debug ?? false;
-            var localTempStorageLocation = _localTempStorageLocation ?? LocalTempStorage.Default;
+            var localTempStorageLocation = _localTempStorageLocation ?? LocalTempStorage.Default.ToString();
             var applicationVirtualPath = _applicationVirtualPath ?? null;
 
             return new HostingSettings

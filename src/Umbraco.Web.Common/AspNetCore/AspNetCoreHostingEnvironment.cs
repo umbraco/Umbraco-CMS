@@ -45,7 +45,7 @@ namespace Umbraco.Web.Common.AspNetCore
                 if (_localTempPath != null)
                     return _localTempPath;
 
-                switch (_hostingSettings.CurrentValue.LocalTempStorageLocation)
+                switch (_hostingSettings.CurrentValue.LocalTempStorageLocationValue)
                 {
                     case LocalTempStorage.AspNetTemp:
 

@@ -8,18 +8,18 @@ namespace Umbraco.ModelsBuilder.Embedded.BackOffice
 {
     internal class DashboardReport
     {
-        private readonly ModelsBuilderConfig _config;
+        private readonly ModelsBuilderSettings _config;
         private readonly OutOfDateModelsStatus _outOfDateModels;
         private readonly ModelsGenerationError _mbErrors;
 
-        public DashboardReport(IOptions<ModelsBuilderConfig> config, OutOfDateModelsStatus outOfDateModels, ModelsGenerationError mbErrors)
+        public DashboardReport(IOptions<ModelsBuilderSettings> config, OutOfDateModelsStatus outOfDateModels, ModelsGenerationError mbErrors)
         {
             _config = config.Value;
             _outOfDateModels = outOfDateModels;
             _mbErrors = mbErrors;
         }
 
-        public bool CanGenerate() => _config.ModelsMode.SupportsExplicitGeneration();
+        public bool CanGenerate() => _config.ModelsModeValue.SupportsExplicitGeneration();
 
         public bool AreModelsOutOfDate() => _outOfDateModels.IsOutOfDate;
 
@@ -41,13 +41,13 @@ namespace Umbraco.ModelsBuilder.Embedded.BackOffice
             sb.Append("<ul>");
 
             sb.Append("<li>The <strong>models factory</strong> is ");
-            sb.Append(_config.EnableFactory || _config.ModelsMode == ModelsMode.PureLive
+            sb.Append(_config.EnableFactory || _config.ModelsModeValue == ModelsMode.PureLive
                 ? "enabled"
                 : "not enabled. Umbraco will <em>not</em> use models");
             sb.Append(".</li>");
 
-            sb.Append(_config.ModelsMode != ModelsMode.Nothing
-                ? $"<li><strong>{_config.ModelsMode} models</strong> are enabled.</li>"
+            sb.Append(_config.ModelsModeValue != ModelsMode.Nothing
+                ? $"<li><strong>{_config.ModelsModeValue} models</strong> are enabled.</li>"
                 : "<li>No models mode is specified: models will <em>not</em> be generated.</li>");
 
             sb.Append($"<li>Models namespace is {_config.ModelsNamespace}.</li>");
