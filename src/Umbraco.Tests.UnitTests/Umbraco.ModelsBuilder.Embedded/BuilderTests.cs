@@ -2,15 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Moq;
 using NUnit.Framework;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.ModelsBuilder.Embedded;
 using Umbraco.ModelsBuilder.Embedded.Building;
 using Umbraco.Tests.Common.Builders;
 
-namespace Umbraco.Tests.ModelsBuilder
+namespace Umbraco.Tests.UnitTests.Umbraco.ModelsBuilder.Embedded
 {
     [TestFixture]
     public class BuilderTests
@@ -43,7 +41,7 @@ namespace Umbraco.Tests.ModelsBuilder
             {
             };
 
-            var modelsBuilderConfig = new ModelsBuilderConfigBuilder().Build();
+            var modelsBuilderConfig = new ModelsBuilderSettingsBuilder().Build();
             var builder = new TextBuilder(modelsBuilderConfig, types);
             var btypes = builder.TypeModels;
 
@@ -154,7 +152,7 @@ namespace Umbraco.Web.PublishedModels
 " }
             };
 
-            var modelsBuilderConfig = new ModelsBuilderConfigBuilder().Build();
+            var modelsBuilderConfig = new ModelsBuilderSettingsBuilder().Build();
             var builder = new TextBuilder(modelsBuilderConfig, types);
             var btypes = builder.TypeModels;
 
@@ -252,7 +250,7 @@ namespace Umbraco.Web.PublishedModels
             {
                 Alias = "prop2",
                 ClrName = "Prop2",
-                ModelClrType = typeof(global::System.Text.StringBuilder),
+                ModelClrType = typeof(StringBuilder),
             });
             type1.Properties.Add(new PropertyModel
             {
@@ -266,7 +264,7 @@ namespace Umbraco.Web.PublishedModels
             {
             };
 
-            var modelsBuilderConfig = new ModelsBuilderConfigBuilder().Build();
+            var modelsBuilderConfig = new ModelsBuilderSettingsBuilder().Build();
             var builder = new TextBuilder(modelsBuilderConfig, types);
             builder.ModelsNamespace = "Umbraco.ModelsBuilder.Models"; // forces conflict with Umbraco.ModelsBuilder.Umbraco
             var btypes = builder.TypeModels;
@@ -424,14 +422,14 @@ namespace Umbraco.Web.PublishedModels
         public class Class1 { }
     }
 
-// make it public to be ambiguous (see above)
+    // make it public to be ambiguous (see above)
     public class ASCIIEncoding
     {
         // can we handle nested types?
         public class Nested { }
     }
 
-    class BuilderTestsClass1 {}
+    class BuilderTestsClass1 { }
 
     public class System { }
 }

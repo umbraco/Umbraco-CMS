@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Tests.ModelsBuilder
+﻿namespace Umbraco.Tests.UnitTests.Umbraco.ModelsBuilder.Embedded
 {
     public static class StringExtensions
     {

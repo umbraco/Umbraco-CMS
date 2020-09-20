@@ -4,7 +4,7 @@ using NUnit.Framework;
 using Umbraco.ModelsBuilder.Embedded;
 using Umbraco.ModelsBuilder.Embedded.Building;
 
-namespace Umbraco.Tests.ModelsBuilder
+namespace Umbraco.Tests.UnitTests.Umbraco.ModelsBuilder.Embedded
 {
     [TestFixture]
     public class UmbracoApplicationTests
