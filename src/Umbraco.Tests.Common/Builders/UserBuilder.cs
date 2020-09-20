@@ -91,8 +91,6 @@ namespace Umbraco.Tests.Common.Builders
             return this;
         }
 
-
-
         public UserBuilder<TParent> WithSessionTimeout(int sessionTimeout)
         {
             _sessionTimeout = sessionTimeout;
@@ -120,6 +118,13 @@ namespace Umbraco.Tests.Common.Builders
         {
             _suffix = suffix;
             return this;
+        }
+
+        public UserGroupBuilder<UserBuilder<TParent>> AddUserGroup()
+        {
+            var builder = new UserGroupBuilder<UserBuilder<TParent>>(this);
+            _userGroupBuilders.Add(builder);
+            return builder;
         }
 
         public override User Build()
@@ -175,19 +180,8 @@ namespace Umbraco.Tests.Common.Builders
                 result.AddGroup(readOnlyUserGroup.ToReadOnlyGroup());
             }
 
-
             return result;
         }
-
-        public UserGroupBuilder<UserBuilder<TParent>> AddUserGroup()
-        {
-            var builder = new UserGroupBuilder<UserBuilder<TParent>>(this);
-
-            _userGroupBuilders.Add(builder);
-
-            return builder;
-        }
-
 
         int? IWithIdBuilder.Id
         {

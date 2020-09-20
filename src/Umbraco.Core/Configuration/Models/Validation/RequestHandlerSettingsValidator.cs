@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Configuration.Models.Validation
 {
-    public class RequestHandlerSettingsValidation : ConfigurationValidationBase, IValidateOptions<RequestHandlerSettings>
+    public class RequestHandlerSettingsValidator : ConfigurationValidatorBase, IValidateOptions<RequestHandlerSettings>
     {
         public ValidateOptionsResult Validate(string name, RequestHandlerSettings options)
         {

@@ -2,7 +2,8 @@
 
 namespace Umbraco.Core.Configuration.Models.Validation
 {
-    public class GlobalSettingsValidation : ConfigurationValidationBase, IValidateOptions<GlobalSettings>
+    public class GlobalSettingsValidator
+        : ConfigurationValidatorBase, IValidateOptions<GlobalSettings>
     {
         public ValidateOptionsResult Validate(string name, GlobalSettings options)
         {

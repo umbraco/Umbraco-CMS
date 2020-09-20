@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Configuration.Models.Validation
 {
-    public class ModelsBuilderSettingsValidation : ConfigurationValidationBase, IValidateOptions<ModelsBuilderSettings>
+    public class ModelsBuilderSettingsValidator : ConfigurationValidatorBase, IValidateOptions<ModelsBuilderSettings>
     {
         public ValidateOptionsResult Validate(string name, ModelsBuilderSettings options)
         {

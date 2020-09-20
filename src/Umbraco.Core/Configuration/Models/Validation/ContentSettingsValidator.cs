@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using Microsoft.Extensions.Options;
 using Umbraco.Core.Macros;
 
 namespace Umbraco.Core.Configuration.Models.Validation
 {
-    public class ContentSettingsValidation : ConfigurationValidationBase, IValidateOptions<ContentSettings>
+    public class ContentSettingsValidator : ConfigurationValidatorBase, IValidateOptions<ContentSettings>
     {
         public ValidateOptionsResult Validate(string name, ContentSettings options)
         {

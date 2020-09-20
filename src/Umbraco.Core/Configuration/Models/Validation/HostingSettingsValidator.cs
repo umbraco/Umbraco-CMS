@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Configuration.Models.Validation
 {
-    public class HostingSettingsValidation : ConfigurationValidationBase, IValidateOptions<HostingSettings>
+    public class HostingSettingsValidator : ConfigurationValidatorBase, IValidateOptions<HostingSettings>
     {
         public ValidateOptionsResult Validate(string name, HostingSettings options)
         {

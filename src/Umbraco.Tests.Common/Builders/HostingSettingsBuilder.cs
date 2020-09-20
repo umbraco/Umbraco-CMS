@@ -27,6 +27,12 @@ namespace Umbraco.Tests.Common.Builders
             return this;
         }
 
+        public HostingSettingsBuilder WithLocalTempStorageLocation(string localTempStorageLocation)
+        {
+            _localTempStorageLocation = localTempStorageLocation;
+            return this;
+        }
+
         public override HostingSettings Build()
         {
             var debug = _debug ?? false;

@@ -127,11 +127,11 @@ namespace Umbraco.Extensions
         {
             if (configuration == null) throw new ArgumentNullException(nameof(configuration));
 
-            services.AddSingleton<IValidateOptions<ContentSettings>, ContentSettingsValidation>();
-            services.AddSingleton<IValidateOptions<GlobalSettings>, GlobalSettingsValidation>();
-            services.AddSingleton<IValidateOptions<HostingSettings>, HostingSettingsValidation>();
-            services.AddSingleton<IValidateOptions<ModelsBuilderSettings>, ModelsBuilderSettingsValidation>();
-            services.AddSingleton<IValidateOptions<RequestHandlerSettings>, RequestHandlerSettingsValidation>();
+            services.AddSingleton<IValidateOptions<ContentSettings>, ContentSettingsValidator>();
+            services.AddSingleton<IValidateOptions<GlobalSettings>, GlobalSettingsValidator>();
+            services.AddSingleton<IValidateOptions<HostingSettings>, HostingSettingsValidator>();
+            services.AddSingleton<IValidateOptions<ModelsBuilderSettings>, ModelsBuilderSettingsValidator>();
+            services.AddSingleton<IValidateOptions<RequestHandlerSettings>, RequestHandlerSettingsValidator>();
 
             services.Configure<ActiveDirectorySettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "ActiveDirectory"));
             services.Configure<ConnectionStrings>(configuration.GetSection("ConnectionStrings"), o => o.BindNonPublicProperties = true);

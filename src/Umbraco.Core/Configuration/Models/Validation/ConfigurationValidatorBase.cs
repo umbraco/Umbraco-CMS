@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Umbraco.Core.Configuration.Models.Validation
 {
-    public abstract class ConfigurationValidationBase
+    public abstract class ConfigurationValidatorBase
     {
         public bool ValidateStringIsOneOfValidValues(string configPath, string value, IEnumerable<string> validValues, out string message)
         {

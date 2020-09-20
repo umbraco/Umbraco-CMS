@@ -24,7 +24,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Tests.Common.Builders
 
             // Assert
             Assert.AreEqual(debugMode, hostingSettings.Debug);
-            Assert.AreEqual(localTempStorageLocation, hostingSettings.LocalTempStorageLocation);
+            Assert.AreEqual(localTempStorageLocation, hostingSettings.LocalTempStorageLocationValue);
         }
     }
 }
