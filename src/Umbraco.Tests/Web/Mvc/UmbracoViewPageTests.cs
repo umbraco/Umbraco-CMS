@@ -424,7 +424,7 @@ namespace Umbraco.Tests.Web.Mvc
                 null, null,
                 umbracoContextAccessor, null, null, null,
                 new TestDefaultCultureAccessor(),
-                Current.LoggerFactory.CreateLogger("XmlPublishedSnapshotService"), TestObjects.GetGlobalSettings(),
+                Current.LoggerFactory, TestObjects.GetGlobalSettings(),
                 TestHelper.GetHostingEnvironment(),
                 TestHelper.GetHostingEnvironmentLifetime(),
                 ShortStringHelper,

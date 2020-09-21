@@ -1240,7 +1240,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             var snapshotCache = new DictionaryAppCache();
 
-            var memberTypeCache = new PublishedContentTypeCache(null, null, _serviceContext.MemberTypeService, _publishedContentTypeFactory, _loggerFactory.CreateLogger("PublishedContentTypeCache"));
+            var memberTypeCache = new PublishedContentTypeCache(null, null, _serviceContext.MemberTypeService, _publishedContentTypeFactory, _loggerFactory.CreateLogger<PublishedContentTypeCache>());
 
             var defaultCulture = _defaultCultureAccessor.DefaultCulture;
             var domainCache = new DomainCache(domainSnap, defaultCulture);
