@@ -70,7 +70,6 @@ namespace Umbraco.Tests.Runtimes
                 Assert.IsTrue(TestComponent.Ctored);
                 Assert.IsNotNull(TestComponent.ProfilingLogger);
                 Assert.IsInstanceOf<ProfilingLogger>(TestComponent.ProfilingLogger);
-                Assert.IsInstanceOf<DebugDiagnosticsLogger<object>>(((ProfilingLogger) TestComponent.ProfilingLogger).Logger);
 
                 // note: components are NOT disposed after boot
 

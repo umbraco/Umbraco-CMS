@@ -46,7 +46,6 @@ namespace Umbraco.Tests.Components
             var p = new ScopeProvider(f, fs, Microsoft.Extensions.Options.Options.Create(coreDebug), mediaFileSystem, loggerFactory.CreateLogger<ScopeProvider>(), loggerFactory, typeFinder, NoAppCache.Instance);
 
             mock.Setup(x => x.GetInstance(typeof (ILogger))).Returns(logger);
-            mock.Setup(x => x.GetInstance(typeof (Umbraco.Core.Logging.ILogger))).Returns(Mock.Of<Umbraco.Core.Logging.ILogger>());
             mock.Setup(x => x.GetInstance(typeof(ILoggerFactory))).Returns(loggerFactory);
             mock.Setup(x => x.GetInstance(typeof (IProfilingLogger))).Returns(new ProfilingLogger(logger, Mock.Of<IProfiler>()));
             mock.Setup(x => x.GetInstance(typeof (IUmbracoDatabaseFactory))).Returns(f);
@@ -99,7 +98,6 @@ namespace Umbraco.Tests.Components
                     if (type == typeof(Composer5)) return new Composer5();
                     if (type == typeof(Component5)) return new Component5(new SomeResource());
                     if (type == typeof(IProfilingLogger)) return new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>());
-                    if (type == typeof(Core.Logging.ILogger)) return Mock.Of<Core.Logging.ILogger>();
                     throw new NotSupportedException(type.FullName);
                 });
             });
