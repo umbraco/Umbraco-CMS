@@ -78,7 +78,7 @@ namespace Umbraco.Tests.Persistence
             }
 
             // re-create the database factory and database context with proper connection string
-            _databaseFactory = new UmbracoDatabaseFactory(_logger, connString, Constants.DbProviderNames.SqlCe, new Lazy<IMapperCollection>(() => Mock.Of<IMapperCollection>()), TestHelper.DbProviderFactoryCreator);
+            _databaseFactory = new UmbracoDatabaseFactory(_logger, NullLoggerFactory.Instance, connString, Constants.DbProviderNames.SqlCe, new Lazy<IMapperCollection>(() => Mock.Of<IMapperCollection>()), TestHelper.DbProviderFactoryCreator);
 
             // test get database type (requires an actual database)
             using (var database = _databaseFactory.CreateDatabase())

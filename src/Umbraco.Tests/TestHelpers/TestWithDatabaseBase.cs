@@ -5,6 +5,7 @@ using System.Threading;
 using System.Web.Routing;
 using System.Xml;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -90,7 +91,7 @@ namespace Umbraco.Tests.TestHelpers
                     return TestObjects.GetDatabaseFactoryMock();
 
                 var lazyMappers = new Lazy<IMapperCollection>(f.GetInstance<IMapperCollection>);
-                var factory = new UmbracoDatabaseFactory(f.GetInstance<Microsoft.Extensions.Logging.ILogger<UmbracoDatabaseFactory>>(), GetDbConnectionString(), GetDbProviderName(), lazyMappers, TestHelper.DbProviderFactoryCreator);
+                var factory = new UmbracoDatabaseFactory(f.GetInstance<Microsoft.Extensions.Logging.ILogger<UmbracoDatabaseFactory>>(), NullLoggerFactory.Instance, GetDbConnectionString(), GetDbProviderName(), lazyMappers, TestHelper.DbProviderFactoryCreator);
                 factory.ResetForTests();
                 return factory;
             });
