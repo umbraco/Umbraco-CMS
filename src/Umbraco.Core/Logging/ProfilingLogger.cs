@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.Extensions.Logging;
+using Umbraco.Core.Models;
 
 
 namespace Umbraco.Core.Logging
@@ -12,7 +13,7 @@ namespace Umbraco.Core.Logging
         /// <summary>
         /// Gets the underlying <see cref="ILogger"/> implementation.
         /// </summary>
-        public Microsoft.Extensions.Logging.ILogger Logger { get; }
+        public ILogger Logger { get; }
 
         /// <summary>
         /// Gets the underlying <see cref="IProfiler"/> implementation.
@@ -22,8 +23,9 @@ namespace Umbraco.Core.Logging
         /// <summary>
         /// Initializes a new instance of the <see cref="ProfilingLogger"/> class.
         /// </summary>
-        public ProfilingLogger(Microsoft.Extensions.Logging.ILogger logger, IProfiler profiler)
+        public ProfilingLogger(ILogger logger, IProfiler profiler)
         {
+            // TODO: Use typed logger
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
             Profiler = profiler ?? throw new ArgumentNullException(nameof(profiler));
         }

@@ -18,7 +18,6 @@ using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Scoping;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.TestHelpers;
-using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Umbraco.Tests.Components
 {
@@ -98,6 +97,7 @@ namespace Umbraco.Tests.Components
                     if (type == typeof(Composer5)) return new Composer5();
                     if (type == typeof(Component5)) return new Component5(new SomeResource());
                     if (type == typeof(IProfilingLogger)) return new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>());
+                    if (type == typeof(ILogger)) return Mock.Of<ILogger>();
                     throw new NotSupportedException(type.FullName);
                 });
             });

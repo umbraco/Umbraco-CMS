@@ -120,8 +120,9 @@ namespace Umbraco.Tests.Testing
 
         #region Accessors
         protected ServiceContext ServiceContext => Factory.GetInstance<ServiceContext>();
-        
+
         protected ILoggerFactory LoggerFactory => Factory.GetInstance<ILoggerFactory>();
+
         protected IJsonSerializer JsonNetSerializer { get; } = new JsonNetSerializer();
 
         protected IIOHelper IOHelper { get; private set; }
@@ -154,6 +155,7 @@ namespace Umbraco.Tests.Testing
         protected UmbracoMapper Mapper => Factory.GetInstance<UmbracoMapper>();
         protected IHttpContextAccessor HttpContextAccessor => Factory.GetInstance<IHttpContextAccessor>();
         protected IRuntimeState RuntimeState => ComponentTests.MockRuntimeState(RuntimeLevel.Run);
+        private ILoggerFactory _loggerFactory;
 
         #endregion
 
@@ -172,6 +174,7 @@ namespace Umbraco.Tests.Testing
             // FIXME: align to runtimes & components - don't redo everything here !!!! Yes this is getting painful
 
             var loggerFactory = GetLoggerFactory(Options.Logger);
+            _loggerFactory = loggerFactory;
             var profiler = new LogProfiler(loggerFactory.CreateLogger<LogProfiler>());
             var msLogger = loggerFactory.CreateLogger("msLogger");
             var proflogger = new ProfilingLogger(loggerFactory.CreateLogger("ProfilingLogger"), profiler);
@@ -198,15 +201,17 @@ namespace Umbraco.Tests.Testing
 
             //TestHelper.GetConfigs().RegisterWith(register);
 
-            Composition.Register<ILoggerFactory>(new NullLoggerFactory());
-            Composition.Register(typeof(Microsoft.Extensions.Logging.ILogger<>), typeof(Logger<>));
+            Composition.RegisterUnique(typeof(ILoggerFactory), loggerFactory);
+            Composition.Register(typeof(ILogger<>), typeof(Logger<>));
+            // TODO Remove this at some point
+            Composition.Register(typeof(Microsoft.Extensions.Logging.ILogger), msLogger);
             Composition.RegisterUnique(IOHelper);
             Composition.RegisterUnique(UriUtility);
             Composition.RegisterUnique(UmbracoVersion);
             Composition.RegisterUnique(TypeFinder);
             Composition.RegisterUnique(LocalizedTextService);
             Composition.RegisterUnique(typeLoader);
-            Composition.RegisterUnique(profiler);
+            Composition.RegisterUnique<IProfiler>(profiler);
             Composition.RegisterUnique<IProfilingLogger>(proflogger);
             Composition.RegisterUnique(appCaches);
             Composition.RegisterUnique(HostingEnvironment);
@@ -453,7 +458,7 @@ namespace Umbraco.Tests.Testing
 
             var scheme = Mock.Of<IMediaPathScheme>();
 
-            var mediaFileSystem = new MediaFileSystem(Mock.Of<IFileSystem>(), scheme, LoggerFactory.CreateLogger<MediaFileSystem>(), TestHelper.ShortStringHelper);
+            var mediaFileSystem = new MediaFileSystem(Mock.Of<IFileSystem>(), scheme, _loggerFactory.CreateLogger<MediaFileSystem>(), TestHelper.ShortStringHelper);
             Composition.RegisterUnique<IMediaFileSystem>(factory => mediaFileSystem);
 
             // no factory (noop)
@@ -468,7 +473,7 @@ namespace Umbraco.Tests.Testing
             var globalSettings = new GlobalSettingsBuilder().Build();
             var connectionStrings = new ConnectionStringsBuilder().Build();
 
-            Composition.RegisterUnique<IUmbracoDatabaseFactory>(f => new UmbracoDatabaseFactory(LoggerFactory.CreateLogger<UmbracoDatabaseFactory>(),
+            Composition.RegisterUnique<IUmbracoDatabaseFactory>(f => new UmbracoDatabaseFactory(_loggerFactory.CreateLogger<UmbracoDatabaseFactory>(),
                 LoggerFactory,
                 globalSettings,
                 connectionStrings,
@@ -480,7 +485,7 @@ namespace Umbraco.Tests.Testing
             Composition.WithCollectionBuilder<UrlSegmentProviderCollectionBuilder>(); // empty
 
             Composition.RegisterUnique(factory
-                => TestObjects.GetScopeProvider(factory.TryGetInstance<ILoggerFactory>(), factory.TryGetInstance<ITypeFinder>(), factory.TryGetInstance<FileSystems>(), factory.TryGetInstance<IUmbracoDatabaseFactory>()));
+                => TestObjects.GetScopeProvider(_loggerFactory, factory.TryGetInstance<ITypeFinder>(), factory.TryGetInstance<FileSystems>(), factory.TryGetInstance<IUmbracoDatabaseFactory>()));
             Composition.RegisterUnique(factory => (IScopeAccessor) factory.GetInstance<IScopeProvider>());
 
             Composition.ComposeServices();
