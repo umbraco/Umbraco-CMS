@@ -18,7 +18,7 @@ namespace Umbraco.Core.Configuration.Models
         public string PickupDirectoryLocation { get; set; }
 
         // See notes on ContentSettings.MacroErrors
-        internal string DeliveryMethod { get; set; }
+        internal string DeliveryMethod { get; set; } = SmtpDeliveryMethod.Network.ToString();
 
         public SmtpDeliveryMethod DeliveryMethodValue
         {
