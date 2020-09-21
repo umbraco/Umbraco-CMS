@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Configuration.Models;
@@ -49,7 +50,7 @@ namespace Umbraco.Tests.Routing
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
             var urlProvider = new DefaultUrlProvider(
                 Microsoft.Extensions.Options.Options.Create(requestHandlerSettings),
-                Logger,
+                LoggerFactory_.CreateLogger<DefaultUrlProvider>(),
                 Microsoft.Extensions.Options.Options.Create(_globalSettings),
                 new SiteDomainHelper(), umbracoContextAccessor, UriUtility);
 
@@ -110,7 +111,7 @@ namespace Umbraco.Tests.Routing
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
             var urlProvider = new DefaultUrlProvider(
                 Microsoft.Extensions.Options.Options.Create(requestHandlerSettings),
-                Logger,
+                LoggerFactory_.CreateLogger<DefaultUrlProvider>(),
                 Microsoft.Extensions.Options.Options.Create(_globalSettings),
                 new SiteDomainHelper(), umbracoContextAccessor, UriUtility);
             var publishedUrlProvider = GetPublishedUrlProvider(umbracoContext, urlProvider);
@@ -151,7 +152,7 @@ namespace Umbraco.Tests.Routing
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
             var urlProvider = new DefaultUrlProvider(
                 Microsoft.Extensions.Options.Options.Create(requestHandlerSettings),
-                Logger,
+                LoggerFactory_.CreateLogger<DefaultUrlProvider>(),
                 Microsoft.Extensions.Options.Options.Create(_globalSettings),
                 new SiteDomainHelper(), umbracoContextAccessor, UriUtility);
             var publishedUrlProvider = GetPublishedUrlProvider(umbracoContext, urlProvider);
@@ -206,7 +207,7 @@ namespace Umbraco.Tests.Routing
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
             var urlProvider = new DefaultUrlProvider(
                 Microsoft.Extensions.Options.Options.Create(requestHandlerSettings),
-                Logger,
+                LoggerFactory_.CreateLogger<DefaultUrlProvider>(),
                 Microsoft.Extensions.Options.Options.Create(_globalSettings),
                 new SiteDomainHelper(), umbracoContextAccessor, UriUtility);
 
@@ -261,7 +262,7 @@ namespace Umbraco.Tests.Routing
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
             var urlProvider = new DefaultUrlProvider(
                 Microsoft.Extensions.Options.Options.Create(requestHandlerSettings),
-                Logger,
+                LoggerFactory_.CreateLogger<DefaultUrlProvider>(),
                 Microsoft.Extensions.Options.Options.Create(_globalSettings),
                 new SiteDomainHelper(), umbracoContextAccessor, UriUtility);
 
@@ -282,7 +283,7 @@ namespace Umbraco.Tests.Routing
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
             var urlProvider = new DefaultUrlProvider(
                 Microsoft.Extensions.Options.Options.Create(requestHandlerSettings),
-                Logger,
+                LoggerFactory_.CreateLogger<DefaultUrlProvider>(),
                 Microsoft.Extensions.Options.Options.Create(_globalSettings),
                 new SiteDomainHelper(), umbracoContextAccessor, UriUtility);
             var publishedUrlProvider = GetPublishedUrlProvider(umbracoContext, urlProvider);
@@ -299,7 +300,7 @@ namespace Umbraco.Tests.Routing
             var requestHandlerSettings = new RequestHandlerSettingsBuilder().Build();
 
             var urlProvider = new DefaultUrlProvider(Microsoft.Extensions.Options.Options.Create(requestHandlerSettings),
-                Logger,
+                LoggerFactory_.CreateLogger<DefaultUrlProvider>(),
                 Microsoft.Extensions.Options.Options.Create(_globalSettings),
                 new SiteDomainHelper(), UmbracoContextAccessor, UriUtility);
             var umbracoContext = GetUmbracoContext("http://example.com/test", 1111, globalSettings: _globalSettings);

@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Upgrade.V_8_0_0.DataTypes;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
@@ -17,7 +17,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
     {
         private readonly PreValueMigratorCollection _preValueMigrators;
         private readonly PropertyEditorCollection _propertyEditors;
-        private readonly ILogger _logger;
+        private readonly ILogger<DataTypeMigration> _logger;
 
         private static readonly ISet<string> LegacyAliases = new HashSet<string>()
         {
@@ -31,7 +31,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
             Constants.PropertyEditors.Legacy.Aliases.MultiNodeTreePicker2,
         };
 
-        public DataTypeMigration(IMigrationContext context, PreValueMigratorCollection preValueMigrators, PropertyEditorCollection propertyEditors, ILogger logger)
+        public DataTypeMigration(IMigrationContext context, PreValueMigratorCollection preValueMigrators, PropertyEditorCollection propertyEditors, ILogger<DataTypeMigration> logger)
             : base(context)
         {
             _preValueMigrators = preValueMigrators;

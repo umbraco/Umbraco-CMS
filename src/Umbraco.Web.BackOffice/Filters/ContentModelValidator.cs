@@ -6,7 +6,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Umbraco.Core.Logging;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
@@ -24,9 +24,9 @@ namespace Umbraco.Web.BackOffice.Filters
 
         protected IWebSecurity WebSecurity { get; }
         public IPropertyValidationService PropertyValidationService { get; }
-        protected ILogger Logger { get; }
+        protected ILogger<ContentModelValidator> Logger { get; }
 
-        protected ContentModelValidator(ILogger logger, IWebSecurity webSecurity, IPropertyValidationService propertyValidationService)
+        protected ContentModelValidator(ILogger<ContentModelValidator> logger, IWebSecurity webSecurity, IPropertyValidationService propertyValidationService)
         {
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
             WebSecurity = webSecurity ?? throw new ArgumentNullException(nameof(webSecurity));
@@ -52,7 +52,7 @@ namespace Umbraco.Web.BackOffice.Filters
         private readonly ILocalizedTextService _textService;
 
         protected ContentModelValidator(
-            ILogger logger,
+            ILogger<ContentModelValidator> logger,
             IWebSecurity webSecurity,
             ILocalizedTextService textService,
             IPropertyValidationService propertyValidationService)

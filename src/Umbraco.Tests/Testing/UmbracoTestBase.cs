@@ -485,7 +485,7 @@ namespace Umbraco.Tests.Testing
             var logger = Mock.Of<ILogger>();
             var scheme = Mock.Of<IMediaPathScheme>();
 
-            var mediaFileSystem = new MediaFileSystem(Mock.Of<IFileSystem>(), scheme, logger, TestHelper.ShortStringHelper);
+            var mediaFileSystem = new MediaFileSystem(Mock.Of<IFileSystem>(), scheme, LoggerFactory_.CreateLogger<MediaFileSystem>(), TestHelper.ShortStringHelper);
             Composition.RegisterUnique<IMediaFileSystem>(factory => mediaFileSystem);
 
             // no factory (noop)

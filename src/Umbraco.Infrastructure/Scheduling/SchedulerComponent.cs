@@ -16,7 +16,6 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Sync;
 using Umbraco.Web.HealthCheck;
 using Umbraco.Web.Routing;
-using ILogger = Umbraco.Core.Logging.ILogger;
 
 namespace Umbraco.Web.Scheduling
 {
@@ -33,7 +32,7 @@ namespace Umbraco.Web.Scheduling
         private readonly IContentService _contentService;
         private readonly IAuditService _auditService;
         private readonly IProfilingLogger _pLogger;
-        private readonly ILogger _logger;
+        private readonly Microsoft.Extensions.Logging.ILogger<SchedulerComponent> _logger;
         private readonly ILoggerFactory _loggerFactory;
         private readonly IApplicationShutdownRegistry _applicationShutdownRegistry;
         private readonly IScopeProvider _scopeProvider;
@@ -60,7 +59,7 @@ namespace Umbraco.Web.Scheduling
         public SchedulerComponent(IRuntimeState runtime, IMainDom mainDom, IServerRegistrar serverRegistrar,
             IContentService contentService, IAuditService auditService,
             HealthCheckCollection healthChecks, HealthCheckNotificationMethodCollection notifications,
-            IScopeProvider scopeProvider, IUmbracoContextFactory umbracoContextFactory, IProfilingLogger pLogger, Core.Logging.ILogger logger, ILoggerFactory loggerFactory,
+            IScopeProvider scopeProvider, IUmbracoContextFactory umbracoContextFactory, IProfilingLogger pLogger, ILoggerFactory loggerFactory,
             IApplicationShutdownRegistry applicationShutdownRegistry, IOptions<HealthChecksSettings> healthChecksSettings,
             IServerMessenger serverMessenger, IRequestAccessor requestAccessor,
             IOptions<LoggingSettings> loggingSettings, IOptions<KeepAliveSettings> keepAliveSettings,
@@ -73,8 +72,8 @@ namespace Umbraco.Web.Scheduling
             _auditService = auditService;
             _scopeProvider = scopeProvider;
             _pLogger = pLogger;
-            _logger = logger;
             _loggerFactory = loggerFactory;
+            _logger = loggerFactory.CreateLogger<SchedulerComponent>();
             _applicationShutdownRegistry = applicationShutdownRegistry;
             _umbracoContextFactory = umbracoContextFactory;
 

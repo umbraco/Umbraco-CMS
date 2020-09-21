@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Web;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 
@@ -10,7 +11,7 @@ namespace Umbraco.Web.Logging
         private readonly WebProfiler _profiler;
         private readonly bool _profile;
 
-        public WebProfilerComponent(IProfiler profiler, ILogger logger)
+        public WebProfilerComponent(IProfiler profiler, Microsoft.Extensions.Logging.ILogger<WebProfilerComponent> logger)
         {
             _profile = true;
 

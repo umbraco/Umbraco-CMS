@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Editors;
 
@@ -13,9 +13,9 @@ namespace Umbraco.Web.BackOffice.Controllers
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     public class HelpController : UmbracoAuthorizedJsonController
     {
-        private readonly ILogger _logger;
+        private readonly ILogger<HelpController> _logger;
 
-        public HelpController(ILogger logger)
+        public HelpController(ILogger<HelpController> logger)
         {
             _logger = logger;
         }

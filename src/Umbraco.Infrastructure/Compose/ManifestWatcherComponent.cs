@@ -1,8 +1,8 @@
 ﻿using System.IO;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
 using Umbraco.Net;
 
@@ -11,7 +11,7 @@ namespace Umbraco.Core.Compose
     public sealed class ManifestWatcherComponent : IComponent
     {
         private readonly IHostingEnvironment _hosting;
-        private readonly ILogger _logger;
+        private readonly ILoggerFactory _loggerFactory;
         private readonly IIOHelper _ioHelper;
         private readonly IUmbracoApplicationLifetime _umbracoApplicationLifetime;
 
@@ -19,10 +19,10 @@ namespace Umbraco.Core.Compose
         // package.manifest chances and restarts the application on any change
         private ManifestWatcher _mw;
 
-        public ManifestWatcherComponent(IHostingEnvironment hosting, ILogger logger, IIOHelper ioHelper, IUmbracoApplicationLifetime umbracoApplicationLifetime)
+        public ManifestWatcherComponent(IHostingEnvironment hosting, ILoggerFactory loggerFactory, IIOHelper ioHelper, IUmbracoApplicationLifetime umbracoApplicationLifetime)
         {
             _hosting = hosting;
-            _logger = logger;
+            _loggerFactory = loggerFactory;
             _ioHelper = ioHelper;
             _umbracoApplicationLifetime = umbracoApplicationLifetime;
         }
@@ -37,7 +37,7 @@ namespace Umbraco.Core.Compose
             var appPlugins = _ioHelper.MapPath("~/App_Plugins/");
             if (Directory.Exists(appPlugins) == false) return;
 
-            _mw = new ManifestWatcher(_logger, _umbracoApplicationLifetime);
+            _mw = new ManifestWatcher(_loggerFactory.CreateLogger<ManifestWatcher>(), _umbracoApplicationLifetime);
             _mw.Start(Directory.GetDirectories(appPlugins));
         }
 

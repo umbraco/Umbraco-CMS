@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
@@ -12,7 +13,6 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Install;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence;
@@ -78,7 +78,7 @@ namespace Umbraco.Tests.Services
                 ScopeProvider,
                 documentRepository, mediaRepository, memberRepository,
                 DefaultCultureAccessor,
-                new DatabaseDataSource(Mock.Of<ILogger>()),
+                new DatabaseDataSource(Mock.Of<ILogger<DatabaseDataSource>>()),
                 Microsoft.Extensions.Options.Options.Create(globalSettings ?? new GlobalSettingsBuilder().Build()),
                 Factory.GetInstance<IEntityXmlSerializer>(),
                 Mock.Of<IPublishedModelFactory>(),

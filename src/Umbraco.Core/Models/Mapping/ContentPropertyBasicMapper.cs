@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
@@ -17,11 +17,11 @@ namespace Umbraco.Web.Models.Mapping
         where TDestination : ContentPropertyBasic, new()
     {
         private readonly IEntityService _entityService;
-        private readonly ILogger _logger;
+        private readonly ILogger<ContentPropertyBasicMapper<TDestination>> _logger;
         private readonly PropertyEditorCollection _propertyEditors;
         protected IDataTypeService DataTypeService { get; }
 
-        public ContentPropertyBasicMapper(IDataTypeService dataTypeService, IEntityService entityService, ILogger logger, PropertyEditorCollection propertyEditors)
+        public ContentPropertyBasicMapper(IDataTypeService dataTypeService, IEntityService entityService, ILogger<ContentPropertyBasicMapper<TDestination>> logger, PropertyEditorCollection propertyEditors)
         {
             _logger = logger;
             _propertyEditors = propertyEditors;

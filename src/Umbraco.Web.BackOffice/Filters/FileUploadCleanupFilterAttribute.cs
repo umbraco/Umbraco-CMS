@@ -5,8 +5,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.WebApi.Filters
@@ -36,10 +36,10 @@ namespace Umbraco.Web.WebApi.Filters
 
         private class FileUploadCleanupFilter : IAsyncActionFilter
         {
-            private readonly ILogger _logger;
+            private readonly ILogger<FileUploadCleanupFilter> _logger;
             private readonly bool _incomingModel;
 
-            public FileUploadCleanupFilter(ILogger logger, bool incomingModel)
+            public FileUploadCleanupFilter(ILogger<FileUploadCleanupFilter> logger, bool incomingModel)
             {
                 _logger = logger ?? throw new ArgumentNullException(nameof(logger));
                 _incomingModel = incomingModel;

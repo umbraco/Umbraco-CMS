@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Routing;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
@@ -13,7 +14,6 @@ using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Events;
 using Umbraco.Core.Install;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence.Repositories;
@@ -106,7 +106,7 @@ namespace Umbraco.Tests.Scoping
                 ScopeProvider,
                 documentRepository, mediaRepository, memberRepository,
                 DefaultCultureAccessor,
-                new DatabaseDataSource(Mock.Of<ILogger>()),
+                new DatabaseDataSource(Mock.Of<ILogger<DatabaseDataSource>>()),
                 Microsoft.Extensions.Options.Options.Create(globalSettings ?? new GlobalSettingsBuilder().Build()),
                 Factory.GetInstance<IEntityXmlSerializer>(),
                 new NoopPublishedModelFactory(),
@@ -148,7 +148,7 @@ namespace Umbraco.Tests.Scoping
             var umbracoContext = GetUmbracoContextNu("http://example.com/", setSingleton: true);
 
             // wire cache refresher
-            _distributedCacheBinder = new DistributedCacheBinder(new DistributedCache(Current.ServerMessenger, Current.CacheRefreshers), Mock.Of<IUmbracoContextFactory>(), Mock.Of<ILogger>());
+            _distributedCacheBinder = new DistributedCacheBinder(new DistributedCache(Current.ServerMessenger, Current.CacheRefreshers), Mock.Of<IUmbracoContextFactory>(), Mock.Of<ILogger<DistributedCacheBinder>>());
             _distributedCacheBinder.BindEvents(true);
 
             // create document type, document

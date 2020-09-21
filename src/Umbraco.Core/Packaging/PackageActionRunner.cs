@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Xml.Linq;
-using Umbraco.Core.Logging;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.PackageActions;
 
 namespace Umbraco.Core.Packaging
@@ -11,10 +11,10 @@ namespace Umbraco.Core.Packaging
     /// </summary>
     public class PackageActionRunner : IPackageActionRunner
     {
-        private readonly ILogger _logger;
+        private readonly ILogger<PackageActionRunner> _logger;
         private readonly PackageActionCollection _packageActions;
 
-        public PackageActionRunner(ILogger logger, PackageActionCollection packageActions)
+        public PackageActionRunner(ILogger<PackageActionRunner> logger, PackageActionCollection packageActions)
         {
             _logger = logger;
             _packageActions = packageActions;

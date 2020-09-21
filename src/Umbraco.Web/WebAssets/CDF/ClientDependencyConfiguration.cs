@@ -6,11 +6,11 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Web;
 using System.Xml.Linq;
+using Microsoft.Extensions.Logging;
 using ClientDependency.Core.CompositeFiles.Providers;
 using ClientDependency.Core.Config;
 using Semver;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 
 namespace Umbraco.Web.WebAssets.CDF
 {
@@ -19,7 +19,7 @@ namespace Umbraco.Web.WebAssets.CDF
     /// </summary>
     public class ClientDependencyConfiguration
     {
-        private readonly ILogger _logger;
+        private readonly ILogger<ClientDependencyConfiguration> _logger;
         private readonly string _fileName;
 
         private string FileMapDefaultFolder
@@ -28,7 +28,7 @@ namespace Umbraco.Web.WebAssets.CDF
             set => XmlFileMapper.FileMapDefaultFolder = value;
         }
 
-        public ClientDependencyConfiguration(ILogger logger, IIOHelper ioHelper)
+        public ClientDependencyConfiguration(ILogger<ClientDependencyConfiguration> logger, IIOHelper ioHelper)
         {
             if (logger == null) throw new ArgumentNullException("logger");
             _logger = logger;

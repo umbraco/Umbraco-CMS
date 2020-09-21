@@ -5,11 +5,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Semver;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Packaging;
 using Umbraco.Net;
 using Umbraco.Core.Packaging;
@@ -37,7 +37,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IUmbracoApplicationLifetime _umbracoApplicationLifetime;
         private readonly IRuntimeMinifier _runtimeMinifier;
         private readonly IPackagingService _packagingService;
-        private readonly ILogger _logger;
+        private readonly ILogger<PackageInstallController> _logger;
         private readonly IWebSecurity _webSecurity;
         private readonly ILocalizedTextService _localizedTextService;
 
@@ -47,7 +47,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             IUmbracoApplicationLifetime umbracoApplicationLifetime,
             IRuntimeMinifier runtimeMinifier,
             IPackagingService packagingService,
-            ILogger logger,
+            ILogger<PackageInstallController> logger,
             IWebSecurity webSecurity,
             ILocalizedTextService localizedTextService)
         {

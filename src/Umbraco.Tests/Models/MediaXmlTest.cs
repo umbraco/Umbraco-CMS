@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Xml.Linq;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
@@ -31,12 +32,12 @@ namespace Umbraco.Tests.Models
 
             // reference, so static ctor runs, so event handlers register
             // and then, this will reset the width, height... because the file does not exist, of course ;-(
-            var logger = Mock.Of<ILogger>();
+            var loggerFactory = NullLoggerFactory.Instance;
             var scheme = Mock.Of<IMediaPathScheme>();
             var contentSettings = new ContentSettingsBuilder().Build();
 
-            var mediaFileSystem = new MediaFileSystem(Mock.Of<IFileSystem>(), scheme, logger, ShortStringHelper);
-            var ignored = new FileUploadPropertyEditor(NullLoggerFactory.Instance, mediaFileSystem, Microsoft.Extensions.Options.Options.Create(contentSettings), DataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper);
+            var mediaFileSystem = new MediaFileSystem(Mock.Of<IFileSystem>(), scheme, loggerFactory.CreateLogger<MediaFileSystem>(), ShortStringHelper);
+            var ignored = new FileUploadPropertyEditor(loggerFactory, mediaFileSystem, Microsoft.Extensions.Options.Options.Create(contentSettings), DataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper);
 
             var media = MockedMedia.CreateMediaImage(mediaType, -1);
             media.WriterId = -1; // else it's zero and that's not a user and it breaks the tests

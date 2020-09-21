@@ -1,6 +1,6 @@
 using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Routing
@@ -15,10 +15,10 @@ namespace Umbraco.Web.Routing
     public class ContentFinderByRedirectUrl : IContentFinder
     {
         private readonly IRedirectUrlService _redirectUrlService;
-        private readonly ILogger _logger;
+        private readonly ILogger<ContentFinderByRedirectUrl> _logger;
         private readonly IPublishedUrlProvider _publishedUrlProvider;
 
-        public ContentFinderByRedirectUrl(IRedirectUrlService redirectUrlService, ILogger logger, IPublishedUrlProvider publishedUrlProvider)
+        public ContentFinderByRedirectUrl(IRedirectUrlService redirectUrlService, ILogger<ContentFinderByRedirectUrl> logger, IPublishedUrlProvider publishedUrlProvider)
         {
             _redirectUrlService = redirectUrlService;
             _logger = logger;

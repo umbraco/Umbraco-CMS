@@ -2,9 +2,9 @@ using System.Globalization;
 using System.Linq;
 using Examine;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 
@@ -15,13 +15,13 @@ namespace Umbraco.Web.Routing
     /// </summary>
     public class ContentFinderByConfigured404 : IContentLastChanceFinder
     {
-        private readonly ILogger _logger;
+        private readonly ILogger<ContentFinderByConfigured404> _logger;
         private readonly IEntityService _entityService;
         private readonly ContentSettings _contentSettings;
         private readonly IExamineManager _examineManager;
 
         public ContentFinderByConfigured404(
-            ILogger logger,
+            ILogger<ContentFinderByConfigured404> logger,
             IEntityService entityService,
             IOptions<ContentSettings> contentConfigSettings,
             IExamineManager examineManager)

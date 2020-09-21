@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
@@ -13,9 +13,9 @@ namespace Umbraco.Web.Models.Mapping
     public class MacroMapDefinition : IMapDefinition
     {
         private readonly ParameterEditorCollection _parameterEditors;
-        private readonly ILogger _logger;
+        private readonly ILogger<MacroMapDefinition> _logger;
 
-        public MacroMapDefinition(ParameterEditorCollection parameterEditors, ILogger logger)
+        public MacroMapDefinition(ParameterEditorCollection parameterEditors, ILogger<MacroMapDefinition> logger)
         {
             _parameterEditors = parameterEditors;
             _logger = logger;

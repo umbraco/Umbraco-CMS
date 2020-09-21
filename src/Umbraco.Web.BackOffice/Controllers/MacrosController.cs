@@ -5,8 +5,8 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Strings;
 using Umbraco.Web.Models.ContentEditing;
@@ -33,7 +33,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IMacroService _macroService;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly IWebSecurity _webSecurity;
-        private readonly ILogger _logger;
+        private readonly ILogger<MacrosController> _logger;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly UmbracoMapper _umbracoMapper;
 
@@ -42,7 +42,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             IMacroService macroService,
             IShortStringHelper shortStringHelper,
             IWebSecurity webSecurity,
-            ILogger logger,
+            ILogger<MacrosController> logger,
             IHostingEnvironment hostingEnvironment,
             UmbracoMapper umbracoMapper
             )

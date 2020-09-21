@@ -25,7 +25,6 @@
  using Umbraco.Web.BackOffice.ModelBinders;
  using Umbraco.Web.Security;
  using DataType = Umbraco.Core.Models.DataType;
- using ILogger = Umbraco.Core.Logging.ILogger;
 
  namespace Umbraco.Tests.Web.Validation
  {
@@ -138,7 +137,7 @@
          [Test]
          public void Validating_ContentItemSave()
          {
-             var logger = Services.GetRequiredService<ILogger>();
+             var logger = Services.GetRequiredService<ILogger<ContentSaveModelValidator>>();
              var webSecurity = Services.GetRequiredService<IWebSecurity>();
              var localizedTextService = Services.GetRequiredService<ILocalizedTextService>();
              var propertyValidationService = Services.GetRequiredService<IPropertyValidationService>();

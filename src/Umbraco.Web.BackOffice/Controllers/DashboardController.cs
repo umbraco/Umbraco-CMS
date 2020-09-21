@@ -9,8 +9,8 @@ using System;
 using System.Linq;
 using System.Text;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
@@ -34,7 +34,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     {
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly AppCaches _appCaches;
-        private readonly ILogger _logger;
+        private readonly ILogger<DashboardController> _logger;
         private readonly IDashboardService _dashboardService;
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly IShortStringHelper _shortStringHelper;
@@ -47,7 +47,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             ISqlContext sqlContext,
             ServiceContext services,
             AppCaches appCaches,
-            ILogger logger,
+            ILogger<DashboardController> logger,
             IRuntimeState runtimeState,
             IDashboardService dashboardService,
             IUmbracoVersion umbracoVersion,

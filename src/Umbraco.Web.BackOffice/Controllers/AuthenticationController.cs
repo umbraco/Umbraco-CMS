@@ -8,11 +8,11 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.BackOffice;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
@@ -47,7 +47,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly UmbracoMapper _umbracoMapper;
         private readonly GlobalSettings _globalSettings;
         private readonly SecuritySettings _securitySettings;
-        private readonly ILogger _logger;
+        private readonly ILogger<AuthenticationController> _logger;
         private readonly IIpResolver _ipResolver;
         private readonly UserPasswordConfigurationSettings _passwordConfiguration;
         private readonly IEmailSender _emailSender;
@@ -66,7 +66,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             UmbracoMapper umbracoMapper,
             IOptions<GlobalSettings> globalSettings,
             IOptions<SecuritySettings> securitySettings,
-            ILogger logger,
+            ILogger<AuthenticationController> logger,
             IIpResolver ipResolver,
             IOptions<UserPasswordConfigurationSettings> passwordConfiguration,
             IEmailSender emailSender,

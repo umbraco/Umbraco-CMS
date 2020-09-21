@@ -2,11 +2,11 @@
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.Logging;
 using Umbraco.Core.WebAssets;
 using Umbraco.Extensions;
 using Umbraco.Web.Common.Filters;
@@ -31,7 +31,7 @@ namespace Umbraco.Web.Common.Install
         private readonly GlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IUmbracoVersion _umbracoVersion;
-        private readonly ILogger _logger;
+        private readonly ILogger<InstallController> _logger;
         private readonly LinkGenerator _linkGenerator;
         private readonly IRuntimeMinifier _runtimeMinifier;
 
@@ -43,7 +43,7 @@ namespace Umbraco.Web.Common.Install
             IRuntimeMinifier runtimeMinifier,
             IHostingEnvironment hostingEnvironment,
             IUmbracoVersion umbracoVersion,
-            ILogger logger,
+            ILogger<InstallController> logger,
             LinkGenerator linkGenerator)
         {
             _webSecurity = webSecurity;
@@ -115,7 +115,7 @@ namespace Umbraco.Web.Common.Install
         private static bool _reported;
         private static RuntimeLevel _reportedLevel;
 
-        private static void ReportRuntime(ILogger logger, RuntimeLevel level, string message)
+        private static void ReportRuntime(ILogger<InstallController> logger, RuntimeLevel level, string message)
         {
             if (_reported && _reportedLevel == level) return;
             _reported = true;
