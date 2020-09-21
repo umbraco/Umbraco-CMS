@@ -283,8 +283,8 @@ namespace Umbraco.Web.PublishedModels
 
         [TestCase("int", typeof(int))]
         [TestCase("global::System.Collections.Generic.IEnumerable<int>", typeof(IEnumerable<int>))]
-        [TestCase("global::Umbraco.Tests.ModelsBuilder.BuilderTestsClass1", typeof(BuilderTestsClass1))]
-        [TestCase("global::Umbraco.Tests.ModelsBuilder.BuilderTests.Class1", typeof(Class1))]
+        [TestCase("global::Umbraco.Tests.UnitTests.Umbraco.ModelsBuilder.Embedded.BuilderTestsClass1", typeof(BuilderTestsClass1))]
+        [TestCase("global::Umbraco.Tests.UnitTests.Umbraco.ModelsBuilder.Embedded.BuilderTests.Class1", typeof(Class1))]
         public void WriteClrType(string expected, Type input)
         {
             // note - these assertions differ from the original tests in MB because in the embedded version, the result of Builder.IsAmbiguousSymbol is always true
@@ -299,15 +299,15 @@ namespace Umbraco.Web.PublishedModels
 
         [TestCase("int", typeof(int))]
         [TestCase("global::System.Collections.Generic.IEnumerable<int>", typeof(IEnumerable<int>))]
-        [TestCase("global::Umbraco.Tests.ModelsBuilder.BuilderTestsClass1", typeof(BuilderTestsClass1))]
-        [TestCase("global::Umbraco.Tests.ModelsBuilder.BuilderTests.Class1", typeof(Class1))]
+        [TestCase("global::Umbraco.Tests.UnitTests.Umbraco.ModelsBuilder.Embedded.BuilderTestsClass1", typeof(BuilderTestsClass1))]
+        [TestCase("global::Umbraco.Tests.UnitTests.Umbraco.ModelsBuilder.Embedded.BuilderTests.Class1", typeof(Class1))]
         public void WriteClrTypeUsing(string expected, Type input)
         {
             // note - these assertions differ from the original tests in MB because in the embedded version, the result of Builder.IsAmbiguousSymbol is always true
             // which means global:: syntax will be applied to most things
 
             var builder = new TextBuilder();
-            builder.Using.Add("Umbraco.Tests.ModelsBuilder");
+            builder.Using.Add("Umbraco.Tests.UnitTests.Umbraco.ModelsBuilder");
             builder.ModelsNamespaceForTests = "ModelsNamespace";
             var sb = new StringBuilder();
             builder.WriteClrType(sb, input);
@@ -319,7 +319,7 @@ namespace Umbraco.Web.PublishedModels
         {
             var builder = new TextBuilder();
             builder.Using.Add("System.Text");
-            builder.ModelsNamespaceForTests = "Umbraco.Tests.ModelsBuilder.Models";
+            builder.ModelsNamespaceForTests = "Umbraco.Tests.UnitTests.Umbraco.ModelsBuilder.Models";
             var sb = new StringBuilder();
             builder.WriteClrType(sb, typeof(StringBuilder));
 
@@ -333,7 +333,7 @@ namespace Umbraco.Web.PublishedModels
         public void WriteClrTypeAnother_WithoutUsing()
         {
             var builder = new TextBuilder();
-            builder.ModelsNamespaceForTests = "Umbraco.Tests.ModelsBuilder.Models";
+            builder.ModelsNamespaceForTests = "Umbraco.Tests.UnitTests.Umbraco.ModelsBuilder.Models";
             var sb = new StringBuilder();
             builder.WriteClrType(sb, typeof(StringBuilder));
             Assert.AreEqual("global::System.Text.StringBuilder", sb.ToString());
@@ -344,7 +344,7 @@ namespace Umbraco.Web.PublishedModels
         {
             var builder = new TextBuilder();
             builder.Using.Add("System.Text");
-            builder.Using.Add("Umbraco.Tests.ModelsBuilder");
+            builder.Using.Add("Umbraco.Tests.UnitTests.Umbraco.ModelsBuilder.Embedded");
             builder.ModelsNamespaceForTests = "SomeRandomNamespace";
             var sb = new StringBuilder();
             builder.WriteClrType(sb, typeof(global::System.Text.ASCIIEncoding));
@@ -360,7 +360,7 @@ namespace Umbraco.Web.PublishedModels
         {
             var builder = new TextBuilder();
             builder.Using.Add("System.Text");
-            builder.Using.Add("Umbraco.Tests.ModelsBuilder");
+            builder.Using.Add("Umbraco.Tests.UnitTests.Umbraco.ModelsBuilder.Embedded");
             builder.ModelsNamespaceForTests = "SomeBorkedNamespace";
             var sb = new StringBuilder();
             builder.WriteClrType(sb, typeof(global::System.Text.ASCIIEncoding));
@@ -376,7 +376,7 @@ namespace Umbraco.Web.PublishedModels
         {
             var builder = new TextBuilder();
             builder.Using.Add("System.Text");
-            builder.Using.Add("Umbraco.Tests.ModelsBuilder");
+            builder.Using.Add("Umbraco.Tests.UnitTests.Umbraco.ModelsBuilder.Embedded");
             builder.ModelsNamespaceForTests = "SomeRandomNamespace";
             var sb = new StringBuilder();
             builder.WriteClrType(sb, typeof(ASCIIEncoding));
@@ -384,7 +384,7 @@ namespace Umbraco.Web.PublishedModels
             // note - these assertions differ from the original tests in MB because in the embedded version, the result of Builder.IsAmbiguousSymbol is always true
             // which means global:: syntax will be applied to most things
 
-            Assert.AreEqual("global::Umbraco.Tests.ModelsBuilder.ASCIIEncoding", sb.ToString());
+            Assert.AreEqual("global::Umbraco.Tests.UnitTests.Umbraco.ModelsBuilder.Embedded.ASCIIEncoding", sb.ToString());
         }
 
         [Test]
@@ -392,15 +392,15 @@ namespace Umbraco.Web.PublishedModels
         {
             var builder = new TextBuilder();
             builder.Using.Add("System.Text");
-            builder.Using.Add("Umbraco.Tests.ModelsBuilder");
-            builder.ModelsNamespaceForTests = "Umbraco.Tests.ModelsBuilder.Models";
+            builder.Using.Add("Umbraco.Tests.UnitTests.Umbraco.ModelsBuilder.Embedded");
+            builder.ModelsNamespaceForTests = "Umbraco.Tests.UnitTests.Umbraco.ModelsBuilder.Models";
             var sb = new StringBuilder();
             builder.WriteClrType(sb, typeof(ASCIIEncoding));
 
             // note - these assertions differ from the original tests in MB because in the embedded version, the result of Builder.IsAmbiguousSymbol is always true
             // which means global:: syntax will be applied to most things
 
-            Assert.AreEqual("global::Umbraco.Tests.ModelsBuilder.ASCIIEncoding", sb.ToString());
+            Assert.AreEqual("global::Umbraco.Tests.UnitTests.Umbraco.ModelsBuilder.Embedded.ASCIIEncoding", sb.ToString());
         }
 
         [Test]
@@ -408,7 +408,7 @@ namespace Umbraco.Web.PublishedModels
         {
             var builder = new TextBuilder();
             builder.Using.Add("System.Text");
-            builder.Using.Add("Umbraco.Tests.ModelsBuilder");
+            builder.Using.Add("Umbraco.Tests.UnitTests.Umbraco.ModelsBuilder.Embedded");
             builder.ModelsNamespaceForTests = "SomeRandomNamespace";
             var sb = new StringBuilder();
             builder.WriteClrType(sb, typeof(ASCIIEncoding.Nested));
@@ -416,7 +416,7 @@ namespace Umbraco.Web.PublishedModels
             // note - these assertions differ from the original tests in MB because in the embedded version, the result of Builder.IsAmbiguousSymbol is always true
             // which means global:: syntax will be applied to most things
 
-            Assert.AreEqual("global::Umbraco.Tests.ModelsBuilder.ASCIIEncoding.Nested", sb.ToString());
+            Assert.AreEqual("global::Umbraco.Tests.UnitTests.Umbraco.ModelsBuilder.Embedded.ASCIIEncoding.Nested", sb.ToString());
         }
 
         public class Class1 { }

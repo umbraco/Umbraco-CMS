@@ -19,7 +19,7 @@ namespace Umbraco.Core.Configuration.Models.Validation
         private bool ValidateSmtpSetting(SmtpSettings value, out string message)
         {
             return ValidateOptionalEntry("Global:Smtp", value, "A valid From email address is required", out message) &&
-                ValidateStringIsOneOfEnumValues("Global:Smtp:DeliveryMethod", value.DeliveryMethod, typeof(SmtpDeliveryMethod), out message);
+                (value == null || ValidateStringIsOneOfEnumValues("Global:Smtp:DeliveryMethod", value.DeliveryMethod, typeof(SmtpDeliveryMethod), out message));
         }
     }
 }
