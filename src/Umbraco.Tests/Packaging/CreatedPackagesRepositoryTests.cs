@@ -39,7 +39,7 @@ namespace Umbraco.Tests.Packaging
             ServiceContext.ContentService, ServiceContext.ContentTypeService, ServiceContext.DataTypeService,
             ServiceContext.FileService, ServiceContext.MacroService, ServiceContext.LocalizationService,
             HostingEnvironment,
-            Factory.GetInstance<IEntityXmlSerializer>(), Logger,
+            Factory.GetInstance<IEntityXmlSerializer>(), LoggerFactory_,
             UmbracoVersion,
             Microsoft.Extensions.Options.Options.Create(new GlobalSettingsBuilder().Build()),
             "createdPackages.config",

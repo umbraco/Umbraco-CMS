@@ -8,9 +8,7 @@ using System.Xml.Linq;
 using Umbraco.Composing;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Logging;
 using Microsoft.Extensions.Logging;
-using ILogger = Umbraco.Core.Logging.ILogger;
 
 namespace Umbraco.Core.Services.Implement
 {
@@ -19,7 +17,7 @@ namespace Umbraco.Core.Services.Implement
     /// </summary>
     public class LocalizedTextServiceFileSources
     {
-        private readonly ILogger _logger;
+        private readonly ILogger<LocalizedTextServiceFileSources> _logger;
         private readonly IAppPolicyCache _cache;
         private readonly IEnumerable<LocalizedTextServiceSupplementaryFileSource> _supplementFileSources;
         private readonly DirectoryInfo _fileSourceFolder;
@@ -39,7 +37,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="fileSourceFolder"></param>
         /// <param name="supplementFileSources"></param>
         public LocalizedTextServiceFileSources(
-            ILogger logger,
+            ILogger<LocalizedTextServiceFileSources> logger,
             AppCaches appCaches,
             DirectoryInfo fileSourceFolder,
             IEnumerable<LocalizedTextServiceSupplementaryFileSource> supplementFileSources)
@@ -53,7 +51,7 @@ namespace Umbraco.Core.Services.Implement
 
             if (fileSourceFolder.Exists == false)
             {
-                Current.Logger.LogWarning("The folder does not exist: {FileSourceFolder}, therefore no sources will be discovered", fileSourceFolder.FullName);
+                _logger.LogWarning("The folder does not exist: {FileSourceFolder}, therefore no sources will be discovered", fileSourceFolder.FullName);
             }
             else
             {
@@ -101,7 +99,7 @@ namespace Umbraco.Core.Services.Implement
                                         }
                                         catch (CultureNotFoundException)
                                         {
-                                            Current.Logger.LogWarning("The culture {CultureValue} found in the file {CultureFile} is not a valid culture", cultureVal, fileInfo.FullName);
+                                            _logger.LogWarning("The culture {CultureValue} found in the file {CultureFile} is not a valid culture", cultureVal, fileInfo.FullName);
                                             //If the culture in the file is invalid, we'll just hope the file name is a valid culture below, otherwise
                                             // an exception will be thrown.
                                         }
@@ -142,7 +140,7 @@ namespace Umbraco.Core.Services.Implement
         /// <summary>
         /// Constructor
         /// </summary>
-        public LocalizedTextServiceFileSources(ILogger logger, AppCaches appCaches, DirectoryInfo fileSourceFolder)
+        public LocalizedTextServiceFileSources(ILogger<LocalizedTextServiceFileSources> logger, AppCaches appCaches, DirectoryInfo fileSourceFolder)
             : this(logger, appCaches, fileSourceFolder, Enumerable.Empty<LocalizedTextServiceSupplementaryFileSource>())
         { }
 

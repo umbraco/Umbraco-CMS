@@ -175,22 +175,22 @@ namespace Umbraco.Tests.Testing
             // FIXME: align to runtimes & components - don't redo everything here !!!! Yes this is getting painful
 
             var (logger, profiler) = GetLoggers(Options.Logger);
-            var loggerFactoy = GetLoggerFactory(Options.Logger);
-            var msLogger = loggerFactoy.CreateLogger("msLogger");
-            var proflogger = new ProfilingLogger(loggerFactoy.CreateLogger("ProfilingLogger"), profiler);
+            var loggerFactory = GetLoggerFactory(Options.Logger);
+            var msLogger = loggerFactory.CreateLogger("msLogger");
+            var proflogger = new ProfilingLogger(loggerFactory.CreateLogger("ProfilingLogger"), profiler);
             IOHelper = TestHelper.IOHelper;
 
-            TypeFinder = new TypeFinder(loggerFactoy.CreateLogger<TypeFinder>(), new DefaultUmbracoAssemblyProvider(GetType().Assembly), new VaryingRuntimeHash());
+            TypeFinder = new TypeFinder(loggerFactory.CreateLogger<TypeFinder>(), new DefaultUmbracoAssemblyProvider(GetType().Assembly), new VaryingRuntimeHash());
             var appCaches = GetAppCaches();
             var globalSettings = new GlobalSettingsBuilder().Build();
             var settings = new WebRoutingSettings();
 
-            IBackOfficeInfo backOfficeInfo = new AspNetBackOfficeInfo(globalSettings, IOHelper, loggerFactoy.CreateLogger<AspNetBackOfficeInfo>(), Microsoft.Extensions.Options.Options.Create(settings));
+            IBackOfficeInfo backOfficeInfo = new AspNetBackOfficeInfo(globalSettings, IOHelper, loggerFactory.CreateLogger<AspNetBackOfficeInfo>(), Microsoft.Extensions.Options.Options.Create(settings));
             IIpResolver ipResolver = new AspNetIpResolver();
             UmbracoVersion = new UmbracoVersion();
 
 
-            LocalizedTextService = new LocalizedTextService(new Dictionary<CultureInfo, Lazy<XDocument>>(), logger);
+            LocalizedTextService = new LocalizedTextService(new Dictionary<CultureInfo, Lazy<XDocument>>(), loggerFactory.CreateLogger<LocalizedTextService>());
             var typeLoader = GetTypeLoader(IOHelper, TypeFinder, appCaches.RuntimeCache, HostingEnvironment, msLogger, proflogger, Options.TypeLoader);
 
             var register = TestHelper.GetRegister();

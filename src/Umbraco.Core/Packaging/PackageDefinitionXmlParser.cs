@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Packaging;
 
 namespace Umbraco.Core.Packaging
@@ -13,10 +13,10 @@ namespace Umbraco.Core.Packaging
     /// </summary>
     public class PackageDefinitionXmlParser
     {
-        private readonly ILogger _logger;
+        private readonly ILogger<PackageDefinitionXmlParser> _logger;
         private readonly IUmbracoVersion _umbracoVersion;
 
-        public PackageDefinitionXmlParser(ILogger logger, IUmbracoVersion umbracoVersion)
+        public PackageDefinitionXmlParser(ILogger<PackageDefinitionXmlParser> logger, IUmbracoVersion umbracoVersion)
         {
             _logger = logger;
             _umbracoVersion = umbracoVersion;

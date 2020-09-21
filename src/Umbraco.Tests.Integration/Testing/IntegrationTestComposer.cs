@@ -63,6 +63,7 @@ namespace Umbraco.Tests.Integration.Testing
         {
             var globalSettings = factory.GetInstance<IOptions<GlobalSettings>>();
             var logger = factory.GetInstance<ILogger>();
+            var loggerFactory = factory.GetInstance<ILoggerFactory>();
             var appCaches = factory.GetInstance<AppCaches>();
 
             var localizedTextService = new LocalizedTextService(
@@ -78,12 +79,12 @@ namespace Umbraco.Tests.Integration.Testing
                     var mainLangFolder = new DirectoryInfo(Path.Combine(netcoreUI.FullName, globalSettings.Value.UmbracoPath.TrimStart("~/"), "config", "lang"));
 
                     return new LocalizedTextServiceFileSources(
-                        logger,
+                        loggerFactory.CreateLogger<LocalizedTextServiceFileSources>(),
                         appCaches,
                         mainLangFolder);
 
                 }),
-                logger);
+                loggerFactory.CreateLogger<LocalizedTextService>());
 
             return localizedTextService;
         }
