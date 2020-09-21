@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.Net.Mail;
 using Umbraco.Core.Configuration.Models.Validation;
 
@@ -16,7 +17,18 @@ namespace Umbraco.Core.Configuration.Models
 
         public string PickupDirectoryLocation { get; set; }
 
-        public SmtpDeliveryMethod DeliveryMethod { get; set; }
+        // See notes on ContentSettings.MacroErrors
+        internal string DeliveryMethod { get; set; }
+
+        public SmtpDeliveryMethod DeliveryMethodValue
+        {
+            get
+            {
+                return Enum.TryParse<SmtpDeliveryMethod>(DeliveryMethod, true, out var value)
+                    ? value
+                    : SmtpDeliveryMethod.Network;
+            }
+        }
 
         public string Username { get; set; }
 

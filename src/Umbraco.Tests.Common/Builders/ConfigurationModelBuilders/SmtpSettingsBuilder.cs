@@ -17,7 +17,7 @@ namespace Umbraco.Tests.Common.Builders
         private string _host;
         private int? _port;
         private string _pickupDirectoryLocation;
-        private SmtpDeliveryMethod? _deliveryMethod;
+        private string _deliveryMethod;
         private string _username;
         private string _password;
 
@@ -43,7 +43,7 @@ namespace Umbraco.Tests.Common.Builders
             return this;
         }
 
-        public SmtpSettingsBuilder<TParent> WithPost(int port)
+        public SmtpSettingsBuilder<TParent> WithPort(int port)
         {
             _port = port;
             return this;
@@ -61,9 +61,15 @@ namespace Umbraco.Tests.Common.Builders
             return this;
         }
 
-        public SmtpSettingsBuilder<TParent> WithDeliveryMethod(SmtpDeliveryMethod deliveryMethod)
+        public SmtpSettingsBuilder<TParent> WithDeliveryMethod(string deliveryMethod)
         {
             _deliveryMethod = deliveryMethod;
+            return this;
+        }
+
+        public SmtpSettingsBuilder<TParent> WithDeliveryMethod(SmtpDeliveryMethod deliveryMethod)
+        {
+            _deliveryMethod = deliveryMethod.ToString();
             return this;
         }
 
@@ -73,7 +79,7 @@ namespace Umbraco.Tests.Common.Builders
             var host = _host ?? null;
             var port = _port ?? 25;
             var pickupDirectoryLocation = _pickupDirectoryLocation ?? null;
-            var deliveryMethod = _deliveryMethod ?? SmtpDeliveryMethod.Network;
+            var deliveryMethod = _deliveryMethod ?? SmtpDeliveryMethod.Network.ToString();
             var username = _username ?? null;
             var password = _password ?? null;
 

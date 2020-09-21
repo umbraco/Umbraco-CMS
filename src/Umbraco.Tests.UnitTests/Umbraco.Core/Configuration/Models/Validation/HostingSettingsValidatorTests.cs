@@ -8,7 +8,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Configuration.Models.Validation
     public class HostingSettingsValidatorTests
     {
         [Test]
-        public void ReturnsSuccessResponseForValidConfiguration()
+        public void Returns_Success_ForValid_Configuration()
         {
             var validator = new HostingSettingsValidator();
             var options = new HostingSettingsBuilder().Build();
@@ -17,7 +17,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Configuration.Models.Validation
         }
 
         [Test]
-        public void ReturnsFailResponseForConfigurationWithInvalidLocalTempStorageLocationField()
+        public void Returns_Fail_For_Configuration_With_Invalid_LocalTempStorage_Field()
         {
             var validator = new HostingSettingsValidator();
             var options = new HostingSettingsBuilder().WithLocalTempStorageLocation("invalid").Build();

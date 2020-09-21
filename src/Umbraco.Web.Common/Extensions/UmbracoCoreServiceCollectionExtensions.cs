@@ -138,7 +138,7 @@ namespace Umbraco.Extensions
             services.Configure<ContentSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "Content"), o => o.BindNonPublicProperties = true);
             services.Configure<CoreDebugSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "Core:Debug"));
             services.Configure<ExceptionFilterSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "ExceptionFilter"));
-            services.Configure<GlobalSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "Global"));
+            services.Configure<GlobalSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "Global"), o => o.BindNonPublicProperties = true);
             services.Configure<HealthChecksSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "HealthChecks"));
             services.Configure<HostingSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "Hosting"), o => o.BindNonPublicProperties = true);
             services.Configure<ImagingSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "Imaging"));
