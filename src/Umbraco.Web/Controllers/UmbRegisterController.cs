@@ -21,9 +21,9 @@ namespace Umbraco.Web.Controllers
         }
 
         public UmbRegisterController(IUmbracoContextAccessor umbracoContextAccessor,
-            IUmbracoDatabaseFactory databaseFactory, ServiceContext services, AppCaches appCaches, ILogger logger,
+            IUmbracoDatabaseFactory databaseFactory, ServiceContext services, AppCaches appCaches,
             IProfilingLogger profilingLogger, MembershipHelper membershipHelper)
-            : base(umbracoContextAccessor, databaseFactory, services, appCaches, logger, profilingLogger)
+            : base(umbracoContextAccessor, databaseFactory, services, appCaches, profilingLogger)
         {
             _membershipHelper = membershipHelper;
         }

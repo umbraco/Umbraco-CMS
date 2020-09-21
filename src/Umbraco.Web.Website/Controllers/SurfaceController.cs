@@ -39,8 +39,8 @@ namespace Umbraco.Web.Website.Controllers
             }
         }
 
-        protected SurfaceController(IUmbracoContextAccessor umbracoContextAccessor, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, AppCaches appCaches, ILogger logger, IProfilingLogger profilingLogger, IPublishedUrlProvider publishedUrlProvider)
-            : base(umbracoContextAccessor, databaseFactory, services, appCaches, logger, profilingLogger)
+        protected SurfaceController(IUmbracoContextAccessor umbracoContextAccessor, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger, IPublishedUrlProvider publishedUrlProvider)
+            : base(umbracoContextAccessor, databaseFactory, services, appCaches, profilingLogger)
         {
             _publishedUrlProvider = publishedUrlProvider;
         }

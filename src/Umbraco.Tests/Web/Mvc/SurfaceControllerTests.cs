@@ -182,7 +182,7 @@ namespace Umbraco.Tests.Web.Mvc
             private readonly IPublishedContentQuery _publishedContentQuery;
 
             public TestSurfaceController(IUmbracoContextAccessor umbracoContextAccessor, IPublishedContentQuery publishedContentQuery)
-                : base(umbracoContextAccessor, null, ServiceContext.CreatePartial(), AppCaches.Disabled, null, null)
+                : base(umbracoContextAccessor, null, ServiceContext.CreatePartial(), AppCaches.Disabled, null)
             {
                 _publishedContentQuery = publishedContentQuery;
             }
