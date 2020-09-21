@@ -21,7 +21,6 @@ using Umbraco.Web.Compose;
 using Umbraco.Web.PublishedCache.NuCache;
 using Umbraco.Web.Scheduling;
 using Umbraco.Web.Search;
-using ILogger = Umbraco.Core.Logging.ILogger;
 
 namespace Umbraco.Tests.Integration.Testing
 {
@@ -62,7 +61,6 @@ namespace Umbraco.Tests.Integration.Testing
         private ILocalizedTextService GetLocalizedTextService(IFactory factory)
         {
             var globalSettings = factory.GetInstance<IOptions<GlobalSettings>>();
-            var logger = factory.GetInstance<ILogger>();
             var loggerFactory = factory.GetInstance<ILoggerFactory>();
             var appCaches = factory.GetInstance<AppCaches>();
 

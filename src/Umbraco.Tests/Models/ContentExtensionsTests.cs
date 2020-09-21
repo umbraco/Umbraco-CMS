@@ -6,7 +6,6 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Composing.CompositionExtensions;
 using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
@@ -26,7 +25,6 @@ namespace Umbraco.Tests.Models
         {
             base.Compose();
 
-            Composition.Register(_ => Mock.Of<ILogger>());
             Composition.ComposeFileSystems();
 
             Composition.Register(_ => Mock.Of<IDataTypeService>());

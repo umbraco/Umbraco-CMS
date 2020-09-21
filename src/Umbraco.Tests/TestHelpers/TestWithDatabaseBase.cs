@@ -301,7 +301,7 @@ namespace Umbraco.Tests.TestHelpers
             {
                 using (var scope = ScopeProvider.CreateScope())
                 {
-                    var schemaHelper = new DatabaseSchemaCreator(scope.Database, LoggerFactory_.CreateLogger<DatabaseSchemaCreator>(), LoggerFactory_, UmbracoVersion);
+                    var schemaHelper = new DatabaseSchemaCreator(scope.Database, LoggerFactory.CreateLogger<DatabaseSchemaCreator>(), LoggerFactory, UmbracoVersion);
                     //Create the umbraco database and its base data
                     schemaHelper.InitializeDatabaseSchema();
 
@@ -344,7 +344,7 @@ namespace Umbraco.Tests.TestHelpers
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "Could not remove the old database file");
+                LoggerFactory.CreateLogger<TestWithDatabaseBase>().LogError(ex, "Could not remove the old database file");
 
                 // swallow this exception - that's because a sub class might require further teardown logic
                 onFail?.Invoke(ex);

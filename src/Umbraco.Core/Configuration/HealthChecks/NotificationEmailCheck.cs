@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Web.HealthCheck.Checks.Config
@@ -13,8 +13,8 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
     {
         private const string DefaultFromEmail = "your@email.here";
 
-        public NotificationEmailCheck(ILocalizedTextService textService, IHostingEnvironment hostingEnvironment, ILogger logger)
-            : base(textService, hostingEnvironment, logger)
+        public NotificationEmailCheck(ILocalizedTextService textService, IHostingEnvironment hostingEnvironment, ILoggerFactory loggerFactory)
+            : base(textService, hostingEnvironment, loggerFactory)
         { }
 
         public override string FilePath => "~/Config/umbracoSettings.config";

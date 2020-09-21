@@ -27,7 +27,6 @@ using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Tests.TestHelpers;
-using ILogger = Umbraco.Core.Logging.ILogger;
 
 namespace Umbraco.Tests.Models
 {
@@ -40,7 +39,6 @@ namespace Umbraco.Tests.Models
         {
             base.Compose();
 
-            Composition.Register(_ => Mock.Of<ILogger>());
             Composition.ComposeFileSystems();
 
             Composition.Register(_ => Mock.Of<IDataTypeService>());
@@ -241,7 +239,7 @@ namespace Umbraco.Tests.Models
 
         private static IProfilingLogger GetTestProfilingLogger()
         {
-            var logger = LoggerFactory.Create(builder => builder.AddDebug()).CreateLogger("ProfilingLogger");
+            var logger = Microsoft.Extensions.Logging.LoggerFactory.Create(builder => builder.AddDebug()).CreateLogger("ProfilingLogger");
             var profiler = new TestProfiler();
             return new ProfilingLogger(logger, profiler);
         }

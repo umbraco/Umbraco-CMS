@@ -18,7 +18,6 @@ using Umbraco.Tests.TestHelpers;
 using Umbraco.Core.Composing.CompositionExtensions;
 using Current = Umbraco.Web.Composing.Current;
 using FileSystems = Umbraco.Core.IO.FileSystems;
-using ILogger = Umbraco.Core.Logging.ILogger;
 using Umbraco.Tests.Common.Builders;
 
 namespace Umbraco.Tests.IO
@@ -36,9 +35,8 @@ namespace Umbraco.Tests.IO
 
             var composition = new Composition(_register, TestHelper.GetMockedTypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.IOHelper, AppCaches.NoCache);
 
-            composition.Register(_ => Mock.Of<ILogger>());
             composition.Register(_ => Mock.Of<IDataTypeService>());
-            composition.Register<ILoggerFactory>(new NullLoggerFactory());
+            composition.Register<ILoggerFactory>(NullLoggerFactory.Instance);
             composition.Register(typeof(Microsoft.Extensions.Logging.ILogger<>), typeof(Logger<>));
             composition.Register(_ => TestHelper.ShortStringHelper);
             composition.Register(_ => TestHelper.IOHelper);

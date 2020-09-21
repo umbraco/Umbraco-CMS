@@ -2,6 +2,7 @@
 using System.Linq;
 using Moq;
 using NUnit.Framework;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
@@ -50,7 +51,7 @@ namespace Umbraco.Tests.Routing
             var publishedRouter = CreatePublishedRouter();
             var frequest = publishedRouter.CreateRequest(umbracoContext);
             var lookup =
-                new ContentFinderByUrlAlias(Logger, Mock.Of<IPublishedValueFallback>(), VariationContextAccessor);
+                new ContentFinderByUrlAlias(LoggerFactory.CreateLogger<ContentFinderByUrlAlias>(), Mock.Of<IPublishedValueFallback>(), VariationContextAccessor);
 
             var result = lookup.TryFindContent(frequest);
 

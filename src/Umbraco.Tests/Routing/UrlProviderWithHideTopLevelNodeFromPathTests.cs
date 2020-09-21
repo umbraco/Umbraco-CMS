@@ -48,7 +48,7 @@ namespace Umbraco.Tests.Routing
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
             var urlProvider = new DefaultUrlProvider(
                 Microsoft.Extensions.Options.Options.Create(requestHandlerSettings),
-                LoggerFactory_.CreateLogger<DefaultUrlProvider>(),
+                LoggerFactory.CreateLogger<DefaultUrlProvider>(),
                 Microsoft.Extensions.Options.Options.Create(_globalSettings),
                 new SiteDomainHelper(), umbracoContextAccessor, UriUtility);
             var publishedUrlProvider = GetPublishedUrlProvider(umbracoContext, urlProvider);

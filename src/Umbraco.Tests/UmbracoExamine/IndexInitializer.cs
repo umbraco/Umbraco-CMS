@@ -24,7 +24,6 @@ using Umbraco.Core.Strings;
 using Umbraco.Examine;
 using Umbraco.Tests.TestHelpers;
 using IContentService = Umbraco.Core.Services.IContentService;
-using ILogger = Umbraco.Core.Logging.ILogger;
 using IMediaService = Umbraco.Core.Services.IMediaService;
 using Version = Lucene.Net.Util.Version;
 

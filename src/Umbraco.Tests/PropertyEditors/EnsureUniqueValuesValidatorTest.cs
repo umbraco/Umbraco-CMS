@@ -7,7 +7,6 @@ using Newtonsoft.Json.Linq;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.PropertyEditors;
-using ILogger = Umbraco.Core.Logging.ILogger;
 
 namespace Umbraco.Tests.PropertyEditors
 {

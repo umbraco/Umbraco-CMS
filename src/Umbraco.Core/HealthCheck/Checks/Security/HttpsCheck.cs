@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Security.Cryptography.X509Certificates;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Services;
-using Umbraco.Core.Logging;
 using Umbraco.Web.HealthCheck.Checks.Config;
 using Umbraco.Core.Configuration.Models;
 using Microsoft.Extensions.Options;
@@ -23,17 +23,17 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
         private readonly ILocalizedTextService _textService;
         private readonly GlobalSettings _globalSettings;
         private readonly IIOHelper _ioHelper;
-        private readonly ILogger _logger;
+        private readonly LoggerFactory _loggerFactory;
         private readonly IRequestAccessor _requestAccessor;
 
         private const string FixHttpsSettingAction = "fixHttpsSetting";
 
-        public HttpsCheck(ILocalizedTextService textService, IOptions<GlobalSettings> globalSettings, IIOHelper ioHelper, ILogger logger, IRequestAccessor requestAccessor)
+        public HttpsCheck(ILocalizedTextService textService, IOptions<GlobalSettings> globalSettings, IIOHelper ioHelper, LoggerFactory loggerFactory, IRequestAccessor requestAccessor)
         {
             _textService = textService;
             _globalSettings = globalSettings.Value;
             _ioHelper = ioHelper;
-            _logger = logger;
+            _loggerFactory = loggerFactory;
             _requestAccessor = requestAccessor;
         }
 
@@ -190,7 +190,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
         {
             var configFile = _ioHelper.MapPath("~/Web.config");
             const string xPath = "/configuration/appSettings/add[@key='Umbraco.Core.UseHttps']/@value";
-            var configurationService = new ConfigurationService(configFile, xPath, _textService, _logger);
+            var configurationService = new ConfigurationService(configFile, xPath, _textService, _loggerFactory.CreateLogger<ConfigurationService>());
             var updateConfigFile = configurationService.UpdateConfigFile("true");
 
             if (updateConfigFile.Success)

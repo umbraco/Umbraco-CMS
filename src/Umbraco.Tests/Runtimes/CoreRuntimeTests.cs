@@ -24,7 +24,6 @@ using Umbraco.Web.Hosting;
 using Umbraco.Web.Runtime;
 using ConnectionStrings = Umbraco.Core.Configuration.Models.ConnectionStrings;
 using Current = Umbraco.Web.Composing.Current;
-using ILogger = Umbraco.Core.Logging.ILogger;
 
 namespace Umbraco.Tests.Runtimes
 {

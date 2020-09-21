@@ -30,18 +30,18 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             var accessor = (IScopeAccessor) provider;
             var globalSettings = new GlobalSettingsBuilder().Build();
-            var templateRepository = new TemplateRepository(accessor, AppCaches.Disabled, LoggerFactory_.CreateLogger<TemplateRepository>(), TestObjects.GetFileSystemsMock(), IOHelper, ShortStringHelper);
+            var templateRepository = new TemplateRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<TemplateRepository>(), TestObjects.GetFileSystemsMock(), IOHelper, ShortStringHelper);
             var commonRepository = new ContentTypeCommonRepository(accessor, templateRepository, AppCaches, ShortStringHelper);
-            var languageRepository = new LanguageRepository(accessor, AppCaches, LoggerFactory_.CreateLogger<LanguageRepository>(), Microsoft.Extensions.Options.Options.Create(globalSettings));
+            var languageRepository = new LanguageRepository(accessor, AppCaches, LoggerFactory.CreateLogger<LanguageRepository>(), Microsoft.Extensions.Options.Options.Create(globalSettings));
             mediaTypeRepository = new MediaTypeRepository(accessor, AppCaches, Mock.Of<ILogger<MediaTypeRepository>>(), commonRepository, languageRepository, ShortStringHelper);
             var tagRepository = new TagRepository(accessor, AppCaches, Mock.Of<ILogger<TagRepository>>());
-            var relationTypeRepository = new RelationTypeRepository(accessor, AppCaches.Disabled, LoggerFactory_.CreateLogger<RelationTypeRepository>());
+            var relationTypeRepository = new RelationTypeRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<RelationTypeRepository>());
             var entityRepository = new EntityRepository(accessor);
-            var relationRepository = new RelationRepository(accessor, LoggerFactory_.CreateLogger<RelationRepository>(), relationTypeRepository, entityRepository);
+            var relationRepository = new RelationRepository(accessor, LoggerFactory.CreateLogger<RelationRepository>(), relationTypeRepository, entityRepository);
             var propertyEditors = new Lazy<PropertyEditorCollection>(() => new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>())));
             var mediaUrlGenerators = new MediaUrlGeneratorCollection(Enumerable.Empty<IMediaUrlGenerator>());
             var dataValueReferences = new DataValueReferenceFactoryCollection(Enumerable.Empty<IDataValueReferenceFactory>());
-            var repository = new MediaRepository(accessor, AppCaches, Mock.Of<ILogger<MediaRepository>>(), LoggerFactory_, mediaTypeRepository, tagRepository, Mock.Of<ILanguageRepository>(), relationRepository, relationTypeRepository, propertyEditors, mediaUrlGenerators, dataValueReferences, DataTypeService);
+            var repository = new MediaRepository(accessor, AppCaches, Mock.Of<ILogger<MediaRepository>>(), LoggerFactory, mediaTypeRepository, tagRepository, Mock.Of<ILanguageRepository>(), relationRepository, relationTypeRepository, propertyEditors, mediaUrlGenerators, dataValueReferences, DataTypeService);
             return repository;
         }
 
@@ -55,17 +55,17 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             var accessor = (IScopeAccessor) provider;
             var globalSettings = new GlobalSettingsBuilder().Build();
-            templateRepository = new TemplateRepository(accessor, AppCaches, LoggerFactory_.CreateLogger<TemplateRepository>(), TestObjects.GetFileSystemsMock(), IOHelper, ShortStringHelper);
-            var tagRepository = new TagRepository(accessor, AppCaches, LoggerFactory_.CreateLogger<TagRepository>());
+            templateRepository = new TemplateRepository(accessor, AppCaches, LoggerFactory.CreateLogger<TemplateRepository>(), TestObjects.GetFileSystemsMock(), IOHelper, ShortStringHelper);
+            var tagRepository = new TagRepository(accessor, AppCaches, LoggerFactory.CreateLogger<TagRepository>());
             var commonRepository = new ContentTypeCommonRepository(accessor, templateRepository, AppCaches, ShortStringHelper);
-            var languageRepository = new LanguageRepository(accessor, AppCaches, LoggerFactory_.CreateLogger<LanguageRepository>(), Microsoft.Extensions.Options.Options.Create(globalSettings));
-            contentTypeRepository = new ContentTypeRepository(accessor, AppCaches, LoggerFactory_.CreateLogger<ContentTypeRepository>(), commonRepository, languageRepository, ShortStringHelper);
-            var relationTypeRepository = new RelationTypeRepository(accessor, AppCaches.Disabled, LoggerFactory_.CreateLogger<RelationTypeRepository>());
+            var languageRepository = new LanguageRepository(accessor, AppCaches, LoggerFactory.CreateLogger<LanguageRepository>(), Microsoft.Extensions.Options.Options.Create(globalSettings));
+            contentTypeRepository = new ContentTypeRepository(accessor, AppCaches, LoggerFactory.CreateLogger<ContentTypeRepository>(), commonRepository, languageRepository, ShortStringHelper);
+            var relationTypeRepository = new RelationTypeRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<RelationTypeRepository>());
             var entityRepository = new EntityRepository(accessor);
-            var relationRepository = new RelationRepository(accessor, LoggerFactory_.CreateLogger<RelationRepository>(), relationTypeRepository, entityRepository);
+            var relationRepository = new RelationRepository(accessor, LoggerFactory.CreateLogger<RelationRepository>(), relationTypeRepository, entityRepository);
             var propertyEditors = new Lazy<PropertyEditorCollection>(() => new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>())));
             var dataValueReferences = new DataValueReferenceFactoryCollection(Enumerable.Empty<IDataValueReferenceFactory>());
-            var repository = new DocumentRepository(accessor, AppCaches, LoggerFactory_.CreateLogger<DocumentRepository>(), LoggerFactory_, contentTypeRepository, templateRepository, tagRepository, languageRepository, relationRepository, relationTypeRepository, propertyEditors, dataValueReferences, DataTypeService);
+            var repository = new DocumentRepository(accessor, AppCaches, LoggerFactory.CreateLogger<DocumentRepository>(), LoggerFactory, contentTypeRepository, templateRepository, tagRepository, languageRepository, relationRepository, relationTypeRepository, propertyEditors, dataValueReferences, DataTypeService);
             return repository;
         }
 
@@ -73,14 +73,14 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             var accessor = (IScopeAccessor) provider;
             var globalSettings = new GlobalSettingsBuilder().Build();
-            var repository = new UserRepository(accessor, AppCaches.Disabled, LoggerFactory_.CreateLogger<UserRepository>(), Mappers, Microsoft.Extensions.Options.Options.Create(globalSettings), Microsoft.Extensions.Options.Options.Create(new UserPasswordConfigurationSettings()), new JsonNetSerializer());
+            var repository = new UserRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<UserRepository>(), Mappers, Microsoft.Extensions.Options.Options.Create(globalSettings), Microsoft.Extensions.Options.Options.Create(new UserPasswordConfigurationSettings()), new JsonNetSerializer());
             return repository;
         }
 
         private UserGroupRepository CreateUserGroupRepository(IScopeProvider provider)
         {
             var accessor = (IScopeAccessor) provider;
-            return new UserGroupRepository(accessor, AppCaches.Disabled, LoggerFactory_.CreateLogger<UserGroupRepository>(), LoggerFactory_, ShortStringHelper);
+            return new UserGroupRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<UserGroupRepository>(), LoggerFactory, ShortStringHelper);
         }
 
         [Test]
@@ -90,7 +90,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var mt = MockedContentTypes.CreateSimpleMediaType("testmedia", "TestMedia");
 
             // Arrange
-            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (var scope = provider.CreateScope())
             {
                 var userRepository = CreateRepository(provider);

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -64,7 +65,7 @@ namespace Umbraco.Tests.Routing
             if (expectedNode > 0)
                 Assert.AreEqual(expectedCulture, request.Culture.Name);
 
-            var finder = new ContentFinderByUrlAlias(Logger, Mock.Of<IPublishedValueFallback>(), VariationContextAccessor);
+            var finder = new ContentFinderByUrlAlias(LoggerFactory.CreateLogger<ContentFinderByUrlAlias>(), Mock.Of<IPublishedValueFallback>(), VariationContextAccessor);
             var result = finder.TryFindContent(request);
 
             if (expectedNode > 0)

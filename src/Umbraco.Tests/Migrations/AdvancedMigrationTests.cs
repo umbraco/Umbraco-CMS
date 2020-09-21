@@ -21,7 +21,7 @@ namespace Umbraco.Tests.Migrations
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewEmptyPerTest)]
     public class AdvancedMigrationTests : TestWithDatabaseBase
     {
-        private ILoggerFactory _loggerFactory = LoggerFactory.Create(builder => builder.AddDebug());
+        private ILoggerFactory _loggerFactory = Microsoft.Extensions.Logging.LoggerFactory.Create(builder => builder.AddDebug());
 
         [Test]
         public void CreateTableOfTDto()
@@ -45,7 +45,7 @@ namespace Umbraco.Tests.Migrations
 
                 upgrader.Execute(ScopeProvider, builder, Mock.Of<IKeyValueService>(), _loggerFactory.CreateLogger<Upgrader>(), _loggerFactory);
 
-                var helper = new DatabaseSchemaCreator(scope.Database, LoggerFactory_.CreateLogger<DatabaseSchemaCreator>(), LoggerFactory_, UmbracoVersion);
+                var helper = new DatabaseSchemaCreator(scope.Database, LoggerFactory.CreateLogger<DatabaseSchemaCreator>(), LoggerFactory, UmbracoVersion);
                 var exists = helper.TableExists("umbracoUser");
                 Assert.IsTrue(exists);
 

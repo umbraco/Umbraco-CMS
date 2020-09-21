@@ -19,7 +19,6 @@ using Umbraco.Web.Common.AspNetCore;
 using Umbraco.Extensions;
 using Umbraco.Tests.Common.Builders;
 using Microsoft.Extensions.Options;
-using ILogger = Umbraco.Core.Logging.ILogger;
 
 namespace Umbraco.Tests.Integration
 {
@@ -210,9 +209,9 @@ namespace Umbraco.Tests.Integration
             public static bool IsInit { get; private set; }
             public static bool IsTerminated { get; private set; }
 
-            private readonly ILogger _logger;
+            private readonly ILogger<MyComponent> _logger;
 
-            public MyComponent(ILogger logger)
+            public MyComponent(ILogger<MyComponent> logger)
             {
                 _logger = logger;
             }

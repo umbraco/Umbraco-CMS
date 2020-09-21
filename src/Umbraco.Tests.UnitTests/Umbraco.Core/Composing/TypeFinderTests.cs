@@ -7,7 +7,6 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Web.BackOffice.Trees;
-using ILogger = Umbraco.Core.Logging.ILogger;
 
 namespace Umbraco.Tests.Composing
 {

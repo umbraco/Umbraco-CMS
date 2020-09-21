@@ -34,7 +34,6 @@ using Umbraco.Web.Security;
 using Umbraco.Web.Services;
 using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
-using ILogger = Umbraco.Core.Logging.ILogger;
 
 namespace Umbraco.Web.Composing
 {

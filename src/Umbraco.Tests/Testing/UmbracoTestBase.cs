@@ -65,7 +65,6 @@ using Umbraco.Web.Templates;
 using Umbraco.Web.Trees;
 using Current = Umbraco.Web.Composing.Current;
 using FileSystems = Umbraco.Core.IO.FileSystems;
-using ILogger = Umbraco.Core.Logging.ILogger;
 
 namespace Umbraco.Tests.Testing
 {
@@ -121,10 +120,8 @@ namespace Umbraco.Tests.Testing
 
         #region Accessors
         protected ServiceContext ServiceContext => Factory.GetInstance<ServiceContext>();
-
-        protected ILogger Logger => Factory.GetInstance<ILogger>();
-        // TODO: We probably need to do something different with LoggerFactory, but for now this should be ok, and find a better name
-        protected ILoggerFactory LoggerFactory_ => Factory.GetInstance<ILoggerFactory>();
+        
+        protected ILoggerFactory LoggerFactory => Factory.GetInstance<ILoggerFactory>();
         protected IJsonSerializer JsonNetSerializer { get; } = new JsonNetSerializer();
 
         protected IIOHelper IOHelper { get; private set; }
@@ -273,10 +270,10 @@ namespace Umbraco.Tests.Testing
                     factory = NullLoggerFactory.Instance;
                     break;
                 case UmbracoTestOptions.Logger.Serilog:
-                    factory = LoggerFactory.Create(builder => { builder.AddSerilog(); });
+                    factory = Microsoft.Extensions.Logging.LoggerFactory.Create(builder => { builder.AddSerilog(); });
                     break;
                 case UmbracoTestOptions.Logger.Console:
-                    factory = LoggerFactory.Create(builder => { builder.AddConsole(); });
+                    factory = Microsoft.Extensions.Logging.LoggerFactory.Create(builder => { builder.AddConsole(); });
                     break;
                 default:
                     throw new NotSupportedException($"Logger option {option} is not supported.");
@@ -454,10 +451,9 @@ namespace Umbraco.Tests.Testing
             Composition.RegisterUnique(factory => TestObjects.GetFileSystemsMock());
 
 
-            var logger = Mock.Of<ILogger>();
             var scheme = Mock.Of<IMediaPathScheme>();
 
-            var mediaFileSystem = new MediaFileSystem(Mock.Of<IFileSystem>(), scheme, LoggerFactory_.CreateLogger<MediaFileSystem>(), TestHelper.ShortStringHelper);
+            var mediaFileSystem = new MediaFileSystem(Mock.Of<IFileSystem>(), scheme, LoggerFactory.CreateLogger<MediaFileSystem>(), TestHelper.ShortStringHelper);
             Composition.RegisterUnique<IMediaFileSystem>(factory => mediaFileSystem);
 
             // no factory (noop)
@@ -472,8 +468,8 @@ namespace Umbraco.Tests.Testing
             var globalSettings = new GlobalSettingsBuilder().Build();
             var connectionStrings = new ConnectionStringsBuilder().Build();
 
-            Composition.RegisterUnique<IUmbracoDatabaseFactory>(f => new UmbracoDatabaseFactory(LoggerFactory_.CreateLogger<UmbracoDatabaseFactory>(),
-                LoggerFactory_,
+            Composition.RegisterUnique<IUmbracoDatabaseFactory>(f => new UmbracoDatabaseFactory(LoggerFactory.CreateLogger<UmbracoDatabaseFactory>(),
+                LoggerFactory,
                 globalSettings,
                 connectionStrings,
                 new Lazy<IMapperCollection>(f.GetInstance<IMapperCollection>),

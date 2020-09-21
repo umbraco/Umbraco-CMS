@@ -23,7 +23,6 @@ using Umbraco.Web.Common.AspNetCore;
 using IHostingEnvironment = Umbraco.Core.Hosting.IHostingEnvironment;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
-using ILogger = Umbraco.Core.Logging.ILogger;
 
 namespace Umbraco.Tests.Integration.Implementations
 {

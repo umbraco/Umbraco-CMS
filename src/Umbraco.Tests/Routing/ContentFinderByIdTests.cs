@@ -20,7 +20,7 @@ namespace Umbraco.Tests.Routing
             var publishedRouter = CreatePublishedRouter();
             var frequest = publishedRouter.CreateRequest(umbracoContext);
             var webRoutingSettings = new WebRoutingSettingsBuilder().Build();
-            var lookup = new ContentFinderByIdPath(Microsoft.Extensions.Options.Options.Create(webRoutingSettings), LoggerFactory_.CreateLogger<ContentFinderByIdPath>(), Factory.GetInstance<IRequestAccessor>());
+            var lookup = new ContentFinderByIdPath(Microsoft.Extensions.Options.Options.Create(webRoutingSettings), LoggerFactory.CreateLogger<ContentFinderByIdPath>(), Factory.GetInstance<IRequestAccessor>());
 
 
             var result = lookup.TryFindContent(frequest);

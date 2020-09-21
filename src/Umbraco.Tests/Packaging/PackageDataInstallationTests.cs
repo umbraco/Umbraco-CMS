@@ -19,7 +19,6 @@ using Umbraco.Tests.Testing;
 using Umbraco.Core.Composing.CompositionExtensions;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.Common.Builders;
-using ILogger = Umbraco.Core.Logging.ILogger;
 
 namespace Umbraco.Tests.Packaging
 {

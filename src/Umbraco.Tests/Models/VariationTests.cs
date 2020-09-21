@@ -10,7 +10,6 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
-using ILogger = Umbraco.Core.Logging.ILogger;
 using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.Models

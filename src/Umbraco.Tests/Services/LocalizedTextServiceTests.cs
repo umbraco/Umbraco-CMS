@@ -11,7 +11,6 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
-using ILogger = Umbraco.Core.Logging.ILogger;
 
 namespace Umbraco.Tests.Services
 {

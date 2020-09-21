@@ -3,6 +3,8 @@ using System.IO;
 using Moq;
 using NPoco;
 using NUnit.Framework;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
@@ -48,7 +50,8 @@ namespace Umbraco.Tests.TestHelpers
 
             var composition = new Composition(container, typeLoader, Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.IOHelper, AppCaches.NoCache);
 
-            composition.RegisterUnique<ILogger>(_ => Mock.Of<ILogger>());
+            composition.RegisterUnique<Microsoft.Extensions.Logging.ILogger>(_ => Mock.Of<Microsoft.Extensions.Logging.ILogger>());
+            composition.RegisterUnique<ILoggerFactory>(_ => NullLoggerFactory.Instance);
             composition.RegisterUnique<IProfiler>(_ => Mock.Of<IProfiler>());
 
             composition.RegisterUnique(typeLoader);

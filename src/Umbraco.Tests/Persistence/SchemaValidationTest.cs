@@ -23,7 +23,7 @@ namespace Umbraco.Tests.Persistence
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var schema = new DatabaseSchemaCreator(scope.Database, LoggerFactory_.CreateLogger<DatabaseSchemaCreator>(), LoggerFactory_, UmbracoVersion);
+                var schema = new DatabaseSchemaCreator(scope.Database, LoggerFactory.CreateLogger<DatabaseSchemaCreator>(), LoggerFactory, UmbracoVersion);
                 result = schema.ValidateSchema(
                     //TODO: When we remove the xml cache from tests we can remove this too
                     DatabaseSchemaCreator.OrderedTables.Concat(new []{typeof(ContentXmlDto), typeof(PreviewXmlDto)}));

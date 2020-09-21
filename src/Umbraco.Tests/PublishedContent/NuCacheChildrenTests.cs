@@ -31,7 +31,6 @@ using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.NuCache;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
 using Current = Umbraco.Web.Composing.Current;
-using ILogger = Umbraco.Core.Logging.ILogger;
 
 namespace Umbraco.Tests.PublishedContent
 {

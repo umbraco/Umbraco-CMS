@@ -24,7 +24,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             base.SetUp();
 
-            _fileSystem = new PhysicalFileSystem(IOHelper, HostingEnvironment, LoggerFactory_.CreateLogger<PhysicalFileSystem>(), Constants.SystemDirectories.MvcViews + "/Partials/");
+            _fileSystem = new PhysicalFileSystem(IOHelper, HostingEnvironment, LoggerFactory.CreateLogger<PhysicalFileSystem>(), Constants.SystemDirectories.MvcViews + "/Partials/");
         }
 
         protected override void Compose()
@@ -42,7 +42,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var fileSystems = Mock.Of<IFileSystems>();
             Mock.Get(fileSystems).Setup(x => x.PartialViewsFileSystem).Returns(_fileSystem);
 
-            var provider = TestObjects.GetScopeProvider(LoggerFactory_);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (var scope = provider.CreateScope())
             {
                 var repository = new PartialViewRepository(fileSystems, IOHelper);

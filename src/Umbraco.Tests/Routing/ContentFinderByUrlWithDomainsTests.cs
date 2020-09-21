@@ -138,7 +138,7 @@ namespace Umbraco.Tests.Routing
             // must lookup domain else lookup by url fails
             publishedRouter.FindDomain(frequest);
 
-            var lookup = new ContentFinderByUrl(LoggerFactory_.CreateLogger<ContentFinderByUrl>());
+            var lookup = new ContentFinderByUrl(LoggerFactory.CreateLogger<ContentFinderByUrl>());
             var result = lookup.TryFindContent(frequest);
             Assert.IsTrue(result);
             Assert.AreEqual(expectedId, frequest.PublishedContent.Id);
@@ -180,7 +180,7 @@ namespace Umbraco.Tests.Routing
             publishedRouter.FindDomain(frequest);
             Assert.AreEqual(expectedCulture, frequest.Culture.Name);
 
-            var lookup = new ContentFinderByUrl(LoggerFactory_.CreateLogger<ContentFinderByUrl>());
+            var lookup = new ContentFinderByUrl(LoggerFactory.CreateLogger<ContentFinderByUrl>());
             var result = lookup.TryFindContent(frequest);
             Assert.IsTrue(result);
             Assert.AreEqual(expectedId, frequest.PublishedContent.Id);
