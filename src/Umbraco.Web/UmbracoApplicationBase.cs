@@ -111,7 +111,7 @@ namespace Umbraco.Web
             }
         }
 
-        protected Microsoft.Extensions.Logging.ILogger<UmbracoApplicationBase> Logger { get; }
+        protected ILogger<UmbracoApplicationBase> Logger { get; }
 
         /// <summary>
         /// Gets a <see cref="ITypeFinder"/>

@@ -12,10 +12,10 @@ namespace Umbraco.Core.Logging.Viewer
     internal class SerilogJsonLogViewer : SerilogLogViewerSourceBase
     {
         private readonly string _logsPath;
-        private readonly Microsoft.Extensions.Logging.ILogger<SerilogJsonLogViewer> _logger;
+        private readonly ILogger<SerilogJsonLogViewer> _logger;
 
         public SerilogJsonLogViewer(
-            Microsoft.Extensions.Logging.ILogger<SerilogJsonLogViewer> logger,
+            ILogger<SerilogJsonLogViewer> logger,
             ILogViewerConfig logViewerConfig,
             ILoggingConfiguration loggingConfiguration,
             global::Serilog.ILogger serilogLog)

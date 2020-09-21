@@ -94,7 +94,7 @@ namespace Umbraco.Tests.Runtimes
             }
 
             private static ILoggerFactory _loggerFactory;
-            private static  Microsoft.Extensions.Logging.ILogger<TestUmbracoApplication> _logger;
+            private static  ILogger<TestUmbracoApplication> _logger;
             private static readonly IIOHelper _ioHelper = TestHelper.IOHelper;
             private static readonly IProfiler _profiler = new TestProfiler();
             private static readonly GlobalSettings _globalSettings = new GlobalSettings();
