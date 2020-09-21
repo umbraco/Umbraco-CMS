@@ -10,7 +10,7 @@ using Umbraco.Core.Strings;
 namespace Umbraco.Tests.Strings
 {
     [TestFixture]
-    public class DefaultShortStringHelperTests2
+    public class DefaultShortStringHelperTestsWithoutSetup
     {
 
         [Test]
