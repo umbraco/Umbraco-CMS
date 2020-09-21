@@ -2,7 +2,7 @@
 using System.Xml;
 using System.Security;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Core.Logging;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Core;

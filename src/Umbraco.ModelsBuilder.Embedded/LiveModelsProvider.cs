@@ -2,11 +2,11 @@
 using System.Threading;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Configuration;
 using Umbraco.Configuration;
 using Umbraco.Core;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.Logging;
 using Umbraco.ModelsBuilder.Embedded.Building;
 using Umbraco.Web.Cache;
 using Umbraco.Core.Configuration.Models;
@@ -19,7 +19,7 @@ namespace Umbraco.ModelsBuilder.Embedded
     {
         private static Mutex _mutex;
         private static int _req;
-        private readonly ILogger _logger;
+        private readonly ILogger<LiveModelsProvider> _logger;
         private readonly ModelsBuilderConfig _config;
         private readonly ModelsGenerator _modelGenerator;
         private readonly ModelsGenerationError _mbErrors;
@@ -28,7 +28,7 @@ namespace Umbraco.ModelsBuilder.Embedded
         // we do not manage pure live here
         internal bool IsEnabled => _config.ModelsMode.IsLiveNotPure();
 
-        public LiveModelsProvider(ILogger logger, IOptions<ModelsBuilderConfig> config, ModelsGenerator modelGenerator, ModelsGenerationError mbErrors, IHostingEnvironment hostingEnvironment)
+        public LiveModelsProvider(ILogger<LiveModelsProvider> logger, IOptions<ModelsBuilderConfig> config, ModelsGenerator modelGenerator, ModelsGenerationError mbErrors, IHostingEnvironment hostingEnvironment)
         {
             _logger = logger;
             _config = config.Value ?? throw new ArgumentNullException(nameof(config));

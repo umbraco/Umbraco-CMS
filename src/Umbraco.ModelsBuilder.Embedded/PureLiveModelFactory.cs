@@ -8,6 +8,7 @@ using System.Reflection.Emit;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Configuration;
 using Umbraco.Core;
 using Umbraco.Core.Hosting;
@@ -27,7 +28,7 @@ namespace Umbraco.ModelsBuilder.Embedded
         private volatile bool _hasModels; // volatile 'cos reading outside lock
         private bool _pendingRebuild;
         private readonly IProfilingLogger _profilingLogger;
-        private readonly ILogger<PureLiveModelFactory> _logger;
+        private readonly Microsoft.Extensions.Logging.ILogger<PureLiveModelFactory> _logger;
         private readonly FileSystemWatcher _watcher;
         private int _ver, _skipver;
         private readonly int _debugLevel;
@@ -48,7 +49,7 @@ namespace Umbraco.ModelsBuilder.Embedded
         public PureLiveModelFactory(
             Lazy<UmbracoServices> umbracoServices,
             IProfilingLogger profilingLogger,
-            ILogger<PureLiveModelFactory> logger,
+            Microsoft.Extensions.Logging.ILogger<PureLiveModelFactory> logger,
             IOptions<ModelsBuilderConfig> config,
             IHostingEnvironment hostingEnvironment,
             IApplicationShutdownRegistry hostingLifetime,

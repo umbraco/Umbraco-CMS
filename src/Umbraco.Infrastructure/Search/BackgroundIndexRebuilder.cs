@@ -21,17 +21,17 @@ namespace Umbraco.Web.Search
         private readonly IMainDom _mainDom;
         // TODO: Remove unused ProfilingLogger?
         private readonly IProfilingLogger _pLogger;
-        private readonly Core.Logging.ILogger<BackgroundIndexRebuilder> _logger;
+        private readonly Microsoft.Extensions.Logging.ILogger<BackgroundIndexRebuilder> _logger;
         private readonly ILoggerFactory _loggerFactory;
         private readonly IApplicationShutdownRegistry _hostingEnvironment;
         private static BackgroundTaskRunner<IBackgroundTask> _rebuildOnStartupRunner;
 
-        public BackgroundIndexRebuilder(IMainDom mainDom, IProfilingLogger pLogger, Core.Logging.ILogger<BackgroundIndexRebuilder> logger, ILoggerFactory loggerFactory, IApplicationShutdownRegistry hostingEnvironment, IndexRebuilder indexRebuilder)
+        public BackgroundIndexRebuilder(IMainDom mainDom, IProfilingLogger pLogger, ILoggerFactory loggerFactory, IApplicationShutdownRegistry hostingEnvironment, IndexRebuilder indexRebuilder)
         {
             _mainDom = mainDom;
             _pLogger = pLogger;
-            _logger = logger;
             _loggerFactory = loggerFactory;
+            _logger = loggerFactory.CreateLogger<BackgroundIndexRebuilder>();
             _hostingEnvironment = hostingEnvironment;
             _indexRebuilder = indexRebuilder;
         }
@@ -55,7 +55,7 @@ namespace Umbraco.Web.Search
 
                 _logger.LogInformation("Starting initialize async background thread.");
                 //do the rebuild on a managed background thread
-                var task = new RebuildOnStartupTask(_mainDom, _indexRebuilder, _logger as ILogger, onlyEmptyIndexes, waitMilliseconds);
+                var task = new RebuildOnStartupTask(_mainDom, _indexRebuilder, _loggerFactory.CreateLogger<RebuildOnStartupTask>(), onlyEmptyIndexes, waitMilliseconds);
 
                 _rebuildOnStartupRunner = new BackgroundTaskRunner<IBackgroundTask>(
                     "RebuildIndexesOnStartup",
@@ -73,12 +73,12 @@ namespace Umbraco.Web.Search
             private readonly IMainDom _mainDom;
 
             private readonly IndexRebuilder _indexRebuilder;
-            private readonly ILogger _logger;
+            private readonly Microsoft.Extensions.Logging.ILogger<RebuildOnStartupTask> _logger;
             private readonly bool _onlyEmptyIndexes;
             private readonly int _waitMilliseconds;
 
             public RebuildOnStartupTask(IMainDom mainDom,
-                IndexRebuilder indexRebuilder, ILogger logger, bool onlyEmptyIndexes, int waitMilliseconds = 0)
+                IndexRebuilder indexRebuilder, Microsoft.Extensions.Logging.ILogger<RebuildOnStartupTask> logger, bool onlyEmptyIndexes, int waitMilliseconds = 0)
             {
                 _mainDom = mainDom;
                 _indexRebuilder = indexRebuilder ?? throw new ArgumentNullException(nameof(indexRebuilder));

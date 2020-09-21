@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Serilog.Events;
 using Serilog.Formatting.Compact.Reader;
@@ -11,10 +12,10 @@ namespace Umbraco.Core.Logging.Viewer
     internal class SerilogJsonLogViewer : SerilogLogViewerSourceBase
     {
         private readonly string _logsPath;
-        private readonly ILogger _logger;
+        private readonly Microsoft.Extensions.Logging.ILogger<SerilogJsonLogViewer> _logger;
 
         public SerilogJsonLogViewer(
-            ILogger logger,
+            Microsoft.Extensions.Logging.ILogger<SerilogJsonLogViewer> logger,
             ILogViewerConfig logViewerConfig,
             ILoggingConfiguration loggingConfiguration,
             global::Serilog.ILogger serilogLog)

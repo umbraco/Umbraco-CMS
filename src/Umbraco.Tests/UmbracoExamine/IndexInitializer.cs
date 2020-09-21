@@ -57,7 +57,7 @@ namespace Umbraco.Tests.UmbracoExamine
 
         public static MediaIndexPopulator GetMediaIndexRebuilder(PropertyEditorCollection propertyEditors, IMediaService mediaService)
         {
-            var mediaValueSetBuilder = new MediaValueSetBuilder(propertyEditors, new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider(TestHelper.ShortStringHelper) }), GetMockUserService(), Mock.Of<ILogger>(), TestHelper.ShortStringHelper, TestHelper.JsonSerializer);
+            var mediaValueSetBuilder = new MediaValueSetBuilder(propertyEditors, new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider(TestHelper.ShortStringHelper) }), GetMockUserService(), Mock.Of<Microsoft.Extensions.Logging.ILogger<MediaValueSetBuilder>>(), TestHelper.ShortStringHelper, TestHelper.JsonSerializer);
             var mediaIndexDataSource = new MediaIndexPopulator(null, mediaService, mediaValueSetBuilder);
             return mediaIndexDataSource;
         }
@@ -161,11 +161,6 @@ namespace Umbraco.Tests.UmbracoExamine
         public static IProfilingLogger GetMockProfilingLogger()
         {
             return new ProfilingLogger(Mock.Of<Microsoft.Extensions.Logging.ILogger>(), Mock.Of<IProfiler>());
-        }
-
-        public static Core.Logging.ILogger<T> GetMockLogger<T>()
-        {
-            return Mock.Of<Core.Logging.ILogger<T>>();
         }
 
         public static UmbracoContentIndex GetUmbracoIndexer(

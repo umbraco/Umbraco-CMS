@@ -45,7 +45,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly IProfilingLogger _profilingLogger;
         private readonly IScopeProvider _scopeProvider;
         private readonly IDataSource _dataSource;
-        private readonly Core.Logging.ILogger<PublishedSnapshotService> _logger;
+        private readonly Microsoft.Extensions.Logging.ILogger<PublishedSnapshotService> _logger;
         private readonly ILoggerFactory _loggerFactory;
         private readonly IDocumentRepository _documentRepository;
         private readonly IMediaRepository _mediaRepository;
@@ -87,7 +87,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         public PublishedSnapshotService(PublishedSnapshotServiceOptions options, IMainDom mainDom, IRuntimeState runtime,
             ServiceContext serviceContext, IPublishedContentTypeFactory publishedContentTypeFactory,
             IPublishedSnapshotAccessor publishedSnapshotAccessor, IVariationContextAccessor variationContextAccessor,
-            IProfilingLogger profilingLogger, Core.Logging.ILogger<PublishedSnapshotService> logger,
+            IProfilingLogger profilingLogger,
             ILoggerFactory loggerFactory,
             IScopeProvider scopeProvider,
             IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository,
@@ -110,8 +110,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _publishedContentTypeFactory = publishedContentTypeFactory;
             _profilingLogger = profilingLogger;
             _dataSource = dataSource;
-            _logger = logger;
             _loggerFactory = loggerFactory;
+            _logger = _loggerFactory.CreateLogger<PublishedSnapshotService>();
             _scopeProvider = scopeProvider;
             _documentRepository = documentRepository;
             _mediaRepository = mediaRepository;

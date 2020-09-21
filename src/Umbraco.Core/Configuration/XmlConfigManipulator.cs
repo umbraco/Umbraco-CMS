@@ -4,8 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Configuration
 {

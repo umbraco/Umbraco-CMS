@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
@@ -32,7 +32,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     [UmbracoTreeAuthorize(Constants.Trees.Dictionary)]
     public class DictionaryController : BackOfficeNotificationsController
     {
-        private readonly ILogger _logger;
+        private readonly ILogger<DictionaryController> _logger;
         private readonly ILocalizationService _localizationService;
         private readonly IWebSecurity _webSecurity;
         private readonly GlobalSettings _globalSettings;
@@ -40,7 +40,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly UmbracoMapper _umbracoMapper;
 
         public DictionaryController(
-            ILogger logger,
+            ILogger<DictionaryController> logger,
             ILocalizationService localizationService,
             IWebSecurity webSecurity,
             IOptions<GlobalSettings> globalSettings,

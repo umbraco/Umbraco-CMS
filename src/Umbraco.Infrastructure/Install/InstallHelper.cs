@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Models;
 using Umbraco.Net;
@@ -22,7 +22,7 @@ namespace Umbraco.Web.Install
     {
         private static HttpClient _httpClient;
         private readonly DatabaseBuilder _databaseBuilder;
-        private readonly ILogger _logger;
+        private readonly ILogger<InstallHelper> _logger;
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly ConnectionStrings _connectionStrings;
         private readonly IInstallationService _installationService;
@@ -33,7 +33,7 @@ namespace Umbraco.Web.Install
         private InstallationType? _installationType;
 
         public InstallHelper(DatabaseBuilder databaseBuilder,
-            ILogger logger,
+            ILogger<InstallHelper> logger,
             IUmbracoVersion umbracoVersion,
             IOptions<ConnectionStrings> connectionStrings,
             IInstallationService installationService,

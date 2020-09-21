@@ -55,7 +55,7 @@ namespace Umbraco.Tests.Logging
             File.Copy(exampleLogfilePath, _newLogfilePath, true);
             File.Copy(exampleSearchfilePath, _newSearchfilePath, true);
 
-            var logger = Mock.Of<Core.Logging.ILogger>();
+            var logger = Mock.Of<Microsoft.Extensions.Logging.ILogger<SerilogJsonLogViewer>>();
             var logViewerConfig = new LogViewerConfig(hostingEnv);
             _logViewer = new SerilogJsonLogViewer(logger, logViewerConfig, loggingConfiguration, Log.Logger);
         }

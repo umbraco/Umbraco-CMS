@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.Models;
@@ -22,7 +23,7 @@ namespace Umbraco.Web.Macros
     public class MacroRenderer : IMacroRenderer
     {
         private readonly IProfilingLogger _plogger;
-        private readonly ILogger<MacroRenderer> _logger;
+        private readonly Microsoft.Extensions.Logging.ILogger<MacroRenderer> _logger;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly ContentSettings _contentSettings;
         private readonly ILocalizedTextService _textService;
@@ -37,7 +38,7 @@ namespace Umbraco.Web.Macros
 
         public MacroRenderer(
             IProfilingLogger plogger,
-            ILogger<MacroRenderer> logger,
+            Microsoft.Extensions.Logging.ILogger<MacroRenderer> logger,
             IUmbracoContextAccessor umbracoContextAccessor,
             IOptions<ContentSettings> contentSettings,
             ILocalizedTextService textService,

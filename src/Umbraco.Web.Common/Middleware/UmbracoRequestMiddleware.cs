@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.Extensions.Logging;
 using Umbraco.Web.Common.Lifetime;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
@@ -20,13 +21,13 @@ namespace Umbraco.Web.Common.Middleware
     /// </remarks>
     public class UmbracoRequestMiddleware : IMiddleware
     {
-        private readonly ILogger _logger;
+        private readonly Microsoft.Extensions.Logging.ILogger<UmbracoRequestMiddleware> _logger;
         private readonly IUmbracoRequestLifetimeManager _umbracoRequestLifetimeManager;
         private readonly IUmbracoContextFactory _umbracoContextFactory;
         private readonly IRequestCache _requestCache;
 
         public UmbracoRequestMiddleware(
-            ILogger logger,
+            Microsoft.Extensions.Logging.ILogger<UmbracoRequestMiddleware> logger,
             IUmbracoRequestLifetimeManager umbracoRequestLifetimeManager,
             IUmbracoContextFactory umbracoContextFactory,
             IRequestCache requestCache)
@@ -104,7 +105,7 @@ namespace Umbraco.Web.Common.Middleware
         /// <param name="http"></param>
         /// <param name="requestCache"></param>
         /// <param name="requestUri"></param>
-        private static void DisposeRequestCacheItems(ILogger logger, IRequestCache requestCache, Uri requestUri)
+        private static void DisposeRequestCacheItems(Microsoft.Extensions.Logging.ILogger<UmbracoRequestMiddleware> logger, IRequestCache requestCache, Uri requestUri)
         {
             // do not process if client-side request
             if (requestUri.IsClientSideRequest())

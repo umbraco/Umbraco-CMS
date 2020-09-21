@@ -147,7 +147,7 @@ namespace Umbraco.Core.Runtime
                     factory.GetInstance<IScopeProvider>(),
                     factory.GetInstance<ISqlContext>(),
                     factory.GetInstance<IProfilingLogger>(),
-                    factory.GetInstance<ILogger>(),
+                    factory.GetInstance<Microsoft.Extensions.Logging.ILogger<DatabaseServerMessenger>>(),
                     factory.GetInstance<IServerRegistrar>(),
                     true, new DatabaseServerMessengerOptions(),
                     factory.GetInstance<IHostingEnvironment>(),

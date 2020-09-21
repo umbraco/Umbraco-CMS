@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Routing;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -101,8 +102,7 @@ namespace Umbraco.Tests.Scoping
                 publishedSnapshotAccessor,
                 Mock.Of<IVariationContextAccessor>(),
                 ProfilingLogger,
-                Mock.Of<ILogger<PublishedSnapshotService>>(),
-                Mock.Of<Microsoft.Extensions.Logging.LoggerFactory>(),
+                NullLoggerFactory.Instance,
                 ScopeProvider,
                 documentRepository, mediaRepository, memberRepository,
                 DefaultCultureAccessor,

@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.BackOffice;
 using Umbraco.Core.Cache;
@@ -14,7 +15,6 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Grid;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 using Umbraco.Core.WebAssets;
 using Umbraco.Extensions;
@@ -46,7 +46,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly AppCaches _appCaches;
         private readonly BackOfficeSignInManager _signInManager;
         private readonly IWebSecurity _webSecurity;
-        private readonly ILogger _logger;
+        private readonly ILogger<BackOfficeController> _logger;
 
         public BackOfficeController(
             BackOfficeUserManager userManager,
@@ -60,7 +60,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             AppCaches appCaches,
             BackOfficeSignInManager signInManager,
             IWebSecurity webSecurity,
-            ILogger logger)
+            ILogger<BackOfficeController> logger)
         {
             _userManager = userManager;
             _runtimeMinifier = runtimeMinifier;

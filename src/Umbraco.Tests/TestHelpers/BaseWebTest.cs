@@ -106,7 +106,7 @@ namespace Umbraco.Tests.TestHelpers
                 new TestLastChanceFinder(),
                 new TestVariationContextAccessor(),
                 new ProfilingLogger(Mock.Of<Microsoft.Extensions.Logging.ILogger>(), Mock.Of<IProfiler>()),
-                Mock.Of<ILogger<PublishedRouter>>(),
+                Mock.Of<Microsoft.Extensions.Logging.ILogger<PublishedRouter>>(),
                 Mock.Of<IPublishedUrlProvider>(),
                 Mock.Of<IRequestAccessor>(),
                 container?.GetInstance<IPublishedValueFallback>() ?? Current.Factory.GetInstance<IPublishedValueFallback>(),

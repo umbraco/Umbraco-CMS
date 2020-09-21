@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Sync;
@@ -32,7 +33,7 @@ namespace Umbraco.Web
             IScopeProvider scopeProvider,
             ISqlContext sqlContext,
             IProfilingLogger proflog,
-            ILogger logger,
+            Microsoft.Extensions.Logging.ILogger<BatchedDatabaseServerMessenger> logger,
             IServerRegistrar serverRegistrar,
             DatabaseServerMessengerOptions options,
             IHostingEnvironment hostingEnvironment,

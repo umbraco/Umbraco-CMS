@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 using Examine;
 using Umbraco.Core.Composing;
@@ -15,11 +16,11 @@ namespace Umbraco.Examine
     public class IndexRebuilder
     {
         private readonly IProfilingLogger _pLogger;
-        private readonly ILogger<IndexRebuilder> _logger;
+        private readonly Microsoft.Extensions.Logging.ILogger<IndexRebuilder> _logger;
         private readonly IEnumerable<IIndexPopulator> _populators;
         public IExamineManager ExamineManager { get; }
 
-        public IndexRebuilder(IProfilingLogger pLogger, ILogger<IndexRebuilder> logger, IExamineManager examineManager, IEnumerable<IIndexPopulator> populators)
+        public IndexRebuilder(IProfilingLogger pLogger, Microsoft.Extensions.Logging.ILogger<IndexRebuilder> logger, IExamineManager examineManager, IEnumerable<IIndexPopulator> populators)
         {
             _pLogger = pLogger;
             _populators = populators;

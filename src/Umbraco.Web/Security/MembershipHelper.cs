@@ -16,7 +16,6 @@ using Umbraco.Core.Strings;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Security.Providers;
 using System.ComponentModel.DataAnnotations;
-using ILogger = Umbraco.Core.Logging.ILogger;
 
 namespace Umbraco.Web.Security
 {
@@ -32,6 +31,7 @@ namespace Umbraco.Web.Security
         private readonly IMemberTypeService _memberTypeService;
         private readonly IPublicAccessService _publicAccessService;
         private readonly AppCaches _appCaches;
+        private readonly ILoggerFactory _loggerFactory;
         private readonly ILogger _logger;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly IEntityService _entityService;
@@ -48,7 +48,7 @@ namespace Umbraco.Web.Security
             IMemberTypeService memberTypeService,
             IPublicAccessService publicAccessService,
             AppCaches appCaches,
-            ILogger logger,
+            ILoggerFactory loggerFactory,
             IShortStringHelper shortStringHelper,
             IEntityService entityService
         )
@@ -59,7 +59,8 @@ namespace Umbraco.Web.Security
             _memberTypeService = memberTypeService;
             _publicAccessService = publicAccessService;
             _appCaches = appCaches;
-            _logger = logger;
+            _loggerFactory = loggerFactory;
+            _logger = _loggerFactory.CreateLogger<MembershipHelper>();
             _shortStringHelper = shortStringHelper;
 
             _membershipProvider = membershipProvider ?? throw new ArgumentNullException(nameof(membershipProvider));
@@ -706,7 +707,7 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         public virtual Attempt<PasswordChangedModel> ChangePassword(string username, ChangingPasswordModel passwordModel, MembershipProvider membershipProvider)
         {
-            var passwordChanger = new PasswordChanger(_logger);
+            var passwordChanger = new PasswordChanger(_loggerFactory.CreateLogger<PasswordChanger>());
             return ChangePasswordWithMembershipProvider(username, passwordModel, membershipProvider);
         }
 
