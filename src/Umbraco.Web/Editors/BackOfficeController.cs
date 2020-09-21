@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.Mvc;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
 using Microsoft.Owin.Security;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
@@ -37,6 +38,7 @@ namespace Umbraco.Web.Editors
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly RuntimeSettings _runtimeSettings;
         private readonly SecuritySettings _securitySettings;
+        private readonly Microsoft.Extensions.Logging.ILogger<BackOfficeController> _logger;
 
         public BackOfficeController(
             UmbracoFeatures features,
@@ -45,13 +47,13 @@ namespace Umbraco.Web.Editors
             ServiceContext services,
             AppCaches appCaches,
             IProfilingLogger profilingLogger,
-            ILogger<BackOfficeController> logger,
+            ILoggerFactory loggerFactory,
             IUmbracoVersion umbracoVersion,
             IOptions<ContentSettings> contentSettings,
             IHostingEnvironment hostingEnvironment,
             IOptions<RuntimeSettings> settings,
             IOptions<SecuritySettings> securitySettings)
-            : base(globalSettings, umbracoContextAccessor, services, appCaches, profilingLogger, logger)
+            : base(globalSettings, umbracoContextAccessor, services, appCaches, profilingLogger, loggerFactory)
 
         {
             _features = features;
@@ -60,6 +62,7 @@ namespace Umbraco.Web.Editors
             _hostingEnvironment = hostingEnvironment;
             _runtimeSettings = settings.Value;
             _securitySettings = securitySettings.Value;
+            _logger = loggerFactory.CreateLogger<BackOfficeController>();
         }
 
         protected BackOfficeSignInManager SignInManager => _signInManager ?? (_signInManager = OwinContext.GetBackOfficeSignInManager());
@@ -177,7 +180,7 @@ namespace Umbraco.Web.Editors
             var authType = OwinContext.Authentication.GetExternalAuthenticationTypes().FirstOrDefault(x => x.AuthenticationType == loginInfo.Login.LoginProvider);
             if (authType == null)
             {
-                Logger.LogWarning("Could not find external authentication provider registered: {LoginProvider}", loginInfo.Login.LoginProvider);
+                _logger.LogWarning("Could not find external authentication provider registered: {LoginProvider}", loginInfo.Login.LoginProvider);
             }
             else
             {
@@ -200,7 +203,7 @@ namespace Umbraco.Web.Editors
                     shouldSignIn = autoLinkOptions.OnExternalLogin(user, loginInfo);
                     if (shouldSignIn == false)
                     {
-                        Logger.LogWarning("The AutoLinkOptions of the external authentication provider '{LoginProvider}' have refused the login based on the OnExternalLogin method. Affected user id: '{UserId}'", loginInfo.Login.LoginProvider, user.Id);
+                        _logger.LogWarning("The AutoLinkOptions of the external authentication provider '{LoginProvider}' have refused the login based on the OnExternalLogin method. Affected user id: '{UserId}'", loginInfo.Login.LoginProvider, user.Id);
                     }
                 }
 

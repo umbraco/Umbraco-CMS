@@ -161,7 +161,7 @@ namespace Umbraco.Tests.Routing
                         Factory.GetInstance<ServiceContext>(),
                         Factory.GetInstance<AppCaches>(),
                         Factory.GetInstance<IProfilingLogger>(),
-                        Factory.GetInstance<Umbraco.Core.Logging.ILogger<CustomDocumentController>>());
+                        Factory.GetInstance<ILoggerFactory>());
                 }), ShortStringHelper);
 
             handler.GetHandlerForRoute(httpContext.Request.RequestContext, frequest);
@@ -198,8 +198,8 @@ namespace Umbraco.Tests.Routing
         /// </summary>
         public class CustomDocumentController : RenderMvcController
         {
-            public CustomDocumentController(IOptions<GlobalSettings> globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger, Umbraco.Core.Logging.ILogger<CustomDocumentController> logger)
-                : base(globalSettings, umbracoContextAccessor, services, appCaches, profilingLogger, logger)
+            public CustomDocumentController(IOptions<GlobalSettings> globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger, ILoggerFactory loggerFactory)
+                : base(globalSettings, umbracoContextAccessor, services, appCaches, profilingLogger, loggerFactory)
             {
             }
 

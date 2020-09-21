@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Web;
 using System.Web.Mvc;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Owin;
 using Umbraco.Core.Cache;
@@ -47,15 +48,16 @@ namespace Umbraco.Web.Mvc
         /// </summary>
         public AppCaches AppCaches { get; }
 
-        /// <summary>
-        /// Gets or sets the logger.
-        /// </summary>
-        public ILogger<UmbracoController> Logger { get; }
 
         /// <summary>
         /// Gets or sets the profiling logger.
         /// </summary>
         public IProfilingLogger ProfilingLogger { get; set; }
+
+        /// <summary>
+        /// Gets the LoggerFactory
+        /// </summary>
+        public ILoggerFactory LoggerFactory { get; }
 
         protected IOwinContext OwinContext => Request.GetOwinContext();
 
@@ -76,19 +78,19 @@ namespace Umbraco.Web.Mvc
                   Current.Factory.GetInstance<ServiceContext>(),
                   Current.Factory.GetInstance<AppCaches>(),
                   Current.Factory.GetInstance<IProfilingLogger>(),
-                  Current.Factory.GetInstance<ILogger<UmbracoController>>()
+                  Current.Factory.GetInstance<LoggerFactory>()
             )
         {
         }
 
-        protected UmbracoController(IOptions<GlobalSettings> globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger, ILogger<UmbracoController> logger)
+        protected UmbracoController(IOptions<GlobalSettings> globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger, ILoggerFactory loggerFactory)
         {
             GlobalSettings = globalSettings;
             UmbracoContextAccessor = umbracoContextAccessor;
             Services = services;
             AppCaches = appCaches;
-            Logger = logger;
             ProfilingLogger = profilingLogger;
+            LoggerFactory = loggerFactory;
         }
     }
 }
