@@ -63,8 +63,7 @@ namespace Umbraco.Tests.Runtimes
 
             var loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
             // create the very basic and essential things we need
-            var logger = new ConsoleLogger<object>(new MessageTemplates());
-            var profiler = new LogProfiler(logger);
+            var profiler = new LogProfiler(loggerFactory.CreateLogger<LogProfiler>());
             var profilingLogger = new ProfilingLogger(loggerFactory.CreateLogger("ProfilingLogger"), profiler);
             var appCaches = AppCaches.Disabled;
             var globalSettings = new GlobalSettingsBuilder().Build();
@@ -273,7 +272,6 @@ namespace Umbraco.Tests.Runtimes
 
             // create the very basic and essential things we need
             var loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
-            var logger = new ConsoleLogger<StandaloneTests>(new MessageTemplates());
             var profiler = Mock.Of<IProfiler>();
             var profilingLogger = new ProfilingLogger(loggerFactory.CreateLogger("ProfilingLogger"), profiler);
             var appCaches = AppCaches.Disabled;

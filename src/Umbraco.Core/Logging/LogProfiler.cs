@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using Microsoft.Extensions.Logging;
 
 namespace Umbraco.Core.Logging
 {
@@ -8,9 +9,9 @@ namespace Umbraco.Core.Logging
     /// </summary>
     public class LogProfiler : IProfiler
     {
-        private readonly ILogger _logger;
+        private readonly Microsoft.Extensions.Logging.ILogger<LogProfiler> _logger;
 
-        public LogProfiler(ILogger logger)
+        public LogProfiler(Microsoft.Extensions.Logging.ILogger<LogProfiler> logger)
         {
             _logger = logger;
         }

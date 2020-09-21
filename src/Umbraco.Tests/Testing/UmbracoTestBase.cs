@@ -174,8 +174,8 @@ namespace Umbraco.Tests.Testing
 
             // FIXME: align to runtimes & components - don't redo everything here !!!! Yes this is getting painful
 
-            var (logger, profiler) = GetLoggers(Options.Logger);
             var loggerFactory = GetLoggerFactory(Options.Logger);
+            var profiler = new LogProfiler(loggerFactory.CreateLogger<LogProfiler>());
             var msLogger = loggerFactory.CreateLogger("msLogger");
             var proflogger = new ProfilingLogger(loggerFactory.CreateLogger("ProfilingLogger"), profiler);
             IOHelper = TestHelper.IOHelper;
@@ -209,7 +209,6 @@ namespace Umbraco.Tests.Testing
             Composition.RegisterUnique(TypeFinder);
             Composition.RegisterUnique(LocalizedTextService);
             Composition.RegisterUnique(typeLoader);
-            Composition.RegisterUnique(logger);
             Composition.RegisterUnique(profiler);
             Composition.RegisterUnique<IProfilingLogger>(proflogger);
             Composition.RegisterUnique(appCaches);
@@ -284,33 +283,6 @@ namespace Umbraco.Tests.Testing
             }
 
             return factory;
-        }
-
-        protected virtual (ILogger, IProfiler) GetLoggers(UmbracoTestOptions.Logger option)
-        {
-            // TODO: Fix this, give the microsoft loggers a name
-            ILogger logger;
-            IProfiler profiler;
-
-            switch (option)
-            {
-                case UmbracoTestOptions.Logger.Mock:
-                    logger = Mock.Of<ILogger>();
-                    profiler = Mock.Of<IProfiler>();
-                    break;
-                case UmbracoTestOptions.Logger.Serilog:
-                    logger = new SerilogLogger<object>(new FileInfo(TestHelper.MapPathForTestFiles("~/unit-test.config")));
-                    profiler = new LogProfiler(logger);
-                    break;
-                case UmbracoTestOptions.Logger.Console:
-                    logger = new ConsoleLogger<object>(new MessageTemplates());
-                    profiler = new LogProfiler(logger);
-                    break;
-                default:
-                    throw new NotSupportedException($"Logger option {option} is not supported.");
-            }
-
-            return (logger, profiler);
         }
 
         protected virtual AppCaches GetAppCaches()

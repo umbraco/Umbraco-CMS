@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
@@ -20,8 +21,8 @@ namespace Umbraco.Tests.UmbracoExamine
         public void InitializeFixture()
         {
 
-            var logger = new SerilogLogger<object>(new FileInfo(TestHelper.MapPathForTestFiles("~/unit-test.config")));
-            _profilingLogger = new ProfilingLogger(NullLogger.Instance, new LogProfiler(logger));
+            // var logger = new SerilogLogger<object>(new FileInfo(TestHelper.MapPathForTestFiles("~/unit-test.config")));
+            _profilingLogger = new ProfilingLogger(NullLogger.Instance, new LogProfiler(NullLogger<LogProfiler>.Instance));
         }
 
         private IProfilingLogger _profilingLogger;
