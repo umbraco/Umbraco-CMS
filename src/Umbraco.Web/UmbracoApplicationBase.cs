@@ -74,6 +74,7 @@ namespace Umbraco.Web
                 var backOfficeInfo = new AspNetBackOfficeInfo(globalSettings, ioHelper, _loggerFactory.CreateLogger<AspNetBackOfficeInfo>(), Options.Create(webRoutingSettings));
                 var profiler = GetWebProfiler(hostingEnvironment);
                 Umbraco.Composing.Current.Initialize(logger,
+                    _loggerFactory,
                     securitySettings,
                     globalSettings,
                     ioHelper, hostingEnvironment, backOfficeInfo, profiler);
@@ -97,7 +98,7 @@ namespace Umbraco.Web
             return webProfiler;
         }
 
-        protected UmbracoApplicationBase(Microsoft.Extensions.Logging.ILogger<UmbracoApplicationBase> logger, SecuritySettings securitySettings, GlobalSettings globalSettings, ConnectionStrings connectionStrings, IIOHelper ioHelper, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)
+        protected UmbracoApplicationBase(ILogger<UmbracoApplicationBase> logger, SecuritySettings securitySettings, GlobalSettings globalSettings, ConnectionStrings connectionStrings, IIOHelper ioHelper, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)
         {
             _securitySettings = securitySettings;
             _globalSettings = globalSettings;
@@ -106,7 +107,7 @@ namespace Umbraco.Web
             if (!Umbraco.Composing.Current.IsInitialized)
             {
                 Logger = logger;
-                Umbraco.Composing.Current.Initialize(logger, securitySettings, globalSettings, ioHelper, hostingEnvironment, backOfficeInfo, profiler);
+                Umbraco.Composing.Current.Initialize(logger, _loggerFactory, securitySettings, globalSettings, ioHelper, hostingEnvironment, backOfficeInfo, profiler);
             }
         }
 

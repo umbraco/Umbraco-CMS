@@ -45,6 +45,7 @@ namespace Umbraco.Composing
 
         public static void Initialize(
             ILogger<object> logger,
+            ILoggerFactory loggerFactory,
             SecuritySettings securitySettings,
             GlobalSettings globalSettings,
             IIOHelper ioHelper,
@@ -58,6 +59,7 @@ namespace Umbraco.Composing
             }
 
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
             _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
             _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
             _backOfficeInfo = backOfficeInfo ?? throw new ArgumentNullException(nameof(backOfficeInfo));
