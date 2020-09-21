@@ -20,27 +20,7 @@ namespace Umbraco.Core.Configuration.Models
 
         public string PreviewBadge { get; set; } = DefaultPreviewBadge;
 
-        // We could bind the enum MacroErrorsBehaviour directly from configuration, but we're doing so
-        // via this string to allow for validation to occur on start-up that the configured value does
-        // match one of the enum values.
-        // Without this it'll fail on first use, and we'd have less control over the error message.
-        internal string MacroErrors { get; set; } = MacroErrorBehaviour.Inline.ToString();
-
-        public MacroErrorBehaviour MacroErrorsBehaviour
-        {
-            get
-            {
-                if (Enum.TryParse<MacroErrorBehaviour>(MacroErrors, true, out var value))
-                {
-                    return value;
-                }
-
-                // We need to return somethhing valid here as this property is evalulated during start-up, and if there's an error
-                // in the configured value it won't be parsed to the enum.
-                // At run-time though this default won't be used, as an invalid value will be picked up by ContentSettingsValidator.
-                return MacroErrorBehaviour.Inline;
-            }
-        }
+        public MacroErrorBehaviour MacroErrors { get; set; } = MacroErrorBehaviour.Inline;
 
         public IEnumerable<string> DisallowedUploadFiles { get; set; } = new[] { "ashx", "aspx", "ascx", "config", "cshtml", "vbhtml", "asmx", "air", "axd" };
 

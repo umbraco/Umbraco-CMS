@@ -25,23 +25,13 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Configuration.Models.Validation
             Assert.False(result.Succeeded);
         }
 
-        [Test]
-        public void Returns_Fail_For_Configuration_With_Invalid_SmtpDeliveryMethod_Field()
-        {
-            var validator = new GlobalSettingsValidator();
-            var options = BuildGlobalSettings(smtpDeliveryMethod: "invalid");
-            var result = validator.Validate("settings", options);
-            Assert.False(result.Succeeded);
-        }
-
-        private static GlobalSettings BuildGlobalSettings(string smtpEmail = "test@test.com", string smtpDeliveryMethod = "Network")
+        private static GlobalSettings BuildGlobalSettings(string smtpEmail = "test@test.com")
         {
             return new GlobalSettings
             {
                 Smtp = new SmtpSettings
                 {
                     From = smtpEmail,
-                    DeliveryMethod = smtpDeliveryMethod,
                 }
             };
         }

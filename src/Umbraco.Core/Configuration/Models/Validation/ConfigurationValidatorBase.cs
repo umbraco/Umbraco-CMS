@@ -18,12 +18,6 @@ namespace Umbraco.Core.Configuration.Models.Validation
             return true;
         }
 
-        public bool ValidateStringIsOneOfEnumValues(string configPath, string value, Type enumType, out string message)
-        {
-            var validValues = Enum.GetValues(enumType).OfType<object>().Select(x => x.ToString());
-            return ValidateStringIsOneOfValidValues(configPath, value, validValues, out message);
-        }
-
         public bool ValidateCollection(string configPath, IEnumerable<ValidatableEntryBase> values, string validationDescription, out string message)
         {
             if (values.Any(x => !x.IsValid()))

@@ -1,5 +1,4 @@
-﻿using System.Net.Mail;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 
 namespace Umbraco.Core.Configuration.Models.Validation
 {
@@ -18,8 +17,7 @@ namespace Umbraco.Core.Configuration.Models.Validation
 
         private bool ValidateSmtpSetting(SmtpSettings value, out string message)
         {
-            return ValidateOptionalEntry($"{Constants.Configuration.ConfigGlobal}:{nameof(GlobalSettings.Smtp)}", value, "A valid From email address is required", out message) &&
-                (value == null || ValidateStringIsOneOfEnumValues("Global:Smtp:DeliveryMethod", value.DeliveryMethod, typeof(SmtpDeliveryMethod), out message));
+            return ValidateOptionalEntry($"{Constants.Configuration.ConfigGlobal}:{nameof(GlobalSettings.Smtp)}", value, "A valid From email address is required", out message);
         }
     }
 }

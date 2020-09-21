@@ -1,6 +1,4 @@
-﻿using System;
-using Umbraco.Configuration;
-using Umbraco.Core.Configuration.Models.Validation;
+﻿using Umbraco.Configuration;
 
 namespace Umbraco.Core.Configuration.Models
 {
@@ -20,27 +18,10 @@ namespace Umbraco.Core.Configuration.Models
         /// </remarks>
         public bool Enable { get; set; } = false;
 
-        // See note on ContentSettings.MacroErrors
-        internal string ModelsMode { get; set; } = Configuration.ModelsMode.Nothing.ToString();
-
         /// <summary>
         ///     Gets the models mode.
         /// </summary>
-        public ModelsMode ModelsModeValue
-        {
-            get
-            {
-                if (Enum.TryParse<ModelsMode>(ModelsMode, true, out var value))
-                {
-                    return value;
-                }
-
-                // We need to return somethhing valid here as this property is evalulated during start-up, and if there's an error
-                // in the configured value it won't be parsed to the enum.
-                // At run-time though this default won't be used, as an invalid value will be picked up by ModelsBuilderSettingsValidator.
-                return Configuration.ModelsMode.Nothing;
-            }
-        }
+        public ModelsMode ModelsMode { get; set; } = ModelsMode.Nothing;
 
         /// <summary>
         ///     Gets the models namespace.
@@ -70,7 +51,7 @@ namespace Umbraco.Core.Configuration.Models
 
             set
             {
-                if (!ModelsModeValue.IsLive())
+                if (!ModelsMode.IsLive())
                 {
                     _flagOutOfDateModels = false;
                 }

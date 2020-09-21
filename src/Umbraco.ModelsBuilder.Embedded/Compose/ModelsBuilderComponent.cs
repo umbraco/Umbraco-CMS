@@ -55,7 +55,7 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
             if (_config.Enable)
                 FileService.SavingTemplate += FileService_SavingTemplate;
 
-            if (_config.ModelsModeValue.IsLiveNotPure())
+            if (_config.ModelsMode.IsLiveNotPure())
                 _liveModelsProvider.Install();
 
             if (_config.FlagOutOfDateModels)

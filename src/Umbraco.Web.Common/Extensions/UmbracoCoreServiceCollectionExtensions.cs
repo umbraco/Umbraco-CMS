@@ -129,18 +129,16 @@ namespace Umbraco.Extensions
 
             services.AddSingleton<IValidateOptions<ContentSettings>, ContentSettingsValidator>();
             services.AddSingleton<IValidateOptions<GlobalSettings>, GlobalSettingsValidator>();
-            services.AddSingleton<IValidateOptions<HostingSettings>, HostingSettingsValidator>();
-            services.AddSingleton<IValidateOptions<ModelsBuilderSettings>, ModelsBuilderSettingsValidator>();
             services.AddSingleton<IValidateOptions<RequestHandlerSettings>, RequestHandlerSettingsValidator>();
 
             services.Configure<ActiveDirectorySettings>(configuration.GetSection(Constants.Configuration.ConfigActiveDirectory));
             services.Configure<ConnectionStrings>(configuration.GetSection("ConnectionStrings"), o => o.BindNonPublicProperties = true);
-            services.Configure<ContentSettings>(configuration.GetSection(Constants.Configuration.ConfigContent), o => o.BindNonPublicProperties = true);
+            services.Configure<ContentSettings>(configuration.GetSection(Constants.Configuration.ConfigContent));
             services.Configure<CoreDebugSettings>(configuration.GetSection(Constants.Configuration.ConfigCoreDebug));
             services.Configure<ExceptionFilterSettings>(configuration.GetSection(Constants.Configuration.ConfigExceptionFilter));
-            services.Configure<GlobalSettings>(configuration.GetSection(Constants.Configuration.ConfigGlobal), o => o.BindNonPublicProperties = true);
+            services.Configure<GlobalSettings>(configuration.GetSection(Constants.Configuration.ConfigGlobal));
             services.Configure<HealthChecksSettings>(configuration.GetSection(Constants.Configuration.ConfigHealthChecks));
-            services.Configure<HostingSettings>(configuration.GetSection(Constants.Configuration.ConfigHosting), o => o.BindNonPublicProperties = true);
+            services.Configure<HostingSettings>(configuration.GetSection(Constants.Configuration.ConfigHosting));
             services.Configure<ImagingSettings>(configuration.GetSection(Constants.Configuration.ConfigImaging));
             services.Configure<IndexCreatorSettings>(configuration.GetSection(Constants.Configuration.ConfigExamine));
             services.Configure<KeepAliveSettings>(configuration.GetSection(Constants.Configuration.ConfigKeepAlive));

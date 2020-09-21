@@ -92,7 +92,7 @@ namespace Umbraco.ModelsBuilder.Embedded.Building
         {
             TypeModel.MapModelTypes(_typeModels, ModelsNamespace);
 
-            var pureLive = Config.ModelsModeValue == ModelsMode.PureLive;
+            var pureLive = Config.ModelsMode == ModelsMode.PureLive;
 
             // for the first two of these two tests,
             //  always throw, even in purelive: cannot happen unless ppl start fidling with attributes to rename

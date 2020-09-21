@@ -63,7 +63,7 @@ namespace Umbraco.Web.Hosting
                 if (_localTempPath != null)
                     return _localTempPath;
 
-                switch (_hostingSettings.LocalTempStorageLocationValue)
+                switch (_hostingSettings.LocalTempStorageLocation)
                 {
                     case LocalTempStorage.AspNetTemp:
                         return _localTempPath = System.IO.Path.Combine(HttpRuntime.CodegenDir, "UmbracoData");

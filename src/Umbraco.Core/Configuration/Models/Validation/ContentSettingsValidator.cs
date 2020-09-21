@@ -9,11 +9,6 @@ namespace Umbraco.Core.Configuration.Models.Validation
         public ValidateOptionsResult Validate(string name, ContentSettings options)
         {
             string message;
-            if (!ValidateMacroErrors(options.MacroErrors, out message))
-            {
-                return ValidateOptionsResult.Fail(message);
-            }
-
             if (!ValidateError404Collection(options.Error404Collection, out message))
             {
                 return ValidateOptionsResult.Fail(message);
@@ -25,11 +20,6 @@ namespace Umbraco.Core.Configuration.Models.Validation
             }
 
             return ValidateOptionsResult.Success;
-        }
-
-        private bool ValidateMacroErrors(string value, out string message)
-        {
-            return ValidateStringIsOneOfEnumValues($"{Constants.Configuration.ConfigContent}:{nameof(ContentSettings.MacroErrors)}", value, typeof(MacroErrorBehaviour), out message);
         }
 
         private bool ValidateError404Collection(IEnumerable<ContentErrorPage> values, out string message)

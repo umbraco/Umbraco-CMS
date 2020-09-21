@@ -26,7 +26,7 @@ namespace Umbraco.ModelsBuilder.Embedded
         private readonly IHostingEnvironment _hostingEnvironment;
 
         // we do not manage pure live here
-        internal bool IsEnabled => _config.ModelsModeValue.IsLiveNotPure();
+        internal bool IsEnabled => _config.ModelsMode.IsLiveNotPure();
 
         public LiveModelsProvider(ILogger logger, IOptions<ModelsBuilderSettings> config, ModelsGenerator modelGenerator, ModelsGenerationError mbErrors, IHostingEnvironment hostingEnvironment)
         {

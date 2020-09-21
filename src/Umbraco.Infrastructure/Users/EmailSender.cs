@@ -89,7 +89,7 @@ namespace Umbraco.Core
                     }
 
                     var mailMessage = ConstructEmailMessage(message);
-                    if (_globalSettings.Smtp.DeliveryMethodValue == SmtpDeliveryMethod.Network)
+                    if (_globalSettings.Smtp.DeliveryMethod == SmtpDeliveryMethod.Network)
                     {
                         await client.SendAsync(mailMessage);
                     }
