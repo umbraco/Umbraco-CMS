@@ -14,7 +14,7 @@ namespace Umbraco.Composing
 {
     public static class Current
     {
-        private static Microsoft.Extensions.Logging.ILogger<object> _logger = new NullLogger<object>();
+        private static ILogger<object> _logger = new NullLogger<object>();
         private static ILoggerFactory _loggerFactory;
         private static IIOHelper _ioHelper;
         private static IHostingEnvironment _hostingEnvironment;
@@ -23,7 +23,7 @@ namespace Umbraco.Composing
         private static SecuritySettings _securitySettings;
         private static GlobalSettings _globalSettings;
 
-        public static Microsoft.Extensions.Logging.ILogger<object> Logger => EnsureInitialized(_logger);
+        public static ILogger<object> Logger => EnsureInitialized(_logger);
         public static IIOHelper IOHelper => EnsureInitialized(_ioHelper);
         public static IHostingEnvironment HostingEnvironment => EnsureInitialized(_hostingEnvironment);
         public static IBackOfficeInfo BackOfficeInfo => EnsureInitialized(_backOfficeInfo);
@@ -44,7 +44,7 @@ namespace Umbraco.Composing
         }
 
         public static void Initialize(
-            Microsoft.Extensions.Logging.ILogger<object> logger,
+            ILogger<object> logger,
             SecuritySettings securitySettings,
             GlobalSettings globalSettings,
             IIOHelper ioHelper,
