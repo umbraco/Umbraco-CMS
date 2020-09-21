@@ -5,24 +5,22 @@ using System.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Web.Composing;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
-using Umbraco.Tests.PublishedContent;
-using Umbraco.Tests.TestHelpers;
-using Umbraco.Web;
+using Umbraco.Core.Strings;
+using Umbraco.Tests.Common.PublishedContent;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.PropertyEditors.ValueConverters;
 using Umbraco.Web.PublishedCache;
-using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Published
 {
     [TestFixture]
-    public class NestedContentTests : UmbracoTestBase
+    public class NestedContentTests
     {
         private (IPublishedContentType, IPublishedContentType) CreateContentTypes()
         {
@@ -32,7 +30,7 @@ namespace Umbraco.Tests.Published
             var localizationService = Mock.Of<ILocalizationService>();
 
             PropertyEditorCollection editors = null;
-            var editor = new NestedContentPropertyEditor(logger, new Lazy<PropertyEditorCollection>(() => editors), Mock.Of<IDataTypeService>(),localizationService, Mock.Of<IContentTypeService>(), TestHelper.IOHelper, TestHelper.ShortStringHelper, Mock.Of<ILocalizedTextService>());
+            var editor = new NestedContentPropertyEditor(logger, new Lazy<PropertyEditorCollection>(() => editors), Mock.Of<IDataTypeService>(),localizationService, Mock.Of<IContentTypeService>(), Mock.Of<IIOHelper>(), Mock.Of<IShortStringHelper>(), Mock.Of<ILocalizedTextService>());
             editors = new PropertyEditorCollection(new DataEditorCollection(new DataEditor[] { editor }));
 
             var dataType1 = new DataType(editor)
@@ -63,13 +61,14 @@ namespace Umbraco.Tests.Published
                 }
             };
 
-            var dataType3 = new DataType(new TextboxPropertyEditor(logger, Mock.Of<IDataTypeService>(), localizationService, TestHelper.IOHelper, TestHelper.ShortStringHelper, Mock.Of<ILocalizedTextService>()))
+            var dataType3 = new DataType(new TextboxPropertyEditor(logger, Mock.Of<IDataTypeService>(), localizationService, Mock.Of<IIOHelper>(), Mock.Of<IShortStringHelper>(), Mock.Of<ILocalizedTextService>()))
             {
                 Id = 3
             };
 
             // mocked dataservice returns nested content preValues
-            var dataTypeService = new TestObjects.TestDataTypeService(dataType1, dataType2, dataType3);
+            var dataTypeServiceMock = new Mock<IDataTypeService>();
+            dataTypeServiceMock.Setup(x => x.GetAll()).Returns(new []{dataType1, dataType2, dataType3});
 
             var publishedModelFactory = new Mock<IPublishedModelFactory>();
 
@@ -123,7 +122,7 @@ namespace Umbraco.Tests.Published
                 new NestedContentManyValueConverter(publishedSnapshotAccessor.Object, publishedModelFactory.Object, proflog),
             });
 
-            var factory = new PublishedContentTypeFactory(publishedModelFactory.Object, converters, dataTypeService);
+            var factory = new PublishedContentTypeFactory(publishedModelFactory.Object, converters, dataTypeServiceMock.Object);
 
             IEnumerable<IPublishedPropertyType> CreatePropertyTypes1(IPublishedContentType contentType)
             {
@@ -177,7 +176,7 @@ namespace Umbraco.Tests.Published
                 ]")
                 }
             };
-            var value = content.Value("property1");
+            var value = content.Value(Mock.Of<IPublishedValueFallback>(),"property1");
 
             // nested single converter returns proper TestModel value
             Assert.IsInstanceOf<TestElementModel>(value);
@@ -209,7 +208,7 @@ namespace Umbraco.Tests.Published
                 ]")
                 }
             };
-            var value = content.Value("property2");
+            var value = content.Value(Mock.Of<IPublishedValueFallback>(), ("property2"));
 
             // nested many converter returns proper IEnumerable<TestModel> value
             Assert.IsInstanceOf<IEnumerable<IPublishedElement>>(value);
@@ -227,7 +226,7 @@ namespace Umbraco.Tests.Published
                 : base(content)
             { }
 
-            public string PropValue => this.Value<string>("propertyN1");
+            public string PropValue => this.Value<string>(Mock.Of<IPublishedValueFallback>(),"propertyN1");
         }
 
         class TestPublishedProperty : PublishedPropertyBase

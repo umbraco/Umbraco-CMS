@@ -18,6 +18,8 @@ namespace Umbraco.Core.Models.PublishedContent
     /// </example>
     public class ModelType : Type
     {
+
+
         private ModelType(string contentTypeAlias)
         {
             if (contentTypeAlias == null) throw new ArgumentNullException(nameof(contentTypeAlias));
@@ -261,6 +263,10 @@ namespace Umbraco.Core.Models.PublishedContent
         protected override bool IsCOMObjectImpl()
             => false;
 
+
+        public new bool IsSZArray => false;
+
+
         /// <inheritdoc />
         public override object InvokeMember(string name, BindingFlags invokeAttr, Binder binder, object target, object[] args, ParameterModifier[] modifiers, CultureInfo culture, string[] namedParameters)
             => throw new NotSupportedException();
@@ -291,6 +297,9 @@ namespace Umbraco.Core.Models.PublishedContent
 
         /// <inheritdoc />
         public override string AssemblyQualifiedName => Name;
+
+
+        internal virtual bool IsSzArray => false;
 
         /// <inheritdoc />
         public override Type MakeArrayType()
@@ -390,6 +399,8 @@ namespace Umbraco.Core.Models.PublishedContent
 
         protected override bool IsCOMObjectImpl()
             => false;
+
+        internal virtual bool IsSzArray => false;
 
         public override object InvokeMember(string name, BindingFlags invokeAttr, Binder binder, object target, object[] args, ParameterModifier[] modifiers, CultureInfo culture, string[] namedParameters)
         {

@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Moq;
+using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Web;
-using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Tests.Published
 {
     public class PublishedSnapshotTestObjects
     {
+
         [PublishedModel("element1")]
         public class TestElementModel1 : PublishedElementModel
         {
@@ -15,7 +15,7 @@ namespace Umbraco.Tests.Published
                 : base(content)
             { }
 
-            public string Prop1 => this.Value<string>("prop1");
+            public string Prop1 => this.Value<string>(Mock.Of<IPublishedValueFallback>(), "prop1");
         }
 
         [PublishedModel("element2")]
@@ -25,7 +25,7 @@ namespace Umbraco.Tests.Published
                 : base(content)
             { }
 
-            public IEnumerable<TestContentModel1> Prop2 => this.Value<IEnumerable<TestContentModel1>>("prop2");
+            public IEnumerable<TestContentModel1> Prop2 => this.Value<IEnumerable<TestContentModel1>>(Mock.Of<IPublishedValueFallback>(), "prop2");
         }
 
         [PublishedModel("content1")]
@@ -35,7 +35,7 @@ namespace Umbraco.Tests.Published
                 : base(content)
             { }
 
-            public string Prop1 => this.Value<string>("prop1");
+            public string Prop1 => this.Value<string>(Mock.Of<IPublishedValueFallback>(), "prop1");
         }
 
         [PublishedModel("content2")]
@@ -45,8 +45,8 @@ namespace Umbraco.Tests.Published
                 : base(content)
             { }
 
-            public IEnumerable<TestContentModel1> Prop2 => this.Value<IEnumerable<TestContentModel1>>("prop2");
+            public IEnumerable<TestContentModel1> Prop2 => this.Value<IEnumerable<TestContentModel1>>(Mock.Of<IPublishedValueFallback>(), "prop2");
         }
-        
+
     }
 }

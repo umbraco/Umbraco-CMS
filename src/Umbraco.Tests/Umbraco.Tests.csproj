@@ -133,6 +133,9 @@
     <Compile Include="Models\VariationTests.cs" />
     <Compile Include="Persistence\Mappers\MapperTestBase.cs" />
     <Compile Include="Persistence\Repositories\DocumentRepositoryTest.cs" />
+    <Compile Include="PublishedContent\SolidPublishedSnapshot.cs" />
+    <Compile Include="Published\ConvertersTests.cs" />
+    <Compile Include="Published\ModelTypeTests.cs" />
     <Compile Include="Routing\BaseUrlProviderTest.cs" />
     <Compile Include="Routing\UrlProviderWithHideTopLevelNodeFromPathTests.cs" />
     <Compile Include="Security\BackOfficeOwinUserManagerTests.cs" />
@@ -146,7 +149,6 @@
     <Compile Include="PublishedContent\NuCacheChildrenTests.cs" />
     <Compile Include="PublishedContent\PublishedContentLanguageVariantTests.cs" />
     <Compile Include="PublishedContent\PublishedContentSnapshotTestBase.cs" />
-    <Compile Include="PublishedContent\SolidPublishedSnapshot.cs" />
     <Compile Include="PublishedContent\NuCacheTests.cs" />
     <Compile Include="Routing\MediaUrlProviderTests.cs" />
     <Compile Include="Routing\RoutableDocumentFilterTests.cs" />
@@ -166,10 +168,6 @@
     <Compile Include="TestHelpers\RandomIdRamDirectory.cs" />
     <Compile Include="TestHelpers\Stubs\TestUserPasswordConfig.cs" />
     <Compile Include="Testing\Objects\TestDataSource.cs" />
-    <Compile Include="Published\PublishedSnapshotTestObjects.cs" />
-    <Compile Include="Published\ModelTypeTests.cs" />
-    <Compile Include="Published\NestedContentTests.cs" />
-    <Compile Include="Published\PropertyCacheLevelTests.cs" />
     <Compile Include="IO\ShadowFileSystemTests.cs" />
     <Compile Include="Issues\U9560.cs" />
     <Compile Include="Integration\ContentEventsTests.cs" />
@@ -177,7 +175,6 @@
     <Compile Include="Packaging\PackageExtractionTests.cs" />
     <Compile Include="Persistence\NPocoTests\NPocoFetchTests.cs" />
     <Compile Include="Persistence\NPocoTests\NPocoSqlTemplateTests.cs" />
-    <Compile Include="Published\ConvertersTests.cs" />
     <Compile Include="Routing\ContentFinderByUrlAndTemplateTests.cs" />
     <Compile Include="Routing\ContentFinderByUrlTests.cs" />
     <Compile Include="Routing\ContentFinderByUrlWithDomainsTests.cs" />

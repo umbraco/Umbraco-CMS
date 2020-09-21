@@ -4,22 +4,18 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
-using Umbraco.Tests.TestHelpers;
-using Umbraco.Tests.Testing;
-using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Tests.Published
 {
     [TestFixture]
-    public class PropertyCacheLevelTests : UmbracoTestBase
+    public class PropertyCacheLevelTests
     {
         [TestCase(PropertyCacheLevel.None, 2)]
         [TestCase(PropertyCacheLevel.Element, 1)]
@@ -34,14 +30,18 @@ namespace Umbraco.Tests.Published
                 converter,
             });
 
-            var dataTypeService = new TestObjects.TestDataTypeService(
-                new DataType(new VoidEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(),Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>())) { Id = 1 });
+            var dataTypeServiceMock = new Mock<IDataTypeService>();
+            var dataType = new DataType(new VoidEditor(Mock.Of<ILogger>(), dataTypeServiceMock.Object,
+                    Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>()))
+                { Id = 1 };
+            dataTypeServiceMock.Setup(x => x.GetAll()).Returns(dataType.Yield);
 
-            var publishedContentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters, dataTypeService);
+
+            var publishedContentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters, dataTypeServiceMock.Object);
 
             IEnumerable<IPublishedPropertyType> CreatePropertyTypes(IPublishedContentType contentType)
             {
-                yield return publishedContentTypeFactory.CreatePropertyType(contentType, "prop1", 1);
+                yield return publishedContentTypeFactory.CreatePropertyType(contentType, "prop1", dataType.Id);
             }
 
             var setType1 = publishedContentTypeFactory.CreateContentType(Guid.NewGuid(), 1000, "set1", CreatePropertyTypes);
@@ -61,14 +61,14 @@ namespace Umbraco.Tests.Published
 
             var set1 = new PublishedElement(setType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "1234" } }, false);
 
-            Assert.AreEqual(1234, set1.Value("prop1"));
+            Assert.AreEqual(1234, set1.Value(Mock.Of<IPublishedValueFallback>(), "prop1"));
             Assert.AreEqual(1, converter.SourceConverts);
             Assert.AreEqual(1, converter.InterConverts);
 
             // source is always converted once and cached per content
             // inter conversion depends on the specified cache level
 
-            Assert.AreEqual(1234, set1.Value("prop1"));
+            Assert.AreEqual(1234, set1.Value(Mock.Of<IPublishedValueFallback>(), "prop1"));
             Assert.AreEqual(1, converter.SourceConverts);
             Assert.AreEqual(interConverts, converter.InterConverts);
         }
@@ -115,10 +115,13 @@ namespace Umbraco.Tests.Published
                 converter,
             });
 
-            var dataTypeService = new TestObjects.TestDataTypeService(
-                new DataType(new VoidEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(),Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>())) { Id = 1 });
+            var dataTypeServiceMock = new Mock<IDataTypeService>();
+            var dataType = new DataType(new VoidEditor(Mock.Of<ILogger>(), dataTypeServiceMock.Object,
+                    Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>()))
+                { Id = 1 };
+            dataTypeServiceMock.Setup(x => x.GetAll()).Returns(dataType.Yield);
 
-            var publishedContentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters, dataTypeService);
+            var publishedContentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters, dataTypeServiceMock.Object);
 
             IEnumerable<IPublishedPropertyType> CreatePropertyTypes(IPublishedContentType contentType)
             {
@@ -143,14 +146,14 @@ namespace Umbraco.Tests.Published
 
             var set1 = new PublishedElement(setType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "1234" } }, false, referenceCacheLevel, publishedSnapshotAccessor.Object);
 
-            Assert.AreEqual(1234, set1.Value("prop1"));
+            Assert.AreEqual(1234, set1.Value(Mock.Of<IPublishedValueFallback>(), "prop1"));
             Assert.AreEqual(1, converter.SourceConverts);
             Assert.AreEqual(1, converter.InterConverts);
 
             Assert.AreEqual(elementsCount1, elementsCache.Count);
             Assert.AreEqual(snapshotCount1, snapshotCache.Count);
 
-            Assert.AreEqual(1234, set1.Value("prop1"));
+            Assert.AreEqual(1234, set1.Value(Mock.Of<IPublishedValueFallback>(), "prop1"));
             Assert.AreEqual(1, converter.SourceConverts);
             Assert.AreEqual(interConverts, converter.InterConverts);
 
@@ -160,7 +163,7 @@ namespace Umbraco.Tests.Published
             var oldSnapshotCache = snapshotCache;
             snapshotCache.Clear();
 
-            Assert.AreEqual(1234, set1.Value("prop1"));
+            Assert.AreEqual(1234, set1.Value(Mock.Of<IPublishedValueFallback>(), "prop1"));
             Assert.AreEqual(1, converter.SourceConverts);
 
             Assert.AreEqual(elementsCount2, elementsCache.Count);
@@ -172,7 +175,7 @@ namespace Umbraco.Tests.Published
             var oldElementsCache = elementsCache;
             elementsCache.Clear();
 
-            Assert.AreEqual(1234, set1.Value("prop1"));
+            Assert.AreEqual(1234, set1.Value(Mock.Of<IPublishedValueFallback>(), "prop1"));
             Assert.AreEqual(1, converter.SourceConverts);
 
             Assert.AreEqual(elementsCount2, elementsCache.Count);
@@ -192,10 +195,13 @@ namespace Umbraco.Tests.Published
                 converter,
             });
 
-            var dataTypeService = new TestObjects.TestDataTypeService(
-                new DataType(new VoidEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(),Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>())) { Id = 1 });
+            var dataTypeServiceMock = new Mock<IDataTypeService>();
+            var dataType = new DataType(new VoidEditor(Mock.Of<ILogger>(), dataTypeServiceMock.Object,
+                    Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>()))
+                { Id = 1 };
+            dataTypeServiceMock.Setup(x => x.GetAll()).Returns(dataType.Yield);
 
-            var publishedContentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters, dataTypeService);
+            var publishedContentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters, dataTypeServiceMock.Object);
 
             IEnumerable<IPublishedPropertyType> CreatePropertyTypes(IPublishedContentType contentType)
             {
