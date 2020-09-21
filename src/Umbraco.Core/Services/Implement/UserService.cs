@@ -372,7 +372,7 @@ namespace Umbraco.Core.Services.Implement
         /// <returns></returns>
         public string GetDefaultMemberType()
         {
-            return "writer";
+            return Constants.Security.WriterGroupAlias;
         }
 
         /// <summary>
@@ -1197,12 +1197,12 @@ namespace Umbraco.Core.Services.Implement
         /// <summary>
         /// Occurs before Save
         /// </summary>
-        internal static event TypedEventHandler<IUserService, SaveEventArgs<UserGroupWithUsers>> SavingUserGroup;
+        public static event TypedEventHandler<IUserService, SaveEventArgs<UserGroupWithUsers>> SavingUserGroup;
 
         /// <summary>
         /// Occurs after Save
         /// </summary>
-        internal static event TypedEventHandler<IUserService, SaveEventArgs<UserGroupWithUsers>> SavedUserGroup;
+        public static event TypedEventHandler<IUserService, SaveEventArgs<UserGroupWithUsers>> SavedUserGroup;
 
         /// <summary>
         /// Occurs before Delete

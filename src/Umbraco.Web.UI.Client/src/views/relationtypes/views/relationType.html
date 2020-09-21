@@ -11,10 +11,18 @@
             <umb-control-group label="@relationType_direction">
                 <ul class="unstyled">
                     <li>
-                        <umb-radiobutton name="relationTypeDirection" value="false" model="model.relationType.isBidirectional" text="{{vm.labels.parentToChild}}"></umb-radiobutton>
+                        <umb-radiobutton name="relationTypeDirection"
+                                         value="false"
+                                         model="model.relationType.isBidirectional"
+                                         text="{{vm.labels.parentToChild}}">
+                        </umb-radiobutton>
                     </li>
                     <li>
-                        <umb-radiobutton name="relationTypeDirection" value="true" model="model.relationType.isBidirectional" text="{{vm.labels.bidirectional}}"></umb-radiobutton>
+                        <umb-radiobutton name="relationTypeDirection"
+                                         value="true"
+                                         model="model.relationType.isBidirectional"
+                                         text="{{vm.labels.bidirectional}}">
+                        </umb-radiobutton>
                     </li>
                 </ul>
             </umb-control-group>

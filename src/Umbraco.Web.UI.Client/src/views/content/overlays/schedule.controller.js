@@ -1,7 +1,7 @@
 (function () {
     "use strict";
     
-    function ScheduleContentController($scope, $timeout, localizationService, dateHelper, userService, contentEditingHelper) {
+    function ScheduleContentController($scope, $timeout, localizationService, dateHelper, userService) {
 
         var vm = this;
 
@@ -12,7 +12,6 @@
         vm.clearPublishDate = clearPublishDate;
         vm.clearUnpublishDate = clearUnpublishDate;
         vm.dirtyVariantFilter = dirtyVariantFilter;
-        vm.pristineVariantFilter = pristineVariantFilter;
         vm.changeSelection = changeSelection;
 
         vm.firstSelectedDates = {};
@@ -24,60 +23,62 @@
         function onInit() {
 
             vm.variants = $scope.model.variants;
-            vm.hasPristineVariants = false;
-
-            for (let i = 0; i < vm.variants.length; i++) {
-                origDates.push({
-                    releaseDate: vm.variants[i].releaseDate,
-                    expireDate: vm.variants[i].expireDate
-                });
-            }
+            vm.displayVariants = vm.variants.slice(0);// shallow copy, we dont want to share the array-object(because we will be performing a sort method) but each entry should be shared (because we need validation and notifications).
 
             if(!$scope.model.title) {
-                localizationService.localize("general_scheduledPublishing").then(function(value){
+                localizationService.localize("general_scheduledPublishing").then(value => {
                     $scope.model.title = value;
                 });
             }
+
+            vm.variants.forEach(variant => {
+                origDates.push({
+                    releaseDate: variant.releaseDate,
+                    expireDate: variant.expireDate
+                });
+
+                variant.isMandatory = isMandatoryFilter(variant);
+            });
 
             // Check for variants: if a node is invariant it will still have the default language in variants
             // so we have to check for length > 1
             if (vm.variants.length > 1) {
 
-                _.each(vm.variants,
-                    function (variant) {
-                        variant.compositeId = contentEditingHelper.buildCompositeVariantId(variant);
-                        variant.htmlId = "_content_variant_" + variant.compositeId;
-    
-                        //check for pristine variants
-                        if (!vm.hasPristineVariants) {
-                            vm.hasPristineVariants = pristineVariantFilter(variant);
+                vm.displayVariants.sort((a, b) => {
+                    if (a.language && b.language) {
+                        if (a.language.name < b.language.name) {
+                            return -1;
                         }
-                    });
-
-                //now sort it so that the current one is at the top
-                vm.variants = _.sortBy(vm.variants, function (v) {
-                    return v.active ? 0 : 1;
+                        if (a.language.name > b.language.name) {
+                            return 1;
+                        }
+                    }
+                    if (a.segment && b.segment) {
+                        if (a.segment < b.segment) {
+                            return -1;
+                        }
+                        if (a.segment > b.segment) {
+                            return 1;
+                        }
+                    }
+                    return 0;
                 });
 
-                var active = _.find(vm.variants, function (v) {
-                    return v.active;
+                vm.variants.forEach(v => {
+                    if (v.active) {
+                        v.save = true;
+                    }
                 });
-
-                if (active) {
-                    //ensure that the current one is selected
-                    active.save = true;
-                }
-
-                $scope.model.disableSubmitButton = !canSchedule();
-            
+                
+                $scope.model.disableSubmitButton = !canSchedule();            
             }
 
             // get current backoffice user and format dates
-            userService.getCurrentUser().then(function (currentUser) {
+            userService.getCurrentUser().then(currentUser => {
 
                 vm.currentUser = currentUser;
 
-                angular.forEach(vm.variants, function(variant) {
+                vm.variants.forEach(variant => {
 
                     // prevent selecting publish/unpublish date before today
                     var now = new Date();
@@ -98,9 +99,7 @@
                         formatDatesToLocal(variant);
                     }
                 });
-
             });
-
         }
 
         /**
@@ -173,9 +172,7 @@
          */
         function checkForBackdropClick() {
 
-            var open = _.find(vm.variants, function (variant) {
-                return variant.releaseDatePickerOpen || variant.expireDatePickerOpen;
-            });
+            var open = vm.variants.find(variant => variant.releaseDatePickerOpen || variant.expireDatePickerOpen);
 
             if(open) {
                 $scope.model.disableBackdropClick = true;
@@ -297,8 +294,11 @@
             return (variant.active || variant.isDirty || variant.state === "Draft" || variant.state === "PublishedPendingChanges" || variant.state === "NotCreated");
         }
 
-        function pristineVariantFilter(variant) {
-            return !(dirtyVariantFilter(variant));
+        function isMandatoryFilter(variant) {
+            //determine a variant is 'dirty' (meaning it will show up as publish-able) if it's
+            // * has a mandatory language
+            // * without having a segment, segments cant be mandatory at current state of code.
+            return (variant.language && variant.language.isMandatory === true && variant.segment == null);
         }
 
         /** Returns true if publishing is possible based on if there are un-published mandatory languages */
@@ -321,7 +321,7 @@
                     return true;
                 }
 
-                var isMandatory = variant.language && variant.language.isMandatory;
+                var isMandatory = variant.segment == null && variant.language && variant.language.isMandatory;
 
                 //if this variant will show up in the publish-able list
                 var publishable = dirtyVariantFilter(variant);
@@ -347,20 +347,19 @@
         onInit();
 
         //when this dialog is closed, clean up
-        $scope.$on('$destroy', function () {
-            for (var i = 0; i < vm.variants.length; i++) {
-                vm.variants[i].save = false;
+        $scope.$on('$destroy', () => {
+            vm.variants.forEach(variant => {
+                variant.save = false;
                 // remove properties only needed for this dialog
-                delete vm.variants[i].releaseDateFormatted;
-                delete vm.variants[i].expireDateFormatted;
-                delete vm.variants[i].datePickerConfig;
-                delete vm.variants[i].releaseDatePickerInstance;
-                delete vm.variants[i].expireDatePickerInstance;
-                delete vm.variants[i].releaseDatePickerOpen;
-                delete vm.variants[i].expireDatePickerOpen;
-            } 
+                delete variant.releaseDateFormatted;
+                delete variant.expireDateFormatted;
+                delete variant.datePickerConfig;
+                delete variant.releaseDatePickerInstance;
+                delete variant.expireDatePickerInstance;
+                delete variant.releaseDatePickerOpen;
+                delete variant.expireDatePickerOpen;
+            }); 
         });
-
     }
 
     angular.module("umbraco").controller("Umbraco.Overlays.ScheduleContentController", ScheduleContentController);

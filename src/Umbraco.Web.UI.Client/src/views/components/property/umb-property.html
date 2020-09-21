@@ -1,29 +1,30 @@
 <div class="umb-property">
     <ng-form name="propertyForm">
-        <div class="control-group umb-control-group" ng-class="{hidelabel:property.hideLabel, 'umb-control-group__listview': property.alias === '_umb_containerView'}">
+        <div class="control-group umb-control-group"
+             ng-class="{hidelabel:vm.property.hideLabel, 'umb-control-group__listview': vm.property.alias === '_umb_containerView'}">
 
             <val-property-msg></val-property-msg>
 
             <div class="umb-el-wrap">
 
-                <div class="control-header" ng-hide="property.hideLabel === true">
-                    <small ng-if="showInherit" class="db" style="padding-top: 0; margin-bottom: 5px;">
-                        <localize key="contentTypeEditor_inheritedFrom"></localize> {{inheritsFrom}}
+                <div class="control-header" ng-hide="vm.property.hideLabel === true">
+                    <small ng-if="vm.showInherit" class="db" style="padding-top: 0; margin-bottom: 5px;">
+                        <localize key="contentTypeEditor_inheritedFrom"></localize> {{vm.inheritsFrom}}
                     </small>
 
-                    <label class="control-label" for="{{property.alias}}" ng-attr-title="{{propertyAlias}}">
+                    <label class="control-label" for="{{vm.property.alias}}" ng-attr-title="{{vm.controlLabelTitle}}">
 
-                        {{property.label}}
+                        {{vm.property.label}}
 
-                        <span ng-if="property.validation.mandatory">
+                        <span ng-if="vm.property.validation.mandatory">
                             <strong class="umb-control-required">*</strong>
                         </span>
 
                     </label>
 
-                    <umb-property-actions actions="propertyActions"></umb-property-actions>
+                    <umb-property-actions actions="vm.propertyActions"></umb-property-actions>
 
-                    <small class="control-description" ng-bind-html="property.description | preserveNewLineInHtml"></small>
+                    <small class="control-description" ng-if="vm.property.description" ng-bind-html="vm.property.description | preserveNewLineInHtml"></small>
                 </div>
 
                 <div class="controls" ng-transclude>

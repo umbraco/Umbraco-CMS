@@ -88,6 +88,7 @@ function MemberGroupsEditController($scope, $routeParams, appState, navigationSe
 
                 }, function (err) {
 
+                    formHelper.resetForm({ scope: $scope, hasErrors: true });
                     contentEditingHelper.handleSaveError({
                         err: err
                     });

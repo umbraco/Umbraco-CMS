@@ -256,7 +256,7 @@ angular.module('umbraco.services')
             load: function (pathArray, scope, defaultAssetType) {
                 var promise;
 
-                if (!angular.isArray(pathArray)) {
+                if (!Utilities.isArray(pathArray)) {
                     throw "pathArray must be an array";
                 }
 
@@ -276,7 +276,7 @@ angular.module('umbraco.services')
                 //blocking
                 var promises = [];
                 var assets = [];
-                _.each(nonEmpty, function (path) {
+                nonEmpty.forEach(path => {
                     path = convertVirtualPath(path);
                     var asset = service._getAssetPromise(path);
                     //if not previously loaded, add to list of promises
@@ -325,19 +325,17 @@ angular.module('umbraco.services')
                         scope = $rootScope;
                     }
                     angularHelper.safeApply(scope,
-                        function () {
-                            asset.deferred.resolve(true);
-                        });
+                        () => asset.deferred.resolve(true));
                 }
 
                 if (cssAssets.length > 0) {
-                    var cssPaths = _.map(cssAssets, function (asset) { return appendRnd(asset.path) });
-                    LazyLoad.css(cssPaths, function () { _.each(cssAssets, assetLoaded); });
+                    var cssPaths = cssAssets.map(css => appendRnd(css.path));
+                    LazyLoad.css(cssPaths, () => cssAssets.forEach(assetLoaded));
                 }
 
                 if (jsAssets.length > 0) {
-                    var jsPaths = _.map(jsAssets, function (asset) { return appendRnd(asset.path) });
-                    LazyLoad.js(jsPaths, function () { _.each(jsAssets, assetLoaded); });
+                    var jsPaths = jsAssets.map(js => appendRnd(js.path));
+                    LazyLoad.js(jsPaths, () => jsAssets.forEach(assetLoaded));
                 }
 
                 return promise;

@@ -388,7 +388,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                     umbRequestHelper.getApiUrl(
                         "contentApiBaseUrl",
                         "GetBlueprintById",
-                        [{ id: id }])),
+                        { id: id })),
                 'Failed to retrieve data for content id ' + id)
                 .then(function (result) {
                     return $q.when(umbDataFormatter.formatContentGetData(result));
@@ -401,7 +401,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                     umbRequestHelper.getApiUrl(
                         "contentApiBaseUrl",
                         "GetNotificationOptions",
-                        [{ contentId: id }])),
+                        { contentId: id })),
                 'Failed to retrieve data for content id ' + id);
         },
 
@@ -442,9 +442,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
         getByIds: function (ids) {
 
             var idQuery = "";
-            _.each(ids, function (item) {
-                idQuery += "ids=" + item + "&";
-            });
+            ids.forEach(id => idQuery += `ids=${id}&`);
 
             return umbRequestHelper.resourcePromise(
                 $http.get(
@@ -455,9 +453,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                 'Failed to retrieve data for content with multiple ids')
                 .then(function (result) {
                     //each item needs to be re-formatted
-                    _.each(result, function (r) {
-                        umbDataFormatter.formatContentGetData(r)
-                    });
+                    result.forEach(r => umbDataFormatter.formatContentGetData(r));
                     return $q.when(result);
                 });
         },
@@ -502,8 +498,53 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                     umbRequestHelper.getApiUrl(
                         "contentApiBaseUrl",
                         "GetEmpty",
-                        [{ contentTypeAlias: alias }, { parentId: parentId }])),
+                        { contentTypeAlias: alias, parentId: parentId })),
                 'Failed to retrieve data for empty content item type ' + alias)
+                .then(function (result) {
+                    return $q.when(umbDataFormatter.formatContentGetData(result));
+                });
+        },
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.contentResource#getScaffoldByKey
+         * @methodOf umbraco.resources.contentResource
+         *
+         * @description
+         * Returns a scaffold of an empty content item, given the id of the content item to place it underneath and the content type alias.
+          *
+         * - Parent Id must be provided so umbraco knows where to store the content
+          * - Content Type Id must be provided so umbraco knows which properties to put on the content scaffold
+          *
+         * The scaffold is used to build editors for content that has not yet been populated with data.
+          *
+         * ##usage
+         * <pre>
+         * contentResource.getScaffoldByKey(1234, '...')
+         *    .then(function(scaffold) {
+         *        var myDoc = scaffold;
+          *        myDoc.name = "My new document";
+         *
+         *        contentResource.publish(myDoc, true)
+         *            .then(function(content){
+         *                alert("Retrieved, updated and published again");
+         *            });
+         *    });
+          * </pre>
+          *
+         * @param {Int} parentId id of content item to return
+          * @param {String} contentTypeGuid contenttype guid to base the scaffold on
+         * @returns {Promise} resourcePromise object containing the content scaffold.
+         *
+         */
+        getScaffoldByKey: function (parentId, contentTypeKey) {
+
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "contentApiBaseUrl",
+                        "GetEmptyByKey",
+                        { contentTypeKey: contentTypeKey, parentId: parentId })),
+                'Failed to retrieve data for empty content item id ' + contentTypeKey)
                 .then(function (result) {
                     return $q.when(umbDataFormatter.formatContentGetData(result));
                 });
@@ -516,7 +557,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                     umbRequestHelper.getApiUrl(
                         "contentApiBaseUrl",
                         "GetEmpty",
-                        [{ blueprintId: blueprintId }, { parentId: parentId }])),
+                        { blueprintId: blueprintId, parentId: parentId })),
                 'Failed to retrieve blueprint for id ' + blueprintId)
                 .then(function (result) {
                     return $q.when(umbDataFormatter.formatContentGetData(result));
@@ -610,10 +651,10 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
             
             //converts the value to a js bool
             function toBool(v) {
-                if (angular.isNumber(v)) {
+                if (Utilities.isNumber(v)) {
                     return v > 0;
                 }
-                if (angular.isString(v)) {
+                if (Utilities.isString(v)) {
                     return v === "true";
                 }
                 if (typeof v === "boolean") {
@@ -1003,10 +1044,10 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                 loginPageId: loginPageId,
                 errorPageId: errorPageId
             };
-            if (angular.isArray(groups) && groups.length) {
+            if (Utilities.isArray(groups) && groups.length) {
                 publicAccess.groups = groups;
             }
-            else if (angular.isArray(usernames) && usernames.length) {
+            else if (Utilities.isArray(usernames) && usernames.length) {
                 publicAccess.usernames = usernames;
             }
             else {

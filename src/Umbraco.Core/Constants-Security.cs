@@ -28,8 +28,10 @@ namespace Umbraco.Core
             public const string UnknownUserName = "SYTEM";
 
             public const string AdminGroupAlias = "admin";
+            public const string EditorGroupAlias = "editor";
             public const string SensitiveDataGroupAlias = "sensitiveData";
             public const string TranslatorGroupAlias = "translator";
+            public const string WriterGroupAlias = "writer";
 
             public const string BackOfficeAuthenticationType = "UmbracoBackOffice";
             public const string BackOfficeExternalAuthenticationType = "UmbracoExternalCookie";

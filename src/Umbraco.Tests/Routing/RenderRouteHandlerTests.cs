@@ -140,7 +140,7 @@ namespace Umbraco.Tests.Routing
             frequest.TemplateModel = template;
 
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
-            var type = new AutoPublishedContentType(22, "CustomDocument", new PublishedPropertyType[] { });
+            var type = new AutoPublishedContentType(Guid.NewGuid(), 22, "CustomDocument", new PublishedPropertyType[] { });
             ContentTypesCache.GetPublishedContentTypeByAlias = alias => type;
 
             var handler = new RenderRouteHandler(umbracoContext, new TestControllerFactory(umbracoContextAccessor, Mock.Of<ILogger>(), context =>

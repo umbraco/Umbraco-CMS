@@ -9,13 +9,17 @@
 (function () {
     "use strict";
 
-    function MemberTypesEditController($scope, $rootScope, $routeParams, $log, $filter, memberTypeResource, dataTypeResource, editorState, iconHelper, formHelper, navigationService, contentEditingHelper, notificationsService, $q, localizationService, overlayHelper, contentTypeHelper, angularHelper, eventsService) {
+    function MemberTypesEditController($scope, $routeParams, $q,
+        memberTypeResource, editorState, iconHelper,
+        navigationService, contentEditingHelper, notificationsService, localizationService,
+        overlayHelper, contentTypeHelper, angularHelper, eventsService) {
 
         var evts = [];
         var vm = this;
         var infiniteMode = $scope.model && $scope.model.infiniteMode;
-        var memberTypeId = infiniteMode ? $scope.model.id : $routeParams.id;
-        var create = infiniteMode ? $scope.model.create : $routeParams.create;
+        var memberTypeId = $routeParams.id;
+        var create = $routeParams.create;
+        var memberTypeIcon = "";
 
         vm.save = save;
         vm.close = close;
@@ -30,7 +34,20 @@
         vm.page.loading = false;
         vm.page.saveButtonState = "init";
         vm.labels = {};
-        vm.saveButtonKey = infiniteMode ? "buttons_saveAndClose" : "buttons_save";
+        vm.saveButtonKey = "buttons_save";
+        vm.generateModelsKey = "buttons_saveAndGenerateModels";
+
+        onInit();
+
+        function onInit() {
+            // get init values from model when in infinite mode
+            if (infiniteMode) {
+                memberTypeId = $scope.model.id;
+                create = $scope.model.create;
+                vm.saveButtonKey = "buttons_saveAndClose";
+                vm.generateModelsKey = "buttons_generateModelsAndClose";
+            }
+        }
 
         var labelKeys = [
             "general_design",
@@ -154,7 +171,7 @@
         });
 
         if (create) {
-
+            
             vm.page.loading = true;
 
             //we are creating so get an empty data type item
@@ -166,13 +183,17 @@
 				});
         }
         else {
+            loadMemberType();
+        }
+
+        function loadMemberType() {
 
             vm.page.loading = true;
 
             memberTypeResource.getById(memberTypeId).then(function (dt) {
                 init(dt);
 
-                if(!infiniteMode) {
+                if (!infiniteMode) {
                     syncTreeNode(vm.contentType, dt.path, true);
                 }
 
@@ -180,7 +201,10 @@
             });
         }
 
+        /* ---------- SAVE ---------- */
+
         function save() {
+            
             // only save if there is no overlays open
             if(overlayHelper.getNumberOfOverlays() === 0) {
 
@@ -227,8 +251,17 @@
                     }
                 }).then(function (data) {
                     //success
+
                     if(!infiniteMode) {
                         syncTreeNode(vm.contentType, data.path);
+                    }
+
+                    // emit event
+                    var args = { memberType: vm.contentType };
+                    eventsService.emit("editors.memberType.saved", args);
+
+                    if (memberTypeIcon !== vm.contentType.icon) {
+                        eventsService.emit("editors.tree.icon.changed", args);
                     }
 
                     vm.page.saveButtonState = "success";
@@ -238,6 +271,7 @@
                     }
 
                     deferred.resolve(data);
+
                 }, function (err) {
                     //error
                     if (err) {
@@ -263,18 +297,6 @@
 
         function init(contentType) {
 
-            // set all tab to inactive
-            if (contentType.groups.length !== 0) {
-                angular.forEach(contentType.groups, function (group) {
-
-                    angular.forEach(group.properties, function (property) {
-                        // get data type details for each property
-                        getDataTypeDetails(property);
-                    });
-
-                });
-            }
-
             // convert legacy icons
             convertLegacyIcons(contentType);
 
@@ -283,6 +305,7 @@
 
             vm.contentType = contentType;
 
+            memberTypeIcon = contentType.icon;
         }
 
         function convertLegacyIcons(contentType) {
@@ -298,35 +321,24 @@
 
             // set icon back on contentType
             contentType.icon = contentTypeArray[0].icon;
-
-        }
-
-        function getDataTypeDetails(property) {
-
-            if (property.propertyState !== "init") {
-
-                dataTypeResource.getById(property.dataTypeId)
-					.then(function (dataType) {
-					    property.dataTypeIcon = dataType.icon;
-					    property.dataTypeName = dataType.name;
-					});
-            }
         }
 
         /** Syncs the content type  to it's tree node - this occurs on first load and after saving */
         function syncTreeNode(dt, path, initialLoad) {
-
             navigationService.syncTree({ tree: "membertypes", path: path.split(","), forceReload: initialLoad !== true }).then(function (syncArgs) {
                 vm.currentNode = syncArgs.node;
             });
-
         }
         
         function close() {
-            if(infiniteMode && $scope.model.close) {
+            if (infiniteMode && $scope.model.close) {
                 $scope.model.close();
             }
         }
+
+        evts.push(eventsService.on("app.refreshEditor", function (name, error) {
+            loadMemberType();
+        }));
 
         evts.push(eventsService.on("editors.groupsBuilder.changed", function(name, args) {
             angularHelper.getCurrentForm($scope).$setDirty();

@@ -13,7 +13,6 @@ namespace Umbraco.Web.Editors.Binders
     /// </summary>
     internal class MediaItemBinder : IModelBinder
     {
-        private readonly ContentModelBinderHelper _modelBinderHelper;
         private readonly ServiceContext _services;
 
         public MediaItemBinder() : this(Current.Services)
@@ -23,7 +22,6 @@ namespace Umbraco.Web.Editors.Binders
         public MediaItemBinder(ServiceContext services)
         {
             _services = services;
-            _modelBinderHelper = new ContentModelBinderHelper();
         }
 
         /// <summary>
@@ -34,7 +32,7 @@ namespace Umbraco.Web.Editors.Binders
         /// <returns></returns>
         public bool BindModel(HttpActionContext actionContext, ModelBindingContext bindingContext)
         {
-            var model = _modelBinderHelper.BindModelFromMultipartRequest<MediaItemSave>(actionContext, bindingContext);
+            var model = ContentModelBinderHelper.BindModelFromMultipartRequest<MediaItemSave>(actionContext, bindingContext);
             if (model == null) return false;
 
             model.PersistedContent = ContentControllerBase.IsCreatingAction(model.Action) ? CreateNew(model) : GetExisting(model);
@@ -44,7 +42,7 @@ namespace Umbraco.Web.Editors.Binders
             {
                 model.PropertyCollectionDto = Current.Mapper.Map<IMedia, ContentPropertyCollectionDto>(model.PersistedContent);
                 //now map all of the saved values to the dto
-                _modelBinderHelper.MapPropertyValuesFromSaved(model, model.PropertyCollectionDto);
+                ContentModelBinderHelper.MapPropertyValuesFromSaved(model, model.PropertyCollectionDto);
             }
 
             model.Name = model.Name.Trim();

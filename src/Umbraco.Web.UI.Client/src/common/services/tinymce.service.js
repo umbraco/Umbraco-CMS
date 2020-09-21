@@ -107,7 +107,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
         //queue rules loading
         if (configuredStylesheets) {
-            angular.forEach(configuredStylesheets, function (val, key) {
+            configuredStylesheets.forEach(function (val, key) {
 
                 if (val.indexOf(Umbraco.Sys.ServerVariables.umbracoSettings.cssPath + "/") === 0) {
                     // current format (full path to stylesheet)
@@ -119,7 +119,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 }
 
                 promises.push(stylesheetResource.getRulesByName(val).then(function (rules) {
-                    angular.forEach(rules, function (rule) {
+                    rules.forEach(function (rule) {
                         var r = {};
                         r.title = rule.name;
                         if (rule.selector[0] == ".") {
@@ -133,7 +133,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                         else if (rule.selector[0] !== "." && rule.selector.indexOf(".") > -1) {
                             var split = rule.selector.split(".");
                             r.block = split[0];
-                            r.classes = rule.selector.substring(rule.selector.indexOf(".") + 1).replace(".", " ");
+                            r.classes = rule.selector.substring(rule.selector.indexOf(".") + 1).replace(/\./g, " ");
                         }
                         else if (rule.selector[0] != "#" && rule.selector.indexOf("#") > -1) {
                             var split = rule.selector.split("#");
@@ -480,7 +480,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                                     //now we need to check if this custom config key is defined in our baseline, if it is we don't want to
                                     //overwrite the baseline config item if it is an array, we want to concat the items in the array, otherwise
                                     //if it's an object it will overwrite the baseline
-                                    if (angular.isArray(config[i]) && angular.isArray(tinyMceConfig.customConfig[i])) {
+                                    if (Utilities.isArray(config[i]) && Utilities.isArray(tinyMceConfig.customConfig[i])) {
                                         //concat it and below this concat'd array will overwrite the baseline in angular.extend
                                         tinyMceConfig.customConfig[i] = config[i].concat(tinyMceConfig.customConfig[i]);
                                     }
@@ -1367,6 +1367,9 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             //    throw "args.model.value is required";
             //}
 
+            // force TinyMCE to load plugins/themes from minified files (see http://archive.tinymce.com/wiki.php/api4:property.tinymce.suffix.static)
+            args.editor.suffix = ".min";
+
             var unwatch = null;
 
             //Starts a watch on the model value so that we can update TinyMCE if the model changes behind the scenes or from the server
@@ -1504,6 +1507,8 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             });
 
             args.editor.on('Dirty', function (e) {
+            	syncContent(); // Set model.value to the RTE's content
+
                 //make the form dirty manually so that the track changes works, setting our model doesn't trigger
                 // the angular bits because tinymce replaces the textarea.
                 if (args.currentForm) {

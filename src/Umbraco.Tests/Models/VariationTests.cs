@@ -442,7 +442,10 @@ namespace Umbraco.Tests.Models
         [Test]
         public void ContentPublishValuesWithMixedPropertyTypeVariations()
         {
-            var propertyValidationService = new PropertyValidationService(Current.Factory.GetInstance<PropertyEditorCollection>(), Current.Factory.GetInstance<ServiceContext>().DataTypeService);
+            var propertyValidationService = new PropertyValidationService(
+                Current.Factory.GetInstance<PropertyEditorCollection>(),
+                Current.Factory.GetInstance<ServiceContext>().DataTypeService,
+                Current.Factory.GetInstance<ServiceContext>().TextService);
             const string langFr = "fr-FR";
 
             // content type varies by Culture
@@ -574,7 +577,10 @@ namespace Umbraco.Tests.Models
             prop.SetValue("a");
             Assert.AreEqual("a", prop.GetValue());
             Assert.IsNull(prop.GetValue(published: true));
-            var propertyValidationService = new PropertyValidationService(Current.Factory.GetInstance<PropertyEditorCollection>(), Current.Factory.GetInstance<ServiceContext>().DataTypeService);
+            var propertyValidationService = new PropertyValidationService(
+                Current.Factory.GetInstance<PropertyEditorCollection>(),
+                Current.Factory.GetInstance<ServiceContext>().DataTypeService,
+                Current.Factory.GetInstance<ServiceContext>().TextService);
 
             Assert.IsTrue(propertyValidationService.IsPropertyValid(prop));
 

@@ -69,15 +69,18 @@ namespace Umbraco.Web.Trees
                     .OrderBy(entity => entity.Name)
                     .Select(dt =>
                     {
+                        // get the content type here so we can get the icon from it to use when we create the tree node
+                        // and we can enrich the result with content type data that's not available in the entity service output
+                        var contentType = contentTypes[dt.Id];
+
                         // since 7.4+ child type creation is enabled by a config option. It defaults to on, but can be disabled if we decide to.
                         // need this check to keep supporting sites where children have already been created.
                         var hasChildren = dt.HasChildren;
-                        var node = CreateTreeNode(dt, Constants.ObjectTypes.DocumentType, id, queryStrings, Constants.Icons.ContentType, hasChildren);
+                        var node = CreateTreeNode(dt, Constants.ObjectTypes.DocumentType, id, queryStrings, contentType?.Icon ?? Constants.Icons.ContentType, hasChildren);
 
                         node.Path = dt.Path;
 
-                        // enrich the result with content type data that's not available in the entity service output
-                        var contentType = contentTypes[dt.Id];
+                        // now we can enrich the result with content type data that's not available in the entity service output
                         node.Alias = contentType.Alias;
                         node.AdditionalData["isElement"] = contentType.IsElement;
 
