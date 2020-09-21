@@ -1,6 +1,6 @@
 ﻿using NUnit.Framework;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Configuration.Models.Validation;
-using Umbraco.Tests.Common.Builders;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.Configuration.Models.Validation
 {
@@ -11,7 +11,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Configuration.Models.Validation
         public void Returns_Success_ForValid_Configuration()
         {
             var validator = new ModelsBuilderSettingsValidator();
-            var options = new ModelsBuilderSettingsBuilder().Build();
+            var options = new ModelsBuilderSettings();
             var result = validator.Validate("settings", options);
             Assert.True(result.Succeeded);
         }
@@ -20,7 +20,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Configuration.Models.Validation
         public void Returns_Fail_For_Configuration_With_Invalid_ModelsMode_Field()
         {
             var validator = new ModelsBuilderSettingsValidator();
-            var options = new ModelsBuilderSettingsBuilder().WithModelsMode("invalid").Build();
+            var options = new ModelsBuilderSettings { ModelsMode = "invalid" };
             var result = validator.Validate("settings", options);
             Assert.False(result.Succeeded);
         }

@@ -73,7 +73,7 @@ namespace Umbraco.Tests.Routing
             var umbracoApiControllerTypes = new UmbracoApiControllerTypeCollection(Composition.TypeLoader.GetUmbracoApiControllers());
             Composition.RegisterUnique(umbracoApiControllerTypes);
 
-            var requestHandlerSettings = new RequestHandlerSettingsBuilder().Build();
+            var requestHandlerSettings = new RequestHandlerSettings();
             Composition.RegisterUnique<IShortStringHelper>(_ => new DefaultShortStringHelper(Microsoft.Extensions.Options.Options.Create(requestHandlerSettings)));
         }
 

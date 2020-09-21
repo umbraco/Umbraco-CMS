@@ -29,7 +29,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         private MediaRepository CreateMediaRepository(IScopeProvider provider, out IMediaTypeRepository mediaTypeRepository)
         {
             var accessor = (IScopeAccessor) provider;
-            var globalSettings = new GlobalSettingsBuilder().Build();
+            var globalSettings = new GlobalSettings();
             var templateRepository = new TemplateRepository(accessor, AppCaches.Disabled, Logger, TestObjects.GetFileSystemsMock(), IOHelper, ShortStringHelper);
             var commonRepository = new ContentTypeCommonRepository(accessor, templateRepository, AppCaches, ShortStringHelper);
             var languageRepository = new LanguageRepository(accessor, AppCaches, Logger, Microsoft.Extensions.Options.Options.Create(globalSettings));
@@ -54,7 +54,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         private DocumentRepository CreateContentRepository(IScopeProvider provider, out IContentTypeRepository contentTypeRepository, out ITemplateRepository templateRepository)
         {
             var accessor = (IScopeAccessor) provider;
-            var globalSettings = new GlobalSettingsBuilder().Build();
+            var globalSettings = new GlobalSettings();
             templateRepository = new TemplateRepository(accessor, AppCaches, Logger, TestObjects.GetFileSystemsMock(), IOHelper, ShortStringHelper);
             var tagRepository = new TagRepository(accessor, AppCaches, Logger);
             var commonRepository = new ContentTypeCommonRepository(accessor, templateRepository, AppCaches, ShortStringHelper);
@@ -72,7 +72,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         private UserRepository CreateRepository(IScopeProvider provider)
         {
             var accessor = (IScopeAccessor) provider;
-            var globalSettings = new GlobalSettingsBuilder().Build();
+            var globalSettings = new GlobalSettings();
             var repository = new UserRepository(accessor, AppCaches.Disabled, Logger, Mappers, Microsoft.Extensions.Options.Options.Create(globalSettings), Microsoft.Extensions.Options.Options.Create(new UserPasswordConfigurationSettings()), new JsonNetSerializer());
             return repository;
         }

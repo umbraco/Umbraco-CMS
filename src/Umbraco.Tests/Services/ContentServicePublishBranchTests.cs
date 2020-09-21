@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Common.Builders;
@@ -426,7 +427,7 @@ namespace Umbraco.Tests.Services
 
         private void CreateTypes(out IContentType iContentType, out IContentType vContentType)
         {
-            var globalSettings = new GlobalSettingsBuilder().Build();
+            var globalSettings = new GlobalSettings();
 
             var langDe = new Language(globalSettings, "de") { IsDefault = true };
             ServiceContext.LocalizationService.Save(langDe);

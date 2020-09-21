@@ -39,7 +39,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private IStylesheetRepository CreateRepository()
         {
-            var globalSettings = new GlobalSettingsBuilder().Build();
+            var globalSettings = new GlobalSettings();
             return new StylesheetRepository(_fileSystems, IOHelper, Microsoft.Extensions.Options.Options.Create(globalSettings));
         }
 

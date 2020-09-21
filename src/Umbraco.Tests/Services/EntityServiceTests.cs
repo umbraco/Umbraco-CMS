@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
@@ -32,7 +33,7 @@ namespace Umbraco.Tests.Services
 
             if (_langFr == null && _langEs == null)
             {
-                var globalSettings = new GlobalSettingsBuilder().Build();
+                var globalSettings = new GlobalSettings();
                 _langFr = new Language(globalSettings, "fr-FR");
                 _langEs = new Language(globalSettings, "es-ES");
                 ServiceContext.LocalizationService.Save(_langFr);

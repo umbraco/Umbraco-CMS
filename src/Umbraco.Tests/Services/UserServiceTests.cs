@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Querying;
@@ -721,7 +722,7 @@ namespace Umbraco.Tests.Services
             var hash = new HMACSHA1();
             hash.Key = Encoding.Unicode.GetBytes(password);
             var encodedPassword = Convert.ToBase64String(hash.ComputeHash(Encoding.Unicode.GetBytes(password)));
-            var globalSettings = new GlobalSettingsBuilder().Build();
+            var globalSettings = new GlobalSettings();
             var membershipUser = new User(globalSettings, "JohnDoe", "john@umbraco.io", encodedPassword, encodedPassword);
             userService.Save(membershipUser);
 

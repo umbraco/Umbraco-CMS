@@ -5,11 +5,11 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Strings;
-using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Components;
 using Umbraco.Tests.TestHelpers;
 using Current = Umbraco.Web.Composing.Current;
@@ -28,7 +28,7 @@ namespace Umbraco.Tests.PropertyEditors
             var register = TestHelper.GetRegister();
             var composition = new Composition(register, TestHelper.GetMockedTypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.IOHelper, AppCaches.NoCache);
 
-            var requestHandlerSettings = new RequestHandlerSettingsBuilder().Build();
+            var requestHandlerSettings = new RequestHandlerSettings();
             register.Register<IShortStringHelper>(_
                 => new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(requestHandlerSettings)));
 

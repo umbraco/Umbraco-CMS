@@ -23,7 +23,7 @@ namespace Umbraco.Tests.Configurations
                 ApplicationVirtualPath = rootPath
             }));
 
-            var globalSettings = new GlobalSettingsBuilder().WithUmbracoPath(path).Build();
+            var globalSettings = new GlobalSettings { UmbracoPath = path };
 
             Assert.AreEqual(outcome, globalSettings.GetUmbracoMvcAreaNoCache(hostingEnvironment));
         }

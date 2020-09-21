@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.ModelsBuilder.Embedded;
 using Umbraco.ModelsBuilder.Embedded.Building;
-using Umbraco.Tests.Common.Builders;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.ModelsBuilder.Embedded
 {
@@ -41,7 +41,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.ModelsBuilder.Embedded
             {
             };
 
-            var modelsBuilderConfig = new ModelsBuilderSettingsBuilder().Build();
+            var modelsBuilderConfig = new ModelsBuilderSettings();
             var builder = new TextBuilder(modelsBuilderConfig, types);
             var btypes = builder.TypeModels;
 
@@ -152,7 +152,7 @@ namespace Umbraco.Web.PublishedModels
 " }
             };
 
-            var modelsBuilderConfig = new ModelsBuilderSettingsBuilder().Build();
+            var modelsBuilderConfig = new ModelsBuilderSettings();
             var builder = new TextBuilder(modelsBuilderConfig, types);
             var btypes = builder.TypeModels;
 
@@ -264,7 +264,7 @@ namespace Umbraco.Web.PublishedModels
             {
             };
 
-            var modelsBuilderConfig = new ModelsBuilderSettingsBuilder().Build();
+            var modelsBuilderConfig = new ModelsBuilderSettings();
             var builder = new TextBuilder(modelsBuilderConfig, types);
             builder.ModelsNamespace = "Umbraco.ModelsBuilder.Models"; // forces conflict with Umbraco.ModelsBuilder.Umbraco
             var btypes = builder.TypeModels;

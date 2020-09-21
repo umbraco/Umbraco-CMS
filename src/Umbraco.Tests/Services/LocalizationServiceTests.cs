@@ -36,7 +36,7 @@ namespace Umbraco.Tests.Services
         public override void SetUp()
         {
             base.SetUp();
-            _globalSettings = new GlobalSettingsBuilder().Build();
+            _globalSettings = new GlobalSettings();
         }
 
         [Test]

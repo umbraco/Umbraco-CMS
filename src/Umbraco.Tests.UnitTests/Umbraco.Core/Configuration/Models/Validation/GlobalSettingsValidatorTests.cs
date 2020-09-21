@@ -1,7 +1,6 @@
 ﻿using NUnit.Framework;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Configuration.Models.Validation;
-using Umbraco.Tests.Common.Builders;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.Configuration.Models.Validation
 {
@@ -37,12 +36,14 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Configuration.Models.Validation
 
         private static GlobalSettings BuildGlobalSettings(string smtpEmail = "test@test.com", string smtpDeliveryMethod = "Network")
         {
-            return new GlobalSettingsBuilder()
-                .AddSmtpSettings()
-                    .WithFrom(smtpEmail)
-                    .WithDeliveryMethod(smtpDeliveryMethod)
-                    .Done()
-                .Build();
+            return new GlobalSettings
+            {
+                Smtp = new SmtpSettings
+                {
+                    From = smtpEmail,
+                    DeliveryMethod = smtpDeliveryMethod,
+                }
+            };
         }
     }
 }

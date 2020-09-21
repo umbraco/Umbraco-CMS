@@ -40,7 +40,6 @@ using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Strings;
 using Umbraco.Net;
 using Umbraco.Tests.Common;
-using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Components;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Stubs;
@@ -173,7 +172,7 @@ namespace Umbraco.Tests.Testing
 
             TypeFinder = new TypeFinder(logger, new DefaultUmbracoAssemblyProvider(GetType().Assembly), new VaryingRuntimeHash());
             var appCaches = GetAppCaches();
-            var globalSettings = new GlobalSettingsBuilder().Build();
+            var globalSettings = new GlobalSettings();
             var settings = new WebRoutingSettings();
 
             IBackOfficeInfo backOfficeInfo = new AspNetBackOfficeInfo(globalSettings, IOHelper, logger, Microsoft.Extensions.Options.Options.Create(settings));
@@ -323,7 +322,7 @@ namespace Umbraco.Tests.Testing
             Composition.RegisterUnique<RichTextEditorPastedImages>();
             Composition.RegisterUnique<IPublishedValueFallback, NoopPublishedValueFallback>();
 
-            var webRoutingSettings = new WebRoutingSettingsBuilder().Build();
+            var webRoutingSettings = new WebRoutingSettings();
             Composition.RegisterUnique<IPublishedUrlProvider>(factory =>
                 new UrlProvider(
                     factory.GetInstance<IUmbracoContextAccessor>(),
@@ -414,13 +413,13 @@ namespace Umbraco.Tests.Testing
 
         protected virtual void ComposeSettings()
         {
-            var contentSettings = new ContentSettingsBuilder().Build();
-            var coreDebugSettings = new CoreDebugSettingsBuilder().Build();
-            var globalSettings = new GlobalSettingsBuilder().Build();
-            var nuCacheSettings = new NuCacheSettingsBuilder().Build();
-            var requestHandlerSettings = new RequestHandlerSettingsBuilder().Build();
-            var userPasswordConfigurationSettings = new UserPasswordConfigurationSettingsBuilder().Build();
-            var webRoutingSettings = new WebRoutingSettingsBuilder().Build();
+            var contentSettings = new ContentSettings();
+            var coreDebugSettings = new CoreDebugSettings();
+            var globalSettings = new GlobalSettings();
+            var nuCacheSettings = new NuCacheSettings();
+            var requestHandlerSettings = new RequestHandlerSettings();
+            var userPasswordConfigurationSettings = new UserPasswordConfigurationSettings();
+            var webRoutingSettings = new WebRoutingSettings();
 
             Composition.Register(x => Microsoft.Extensions.Options.Options.Create(contentSettings));
             Composition.Register(x => Microsoft.Extensions.Options.Options.Create(coreDebugSettings));
@@ -465,8 +464,8 @@ namespace Umbraco.Tests.Testing
 
             Composition.RegisterUnique<IEventMessagesFactory>(_ => new TransientEventMessagesFactory());
 
-            var globalSettings = new GlobalSettingsBuilder().Build();
-            var connectionStrings = new ConnectionStringsBuilder().Build();
+            var globalSettings = new GlobalSettings();
+            var connectionStrings = new ConnectionStrings();
 
             Composition.RegisterUnique<IUmbracoDatabaseFactory>(f => new UmbracoDatabaseFactory(Logger,
                 globalSettings,

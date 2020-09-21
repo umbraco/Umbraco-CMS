@@ -8,6 +8,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Scoping;
@@ -438,7 +439,7 @@ namespace Umbraco.Tests.IO
             var phy = new PhysicalFileSystem(ioHelper, hostingEnvironment, logger, path, "ignore");
 
             var container = Mock.Of<IFactory>();
-            var globalSettings = Options.Create(new GlobalSettingsBuilder().Build());
+            var globalSettings = Options.Create(new GlobalSettings());
             var fileSystems = new FileSystems(container, logger, ioHelper, globalSettings, TestHelper.GetHostingEnvironment()) { IsScoped = () => scopedFileSystems };
             var fs = fileSystems.GetFileSystem<FS>(phy);
             var sw = (ShadowWrapper) fs.InnerFileSystem;
@@ -535,7 +536,7 @@ namespace Umbraco.Tests.IO
             var phy = new PhysicalFileSystem(ioHelper, hostingEnvironment, logger, path, "ignore");
 
             var container = Mock.Of<IFactory>();
-            var globalSettings = Options.Create(new GlobalSettingsBuilder().Build());
+            var globalSettings = Options.Create(new GlobalSettings());
             var fileSystems = new FileSystems(container, logger, ioHelper, globalSettings, TestHelper.GetHostingEnvironment()) { IsScoped = () => scopedFileSystems };
             var fs = fileSystems.GetFileSystem<FS>( phy);
             var sw = (ShadowWrapper) fs.InnerFileSystem;
@@ -591,7 +592,7 @@ namespace Umbraco.Tests.IO
             var phy = new PhysicalFileSystem(ioHelper, hostingEnvironment, logger, path, "ignore");
 
             var container = Mock.Of<IFactory>();
-            var globalSettings = Options.Create(new GlobalSettingsBuilder().Build());
+            var globalSettings = Options.Create(new GlobalSettings());
             var fileSystems = new FileSystems(container, logger, ioHelper, globalSettings, TestHelper.GetHostingEnvironment()) { IsScoped = () => scopedFileSystems };
             var fs = fileSystems.GetFileSystem<FS>( phy);
             var sw = (ShadowWrapper)fs.InnerFileSystem;

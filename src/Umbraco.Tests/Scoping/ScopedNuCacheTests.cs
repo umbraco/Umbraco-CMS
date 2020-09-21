@@ -90,7 +90,7 @@ namespace Umbraco.Tests.Scoping
 
             var typeFinder = TestHelper.GetTypeFinder();
 
-            var nuCacheSettings = new NuCacheSettingsBuilder().Build();
+            var nuCacheSettings = new NuCacheSettings();
 
             return new PublishedSnapshotService(
                 options,
@@ -105,7 +105,7 @@ namespace Umbraco.Tests.Scoping
                 documentRepository, mediaRepository, memberRepository,
                 DefaultCultureAccessor,
                 new DatabaseDataSource(Mock.Of<ILogger>()),
-                Microsoft.Extensions.Options.Options.Create(globalSettings ?? new GlobalSettingsBuilder().Build()),
+                Microsoft.Extensions.Options.Options.Create(globalSettings ?? new GlobalSettings()),
                 Factory.GetInstance<IEntityXmlSerializer>(),
                 new NoopPublishedModelFactory(),
                 new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider(ShortStringHelper) }),

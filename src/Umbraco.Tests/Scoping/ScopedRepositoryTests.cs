@@ -33,7 +33,7 @@ namespace Umbraco.Tests.Scoping
         {
             base.SetUp();
 
-            _globalSettings = new GlobalSettingsBuilder().Build();
+            _globalSettings = new GlobalSettings();
         }
 
         protected override void Compose()

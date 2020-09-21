@@ -9,6 +9,7 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
@@ -34,13 +35,13 @@ namespace Umbraco.Tests.Components
 
             var logger = Mock.Of<ILogger>();
             var typeFinder = TestHelper.GetTypeFinder();
-            var globalSettings = new GlobalSettingsBuilder().Build();
-            var connectionStrings = new ConnectionStringsBuilder().Build();
+            var globalSettings = new GlobalSettings();
+            var connectionStrings = new ConnectionStrings();
             var f = new UmbracoDatabaseFactory(logger, Options.Create(globalSettings), Options.Create(connectionStrings), new Lazy<IMapperCollection>(() => new MapperCollection(Enumerable.Empty<BaseMapper>())), TestHelper.DbProviderFactoryCreator);
             var fs = new FileSystems(mock.Object, logger, TestHelper.IOHelper, Options.Create(globalSettings), TestHelper.GetHostingEnvironment());
-            var coreDebug = new CoreDebugSettingsBuilder().Build();
+            var coreDebug = new CoreDebugSettings();
             var mediaFileSystem = Mock.Of<IMediaFileSystem>();
-            var p = new ScopeProvider(f, fs, Microsoft.Extensions.Options.Options.Create(coreDebug), mediaFileSystem, logger, typeFinder, NoAppCache.Instance);
+            var p = new ScopeProvider(f, fs, Options.Create(coreDebug), mediaFileSystem, logger, typeFinder, NoAppCache.Instance);
 
             mock.Setup(x => x.GetInstance(typeof (ILogger))).Returns(logger);
             mock.Setup(x => x.GetInstance(typeof (IProfilingLogger))).Returns(new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));

@@ -55,19 +55,21 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Configuration.Models.Validation
 
         private static ContentSettings BuildContentSettings(string macroErrors = "inline", string culture = "en-US", string contentXPath = "", string autoFillImagePropertyAlias = "testAlias")
         {
-            return new ContentSettingsBuilder()
-                .WithMacroErrors(macroErrors)
-                .AddErrorPage()
-                    .WithCulture(culture)
-                    .WithContentId(1)
-                    .WithContentXPath(contentXPath)
-                    .Done()
-                .AddImaging()
-                    .AddAutoFillImageProperty()
-                        .WithAlias(autoFillImagePropertyAlias)
-                        .Done()
-                    .Done()
-                .Build();
+            return new ContentSettings
+            {
+                MacroErrors = macroErrors,
+                Error404Collection = new ContentErrorPage[]
+                {
+                    new ContentErrorPage { Culture = culture, ContentId = 1, ContentXPath = contentXPath },
+                },
+                Imaging = new ContentImagingSettings
+                {
+                    AutoFillImageProperties = new ImagingAutoFillUploadField[]
+                    {
+                        new ImagingAutoFillUploadField { Alias = autoFillImagePropertyAlias, WidthFieldAlias = "w", HeightFieldAlias = "h", LengthFieldAlias = "l", ExtensionFieldAlias = "e" }
+                    }
+                }
+            };
         }
     }
 }

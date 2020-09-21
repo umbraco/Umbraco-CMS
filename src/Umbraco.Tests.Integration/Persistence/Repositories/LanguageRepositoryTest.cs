@@ -9,7 +9,6 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
-using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;
 
@@ -25,7 +24,7 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
         public void SetUp()
         {
             CreateTestData();
-            _globalSettings = new GlobalSettingsBuilder().Build();
+            _globalSettings = new GlobalSettings();
         }
 
         private LanguageRepository CreateRepository(IScopeProvider provider)

@@ -104,7 +104,7 @@ namespace Umbraco.Tests.TestHelpers
         public static IMainDom MainDom => _testHelperInternal.MainDom;
         public static UriUtility UriUtility => _testHelperInternal.UriUtility;
 
-        public static IEmailSender EmailSender { get; } = new EmailSender(Options.Create(new GlobalSettingsBuilder().Build()));
+        public static IEmailSender EmailSender { get; } = new EmailSender(Options.Create(new GlobalSettings()));
 
 
         /// <summary>

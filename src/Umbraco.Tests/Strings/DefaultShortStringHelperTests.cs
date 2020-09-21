@@ -6,9 +6,9 @@ using System.Text.RegularExpressions;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Strings;
-using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Strings
@@ -24,7 +24,7 @@ namespace Umbraco.Tests.Strings
 
             // NOTE pre-filters runs _before_ Recode takes place
             // so there still may be utf8 chars even though you want ascii
-            var requestHandlerSettings = new RequestHandlerSettingsBuilder().Build();
+            var requestHandlerSettings = new RequestHandlerSettings();
             _helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(requestHandlerSettings)
                 .WithConfig(CleanStringType.FileName, new DefaultShortStringHelperConfig.Config
                 {
@@ -93,10 +93,7 @@ namespace Umbraco.Tests.Strings
         [Test]
         public void U4_4056()
         {
-            var requestHandlerSettings = new RequestHandlerSettingsBuilder()
-                .WithConvertUrlsToAscii("false")
-                .WithCharCollection(Enumerable.Empty<IChar>())
-                .Build();
+            var requestHandlerSettings = new RequestHandlerSettings { ConvertUrlsToAscii = "false", CharCollection = Enumerable.Empty<IChar>() };
 
             const string input = "ÆØÅ and æøå and 中文测试 and  אודות האתר and größer БбДдЖж page";
 
@@ -118,10 +115,7 @@ namespace Umbraco.Tests.Strings
         [Test]
         public void U4_4056_TryAscii()
         {
-            var requestHandlerSettings = new RequestHandlerSettingsBuilder()
-                .WithConvertUrlsToAscii("false")
-                .WithCharCollection(Enumerable.Empty<IChar>())
-                .Build();
+            var requestHandlerSettings = new RequestHandlerSettings { ConvertUrlsToAscii = "false", CharCollection = Enumerable.Empty<IChar>() };
 
             const string input1 = "ÆØÅ and æøå and 中文测试 and  אודות האתר and größer БбДдЖж page";
             const string input2 = "ÆØÅ and æøå and größer БбДдЖж page";
@@ -144,7 +138,8 @@ namespace Umbraco.Tests.Strings
         [Test]
         public void CleanStringUnderscoreInTerm()
         {
-            var requestHandlerSettings = new RequestHandlerSettingsBuilder().Build();
+            var requestHandlerSettings = new RequestHandlerSettings { ConvertUrlsToAscii = "false", CharCollection = Enumerable.Empty<IChar>() };
+
             var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(requestHandlerSettings)
                 .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
@@ -169,7 +164,7 @@ namespace Umbraco.Tests.Strings
         [Test]
         public void CleanStringLeadingChars()
         {
-            var requestHandlerSettings = new RequestHandlerSettingsBuilder().Build();
+            var requestHandlerSettings = new RequestHandlerSettings();
             var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(requestHandlerSettings)
                 .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
@@ -198,7 +193,7 @@ namespace Umbraco.Tests.Strings
         [Test]
         public void CleanStringTermOnUpper()
         {
-            var requestHandlerSettings = new RequestHandlerSettingsBuilder().Build();
+            var requestHandlerSettings = new RequestHandlerSettings();
             var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(requestHandlerSettings)
                 .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
@@ -223,7 +218,7 @@ namespace Umbraco.Tests.Strings
         [Test]
         public void CleanStringAcronymOnNonUpper()
         {
-            var requestHandlerSettings = new RequestHandlerSettingsBuilder().Build();
+            var requestHandlerSettings = new RequestHandlerSettings();
             var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(requestHandlerSettings)
                 .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
@@ -254,7 +249,7 @@ namespace Umbraco.Tests.Strings
         [Test]
         public void CleanStringGreedyAcronyms()
         {
-            var requestHandlerSettings = new RequestHandlerSettingsBuilder().Build();
+            var requestHandlerSettings = new RequestHandlerSettings();
             var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(requestHandlerSettings)
                 .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
@@ -285,7 +280,7 @@ namespace Umbraco.Tests.Strings
         [Test]
         public void CleanStringWhiteSpace()
         {
-            var requestHandlerSettings = new RequestHandlerSettingsBuilder().Build();
+            var requestHandlerSettings = new RequestHandlerSettings();
             var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(requestHandlerSettings)
                 .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
@@ -299,7 +294,7 @@ namespace Umbraco.Tests.Strings
         [Test]
         public void CleanStringSeparator()
         {
-            var requestHandlerSettings = new RequestHandlerSettingsBuilder().Build();
+            var requestHandlerSettings = new RequestHandlerSettings();
             var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(requestHandlerSettings)
                 .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
@@ -335,7 +330,7 @@ namespace Umbraco.Tests.Strings
         [Test]
         public void CleanStringSymbols()
         {
-            var requestHandlerSettings = new RequestHandlerSettingsBuilder().Build();
+            var requestHandlerSettings = new RequestHandlerSettings();
             var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(requestHandlerSettings)
                 .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
@@ -390,7 +385,7 @@ namespace Umbraco.Tests.Strings
         [Test]
         public void CleanStringEncoding()
         {
-            var requestHandlerSettings = new RequestHandlerSettingsBuilder().Build();
+            var requestHandlerSettings = new RequestHandlerSettings();
 
             var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(requestHandlerSettings)
                 .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
@@ -414,10 +409,7 @@ namespace Umbraco.Tests.Strings
         [Test]
         public void CleanStringDefaultConfig()
         {
-            var requestHandlerSettings = new RequestHandlerSettingsBuilder()
-                .WithCharCollection(Enumerable.Empty<IChar>())
-                .WithConvertUrlsToAscii("false")
-                .Build();
+            var requestHandlerSettings = new RequestHandlerSettings { ConvertUrlsToAscii = "false", CharCollection = Enumerable.Empty<IChar>() };
 
             var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(requestHandlerSettings));
 
@@ -440,7 +432,7 @@ namespace Umbraco.Tests.Strings
         [Test]
         public void CleanStringCasing()
         {
-            var requestHandlerSettings = new RequestHandlerSettingsBuilder().Build();
+            var requestHandlerSettings = new RequestHandlerSettings();
             var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(requestHandlerSettings)
                 .WithConfig(CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {

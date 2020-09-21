@@ -5,6 +5,7 @@ using System.Net;
 using System.Reflection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -18,10 +19,8 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Runtime;
 using Umbraco.Net;
 using Umbraco.Tests.Common;
-using Umbraco.Tests.Common.Builders;
 using Umbraco.Web.Common.AspNetCore;
 using IHostingEnvironment = Umbraco.Core.Hosting.IHostingEnvironment;
-using Microsoft.Extensions.FileProviders;
 
 namespace Umbraco.Tests.Integration.Implementations
 {
@@ -112,7 +111,7 @@ namespace Umbraco.Tests.Integration.Implementations
         {
             if (_backOfficeInfo == null)
             {
-                var globalSettings = new GlobalSettingsBuilder().Build();
+                var globalSettings = new GlobalSettings();
                 var mockedOptionsMonitorOfGlobalSettings = Mock.Of<IOptionsMonitor<GlobalSettings>>(x => x.CurrentValue == globalSettings);
                 _backOfficeInfo = new AspNetCoreBackOfficeInfo(mockedOptionsMonitorOfGlobalSettings);
             }
@@ -127,7 +126,7 @@ namespace Umbraco.Tests.Integration.Implementations
 
         private IOptionsMonitor<HostingSettings> GetIOptionsMonitorOfHostingSettings()
         {
-            var hostingSettings = new HostingSettingsBuilder().Build();
+            var hostingSettings = new HostingSettings();
             return Mock.Of<IOptionsMonitor<HostingSettings>>(x => x.CurrentValue == hostingSettings);
         }
 

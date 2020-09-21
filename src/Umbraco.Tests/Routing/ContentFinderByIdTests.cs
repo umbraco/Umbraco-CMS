@@ -1,6 +1,6 @@
 ﻿using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Tests.Common.Builders;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using Umbraco.Web.Routing;
@@ -18,7 +18,7 @@ namespace Umbraco.Tests.Routing
             var umbracoContext = GetUmbracoContext(urlAsString);
             var publishedRouter = CreatePublishedRouter();
             var frequest = publishedRouter.CreateRequest(umbracoContext);
-            var webRoutingSettings = new WebRoutingSettingsBuilder().Build();
+            var webRoutingSettings = new WebRoutingSettings();
             var lookup = new ContentFinderByIdPath(Microsoft.Extensions.Options.Options.Create(webRoutingSettings), Logger, Factory.GetInstance<IRequestAccessor>());
 
 
