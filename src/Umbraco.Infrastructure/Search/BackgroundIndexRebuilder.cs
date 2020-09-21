@@ -7,7 +7,6 @@ using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Hosting;
 using Umbraco.Web.Scheduling;
-using ILogger = Umbraco.Core.Logging.ILogger;
 
 namespace Umbraco.Web.Search
 {
