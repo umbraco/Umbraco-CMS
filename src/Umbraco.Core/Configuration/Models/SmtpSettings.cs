@@ -26,7 +26,10 @@ namespace Umbraco.Core.Configuration.Models
             {
                 return Enum.TryParse<SmtpDeliveryMethod>(DeliveryMethod, true, out var value)
                     ? value
-                    : SmtpDeliveryMethod.Network;
+                    : throw new InvalidOperationException(
+                        $"Parsing of {nameof(DeliveryMethod)} field value of {DeliveryMethod} was not recognised as a valid value of the enum {nameof(SmtpDeliveryMethod)}. " +
+                        $"This state shouldn't have been reached as if the configuration contains an invalid valie it should be caught by {nameof(GlobalSettingsValidator)}.");
+
             }
         }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using Umbraco.Configuration;
+using Umbraco.Core.Configuration.Models.Validation;
 
 namespace Umbraco.Core.Configuration.Models
 {
@@ -31,7 +32,9 @@ namespace Umbraco.Core.Configuration.Models
             {
                 return Enum.TryParse<ModelsMode>(ModelsMode, true, out var value)
                     ? value
-                    : Configuration.ModelsMode.Nothing;
+                    : throw new InvalidOperationException(
+                        $"Parsing of {nameof(ModelsMode)} field value of {ModelsMode} was not recognised as a valid value of the enum {nameof(ModelsMode)}. " +
+                        $"This state shouldn't have been reached as if the configuration contains an invalid valie it should be caught by {nameof(ModelsBuilderSettingsValidator)}.");
             }
         }
 

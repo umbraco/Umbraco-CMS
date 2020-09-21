@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Umbraco.Core.Configuration.Models.Validation;
 using Umbraco.Core.Macros;
 
 namespace Umbraco.Core.Configuration.Models
@@ -31,7 +32,9 @@ namespace Umbraco.Core.Configuration.Models
             {
                 return Enum.TryParse<MacroErrorBehaviour>(MacroErrors, true, out var value)
                     ? value
-                    : MacroErrorBehaviour.Inline;
+                    : throw new InvalidOperationException(
+                        $"Parsing of {nameof(MacroErrors)} field value of {MacroErrors} was not recognised as a valid value of the enum {nameof(MacroErrorBehaviour)}. " +
+                        $"This state shouldn't have been reached as if the configuration contains an invalid valie it should be caught by {nameof(ContentSettingsValidator)}.");
             }
         }
 
