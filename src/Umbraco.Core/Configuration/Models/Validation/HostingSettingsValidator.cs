@@ -16,7 +16,7 @@ namespace Umbraco.Core.Configuration.Models.Validation
 
         private bool ValidateLocalTempStorageLocation(string value, out string message)
         {
-            return ValidateStringIsOneOfEnumValues("Hosting:LocalTempStorageLocation", value, typeof(LocalTempStorage), out message);
+            return ValidateStringIsOneOfEnumValues($"{Constants.Configuration.ConfigHosting}:{nameof(HostingSettings.LocalTempStorageLocation)}", value, typeof(LocalTempStorage), out message);
         }
     }
 }

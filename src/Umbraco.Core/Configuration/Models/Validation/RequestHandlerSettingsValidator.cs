@@ -17,7 +17,7 @@ namespace Umbraco.Core.Configuration.Models.Validation
         private bool ValidateConvertUrlsToAscii(string value, out string message)
         {
             var validValues = new[] { "try", "true", "false" };
-            return ValidateStringIsOneOfValidValues("RequestHandler:ConvertUrlsToAscii", value, validValues, out message);
+            return ValidateStringIsOneOfValidValues($"{Constants.Configuration.ConfigRequestHandler}:{nameof(RequestHandlerSettings.ConvertUrlsToAscii)}", value, validValues, out message);
         }
     }
 }

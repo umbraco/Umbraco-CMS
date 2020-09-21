@@ -16,7 +16,7 @@ namespace Umbraco.Core.Configuration.Models.Validation
 
         private bool ValidateModelsMode(string value, out string message)
         {
-            return ValidateStringIsOneOfEnumValues("ModelsBuilder:ModelsMode", value, typeof(ModelsMode), out message);
+            return ValidateStringIsOneOfEnumValues($"{Constants.Configuration.ConfigModelsBuilder}:{nameof(ModelsBuilderSettings.ModelsMode)}", value, typeof(ModelsMode), out message);
         }
     }
 }

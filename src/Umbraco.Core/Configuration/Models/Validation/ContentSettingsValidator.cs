@@ -29,17 +29,17 @@ namespace Umbraco.Core.Configuration.Models.Validation
 
         private bool ValidateMacroErrors(string value, out string message)
         {
-            return ValidateStringIsOneOfEnumValues("Content:MacroErrors", value, typeof(MacroErrorBehaviour), out message);
+            return ValidateStringIsOneOfEnumValues($"{Constants.Configuration.ConfigContent}:{nameof(ContentSettings.MacroErrors)}", value, typeof(MacroErrorBehaviour), out message);
         }
 
         private bool ValidateError404Collection(IEnumerable<ContentErrorPage> values, out string message)
         {
-            return ValidateCollection("Content:Error404Collection", values, "Culture and one and only one of ContentId, ContentKey and ContentXPath must be specified for each entry", out message);
+            return ValidateCollection($"{Constants.Configuration.ConfigContent}:{nameof(ContentSettings.Error404Collection)}", values, "Culture and one and only one of ContentId, ContentKey and ContentXPath must be specified for each entry", out message);
         }
 
         private bool ValidateAutoFillImageProperties(IEnumerable<ImagingAutoFillUploadField> values, out string message)
         {
-            return ValidateCollection("Content:Imaging:AutoFillImageProperties", values, "Alias, WidthFieldAlias, HeightFieldAlias, LengthFieldAlias and ExtensionFieldAlias must be specified for each entry", out message);
+            return ValidateCollection($"{Constants.Configuration.ConfigContent}:{nameof(ContentSettings.Imaging)}:{nameof(ContentSettings.Imaging.AutoFillImageProperties)}", values, "Alias, WidthFieldAlias, HeightFieldAlias, LengthFieldAlias and ExtensionFieldAlias must be specified for each entry", out message);
         }
     }
 }
