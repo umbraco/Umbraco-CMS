@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Web.Mvc;
 using System.Web.Routing;
 using System.Web.SessionState;
@@ -12,6 +13,7 @@ using Umbraco.Core.Composing;
 using Umbraco.Web;
 using Current = Umbraco.Web.Composing.Current;
 
+[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 namespace Umbraco.Tests.TestHelpers.Stubs
 {
     /// <summary>
