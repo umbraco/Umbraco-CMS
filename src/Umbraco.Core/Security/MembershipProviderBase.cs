@@ -31,7 +31,9 @@ namespace Umbraco.Core.Security
 
         public bool VerifyPassword(string password, string hashedPassword)
         {
-            if (string.IsNullOrWhiteSpace(hashedPassword)) throw new ArgumentException("Value cannot be null or whitespace.", "hashedPassword");
+            if (string.IsNullOrWhiteSpace(hashedPassword))
+                return false;
+
             return CheckPassword(password, hashedPassword);
         }
 

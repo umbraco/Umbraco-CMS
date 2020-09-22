@@ -100,7 +100,7 @@
             </div>
 
         </div>
-        <div ng-if="!vm.denyLocalLogin" ng-show="vm.invitedUser == null && vm.inviteStep === 3" ng-if="vm.inviteStep === 3" class="umb-login-container">
+        <div ng-show="vm.invitedUser == null && vm.inviteStep === 3" ng-if="!vm.denyLocalLogin && vm.inviteStep === 3" class="umb-login-container">
             <div class="form">
                 <h1 style="margin-bottom: 10px; text-align: left;">Hi there</h1>
                 <p style="line-height: 1.6; margin-bottom: 25px;">

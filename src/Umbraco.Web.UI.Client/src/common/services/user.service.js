@@ -166,7 +166,7 @@ angular.module('umbraco.services')
             },
 
             /** Internal method to retry all request after sucessfull login */
-            _retryRequestQueue: function(success) {
+            _retryRequestQueue: function (success) {
                 retryRequestQueue(success)
             },
 
@@ -185,18 +185,22 @@ angular.module('umbraco.services')
             authenticate: function (login, password) {
 
                 return authResource.performLogin(login, password)
-                    .then(function(data) {
+                    .then(function (data) {
 
                         // Check if user has a start node set.
-                        if(data.startContentIds.length === 0 && data.startMediaIds.length === 0){
+                        if (data.startContentIds.length === 0 && data.startMediaIds.length === 0) {
                             var errorMsg = "User has no start-nodes";
                             var result = { errorMsg: errorMsg, user: data, authenticated: false, lastUserId: lastUserId, loginType: "credentials" };
                             eventsService.emit("app.notAuthenticated", result);
+                            // TODO: How does this make sense? How can you throw from a promise? Does this get caught by the rejection?
+                            // If so then return $q.reject should be used.
                             throw result;
                         }
-                        
+
                         return data;
-                        
+
+                    }, function (err) {
+                        return $q.reject(err);
                     }).then(this.setAuthenticationSuccessful);
             },
             setAuthenticationSuccessful: function (data) {
@@ -251,7 +255,7 @@ angular.module('umbraco.services')
 
             /** Returns the current user object in a promise  */
             getCurrentUser: function (args) {
-                
+
                 if (!currentUser) {
                     return authResource.getCurrentUser()
                         .then(function (data) {

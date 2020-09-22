@@ -40,7 +40,7 @@
             uploadProgress: 0,
             maxFileSize: Umbraco.Sys.ServerVariables.umbracoSettings.maxFileSize + "KB",
             acceptedFileTypes: mediaHelper.formatFileTypes(Umbraco.Sys.ServerVariables.umbracoSettings.imageFileTypes),
-            uploaded: false 
+            uploaded: false
         };
 
         vm.allowPasswordReset = Umbraco.Sys.ServerVariables.umbracoSettings.canSendRequiredEmail && Umbraco.Sys.ServerVariables.umbracoSettings.allowPasswordReset;
@@ -73,7 +73,7 @@
         vm.setPasswordSubmit = setPasswordSubmit;
         vm.labels = {};
         localizationService.localizeMany([
-            vm.usernameIsEmail ? "general_email" : "general_username", 
+            vm.usernameIsEmail ? "general_email" : "general_username",
             vm.usernameIsEmail ? "placeholders_email" : "placeholders_usernameHint",
             vm.usernameIsEmail ? "placeholders_emptyEmail" : "placeholders_emptyUsername",
             "placeholders_emptyPassword"]
@@ -83,7 +83,7 @@
             vm.labels.usernameError = data[2];
             vm.labels.passwordError = data[3];
         });
-        
+
         vm.twoFactor = {};
 
         vm.loginSuccess = loginSuccess;
@@ -111,11 +111,11 @@
 
                         //localize the text
                         localizationService.localize("errorHandling_errorInPasswordFormat", [
-                                vm.invitedUserPasswordModel.passwordPolicies.minPasswordLength,
-                                vm.invitedUserPasswordModel.passwordPolicies.minNonAlphaNumericChars
-                            ]).then(function (data) {
-                                vm.invitedUserPasswordModel.passwordPolicyText = data;
-                            });
+                            vm.invitedUserPasswordModel.passwordPolicies.minPasswordLength,
+                            vm.invitedUserPasswordModel.passwordPolicies.minNonAlphaNumericChars
+                        ]).then(function (data) {
+                            vm.invitedUserPasswordModel.passwordPolicyText = data;
+                        });
                     })
                 ]).then(function () {
                     vm.inviteStep = Number(inviteVal);
@@ -157,12 +157,12 @@
 
         function getStarted() {
             $location.search('invite', null);
-            if(vm.onLogin) {
+            if (vm.onLogin) {
                 vm.onLogin();
             }
         }
 
-        function inviteSavePassword () {
+        function inviteSavePassword() {
 
             if (formHelper.submitForm({ scope: $scope })) {
 
@@ -219,32 +219,32 @@
         }
 
         function loginSubmit() {
-                       
-            if (formHelper.submitForm({ scope: $scope })) {
+
+            if (formHelper.submitForm({ scope: $scope, formCtrl: vm.loginForm })) {
                 //if the login and password are not empty we need to automatically
                 // validate them - this is because if there are validation errors on the server	
                 // then the user has to change both username & password to resubmit which isn't ideal,	            
                 // so if they're not empty, we'll just make sure to set them to valid.
-                if (vm.login && vm.password && vm.login.length > 0 && vm.password.length > 0) {	
+                if (vm.login && vm.password && vm.login.length > 0 && vm.password.length > 0) {
                     vm.loginForm.username.$setValidity('auth', true);
                     vm.loginForm.password.$setValidity('auth', true);
                 }
-                
+
                 if (vm.loginForm.$invalid) {
                     SetTitle();
                     return;
                 }
-                
+
                 // make sure that we are returning to the login view.
                 vm.view = "login";
 
                 vm.loginStates.submitButton = "busy";
 
                 userService.authenticate(vm.login, vm.password)
-                    .then(function(data) {
-                    loginSuccess();
-                        },
-                        function(reason) {
+                    .then(function (data) {
+                        loginSuccess();
+                    },
+                        function (reason) {
 
                             //is Two Factor required?
                             if (reason.status === 402) {
@@ -266,13 +266,13 @@
                 //setup a watch for both of the model values changing, if they change
                 // while the form is invalid, then revalidate them so that the form can
                 // be submitted again.
-                vm.loginForm.username.$viewChangeListeners.push(function() {
+                vm.loginForm.username.$viewChangeListeners.push(function () {
                     if (vm.loginForm.$invalid) {
                         vm.loginForm.username.$setValidity('auth', true);
                         vm.loginForm.password.$setValidity('auth', true);
                     }
                 });
-                vm.loginForm.password.$viewChangeListeners.push(function() {
+                vm.loginForm.password.$viewChangeListeners.push(function () {
                     if (vm.loginForm.$invalid) {
                         vm.loginForm.username.$setValidity('auth', true);
                         vm.loginForm.password.$setValidity('auth', true);
@@ -477,7 +477,7 @@
                 case "2fa-login":
                     title = "Two Factor Authentication";
                     break;
-            } 
+            }
 
             $scope.$emit("$changeTitle", title);
         }
