@@ -4,7 +4,6 @@
 @using Umbraco.Core.Composing
 @using Umbraco.Core.IO
 @using Umbraco.Web
-@using Umbraco.Core.Configuration
 
 @inherits WebViewPage<Umbraco.Web.Editors.BackOfficeModel>
 
@@ -122,12 +121,9 @@
             @Html.AngularValueTinyMceAssets()
 
             app.run(["iconHelper", function (iconHelper) {
-
                 @* We inject icons to the icon helper(service), since icons can only be loaded if user is authorized. By injecting these to the service they will not be requested as they will become cached. *@
-
-                iconHelper.defineIcon("icon-check", '<svg viewBox="0 0 512 512"><path d="M461.884 68.14c-132.601 81.297-228.817 183.87-272.048 235.345l-105.874-82.95-46.751 37.691 182.941 186.049c31.485-80.646 131.198-238.264 252.956-350.252L461.884 68.14z"></path></svg>');
-                iconHelper.defineIcon("icon-delete", '<svg viewBox="0 0 512 512"><path d="M401.431 167.814l-58.757-58.76-88.029 88.026-88.028-88.026-58.76 58.76 88.026 88.027-88.026 88.024 58.76 58.768 88.028-88.031 88.029 88.031 58.757-58.768-88.027-88.024z"></path></svg>');
-
+                iconHelper.defineIcon("icon-check", '@Html.Raw(Model.IconCheckData)');
+                iconHelper.defineIcon("icon-delete", '@Html.Raw(Model.IconDeleteData)');
             }]);
 
             //required for the noscript trick
