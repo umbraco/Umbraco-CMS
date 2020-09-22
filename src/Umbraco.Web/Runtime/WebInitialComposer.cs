@@ -28,6 +28,7 @@ using Umbraco.Web.AspNet;
 using Umbraco.Core.Diagnostics;
 using Umbraco.Core.Logging;
 using Umbraco.Web.Logging;
+using Umbraco.Web.Services;
 
 namespace Umbraco.Web.Runtime
 {
@@ -139,6 +140,8 @@ namespace Umbraco.Web.Runtime
             composition.Register<ISessionIdResolver>(factory => factory.GetInstance<AspNetSessionManager>(), Lifetime.Singleton);
             composition.Register<ISessionManager>(factory => factory.GetInstance<AspNetSessionManager>(), Lifetime.Singleton);
 
+
+            composition.RegisterUnique<IIconService, IconService>();
         }
     }
 }

@@ -2,9 +2,10 @@
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
 using Umbraco.Core.Models;
+using Umbraco.Core.Services;
 using Umbraco.Web.Features;
+using Umbraco.Web.Services;
 using Umbraco.Web.Trees;
 
 namespace Umbraco.Web.Editors
@@ -14,8 +15,29 @@ namespace Umbraco.Web.Editors
         private readonly UmbracoFeatures _features;
         public IEnumerable<ILanguage> Languages { get; }
 
-        public BackOfficePreviewModel(UmbracoFeatures features, IGlobalSettings globalSettings, IUmbracoVersion umbracoVersion, IEnumerable<ILanguage> languages, IContentSettings contentSettings, TreeCollection treeCollection, IHttpContextAccessor httpContextAccessor, IHostingEnvironment hostingEnvironment, IRuntimeSettings runtimeSettings, ISecuritySettings securitySettings)
-            : base(features, globalSettings, umbracoVersion, contentSettings, treeCollection, httpContextAccessor, hostingEnvironment, runtimeSettings, securitySettings)
+        public BackOfficePreviewModel(
+            UmbracoFeatures features,
+            IGlobalSettings globalSettings,
+            IUmbracoVersion umbracoVersion,
+            IEnumerable<ILanguage> languages,
+            IContentSettings contentSettings,
+            TreeCollection treeCollection,
+            IHttpContextAccessor httpContextAccessor,
+            IHostingEnvironment hostingEnvironment,
+            IRuntimeSettings runtimeSettings,
+            ISecuritySettings securitySettings,
+            IIconService iconService)
+            : base(
+                features,
+                globalSettings,
+                umbracoVersion,
+                contentSettings,
+                treeCollection,
+                httpContextAccessor,
+                hostingEnvironment,
+                runtimeSettings,
+                securitySettings,
+                iconService)
         {
             _features = features;
             Languages = languages;

@@ -13,6 +13,7 @@ using Umbraco.Web.Composing;
 using Umbraco.Web.Features;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
+using Umbraco.Web.Services;
 using Umbraco.Web.Trees;
 using Umbraco.Web.WebAssets;
 using Constants = Umbraco.Core.Constants;
@@ -27,6 +28,7 @@ namespace Umbraco.Web.Editors
         private readonly IPublishedSnapshotService _publishedSnapshotService;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly ILocalizationService _localizationService;
+        private readonly IIconService _iconService;
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly IContentSettings _contentSettings;
         private readonly TreeCollection _treeCollection;
@@ -51,7 +53,8 @@ namespace Umbraco.Web.Editors
             ICookieManager cookieManager,
             IRuntimeSettings settings,
             ISecuritySettings securitySettings,
-            IRuntimeMinifier runtimeMinifier)
+            IRuntimeMinifier runtimeMinifier,
+            IIconService iconService)
         {
             _features = features;
             _globalSettings = globalSettings;
@@ -67,6 +70,7 @@ namespace Umbraco.Web.Editors
             _runtimeSettings = settings;
             _securitySettings = securitySettings;
             _runtimeMinifier = runtimeMinifier;
+            _iconService = iconService;
         }
 
         [UmbracoAuthorize(redirectToUmbracoLogin: true)]
@@ -75,7 +79,7 @@ namespace Umbraco.Web.Editors
         {
             var availableLanguages = _localizationService.GetAllLanguages();
 
-            var model = new BackOfficePreviewModel(_features, _globalSettings, _umbracoVersion, availableLanguages, _contentSettings, _treeCollection, _httpContextAccessor, _hostingEnvironment, _runtimeSettings, _securitySettings);
+            var model = new BackOfficePreviewModel(_features, _globalSettings, _umbracoVersion, availableLanguages, _contentSettings, _treeCollection, _httpContextAccessor, _hostingEnvironment, _runtimeSettings, _securitySettings, _iconService);
 
             if (model.PreviewExtendedHeaderView.IsNullOrWhiteSpace() == false)
             {

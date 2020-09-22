@@ -1,8 +1,9 @@
 ﻿using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
+using Umbraco.Core.Services;
 using Umbraco.Web.Features;
+using Umbraco.Web.Services;
 using Umbraco.Web.Trees;
 
 namespace Umbraco.Web.Editors
@@ -13,7 +14,7 @@ namespace Umbraco.Web.Editors
         public BackOfficeModel(UmbracoFeatures features, IGlobalSettings globalSettings, IUmbracoVersion umbracoVersion,
             IContentSettings contentSettings, TreeCollection treeCollection,
             IHttpContextAccessor httpContextAccessor, IHostingEnvironment hostingEnvironment,
-            IRuntimeSettings runtimeSettings, ISecuritySettings securitySettings)
+            IRuntimeSettings runtimeSettings, ISecuritySettings securitySettings, IIconService iconService)
         {
             Features = features;
             GlobalSettings = globalSettings;
@@ -25,6 +26,8 @@ namespace Umbraco.Web.Editors
             RuntimeSettings = runtimeSettings;
             SecuritySettings = securitySettings;
             BackOfficePath = GlobalSettings.GetBackOfficePath(HostingEnvironment);
+            IconCheckData = iconService.GetIcon("icon-check")?.SvgString;
+            IconDeleteData = iconService.GetIcon("icon-delete")?.SvgString;
         }
 
         public UmbracoFeatures Features { get; }
@@ -37,6 +40,8 @@ namespace Umbraco.Web.Editors
         public IRuntimeSettings RuntimeSettings { get; set; }
         public ISecuritySettings SecuritySettings { get; set; }
 
-        public string BackOfficePath { get; } 
+        public string BackOfficePath { get; }
+        public string IconCheckData { get; }
+        public string IconDeleteData { get; }
     }
 }
