@@ -1,16 +1,15 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Routing;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
-using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.WebAssets;
 using Umbraco.Extensions;
@@ -19,10 +18,8 @@ using Umbraco.Web.BackOffice.PropertyEditors;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Features;
-using Umbraco.Web.HealthCheck;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Trees;
-using Umbraco.Web.WebApi;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -34,14 +31,14 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly LinkGenerator _linkGenerator;
         private readonly IRuntimeState _runtimeState;
         private readonly UmbracoFeatures _features;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly IUmbracoVersion _umbracoVersion;
-        private readonly IContentSettings _contentSettings;
+        private readonly ContentSettings _contentSettings;
         private readonly TreeCollection _treeCollection;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IHostingEnvironment _hostingEnvironment;
-        private readonly IRuntimeSettings _settings;
-        private readonly ISecuritySettings _securitySettings;
+        private readonly RuntimeSettings _runtimeSettings;
+        private readonly SecuritySettings _securitySettings;
         private readonly IRuntimeMinifier _runtimeMinifier;
         private readonly IAuthenticationSchemeProvider _authenticationSchemeProvider;
 
@@ -49,28 +46,28 @@ namespace Umbraco.Web.BackOffice.Controllers
             LinkGenerator linkGenerator,
             IRuntimeState runtimeState,
             UmbracoFeatures features,
-            IGlobalSettings globalSettings,
+            IOptions<GlobalSettings> globalSettings,
             IUmbracoVersion umbracoVersion,
-            IContentSettings contentSettings,
+            IOptions<ContentSettings> contentSettings,
             IHttpContextAccessor httpContextAccessor,
             TreeCollection treeCollection,
             IHostingEnvironment hostingEnvironment,
-            IRuntimeSettings settings,
-            ISecuritySettings securitySettings,
+            IOptions<RuntimeSettings> runtimeSettings,
+            IOptions<SecuritySettings> securitySettings,
             IRuntimeMinifier runtimeMinifier,
             IAuthenticationSchemeProvider authenticationSchemeProvider)
         {
             _linkGenerator = linkGenerator;
             _runtimeState = runtimeState;
             _features = features;
-            _globalSettings = globalSettings;
+            _globalSettings = globalSettings.Value;
             _umbracoVersion = umbracoVersion;
-            _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
+            _contentSettings = contentSettings.Value ?? throw new ArgumentNullException(nameof(contentSettings));
             _httpContextAccessor = httpContextAccessor;
             _treeCollection = treeCollection ?? throw new ArgumentNullException(nameof(treeCollection));
             _hostingEnvironment = hostingEnvironment;
-            _settings = settings;
-            _securitySettings = securitySettings;
+            _runtimeSettings = runtimeSettings.Value;
+            _securitySettings = securitySettings.Value;
             _runtimeMinifier = runtimeMinifier;
             _authenticationSchemeProvider = authenticationSchemeProvider;
         }
@@ -366,7 +363,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                         {"appPluginsPath", _hostingEnvironment.ToAbsolute(Constants.SystemDirectories.AppPlugins).TrimEnd('/')},
                         {
                             "imageFileTypes",
-                            string.Join(",", _contentSettings.ImageFileTypes)
+                            string.Join(",", _contentSettings.Imaging.ImageFileTypes)
                         },
                         {
                             "disallowedUploadFiles",
@@ -513,7 +510,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
         private string GetMaxRequestLength()
         {
-            return _settings.MaxRequestLength.HasValue ? _settings.MaxRequestLength.Value.ToString() : string.Empty;
+            return _runtimeSettings.MaxRequestLength.HasValue ? _runtimeSettings.MaxRequestLength.Value.ToString() : string.Empty;
         }
     }
 }

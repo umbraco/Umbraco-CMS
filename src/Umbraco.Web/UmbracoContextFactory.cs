@@ -2,6 +2,7 @@
 using System.IO;
 using System.Text;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
@@ -20,7 +21,7 @@ namespace Umbraco.Web
         private readonly IVariationContextAccessor _variationContextAccessor;
         private readonly IDefaultCultureAccessor _defaultCultureAccessor;
 
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly IUserService _userService;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IHttpContextAccessor _httpContextAccessor;
@@ -35,7 +36,7 @@ namespace Umbraco.Web
             IPublishedSnapshotService publishedSnapshotService,
             IVariationContextAccessor variationContextAccessor,
             IDefaultCultureAccessor defaultCultureAccessor,
-            IGlobalSettings globalSettings,
+            GlobalSettings globalSettings,
             IUserService userService,
             IHostingEnvironment hostingEnvironment,
             UriUtility uriUtility,
@@ -67,7 +68,7 @@ namespace Umbraco.Web
                 _variationContextAccessor.VariationContext = new VariationContext(_defaultCultureAccessor.DefaultCulture);
             }
 
-            return new UmbracoContext(_httpContextAccessor, _publishedSnapshotService, new WebSecurity(), _globalSettings, _hostingEnvironment, _variationContextAccessor, _uriUtility, _cookieManager);
+            return new UmbracoContext(_httpContextAccessor, _publishedSnapshotService, new BackofficeSecurity(), _globalSettings, _hostingEnvironment, _variationContextAccessor, _uriUtility, _cookieManager);
         }
 
         /// <inheritdoc />

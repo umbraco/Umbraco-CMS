@@ -4,20 +4,21 @@ using System.Data;
 using System.Linq;
 using System.Net;
 using System.Net.Mime;
+using System.Text;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
+using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
-using Umbraco.Web.Models.ContentEditing;
-using System.Text;
-using Constants = Umbraco.Core.Constants;
-using Umbraco.Core.Mapping;
-using Microsoft.AspNetCore.Mvc;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Editors;
+using Umbraco.Web.Models.ContentEditing;
+using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -34,7 +35,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     {
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly IDataTypeService _dataTypeService;
-        private readonly IContentSettings _contentSettings;
+        private readonly ContentSettings _contentSettings;
         private readonly UmbracoMapper _umbracoMapper;
         private readonly PropertyEditorCollection _propertyEditorCollection;
         private readonly IContentTypeService _contentTypeService;
@@ -46,7 +47,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         public DataTypeController(
             PropertyEditorCollection propertyEditors,
             IDataTypeService dataTypeService,
-            IContentSettings contentSettings,
+            IOptions<ContentSettings> contentSettings,
             UmbracoMapper umbracoMapper,
             PropertyEditorCollection propertyEditorCollection,
             IContentTypeService contentTypeService,
@@ -57,7 +58,7 @@ namespace Umbraco.Web.BackOffice.Controllers
          {
             _propertyEditors = propertyEditors ?? throw new ArgumentNullException(nameof(propertyEditors));
             _dataTypeService = dataTypeService ?? throw new ArgumentNullException(nameof(dataTypeService));
-            _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
+            _contentSettings = contentSettings.Value ?? throw new ArgumentNullException(nameof(contentSettings));
             _umbracoMapper = umbracoMapper ?? throw new ArgumentNullException(nameof(umbracoMapper));
             _propertyEditorCollection = propertyEditorCollection ?? throw new ArgumentNullException(nameof(propertyEditorCollection));
             _contentTypeService = contentTypeService ?? throw new ArgumentNullException(nameof(contentTypeService));

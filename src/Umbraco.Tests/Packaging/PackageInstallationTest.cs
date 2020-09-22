@@ -16,6 +16,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
+using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 using File = System.IO.File;
@@ -46,7 +47,11 @@ namespace Umbraco.Tests.Packaging
                 _testBaseFolder.Delete(true);
         }
 
-        private CompiledPackageXmlParser Parser => new CompiledPackageXmlParser(new ConflictingPackageData(ServiceContext.MacroService, ServiceContext.FileService),Factory.GetInstance<IGlobalSettings>());
+        private CompiledPackageXmlParser Parser => new CompiledPackageXmlParser(
+            new ConflictingPackageData(
+                ServiceContext.MacroService,
+                ServiceContext.FileService),
+                Microsoft.Extensions.Options.Options.Create(new GlobalSettingsBuilder().Build()));
 
         private PackageDataInstallation PackageDataInstallation => new PackageDataInstallation(
             Logger, ServiceContext.FileService, ServiceContext.MacroService, ServiceContext.LocalizationService,
@@ -55,9 +60,8 @@ namespace Umbraco.Tests.Packaging
             Factory.GetInstance<PropertyEditorCollection>(),
             Factory.GetInstance<IScopeProvider>(),
             Factory.GetInstance<IShortStringHelper>(),
-            Factory.GetInstance<IGlobalSettings>(),
-            Factory.GetInstance<ILocalizedTextService>()
-            );
+            Microsoft.Extensions.Options.Options.Create(new GlobalSettingsBuilder().Build()),
+            Factory.GetInstance<ILocalizedTextService>());
 
         private IPackageInstallation PackageInstallation => new PackageInstallation(
             PackageDataInstallation,

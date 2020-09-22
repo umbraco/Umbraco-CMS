@@ -26,12 +26,15 @@ using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Constants = Umbraco.Core.Constants;
 using Umbraco.Core.Mapping;
+using Umbraco.Core.Security;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Security;
 using ContentType = Umbraco.Core.Models.ContentType;
+using Umbraco.Core.Configuration.Models;
+using Microsoft.Extensions.Options;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -48,13 +51,13 @@ namespace Umbraco.Web.BackOffice.Controllers
     public class ContentTypeController : ContentTypeControllerBase<IContentType>
     {
         private readonly IEntityXmlSerializer _serializer;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly IScopeProvider _scopeProvider;
         private readonly IIOHelper _ioHelper;
         private readonly IContentTypeService _contentTypeService;
         private readonly UmbracoMapper _umbracoMapper;
-        private readonly IWebSecurity _webSecurity;
+        private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly IDataTypeService _dataTypeService;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly ILocalizedTextService _localizedTextService;
@@ -67,21 +70,19 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IEntityService _entityService;
         private readonly IHostingEnvironment _hostingEnvironment;
 
-
         public ContentTypeController(
             ICultureDictionary cultureDictionary,
-            EditorValidatorCollection editorValidatorCollection,
             IContentTypeService contentTypeService,
             IMediaTypeService mediaTypeService,
             IMemberTypeService memberTypeService,
             UmbracoMapper umbracoMapper,
             ILocalizedTextService localizedTextService,
             IEntityXmlSerializer serializer,
-            IGlobalSettings globalSettings,
+            IOptions<GlobalSettings> globalSettings,
             PropertyEditorCollection propertyEditors,
             IScopeProvider scopeProvider,
             IIOHelper ioHelper,
-            IWebSecurity webSecurity,
+            IBackofficeSecurityAccessor backofficeSecurityAccessor,
             IDataTypeService dataTypeService,
             IShortStringHelper shortStringHelper,
             IFileService fileService,
@@ -91,7 +92,8 @@ namespace Umbraco.Web.BackOffice.Controllers
             ILocalizationService localizationService,
             IMacroService macroService,
             IEntityService entityService,
-            IHostingEnvironment hostingEnvironment)
+            IHostingEnvironment hostingEnvironment,
+            EditorValidatorCollection editorValidatorCollection)
             : base(cultureDictionary,
                 editorValidatorCollection,
                 contentTypeService,
@@ -101,13 +103,13 @@ namespace Umbraco.Web.BackOffice.Controllers
                 localizedTextService)
         {
             _serializer = serializer;
-            _globalSettings = globalSettings;
+            _globalSettings = globalSettings.Value;
             _propertyEditors = propertyEditors;
             _scopeProvider = scopeProvider;
             _ioHelper = ioHelper;
             _contentTypeService = contentTypeService;
             _umbracoMapper = umbracoMapper;
-            _webSecurity = webSecurity;
+            _backofficeSecurityAccessor = backofficeSecurityAccessor;
             _dataTypeService = dataTypeService;
             _shortStringHelper = shortStringHelper;
             _localizedTextService = localizedTextService;
@@ -206,7 +208,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            _contentTypeService.Delete(foundType, _webSecurity.CurrentUser.Id);
+            _contentTypeService.Delete(foundType, _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.Id);
             return Ok();
         }
 
@@ -305,14 +307,14 @@ namespace Umbraco.Web.BackOffice.Controllers
         [HttpPost]
         public IActionResult DeleteContainer(int id)
         {
-            _contentTypeService.DeleteContainer(id, _webSecurity.CurrentUser.Id);
+            _contentTypeService.DeleteContainer(id, _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.Id);
 
             return Ok();
         }
 
         public IActionResult PostCreateContainer(int parentId, string name)
         {
-            var result = _contentTypeService.CreateContainer(parentId, name, _webSecurity.CurrentUser.Id);
+            var result = _contentTypeService.CreateContainer(parentId, name, _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.Id);
 
             return result
                 ? Ok(result.Result) //return the id
@@ -321,7 +323,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
         public IActionResult PostRenameContainer(int id, string name)
         {
-            var result = _contentTypeService.RenameContainer(id, name, _webSecurity.CurrentUser.Id);
+            var result = _contentTypeService.RenameContainer(id, name, _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.Id);
 
             return result
                 ? Ok(result.Result) //return the id
@@ -616,12 +618,12 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
 
             var dataInstaller = new PackageDataInstallation(_logger, _fileService, _macroService, _LocalizationService,
-                _dataTypeService, _entityService, _contentTypeService, _contentService, _propertyEditors, _scopeProvider, _shortStringHelper, _globalSettings, _localizedTextService);
+                _dataTypeService, _entityService, _contentTypeService, _contentService, _propertyEditors, _scopeProvider, _shortStringHelper, Options.Create(_globalSettings), _localizedTextService);
 
             var xd = new XmlDocument {XmlResolver = null};
             xd.Load(filePath);
 
-            var userId = _webSecurity.GetUserId().ResultOr(0);
+            var userId = _backofficeSecurityAccessor.BackofficeSecurity.GetUserId().ResultOr(0);
             var element = XElement.Parse(xd.InnerXml);
             dataInstaller.ImportDocumentType(element, userId);
 

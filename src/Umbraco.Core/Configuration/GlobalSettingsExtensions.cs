@@ -1,4 +1,5 @@
 ﻿using System;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 
 namespace Umbraco.Core.Configuration
@@ -14,7 +15,7 @@ namespace Umbraco.Core.Configuration
         /// <param name="globalSettings"></param>
         /// <param name="hostingEnvironment"></param>
         /// <returns></returns>
-        public static string GetBackOfficePath(this IGlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
+        public static string GetBackOfficePath(this GlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
         {
             if (_backOfficePath != null) return _backOfficePath;
             _backOfficePath = hostingEnvironment.ToAbsolute(globalSettings.UmbracoPath);
@@ -32,7 +33,7 @@ namespace Umbraco.Core.Configuration
         /// We also make sure that the virtual directory (SystemDirectories.Root) is stripped off first, otherwise we'd end up with something
         /// like "MyVirtualDirectory-Umbraco" instead of just "Umbraco".
         /// </remarks>
-        public static string GetUmbracoMvcArea(this IGlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
+        public static string GetUmbracoMvcArea(this GlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
         {
             if (_mvcArea != null) return _mvcArea;
 
@@ -41,7 +42,7 @@ namespace Umbraco.Core.Configuration
             return _mvcArea;
         }
 
-        internal static string GetUmbracoMvcAreaNoCache(this IGlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
+        internal static string GetUmbracoMvcAreaNoCache(this GlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
         {
             var path = string.IsNullOrEmpty(globalSettings.UmbracoPath)
                 ? string.Empty

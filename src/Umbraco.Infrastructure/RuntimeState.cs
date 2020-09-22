@@ -2,6 +2,7 @@
 using System.Threading;
 using Semver;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Upgrade;
@@ -14,7 +15,7 @@ namespace Umbraco.Core
     /// </summary>
     public class RuntimeState : IRuntimeState
     {
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly IUmbracoDatabaseFactory _databaseFactory;
         private readonly ILogger _logger;
@@ -31,7 +32,7 @@ namespace Umbraco.Core
         /// <summary>
         /// Initializes a new instance of the <see cref="RuntimeState"/> class.
         /// </summary>
-        public RuntimeState(IGlobalSettings globalSettings, IUmbracoVersion umbracoVersion, IUmbracoDatabaseFactory databaseFactory, ILogger logger)
+        public RuntimeState(GlobalSettings globalSettings, IUmbracoVersion umbracoVersion, IUmbracoDatabaseFactory databaseFactory, ILogger logger)
         {
             _globalSettings = globalSettings;
             _umbracoVersion = umbracoVersion;
@@ -161,7 +162,7 @@ namespace Umbraco.Core
 
         private bool EnsureUmbracoUpgradeState(IUmbracoDatabaseFactory databaseFactory, ILogger logger)
         {
-            var upgrader = new Upgrader(new UmbracoPlan(_umbracoVersion, _globalSettings));
+            var upgrader = new Upgrader(new UmbracoPlan(_umbracoVersion));
             var stateValueKey = upgrader.StateValueKey;
 
             // no scope, no service - just directly accessing the database

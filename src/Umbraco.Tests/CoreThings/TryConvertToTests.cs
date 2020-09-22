@@ -1,6 +1,8 @@
 ﻿using System;
+using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.Testing;
@@ -14,7 +16,7 @@ namespace Umbraco.Tests.CoreThings
         {
             base.Compose();
 
-            Composition.RegisterUnique<IShortStringHelper>(f => new DefaultShortStringHelper(f.GetInstance<IRequestHandlerSettings>()));
+            Composition.RegisterUnique<IShortStringHelper>(f => new DefaultShortStringHelper(f.GetInstance<IOptions<RequestHandlerSettings>>()));
         }
 
         [Test]

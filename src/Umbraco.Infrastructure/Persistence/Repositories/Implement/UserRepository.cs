@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
+using Microsoft.Extensions.Options;
 using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Membership;
@@ -24,8 +26,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     internal class UserRepository : NPocoRepositoryBase<int, IUser>, IUserRepository
     {
         private readonly IMapperCollection _mapperCollection;
-        private readonly IGlobalSettings _globalSettings;
-        private readonly IUserPasswordConfiguration _passwordConfiguration;
+        private readonly GlobalSettings _globalSettings;
+        private readonly UserPasswordConfigurationSettings _passwordConfiguration;
         private readonly IJsonSerializer _jsonSerializer;
         private string _passwordConfigJson;
         private bool _passwordConfigInitialized;
@@ -40,12 +42,19 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// A dictionary specifying the configuration for user passwords. If this is null then no password configuration will be persisted or read.
         /// </param>
         /// <param name="globalSettings"></param>
-        public UserRepository(IScopeAccessor scopeAccessor, AppCaches appCaches, ILogger logger, IMapperCollection mapperCollection, IGlobalSettings globalSettings, IUserPasswordConfiguration passwordConfiguration, IJsonSerializer jsonSerializer)
+        public UserRepository(
+            IScopeAccessor scopeAccessor,
+            AppCaches appCaches,
+            ILogger logger,
+            IMapperCollection mapperCollection,
+            IOptions<GlobalSettings> globalSettings,
+            IOptions<UserPasswordConfigurationSettings> passwordConfiguration,
+            IJsonSerializer jsonSerializer)
             : base(scopeAccessor, appCaches, logger)
         {
             _mapperCollection = mapperCollection ?? throw new ArgumentNullException(nameof(mapperCollection));
-            _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
-            _passwordConfiguration = passwordConfiguration ?? throw new ArgumentNullException(nameof(passwordConfiguration));
+            _globalSettings = globalSettings.Value ?? throw new ArgumentNullException(nameof(globalSettings));
+            _passwordConfiguration = passwordConfiguration.Value ?? throw new ArgumentNullException(nameof(passwordConfiguration));
             _jsonSerializer = jsonSerializer;
         }
 

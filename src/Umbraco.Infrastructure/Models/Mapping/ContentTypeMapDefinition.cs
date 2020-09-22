@@ -13,6 +13,8 @@ using Umbraco.Core.Exceptions;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Strings;
+using Umbraco.Core.Configuration.Models;
+using Microsoft.Extensions.Options;
 
 namespace Umbraco.Web.Models.Mapping
 {
@@ -30,13 +32,12 @@ namespace Umbraco.Web.Models.Mapping
         private readonly IMemberTypeService _memberTypeService;
         private readonly ILogger _logger;
         private readonly IShortStringHelper _shortStringHelper;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
-
 
         public ContentTypeMapDefinition(CommonMapper commonMapper, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IFileService fileService,
             IContentTypeService contentTypeService, IMediaTypeService mediaTypeService, IMemberTypeService memberTypeService,
-            ILogger logger, IShortStringHelper shortStringHelper, IGlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
+            ILogger logger, IShortStringHelper shortStringHelper, IOptions<GlobalSettings> globalSettings, IHostingEnvironment hostingEnvironment)
         {
             _commonMapper = commonMapper;
             _propertyEditors = propertyEditors;
@@ -47,7 +48,7 @@ namespace Umbraco.Web.Models.Mapping
             _memberTypeService = memberTypeService;
             _logger = logger;
             _shortStringHelper = shortStringHelper;
-            _globalSettings = globalSettings;
+            _globalSettings = globalSettings.Value;
             _hostingEnvironment = hostingEnvironment;
         }
 

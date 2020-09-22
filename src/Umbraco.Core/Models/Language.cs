@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Runtime.Serialization;
 using System.Threading;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
@@ -14,7 +15,7 @@ namespace Umbraco.Core.Models
     [DataContract(IsReference = true)]
     public class Language : EntityBase, ILanguage
     {
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
 
         private string _isoCode;
         private string _cultureName;
@@ -22,7 +23,7 @@ namespace Umbraco.Core.Models
         private bool _mandatory;
         private int? _fallbackLanguageId;
 
-        public Language(IGlobalSettings globalSettings, string isoCode)
+        public Language(GlobalSettings globalSettings, string isoCode)
         {
             IsoCode = isoCode;
             _globalSettings = globalSettings;

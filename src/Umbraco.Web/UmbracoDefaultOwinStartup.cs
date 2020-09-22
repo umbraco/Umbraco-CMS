@@ -1,9 +1,11 @@
 ﻿using System;
+using Microsoft.Extensions.Options;
 using Microsoft.Owin;
 using Owin;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
@@ -28,9 +30,8 @@ namespace Umbraco.Web
     public class UmbracoDefaultOwinStartup
     {
         protected IUmbracoContextAccessor UmbracoContextAccessor => Current.UmbracoContextAccessor;
-        protected IGlobalSettings GlobalSettings => Current.Factory.GetInstance<IGlobalSettings>();
-        protected IContentSettings ContentSettings => Current.Factory.GetInstance<IContentSettings>();
-        protected ISecuritySettings SecuritySettings => Current.Factory.GetInstance<ISecuritySettings>();
+        protected GlobalSettings GlobalSettings => Current.Factory.GetInstance<GlobalSettings>();
+        protected SecuritySettings SecuritySettings => Current.Factory.GetInstance<IOptions<SecuritySettings>>().Value;
         protected IUserPasswordConfiguration UserPasswordConfig => Current.Factory.GetInstance<IUserPasswordConfiguration>();
         protected IRuntimeState RuntimeState => Current.RuntimeState;
         protected ServiceContext Services => Current.Services;

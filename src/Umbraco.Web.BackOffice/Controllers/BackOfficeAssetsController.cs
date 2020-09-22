@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -17,9 +19,9 @@ namespace Umbraco.Web.BackOffice.Controllers
     {
         private readonly IFileSystem _jsLibFileSystem;
 
-        public BackOfficeAssetsController(IIOHelper ioHelper, IHostingEnvironment hostingEnvironment, ILogger logger, IGlobalSettings globalSettings)
+        public BackOfficeAssetsController(IIOHelper ioHelper, IHostingEnvironment hostingEnvironment, ILogger logger, IOptions<GlobalSettings> globalSettings)
         {
-            _jsLibFileSystem = new PhysicalFileSystem(ioHelper, hostingEnvironment, logger, globalSettings.UmbracoPath + Path.DirectorySeparatorChar + "lib");
+            _jsLibFileSystem = new PhysicalFileSystem(ioHelper, hostingEnvironment, logger, globalSettings.Value.UmbracoPath + Path.DirectorySeparatorChar + "lib");
         }
 
         [HttpGet]

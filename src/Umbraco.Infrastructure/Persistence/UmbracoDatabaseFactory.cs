@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Data.Common;
-using System.Data.SqlClient;
 using System.Threading;
+using Microsoft.Extensions.Options;
 using NPoco;
 using NPoco.FluentMappings;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.FaultHandling;
 using Umbraco.Core.Persistence.Mappers;
@@ -28,7 +27,7 @@ namespace Umbraco.Core.Persistence
     internal class UmbracoDatabaseFactory : DisposableObjectSlim, IUmbracoDatabaseFactory
     {
         private readonly IDbProviderFactoryCreator _dbProviderFactoryCreator;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly Lazy<IMapperCollection> _mappers;
         private readonly ILogger _logger;
 
@@ -70,8 +69,8 @@ namespace Umbraco.Core.Persistence
         /// Initializes a new instance of the <see cref="UmbracoDatabaseFactory"/>.
         /// </summary>
         /// <remarks>Used by core runtime.</remarks>
-        public UmbracoDatabaseFactory(ILogger logger, IGlobalSettings globalSettings, IConnectionStrings connectionStrings, Lazy<IMapperCollection> mappers,IDbProviderFactoryCreator dbProviderFactoryCreator)
-            : this(logger, globalSettings, connectionStrings, Constants.System.UmbracoConnectionName, mappers, dbProviderFactoryCreator)
+        public UmbracoDatabaseFactory(ILogger logger, IOptions<GlobalSettings> globalSettings, IOptions<ConnectionStrings> connectionStrings, Lazy<IMapperCollection> mappers,IDbProviderFactoryCreator dbProviderFactoryCreator)
+            : this(logger, globalSettings.Value, connectionStrings.Value, mappers, dbProviderFactoryCreator)
         {
 
         }
@@ -80,17 +79,15 @@ namespace Umbraco.Core.Persistence
         /// Initializes a new instance of the <see cref="UmbracoDatabaseFactory"/>.
         /// </summary>
         /// <remarks>Used by the other ctor and in tests.</remarks>
-        public UmbracoDatabaseFactory(ILogger logger, IGlobalSettings globalSettings, IConnectionStrings connectionStrings, string connectionStringName, Lazy<IMapperCollection> mappers, IDbProviderFactoryCreator dbProviderFactoryCreator)
+        public UmbracoDatabaseFactory(ILogger logger, GlobalSettings globalSettings, ConnectionStrings connectionStrings,  Lazy<IMapperCollection> mappers, IDbProviderFactoryCreator dbProviderFactoryCreator)
         {
-            if (connectionStringName == null) throw new ArgumentNullException(nameof(connectionStringName));
-            if (string.IsNullOrWhiteSpace(connectionStringName)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(connectionStringName));
 
             _globalSettings = globalSettings;
             _mappers = mappers ?? throw new ArgumentNullException(nameof(mappers));
             _dbProviderFactoryCreator = dbProviderFactoryCreator  ?? throw new ArgumentNullException(nameof(dbProviderFactoryCreator));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-            var settings = connectionStrings[connectionStringName];
+            var settings = connectionStrings.UmbracoConnectionString;
 
             if (settings == null)
             {

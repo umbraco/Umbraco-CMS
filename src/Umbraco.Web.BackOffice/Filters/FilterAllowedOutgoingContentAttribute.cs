@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.Actions;
 using Umbraco.Web.Security;
@@ -60,8 +61,8 @@ namespace Umbraco.Web.BackOffice.Filters
 
 
 
-        public FilterAllowedOutgoingContentFilter(Type outgoingType, string propertyName, char permissionToCheck,  IUserService userService, IEntityService entityService, IWebSecurity webSecurity)
-            : base(entityService, webSecurity, outgoingType, propertyName)
+        public FilterAllowedOutgoingContentFilter(Type outgoingType, string propertyName, char permissionToCheck,  IUserService userService, IEntityService entityService, IBackofficeSecurityAccessor backofficeSecurityAccessor)
+            : base(entityService, backofficeSecurityAccessor, outgoingType, propertyName)
         {
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
