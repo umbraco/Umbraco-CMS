@@ -270,7 +270,7 @@ namespace Umbraco.Extensions
                 out var logger, out var ioHelper, out var hostingEnvironment, out var backOfficeInfo, out var profiler);
 
             var umbracoVersion = new UmbracoVersion();
-            var typeFinder = CreateTypeFinder(Current.LoggerFactory, profiler, webHostEnvironment, entryAssembly, typeFinderSettings);
+            var typeFinder = CreateTypeFinder(serviceProvider.GetService<ILoggerFactory>(), profiler, webHostEnvironment, entryAssembly, typeFinderSettings);
 
             var coreRuntime = getRuntime(
                 globalSettings.CurrentValue,
