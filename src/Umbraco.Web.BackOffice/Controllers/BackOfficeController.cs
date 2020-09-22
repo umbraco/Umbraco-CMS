@@ -15,6 +15,7 @@ using Umbraco.Core.Configuration.Grid;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Core.WebAssets;
 using Umbraco.Extensions;
@@ -44,7 +45,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly BackOfficeServerVariables _backOfficeServerVariables;
         private readonly AppCaches _appCaches;
         private readonly BackOfficeSignInManager _signInManager;
-        private readonly IWebSecurity _webSecurity;
+        private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly ILogger _logger;
 
         public BackOfficeController(
@@ -57,7 +58,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             BackOfficeServerVariables backOfficeServerVariables,
             AppCaches appCaches,
             BackOfficeSignInManager signInManager,
-            IWebSecurity webSecurity,
+            IBackofficeSecurityAccessor backofficeSecurityAccessor,
             ILogger logger)
         {
             _userManager = userManager;
@@ -69,7 +70,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _backOfficeServerVariables = backOfficeServerVariables;
             _appCaches = appCaches;
             _signInManager = signInManager;
-            _webSecurity = webSecurity;
+            _backofficeSecurityAccessor = backofficeSecurityAccessor;
             _logger = logger;
         }
 
@@ -90,7 +91,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             //if you are hitting VerifyInvite, you're already signed in as a different user, and the token is invalid
             //you'll exit on one of the return RedirectToAction(nameof(Default)) but you're still logged in so you just get
             //dumped at the default admin view with no detail
-            if (_webSecurity.IsAuthenticated())
+            if (_backofficeSecurityAccessor.BackofficeSecurity.IsAuthenticated())
             {
                 await _signInManager.SignOutAsync();
             }
@@ -183,7 +184,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         [HttpGet]
         public Dictionary<string, Dictionary<string, string>> LocalizedText(string culture = null)
         {
-            var isAuthenticated = _webSecurity.IsAuthenticated();
+            var isAuthenticated = _backofficeSecurityAccessor.BackofficeSecurity.IsAuthenticated();
 
             var cultureInfo = string.IsNullOrWhiteSpace(culture)
                 //if the user is logged in, get their culture, otherwise default to 'en'

@@ -14,7 +14,7 @@ namespace Umbraco.Web.Security
 {
 
     // NOTE: Moved to netcore
-    public class WebSecurity : IWebSecurity
+    public class BackofficeSecurity : IBackofficeSecurity
     {
         public IUser CurrentUser => throw new NotImplementedException();
 

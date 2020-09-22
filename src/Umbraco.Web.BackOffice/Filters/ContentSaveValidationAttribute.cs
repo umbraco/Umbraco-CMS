@@ -35,12 +35,12 @@ namespace Umbraco.Web.BackOffice.Filters
             private readonly ILogger _logger;
             private readonly ILocalizedTextService _textService;
             private readonly IUserService _userService;
-            private readonly IWebSecurity _webSecurity;
+            private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
 
 
             public ContentSaveValidationFilter(
                 ILogger logger,
-                IWebSecurity webSecurity,
+                IBackofficeSecurityAccessor backofficeSecurityAccessor,
                 ILocalizedTextService textService,
                 IContentService contentService,
                 IUserService userService,
@@ -48,7 +48,7 @@ namespace Umbraco.Web.BackOffice.Filters
                 IPropertyValidationService propertyValidationService)
             {
                 _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-                _webSecurity = webSecurity ?? throw new ArgumentNullException(nameof(webSecurity));
+                _backofficeSecurityAccessor = backofficeSecurityAccessor ?? throw new ArgumentNullException(nameof(backofficeSecurityAccessor));
                 _textService = textService ?? throw new ArgumentNullException(nameof(textService));
                 _contentService = contentService ?? throw new ArgumentNullException(nameof(contentService));
                 _userService = userService ?? throw new ArgumentNullException(nameof(userService));
@@ -59,11 +59,11 @@ namespace Umbraco.Web.BackOffice.Filters
             public void OnActionExecuting(ActionExecutingContext context)
             {
                 var model = (ContentItemSave) context.ActionArguments["contentItem"];
-                var contentItemValidator = new ContentSaveModelValidator(_logger, _webSecurity, _textService, _propertyValidationService);
+                var contentItemValidator = new ContentSaveModelValidator(_logger, _backofficeSecurityAccessor.BackofficeSecurity, _textService, _propertyValidationService);
 
                 if (!ValidateAtLeastOneVariantIsBeingSaved(model, context)) return;
                 if (!contentItemValidator.ValidateExistingContent(model, context)) return;
-                if (!ValidateUserAccess(model, context, _webSecurity)) return;
+                if (!ValidateUserAccess(model, context, _backofficeSecurityAccessor.BackofficeSecurity)) return;
 
                 //validate for each variant that is being updated
                 foreach (var variant in model.Variants.Where(x => x.Save))
@@ -101,9 +101,9 @@ namespace Umbraco.Web.BackOffice.Filters
             /// </summary>
             /// <param name="actionContext"></param>
             /// <param name="contentItem"></param>
-            /// <param name="webSecurity"></param>
+            /// <param name="backofficeSecurity"></param>
             private bool ValidateUserAccess(ContentItemSave contentItem, ActionExecutingContext actionContext,
-                IWebSecurity webSecurity)
+                IBackofficeSecurity backofficeSecurity)
             {
                 // We now need to validate that the user is allowed to be doing what they are doing.
                 // Based on the action we need to check different permissions.
@@ -217,13 +217,13 @@ namespace Umbraco.Web.BackOffice.Filters
                     actionContext.HttpContext.Items[typeof(IContent).ToString()] = contentItem;
 
                     accessResult = ContentPermissionsHelper.CheckPermissions(
-                        contentToCheck, webSecurity.CurrentUser,
+                        contentToCheck, backofficeSecurity.CurrentUser,
                         _userService, _entityService, permissionToCheck.ToArray());
                 }
                 else
                 {
                     accessResult = ContentPermissionsHelper.CheckPermissions(
-                        contentIdToCheck, webSecurity.CurrentUser,
+                        contentIdToCheck, backofficeSecurity.CurrentUser,
                         _userService, _contentService, _entityService,
                         out contentToCheck,
                         permissionToCheck.ToArray());

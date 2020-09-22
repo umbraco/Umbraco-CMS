@@ -13,10 +13,10 @@ namespace Umbraco.Web.BackOffice.Filters
     {
         public MediaSaveModelValidator(
             ILogger logger,
-            IWebSecurity webSecurity,
+            IBackofficeSecurity backofficeSecurity,
             ILocalizedTextService textService,
             IPropertyValidationService propertyValidationService)
-            : base(logger, webSecurity, textService, propertyValidationService)
+            : base(logger, backofficeSecurity, textService, propertyValidationService)
         {
         }
     }
