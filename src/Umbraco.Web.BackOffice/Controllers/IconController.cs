@@ -12,7 +12,7 @@ using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Filters;
 
-namespace Umbraco.Web.Editors
+namespace Umbraco.Web.BackOffice.Controllers
 {
     [PluginController("UmbracoApi")]
     public class IconController : UmbracoAuthorizedApiController

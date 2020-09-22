@@ -13,7 +13,7 @@ using Umbraco.Web.Security;
 using Umbraco.Web.Services;
 using Umbraco.Web.Trees;
 
-namespace Umbraco.Web.Editors
+namespace Umbraco.Web.BackOffice.Controllers
 {
     /// <summary>
     ///     The API controller used for using the list of sections
