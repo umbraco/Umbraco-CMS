@@ -91,7 +91,6 @@ namespace Umbraco.Tests.Runtimes
                 _ioHelper, _profiler, new AspNetHostingEnvironment(Options.Create(new HostingSettings())), new AspNetBackOfficeInfo(_globalSettings, _ioHelper,  CreateLoggerFactory().CreateLogger<AspNetBackOfficeInfo>(), Options.Create(new WebRoutingSettings())))
             {
                 _loggerFactory = CreateLoggerFactory();
-                _logger = _loggerFactory.CreateLogger<TestUmbracoApplication>();
             }
 
             // Since we can't pass ILoggerFactory before it's created this will take care of it.
@@ -106,14 +105,13 @@ namespace Umbraco.Tests.Runtimes
             }
 
             private static ILoggerFactory _loggerFactory;
-            private static  ILogger<TestUmbracoApplication> _logger;
             private static readonly IIOHelper _ioHelper = TestHelper.IOHelper;
             private static readonly IProfiler _profiler = new TestProfiler();
             private static readonly GlobalSettings _globalSettings = new GlobalSettings();
 
             public IRuntime Runtime { get; private set; }
 
-            protected override IRuntime GetRuntime(GlobalSettings globalSettings, ConnectionStrings connectionStrings, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, Microsoft.Extensions.Logging.ILogger logger,  ILoggerFactory loggerFactory, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)
+            protected override IRuntime GetRuntime(GlobalSettings globalSettings, ConnectionStrings connectionStrings, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger,  ILoggerFactory loggerFactory, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)
             {
                 return Runtime = new TestRuntime(globalSettings, connectionStrings, umbracoVersion, ioHelper, logger, loggerFactory, profiler, hostingEnvironment, backOfficeInfo);
             }
@@ -122,7 +120,7 @@ namespace Umbraco.Tests.Runtimes
         // test runtime
         public class TestRuntime : CoreRuntime
         {
-            public TestRuntime(GlobalSettings globalSettings, ConnectionStrings connectionStrings, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, Microsoft.Extensions.Logging.ILogger logger, ILoggerFactory loggerFactory, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)
+            public TestRuntime(GlobalSettings globalSettings, ConnectionStrings connectionStrings, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, ILoggerFactory loggerFactory, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)
                 :base(globalSettings, connectionStrings,umbracoVersion, ioHelper, logger, loggerFactory, profiler, new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, TestHelper.DbProviderFactoryCreator, TestHelper.MainDom, TestHelper.GetTypeFinder(), AppCaches.NoCache)
             {
 
