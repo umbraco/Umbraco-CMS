@@ -67,9 +67,7 @@ namespace Umbraco.Web.Editors
                 umbracoHelper,
                 Current.IconService)
         {
-            _manifestParser = manifestParser;
-            _features = features;
-            _runtimeState = runtimeState;
+
         }
 
         public BackOfficeController(
