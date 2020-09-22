@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Threading;
 using System.Web;
 using System.Web.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Serilog;
 using Serilog.Context;
@@ -51,34 +54,18 @@ namespace Umbraco.Web
 
                 var hostingEnvironment = new AspNetHostingEnvironment(Options.Create(hostingSettings));
                 var loggingConfiguration = new LoggingConfiguration(
-                    Path.Combine(hostingEnvironment.ApplicationPhysicalPath, "App_Data\\Logs"),
-                    Path.Combine(hostingEnvironment.ApplicationPhysicalPath, "config\\serilog.config"),
-                    Path.Combine(hostingEnvironment.ApplicationPhysicalPath, "config\\serilog.user.config"));
+                    Path.Combine(hostingEnvironment.ApplicationPhysicalPath, "App_Data\\Logs"));
                 var ioHelper = new IOHelper(hostingEnvironment);
-
-                // TODO: Configure Serilog somewhere else
-                var loggerConfig = new LoggerConfiguration();
-                loggerConfig
-                    .MinimalConfiguration(hostingEnvironment, loggingConfiguration)
-                    .ReadFromConfigFile(loggingConfiguration)
-                    .ReadFromUserConfigFile(loggingConfiguration);
-                Log.Logger = loggerConfig.CreateLogger();
-
-                _loggerFactory = LoggerFactory.Create(builder =>
-                {
-                    builder.AddSerilog();
-                });
-
-                var logger = _loggerFactory.CreateLogger<UmbracoApplicationBase>();
+                var logger = SerilogLogger.CreateWithDefaultConfiguration(hostingEnvironment, loggingConfiguration, new ConfigurationRoot(new List<IConfigurationProvider>()));
 
                 var backOfficeInfo = new AspNetBackOfficeInfo(globalSettings, ioHelper, _loggerFactory.CreateLogger<AspNetBackOfficeInfo>(), Options.Create(webRoutingSettings));
                 var profiler = GetWebProfiler(hostingEnvironment);
-                Umbraco.Composing.Current.Initialize(logger,
+                Umbraco.Composing.Current.Initialize(NullLogger<object>.Instance,
                     _loggerFactory,
                     securitySettings,
                     globalSettings,
                     ioHelper, hostingEnvironment, backOfficeInfo, profiler);
-                Logger = logger;
+                Logger = NullLogger<UmbracoApplicationBase>.Instance;
             }
         }
 

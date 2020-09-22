@@ -236,6 +236,7 @@ namespace Umbraco.Tests.Integration.Testing
                 GetType().Assembly,
                 AppCaches.NoCache, // Disable caches for integration tests
                 TestHelper.GetLoggingConfiguration(),
+                Configuration,
                 CreateTestRuntime,
                 out _);
 
