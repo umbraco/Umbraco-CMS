@@ -141,7 +141,7 @@ namespace Umbraco.Extensions
             services.Configure<KeepAliveSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "KeepAlive"));
             services.Configure<LoggingSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "Logging"));
             services.Configure<MemberPasswordConfigurationSettings>(configuration.GetSection(Constants.Configuration.ConfigSecurityPrefix + "MemberPassword"));
-            services.Configure<ModelsBuilderConfig>(configuration.GetSection(Constants.Configuration.ConfigGlobalPrefix + "ModelsBuilder"));
+            services.Configure<ModelsBuilderConfig>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "ModelsBuilder"));
             services.Configure<NuCacheSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "NuCache"));
             services.Configure<RequestHandlerSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "RequestHandler"));
             services.Configure<RuntimeSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "Runtime"));

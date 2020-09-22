@@ -72,7 +72,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IMediaService _mediaService;
         private readonly IContentService _contentService;
         private readonly GlobalSettings _globalSettings;
-        private readonly BackOfficeUserManager _backOfficeUserManager;
+        private readonly IBackOfficeUserManager _backOfficeUserManager;
         private readonly ILoggerFactory _loggerFactory;
         private readonly LinkGenerator _linkGenerator;
 
@@ -95,7 +95,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             IMediaService mediaService,
             IContentService contentService,
             IOptions<GlobalSettings> globalSettings,
-            BackOfficeUserManager backOfficeUserManager,
+            IBackOfficeUserManager backOfficeUserManager,
             ILoggerFactory loggerFactory,
             LinkGenerator linkGenerator)
         {
