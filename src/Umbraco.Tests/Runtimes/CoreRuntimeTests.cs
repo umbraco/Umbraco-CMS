@@ -83,14 +83,26 @@ namespace Umbraco.Tests.Runtimes
         // test application
         public class TestUmbracoApplication : UmbracoApplicationBase
         {
-            public TestUmbracoApplication() : base(_logger,
+            public TestUmbracoApplication() : base(CreateLoggerFactory().CreateLogger<TestUmbracoApplication>(),
+                CreateLoggerFactory(),
                 new SecuritySettings(),
                 new GlobalSettings(),
                 new ConnectionStrings(),
-                _ioHelper, _profiler, new AspNetHostingEnvironment(Options.Create(new HostingSettings())), new AspNetBackOfficeInfo(_globalSettings, _ioHelper,  _loggerFactory.CreateLogger<AspNetBackOfficeInfo>(), Options.Create(new WebRoutingSettings())))
+                _ioHelper, _profiler, new AspNetHostingEnvironment(Options.Create(new HostingSettings())), new AspNetBackOfficeInfo(_globalSettings, _ioHelper,  CreateLoggerFactory().CreateLogger<AspNetBackOfficeInfo>(), Options.Create(new WebRoutingSettings())))
             {
-                _loggerFactory = LoggerFactory.Create(builder => builder.AddDebug());
+                _loggerFactory = CreateLoggerFactory();
                 _logger = _loggerFactory.CreateLogger<TestUmbracoApplication>();
+            }
+
+            // Since we can't pass ILoggerFactory before it's created this will take care of it.
+            private static ILoggerFactory CreateLoggerFactory()
+            {
+                if (_loggerFactory is null)
+                {
+                    _loggerFactory = LoggerFactory.Create(builder => builder.AddDebug());
+                }
+
+                return _loggerFactory;
             }
 
             private static ILoggerFactory _loggerFactory;

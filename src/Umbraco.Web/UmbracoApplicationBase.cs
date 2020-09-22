@@ -98,11 +98,12 @@ namespace Umbraco.Web
             return webProfiler;
         }
 
-        protected UmbracoApplicationBase(ILogger<UmbracoApplicationBase> logger, SecuritySettings securitySettings, GlobalSettings globalSettings, ConnectionStrings connectionStrings, IIOHelper ioHelper, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)
+        protected UmbracoApplicationBase(ILogger<UmbracoApplicationBase> logger, ILoggerFactory loggerFactory, SecuritySettings securitySettings, GlobalSettings globalSettings, ConnectionStrings connectionStrings, IIOHelper ioHelper, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)
         {
             _securitySettings = securitySettings;
             _globalSettings = globalSettings;
             _connectionStrings = connectionStrings;
+            _loggerFactory = loggerFactory;
 
             if (!Umbraco.Composing.Current.IsInitialized)
             {
