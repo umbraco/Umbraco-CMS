@@ -435,7 +435,6 @@ namespace Umbraco.Tests.Integration.Testing
 
         #region Builders
 
-        protected GlobalSettingsBuilder GlobalSettingsBuilder = new GlobalSettingsBuilder();
         protected UserBuilder UserBuilder = new UserBuilder();
         protected UserGroupBuilder UserGroupBuilder = new UserGroupBuilder();
 

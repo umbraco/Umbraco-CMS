@@ -21,7 +21,7 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
 {
     internal class ModelsBuilderComponent : IComponent
     {
-        private readonly ModelsBuilderConfig _config;
+        private readonly ModelsBuilderSettings _config;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly LiveModelsProvider _liveModelsProvider;
         private readonly OutOfDateModelsStatus _outOfDateModels;
@@ -29,7 +29,7 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
         private readonly IUmbracoApplicationLifetime _umbracoApplicationLifetime;
         private readonly IUmbracoRequestLifetime _umbracoRequestLifetime;
 
-        public ModelsBuilderComponent(IOptions<ModelsBuilderConfig> config, IShortStringHelper shortStringHelper,
+        public ModelsBuilderComponent(IOptions<ModelsBuilderSettings> config, IShortStringHelper shortStringHelper,
             LiveModelsProvider liveModelsProvider, OutOfDateModelsStatus outOfDateModels, LinkGenerator linkGenerator,
             IUmbracoRequestLifetime umbracoRequestLifetime, IUmbracoApplicationLifetime umbracoApplicationLifetime)
         {

@@ -40,7 +40,7 @@ namespace Umbraco.Tests.UnitTests.AutoFixture
                 {
                     fixture.Customize<BackOfficeIdentityUser>(
                         u => u.FromFactory<string ,string, string>(
-                            (a,b,c) => BackOfficeIdentityUser.CreateNew(new GlobalSettingsBuilder().Build(),a,b,c)));
+                            (a,b,c) => BackOfficeIdentityUser.CreateNew(new GlobalSettings(),a,b,c)));
                     fixture
                         .Customize(new ConstructorCustomization(typeof(UsersController), new GreedyConstructorQuery()))
                         .Customize(new ConstructorCustomization(typeof(InstallController), new GreedyConstructorQuery()))

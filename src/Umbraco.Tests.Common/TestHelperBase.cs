@@ -120,7 +120,7 @@ namespace Umbraco.Tests.Common
 
         public IRegister GetRegister()
         {
-            return RegisterFactory.Create(new GlobalSettingsBuilder().Build());
+            return RegisterFactory.Create(new GlobalSettings());
         }
 
         public abstract IHostingEnvironment GetHostingEnvironment();

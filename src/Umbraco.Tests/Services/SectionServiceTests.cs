@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Testing;
@@ -35,7 +36,7 @@ namespace Umbraco.Tests.Services
 
         private IUser CreateTestUser()
         {
-            var globalSettings = new GlobalSettingsBuilder().Build();
+            var globalSettings = new GlobalSettings();
             var user = new User(globalSettings)
             {
                 Name = "Test user",

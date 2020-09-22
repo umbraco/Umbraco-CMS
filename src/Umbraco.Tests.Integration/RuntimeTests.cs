@@ -1,24 +1,21 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
-using Smidge;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Runtime;
+using Umbraco.Extensions;
 using Umbraco.Tests.Common;
 using Umbraco.Tests.Integration.Extensions;
 using Umbraco.Tests.Integration.Implementations;
 using Umbraco.Tests.Integration.Testing;
-using Umbraco.Web.Common.AspNetCore;
-using Umbraco.Extensions;
-using Umbraco.Tests.Common.Builders;
-using Microsoft.Extensions.Options;
 
 namespace Umbraco.Tests.Integration
 {
@@ -56,8 +53,8 @@ namespace Umbraco.Tests.Integration
 
             var testHelper = new TestHelper();
 
-            var globalSettings = new GlobalSettingsBuilder().Build();
-            var connectionStrings = new ConnectionStringsBuilder().Build();
+            var globalSettings = new GlobalSettings();
+            var connectionStrings = new ConnectionStrings();
 
             // Create the core runtime
             var coreRuntime = new CoreRuntime(globalSettings, connectionStrings, testHelper.GetUmbracoVersion(),
@@ -77,12 +74,12 @@ namespace Umbraco.Tests.Integration
 
             // TODO: found these registration were necessary here (as we haven't called the HostBuilder?), as dependencies for ComponentCollection
             // are not resolved.  Need to check this if these explicit registrations are the best way to handle this.
-            var contentSettings = new ContentSettingsBuilder().Build();
-            var coreDebugSettings = new CoreDebugSettingsBuilder().Build();
-            var nuCacheSettings = new NuCacheSettingsBuilder().Build();
-            var requestHandlerSettings = new RequestHandlerSettingsBuilder().Build();
-            var userPasswordConfigurationSettings = new UserPasswordConfigurationSettingsBuilder().Build();
-            var webRoutingSettings = new WebRoutingSettingsBuilder().Build();
+            var contentSettings = new ContentSettings();
+            var coreDebugSettings = new CoreDebugSettings();
+            var nuCacheSettings = new NuCacheSettings();
+            var requestHandlerSettings = new RequestHandlerSettings();
+            var userPasswordConfigurationSettings = new UserPasswordConfigurationSettings();
+            var webRoutingSettings = new WebRoutingSettings();
 
             umbracoContainer.Register(x => Options.Create(globalSettings));
             umbracoContainer.Register(x => Options.Create(contentSettings));

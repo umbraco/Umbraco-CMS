@@ -60,7 +60,7 @@ namespace Umbraco.Tests.Services
 
             var typeFinder = TestHelper.GetTypeFinder();
 
-            var nuCacheSettings = new NuCacheSettingsBuilder().Build();
+            var nuCacheSettings = new NuCacheSettings();
 
             return new PublishedSnapshotService(
                 options,
@@ -75,7 +75,7 @@ namespace Umbraco.Tests.Services
                 documentRepository, mediaRepository, memberRepository,
                 DefaultCultureAccessor,
                 new DatabaseDataSource(Mock.Of<ILogger>()),
-                Microsoft.Extensions.Options.Options.Create(globalSettings ?? new GlobalSettingsBuilder().Build()),
+                Microsoft.Extensions.Options.Options.Create(globalSettings ?? new GlobalSettings()),
                 Factory.GetInstance<IEntityXmlSerializer>(),
                 Mock.Of<IPublishedModelFactory>(),
                 new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider(ShortStringHelper) }),
@@ -311,7 +311,7 @@ namespace Umbraco.Tests.Services
             var nlContentName = "Content nl-NL";
             var nlCulture = "nl-NL";
 
-            var globalSettings = new GlobalSettingsBuilder().Build();
+            var globalSettings = new GlobalSettings();
 
             ServiceContext.LocalizationService.Save(new Language(globalSettings, nlCulture));
 
@@ -669,7 +669,7 @@ namespace Umbraco.Tests.Services
             // can change it to variant and back
             // can then switch one property to variant
 
-            var globalSettings = new GlobalSettingsBuilder().Build();
+            var globalSettings = new GlobalSettings();
 
             var languageEn = new Language(globalSettings, "en") { IsDefault = true };
             ServiceContext.LocalizationService.Save(languageEn);
@@ -1264,7 +1264,7 @@ namespace Umbraco.Tests.Services
 
         private void CreateFrenchAndEnglishLangs()
         {
-            var globalSettings = new GlobalSettingsBuilder().Build();
+            var globalSettings = new GlobalSettings();
             var languageEn = new Language(globalSettings, "en") { IsDefault = true };
             ServiceContext.LocalizationService.Save(languageEn);
             var languageFr = new Language(globalSettings, "fr");

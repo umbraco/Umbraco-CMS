@@ -2,6 +2,9 @@
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Composing;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Strings;
@@ -25,6 +28,7 @@ namespace Umbraco.Tests.PropertyEditors
 
             var result = valueEditor.ToEditor(prop);
             Assert.AreEqual(isOk, !(result is string));
+
         }
 
         [TestCase("STRING", "hello", "hello")]

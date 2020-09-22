@@ -86,7 +86,7 @@ namespace Umbraco.Tests.Testing.TestingTests
                 .Returns(UrlInfo.Url("/hello/world/1234"));
             var urlProvider = urlProviderMock.Object;
 
-            var webRoutingSettings = new WebRoutingSettingsBuilder().Build();
+            var webRoutingSettings = new WebRoutingSettings();
             var theUrlProvider = new UrlProvider(
                 new TestUmbracoContextAccessor(umbracoContext),
                 Microsoft.Extensions.Options.Options.Create(webRoutingSettings),

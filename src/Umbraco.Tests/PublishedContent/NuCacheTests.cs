@@ -6,6 +6,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -17,7 +18,6 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.Common;
-using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing.Objects;
 using Umbraco.Web;
@@ -178,8 +178,8 @@ namespace Umbraco.Tests.PublishedContent
 
             var typeFinder = TestHelper.GetTypeFinder();
 
-            var globalSettings = new GlobalSettingsBuilder().Build();
-            var nuCacheSettings = new NuCacheSettingsBuilder().Build();
+            var globalSettings = new GlobalSettings();
+            var nuCacheSettings = new NuCacheSettings();
 
             // at last, create the complete NuCache snapshot service!
             var options = new PublishedSnapshotServiceOptions { IgnoreLocalDb = true };

@@ -6,10 +6,10 @@ using System.Linq;
 using System.Xml.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models.Packaging;
 using Umbraco.Core.Packaging;
 using Umbraco.Core.Services;
-using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 
@@ -41,7 +41,7 @@ namespace Umbraco.Tests.Packaging
             HostingEnvironment,
             Factory.GetInstance<IEntityXmlSerializer>(), Logger,
             UmbracoVersion,
-            Microsoft.Extensions.Options.Options.Create(new GlobalSettingsBuilder().Build()),
+            Microsoft.Extensions.Options.Options.Create(new GlobalSettings()),
             "createdPackages.config",
             //temp paths
             tempFolderPath: "~/" + _testBaseFolder + "/temp",

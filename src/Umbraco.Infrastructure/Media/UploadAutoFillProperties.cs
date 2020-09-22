@@ -5,7 +5,6 @@ using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -38,7 +37,7 @@ namespace Umbraco.Web.Media
         /// <param name="autoFillConfig">The auto-fill configuration.</param>
         /// <param name="culture">Variation language.</param>
         /// <param name="segment">Variation segment.</param>
-        public void Reset(IContentBase content, IImagingAutoFillUploadField autoFillConfig, string culture, string segment)
+        public void Reset(IContentBase content, ImagingAutoFillUploadField autoFillConfig, string culture, string segment)
         {
             if (content == null) throw new ArgumentNullException(nameof(content));
             if (autoFillConfig == null) throw new ArgumentNullException(nameof(autoFillConfig));
@@ -55,7 +54,7 @@ namespace Umbraco.Web.Media
         /// <remarks>The <paramref name="filepath"/> parameter is the path relative to the filesystem.</remarks>
         /// <param name="culture">Variation language.</param>
         /// <param name="segment">Variation segment.</param>
-        public void Populate(IContentBase content, IImagingAutoFillUploadField autoFillConfig, string filepath, string culture, string segment)
+        public void Populate(IContentBase content, ImagingAutoFillUploadField autoFillConfig, string filepath, string culture, string segment)
         {
             if (content == null) throw new ArgumentNullException(nameof(content));
             if (autoFillConfig == null) throw new ArgumentNullException(nameof(autoFillConfig));
@@ -94,7 +93,7 @@ namespace Umbraco.Web.Media
         /// <param name="filestream">The stream containing the file data.</param>
         /// <param name="culture">Variation language.</param>
         /// <param name="segment">Variation segment.</param>
-        public void Populate(IContentBase content, IImagingAutoFillUploadField autoFillConfig, string filepath, Stream filestream, string culture, string segment)
+        public void Populate(IContentBase content, ImagingAutoFillUploadField autoFillConfig, string filepath, Stream filestream, string culture, string segment)
         {
             if (content == null) throw new ArgumentNullException(nameof(content));
             if (autoFillConfig == null) throw new ArgumentNullException(nameof(autoFillConfig));
@@ -112,7 +111,7 @@ namespace Umbraco.Web.Media
             }
         }
 
-        private static void SetProperties(IContentBase content, IImagingAutoFillUploadField autoFillConfig, Size? size, long length, string extension, string culture, string segment)
+        private static void SetProperties(IContentBase content, ImagingAutoFillUploadField autoFillConfig, Size? size, long length, string extension, string culture, string segment)
         {
             if (content == null) throw new ArgumentNullException(nameof(content));
             if (autoFillConfig == null) throw new ArgumentNullException(nameof(autoFillConfig));
@@ -130,7 +129,7 @@ namespace Umbraco.Web.Media
                 content.Properties[autoFillConfig.ExtensionFieldAlias].SetValue(extension, culture, segment);
         }
 
-        private static void ResetProperties(IContentBase content, IImagingAutoFillUploadField autoFillConfig, string culture, string segment)
+        private static void ResetProperties(IContentBase content, ImagingAutoFillUploadField autoFillConfig, string culture, string segment)
         {
             if (content == null) throw new ArgumentNullException(nameof(content));
             if (autoFillConfig == null) throw new ArgumentNullException(nameof(autoFillConfig));

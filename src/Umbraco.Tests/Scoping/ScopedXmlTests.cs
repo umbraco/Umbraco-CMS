@@ -5,6 +5,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -44,9 +45,9 @@ namespace Umbraco.Tests.Scoping
 
         protected override void ComposeSettings()
         {
-            var contentSettings = new ContentSettingsBuilder().Build();
-            var globalSettings = new GlobalSettingsBuilder().Build();
-            var userPasswordConfigurationSettings = new UserPasswordConfigurationSettingsBuilder().Build();
+            var contentSettings = new ContentSettings();
+            var globalSettings = new GlobalSettings();
+            var userPasswordConfigurationSettings = new UserPasswordConfigurationSettings();
 
             Composition.Register(x => Microsoft.Extensions.Options.Options.Create(contentSettings));
             Composition.Register(x => Microsoft.Extensions.Options.Options.Create(globalSettings));

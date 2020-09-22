@@ -229,7 +229,7 @@ namespace Umbraco.Tests.Security
             _mockDataProtector.Setup(x => x.Protect(It.IsAny<byte[]>())).Returns((byte[] originalBytes) => originalBytes);
             _mockDataProtector.Setup(x => x.Unprotect(It.IsAny<byte[]>())).Returns((byte[] originalBytes) => originalBytes);
 
-            var globalSettings = new GlobalSettingsBuilder().Build();
+            var globalSettings = new GlobalSettings();
 
             _mockUserManager = new Mock<UserManager<BackOfficeIdentityUser>>(new Mock<IUserStore<BackOfficeIdentityUser>>().Object,
                 null, null, null, null, null, null, null, null);
