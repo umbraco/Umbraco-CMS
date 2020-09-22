@@ -66,14 +66,14 @@
     <PackageReference Include="Examine.Core">
       <Version>2.0.0-alpha.20200128.15</Version>
     </PackageReference>
-    <PackageReference Include="HtmlAgilityPack" Version="1.8.14" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.24" />
     <PackageReference Include="HtmlSanitizer">
-      <Version>4.0.217</Version>
+      <Version>5.0.343</Version>
     </PackageReference>
     <PackageReference Include="ImageProcessor">
       <Version>2.7.0.100</Version>
     </PackageReference>
-    <PackageReference Include="LightInject" Version="6.3.2" />
+    <PackageReference Include="LightInject" Version="6.3.4" />
     <PackageReference Include="LightInject.Annotation" Version="1.1.0" />
     <PackageReference Include="LightInject.Mvc" Version="2.0.0" />
     <PackageReference Include="LightInject.Web">
@@ -83,11 +83,14 @@
     <PackageReference Include="Markdown" Version="2.2.1" />
     <PackageReference Include="Microsoft.AspNet.Identity.Core" Version="2.2.3" />
     <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.2.7" />
-    <PackageReference Include="Microsoft.AspNet.SignalR.Core" Version="2.4.0" />
+    <PackageReference Include="Microsoft.AspNet.SignalR.Core" Version="2.4.1" />
     <PackageReference Include="Microsoft.AspNet.WebApi" Version="5.2.7" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
     <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="3.1.8" />
     <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="3.1.8" />
+    <PackageReference Include="Microsoft.Owin.Host.SystemWeb" Version="4.1.1" />
+    <PackageReference Include="Microsoft.Owin.Security.Cookies" Version="4.1.1" />
+    <PackageReference Include="Microsoft.Owin.Security.OAuth" Version="4.1.1" />
     <PackageReference Include="Microsoft.Owin.Host.SystemWeb" Version="4.0.1" />
     <PackageReference Include="Microsoft.Owin.Security.Cookies" Version="4.0.1" />
     <PackageReference Include="Microsoft.Owin.Security.OAuth" Version="4.0.1" />
@@ -96,7 +99,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="MiniProfiler" Version="4.1.0" />
+    <PackageReference Include="MiniProfiler" Version="4.2.1" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="NPoco" Version="4.0.2" />
     <PackageReference Include="SecurityCodeScan">
@@ -104,7 +107,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="System.Threading.Tasks.Dataflow" Version="4.9.0" />
+    <PackageReference Include="System.Threading.Tasks.Dataflow" Version="4.11.1" />
     <PackageReference Include="Umbraco.Code">
       <Version>1.0.5</Version>
     </PackageReference>
@@ -145,9 +148,6 @@
     <Compile Include="Compose\AuditEventsComposer.cs" />
     <Compile Include="Compose\BackOfficeUserAuditEventsComponent.cs" />
     <Compile Include="Compose\BackOfficeUserAuditEventsComposer.cs" />
-    <Compile Include="Compose\BlockEditorComponent.cs" />
-    <Compile Include="Compose\BlockEditorComposer.cs" />
-    <Compile Include="Compose\NestedContentPropertyComponent.cs" />
     <Compile Include="Composing\LightInject\LightInjectContainer.cs" />
     <Compile Include="Editors\PasswordChanger.cs" />
     <Compile Include="HttpContextExtensions.cs" />
@@ -181,7 +181,6 @@
     <Compile Include="AspNet\AspNetHttpContextAccessor.cs" />
     <Compile Include="AspNet\AspNetIpResolver.cs" />
     <Compile Include="AspNet\AspNetPasswordHasher.cs" />
-    <Compile Include="Compose\NestedContentPropertyComposer.cs" />
     <Compile Include="RoutableDocumentFilter.cs" />
     <Compile Include="Runtime\AspNetUmbracoBootPermissionChecker.cs" />
     <Compile Include="Security\BackOfficeSignInManager.cs" />

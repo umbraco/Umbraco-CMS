@@ -39,6 +39,7 @@ using Umbraco.Tests.Common.Composing;
 using Umbraco.Core.Media;
 using Umbraco.Tests.Common.Builders;
 using Microsoft.Extensions.Options;
+using Umbraco.Core.Configuration.Models;
 
 namespace Umbraco.Tests.Runtimes
 {
@@ -65,8 +66,8 @@ namespace Umbraco.Tests.Runtimes
             var profiler = new LogProfiler(logger);
             var profilingLogger = new ProfilingLogger(logger, profiler);
             var appCaches = AppCaches.Disabled;
-            var globalSettings = new GlobalSettingsBuilder().Build();
-            var connectionStrings = new ConnectionStringsBuilder().Build();
+            var globalSettings = new GlobalSettings();
+            var connectionStrings = new ConnectionStrings();
             var typeFinder = TestHelper.GetTypeFinder();
             var databaseFactory = new UmbracoDatabaseFactory(logger, Options.Create(globalSettings), Options.Create(connectionStrings), new Lazy<IMapperCollection>(() => factory.GetInstance<IMapperCollection>()),  TestHelper.DbProviderFactoryCreator);
             var ioHelper = TestHelper.IOHelper;
@@ -120,12 +121,12 @@ namespace Umbraco.Tests.Runtimes
 
             // TODO: found these registration were necessary here as dependencies for ComponentCollection
             // are not resolved.  Need to check this if these explicit registrations are the best way to handle this.
-            var contentSettings = new ContentSettingsBuilder().Build();
-            var coreDebugSettings = new CoreDebugSettingsBuilder().Build();
-            var nuCacheSettings = new NuCacheSettingsBuilder().Build();
-            var requestHandlerSettings = new RequestHandlerSettingsBuilder().Build();
-            var userPasswordConfigurationSettings = new UserPasswordConfigurationSettingsBuilder().Build();
-            var webRoutingSettings = new WebRoutingSettingsBuilder().Build();
+            var contentSettings = new ContentSettings();
+            var coreDebugSettings = new CoreDebugSettings();
+            var nuCacheSettings = new NuCacheSettings();
+            var requestHandlerSettings = new RequestHandlerSettings();
+            var userPasswordConfigurationSettings = new UserPasswordConfigurationSettings();
+            var webRoutingSettings = new WebRoutingSettings();
 
             composition.Register(x => Options.Create(globalSettings));
             composition.Register(x => Options.Create(contentSettings));
@@ -292,8 +293,8 @@ namespace Umbraco.Tests.Runtimes
             composition.RegisterEssentials(logger, profiler, profilingLogger, mainDom, appCaches, databaseFactory, typeLoader, runtimeState, typeFinder, ioHelper, umbracoVersion, TestHelper.DbProviderFactoryCreator, hostingEnvironment, backOfficeInfo);
 
             // create the core runtime and have it compose itself
-            var globalSettings = new GlobalSettingsBuilder().Build();
-            var connectionStrings = new ConnectionStringsBuilder().Build();
+            var globalSettings = new GlobalSettings();
+            var connectionStrings = new ConnectionStrings();
 
             var coreRuntime = new CoreRuntime(globalSettings, connectionStrings, umbracoVersion, ioHelper, logger, profiler, new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, TestHelper.DbProviderFactoryCreator, TestHelper.MainDom, typeFinder, AppCaches.NoCache);
 

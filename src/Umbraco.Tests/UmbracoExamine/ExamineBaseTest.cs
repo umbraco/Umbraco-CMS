@@ -1,13 +1,10 @@
 ﻿using System.IO;
 using NUnit.Framework;
-using Umbraco.Core;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Logging.Serilog;
 using Umbraco.Core.Strings;
-using Umbraco.Tests.Common.Builders;
-using Umbraco.Tests.Components;
 using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.UmbracoExamine
@@ -34,7 +31,7 @@ namespace Umbraco.Tests.UmbracoExamine
         protected override void Compose()
         {
             base.Compose();
-            var requestHandlerSettings = new RequestHandlerSettingsBuilder().Build();
+            var requestHandlerSettings = new RequestHandlerSettings();
             Composition.RegisterUnique<IShortStringHelper>(_ => new DefaultShortStringHelper(Microsoft.Extensions.Options.Options.Create(requestHandlerSettings)));
         }
     }

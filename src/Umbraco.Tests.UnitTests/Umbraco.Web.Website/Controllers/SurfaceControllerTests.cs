@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
@@ -7,12 +6,12 @@ using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Common;
-using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Testing;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
@@ -42,7 +41,7 @@ namespace Umbraco.Tests.Integration
             var hostingEnvironment = Mock.Of<IHostingEnvironment>();
             var backofficeSecurityAccessor = Mock.Of<IBackofficeSecurityAccessor>();
             Mock.Get(backofficeSecurityAccessor).Setup(x => x.BackofficeSecurity).Returns(Mock.Of<IBackofficeSecurity>());
-            var globalSettings = new GlobalSettingsBuilder().Build();
+            var globalSettings = new GlobalSettings();
 
             var umbracoContextFactory = new UmbracoContextFactory(
                 _umbracoContextAccessor,
@@ -73,7 +72,7 @@ namespace Umbraco.Tests.Integration
         [Test]
         public void Umbraco_Context_Not_Null()
         {
-            var globalSettings = new GlobalSettingsBuilder().Build();
+            var globalSettings = new GlobalSettings();
             var httpContextAccessor = Mock.Of<IHttpContextAccessor>();
             var hostingEnvironment = Mock.Of<IHostingEnvironment>();
             var backofficeSecurityAccessor = Mock.Of<IBackofficeSecurityAccessor>();
@@ -114,7 +113,7 @@ namespace Umbraco.Tests.Integration
             var publishedSnapshotService = new Mock<IPublishedSnapshotService>();
             var httpContextAccessor = Mock.Of<IHttpContextAccessor>();
             var hostingEnvironment = Mock.Of<IHostingEnvironment>();
-            var globalSettings = new GlobalSettingsBuilder().Build();
+            var globalSettings = new GlobalSettings();
 
             var umbracoContextFactory = new UmbracoContextFactory(
                 _umbracoContextAccessor,
@@ -149,7 +148,7 @@ namespace Umbraco.Tests.Integration
         [Test]
         public void Mock_Current_Page()
         {
-            var globalSettings = new GlobalSettingsBuilder().Build();
+            var globalSettings = new GlobalSettings();
             var httpContextAccessor = Mock.Of<IHttpContextAccessor>();
             var hostingEnvironment = Mock.Of<IHostingEnvironment>();
             var backofficeSecurityAccessor = Mock.Of<IBackofficeSecurityAccessor>();

@@ -9,16 +9,14 @@ using NPoco;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Core.Services;
 using Umbraco.Persistance.SqlCe;
-using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Web.Security;
 
 namespace Umbraco.Tests.Persistence
 {
@@ -40,8 +38,8 @@ namespace Umbraco.Tests.Persistence
             _sqlSyntaxProviders = new[] { (ISqlSyntaxProvider) _sqlCeSyntaxProvider };
             _logger = Mock.Of<ILogger>();
             _umbracoVersion = TestHelper.GetUmbracoVersion();
-            var globalSettings = new GlobalSettingsBuilder().Build();
-            var connectionStrings = new ConnectionStringsBuilder().Build();
+            var globalSettings = new GlobalSettings();
+            var connectionStrings = new ConnectionStrings();
             _databaseFactory = new UmbracoDatabaseFactory(_logger, Options.Create(globalSettings), Options.Create(connectionStrings),  new Lazy<IMapperCollection>(() => Mock.Of<IMapperCollection>()), TestHelper.DbProviderFactoryCreator);
         }
 

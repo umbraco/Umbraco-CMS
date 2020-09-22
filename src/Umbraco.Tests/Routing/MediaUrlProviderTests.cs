@@ -4,7 +4,7 @@ using Moq;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -13,7 +13,6 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Common;
-using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.PublishedContent;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
@@ -35,7 +34,7 @@ namespace Umbraco.Tests.Routing
 
             var logger = Mock.Of<ILogger>();
             var mediaFileSystemMock = Mock.Of<IMediaFileSystem>();
-            var contentSettings = new ContentSettingsBuilder().Build();
+            var contentSettings = new ContentSettings();
             var dataTypeService = Mock.Of<IDataTypeService>();
             var propertyEditors = new MediaUrlGeneratorCollection(new IMediaUrlGenerator[]
             {
@@ -150,7 +149,7 @@ namespace Umbraco.Tests.Routing
 
         private IPublishedUrlProvider GetPublishedUrlProvider(IUmbracoContext umbracoContext)
         {
-            var webRoutingSettings = new WebRoutingSettingsBuilder().Build();
+            var webRoutingSettings = new WebRoutingSettings();
             return new UrlProvider(
                 new TestUmbracoContextAccessor(umbracoContext),
                 Microsoft.Extensions.Options.Options.Create(webRoutingSettings),

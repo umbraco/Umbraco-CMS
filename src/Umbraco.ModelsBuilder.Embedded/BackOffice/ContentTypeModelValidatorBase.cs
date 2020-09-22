@@ -14,9 +14,9 @@ namespace Umbraco.ModelsBuilder.Embedded.BackOffice
         where TModel : ContentTypeSave<TProperty>
         where TProperty : PropertyTypeBasic
     {
-        private readonly IOptions<ModelsBuilderConfig> _config;
+        private readonly IOptions<ModelsBuilderSettings> _config;
 
-        public ContentTypeModelValidatorBase(IOptions<ModelsBuilderConfig> config)
+        public ContentTypeModelValidatorBase(IOptions<ModelsBuilderSettings> config)
         {
             _config = config;
         }

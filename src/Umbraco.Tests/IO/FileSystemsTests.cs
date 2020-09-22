@@ -6,17 +6,16 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Composing.CompositionExtensions;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
 using Umbraco.Core.IO.MediaPathSchemes;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Components;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Core.Composing.CompositionExtensions;
 using Current = Umbraco.Web.Composing.Current;
 using FileSystems = Umbraco.Core.IO.FileSystems;
-using Umbraco.Tests.Common.Builders;
 
 namespace Umbraco.Tests.IO
 {
@@ -41,7 +40,7 @@ namespace Umbraco.Tests.IO
             composition.RegisterUnique(TestHelper.IOHelper);
             composition.RegisterUnique(TestHelper.GetHostingEnvironment());
 
-            var globalSettings = new GlobalSettingsBuilder().Build();
+            var globalSettings = new GlobalSettings();
             composition.Register(x => Microsoft.Extensions.Options.Options.Create(globalSettings));
 
             composition.ComposeFileSystems();

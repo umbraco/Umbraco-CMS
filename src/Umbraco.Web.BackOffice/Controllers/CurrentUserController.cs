@@ -43,7 +43,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly IUserService _userService;
         private readonly UmbracoMapper _umbracoMapper;
-        private readonly BackOfficeUserManager _backOfficeUserManager;
+        private readonly IBackOfficeUserManager _backOfficeUserManager;
         private readonly ILogger _logger;
         private readonly ILocalizedTextService _localizedTextService;
         private readonly AppCaches _appCaches;
@@ -57,7 +57,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             IBackofficeSecurityAccessor backofficeSecurityAccessor,
             IUserService userService,
             UmbracoMapper umbracoMapper,
-            BackOfficeUserManager backOfficeUserManager,
+            IBackOfficeUserManager backOfficeUserManager,
             ILogger logger,
             ILocalizedTextService localizedTextService,
             AppCaches appCaches,

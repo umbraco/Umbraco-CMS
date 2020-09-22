@@ -21,6 +21,7 @@ using Umbraco.Core.Services;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Tests.Common.Builders;
+using Umbraco.Core.Configuration.Models;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
@@ -63,7 +64,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private DocumentRepository CreateRepository(IScopeAccessor scopeAccessor, out ContentTypeRepository contentTypeRepository, out TemplateRepository templateRepository, AppCaches appCaches = null)
         {
-            var globalSettings = Microsoft.Extensions.Options.Options.Create(new GlobalSettingsBuilder().Build());
+            var globalSettings = Microsoft.Extensions.Options.Options.Create(new GlobalSettings());
 
             appCaches = appCaches ?? AppCaches;
 
