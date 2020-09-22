@@ -56,7 +56,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             var ext = Path.GetExtension(imagePath);
 
             // we need to check if it is an image by extension
-            if (_imageUrlGenerator.IsImageFile(ext) == false)
+            if (_imageUrlGenerator.IsSupportedImageFormat(ext) == false)
                 return NotFound();
 
             //redirect to ImageProcessor thumbnail with rnd generated from last modified time of original media file

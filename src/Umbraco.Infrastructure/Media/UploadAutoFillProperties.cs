@@ -71,7 +71,7 @@ namespace Umbraco.Web.Media
                     using (var filestream = _mediaFileSystem.OpenFile(filepath))
                     {
                         var extension = (Path.GetExtension(filepath) ?? "").TrimStart('.');
-                        var size = _imageUrlGenerator.IsImageFile(extension) ? (Size?)ImageHelper.GetDimensions(filestream) : null;
+                        var size = _imageUrlGenerator.IsSupportedImageFormat(extension) ? (Size?)ImageHelper.GetDimensions(filestream) : null;
                         SetProperties(content, autoFillConfig, size, filestream.Length, extension, culture, segment);
                     }
                 }
@@ -105,7 +105,7 @@ namespace Umbraco.Web.Media
             else
             {
                 var extension = (Path.GetExtension(filepath) ?? "").TrimStart('.');
-                var size = _imageUrlGenerator.IsImageFile(extension) ? (Size?)ImageHelper.GetDimensions(filestream) : null;
+                var size = _imageUrlGenerator.IsSupportedImageFormat(extension) ? (Size?)ImageHelper.GetDimensions(filestream) : null;
                 SetProperties(content, autoFillConfig, size, filestream.Length, extension, culture, segment);
             }
         }
