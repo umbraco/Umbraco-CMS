@@ -9,6 +9,7 @@ using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Runtime;
 using Umbraco.Core.Security;
+using Umbraco.Core.Services;
 using Umbraco.Extensions;
 using Umbraco.Net;
 using Umbraco.Web.Common.AspNetCore;
@@ -75,7 +76,8 @@ namespace Umbraco.Web.Common.Runtime
 
             // register the umbraco context factory
             composition.RegisterUnique<IUmbracoContextFactory, UmbracoContextFactory>();
-            composition.RegisterUnique<IWebSecurity, WebSecurity>();
+            composition.RegisterUnique<IBackofficeSecurityFactory, BackofficeSecurityFactory>();
+            composition.RegisterUnique<IBackofficeSecurityAccessor, HybridBackofficeSecurityAccessor>();
 
             //register the install components
             //NOTE: i tried to not have these registered if we weren't installing or upgrading but post install when the site restarts
@@ -98,8 +100,6 @@ namespace Umbraco.Web.Common.Runtime
             composition.RegisterUnique<ITemplateRenderer, TemplateRenderer>();
             composition.RegisterUnique<IPublicAccessChecker, PublicAccessChecker>();
             composition.RegisterUnique(factory => new LegacyPasswordSecurity(factory.GetInstance<IOptions<UserPasswordConfigurationSettings>>().Value));
-
-
         }
     }
 }

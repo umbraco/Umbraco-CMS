@@ -8,6 +8,7 @@ using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Common.TestHelpers.Entities;
 using Umbraco.Web.Actions;
@@ -30,7 +31,7 @@ namespace Umbraco.Tests.Web.Controllers
                 ActionBrowse.ActionLetter,
                 Mock.Of<IUserService>(),
                 Mock.Of<IEntityService>(),
-                Mock.Of<IWebSecurity>() );
+                Mock.Of<IBackofficeSecurityAccessor>() );
 
             var result = att.GetValueFromResponse(new ObjectResult(expected));
 
@@ -48,7 +49,7 @@ namespace Umbraco.Tests.Web.Controllers
                 ActionBrowse.ActionLetter,
                 Mock.Of<IUserService>(),
                 Mock.Of<IEntityService>(),
-                Mock.Of<IWebSecurity>() );
+                Mock.Of<IBackofficeSecurityAccessor>() );
 
             var result = att.GetValueFromResponse(new ObjectResult(container));
 
@@ -66,7 +67,7 @@ namespace Umbraco.Tests.Web.Controllers
                 ActionBrowse.ActionLetter,
                 Mock.Of<IUserService>(),
                 Mock.Of<IEntityService>(),
-                Mock.Of<IWebSecurity>() );
+                Mock.Of<IBackofficeSecurityAccessor>() );
 
             var actual = att.GetValueFromResponse(new ObjectResult(container));
 
@@ -94,7 +95,7 @@ namespace Umbraco.Tests.Web.Controllers
                 ActionBrowse.ActionLetter,
                 userService,
                 entityService,
-                Mock.Of<IWebSecurity>() );
+                Mock.Of<IBackofficeSecurityAccessor>() );
 
             var path = "";
             for (var i = 0; i < 10; i++)
@@ -145,7 +146,7 @@ namespace Umbraco.Tests.Web.Controllers
                 ActionBrowse.ActionLetter,
                 userService,
                 Mock.Of<IEntityService>(),
-                Mock.Of<IWebSecurity>() );
+                Mock.Of<IBackofficeSecurityAccessor>() );
             att.FilterBasedOnPermissions(list, user);
 
             Assert.AreEqual(3, list.Count);

@@ -74,7 +74,7 @@ namespace Umbraco.Tests.PublishedContent
             var umbracoContext = new UmbracoContext(
                 httpContextAccessor,
                 publishedSnapshotService.Object,
-                Mock.Of<IWebSecurity>(),
+                Mock.Of<IBackofficeSecurity>(),
                 globalSettings,
                 HostingEnvironment,
                 new TestVariationContextAccessor(),

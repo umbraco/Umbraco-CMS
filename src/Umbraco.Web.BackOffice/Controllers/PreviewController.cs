@@ -10,6 +10,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Hosting;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Core.WebAssets;
 using Umbraco.Extensions;
@@ -20,6 +21,8 @@ using Umbraco.Web.Editors;
 using Umbraco.Web.Features;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Security;
+using Umbraco.Web.Services;
+using Umbraco.Web.Trees;
 using Umbraco.Web.WebAssets;
 using Constants = Umbraco.Core.Constants;
 
@@ -32,8 +35,8 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly UmbracoFeatures _features;
         private readonly GlobalSettings _globalSettings;
         private readonly IPublishedSnapshotService _publishedSnapshotService;
-        private readonly IWebSecurity _webSecurity;
-        private readonly ILocalizationService _localizationService;        
+        private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
+        private readonly ILocalizationService _localizationService;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ICookieManager _cookieManager;
         private readonly IRuntimeMinifier _runtimeMinifier;
@@ -43,7 +46,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             UmbracoFeatures features,
             IOptions<GlobalSettings> globalSettings,
             IPublishedSnapshotService publishedSnapshotService,
-            IWebSecurity webSecurity,
+            IBackofficeSecurityAccessor backofficeSecurityAccessor,
             ILocalizationService localizationService,
             IHostingEnvironment hostingEnvironment,
             ICookieManager cookieManager,
@@ -53,7 +56,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _features = features;
             _globalSettings = globalSettings.Value;
             _publishedSnapshotService = publishedSnapshotService;
-            _webSecurity = webSecurity;
+            _backofficeSecurityAccessor = backofficeSecurityAccessor;
             _localizationService = localizationService;
             _hostingEnvironment = hostingEnvironment;
             _cookieManager = cookieManager;
@@ -107,7 +110,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         [UmbracoAuthorize]
         public ActionResult Frame(int id, string culture)
         {
-            var user = _webSecurity.CurrentUser;
+            var user = _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser;
 
             var previewToken = _publishedSnapshotService.EnterPreview(user, id);
 

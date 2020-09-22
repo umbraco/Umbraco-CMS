@@ -15,6 +15,7 @@ using Umbraco.Core.Configuration.Grid;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Core.WebAssets;
 using Umbraco.Extensions;
@@ -35,44 +36,41 @@ namespace Umbraco.Web.BackOffice.Controllers
     [PluginController(Constants.Web.Mvc.BackOfficeArea)]
     public class BackOfficeController : Controller
     {
-        private readonly BackOfficeUserManager _userManager;
+        private readonly IBackOfficeUserManager _userManager;
         private readonly IRuntimeMinifier _runtimeMinifier;
         private readonly GlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
-        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly ILocalizedTextService _textService;
         private readonly IGridConfig _gridConfig;
         private readonly BackOfficeServerVariables _backOfficeServerVariables;
         private readonly AppCaches _appCaches;
         private readonly BackOfficeSignInManager _signInManager;
-        private readonly IWebSecurity _webSecurity;
+        private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly ILogger _logger;
 
         public BackOfficeController(
-            BackOfficeUserManager userManager,
+            IBackOfficeUserManager userManager,
             IRuntimeMinifier runtimeMinifier,
             IOptions<GlobalSettings> globalSettings,
             IHostingEnvironment hostingEnvironment,
-            IUmbracoContextAccessor umbracoContextAccessor,
             ILocalizedTextService textService,
             IGridConfig gridConfig,
             BackOfficeServerVariables backOfficeServerVariables,
             AppCaches appCaches,
             BackOfficeSignInManager signInManager,
-            IWebSecurity webSecurity,
+            IBackofficeSecurityAccessor backofficeSecurityAccessor,
             ILogger logger)
         {
             _userManager = userManager;
             _runtimeMinifier = runtimeMinifier;
             _globalSettings = globalSettings.Value;
             _hostingEnvironment = hostingEnvironment;
-            _umbracoContextAccessor = umbracoContextAccessor;
             _textService = textService;
             _gridConfig = gridConfig ?? throw new ArgumentNullException(nameof(gridConfig));
             _backOfficeServerVariables = backOfficeServerVariables;
             _appCaches = appCaches;
             _signInManager = signInManager;
-            _webSecurity = webSecurity;
+            _backofficeSecurityAccessor = backofficeSecurityAccessor;
             _logger = logger;
         }
 
@@ -93,7 +91,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             //if you are hitting VerifyInvite, you're already signed in as a different user, and the token is invalid
             //you'll exit on one of the return RedirectToAction(nameof(Default)) but you're still logged in so you just get
             //dumped at the default admin view with no detail
-            if (_webSecurity.IsAuthenticated())
+            if (_backofficeSecurityAccessor.BackofficeSecurity.IsAuthenticated())
             {
                 await _signInManager.SignOutAsync();
             }
@@ -186,7 +184,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         [HttpGet]
         public Dictionary<string, Dictionary<string, string>> LocalizedText(string culture = null)
         {
-            var isAuthenticated = _webSecurity.IsAuthenticated();
+            var isAuthenticated = _backofficeSecurityAccessor.BackofficeSecurity.IsAuthenticated();
 
             var cultureInfo = string.IsNullOrWhiteSpace(culture)
                 //if the user is logged in, get their culture, otherwise default to 'en'

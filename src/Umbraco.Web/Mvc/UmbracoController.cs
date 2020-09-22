@@ -67,7 +67,7 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Gets the web security helper.
         /// </summary>
-        public virtual IWebSecurity Security => UmbracoContext.Security;
+        public virtual IBackofficeSecurity Security => UmbracoContext.Security;
 
         protected UmbracoController()
             : this(
