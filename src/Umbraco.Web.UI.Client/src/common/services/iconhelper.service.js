@@ -209,7 +209,7 @@ function iconHelper($http, $q, $sce, $timeout, umbRequestHelper) {
                             ,'Failed to retrieve icon: ' + iconName)
                         .then(icon => {
                             if(icon) {
-                                var trustedIcon = this.defineIcon(icon.name, icon.SvgString);
+                                var trustedIcon = this.defineIcon(icon.Name, icon.SvgString);
 
                                 liveRequests = _.filter(liveRequests, iconRequestPath);
 
