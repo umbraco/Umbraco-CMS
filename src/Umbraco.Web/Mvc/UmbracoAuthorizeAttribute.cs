@@ -30,7 +30,7 @@ namespace Umbraco.Web.Mvc
         /// <param name="runtimeState"></param>
         public UmbracoAuthorizeAttribute(IBackofficeSecurityAccessor backofficeSecurityAccessor, IRuntimeState runtimeState)
         {
-            _backofficeSecurityAccessor = _backofficeSecurityAccessor ?? throw new ArgumentNullException(nameof(backofficeSecurityAccessor));
+            _backofficeSecurityAccessor = backofficeSecurityAccessor ?? throw new ArgumentNullException(nameof(backofficeSecurityAccessor));
             _runtimeState = runtimeState ?? throw new ArgumentNullException(nameof(runtimeState));
         }
 
