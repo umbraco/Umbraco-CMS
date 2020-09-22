@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Umbraco.Core;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
@@ -23,6 +24,7 @@ namespace Umbraco.Web.Editors
     public class SectionController : UmbracoAuthorizedJsonController
     {
         private readonly IControllerFactory _controllerFactory;
+        private readonly IActionDescriptorCollectionProvider _actionDescriptorCollectionProvider;
         private readonly IDashboardService _dashboardService;
         private readonly ILocalizedTextService _localizedTextService;
         private readonly ISectionService _sectionService;
@@ -34,7 +36,8 @@ namespace Umbraco.Web.Editors
             IBackofficeSecurityAccessor backofficeSecurityAccessor,
             ILocalizedTextService localizedTextService,
             IDashboardService dashboardService, ISectionService sectionService, ITreeService treeService,
-            UmbracoMapper umbracoMapper, IControllerFactory controllerFactory)
+            UmbracoMapper umbracoMapper, IControllerFactory controllerFactory,
+            IActionDescriptorCollectionProvider actionDescriptorCollectionProvider)
         {
             _backofficeSecurityAccessor = backofficeSecurityAccessor;
             _localizedTextService = localizedTextService;
@@ -43,6 +46,7 @@ namespace Umbraco.Web.Editors
             _treeService = treeService;
             _umbracoMapper = umbracoMapper;
             _controllerFactory = controllerFactory;
+            _actionDescriptorCollectionProvider = actionDescriptorCollectionProvider;
         }
 
         public IEnumerable<Section> GetSections()
@@ -54,7 +58,7 @@ namespace Umbraco.Web.Editors
             // this is a bit nasty since we'll be proxying via the app tree controller but we sort of have to do that
             // since tree's by nature are controllers and require request contextual data
             var appTreeController =
-                new ApplicationTreeController(_treeService, _sectionService, _localizedTextService, _controllerFactory)
+                new ApplicationTreeController(_treeService, _sectionService, _localizedTextService, _controllerFactory, _actionDescriptorCollectionProvider)
                 {
                     ControllerContext = ControllerContext
                 };

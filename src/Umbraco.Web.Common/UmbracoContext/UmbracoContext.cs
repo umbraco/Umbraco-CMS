@@ -40,16 +40,16 @@ namespace Umbraco.Web
             IRequestAccessor requestAccessor)
         {
             if (publishedSnapshotService == null) throw new ArgumentNullException(nameof(publishedSnapshotService));
-            if (backofficeSecurity == null) throw new ArgumentNullException(nameof(backofficeSecurity));
             VariationContextAccessor = variationContextAccessor ??  throw new ArgumentNullException(nameof(variationContextAccessor));
             _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
+
             _hostingEnvironment = hostingEnvironment;
             _cookieManager = cookieManager;
             _requestAccessor = requestAccessor;
 
             ObjectCreated = DateTime.Now;
             UmbracoRequestId = Guid.NewGuid();
-            Security = backofficeSecurity;
+            Security = backofficeSecurity ?? throw new ArgumentNullException(nameof(backofficeSecurity));
 
             // beware - we cannot expect a current user here, so detecting preview mode must be a lazy thing
             _publishedSnapshot = new Lazy<IPublishedSnapshot>(() => publishedSnapshotService.CreatePublishedSnapshot(PreviewToken));

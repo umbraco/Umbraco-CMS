@@ -14,13 +14,14 @@ namespace Umbraco.Web.Scheduling
         private readonly IMainDom _mainDom;
         private readonly IRuntimeState _runtime;
         private readonly IServerMessenger _serverMessenger;
+        private readonly IBackofficeSecurityFactory _backofficeSecurityFactory;
         private readonly IServerRegistrar _serverRegistrar;
         private readonly IUmbracoContextFactory _umbracoContextFactory;
 
         public ScheduledPublishing(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds,
             int periodMilliseconds,
             IRuntimeState runtime, IMainDom mainDom, IServerRegistrar serverRegistrar, IContentService contentService,
-            IUmbracoContextFactory umbracoContextFactory, ILogger logger, IServerMessenger serverMessenger)
+            IUmbracoContextFactory umbracoContextFactory, ILogger logger, IServerMessenger serverMessenger, IBackofficeSecurityFactory backofficeSecurityFactory)
             : base(runner, delayMilliseconds, periodMilliseconds)
         {
             _runtime = runtime;
@@ -30,6 +31,7 @@ namespace Umbraco.Web.Scheduling
             _umbracoContextFactory = umbracoContextFactory;
             _logger = logger;
             _serverMessenger = serverMessenger;
+            _backofficeSecurityFactory = backofficeSecurityFactory;
         }
 
         public override bool IsAsync => false;
@@ -76,6 +78,7 @@ namespace Umbraco.Web.Scheduling
                 //    but then what should be its "scope"? could we attach it to scopes?
                 // - and we should definitively *not* have to flush it here (should be auto)
                 //
+                _backofficeSecurityFactory.EnsureBackofficeSecurity();
                 using (var contextReference = _umbracoContextFactory.EnsureUmbracoContext())
                 {
                     try
