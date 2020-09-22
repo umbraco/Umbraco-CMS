@@ -62,7 +62,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets the web security helper.
         /// </summary>
-        public IWebSecurity Security => UmbracoContext.Security;
+        public IBackofficeSecurity Security => UmbracoContext.Security;
 
         /// <summary>
         /// Gets the Url helper.

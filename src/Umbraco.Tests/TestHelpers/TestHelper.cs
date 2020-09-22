@@ -303,25 +303,6 @@ namespace Umbraco.Tests.TestHelpers
             }
         }
 
-        // TODO: Move to MockedValueEditors.cs
-        public static DataValueEditor CreateDataValueEditor(string name)
-        {
-            var valueType = (ValueTypes.IsValue(name)) ? name : ValueTypes.String;
-
-            return new DataValueEditor(
-                Mock.Of<IDataTypeService>(),
-                Mock.Of<ILocalizationService>(),
-                Mock.Of<ILocalizedTextService>(),
-                Mock.Of<IShortStringHelper>(),
-                new DataEditorAttribute(name, name, name)
-                {
-                    ValueType = valueType
-                }
-
-            );
-        }
-
-
         public static IUmbracoVersion GetUmbracoVersion() => _testHelperInternal.GetUmbracoVersion();
 
         public static IRegister GetRegister() => _testHelperInternal.GetRegister();

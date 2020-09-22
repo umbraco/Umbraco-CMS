@@ -12,6 +12,7 @@ using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Search;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Security;
 using Constants = Umbraco.Core.Constants;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.BackOffice.Trees;
@@ -39,26 +40,26 @@ namespace Umbraco.Web.Trees
         private readonly UmbracoTreeSearcher _treeSearcher;
         private readonly IMediaService _mediaService;
         private readonly IEntityService _entityService;
-        private readonly IWebSecurity _webSecurity;
+        private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
 
         public MediaTreeController(
             ILocalizedTextService localizedTextService,
             UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
             IMenuItemCollectionFactory menuItemCollectionFactory,
             IEntityService entityService,
-            IWebSecurity webSecurity,
+            IBackofficeSecurityAccessor backofficeSecurityAccessor,
             ILogger logger,
             ActionCollection actionCollection,
             IUserService userService,
             IDataTypeService dataTypeService,
             UmbracoTreeSearcher treeSearcher,
             IMediaService mediaService)
-            : base(localizedTextService, umbracoApiControllerTypeCollection, menuItemCollectionFactory, entityService, webSecurity, logger, actionCollection, userService, dataTypeService)
+            : base(localizedTextService, umbracoApiControllerTypeCollection, menuItemCollectionFactory, entityService, backofficeSecurityAccessor, logger, actionCollection, userService, dataTypeService)
         {
             _treeSearcher = treeSearcher;
             _mediaService = mediaService;
             _entityService = entityService;
-            _webSecurity = webSecurity;
+            _backofficeSecurityAccessor = backofficeSecurityAccessor;
         }
 
         protected override int RecycleBinId => Constants.System.RecycleBinMedia;
@@ -67,7 +68,7 @@ namespace Umbraco.Web.Trees
 
         private int[] _userStartNodes;
         protected override int[] UserStartNodes
-            => _userStartNodes ?? (_userStartNodes = _webSecurity.CurrentUser.CalculateMediaStartNodeIds(_entityService));
+            => _userStartNodes ?? (_userStartNodes = _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.CalculateMediaStartNodeIds(_entityService));
 
         /// <summary>
         /// Creates a tree node for a content item based on an UmbracoEntity
@@ -134,7 +135,7 @@ namespace Umbraco.Web.Trees
             }
 
             //if the user has no path access for this node, all they can do is refresh
-            if (!_webSecurity.CurrentUser.HasMediaPathAccess(item, _entityService))
+            if (!_backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.HasMediaPathAccess(item, _entityService))
             {
                 menu.Items.Add(new RefreshNode(LocalizedTextService, true));
                 return menu;

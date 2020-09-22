@@ -1,7 +1,4 @@
 ﻿using System.Collections.Generic;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.Hosting;
 using Umbraco.Core.Models;
 using Umbraco.Web.Features;
 
@@ -10,7 +7,7 @@ namespace Umbraco.Web.Editors
     public class BackOfficePreviewModel
     {
         private readonly UmbracoFeatures _features;
-        
+
         public BackOfficePreviewModel(UmbracoFeatures features, IEnumerable<ILanguage> languages)
         {
             _features = features;

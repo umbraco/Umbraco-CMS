@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -57,7 +58,7 @@ namespace Umbraco.Extensions
             services.BuildUmbracoBackOfficeIdentity()
                 .AddDefaultTokenProviders()
                 .AddUserStore<BackOfficeUserStore>()
-                .AddUserManager<BackOfficeUserManager>()
+                .AddUserManager<IBackOfficeUserManager, BackOfficeUserManager>()
                 .AddSignInManager<BackOfficeSignInManager>()
                 .AddClaimsPrincipalFactory<BackOfficeClaimsPrincipalFactory<BackOfficeIdentityUser>>();
 

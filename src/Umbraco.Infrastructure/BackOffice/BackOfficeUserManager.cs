@@ -14,7 +14,7 @@ using Umbraco.Net;
 
 namespace Umbraco.Core.BackOffice
 {
-    public class BackOfficeUserManager : BackOfficeUserManager<BackOfficeIdentityUser>
+    public class BackOfficeUserManager : BackOfficeUserManager<BackOfficeIdentityUser>, IBackOfficeUserManager
     {
         public BackOfficeUserManager(
             IIpResolver ipResolver,

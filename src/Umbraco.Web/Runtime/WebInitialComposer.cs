@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Web.Security;
+﻿using System.Web.Security;
 using Microsoft.AspNet.SignalR;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
@@ -15,8 +14,7 @@ using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Security;
 using Umbraco.Web.Security.Providers;
 using Umbraco.Web.SignalR;
-using Umbraco.Web.Templates;
-using Umbraco.Web.Trees;
+using Umbraco.Web.Services;
 
 namespace Umbraco.Web.Runtime
 {
