@@ -8,6 +8,7 @@ using Umbraco.Core.Logging;
 using System.Threading;
 using Umbraco.Core.Cache;
 using System.Collections.Generic;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Web.Common.Middleware
 {
@@ -24,17 +25,20 @@ namespace Umbraco.Web.Common.Middleware
         private readonly IUmbracoRequestLifetimeManager _umbracoRequestLifetimeManager;
         private readonly IUmbracoContextFactory _umbracoContextFactory;
         private readonly IRequestCache _requestCache;
+        private readonly IBackofficeSecurityFactory _backofficeSecurityFactory;
 
         public UmbracoRequestMiddleware(
             ILogger logger,
             IUmbracoRequestLifetimeManager umbracoRequestLifetimeManager,
             IUmbracoContextFactory umbracoContextFactory,
-            IRequestCache requestCache)
+            IRequestCache requestCache,
+            IBackofficeSecurityFactory backofficeSecurityFactory)
         {
             _logger = logger;
             _umbracoRequestLifetimeManager = umbracoRequestLifetimeManager;
             _umbracoContextFactory = umbracoContextFactory;
             _requestCache = requestCache;
+            _backofficeSecurityFactory = backofficeSecurityFactory;
         }
 
         public async Task InvokeAsync(HttpContext context, RequestDelegate next)
@@ -47,13 +51,14 @@ namespace Umbraco.Web.Common.Middleware
                 await next(context);
                 return;
             }
-
+            _backofficeSecurityFactory.EnsureBackofficeSecurity();  // Needs to be before UmbracoContext
             var umbracoContextReference = _umbracoContextFactory.EnsureUmbracoContext();
+
 
             try
             {
                 if (umbracoContextReference.UmbracoContext.IsFrontEndUmbracoRequest)
-                { 
+                {
                     LogHttpRequest.TryGetCurrentHttpRequestId(out var httpRequestId, _requestCache);
                    _logger.Verbose<UmbracoRequestMiddleware>("Begin request [{HttpRequestId}]: {RequestUrl}", httpRequestId, requestUri);
                 }

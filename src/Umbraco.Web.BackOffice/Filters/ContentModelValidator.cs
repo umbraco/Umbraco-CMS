@@ -22,14 +22,14 @@ namespace Umbraco.Web.BackOffice.Filters
     internal abstract class ContentModelValidator
     {
 
-        protected IWebSecurity WebSecurity { get; }
+        protected IBackofficeSecurity BackofficeSecurity { get; }
         public IPropertyValidationService PropertyValidationService { get; }
         protected ILogger Logger { get; }
 
-        protected ContentModelValidator(ILogger logger, IWebSecurity webSecurity, IPropertyValidationService propertyValidationService)
+        protected ContentModelValidator(ILogger logger, IBackofficeSecurity backofficeSecurity, IPropertyValidationService propertyValidationService)
         {
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            WebSecurity = webSecurity ?? throw new ArgumentNullException(nameof(webSecurity));
+            BackofficeSecurity = backofficeSecurity ?? throw new ArgumentNullException(nameof(backofficeSecurity));
             PropertyValidationService = propertyValidationService ?? throw new ArgumentNullException(nameof(propertyValidationService));
         }
     }
@@ -53,10 +53,10 @@ namespace Umbraco.Web.BackOffice.Filters
 
         protected ContentModelValidator(
             ILogger logger,
-            IWebSecurity webSecurity,
+            IBackofficeSecurity backofficeSecurity,
             ILocalizedTextService textService,
             IPropertyValidationService propertyValidationService)
-            : base(logger, webSecurity, propertyValidationService)
+            : base(logger, backofficeSecurity, propertyValidationService)
         {
             _textService = textService ?? throw new ArgumentNullException(nameof(textService));
         }

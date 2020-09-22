@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Web.BackOffice.Filters;
@@ -27,13 +28,13 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IContentService _contentService;
         private readonly IEntityService _entityService;
         private readonly IMediaService _mediaService;
-        private readonly IWebSecurity _webSecurity;
+        private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly UmbracoMapper _umbracoMapper;
         private readonly ILocalizedTextService _localizedTextService;
         private readonly IShortStringHelper _shortStringHelper;
 
         public UserGroupsController(IUserService userService, IContentService contentService,
-            IEntityService entityService, IMediaService mediaService, IWebSecurity webSecurity,
+            IEntityService entityService, IMediaService mediaService, IBackofficeSecurityAccessor backofficeSecurityAccessor,
             UmbracoMapper umbracoMapper, ILocalizedTextService localizedTextService,
             IShortStringHelper shortStringHelper)
         {
@@ -41,7 +42,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _contentService = contentService ?? throw new ArgumentNullException(nameof(contentService));
             _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
             _mediaService = mediaService ?? throw new ArgumentNullException(nameof(mediaService));
-            _webSecurity = webSecurity ?? throw new ArgumentNullException(nameof(webSecurity));
+            _backofficeSecurityAccessor = backofficeSecurityAccessor ?? throw new ArgumentNullException(nameof(backofficeSecurityAccessor));
             _umbracoMapper = umbracoMapper ?? throw new ArgumentNullException(nameof(umbracoMapper));
             _localizedTextService =
                 localizedTextService ?? throw new ArgumentNullException(nameof(localizedTextService));
@@ -57,19 +58,19 @@ namespace Umbraco.Web.BackOffice.Controllers
             var authHelper = new UserGroupEditorAuthorizationHelper(
                 _userService, _contentService, _mediaService, _entityService);
 
-            var isAuthorized = authHelper.AuthorizeGroupAccess(_webSecurity.CurrentUser, userGroupSave.Alias);
+            var isAuthorized = authHelper.AuthorizeGroupAccess(_backofficeSecurityAccessor.BackofficeSecurity.CurrentUser, userGroupSave.Alias);
             if (isAuthorized == false)
                 throw new HttpResponseException(HttpStatusCode.Unauthorized, isAuthorized.Result);
 
             //if sections were added we need to check that the current user has access to that section
-            isAuthorized = authHelper.AuthorizeSectionChanges(_webSecurity.CurrentUser,
+            isAuthorized = authHelper.AuthorizeSectionChanges(_backofficeSecurityAccessor.BackofficeSecurity.CurrentUser,
                 userGroupSave.PersistedUserGroup.AllowedSections,
                 userGroupSave.Sections);
             if (isAuthorized == false)
                 throw new HttpResponseException(HttpStatusCode.Unauthorized, isAuthorized.Result);
 
             //if start nodes were changed we need to check that the current user has access to them
-            isAuthorized = authHelper.AuthorizeStartNodeChanges(_webSecurity.CurrentUser,
+            isAuthorized = authHelper.AuthorizeStartNodeChanges(_backofficeSecurityAccessor.BackofficeSecurity.CurrentUser,
                 userGroupSave.PersistedUserGroup.StartContentId,
                 userGroupSave.StartContentId,
                 userGroupSave.PersistedUserGroup.StartMediaId,
@@ -111,18 +112,18 @@ namespace Umbraco.Web.BackOffice.Controllers
 
         private void EnsureNonAdminUserIsInSavedUserGroup(UserGroupSave userGroupSave)
         {
-            if (_webSecurity.CurrentUser.IsAdmin())
+            if (_backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.IsAdmin())
             {
                 return;
             }
 
             var userIds = userGroupSave.Users.ToList();
-            if (userIds.Contains(_webSecurity.CurrentUser.Id))
+            if (userIds.Contains(_backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.Id))
             {
                 return;
             }
 
-            userIds.Add(_webSecurity.CurrentUser.Id);
+            userIds.Add(_backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.Id);
             userGroupSave.Users = userIds;
         }
 
@@ -144,7 +145,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             var allGroups = _umbracoMapper.MapEnumerable<IUserGroup, UserGroupBasic>(_userService.GetAllUserGroups())
                 .ToList();
 
-            var isAdmin = _webSecurity.CurrentUser.IsAdmin();
+            var isAdmin = _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.IsAdmin();
             if (isAdmin) return allGroups;
 
             if (onlyCurrentUserGroups == false)
@@ -155,7 +156,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
 
             //we cannot return user groups that this user does not have access to
-            var currentUserGroups = _webSecurity.CurrentUser.Groups.Select(x => x.Alias).ToArray();
+            var currentUserGroups = _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.Groups.Select(x => x.Alias).ToArray();
             return allGroups.Where(x => currentUserGroups.Contains(x.Alias)).ToArray();
         }
 
