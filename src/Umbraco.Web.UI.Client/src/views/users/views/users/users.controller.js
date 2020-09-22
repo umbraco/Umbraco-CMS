@@ -75,6 +75,7 @@
         function getCreateUserButton() {
             if (!vm.denyLocalLogin) {
                 return {
+                    type: "button",
                     labelKey: "user_createUser",
                     handler: function () {
                         vm.setUsersViewState('createUser');
