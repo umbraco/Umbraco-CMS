@@ -30,7 +30,7 @@ namespace Umbraco.Web
         // warn: does *not* manage setting any IUmbracoContextAccessor
         internal UmbracoContext(IHttpContextAccessor httpContextAccessor,
             IPublishedSnapshotService publishedSnapshotService,
-            IWebSecurity webSecurity,
+            IBackofficeSecurity backofficeSecurity,
             GlobalSettings globalSettings,
             IHostingEnvironment hostingEnvironment,
             IVariationContextAccessor variationContextAccessor,
@@ -39,7 +39,7 @@ namespace Umbraco.Web
         {
             if (httpContextAccessor == null) throw new ArgumentNullException(nameof(httpContextAccessor));
             if (publishedSnapshotService == null) throw new ArgumentNullException(nameof(publishedSnapshotService));
-            if (webSecurity == null) throw new ArgumentNullException(nameof(webSecurity));
+            if (backofficeSecurity == null) throw new ArgumentNullException(nameof(backofficeSecurity));
             VariationContextAccessor = variationContextAccessor ??  throw new ArgumentNullException(nameof(variationContextAccessor));
             _httpContextAccessor = httpContextAccessor;
             _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
@@ -58,7 +58,7 @@ namespace Umbraco.Web
 
             ObjectCreated = DateTime.Now;
             UmbracoRequestId = Guid.NewGuid();
-            Security = webSecurity;
+            Security = backofficeSecurity;
 
             // beware - we cannot expect a current user here, so detecting preview mode must be a lazy thing
             _publishedSnapshot = new Lazy<IPublishedSnapshot>(() => publishedSnapshotService.CreatePublishedSnapshot(PreviewToken));
@@ -87,9 +87,9 @@ namespace Umbraco.Web
         public Guid UmbracoRequestId { get; }
 
         /// <summary>
-        /// Gets the WebSecurity class
+        /// Gets the BackofficeSecurity class
         /// </summary>
-        public IWebSecurity Security { get; }
+        public IBackofficeSecurity Security { get; }
 
         /// <summary>
         /// Gets the uri that is handled by ASP.NET after server-side rewriting took place.
