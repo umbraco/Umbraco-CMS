@@ -116,6 +116,11 @@ namespace Umbraco.Tests.Integration.Testing
                     Configuration = context.Configuration;
                     configBuilder.AddInMemoryCollection(InMemoryConfiguration);
                 })
+                .ConfigureLogging(logging =>
+                {
+                    logging.ClearProviders();
+                    logging.AddConsole();
+                })
                 .ConfigureServices((hostContext, services) =>
                 {
                     ConfigureServices(services);
@@ -219,9 +224,6 @@ namespace Umbraco.Tests.Integration.Testing
 
         public virtual void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton<ILogger>(LoggerFactory.Create(builder => builder.AddConsole()).CreateLogger("ConsoleLogger"));
-            services.AddSingleton<ILoggerFactory>(LoggerFactory.Create(builder => builder.AddConsole()));
-
             services.AddSingleton(TestHelper.DbProviderFactoryCreator);
             var webHostEnvironment = TestHelper.GetWebHostEnvironment();
             services.AddRequiredNetCoreServices(TestHelper, webHostEnvironment);
