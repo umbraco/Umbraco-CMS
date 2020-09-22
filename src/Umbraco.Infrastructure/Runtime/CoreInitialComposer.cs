@@ -57,6 +57,7 @@ using IntegerValidator = Umbraco.Core.PropertyEditors.Validators.IntegerValidato
 using TextStringValueConverter = Umbraco.Core.PropertyEditors.ValueConverters.TextStringValueConverter;
 using Umbraco.Core.Configuration.Models;
 using Microsoft.Extensions.Options;
+using Umbraco.Web.Media;
 
 namespace Umbraco.Core.Runtime
 {
@@ -371,6 +372,8 @@ namespace Umbraco.Core.Runtime
             // Register noop versions for examine to be overridden by examine
             composition.RegisterUnique<IUmbracoIndexesCreator, NoopUmbracoIndexesCreator>();
             composition.RegisterUnique<IBackOfficeExamineSearcher, NoopBackOfficeExamineSearcher>();
+
+            composition.RegisterUnique<UploadAutoFillProperties>();
         }
     }
 }

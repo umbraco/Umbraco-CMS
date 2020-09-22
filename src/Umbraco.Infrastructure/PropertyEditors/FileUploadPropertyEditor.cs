@@ -39,7 +39,7 @@ namespace Umbraco.Web.PropertyEditors
             ILocalizationService localizationService,
             ILocalizedTextService localizedTextService,
             IShortStringHelper shortStringHelper,
-            IImageUrlGenerator imageUrlGenerator)
+            UploadAutoFillProperties uploadAutoFillProperties)
             : base(logger, dataTypeService, localizationService, localizedTextService, shortStringHelper)
         {
             _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
@@ -47,7 +47,7 @@ namespace Umbraco.Web.PropertyEditors
             _dataTypeService = dataTypeService;
             _localizationService = localizationService;
             _localizedTextService = localizedTextService;
-            _uploadAutoFillProperties = new UploadAutoFillProperties(_mediaFileSystem, logger, imageUrlGenerator);
+            _uploadAutoFillProperties = uploadAutoFillProperties;
         }
 
         /// <summary>

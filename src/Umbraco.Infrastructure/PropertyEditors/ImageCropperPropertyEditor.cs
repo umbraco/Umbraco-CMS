@@ -49,16 +49,14 @@ namespace Umbraco.Web.PropertyEditors
             IIOHelper ioHelper,
             IShortStringHelper shortStringHelper,
             ILocalizedTextService localizedTextService,
-            IImageUrlGenerator imageUrlGenerator)
+            UploadAutoFillProperties uploadAutoFillProperties)
             : base(logger, dataTypeService, localizationService, localizedTextService, shortStringHelper)
         {
             _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
             _contentSettings = contentSettings.Value ?? throw new ArgumentNullException(nameof(contentSettings));
-            _dataTypeService = dataTypeService;
-            _ioHelper = ioHelper;
-
-            // TODO: inject?
-            _autoFillProperties = new UploadAutoFillProperties(_mediaFileSystem, logger, imageUrlGenerator);
+            _dataTypeService = dataTypeService ?? throw new ArgumentNullException(nameof(dataTypeService));
+            _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
+            _autoFillProperties = uploadAutoFillProperties ?? throw new ArgumentNullException(nameof(uploadAutoFillProperties));
         }
 
         public bool TryGetMediaPath(string alias, object value, out string mediaPath)
