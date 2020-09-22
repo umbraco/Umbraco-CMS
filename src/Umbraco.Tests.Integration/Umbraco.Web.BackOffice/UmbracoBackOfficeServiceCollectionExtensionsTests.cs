@@ -32,7 +32,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Extensions
         [Test]
         public void AddUmbracoBackOfficeIdentity_ExpectBackOfficeUserManagerResolvable()
         {
-            var userManager = Services.GetService<BackOfficeUserManager>();
+            var userManager = Services.GetService<IBackOfficeUserManager>();
 
             Assert.NotNull(userManager);
         }

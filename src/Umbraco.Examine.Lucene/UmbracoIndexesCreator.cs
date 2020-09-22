@@ -9,9 +9,12 @@ using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
+using Umbraco.Core.Configuration.Models;
+using Microsoft.Extensions.Options;
 
 namespace Umbraco.Examine
 {
+
     /// <summary>
     /// Creates the indexes used by Umbraco
     /// </summary>
@@ -28,7 +31,8 @@ namespace Umbraco.Examine
             IUmbracoIndexConfig umbracoIndexConfig,
             IHostingEnvironment hostingEnvironment,
             IRuntimeState runtimeState,
-            IIndexCreatorSettings settings) : base(typeFinder, hostingEnvironment, settings)
+            IOptions<IndexCreatorSettings> settings,
+            ILuceneDirectoryFactory directoryFactory) : base(typeFinder, hostingEnvironment, settings)
         {
             ProfilingLogger = profilingLogger ?? throw new System.ArgumentNullException(nameof(profilingLogger));
             LanguageService = languageService ?? throw new System.ArgumentNullException(nameof(languageService));
@@ -37,11 +41,13 @@ namespace Umbraco.Examine
             UmbracoIndexConfig = umbracoIndexConfig;
             HostingEnvironment = hostingEnvironment ?? throw new System.ArgumentNullException(nameof(hostingEnvironment));
             RuntimeState = runtimeState ?? throw new System.ArgumentNullException(nameof(runtimeState));
+            DirectoryFactory = directoryFactory;
         }
 
         protected IProfilingLogger ProfilingLogger { get; }
         protected IHostingEnvironment HostingEnvironment { get; }
         protected IRuntimeState RuntimeState { get; }
+        protected ILuceneDirectoryFactory DirectoryFactory { get; }
         protected ILocalizationService LanguageService { get; }
         protected IPublicAccessService PublicAccessService { get; }
         protected IMemberService MemberService { get; }
@@ -65,7 +71,7 @@ namespace Umbraco.Examine
         {
             var index = new UmbracoContentIndex(
                 Constants.UmbracoIndexes.InternalIndexName,
-                CreateFileSystemLuceneDirectory(Constants.UmbracoIndexes.InternalIndexPath),
+                DirectoryFactory.CreateDirectory(Constants.UmbracoIndexes.InternalIndexPath),
                 new UmbracoFieldDefinitionCollection(),
                 new CultureInvariantWhitespaceAnalyzer(),
                 ProfilingLogger,
@@ -81,7 +87,7 @@ namespace Umbraco.Examine
         {
             var index = new UmbracoContentIndex(
                 Constants.UmbracoIndexes.ExternalIndexName,
-                CreateFileSystemLuceneDirectory(Constants.UmbracoIndexes.ExternalIndexPath),
+                DirectoryFactory.CreateDirectory(Constants.UmbracoIndexes.ExternalIndexPath),
                 new UmbracoFieldDefinitionCollection(),
                 new StandardAnalyzer(Lucene.Net.Util.Version.LUCENE_30),
                 ProfilingLogger,
@@ -97,7 +103,7 @@ namespace Umbraco.Examine
             var index = new UmbracoMemberIndex(
                 Constants.UmbracoIndexes.MembersIndexName,
                 new UmbracoFieldDefinitionCollection(),
-                CreateFileSystemLuceneDirectory(Constants.UmbracoIndexes.MembersIndexPath),
+                DirectoryFactory.CreateDirectory(Constants.UmbracoIndexes.MembersIndexPath),
                 new CultureInvariantWhitespaceAnalyzer(),
                 ProfilingLogger,
                 HostingEnvironment,

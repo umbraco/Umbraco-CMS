@@ -16,13 +16,15 @@ namespace Umbraco.Web.Compose
 
         public void Initialize()
         {
-            MemberGroupService.Saved += (s, e) => MemberGroupService_Saved(s, e, _publicAccessService);
+            MemberGroupService.Saved += MemberGroupService_Saved;
         }
 
         public void Terminate()
-        { }
+        {
+            MemberGroupService.Saved -= MemberGroupService_Saved;
+        }
 
-        static void MemberGroupService_Saved(IMemberGroupService sender, Core.Events.SaveEventArgs<Core.Models.IMemberGroup> e, IPublicAccessService publicAccessService)
+        private void MemberGroupService_Saved(IMemberGroupService sender, Core.Events.SaveEventArgs<Core.Models.IMemberGroup> e)
         {
             foreach (var grp in e.SavedEntities)
             {
@@ -32,7 +34,7 @@ namespace Umbraco.Web.Compose
                     && grp.AdditionalData["previousName"].ToString().IsNullOrWhiteSpace() == false
                     && grp.AdditionalData["previousName"].ToString() != grp.Name)
                 {
-                    publicAccessService.RenameMemberGroupRoleRules(grp.AdditionalData["previousName"].ToString(), grp.Name);
+                    _publicAccessService.RenameMemberGroupRoleRules(grp.AdditionalData["previousName"].ToString(), grp.Name);
                 }
             }
         }

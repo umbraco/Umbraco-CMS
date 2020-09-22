@@ -1,16 +1,14 @@
 ﻿
+using System;
+using System.Security.Claims;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Extensions;
-using System;
-using System.Collections.Generic;
-using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.BackOffice;
-using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Extensions;
 
@@ -37,14 +35,14 @@ namespace Umbraco.Web.BackOffice.Security
     {
         public const string CookieName = "UMB_UCONTEXT_C";
         private readonly ISystemClock _systemClock;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
-        private readonly BackOfficeUserManager _userManager;
+        private readonly IBackOfficeUserManager _userManager;
 
-        public BackOfficeSessionIdValidator(ISystemClock systemClock, IGlobalSettings globalSettings, IHostingEnvironment hostingEnvironment, BackOfficeUserManager userManager)
+        public BackOfficeSessionIdValidator(ISystemClock systemClock, IOptions<GlobalSettings> globalSettings, IHostingEnvironment hostingEnvironment, IBackOfficeUserManager userManager)
         {
             _systemClock = systemClock;
-            _globalSettings = globalSettings;
+            _globalSettings = globalSettings.Value;
             _hostingEnvironment = hostingEnvironment;
             _userManager = userManager;
         }

@@ -3,6 +3,7 @@ using Umbraco.Core;
 using Umbraco.Core.Compose;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 using Umbraco.Web.Security;
@@ -13,9 +14,9 @@ namespace Umbraco.Web.Compose
     {
         private readonly IAuditService _auditService;
         private readonly IUserService _userService;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
 
-        public BackOfficeUserAuditEventsComponent(IAuditService auditService, IUserService userService, IGlobalSettings globalSettings)
+        public BackOfficeUserAuditEventsComponent(IAuditService auditService, IUserService userService, GlobalSettings globalSettings)
         {
             _auditService = auditService;
             _userService = userService;
@@ -38,7 +39,19 @@ namespace Umbraco.Web.Compose
         }
 
         public void Terminate()
-        { }
+        {
+            //BackOfficeUserManager.AccountLocked -= ;
+            //BackOfficeUserManager.AccountUnlocked -= ;
+            BackOfficeOwinUserManager.ForgotPasswordRequested -= OnForgotPasswordRequest;
+            BackOfficeOwinUserManager.ForgotPasswordChangedSuccess -= OnForgotPasswordChange;
+            BackOfficeOwinUserManager.LoginFailed -= OnLoginFailed;
+            //BackOfficeUserManager.LoginRequiresVerification -= ;
+            BackOfficeOwinUserManager.LoginSuccess -= OnLoginSuccess;
+            BackOfficeOwinUserManager.LogoutSuccess -= OnLogoutSuccess;
+            BackOfficeOwinUserManager.PasswordChanged -= OnPasswordChanged;
+            BackOfficeOwinUserManager.PasswordReset -= OnPasswordReset;
+            //BackOfficeUserManager.ResetAccessFailedCount -= ;
+        }
 
         private IUser GetPerformingUser(int userId)
         {

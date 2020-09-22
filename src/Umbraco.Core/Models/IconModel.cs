@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Web.Models
+namespace Umbraco.Core.Models
 {
     public class IconModel
     {

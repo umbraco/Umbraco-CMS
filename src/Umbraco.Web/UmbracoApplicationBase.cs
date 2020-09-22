@@ -1,24 +1,27 @@
-﻿using Serilog.Context;
-using System;
+﻿using System;
 using System.IO;
 using System.Reflection;
 using System.Threading;
 using System.Web;
 using System.Web.Hosting;
+using Microsoft.Extensions.Options;
+using Serilog.Context;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Logging.Serilog;
 using Umbraco.Core.Logging.Serilog.Enrichers;
 using Umbraco.Net;
-using Umbraco.Web.AspNet;
 using Umbraco.Web.Hosting;
 using Umbraco.Web.Logging;
+using ConnectionStrings = Umbraco.Core.Configuration.Models.ConnectionStrings;
 using Current = Umbraco.Web.Composing.Current;
+using GlobalSettings = Umbraco.Core.Configuration.Models.GlobalSettings;
 
 namespace Umbraco.Web
 {
@@ -27,6 +30,9 @@ namespace Umbraco.Web
     /// </summary>
     public abstract class UmbracoApplicationBase : HttpApplication
     {
+        private readonly SecuritySettings _securitySettings;
+        private readonly GlobalSettings _globalSettings;
+        private readonly ConnectionStrings _connectionStrings;
         private IRuntime _runtime;
         private IFactory _factory;
 
@@ -34,24 +40,25 @@ namespace Umbraco.Web
         {
             if (!Umbraco.Composing.Current.IsInitialized)
             {
-                var configFactory = new ConfigsFactory();
+                HostingSettings hostingSettings = null;
+                GlobalSettings globalSettings = null;
+                SecuritySettings securitySettings = null;
+                WebRoutingSettings webRoutingSettings = null;
 
-                var hostingSettings = configFactory.HostingSettings;
-                var globalSettings = configFactory.GlobalSettings;
-
-                var hostingEnvironment = new AspNetHostingEnvironment(hostingSettings);
+                var hostingEnvironment = new AspNetHostingEnvironment(Options.Create(hostingSettings));
                 var loggingConfiguration = new LoggingConfiguration(
                     Path.Combine(hostingEnvironment.ApplicationPhysicalPath, "App_Data\\Logs"),
                     Path.Combine(hostingEnvironment.ApplicationPhysicalPath, "config\\serilog.config"),
                     Path.Combine(hostingEnvironment.ApplicationPhysicalPath, "config\\serilog.user.config"));
-                var ioHelper = new IOHelper(hostingEnvironment, globalSettings);
+                var ioHelper = new IOHelper(hostingEnvironment);
                 var logger = SerilogLogger.CreateWithDefaultConfiguration(hostingEnvironment, loggingConfiguration);
 
-                var configs = configFactory.Create();
-
-                var backOfficeInfo = new AspNetBackOfficeInfo(globalSettings, ioHelper, logger, configFactory.WebRoutingSettings);
+                var backOfficeInfo = new AspNetBackOfficeInfo(globalSettings, ioHelper, logger, Options.Create(webRoutingSettings));
                 var profiler = GetWebProfiler(hostingEnvironment);
-                Umbraco.Composing.Current.Initialize(logger, configs, ioHelper, hostingEnvironment, backOfficeInfo, profiler);
+                Umbraco.Composing.Current.Initialize(logger,
+                    securitySettings,
+                    globalSettings,
+                    ioHelper, hostingEnvironment, backOfficeInfo, profiler);
                 Logger = logger;
             }
         }
@@ -72,12 +79,16 @@ namespace Umbraco.Web
             return webProfiler;
         }
 
-        protected UmbracoApplicationBase(ILogger logger, Configs configs, IIOHelper ioHelper, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)
+        protected UmbracoApplicationBase(ILogger logger, SecuritySettings securitySettings, GlobalSettings globalSettings, ConnectionStrings connectionStrings, IIOHelper ioHelper, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)
         {
+            _securitySettings = securitySettings;
+            _globalSettings = globalSettings;
+            _connectionStrings = connectionStrings;
+
             if (!Umbraco.Composing.Current.IsInitialized)
             {
                 Logger = logger;
-                Umbraco.Composing.Current.Initialize(logger, configs, ioHelper, hostingEnvironment, backOfficeInfo, profiler);
+                Umbraco.Composing.Current.Initialize(logger, securitySettings, globalSettings, ioHelper, hostingEnvironment, backOfficeInfo, profiler);
             }
         }
 
@@ -120,12 +131,12 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets a runtime.
         /// </summary>
-        protected abstract IRuntime GetRuntime(Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo);
+        protected abstract IRuntime GetRuntime(GlobalSettings globalSettings, ConnectionStrings connectionStrings, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo);
 
         /// <summary>
         /// Gets the application register.
         /// </summary>
-        protected virtual IRegister GetRegister(IGlobalSettings globalSettings)
+        protected virtual IRegister GetRegister(GlobalSettings globalSettings)
         {
             return RegisterFactory.Create(globalSettings);
         }
@@ -159,14 +170,15 @@ namespace Umbraco.Web
             // ******** THIS IS WHERE EVERYTHING BEGINS ********
 
 
-            var globalSettings =  Umbraco.Composing.Current.Configs.Global();
-            var umbracoVersion = new UmbracoVersion(globalSettings);
+            var globalSettings =  _globalSettings;
+            var umbracoVersion = new UmbracoVersion();
 
             // create the register for the application, and boot
             // the boot manager is responsible for registrations
             var register = GetRegister(globalSettings);
             _runtime = GetRuntime(
-                Umbraco.Composing.Current.Configs,
+                _globalSettings,
+                _connectionStrings,
                 umbracoVersion,
                 Umbraco.Composing.Current.IOHelper,
                 Umbraco.Composing.Current.Logger,

@@ -4,18 +4,18 @@
         <div class="umb-pane" ng-if="!model.creatingFolder">
             <h5><localize key="create_createUnder">Create an item under</localize> {{currentNode.name}}</h5>
 
-            <ul class="umb-actions umb-actions-child">           
+            <ul class="umb-actions umb-actions-child">
                 <li data-element="action-data-type" class="umb-action">
-                    <button href="" class="umb-action-link umb-outline btn-reset" ng-click="createDataType()" umb-auto-focus>
-                        <i class="large icon icon-autofill"></i>
+                    <button type="button" class="umb-action-link umb-outline btn-reset" ng-click="createDataType()" umb-auto-focus>
+                        <i class="large icon icon-autofill" aria-hidden="true"></i>
                         <span class="menu-label">
                             <localize key="create_newDataType">New data type</localize>
                         </span>
                     </button>
                 </li>
                 <li data-element="action-folder" class="umb-action">
-                    <button href="" class="umb-action-link umb-outline btn-reset" ng-click="showCreateFolder()">
-                        <i class="large icon icon-folder"></i>
+                    <button type="button" class="umb-action-link umb-outline btn-reset" ng-click="showCreateFolder()">
+                        <i class="large icon icon-folder" aria-hidden="true"></i>
                         <span class="menu-label">
                             <localize key="create_newFolder">New folder</localize>...
                         </span>
@@ -40,7 +40,7 @@
     </div>
 
     <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar" ng-if="!model.creatingFolder">
-        <button class="btn btn-info" ng-click="close()">
+        <button type="button" class="btn btn-info" ng-click="close()">
             <localize key="buttons_somethingElse">Do something else</localize>
         </button>
     </div>

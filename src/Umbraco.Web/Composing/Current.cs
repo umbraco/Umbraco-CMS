@@ -177,6 +177,9 @@ namespace Umbraco.Web.Composing
         public static ISectionService SectionService
             => Factory.GetInstance<ISectionService>();
 
+        public static IIconService IconService
+            => Factory.GetInstance<IIconService>();
+
         #endregion
 
         #region Web Constants
@@ -212,8 +215,6 @@ namespace Umbraco.Web.Composing
         public static IRuntimeState RuntimeState => Factory.GetInstance<IRuntimeState>();
 
         public static TypeLoader TypeLoader => Factory.GetInstance<TypeLoader>();
-
-        public static Configs Configs => Factory.GetInstance<Configs>();
 
         public static UrlSegmentProviderCollection UrlSegmentProviders => Factory.GetInstance<UrlSegmentProviderCollection>();
 

@@ -6,6 +6,7 @@ using System;
 using System.Reflection;
 using Umbraco.Core.Composing.LightInject;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 
 namespace Umbraco.Core.Composing
 {
@@ -29,7 +30,7 @@ namespace Umbraco.Core.Composing
         /// To override the default LightInjectContainer, add an appSetting named 'Umbraco.Core.RegisterType' with
         /// a fully qualified type name to a class with a static method "Create" returning an IRegister.
         /// </remarks>
-        public static IRegister Create(IGlobalSettings globalSettings)
+        public static IRegister Create(GlobalSettings globalSettings)
         {
             Type type;
 

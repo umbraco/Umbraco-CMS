@@ -19,6 +19,7 @@ namespace Umbraco.Web.Mvc
     {
         private IPublishedContent _publishedContent;
         private readonly int _pageId;
+        private readonly Guid _key;
         private NameValueCollection _queryStringValues;
         private IPublishedUrlProvider _publishedUrlProvider;
         private string _url;
@@ -51,14 +52,25 @@ namespace Umbraco.Web.Mvc
             get { return _pageId; }
         }
 
+        public Guid Key
+        {
+            get { return _key; }
+        }
         public IPublishedContent PublishedContent
         {
             get
             {
                 if (_publishedContent != null) return _publishedContent;
 
-                //need to get the URL for the page
-                _publishedContent = Current.UmbracoContext.Content.GetById(_pageId);
+                if (_pageId != default(int))
+                {
+                    _publishedContent = Current.UmbracoContext.Content.GetById(_pageId);
+                }
+
+                else if (_key != default(Guid))
+                {
+                    _publishedContent = Current.UmbracoContext.Content.GetById(_key);
+                }
 
                 return _publishedContent;
             }
@@ -157,6 +169,38 @@ namespace Umbraco.Web.Mvc
             _pageId = pageId;
             _queryStringValues = ParseQueryString(queryString);
             _publishedUrlProvider = publishedUrlProvider;
+        }
+
+        /// <summary>
+        /// Creates a new RedirectToUmbracoResult
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="umbracoContextAccessor"></param>
+        public RedirectToUmbracoPageResult(Guid key)
+        {
+            _key = key;
+        }
+
+        /// <summary>
+        /// Creates a new RedirectToUmbracoResult
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="queryStringValues"></param>
+        public RedirectToUmbracoPageResult(Guid key, NameValueCollection queryStringValues)
+        {
+            _key = key;
+            _queryStringValues = queryStringValues;
+        }
+
+        /// <summary>
+        /// Creates a new RedirectToUmbracoResult
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="queryString"></param>
+        public RedirectToUmbracoPageResult(Guid key, string queryString)
+        {
+            _key = key;
+            _queryStringValues = ParseQueryString(queryString);
         }
 
         /// <summary>

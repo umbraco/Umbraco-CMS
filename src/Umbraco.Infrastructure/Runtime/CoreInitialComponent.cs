@@ -1,5 +1,6 @@
-﻿using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
+﻿using Microsoft.Extensions.Options;
+using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
 
 namespace Umbraco.Core.Runtime
@@ -7,12 +8,12 @@ namespace Umbraco.Core.Runtime
     public class CoreInitialComponent : IComponent
     {
         private readonly IIOHelper _ioHelper;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
 
-        public CoreInitialComponent(IIOHelper ioHelper, IGlobalSettings globalSettings)
+        public CoreInitialComponent(IIOHelper ioHelper, IOptions<GlobalSettings> globalSettings)
         {
             _ioHelper = ioHelper;
-            _globalSettings = globalSettings;
+            _globalSettings = globalSettings.Value;
         }
 
         public void Initialize()

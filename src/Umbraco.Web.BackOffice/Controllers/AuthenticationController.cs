@@ -1,22 +1,21 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Routing;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Mail;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.BackOffice;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Extensions;
 using Umbraco.Net;
@@ -40,17 +39,17 @@ namespace Umbraco.Web.BackOffice.Controllers
     [IsBackOffice] // TODO: This could be applied with our Application Model conventions
     public class AuthenticationController : UmbracoApiControllerBase
     {
-        private readonly IWebSecurity _webSecurity;
-        private readonly BackOfficeUserManager _userManager;
+        private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
+        private readonly IBackOfficeUserManager _userManager;
         private readonly BackOfficeSignInManager _signInManager;
         private readonly IUserService _userService;
         private readonly ILocalizedTextService _textService;
         private readonly UmbracoMapper _umbracoMapper;
-        private readonly IGlobalSettings _globalSettings;
-        private readonly ISecuritySettings _securitySettings;
+        private readonly GlobalSettings _globalSettings;
+        private readonly SecuritySettings _securitySettings;
         private readonly ILogger _logger;
         private readonly IIpResolver _ipResolver;
-        private readonly IUserPasswordConfiguration _passwordConfiguration;
+        private readonly UserPasswordConfigurationSettings _passwordConfiguration;
         private readonly IEmailSender _emailSender;
         private readonly Core.Hosting.IHostingEnvironment _hostingEnvironment;
         private readonly IRequestAccessor _requestAccessor;
@@ -60,33 +59,33 @@ namespace Umbraco.Web.BackOffice.Controllers
         // TODO: We need to review all _userManager.Raise calls since many/most should be on the usermanager or signinmanager, very few should be here
 
         public AuthenticationController(
-            IWebSecurity webSecurity,
-            BackOfficeUserManager backOfficeUserManager,
+            IBackofficeSecurityAccessor backofficeSecurityAccessor,
+            IBackOfficeUserManager backOfficeUserManager,
             BackOfficeSignInManager signInManager,
             IUserService userService,
             ILocalizedTextService textService,
             UmbracoMapper umbracoMapper,
-            IGlobalSettings globalSettings,
-            ISecuritySettings securitySettings,
+            IOptions<GlobalSettings> globalSettings,
+            IOptions<SecuritySettings> securitySettings,
             ILogger logger,
             IIpResolver ipResolver,
-            IUserPasswordConfiguration passwordConfiguration,
+            IOptions<UserPasswordConfigurationSettings> passwordConfiguration,
             IEmailSender emailSender,
             Core.Hosting.IHostingEnvironment hostingEnvironment,
             IRequestAccessor requestAccessor,
             LinkGenerator linkGenerator)
         {
-            _webSecurity = webSecurity;
+            _backofficeSecurityAccessor = backofficeSecurityAccessor;
             _userManager = backOfficeUserManager;
             _signInManager = signInManager;
             _userService = userService;
             _textService = textService;
             _umbracoMapper = umbracoMapper;
-            _globalSettings = globalSettings;
-            _securitySettings = securitySettings;
+            _globalSettings = globalSettings.Value;
+            _securitySettings = securitySettings.Value;
             _logger = logger;
             _ipResolver = ipResolver;
-            _passwordConfiguration = passwordConfiguration;
+            _passwordConfiguration = passwordConfiguration.Value;
             _emailSender = emailSender;
             _hostingEnvironment = hostingEnvironment;
             _requestAccessor = requestAccessor;
@@ -100,7 +99,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         [UmbracoAuthorize]
         public IDictionary<string, object> GetPasswordConfig(int userId)
         {
-            return _passwordConfiguration.GetConfiguration(userId != _webSecurity.CurrentUser.Id);
+            return _passwordConfiguration.GetConfiguration(userId != _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.Id);
         }
 
         /// <summary>
@@ -168,7 +167,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         [HttpGet]
         public bool IsAuthenticated()
         {
-            var attempt = _webSecurity.AuthorizeRequest();
+            var attempt = _backofficeSecurityAccessor.BackofficeSecurity.AuthorizeRequest();
             if (attempt == ValidateRequestAttempt.Success)
             {
                 return true;
@@ -190,7 +189,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         //[CheckIfUserTicketDataIsStale] // TODO: Migrate this, though it will need to be done differently at the cookie auth level
         public UserDetail GetCurrentUser()
         {
-            var user = _webSecurity.CurrentUser;
+            var user = _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser;
             var result = _umbracoMapper.Map<UserDetail>(user);
 
             //set their remaining seconds
@@ -211,7 +210,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         [SetAngularAntiForgeryTokens]
         public ActionResult<UserDetail> GetCurrentInvitedUser()
         {
-            var user = _webSecurity.CurrentUser;
+            var user = _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser;
 
             if (user.IsApproved)
             {

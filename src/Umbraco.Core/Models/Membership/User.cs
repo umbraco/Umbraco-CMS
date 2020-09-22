@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models.Membership
@@ -18,7 +19,7 @@ namespace Umbraco.Core.Models.Membership
         /// <summary>
         /// Constructor for creating a new/empty user
         /// </summary>
-        public User(IGlobalSettings globalSettings)
+        public User(GlobalSettings globalSettings)
         {
             SessionTimeout = 60;
             _userGroups = new HashSet<IReadOnlyUserGroup>();
@@ -38,7 +39,7 @@ namespace Umbraco.Core.Models.Membership
         /// <param name="email"></param>
         /// <param name="username"></param>
         /// <param name="rawPasswordValue"></param>
-        public User(IGlobalSettings globalSettings, string name, string email, string username, string rawPasswordValue)
+        public User(GlobalSettings globalSettings, string name, string email, string username, string rawPasswordValue)
             : this(globalSettings)
         {
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(name));
@@ -69,7 +70,7 @@ namespace Umbraco.Core.Models.Membership
         /// <param name="userGroups"></param>
         /// <param name="startContentIds"></param>
         /// <param name="startMediaIds"></param>
-        public User(IGlobalSettings globalSettings, int id, string name, string email, string username,
+        public User(GlobalSettings globalSettings, int id, string name, string email, string username,
             string rawPasswordValue, string passwordConfig,
             IEnumerable<IReadOnlyUserGroup> userGroups, int[] startContentIds, int[] startMediaIds)
             : this(globalSettings)

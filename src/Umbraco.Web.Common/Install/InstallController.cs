@@ -7,11 +7,14 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Security;
 using Umbraco.Core.WebAssets;
 using Umbraco.Extensions;
 using Umbraco.Web.Common.Filters;
 using Umbraco.Web.Install;
 using Umbraco.Web.Security;
+using Umbraco.Core.Configuration.Models;
+using Microsoft.Extensions.Options;
 
 namespace Umbraco.Web.Common.Install
 {
@@ -23,10 +26,10 @@ namespace Umbraco.Web.Common.Install
     [Area(Umbraco.Core.Constants.Web.Mvc.InstallArea)]
     public class InstallController : Controller
     {
-        private readonly IWebSecurity _webSecurity;
+        private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly InstallHelper _installHelper;
         private readonly IRuntimeState _runtime;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly ILogger _logger;
@@ -34,20 +37,20 @@ namespace Umbraco.Web.Common.Install
         private readonly IRuntimeMinifier _runtimeMinifier;
 
         public InstallController(
-            IWebSecurity webSecurity,
+            IBackofficeSecurityAccessor backofficeSecurityAccessor,
             InstallHelper installHelper,
             IRuntimeState runtime,
-            IGlobalSettings globalSettings,
+            IOptions<GlobalSettings> globalSettings,
             IRuntimeMinifier runtimeMinifier,
             IHostingEnvironment hostingEnvironment,
             IUmbracoVersion umbracoVersion,
             ILogger logger,
             LinkGenerator linkGenerator)
         {
-            _webSecurity = webSecurity;
+            _backofficeSecurityAccessor = backofficeSecurityAccessor;
             _installHelper = installHelper;
             _runtime = runtime;
-            _globalSettings = globalSettings;
+            _globalSettings = globalSettings.Value;
             _runtimeMinifier = runtimeMinifier;
             _hostingEnvironment = hostingEnvironment;
             _umbracoVersion = umbracoVersion;
@@ -70,7 +73,7 @@ namespace Umbraco.Web.Common.Install
                 // Update ClientDependency version and delete its temp directories to make sure we get fresh caches
                 _runtimeMinifier.Reset();
 
-                var result = _webSecurity.ValidateCurrentUser(false);
+                var result = _backofficeSecurityAccessor.BackofficeSecurity.ValidateCurrentUser(false);
 
                 switch (result)
                 {

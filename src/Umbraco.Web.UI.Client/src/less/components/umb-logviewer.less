@@ -122,6 +122,11 @@
         .table {
             table-layout: fixed;
 
+            table {
+                display: table;
+                width: 100%;
+            }
+
             thead th:first-child, thead th:nth-child(3) {
                 width: 20%;
             }
@@ -130,8 +135,15 @@
                 width: 15%;
             }
 
+
             tr td:nth-child(3) {
                 word-break: break-word;
+            }
+
+            button {
+                white-space: normal;
+                word-break: break-word;
+                text-align-last: left;
             }
         }
 

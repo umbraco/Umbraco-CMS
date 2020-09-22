@@ -90,6 +90,24 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return moveInfo;
         }
 
+        protected override IEnumerable<TEntity> PerformGetAll(params int[] ids)
+        {
+            var result = GetAllWithFullCachePolicy();
+
+            // By default the cache policy will always want everything
+            // even GetMany(ids) gets everything and filters afterwards,
+            // however if we are using No Cache, we must still be able to support
+            // collections of Ids, so this is to work around that:
+            if (ids.Any())
+            {
+                return result.Where(x => ids.Contains(x.Id));
+            }
+
+            return result;
+        }
+
+        protected abstract IEnumerable<TEntity> GetAllWithFullCachePolicy();
+
         protected virtual PropertyType CreatePropertyType(string propertyEditorAlias, ValueStorageType storageType, string propertyTypeAlias)
         {
             return new PropertyType(_shortStringHelper, propertyEditorAlias, storageType, propertyTypeAlias);
@@ -1185,7 +1203,7 @@ AND umbracoNode.id <> @id",
         {
             // first clear dependencies
             Database.Delete<TagRelationshipDto>("WHERE propertyTypeId = @Id", new { Id = propertyTypeId });
-            Database.Delete<PropertyDataDto>("WHERE propertytypeid = @Id", new { Id = propertyTypeId });
+            Database.Delete<PropertyDataDto>("WHERE propertyTypeId = @Id", new { Id = propertyTypeId });
 
             // then delete the property type
             Database.Delete<PropertyTypeDto>("WHERE contentTypeId = @Id AND id = @PropertyTypeId",

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Install;
@@ -20,29 +22,20 @@ namespace Umbraco.Web.Install.InstallSteps
         private readonly IRuntimeState _runtime;
         private readonly ILogger _logger;
         private readonly IUmbracoVersion _umbracoVersion;
-        private readonly IGlobalSettings _globalSettings;
-        private readonly IConnectionStrings _connectionStrings;
-        private readonly IIOHelper _ioHelper;
-        private readonly IConfigManipulator _configManipulator;
+        private readonly ConnectionStrings _connectionStrings;
 
         public DatabaseUpgradeStep(
             DatabaseBuilder databaseBuilder,
             IRuntimeState runtime,
             ILogger logger,
             IUmbracoVersion umbracoVersion,
-            IGlobalSettings globalSettings,
-            IConnectionStrings connectionStrings,
-            IIOHelper ioHelper,
-            IConfigManipulator configManipulator)
+            IOptions<ConnectionStrings> connectionStrings)
         {
             _databaseBuilder = databaseBuilder;
             _runtime = runtime;
             _logger = logger;
             _umbracoVersion = umbracoVersion;
-            _globalSettings = globalSettings;
-            _connectionStrings = connectionStrings ?? throw new ArgumentNullException(nameof(connectionStrings));
-            _ioHelper = ioHelper;
-            _configManipulator = configManipulator;
+            _connectionStrings = connectionStrings.Value ?? throw new ArgumentNullException(nameof(connectionStrings));
         }
 
         public override Task<InstallSetupResult> ExecuteAsync(object model)
@@ -55,7 +48,7 @@ namespace Umbraco.Web.Install.InstallSteps
             {
                 _logger.Info<DatabaseUpgradeStep>("Running 'Upgrade' service");
 
-                var plan = new UmbracoPlan(_umbracoVersion, _globalSettings);
+                var plan = new UmbracoPlan(_umbracoVersion);
                 plan.AddPostMigration<ClearCsrfCookies>(); // needed when running installer (back-office)
 
                 var result = _databaseBuilder.UpgradeSchemaAndData(plan);
@@ -82,7 +75,7 @@ namespace Umbraco.Web.Install.InstallSteps
                 return false;
             }
 
-            var databaseSettings = _connectionStrings[Constants.System.UmbracoConnectionName];
+            var databaseSettings = _connectionStrings.UmbracoConnectionString;
 
             if (databaseSettings.IsConnectionStringConfigured())
             {

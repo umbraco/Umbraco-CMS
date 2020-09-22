@@ -48,11 +48,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         protected override IMediaType PerformGet(string alias)
             => GetMany().FirstOrDefault(x => x.Alias.InvariantEquals(alias));
 
-        protected override IEnumerable<IMediaType> PerformGetAll(params int[] ids)
+        protected override IEnumerable<IMediaType> GetAllWithFullCachePolicy()
         {
-            // the cache policy will always want everything
-            // even GetMany(ids) gets everything and filters afterwards
-            if (ids.Any()) throw new PanicException("There can be no ids specified");
             return CommonRepository.GetAllTypes().OfType<IMediaType>();
         }
 

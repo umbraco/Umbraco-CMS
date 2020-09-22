@@ -55,6 +55,8 @@ using Umbraco.Web.Templates;
 using Umbraco.Web.Trees;
 using IntegerValidator = Umbraco.Core.PropertyEditors.Validators.IntegerValidator;
 using TextStringValueConverter = Umbraco.Core.PropertyEditors.ValueConverters.TextStringValueConverter;
+using Umbraco.Core.Configuration.Models;
+using Microsoft.Extensions.Options;
 
 namespace Umbraco.Core.Runtime
 {
@@ -124,7 +126,7 @@ namespace Umbraco.Core.Runtime
             // register a server registrar, by default it's the db registrar
             composition.RegisterUnique<IServerRegistrar>(f =>
             {
-                var globalSettings = f.GetInstance<IGlobalSettings>();
+                var globalSettings = f.GetInstance<IOptions<GlobalSettings>>().Value;
 
                 // TODO:  we still register the full IServerMessenger because
                 // even on 1 single server we can have 2 concurrent app domains
@@ -163,7 +165,7 @@ namespace Umbraco.Core.Runtime
             composition.RegisterUnique<IPublishedContentTypeFactory, PublishedContentTypeFactory>();
 
             composition.RegisterUnique<IShortStringHelper>(factory
-                => new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(factory.GetInstance<IRequestHandlerSettings>())));
+                => new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(factory.GetInstance<IOptions<RequestHandlerSettings>>().Value)));
 
             composition.UrlSegmentProviders()
                 .Append<DefaultUrlSegmentProvider>();

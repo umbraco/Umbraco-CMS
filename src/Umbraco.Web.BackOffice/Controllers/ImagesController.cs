@@ -1,8 +1,10 @@
 ﻿using System;
 using System.IO;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
-using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
 using Umbraco.Core.Media;
 using Umbraco.Core.Models;
@@ -18,14 +20,16 @@ namespace Umbraco.Web.BackOffice.Controllers
     public class ImagesController : UmbracoAuthorizedApiController
     {
         private readonly IMediaFileSystem _mediaFileSystem;
-        private readonly IContentSettings _contentSettings;
+        private readonly ContentSettings _contentSettings;
         private readonly IImageUrlGenerator _imageUrlGenerator;
 
-        public ImagesController(IMediaFileSystem mediaFileSystem, IContentSettings contentSettings,
+        public ImagesController(
+            IMediaFileSystem mediaFileSystem,
+            IOptions<ContentSettings> contentSettings,
             IImageUrlGenerator imageUrlGenerator)
         {
             _mediaFileSystem = mediaFileSystem;
-            _contentSettings = contentSettings;
+            _contentSettings = contentSettings.Value;
             _imageUrlGenerator = imageUrlGenerator;
         }
 
@@ -99,9 +103,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="animationProcessMode"></param>
         /// <param name="mode"></param>
         /// <param name="upscale"></param>
-        /// <param name="cacheBusterValue"></param>
-        /// <param name="crop"></param>
-        /// <param name="center"></param>
         /// <returns></returns>
         /// <remarks>
         /// If there is no media, image property or image file is found then this will return not found.
@@ -112,7 +113,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             decimal? focalPointLeft = null,
             decimal? focalPointTop = null,
             string animationProcessMode = "first",
-                                           ImageCropMode mode = ImageCropMode.Max,
+            ImageCropMode mode = ImageCropMode.Max,
             bool upscale = false,
             string cacheBusterValue = "",
             decimal? cropX1 = null,

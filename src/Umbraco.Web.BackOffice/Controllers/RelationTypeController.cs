@@ -15,7 +15,6 @@ using Umbraco.Core.Mapping;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Exceptions;
-using Umbraco.Web.Editors;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -43,9 +42,8 @@ namespace Umbraco.Web.BackOffice.Controllers
             _shortStringHelper = shortStringHelper ?? throw new ArgumentNullException(nameof(shortStringHelper));
         }
 
-
         /// <summary>
-        /// Gets a relation type by ID.
+        /// Gets a relation type by id
         /// </summary>
         /// <param name="id">The relation type ID.</param>
         /// <returns>Returns the <see cref="RelationTypeDisplay"/>.</returns>
@@ -63,7 +61,6 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             return display;
         }
-
         /// <summary>
         /// Gets a relation type by guid
         /// </summary>

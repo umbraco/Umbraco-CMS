@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SqlServerCe;
-using System.Linq;
 using System.Threading;
 using System.Web.Routing;
 using System.Xml;
@@ -10,8 +8,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -33,6 +30,7 @@ using Umbraco.Persistance.SqlCe;
 using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Web.WebApi;
 using Umbraco.Tests.Common;
+using Umbraco.Tests.Common.Builders;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -237,11 +235,11 @@ namespace Umbraco.Tests.TestHelpers
             }
         }
 
-        protected virtual IPublishedSnapshotService CreatePublishedSnapshotService()
+        protected virtual IPublishedSnapshotService CreatePublishedSnapshotService(GlobalSettings globalSettings = null)
         {
             var cache = NoAppCache.Instance;
 
-            ContentTypesCache = new PublishedContentTypeCache(
+            ContentTypesCache ??= new PublishedContentTypeCache(
                 Factory.GetInstance<IContentTypeService>(),
                 Factory.GetInstance<IMediaTypeService>(),
                 Factory.GetInstance<IMemberTypeService>(),
@@ -261,7 +259,7 @@ namespace Umbraco.Tests.TestHelpers
                 Factory.GetInstance<IDocumentRepository>(), Factory.GetInstance<IMediaRepository>(), Factory.GetInstance<IMemberRepository>(),
                 DefaultCultureAccessor,
                 Logger,
-                Factory.GetInstance<IGlobalSettings>(),
+                globalSettings ?? TestObjects.GetGlobalSettings(),
                 HostingEnvironment,
                 HostingLifetime,
                 ShortStringHelper,
@@ -301,7 +299,7 @@ namespace Umbraco.Tests.TestHelpers
             {
                 using (var scope = ScopeProvider.CreateScope())
                 {
-                    var schemaHelper = new DatabaseSchemaCreator(scope.Database, Logger, UmbracoVersion, TestObjects.GetGlobalSettings());
+                    var schemaHelper = new DatabaseSchemaCreator(scope.Database, Logger, UmbracoVersion);
                     //Create the umbraco database and its base data
                     schemaHelper.InitializeDatabaseSchema();
 
@@ -351,7 +349,7 @@ namespace Umbraco.Tests.TestHelpers
             }
         }
 
-        protected IUmbracoContext GetUmbracoContext(string url, int templateId = 1234, RouteData routeData = null, bool setSingleton = false,  IGlobalSettings globalSettings = null, IPublishedSnapshotService snapshotService = null)
+        protected IUmbracoContext GetUmbracoContext(string url, int templateId = 1234, RouteData routeData = null, bool setSingleton = false, GlobalSettings globalSettings = null, IPublishedSnapshotService snapshotService = null)
         {
             // ensure we have a PublishedCachesService
             var service = snapshotService ?? PublishedSnapshotService as XmlPublishedSnapshotService;
@@ -374,8 +372,8 @@ namespace Umbraco.Tests.TestHelpers
             var umbracoContext = new UmbracoContext(
                 httpContextAccessor,
                 service,
-                Mock.Of<IWebSecurity>(),
-                globalSettings ?? Factory.GetInstance<IGlobalSettings>(),
+                Mock.Of<IBackofficeSecurity>(),
+                globalSettings ?? new GlobalSettingsBuilder().Build(),
                 HostingEnvironment,
                 new TestVariationContextAccessor(),
                 UriUtility,

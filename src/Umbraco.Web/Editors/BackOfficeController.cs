@@ -4,17 +4,19 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 using Microsoft.Owin.Security;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Web.Mvc;
 using Umbraco.Core.Services;
 using Umbraco.Web.Features;
 using Umbraco.Web.Security;
 using Constants = Umbraco.Core.Constants;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Hosting;
 using BackOfficeIdentityUser = Umbraco.Core.BackOffice.BackOfficeIdentityUser;
 
@@ -32,32 +34,35 @@ namespace Umbraco.Web.Editors
         private BackOfficeOwinUserManager _userManager;
         private BackOfficeSignInManager _signInManager;
         private readonly IUmbracoVersion _umbracoVersion;
-        private readonly IContentSettings _contentSettings;
+        private readonly ContentSettings _contentSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
-        private readonly IRuntimeSettings _runtimeSettings;
-        private readonly ISecuritySettings _securitySettings;
+        private readonly RuntimeSettings _runtimeSettings;
+        private readonly SecuritySettings _securitySettings;
+        private readonly IIconService _iconService;
 
         public BackOfficeController(
             UmbracoFeatures features,
-            IGlobalSettings globalSettings,
+            IOptions<GlobalSettings> globalSettings,
             IUmbracoContextAccessor umbracoContextAccessor,
             ServiceContext services,
             AppCaches appCaches,
             IProfilingLogger profilingLogger,
             IUmbracoVersion umbracoVersion,
-            IContentSettings contentSettings,
+            IOptions<ContentSettings> contentSettings,
             IHostingEnvironment hostingEnvironment,
-            IRuntimeSettings settings,
-            ISecuritySettings securitySettings)
+            IOptions<RuntimeSettings> settings,
+            IOptions<SecuritySettings> securitySettings,
+            IIconService iconService)
             : base(globalSettings, umbracoContextAccessor, services, appCaches, profilingLogger)
 
         {
             _features = features;
             _umbracoVersion = umbracoVersion;
-            _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
+            _contentSettings = contentSettings.Value;
             _hostingEnvironment = hostingEnvironment;
-            _runtimeSettings = settings;
-            _securitySettings = securitySettings;
+            _runtimeSettings = settings.Value;
+            _securitySettings = securitySettings.Value;
+            _iconService = iconService;
         }
 
         protected BackOfficeSignInManager SignInManager => _signInManager ?? (_signInManager = OwinContext.GetBackOfficeSignInManager());
@@ -139,7 +144,7 @@ namespace Umbraco.Web.Editors
             if (defaultResponse == null) throw new ArgumentNullException("defaultResponse");
             if (externalSignInResponse == null) throw new ArgumentNullException("externalSignInResponse");
 
-            ViewData.SetUmbracoPath(GlobalSettings.GetUmbracoMvcArea(_hostingEnvironment));
+            ViewData.SetUmbracoPath(GlobalSettings.Value.GetUmbracoMvcArea(_hostingEnvironment));
 
             //check if there is the TempData with the any token name specified, if so, assign to view bag and render the view
             if (ViewData.FromTempData(TempData, ViewDataExtensions.TokenExternalSignInError) ||
@@ -253,8 +258,7 @@ namespace Umbraco.Web.Editors
 
                     var groups = Services.UserService.GetUserGroupsByAlias(autoLinkOptions.GetDefaultUserGroups(UmbracoContext, loginInfo));
 
-                    var autoLinkUser = BackOfficeIdentityUser.CreateNew(
-                        GlobalSettings,
+                    var autoLinkUser = BackOfficeIdentityUser.CreateNew(GlobalSettings.Value,
                         loginInfo.Email,
                         loginInfo.Email,
                         autoLinkOptions.GetDefaultCulture(UmbracoContext, loginInfo));

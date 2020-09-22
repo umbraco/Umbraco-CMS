@@ -54,11 +54,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         protected override bool PerformExists(Guid id)
         => GetMany().FirstOrDefault(x => x.Key == id) != null;
 
-        protected override IEnumerable<IContentType> PerformGetAll(params int[] ids)
+        protected override IEnumerable<IContentType> GetAllWithFullCachePolicy()
         {
-            // the cache policy will always want everything
-            // even GetMany(ids) gets everything and filters afterwards
-            if (ids.Any()) throw new PanicException("There can be no ids specified");
             return CommonRepository.GetAllTypes().OfType<IContentType>();
         }
 
@@ -135,7 +132,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             if (objectTypes.Any())
             {
-                sql = sql.Where("umbracoNode.nodeObjectType IN (@objectTypes)", objectTypes);
+                sql = sql.Where("umbracoNode.nodeObjectType IN (@objectTypes)", new { objectTypes = objectTypes });
             }
 
             return Database.Fetch<string>(sql);

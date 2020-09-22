@@ -1,4 +1,4 @@
-using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 
 namespace Umbraco.Tests.Common.Builders
 {
@@ -9,7 +9,7 @@ namespace Umbraco.Tests.Common.Builders
         }
     }
 
-    public class GlobalSettingsBuilder<TParent> : ChildBuilderBase<TParent, IGlobalSettings>
+    public class GlobalSettingsBuilder<TParent> : ChildBuilderBase<TParent, GlobalSettings>
     {
         private string _configurationStatus;
         private string _databaseFactoryServerVersion;
@@ -18,15 +18,13 @@ namespace Umbraco.Tests.Common.Builders
         private bool? _hideTopLevelNodeFromPath;
         private bool? _installEmptyDatabase;
         private bool? _installMissingDatabase;
-        private bool? _isSmtpServerConfigured;
-        private string _path;
+        private string _umbracoPath;
         private string _registerType;
         private string _reservedPaths;
         private string _reservedUrls;
         private int? _timeOutInMinutes;
         private string _umbracoCssPath;
         private string _umbracoMediaPath;
-        private string _umbracoPath;
         private string _umbracoScriptsPath;
         private string _mainDomLock;
         private string _noNodesViewPath;
@@ -83,15 +81,9 @@ namespace Umbraco.Tests.Common.Builders
             return this;
         }
 
-        public GlobalSettingsBuilder<TParent> WithIsSmtpServerConfigured(bool isSmtpServerConfigured)
+        public GlobalSettingsBuilder<TParent> WithUmbracoPath(string umbracoPath)
         {
-            _isSmtpServerConfigured = isSmtpServerConfigured;
-            return this;
-        }
-
-        public GlobalSettingsBuilder<TParent> WithPath(string path)
-        {
-            _path = path;
+            _umbracoPath = umbracoPath;
             return this;
         }
 
@@ -110,12 +102,6 @@ namespace Umbraco.Tests.Common.Builders
         public GlobalSettingsBuilder<TParent> WithReservedUrls(string reservedUrls)
         {
             _reservedUrls = reservedUrls;
-            return this;
-        }
-
-        public GlobalSettingsBuilder<TParent> WithUmbracoPath(string umbracoPath)
-        {
-            _umbracoPath = umbracoPath;
             return this;
         }
 
@@ -166,7 +152,7 @@ namespace Umbraco.Tests.Common.Builders
             return this;
         }
 
-        public override IGlobalSettings Build()
+        public override GlobalSettings Build()
         {
             var configurationStatus = _configurationStatus ?? "9.0.0";
             var databaseFactoryServerVersion = _databaseFactoryServerVersion ?? null;
@@ -175,11 +161,9 @@ namespace Umbraco.Tests.Common.Builders
             var hideTopLevelNodeFromPath = _hideTopLevelNodeFromPath ?? false;
             var installEmptyDatabase = _installEmptyDatabase ?? false;
             var installMissingDatabase = _installMissingDatabase ?? false;
-            var isSmtpServerConfigured = _isSmtpServerConfigured ?? false;
-            var path = _path ?? "/umbraco";
             var registerType = _registerType ?? null;
-            var reservedPaths = _reservedPaths ?? "~/app_plugins/,~/install/,~/mini-profiler-resources/,";
-            var reservedUrls = _reservedUrls ?? "~/config/splashes/noNodes.aspx,~/.well-known,";
+            var reservedPaths = _reservedPaths ?? GlobalSettings.StaticReservedPaths;
+            var reservedUrls = _reservedUrls ?? GlobalSettings.StaticReservedUrls;
             var umbracoPath = _umbracoPath ?? "~/umbraco";
             var useHttps = _useHttps ?? false;
             var umbracoCssPath = _umbracoCssPath ?? "~/css";
@@ -191,7 +175,7 @@ namespace Umbraco.Tests.Common.Builders
             var mainDomLock = _mainDomLock ?? string.Empty;
             var noNodesViewPath = _noNodesViewPath ?? "~/config/splashes/NoNodes.cshtml";
 
-            return new TestGlobalSettings
+            return new GlobalSettings
             {
                 ConfigurationStatus = configurationStatus,
                 DatabaseFactoryServerVersion = databaseFactoryServerVersion,
@@ -200,8 +184,6 @@ namespace Umbraco.Tests.Common.Builders
                 HideTopLevelNodeFromPath = hideTopLevelNodeFromPath,
                 InstallEmptyDatabase = installEmptyDatabase,
                 InstallMissingDatabase = installMissingDatabase,
-                IsSmtpServerConfigured = isSmtpServerConfigured,
-                Path = path,
                 RegisterType = registerType,
                 ReservedPaths = reservedPaths,
                 ReservedUrls = reservedUrls,
@@ -212,40 +194,14 @@ namespace Umbraco.Tests.Common.Builders
                 UmbracoScriptsPath = umbracoScriptsPath,
                 VersionCheckPeriod = versionCheckPeriod,
                 TimeOutInMinutes = timeOutInMinutes,
-                SmtpSettings = smtpSettings,
+                Smtp = smtpSettings,
                 MainDomLock = mainDomLock,
                 NoNodesViewPath = noNodesViewPath,
             };
         }
-
-        private class TestGlobalSettings : IGlobalSettings
-        {
             private string _iconsPath;
-            public string ReservedUrls { get; set; }
-            public string ReservedPaths { get; set; }
 
             public string IconsPath{ get; set; }
 
-            public string Path { get; set; }
-            public string ConfigurationStatus { get; set; }
-            public int TimeOutInMinutes { get; set; }
-            public string DefaultUILanguage { get; set; }
-            public bool HideTopLevelNodeFromPath { get; set; }
-            public bool UseHttps { get; set; }
-            public int VersionCheckPeriod { get; set; }
-            public string UmbracoPath { get; set; }
-            public string UmbracoCssPath { get; set; }
-            public string UmbracoScriptsPath { get; set; }
-            public string UmbracoMediaPath { get; set; }
-            public bool IsSmtpServerConfigured { get; set; }
-            public ISmtpSettings SmtpSettings { get; set; }
-            public bool InstallMissingDatabase { get; set; }
-            public bool InstallEmptyDatabase { get; set; }
-            public bool DisableElectionForSingleServer { get; set; }
-            public string RegisterType { get; set; }
-            public string DatabaseFactoryServerVersion { get; set; }
-            public string MainDomLock { get; set; }
-            public string NoNodesViewPath { get; set; }
-        }
     }
 }

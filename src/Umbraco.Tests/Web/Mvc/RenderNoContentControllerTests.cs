@@ -2,6 +2,7 @@
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
 using Umbraco.Tests.Common;
 using Umbraco.Web;
@@ -20,8 +21,7 @@ namespace Umbraco.Tests.Web.Mvc
             var mockUmbracoContext = new Mock<IUmbracoContext>();
             mockUmbracoContext.Setup(x => x.Content.HasContent()).Returns(true);
             var mockIOHelper = new Mock<IIOHelper>();
-            var mockGlobalSettings = new Mock<IGlobalSettings>();
-            var controller = new RenderNoContentController(new TestUmbracoContextAccessor(mockUmbracoContext.Object), mockIOHelper.Object, mockGlobalSettings.Object);
+            var controller = new RenderNoContentController(new TestUmbracoContextAccessor(mockUmbracoContext.Object), mockIOHelper.Object, new GlobalSettings());
 
             var result = controller.Index() as RedirectResult;
 
@@ -39,10 +39,12 @@ namespace Umbraco.Tests.Web.Mvc
             mockUmbracoContext.Setup(x => x.Content.HasContent()).Returns(false);
             var mockIOHelper = new Mock<IIOHelper>();
             mockIOHelper.Setup(x => x.ResolveUrl(It.Is<string>(y => y == UmbracoPathSetting))).Returns(UmbracoPath);
-            var mockGlobalSettings = new Mock<IGlobalSettings>();
-            mockGlobalSettings.SetupGet(x => x.UmbracoPath).Returns(UmbracoPathSetting);
-            mockGlobalSettings.SetupGet(x => x.NoNodesViewPath).Returns(ViewPath);
-            var controller = new RenderNoContentController(new TestUmbracoContextAccessor(mockUmbracoContext.Object), mockIOHelper.Object, mockGlobalSettings.Object);
+            var globalSettings = new GlobalSettings()
+            {
+                UmbracoPath = UmbracoPathSetting,
+                NoNodesViewPath = ViewPath,
+            };
+            var controller = new RenderNoContentController(new TestUmbracoContextAccessor(mockUmbracoContext.Object), mockIOHelper.Object, globalSettings);
 
             var result = controller.Index() as ViewResult;
             Assert.IsNotNull(result);
