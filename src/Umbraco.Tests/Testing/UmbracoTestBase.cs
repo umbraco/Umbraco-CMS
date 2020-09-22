@@ -322,7 +322,7 @@ namespace Umbraco.Tests.Testing
             Composition.RegisterUnique<ISectionService, SectionService>();
 
             Composition.RegisterUnique<HtmlLocalLinkParser>();
-            Composition.RegisterUnique<IWebSecurity, WebSecurity>();
+            Composition.RegisterUnique<IBackofficeSecurity, BackofficeSecurity>();
             Composition.RegisterUnique<IEmailSender, EmailSender>();
             Composition.RegisterUnique<HtmlUrlParser>();
             Composition.RegisterUnique<HtmlImageSourceParser>();

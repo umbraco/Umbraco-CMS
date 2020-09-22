@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Umbraco.Core;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Security;
@@ -34,7 +35,7 @@ namespace Umbraco.Web.BackOffice.Filters
             private readonly IContentService _contentService;
             private readonly IMediaService _mediaService;
             private readonly IEntityService _entityService;
-            private readonly IWebSecurity _webSecurity;
+            private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
 
             public AdminUsersAuthorizeFilter(
                 IRequestAccessor requestAccessor,
@@ -42,7 +43,7 @@ namespace Umbraco.Web.BackOffice.Filters
                 IContentService contentService,
                 IMediaService mediaService,
                 IEntityService entityService,
-                IWebSecurity webSecurity,
+                IBackofficeSecurityAccessor backofficeSecurityAccessor,
                 string parameterName)
             {
                 _requestAccessor = requestAccessor;
@@ -50,7 +51,7 @@ namespace Umbraco.Web.BackOffice.Filters
                 _contentService = contentService;
                 _mediaService = mediaService;
                 _entityService = entityService;
-                _webSecurity = webSecurity;
+                _backofficeSecurityAccessor = backofficeSecurityAccessor;
                 _parameterName = parameterName;
             }
 
@@ -86,7 +87,7 @@ namespace Umbraco.Web.BackOffice.Filters
 
                 var users = _userService.GetUsersById(userIds);
                 var authHelper = new UserEditorAuthorizationHelper(_contentService, _mediaService, _userService, _entityService);
-                return users.All(user => authHelper.IsAuthorized(_webSecurity.CurrentUser, user, null, null, null) != false);
+                return users.All(user => authHelper.IsAuthorized(_backofficeSecurityAccessor.BackofficeSecurity.CurrentUser, user, null, null, null) != false);
             }
         }
 

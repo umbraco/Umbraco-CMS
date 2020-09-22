@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
+using Umbraco.Core.Security;
 using Umbraco.Core.WebAssets;
 using Umbraco.Extensions;
 using Umbraco.Web.Common.Filters;
@@ -25,7 +26,7 @@ namespace Umbraco.Web.Common.Install
     [Area(Umbraco.Core.Constants.Web.Mvc.InstallArea)]
     public class InstallController : Controller
     {
-        private readonly IWebSecurity _webSecurity;
+        private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly InstallHelper _installHelper;
         private readonly IRuntimeState _runtime;
         private readonly GlobalSettings _globalSettings;
@@ -36,7 +37,7 @@ namespace Umbraco.Web.Common.Install
         private readonly IRuntimeMinifier _runtimeMinifier;
 
         public InstallController(
-            IWebSecurity webSecurity,
+            IBackofficeSecurityAccessor backofficeSecurityAccessor,
             InstallHelper installHelper,
             IRuntimeState runtime,
             IOptions<GlobalSettings> globalSettings,
@@ -46,7 +47,7 @@ namespace Umbraco.Web.Common.Install
             ILogger<InstallController> logger,
             LinkGenerator linkGenerator)
         {
-            _webSecurity = webSecurity;
+            _backofficeSecurityAccessor = backofficeSecurityAccessor;
             _installHelper = installHelper;
             _runtime = runtime;
             _globalSettings = globalSettings.Value;
@@ -72,7 +73,7 @@ namespace Umbraco.Web.Common.Install
                 // Update ClientDependency version and delete its temp directories to make sure we get fresh caches
                 _runtimeMinifier.Reset();
 
-                var result = _webSecurity.ValidateCurrentUser(false);
+                var result = _backofficeSecurityAccessor.BackofficeSecurity.ValidateCurrentUser(false);
 
                 switch (result)
                 {

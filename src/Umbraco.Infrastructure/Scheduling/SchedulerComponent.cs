@@ -32,7 +32,7 @@ namespace Umbraco.Web.Scheduling
         private readonly IContentService _contentService;
         private readonly IAuditService _auditService;
         private readonly IProfilingLogger _pLogger;
-        private readonly Microsoft.Extensions.Logging.ILogger<SchedulerComponent> _logger;
+        private readonly ILogger<SchedulerComponent> _logger;
         private readonly ILoggerFactory _loggerFactory;
         private readonly IApplicationShutdownRegistry _applicationShutdownRegistry;
         private readonly IScopeProvider _scopeProvider;
@@ -42,6 +42,7 @@ namespace Umbraco.Web.Scheduling
         private readonly HealthChecksSettings _healthChecksSettings;
         private readonly IServerMessenger _serverMessenger;
         private readonly IRequestAccessor _requestAccessor;
+        private readonly IBackofficeSecurityFactory _backofficeSecurityFactory;
         private readonly LoggingSettings _loggingSettings;
         private readonly KeepAliveSettings _keepAliveSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
@@ -63,7 +64,8 @@ namespace Umbraco.Web.Scheduling
             IApplicationShutdownRegistry applicationShutdownRegistry, IOptions<HealthChecksSettings> healthChecksSettings,
             IServerMessenger serverMessenger, IRequestAccessor requestAccessor,
             IOptions<LoggingSettings> loggingSettings, IOptions<KeepAliveSettings> keepAliveSettings,
-            IHostingEnvironment hostingEnvironment)
+            IHostingEnvironment hostingEnvironment,
+            IBackofficeSecurityFactory backofficeSecurityFactory)
         {
             _runtime = runtime;
             _mainDom = mainDom;
@@ -82,6 +84,7 @@ namespace Umbraco.Web.Scheduling
             _healthChecksSettings = healthChecksSettings.Value ?? throw new ArgumentNullException(nameof(healthChecksSettings));
             _serverMessenger = serverMessenger;
             _requestAccessor = requestAccessor;
+            _backofficeSecurityFactory = backofficeSecurityFactory;
             _loggingSettings = loggingSettings.Value;
             _keepAliveSettings = keepAliveSettings.Value;
             _hostingEnvironment = hostingEnvironment;
@@ -156,7 +159,7 @@ namespace Umbraco.Web.Scheduling
         {
             // scheduled publishing/unpublishing
             // install on all, will only run on non-replica servers
-            var task = new ScheduledPublishing(_publishingRunner, DefaultDelayMilliseconds, OneMinuteMilliseconds, _runtime, _mainDom, _serverRegistrar, _contentService, _umbracoContextFactory, _loggerFactory.CreateLogger<ScheduledPublishing>(), _serverMessenger);
+            var task = new ScheduledPublishing(_publishingRunner, DefaultDelayMilliseconds, OneMinuteMilliseconds, _runtime, _mainDom, _serverRegistrar, _contentService, _umbracoContextFactory, _loggerFactory.CreateLogger<ScheduledPublishing>(), _serverMessenger, _backofficeSecurityFactory);
             _publishingRunner.TryAdd(task);
             return task;
         }

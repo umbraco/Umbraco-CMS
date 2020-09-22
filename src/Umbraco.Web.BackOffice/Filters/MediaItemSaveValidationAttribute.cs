@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.Models.ContentEditing;
@@ -29,18 +30,18 @@ namespace Umbraco.Web.BackOffice.Filters
             private readonly IMediaService _mediaService;
             private readonly ILocalizedTextService _textService;
             private readonly ILoggerFactory _loggerFactory;
-            private readonly IWebSecurity _webSecurity;
+            private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
 
             public MediaItemSaveValidationFilter(
                 ILoggerFactory loggerFactory,
-                IWebSecurity webSecurity,
+                IBackofficeSecurityAccessor backofficeSecurityAccessor,
                 ILocalizedTextService textService,
                 IMediaService mediaService,
                 IEntityService entityService,
                 IPropertyValidationService propertyValidationService)
             {
                 _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
-                _webSecurity = webSecurity ?? throw new ArgumentNullException(nameof(webSecurity));
+                _backofficeSecurityAccessor = backofficeSecurityAccessor ?? throw new ArgumentNullException(nameof(backofficeSecurityAccessor));
                 _textService = textService ?? throw new ArgumentNullException(nameof(textService));
                 _mediaService = mediaService ?? throw new ArgumentNullException(nameof(mediaService));
                 _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
@@ -50,7 +51,7 @@ namespace Umbraco.Web.BackOffice.Filters
             public void OnActionExecuting(ActionExecutingContext context)
             {
                 var model = (MediaItemSave) context.ActionArguments["contentItem"];
-                var contentItemValidator = new MediaSaveModelValidator(_loggerFactory.CreateLogger<MediaSaveModelValidator>(), _webSecurity, _textService, _propertyValidationService);
+                var contentItemValidator = new MediaSaveModelValidator(_loggerFactory.CreateLogger<MediaSaveModelValidator>(), _backofficeSecurityAccessor.BackofficeSecurity, _textService, _propertyValidationService);
 
                 if (ValidateUserAccess(model, context))
                 {
@@ -101,7 +102,7 @@ namespace Umbraco.Web.BackOffice.Filters
 
                 if (MediaController.CheckPermissions(
                     actionContext.HttpContext.Items,
-                    _webSecurity.CurrentUser,
+                    _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser,
                     _mediaService, _entityService,
                     contentIdToCheck, contentToCheck) == false)
                 {

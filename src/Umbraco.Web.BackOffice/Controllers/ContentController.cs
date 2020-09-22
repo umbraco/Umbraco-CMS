@@ -56,7 +56,7 @@ namespace Umbraco.Web.Editors
         private readonly IContentService _contentService;
         private readonly ILocalizedTextService _localizedTextService;
         private readonly IUserService _userService;
-        private readonly IWebSecurity _webSecurity;
+        private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly IEntityService _entityService;
         private readonly IContentTypeService _contentTypeService;
         private readonly UmbracoMapper _umbracoMapper;
@@ -85,7 +85,7 @@ namespace Umbraco.Web.Editors
             PropertyEditorCollection propertyEditors,
             IContentService contentService,
             IUserService userService,
-            IWebSecurity webSecurity,
+            IBackofficeSecurityAccessor backofficeSecurityAccessor,
             IEntityService entityService,
             IContentTypeService contentTypeService,
             UmbracoMapper umbracoMapper,
@@ -106,7 +106,7 @@ namespace Umbraco.Web.Editors
             _contentService = contentService;
             _localizedTextService = localizedTextService;
             _userService = userService;
-            _webSecurity = webSecurity;
+            _backofficeSecurityAccessor = backofficeSecurityAccessor;
             _entityService = entityService;
             _contentTypeService = contentTypeService;
             _umbracoMapper = umbracoMapper;
@@ -430,7 +430,7 @@ namespace Umbraco.Web.Editors
 
         private ContentItemDisplay GetEmpty(IContentType contentType, int parentId)
         {
-            var emptyContent = _contentService.Create("", parentId, contentType.Alias, _webSecurity.GetUserId().ResultOr(0));
+            var emptyContent = _contentService.Create("", parentId, contentType.Alias, _backofficeSecurityAccessor.BackofficeSecurity.GetUserId().ResultOr(0));
             var mapped = MapToDisplay(emptyContent);
             // translate the content type name if applicable
             mapped.ContentTypeName = _localizedTextService.UmbracoDictionaryTranslate(CultureDictionary, mapped.ContentTypeName);
@@ -599,9 +599,9 @@ namespace Umbraco.Web.Editors
 
             EnsureUniqueName(name, content, nameof(name));
 
-            var blueprint = _contentService.CreateContentFromBlueprint(content, name, _webSecurity.GetUserId().ResultOr(0));
+            var blueprint = _contentService.CreateContentFromBlueprint(content, name, _backofficeSecurityAccessor.BackofficeSecurity.GetUserId().ResultOr(0));
 
-            _contentService.SaveBlueprint(blueprint, _webSecurity.GetUserId().ResultOr(0));
+            _contentService.SaveBlueprint(blueprint, _backofficeSecurityAccessor.BackofficeSecurity.GetUserId().ResultOr(0));
 
             var notificationModel = new SimpleNotificationModel();
             notificationModel.AddSuccessNotification(
@@ -635,7 +635,7 @@ namespace Umbraco.Web.Editors
                  {
                      EnsureUniqueName(content.Name, content, "Name");
 
-                     _contentService.SaveBlueprint(contentItem.PersistedContent, _webSecurity.CurrentUser.Id);
+                     _contentService.SaveBlueprint(contentItem.PersistedContent, _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.Id);
                      //we need to reuse the underlying logic so return the result that it wants
                      return OperationResult.Succeed(new EventMessages());
                  },
@@ -660,7 +660,7 @@ namespace Umbraco.Web.Editors
         {
             var contentItemDisplay = PostSaveInternal(
                 contentItem,
-                content => _contentService.Save(contentItem.PersistedContent, _webSecurity.CurrentUser.Id),
+                content => _contentService.Save(contentItem.PersistedContent, _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.Id),
                 MapToDisplay);
 
             return contentItemDisplay;
@@ -762,7 +762,7 @@ namespace Umbraco.Web.Editors
 
                 case ContentSaveAction.SendPublish:
                 case ContentSaveAction.SendPublishNew:
-                    var sendResult = _contentService.SendToPublication(contentItem.PersistedContent, _webSecurity.CurrentUser.Id);
+                    var sendResult = _contentService.SendToPublication(contentItem.PersistedContent, _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.Id);
                     wasCancelled = sendResult == false;
                     if (sendResult)
                     {
@@ -1206,7 +1206,7 @@ namespace Umbraco.Web.Editors
                     //if this item's path has already been denied or if the user doesn't have access to it, add to the deny list
                     if (denied.Any(x => c.Path.StartsWith($"{x.Path},"))
                         || (ContentPermissionsHelper.CheckPermissions(c,
-                            _webSecurity.CurrentUser, _userService, _entityService,
+                            _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser, _userService, _entityService,
                             ActionPublish.ActionLetter) == ContentPermissionsHelper.ContentAccess.Denied))
                     {
                         denied.Add(c);
@@ -1223,7 +1223,7 @@ namespace Umbraco.Web.Editors
             if (!contentItem.PersistedContent.ContentType.VariesByCulture())
             {
                 //its invariant, proceed normally
-                var publishStatus = _contentService.SaveAndPublishBranch(contentItem.PersistedContent, force, userId: _webSecurity.CurrentUser.Id);
+                var publishStatus = _contentService.SaveAndPublishBranch(contentItem.PersistedContent, force, userId: _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.Id);
                 // TODO: Deal with multiple cancellations
                 wasCancelled = publishStatus.Any(x => x.Result == PublishResultType.FailedPublishCancelledByEvent);
                 successfulCultures = null; //must be null! this implies invariant
@@ -1258,7 +1258,7 @@ namespace Umbraco.Web.Editors
             if (canPublish)
             {
                 //proceed to publish if all validation still succeeds
-                var publishStatus = _contentService.SaveAndPublishBranch(contentItem.PersistedContent, force, culturesToPublish, _webSecurity.CurrentUser.Id);
+                var publishStatus = _contentService.SaveAndPublishBranch(contentItem.PersistedContent, force, culturesToPublish, _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.Id);
                 // TODO: Deal with multiple cancellations
                 wasCancelled = publishStatus.Any(x => x.Result == PublishResultType.FailedPublishCancelledByEvent);
                 successfulCultures = contentItem.Variants.Where(x => x.Publish).Select(x => x.Culture).ToArray();
@@ -1267,7 +1267,7 @@ namespace Umbraco.Web.Editors
             else
             {
                 //can only save
-                var saveResult = _contentService.Save(contentItem.PersistedContent, _webSecurity.CurrentUser.Id);
+                var saveResult = _contentService.Save(contentItem.PersistedContent, _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.Id);
                 var publishStatus = new[]
                 {
                     new PublishResult(PublishResultType.FailedPublishMandatoryCultureMissing, null, contentItem.PersistedContent)
@@ -1295,7 +1295,7 @@ namespace Umbraco.Web.Editors
             if (!contentItem.PersistedContent.ContentType.VariesByCulture())
             {
                 //its invariant, proceed normally
-                var publishStatus = _contentService.SaveAndPublish(contentItem.PersistedContent, userId: _webSecurity.CurrentUser.Id);
+                var publishStatus = _contentService.SaveAndPublish(contentItem.PersistedContent, userId: _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.Id);
                 wasCancelled = publishStatus.Result == PublishResultType.FailedPublishCancelledByEvent;
                 successfulCultures = null; //must be null! this implies invariant
                 return publishStatus;
@@ -1340,7 +1340,7 @@ namespace Umbraco.Web.Editors
             if (canPublish)
             {
                 //proceed to publish if all validation still succeeds
-                var publishStatus = _contentService.SaveAndPublish(contentItem.PersistedContent, culturesToPublish, _webSecurity.CurrentUser.Id);
+                var publishStatus = _contentService.SaveAndPublish(contentItem.PersistedContent, culturesToPublish, _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.Id);
                 wasCancelled = publishStatus.Result == PublishResultType.FailedPublishCancelledByEvent;
                 successfulCultures = culturesToPublish;
                 return publishStatus;
@@ -1348,7 +1348,7 @@ namespace Umbraco.Web.Editors
             else
             {
                 //can only save
-                var saveResult = _contentService.Save(contentItem.PersistedContent, _webSecurity.CurrentUser.Id);
+                var saveResult = _contentService.Save(contentItem.PersistedContent, _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.Id);
                 var publishStatus = new PublishResult(PublishResultType.FailedPublishMandatoryCultureMissing, null, contentItem.PersistedContent);
                 wasCancelled = saveResult.Result == OperationResultType.FailedCancelledByEvent;
                 successfulCultures = Array.Empty<string>();
@@ -1503,7 +1503,7 @@ namespace Umbraco.Web.Editors
                 return HandleContentNotFound(id, false);
             }
 
-            var publishResult = _contentService.SaveAndPublish(foundContent, userId: _webSecurity.GetUserId().ResultOr(0));
+            var publishResult = _contentService.SaveAndPublish(foundContent, userId: _backofficeSecurityAccessor.BackofficeSecurity.GetUserId().ResultOr(0));
             if (publishResult.Success == false)
             {
                 var notificationModel = new SimpleNotificationModel();
@@ -1555,7 +1555,7 @@ namespace Umbraco.Web.Editors
             //if the current item is in the recycle bin
             if (foundContent.Trashed == false)
             {
-                var moveResult = _contentService.MoveToRecycleBin(foundContent, _webSecurity.GetUserId().ResultOr(0));
+                var moveResult = _contentService.MoveToRecycleBin(foundContent, _backofficeSecurityAccessor.BackofficeSecurity.GetUserId().ResultOr(0));
                 if (moveResult.Success == false)
                 {
                     //returning an object of INotificationModel will ensure that any pending
@@ -1565,7 +1565,7 @@ namespace Umbraco.Web.Editors
             }
             else
             {
-                var deleteResult = _contentService.Delete(foundContent, _webSecurity.GetUserId().ResultOr(0));
+                var deleteResult = _contentService.Delete(foundContent, _backofficeSecurityAccessor.BackofficeSecurity.GetUserId().ResultOr(0));
                 if (deleteResult.Success == false)
                 {
                     //returning an object of INotificationModel will ensure that any pending
@@ -1589,7 +1589,7 @@ namespace Umbraco.Web.Editors
         [EnsureUserPermissionForContent(Constants.System.RecycleBinContent, ActionDelete.ActionLetter)]
         public IActionResult EmptyRecycleBin()
         {
-            _contentService.EmptyRecycleBin(_webSecurity.GetUserId().ResultOr(Constants.Security.SuperUserId));
+            _contentService.EmptyRecycleBin(_backofficeSecurityAccessor.BackofficeSecurity.GetUserId().ResultOr(Constants.Security.SuperUserId));
 
             return new UmbracoNotificationSuccessResponse(_localizedTextService.Localize("defaultdialogs/recycleBinIsEmpty"));
         }
@@ -1618,7 +1618,7 @@ namespace Umbraco.Web.Editors
                 var contentService = _contentService;
 
                 // Save content with new sort order and update content xml in db accordingly
-                var sortResult = contentService.Sort(sorted.IdSortOrder, _webSecurity.CurrentUser.Id);
+                var sortResult = contentService.Sort(sorted.IdSortOrder, _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.Id);
                 if (!sortResult.Success)
                 {
                     _logger.LogWarning("Content sorting failed, this was probably caused by an event being cancelled");
@@ -1645,7 +1645,7 @@ namespace Umbraco.Web.Editors
         {
             var toMove = ValidateMoveOrCopy(move);
 
-            _contentService.Move(toMove, move.ParentId, _webSecurity.GetUserId().ResultOr(0));
+            _contentService.Move(toMove, move.ParentId, _backofficeSecurityAccessor.BackofficeSecurity.GetUserId().ResultOr(0));
 
             return Content(toMove.Path, MediaTypeNames.Text.Plain, Encoding.UTF8);
         }
@@ -1660,7 +1660,7 @@ namespace Umbraco.Web.Editors
         {
             var toCopy = ValidateMoveOrCopy(copy);
 
-            var c = _contentService.Copy(toCopy, copy.ParentId, copy.RelateToOriginal, copy.Recursive, _webSecurity.GetUserId().ResultOr(0));
+            var c = _contentService.Copy(toCopy, copy.ParentId, copy.RelateToOriginal, copy.Recursive, _backofficeSecurityAccessor.BackofficeSecurity.GetUserId().ResultOr(0));
 
             return Content(c.Path, MediaTypeNames.Text.Plain, Encoding.UTF8);
         }
@@ -1683,7 +1683,7 @@ namespace Umbraco.Web.Editors
             if (model.Cultures.Length == 0 || model.Cultures.Length == languageCount)
             {
                 //this means that the entire content item will be unpublished
-                var unpublishResult = _contentService.Unpublish(foundContent, userId: _webSecurity.GetUserId().ResultOr(0));
+                var unpublishResult = _contentService.Unpublish(foundContent, userId: _backofficeSecurityAccessor.BackofficeSecurity.GetUserId().ResultOr(0));
 
                 var content = MapToDisplay(foundContent);
 
@@ -1706,7 +1706,7 @@ namespace Umbraco.Web.Editors
                 var results = new Dictionary<string, PublishResult>();
                 foreach (var c in model.Cultures)
                 {
-                    var result = _contentService.Unpublish(foundContent, culture: c, userId: _webSecurity.GetUserId().ResultOr(0));
+                    var result = _contentService.Unpublish(foundContent, culture: c, userId: _backofficeSecurityAccessor.BackofficeSecurity.GetUserId().ResultOr(0));
                     results[c] = result;
                     if (result.Result == PublishResultType.SuccessUnpublishMandatoryCulture)
                     {
@@ -1774,7 +1774,7 @@ namespace Umbraco.Web.Editors
                 return NotFound("There is no content node with id {model.NodeId}.");
             }
 
-            var permission = _userService.GetPermissions(_webSecurity.CurrentUser, node.Path);
+            var permission = _userService.GetPermissions(_backofficeSecurityAccessor.BackofficeSecurity.CurrentUser, node.Path);
 
 
             if (permission.AssignedPermissions.Contains(ActionAssignDomain.ActionLetter.ToString(), StringComparer.Ordinal) == false)
@@ -2262,7 +2262,7 @@ namespace Umbraco.Web.Editors
         {
             var display = _umbracoMapper.Map<ContentItemDisplay>(content, context =>
             {
-                context.Items["CurrentUser"] = _webSecurity.CurrentUser;
+                context.Items["CurrentUser"] = _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser;
             });
             display.AllowPreview = display.AllowPreview && content.Trashed == false && content.ContentType.IsElement == false;
             return display;
@@ -2277,7 +2277,7 @@ namespace Umbraco.Web.Editors
             var content = _contentService.GetById(contentId);
             if (content == null) return NotFound();
 
-            var userNotifications = _notificationService.GetUserNotifications(_webSecurity.CurrentUser, content.Path).ToList();
+            var userNotifications = _notificationService.GetUserNotifications(_backofficeSecurityAccessor.BackofficeSecurity.CurrentUser, content.Path).ToList();
 
             foreach (var a in _actionCollection.Where(x => x.ShowInNotifier))
             {
@@ -2299,7 +2299,7 @@ namespace Umbraco.Web.Editors
             var content = _contentService.GetById(contentId);
             if (content == null) return NotFound();
 
-            _notificationService.SetNotifications(_webSecurity.CurrentUser, content, notifyOptions);
+            _notificationService.SetNotifications(_backofficeSecurityAccessor.BackofficeSecurity.CurrentUser, content, notifyOptions);
 
             return NoContent();
         }
@@ -2364,7 +2364,7 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public IActionResult PostRollbackContent(int contentId, int versionId, string culture = "*")
         {
-            var rollbackResult = _contentService.Rollback(contentId, versionId, culture, _webSecurity.GetUserId().ResultOr(0));
+            var rollbackResult = _contentService.Rollback(contentId, versionId, culture, _backofficeSecurityAccessor.BackofficeSecurity.GetUserId().ResultOr(0));
 
             if (rollbackResult.Success)
                 return Ok();

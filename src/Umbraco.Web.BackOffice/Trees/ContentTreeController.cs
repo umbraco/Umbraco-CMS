@@ -13,6 +13,7 @@ using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Search;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Security;
 using Constants = Umbraco.Core.Constants;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.BackOffice.Trees;
@@ -44,7 +45,7 @@ namespace Umbraco.Web.Trees
         private readonly ActionCollection _actions;
         private readonly GlobalSettings _globalSettings;
         private readonly IMenuItemCollectionFactory _menuItemCollectionFactory;
-        private readonly IWebSecurity _webSecurity;
+        private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly IContentService _contentService;
         private readonly IEntityService _entityService;
         private readonly IPublicAccessService _publicAccessService;
@@ -56,7 +57,7 @@ namespace Umbraco.Web.Trees
             UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
             IMenuItemCollectionFactory menuItemCollectionFactory,
             IEntityService entityService,
-            IWebSecurity webSecurity,
+            IBackofficeSecurityAccessor backofficeSecurityAccessor,
             ILogger<ContentTreeController> logger,
             ActionCollection actionCollection,
             IUserService userService,
@@ -67,13 +68,13 @@ namespace Umbraco.Web.Trees
             IContentService contentService,
             IPublicAccessService publicAccessService,
             ILocalizationService localizationService)
-            : base(localizedTextService, umbracoApiControllerTypeCollection, menuItemCollectionFactory, entityService, webSecurity, logger, actionCollection, userService, dataTypeService)
+            : base(localizedTextService, umbracoApiControllerTypeCollection, menuItemCollectionFactory, entityService, backofficeSecurityAccessor, logger, actionCollection, userService, dataTypeService)
         {
             _treeSearcher = treeSearcher;
             _actions = actions;
             _globalSettings = globalSettings.Value;
             _menuItemCollectionFactory = menuItemCollectionFactory;
-            _webSecurity = webSecurity;
+            _backofficeSecurityAccessor = backofficeSecurityAccessor;
             _contentService = contentService;
             _entityService = entityService;
             _publicAccessService = publicAccessService;
@@ -88,7 +89,7 @@ namespace Umbraco.Web.Trees
         private int[] _userStartNodes;
 
         protected override int[] UserStartNodes
-            => _userStartNodes ?? (_userStartNodes = _webSecurity.CurrentUser.CalculateContentStartNodeIds(_entityService));
+            => _userStartNodes ?? (_userStartNodes = _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.CalculateContentStartNodeIds(_entityService));
 
 
 
@@ -166,7 +167,7 @@ namespace Umbraco.Web.Trees
                 menu.DefaultMenuAlias = ActionNew.ActionAlias;
 
                 // we need to get the default permissions as you can't set permissions on the very root node
-                var permission = _userService.GetPermissions(_webSecurity.CurrentUser, Constants.System.Root).First();
+                var permission = _userService.GetPermissions(_backofficeSecurityAccessor.BackofficeSecurity.CurrentUser, Constants.System.Root).First();
                 var nodeActions = _actions.FromEntityPermission(permission)
                     .Select(x => new MenuItem(x));
 
@@ -202,7 +203,7 @@ namespace Umbraco.Web.Trees
             }
 
             //if the user has no path access for this node, all they can do is refresh
-            if (!_webSecurity.CurrentUser.HasContentPathAccess(item, _entityService))
+            if (!_backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.HasContentPathAccess(item, _entityService))
             {
                 var menu = _menuItemCollectionFactory.Create();
                 menu.Items.Add(new RefreshNode(LocalizedTextService, true));
