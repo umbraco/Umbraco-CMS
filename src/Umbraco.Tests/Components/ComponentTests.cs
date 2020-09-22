@@ -97,7 +97,7 @@ namespace Umbraco.Tests.Components
                     if (type == typeof(Composer5)) return new Composer5();
                     if (type == typeof(Component5)) return new Component5(new SomeResource());
                     if (type == typeof(IProfilingLogger)) return new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>());
-                    if (type == typeof(ILogger)) return Mock.Of<ILogger>();
+                    if (type == typeof(ILogger<ComponentCollection>)) return Mock.Of<ILogger<ComponentCollection>>();
                     throw new NotSupportedException(type.FullName);
                 });
             });
@@ -221,6 +221,7 @@ namespace Umbraco.Tests.Components
                     if (type == typeof(Component5)) return new Component5(new SomeResource());
                     if (type == typeof(Component5a)) return new Component5a();
                     if (type == typeof(IProfilingLogger)) return new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>());
+                    if (type == typeof(ILogger<ComponentCollection>)) return Mock.Of<ILogger<ComponentCollection>>();
                     throw new NotSupportedException(type.FullName);
                 });
             });
