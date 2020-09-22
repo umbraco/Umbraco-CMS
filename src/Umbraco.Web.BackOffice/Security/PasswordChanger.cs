@@ -32,7 +32,7 @@ namespace Umbraco.Web.BackOffice.Security
             IUser currentUser,
             IUser savingUser,
             ChangingPasswordModel passwordModel,
-            BackOfficeUserManager userMgr)
+            IBackOfficeUserManager userMgr)
         {
             if (passwordModel == null) throw new ArgumentNullException(nameof(passwordModel));
             if (userMgr == null) throw new ArgumentNullException(nameof(userMgr));
