@@ -13,7 +13,6 @@ using Umbraco.Core.Composing;
 using Umbraco.Web;
 using Current = Umbraco.Web.Composing.Current;
 
-[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 namespace Umbraco.Tests.TestHelpers.Stubs
 {
     /// <summary>
