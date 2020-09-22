@@ -238,8 +238,8 @@
     <Compile Include="Models\ContentEditing\LinkDisplay.cs" />
     <Compile Include="Models\ContentEditing\MacroDisplay.cs" />
     <Compile Include="Models\ContentEditing\MacroParameterDisplay.cs" />
-    <Compile Include="Models\IconModel.cs" />
     <Compile Include="Models\ContentEditing\UrlAndAnchors.cs" />
+    <Compile Include="Models\IconModel.cs" />
     <Compile Include="Models\ImageProcessorImageUrlGenerator.cs" />
     <Compile Include="Models\Mapping\CommonMapper.cs" />
     <Compile Include="Models\Mapping\MapperContextExtensions.cs" />
@@ -284,10 +284,12 @@
     <Compile Include="Search\IUmbracoTreeSearcherFields.cs" />
     <Compile Include="Search\UmbracoTreeSearcherFields.cs" />
     <Compile Include="Services\DashboardService.cs" />
+    <Compile Include="Services\IconService.cs" />
     <Compile Include="Services\IDashboardService.cs" />
     <Compile Include="Models\Link.cs" />
     <Compile Include="Models\LinkType.cs" />
     <Compile Include="Models\TemplateQuery\OperatorFactory.cs" />
+    <Compile Include="Services\IIconService.cs" />
     <Compile Include="Templates\HtmlLocalLinkParser.cs" />
     <Compile Include="Templates\HtmlImageSourceParser.cs" />
     <Compile Include="Templates\HtmlUrlParser.cs" />

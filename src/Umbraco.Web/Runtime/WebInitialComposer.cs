@@ -139,6 +139,7 @@ namespace Umbraco.Web.Runtime
             composition.RegisterUnique<ISectionService, SectionService>();
 
             composition.RegisterUnique<IDashboardService, DashboardService>();
+            composition.RegisterUnique<IIconService, IconService>();
 
             composition.RegisterUnique<IExamineManager>(factory => ExamineManager.Instance);
 
