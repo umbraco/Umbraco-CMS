@@ -9,6 +9,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Media;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
@@ -33,7 +34,6 @@ namespace Umbraco.Web.PropertyEditors
         private readonly IMediaFileSystem _mediaFileSystem;
         private readonly ContentSettings _contentSettings;
         private readonly IDataTypeService _dataTypeService;
-        private readonly ILocalizationService _localizationService;
         private readonly IIOHelper _ioHelper;
         private readonly UploadAutoFillProperties _autoFillProperties;
 
@@ -48,17 +48,17 @@ namespace Umbraco.Web.PropertyEditors
             ILocalizationService localizationService,
             IIOHelper ioHelper,
             IShortStringHelper shortStringHelper,
-            ILocalizedTextService localizedTextService)
+            ILocalizedTextService localizedTextService,
+            IImageUrlGenerator imageUrlGenerator)
             : base(logger, dataTypeService, localizationService, localizedTextService, shortStringHelper)
         {
             _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
             _contentSettings = contentSettings.Value ?? throw new ArgumentNullException(nameof(contentSettings));
             _dataTypeService = dataTypeService;
-            _localizationService = localizationService;
             _ioHelper = ioHelper;
 
             // TODO: inject?
-            _autoFillProperties = new UploadAutoFillProperties(_mediaFileSystem, logger, contentSettings);
+            _autoFillProperties = new UploadAutoFillProperties(_mediaFileSystem, logger, imageUrlGenerator);
         }
 
         public bool TryGetMediaPath(string alias, object value, out string mediaPath)

@@ -18,6 +18,7 @@ using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
+using Umbraco.Core.Media;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.ContentEditing;
 using Umbraco.Core.Models.Entities;
@@ -27,8 +28,6 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Security;
-using Umbraco.Web.ContentApps;
-using Umbraco.Web.WebApi.Filters;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Extensions;
@@ -39,7 +38,6 @@ using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.ContentApps;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Security;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
 
@@ -65,6 +63,8 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly ISqlContext _sqlContext;
         private readonly IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
         private readonly IRelationService _relationService;
+        private readonly IImageUrlGenerator _imageUrlGenerator;
+
         public MediaController(
             ICultureDictionary cultureDictionary,
             ILogger logger,
@@ -83,7 +83,8 @@ namespace Umbraco.Web.BackOffice.Controllers
             IRelationService relationService,
             PropertyEditorCollection propertyEditors,
             IMediaFileSystem mediaFileSystem,
-            IHostingEnvironment hostingEnvironment)
+            IHostingEnvironment hostingEnvironment,
+            IImageUrlGenerator imageUrlGenerator)
             : base(cultureDictionary, logger, shortStringHelper, eventMessages, localizedTextService)
         {
             _shortStringHelper = shortStringHelper;
@@ -101,6 +102,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _propertyEditors = propertyEditors;
             _mediaFileSystem = mediaFileSystem;
             _hostingEnvironment = hostingEnvironment;
+            _imageUrlGenerator = imageUrlGenerator;
         }
 
         /// <summary>
@@ -744,7 +746,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
                     if (contentTypeAlias == Constants.Conventions.MediaTypes.AutoSelect)
                     {
-                        if (_contentSettings.Imaging.ImageFileTypes.Contains(ext))
+                        if (_imageUrlGenerator.SupportedImageFileTypes.Contains(ext))
                         {
                             mediaType = Constants.Conventions.MediaTypes.Image;
                         }

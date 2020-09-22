@@ -17,8 +17,6 @@ namespace Umbraco.Core.Configuration.Models
             }
         };
 
-        public IEnumerable<string> ImageFileTypes { get; set; } = new[] { "jpeg", "jpg", "gif", "bmp", "png", "tiff", "tif" };
-
         public IEnumerable<IImagingAutoFillUploadField> AutoFillImageProperties { get; set; } = DefaultImagingAutoFillUploadField;
 
         private class ImagingAutoFillUploadField : IImagingAutoFillUploadField

@@ -129,6 +129,7 @@ namespace Umbraco.Tests.Testing
         protected ILocalizationService LocalizationService => Factory.GetInstance<ILocalizationService>();
         protected ILocalizedTextService LocalizedTextService  { get; private set; }
         protected IShortStringHelper ShortStringHelper => Factory?.GetInstance<IShortStringHelper>() ?? TestHelper.ShortStringHelper;
+        protected IImageUrlGenerator ImageUrlGenerator => Factory.GetInstance<IImageUrlGenerator>();
         protected IUmbracoVersion UmbracoVersion { get; private set; }
 
         protected ITypeFinder TypeFinder { get; private set; }
