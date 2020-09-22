@@ -184,7 +184,7 @@ namespace Umbraco.Core.Runtime
                 // create the composition
                 composition = new Composition(register, typeLoader, ProfilingLogger, _state, IOHelper, AppCaches);
 
-                composition.RegisterEssentials(Logger, Profiler, ProfilingLogger, MainDom, AppCaches, databaseFactory, typeLoader, _state, TypeFinder, IOHelper, UmbracoVersion, DbProviderFactoryCreator, HostingEnvironment, BackOfficeInfo);
+                composition.RegisterEssentials(Logger, RuntimeLoggerFactory, Profiler, ProfilingLogger, MainDom, AppCaches, databaseFactory, typeLoader, _state, TypeFinder, IOHelper, UmbracoVersion, DbProviderFactoryCreator, HostingEnvironment, BackOfficeInfo);
 
                 // register ourselves (TODO: Should we put this in RegisterEssentials?)
                 composition.Register<IRuntime>(_ => this, Lifetime.Singleton);

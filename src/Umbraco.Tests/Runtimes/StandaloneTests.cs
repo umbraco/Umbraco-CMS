@@ -82,7 +82,7 @@ namespace Umbraco.Tests.Runtimes
             // create the register and the composition
             var register = TestHelper.GetRegister();
             var composition = new Composition(register, typeLoader, profilingLogger, runtimeState, ioHelper, appCaches);
-            composition.RegisterEssentials(loggerFactory.CreateLogger("Essentials"), profiler, profilingLogger, mainDom, appCaches, databaseFactory, typeLoader, runtimeState, typeFinder, ioHelper, umbracoVersion, TestHelper.DbProviderFactoryCreator, hostingEnvironment, backOfficeInfo);
+            composition.RegisterEssentials(loggerFactory.CreateLogger("Essentials"), loggerFactory, profiler, profilingLogger, mainDom, appCaches, databaseFactory, typeLoader, runtimeState, typeFinder, ioHelper, umbracoVersion, TestHelper.DbProviderFactoryCreator, hostingEnvironment, backOfficeInfo);
 
             // create the core runtime and have it compose itself
             var coreRuntime = new CoreRuntime(globalSettings, connectionStrings, umbracoVersion, ioHelper, loggerFactory.CreateLogger("CoreRunTime"), loggerFactory, profiler, new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, TestHelper.DbProviderFactoryCreator, TestHelper.MainDom, typeFinder, AppCaches.NoCache);
@@ -290,7 +290,7 @@ namespace Umbraco.Tests.Runtimes
             var register = TestHelper.GetRegister();
             var composition = new Composition(register, typeLoader, profilingLogger, runtimeState, ioHelper, appCaches);
             var umbracoVersion = TestHelper.GetUmbracoVersion();
-            composition.RegisterEssentials(loggerFactory.CreateLogger("RegisterEssentials"), profiler, profilingLogger, mainDom, appCaches, databaseFactory, typeLoader, runtimeState, typeFinder, ioHelper, umbracoVersion, TestHelper.DbProviderFactoryCreator, hostingEnvironment, backOfficeInfo);
+            composition.RegisterEssentials(loggerFactory.CreateLogger("RegisterEssentials"), loggerFactory, profiler, profilingLogger, mainDom, appCaches, databaseFactory, typeLoader, runtimeState, typeFinder, ioHelper, umbracoVersion, TestHelper.DbProviderFactoryCreator, hostingEnvironment, backOfficeInfo);
 
             // create the core runtime and have it compose itself
             var globalSettings = new GlobalSettingsBuilder().Build();
