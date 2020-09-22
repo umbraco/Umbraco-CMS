@@ -21,6 +21,8 @@ using Umbraco.Web.Editors;
 using Umbraco.Web.Features;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Security;
+using Umbraco.Web.Services;
+using Umbraco.Web.Trees;
 using Umbraco.Web.WebAssets;
 using Constants = Umbraco.Core.Constants;
 

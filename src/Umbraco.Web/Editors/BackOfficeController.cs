@@ -11,6 +11,7 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Web.Mvc;
 using Umbraco.Core.Services;
@@ -38,7 +39,8 @@ namespace Umbraco.Web.Editors
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly RuntimeSettings _runtimeSettings;
         private readonly SecuritySettings _securitySettings;
-        private readonly Microsoft.Extensions.Logging.ILogger<BackOfficeController> _logger;
+        private readonly IIconService _iconService;
+        private readonly ILogger<BackOfficeController> _logger;
 
         public BackOfficeController(
             UmbracoFeatures features,
@@ -52,7 +54,8 @@ namespace Umbraco.Web.Editors
             IOptions<ContentSettings> contentSettings,
             IHostingEnvironment hostingEnvironment,
             IOptions<RuntimeSettings> settings,
-            IOptions<SecuritySettings> securitySettings)
+            IOptions<SecuritySettings> securitySettings,
+            IIconService iconService)
             : base(globalSettings, umbracoContextAccessor, services, appCaches, profilingLogger, loggerFactory)
 
         {
@@ -62,6 +65,7 @@ namespace Umbraco.Web.Editors
             _hostingEnvironment = hostingEnvironment;
             _runtimeSettings = settings.Value;
             _securitySettings = securitySettings.Value;
+            _iconService = iconService;
             _logger = loggerFactory.CreateLogger<BackOfficeController>();
         }
 
