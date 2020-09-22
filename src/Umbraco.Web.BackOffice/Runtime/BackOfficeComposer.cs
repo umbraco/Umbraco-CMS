@@ -4,10 +4,12 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Services;
 using Umbraco.Extensions;
 using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.BackOffice.Routing;
 using Umbraco.Web.BackOffice.Security;
+using Umbraco.Web.BackOffice.Services;
 using Umbraco.Web.BackOffice.Trees;
 using Umbraco.Web.Common.Runtime;
 using Umbraco.Web.Trees;
@@ -45,6 +47,8 @@ namespace Umbraco.Web.BackOffice.Runtime
                     factory.GetInstance<IHostingEnvironment>(),
                     factory.GetInstance<ILogger>(),
                     "~/"));
+
+            composition.RegisterUnique<IIconService, IconService>();
         }
     }
 }
