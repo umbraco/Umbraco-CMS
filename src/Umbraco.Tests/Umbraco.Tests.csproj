@@ -121,9 +121,7 @@
     <Compile Include="Composing\CompositionTests.cs" />
     <Compile Include="Composing\ContainerConformingTests.cs" />
     <Compile Include="Configurations\GlobalSettingsTests.cs" />
-    <Compile Include="CoreThings\CallContextTests.cs" />
     <Compile Include="Components\ComponentTests.cs" />
-    <Compile Include="CoreXml\RenamedRootNavigatorTests.cs" />
     <Compile Include="LegacyXmlPublishedCache\ContentXmlDto.cs" />
     <Compile Include="LegacyXmlPublishedCache\PreviewXmlDto.cs" />
     <Compile Include="Logging\LogviewerTests.cs" />
@@ -135,6 +133,9 @@
     <Compile Include="Models\VariationTests.cs" />
     <Compile Include="Persistence\Mappers\MapperTestBase.cs" />
     <Compile Include="Persistence\Repositories\DocumentRepositoryTest.cs" />
+    <Compile Include="PublishedContent\SolidPublishedSnapshot.cs" />
+    <Compile Include="Published\ConvertersTests.cs" />
+    <Compile Include="Published\ModelTypeTests.cs" />
     <Compile Include="Routing\BaseUrlProviderTest.cs" />
     <Compile Include="Routing\UrlProviderWithHideTopLevelNodeFromPathTests.cs" />
     <Compile Include="Security\BackOfficeOwinUserManagerTests.cs" />
@@ -145,14 +146,9 @@
     <Compile Include="TestHelpers\Entities\MockedPropertyTypes.cs" />
     <Compile Include="TestHelpers\Entities\MockedUser.cs" />
     <Compile Include="UmbracoExamine\ExamineExtensions.cs" />
-    <Compile Include="PropertyEditors\BlockEditorComponentTests.cs" />
-    <Compile Include="PropertyEditors\BlockListPropertyValueConverterTests.cs" />
-    <Compile Include="PropertyEditors\DataValueReferenceFactoryCollectionTests.cs" />
-    <Compile Include="PropertyEditors\NestedContentPropertyComponentTests.cs" />
     <Compile Include="PublishedContent\NuCacheChildrenTests.cs" />
     <Compile Include="PublishedContent\PublishedContentLanguageVariantTests.cs" />
     <Compile Include="PublishedContent\PublishedContentSnapshotTestBase.cs" />
-    <Compile Include="PublishedContent\SolidPublishedSnapshot.cs" />
     <Compile Include="PublishedContent\NuCacheTests.cs" />
     <Compile Include="Routing\MediaUrlProviderTests.cs" />
     <Compile Include="Routing\RoutableDocumentFilterTests.cs" />
@@ -172,10 +168,6 @@
     <Compile Include="TestHelpers\RandomIdRamDirectory.cs" />
     <Compile Include="TestHelpers\Stubs\TestUserPasswordConfig.cs" />
     <Compile Include="Testing\Objects\TestDataSource.cs" />
-    <Compile Include="Published\PublishedSnapshotTestObjects.cs" />
-    <Compile Include="Published\ModelTypeTests.cs" />
-    <Compile Include="Published\NestedContentTests.cs" />
-    <Compile Include="Published\PropertyCacheLevelTests.cs" />
     <Compile Include="IO\ShadowFileSystemTests.cs" />
     <Compile Include="Issues\U9560.cs" />
     <Compile Include="Integration\ContentEventsTests.cs" />
@@ -183,7 +175,6 @@
     <Compile Include="Packaging\PackageExtractionTests.cs" />
     <Compile Include="Persistence\NPocoTests\NPocoFetchTests.cs" />
     <Compile Include="Persistence\NPocoTests\NPocoSqlTemplateTests.cs" />
-    <Compile Include="Published\ConvertersTests.cs" />
     <Compile Include="Routing\ContentFinderByUrlAndTemplateTests.cs" />
     <Compile Include="Routing\ContentFinderByUrlTests.cs" />
     <Compile Include="Routing\ContentFinderByUrlWithDomainsTests.cs" />
@@ -221,10 +212,8 @@
     <Compile Include="Persistence\NPocoTests\NPocoSqlExtensionsTests.cs" />
     <Compile Include="Persistence\UnitOfWorkTests.cs" />
     <Compile Include="Testing\UmbracoTestBase.cs" />
-    <Compile Include="CoreThings\TryConvertToTests.cs" />
     <Compile Include="TestHelpers\TestObjects-Mocks.cs" />
     <Compile Include="TestHelpers\TestObjects.cs" />
-    <Compile Include="CoreThings\UdiTests.cs" />
     <Compile Include="UmbracoExamine\RandomIdRamDirectory.cs" />
     <Compile Include="UmbracoExamine\UmbracoContentValueSetValidatorTests.cs" />
     <Compile Include="Web\AngularIntegration\AngularAntiForgeryTests.cs" />
@@ -253,9 +242,6 @@
     <Compile Include="Routing\UrlRoutingTestBase.cs" />
     <Compile Include="Services\ContentTypeServiceExtensionsTests.cs" />
     <Compile Include="Services\PublicAccessServiceTests.cs" />
-    <Compile Include="StringNewlineExtensions.cs" />
-    <Compile Include="Strings\StylesheetHelperTests.cs" />
-    <Compile Include="Strings\StringValidationTests.cs" />
     <Compile Include="Web\Mvc\RenderNoContentControllerTests.cs" />
     <Compile Include="Web\Mvc\ValidateUmbracoFormRouteStringAttributeTests.cs" />
     <Compile Include="Web\PublishedContentQueryTests.cs" />
@@ -278,7 +264,6 @@
     <Compile Include="Cache\AppCacheTests.cs" />
     <Compile Include="Cache\HttpRequestAppCacheTests.cs" />
     <Compile Include="Cache\RuntimeAppCacheTests.cs" />
-    <Compile Include="CoreXml\FrameworkXmlTests.cs" />
     <Compile Include="Macros\MacroParserTests.cs" />
     <Compile Include="Models\ContentExtensionsTests.cs" />
     <Compile Include="Web\Mvc\MergeParentContextViewDataAttributeTests.cs" />
@@ -289,10 +274,6 @@
     <Compile Include="Persistence\Repositories\MemberTypeRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\TagRepositoryTest.cs" />
     <Compile Include="PublishedContent\PublishedContentExtensionTests.cs" />
-    <Compile Include="PropertyEditors\ColorListValidatorTest.cs" />
-    <Compile Include="PropertyEditors\MultiValuePropertyEditorTests.cs" />
-    <Compile Include="PropertyEditors\EnsureUniqueValuesValidatorTest.cs" />
-    <Compile Include="PropertyEditors\PropertyEditorValueEditorTests.cs" />
     <Compile Include="PublishedContent\PublishedRouterTests.cs" />
     <Compile Include="PublishedContent\RootNodeTests.cs" />
     <Compile Include="Scheduling\BackgroundTaskRunnerTests.cs" />
@@ -311,11 +292,7 @@
     <Compile Include="Services\UserServiceTests.cs" />
     <Compile Include="Manifest\ManifestParserTests.cs" />
     <Compile Include="Templates\ViewHelperTests.cs" />
-    <Compile Include="CoreXml\NavigableNavigatorTests.cs" />
     <Compile Include="Cache\PublishedCache\PublishedMediaCacheTests.cs" />
-    <Compile Include="Strings\CmsHelperCasingTests.cs" />
-    <Compile Include="Strings\DefaultShortStringHelperTests.cs" />
-    <Compile Include="Strings\MockShortStringHelper.cs" />
     <Compile Include="Migrations\AlterMigrationTests.cs" />
     <Compile Include="Migrations\SqlScripts\SqlResources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -341,7 +318,6 @@
     <Compile Include="PublishedContent\PublishedMediaTests.cs" />
     <Compile Include="Web\Mvc\HtmlHelperExtensionMethodsTests.cs" />
     <Compile Include="IO\IoHelperTests.cs" />
-    <Compile Include="PropertyEditors\PropertyEditorValueConverterTests.cs" />
     <Compile Include="Models\ContentTests.cs" />
     <Compile Include="Persistence\SqlCeTableByTableTest.cs" />
     <Compile Include="Persistence\DatabaseContextTests.cs" />
@@ -367,7 +343,6 @@
     <Compile Include="Persistence\Repositories\StylesheetRepositoryTest.cs" />
     <Compile Include="PublishedContent\PublishedContentMoreTests.cs" />
     <Compile Include="Publishing\PublishingStrategyTests.cs" />
-    <Compile Include="CoreThings\ObjectExtensionsTests.cs" />
     <Compile Include="Cache\PublishedCache\PublishedContentCacheTests.cs" />
     <Compile Include="Composing\LazyCollectionBuilderTests.cs" />
     <Compile Include="Composing\CollectionBuildersTests.cs" />
@@ -421,7 +396,6 @@
     <Compile Include="IO\FileSystemsTests.cs" />
     <Compile Include="IO\PhysicalFileSystemTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Strings\StringExtensionsTests.cs" />
     <Compile Include="TestHelpers\FakeHttpContextFactory.cs" />
     <Compile Include="Routing\UmbracoModuleTests.cs" />
     <Compile Include="Web\UrlHelperExtensionTests.cs" />

@@ -15,7 +15,7 @@ using Umbraco.Tests.Testing;
 namespace Umbraco.Tests.CoreXml
 {
     [TestFixture]
-    public class NavigableNavigatorTests : UmbracoTestBase
+    public class NavigableNavigatorTests
     {
         [Test]
         public void NewNavigatorIsAtRoot()

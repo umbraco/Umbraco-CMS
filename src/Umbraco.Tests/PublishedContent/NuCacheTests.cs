@@ -18,7 +18,6 @@ using Umbraco.Core.Services.Changes;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.Common;
 using Umbraco.Tests.Common.Builders;
-using Umbraco.Tests.Strings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing.Objects;
 using Umbraco.Web;
@@ -203,7 +202,7 @@ namespace Umbraco.Tests.PublishedContent
                 publishedModelFactory,
                 new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider(TestHelper.ShortStringHelper) }),
                 TestHelper.GetHostingEnvironment(),
-                new MockShortStringHelper(),
+                Mock.Of<IShortStringHelper>(),
                 TestHelper.IOHelper,
                 Microsoft.Extensions.Options.Options.Create(nuCacheSettings));
 

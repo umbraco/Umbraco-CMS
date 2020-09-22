@@ -1,22 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using Moq;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Web.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
-using Umbraco.Tests.TestHelpers;
-using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 
-namespace Umbraco.Tests.PublishedContent
+namespace Umbraco.Tests.Common.PublishedContent
 {
     public class SolidPublishedSnapshot : IPublishedSnapshot
     {
@@ -57,7 +53,7 @@ namespace Umbraco.Tests.PublishedContent
 
         public void Add(SolidPublishedContent content)
         {
-            _content[content.Id] = content.CreateModel(Current.PublishedModelFactory);
+            _content[content.Id] = content.CreateModel(Mock.Of<IPublishedModelFactory>());
         }
 
         public void Clear()

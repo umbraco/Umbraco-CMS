@@ -21,7 +21,7 @@ namespace Umbraco.Tests.PropertyEditors
     public class DataValueReferenceFactoryCollectionTests
     {
         IDataTypeService DataTypeService { get; } = Mock.Of<IDataTypeService>();
-        private IIOHelper IOHelper { get; } = TestHelper.IOHelper;
+        private IIOHelper IOHelper { get; } = Mock.Of<IIOHelper>();
         ILocalizedTextService LocalizedTextService { get; } = Mock.Of<ILocalizedTextService>();
         ILocalizationService LocalizationService { get; } = Mock.Of<ILocalizationService>();
         IShortStringHelper ShortStringHelper { get; } = Mock.Of<IShortStringHelper>();

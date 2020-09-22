@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
-using System.Web.UI.WebControls;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.PropertyEditors;
-using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.TestHelpers.Entities;
 
 namespace Umbraco.Tests.CoreThings
 {
@@ -27,20 +26,6 @@ namespace Umbraco.Tests.CoreThings
         public void TestTearDown()
         {
             Thread.CurrentThread.CurrentCulture = _savedCulture;
-        }
-
-        [Test]
-        public void CanParseStringToUnit()
-        {
-            const string stringUnit = "1234px";
-            object objUnit = "1234px";
-            var result = stringUnit.TryConvertTo<Unit>();
-            var result2 = objUnit.TryConvertTo<Unit>();
-            var unit = new Unit("1234px");
-            Assert.IsTrue(result.Success);
-            Assert.IsTrue(result2.Success);
-            Assert.AreEqual(unit, result.Result);
-            Assert.AreEqual(unit, result2.Result);
         }
 
         [Test]
@@ -301,7 +286,7 @@ namespace Umbraco.Tests.CoreThings
         [Test]
         public void Value_Editor_Can_Convert_Decimal_To_Decimal_Clr_Type()
         {
-            var valueEditor = TestHelper.CreateDataValueEditor(ValueTypes.Decimal);
+            var valueEditor = MockedValueEditors.CreateDataValueEditor(ValueTypes.Decimal);
 
             var result = valueEditor.TryConvertValueToCrlType(12.34d);
             Assert.IsTrue(result.Success);
