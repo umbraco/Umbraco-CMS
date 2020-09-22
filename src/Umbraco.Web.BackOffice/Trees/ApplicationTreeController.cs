@@ -286,7 +286,7 @@ namespace Umbraco.Web.Trees
 
              var isAllowed = await controller.ControllerContext.InvokeAuthorizationFiltersForRequest(actionContext);
              if (!isAllowed)
-                 throw new HttpResponseException();
+                 throw new HttpResponseException(HttpStatusCode.Forbidden);
 
             return controller;
         }
