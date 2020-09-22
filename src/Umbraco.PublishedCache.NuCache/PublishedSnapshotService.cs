@@ -45,7 +45,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly IProfilingLogger _profilingLogger;
         private readonly IScopeProvider _scopeProvider;
         private readonly IDataSource _dataSource;
-        private readonly Microsoft.Extensions.Logging.ILogger<PublishedSnapshotService> _logger;
+        private readonly ILogger<PublishedSnapshotService> _logger;
         private readonly ILoggerFactory _loggerFactory;
         private readonly IDocumentRepository _documentRepository;
         private readonly IMediaRepository _mediaRepository;
