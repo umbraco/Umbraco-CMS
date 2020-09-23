@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
+using Umbraco.Core.Models;
+using Umbraco.Core.Services;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
-using Umbraco.Web.Models;
-using Umbraco.Web.Services;
 
 namespace Umbraco.Web.Editors
 {

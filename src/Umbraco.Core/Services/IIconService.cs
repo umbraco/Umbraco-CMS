@@ -1,7 +1,7 @@
 using System.Collections.Generic;
-using Umbraco.Web.Models;
+using Umbraco.Core.Models;
 
-namespace Umbraco.Web.Services
+namespace Umbraco.Core.Services
 {
     public interface IIconService
     {
