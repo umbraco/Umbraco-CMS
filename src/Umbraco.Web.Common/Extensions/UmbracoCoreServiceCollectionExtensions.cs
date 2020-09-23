@@ -103,19 +103,20 @@ namespace Umbraco.Extensions
         /// <param name="umbContainer"></param>
         /// <param name="entryAssembly"></param>
         /// <param name="appCaches"></param>
-        /// <param name="httpContextAccessor"></param>
         /// <param name="loggingConfiguration"></param>
         /// <param name="factory"></param>
+        /// <param name="configuration"></param>
+        /// <param name="httpContextAccessor"></param>
         /// <returns></returns>
-        public static IServiceCollection AddUmbracoCore(
-            this IServiceCollection services,
+        public static IServiceCollection AddUmbracoCore(this IServiceCollection services,
             IWebHostEnvironment webHostEnvironment,
             IRegister umbContainer,
             Assembly entryAssembly,
             AppCaches appCaches,
             ILoggingConfiguration loggingConfiguration,
+            IConfiguration configuration,
             out IFactory factory)
-            => services.AddUmbracoCore(webHostEnvironment, umbContainer, entryAssembly, appCaches, loggingConfiguration, GetCoreRuntime, out factory);
+            => services.AddUmbracoCore(webHostEnvironment, umbContainer, entryAssembly, appCaches, loggingConfiguration, configuration, GetCoreRuntime, out factory);
 
         /// <summary>
         /// Adds the Umbraco Configuration requirements
@@ -162,10 +163,11 @@ namespace Umbraco.Extensions
         /// </summary>
         /// <param name="services"></param>
         /// <param name="webHostEnvironment"></param>
+        /// <param name="configuration"></param>
         /// <returns></returns>
-        public static IServiceCollection AddUmbracoCore(this IServiceCollection services, IWebHostEnvironment webHostEnvironment)
+        public static IServiceCollection AddUmbracoCore(this IServiceCollection services, IWebHostEnvironment webHostEnvironment, IConfiguration configuration)
         {
-            return services.AddUmbracoCore(webHostEnvironment, out _);
+            return services.AddUmbracoCore(webHostEnvironment, configuration, out _);
         }
 
         /// <summary>
@@ -173,9 +175,10 @@ namespace Umbraco.Extensions
         /// </summary>
         /// <param name="services"></param>
         /// <param name="webHostEnvironment"></param>
+        /// <param name="configuration"></param>
         /// <param name="factory"></param>
         /// <returns></returns>
-        public static IServiceCollection AddUmbracoCore(this IServiceCollection services, IWebHostEnvironment webHostEnvironment, out IFactory factory)
+        public static IServiceCollection AddUmbracoCore(this IServiceCollection services, IWebHostEnvironment webHostEnvironment, IConfiguration configuration, out IFactory factory)
         {
             if (!UmbracoServiceProviderFactory.IsActive)
                 throw new InvalidOperationException("Ensure to add UseUmbraco() in your Program.cs after ConfigureWebHostDefaults to enable Umbraco's service provider factory");
@@ -183,12 +186,11 @@ namespace Umbraco.Extensions
             var umbContainer = UmbracoServiceProviderFactory.UmbracoContainer;
 
             var loggingConfig = new LoggingConfiguration(
-                Path.Combine(webHostEnvironment.ContentRootPath, "App_Data", "Logs"),
-                Path.Combine(webHostEnvironment.ContentRootPath, "config", "serilog.config"),
-                Path.Combine(webHostEnvironment.ContentRootPath, "config", "serilog.user.config"));
+                Path.Combine(webHostEnvironment.ContentRootPath, "umbraco", "logs"));
 
             IHttpContextAccessor httpContextAccessor = new HttpContextAccessor();
             services.AddSingleton<IHttpContextAccessor>(httpContextAccessor);
+            services.AddSingleton<ILoggingConfiguration>(loggingConfig);
 
             var requestCache = new GenericDictionaryRequestAppCache(() => httpContextAccessor.HttpContext?.Items);
             var appCaches = new AppCaches(
@@ -201,6 +203,7 @@ namespace Umbraco.Extensions
                 Assembly.GetEntryAssembly(),
                 appCaches,
                 loggingConfig,
+                configuration,
                 GetCoreRuntime,
                 out factory);
 
@@ -227,6 +230,7 @@ namespace Umbraco.Extensions
             Assembly entryAssembly,
             AppCaches  appCaches,
             ILoggingConfiguration loggingConfiguration,
+            IConfiguration configuration,
             //TODO: Yep that's extremely ugly
             Func<GlobalSettings, ConnectionStrings, IUmbracoVersion, IIOHelper, ILogger, IProfiler, IHostingEnvironment, IBackOfficeInfo, ITypeFinder, AppCaches, IDbProviderFactoryCreator, IRuntime> getRuntime,
             out IFactory factory)
@@ -268,6 +272,7 @@ namespace Umbraco.Extensions
                 hostingSettings,
                 webHostEnvironment,
                 loggingConfiguration,
+                configuration,
                 out var logger, out var ioHelper, out var hostingEnvironment, out var backOfficeInfo, out var profiler);
 
             var umbracoVersion = new UmbracoVersion();
@@ -287,6 +292,13 @@ namespace Umbraco.Extensions
                 dbProviderFactoryCreator);
 
             factory = coreRuntime.Configure(container);
+
+
+            services.Configure<HostingSettings>(hostingSettings =>
+            {
+                hostingSettings.Debug = false;
+            });
+
 
             return services;
         }
@@ -338,6 +350,7 @@ namespace Umbraco.Extensions
             IOptionsMonitor<HostingSettings> hostingSettings,
             IWebHostEnvironment webHostEnvironment,
             ILoggingConfiguration loggingConfiguration,
+            IConfiguration configuration,
             out Core.Logging.ILogger logger,
             out IIOHelper ioHelper,
             out Core.Hosting.IHostingEnvironment hostingEnvironment,
@@ -349,8 +362,7 @@ namespace Umbraco.Extensions
 
             hostingEnvironment = new AspNetCoreHostingEnvironment(hostingSettings, webHostEnvironment);
             ioHelper = new IOHelper(hostingEnvironment);
-            logger = AddLogger(services, hostingEnvironment, loggingConfiguration);
-
+            logger = AddLogger(services, hostingEnvironment, loggingConfiguration, configuration);
             backOfficeInfo = new AspNetCoreBackOfficeInfo(globalSettings);
             profiler = GetWebProfiler(hostingEnvironment);
 
@@ -361,10 +373,14 @@ namespace Umbraco.Extensions
         /// Create and configure the logger
         /// </summary>
         /// <param name="hostingEnvironment"></param>
-        private static Core.Logging.ILogger AddLogger(IServiceCollection services, Core.Hosting.IHostingEnvironment hostingEnvironment, ILoggingConfiguration loggingConfiguration)
+        private static Core.Logging.ILogger AddLogger(IServiceCollection services, Core.Hosting.IHostingEnvironment hostingEnvironment, ILoggingConfiguration loggingConfiguration, IConfiguration configuration)
         {
             // Create a serilog logger
-            var logger = SerilogLogger.CreateWithDefaultConfiguration(hostingEnvironment, loggingConfiguration);
+            var logger = SerilogLogger.CreateWithDefaultConfiguration(hostingEnvironment, loggingConfiguration, configuration);
+
+            // This is nessasary to pick up all the loggins to MS ILogger.
+            Log.Logger = logger.SerilogLog;
+
 
             // Wire up all the bits that serilog needs. We need to use our own code since the Serilog ext methods don't cater to our needs since
             // we don't want to use the global serilog `Log` object and we don't have our own ILogger implementation before the HostBuilder runs which
@@ -372,7 +388,13 @@ namespace Umbraco.Extensions
             // I have created a PR to make this nicer https://github.com/serilog/serilog-extensions-hosting/pull/19 but we'll need to wait for that.
             // Also see : https://github.com/serilog/serilog-extensions-hosting/blob/dev/src/Serilog.Extensions.Hosting/SerilogHostBuilderExtensions.cs
 
-            services.AddSingleton<ILoggerFactory>(services => new SerilogLoggerFactory(logger.SerilogLog, false));
+            services.AddLogging(configure =>
+            {
+                configure.AddSerilog(logger.SerilogLog, false);
+            });
+
+
+            //services.AddSingleton<ILoggerFactory>(services => new SerilogLoggerFactory(logger.SerilogLog, false));
 
             // This won't (and shouldn't) take ownership of the logger.
             services.AddSingleton(logger.SerilogLog);

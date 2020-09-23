@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Composing;
 
 namespace Umbraco.Web.UI.NetCore
@@ -15,6 +16,10 @@ namespace Umbraco.Web.UI.NetCore
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
+                .ConfigureLogging(x =>
+                {
+                    x.ClearProviders();
+                })
                 .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); })
                 .UseUmbraco();
     }

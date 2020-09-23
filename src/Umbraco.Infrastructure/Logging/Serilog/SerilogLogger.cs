@@ -1,7 +1,9 @@
 ﻿using System;
 using System.IO;
+using Microsoft.Extensions.Configuration;
 using Serilog;
 using Serilog.Events;
+using Serilog.Extensions.Logging;
 using Umbraco.Core.Hosting;
 
 namespace Umbraco.Core.Logging.Serilog
@@ -35,13 +37,14 @@ namespace Umbraco.Core.Logging.Serilog
         /// Creates a logger with some pre-defined configuration and remainder from config file
         /// </summary>
         /// <remarks>Used by UmbracoApplicationBase to get its logger.</remarks>
-        public static SerilogLogger CreateWithDefaultConfiguration(IHostingEnvironment hostingEnvironment, ILoggingConfiguration loggingConfiguration)
+        public static SerilogLogger CreateWithDefaultConfiguration(
+            IHostingEnvironment hostingEnvironment,
+            ILoggingConfiguration loggingConfiguration,
+            IConfiguration configuration)
         {
-            var loggerConfig = new LoggerConfiguration();
-            loggerConfig
+            var loggerConfig = new LoggerConfiguration()
                 .MinimalConfiguration(hostingEnvironment, loggingConfiguration)
-                .ReadFromConfigFile(loggingConfiguration)
-                .ReadFromUserConfigFile(loggingConfiguration);
+                .ReadFrom.Configuration(configuration);
 
             return new SerilogLogger(loggerConfig);
         }
@@ -83,7 +86,7 @@ namespace Umbraco.Core.Logging.Serilog
         /// <inheritdoc/>
         public void Fatal(Type reporting, Exception exception, string message)
         {
-            var logger = LoggerFor(reporting);            
+            var logger = LoggerFor(reporting);
             logger.Fatal(exception, message);
         }
 
@@ -91,7 +94,7 @@ namespace Umbraco.Core.Logging.Serilog
         public void Fatal(Type reporting, Exception exception)
         {
             var logger = LoggerFor(reporting);
-            var message = "Exception.";            
+            var message = "Exception.";
             logger.Fatal(exception, message);
         }
 
@@ -110,14 +113,14 @@ namespace Umbraco.Core.Logging.Serilog
         /// <inheritdoc/>
         public void Fatal(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues)
         {
-            var logger = LoggerFor(reporting);            
+            var logger = LoggerFor(reporting);
             logger.Fatal(exception, messageTemplate, propertyValues);
         }
 
         /// <inheritdoc/>
         public void Error(Type reporting, Exception exception, string message)
         {
-            var logger = LoggerFor(reporting);            
+            var logger = LoggerFor(reporting);
             logger.Error(exception, message);
         }
 

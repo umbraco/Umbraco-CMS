@@ -7,7 +7,6 @@ using Serilog.Core;
 using Serilog.Events;
 using Serilog.Formatting;
 using Serilog.Formatting.Compact;
-using Umbraco.Core.IO;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging.Serilog.Enrichers;
 
@@ -48,6 +47,11 @@ namespace Umbraco.Core.Logging.Serilog
                 .Enrich.With<Log4NetLevelMapperEnricher>()
                 .Enrich.FromLogContext(); // allows us to dynamically enrich
 
+
+            logConfig.WriteTo.UmbracoFile(
+                Path.Combine(loggingConfiguration.LogDirectory, $"UmbracoTraceLog.{Environment.MachineName}..json")
+                );
+
             return logConfig;
         }
 
@@ -61,7 +65,7 @@ namespace Umbraco.Core.Logging.Serilog
         public static LoggerConfiguration OutputDefaultTextFile(
             this LoggerConfiguration logConfig,
             IHostingEnvironment hostingEnvironment,
-            ILoggingConfiguration loggingConfiguration, LogEventLevel minimumLevel = LogEventLevel.Verbose, int? retainedFileCount = null)
+            LogEventLevel minimumLevel = LogEventLevel.Verbose)
         {
             //Main .txt logfile - in similar format to older Log4Net output
             //Ends with ..txt as Date is inserted before file extension substring
@@ -79,18 +83,25 @@ namespace Umbraco.Core.Logging.Serilog
         /// <remarks>
         ///    Used in config - If renamed or moved to other assembly the config file also has be updated.
         /// </remarks>
-        public static LoggerConfiguration File(this LoggerSinkConfiguration configuration, ITextFormatter formatter,
+        public static LoggerConfiguration UmbracoFile(this LoggerSinkConfiguration configuration,
             string path,
+            ITextFormatter formatter = null,
             LogEventLevel restrictedToMinimumLevel = LogEventLevel.Verbose,
             LoggingLevelSwitch levelSwitch = null,
             long? fileSizeLimitBytes = 1073741824,
             TimeSpan? flushToDiskInterval = null,
-            RollingInterval rollingInterval = RollingInterval.Infinite,
+            RollingInterval rollingInterval = RollingInterval.Day,
             bool rollOnFileSizeLimit = false,
             int? retainedFileCountLimit = 31,
             Encoding encoding = null
    )
         {
+
+            if (formatter is null)
+            {
+                formatter = new CompactJsonFormatter();
+            }
+
             return configuration.Async(
                 asyncConfiguration => asyncConfiguration.Map(AppDomainId, (_,mapConfiguration) =>
                         mapConfiguration.File(
@@ -132,35 +143,6 @@ namespace Umbraco.Core.Logging.Serilog
                 rollingInterval: RollingInterval.Day, //Create a new JSON file every day
                 retainedFileCountLimit: retainedFileCount, //Setting to null means we keep all files - default is 31 days
                 restrictedToMinimumLevel: minimumLevel);
-
-            return logConfig;
-        }
-
-        /// <summary>
-        /// Reads settings from /config/serilog.config
-        /// That allows the main logging pipeline to be configured
-        /// </summary>
-        /// <param name="logConfig">A Serilog LoggerConfiguration</param>
-        /// <param name="loggingConfiguration"></param>
-        public static LoggerConfiguration ReadFromConfigFile(this LoggerConfiguration logConfig, ILoggingConfiguration loggingConfiguration)
-        {
-            //Read from main serilog.config file
-            logConfig.ReadFrom.AppSettings(filePath: loggingConfiguration.LogConfigurationFile);
-
-            return logConfig;
-        }
-
-        /// <summary>
-        /// Reads settings from /config/serilog.user.config
-        /// That allows a separate logging pipeline to be configured that will not affect the main Umbraco log
-        /// </summary>
-        /// <param name="logConfig">A Serilog LoggerConfiguration</param>
-        /// <param name="loggingConfiguration"></param>
-        public static LoggerConfiguration ReadFromUserConfigFile(this LoggerConfiguration logConfig, ILoggingConfiguration loggingConfiguration)
-        {
-            //A nested logger - where any user configured sinks via config can not effect the main 'umbraco' logger above
-            logConfig.WriteTo.Logger(cfg =>
-                cfg.ReadFrom.AppSettings(filePath: loggingConfiguration.UserLogConfigurationFile));
 
             return logConfig;
         }

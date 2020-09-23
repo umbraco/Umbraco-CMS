@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Threading;
 using System.Web;
 using System.Web.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Serilog.Context;
 using Umbraco.Core;
@@ -47,11 +49,9 @@ namespace Umbraco.Web
 
                 var hostingEnvironment = new AspNetHostingEnvironment(Options.Create(hostingSettings));
                 var loggingConfiguration = new LoggingConfiguration(
-                    Path.Combine(hostingEnvironment.ApplicationPhysicalPath, "App_Data\\Logs"),
-                    Path.Combine(hostingEnvironment.ApplicationPhysicalPath, "config\\serilog.config"),
-                    Path.Combine(hostingEnvironment.ApplicationPhysicalPath, "config\\serilog.user.config"));
+                    Path.Combine(hostingEnvironment.ApplicationPhysicalPath, "App_Data\\Logs"));
                 var ioHelper = new IOHelper(hostingEnvironment);
-                var logger = SerilogLogger.CreateWithDefaultConfiguration(hostingEnvironment, loggingConfiguration);
+                var logger = SerilogLogger.CreateWithDefaultConfiguration(hostingEnvironment, loggingConfiguration, new ConfigurationRoot(new List<IConfigurationProvider>()));
 
                 var backOfficeInfo = new AspNetBackOfficeInfo(globalSettings, ioHelper, logger, Options.Create(webRoutingSettings));
                 var profiler = GetWebProfiler(hostingEnvironment);
