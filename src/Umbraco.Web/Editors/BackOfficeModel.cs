@@ -1,8 +1,8 @@
 ﻿using System;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Features;
-using Umbraco.Web.Services;
 
 namespace Umbraco.Web.Editors
 {

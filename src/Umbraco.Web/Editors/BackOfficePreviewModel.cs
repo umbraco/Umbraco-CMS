@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
+using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Features;
-using Umbraco.Web.Services;
 
 namespace Umbraco.Web.Editors
 {
