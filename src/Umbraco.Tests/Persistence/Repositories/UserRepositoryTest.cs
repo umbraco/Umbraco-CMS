@@ -16,6 +16,7 @@ using Umbraco.Tests.Testing;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.PropertyEditors;
 using System;
+using Umbraco.Core.Persistence.Dtos;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
@@ -77,11 +78,43 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
+        public void Validate_Login_Session()
+        {
+            // Arrange
+            var provider = TestObjects.GetScopeProvider(Logger);
+            var user = MockedUser.CreateUser();
+            using (var scope = provider.CreateScope(autoComplete: true))
+            {
+                var repository = CreateRepository(provider);                
+                repository.Save(user);                
+            }
+
+            using (var scope = provider.CreateScope(autoComplete: true))
+            {
+                var repository = CreateRepository(provider);
+                var sessionId = repository.CreateLoginSession(user.Id, "1.2.3.4");
+
+                // manually update this record to be in the past
+                scope.Database.Execute(SqlContext.Sql()
+                    .Update<UserLoginDto>(u => u.Set(x => x.LoggedOutUtc, DateTime.UtcNow.AddDays(-100)))
+                    .Where<UserLoginDto>(x => x.SessionId == sessionId));
+
+                var isValid = repository.ValidateLoginSession(user.Id, sessionId);
+                Assert.IsFalse(isValid);
+
+                // create a new one
+                sessionId = repository.CreateLoginSession(user.Id, "1.2.3.4");
+                isValid = repository.ValidateLoginSession(user.Id, sessionId);
+                Assert.IsTrue(isValid);
+            }
+        }
+
+        [Test]
         public void Can_Perform_Add_On_UserRepository()
         {
             // Arrange
             var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
+            using (var scope = provider.CreateScope(autoComplete: true))
             {
                 var repository = CreateRepository(provider);
 
@@ -101,7 +134,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
+            using (var scope = provider.CreateScope(autoComplete: true))
             {
                 var repository = CreateRepository(provider);
 
@@ -125,7 +158,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
+            using (var scope = provider.CreateScope(autoComplete: true))
             {
                 var repository = CreateRepository(provider);
 
@@ -150,7 +183,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
             // Arrange
             var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
+            using (var scope = provider.CreateScope(autoComplete: true))
             {
                 var userRepository = CreateRepository(provider);
                 var contentRepository = CreateContentRepository(provider, out var contentTypeRepo);
@@ -209,7 +242,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
+            using (var scope = provider.CreateScope(autoComplete: true))
             {
                 var repository = CreateRepository(provider);
 
@@ -237,7 +270,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
+            using (var scope = provider.CreateScope(autoComplete: true))
             {
                 var repository = CreateRepository(provider);
                 var userGroupRepository = CreateUserGroupRepository(provider);
@@ -260,7 +293,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
+            using (var scope = provider.CreateScope(autoComplete: true))
             {
                 var repository = CreateRepository(provider);
 
@@ -280,7 +313,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
+            using (var scope = provider.CreateScope(autoComplete: true))
             {
                 var repository = CreateRepository(provider);
 
@@ -301,7 +334,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
+            using (var scope = provider.CreateScope(autoComplete: true))
             {
                 var repository = CreateRepository(provider);
 
@@ -322,7 +355,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
+            using (var scope = provider.CreateScope(autoComplete: true))
             {
                 var repository = CreateRepository(provider);
 
@@ -341,7 +374,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
+            using (var scope = provider.CreateScope(autoComplete: true))
             {
                 var repository = CreateRepository(provider);
 
@@ -360,7 +393,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Get_Paged_Results_By_Query_And_Filter_And_Groups()
         {
             var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
+            using (var scope = provider.CreateScope(autoComplete: true))
             {
                 var repository = CreateRepository(provider);
 
@@ -393,7 +426,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Get_Paged_Results_With_Filter_And_Groups()
         {
             var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
+            using (var scope = provider.CreateScope(autoComplete: true))
             {
                 var repository = CreateRepository(provider);
 
@@ -426,7 +459,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
+            using (var scope = provider.CreateScope(autoComplete: true))
             {
                 var repository = CreateRepository(provider);
                 var userGroupRepository = CreateUserGroupRepository(provider);
