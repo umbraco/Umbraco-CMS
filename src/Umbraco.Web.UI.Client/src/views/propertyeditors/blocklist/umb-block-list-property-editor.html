@@ -10,6 +10,7 @@
 
                 <button type="button"
                         class="btn-reset umb-block-list__block--create-button"
+                        ng-hide="vm.validationLimit.max && vm.layout.length >= vm.validationLimit.max"
                         ng-click="vm.showCreateDialog($index, $event)"
                         ng-controller="Umbraco.PropertyEditors.BlockListPropertyEditor.CreateButtonController as inlineCreateButtonCtrl"
                         ng-mousemove="inlineCreateButtonCtrl.onMouseMove($event)">
@@ -25,7 +26,7 @@
         </div>
 
         <button ng-if="vm.loading !== true"
-                ng-hide="vm.validationLimit.max && vm.layout.length === vm.validationLimit.max"
+                ng-hide="vm.validationLimit.max && vm.layout.length >= vm.validationLimit.max"
                 id="{{vm.model.alias}}"
                 type="button"
                 class="btn-reset umb-block-list__create-button umb-outline"
