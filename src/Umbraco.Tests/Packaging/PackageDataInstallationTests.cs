@@ -7,18 +7,18 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Composing.CompositionExtensions;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Packaging;
 using Umbraco.Core.Packaging;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Tests.Services;
 using Umbraco.Tests.Services.Importing;
 using Umbraco.Tests.Testing;
-using Umbraco.Core.Composing.CompositionExtensions;
-using Umbraco.Core.Strings;
-using Umbraco.Tests.Common.Builders;
 
 namespace Umbraco.Tests.Packaging
 {
@@ -713,7 +713,7 @@ namespace Umbraco.Tests.Packaging
 
         private void AddLanguages()
         {
-            var globalSettings = new GlobalSettingsBuilder().Build();
+            var globalSettings = new GlobalSettings();
             var norwegian = new Core.Models.Language(globalSettings, "nb-NO");
             var english = new Core.Models.Language(globalSettings, "en-GB");
             ServiceContext.LocalizationService.Save(norwegian, 0);

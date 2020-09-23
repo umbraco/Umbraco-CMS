@@ -40,7 +40,7 @@ namespace Umbraco.ModelsBuilder.Embedded
         private static readonly Regex AssemblyVersionRegex = new Regex("AssemblyVersion\\(\"[0-9]+.[0-9]+.[0-9]+.[0-9]+\"\\)", RegexOptions.Compiled);
         private static readonly string[] OurFiles = { "models.hash", "models.generated.cs", "all.generated.cs", "all.dll.path", "models.err", "Compiled" };
 
-        private readonly ModelsBuilderConfig _config;
+        private readonly ModelsBuilderSettings _config;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IApplicationShutdownRegistry _hostingLifetime;
         private readonly ModelsGenerationError _errors;
@@ -50,7 +50,7 @@ namespace Umbraco.ModelsBuilder.Embedded
             Lazy<UmbracoServices> umbracoServices,
             IProfilingLogger profilingLogger,
             Microsoft.Extensions.Logging.ILogger<PureLiveModelFactory> logger,
-            IOptions<ModelsBuilderConfig> config,
+            IOptions<ModelsBuilderSettings> config,
             IHostingEnvironment hostingEnvironment,
             IApplicationShutdownRegistry hostingLifetime,
             IPublishedValueFallback publishedValueFallback)

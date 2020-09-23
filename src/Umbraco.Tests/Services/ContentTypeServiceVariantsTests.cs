@@ -8,11 +8,8 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.Install;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence;
@@ -21,8 +18,6 @@ using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
-using Umbraco.Tests.Common.Builders;
-using Umbraco.Tests.Strings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
@@ -63,7 +58,7 @@ namespace Umbraco.Tests.Services
 
             var typeFinder = TestHelper.GetTypeFinder();
 
-            var nuCacheSettings = new NuCacheSettingsBuilder().Build();
+            var nuCacheSettings = new NuCacheSettings();
 
             return new PublishedSnapshotService(
                 options,
@@ -79,12 +74,12 @@ namespace Umbraco.Tests.Services
                 documentRepository, mediaRepository, memberRepository,
                 DefaultCultureAccessor,
                 new DatabaseDataSource(Mock.Of<ILogger<DatabaseDataSource>>()),
-                Microsoft.Extensions.Options.Options.Create(globalSettings ?? new GlobalSettingsBuilder().Build()),
+                Microsoft.Extensions.Options.Options.Create(globalSettings ?? new GlobalSettings()),
                 Factory.GetInstance<IEntityXmlSerializer>(),
                 Mock.Of<IPublishedModelFactory>(),
                 new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider(ShortStringHelper) }),
                 hostingEnvironment,
-                new MockShortStringHelper(),
+                Mock.Of<IShortStringHelper>(),
                 IOHelper,
                 Microsoft.Extensions.Options.Options.Create(nuCacheSettings));
         }
@@ -315,7 +310,7 @@ namespace Umbraco.Tests.Services
             var nlContentName = "Content nl-NL";
             var nlCulture = "nl-NL";
 
-            var globalSettings = new GlobalSettingsBuilder().Build();
+            var globalSettings = new GlobalSettings();
 
             ServiceContext.LocalizationService.Save(new Language(globalSettings, nlCulture));
 
@@ -673,7 +668,7 @@ namespace Umbraco.Tests.Services
             // can change it to variant and back
             // can then switch one property to variant
 
-            var globalSettings = new GlobalSettingsBuilder().Build();
+            var globalSettings = new GlobalSettings();
 
             var languageEn = new Language(globalSettings, "en") { IsDefault = true };
             ServiceContext.LocalizationService.Save(languageEn);
@@ -1268,7 +1263,7 @@ namespace Umbraco.Tests.Services
 
         private void CreateFrenchAndEnglishLangs()
         {
-            var globalSettings = new GlobalSettingsBuilder().Build();
+            var globalSettings = new GlobalSettings();
             var languageEn = new Language(globalSettings, "en") { IsDefault = true };
             ServiceContext.LocalizationService.Save(languageEn);
             var languageFr = new Language(globalSettings, "fr");

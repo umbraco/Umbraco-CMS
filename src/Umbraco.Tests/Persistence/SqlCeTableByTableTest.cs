@@ -19,7 +19,7 @@ namespace Umbraco.Tests.Persistence
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class SqlCeTableByTableTest : TestWithDatabaseBase
     {
-        public GlobalSettings GlobalSettings => new GlobalSettingsBuilder().Build();
+        public GlobalSettings GlobalSettings => new GlobalSettings();
         private static ILoggerFactory _loggerFactory = NullLoggerFactory.Instance;
 
         [Test]

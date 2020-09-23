@@ -19,6 +19,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.Configuration.Models.Validation;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Logging.Serilog;
@@ -128,29 +129,32 @@ namespace Umbraco.Extensions
         {
             if (configuration == null) throw new ArgumentNullException(nameof(configuration));
 
-            services.Configure<ActiveDirectorySettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "ActiveDirectory"));
-            services.Configure<ConnectionStrings>(configuration.GetSection("ConnectionStrings"), o => o.BindNonPublicProperties = true);
-            services.Configure<ContentSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "Content"));
-            services.Configure<CoreDebugSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "Core:Debug"));
-            services.Configure<ExceptionFilterSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "ExceptionFilter"));
-            services.Configure<GlobalSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "Global"));
-            services.Configure<HealthChecksSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "HealthChecks"));
-            services.Configure<HostingSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "Hosting"));
-            services.Configure<ImagingSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "Imaging"));
-            services.Configure<IndexCreatorSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "Examine"));
-            services.Configure<KeepAliveSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "KeepAlive"));
-            services.Configure<LoggingSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "Logging"));
-            services.Configure<MemberPasswordConfigurationSettings>(configuration.GetSection(Constants.Configuration.ConfigSecurityPrefix + "MemberPassword"));
-            services.Configure<ModelsBuilderConfig>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "ModelsBuilder"));
-            services.Configure<NuCacheSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "NuCache"));
-            services.Configure<RequestHandlerSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "RequestHandler"));
-            services.Configure<RuntimeSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "Runtime"));
-            services.Configure<SecuritySettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "Security"));
-            services.Configure<TourSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "Tours"));
-            services.Configure<TypeFinderSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "TypeFinder"));
-            services.Configure<UserPasswordConfigurationSettings>(configuration.GetSection(Constants.Configuration.ConfigSecurityPrefix + "UserPassword"));
-            services.Configure<WebRoutingSettings>(configuration.GetSection(Constants.Configuration.ConfigPrefix + "WebRouting"));
+            services.AddSingleton<IValidateOptions<ContentSettings>, ContentSettingsValidator>();
+            services.AddSingleton<IValidateOptions<GlobalSettings>, GlobalSettingsValidator>();
+            services.AddSingleton<IValidateOptions<RequestHandlerSettings>, RequestHandlerSettingsValidator>();
 
+            services.Configure<ActiveDirectorySettings>(configuration.GetSection(Constants.Configuration.ConfigActiveDirectory));
+            services.Configure<ConnectionStrings>(configuration.GetSection("ConnectionStrings"), o => o.BindNonPublicProperties = true);
+            services.Configure<ContentSettings>(configuration.GetSection(Constants.Configuration.ConfigContent));
+            services.Configure<CoreDebugSettings>(configuration.GetSection(Constants.Configuration.ConfigCoreDebug));
+            services.Configure<ExceptionFilterSettings>(configuration.GetSection(Constants.Configuration.ConfigExceptionFilter));
+            services.Configure<GlobalSettings>(configuration.GetSection(Constants.Configuration.ConfigGlobal));
+            services.Configure<HealthChecksSettings>(configuration.GetSection(Constants.Configuration.ConfigHealthChecks));
+            services.Configure<HostingSettings>(configuration.GetSection(Constants.Configuration.ConfigHosting));
+            services.Configure<ImagingSettings>(configuration.GetSection(Constants.Configuration.ConfigImaging));
+            services.Configure<IndexCreatorSettings>(configuration.GetSection(Constants.Configuration.ConfigExamine));
+            services.Configure<KeepAliveSettings>(configuration.GetSection(Constants.Configuration.ConfigKeepAlive));
+            services.Configure<LoggingSettings>(configuration.GetSection(Constants.Configuration.ConfigLogging));
+            services.Configure<MemberPasswordConfigurationSettings>(configuration.GetSection(Constants.Configuration.ConfigMemberPassword));
+            services.Configure<ModelsBuilderSettings>(configuration.GetSection(Constants.Configuration.ConfigModelsBuilder), o => o.BindNonPublicProperties = true);
+            services.Configure<NuCacheSettings>(configuration.GetSection(Constants.Configuration.ConfigNuCache));
+            services.Configure<RequestHandlerSettings>(configuration.GetSection(Constants.Configuration.ConfigRequestHandler));
+            services.Configure<RuntimeSettings>(configuration.GetSection(Constants.Configuration.ConfigRuntime));
+            services.Configure<SecuritySettings>(configuration.GetSection(Constants.Configuration.ConfigSecurity));
+            services.Configure<TourSettings>(configuration.GetSection(Constants.Configuration.ConfigTours));
+            services.Configure<TypeFinderSettings>(configuration.GetSection(Constants.Configuration.ConfigTypeFinder));
+            services.Configure<UserPasswordConfigurationSettings>(configuration.GetSection(Constants.Configuration.ConfigUserPassword));
+            services.Configure<WebRoutingSettings>(configuration.GetSection(Constants.Configuration.ConfigWebRouting));
 
             return services;
         }

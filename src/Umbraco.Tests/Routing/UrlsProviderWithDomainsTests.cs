@@ -5,11 +5,11 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Common;
-using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Web;
 using Umbraco.Web.Routing;
@@ -178,9 +178,8 @@ namespace Umbraco.Tests.Routing
         [TestCase(10011, "https://domain1.com", false, "/1001-1/")]
         public void Get_Url_SimpleDomain(int nodeId, string currentUrl, bool absolute, string expected)
         {
-            var requestHandlerSettings = new RequestHandlerSettingsBuilder().WithAddTrailingSlash(true).Build();
-
-            var globalSettings = new GlobalSettingsBuilder().WithHideTopLevelNodeFromPath(false).Build();
+            var requestHandlerSettings = new RequestHandlerSettings { AddTrailingSlash = true };
+            var globalSettings = new GlobalSettings { HideTopLevelNodeFromPath = false };
 
             var umbracoContext = GetUmbracoContext("/test", 1111, globalSettings: globalSettings);
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
@@ -213,8 +212,8 @@ namespace Umbraco.Tests.Routing
         [TestCase(10011, "https://domain1.com", false, "http://domain1.com/foo/1001-1/")]
         public void Get_Url_SimpleWithSchemeAndPath(int nodeId, string currentUrl, bool absolute, string expected)
         {
-            var requestHandlerSettings = new RequestHandlerSettingsBuilder().WithAddTrailingSlash(true).Build();
-            var globalSettings = new GlobalSettingsBuilder().WithHideTopLevelNodeFromPath(false).Build();
+            var requestHandlerSettings = new RequestHandlerSettings { AddTrailingSlash = true };
+            var globalSettings = new GlobalSettings { HideTopLevelNodeFromPath = false };
 
             var umbracoContext = GetUmbracoContext("/test", 1111, globalSettings: globalSettings);
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
@@ -239,9 +238,8 @@ namespace Umbraco.Tests.Routing
         [TestCase(1002, "http://domain1.com", false, "/1002/")]
         public void Get_Url_DeepDomain(int nodeId, string currentUrl, bool absolute, string expected)
         {
-            var requestHandlerSettings = new RequestHandlerSettingsBuilder().WithAddTrailingSlash(true).Build();
-
-            var globalSettings = new GlobalSettingsBuilder().WithHideTopLevelNodeFromPath(false).Build();
+            var requestHandlerSettings = new RequestHandlerSettings { AddTrailingSlash = true };
+            var globalSettings = new GlobalSettings { HideTopLevelNodeFromPath = false };
 
             var umbracoContext = GetUmbracoContext("/test", 1111, globalSettings: globalSettings);
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
@@ -272,9 +270,8 @@ namespace Umbraco.Tests.Routing
         [TestCase(100321, "http://domain3.com", false, "/fr/1003-2-1/")]
         public void Get_Url_NestedDomains(int nodeId, string currentUrl, bool absolute, string expected)
         {
-            var requestHandlerSettings = new RequestHandlerSettingsBuilder().WithAddTrailingSlash(true).Build();
-
-            var globalSettings = new GlobalSettingsBuilder().WithHideTopLevelNodeFromPath(false).Build();
+            var requestHandlerSettings = new RequestHandlerSettings { AddTrailingSlash = true };
+            var globalSettings = new GlobalSettings { HideTopLevelNodeFromPath = false };
 
             var umbracoContext = GetUmbracoContext("/test", 1111, globalSettings: globalSettings);
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
@@ -296,9 +293,8 @@ namespace Umbraco.Tests.Routing
         [Test]
         public void Get_Url_DomainsAndCache()
         {
-            var requestHandlerSettings = new RequestHandlerSettingsBuilder().WithAddTrailingSlash(true).Build();
-
-            var globalSettings = new GlobalSettingsBuilder().WithHideTopLevelNodeFromPath(false).Build();
+            var requestHandlerSettings = new RequestHandlerSettings { AddTrailingSlash = true };
+            var globalSettings = new GlobalSettings { HideTopLevelNodeFromPath = false };
 
             var umbracoContext = GetUmbracoContext("/test", 1111, globalSettings: globalSettings);
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
@@ -362,9 +358,8 @@ namespace Umbraco.Tests.Routing
         [Test]
         public void Get_Url_Relative_Or_Absolute()
         {
-            var requestHandlerSettings = new RequestHandlerSettingsBuilder().WithAddTrailingSlash(true).Build();
-
-            var globalSettings = new GlobalSettingsBuilder().WithHideTopLevelNodeFromPath(false).Build();
+            var requestHandlerSettings = new RequestHandlerSettings { AddTrailingSlash = true };
+            var globalSettings = new GlobalSettings { HideTopLevelNodeFromPath = false };
 
             var umbracoContext = GetUmbracoContext("http://domain1.com/test", 1111, globalSettings: globalSettings);
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
@@ -389,9 +384,8 @@ namespace Umbraco.Tests.Routing
         [Test]
         public void Get_Url_Alternate()
         {
-            var requestHandlerSettings = new RequestHandlerSettingsBuilder().WithAddTrailingSlash(true).Build();
-
-            var globalSettings = new GlobalSettingsBuilder().WithHideTopLevelNodeFromPath(false).Build();
+            var requestHandlerSettings = new RequestHandlerSettings { AddTrailingSlash = true };
+            var globalSettings = new GlobalSettings { HideTopLevelNodeFromPath = false };
 
             var umbracoContext = GetUmbracoContext("http://domain1.com/en/test", 1111, globalSettings: globalSettings);
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
@@ -418,7 +412,7 @@ namespace Umbraco.Tests.Routing
 
         private IPublishedUrlProvider GetPublishedUrlProvider(IUmbracoContext umbracoContext, DefaultUrlProvider urlProvider)
         {
-            var webRoutingSettings = new WebRoutingSettingsBuilder().Build();
+            var webRoutingSettings = new WebRoutingSettings();
             return new UrlProvider(
                 new TestUmbracoContextAccessor(umbracoContext),
                 Microsoft.Extensions.Options.Options.Create(webRoutingSettings),

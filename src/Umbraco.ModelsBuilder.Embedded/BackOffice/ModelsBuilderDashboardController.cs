@@ -23,14 +23,14 @@ namespace Umbraco.ModelsBuilder.Embedded.BackOffice
     [UmbracoApplicationAuthorize(Core.Constants.Applications.Settings)]
     public class ModelsBuilderDashboardController : UmbracoAuthorizedJsonController
     {
-        private readonly ModelsBuilderConfig _config;
+        private readonly ModelsBuilderSettings _config;
         private readonly ModelsGenerator _modelGenerator;
         private readonly OutOfDateModelsStatus _outOfDateModels;
         private readonly ModelsGenerationError _mbErrors;
         private readonly DashboardReport _dashboardReport;
         private readonly IHostingEnvironment _hostingEnvironment;
 
-        public ModelsBuilderDashboardController(IOptions<ModelsBuilderConfig> config, ModelsGenerator modelsGenerator, OutOfDateModelsStatus outOfDateModels, ModelsGenerationError mbErrors, IHostingEnvironment hostingEnvironment)
+        public ModelsBuilderDashboardController(IOptions<ModelsBuilderSettings> config, ModelsGenerator modelsGenerator, OutOfDateModelsStatus outOfDateModels, ModelsGenerationError mbErrors, IHostingEnvironment hostingEnvironment)
         {
             //_umbracoServices = umbracoServices;
             _config = config.Value;

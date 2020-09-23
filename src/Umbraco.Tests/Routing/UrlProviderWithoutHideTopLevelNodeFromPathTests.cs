@@ -9,7 +9,6 @@ using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Tests.Common;
-using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Tests.PublishedContent;
 using Umbraco.Tests.Testing;
@@ -26,7 +25,7 @@ namespace Umbraco.Tests.Routing
 
         public UrlProviderWithoutHideTopLevelNodeFromPathTests()
         {
-            _globalSettings = new GlobalSettingsBuilder().WithHideTopLevelNodeFromPath(HideTopLevelNodeFromPath).Build();
+            _globalSettings = new GlobalSettings { HideTopLevelNodeFromPath = HideTopLevelNodeFromPath };
         }
 
         protected override bool HideTopLevelNodeFromPath => false;
@@ -44,7 +43,7 @@ namespace Umbraco.Tests.Routing
         [Test]
         public void Ensure_Cache_Is_Correct()
         {
-            var requestHandlerSettings = new RequestHandlerSettingsBuilder().WithAddTrailingSlash(false).Build();
+            var requestHandlerSettings = new RequestHandlerSettings { AddTrailingSlash = false };
 
             var umbracoContext = GetUmbracoContext("/test", 1111, globalSettings: _globalSettings);
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
@@ -105,7 +104,7 @@ namespace Umbraco.Tests.Routing
         [TestCase(1172, "/test-page/")]
         public void Get_Url_Not_Hiding_Top_Level(int nodeId, string niceUrlMatch)
         {
-            var requestHandlerSettings = new RequestHandlerSettingsBuilder().WithAddTrailingSlash(true).Build();
+            var requestHandlerSettings = new RequestHandlerSettings { AddTrailingSlash = true };
 
             var umbracoContext = GetUmbracoContext("/test", 1111, globalSettings: _globalSettings);
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
@@ -125,7 +124,7 @@ namespace Umbraco.Tests.Routing
         {
             const string currentUri = "http://example.us/test";
 
-            var requestHandlerSettings = new RequestHandlerSettingsBuilder().WithAddTrailingSlash(true).Build();
+            var requestHandlerSettings = new RequestHandlerSettings { AddTrailingSlash = true };
 
             var contentType = new PublishedContentType(Guid.NewGuid(), 666, "alias", PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.Culture);
             var publishedContent = new SolidPublishedContent(contentType) { Id = 1234 };
@@ -171,7 +170,7 @@ namespace Umbraco.Tests.Routing
         {
             const string currentUri = "http://example.fr/test";
 
-            var requestHandlerSettings = new RequestHandlerSettingsBuilder().WithAddTrailingSlash(true).Build();
+            var requestHandlerSettings = new RequestHandlerSettings { AddTrailingSlash = true };
 
             var contentType = new PublishedContentType(Guid.NewGuid(), 666, "alias", PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.Culture);
             var publishedContent = new SolidPublishedContent(contentType) { Id = 1234 };
@@ -226,7 +225,7 @@ namespace Umbraco.Tests.Routing
         {
             const string currentUri = "http://example.us/test";
 
-            var requestHandlerSettings = new RequestHandlerSettingsBuilder().WithAddTrailingSlash(true).Build();
+            var requestHandlerSettings = new RequestHandlerSettings { AddTrailingSlash = true };
 
             var contentType = new PublishedContentType(Guid.NewGuid(), 666, "alias", PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.Culture);
             var publishedContent = new SolidPublishedContent(contentType) { Id = 1234 };
@@ -277,7 +276,7 @@ namespace Umbraco.Tests.Routing
         [Test]
         public void Get_Url_Relative_Or_Absolute()
         {
-            var requestHandlerSettings = new RequestHandlerSettingsBuilder().WithAddTrailingSlash(true).Build();
+            var requestHandlerSettings = new RequestHandlerSettings { AddTrailingSlash = true };
 
             var umbracoContext = GetUmbracoContext("http://example.com/test", 1111, globalSettings: _globalSettings);
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
@@ -297,7 +296,7 @@ namespace Umbraco.Tests.Routing
         [Test]
         public void Get_Url_Unpublished()
         {
-            var requestHandlerSettings = new RequestHandlerSettingsBuilder().Build();
+            var requestHandlerSettings = new RequestHandlerSettings();
 
             var urlProvider = new DefaultUrlProvider(Microsoft.Extensions.Options.Options.Create(requestHandlerSettings),
                 LoggerFactory.CreateLogger<DefaultUrlProvider>(),

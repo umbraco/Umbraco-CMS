@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Globalization;
-using System.Linq;
 using System.Web.Mvc;
 using System.Web.Routing;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -8,22 +7,20 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Web.Composing;
-using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
-using Umbraco.Core.Strings;
+using Umbraco.Tests.Common;
 using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
-using Umbraco.Tests.Common;
 using Umbraco.Web;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
-using Umbraco.Tests.Common.Builders;
 
 namespace Umbraco.Tests.Web.Mvc
 {
@@ -389,7 +386,7 @@ namespace Umbraco.Tests.Web.Mvc
         {
             var umbracoContext = GetUmbracoContext("/dang", 0);
 
-            var webRoutingSettings = new WebRoutingSettingsBuilder().Build();
+            var webRoutingSettings = new WebRoutingSettings();
             var publishedRouter = BaseWebTest.CreatePublishedRouter(webRoutingSettings);
             var frequest = publishedRouter.CreateRequest(umbracoContext,  new Uri("http://localhost/dang"));
 

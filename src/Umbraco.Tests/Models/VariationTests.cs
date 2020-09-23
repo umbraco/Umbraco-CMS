@@ -4,12 +4,12 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.TestHelpers.Entities;
 using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.Models
@@ -37,7 +37,7 @@ namespace Umbraco.Tests.Models
 
             var dataEditors = new DataEditorCollection(new IDataEditor[]
             {
-                new DataEditor(NullLoggerFactory.Instance, Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>()) { Alias = "editor", ExplicitValueEditor = TestHelper.CreateDataValueEditor("view") }
+                new DataEditor(NullLoggerFactory.Instance, Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>()) { Alias = "editor", ExplicitValueEditor = MockedValueEditors.CreateDataValueEditor("view") }
             });
             var propertyEditors = new PropertyEditorCollection(dataEditors);
 

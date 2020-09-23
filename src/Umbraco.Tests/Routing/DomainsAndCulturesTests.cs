@@ -1,13 +1,9 @@
-﻿using Moq;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Routing;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
-using Umbraco.Tests.Common.Builders;
+using Umbraco.Core.Configuration.Models;
 
 namespace Umbraco.Tests.Routing
 {
@@ -268,8 +264,7 @@ namespace Umbraco.Tests.Routing
         {
             SetDomains1();
 
-
-            var globalSettings = new GlobalSettingsBuilder().WithHideTopLevelNodeFromPath(false).Build();
+            var globalSettings = new GlobalSettings { HideTopLevelNodeFromPath = false };
 
             var umbracoContext = GetUmbracoContext(inputUrl, globalSettings:globalSettings);
             var publishedRouter = CreatePublishedRouter(Factory);
@@ -317,7 +312,7 @@ namespace Umbraco.Tests.Routing
             // defaults depend on test environment
             expectedCulture = expectedCulture ?? System.Threading.Thread.CurrentThread.CurrentUICulture.Name;
 
-            var globalSettings = new GlobalSettingsBuilder().WithHideTopLevelNodeFromPath(false).Build();
+            var globalSettings = new GlobalSettings { HideTopLevelNodeFromPath = false };
 
             var umbracoContext = GetUmbracoContext(inputUrl, globalSettings:globalSettings);
             var publishedRouter = CreatePublishedRouter(Factory);
@@ -371,7 +366,7 @@ namespace Umbraco.Tests.Routing
         {
             SetDomains3();
 
-            var globalSettings = new GlobalSettingsBuilder().WithHideTopLevelNodeFromPath(false).Build();
+            var globalSettings = new GlobalSettings { HideTopLevelNodeFromPath = false };
             var umbracoContext = GetUmbracoContext(inputUrl, globalSettings:globalSettings);
             var publishedRouter = CreatePublishedRouter(Factory);
             var frequest = publishedRouter.CreateRequest(umbracoContext);

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Web.Routing;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -8,12 +6,8 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Events;
-using Umbraco.Core.Install;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence.Repositories;
@@ -22,17 +16,13 @@ using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
 using Umbraco.Tests.Common;
-using Umbraco.Tests.Common.Builders;
-using Umbraco.Tests.Strings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
-using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web;
 using Umbraco.Web.Cache;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.NuCache;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
-using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 using Current = Umbraco.Web.Composing.Current;
 
@@ -91,7 +81,7 @@ namespace Umbraco.Tests.Scoping
 
             var typeFinder = TestHelper.GetTypeFinder();
 
-            var nuCacheSettings = new NuCacheSettingsBuilder().Build();
+            var nuCacheSettings = new NuCacheSettings();
 
             return new PublishedSnapshotService(
                 options,
@@ -107,12 +97,12 @@ namespace Umbraco.Tests.Scoping
                 documentRepository, mediaRepository, memberRepository,
                 DefaultCultureAccessor,
                 new DatabaseDataSource(Mock.Of<ILogger<DatabaseDataSource>>()),
-                Microsoft.Extensions.Options.Options.Create(globalSettings ?? new GlobalSettingsBuilder().Build()),
+                Microsoft.Extensions.Options.Options.Create(globalSettings ?? new GlobalSettings()),
                 Factory.GetInstance<IEntityXmlSerializer>(),
                 new NoopPublishedModelFactory(),
                 new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider(ShortStringHelper) }),
                 hostingEnvironment,
-                new MockShortStringHelper(),
+                Mock.Of<IShortStringHelper>(),
                 IOHelper,
                 Microsoft.Extensions.Options.Options.Create(nuCacheSettings));
         }

@@ -5,13 +5,11 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
-using Umbraco.Tests.Common.Builders;
-using Umbraco.Tests.Strings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
@@ -34,7 +32,7 @@ namespace Umbraco.Tests.Models
             // and then, this will reset the width, height... because the file does not exist, of course ;-(
             var loggerFactory = NullLoggerFactory.Instance;
             var scheme = Mock.Of<IMediaPathScheme>();
-            var contentSettings = new ContentSettingsBuilder().Build();
+            var contentSettings = new ContentSettings();
 
             var mediaFileSystem = new MediaFileSystem(Mock.Of<IFileSystem>(), scheme, loggerFactory.CreateLogger<MediaFileSystem>(), ShortStringHelper);
             var ignored = new FileUploadPropertyEditor(loggerFactory, mediaFileSystem, Microsoft.Extensions.Options.Options.Create(contentSettings), DataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper);

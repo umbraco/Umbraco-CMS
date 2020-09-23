@@ -1,5 +1,4 @@
-﻿using Moq;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Tests.Common.Builders;
@@ -24,7 +23,7 @@ namespace Umbraco.Tests.Configurations
                 ApplicationVirtualPath = rootPath
             }));
 
-            var globalSettings = new GlobalSettingsBuilder().WithUmbracoPath(path).Build();
+            var globalSettings = new GlobalSettings { UmbracoPath = path };
 
             Assert.AreEqual(outcome, globalSettings.GetUmbracoMvcAreaNoCache(hostingEnvironment));
         }

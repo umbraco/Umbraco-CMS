@@ -152,7 +152,7 @@ namespace Umbraco.Tests.TestHelpers
 
         protected virtual string GetDbConnectionString()
         {
-            return @"Datasource=|DataDirectory|UmbracoNPocoTests.sdf;Flush Interval=1;";
+            return @"DataSource=|DataDirectory|UmbracoNPocoTests.sdf;Flush Interval=1;";
         }
 
 
@@ -375,7 +375,7 @@ namespace Umbraco.Tests.TestHelpers
                 httpContextAccessor,
                 service,
                 Mock.Of<IBackofficeSecurity>(),
-                globalSettings ?? new GlobalSettingsBuilder().Build(),
+                globalSettings ?? new GlobalSettings(),
                 HostingEnvironment,
                 new TestVariationContextAccessor(),
                 UriUtility,

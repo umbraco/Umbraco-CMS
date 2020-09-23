@@ -18,7 +18,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Extensions
         public void Setup()
         {
             _hostEnvironment = Mock.Of<IWebHostEnvironment>();
-            _globalSettings = new GlobalSettingsBuilder().Build();
+            _globalSettings = new GlobalSettings();
         }
 
         private IWebHostEnvironment _hostEnvironment;
@@ -69,7 +69,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Extensions
 
         private AspNetCoreHostingEnvironment CreateHostingEnvironment(string virtualPath = "")
         {
-            var hostingSettings = new HostingSettingsBuilder().WithApplicationVirtualPath(virtualPath).Build();
+            var hostingSettings = new HostingSettings { ApplicationVirtualPath = virtualPath };
             var mockedOptionsMonitorOfHostingSettings = Mock.Of<IOptionsMonitor<HostingSettings>>(x => x.CurrentValue == hostingSettings);
             return new AspNetCoreHostingEnvironment(mockedOptionsMonitorOfHostingSettings, _hostEnvironment);
         }

@@ -62,7 +62,7 @@ namespace Umbraco.Web.Routing
         }
 
         /// <summary>
-        /// Returns the content id based on the configured IContentErrorPage section
+        /// Returns the content id based on the configured ContentErrorPage section.
         /// </summary>
         /// <param name="errorPage"></param>
         /// <param name="entityService"></param>

@@ -10,13 +10,12 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Scoping;
-using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Components
@@ -36,13 +35,13 @@ namespace Umbraco.Tests.Components
             var loggerFactory = NullLoggerFactory.Instance;
             var logger = loggerFactory.CreateLogger("GenericLogger");
             var typeFinder = TestHelper.GetTypeFinder();
-            var globalSettings = new GlobalSettingsBuilder().Build();
-            var connectionStrings = new ConnectionStringsBuilder().Build();
+            var globalSettings = new GlobalSettings();
+            var connectionStrings = new ConnectionStrings();
             var f = new UmbracoDatabaseFactory(loggerFactory.CreateLogger<UmbracoDatabaseFactory>(), loggerFactory, Options.Create(globalSettings), Options.Create(connectionStrings), new Lazy<IMapperCollection>(() => new MapperCollection(Enumerable.Empty<BaseMapper>())), TestHelper.DbProviderFactoryCreator);
             var fs = new FileSystems(mock.Object, loggerFactory.CreateLogger<FileSystems>(), loggerFactory, TestHelper.IOHelper, Options.Create(globalSettings), TestHelper.GetHostingEnvironment());
-            var coreDebug = new CoreDebugSettingsBuilder().Build();
+            var coreDebug = new CoreDebugSettings();
             var mediaFileSystem = Mock.Of<IMediaFileSystem>();
-            var p = new ScopeProvider(f, fs, Microsoft.Extensions.Options.Options.Create(coreDebug), mediaFileSystem, loggerFactory.CreateLogger<ScopeProvider>(), loggerFactory, typeFinder, NoAppCache.Instance);
+            var p = new ScopeProvider(f, fs, Options.Create(coreDebug), mediaFileSystem, loggerFactory.CreateLogger<ScopeProvider>(), loggerFactory, typeFinder, NoAppCache.Instance);
 
             mock.Setup(x => x.GetInstance(typeof (ILogger))).Returns(logger);
             mock.Setup(x => x.GetInstance(typeof(ILoggerFactory))).Returns(loggerFactory);

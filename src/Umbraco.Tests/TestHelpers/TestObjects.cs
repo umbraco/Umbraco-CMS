@@ -82,10 +82,10 @@ namespace Umbraco.Tests.TestHelpers
 
         public IScopeProvider GetScopeProvider(ILoggerFactory loggerFactory, ITypeFinder typeFinder = null, FileSystems fileSystems = null, IUmbracoDatabaseFactory databaseFactory = null)
         {
-            var globalSettings = new GlobalSettingsBuilder().Build();
+            var globalSettings = new GlobalSettings();
             var connectionString = ConfigurationManager.ConnectionStrings[Constants.System.UmbracoConnectionName].ConnectionString;
-            var connectionStrings = new ConnectionStringsBuilder().WithUmbracoConnectionString(connectionString).Build();
-            var coreDebugSettings = new CoreDebugSettingsBuilder().Build();
+            var connectionStrings = new ConnectionStrings { UmbracoConnectionString = new ConfigConnectionString(Constants.System.UmbracoConnectionName, connectionString) };
+            var coreDebugSettings = new CoreDebugSettings();
 
             if (databaseFactory == null)
             {
