@@ -31,7 +31,7 @@ namespace Umbraco.Web.Trees
         Constants.Applications.Packages,
         Constants.Applications.Members)]
     [Tree(Constants.Applications.Media, Constants.Trees.Media)]
-    [PluginController("UmbracoTrees")]
+    [PluginController(Constants.Web.Mvc.BackOfficeTreeArea)]
     [CoreTree]
     [SearchableTree("searchResultFormatter", "configureMediaResult", 20)]
     public class MediaTreeController : ContentTreeControllerBase, ISearchableTree, ITreeNodeController

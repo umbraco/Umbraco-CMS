@@ -35,7 +35,7 @@ namespace Umbraco.Web.Trees
         Constants.Applications.Packages,
         Constants.Applications.Members)]
     [Tree(Constants.Applications.Content, Constants.Trees.Content)]
-    [PluginController("UmbracoTrees")]
+    [PluginController(Constants.Web.Mvc.BackOfficeTreeArea)]
     [CoreTree]
     [SearchableTree("searchResultFormatter", "configureContentResult", 10)]
     public class ContentTreeController : ContentTreeControllerBase, ISearchableTree

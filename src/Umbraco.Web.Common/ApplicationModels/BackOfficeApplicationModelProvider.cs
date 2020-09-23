@@ -53,7 +53,8 @@ namespace Umbraco.Web.Common.ApplicationModels
             var pluginControllerAttribute = controller.Attributes.OfType<PluginControllerAttribute>().FirstOrDefault();
             return pluginControllerAttribute != null
                 && (pluginControllerAttribute.AreaName == Core.Constants.Web.Mvc.BackOfficeArea
-                || pluginControllerAttribute.AreaName == Core.Constants.Web.Mvc.BackOfficeApiArea);
+                || pluginControllerAttribute.AreaName == Core.Constants.Web.Mvc.BackOfficeApiArea
+                || pluginControllerAttribute.AreaName == Core.Constants.Web.Mvc.BackOfficeTreeArea);
         }
     }
 }
