@@ -6,10 +6,10 @@
         function link(scope, element, attrs, ctrl) {
 
             var evts = [];
-            
+
             function onInit() {
                 // If logged in user has access to the settings section
-                // show the open anchors - if the user doesn't have 
+                // show the open anchors - if the user doesn't have
                 // access, contentType is null, see MediaModelMapper
                 scope.allowOpen = scope.node.contentType !== null;
 
@@ -49,13 +49,7 @@
             };
 
             scope.openSVG = function () {
-                var popup = window.open('', '_blank');
-                var html = '<!DOCTYPE html><body><img src="' + scope.nodeUrl + '"/>' +
-                    '<script>history.pushState(null, null,"' + $location.$$absUrl + '");</script></body>';
-
-                popup.document.open();
-                popup.document.write(html);
-                popup.document.close();
+                mediaHelper.openSVG(scope.nodeUrl);
             }
 
             // watch for content updates - reload content when node is saved, published etc.

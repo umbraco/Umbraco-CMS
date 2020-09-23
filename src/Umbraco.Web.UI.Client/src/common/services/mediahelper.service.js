@@ -3,7 +3,7 @@
 * @name umbraco.services.mediaHelper
 * @description A helper object used for dealing with media items
 **/
-function mediaHelper(umbRequestHelper, $log) {
+function mediaHelper(umbRequestHelper, $log, $location) {
 
     //container of fileresolvers
     var _mediaFileResolvers = {};
@@ -383,6 +383,28 @@ function mediaHelper(umbRequestHelper, $log) {
             var lowered = filePath.toLowerCase();
             var ext = lowered.substr(lowered.lastIndexOf(".") + 1);
             return ext;
+        },
+
+        /**
+         * @ngdoc function
+         * @name umbraco.services.mediaHelper#openSVG
+         * @methodOf umbraco.services.mediaHelper
+         * @function
+         *
+         * @description
+         * Opens up a new window for an SVG, rendered in an img tag so that any embedded scripts don't execute
+		 * Reference: https://www.w3.org/wiki/SVG_Security#SVG_as_image
+         *
+         * @param {string} svgUrl - the path to the svg file, ex /media/1234/my-image.svg
+         */
+		openSVG: function (svgUrl) {
+            var popup = window.open('', '_blank');
+            var html = '<!DOCTYPE html><body><img src="' + svgUrl + '"/>' +
+            	'<script>history.pushState(null, null,"' + $location.$$absUrl + '");</script></body>';
+
+            popup.document.open();
+            popup.document.write(html);
+            popup.document.close();
         }
 
     };

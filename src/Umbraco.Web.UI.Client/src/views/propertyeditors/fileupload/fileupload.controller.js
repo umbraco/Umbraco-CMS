@@ -91,6 +91,10 @@ function fileUploadController($scope, $element, $compile, imageHelper, fileManag
         };
     }
 
+    $scope.openSVG = function (svgUrl) {
+        mediaHelper.openSVG(svgUrl);
+    }
+
     //listen for clear files changes to set our model to be sent up to the server
     $scope.$watch("clearFiles", function (isCleared) {
         if (isCleared == true) {
