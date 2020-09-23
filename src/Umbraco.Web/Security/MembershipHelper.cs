@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Web.Security;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
@@ -300,8 +299,9 @@ namespace Umbraco.Web.Security
             {
                 return false;
             }
-            //Set member online
-            var member = provider.GetUser(username, true);
+            // Get the member, do not set to online - this is done implicitly as part of ValidateUser which is consistent with
+            // how the .NET framework SqlMembershipProvider works. Passing in true will just cause more unnecessary SQL queries/locks.
+            var member = provider.GetUser(username, false);
             if (member == null)
             {
                 //this should not happen
@@ -770,29 +770,12 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         private IMember GetCurrentPersistedMember()
         {
-            return _appCaches.RequestCache.GetCacheItem<IMember>(
-                GetCacheKey("GetCurrentPersistedMember"), () =>
-                {
-                    var provider = _membershipProvider;
+            var provider = _membershipProvider;
 
                     var username = provider.GetCurrentUserName();
-                    var member = _memberService.GetByUsername(username);
-                    return member;
-                });
-        }
-
-        private static string GetCacheKey(string key, params object[] additional)
-        {
-            var sb = new StringBuilder();
-            sb.Append(typeof(MembershipHelper).Name);
-            sb.Append("-");
-            sb.Append(key);
-            foreach (var s in additional)
-            {
-                sb.Append("-");
-                sb.Append(s);
-            }
-            return sb.ToString();
+        // The result of this is cached by the MemberRepository
+            var member = _memberService.GetByUsername(username);
+            return member;
         }
 
         /// <summary>

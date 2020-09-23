@@ -156,7 +156,6 @@
     <Compile Include="PropertyEditors\Validation\ContentPropertyValidationResult.cs" />
     <Compile Include="PropertyEditors\Validation\ValidationResultConverter.cs" />
     <Compile Include="Security\IdentityFactoryMiddleware.cs" />
-    <Compile Include="Services\IconService.cs" />
     <Compile Include="WebApi\Filters\OnlyLocalRequestsAttribute.cs" />
     <Compile Include="WebAssets\CDF\ClientDependencyRuntimeMinifier.cs" />
     <Compile Include="Models\NoNodesViewModel.cs" />
@@ -234,6 +233,7 @@
     <Compile Include="Trees\ITreeNodeController.cs" />
     <Compile Include="Trees\TreeCollectionBuilder.cs" />
     <Compile Include="UmbracoContext.cs" />
+    <Compile Include="Services\IconService.cs" />
     <Compile Include="UmbracoContextFactory.cs" />
     <Compile Include="Mvc\UmbracoVirtualNodeByUdiRouteHandler.cs" />
     <Compile Include="UmbracoDbProviderFactoryCreator.cs" />

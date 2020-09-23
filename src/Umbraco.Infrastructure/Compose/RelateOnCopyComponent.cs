@@ -23,7 +23,9 @@ namespace Umbraco.Core.Compose
         }
 
         public void Terminate()
-        { }
+        {
+            ContentService.Copied -= ContentServiceCopied;
+        }
 
         private void ContentServiceCopied(IContentService sender, Events.CopyEventArgs<IContent> e)
         {

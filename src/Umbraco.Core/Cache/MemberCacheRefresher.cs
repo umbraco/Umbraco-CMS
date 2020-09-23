@@ -1,21 +1,37 @@
-﻿using System;
+//using Newtonsoft.Json;
+using System;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Cache
 {
-    public sealed class MemberCacheRefresher : TypedCacheRefresherBase<MemberCacheRefresher, IMember>
+    public sealed class MemberCacheRefresher : PayloadCacheRefresherBase<MemberCacheRefresher, MemberCacheRefresher.JsonPayload>
     {
         private readonly IIdKeyMap _idKeyMap;
+        private readonly LegacyMemberCacheRefresher _legacyMemberRefresher;
 
-        public MemberCacheRefresher(AppCaches appCaches, IIdKeyMap idKeyMap)
-            : base(appCaches)
+        public MemberCacheRefresher(AppCaches appCaches, IJsonSerializer serializer, IIdKeyMap idKeyMap)
+            : base(appCaches, serializer)
         {
             _idKeyMap = idKeyMap;
+            _legacyMemberRefresher = new LegacyMemberCacheRefresher(this, appCaches);
+        }
+
+        public class JsonPayload
+        {
+            //[JsonConstructor]
+            public JsonPayload(int id, string username)
+            {
+                Id = id;
+                Username = username;
+            }
+
+            public int Id { get; }
+            public string Username { get; }
         }
 
         #region Define
@@ -32,38 +48,45 @@ namespace Umbraco.Web.Cache
 
         #region Refresher
 
+        public override void Refresh(JsonPayload[] payloads)
+        {
+            ClearCache(payloads);
+            base.Refresh(payloads);
+        }
+
         public override void Refresh(int id)
         {
-            ClearCache(id);
+            ClearCache(new JsonPayload(id, null));
             base.Refresh(id);
         }
 
         public override void Remove(int id)
         {
-            ClearCache(id);
+            ClearCache(new JsonPayload(id, null));
             base.Remove(id);
         }
 
-        public override void Refresh(IMember instance)
-        {
-            ClearCache(instance.Id);
-            base.Refresh(instance);
-        }
+        [Obsolete("This is no longer used and will be removed from the codebase in the future")]
+        public void Refresh(IMember instance) => _legacyMemberRefresher.Refresh(instance);
 
-        public override void Remove(IMember instance)
-        {
-            ClearCache(instance.Id);
-            base.Remove(instance);
-        }
+        [Obsolete("This is no longer used and will be removed from the codebase in the future")]
+        public void Remove(IMember instance) => _legacyMemberRefresher.Remove(instance);
 
-        private void ClearCache(int id)
+        private void ClearCache(params JsonPayload[] payloads)
         {
-            _idKeyMap.ClearCache(id);
             AppCaches.ClearPartialViewCache();
-
             var memberCache = AppCaches.IsolatedCaches.Get<IMember>();
-            if (memberCache)
-                memberCache.Result.Clear(RepositoryCacheKeys.GetKey<IMember>(id));
+
+            foreach (var p in payloads)
+            {
+                _idKeyMap.ClearCache(p.Id);
+                if (memberCache)
+                {
+                    memberCache.Result.Clear(RepositoryCacheKeys.GetKey<IMember>(p.Id));
+                    memberCache.Result.Clear(RepositoryCacheKeys.GetKey<IMember>(p.Username));
+                }
+            }
+
         }
 
         #endregion
@@ -73,6 +96,39 @@ namespace Umbraco.Web.Cache
         public static void RefreshMemberTypes(AppCaches appCaches)
         {
             appCaches.IsolatedCaches.ClearCache<IMember>();
+        }
+
+        #endregion
+
+        #region Backwards Compat
+
+        // TODO: this is here purely for backwards compat but should be removed in netcore
+        private class LegacyMemberCacheRefresher : TypedCacheRefresherBase<MemberCacheRefresher, IMember>
+        {
+            private readonly MemberCacheRefresher _parent;
+
+            public LegacyMemberCacheRefresher(MemberCacheRefresher parent, AppCaches appCaches) : base(appCaches)
+            {
+                _parent = parent;
+            }
+
+            public override Guid RefresherUniqueId => _parent.RefresherUniqueId;
+
+            public override string Name => _parent.Name;
+
+            protected override MemberCacheRefresher This => _parent;
+
+            public override void Refresh(IMember instance)
+            {
+                _parent.ClearCache(new JsonPayload(instance.Id, instance.Username));
+                base.Refresh(instance.Id);
+            }
+
+            public override void Remove(IMember instance)
+            {
+                _parent.ClearCache(new JsonPayload(instance.Id, instance.Username));
+                base.Remove(instance);
+            }
         }
 
         #endregion
