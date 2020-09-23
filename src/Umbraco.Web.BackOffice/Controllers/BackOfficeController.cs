@@ -63,7 +63,6 @@ namespace Umbraco.Web.BackOffice.Controllers
             IBackofficeSecurityAccessor backofficeSecurityAccessor,
             ILogger logger,
             IJsonSerializer jsonSerializer)
-
         {
             _userManager = userManager;
             _runtimeMinifier = runtimeMinifier;
