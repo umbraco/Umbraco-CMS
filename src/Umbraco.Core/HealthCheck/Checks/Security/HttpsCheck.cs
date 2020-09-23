@@ -23,18 +23,22 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
         private readonly ILocalizedTextService _textService;
         private readonly GlobalSettings _globalSettings;
         private readonly IIOHelper _ioHelper;
-        private readonly LoggerFactory _loggerFactory;
         private readonly IRequestAccessor _requestAccessor;
+        private readonly ILogger<ConfigurationService> _logger;
 
         private const string FixHttpsSettingAction = "fixHttpsSetting";
 
-        public HttpsCheck(ILocalizedTextService textService, IOptions<GlobalSettings> globalSettings, IIOHelper ioHelper, LoggerFactory loggerFactory, IRequestAccessor requestAccessor)
+        public HttpsCheck(ILocalizedTextService textService,
+            IOptions<GlobalSettings> globalSettings,
+            IIOHelper ioHelper,
+            IRequestAccessor requestAccessor,
+            ILogger<ConfigurationService> logger)
         {
             _textService = textService;
             _globalSettings = globalSettings.Value;
             _ioHelper = ioHelper;
-            _loggerFactory = loggerFactory;
             _requestAccessor = requestAccessor;
+            _logger = logger;
         }
 
         /// <summary>
@@ -190,7 +194,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
         {
             var configFile = _ioHelper.MapPath("~/Web.config");
             const string xPath = "/configuration/appSettings/add[@key='Umbraco.Core.UseHttps']/@value";
-            var configurationService = new ConfigurationService(configFile, xPath, _textService, _loggerFactory.CreateLogger<ConfigurationService>());
+            var configurationService = new ConfigurationService(configFile, xPath, _textService, _logger);
             var updateConfigFile = configurationService.UpdateConfigFile("true");
 
             if (updateConfigFile.Success)
