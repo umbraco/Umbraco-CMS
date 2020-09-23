@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Drawing;
 using System.IO;
-using Microsoft.Extensions.Options;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Media;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Web.Media
@@ -18,16 +17,16 @@ namespace Umbraco.Web.Media
     {
         private readonly IMediaFileSystem _mediaFileSystem;
         private readonly ILogger _logger;
-        private readonly ContentSettings _contentSettings;
+        private readonly IImageUrlGenerator _imageUrlGenerator;
 
         public UploadAutoFillProperties(
             IMediaFileSystem mediaFileSystem,
             ILogger logger,
-            IOptions<ContentSettings> contentSettings)
+            IImageUrlGenerator imageUrlGenerator)
         {
             _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _contentSettings = contentSettings.Value ?? throw new ArgumentNullException(nameof(contentSettings));
+            _imageUrlGenerator = imageUrlGenerator ?? throw new ArgumentNullException(nameof(imageUrlGenerator));
         }
 
         /// <summary>
@@ -72,7 +71,7 @@ namespace Umbraco.Web.Media
                     using (var filestream = _mediaFileSystem.OpenFile(filepath))
                     {
                         var extension = (Path.GetExtension(filepath) ?? "").TrimStart('.');
-                        var size = _contentSettings.IsImageFile(extension) ? (Size?)ImageHelper.GetDimensions(filestream) : null;
+                        var size = _imageUrlGenerator.IsSupportedImageFormat(extension) ? (Size?)ImageHelper.GetDimensions(filestream) : null;
                         SetProperties(content, autoFillConfig, size, filestream.Length, extension, culture, segment);
                     }
                 }
@@ -106,7 +105,7 @@ namespace Umbraco.Web.Media
             else
             {
                 var extension = (Path.GetExtension(filepath) ?? "").TrimStart('.');
-                var size = _contentSettings.IsImageFile(extension) ? (Size?)ImageHelper.GetDimensions(filestream) : null;
+                var size = _imageUrlGenerator.IsSupportedImageFormat(extension) ? (Size?)ImageHelper.GetDimensions(filestream) : null;
                 SetProperties(content, autoFillConfig, size, filestream.Length, extension, culture, segment);
             }
         }

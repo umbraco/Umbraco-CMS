@@ -49,6 +49,7 @@ using Umbraco.Web.AspNet;
 using Umbraco.Web.ContentApps;
 using Umbraco.Web.Hosting;
 using Umbraco.Web.Install;
+using Umbraco.Web.Media;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
@@ -128,6 +129,8 @@ namespace Umbraco.Tests.Testing
         protected ILocalizationService LocalizationService => Factory.GetInstance<ILocalizationService>();
         protected ILocalizedTextService LocalizedTextService  { get; private set; }
         protected IShortStringHelper ShortStringHelper => Factory?.GetInstance<IShortStringHelper>() ?? TestHelper.ShortStringHelper;
+        protected IImageUrlGenerator ImageUrlGenerator => Factory.GetInstance<IImageUrlGenerator>();
+        protected UploadAutoFillProperties UploadAutoFillProperties => Factory.GetInstance<UploadAutoFillProperties>();
         protected IUmbracoVersion UmbracoVersion { get; private set; }
 
         protected ITypeFinder TypeFinder { get; private set; }
@@ -342,6 +345,7 @@ namespace Umbraco.Tests.Testing
             runtimeStateMock.Setup(x => x.Level).Returns(RuntimeLevel.Run);
             Composition.RegisterUnique(f => runtimeStateMock.Object);
             Composition.Register(_ => Mock.Of<IImageUrlGenerator>());
+            Composition.Register<UploadAutoFillProperties>();
 
             // ah...
             Composition.WithCollectionBuilder<ActionCollectionBuilder>();

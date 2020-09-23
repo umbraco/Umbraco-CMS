@@ -11,6 +11,7 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
+using Umbraco.Core.Media;
 using Umbraco.Core.WebAssets;
 using Umbraco.Extensions;
 using Umbraco.Web.BackOffice.Profiling;
@@ -41,6 +42,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly SecuritySettings _securitySettings;
         private readonly IRuntimeMinifier _runtimeMinifier;
         private readonly IAuthenticationSchemeProvider _authenticationSchemeProvider;
+        private readonly IImageUrlGenerator _imageUrlGenerator;
 
         public BackOfficeServerVariables(
             LinkGenerator linkGenerator,
@@ -55,7 +57,8 @@ namespace Umbraco.Web.BackOffice.Controllers
             IOptions<RuntimeSettings> runtimeSettings,
             IOptions<SecuritySettings> securitySettings,
             IRuntimeMinifier runtimeMinifier,
-            IAuthenticationSchemeProvider authenticationSchemeProvider)
+            IAuthenticationSchemeProvider authenticationSchemeProvider,
+            IImageUrlGenerator imageUrlGenerator)
         {
             _linkGenerator = linkGenerator;
             _runtimeState = runtimeState;
@@ -70,6 +73,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _securitySettings = securitySettings.Value;
             _runtimeMinifier = runtimeMinifier;
             _authenticationSchemeProvider = authenticationSchemeProvider;
+            _imageUrlGenerator = imageUrlGenerator;
         }
 
         /// <summary>
@@ -363,7 +367,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                         {"appPluginsPath", _hostingEnvironment.ToAbsolute(Constants.SystemDirectories.AppPlugins).TrimEnd('/')},
                         {
                             "imageFileTypes",
-                            string.Join(",", _contentSettings.Imaging.ImageFileTypes)
+                            string.Join(",", _imageUrlGenerator.SupportedImageFileTypes)
                         },
                         {
                             "disallowedUploadFiles",
