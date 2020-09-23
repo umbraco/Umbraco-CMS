@@ -55,4 +55,8 @@
       </None>
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Umbraco\logs" />
+    </ItemGroup>
+
 </Project>

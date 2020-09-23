@@ -168,10 +168,7 @@ ORDER BY colName";
         }
 
         public Guid CreateLoginSession(int userId, string requestingIpAddress, bool cleanStaleSessions = true)
-        {
-            // TODO: I know this doesn't follow the normal repository conventions which would require us to create a UserSessionRepository
-            //and also business logic models for these objects but that's just so overkill for what we are doing
-            //and now that everything is properly in a transaction (Scope) there doesn't seem to be much reason for using that anymore
+        {            
             var now = DateTime.UtcNow;
             var dto = new UserLoginDto
             {
@@ -201,13 +198,14 @@ ORDER BY colName";
             // that query is going to run a *lot*, make it a template
             var t = SqlContext.Templates.Get("Umbraco.Core.UserRepository.ValidateLoginSession", s => s
                 .Select<UserLoginDto>()
+                .SelectTop(1)
                 .From<UserLoginDto>()
                 .Where<UserLoginDto>(x => x.SessionId == SqlTemplate.Arg<Guid>("sessionId"))
                 .ForUpdate());
 
             var sql = t.Sql(sessionId);
 
-            var found = Database.Query<UserLoginDto>(sql).FirstOrDefault();
+            var found = Database.FirstOrDefault<UserLoginDto>(sql);
             if (found == null || found.UserId != userId || found.LoggedOutUtc.HasValue)
                 return false;
 

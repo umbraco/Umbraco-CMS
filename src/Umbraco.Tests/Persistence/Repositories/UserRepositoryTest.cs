@@ -16,6 +16,11 @@ using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Core.Persistence.Mappers;
+using Umbraco.Tests.Common.Builders.Extensions;
 using MockedUser = Umbraco.Tests.TestHelpers.Entities.MockedUser;
 
 namespace Umbraco.Tests.Persistence.Repositories
@@ -84,6 +89,104 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
+        public void Validate_Login_Session()
+        {
+            // Arrange
+            var provider = TestObjects.GetScopeProvider(Logger);
+            var user = MockedUser.CreateUser();
+            using (var scope = provider.CreateScope(autoComplete: true))
+            {
+                var repository = CreateRepository(provider);
+                repository.Save(user);
+            }
+
+            using (var scope = provider.CreateScope(autoComplete: true))
+            {
+                var repository = CreateRepository(provider);
+                var sessionId = repository.CreateLoginSession(user.Id, "1.2.3.4");
+
+                // manually update this record to be in the past
+                scope.Database.Execute(SqlContext.Sql()
+                    .Update<UserLoginDto>(u => u.Set(x => x.LoggedOutUtc, DateTime.UtcNow.AddDays(-100)))
+                    .Where<UserLoginDto>(x => x.SessionId == sessionId));
+
+                var isValid = repository.ValidateLoginSession(user.Id, sessionId);
+                Assert.IsFalse(isValid);
+
+                // create a new one
+                sessionId = repository.CreateLoginSession(user.Id, "1.2.3.4");
+                isValid = repository.ValidateLoginSession(user.Id, sessionId);
+                Assert.IsTrue(isValid);
+            }
+        }
+
+        [Test]
+        public void Can_Perform_Add_On_UserRepository()
+        {
+            // Arrange
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope(autoComplete: true))
+            {
+                var repository = CreateRepository(provider);
+
+                var user = MockedUser.CreateUser();
+
+                // Act
+                repository.Save(user);
+
+
+                // Assert
+                Assert.That(user.HasIdentity, Is.True);
+            }
+        }
+
+        [Test]
+        public void Can_Perform_Multiple_Adds_On_UserRepository()
+        {
+            // Arrange
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope(autoComplete: true))
+            {
+                var repository = CreateRepository(provider);
+
+                var user1 = MockedUser.CreateUser("1");
+                var use2 = MockedUser.CreateUser("2");
+
+                // Act
+                repository.Save(user1);
+
+                repository.Save(use2);
+
+
+                // Assert
+                Assert.That(user1.HasIdentity, Is.True);
+                Assert.That(use2.HasIdentity, Is.True);
+            }
+        }
+
+        [Test]
+        public void Can_Verify_Fresh_Entity_Is_Not_Dirty()
+        {
+            // Arrange
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope(autoComplete: true))
+            {
+                var repository = CreateRepository(provider);
+
+                var user = MockedUser.CreateUser();
+                repository.Save(user);
+
+
+                // Act
+                var resolved = repository.Get((int)user.Id);
+                bool dirty = ((User)resolved).IsDirty();
+
+                // Assert
+                Assert.That(dirty, Is.False);
+            }
+        }
+
+        [Test]
         public void Can_Perform_Update_On_UserRepository()
         {
             var ct = MockedContentTypes.CreateBasicContentType("test");
@@ -91,7 +194,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
             // Arrange
             var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
+            using (var scope = provider.CreateScope(autoComplete: true))
             {
                 var userRepository = CreateRepository(provider);
                 var contentRepository = CreateContentRepository(provider, out var contentTypeRepo);
@@ -145,6 +248,272 @@ namespace Umbraco.Tests.Persistence.Repositories
             }
         }
 
+        [Test]
+        public void Can_Perform_Delete_On_UserRepository()
+        {
+            // Arrange
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope(autoComplete: true))
+            {
+                var repository = CreateRepository(provider);
+
+                var user = MockedUser.CreateUser();
+
+                // Act
+                repository.Save(user);
+
+                var id = user.Id;
+
+                var repository2 = new UserRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger,
+                    Mock.Of<IMapperCollection>(),
+                    Microsoft.Extensions.Options.Options.Create(new GlobalSettings()),
+                    Microsoft.Extensions.Options.Options.Create(new UserPasswordConfigurationSettings()),
+                    Mock.Of<IJsonSerializer>());
+
+                repository2.Delete(user);
+
+
+                var resolved = repository2.Get((int) id);
+
+                // Assert
+                Assert.That(resolved, Is.Null);
+            }
+        }
+
+        [Test]
+        public void Can_Perform_Get_On_UserRepository()
+        {
+            // Arrange
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope(autoComplete: true))
+            {
+                var repository = CreateRepository(provider);
+                var userGroupRepository = CreateUserGroupRepository(provider);
+
+                var user = CreateAndCommitUserWithGroup(repository, userGroupRepository);
+
+                // Act
+                var updatedItem = repository.Get(user.Id);
+
+                // FIXME: this test cannot work, user has 2 sections but the way it's created,
+                // they don't show, so the comparison with updatedItem fails - fix!
+
+                // Assert
+                AssertPropertyValues(updatedItem, user);
+            }
+        }
+
+        [Test]
+        public void Can_Perform_GetByQuery_On_UserRepository()
+        {
+            // Arrange
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope(autoComplete: true))
+            {
+                var repository = CreateRepository(provider);
+
+                CreateAndCommitMultipleUsers(repository);
+
+                // Act
+                var query = scope.SqlContext.Query<IUser>().Where(x => x.Username == "TestUser1");
+                var result = repository.Get(query);
+
+                // Assert
+                Assert.That(result.Count(), Is.GreaterThanOrEqualTo(1));
+            }
+        }
+
+        [Test]
+        public void Can_Perform_GetAll_By_Param_Ids_On_UserRepository()
+        {
+            // Arrange
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope(autoComplete: true))
+            {
+                var repository = CreateRepository(provider);
+
+                var users = CreateAndCommitMultipleUsers(repository);
+
+                // Act
+                var result = repository.GetMany((int) users[0].Id, (int) users[1].Id);
+
+                // Assert
+                Assert.That(result, Is.Not.Null);
+                Assert.That(result.Any(), Is.True);
+                Assert.That(result.Count(), Is.EqualTo(2));
+            }
+        }
+
+        [Test]
+        public void Can_Perform_GetAll_On_UserRepository()
+        {
+            // Arrange
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope(autoComplete: true))
+            {
+                var repository = CreateRepository(provider);
+
+                CreateAndCommitMultipleUsers(repository);
+
+                // Act
+                var result = repository.GetMany();
+
+                // Assert
+                Assert.That(result, Is.Not.Null);
+                Assert.That(result.Any(), Is.True);
+                Assert.That(result.Count(), Is.GreaterThanOrEqualTo(3));
+            }
+        }
+
+        [Test]
+        public void Can_Perform_Exists_On_UserRepository()
+        {
+            // Arrange
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope(autoComplete: true))
+            {
+                var repository = CreateRepository(provider);
+
+                var users = CreateAndCommitMultipleUsers(repository);
+
+                // Act
+                var exists = repository.Exists(users[0].Id);
+
+                // Assert
+                Assert.That(exists, Is.True);
+            }
+        }
+
+        [Test]
+        public void Can_Perform_Count_On_UserRepository()
+        {
+            // Arrange
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope(autoComplete: true))
+            {
+                var repository = CreateRepository(provider);
+
+                var users = CreateAndCommitMultipleUsers(repository);
+
+                // Act
+                var query = scope.SqlContext.Query<IUser>().Where(x => x.Username == "TestUser1" || x.Username == "TestUser2");
+                var result = repository.Count(query);
+
+                // Assert
+                Assert.AreEqual(2, result);
+            }
+        }
+
+        [Test]
+        public void Can_Get_Paged_Results_By_Query_And_Filter_And_Groups()
+        {
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope(autoComplete: true))
+            {
+                var repository = CreateRepository(provider);
+
+                var users = CreateAndCommitMultipleUsers(repository);
+                var query = provider.SqlContext.Query<IUser>().Where(x => x.Username == "TestUser1" || x.Username == "TestUser2");
+
+                try
+                {
+                    scope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
+                    scope.Database.AsUmbracoDatabase().EnableSqlCount = true;
+
+                    // Act
+                    var result = repository.GetPagedResultsByQuery(query, 0, 10, out var totalRecs, user => user.Id, Direction.Ascending,
+                            excludeUserGroups: new[] { Constants.Security.TranslatorGroupAlias },
+                            filter: provider.SqlContext.Query<IUser>().Where(x => x.Id > -1));
+
+                    // Assert
+                    Assert.AreEqual(2, totalRecs);
+                }
+                finally
+                {
+                    scope.Database.AsUmbracoDatabase().EnableSqlTrace = false;
+                    scope.Database.AsUmbracoDatabase().EnableSqlCount = false;
+                }
+            }
+
+        }
+
+        [Test]
+        public void Can_Get_Paged_Results_With_Filter_And_Groups()
+        {
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope(autoComplete: true))
+            {
+                var repository = CreateRepository(provider);
+
+                var users = CreateAndCommitMultipleUsers(repository);
+
+                try
+                {
+                    scope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
+                    scope.Database.AsUmbracoDatabase().EnableSqlCount = true;
+
+                    // Act
+                    var result = repository.GetPagedResultsByQuery(null, 0, 10, out var totalRecs, user => user.Id, Direction.Ascending,
+                        includeUserGroups: new[] { Constants.Security.AdminGroupAlias, Constants.Security.SensitiveDataGroupAlias },
+                        excludeUserGroups: new[] { Constants.Security.TranslatorGroupAlias },
+                        filter: provider.SqlContext.Query<IUser>().Where(x => x.Id == -1));
+
+                    // Assert
+                    Assert.AreEqual(1, totalRecs);
+                }
+                finally
+                {
+                    scope.Database.AsUmbracoDatabase().EnableSqlTrace = false;
+                    scope.Database.AsUmbracoDatabase().EnableSqlCount = false;
+                }
+            }
+        }
+
+        [Test]
+        public void Can_Invalidate_SecurityStamp_On_Username_Change()
+        {
+            // Arrange
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope(autoComplete: true))
+            {
+                var repository = CreateRepository(provider);
+                var userGroupRepository = CreateUserGroupRepository(provider);
+
+                var user = CreateAndCommitUserWithGroup(repository, userGroupRepository);
+                var originalSecurityStamp = user.SecurityStamp;
+
+                // Ensure when user generated a security stamp is present
+                Assert.That(user.SecurityStamp, Is.Not.Null);
+                Assert.That(user.SecurityStamp, Is.Not.Empty);
+
+                // Update username
+                user.Username = user.Username + "UPDATED";
+                repository.Save(user);
+
+                // Get the user
+                var updatedUser = repository.Get(user.Id);
+
+                // Ensure the Security Stamp is invalidated & no longer the same
+                Assert.AreNotEqual(originalSecurityStamp, updatedUser.SecurityStamp);
+            }
+        }
+
+        private void AssertPropertyValues(IUser updatedItem, IUser originalUser)
+        {
+            Assert.That(updatedItem.Id, Is.EqualTo(originalUser.Id));
+            Assert.That(updatedItem.Name, Is.EqualTo(originalUser.Name));
+            Assert.That(updatedItem.Language, Is.EqualTo(originalUser.Language));
+            Assert.That(updatedItem.IsApproved, Is.EqualTo(originalUser.IsApproved));
+            Assert.That(updatedItem.RawPasswordValue, Is.EqualTo(originalUser.RawPasswordValue));
+            Assert.That(updatedItem.IsLockedOut, Is.EqualTo(originalUser.IsLockedOut));
+            Assert.IsTrue(updatedItem.StartContentIds.UnsortedSequenceEqual(originalUser.StartContentIds));
+            Assert.IsTrue(updatedItem.StartMediaIds.UnsortedSequenceEqual(originalUser.StartMediaIds));
+            Assert.That(updatedItem.Email, Is.EqualTo(originalUser.Email));
+            Assert.That(updatedItem.Username, Is.EqualTo(originalUser.Username));
+            Assert.That(updatedItem.AllowedSections.Count(), Is.EqualTo(originalUser.AllowedSections.Count()));
+            foreach (var allowedSection in originalUser.AllowedSections)
+                Assert.IsTrue(updatedItem.AllowedSections.Contains(allowedSection));
+        }
 
         private static User CreateAndCommitUserWithGroup(IUserRepository repository, IUserGroupRepository userGroupRepository)
         {
@@ -158,6 +527,16 @@ namespace Umbraco.Tests.Persistence.Repositories
             user.AddGroup(group);
 
             return user;
+        }
+        private IUser[] CreateAndCommitMultipleUsers(IUserRepository repository)
+        {
+            var user1 = new UserBuilder().WithoutIdentity().WithSuffix("1").Build();
+            var user2 = new UserBuilder().WithoutIdentity().WithSuffix("2").Build();
+            var user3 = new UserBuilder().WithoutIdentity().WithSuffix("3").Build();
+            repository.Save(user1);
+            repository.Save(user2);
+            repository.Save(user3);
+            return new IUser[] { user1, user2, user3 };
         }
 
     }
