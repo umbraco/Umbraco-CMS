@@ -22,7 +22,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         public void DeleteUserLogins(int memberId)
         {
-            Database.Execute("DELETE FROM ExternalLogins WHERE UserId=@userId", new { userId = memberId });
+            Database.Delete<ExternalLoginDto>("WHERE userId=@userId", new { userId = memberId });
         }
 
         public void Save(int userId, IEnumerable<IExternalLogin> logins)

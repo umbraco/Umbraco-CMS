@@ -537,29 +537,39 @@ namespace Umbraco.Web.Editors
 
         private async Task LinkUser(BackOfficeIdentityUser autoLinkUser, ExternalLoginInfo loginInfo)
         {
-            var linkResult = await UserManager.AddLoginAsync(autoLinkUser.Id, loginInfo.Login);
-            if (linkResult.Succeeded == false)
-            {
-                ViewData.SetExternalSignInProviderErrors(
-                    new BackOfficeExternalLoginProviderErrors(
-                        loginInfo.Login.LoginProvider,
-                        linkResult.Errors));
+            var existingLogins = await UserManager.GetLoginsAsync(autoLinkUser.Id);
+            var exists = existingLogins.FirstOrDefault(x => x.LoginProvider == loginInfo.Login.LoginProvider && x.ProviderKey == loginInfo.Login.ProviderKey);
 
-                //If this fails, we should really delete the user since it will be in an inconsistent state!
-                var deleteResult = await UserManager.DeleteAsync(autoLinkUser);
-                if (deleteResult.Succeeded == false)
-                {
-                    //DOH! ... this isn't good, combine all errors to be shown
-                    ViewData.SetExternalSignInProviderErrors(
-                        new BackOfficeExternalLoginProviderErrors(
-                            loginInfo.Login.LoginProvider,
-                            linkResult.Errors.Concat(deleteResult.Errors)));
-                }
-            }
-            else
+            // if it already exists (perhaps it was added in the AutoLink callbak) then we just continue
+            if (exists != null)
             {
                 //sign in
                 await SignInManager.SignInAsync(autoLinkUser, isPersistent: false, rememberBrowser: false);
+                return;
+            }
+
+            var linkResult = await UserManager.AddLoginAsync(autoLinkUser.Id, loginInfo.Login);
+            if (linkResult.Succeeded)
+            {
+                //we're good! sign in
+                await SignInManager.SignInAsync(autoLinkUser, isPersistent: false, rememberBrowser: false);
+                return;
+            }
+
+            ViewData.SetExternalSignInProviderErrors(
+                   new BackOfficeExternalLoginProviderErrors(
+                       loginInfo.Login.LoginProvider,
+                       linkResult.Errors));
+
+            //If this fails, we should really delete the user since it will be in an inconsistent state!
+            var deleteResult = await UserManager.DeleteAsync(autoLinkUser);
+            if (!deleteResult.Succeeded)
+            {
+                //DOH! ... this isn't good, combine all errors to be shown
+                ViewData.SetExternalSignInProviderErrors(
+                    new BackOfficeExternalLoginProviderErrors(
+                        loginInfo.Login.LoginProvider,
+                        linkResult.Errors.Concat(deleteResult.Errors)));
             }
         }
 

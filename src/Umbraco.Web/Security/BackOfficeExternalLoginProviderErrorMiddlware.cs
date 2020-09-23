@@ -35,7 +35,7 @@ namespace Umbraco.Web.Security
 
                     var serialized = Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(errors)));
 
-                    context.Response.Cookies.Append("ExternalSignInError", serialized, new CookieOptions
+                    context.Response.Cookies.Append(ViewDataExtensions.TokenExternalSignInError, serialized, new CookieOptions
                     {
                         Expires = DateTime.Now.AddMinutes(5),
                         HttpOnly = true,

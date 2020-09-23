@@ -14,6 +14,8 @@ namespace Umbraco.Core.Persistence.Dtos
         [PrimaryKeyColumn(Name = "PK_umbracoExternalLogin")]
         public int Id { get; set; }
 
+        // TODO: This is completely missing a FK!!?
+
         [Column("userId")]
         public int UserId { get; set; }
 
