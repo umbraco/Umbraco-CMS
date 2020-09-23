@@ -120,7 +120,7 @@ namespace Umbraco.Tests.Common
 
         public IRegister GetRegister()
         {
-            return RegisterFactory.Create(new GlobalSettingsBuilder().Build());
+            return RegisterFactory.Create(new GlobalSettings());
         }
 
         public abstract IHostingEnvironment GetHostingEnvironment();
@@ -144,9 +144,7 @@ namespace Umbraco.Tests.Common
         {
             hostingEnv = hostingEnv ?? GetHostingEnvironment();
             return new LoggingConfiguration(
-                Path.Combine(hostingEnv.ApplicationPhysicalPath, "App_Data","Logs"),
-                Path.Combine(hostingEnv.ApplicationPhysicalPath, "config","serilog.config"),
-                Path.Combine(hostingEnv.ApplicationPhysicalPath, "config","serilog.user.config"));
+                Path.Combine(hostingEnv.ApplicationPhysicalPath, "umbraco","logs"));
         }
     }
 }

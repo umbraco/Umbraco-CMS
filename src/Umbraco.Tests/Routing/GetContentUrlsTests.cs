@@ -8,7 +8,6 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Common;
-using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Web.Routing;
 
@@ -25,9 +24,9 @@ namespace Umbraco.Tests.Routing
         {
             base.SetUp();
 
-            _globalSettings = new GlobalSettingsBuilder().Build();
-            _webRoutingSettings = new WebRoutingSettingsBuilder().Build();
-            _requestHandlerSettings = new RequestHandlerSettingsBuilder().WithAddTrailingSlash(true).Build();
+            _globalSettings = new GlobalSettings();
+            _webRoutingSettings = new WebRoutingSettings();
+            _requestHandlerSettings = new RequestHandlerSettings { AddTrailingSlash = true };
         }
 
         private ILocalizedTextService GetTextService()

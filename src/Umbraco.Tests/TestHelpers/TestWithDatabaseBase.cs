@@ -373,7 +373,7 @@ namespace Umbraco.Tests.TestHelpers
                 httpContextAccessor,
                 service,
                 Mock.Of<IBackofficeSecurity>(),
-                globalSettings ?? new GlobalSettingsBuilder().Build(),
+                globalSettings ?? new GlobalSettings(),
                 HostingEnvironment,
                 new TestVariationContextAccessor(),
                 UriUtility,

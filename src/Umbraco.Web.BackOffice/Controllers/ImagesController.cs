@@ -1,10 +1,7 @@
 ﻿using System;
 using System.IO;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
 using Umbraco.Core.Media;
 using Umbraco.Core.Models;
@@ -20,16 +17,13 @@ namespace Umbraco.Web.BackOffice.Controllers
     public class ImagesController : UmbracoAuthorizedApiController
     {
         private readonly IMediaFileSystem _mediaFileSystem;
-        private readonly ContentSettings _contentSettings;
         private readonly IImageUrlGenerator _imageUrlGenerator;
 
         public ImagesController(
             IMediaFileSystem mediaFileSystem,
-            IOptions<ContentSettings> contentSettings,
             IImageUrlGenerator imageUrlGenerator)
         {
             _mediaFileSystem = mediaFileSystem;
-            _contentSettings = contentSettings.Value;
             _imageUrlGenerator = imageUrlGenerator;
         }
 
@@ -62,7 +56,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             var ext = Path.GetExtension(imagePath);
 
             // we need to check if it is an image by extension
-            if (_contentSettings.IsImageFile(ext) == false)
+            if (_imageUrlGenerator.IsSupportedImageFormat(ext) == false)
                 return NotFound();
 
             //redirect to ImageProcessor thumbnail with rnd generated from last modified time of original media file

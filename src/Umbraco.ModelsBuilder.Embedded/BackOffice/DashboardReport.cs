@@ -8,11 +8,11 @@ namespace Umbraco.ModelsBuilder.Embedded.BackOffice
 {
     internal class DashboardReport
     {
-        private readonly ModelsBuilderConfig _config;
+        private readonly ModelsBuilderSettings _config;
         private readonly OutOfDateModelsStatus _outOfDateModels;
         private readonly ModelsGenerationError _mbErrors;
 
-        public DashboardReport(IOptions<ModelsBuilderConfig> config, OutOfDateModelsStatus outOfDateModels, ModelsGenerationError mbErrors)
+        public DashboardReport(IOptions<ModelsBuilderSettings> config, OutOfDateModelsStatus outOfDateModels, ModelsGenerationError mbErrors)
         {
             _config = config.Value;
             _outOfDateModels = outOfDateModels;

@@ -2,21 +2,21 @@
 using System.Linq;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Core.Persistence.Repositories.Implement;
+using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Scoping;
+using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
-using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.Persistence.Repositories.Implement;
-using Umbraco.Core.Scoping;
 using Umbraco.Tests.Testing;
-using Umbraco.Core.Services;
-using Umbraco.Core;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Tests.Common.Builders;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
@@ -35,7 +35,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             appCaches = appCaches ?? AppCaches;
             var scopeAccessor = (IScopeAccessor) provider;
-            var globalSettings = new GlobalSettingsBuilder().Build();
+            var globalSettings = new GlobalSettings();
             var templateRepository = new TemplateRepository(scopeAccessor, appCaches, Logger, TestObjects.GetFileSystemsMock(), IOHelper, ShortStringHelper);
             var commonRepository = new ContentTypeCommonRepository(scopeAccessor, templateRepository, appCaches, ShortStringHelper);
             var languageRepository = new LanguageRepository(scopeAccessor, appCaches, Logger, Microsoft.Extensions.Options.Options.Create(globalSettings));

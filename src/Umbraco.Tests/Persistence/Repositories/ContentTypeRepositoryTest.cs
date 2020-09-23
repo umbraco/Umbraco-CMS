@@ -32,7 +32,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
             CreateTestData();
 
-            _globalSettings = Microsoft.Extensions.Options.Options.Create(new GlobalSettingsBuilder().Build());
+            _globalSettings = Microsoft.Extensions.Options.Options.Create(new GlobalSettings());
         }
 
         private DocumentRepository CreateRepository(IScopeAccessor scopeAccessor, out ContentTypeRepository contentTypeRepository)

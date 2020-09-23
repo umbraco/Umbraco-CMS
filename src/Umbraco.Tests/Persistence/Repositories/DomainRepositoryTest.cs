@@ -4,6 +4,7 @@ using System.Data;
 using System.Linq;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories.Implement;
@@ -22,7 +23,7 @@ namespace Umbraco.Tests.Persistence.Repositories
     {
         private DomainRepository CreateRepository(IScopeProvider provider, out ContentTypeRepository contentTypeRepository, out DocumentRepository documentRepository, out LanguageRepository languageRepository)
         {
-            var globalSettings = Microsoft.Extensions.Options.Options.Create(new GlobalSettingsBuilder().Build());
+            var globalSettings = Microsoft.Extensions.Options.Options.Create(new GlobalSettings());
 
             var accessor = (IScopeAccessor) provider;
             var templateRepository = new TemplateRepository(accessor, Core.Cache.AppCaches.Disabled, Logger, TestObjects.GetFileSystemsMock(), IOHelper, ShortStringHelper);
@@ -51,7 +52,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var repo = CreateRepository(provider, out contentTypeRepo, out documentRepo, out langRepo);
 
-                var globalSettings = new GlobalSettingsBuilder().Build();
+                var globalSettings = new GlobalSettings();
                 var lang = new Language(globalSettings, isoName);
                 langRepo.Save(lang);
 
@@ -207,7 +208,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 //more test data
                 var lang1 = langRepo.GetByIsoCode("en-AU");
-                var globalSettings = new GlobalSettingsBuilder().Build();
+                var globalSettings = new GlobalSettings();
                 var lang2 = new Language(globalSettings, "es");
                 langRepo.Save(lang2);
                 var content2 = new Content("test", -1, ct) { CreatorId = 0, WriterId = 0 };

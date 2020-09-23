@@ -31,15 +31,8 @@ namespace Umbraco.Web.Routing
             _urlProviders = urlProviders;
             _mediaUrlProviders = mediaUrlProviders;
             _variationContextAccessor = variationContextAccessor ?? throw new ArgumentNullException(nameof(variationContextAccessor));
-            var provider = UrlMode.Auto;
-            Mode = provider;
-
-            if (Enum<UrlMode>.TryParse(routingSettings.Value.UrlProviderMode, out provider))
-            {
-                Mode = provider;
-            }
+            Mode = routingSettings.Value.UrlProviderMode;
         }
-
 
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly IEnumerable<IUrlProvider> _urlProviders;

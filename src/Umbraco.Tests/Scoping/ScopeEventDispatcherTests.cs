@@ -5,18 +5,18 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Events;
-using Umbraco.Core.Models;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Scoping;
-using Umbraco.Tests.TestHelpers;
-using Umbraco.Tests.TestHelpers.Entities;
+using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Mappers;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Components;
+using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.TestHelpers.Entities;
 using Current = Umbraco.Web.Composing.Current;
-using Umbraco.Tests.Common.Builders;
 
 namespace Umbraco.Tests.Scoping
 {
@@ -39,7 +39,7 @@ namespace Umbraco.Tests.Scoping
 
             _testObjects = new TestObjects(register);
 
-            var globalSettings = new GlobalSettingsBuilder().Build();
+            var globalSettings = new GlobalSettings();
             composition.RegisterUnique(factory => new FileSystems(factory, factory.TryGetInstance<ILogger>(), TestHelper.IOHelper, Microsoft.Extensions.Options.Options.Create(globalSettings), TestHelper.GetHostingEnvironment()));
             composition.WithCollectionBuilder<MapperCollectionBuilder>();
 

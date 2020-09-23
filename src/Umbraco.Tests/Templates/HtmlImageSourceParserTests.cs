@@ -1,20 +1,16 @@
-﻿using Umbraco.Core.Logging;
+﻿using System;
+using System.Diagnostics;
+using System.Linq;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Web.Templates;
-using Umbraco.Web;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Web.Routing;
-using Umbraco.Tests.Testing.Objects;
-using System.Web;
-using System;
-using System.Linq;
-using Umbraco.Core.Models;
 using Umbraco.Core;
-using System.Diagnostics;
-using Umbraco.Tests.TestHelpers;
+using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.Models;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Tests.Common;
-using Umbraco.Tests.Common.Builders;
+using Umbraco.Tests.Testing.Objects;
+using Umbraco.Web.Routing;
+using Umbraco.Web.Templates;
 
 namespace Umbraco.Tests.Templates
 {
@@ -77,7 +73,7 @@ namespace Umbraco.Tests.Templates
             var umbracoContextFactory = TestUmbracoContextFactory.Create(
                 umbracoContextAccessor: umbracoContextAccessor);
 
-            var webRoutingSettings = new WebRoutingSettingsBuilder().Build();
+            var webRoutingSettings = new WebRoutingSettings();
             var publishedUrlProvider = new UrlProvider(umbracoContextAccessor,
                 Microsoft.Extensions.Options.Options.Create(webRoutingSettings),
                 new UrlProviderCollection(Enumerable.Empty<IUrlProvider>()),

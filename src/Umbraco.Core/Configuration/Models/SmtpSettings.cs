@@ -1,9 +1,14 @@
-﻿using System.Net.Mail;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+using System.Net.Mail;
+using Umbraco.Core.Configuration.Models.Validation;
 
 namespace Umbraco.Core.Configuration.Models
 {
-    public class SmtpSettings
+    public class SmtpSettings : ValidatableEntryBase
     {
+        [Required]
+        [EmailAddress]
         public string From { get; set; }
 
         public string Host { get; set; }
@@ -12,7 +17,7 @@ namespace Umbraco.Core.Configuration.Models
 
         public string PickupDirectoryLocation { get; set; }
 
-        public SmtpDeliveryMethod DeliveryMethod { get; set; }
+        public SmtpDeliveryMethod DeliveryMethod { get; set; } = SmtpDeliveryMethod.Network;
 
         public string Username { get; set; }
 

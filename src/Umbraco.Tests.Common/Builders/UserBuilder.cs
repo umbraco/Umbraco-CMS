@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Tests.Common.Builders.Interfaces;
 
@@ -12,6 +13,7 @@ namespace Umbraco.Tests.Common.Builders
         {
         }
     }
+
     public class UserBuilder<TParent>
         : ChildBuilderBase<TParent, User>,
             IWithIdBuilder,
@@ -91,8 +93,6 @@ namespace Umbraco.Tests.Common.Builders
             return this;
         }
 
-
-
         public UserBuilder<TParent> WithSessionTimeout(int sessionTimeout)
         {
             _sessionTimeout = sessionTimeout;
@@ -122,11 +122,18 @@ namespace Umbraco.Tests.Common.Builders
             return this;
         }
 
+        public UserGroupBuilder<UserBuilder<TParent>> AddUserGroup()
+        {
+            var builder = new UserGroupBuilder<UserBuilder<TParent>>(this);
+            _userGroupBuilders.Add(builder);
+            return builder;
+        }
+
         public override User Build()
         {
             var id = _id ?? 0;
             var defaultLang = _defaultLang ?? "en";
-            var globalSettings = new GlobalSettingsBuilder().WithDefaultUiLanguage(defaultLang).Build();
+            var globalSettings = new GlobalSettings { DefaultUILanguage = defaultLang };
             var key = _key ?? Guid.NewGuid();
             var createDate = _createDate ?? DateTime.Now;
             var updateDate = _updateDate ?? DateTime.Now;
@@ -175,19 +182,8 @@ namespace Umbraco.Tests.Common.Builders
                 result.AddGroup(readOnlyUserGroup.ToReadOnlyGroup());
             }
 
-
             return result;
         }
-
-        public UserGroupBuilder<UserBuilder<TParent>> AddUserGroup()
-        {
-            var builder = new UserGroupBuilder<UserBuilder<TParent>>(this);
-
-            _userGroupBuilders.Add(builder);
-
-            return builder;
-        }
-
 
         int? IWithIdBuilder.Id
         {

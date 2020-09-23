@@ -226,6 +226,7 @@ namespace Umbraco.Tests.Integration.Testing
                 GetType().Assembly,
                 AppCaches.NoCache, // Disable caches for integration tests
                 TestHelper.GetLoggingConfiguration(),
+                Configuration,
                 CreateTestRuntime,
                 out _);
 
@@ -435,7 +436,6 @@ namespace Umbraco.Tests.Integration.Testing
 
         #region Builders
 
-        protected GlobalSettingsBuilder GlobalSettingsBuilder = new GlobalSettingsBuilder();
         protected UserBuilder UserBuilder = new UserBuilder();
         protected UserGroupBuilder UserGroupBuilder = new UserGroupBuilder();
 

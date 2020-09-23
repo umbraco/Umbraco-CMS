@@ -3,6 +3,7 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.TestHelpers;
@@ -128,7 +129,7 @@ namespace Umbraco.Tests.Routing
         {
             SetDomains3();
 
-            var globalSettings = new GlobalSettingsBuilder().WithHideTopLevelNodeFromPath(true).Build();
+            var globalSettings = new GlobalSettings { HideTopLevelNodeFromPath = true };
 
             var umbracoContext = GetUmbracoContext(url, globalSettings:globalSettings);
             var publishedRouter = CreatePublishedRouter(Factory);
@@ -169,7 +170,7 @@ namespace Umbraco.Tests.Routing
             // defaults depend on test environment
             expectedCulture = expectedCulture ?? System.Threading.Thread.CurrentThread.CurrentUICulture.Name;
 
-            var globalSettings = new GlobalSettingsBuilder().WithHideTopLevelNodeFromPath(true).Build();
+            var globalSettings = new GlobalSettings { HideTopLevelNodeFromPath = true };
 
             var umbracoContext = GetUmbracoContext(url, globalSettings:globalSettings);
             var publishedRouter = CreatePublishedRouter(Factory);

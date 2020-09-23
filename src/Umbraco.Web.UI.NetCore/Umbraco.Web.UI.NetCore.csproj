@@ -59,11 +59,11 @@
 
     <!-- We don't want to include the generated files, they will throw a lot of errors -->
     <ItemGroup>
-        <None Remove="Umbraco/Models/all.generated.cs"/>
-        <Compile Remove="Umbraco/Models/all.generated.cs"/>
-        <None Remove="Umbraco/Models/models.generated.cs"/>
+        <None Remove="Umbraco/Models/all.generated.cs" />
+        <Compile Remove="Umbraco/Models/all.generated.cs" />
+        <None Remove="Umbraco/Models/models.generated.cs" />
         <Compile Remove="Umbraco/Models/models.generated.cs" />
-        <Folder Remove="Umbraco/Models/Compiled"/>
+        <Folder Remove="Umbraco/Models/Compiled" />
         <None Remove="Umbraco/Models/Compiled/**" />
         <None Remove="Umbraco/Models/all.dll.path" />
         <None Remove="Umbraco/Models/models.hash" />

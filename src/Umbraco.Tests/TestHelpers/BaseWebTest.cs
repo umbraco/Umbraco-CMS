@@ -93,7 +93,7 @@ namespace Umbraco.Tests.TestHelpers
 
         internal PublishedRouter CreatePublishedRouter(IFactory container = null, ContentFinderCollection contentFinders = null)
         {
-            var webRoutingSettings = new WebRoutingSettingsBuilder().Build();
+            var webRoutingSettings = new WebRoutingSettings();
             return CreatePublishedRouter(webRoutingSettings, container ?? Factory, contentFinders);
         }
 
