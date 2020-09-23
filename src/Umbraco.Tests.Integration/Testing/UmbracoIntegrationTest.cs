@@ -31,6 +31,8 @@ using System.IO;
 using Umbraco.Core.Configuration.Models;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
+using Serilog;
+using Umbraco.Core.Logging.Serilog;
 using ConnectionStrings = Umbraco.Core.Configuration.Models.ConnectionStrings;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
@@ -102,6 +104,9 @@ namespace Umbraco.Tests.Integration.Testing
         {
             UmbracoContainer = CreateUmbracoContainer(out var serviceProviderFactory);
             _serviceProviderFactory = serviceProviderFactory;
+            // TODO: Is this the right way to do this?
+            var loggerConfig = new LoggerConfiguration().WriteTo.Console();
+            var logger = new SerilogLogger(loggerConfig);
 
             var hostBuilder = Host.CreateDefaultBuilder()
                 // IMPORTANT: We Cannot use UseStartup, there's all sorts of threads about this with testing. Although this can work
@@ -116,11 +121,7 @@ namespace Umbraco.Tests.Integration.Testing
                     Configuration = context.Configuration;
                     configBuilder.AddInMemoryCollection(InMemoryConfiguration);
                 })
-                .ConfigureLogging(logging =>
-                {
-                    logging.ClearProviders();
-                    logging.AddConsole();
-                })
+                .UseSerilog(logger.SerilogLog, false)
                 .ConfigureServices((hostContext, services) =>
                 {
                     ConfigureServices(services);
