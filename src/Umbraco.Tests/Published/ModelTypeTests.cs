@@ -36,7 +36,7 @@ namespace Umbraco.Tests.Published
             // there's an "*" there because the arrays are not true SZArray - but that changes when we map
             Assert.AreEqual("{alias1}[*]", ModelType.For("alias1").MakeArrayType().FullName);
             // note the inner assembly qualified name
-            Assert.AreEqual("System.Collections.Generic.IEnumerable`1[[{alias1}[*], Umbraco.Core, Version=9.0.0.0, Culture=neutral, PublicKeyToken=null]]", typeof(IEnumerable<>).MakeGenericType(ModelType.For("alias1").MakeArrayType()).FullName);
+            Assert.AreEqual("System.Collections.Generic.IEnumerable`1[[{alias1}[*], Umbraco.Core, Version=0.5.0.0, Culture=neutral, PublicKeyToken=null]]", typeof(IEnumerable<>).MakeGenericType(ModelType.For("alias1").MakeArrayType()).FullName);
         }
 
     }
