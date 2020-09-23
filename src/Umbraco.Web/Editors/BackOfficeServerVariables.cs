@@ -10,6 +10,7 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
+using Umbraco.Core.Media;
 using Umbraco.Core.WebAssets;
 using Umbraco.Web.Features;
 using Umbraco.Web.Mvc;
@@ -36,6 +37,7 @@ namespace Umbraco.Web.Editors
         private readonly RuntimeSettings _settings;
         private readonly SecuritySettings _securitySettings;
         private readonly IRuntimeMinifier _runtimeMinifier;
+        private readonly IImageUrlGenerator _imageUrlGenerator;
 
         internal BackOfficeServerVariables(
             UrlHelper urlHelper,
@@ -48,7 +50,8 @@ namespace Umbraco.Web.Editors
             IHostingEnvironment hostingEnvironment,
             IOptions<RuntimeSettings> settings,
             IOptions<SecuritySettings> securitySettings,
-            IRuntimeMinifier runtimeMinifier)
+            IRuntimeMinifier runtimeMinifier,
+            IImageUrlGenerator imageUrlGenerator)
         {
             _urlHelper = urlHelper;
             _runtimeState = runtimeState;
@@ -61,6 +64,7 @@ namespace Umbraco.Web.Editors
             _settings = settings.Value;
             _securitySettings = securitySettings.Value;
             _runtimeMinifier = runtimeMinifier;
+            _imageUrlGenerator = imageUrlGenerator;
         }
 
         /// <summary>
@@ -147,7 +151,7 @@ namespace Umbraco.Web.Editors
                         {"appPluginsPath", _hostingEnvironment.ToAbsolute(Constants.SystemDirectories.AppPlugins).TrimEnd('/')},
                         {
                             "imageFileTypes",
-                            string.Join(",", _contentSettings.Imaging.ImageFileTypes)
+                            string.Join(",", _imageUrlGenerator.SupportedImageFileTypes)
                         },
                         {
                             "disallowedUploadFiles",

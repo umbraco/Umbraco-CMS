@@ -7,6 +7,7 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
+using Umbraco.Core.Media;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
@@ -37,7 +38,8 @@ namespace Umbraco.Web.PropertyEditors
             IDataTypeService dataTypeService,
             ILocalizationService localizationService,
             ILocalizedTextService localizedTextService,
-            IShortStringHelper shortStringHelper)
+            IShortStringHelper shortStringHelper,
+            UploadAutoFillProperties uploadAutoFillProperties)
             : base(loggerFactory, dataTypeService, localizationService, localizedTextService, shortStringHelper)
         {
             _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
@@ -45,7 +47,7 @@ namespace Umbraco.Web.PropertyEditors
             _dataTypeService = dataTypeService;
             _localizationService = localizationService;
             _localizedTextService = localizedTextService;
-            _uploadAutoFillProperties = new UploadAutoFillProperties(_mediaFileSystem, loggerFactory.CreateLogger<UploadAutoFillProperties>(), contentSettings);
+            _uploadAutoFillProperties = uploadAutoFillProperties;
         }
 
         /// <summary>

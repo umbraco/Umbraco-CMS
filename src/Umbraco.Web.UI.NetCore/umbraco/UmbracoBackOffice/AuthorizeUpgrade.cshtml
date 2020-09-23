@@ -60,7 +60,7 @@
     document.angularReady = function (app) {
 
         @await Html.AngularValueExternalLoginInfoScriptAsync(signInManager, ViewData.GetExternalSignInError())
-        @Html.AngularValueResetPasswordCodeInfoScript(ViewData["PasswordResetCode"])
+        @Html.AngularValueResetPasswordCodeInfoScript(ViewData[ViewDataExtensions.TokenPasswordResetCode])
 
     }
     </script>

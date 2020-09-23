@@ -30,7 +30,7 @@ namespace Umbraco.Web.Trees
     /// Used to return tree root nodes
     /// </summary>
     [AngularJsonOnlyConfiguration]
-    [PluginController("UmbracoTrees")]
+    [PluginController(Constants.Web.Mvc.BackOfficeTreeArea)]
     public class ApplicationTreeController : UmbracoAuthorizedApiController
     {
         private readonly ITreeService _treeService;

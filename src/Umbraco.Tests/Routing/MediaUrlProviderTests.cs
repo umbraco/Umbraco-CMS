@@ -7,7 +7,6 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
@@ -39,8 +38,8 @@ namespace Umbraco.Tests.Routing
             var dataTypeService = Mock.Of<IDataTypeService>();
             var propertyEditors = new MediaUrlGeneratorCollection(new IMediaUrlGenerator[]
             {
-                new FileUploadPropertyEditor(loggerFactory, mediaFileSystemMock, Microsoft.Extensions.Options.Options.Create(contentSettings), dataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper),
-                new ImageCropperPropertyEditor(loggerFactory, mediaFileSystemMock, Microsoft.Extensions.Options.Options.Create(contentSettings), dataTypeService, LocalizationService, IOHelper, ShortStringHelper, LocalizedTextService),
+                new FileUploadPropertyEditor(loggerFactory, mediaFileSystemMock, Microsoft.Extensions.Options.Options.Create(contentSettings), dataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper, UploadAutoFillProperties),
+                new ImageCropperPropertyEditor(loggerFactory, mediaFileSystemMock, Microsoft.Extensions.Options.Options.Create(contentSettings), dataTypeService, LocalizationService, IOHelper, ShortStringHelper, LocalizedTextService, UploadAutoFillProperties),
             });
             _mediaUrlProvider = new DefaultMediaUrlProvider(propertyEditors, UriUtility);
         }

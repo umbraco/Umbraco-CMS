@@ -16,6 +16,7 @@ using Umbraco.Core.Configuration.Grid;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Security;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.WebAssets;
 using Umbraco.Extensions;
@@ -47,6 +48,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly BackOfficeSignInManager _signInManager;
         private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly ILogger<BackOfficeController> _logger;
+        private readonly IJsonSerializer _jsonSerializer;
 
         public BackOfficeController(
             IBackOfficeUserManager userManager,
@@ -59,7 +61,8 @@ namespace Umbraco.Web.BackOffice.Controllers
             AppCaches appCaches,
             BackOfficeSignInManager signInManager,
             IBackofficeSecurityAccessor backofficeSecurityAccessor,
-            ILogger<BackOfficeController> logger)
+            ILogger<BackOfficeController> logger,
+            IJsonSerializer jsonSerializer)
         {
             _userManager = userManager;
             _runtimeMinifier = runtimeMinifier;
@@ -72,6 +75,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _signInManager = signInManager;
             _backofficeSecurityAccessor = backofficeSecurityAccessor;
             _logger = logger;
+            _jsonSerializer = jsonSerializer;
         }
 
         [HttpGet]
@@ -249,11 +253,11 @@ namespace Umbraco.Web.BackOffice.Controllers
             var user = await _userManager.FindByIdAsync(userId.ToString());
             if (user != null)
             {
-                var result = await _userManager.VerifyUserTokenAsync(user, "ResetPassword", "ResetPassword", resetCode);
+                var result = await _userManager.VerifyUserTokenAsync(user, "Default", "ResetPassword", resetCode);
                 if (result)
                 {
                     //Add a flag and redirect for it to be displayed
-                    TempData[ViewDataExtensions.TokenPasswordResetCode] = new ValidatePasswordResetCodeModel { UserId = userId, ResetCode = resetCode };
+                    TempData[ViewDataExtensions.TokenPasswordResetCode] =  _jsonSerializer.Serialize(new ValidatePasswordResetCodeModel { UserId = userId, ResetCode = resetCode });
                     return RedirectToLocal(Url.Action("Default", "BackOffice"));
                 }
             }

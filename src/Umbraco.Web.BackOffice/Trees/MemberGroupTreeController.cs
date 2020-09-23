@@ -13,7 +13,7 @@ namespace Umbraco.Web.Trees
 {
     [UmbracoTreeAuthorize(Constants.Trees.MemberGroups)]
     [Tree(Constants.Applications.Members, Constants.Trees.MemberGroups, SortOrder = 1)]
-    [PluginController("UmbracoTrees")]
+    [PluginController(Constants.Web.Mvc.BackOfficeTreeArea)]
     [CoreTree]
     public class MemberGroupTreeController : MemberTypeAndGroupTreeControllerBase
     {

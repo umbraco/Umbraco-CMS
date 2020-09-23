@@ -39,7 +39,7 @@ using Umbraco.Web.Models.Mapping;
 using Umbraco.Web.Security;
 using Umbraco.Web.WebApi.Filters;
 
-namespace Umbraco.Web.Editors
+namespace Umbraco.Web.BackOffice.Controllers
 {
     /// <summary>
     /// The API controller used for editing content
