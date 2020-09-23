@@ -22,6 +22,7 @@ using Umbraco.Web.Common.Builder;
 using Umbraco.Web.Common.Controllers;
 using Umbraco.Web.Editors;
 using Microsoft.Extensions.Hosting;
+using Umbraco.Web.BackOffice.Controllers;
 
 namespace Umbraco.Tests.Integration.TestServerTest
 {

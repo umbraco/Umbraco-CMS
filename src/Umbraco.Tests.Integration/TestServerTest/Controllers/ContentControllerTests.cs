@@ -11,6 +11,7 @@ using Umbraco.Core.Services;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Common.Builders.Extensions;
 using Umbraco.Tests.Testing;
+using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.Common.Formatters;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Models.ContentEditing;
