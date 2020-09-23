@@ -112,8 +112,6 @@ namespace Umbraco.Extensions
         /// <returns></returns>
         public static IHtmlContent AngularValueResetPasswordCodeInfoScript(this IHtmlHelper html, object val)
         {
-            if (val is null) return html.Raw(string.Empty);
-
             var sb = new StringBuilder();
             sb.AppendLine();
             sb.AppendLine(@"var errors = [];");
@@ -129,7 +127,7 @@ namespace Umbraco.Extensions
             sb.AppendLine(@"app.value(""resetPasswordCodeInfo"", {");
             sb.AppendLine(@"errors: errors,");
             sb.Append(@"resetCodeModel: ");
-            sb.AppendLine(val.ToString());
+            sb.AppendLine(val?.ToString() ?? "null");
             sb.AppendLine(@"});");
 
             return html.Raw(sb.ToString());
