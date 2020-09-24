@@ -25,6 +25,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         private readonly IMemberTypeRepository _memberTypeRepository;
         private readonly ITagRepository _tagRepository;
         private readonly IMemberGroupRepository _memberGroupRepository;
+        private readonly IRepositoryCachePolicy<IMember, string> _memberByUsernameCachePolicy;
 
         public MemberRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger,
             IMemberTypeRepository memberTypeRepository, IMemberGroupRepository memberGroupRepository, ITagRepository tagRepository, ILanguageRepository languageRepository, IRelationRepository relationRepository, IRelationTypeRepository relationTypeRepository,
@@ -34,6 +35,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             _memberTypeRepository = memberTypeRepository ?? throw new ArgumentNullException(nameof(memberTypeRepository));
             _tagRepository = tagRepository ?? throw new ArgumentNullException(nameof(tagRepository));
             _memberGroupRepository = memberGroupRepository;
+
+            _memberByUsernameCachePolicy = new DefaultRepositoryCachePolicy<IMember, string>(GlobalIsolatedCache, ScopeAccessor, DefaultOptions);
         }
 
         protected override MemberRepository This => this;
@@ -382,12 +385,27 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (changedCols.Count > 0)
                 Database.Update(dto, changedCols);
 
-            // replace the property data
-            var deletePropertyDataSql = SqlContext.Sql().Delete<PropertyDataDto>().Where<PropertyDataDto>(x => x.VersionId == member.VersionId);
-            Database.Execute(deletePropertyDataSql);
+            // Replace the property data
+            // Lookup the data to update with a UPDLOCK (using ForUpdate()) this is because we have another method that doesn't take an explicit WriteLock
+            // in SetLastLogin which is called very often and we want to avoid the lock timeout for the explicit lock table but we still need to ensure atomic
+            // operations between that method and this one. 
+
+            var propDataSql = SqlContext.Sql().Select("*").From<PropertyDataDto>().Where<PropertyDataDto>(x => x.VersionId == member.VersionId).ForUpdate();
+            var existingPropData = Database.Fetch<PropertyDataDto>(propDataSql).ToDictionary(x => x.PropertyTypeId);
             var propertyDataDtos = PropertyFactory.BuildDtos(member.ContentType.Variations, member.VersionId, 0, entity.Properties, LanguageRepository, out _, out _);
             foreach (var propertyDataDto in propertyDataDtos)
-                Database.Insert(propertyDataDto);
+            {
+                // Check if this already exists and update, else insert a new one
+                if (existingPropData.TryGetValue(propertyDataDto.PropertyTypeId, out var propData))
+                {
+                    propertyDataDto.Id = propData.Id;
+                    Database.Update(propertyDataDto);
+                }
+                else
+                {
+                    Database.Insert(propertyDataDto);
+                }
+            }   
 
             SetEntityTags(entity, _tagRepository);
 
@@ -505,6 +523,56 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return Database.ExecuteScalar<int>(fullSql);
         }
 
+        /// <inheritdoc />
+        public void SetLastLogin(string username, DateTime date)
+        {
+            // Important - these queries are designed to execute without an exclusive WriteLock taken in our distributed lock
+            // table. However due to the data that we are updating which relies on version data we cannot update this data
+            // without taking some locks, otherwise we'll end up with strange situations because when a member is updated, that operation
+            // deletes and re-inserts all property data. So if there are concurrent transactions, one deleting and re-inserting and another trying
+            // to update there can be problems. This is only an issue for cmsPropertyData, not umbracoContentVersion because that table just
+            // maintains a single row and it isn't deleted/re-inserted.
+            // So the important part here is the ForUpdate() call on the select to fetch the property data to update.
+
+            // Update the cms property value for the member
+
+            var sqlSelectTemplateProperty = SqlContext.Templates.Get("Umbraco.Core.MemberRepository.SetLastLogin1", s => s
+                .Select<PropertyDataDto>(x => x.Id)
+                .From<PropertyDataDto>()
+                .InnerJoin<PropertyTypeDto>().On<PropertyTypeDto, PropertyDataDto>((l, r) => l.Id == r.PropertyTypeId)
+                .InnerJoin<ContentVersionDto>().On<ContentVersionDto, PropertyDataDto>((l, r) => l.Id == r.VersionId)
+                .InnerJoin<NodeDto>().On<NodeDto, ContentVersionDto>((l, r) => l.NodeId == r.NodeId)
+                .InnerJoin<MemberDto>().On<MemberDto, NodeDto>((l, r) => l.NodeId == r.NodeId)
+                .Where<NodeDto>(x => x.NodeObjectType == SqlTemplate.Arg<Guid>("nodeObjectType"))
+                .Where<PropertyTypeDto>(x => x.Alias == SqlTemplate.Arg<string>("propertyTypeAlias"))
+                .Where<MemberDto>(x => x.LoginName == SqlTemplate.Arg<string>("username"))
+                .ForUpdate());
+            var sqlSelectProperty = sqlSelectTemplateProperty.Sql(Constants.ObjectTypes.Member, Constants.Conventions.Member.LastLoginDate, username);
+
+            var update = Sql()
+                .Update<PropertyDataDto>(u => u
+                    .Set(x => x.DateValue, date))
+                .WhereIn<PropertyDataDto>(x => x.Id, sqlSelectProperty);
+
+            Database.Execute(update);
+
+            // Update the umbracoContentVersion value for the member
+
+            var sqlSelectTemplateVersion = SqlContext.Templates.Get("Umbraco.Core.MemberRepository.SetLastLogin2", s => s
+               .Select<ContentVersionDto>(x => x.Id)
+               .From<ContentVersionDto>()               
+               .InnerJoin<NodeDto>().On<NodeDto, ContentVersionDto>((l, r) => l.NodeId == r.NodeId)
+               .InnerJoin<MemberDto>().On<MemberDto, NodeDto>((l, r) => l.NodeId == r.NodeId)
+               .Where<NodeDto>(x => x.NodeObjectType == SqlTemplate.Arg<Guid>("nodeObjectType"))
+               .Where<MemberDto>(x => x.LoginName == SqlTemplate.Arg<string>("username")));
+            var sqlSelectVersion = sqlSelectTemplateVersion.Sql(Constants.ObjectTypes.Member, username);
+
+            Database.Execute(Sql()
+                .Update<ContentVersionDto>(u => u
+                    .Set(x => x.VersionDate, date))
+                .WhereIn<ContentVersionDto>(x => x.Id, sqlSelectVersion));
+        }
+
         /// <summary>
         /// Gets paged member results.
         /// </summary>
@@ -526,20 +594,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 x => MapDtosToContent(x),
                 filterSql,
                 ordering);
-        }
-
-        private string _pagedResultsByQueryWhere;
-
-        private string GetPagedResultsByQueryWhere()
-        {
-            if (_pagedResultsByQueryWhere == null)
-                _pagedResultsByQueryWhere = " AND ("
-                    + $"({SqlSyntax.GetQuotedTableName("umbracoNode")}.{SqlSyntax.GetQuotedColumnName("text")} LIKE @0)"
-                    + " OR "
-                    + $"({SqlSyntax.GetQuotedTableName("cmsMember")}.{SqlSyntax.GetQuotedColumnName("LoginName")} LIKE @0)"
-                    + ")";
-
-            return _pagedResultsByQueryWhere;
         }
 
         protected override string ApplySystemOrdering(ref Sql<ISqlContext> sql, Ordering ordering)
@@ -630,6 +684,23 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // reset dirty initial properties (U4-1946)
             member.ResetDirtyProperties(false);
             return member;
+        }
+
+        public IMember GetByUsername(string username)
+        {
+            return _memberByUsernameCachePolicy.Get(username, PerformGetByUsername, PerformGetAllByUsername);
+        }
+
+        private IMember PerformGetByUsername(string username)
+        {
+            var query = Query<IMember>().Where(x => x.Username.Equals(username));
+            return PerformGetByQuery(query).FirstOrDefault();
+        }
+
+        private IEnumerable<IMember> PerformGetAllByUsername(params string[] usernames)
+        {
+            var query = Query<IMember>().WhereIn(x => x.Username, usernames);
+            return PerformGetByQuery(query);
         }
     }
 }
