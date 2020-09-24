@@ -5,7 +5,8 @@ using Ganss.XSS;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
-using Umbraco.Web.Models;
+using Umbraco.Core.Models;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Services
 {
@@ -68,13 +69,13 @@ namespace Umbraco.Web.Services
         private IconModel CreateIconModel(string iconName, string iconPath)
         {
             var sanitizer = new HtmlSanitizer();
-            sanitizer.AllowedAttributes.UnionWith(Core.Constants.SvgSanitizer.Attributes);
-            sanitizer.AllowedCssProperties.UnionWith(Core.Constants.SvgSanitizer.Attributes);
-            sanitizer.AllowedTags.UnionWith(Core.Constants.SvgSanitizer.Tags);
+            sanitizer.AllowedAttributes.UnionWith(Constants.SvgSanitizer.Attributes);
+            sanitizer.AllowedCssProperties.UnionWith(Constants.SvgSanitizer.Attributes);
+            sanitizer.AllowedTags.UnionWith(Constants.SvgSanitizer.Tags);
 
             try
             {
-                var svgContent = File.ReadAllText(iconPath);
+                var svgContent = System.IO.File.ReadAllText(iconPath);
                 var sanitizedString = sanitizer.Sanitize(svgContent);
 
                 var svg = new IconModel
