@@ -1,9 +1,13 @@
 ﻿using Examine;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Membership;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 
@@ -16,19 +20,50 @@ namespace Umbraco.Examine
     {
         private readonly UrlSegmentProviderCollection _urlSegmentProviders;
         private readonly IUserService _userService;
+        private readonly IScopeProvider _scopeProvider;
+
+        [Obsolete("Use the other ctor instead")]
+        public ContentValueSetBuilder(PropertyEditorCollection propertyEditors,
+            UrlSegmentProviderCollection urlSegmentProviders,
+            IUserService userService,
+            bool publishedValuesOnly)
+            : this(propertyEditors, urlSegmentProviders, userService, Current.ScopeProvider, publishedValuesOnly)
+        {
+        }
 
         public ContentValueSetBuilder(PropertyEditorCollection propertyEditors,
             UrlSegmentProviderCollection urlSegmentProviders,
             IUserService userService,
+            IScopeProvider scopeProvider,
             bool publishedValuesOnly)
             : base(propertyEditors, publishedValuesOnly)
         {
             _urlSegmentProviders = urlSegmentProviders;
             _userService = userService;
+            _scopeProvider = scopeProvider;
         }
 
         /// <inheritdoc />
         public override IEnumerable<ValueSet> GetValueSets(params IContent[] content)
+        {
+            Dictionary<int, IProfile> creatorIds;
+            Dictionary<int, IProfile> writerIds;
+
+            // We can lookup all of the creator/writer names at once which can save some
+            // processing below instead of one by one.
+            using (var scope = _scopeProvider.CreateScope())
+            {
+                creatorIds = _userService.GetProfilesById(content.Select(x => x.CreatorId).ToArray())
+                    .ToDictionary(x => x.Id, x => x);
+                writerIds = _userService.GetProfilesById(content.Select(x => x.WriterId).ToArray())
+                    .ToDictionary(x => x.Id, x => x);
+                scope.Complete();
+            }
+
+            return GetValueSetsEnumerable(content, creatorIds, writerIds);
+        }
+
+        private IEnumerable<ValueSet> GetValueSetsEnumerable(IContent[] content, Dictionary<int, IProfile> creatorIds, Dictionary<int, IProfile> writerIds)
         {
             // TODO: There is a lot of boxing going on here and ultimately all values will be boxed by Lucene anyways
             // but I wonder if there's a way to reduce the boxing that we have to do or if it will matter in the end since
@@ -58,8 +93,8 @@ namespace Umbraco.Examine
                     {"urlName", urlValue?.Yield() ?? Enumerable.Empty<string>()},                  //Always add invariant urlName
                     {"path", c.Path?.Yield() ?? Enumerable.Empty<string>()},
                     {"nodeType", c.ContentType.Id.ToString().Yield() ?? Enumerable.Empty<string>()},
-                    {"creatorName", (c.GetCreatorProfile(_userService)?.Name ?? "??").Yield() },
-                    {"writerName",(c.GetWriterProfile(_userService)?.Name ?? "??").Yield() },
+                    {"creatorName", (creatorIds.TryGetValue(c.CreatorId, out var creatorProfile) ? creatorProfile.Name : "??").Yield() },
+                    {"writerName", (writerIds.TryGetValue(c.WriterId, out var writerProfile) ? writerProfile.Name : "??").Yield() },
                     {"writerID", new object[] {c.WriterId}},
                     {"templateID", new object[] {c.TemplateId ?? 0}},
                     {UmbracoContentIndex.VariesByCultureFieldName, new object[] {"n"}},

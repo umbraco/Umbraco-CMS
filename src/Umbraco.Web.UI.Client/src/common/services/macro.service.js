@@ -62,12 +62,12 @@ function macroService() {
                     val = val ? val : "";
                     //need to detect if the val is a string or an object
                     var keyVal;
-                    if (angular.isString(val)) {
+                    if (Utilities.isString(val)) {
                         keyVal = key + "=\"" + (val ? val : "") + "\" ";
                     }
                     else {
                         //if it's not a string we'll send it through the json serializer
-                        var json = angular.toJson(val);
+                        var json = Utilities.toJson(val);
                         //then we need to url encode it so that it's safe
                         var encoded = encodeURIComponent(json);
                         keyVal = key + "=\"" + encoded + "\" ";
@@ -142,7 +142,7 @@ function macroService() {
 
                 if (item.value !== null && item.value !== undefined && !_.isString(item.value)) {
                     try {
-                        val = angular.toJson(val);
+                        val = Utilities.toJson(val);
                     }
                     catch (e) {
                         // not json

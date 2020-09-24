@@ -2,7 +2,7 @@
  * @ngdoc controller
  * @name Umbraco.Editors.Content.CreateController
  * @function
- * 
+ *
  * @description
  * The controller for the content creation dialog
  */
@@ -14,26 +14,40 @@ function contentCreateController($scope,
     navigationService,
     blueprintConfig,
     authResource,
-    contentResource) {
+    contentResource,
+    $q) {
 
     var mainCulture = $routeParams.mculture ? $routeParams.mculture : null;
 
     function initialize() {
+        $scope.loading = true;
         $scope.allowedTypes = null;
-        contentTypeResource.getAllowedTypes($scope.currentNode.id).then(function (data) {
+
+        var getAllowedTypes = contentTypeResource.getAllowedTypes($scope.currentNode.id).then(function (data) {
             $scope.allowedTypes = iconHelper.formatContentTypeIcons(data);
         });
+        var getCurrentUser = authResource.getCurrentUser().then(function (currentUser) {
 
-        if ($scope.currentNode.id > -1) {
-            authResource.getCurrentUser().then(function(currentUser) {
-                if (currentUser.allowedSections.indexOf("settings") > -1) {
-                    $scope.hasSettingsAccess = true;
-                    contentResource.getById($scope.currentNode.id).then(function(data) {
+            $scope.hasSettingsAccess = currentUser.allowedSections.indexOf("settings") > -1;
+            if ($scope.hasSettingsAccess) {
+
+                if ($scope.currentNode.id > -1) {
+                    return contentResource.getById($scope.currentNode.id).then(function (data) {
                         $scope.contentTypeId = data.contentTypeId;
                     });
                 }
-            });
-        }
+            }
+        });
+
+        $q.all([getAllowedTypes, getCurrentUser]).then(function() {
+            if ($scope.hasSettingsAccess === true && $scope.allowedTypes.length === 0) {
+                return contentTypeResource.getCount().then(function(count) {
+                    $scope.countTypes = count;
+                });
+            }
+        }).then(function() {
+            $scope.loading = false;
+        });
 
         $scope.selectContentType = true;
         $scope.selectBlueprint = false;
@@ -49,10 +63,13 @@ function contentCreateController($scope,
             .path("/content/content/edit/" + $scope.currentNode.id)
             .search("doctype", docType.alias)
             .search("create", "true")
-            /* when we create a new node we want to make sure it uses the same 
+            /* when we create a new node we want to make sure it uses the same
             language as what is selected in the tree */
             .search("cculture", mainCulture)
-            /* when we create a new node we must make sure that any previously 
+            /* when we create a new node we must make sure that any previously
+            opened segments is reset */
+            .search("csegment", null)
+            /* when we create a new node we must make sure that any previously
             used blueprint is reset */
             .search("blueprintId", null);
         close();
@@ -91,22 +108,27 @@ function contentCreateController($scope,
 
     $scope.close = function() {
         close();
-    }
+    };
 
     $scope.closeDialog = function (showMenu) {
         navigationService.hideDialog(showMenu);
     };
 
-    $scope.editContentType = function() {
+    $scope.createContentType = function () {
+        $location.path("/settings/documenttypes/edit/-1").search("create", "true");
+        close();
+    };
+
+    $scope.editContentType = function () {
         $location.path("/settings/documenttypes/edit/" + $scope.contentTypeId).search("view", "permissions");
         close();
-    }
+    };
 
     $scope.createBlank = createBlank;
     $scope.createOrSelectBlueprintIfAny = createOrSelectBlueprintIfAny;
     $scope.createFromBlueprint = createFromBlueprint;
 
-    // the current node changes behind the scenes when the context menu is clicked without closing 
+    // the current node changes behind the scenes when the context menu is clicked without closing
     // the default menu first, so we must watch the current node and re-initialize accordingly
     var unbindModelWatcher = $scope.$watch("currentNode", initialize);
     $scope.$on('$destroy', function () {

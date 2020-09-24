@@ -44,7 +44,7 @@ namespace Umbraco.Tests.PublishedContent
         { }
     }
 
-    class SolidPublishedContentCache : PublishedCacheBase, IPublishedContentCache, IPublishedMediaCache
+    class SolidPublishedContentCache : PublishedCacheBase, IPublishedContentCache2, IPublishedMediaCache2
     {
         private readonly Dictionary<int, IPublishedContent> _content = new Dictionary<int, IPublishedContent>();
 
@@ -150,6 +150,11 @@ namespace Umbraco.Tests.PublishedContent
             throw new NotImplementedException();
         }
 
+        public override IPublishedContentType GetContentType(Guid key)
+        {
+            throw new NotImplementedException();
+        }
+
         public override IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType)
         {
             throw new NotImplementedException();
@@ -199,6 +204,7 @@ namespace Umbraco.Tests.PublishedContent
         public DateTime UpdateDate { get; set; }
         public Guid Version { get; set; }
         public int Level { get; set; }
+        [Obsolete("Use the Url() extension instead")]
         public string Url { get; set; }
 
         public PublishedItemType ItemType => PublishedItemType.Content;
@@ -377,7 +383,7 @@ namespace Umbraco.Tests.PublishedContent
         #endregion
     }
 
-    class PublishedContentStrong1 : PublishedContentModel
+    internal class PublishedContentStrong1 : PublishedContentModel
     {
         public PublishedContentStrong1(IPublishedContent content)
             : base(content)
@@ -386,7 +392,7 @@ namespace Umbraco.Tests.PublishedContent
         public int StrongValue => this.Value<int>("strongValue");
     }
 
-    class PublishedContentStrong1Sub : PublishedContentStrong1
+    internal class PublishedContentStrong1Sub : PublishedContentStrong1
     {
         public PublishedContentStrong1Sub(IPublishedContent content)
             : base(content)
@@ -395,7 +401,7 @@ namespace Umbraco.Tests.PublishedContent
         public int AnotherValue => this.Value<int>("anotherValue");
     }
 
-    class PublishedContentStrong2 : PublishedContentModel
+    internal class PublishedContentStrong2 : PublishedContentModel
     {
         public PublishedContentStrong2(IPublishedContent content)
             : base(content)
@@ -404,7 +410,7 @@ namespace Umbraco.Tests.PublishedContent
         public int StrongValue => this.Value<int>("strongValue");
     }
 
-    class AutoPublishedContentType : PublishedContentType
+    internal class AutoPublishedContentType : PublishedContentType
     {
         private static readonly IPublishedPropertyType Default;
 
@@ -417,20 +423,20 @@ namespace Umbraco.Tests.PublishedContent
             Default = factory.CreatePropertyType("*", 666);
         }
 
-        public AutoPublishedContentType(int id, string alias, IEnumerable<PublishedPropertyType> propertyTypes)
-            : base(id, alias, PublishedItemType.Content, Enumerable.Empty<string>(), propertyTypes, ContentVariation.Nothing)
+        public AutoPublishedContentType(Guid key, int id, string alias, IEnumerable<PublishedPropertyType> propertyTypes)
+            : base(key, id, alias, PublishedItemType.Content, Enumerable.Empty<string>(), propertyTypes, ContentVariation.Nothing)
         { }
 
-        public AutoPublishedContentType(int id, string alias, Func<IPublishedContentType, IEnumerable<IPublishedPropertyType>> propertyTypes)
-            : base(id, alias, PublishedItemType.Content, Enumerable.Empty<string>(), propertyTypes, ContentVariation.Nothing)
+        public AutoPublishedContentType(Guid key, int id, string alias, Func<IPublishedContentType, IEnumerable<IPublishedPropertyType>> propertyTypes)
+            : base(key, id, alias, PublishedItemType.Content, Enumerable.Empty<string>(), propertyTypes, ContentVariation.Nothing)
         { }
 
-        public AutoPublishedContentType(int id, string alias, IEnumerable<string> compositionAliases, IEnumerable<PublishedPropertyType> propertyTypes)
-            : base(id, alias, PublishedItemType.Content, compositionAliases, propertyTypes, ContentVariation.Nothing)
+        public AutoPublishedContentType(Guid key, int id, string alias, IEnumerable<string> compositionAliases, IEnumerable<PublishedPropertyType> propertyTypes)
+            : base(key, id, alias, PublishedItemType.Content, compositionAliases, propertyTypes, ContentVariation.Nothing)
         { }
 
-        public AutoPublishedContentType(int id, string alias, IEnumerable<string> compositionAliases, Func<IPublishedContentType, IEnumerable<IPublishedPropertyType>> propertyTypes)
-            : base(id, alias, PublishedItemType.Content, compositionAliases, propertyTypes, ContentVariation.Nothing)
+        public AutoPublishedContentType(Guid key, int id, string alias, IEnumerable<string> compositionAliases, Func<IPublishedContentType, IEnumerable<IPublishedPropertyType>> propertyTypes)
+            : base(key, id, alias, PublishedItemType.Content, compositionAliases, propertyTypes, ContentVariation.Nothing)
         { }
 
         public override IPublishedPropertyType GetPropertyType(string alias)

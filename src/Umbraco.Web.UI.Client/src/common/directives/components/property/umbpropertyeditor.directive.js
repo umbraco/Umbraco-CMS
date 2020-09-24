@@ -15,7 +15,7 @@ function umbPropEditor(umbPropEditorHelper) {
                 preview: "<"
             },
             
-            require: "^^form",
+            require: ["^^form", "?^umbProperty"],
             restrict: 'E',
             replace: true,      
             templateUrl: 'views/components/property/umb-property-editor.html',
@@ -24,14 +24,24 @@ function umbPropEditor(umbPropEditorHelper) {
                 //we need to copy the form controller val to our isolated scope so that
                 //it get's carried down to the child scopes of this!
                 //we'll also maintain the current form name.
-                scope[ctrl.$name] = ctrl;
+                scope[ctrl[0].$name] = ctrl[0];
+
+                // We will capture a reference to umbProperty in this Directive and pass it on to the Scope, so Property-Editor controllers can use it.
+                scope["umbProperty"] = ctrl[1];
 
                 if(!scope.model.alias){
                    scope.model.alias = Math.random().toString(36).slice(2);
                 }
 
-                scope.propertyEditorView = umbPropEditorHelper.getViewPath(scope.model.view, scope.isPreValue);
-                
+                var unbindWatcher = scope.$watch("model.view",
+                    function() {
+                        scope.propertyEditorView = umbPropEditorHelper.getViewPath(scope.model.view, scope.isPreValue);
+                    }
+                );
+
+                scope.$on("$destroy", function () {
+                    unbindWatcher();
+                });
             }
         };
     };

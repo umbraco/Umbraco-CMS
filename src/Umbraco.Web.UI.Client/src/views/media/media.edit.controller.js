@@ -6,10 +6,10 @@
  * @description
  * The controller for the media editor
  */
-function mediaEditController($scope, $routeParams, $q, appState, mediaResource, 
+function mediaEditController($scope, $routeParams, $location, $http, $q, appState, mediaResource, 
     entityResource, navigationService, notificationsService, localizationService, 
     serverValidationManager, contentEditingHelper, fileManager, formHelper, 
-    editorState, umbRequestHelper, $http, eventsService, $location) {
+    editorState, umbRequestHelper, eventsService) {
     
     var evts = [];
     var nodeId = null;
@@ -35,7 +35,8 @@ function mediaEditController($scope, $routeParams, $q, appState, mediaResource,
     //setup scope vars
     $scope.currentSection = appState.getSectionState("currentSection");
     $scope.currentNode = null; //the editors affiliated node
-
+    $scope.header = {};
+    $scope.header.setPageTitle = $scope.currentSection ==="media";
     $scope.page = {};
     $scope.page.loading = false;
     $scope.page.menu = {};
@@ -50,36 +51,38 @@ function mediaEditController($scope, $routeParams, $q, appState, mediaResource,
 
         $scope.page.loading = true;
 
-        mediaResource.getScaffold(nodeId, $routeParams.doctype)
-            .then(function (data) {
-                $scope.content = data;
+        mediaResource.getScaffold(nodeId, $routeParams.doctype).then(function (data) {
+            $scope.content = data;
 
-                init();
+            init();
 
-                $scope.page.loading = false;
-
-            });
+            $scope.page.loading = false;
+        }, function () {
+            $scope.page.loading = false;
+        });
     }
     else {
         $scope.page.loading = true;
-        loadMedia()
-            .then(function(){
-                $scope.page.loading = false;
-            });
+
+        loadMedia().then(function(){
+            $scope.page.loading = false;
+        }, function () {
+            $scope.page.loading = false;
+        });
     }
 
     function init() {
         
         var content = $scope.content;
         
-        // we need to check wether an app is present in the current data, if not we will present the default app.
+        // we need to check whether an app is present in the current data, if not we will present the default app.
         var isAppPresent = false;
         
         // on first init, we dont have any apps. but if we are re-initializing, we do, but ...
         if ($scope.app) {
             
             // lets check if it still exists as part of our apps array. (if not we have made a change to our docType, even just a re-save of the docType it will turn into new Apps.)
-            _.forEach(content.apps, function(app) {
+            content.apps.forEach(app => {
                 if (app === $scope.app) {
                     isAppPresent = true;
                 }
@@ -87,7 +90,7 @@ function mediaEditController($scope, $routeParams, $q, appState, mediaResource,
             
             // if we did reload our DocType, but still have the same app we will try to find it by the alias.
             if (isAppPresent === false) {
-                _.forEach(content.apps, function(app) {
+                content.apps.forEach(app => {
                     if (app.alias === $scope.app.alias) {
                         isAppPresent = true;
                         app.active = true;
@@ -103,12 +106,10 @@ function mediaEditController($scope, $routeParams, $q, appState, mediaResource,
             content.apps[0].active = true;
             $scope.appChanged(content.apps[0]);
         }
-        
 
         editorState.set($scope.content);
         
         bindEvents();
-
     }
     
     function bindEvents() {
@@ -122,6 +123,8 @@ function mediaEditController($scope, $routeParams, $q, appState, mediaResource,
             if(args && args.mediaType && args.mediaType.key === $scope.content.contentType.key) {
                 $scope.page.loading = true;
                 loadMedia().then(function() {
+                    $scope.page.loading = false;
+                }, function () {
                     $scope.page.loading = false;
                 });
             }
@@ -181,28 +184,31 @@ function mediaEditController($scope, $routeParams, $q, appState, mediaResource,
 
                     formHelper.resetForm({ scope: $scope });
 
-                    contentEditingHelper.handleSuccessfulSave({
-                        scope: $scope,
-                        savedContent: data,
-                        rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, data)
-                    });
-
-                    editorState.set($scope.content);
-                    
-                    syncTreeNode($scope.content, data.path);
-
-                    init();
-
-                    $scope.page.saveButtonState = "success";
-
                     // close the editor if it's infinite mode
+                    // submit function manages rebinding changes
                     if(infiniteMode && $scope.model.submit) {
                         $scope.model.mediaNode = $scope.content;
                         $scope.model.submit($scope.model);
+                    } else {
+                        // if not infinite mode, rebind changed props etc
+                        contentEditingHelper.handleSuccessfulSave({
+                            scope: $scope,
+                            savedContent: data,
+                            rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, data)
+                        });
+
+                        editorState.set($scope.content);
+
+                        syncTreeNode($scope.content, data.path);
+                        
+                        $scope.page.saveButtonState = "success";
+
+                        init();
                     }
 
                 }, function(err) {
 
+                    formHelper.resetForm({ scope: $scope, hasErrors: true });
                     contentEditingHelper.handleSaveError({
                         err: err,
                         rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, err.data)
@@ -244,7 +250,7 @@ function mediaEditController($scope, $routeParams, $q, appState, mediaResource,
                     syncTreeNode($scope.content, data.path, true); 
                 }
                
-                if ($scope.content.parentId && $scope.content.parentId != -1) {
+                if ($scope.content.parentId && $scope.content.parentId !== -1 && $scope.content.parentId !== -21) {
                     //We fetch all ancestors of the node to generate the footer breadcrump navigation
                     entityResource.getAncestors(nodeId, "media")
                         .then(function (anc) {
@@ -258,8 +264,11 @@ function mediaEditController($scope, $routeParams, $q, appState, mediaResource,
 
                 $q.resolve($scope.content);
 
-            });
+            }, function (error) {
+                $scope.page.loading = false;
 
+                $q.reject(error);
+            });
     }
 
     $scope.close = function() {
@@ -279,7 +288,7 @@ function mediaEditController($scope, $routeParams, $q, appState, mediaResource,
 
     $scope.showBack = function () {
         return !infiniteMode && !!$scope.page.listViewPath;
-    }
+    };
 
     /** Callback for when user clicks the back-icon */
     $scope.onBack = function() {

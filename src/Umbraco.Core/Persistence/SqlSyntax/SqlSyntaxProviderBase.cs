@@ -196,11 +196,19 @@ namespace Umbraco.Core.Persistence.SqlSyntax
                 return "NCHAR";
             }
             else if (dbTypes == SpecialDbTypes.NTEXT)
+            {
                 return "NTEXT";
+            }
+            else if (dbTypes == SpecialDbTypes.NVARCHARMAX)
+            {
+                return "NVARCHAR(MAX)";
+            }
 
             return "NVARCHAR";
         }
-        
+
+        public abstract IsolationLevel DefaultIsolationLevel { get; }
+
         public virtual IEnumerable<string> GetTablesInSchema(IDatabase db)
         {
             return new List<string>();
@@ -224,6 +232,9 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         public abstract IEnumerable<Tuple<string, string, string, bool>> GetDefinedIndexes(IDatabase db);
 
         public abstract bool TryGetDefaultConstraint(IDatabase db, string tableName, string columnName, out string constraintName);
+
+        public abstract void ReadLock(IDatabase db, params int[] lockIds);
+        public abstract void WriteLock(IDatabase db, params int[] lockIds);
 
         public virtual bool DoesTableExist(IDatabase db, string tableName)
         {

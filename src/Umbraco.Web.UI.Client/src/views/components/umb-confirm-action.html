@@ -1,16 +1,31 @@
-<div class="umb_confirm-action__overlay"
-     ng-class="{
-     '-top': direction === 'top',
-     '-right': direction === 'right',
-     '-bottom': direction === 'bottom',
-     '-left': direction === 'left'}"
-     on-outside-click="clickCancel()">
+<div class="umb_confirm-action">
+    <button ng-if="onDelete" type="button" class="btn-icon" ng-click="clickButton($event)" localize="title" title="@general_delete">
+        <umb-icon icon="icon-trash" class="icon-trash"></umb-icon>
+        <span class="sr-only">
+            <localize key="general_delete">Delete</localize>
+        </span>
+    </button>
 
-        <a class="umb_confirm-action__overlay-action -confirm" href="" ng-click="clickConfirm()" localize="title" title="@buttons_confirmActionConfirm">
-            <i class="icon-check"></i>
-        </a>
+     <div class="umb_confirm-action__overlay"
+        ng-class="{
+        '-top': direction === 'top',
+        '-right': direction === 'right',
+        '-bottom': direction === 'bottom',
+        '-left': direction === 'left'}"
+        on-outside-click="clickCancel()" ng-if="show">
 
-        <a class="umb_confirm-action__overlay-action -cancel" href="" ng-click="clickCancel()" localize="title" title="@buttons_confirmActionCancel">
-            <i class="icon-delete"></i>
-        </a>
+        <button type="button" class="btn-reset umb_confirm-action__overlay-action -confirm" ng-click="clickConfirm()" localize="title" title="@buttons_confirmActionConfirm">
+            <umb-icon icon="icon-check" class="icon-check"></umb-icon>
+            <span class="sr-only">
+                <localize key="buttons_confirmActionConfirm">Confirm</localize>
+            </span>
+        </button>
+
+        <button type="button" class="btn-reset umb_confirm-action__overlay-action -cancel" ng-click="clickCancel()" localize="title" title="@buttons_confirmActionCancel">
+            <umb-icon icon="icon-delete" class="icon-delete"></umb-icon>
+            <span class="sr-only">
+                <localize key="buttons_confirmActionCancel">Cancel</localize>
+            </span>
+        </button>
+    </div>
 </div>

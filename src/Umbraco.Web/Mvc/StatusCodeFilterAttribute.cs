@@ -1,5 +1,7 @@
 ﻿using System.Net;
 using System.Web.Mvc;
+using Umbraco.Core;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Mvc
 {
@@ -20,6 +22,7 @@ namespace Umbraco.Web.Mvc
             base.OnActionExecuted(filterContext);
 
             filterContext.HttpContext.Response.StatusCode = (int)_statusCode;
+            filterContext.HttpContext.Response.TrySkipIisCustomErrors = Current.Configs.Settings().WebRouting.TrySkipIisCustomErrors;
         }
     }
 }

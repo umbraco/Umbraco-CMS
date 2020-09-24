@@ -1,5 +1,5 @@
 angular.module("umbraco").controller("Umbraco.PropertyEditors.DropdownFlexibleController",
-    function($scope) {
+    function ($scope, validationMessageService) {
 
         //setup the default config
         var config = {
@@ -15,6 +15,13 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.DropdownFlexibleCo
 
         //ensure this is a bool, old data could store zeros/ones or string versions
         $scope.model.config.multiple = Object.toBoolean($scope.model.config.multiple);
+
+        //ensure when form is saved that we don't store [] or [null] as string values in the database when no items are selected
+        $scope.$on("formSubmitting", function () {
+            if ($scope.model.value && ($scope.model.value.length === 0 || $scope.model.value[0] === null)) {
+                $scope.model.value = null;
+            }
+        });
 
         function convertArrayToDictionaryArray(model){
             //now we need to format the items in the dictionary because we always want to have an array
@@ -34,7 +41,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.DropdownFlexibleCo
             var keys = _.keys($scope.model.config.items);
 
             for (var i = 0; i < vals.length; i++) {
-                var label = vals[i].value ? vals[i].value : vals[i]; 
+                var label = vals[i].value ? vals[i].value : vals[i];
                 newItems.push({ id: keys[i], sortOrder: vals[i].sortOrder, value: label });
             }
 
@@ -45,20 +52,20 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.DropdownFlexibleCo
             $scope.model.value = [$scope.model.singleDropdownValue];
         }
 
-        if (angular.isArray($scope.model.config.items)) {
+        if (Utilities.isArray($scope.model.config.items)) {
             //PP: I dont think this will happen, but we have tests that expect it to happen..
             //if array is simple values, convert to array of objects
-            if(!angular.isObject($scope.model.config.items[0])){
+            if (!Utilities.isObject($scope.model.config.items[0])){
                 $scope.model.config.items = convertArrayToDictionaryArray($scope.model.config.items);
             }
         }
-        else if (angular.isObject($scope.model.config.items)) {
+        else if (Utilities.isObject($scope.model.config.items)) {
             $scope.model.config.items = convertObjectToDictionaryArray($scope.model.config.items);
         }
         else {
             throw "The items property must be either an array or a dictionary";
         }
-        
+
 
         //sort the values
         $scope.model.config.items.sort(function (a, b) { return (a.sortOrder > b.sortOrder) ? 1 : ((b.sortOrder > a.sortOrder) ? -1 : 0); });
@@ -73,7 +80,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.DropdownFlexibleCo
                 $scope.model.value = "";
             }
         }
-        
+
         // if we run in single mode we'll store the value in a local variable
         // so we can pass an array as the model as our PropertyValueEditor expects that
         $scope.model.singleDropdownValue = "";
@@ -89,4 +96,10 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.DropdownFlexibleCo
                 $scope.model.value = null;
             }
         }
+
+        // Set the message to use for when a mandatory field isn't completed.
+        // Will either use the one provided on the property type or a localised default.
+        validationMessageService.getMandatoryMessage($scope.model.validation).then(function (value) {
+            $scope.mandatoryMessage = value;
+        });
     });

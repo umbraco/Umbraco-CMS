@@ -17,16 +17,13 @@ namespace Umbraco.Web.Editors.Binders
     /// </summary>
     internal class ContentItemBinder : IModelBinder
     {
-        private readonly ContentModelBinderHelper _modelBinderHelper;
-
-        public ContentItemBinder() : this(Current.Logger, Current.Services, Current.UmbracoContextAccessor)
+        public ContentItemBinder() : this(Current.Services)
         {
         }
 
-        public ContentItemBinder(ILogger logger, ServiceContext services, IUmbracoContextAccessor umbracoContextAccessor)
+        public ContentItemBinder(ServiceContext services)
         {
             Services = services;
-            _modelBinderHelper = new ContentModelBinderHelper();
         }
 
         protected ServiceContext Services { get; }
@@ -39,35 +36,39 @@ namespace Umbraco.Web.Editors.Binders
         /// <returns></returns>
         public bool BindModel(HttpActionContext actionContext, ModelBindingContext bindingContext)
         {
-            var model = _modelBinderHelper.BindModelFromMultipartRequest<ContentItemSave>(actionContext, bindingContext);
+            var model = ContentModelBinderHelper.BindModelFromMultipartRequest<ContentItemSave>(actionContext, bindingContext);
             if (model == null) return false;
 
-            model.PersistedContent = ContentControllerBase.IsCreatingAction(model.Action) ? CreateNew(model) : GetExisting(model);
+            BindModel(model, ContentControllerBase.IsCreatingAction(model.Action) ? CreateNew(model) : GetExisting(model));
+
+            return true;
+        }
+
+        internal static void BindModel(ContentItemSave model, IContent persistedContent)
+        {
+            if (model is null) throw new ArgumentNullException(nameof(model));
+
+            model.PersistedContent = persistedContent;
 
             //create the dto from the persisted model
             if (model.PersistedContent != null)
             {
                 foreach (var variant in model.Variants)
                 {
-                    if (variant.Culture.IsNullOrWhiteSpace())
-                    {
-                        //map the property dto collection (no culture is passed to the mapping context so it will be invariant)
-                        variant.PropertyCollectionDto = Current.Mapper.Map<ContentPropertyCollectionDto>(model.PersistedContent);
-                    }
-                    else
-                    {
-                        //map the property dto collection with the culture of the current variant
-                        variant.PropertyCollectionDto = Current.Mapper.Map<ContentPropertyCollectionDto>(
-                            model.PersistedContent,
-                            context => context.SetCulture(variant.Culture));
-                    }
+                    //map the property dto collection with the culture of the current variant
+                    variant.PropertyCollectionDto = Current.Mapper.Map<ContentPropertyCollectionDto>(
+                        model.PersistedContent,
+                        context =>
+                        {
+                            // either of these may be null and that is ok, if it's invariant they will be null which is what is expected
+                            context.SetCulture(variant.Culture);
+                            context.SetSegment(variant.Segment);
+                        });
 
                     //now map all of the saved values to the dto
-                    _modelBinderHelper.MapPropertyValuesFromSaved(variant, variant.PropertyCollectionDto);
+                    ContentModelBinderHelper.MapPropertyValuesFromSaved(variant, variant.PropertyCollectionDto);
                 }
             }
-
-            return true;
         }
 
         protected virtual IContent GetExisting(ContentItemSave model)
@@ -87,6 +88,5 @@ namespace Umbraco.Web.Editors.Binders
                 model.ParentId,
                 contentType);
         }
-        
     }
 }

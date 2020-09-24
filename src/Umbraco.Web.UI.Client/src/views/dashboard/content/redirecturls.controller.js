@@ -82,6 +82,7 @@
                 view: "views/dashboard/content/overlays/disable.html",
                 submitButtonLabel: "Disable",
                 submitButtonLabelKey: "actions_disable",
+                submitButtonStyle:"danger",
                 submit: function (model) {
                     performDisable();
                     overlayService.close();
@@ -106,6 +107,7 @@
                 view: "views/dashboard/content/overlays/delete.html",
                 redirect: redirect,
                 submitButtonLabelKey: "contentTypeEditor_yesDelete",
+                submitButtonStyle: "danger",
                 submit: function (model) {
                     performDelete(model.redirect);
                     overlayService.close();

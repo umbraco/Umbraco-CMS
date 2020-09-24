@@ -10,7 +10,7 @@ var imagemin = require('gulp-imagemin');
 /**************************
  * Task processes and copies all dependencies, either installed by npm or stored locally in the project
  **************************/
-gulp.task('dependencies', function () {
+function dependencies() {
 
     //as we do multiple things in this task, we merge the multiple streams
     var stream = new MergeStream();
@@ -28,12 +28,15 @@ gulp.task('dependencies', function () {
                 "./node_modules/ace-builds/src-min-noconflict/snippets/text.js",
                 "./node_modules/ace-builds/src-min-noconflict/snippets/javascript.js",
                 "./node_modules/ace-builds/src-min-noconflict/snippets/css.js",
+                "./node_modules/ace-builds/src-min-noconflict/snippets/json.js",
                 "./node_modules/ace-builds/src-min-noconflict/theme-chrome.js",
                 "./node_modules/ace-builds/src-min-noconflict/mode-razor.js",
                 "./node_modules/ace-builds/src-min-noconflict/mode-javascript.js",
                 "./node_modules/ace-builds/src-min-noconflict/mode-css.js",
                 "./node_modules/ace-builds/src-min-noconflict/worker-javascript.js",
-                "./node_modules/ace-builds/src-min-noconflict/worker-css.js"
+                "./node_modules/ace-builds/src-min-noconflict/worker-css.js",
+                "./node_modules/ace-builds/src-min-noconflict/mode-json.js",
+                "./node_modules/ace-builds/src-min-noconflict/worker-json.js"
             ],
             "base": "./node_modules/ace-builds"
         },
@@ -41,6 +44,12 @@ gulp.task('dependencies', function () {
             "name": "angular",
             "src":  ["./node_modules/angular/angular.js"],
             "base": "./node_modules/angular"
+        },
+        {
+            "name": "angular-aria",
+            "src":  ["./node_modules/angular-aria/angular-aria.min.js",
+                    "./node_modules/angular-aria/angular-aria.min.js.map"],
+            "base": "./node_modules/angular-aria"
         },
         {
             "name": "angular-cookies",
@@ -100,7 +109,7 @@ gulp.task('dependencies', function () {
             "name": "angular-messages",
             "src":  ["./node_modules/angular-messages/angular-messages.js"],
             "base": "./node_modules/angular-messages"
-        },
+        },        
         {
             "name": "angular-mocks",
             "src":  ["./node_modules/angular-mocks/angular-mocks.js"],
@@ -208,10 +217,10 @@ gulp.task('dependencies', function () {
         {
             "name": "spectrum",
             "src":  [
-                "./node_modules/spectrum-colorpicker/spectrum.js",
-                "./node_modules/spectrum-colorpicker/spectrum.css"
+                "./node_modules/spectrum-colorpicker2/dist/spectrum.js",
+                "./node_modules/spectrum-colorpicker2/dist/spectrum.css"
             ],
-            "base": "./node_modules/spectrum-colorpicker"
+            "base": "./node_modules/spectrum-colorpicker2/dist"
         },
         {
             "name": "tinymce",
@@ -232,6 +241,14 @@ gulp.task('dependencies', function () {
             "name": "underscore",
             "src":  ["node_modules/underscore/underscore-min.js"],
             "base": "./node_modules/underscore"
+        },
+        {
+            "name": "wicg-inert",
+            "src": [
+                "./node_modules/wicg-inert/dist/inert.min.js",
+                "./node_modules/wicg-inert/dist/inert.min.js.map"
+            ],
+            "base": "./node_modules/wicg-inert"
         }
     ];
 
@@ -239,54 +256,55 @@ gulp.task('dependencies', function () {
     nodeModules.forEach(module => {
         stream.add(
             gulp.src(module.src,
-                { base: module.base })
+                { base: module.base, allowEmpty: true })
                 .pipe(gulp.dest(config.root + config.targets.lib + "/" + module.name))
         );
     });
 
     //copy over libs which are not on npm (/lib)
     stream.add(
-         gulp.src(config.sources.globs.lib)
+        gulp.src(config.sources.globs.lib, { allowEmpty: true })
             .pipe(gulp.dest(config.root + config.targets.lib))
         );
 
     //Copies all static assets into /root / assets folder
     //css, fonts and image files
     
-    var assetsTask = gulp.src(config.sources.globs.assets);
-    if (global.isProd === true) {
-        assetsTask = assetsTask.pipe(imagemin([
-            imagemin.gifsicle({interlaced: true}),
-            imagemin.jpegtran({progressive: true}),
-            imagemin.optipng({optimizationLevel: 5}),
-            imagemin.svgo({
-                plugins: [
-                    {removeViewBox: true},
-                    {cleanupIDs: false}
-                ]
-            })
-        ]));
-    }
+    var assetsTask = gulp.src(config.sources.globs.assets, { allowEmpty: true });
+    assetsTask = assetsTask.pipe(imagemin([
+        imagemin.gifsicle({interlaced: true}),
+        imagemin.jpegtran({progressive: true}),
+        imagemin.optipng({optimizationLevel: 5}),
+        imagemin.svgo({
+            plugins: [
+                {removeViewBox: true},
+                {cleanupIDs: false}
+            ]
+        })
+    ]));
+    
     assetsTask = assetsTask.pipe(gulp.dest(config.root + config.targets.assets));
     
     stream.add(assetsTask);
 
     // Copies all the less files related to the preview into their folder
-    //these are not pre-processed as preview has its own less combiler client side
+    //these are not pre-processed as preview has its own less compiler client side
     stream.add(
-            gulp.src("src/canvasdesigner/editors/*.less")
+        gulp.src("src/canvasdesigner/editors/*.less", { allowEmpty: true })
                 .pipe(gulp.dest(config.root + config.targets.assets + "/less"))
         );
 
-	// Todo: check if we need these fileSize
+	// TODO: check if we need these fileSize
     stream.add(
-            gulp.src("src/views/propertyeditors/grid/config/*.*")
+        gulp.src("src/views/propertyeditors/grid/config/*.*", { allowEmpty: true })
                 .pipe(gulp.dest(config.root + config.targets.views + "/propertyeditors/grid/config"))
         );
     stream.add(
-            gulp.src("src/views/dashboard/default/*.jpg")
+        gulp.src("src/views/dashboard/default/*.jpg", { allowEmpty: true })
                 .pipe(gulp.dest(config.root + config.targets.views + "/dashboard/default"))
         );
 
     return stream;
-});
+};
+
+module.exports = { dependencies: dependencies };

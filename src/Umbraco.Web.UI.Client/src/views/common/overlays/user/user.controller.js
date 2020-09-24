@@ -91,6 +91,10 @@ angular.module("umbraco")
             });
         }
 
+        $scope.linkProvider = function (e) {
+            e.target.submit();
+        }
+
         $scope.unlink = function (e, loginProvider, providerKey) {
             var result = confirm("Are you sure you want to unlink this account?");
             if (!result) {
@@ -156,7 +160,7 @@ angular.module("umbraco")
                     }, 2000);
 
                 }, function (err) {
-
+                    formHelper.resetForm({ scope: $scope, hasErrors: true });
                     formHelper.handleError(err);
 
                     $scope.changePasswordButtonState = "error";

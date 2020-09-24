@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function RollbackController($scope, contentResource, localizationService, assetsService) {
+    function RollbackController($scope, contentResource, localizationService, assetsService, dateHelper, userService) {
         
         var vm = this;
 
@@ -68,14 +68,20 @@
 
             if(version && version.versionId) {
 
+                vm.loading = true;
+
                 const culture = $scope.model.node.variants.length > 1 ? vm.currentVersion.language.culture : null;
 
                 contentResource.getRollbackVersion(version.versionId, culture)
-                    .then(function(data){
+                    .then(function(data) {
                         vm.previousVersion = data;
                         vm.previousVersion.versionId = version.versionId;
                         createDiff(vm.currentVersion, vm.previousVersion);
+
+                        vm.loading = false;
                         vm.rollbackButtonDisabled = false;
+                    }, function () {
+                        vm.loading = false;
                     });
 
             } else {
@@ -90,11 +96,15 @@
             const culture = $scope.model.node.variants.length > 1 ? vm.currentVersion.language.culture : null;
 
             return contentResource.getRollbackVersions(nodeId, culture)
-                .then(function(data){
-                    vm.previousVersions = data.map(version => {
-                        version.displayValue = version.versionDate + " - " + version.versionAuthorName;
-                        return version;
-                    }); 
+                .then(function (data) {
+                    // get current backoffice user and format dates
+                    userService.getCurrentUser().then(function (currentUser) {
+                        vm.previousVersions = data.map(version => {
+                            var timestampFormatted = dateHelper.getLocalDate(version.versionDate, currentUser.locale, 'LLL');
+                            version.displayValue = timestampFormatted + ' - ' + version.versionAuthorName;
+                            return version;
+                        }); 
+                    });
                 });
         }
 
@@ -114,6 +124,10 @@
                 tab.properties.forEach((property, propertyIndex) => {
                     var oldProperty = previousVersion.tabs[tabIndex].properties[propertyIndex];
 
+                    // copy existing properties, so it doesn't manipulate existing properties on page
+                    oldProperty = Utilities.copy(oldProperty);
+                    property = Utilities.copy(property);
+
                     // we have to make properties storing values as object into strings (Grid, nested content, etc.)
                     if(property.value instanceof Object) {
                         property.value = JSON.stringify(property.value, null, 1);
@@ -126,8 +140,8 @@
                     }
 
                     // diff requires a string
-                    property.value = property.value ? property.value : "";
-                    oldProperty.value = oldProperty.value ? oldProperty.value : "";
+                    property.value = property.value ? property.value + "" : "";
+                    oldProperty.value = oldProperty.value ? oldProperty.value + "" : "";
 
                     var diffProperty = {
                         "alias": property.alias,

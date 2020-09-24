@@ -85,7 +85,7 @@
     <key alias="saveAndPublish">保存及び公開</key>
     <key alias="saveToPublish">保存して承認に送る</key>
     <key alias="saveListView">リスト ビューの保存</key>
-    <key alias="showPage">プレビュー</key>
+    <key alias="saveAndPreview">プレビュー</key>
     <key alias="showPageDisabled">テンプレートが指定されていないのでプレビューは無効になっています</key>
     <key alias="styleChoose">スタイルの選択</key>
     <key alias="styleShow">スタイルの表示</key>
@@ -240,7 +240,6 @@
     <key alias="linkinternal">内部リンク:</key>
     <key alias="linklocaltip">内部リンクを使うときは、リンクの前に "#" を挿入してください。</key>
     <key alias="linknewwindow">新規ウィンドウで開きますか?</key>
-    <key alias="macroContainerSettings">マクロの設定</key>
     <key alias="macroDoesNotHaveProperties">このマクロは編集できるプロパティがありません</key>
     <key alias="paste">貼り付け</key>
     <key alias="permissionsEdit">許可の編集</key>

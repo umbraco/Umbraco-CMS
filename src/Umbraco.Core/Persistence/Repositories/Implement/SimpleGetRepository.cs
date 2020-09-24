@@ -11,6 +11,8 @@ using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
+    // TODO: Obsolete this, change all implementations of this like in Dictionary to just use custom Cache policies like in the member repository.
+
     /// <summary>
     /// Simple abstract ReadOnly repository used to simply have PerformGet and PeformGetAll with an underlying cache
     /// </summary>
@@ -75,19 +77,19 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected sealed override IEnumerable<string> GetDeleteClauses()
         {
-            throw new WontImplementException();
+            throw new InvalidOperationException("This method won't be implemented.");
         }
 
-        protected sealed override Guid NodeObjectTypeId => throw new WontImplementException();
+        protected sealed override Guid NodeObjectTypeId => throw new InvalidOperationException("This property won't be implemented.");
 
         protected sealed override void PersistNewItem(TEntity entity)
         {
-            throw new WontImplementException();
+            throw new InvalidOperationException("This method won't be implemented.");
         }
 
         protected sealed override void PersistUpdatedItem(TEntity entity)
         {
-            throw new WontImplementException();
+            throw new InvalidOperationException("This method won't be implemented.");
         }
 
         #endregion

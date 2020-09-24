@@ -63,6 +63,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <summary>
         /// Gets the name of the user who created the content item.
         /// </summary>
+        [Obsolete("Use CreatorName(IUserService) extension instead")]
         string CreatorName { get; }
 
         /// <summary>
@@ -78,6 +79,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <summary>
         /// Gets the name of the user who last updated the content item.
         /// </summary>
+        [Obsolete("Use WriterName(IUserService) extension instead")]
         string WriterName { get; }
 
         /// <summary>
@@ -97,6 +99,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <para>The value of this property is contextual. It depends on the 'current' request uri,
         /// if any.</para>
         /// </remarks>
+        [Obsolete("Use the Url() extension instead")]
         string Url { get; }
 
         /// <summary>

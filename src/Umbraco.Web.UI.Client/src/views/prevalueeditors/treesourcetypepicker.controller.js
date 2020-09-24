@@ -7,7 +7,6 @@ function TreeSourceTypePickerController($scope, contentTypeResource, mediaTypeRe
 
     var allItemTypes = null;
     var currentItemType = null;
-    var initialLoad = true;
 
     function init() {
         vm.loading = true;
@@ -42,6 +41,11 @@ function TreeSourceTypePickerController($scope, contentTypeResource, mediaTypeRe
 
         var editor = {
             multiPicker: true,
+            filterCssClass: "not-allowed not-published",
+            filter: function (item) {
+                // filter out folders (containers), element types (for content) and already selected items
+                return item.nodeType === "container" || item.metaData.isElement || !!_.findWhere(vm.itemTypes, { udi: item.udi });
+            },
             submit: function (model) {
                 var newItemTypes = _.map(model.selection,
                     function(selected) {
@@ -81,13 +85,12 @@ function TreeSourceTypePickerController($scope, contentTypeResource, mediaTypeRe
     }
 
     eventsService.on("treeSourceChanged", function (e, args) {
-        currentItemType = args.value;
         // reset the model value if we changed node type (but not on the initial load)
-        if (!initialLoad) {
+        if (!!currentItemType && currentItemType !== args.value) {
             vm.itemTypes = [];
             updateModel();
         }
-        initialLoad = false;
+        currentItemType = args.value;
         init();
     });
 }

@@ -1,0 +1,44 @@
+﻿.umb-code-snippet {
+
+    .umb-code-snippet__header {
+        box-sizing: content-box;
+        background-color: @gray-10;
+        display: flex;
+        flex-direction: row;
+        font-size: .8rem;
+        border: 1px solid @gray-8;
+        border-radius: 3px 3px 0 0;
+        border-bottom: 0;
+        margin-top: 16px;
+        min-height: 30px;
+
+        .language {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            flex-grow: 1;
+            padding: 2px 10px;
+            text-transform: uppercase;
+        }
+
+        button {
+            background-color: transparent;
+            border: none;
+            border-left: 1px solid @gray-8;
+            border-radius: 0;
+            color: #000;
+
+            &:hover {
+                background-color: @grayLighter;
+            }
+        }
+    }
+
+    .umb-code-snippet__content {
+        pre {
+            border-radius: 0 0 3px 3px;
+            overflow: auto;
+            white-space: nowrap;
+        }
+    }
+}

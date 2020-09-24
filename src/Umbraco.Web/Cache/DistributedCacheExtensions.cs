@@ -128,14 +128,15 @@ namespace Umbraco.Web.Cache
 
         public static void RefreshMemberCache(this DistributedCache dc, params IMember[] members)
         {
-            dc.Refresh(MemberCacheRefresher.UniqueId, x => x.Id, members);
+            if (members.Length == 0) return;
+            dc.RefreshByPayload(MemberCacheRefresher.UniqueId, members.Select(x => new MemberCacheRefresher.JsonPayload(x.Id, x.Username)));
         }
 
         public static void RemoveMemberCache(this DistributedCache dc, params IMember[] members)
         {
-            dc.Remove(MemberCacheRefresher.UniqueId, x => x.Id, members);
+            if (members.Length == 0) return;
+            dc.RefreshByPayload(MemberCacheRefresher.UniqueId, members.Select(x => new MemberCacheRefresher.JsonPayload(x.Id, x.Username)));
         }
-
 
         #endregion
 
@@ -266,13 +267,21 @@ namespace Umbraco.Web.Cache
         public static void RefreshLanguageCache(this DistributedCache dc, ILanguage language)
         {
             if (language == null) return;
-            dc.Refresh(LanguageCacheRefresher.UniqueId, language.Id);
+
+            var payload = new LanguageCacheRefresher.JsonPayload(language.Id, language.IsoCode,
+                language.WasPropertyDirty(nameof(ILanguage.IsoCode))
+                    ? LanguageCacheRefresher.JsonPayload.LanguageChangeType.ChangeCulture
+                    : LanguageCacheRefresher.JsonPayload.LanguageChangeType.Update);
+
+            dc.RefreshByPayload(LanguageCacheRefresher.UniqueId, new[] { payload });
         }
 
         public static void RemoveLanguageCache(this DistributedCache dc, ILanguage language)
         {
             if (language == null) return;
-            dc.Remove(LanguageCacheRefresher.UniqueId, language.Id);
+
+            var payload = new LanguageCacheRefresher.JsonPayload(language.Id, language.IsoCode, LanguageCacheRefresher.JsonPayload.LanguageChangeType.Remove);
+            dc.RefreshByPayload(LanguageCacheRefresher.UniqueId, new[] { payload });
         }
 
         #endregion

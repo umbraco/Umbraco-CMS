@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.Data.SqlClient;
 using System.Linq;
 using NPoco;
 using Umbraco.Core.Logging;
@@ -29,6 +30,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             V2014 = 6,
             V2016 = 7,
             V2017 = 8,
+            V2019 = 9,
             Other = 99
         }
 
@@ -37,7 +39,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             Unknown = 0,
             Desktop = 1,
             Standard = 2,
-            Enterprise = 3,
+            Enterprise = 3,// Also developer edition
             Express = 4,
             Azure = 5
         }
@@ -78,6 +80,8 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             {
                 case "??":
                     return VersionName.Invalid;
+                case "15":
+                    return VersionName.V2019;
                 case "14":
                     return VersionName.V2017;
                 case "13":
@@ -179,6 +183,8 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             return items.Select(x => x.TABLE_NAME).Cast<string>().ToList();
         }
 
+        public override IsolationLevel DefaultIsolationLevel => IsolationLevel.ReadCommitted;
+
         public override IEnumerable<ColumnInfo> GetColumnsInSchema(IDatabase db)
         {
             var items = db.Fetch<dynamic>("SELECT TABLE_NAME, COLUMN_NAME, ORDINAL_POSITION, COLUMN_DEFAULT, IS_NULLABLE, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = (SELECT SCHEMA_NAME())");
@@ -244,6 +250,46 @@ where tbl.[name]=@0 and col.[name]=@1;", tableName, columnName)
                                        new { TableName = tableName });
 
             return result > 0;
+        }
+
+        public override void WriteLock(IDatabase db, params int[] lockIds)
+        {
+            WriteLock(db, TimeSpan.FromMilliseconds(1800), lockIds);
+        }
+
+        public void WriteLock(IDatabase db, TimeSpan timeout, params int[] lockIds)
+        {
+            // soon as we get Database, a transaction is started
+
+            if (db.Transaction.IsolationLevel < IsolationLevel.ReadCommitted)
+                throw new InvalidOperationException("A transaction with minimum ReadCommitted isolation level is required.");
+
+
+            // *not* using a unique 'WHERE IN' query here because the *order* of lockIds is important to avoid deadlocks
+            foreach (var lockId in lockIds)
+            {
+                db.Execute($"SET LOCK_TIMEOUT {timeout.TotalMilliseconds};");
+                var i = db.Execute(@"UPDATE umbracoLock WITH (REPEATABLEREAD) SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id=@id", new { id = lockId });
+                if (i == 0) // ensure we are actually locking!
+                    throw new ArgumentException($"LockObject with id={lockId} does not exist.");
+            }
+        }
+
+
+        public override void ReadLock(IDatabase db, params int[] lockIds)
+        {
+            // soon as we get Database, a transaction is started
+
+            if (db.Transaction.IsolationLevel < IsolationLevel.ReadCommitted)
+                throw new InvalidOperationException("A transaction with minimum ReadCommitted isolation level is required.");
+
+            // *not* using a unique 'WHERE IN' query here because the *order* of lockIds is important to avoid deadlocks
+            foreach (var lockId in lockIds)
+            {
+                var i = db.ExecuteScalar<int?>("SELECT value FROM umbracoLock WITH (REPEATABLEREAD) WHERE id=@id", new { id = lockId });
+                if (i == null) // ensure we are actually locking!
+                    throw new ArgumentException($"LockObject with id={lockId} does not exist.", nameof(lockIds));
+            }
         }
 
         public override string FormatColumnRename(string tableName, string oldName, string newName)

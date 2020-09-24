@@ -9,6 +9,8 @@ namespace Umbraco.Core
         /// </summary>
         public static class AppSettings
         {
+            public const string MainDomLock = "Umbraco.Core.MainDom.Lock";
+
             // TODO: Kill me - still used in Umbraco.Core.IO.SystemFiles:27
             [Obsolete("We need to kill this appsetting as we do not use XML content cache umbraco.config anymore due to NuCache")]
             public const string ContentXML = "Umbraco.Core.ContentXML"; //umbracoContentXML
@@ -40,6 +42,26 @@ namespace Umbraco.Core
             /// Gets the path to umbraco's root directory (/umbraco by default).
             /// </summary>
             public const string Path = "Umbraco.Core.Path";
+
+            /// <summary>
+            /// Gets the path to umbraco's icons directory (/umbraco/assets/icons by default).
+            /// </summary>
+            public const string IconsPath = "Umbraco.Icons.Path";
+
+            /// <summary>
+            /// Gets the path to the css directory (/css by default).
+            /// </summary>
+            public const string CssPath = "umbracoCssPath";
+
+            /// <summary>
+            /// Gets the path to the scripts directory (/scripts by default).
+            /// </summary>
+            public const string ScriptsPath = "umbracoScriptsPath";
+
+            /// <summary>
+            /// Gets the path to  media directory (/media by default).
+            /// </summary>
+            public const string MediaPath = "umbracoMediaPath";
 
             /// <summary>
             /// The reserved urls from web.config.

@@ -18,7 +18,7 @@
                             <div class="umb-package-list__item-content">
                                 <div class="umb-package-list__item-name">{{ installedPackage.name }}</div>
                                 <div class="umb-package-list__item-description">
-                                    {{ installedPackage.version }} | <a href="{{ installedPackage.url }}" target="_blank">{{ installedPackage.url }}</a>| {{ installedPackage.author }}
+                                    {{ installedPackage.version }} | <a href="{{ installedPackage.url }}" target="_blank" rel="noopener">{{ installedPackage.url }}</a> | {{ installedPackage.author }}
                                 </div>
                             </div>
                         </td>
@@ -77,7 +77,7 @@
 
                         <div class="umb-info-local-item">
                             <strong><localize key="packager_packageAuthor">Author</localize></strong>
-                            <a href="{{ vm.package.authorLink }}" target="_blank">{{ vm.package.author }}</a>
+                            <a href="{{ vm.package.authorLink }}" target="_blank" rel="noopener">{{ vm.package.author }}</a>
                         </div>
 
                         <div class="umb-info-local-item">
@@ -87,7 +87,7 @@
 
                         <div class="umb-info-local-item">
                             <strong><localize key="packager_packageLicense">License</localize></strong>
-                            <a href="{{ vm.package.licenseUrl }}" target="_blank">{{ vm.package.license }}</a>
+                            <a href="{{ vm.package.licenseUrl }}" target="_blank" rel="noopener">{{ vm.package.license }}</a>
                         </div>
 
                         <div class="umb-info-local-item">
@@ -97,10 +97,15 @@
                         </div>
 
                         <div class="umb-info-local-item mt4 flex items-center flex-column" ng-if="vm.installState.status == ''">
-                            <label for="confirm-uninstall" class="umb-package-installer-label">
-                                <input type="checkbox" id="confirm-uninstall" ng-model="vm.package.confirmUninstall" required no-dirty-check>
-                                <strong class="label-text"><localize key="packager_packageUninstallConfirm">Confirm package uninstall</localize></strong>
-                            </label>
+
+                            <umb-checkbox
+                                css-class="-small-text -bold"
+                                model="vm.package.confirmUninstall"
+                                text="Confirm package uninstall"
+                                label-key="packager_packageUninstallConfirm"
+                                required="true">
+                            </umb-checkbox>
+
                             <umb-button
                                 class="mt3"
                                 type="button"

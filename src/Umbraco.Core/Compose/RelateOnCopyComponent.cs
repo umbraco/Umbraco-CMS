@@ -14,7 +14,9 @@ namespace Umbraco.Core.Compose
         }
 
         public void Terminate()
-        { }
+        {
+            ContentService.Copied -= ContentServiceCopied;
+        }
 
         private static void ContentServiceCopied(IContentService sender, Events.CopyEventArgs<IContent> e)
         {
@@ -26,10 +28,11 @@ namespace Umbraco.Core.Compose
 
             if (relationType == null)
             {
-                relationType = new RelationType(Constants.ObjectTypes.Document,
+                relationType = new RelationType(Constants.Conventions.RelationTypes.RelateDocumentOnCopyAlias,
+                    Constants.Conventions.RelationTypes.RelateDocumentOnCopyName,
+                    true,
                     Constants.ObjectTypes.Document,
-                    Constants.Conventions.RelationTypes.RelateDocumentOnCopyAlias,
-                    Constants.Conventions.RelationTypes.RelateDocumentOnCopyName) { IsBidirectional = true };
+                    Constants.ObjectTypes.Document);
 
                 relationService.Save(relationType);
             }

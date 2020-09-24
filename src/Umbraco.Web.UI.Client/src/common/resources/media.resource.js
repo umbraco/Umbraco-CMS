@@ -226,9 +226,7 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
         getByIds: function (ids) {
 
             var idQuery = "";
-            _.each(ids, function (item) {
-                idQuery += "ids=" + item + "&";
-            });
+            ids.forEach(id => idQuery += `ids=${id}&`);
 
             return umbRequestHelper.resourcePromise(
                 $http.get(
@@ -348,10 +346,10 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
             //converts the value to a js bool
             function toBool(v) {
-                if (angular.isNumber(v)) {
+                if (Utilities.isNumber(v)) {
                     return v > 0;
                 }
-                if (angular.isString(v)) {
+                if (Utilities.isString(v)) {
                     return v === "true";
                 }
                 if (typeof v === "boolean") {
@@ -552,6 +550,36 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
                         "Search",
                         args)),
                 'Failed to retrieve media items for search: ' + query);
+        },
+
+        getPagedReferences: function (id, options) {
+
+            var defaults = {
+                pageSize: 25,
+                pageNumber: 1,
+                entityType: "DOCUMENT"
+            };
+            if (options === undefined) {
+                options = {};
+            }
+            //overwrite the defaults if there are any specified
+            angular.extend(defaults, options);
+            //now copy back to the options we will use
+            options = defaults;
+
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "mediaApiBaseUrl",
+                        "GetPagedReferences",
+                        {
+                            id: id,
+                            entityType: options.entityType,
+                            pageNumber: options.pageNumber,
+                            pageSize: options.pageSize
+                        }
+                    )),
+                "Failed to retrieve usages for media of id " + id);
         }
 
     };

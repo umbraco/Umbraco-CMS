@@ -250,12 +250,13 @@ angular.module('umbraco.services')
              *
              * @param {Array} pathArray string array of paths to the files to load
              * @param {Scope} scope optional scope to pass into the loader
+             * @param {string} defaultAssetType optional default asset type used to load assets with no extension 
              * @returns {Promise} Promise object which resolves when all the files has loaded
              */
-            load: function (pathArray, scope) {
+            load: function (pathArray, scope, defaultAssetType) {
                 var promise;
 
-                if (!angular.isArray(pathArray)) {
+                if (!Utilities.isArray(pathArray)) {
                     throw "pathArray must be an array";
                 }
 
@@ -275,7 +276,7 @@ angular.module('umbraco.services')
                 //blocking
                 var promises = [];
                 var assets = [];
-                _.each(nonEmpty, function (path) {
+                nonEmpty.forEach(path => {
                     path = convertVirtualPath(path);
                     var asset = service._getAssetPromise(path);
                     //if not previously loaded, add to list of promises
@@ -294,14 +295,29 @@ angular.module('umbraco.services')
                 promise = $q.all(promises);
 
                 // Split into css and js asset arrays, and use LazyLoad on each array
-                var cssAssets = _.filter(assets,
-                    function (asset) {
-                        return asset.path.match(/(\.css$|\.css\?)/ig);
-                    });
-                var jsAssets = _.filter(assets,
-                    function (asset) {
-                        return asset.path.match(/(\.js$|\.js\?)/ig);
-                    });
+                var cssAssets = [];
+                var jsAssets = [];
+
+                for (var i = 0; i < assets.length; i++) {
+                    var asset = assets[i];
+                    if (asset.path.match(/(\.css$|\.css\?)/ig)) {
+                        cssAssets.push(asset);
+                    } else if (asset.path.match(/(\.js$|\.js\?)/ig)) {
+                        jsAssets.push(asset);
+                    } else {
+                        // Handle unknown assets
+                        switch (defaultAssetType) {
+                            case "css":
+                                cssAssets.push(asset);
+                                break;
+                            case "js":
+                                jsAssets.push(asset);
+                                break;
+                            default:
+                                throw "Found unknown asset without a valid defaultAssetType specified";
+                        }
+                    }
+                }
 
                 function assetLoaded(asset) {
                     asset.state = "loaded";
@@ -309,19 +325,17 @@ angular.module('umbraco.services')
                         scope = $rootScope;
                     }
                     angularHelper.safeApply(scope,
-                        function () {
-                            asset.deferred.resolve(true);
-                        });
+                        () => asset.deferred.resolve(true));
                 }
 
                 if (cssAssets.length > 0) {
-                    var cssPaths = _.map(cssAssets, function (asset) { return appendRnd(asset.path) });
-                    LazyLoad.css(cssPaths, function () { _.each(cssAssets, assetLoaded); });
+                    var cssPaths = cssAssets.map(css => appendRnd(css.path));
+                    LazyLoad.css(cssPaths, () => cssAssets.forEach(assetLoaded));
                 }
 
                 if (jsAssets.length > 0) {
-                    var jsPaths = _.map(jsAssets, function (asset) { return appendRnd(asset.path) });
-                    LazyLoad.js(jsPaths, function () { _.each(jsAssets, assetLoaded); });
+                    var jsPaths = jsAssets.map(js => appendRnd(js.path));
+                    LazyLoad.js(jsPaths, () => jsAssets.forEach(assetLoaded));
                 }
 
                 return promise;
