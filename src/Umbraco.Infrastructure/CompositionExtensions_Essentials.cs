@@ -34,7 +34,6 @@ namespace Umbraco.Core
             TypeLoader typeLoader,
             IRuntimeState state,
             ITypeFinder typeFinder,
-
             IIOHelper ioHelper,
             IUmbracoVersion umbracoVersion,
             IDbProviderFactoryCreator dbProviderFactoryCreator,
@@ -42,7 +41,6 @@ namespace Umbraco.Core
             IBackOfficeInfo backOfficeInfo)
         {
             composition.RegisterUnique(logger);
-            composition.Register(typeof(ILogger<>), typeof(Logger<>));
             composition.RegisterUnique(loggerFactory);
             composition.RegisterUnique(profiler);
             composition.RegisterUnique(profilingLogger);

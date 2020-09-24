@@ -140,6 +140,8 @@ namespace Umbraco.Tests.Runtimes
             {
                 container.Register<IApplicationShutdownRegistry, AspNetApplicationShutdownRegistry>(Lifetime.Singleton);
                 container.Register<ISessionIdResolver, NullSessionIdResolver>(Lifetime.Singleton);
+                container.Register(typeof(ILogger<>), typeof(Logger<>), Lifetime.Singleton);
+                
 
                 var factory = base.Configure(container);
                 return factory;

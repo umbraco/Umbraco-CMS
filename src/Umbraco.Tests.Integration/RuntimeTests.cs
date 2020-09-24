@@ -88,7 +88,7 @@ namespace Umbraco.Tests.Integration
             umbracoContainer.Register(x => Options.Create(requestHandlerSettings));
             umbracoContainer.Register(x => Options.Create(userPasswordConfigurationSettings));
             umbracoContainer.Register(x => Options.Create(webRoutingSettings));
-
+            umbracoContainer.Register(typeof(ILogger<>), typeof(Logger<>), Lifetime.Singleton);
             coreRuntime.Start();
 
             Assert.IsTrue(MyComponent.IsInit);
