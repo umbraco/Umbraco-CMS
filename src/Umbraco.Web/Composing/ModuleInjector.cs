@@ -30,7 +30,7 @@ namespace Umbraco.Web.Composing
 
                 try
                 {
-                    runtimeState = Current.Factory.GetInstance<IRuntimeState>();
+                    runtimeState = Current.RuntimeState;
                 }
                 catch { /* don't make it worse */ }
 
