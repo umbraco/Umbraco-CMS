@@ -130,11 +130,12 @@ namespace Umbraco.Core.IO
         // but it does not really matter what we return - here, null
         private object CreateWellKnownFileSystems()
         {
-            var macroPartialFileSystem = new PhysicalFileSystem(_ioHelper, _hostingEnvironment, _loggerFactory.CreateLogger<PhysicalFileSystem>(), Constants.SystemDirectories.MacroPartials);
-            var partialViewsFileSystem = new PhysicalFileSystem(_ioHelper, _hostingEnvironment, _loggerFactory.CreateLogger<PhysicalFileSystem>(), Constants.SystemDirectories.PartialViews);
-            var stylesheetsFileSystem = new PhysicalFileSystem(_ioHelper, _hostingEnvironment, _loggerFactory.CreateLogger<PhysicalFileSystem>(), _globalSettings.UmbracoCssPath);
-            var scriptsFileSystem = new PhysicalFileSystem(_ioHelper, _hostingEnvironment, _loggerFactory.CreateLogger<PhysicalFileSystem>(), _globalSettings.UmbracoScriptsPath);
-            var mvcViewsFileSystem = new PhysicalFileSystem(_ioHelper, _hostingEnvironment, _loggerFactory.CreateLogger<PhysicalFileSystem>(), Constants.SystemDirectories.MvcViews);
+            var logger = _loggerFactory.CreateLogger<PhysicalFileSystem>();
+            var macroPartialFileSystem = new PhysicalFileSystem(_ioHelper, _hostingEnvironment, logger, Constants.SystemDirectories.MacroPartials);
+            var partialViewsFileSystem = new PhysicalFileSystem(_ioHelper, _hostingEnvironment, logger, Constants.SystemDirectories.PartialViews);
+            var stylesheetsFileSystem = new PhysicalFileSystem(_ioHelper, _hostingEnvironment, logger, _globalSettings.UmbracoCssPath);
+            var scriptsFileSystem = new PhysicalFileSystem(_ioHelper, _hostingEnvironment, logger, _globalSettings.UmbracoScriptsPath);
+            var mvcViewsFileSystem = new PhysicalFileSystem(_ioHelper, _hostingEnvironment, logger, Constants.SystemDirectories.MvcViews);
 
             _macroPartialFileSystem = new ShadowWrapper(macroPartialFileSystem, _ioHelper, _hostingEnvironment, _loggerFactory,"macro-partials", IsScoped);
             _partialViewsFileSystem = new ShadowWrapper(partialViewsFileSystem, _ioHelper, _hostingEnvironment, _loggerFactory,"partials", IsScoped);

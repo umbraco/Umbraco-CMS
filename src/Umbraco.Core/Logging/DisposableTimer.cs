@@ -9,7 +9,7 @@ namespace Umbraco.Core.Logging
     /// </summary>
 	public class DisposableTimer : DisposableObjectSlim
     {
-        private readonly Microsoft.Extensions.Logging.ILogger _logger;
+        private readonly ILogger _logger;
         private readonly LogLevel _level;
         private readonly Type _loggerType;
         private readonly int _thresholdMilliseconds;
@@ -21,7 +21,7 @@ namespace Umbraco.Core.Logging
         private readonly string _timingId;
 
         // internal - created by profiling logger
-        internal DisposableTimer(Microsoft.Extensions.Logging.ILogger logger, LogLevel level, IProfiler profiler, Type loggerType,
+        internal DisposableTimer(ILogger logger, LogLevel level, IProfiler profiler, Type loggerType,
             string startMessage, string endMessage, string failMessage = null,
             int thresholdMilliseconds = 0)
         {

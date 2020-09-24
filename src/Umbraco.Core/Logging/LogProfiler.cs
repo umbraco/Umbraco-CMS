@@ -9,9 +9,9 @@ namespace Umbraco.Core.Logging
     /// </summary>
     public class LogProfiler : IProfiler
     {
-        private readonly Microsoft.Extensions.Logging.ILogger<LogProfiler> _logger;
+        private readonly ILogger<LogProfiler> _logger;
 
-        public LogProfiler(Microsoft.Extensions.Logging.ILogger<LogProfiler> logger)
+        public LogProfiler(ILogger<LogProfiler> logger)
         {
             _logger = logger;
         }

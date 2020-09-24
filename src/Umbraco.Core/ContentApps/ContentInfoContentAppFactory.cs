@@ -23,7 +23,7 @@ namespace Umbraco.Web.ContentApps
                     return _contentApp ?? (_contentApp = new ContentApp
                     {
                         Alias = "umbInfo",
-                        Name = "LogInformation",
+                        Name = "Info",
                         Icon = "icon-info",
                         View = "views/content/apps/info/info.html",
                         Weight = Weight
@@ -33,7 +33,7 @@ namespace Umbraco.Web.ContentApps
                     return _mediaApp ?? (_mediaApp = new ContentApp
                     {
                         Alias = "umbInfo",
-                        Name = "LogInformation",
+                        Name = "Info",
                         Icon = "icon-info",
                         View = "views/media/apps/info/info.html",
                         Weight = Weight
@@ -42,7 +42,7 @@ namespace Umbraco.Web.ContentApps
                     return _memberApp ?? (_memberApp = new ContentApp
                     {
                         Alias = "umbInfo",
-                        Name = "LogInformation",
+                        Name = "Info",
                         Icon = "icon-info",
                         View = "views/member/apps/info/info.html",
                         Weight = Weight
