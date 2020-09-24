@@ -8,14 +8,14 @@
 (function () {
     "use strict";
 
-    function overlayService(eventsService, backdropService) {
+    function overlayService(eventsService, backdropService, focusLockService) {
 
         var currentOverlay = null;
 
         function open(newOverlay) {
 
             // prevent two open overlays at the same time
-            if(currentOverlay) {
+            if (currentOverlay) {
                 close();
             }
 
@@ -23,32 +23,34 @@
             var overlay = newOverlay;
 
             // set the default overlay position to center
-            if(!overlay.position) {
+            if (!overlay.position) {
                 overlay.position = "center";
             }
 
             // set the default overlay size to small
-            if(!overlay.size) {
+            if (!overlay.size) {
                 overlay.size = "small";
             }
 
             // use a default empty view if nothing is set
-            if(!overlay.view) {
+            if (!overlay.view) {
                 overlay.view = "views/common/overlays/default/default.html";
             }
 
             // option to disable backdrop clicks
-            if(overlay.disableBackdropClick) {
+            if (overlay.disableBackdropClick) {
                 backdropOptions.disableEventsOnClick = true;
             }
 
             overlay.show = true;
+            focusLockService.addInertAttribute();
             backdropService.open(backdropOptions);
             currentOverlay = overlay;
             eventsService.emit("appState.overlay", overlay);
         }
 
         function close() {
+            focusLockService.removeInertAttribute();
             backdropService.close();
             currentOverlay = null;
             eventsService.emit("appState.overlay", null);
@@ -90,7 +92,6 @@
             }
 
             open(overlay);
-
         }
 
         function confirmDelete(overlay) {

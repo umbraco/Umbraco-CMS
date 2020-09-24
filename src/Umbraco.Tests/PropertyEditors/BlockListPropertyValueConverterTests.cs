@@ -154,15 +154,13 @@ namespace Umbraco.Tests.PropertyEditors
             var converted = editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as BlockListModel;
 
             Assert.IsNotNull(converted);
-            Assert.AreEqual(0, converted.ContentData.Count());
-            Assert.AreEqual(0, converted.Layout.Count());
+            Assert.AreEqual(0, converted.Count);
 
             json = string.Empty;
             converted = editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as BlockListModel;
 
             Assert.IsNotNull(converted);
-            Assert.AreEqual(0, converted.ContentData.Count());
-            Assert.AreEqual(0, converted.Layout.Count());            
+            Assert.AreEqual(0, converted.Count);
         }
 
         [Test]
@@ -177,8 +175,7 @@ namespace Umbraco.Tests.PropertyEditors
             var converted = editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as BlockListModel;
 
             Assert.IsNotNull(converted);
-            Assert.AreEqual(0, converted.ContentData.Count());
-            Assert.AreEqual(0, converted.Layout.Count());
+            Assert.AreEqual(0, converted.Count);
 
             json = @"{
 layout: {},
@@ -186,8 +183,7 @@ data: []}";
             converted = editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as BlockListModel;
 
             Assert.IsNotNull(converted);
-            Assert.AreEqual(0, converted.ContentData.Count());
-            Assert.AreEqual(0, converted.Layout.Count());
+            Assert.AreEqual(0, converted.Count);
 
             // Even though there is a layout, there is no data, so the conversion will result in zero elements in total
             json = @"
@@ -205,8 +201,7 @@ data: []}";
             converted = editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as BlockListModel;
 
             Assert.IsNotNull(converted);
-            Assert.AreEqual(0, converted.ContentData.Count());
-            Assert.AreEqual(0, converted.Layout.Count());
+            Assert.AreEqual(0, converted.Count);
 
             // Even though there is a layout and data, the data is invalid (missing required keys) so the conversion will result in zero elements in total
             json = @"
@@ -228,8 +223,7 @@ data: []}";
             converted = editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as BlockListModel;
 
             Assert.IsNotNull(converted);
-            Assert.AreEqual(0, converted.ContentData.Count());
-            Assert.AreEqual(0, converted.Layout.Count());
+            Assert.AreEqual(0, converted.Count);
 
             // Everthing is ok except the udi reference in the layout doesn't match the data so it will be empty
             json = @"
@@ -252,8 +246,7 @@ data: []}";
             converted = editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as BlockListModel;
 
             Assert.IsNotNull(converted);
-            Assert.AreEqual(1, converted.ContentData.Count());
-            Assert.AreEqual(0, converted.Layout.Count());
+            Assert.AreEqual(0, converted.Count);
         }
 
         [Test]
@@ -283,14 +276,12 @@ data: []}";
             var converted = editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as BlockListModel;
 
             Assert.IsNotNull(converted);
-            Assert.AreEqual(1, converted.ContentData.Count());
-            var item0 = converted.ContentData.ElementAt(0);
+            Assert.AreEqual(1, converted.Count);
+            var item0 = converted[0].Content;
             Assert.AreEqual(Guid.Parse("1304E1DD-AC87-4396-84FE-8A399231CB3D"), item0.Key);
             Assert.AreEqual("Test1", item0.ContentType.Alias);
-            Assert.AreEqual(1, converted.Layout.Count());
-            var layout0 = converted.Layout.ElementAt(0);
-            Assert.IsNull(layout0.Settings);
-            Assert.AreEqual(Udi.Parse("umb://element/1304E1DDAC87439684FE8A399231CB3D"), layout0.ContentUdi);
+            Assert.IsNull(converted[0].Settings);
+            Assert.AreEqual(Udi.Parse("umb://element/1304E1DDAC87439684FE8A399231CB3D"), converted[0].ContentUdi);
         }
 
         [Test]
@@ -348,17 +339,15 @@ data: []}";
             var converted = editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as BlockListModel;
 
             Assert.IsNotNull(converted);
-            Assert.AreEqual(3, converted.ContentData.Count());
-            Assert.AreEqual(3, converted.SettingsData.Count());
-            Assert.AreEqual(2, converted.Layout.Count());
+            Assert.AreEqual(2, converted.Count);
 
-            var item0 = converted.Layout.ElementAt(0);
+            var item0 = converted[0];
             Assert.AreEqual(Guid.Parse("1304E1DD-AC87-4396-84FE-8A399231CB3D"), item0.Content.Key);
             Assert.AreEqual("Test1", item0.Content.ContentType.Alias);
             Assert.AreEqual(Guid.Parse("1F613E26CE274898908A561437AF5100"), item0.Settings.Key);
             Assert.AreEqual("Setting2", item0.Settings.ContentType.Alias);
 
-            var item1 = converted.Layout.ElementAt(1);
+            var item1 = converted[1];
             Assert.AreEqual(Guid.Parse("0A4A416E-547D-464F-ABCC-6F345C17809A"), item1.Content.Key);
             Assert.AreEqual("Test2", item1.Content.ContentType.Alias);
             Assert.AreEqual(Guid.Parse("63027539B0DB45E7B70459762D4E83DD"), item1.Settings.Key);
@@ -434,11 +423,9 @@ data: []}";
             var converted = editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as BlockListModel;
 
             Assert.IsNotNull(converted);
-            Assert.AreEqual(2, converted.ContentData.Count());
-            Assert.AreEqual(0, converted.SettingsData.Count());
-            Assert.AreEqual(1, converted.Layout.Count());
+            Assert.AreEqual(1, converted.Count);
 
-            var item0 = converted.Layout.ElementAt(0);
+            var item0 = converted[0];
             Assert.AreEqual(Guid.Parse("0A4A416E-547D-464F-ABCC-6F345C17809A"), item0.Content.Key);
             Assert.AreEqual("Test2", item0.Content.ContentType.Alias);
             Assert.IsNull(item0.Settings);

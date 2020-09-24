@@ -1,0 +1,14 @@
+<ng-form class="umb-mini-search" ng-class="{'--has-value': vm.model !== null && vm.model !== ''}" novalidate>
+    <i class="icon icon-search" aria-hidden="true"></i>
+    <input type="text"
+           class="form-control search-input"
+           localize="placeholder,label"
+           label="@general_typeToSearch"
+           placeholder="@general_typeToSearch"
+           ng-model="vm.model"
+           ng-change="vm.onChange()"
+           ng-keydown="vm.onKeyDown($event)"
+           ng-blur="vm.onBlur($event)"
+           prevent-enter-submit
+           no-dirty-check>
+</ng-form>

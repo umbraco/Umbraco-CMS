@@ -15,11 +15,11 @@
                 <div class="umb-variant-selector-entry" ng-class="{'umb-list-item--error': publishVariantSelectorForm.publishVariantSelector.$invalid}">
 
                     <umb-checkbox input-id="{{variant.htmlId}}"
-                        name="publishVariantSelector"
-                        model="variant.publish"
-                        on-change="vm.changeSelection(variant)"
-                        server-validation-field="{{variant.htmlId}}"
-                    >
+                                  name="publishVariantSelector"
+                                  model="variant.publish"
+                                  on-change="vm.changeSelection(variant)"
+                                  server-validation-field="{{variant.htmlId}}">
+
                         <span class="umb-variant-selector-entry__title" ng-if="!(variant.segment && variant.language)">
                             <span ng-bind="variant.displayName"></span>
                             <strong ng-if="variant.isMandatory" class="umb-control-required">*</strong>
@@ -37,6 +37,7 @@
                         <span class="umb-variant-selector-entry__description" ng-messages="publishVariantSelectorForm.publishVariantSelector.$error" show-validation-on-submit>
                             <span class="text-error" ng-message="valServerField">{{publishVariantSelectorForm.publishVariantSelector.errorMsg}}</span>
                         </span>
+
                     </umb-checkbox>
 
                     <umb-variant-notification-list notifications="variant.notifications"></umb-variant-notification-list>

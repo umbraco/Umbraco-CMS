@@ -42,6 +42,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Trashed = source.Trashed;
             target.Udi = Udi.Create(ObjectTypes.GetUdiType(source.NodeObjectType), source.Key);
 
+
             if (source is IContentEntitySlim contentSlim)
             {
                 source.AdditionalData["ContentTypeAlias"] = contentSlim.ContentTypeAlias;
@@ -54,6 +55,8 @@ namespace Umbraco.Web.Models.Mapping
 
             if (source is IMediaEntitySlim mediaSlim)
             {
+                //pass UpdateDate for MediaPicker ListView ordering
+                source.AdditionalData["UpdateDate"] = mediaSlim.UpdateDate;
                 source.AdditionalData["MediaPath"] = mediaSlim.MediaPath;
             }
 
@@ -183,12 +186,9 @@ namespace Umbraco.Web.Models.Mapping
                 target.Name = source.Values.ContainsKey($"nodeName_{culture}") ? source.Values[$"nodeName_{culture}"] : target.Name;
             }
 
-            if (source.Values.TryGetValue(UmbracoExamineIndex.UmbracoFileFieldName, out var umbracoFile))
+            if (source.Values.TryGetValue(UmbracoExamineIndex.UmbracoFileFieldName, out var umbracoFile) && umbracoFile.IsNullOrWhiteSpace() == false)
             {
-                if (umbracoFile != null)
-                {
-                    target.Name = $"{target.Name} ({umbracoFile})";
-                }
+                target.Name = $"{target.Name} ({umbracoFile})";
             }
 
             if (source.Values.ContainsKey(UmbracoExamineIndex.NodeKeyFieldName))
@@ -244,7 +244,7 @@ namespace Umbraco.Web.Models.Mapping
                     return memberEntity.ContentTypeIcon.IfNullOrWhiteSpace(Constants.Icons.Member);
                 case IContentEntitySlim contentEntity:
                     // NOTE: this case covers both content and media entities
-                    return contentEntity.ContentTypeIcon;                
+                    return contentEntity.ContentTypeIcon;
             }
 
             return null;
