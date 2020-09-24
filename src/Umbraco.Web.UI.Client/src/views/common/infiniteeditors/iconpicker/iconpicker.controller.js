@@ -42,7 +42,7 @@ function IconPickerController($scope, $http, $sce, localizationService, iconHelp
         vm.loading = true;
 
         setTitle();
-    
+
         iconHelper.getAllIcons()
             .then(icons => {
                 vm.icons = icons;
@@ -51,7 +51,8 @@ function IconPickerController($scope, $http, $sce, localizationService, iconHelp
                 iconHelper.getLegacyIcons()
                     .then(icons => {
                         if(icons && icons.length > 0) {
-                            vm.icons = icons.concat(vm.icons);
+                            let legacyIcons = icons.filter(icon => !vm.icons.find(x => x.name == icon.name));
+                            vm.icons = legacyIcons.concat(vm.icons);
                         }
                     });
             });
@@ -96,7 +97,7 @@ function IconPickerController($scope, $http, $sce, localizationService, iconHelp
     }
 
     function submit() {
-        if ($scope.model && $scope.model.submit) {            
+        if ($scope.model && $scope.model.submit) {
             $scope.model.submit($scope.model);
         }
     }
