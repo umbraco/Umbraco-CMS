@@ -129,7 +129,9 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             // We also want to read with a db reader and not load everything into memory, QueryPaged lets us do that.
 
             foreach (var row in scope.Database.QueryPaged<ContentSourceDto>(PageSize, sql, sqlCount))
+            {
                 yield return CreateContentNodeKit(row);
+            }   
         }
 
         public IEnumerable<ContentNodeKit> GetBranchContentSources(IScope scope, int id)
@@ -145,7 +147,9 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             // We also want to read with a db reader and not load everything into memory, QueryPaged lets us do that.
 
             foreach (var row in scope.Database.QueryPaged<ContentSourceDto>(PageSize, sql))
+            {
                 yield return CreateContentNodeKit(row);
+            }   
         }
 
         public IEnumerable<ContentNodeKit> GetTypeContentSources(IScope scope, IEnumerable<int> ids)
@@ -161,7 +165,9 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             // We also want to read with a db reader and not load everything into memory, QueryPaged lets us do that.
 
             foreach (var row in scope.Database.QueryPaged<ContentSourceDto>(PageSize, sql))
+            {
                 yield return CreateContentNodeKit(row);
+            }   
         }
 
         private Sql<ISqlContext> MediaSourcesSelect(IScope scope, Func<Sql<ISqlContext>, Sql<ISqlContext>> joins = null)

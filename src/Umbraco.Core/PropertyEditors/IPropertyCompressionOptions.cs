@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Web.PropertyEditors
+﻿namespace Umbraco.Core.PropertyEditors
 {
     /// <summary>
     /// Determines if a property type's value should be compressed

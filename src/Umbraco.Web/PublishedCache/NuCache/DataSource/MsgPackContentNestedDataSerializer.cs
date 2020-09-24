@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.PropertyEditors;
 
 namespace Umbraco.Web.PublishedCache.NuCache.DataSource

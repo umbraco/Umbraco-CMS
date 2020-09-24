@@ -1,4 +1,6 @@
-﻿namespace Umbraco.Web.PropertyEditors
+﻿using Umbraco.Core.PropertyEditors;
+
+namespace Umbraco.Web.PropertyEditors
 {
     /// <summary>
     /// Disables all compression for all properties

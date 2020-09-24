@@ -387,10 +387,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // contentStore is wlocked (1 thread)
             // content (and types) are read-locked
 
-            var contentTypes = _serviceContext.ContentTypeService.GetAll()
-                .Select(x => _publishedContentTypeFactory.CreateContentType(x));
+            var contentTypes = _serviceContext.ContentTypeService.GetAll().ToList();
 
-            _contentStore.SetAllContentTypesLocked(contentTypes);
+            _contentStore.SetAllContentTypesLocked(contentTypes.Select(x => _publishedContentTypeFactory.CreateContentType(x)));
 
             using (_logger.TraceDuration<PublishedSnapshotService>("Loading content from database"))
             {

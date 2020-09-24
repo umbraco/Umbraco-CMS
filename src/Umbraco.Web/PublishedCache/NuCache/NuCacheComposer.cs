@@ -3,6 +3,7 @@ using System.Configuration;
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
 
@@ -24,7 +25,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             else
             {
                 composition.RegisterUnique<IContentNestedDataSerializer, MsgPackContentNestedDataSerializer>();
-                composition.RegisterUnique<IPropertyCompressionOptions, ComplexEditorPropertyCompressionOptions>();
+                composition.RegisterUnique<IPropertyCompressionOptions, CompressedStoragePropertyEditorCompressionOptions>();
             }
             
             composition.RegisterUnique(factory => new ContentDataSerializer(new DictionaryOfPropertyDataSerializer()));
