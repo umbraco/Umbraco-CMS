@@ -266,8 +266,6 @@ namespace Umbraco.Extensions
             var hostingSettings = serviceProvider.GetService<IOptionsMonitor<HostingSettings>>();
             var typeFinderSettings = serviceProvider.GetService<IOptionsMonitor<TypeFinderSettings>>();
 
-            var loggerFactory = serviceProvider.GetService<ILoggerFactory>();
-
             var dbProviderFactoryCreator = serviceProvider.GetRequiredService<IDbProviderFactoryCreator>();
 
             CreateCompositionRoot(services,
@@ -276,10 +274,10 @@ namespace Umbraco.Extensions
                 webHostEnvironment,
                 loggingConfiguration,
                 configuration,
-                out var logger, out var ioHelper, out var hostingEnvironment, out var backOfficeInfo, out var profiler);
+                out var logger, out var loggerFactory, out var ioHelper, out var hostingEnvironment, out var backOfficeInfo, out var profiler);
 
             var umbracoVersion = new UmbracoVersion();
-            var typeFinder = CreateTypeFinder(serviceProvider.GetService<ILoggerFactory>(), profiler, webHostEnvironment, entryAssembly, typeFinderSettings);
+            var typeFinder = CreateTypeFinder(loggerFactory, profiler, webHostEnvironment, entryAssembly, typeFinderSettings);
 
             var coreRuntime = getRuntime(
                 globalSettings.CurrentValue,
@@ -357,6 +355,7 @@ namespace Umbraco.Extensions
             ILoggingConfiguration loggingConfiguration,
             IConfiguration configuration,
             out ILogger logger,
+            out ILoggerFactory loggerFactory,
             out IIOHelper ioHelper,
             out Core.Hosting.IHostingEnvironment hostingEnvironment,
             out IBackOfficeInfo backOfficeInfo,
@@ -367,7 +366,7 @@ namespace Umbraco.Extensions
 
             hostingEnvironment = new AspNetCoreHostingEnvironment(hostingSettings, webHostEnvironment);
             ioHelper = new IOHelper(hostingEnvironment);
-            logger = AddLogger(services, hostingEnvironment, loggingConfiguration, configuration);
+            logger = AddLogger(services, hostingEnvironment, loggingConfiguration, configuration, out loggerFactory);
             backOfficeInfo = new AspNetCoreBackOfficeInfo(globalSettings);
             profiler = GetWebProfiler(hostingEnvironment);
 
@@ -378,7 +377,12 @@ namespace Umbraco.Extensions
         /// Create and configure the logger
         /// </summary>
         /// <param name="hostingEnvironment"></param>
-        private static ILogger AddLogger(IServiceCollection services, Core.Hosting.IHostingEnvironment hostingEnvironment, ILoggingConfiguration loggingConfiguration, IConfiguration configuration)
+        private static ILogger AddLogger(
+            IServiceCollection services,
+            Core.Hosting.IHostingEnvironment hostingEnvironment,
+            ILoggingConfiguration loggingConfiguration,
+            IConfiguration configuration,
+            out ILoggerFactory loggerFactory)
         {
             // Create a serilog logger
             var logger = SerilogLogger.CreateWithDefaultConfiguration(hostingEnvironment, loggingConfiguration, configuration);
@@ -413,7 +417,8 @@ namespace Umbraco.Extensions
             // // Consumed by user code
             // services.AddSingleton<IDiagnosticContext>(diagnosticContext);
             var serviceProvider = services.BuildServiceProvider();
-            return serviceProvider.GetRequiredService<ILoggerFactory>().CreateLogger("Generic Logger");
+            loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
+            return loggerFactory.CreateLogger("Generic Logger");
         }
 
         private static IProfiler GetWebProfiler(Umbraco.Core.Hosting.IHostingEnvironment hostingEnvironment)
