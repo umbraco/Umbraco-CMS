@@ -22,6 +22,7 @@ namespace Umbraco.Web.PropertyEditors
     /// <summary>
     /// Represents a nested content property editor.
     /// </summary>
+    [CompressedStorage]
     [DataEditor(
         Constants.PropertyEditors.Aliases.NestedContent,
         "Nested Content",

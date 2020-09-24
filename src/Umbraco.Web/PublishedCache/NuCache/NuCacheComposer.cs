@@ -1,10 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Configuration;
-using System.Linq;
+﻿using System.Configuration;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.PropertyEditors;
-using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
 
 namespace Umbraco.Web.PublishedCache.NuCache
@@ -19,13 +16,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
             if (serializer != "MsgPack")
             {
                 // TODO: This allows people to revert to the legacy serializer, by default it will be MessagePack
-                composition.RegisterUnique<IContentNestedDataSerializer, JsonContentNestedDataSerializer>();
-                composition.RegisterUnique<IPropertyCompressionOptions, NoopPropertyCompressionOptions>();
+                composition.RegisterUnique<IContentCacheDataSerializerFactory, JsonContentNestedDataSerializerFactory>();
             }
             else
             {
-                composition.RegisterUnique<IContentNestedDataSerializer, MsgPackContentNestedDataSerializer>();
-                composition.RegisterUnique<IPropertyCompressionOptions, CompressedStoragePropertyEditorCompressionOptions>();
+                composition.RegisterUnique<IContentCacheDataSerializerFactory, MsgPackContentNestedDataSerializerFactory>();
             }
             
             composition.RegisterUnique(factory => new ContentDataSerializer(new DictionaryOfPropertyDataSerializer()));

@@ -7,6 +7,7 @@ namespace Umbraco.Web.PropertyEditors
     /// <summary>
     /// Represents a markdown editor.
     /// </summary>
+    [CompressedStorage]
     [DataEditor(
         Constants.PropertyEditors.Aliases.MarkdownEditor,
         "Markdown editor",

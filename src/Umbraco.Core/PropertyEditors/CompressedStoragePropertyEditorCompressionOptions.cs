@@ -1,44 +1,47 @@
 ﻿using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core.Services;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Core.PropertyEditors
 {
 
     /// <summary>
-    /// Ensures all property types that have an editor storing a complex value are compressed
+    /// Ensures all property types that have a property editor attributed with <see cref="CompressedStorageAttribute"/> use data compression
     /// </summary>
-    public class CompressedStoragePropertyEditorCompressionOptions : IPropertyCompressionOptions
+    internal class CompressedStoragePropertyEditorCompressionOptions : IPropertyCompressionOptions
     {
-        private readonly IContentTypeService _contentTypeService;
+        private readonly IReadOnlyDictionary<int, IContentTypeComposition> _contentTypes;
         private readonly PropertyEditorCollection _propertyEditors;
-        private readonly ConcurrentDictionary<(int, string), string> _editorValueTypes = new ConcurrentDictionary<(int, string), string>();
+        private readonly ConcurrentDictionary<(int, string), CompressedStorageAttribute> _compressedStoragePropertyEditorCache;
 
-        public CompressedStoragePropertyEditorCompressionOptions(PropertyEditorCollection propertyEditors)
+        public CompressedStoragePropertyEditorCompressionOptions(
+            IReadOnlyDictionary<int, IContentTypeComposition> contentTypes,
+            PropertyEditorCollection propertyEditors,
+            ConcurrentDictionary<(int, string), CompressedStorageAttribute> compressedStoragePropertyEditorCache)
         {
-            _propertyEditors = propertyEditors;
+            _contentTypes = contentTypes ?? throw new System.ArgumentNullException(nameof(contentTypes));
+            _propertyEditors = propertyEditors ?? throw new System.ArgumentNullException(nameof(propertyEditors));
+            _compressedStoragePropertyEditorCache = compressedStoragePropertyEditorCache;
         }
 
         public bool IsCompressed(int contentTypeId, string alias)
         {
-            return false;
-            //var valueType = _editorValueTypes.GetOrAdd((contentTypeId, alias), x =>
-            //{
-            //    var ct = _contentTypeService.Get(contentTypeId);
-            //    if (ct == null) return null;
+            var compressedStorage = _compressedStoragePropertyEditorCache.GetOrAdd((contentTypeId, alias), x =>
+            {
+                if (!_contentTypes.TryGetValue(contentTypeId, out var ct))
+                    return null;
 
-            //    var propertyType = ct.CompositionPropertyTypes.FirstOrDefault(x => x.Alias == alias);
-            //    if (propertyType == null) return null;
+                var propertyType = ct.CompositionPropertyTypes.FirstOrDefault(x => x.Alias == alias);
+                if (propertyType == null) return null;
 
-            //    if (!_propertyEditors.TryGet(propertyType.PropertyEditorAlias, out var propertyEditor)) return null;
+                if (!_propertyEditors.TryGet(propertyType.PropertyEditorAlias, out var propertyEditor)) return null;
 
-            //    var editor = propertyEditor.GetValueEditor();
-            //    if (editor == null) return null;
+                var attribute = propertyEditor.GetType().GetCustomAttribute<CompressedStorageAttribute>(true);
+                return attribute;
+            });
 
-            //    return editor.ValueType;
-            //});
-
-            //return valueType == ValueTypes.Json || valueType == ValueTypes.Xml || valueType == ValueTypes.Text;
+            return compressedStorage?.IsCompressed ?? false;
         }
     }
 }

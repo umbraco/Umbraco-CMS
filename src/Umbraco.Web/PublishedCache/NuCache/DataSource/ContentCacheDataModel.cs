@@ -7,10 +7,10 @@ using Umbraco.Core.Serialization;
 namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 {
     /// <summary>
-    /// The content item 1:M data that is serialized to JSON
+    /// The content model stored in the content cache database table serialized as JSON
     /// </summary>
     [DataContract] // NOTE: Use DataContract annotations here to control how MessagePack serializes/deserializes the data to use INT keys
-    public class ContentNestedData
+    public class ContentCacheDataModel
     {
         // TODO: We don't want to allocate empty arrays
         //dont serialize empty properties
