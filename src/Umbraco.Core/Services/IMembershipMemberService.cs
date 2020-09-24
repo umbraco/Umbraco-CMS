@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Querying;
@@ -106,6 +107,18 @@ namespace Umbraco.Core.Services
         /// <remarks>An <see cref="IMembershipUser"/> can be of type <see cref="IMember"/> or <see cref="IUser"/></remarks>
         /// <param name="membershipUser"><see cref="IMember"/> or <see cref="IUser"/> to Delete</param>
         void Delete(T membershipUser);
+
+        /// <summary>
+        /// Sets the last login date for the member if they are found by username
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="date"></param>
+        /// <remarks>
+        /// This is a specialized method because whenever a member logs in, the membership provider requires us to set the 'online' which requires
+        /// updating their login date. This operation must be fast and cannot use database locks which is fine if we are only executing a single query
+        /// for this data since there won't be any other data contention issues.
+        /// </remarks>
+        void SetLastLogin(string username, DateTime date);
 
         /// <summary>
         /// Saves an <see cref="IMembershipUser"/>

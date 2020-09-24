@@ -1,5 +1,6 @@
 ﻿using System.Buffers;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
@@ -55,21 +56,23 @@ namespace Umbraco.Extensions
         /// <returns></returns>
         public static IServiceCollection AddUmbracoImageSharp(this IServiceCollection services, ImagingSettings imagingSettings)
         {
-            services.AddImageSharpCore(
-                    options =>
+
+            services.AddImageSharp(options =>
                     {
                         options.Configuration = SixLabors.ImageSharp.Configuration.Default;
-                        options.MaxBrowserCacheDays = imagingSettings.Cache.MaxBrowserCacheDays;
-                        options.MaxCacheDays = imagingSettings.Cache.MaxCacheDays;
+                        options.BrowserMaxAge = imagingSettings.Cache.BrowserMaxAge;
+                        options.CacheMaxAge = imagingSettings.Cache.CacheMaxAge;
                         options.CachedNameLength = imagingSettings.Cache.CachedNameLength;
-                        options.OnParseCommands = context =>
+                        options.OnParseCommandsAsync = context =>
                         {
                             RemoveIntParamenterIfValueGreatherThen(context.Commands, ResizeWebProcessor.Width, imagingSettings.Resize.MaxWidth);
                             RemoveIntParamenterIfValueGreatherThen(context.Commands, ResizeWebProcessor.Height, imagingSettings.Resize.MaxHeight);
+
+                            return Task.CompletedTask;
                         };
-                        options.OnBeforeSave = _ => { };
-                        options.OnProcessed = _ => { };
-                        options.OnPrepareResponse = _ => { };
+                         options.OnBeforeSaveAsync = _ =>  Task.CompletedTask;
+                        options.OnProcessedAsync = _ => Task.CompletedTask;
+                        options.OnPrepareResponseAsync = _ => Task.CompletedTask;
                     })
                 .SetRequestParser<QueryCollectionRequestParser>()
                 .SetMemoryAllocator(provider => ArrayPoolMemoryAllocator.CreateWithMinimalPooling())
@@ -128,13 +131,13 @@ namespace Umbraco.Extensions
 
             // TODO: we can inject params with DI here
             public UmbracoMvcConfigureOptions()
-            {                
+            {
             }
 
             // TODO: we can configure global mvc options here if we need to
             public void Configure(MvcOptions options)
-            {                
-                
+            {
+
             }
         }
 

@@ -230,7 +230,6 @@
     <Compile Include="Mvc\FilteredControllerFactoryCollectionBuilder.cs" />
     <Compile Include="Mvc\SurfaceControllerTypeCollection.cs" />
     <Compile Include="PublishedElementExtensions.cs" />
-    <Compile Include="PublishedModels\DummyClassSoThatPublishedModelsNamespaceExists.cs" />
     <Compile Include="Security\AuthenticationExtensions.cs" />
     <Compile Include="Security\UmbracoSecureDataFormat.cs" />
     <Compile Include="Security\UmbracoAuthTicketDataProtector.cs" />
@@ -404,9 +403,6 @@
     <None Include="..\Umbraco.Web.UI\Views\web.config">
       <Link>Mvc\web.config</Link>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Services" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

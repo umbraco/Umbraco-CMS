@@ -145,7 +145,7 @@ namespace Umbraco.Web.Compose
         private void UserServiceUserGroupPermissionsAssigned(Core.Events.SaveEventArgs<EntityPermission> args, IContentService contentService)
         {
             var entities = contentService.GetByIds(args.SavedEntities.Select(e => e.EntityId)).ToArray();
-            if(entities.Any() == false)
+            if (entities.Any() == false)
             {
                 return;
             }
@@ -162,7 +162,7 @@ namespace Umbraco.Web.Compose
                 .Where(m => m.OriginalPath.Contains(Constants.System.RecycleBinContentString))
                 .Select(m => m.Entity)
                 .ToArray();
-            if(restoredEntities.Any())
+            if (restoredEntities.Any())
             {
                 _notifier.Notify(_actions.GetAction<ActionRestore>(), restoredEntities);
             }
@@ -171,7 +171,7 @@ namespace Umbraco.Web.Compose
         private void PublicAccessServiceSaved(Core.Events.SaveEventArgs<PublicAccessEntry> args, IContentService contentService)
         {
             var entities = contentService.GetByIds(args.SavedEntities.Select(e => e.ProtectedNodeId)).ToArray();
-            if(entities.Any() == false)
+            if (entities.Any() == false)
             {
                 return;
             }
