@@ -169,9 +169,6 @@
     <Compile Include="Editors\RelationTypeController.cs" />
     <Compile Include="Editors\TinyMceController.cs" />
     <Compile Include="HealthCheck\Checks\Data\DatabaseIntegrityCheck.cs" />
-    <Compile Include="HtmlHelperPartialsExtensions.cs" />
-    <Compile Include="HtmlHelperPartialsExtensions.Elements.cs" />
-    <Compile Include="HtmlHelperPartialsExtensions.BlockList.cs" />
     <Compile Include="ImageCropperTemplateCoreExtensions.cs" />
     <Compile Include="IUmbracoContextFactory.cs" />
     <Compile Include="Install\ChangesMonitor.cs" />
@@ -247,6 +244,12 @@
     <Compile Include="Models\Mapping\MapperContextExtensions.cs" />
     <Compile Include="Models\PublishedContent\HybridVariationContextAccessor.cs" />
     <Compile Include="Models\TemplateQuery\QueryConditionExtensions.cs" />
+    <Compile Include="Mvc\Html\PartialsBlockListItemExtensions.cs" />
+    <Compile Include="Mvc\Html\PartialsExtensions.cs" />
+    <Compile Include="Mvc\Html\PartialsPublishedElementExtensions.cs" />
+    <Compile Include="Mvc\Html\RenderPartialsBlockListItemExtensions.cs" />
+    <Compile Include="Mvc\Html\RenderPartialsExtensions.cs" />
+    <Compile Include="Mvc\Html\RenderPartialsPublishedElementExtensions.cs" />
     <Compile Include="Mvc\HttpUmbracoFormRouteStringException.cs" />
     <Compile Include="Mvc\ModelBindingExceptionFilter.cs" />
     <Compile Include="Mvc\StatusCodeFilterAttribute.cs" />
