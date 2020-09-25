@@ -890,7 +890,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var template = SqlContext.Templates.Get(Constants.SqlTemplates.VersionableRepository.EnsureUniqueNodeName, tsql => tsql
                 .Select<NodeDto>(x => Alias(x.NodeId, "id"), x => Alias(x.Text, "name"))
                 .From<NodeDto>()
-                .Where<NodeDto>(x => x.NodeObjectType == SqlTemplate.Arg<Guid>("nodeObjectType") && x.ParentId == SqlTemplate.Arg<int>("parentId")));
+                .Where<NodeDto>(x => x.NodeObjectType == SqlTemplate.Arg<Guid>("nodeObjectType") && x.ParentId == SqlTemplate.Arg<int>("parentId"))
+            );
 
             var sql = template.Sql(NodeObjectTypeId, parentId);
             var names = Database.Fetch<SimilarNodeName>(sql);
@@ -914,19 +915,29 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected virtual NodeDto GetParentNodeDto(int parentId)
         {
-            var template = SqlContext.Templates.Get(Constants.SqlTemplates.VersionableRepository.GetParentNode, tsql =>
-                tsql.Select<NodeDto>().From<NodeDto>().Where<NodeDto>(x => x.NodeId == SqlTemplate.Arg<int>("parentId"))
+            var template = SqlContext.Templates.Get(Constants.SqlTemplates.VersionableRepository.GetParentNode, tsql => tsql
+                .Select<NodeDto>()
+                .From<NodeDto>()
+                .Where<NodeDto>(x => x.NodeId == SqlTemplate.Arg<int>("parentId"))
             );
 
-            return Database.Fetch<NodeDto>(template.Sql(parentId)).First();
+            var sql = template.Sql(parentId);
+            var nodeDto = Database.First<NodeDto>(sql);
+
+            return nodeDto;
         }
 
         protected virtual int GetReservedId(Guid uniqueId)
         {
-            var template = SqlContext.Templates.Get(Constants.SqlTemplates.VersionableRepository.GetReservedId, tsql =>
-                tsql.Select<NodeDto>(x => x.NodeId).From<NodeDto>().Where<NodeDto>(x => x.UniqueId == SqlTemplate.Arg<Guid>("uniqueId") && x.NodeObjectType == Constants.ObjectTypes.IdReservation)
+            var template = SqlContext.Templates.Get(Constants.SqlTemplates.VersionableRepository.GetReservedId, tsql => tsql
+                .Select<NodeDto>(x => x.NodeId)
+                .From<NodeDto>()
+                .Where<NodeDto>(x => x.UniqueId == SqlTemplate.Arg<Guid>("uniqueId") && x.NodeObjectType == Constants.ObjectTypes.IdReservation)
             );
-            var id = Database.ExecuteScalar<int?>(template.Sql(new { uniqueId = uniqueId }));
+
+            var sql = template.Sql(new { uniqueId });
+            var id = Database.ExecuteScalar<int?>(sql);
+
             return id ?? 0;
         }
 
