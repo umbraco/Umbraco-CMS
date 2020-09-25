@@ -4,12 +4,14 @@ const fs = require('fs');
 const properties = [
     {
         description: 'Enter your superadmin username/email',
-        name: 'username'
+        name: 'username',
+        required: true
     },
     {
         description: 'Enter your superadmin password',
         name: 'password',
-        hidden: true
+        hidden: true,
+        required: true
     },
     {
         description: 'Enter CMS URL, or leave empty for default(https://localhost:44331)',
