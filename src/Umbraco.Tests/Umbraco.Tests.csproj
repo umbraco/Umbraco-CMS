@@ -164,7 +164,6 @@
     <Compile Include="Services\MemberGroupServiceTests.cs" />
     <Compile Include="Services\MediaTypeServiceTests.cs" />
     <Compile Include="Services\PropertyValidationServiceTests.cs" />
-    <Compile Include="Templates\HtmlLocalLinkParserTests.cs" />
     <Compile Include="TestHelpers\RandomIdRamDirectory.cs" />
     <Compile Include="TestHelpers\Stubs\TestUserPasswordConfig.cs" />
     <Compile Include="Testing\Objects\TestDataSource.cs" />
@@ -182,7 +181,6 @@
     <Compile Include="Routing\UrlRoutesTests.cs" />
     <Compile Include="Routing\UrlsProviderWithDomainsTests.cs" />
     <Compile Include="Scheduling\BackgroundTaskRunnerTests2.cs" />
-    <Compile Include="Scoping\EventNameExtractorTests.cs" />
     <Compile Include="Scoping\PassThroughEventDispatcherTests.cs" />
     <Compile Include="Scoping\ScopedRepositoryTests.cs" />
     <Compile Include="Scoping\ScopedXmlTests.cs" />
@@ -203,7 +201,6 @@
     <Compile Include="TestHelpers\ControllerTesting\TraceExceptionLogger.cs" />
     <Compile Include="Testing\Objects\Accessors\NoHttpContextAccessor.cs" />
     <Compile Include="TestHelpers\Stubs\TestExamineManager.cs" />
-    <Compile Include="Testing\Objects\TestUmbracoContextFactory.cs" />
     <Compile Include="Testing\TestDatabase.cs" />
     <Compile Include="Testing\TestingTests\NUnitTests.cs" />
     <Compile Include="Persistence\LocksTests.cs" />
@@ -215,7 +212,6 @@
     <Compile Include="TestHelpers\TestObjects-Mocks.cs" />
     <Compile Include="TestHelpers\TestObjects.cs" />
     <Compile Include="UmbracoExamine\RandomIdRamDirectory.cs" />
-    <Compile Include="UmbracoExamine\UmbracoContentValueSetValidatorTests.cs" />
     <Compile Include="Web\AngularIntegration\AngularAntiForgeryTests.cs" />
     <Compile Include="Web\AngularIntegration\ContentModelSerializationTests.cs" />
     <Compile Include="Web\AngularIntegration\JsInitializationTests.cs" />
@@ -230,7 +226,6 @@
     <Compile Include="Web\Controllers\UserEditorAuthorizationHelperTests.cs" />
     <Compile Include="Web\HealthChecks\HealthCheckResultsTests.cs" />
     <Compile Include="Web\HttpCookieExtensionsTests.cs" />
-    <Compile Include="Templates\HtmlImageSourceParserTests.cs" />
     <Compile Include="Web\Mvc\HtmlStringUtilitiesTests.cs" />
     <Compile Include="Web\Mvc\RenderIndexActionSelectorAttributeTests.cs" />
     <Compile Include="Persistence\NPocoTests\PetaPocoCachesTest.cs" />
@@ -291,7 +286,6 @@
     <Compile Include="Services\MacroServiceTests.cs" />
     <Compile Include="Services\UserServiceTests.cs" />
     <Compile Include="Manifest\ManifestParserTests.cs" />
-    <Compile Include="Templates\ViewHelperTests.cs" />
     <Compile Include="Cache\PublishedCache\PublishedMediaCacheTests.cs" />
     <Compile Include="Migrations\AlterMigrationTests.cs" />
     <Compile Include="Migrations\SqlScripts\SqlResources.Designer.cs">
@@ -506,7 +500,6 @@
     <Content Include="Services\Importing\XsltSearch-Package.xml" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Models\Mapping\" />
     <Folder Include="Web\Validation\" />
   </ItemGroup>
   <ItemGroup>
