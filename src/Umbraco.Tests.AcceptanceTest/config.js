@@ -3,11 +3,17 @@ const fs = require('fs');
 
 const properties = [
     {
+        description: 'Enter your superadmin username/email',
         name: 'username'
     },
     {
+        description: 'Enter your superadmin password',
         name: 'password',
         hidden: true
+    },
+    {
+        description: 'Enter CMS URL, or leave empty for default(https://localhost:44331)',
+        name: 'baseUrl'
     }
 ];
 
@@ -15,7 +21,6 @@ const properties = [
 const configPath = './cypress.env.json'
 
 console.log("Configure your test enviroment")
-console.log("Enter CMS superadmin credentials:")
 
 prompt.start();
 
@@ -24,7 +29,10 @@ prompt.get(properties, function (error, result) {
 
 var fileContent = `{
     "username": "${result.username}",
-    "password": "${result.password}"
+    "password": "${result.password}"${
+        result.baseUrl && `,
+    "baseUrl": "${result.baseUrl}"`
+    }
 }`;
 
     fs.writeFile(configPath, fileContent, function (error) {
