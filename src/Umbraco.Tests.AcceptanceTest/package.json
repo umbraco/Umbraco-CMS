@@ -1,7 +1,7 @@
 {
   "scripts": {
-    "postinstall": "node createEnviromentConfiguration.js",
-    "config": "node createEnviromentConfiguration.js",
+    "postinstall": "node postinstall.js",
+    "config": "node config.js",
     "test": "npx cypress run",
     "ui": "npx cypress open"
   },

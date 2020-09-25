@@ -1,17 +1,21 @@
 const prompt = require('prompt');
-fs = require('fs');
+const fs = require('fs');
 
 const properties = [
     {
-        name: 'superadmin username/email'
+        name: 'username'
     },
     {
-        name: 'superadmin password',
+        name: 'password',
         hidden: true
     }
 ];
 
-console.log("Configure your test enviroment:")
+
+const configPath = './cypress.env.json'
+
+console.log("Configure your test enviroment")
+console.log("Enter CMS superadmin credentials:")
 
 prompt.start();
 
@@ -23,10 +27,10 @@ var fileContent = `{
     "password": "${result.password}"
 }`;
 
-    fs.writeFile('cypress.env.json', fileContent, function (error) {
+    fs.writeFile(configPath, fileContent, function (error) {
         if (error) return console.error(error);
         console.log('Configuration saved');
-      });
+    });
 });
 
 function onError(error) {
