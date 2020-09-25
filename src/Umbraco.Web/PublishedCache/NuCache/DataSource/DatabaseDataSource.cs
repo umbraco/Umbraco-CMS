@@ -2,14 +2,12 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using Newtonsoft.Json;
 using NPoco;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Scoping;
-using Umbraco.Core.Serialization;
 using Umbraco.Web.Composing;
 using static Umbraco.Core.Persistence.NPocoSqlExtensions.Statics;
 
@@ -21,11 +19,11 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
     internal class DatabaseDataSource : IDataSource
     {
         private const int PageSize = 500;
-        private readonly IContentNestedDataSerializer _contentNestedDataSerializer;
+        private readonly IContentCacheDataSerializerFactory _contentCacheDataSerializerFactory;
 
-        public DatabaseDataSource(IContentNestedDataSerializer contentNestedDataSerializer)
+        public DatabaseDataSource(IContentCacheDataSerializerFactory contentCacheDataSerializerFactory)
         {
-            _contentNestedDataSerializer = contentNestedDataSerializer;
+            _contentCacheDataSerializerFactory = contentCacheDataSerializerFactory;
         }
 
         // we want arrays, we want them all loaded, not an enumerable
@@ -110,7 +108,11 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 .OrderBy<NodeDto>(x => x.Level, x => x.ParentId, x => x.SortOrder);
 
             var dto = scope.Database.Fetch<ContentSourceDto>(sql).FirstOrDefault();
-            return dto == null ? new ContentNodeKit() : CreateContentNodeKit(dto);
+
+            if (dto == null) return ContentNodeKit.Empty;
+
+            var serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Document);
+            return CreateContentNodeKit(dto, serializer);
         }
 
         public IEnumerable<ContentNodeKit> GetAllContentSources(IScope scope)
@@ -125,11 +127,15 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Document && !x.Trashed);
             var sqlCount = scope.SqlContext.Sql("SELECT COUNT(*) FROM (").Append(sqlCountQuery).Append(") npoco_tbl");
 
+            var serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Document);
+
             // We need to page here. We don't want to iterate over every single row in one connection cuz this can cause an SQL Timeout.
             // We also want to read with a db reader and not load everything into memory, QueryPaged lets us do that.
 
             foreach (var row in scope.Database.QueryPaged<ContentSourceDto>(PageSize, sql, sqlCount))
-                yield return CreateContentNodeKit(row);
+            {
+                yield return CreateContentNodeKit(row, serializer);
+            }   
         }
 
         public IEnumerable<ContentNodeKit> GetBranchContentSources(IScope scope, int id)
@@ -141,11 +147,15 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                     .Where<NodeDto>(x => x.NodeId == id, "x")
                     .OrderBy<NodeDto>(x => x.Level, x => x.ParentId, x => x.SortOrder);
 
+            var serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Document);
+
             // We need to page here. We don't want to iterate over every single row in one connection cuz this can cause an SQL Timeout.
             // We also want to read with a db reader and not load everything into memory, QueryPaged lets us do that.
 
             foreach (var row in scope.Database.QueryPaged<ContentSourceDto>(PageSize, sql))
-                yield return CreateContentNodeKit(row);
+            {
+                yield return CreateContentNodeKit(row, serializer);
+            }   
         }
 
         public IEnumerable<ContentNodeKit> GetTypeContentSources(IScope scope, IEnumerable<int> ids)
@@ -157,11 +167,15 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 .WhereIn<ContentDto>(x => x.ContentTypeId, ids)
                 .OrderBy<NodeDto>(x => x.Level, x => x.ParentId, x => x.SortOrder);
 
+            var serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Document);
+
             // We need to page here. We don't want to iterate over every single row in one connection cuz this can cause an SQL Timeout.
             // We also want to read with a db reader and not load everything into memory, QueryPaged lets us do that.
 
             foreach (var row in scope.Database.QueryPaged<ContentSourceDto>(PageSize, sql))
-                yield return CreateContentNodeKit(row);
+            {
+                yield return CreateContentNodeKit(row, serializer);
+            }   
         }
 
         private Sql<ISqlContext> MediaSourcesSelect(IScope scope, Func<Sql<ISqlContext>, Sql<ISqlContext>> joins = null)
@@ -195,7 +209,11 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 .OrderBy<NodeDto>(x => x.Level, x => x.ParentId, x => x.SortOrder);
 
             var dto = scope.Database.Fetch<ContentSourceDto>(sql).FirstOrDefault();
-            return dto == null ? new ContentNodeKit() : CreateMediaNodeKit(dto);
+
+            if (dto == null) return ContentNodeKit.Empty;
+
+            var serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Media);
+            return CreateMediaNodeKit(dto, serializer);
         }
 
         public IEnumerable<ContentNodeKit> GetAllMediaSources(IScope scope)
@@ -204,11 +222,15 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Media && !x.Trashed)
                 .OrderBy<NodeDto>(x => x.Level, x => x.ParentId, x => x.SortOrder);
 
+            var serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Media);
+
             // We need to page here. We don't want to iterate over every single row in one connection cuz this can cause an SQL Timeout.
             // We also want to read with a db reader and not load everything into memory, QueryPaged lets us do that.
 
             foreach (var row in scope.Database.QueryPaged<ContentSourceDto>(PageSize, sql))
-                yield return CreateMediaNodeKit(row);
+            {
+                yield return CreateMediaNodeKit(row, serializer);
+            }   
         }
 
         public IEnumerable<ContentNodeKit> GetBranchMediaSources(IScope scope, int id)
@@ -220,11 +242,15 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 .Where<NodeDto>(x => x.NodeId == id, "x")
                 .OrderBy<NodeDto>(x => x.Level, x => x.ParentId, x => x.SortOrder);
 
+            var serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Media);
+
             // We need to page here. We don't want to iterate over every single row in one connection cuz this can cause an SQL Timeout.
             // We also want to read with a db reader and not load everything into memory, QueryPaged lets us do that.
 
             foreach (var row in scope.Database.QueryPaged<ContentSourceDto>(PageSize, sql))
-                yield return CreateMediaNodeKit(row);
+            {
+                yield return CreateMediaNodeKit(row, serializer);
+            }   
         }
 
         public IEnumerable<ContentNodeKit> GetTypeMediaSources(IScope scope, IEnumerable<int> ids)
@@ -236,14 +262,18 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                     .WhereIn<ContentDto>(x => x.ContentTypeId, ids)
                     .OrderBy<NodeDto>(x => x.Level, x => x.ParentId, x => x.SortOrder);
 
+            var serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Media);
+
             // We need to page here. We don't want to iterate over every single row in one connection cuz this can cause an SQL Timeout.
             // We also want to read with a db reader and not load everything into memory, QueryPaged lets us do that.
 
             foreach (var row in scope.Database.QueryPaged<ContentSourceDto>(PageSize, sql))
-                yield return CreateMediaNodeKit(row);
+            {
+                yield return CreateMediaNodeKit(row, serializer);
+            }   
         }
 
-        private ContentNodeKit CreateContentNodeKit(ContentSourceDto dto)
+        private ContentNodeKit CreateContentNodeKit(ContentSourceDto dto, IContentCacheDataSerializer serializer)
         {
             ContentData d = null;
             ContentData p = null;
@@ -258,9 +288,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 }
                 else
                 {
-                    var nested = _contentNestedDataSerializer is IContentNestedDataByteSerializer byteSerializer
-                        ? byteSerializer.DeserializeBytes(dto.ContentTypeId, dto.EditDataRaw)
-                        : _contentNestedDataSerializer.Deserialize(dto.ContentTypeId, dto.EditData);
+                    var deserializedContent = serializer.Deserialize(dto.ContentTypeId, dto.EditData, dto.EditDataRaw);
 
                     d = new ContentData
                     {
@@ -270,9 +298,9 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                         VersionId = dto.VersionId,
                         VersionDate = dto.EditVersionDate,
                         WriterId = dto.EditWriterId,
-                        Properties = nested.PropertyData, // TODO: We don't want to allocate empty arrays
-                        CultureInfos = nested.CultureData,
-                        UrlSegment = nested.UrlSegment
+                        Properties = deserializedContent.PropertyData, // TODO: We don't want to allocate empty arrays
+                        CultureInfos = deserializedContent.CultureData,
+                        UrlSegment = deserializedContent.UrlSegment
                     };
                 }
             }
@@ -287,21 +315,19 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 }
                 else
                 {
-                    var nested = _contentNestedDataSerializer is IContentNestedDataByteSerializer byteSerializer
-                        ? byteSerializer.DeserializeBytes(dto.ContentTypeId, dto.PubDataRaw)
-                        : _contentNestedDataSerializer.Deserialize(dto.ContentTypeId, dto.PubData);
+                    var deserializedContent = serializer.Deserialize(dto.ContentTypeId, dto.PubData, dto.PubDataRaw);
 
                     p = new ContentData
                     {
                         Name = dto.PubName,
-                        UrlSegment = nested.UrlSegment,
+                        UrlSegment = deserializedContent.UrlSegment,
                         Published = true,
                         TemplateId = dto.PubTemplateId,
                         VersionId = dto.VersionId,
                         VersionDate = dto.PubVersionDate,
                         WriterId = dto.PubWriterId,
-                        Properties = nested.PropertyData, // TODO: We don't want to allocate empty arrays
-                        CultureInfos = nested.CultureData
+                        Properties = deserializedContent.PropertyData, // TODO: We don't want to allocate empty arrays
+                        CultureInfos = deserializedContent.CultureData
                     };
                 }
             }
@@ -320,14 +346,12 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             return s;
         }
 
-        private ContentNodeKit CreateMediaNodeKit(ContentSourceDto dto)
+        private ContentNodeKit CreateMediaNodeKit(ContentSourceDto dto, IContentCacheDataSerializer serializer)
         {
             if (dto.EditData == null && dto.EditDataRaw == null)
                 throw new InvalidOperationException("No data for media " + dto.Id);
 
-            var nested = _contentNestedDataSerializer is IContentNestedDataByteSerializer byteSerializer
-                ? byteSerializer.DeserializeBytes(dto.ContentTypeId, dto.EditDataRaw)
-                : _contentNestedDataSerializer.Deserialize(dto.ContentTypeId, dto.EditData);
+            var deserializedMedia = serializer.Deserialize(dto.ContentTypeId, dto.EditData, dto.EditDataRaw);
 
             var p = new ContentData
             {
@@ -337,8 +361,8 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 VersionId = dto.VersionId,
                 VersionDate = dto.EditVersionDate,
                 WriterId = dto.CreatorId, // what-else?
-                Properties = nested.PropertyData, // TODO: We don't want to allocate empty arrays
-                CultureInfos = nested.CultureData
+                Properties = deserializedMedia.PropertyData, // TODO: We don't want to allocate empty arrays
+                CultureInfos = deserializedMedia.CultureData
             };
 
             var n = new ContentNode(dto.Id, dto.Uid,

@@ -1,10 +1,8 @@
-﻿using NUnit.Framework;
+﻿using Moq;
+using NUnit.Framework;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
 
 namespace Umbraco.Tests.PublishedContent
@@ -16,10 +14,10 @@ namespace Umbraco.Tests.PublishedContent
         public void Ensure_Same_Results()
         {
             var jsonSerializer = new JsonContentNestedDataSerializer();
-            var msgPackSerializer = new MsgPackContentNestedDataSerializer();
+            var msgPackSerializer = new MsgPackContentNestedDataSerializer(Mock.Of<IPropertyCompressionOptions>());
 
             var now = DateTime.Now;
-            var content = new ContentNestedData
+            var content = new ContentCacheDataModel
             {
                 PropertyData = new Dictionary<string, PropertyData[]>
                 {
@@ -55,14 +53,14 @@ namespace Umbraco.Tests.PublishedContent
                 UrlSegment = "home"
             };
 
-            var json = jsonSerializer.Serialize(1, content);
-            var msgPack = msgPackSerializer.Serialize(1, content);
+            var json = jsonSerializer.Serialize(1, content).StringData;
+            var msgPack = msgPackSerializer.Serialize(1, content).ByteData;
 
             Console.WriteLine(json);
             Console.WriteLine(msgPackSerializer.ToJson(msgPack));
 
-            var jsonContent = jsonSerializer.Deserialize(1, json);
-            var msgPackContent = msgPackSerializer.Deserialize(1, msgPack);
+            var jsonContent = jsonSerializer.Deserialize(1, json, null);
+            var msgPackContent = msgPackSerializer.Deserialize(1, null, msgPack);
 
 
             CollectionAssert.AreEqual(jsonContent.CultureData.Keys, msgPackContent.CultureData.Keys);

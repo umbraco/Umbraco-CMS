@@ -107,7 +107,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
         //queue rules loading
         if (configuredStylesheets) {
-            angular.forEach(configuredStylesheets, function (val, key) {
+            configuredStylesheets.forEach(function (val, key) {
 
                 if (val.indexOf(Umbraco.Sys.ServerVariables.umbracoSettings.cssPath + "/") === 0) {
                     // current format (full path to stylesheet)
@@ -119,7 +119,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 }
 
                 promises.push(stylesheetResource.getRulesByName(val).then(function (rules) {
-                    angular.forEach(rules, function (rule) {
+                    rules.forEach(function (rule) {
                         var r = {};
                         r.title = rule.name;
                         if (rule.selector[0] == ".") {
@@ -1367,6 +1367,9 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             //    throw "args.model.value is required";
             //}
 
+            // force TinyMCE to load plugins/themes from minified files (see http://archive.tinymce.com/wiki.php/api4:property.tinymce.suffix.static)
+            args.editor.suffix = ".min";
+
             var unwatch = null;
 
             //Starts a watch on the model value so that we can update TinyMCE if the model changes behind the scenes or from the server
@@ -1504,6 +1507,8 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             });
 
             args.editor.on('Dirty', function (e) {
+            	syncContent(); // Set model.value to the RTE's content
+
                 //make the form dirty manually so that the track changes works, setting our model doesn't trigger
                 // the angular bits because tinymce replaces the textarea.
                 if (args.currentForm) {

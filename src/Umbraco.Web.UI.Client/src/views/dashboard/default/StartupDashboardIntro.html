@@ -35,7 +35,6 @@
     </div>
     <!-- grid container end -->
 
-
     <!-- Default content in case we cannot fetch content from the outside -->
     <div style="max-width: 1200px" ng-if="vm.showDefault">
 
@@ -49,23 +48,23 @@
         </div>
 
         <div class="welcome-dashboard__info-box-boxes">
-            <a ng-href="{{infoBox.url}}" target="_blank" class="welcome-dashboard__info-box" ng-repeat="infoBox in vm.defaultDashboard.infoBoxes">
-                <div class="welcome-dashboard__info-box-title">{{ infoBox.title }}</div>
-                <div class="welcome-dashboard__info-box-description">{{ infoBox.description }}</div>
+            <a ng-href="{{infoBox.url}}" href="" target="_blank" rel="noreferrer" class="welcome-dashboard__info-box" ng-repeat="infoBox in vm.defaultDashboard.infoBoxes">
+                <div class="welcome-dashboard__info-box-title">{{infoBox.title}}</div>
+                <div class="welcome-dashboard__info-box-description">{{infoBox.description}}</div>
             </a>
         </div>
 
         <div class="welcome-dashboard__cards">
             <div class="welcome-dashboard__card" ng-repeat="article in vm.defaultDashboard.articles">
                 <div class="welcome-dashboard__card-image-wrapper">
-                    <a ng-href="{{article.url}}" target="_blank">
-                        <img class="welcome-dashboard__card-image" ng-src="{{article.img}}" alt="{{ article.altText }}" />
+                    <a ng-href="{{article.url}}" href="" target="_blank" rel="noreferrer">
+                        <img class="welcome-dashboard__card-image" ng-src="{{article.img}}" alt="{{article.altText}}" />
                     </a>
                 </div>
                 <div class="welcome-dashboard__card-content">
-                    <h2 class="welcome-dashboard__card-title">{{ article.title }}</h2>
-                    <div class="welcome-dashboard__card-teaser">{{ article.description }}</div>
-                    <a class="btn btn-success" ng-href="{{article.url}}" target="_blank">{{article.buttonText}}</a>
+                    <h2 class="welcome-dashboard__card-title">{{article.title}}</h2>
+                    <div class="welcome-dashboard__card-teaser">{{article.description}}</div>
+                    <a class="button" ng-href="{{article.url}}" href="" target="_blank" rel="noreferrer">{{article.buttonText}}</a>
                 </div>
             </div>
         </div>

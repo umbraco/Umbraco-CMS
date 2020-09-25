@@ -54,12 +54,16 @@ namespace Umbraco.Web.Runtime
 
             var factory = base.Boot(register);
 
-            // now (and only now) is the time to switch over to perWebRequest scopes.
-            // up until that point we may not have a request, and scoped services would
-            // fail to resolve - but we run Initialize within a factory scope - and then,
-            // here, we switch the factory to bind scopes to requests
-            factory.EnablePerWebRequestScope();
-
+            // factory can be null if part of the boot process fails
+            if (factory != null)
+            {
+                // now (and only now) is the time to switch over to perWebRequest scopes.
+                // up until that point we may not have a request, and scoped services would
+                // fail to resolve - but we run Initialize within a factory scope - and then,
+                // here, we switch the factory to bind scopes to requests
+                factory.EnablePerWebRequestScope();
+            }
+            
             return factory;
         }
 

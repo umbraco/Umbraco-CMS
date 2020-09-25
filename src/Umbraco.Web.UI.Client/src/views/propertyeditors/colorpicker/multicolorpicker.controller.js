@@ -32,12 +32,14 @@
         ], $scope).then(function () {
             var elem = $element.find("input[name='newColor']");
             elem.spectrum({
-                color: null,
+                type: "color",
+                color: defaultColor,
+                showAlpha: false,
                 showInitial: false,
+                showInput: true,
                 chooseText: $scope.labels.choose,
                 cancelText: $scope.labels.cancel,
                 preferredFormat: "hex",
-                showInput: true,
                 clickoutFiresChange: true,
                 hide: function (color) {
                     //show the add butotn

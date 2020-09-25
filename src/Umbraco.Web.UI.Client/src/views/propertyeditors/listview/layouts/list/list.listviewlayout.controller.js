@@ -86,23 +86,18 @@
         }
 
         function markAsSensitive() {
-            angular.forEach($scope.options.includeProperties, function (option) {
+            $scope.options.includeProperties.forEach(function (option) {
                 option.isSensitive = false;
 
-                angular.forEach($scope.items,
-                    function (item) {
-
-                        angular.forEach(item.properties,
-                            function (property) {
-
-                                if (option.alias === property.alias) {
-                                    option.isSensitive = property.isSensitive;
-                                }
-
-                            });
-
+                if ($scope.items && $scope.items.length) {
+                    $scope.items.forEach(function (item) {
+                        item.properties.forEach(function (property) {
+                            if (option.alias === property.alias) {
+                                option.isSensitive = property.isSensitive;
+                            }
+                         });
                     });
-
+                }
             });
         }
 

@@ -22,7 +22,7 @@
         };
 
         if ($scope.model.modify) {
-            angular.extend($scope.model.embed, $scope.model.modify);
+            Utilities.extend($scope.model.embed, $scope.model.modify);
 
             showPreview();
         }
@@ -34,7 +34,7 @@
         vm.close = close;
 
         function onInit() {
-            if(!$scope.model.title) {
+            if (!$scope.model.title) {
                 localizationService.localize("general_embed").then(function(value){
                     $scope.model.title = value;
                 });
@@ -122,7 +122,6 @@
            if ($scope.model.embed.url !== "") {
                showPreview();
            }
-
        }
 
        function toggleConstrain() {
@@ -130,19 +129,18 @@
        }
 
        function submit() {
-            if($scope.model && $scope.model.submit) {
+            if ($scope.model && $scope.model.submit) {
                 $scope.model.submit($scope.model);
             }
         }
 
         function close() {
-            if($scope.model && $scope.model.close) {
+            if ($scope.model && $scope.model.close) {
                 $scope.model.close();
             }
         }
 
         onInit();
-
    }
 
    angular.module("umbraco").controller("Umbraco.Editors.EmbedController", EmbedController);

@@ -47,8 +47,8 @@
         }
 
         function preSelect(selection) {
-            angular.forEach(selection, function(selected){
-                angular.forEach(vm.sections, function(section){
+            selection.forEach(function(selected){
+                vm.sections.forEach(function(section){
                     if(selected.alias === section.alias) {
                         section.selected = true;
                     }
@@ -65,7 +65,7 @@
 
             } else {
 
-                angular.forEach($scope.model.selection, function(selectedSection, index){
+                $scope.model.selection.forEach(function(selectedSection, index){
                     if(selectedSection.alias === section.alias) {
                         section.selected = false;
                         $scope.model.selection.splice(index, 1);
@@ -77,7 +77,7 @@
         }
 
         function setSectionIcon(sections) {
-            angular.forEach(sections, function(section) {
+            sections.forEach(function(section) {
                 section.icon = "icon-section";
             });
         }
