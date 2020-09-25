@@ -910,7 +910,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var sql = template.Sql(NodeObjectTypeId, parentId);
             var sortOrder = Database.ExecuteScalar<int?>(sql);
 
-            return sortOrder.HasValue ? sortOrder.Value + 1 : first;
+            return (sortOrder + 1) ?? first;
         }
 
         protected virtual NodeDto GetParentNodeDto(int parentId)
