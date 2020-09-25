@@ -900,11 +900,16 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected virtual int GetNewChildSortOrder(int parentId, int first)
         {
-            var template = SqlContext.Templates.Get(Constants.SqlTemplates.VersionableRepository.GetSortOrder, tsql =>
-                tsql.Select($"COALESCE(MAX(sortOrder),{first - 1})").From<NodeDto>().Where<NodeDto>(x => x.ParentId == SqlTemplate.Arg<int>("parentId") && x.NodeObjectType == NodeObjectTypeId)
+            var template = SqlContext.Templates.Get(Constants.SqlTemplates.VersionableRepository.GetSortOrder, tsql => tsql
+                .Select("MAX(sortOrder)")
+                .From<NodeDto>()
+                .Where<NodeDto>(x => x.NodeObjectType == SqlTemplate.Arg<Guid>("nodeObjectType") && x.ParentId == SqlTemplate.Arg<int>("parentId"))
             );
 
-            return Database.ExecuteScalar<int>(template.Sql(new { parentId })) + 1;
+            var sql = template.Sql(NodeObjectTypeId, parentId);
+            var sortOrder = Database.ExecuteScalar<int?>(sql);
+
+            return sortOrder.HasValue ? sortOrder.Value + 1 : first;
         }
 
         protected virtual NodeDto GetParentNodeDto(int parentId)
