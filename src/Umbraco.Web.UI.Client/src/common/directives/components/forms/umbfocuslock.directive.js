@@ -191,10 +191,16 @@
                         target.addEventListener('keydown', handleKeydown);
                     }
 
-                }, timeout);
+                }, 0);
             }
 
-            onInit();
+            scope.$on('$includeContentLoaded', () => {
+                scope.$evalAsync();
+
+                onInit();
+            });
+
+            // onInit();
 
             // If more than one editor is still open then re-initialize otherwise remove the event listener
             scope.$on('$destroy', function () {
