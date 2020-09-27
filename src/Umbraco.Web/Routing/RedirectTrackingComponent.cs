@@ -52,7 +52,12 @@ namespace Umbraco.Web.Routing
         }
 
         public void Terminate()
-        { }
+        {
+            ContentService.Publishing -= ContentService_Publishing;
+            ContentService.Published -= ContentService_Published;
+            ContentService.Moving -= ContentService_Moving;
+            ContentService.Moved -= ContentService_Moved;
+        }
 
         private void ContentService_Publishing(IContentService sender, PublishEventArgs<IContent> args)
         {

@@ -30,6 +30,18 @@ namespace Umbraco.Web.Install
         private readonly IInstallationService _installationService;
         private InstallationType? _installationType;
 
+
+        [Obsolete("Use the constructor with IInstallationService injected.")]
+        public InstallHelper(
+        IUmbracoContextAccessor umbracoContextAccessor,
+            DatabaseBuilder databaseBuilder,
+            ILogger logger,
+            IGlobalSettings globalSettings)
+            : this(umbracoContextAccessor, databaseBuilder, logger, globalSettings, Current.Factory.GetInstance<IInstallationService>())
+        {
+
+        }
+
         public InstallHelper(IUmbracoContextAccessor umbracoContextAccessor,
             DatabaseBuilder databaseBuilder,
             ILogger logger, IGlobalSettings globalSettings, IInstallationService installationService)

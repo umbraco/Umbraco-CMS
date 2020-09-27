@@ -194,7 +194,7 @@
                     vm.package = updatedPackage;
                     vm.buttonState = "success";
 
-                    formHelper.resetForm({ scope: $scope });
+                    formHelper.resetForm({ scope: $scope, formCtrl: editPackageForm });
 
                     if (create) {
                         //if we are creating, then redirect to the correct url and reload
@@ -204,6 +204,7 @@
                     }
 
                 }, function (err) {
+                    formHelper.resetForm({ scope: $scope, formCtrl: editPackageForm, hasErrors: true });
                     formHelper.handleError(err);
                     vm.buttonState = "error";
                 });

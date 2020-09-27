@@ -96,7 +96,6 @@ body.touch .umb-tree {
             width: auto;
             height: auto;
             margin: 0 5px 0 auto;
-            padding: 7px 5px;
             overflow: visible;
             clip: auto;
         }
@@ -185,11 +184,14 @@ body.touch .umb-tree {
     display: flex;
     flex: 0 0 auto;
     justify-content: flex-end;
-    padding: 7px 5px;
     text-align: center;
     margin: 0 5px 0 auto;
     cursor: pointer;
     border-radius: @baseBorderRadius;
+
+    .umb-button-ellipsis {
+        padding: 3px 5px;
+    }
 
     i {
         height: 5px !important;

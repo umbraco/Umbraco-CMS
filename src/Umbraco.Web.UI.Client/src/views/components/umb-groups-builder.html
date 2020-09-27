@@ -44,7 +44,7 @@
         <li ng-repeat="tab in model.groups" ng-class="{'umb-group-builder__group-sortable': sortingMode}" data-element="group-{{tab.name}}">
 
             <!-- TAB INIT STATE -->
-            <button href="" class="umb-group-builder__group -placeholder" hotkey="alt+shift+g" ng-click="addGroup(tab)" ng-if="tab.tabState=='init' && !sortingMode" data-element="group-add">
+            <button type="button" class="umb-group-builder__group -placeholder" hotkey="alt+shift+g" ng-click="addGroup(tab)" ng-if="tab.tabState=='init' && !sortingMode" data-element="group-add">
                 <localize key="contentTypeEditor_addGroup"></localize>
             </button>
 
@@ -117,7 +117,7 @@
                     <li data-element="property-{{property.alias}}" ng-class="{'umb-group-builder__property-sortable': sortingMode && !property.inherited}" ng-repeat="property in tab.properties">
 
                         <!-- Add new property -->
-                        <button href=""
+                        <button type="button"
                             data-element="property-add"
                             class="umb-group-builder__group-add-property"
                             ng-if="property.propertyState=='init' && !sortingMode"

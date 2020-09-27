@@ -147,6 +147,7 @@
     <Compile Include="Persistence\Mappers\MapperTestBase.cs" />
     <Compile Include="Persistence\Repositories\DocumentRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\EntityRepositoryTest.cs" />
+    <Compile Include="PropertyEditors\BlockEditorComponentTests.cs" />
     <Compile Include="PropertyEditors\BlockListPropertyValueConverterTests.cs" />
     <Compile Include="PropertyEditors\DataValueReferenceFactoryCollectionTests.cs" />
     <Compile Include="PropertyEditors\NestedContentPropertyComponentTests.cs" />

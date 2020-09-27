@@ -2,35 +2,37 @@
 
    <div class="list-view-layouts-container">
 
-       <div class="list-view-layouts" ui-sortable="vm.layoutsSortableOptions" ng-model="model.value">
+   <div class="list-view-layouts" ui-sortable="vm.layoutsSortableOptions" ng-model="model.value">
 
-           <div class="list-view-layout" ng-repeat="layout in model.value">
+      <div class="list-view-layout" ng-repeat="layout in model.value">
 
                <i class="icon-navigation list-view-layout__sort-handle" aria-hidden="true" aria-label="Sort"></i>
 
-               <div>
+               <div class="list-view-layout__icon-wrapper">
 
-                   <button ng-if="layout.isSystem !== 1" type="button" ng-click="vm.openIconPicker(layout)" class="list-view-layout__icon" umb-auto-focus>
-                       <i class="{{ layout.icon }}" aria-hidden="true"></i>
-                   </button>
+                   <button ng-if="layout.isSystem !== 1" type="button" class="btn-reset" ng-click="vm.openIconPicker(layout)" umb-auto-focus>
+                       <span class="list-view-layout__icon">
+                           <i class="{{layout.icon}}" aria-hidden="true"></i>
+                       </span>
+            </button>
 
-                   <div ng-if="layout.isSystem === 1" class="list-view-layout__icon">
-                       <i class="{{ layout.icon }}" aria-hidden="true"></i>
-                   </div>
+            <div ng-if="layout.isSystem === 1" class="list-view-layout__icon">
+                       <i class="{{layout.icon}}" aria-hidden="true"></i>
+            </div>
 
-               </div>
+         </div>
 
-               <div class="list-view-layout__name">
-                   <input ng-if="layout.isSystem !== 1" type="text" ng-model="layout.name" placeholder="Name..." class="-full-width-input" focus-when="{{ vm.focusLayoutName }}" />
+         <div class="list-view-layout__name">
+            <input ng-if="layout.isSystem !== 1" type="text" ng-model="layout.name" placeholder="Name..." class="-full-width-input" focus-when="{{ vm.focusLayoutName }}" />
                    <span ng-if="layout.isSystem === 1" class="list-view-layout__name-text">{{ layout.name }}</span>
-                   <span ng-if="layout.isSystem === 1" class="list-view-layout__system">(system layout)</span>
-               </div>
+            <span ng-if="layout.isSystem === 1" class="list-view-layout__system">(system layout)</span>
+         </div>
 
-               <div class="list-view-layout__path">
-                   <input ng-if="layout.isSystem !== 1" type="text" ng-model="layout.path" placeholder="Layout path..." class="-full-width-input" />
-               </div>
+         <div class="list-view-layout__path">
+            <input ng-if="layout.isSystem !== 1" type="text" ng-model="layout.path" placeholder="Layout path..." class="-full-width-input" />
+         </div>
 
-               <div>
+         <div>
                    <umb-checkbox ng-if="layout.isSystem === 1" model="layout.selected"></umb-checkbox>
 
                    <div class="list-view-layout__remove" ng-if="layout.isSystem !== 1">
@@ -41,14 +43,14 @@
                                            on-cancel="vm.hidePrompt(layout)">
                        </umb-confirm-action>
                    </div>
-               </div>
+         </div>
 
-           </div>
+      </div>
 
        </div>
 
-      <button type="button" class="list-view-add-layout" ng-click="vm.addLayout()">Add layout</button>
+      <button type="button" class="list-view-add-layout mt2" ng-click="vm.addLayout()">Add layout</button>
 
-   </div>
+    </div>
 
 </div>

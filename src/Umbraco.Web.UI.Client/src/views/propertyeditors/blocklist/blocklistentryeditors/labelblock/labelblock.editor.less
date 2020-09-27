@@ -24,6 +24,7 @@
     }
 
     span {
+        position: relative;
         display: inline-block;
         vertical-align: middle;
     }
@@ -39,7 +40,42 @@
         background-color: @ui-active;
     }
 
-    &.--error {
-        border-color: @formErrorBorder !important;
+    ng-form.ng-invalid-val-server-match-content > .umb-block-list__block > .umb-block-list__block--content > div > & {
+        color: @formErrorText;
+    }
+    ng-form.ng-invalid-val-server-match-content > .umb-block-list__block:not(.--active) > .umb-block-list__block--content > div > & {
+        span {
+            &::after {
+                content: "!";
+                text-align: center;
+                position: absolute;
+                top: -6px;
+                right: -15px;
+                min-width: 10px;
+                color: @white;
+                background-color: @ui-active-type;
+                border: 2px solid @white;
+                border-radius: 50%;
+                font-size: 10px;
+                font-weight: bold;
+                padding: 2px;
+                line-height: 10px;
+                background-color: @formErrorText;
+                font-weight: 900;
+    
+                animation-duration: 1.4s;
+                animation-iteration-count: infinite;
+                animation-name: blockelement-inlineblock-editor--badge-bounce;
+                animation-timing-function: ease;
+                @keyframes blockelement-inlineblock-editor--badge-bounce {
+                    0%   { transform: translateY(0); }
+                    20%  { transform: translateY(-4px); }
+                    40%  { transform: translateY(0); }
+                    55%  { transform: translateY(-2px); }
+                    70%  { transform: translateY(0); }
+                    100% { transform: translateY(0); }
+                }
+            }
+        }
     }
 }

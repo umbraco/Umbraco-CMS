@@ -3,6 +3,6 @@
         ng-focus="block.focus"
         ng-class="{ '--active': block.active, '--error': parentForm.$invalid && valFormManager.isShowingValidation() }"
         val-server-property-class="">
-    <i class="icon {{block.content.icon}}"></i>
+    <i class="icon {{block.content.icon}}" aria-hidden="true"></i>
     <span>{{block.label}}</span>
 </button>
