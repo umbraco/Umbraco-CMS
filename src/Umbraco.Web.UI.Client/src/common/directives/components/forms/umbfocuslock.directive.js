@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    function FocusLock($timeout, $rootScope) {
+    function FocusLock($timeout, $rootScope, angularHelper) {
 
         function getAutoFocusElement (elements) {
             var elmentWithAutoFocus = null;
@@ -195,9 +195,9 @@
             }
 
             scope.$on('$includeContentLoaded', () => {
-                scope.$evalAsync();
-
-                onInit();
+                angularHelper.safeApply(scope, () => {
+                    onInit();
+                });
             });
 
             // If more than one editor is still open then re-initialize otherwise remove the event listener
