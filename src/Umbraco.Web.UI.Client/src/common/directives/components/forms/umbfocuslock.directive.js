@@ -82,6 +82,7 @@
                 var defaultFocusedElement = getAutoFocusElement(focusableElements);
                 var lastknownElement;
 
+                // If an inifite editor is being closed then we reset the focus to the element that triggered the the overlay
                 if(closingEditor){
                     var lastItemIndex = $rootScope.lastKnownFocusableElements.length - 1;
                     var editorInfo = infiniteEditors[0].querySelector('.editor-info');
@@ -163,8 +164,7 @@
                 }
             }
 
-            function onInit(targetElm, delay) {
-                var timeout = delay ? delay : 500;
+            function onInit(targetElm) {
 
                 $timeout(() => {
 
@@ -191,7 +191,7 @@
                         target.addEventListener('keydown', handleKeydown);
                     }
 
-                }, 0);
+                });
             }
 
             scope.$on('$includeContentLoaded', () => {
@@ -199,8 +199,6 @@
 
                 onInit();
             });
-
-            // onInit();
 
             // If more than one editor is still open then re-initialize otherwise remove the event listener
             scope.$on('$destroy', function () {
@@ -215,8 +213,7 @@
                     // active
                     closingEditor = true;
 
-                    // Passing the timeout parameter as a string on purpose to bypass the falsy value that a number would give
-                    onInit(newTarget, '0');
+                    onInit(newTarget);
 
                     return;
                 }
