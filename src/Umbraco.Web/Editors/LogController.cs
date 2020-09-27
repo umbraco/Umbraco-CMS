@@ -60,8 +60,7 @@ namespace Umbraco.Web.Editors
             }
 
             long totalRecords;
-            var dateQuery = sinceDate.HasValue ? SqlContext.Query<IAuditItem>().Where(x => x.CreateDate >= sinceDate) : null;
-            var result = Services.AuditService.GetPagedItemsByEntity(id, pageNumber - 1, pageSize, out totalRecords, orderDirection, customFilter: dateQuery);
+            var result = Services.AuditService.GetPagedItemsByEntity(id, pageNumber - 1, pageSize, out totalRecords, orderDirection, sinceDate: sinceDate);
             var mapped = result.Select(item => Mapper.Map<AuditLog>(item));
 
             var page = new PagedResult<AuditLog>(totalRecords, pageNumber, pageSize)
@@ -84,9 +83,8 @@ namespace Umbraco.Web.Editors
             }
 
             long totalRecords;
-            var dateQuery = sinceDate.HasValue ? SqlContext.Query<IAuditItem>().Where(x => x.CreateDate >= sinceDate) : null;
             var userId = Security.GetUserId().ResultOr(0);
-            var result = Services.AuditService.GetPagedItemsByUser(userId, pageNumber - 1, pageSize, out totalRecords, orderDirection, customFilter:dateQuery);
+            var result = Services.AuditService.GetPagedItemsByUser(userId, pageNumber - 1, pageSize, out totalRecords, orderDirection, sinceDate: sinceDate);
             var mapped = Mapper.MapEnumerable<IAuditItem, AuditLog>(result);
             return new PagedResult<AuditLog>(totalRecords, pageNumber, pageSize)
             {

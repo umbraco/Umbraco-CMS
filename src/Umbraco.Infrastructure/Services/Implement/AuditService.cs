@@ -4,9 +4,7 @@ using System.Linq;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Scoping;
 
@@ -100,7 +98,7 @@ namespace Umbraco.Core.Services.Implement
         public IEnumerable<IAuditItem> GetPagedItemsByEntity(int entityId, long pageIndex, int pageSize, out long totalRecords,
             Direction orderDirection = Direction.Descending,
             AuditType[] auditTypeFilter = null,
-            IQuery<IAuditItem> customFilter = null)
+            DateTime? sinceDate = null)
         {
             if (pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
             if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
@@ -114,6 +112,7 @@ namespace Umbraco.Core.Services.Implement
             using (ScopeProvider.CreateScope(autoComplete: true))
             {
                 var query = Query<IAuditItem>().Where(x => x.Id == entityId);
+                var customFilter = sinceDate.HasValue ? Query<IAuditItem>().Where(x => x.CreateDate >= sinceDate) : null;
 
                 return _auditRepository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, orderDirection, auditTypeFilter, customFilter);
             }
@@ -133,11 +132,12 @@ namespace Umbraco.Core.Services.Implement
         /// Since we currently do not have enum support with our expression parser, we cannot query on AuditType in the query or the custom filter
         /// so we need to do that here
         /// </param>
-        /// <param name="customFilter">
-        /// Optional filter to be applied
+        /// <param name="sinceDate">
+        /// Date since items where created
         /// </param>
         /// <returns></returns>
-        public IEnumerable<IAuditItem> GetPagedItemsByUser(int userId, long pageIndex, int pageSize, out long totalRecords, Direction orderDirection = Direction.Descending, AuditType[] auditTypeFilter = null, IQuery<IAuditItem> customFilter = null)
+        public IEnumerable<IAuditItem> GetPagedItemsByUser(int userId, long pageIndex, int pageSize, out long totalRecords,
+            Direction orderDirection = Direction.Descending, AuditType[] auditTypeFilter = null, DateTime? sinceDate = null)
         {
             if (pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
             if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
@@ -151,8 +151,9 @@ namespace Umbraco.Core.Services.Implement
             using (ScopeProvider.CreateScope(autoComplete: true))
             {
                 var query = Query<IAuditItem>().Where(x => x.UserId == userId);
+                var dateQuery = sinceDate.HasValue ? Query<IAuditItem>().Where(x => x.CreateDate >= sinceDate) : null;
 
-                return _auditRepository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, orderDirection, auditTypeFilter, customFilter);
+                return _auditRepository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, orderDirection, auditTypeFilter, dateQuery);
             }
         }
 

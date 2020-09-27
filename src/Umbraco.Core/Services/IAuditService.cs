@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Querying;
 
 namespace Umbraco.Core.Services
 {
@@ -11,10 +10,13 @@ namespace Umbraco.Core.Services
     public interface IAuditService : IService
     {
         void Add(AuditType type, int userId, int objectId, string entityType, string comment, string parameters = null);
-        
+
         IEnumerable<IAuditItem> GetLogs(int objectId);
+
         IEnumerable<IAuditItem> GetUserLogs(int userId, AuditType type, DateTime? sinceDate = null);
+
         IEnumerable<IAuditItem> GetLogs(AuditType type, DateTime? sinceDate = null);
+
         void CleanLogs(int maximumAgeOfLogsInMinutes);
 
         /// <summary>
@@ -31,14 +33,14 @@ namespace Umbraco.Core.Services
         /// Since we currently do not have enum support with our expression parser, we cannot query on AuditType in the query or the custom filter
         /// so we need to do that here
         /// </param>
-        /// <param name="customFilter">
-        /// Optional filter to be applied
+        /// <param name="sinceDate">
+        /// Optional date since creation of <see cref="IAuditItem"/>
         /// </param>
         /// <returns></returns>
         IEnumerable<IAuditItem> GetPagedItemsByEntity(int entityId, long pageIndex, int pageSize, out long totalRecords,
             Direction orderDirection = Direction.Descending,
             AuditType[] auditTypeFilter = null,
-            IQuery<IAuditItem> customFilter = null);
+            DateTime? sinceDate = null);
 
         /// <summary>
         /// Returns paged items in the audit trail for a given user
@@ -54,14 +56,14 @@ namespace Umbraco.Core.Services
         /// Since we currently do not have enum support with our expression parser, we cannot query on AuditType in the query or the custom filter
         /// so we need to do that here
         /// </param>
-        /// <param name="customFilter">
-        /// Optional filter to be applied
+        /// <param name="sinceDate">
+        /// Optional date since creation of <see cref="IAuditItem"/>
         /// </param>
         /// <returns></returns>
         IEnumerable<IAuditItem> GetPagedItemsByUser(int userId, long pageIndex, int pageSize, out long totalRecords,
             Direction orderDirection = Direction.Descending,
             AuditType[] auditTypeFilter = null,
-            IQuery<IAuditItem> customFilter = null);
+            DateTime? sinceDate = null);
 
         /// <summary>
         /// Writes an audit entry for an audited event.
@@ -81,6 +83,6 @@ namespace Umbraco.Core.Services
         /// </param>
         /// <param name="eventDetails">Free-form details about the audited event.</param>
         IAuditEntry Write(int performingUserId, string perfomingDetails, string performingIp, DateTime eventDateUtc, int affectedUserId, string affectedDetails, string eventType, string eventDetails);
-        
+
     }
 }
