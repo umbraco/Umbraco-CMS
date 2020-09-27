@@ -128,7 +128,7 @@
                 var targetToObserve = init ? document.querySelector('.umb-editors') : target;
                 // Watch for DOM changes - so we can refresh the focusable elements if an element
                 // changes from being disabled to being enabled for instance
-                var observer = new MutationObserver(domChange);
+                var observer = new MutationObserver(_.debounce(domChange, 200));
 
                 // Options for the observer (which mutations to observe)
                 var config = { attributes: true, childList: true, subtree: true};
