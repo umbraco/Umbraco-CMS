@@ -32,7 +32,7 @@
             $rootScope.lastKnownFocusableElements.push(document.activeElement);
 
             // List of elements that can be focusable within the focus lock
-            var focusableElementsSelector = 'a[href]:not([disabled]):not(.ng-hide), button:not([disabled]):not(.ng-hide), textarea:not([disabled]):not(.ng-hide), input:not([disabled]):not(.ng-hide), select:not([disabled]):not(.ng-hide)';
+            var focusableElementsSelector = '[role="button"], a[href]:not([disabled]):not(.ng-hide), button:not([disabled]):not(.ng-hide), textarea:not([disabled]):not(.ng-hide), input:not([disabled]):not(.ng-hide), select:not([disabled]):not(.ng-hide)';
             var bodyElement = document.querySelector('body');
 
             function getDomNodes(){
