@@ -228,8 +228,8 @@ namespace Umbraco.Core.Models
                 return true;
             }
 
-            //is it descendant?
-            var descendant = startNodePaths.Any(x => path.StartsWith(x));
+            //is it descendant? (add "," to path to check for descendant to prevent ie. 11310 as descendant of 1131)
+            var descendant = startNodePaths.Any(x => path.StartsWith(x + ","));
             if (descendant)
             {
                 hasPathAccess = true;
