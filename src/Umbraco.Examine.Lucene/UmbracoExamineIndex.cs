@@ -14,7 +14,6 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Directory = Lucene.Net.Store.Directory;
 using Microsoft.Extensions.Logging;
-using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Umbraco.Examine
 {
@@ -24,7 +23,7 @@ namespace Umbraco.Examine
     /// </summary>
     public abstract class UmbracoExamineIndex : LuceneIndex, IUmbracoIndex, IIndexDiagnostics
     {
-        private readonly ILogger _logger;
+        private readonly ILogger<UmbracoExamineIndex> _logger;
         private readonly ILoggerFactory _loggerFactory;
 
         private readonly IRuntimeState _runtimeState;
@@ -55,7 +54,7 @@ namespace Umbraco.Examine
             FieldDefinitionCollection fieldDefinitions,
             Analyzer defaultAnalyzer,
             IProfilingLogger profilingLogger,
-            ILogger logger,
+            ILogger<UmbracoExamineIndex> logger,
             ILoggerFactory loggerFactory,
             IHostingEnvironment hostingEnvironment,
             IRuntimeState runtimeState,
@@ -72,7 +71,7 @@ namespace Umbraco.Examine
             if (luceneDirectory is FSDirectory fsDir)
                 LuceneIndexFolder = fsDir.Directory;
 
-            _diagnostics = new UmbracoExamineIndexDiagnostics(this, _loggerFactory.CreateLogger("UmbracoExamineIndexDiagnostics"), hostingEnvironment);
+            _diagnostics = new UmbracoExamineIndexDiagnostics(this, _loggerFactory.CreateLogger<UmbracoExamineIndexDiagnostics>(), hostingEnvironment);
         }
 
         private readonly bool _configBased = false;

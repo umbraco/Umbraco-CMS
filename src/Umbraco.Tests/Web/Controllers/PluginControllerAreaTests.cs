@@ -80,7 +80,7 @@ namespace Umbraco.Tests.Web.Controllers
         public class Plugin4Controller : PluginController
         {
             public Plugin4Controller(IUmbracoContextAccessor umbracoContextAccessor)
-                : base(umbracoContextAccessor, null, null, null,null)
+                : base(umbracoContextAccessor, null, null, null, null)
             {
             }
         }

@@ -11,7 +11,6 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Runtime;
 using Umbraco.Web.Runtime;
 using ConnectionStrings = Umbraco.Core.Configuration.Models.ConnectionStrings;
-using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Umbraco.Web
 {

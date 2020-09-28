@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Examine;
 using Umbraco.Core;
 using Umbraco.Core.Services;
@@ -13,8 +14,6 @@ using Umbraco.Core.Logging;
 using Examine.LuceneEngine;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
-using Microsoft.Extensions.Logging;
-using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Umbraco.Examine
 {
@@ -23,7 +22,7 @@ namespace Umbraco.Examine
     /// </summary>
     public class UmbracoContentIndex : UmbracoExamineIndex, IUmbracoContentIndex, IDisposable
     {
-        private readonly ILogger _logger;
+        private readonly ILogger<UmbracoContentIndex> _logger;
         protected ILocalizationService LanguageService { get; }
 
         #region Constructors
@@ -49,7 +48,7 @@ namespace Umbraco.Examine
             FieldDefinitionCollection fieldDefinitions,
             Analyzer defaultAnalyzer,
             IProfilingLogger profilingLogger,
-            ILogger logger,
+            ILogger<UmbracoContentIndex> logger,
             ILoggerFactory loggerFactory,
             IHostingEnvironment hostingEnvironment,
             IRuntimeState runtimeState,

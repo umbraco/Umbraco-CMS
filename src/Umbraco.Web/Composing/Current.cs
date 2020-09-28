@@ -247,7 +247,6 @@ namespace Umbraco.Web.Composing
 
         public static IShortStringHelper ShortStringHelper => Factory.GetInstance<IShortStringHelper>();
 
-        // TODO: Use LoggerFactory instead of shared Logger
         public static ILogger<object> Logger => Factory.GetInstance<ILogger<object>>();
 
         public static ILoggerFactory LoggerFactory => Factory.GetInstance<ILoggerFactory>();

@@ -34,7 +34,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         protected IShortStringHelper ShortStringHelper { get; }
         protected IEventMessagesFactory EventMessages { get; }
         protected ILocalizedTextService LocalizedTextService { get; }
-
         private readonly ILogger<ContentControllerBase> _logger;
 
         protected ContentControllerBase(

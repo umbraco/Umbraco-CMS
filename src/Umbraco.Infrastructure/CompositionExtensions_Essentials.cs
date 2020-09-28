@@ -5,9 +5,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Migrations;
 using Umbraco.Core.Persistence;
-using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Umbraco.Core
 {

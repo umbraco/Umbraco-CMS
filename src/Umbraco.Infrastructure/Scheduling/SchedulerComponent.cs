@@ -218,7 +218,7 @@ namespace Umbraco.Web.Scheduling
             var task = new TempFileCleanup(_fileCleanupRunner, DefaultDelayMilliseconds, OneHourMilliseconds,
                 tempFolderPaths.Select(x=>new DirectoryInfo(x)),
                 TimeSpan.FromDays(1), //files that are over a day old
-                _mainDom, _pLogger, _loggerFactory.CreateLogger("TempFileCleanup"));
+                _mainDom, _pLogger, _loggerFactory.CreateLogger<TempFileCleanup>());
             _scrubberRunner.TryAdd(task);
             return task;
         }

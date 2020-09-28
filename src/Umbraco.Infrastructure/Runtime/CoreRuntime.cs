@@ -15,7 +15,6 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
-using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Umbraco.Core.Runtime
 {
@@ -176,7 +175,7 @@ namespace Umbraco.Core.Runtime
                 var databaseFactory = CreateDatabaseFactory();
 
                 // type finder/loader
-                var typeLoader = new TypeLoader(TypeFinder, AppCaches.RuntimeCache, new DirectoryInfo(HostingEnvironment.LocalTempPath), RuntimeLoggerFactory.CreateLogger("TypeLoader"), ProfilingLogger);
+                var typeLoader = new TypeLoader(TypeFinder, AppCaches.RuntimeCache, new DirectoryInfo(HostingEnvironment.LocalTempPath), RuntimeLoggerFactory.CreateLogger<TypeLoader>(), ProfilingLogger);
 
                 // re-create the state object with the essential services
                 _state = new RuntimeState(_globalSettings, UmbracoVersion, databaseFactory, RuntimeLoggerFactory.CreateLogger<RuntimeState>());
@@ -296,7 +295,7 @@ namespace Umbraco.Core.Runtime
                 enableDisableAttributes = typeLoader.GetAssemblyAttributes(typeof(EnableComposerAttribute), typeof(DisableComposerAttribute));
             }
 
-            var composers = new Composers(composition, composerTypes, enableDisableAttributes, RuntimeLoggerFactory.CreateLogger("Composers"), ProfilingLogger);
+            var composers = new Composers(composition, composerTypes, enableDisableAttributes, RuntimeLoggerFactory.CreateLogger<Composers>(), ProfilingLogger);
             composers.Compose();
         }
 

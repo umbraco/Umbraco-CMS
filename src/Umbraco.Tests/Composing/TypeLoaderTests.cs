@@ -16,7 +16,6 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using Umbraco.Web.PropertyEditors;
-using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Umbraco.Tests.Composing
 {
@@ -32,7 +31,7 @@ namespace Umbraco.Tests.Composing
             var typeFinder = TestHelper.GetTypeFinder();
             _typeLoader = new TypeLoader(typeFinder, NoAppCache.Instance,
                 new DirectoryInfo(TestHelper.IOHelper.MapPath("~/App_Data/TEMP")),
-                Mock.Of<ILogger>(), new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()), false,
+                Mock.Of<ILogger<TypeLoader>>(), new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()), false,
 
                 // for testing, we'll specify which assemblies are scanned for the PluginTypeResolver
                 // TODO: Should probably update this so it only searches this assembly and add custom types to be found

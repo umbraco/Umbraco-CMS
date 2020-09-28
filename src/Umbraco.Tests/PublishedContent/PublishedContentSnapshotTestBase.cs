@@ -48,7 +48,7 @@ namespace Umbraco.Tests.PublishedContent
             Composition.RegisterUnique<IPublishedModelFactory>(f => new PublishedModelFactory(f.GetInstance<TypeLoader>().GetTypes<PublishedContentModel>(), f.GetInstance<IPublishedValueFallback>()));
         }
 
-        protected override TypeLoader CreateTypeLoader(IIOHelper ioHelper, ITypeFinder typeFinder, IAppPolicyCache runtimeCache, ILogger logger, IProfilingLogger pLogger,  IHostingEnvironment hostingEnvironment)
+        protected override TypeLoader CreateTypeLoader(IIOHelper ioHelper, ITypeFinder typeFinder, IAppPolicyCache runtimeCache, ILogger<TypeLoader> logger, IProfilingLogger pLogger,  IHostingEnvironment hostingEnvironment)
         {
             var baseLoader = base.CreateTypeLoader(ioHelper, typeFinder, runtimeCache, logger, pLogger, hostingEnvironment);
 

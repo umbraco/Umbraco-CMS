@@ -25,7 +25,6 @@ namespace Umbraco.Core.Logging
         /// </summary>
         public ProfilingLogger(ILogger logger, IProfiler profiler)
         {
-            // TODO: Use typed logger
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
             Profiler = profiler ?? throw new ArgumentNullException(nameof(profiler));
         }

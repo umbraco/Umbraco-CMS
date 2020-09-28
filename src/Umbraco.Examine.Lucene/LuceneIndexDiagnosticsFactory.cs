@@ -2,7 +2,6 @@
 using Examine.LuceneEngine.Providers;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.Logging;
 using Umbraco.Core.IO;
 
 namespace Umbraco.Examine
@@ -27,7 +26,7 @@ namespace Umbraco.Examine
             if (!(index is IIndexDiagnostics indexDiag))
             {
                 if (index is LuceneIndex luceneIndex)
-                    indexDiag = new LuceneIndexDiagnostics(luceneIndex, _loggerFactory.CreateLogger("LuceneIndexDiagnostics"), _hostingEnvironment);
+                    indexDiag = new LuceneIndexDiagnostics(luceneIndex, _loggerFactory.CreateLogger<LuceneIndexDiagnostics>(), _hostingEnvironment);
                 else
                     indexDiag = base.Create(index);
             }

@@ -11,7 +11,6 @@ using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Scoping;
 using Umbraco.Web.PublishedCache.NuCache.Snap;
-using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Umbraco.Web.PublishedCache.NuCache
 {
@@ -44,7 +43,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         // We must keep separate dictionaries for by id and by alias because we track these in snapshot/layers
         // and it is possible that the alias of a content type can be different for the same id in another layer
         // whereas the GUID -> INT cross reference can never be different
-        private readonly ConcurrentDictionary<int, LinkedNode<IPublishedContentType>> _contentTypesById;       
+        private readonly ConcurrentDictionary<int, LinkedNode<IPublishedContentType>> _contentTypesById;
         private readonly ConcurrentDictionary<string, LinkedNode<IPublishedContentType>> _contentTypesByAlias;
         private readonly ConcurrentDictionary<Guid, int> _contentTypeKeyToIdMap;
         private readonly ConcurrentDictionary<Guid, int> _contentKeyToIdMap;
@@ -1063,7 +1062,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var parent = parentLink.Value;
 
             // We are doing a null check here but this should no longer be possible because we have a null check in BuildKit
-            // for the parent.Value property and we'll output a warning. However I'll leave this additional null check in place. 
+            // for the parent.Value property and we'll output a warning. However I'll leave this additional null check in place.
             // see https://github.com/umbraco/Umbraco-CMS/issues/7868
             if (parent == null)
                 throw new PanicException($"A null Value was returned on the {nameof(parentLink)} LinkedNode with id={content.ParentContentId}, potentially your database paths are corrupted.");
@@ -1312,7 +1311,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 if (_nextGen == false && _genObj != null)
                     return new Snapshot(this, _genObj.GetGenRef()
 #if DEBUG
-                        , _loggerFactory.CreateLogger("Snapshot")
+                        , _loggerFactory.CreateLogger<Snapshot>()
 #endif
                         );
 
@@ -1348,7 +1347,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
                 var snapshot = new Snapshot(this, _genObj.GetGenRef()
 #if DEBUG
-                    , _loggerFactory.CreateLogger("Snapshot")
+                    , _loggerFactory.CreateLogger<Snapshot>()
 #endif
                     );
 
@@ -1362,7 +1361,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public Snapshot LiveSnapshot => new Snapshot(this, _liveGen
 #if DEBUG
-            , _loggerFactory.CreateLogger("Snapshot")
+            , _loggerFactory.CreateLogger<Snapshot>()
 #endif
         );
 
@@ -1550,7 +1549,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             private readonly GenRef _genRef;
             private long _gen;
 #if DEBUG
-            private readonly ILogger _logger;
+            private readonly ILogger<Snapshot> _logger;
 #endif
 
             //private static int _count;
@@ -1558,7 +1557,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             internal Snapshot(ContentStore store, GenRef genRef
 #if DEBUG
-                    , ILogger logger
+                    , ILogger<Snapshot> logger
 #endif
                 )
             {
@@ -1576,7 +1575,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             internal Snapshot(ContentStore store, long gen
 #if DEBUG
-                , ILogger logger
+                , ILogger<Snapshot> logger
 #endif
                 )
             {

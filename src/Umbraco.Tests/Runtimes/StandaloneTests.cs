@@ -73,7 +73,7 @@ namespace Umbraco.Tests.Runtimes
             var databaseFactory = new UmbracoDatabaseFactory(loggerFactory.CreateLogger<UmbracoDatabaseFactory>(), loggerFactory, Options.Create(globalSettings), Options.Create(connectionStrings), new Lazy<IMapperCollection>(() => factory.GetInstance<IMapperCollection>()),  TestHelper.DbProviderFactoryCreator);
             var ioHelper = TestHelper.IOHelper;
             var hostingEnvironment = Mock.Of<IHostingEnvironment>();
-            var typeLoader = new TypeLoader(typeFinder, appCaches.RuntimeCache, new DirectoryInfo(ioHelper.MapPath("~/App_Data/TEMP")), loggerFactory.CreateLogger("TypeLoader"), profilingLogger);
+            var typeLoader = new TypeLoader(typeFinder, appCaches.RuntimeCache, new DirectoryInfo(ioHelper.MapPath("~/App_Data/TEMP")), loggerFactory.CreateLogger<TypeLoader>(), profilingLogger);
             var mainDom = new SimpleMainDom();
             var umbracoVersion = TestHelper.GetUmbracoVersion();
             var backOfficeInfo = TestHelper.GetBackOfficeInfo();
@@ -97,7 +97,7 @@ namespace Umbraco.Tests.Runtimes
             var composerTypes = typeLoader.GetTypes<IComposer>() // all of them
                 .Where(x => !x.FullName.StartsWith("Umbraco.Tests.")) // exclude test components
                 .Where(x => x != typeof(WebInitialComposer) && x != typeof(WebFinalComposer)); // exclude web runtime
-            var composers = new Composers(composition, composerTypes, Enumerable.Empty<Attribute>(), loggerFactory.CreateLogger("Composers"), profilingLogger);
+            var composers = new Composers(composition, composerTypes, Enumerable.Empty<Attribute>(), loggerFactory.CreateLogger<Composers>(), profilingLogger);
             composers.Compose();
 
             // must registers stuff that WebRuntimeComponent would register otherwise
@@ -279,7 +279,7 @@ namespace Umbraco.Tests.Runtimes
             var databaseFactory = Mock.Of<IUmbracoDatabaseFactory>();
             var typeFinder = TestHelper.GetTypeFinder();
             var ioHelper = TestHelper.IOHelper;
-            var typeLoader = new TypeLoader(typeFinder, appCaches.RuntimeCache, new DirectoryInfo(ioHelper.MapPath("~/App_Data/TEMP")), loggerFactory.CreateLogger("TypeLoader"), profilingLogger);
+            var typeLoader = new TypeLoader(typeFinder, appCaches.RuntimeCache, new DirectoryInfo(ioHelper.MapPath("~/App_Data/TEMP")), loggerFactory.CreateLogger<TypeLoader>(), profilingLogger);
             var runtimeState = Mock.Of<IRuntimeState>();
             var hostingEnvironment = Mock.Of<IHostingEnvironment>();
             var backOfficeInfo = TestHelper.GetBackOfficeInfo();
@@ -307,7 +307,7 @@ namespace Umbraco.Tests.Runtimes
                 .Where(x => !x.FullName.StartsWith("Umbraco.Tests"));
             // single?
             //var componentTypes = new[] { typeof(CoreRuntimeComponent) };
-            var composers = new Composers(composition, composerTypes, Enumerable.Empty<Attribute>(), loggerFactory.CreateLogger("Composers"), profilingLogger);
+            var composers = new Composers(composition, composerTypes, Enumerable.Empty<Attribute>(), loggerFactory.CreateLogger<Composers>(), profilingLogger);
 
             // get components to compose themselves
             composers.Compose();

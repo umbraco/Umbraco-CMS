@@ -6,7 +6,6 @@ using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Directory = Lucene.Net.Store.Directory;
-using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Umbraco.Examine
 {
@@ -33,7 +32,7 @@ namespace Umbraco.Examine
             Directory luceneDirectory,
             Analyzer analyzer,
             IProfilingLogger profilingLogger,
-            ILogger logger,
+            ILogger<UmbracoMemberIndex> logger,
             ILoggerFactory loggerFactory,
             IHostingEnvironment hostingEnvironment,
             IRuntimeState runtimeState,

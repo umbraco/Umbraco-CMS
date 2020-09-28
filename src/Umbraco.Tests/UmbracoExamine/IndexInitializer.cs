@@ -186,9 +186,9 @@ namespace Umbraco.Tests.UmbracoExamine
                 new UmbracoFieldDefinitionCollection(),
                 analyzer,
                 profilingLogger,
-                Mock.Of<ILogger>(),
+                Mock.Of<ILogger<UmbracoContentIndex>>(),
                 Mock.Of<ILoggerFactory>(),
-            hostingEnvironment,
+                hostingEnvironment,
                 runtimeState,
                 languageService,
                 validator);
