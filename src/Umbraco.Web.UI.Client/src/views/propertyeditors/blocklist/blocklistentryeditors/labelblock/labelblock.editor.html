@@ -1,5 +1,5 @@
 <button type="button" class="btn-reset umb-outline blockelement-labelblock-editor blockelement__draggable-element"
-        ng-click="block.edit()"
+        ng-click="api.editBlock(block, block.hideContentInOverlay, index, parentForm)"
         ng-focus="block.focus"
         ng-class="{ '--active': block.active, '--error': parentForm.$invalid && valFormManager.isShowingValidation() }"
         val-server-property-class="">
