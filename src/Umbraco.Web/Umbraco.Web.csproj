@@ -245,6 +245,7 @@
     <Compile Include="Models\PublishedContent\HybridVariationContextAccessor.cs" />
     <Compile Include="Models\TemplateQuery\QueryConditionExtensions.cs" />
     <Compile Include="Mvc\DisposableTagScope.cs" />
+    <Compile Include="Mvc\Html\BeginLinkExtensions.cs" />
     <Compile Include="Mvc\Html\BeginTagScopeExtensions.cs" />
     <Compile Include="Mvc\Html\LinkExtensions.cs" />
     <Compile Include="Mvc\HttpUmbracoFormRouteStringException.cs" />
