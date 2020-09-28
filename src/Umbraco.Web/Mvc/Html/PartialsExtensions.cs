@@ -13,9 +13,9 @@ namespace Umbraco.Web.Mvc.Html
     public static class PartialsExtensions
     {
         /// <summary>
-        /// Renders the partial views for every <paramref name="items" /> item as an HTML-encoded string, using <paramref name="getPartialViewName" /> to get the partial view name.
+        /// Renders the partial views for every <typeparamref name="T" /> item as an HTML-encoded string, using <paramref name="getPartialViewName" /> to get the partial view name.
         /// </summary>
-        /// <typeparam name="T">The type of the items.</typeparam>
+        /// <typeparam name="T">The type of the item.</typeparam>
         /// <param name="htmlHelper">The HTML helper.</param>
         /// <param name="items">The items to render partial views for.</param>
         /// <param name="getPartialViewName">A function to get the partial view name for an item.</param>
@@ -27,9 +27,9 @@ namespace Umbraco.Web.Mvc.Html
             => htmlHelper.Partials(items, item => item, (item, model, index) => getPartialViewName(item), (item, model, index) => viewData);
 
         /// <summary>
-        /// Renders the partial views for every <paramref name="items" /> item as an HTML-encoded string, using <paramref name="getPartialViewName" /> to get the partial view name and <paramref name="getViewData" /> to get the view data.
+        /// Renders the partial views for every <typeparamref name="T" /> item as an HTML-encoded string, using <paramref name="getPartialViewName" /> to get the partial view name and <paramref name="getViewData" /> to get the view data.
         /// </summary>
-        /// <typeparam name="T">The type of the items.</typeparam>
+        /// <typeparam name="T">The type of the item.</typeparam>
         /// <param name="htmlHelper">The HTML helper.</param>
         /// <param name="items">The items to render partial views for.</param>
         /// <param name="getPartialViewName">A function to get the partial view name for an item.</param>
@@ -41,9 +41,9 @@ namespace Umbraco.Web.Mvc.Html
             => htmlHelper.Partials(items, item => item, (item, model, index) => getPartialViewName(item), (item, model, index) => getViewData(item));
 
         /// <summary>
-        /// Renders the partial views for every <paramref name="items" /> item as an HTML-encoded string, using <paramref name="getPartialViewName" /> to get the partial view name and <paramref name="getViewData" /> to get the view data.
+        /// Renders the partial views for every <typeparamref name="T" /> item as an HTML-encoded string, using <paramref name="getPartialViewName" /> to get the partial view name and <paramref name="getViewData" /> to get the view data.
         /// </summary>
-        /// <typeparam name="T">The type of the items.</typeparam>
+        /// <typeparam name="T">The type of the item.</typeparam>
         /// <param name="htmlHelper">The HTML helper.</param>
         /// <param name="items">The items to render partial views for.</param>
         /// <param name="getPartialViewName">A function to get the partial view name for an item.</param>
@@ -55,10 +55,10 @@ namespace Umbraco.Web.Mvc.Html
             => htmlHelper.Partials(items, item => item, (item, model, index) => getPartialViewName(item, index), (item, model, index) => getViewData(item, index));
 
         /// <summary>
-        /// Renders the partial views for every <paramref name="items" /> item as an HTML-encoded string, using <paramref name="getPartialViewName" /> to get the partial view name and <paramref name="getViewData" /> to get the view data.
+        /// Renders the partial views for every <typeparamref name="T" /> item as an HTML-encoded string, using <paramref name="getPartialViewName" /> to get the partial view name and <paramref name="getViewData" /> to get the view data.
         /// </summary>
-        /// <typeparam name="T1">The type of the items.</typeparam>
-        /// <typeparam name="T2">The type of the model.</typeparam>
+        /// <typeparam name="TItem">The type of the item.</typeparam>
+        /// <typeparam name="TModel">The type of the model.</typeparam>
         /// <param name="htmlHelper">The HTML helper.</param>
         /// <param name="items">The items to render partial views for.</param>
         /// <param name="getModel">A function to get the model for an item.</param>
@@ -72,7 +72,7 @@ namespace Umbraco.Web.Mvc.Html
         /// getPartialViewName
         /// or
         /// getViewData</exception>
-        public static IHtmlString Partials<T1, T2>(this HtmlHelper htmlHelper, IEnumerable<T1> items, Func<T1, T2> getModel, Func<T1, T2, int, string> getPartialViewName, Func<T1, T2, int, ViewDataDictionary> getViewData)
+        public static IHtmlString Partials<TItem, TModel>(this HtmlHelper htmlHelper, IEnumerable<TItem> items, Func<TItem, TModel> getModel, Func<TItem, TModel, int, string> getPartialViewName, Func<TItem, TModel, int, ViewDataDictionary> getViewData)
         {
             if (getModel == null) throw new ArgumentNullException(nameof(getModel));
             if (getPartialViewName == null) throw new ArgumentNullException(nameof(getPartialViewName));

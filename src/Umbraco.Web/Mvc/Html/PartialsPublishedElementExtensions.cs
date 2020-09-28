@@ -13,16 +13,6 @@ namespace Umbraco.Web.Mvc.Html
     public static class PartialsPublishedElementExtensions
     {
         /// <summary>
-        /// Gets the partial view name for the <see cref="IPublishedElement" />.
-        /// </summary>
-        /// <param name="element">The element.</param>
-        /// <param name="partialViewPath">The partial view path.</param>
-        /// <returns>
-        /// The partial view name.
-        /// </returns>
-        internal static string GetPartialViewName(IPublishedElement element, string partialViewPath) => (string.IsNullOrEmpty(partialViewPath) ? null : partialViewPath.EnsureEndsWith('/')) + element.ContentType.Alias;
-
-        /// <summary>
         /// Renders the partial views for every <see cref="IPublishedElement" /> item as an HTML-encoded string, using the content type alias as partial view name.
         /// </summary>
         /// <param name="htmlHelper">The HTML helper.</param>
@@ -90,5 +80,15 @@ namespace Umbraco.Web.Mvc.Html
         /// </returns>
         public static IHtmlString Partials<T>(this HtmlHelper htmlHelper, IEnumerable<IPublishedElement> elements, Func<IPublishedElement, T> getModel, string partialViewPath, Func<IPublishedElement, T, int, ViewDataDictionary> getViewData)
             => htmlHelper.Partials(elements, getModel, (element, model, index) => GetPartialViewName(element, partialViewPath), getViewData);
+
+        /// <summary>
+        /// Gets the partial view name for the <see cref="IPublishedElement" />.
+        /// </summary>
+        /// <param name="element">The element.</param>
+        /// <param name="partialViewPath">The partial view path.</param>
+        /// <returns>
+        /// The partial view name.
+        /// </returns>
+        internal static string GetPartialViewName(IPublishedElement element, string partialViewPath) => (string.IsNullOrEmpty(partialViewPath) ? null : partialViewPath.EnsureEndsWith('/')) + element.ContentType.Alias;
     }
 }

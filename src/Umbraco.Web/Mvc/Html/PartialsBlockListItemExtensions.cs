@@ -12,16 +12,6 @@ namespace Umbraco.Web.Mvc.Html
     public static class PartialsBlockListItemExtensions
     {
         /// <summary>
-        /// Gets the partial view name for the <see cref="BlockListItem" />.
-        /// </summary>
-        /// <param name="blockListItem">The block list item.</param>
-        /// <param name="partialViewPath">The partial view path.</param>
-        /// <returns>
-        /// The partial view name.
-        /// </returns>
-        internal static string GetPartialViewName(BlockListItem blockListItem, string partialViewPath) => PartialsPublishedElementExtensions.GetPartialViewName(blockListItem.Content, partialViewPath);
-
-        /// <summary>
         /// Renders the partial views for every <see cref="BlockListItem" /> item as an HTML-encoded string, using the content type alias as partial view name.
         /// </summary>
         /// <param name="htmlHelper">The HTML helper.</param>
@@ -89,5 +79,15 @@ namespace Umbraco.Web.Mvc.Html
         /// </returns>
         public static IHtmlString Partials<T>(this HtmlHelper htmlHelper, IEnumerable<BlockListItem> blockListItems, Func<BlockListItem, T> getModel, string partialViewPath, Func<BlockListItem, T, int, ViewDataDictionary> getViewData)
             => htmlHelper.Partials(blockListItems, getModel, (blockListItem, model, index) => GetPartialViewName(blockListItem, partialViewPath), getViewData);
+
+        /// <summary>
+        /// Gets the partial view name for the <see cref="BlockListItem" />.
+        /// </summary>
+        /// <param name="blockListItem">The block list item.</param>
+        /// <param name="partialViewPath">The partial view path.</param>
+        /// <returns>
+        /// The partial view name.
+        /// </returns>
+        internal static string GetPartialViewName(BlockListItem blockListItem, string partialViewPath) => PartialsPublishedElementExtensions.GetPartialViewName(blockListItem.Content, partialViewPath);
     }
 }
