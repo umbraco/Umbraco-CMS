@@ -120,7 +120,6 @@
     <Compile Include="Cache\SnapDictionaryTests.cs" />
     <Compile Include="Composing\CompositionTests.cs" />
     <Compile Include="Composing\ContainerConformingTests.cs" />
-    <Compile Include="Configurations\GlobalSettingsTests.cs" />
     <Compile Include="Components\ComponentTests.cs" />
     <Compile Include="LegacyXmlPublishedCache\ContentXmlDto.cs" />
     <Compile Include="LegacyXmlPublishedCache\PreviewXmlDto.cs" />
