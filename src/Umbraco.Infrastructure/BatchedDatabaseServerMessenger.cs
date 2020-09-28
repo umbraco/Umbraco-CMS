@@ -33,7 +33,7 @@ namespace Umbraco.Web
             IScopeProvider scopeProvider,
             ISqlContext sqlContext,
             IProfilingLogger proflog,
-            Microsoft.Extensions.Logging.ILogger<BatchedDatabaseServerMessenger> logger,
+            ILogger<BatchedDatabaseServerMessenger> logger,
             IServerRegistrar serverRegistrar,
             DatabaseServerMessengerOptions options,
             IHostingEnvironment hostingEnvironment,

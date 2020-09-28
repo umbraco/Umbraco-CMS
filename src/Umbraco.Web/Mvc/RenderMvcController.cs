@@ -22,7 +22,7 @@ namespace Umbraco.Web.Mvc
     public class RenderMvcController : UmbracoController, IRenderMvcController
     {
         private IPublishedRequest _publishedRequest;
-        private readonly Microsoft.Extensions.Logging.ILogger<RenderMvcController> _logger;
+        private readonly ILogger<RenderMvcController> _logger;
 
         public RenderMvcController()
         {

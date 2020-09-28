@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -37,8 +38,8 @@ namespace Umbraco.Tests.Web
                     typeFinder,
                     NoAppCache.Instance,
                     new DirectoryInfo(ioHelper.MapPath("~/App_Data/TEMP")),
-                    Mock.Of<Microsoft.Extensions.Logging.ILogger>(),
-                    new ProfilingLogger(Mock.Of<Microsoft.Extensions.Logging.ILogger>(), Mock.Of<IProfiler>())
+                    Mock.Of<ILogger>(),
+                    new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>())
                     )
                 );
 

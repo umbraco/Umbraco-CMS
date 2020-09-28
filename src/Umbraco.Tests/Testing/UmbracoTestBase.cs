@@ -65,6 +65,7 @@ using Umbraco.Web.Templates;
 using Umbraco.Web.Trees;
 using Current = Umbraco.Web.Composing.Current;
 using FileSystems = Umbraco.Core.IO.FileSystems;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Umbraco.Tests.Testing
 {
@@ -205,8 +206,7 @@ namespace Umbraco.Tests.Testing
 
             Composition.RegisterUnique(typeof(ILoggerFactory), loggerFactory);
             Composition.Register(typeof(ILogger<>), typeof(Logger<>));
-            // TODO Remove this at some point
-            Composition.Register(typeof(Microsoft.Extensions.Logging.ILogger), msLogger);
+            Composition.Register(typeof(ILogger), msLogger);
             Composition.RegisterUnique(IOHelper);
             Composition.RegisterUnique(UriUtility);
             Composition.RegisterUnique(UmbracoVersion);
@@ -381,7 +381,7 @@ namespace Umbraco.Tests.Testing
                 .ComposeCoreMappingProfiles();
         }
 
-        protected virtual TypeLoader GetTypeLoader(IIOHelper ioHelper, ITypeFinder typeFinder, IAppPolicyCache runtimeCache, IHostingEnvironment hostingEnvironment, Microsoft.Extensions.Logging.ILogger logger, IProfilingLogger pLogger, UmbracoTestOptions.TypeLoader option)
+        protected virtual TypeLoader GetTypeLoader(IIOHelper ioHelper, ITypeFinder typeFinder, IAppPolicyCache runtimeCache, IHostingEnvironment hostingEnvironment, ILogger logger, IProfilingLogger pLogger, UmbracoTestOptions.TypeLoader option)
         {
             switch (option)
             {
@@ -396,13 +396,13 @@ namespace Umbraco.Tests.Testing
             }
         }
 
-        protected virtual TypeLoader CreateTypeLoader(IIOHelper ioHelper, ITypeFinder typeFinder, IAppPolicyCache runtimeCache, Microsoft.Extensions.Logging.ILogger logger, IProfilingLogger pLogger, IHostingEnvironment hostingEnvironment)
+        protected virtual TypeLoader CreateTypeLoader(IIOHelper ioHelper, ITypeFinder typeFinder, IAppPolicyCache runtimeCache, ILogger logger, IProfilingLogger pLogger, IHostingEnvironment hostingEnvironment)
         {
             return CreateCommonTypeLoader(typeFinder, runtimeCache, logger, pLogger, hostingEnvironment);
         }
 
         // common to all tests = cannot be overriden
-        private static TypeLoader CreateCommonTypeLoader(ITypeFinder typeFinder, IAppPolicyCache runtimeCache, Microsoft.Extensions.Logging.ILogger logger, IProfilingLogger pLogger, IHostingEnvironment hostingEnvironment)
+        private static TypeLoader CreateCommonTypeLoader(ITypeFinder typeFinder, IAppPolicyCache runtimeCache, ILogger logger, IProfilingLogger pLogger, IHostingEnvironment hostingEnvironment)
         {
             return new TypeLoader(typeFinder, runtimeCache, new DirectoryInfo(hostingEnvironment.LocalTempPath), logger, pLogger, false, new[]
             {

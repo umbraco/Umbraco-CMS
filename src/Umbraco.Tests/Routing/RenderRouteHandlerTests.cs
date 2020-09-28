@@ -55,7 +55,7 @@ namespace Umbraco.Tests.Routing
         public class TestRuntime : CoreRuntime
         {
             public TestRuntime(GlobalSettings globalSettings, ConnectionStrings connectionStrings, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)
-                : base(globalSettings, connectionStrings,umbracoVersion, ioHelper, Mock.Of<Microsoft.Extensions.Logging.ILogger>(), NullLoggerFactory.Instance, Mock.Of<IProfiler>(), new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, TestHelper.DbProviderFactoryCreator, TestHelper.MainDom, TestHelper.GetTypeFinder(), AppCaches.NoCache)
+                : base(globalSettings, connectionStrings,umbracoVersion, ioHelper, Mock.Of<ILogger>(), NullLoggerFactory.Instance, Mock.Of<IProfiler>(), new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, TestHelper.DbProviderFactoryCreator, TestHelper.MainDom, TestHelper.GetTypeFinder(), AppCaches.NoCache)
             {
             }
 
@@ -111,7 +111,7 @@ namespace Umbraco.Tests.Routing
             frequest.TemplateModel = template;
 
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
-            var handler = new RenderRouteHandler(umbracoContext, new TestControllerFactory(umbracoContextAccessor, Mock.Of<Microsoft.Extensions.Logging.ILogger<TestControllerFactory>>()), ShortStringHelper);
+            var handler = new RenderRouteHandler(umbracoContext, new TestControllerFactory(umbracoContextAccessor, Mock.Of<ILogger<TestControllerFactory>>()), ShortStringHelper);
 
             handler.GetHandlerForRoute(httpContext.Request.RequestContext, frequest);
             Assert.AreEqual("RenderMvc", routeData.Values["controller"].ToString());
@@ -152,7 +152,7 @@ namespace Umbraco.Tests.Routing
             var type = new AutoPublishedContentType(Guid.NewGuid(), 22, "CustomDocument", new PublishedPropertyType[] { });
             ContentTypesCache.GetPublishedContentTypeByAlias = alias => type;
 
-            var handler = new RenderRouteHandler(umbracoContext, new TestControllerFactory(umbracoContextAccessor, Mock.Of<Microsoft.Extensions.Logging.ILogger<TestControllerFactory>>(), context =>
+            var handler = new RenderRouteHandler(umbracoContext, new TestControllerFactory(umbracoContextAccessor, Mock.Of<ILogger<TestControllerFactory>>(), context =>
                 {
 
                   return new CustomDocumentController(Factory.GetInstance<IOptions<GlobalSettings>>(),

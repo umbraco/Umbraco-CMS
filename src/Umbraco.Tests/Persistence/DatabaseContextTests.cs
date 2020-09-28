@@ -26,7 +26,7 @@ namespace Umbraco.Tests.Persistence
     public class DatabaseContextTests
     {
         private IUmbracoDatabaseFactory _databaseFactory;
-        private Microsoft.Extensions.Logging.ILogger<UmbracoDatabaseFactory> _logger;
+        private ILogger<UmbracoDatabaseFactory> _logger;
         private ILoggerFactory _loggerFactory;
         private SqlCeSyntaxProvider _sqlCeSyntaxProvider;
         private ISqlSyntaxProvider[] _sqlSyntaxProviders;
@@ -38,7 +38,7 @@ namespace Umbraco.Tests.Persistence
             // create the database factory and database context
             _sqlCeSyntaxProvider = new SqlCeSyntaxProvider();
             _sqlSyntaxProviders = new[] { (ISqlSyntaxProvider) _sqlCeSyntaxProvider };
-            _logger = Mock.Of<Microsoft.Extensions.Logging.ILogger<UmbracoDatabaseFactory>>();
+            _logger = Mock.Of<ILogger<UmbracoDatabaseFactory>>();
             _loggerFactory = NullLoggerFactory.Instance;
             _umbracoVersion = TestHelper.GetUmbracoVersion();
             var globalSettings = new GlobalSettings();

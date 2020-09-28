@@ -25,7 +25,7 @@ namespace Umbraco.Tests.Composing
 
             var typeFinder = TestHelper.GetTypeFinder();
             var ioHelper = TestHelper.IOHelper;
-            TypeLoader = new TypeLoader(typeFinder, NoAppCache.Instance, new DirectoryInfo(ioHelper.MapPath("~/App_Data/TEMP")), Mock.Of<Microsoft.Extensions.Logging.ILogger>(), ProfilingLogger, false, AssembliesToScan);
+            TypeLoader = new TypeLoader(typeFinder, NoAppCache.Instance, new DirectoryInfo(ioHelper.MapPath("~/App_Data/TEMP")), Mock.Of<ILogger>(), ProfilingLogger, false, AssembliesToScan);
         }
 
         [TearDown]

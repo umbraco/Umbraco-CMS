@@ -49,7 +49,7 @@ namespace Umbraco.Web.Editors
         private BackOfficeSignInManager _signInManager;
         private readonly IUserPasswordConfiguration _passwordConfiguration;
         private readonly IHostingEnvironment _hostingEnvironment;
-        private readonly Microsoft.Extensions.Logging.ILogger<AuthenticationController> _logger;
+        private readonly ILogger<AuthenticationController> _logger;
         private readonly IRuntimeState _runtimeState;
         private readonly SecuritySettings _securitySettings;
         private readonly IRequestAccessor _requestAccessor;
@@ -64,7 +64,7 @@ namespace Umbraco.Web.Editors
             ServiceContext services,
             AppCaches appCaches,
             IProfilingLogger pLogger,
-            Microsoft.Extensions.Logging.ILogger<AuthenticationController> logger,
+            ILogger<AuthenticationController> logger,
             IRuntimeState runtimeState,
             UmbracoMapper umbracoMapper,
             IOptions<SecuritySettings> securitySettings,

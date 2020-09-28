@@ -10,14 +10,14 @@ namespace Umbraco.Web.Templates
     public sealed class HtmlUrlParser
     {
         private readonly ContentSettings _contentSettings;
-        private readonly Microsoft.Extensions.Logging.ILogger<HtmlUrlParser> _logger;
+        private readonly ILogger<HtmlUrlParser> _logger;
         private readonly IIOHelper _ioHelper;
         private readonly IProfilingLogger _profilingLogger;
 
         private static readonly Regex ResolveUrlPattern = new Regex("(=[\"\']?)(\\W?\\~(?:.(?![\"\']?\\s+(?:\\S+)=|[>\"\']))+.)[\"\']?",
             RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
 
-        public HtmlUrlParser(IOptions<ContentSettings> contentSettings, Microsoft.Extensions.Logging.ILogger<HtmlUrlParser> logger ,IProfilingLogger profilingLogger, IIOHelper ioHelper)
+        public HtmlUrlParser(IOptions<ContentSettings> contentSettings, ILogger<HtmlUrlParser> logger ,IProfilingLogger profilingLogger, IIOHelper ioHelper)
         {
             _contentSettings = contentSettings.Value;
             _logger = logger;

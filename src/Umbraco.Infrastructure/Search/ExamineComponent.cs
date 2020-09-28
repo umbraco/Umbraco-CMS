@@ -33,7 +33,7 @@ namespace Umbraco.Web.Search
         private readonly ServiceContext _services;
         private readonly IMainDom _mainDom;
         private readonly IProfilingLogger _pLogger;
-        private readonly Microsoft.Extensions.Logging.ILogger<ExamineComponent> _logger;
+        private readonly ILogger<ExamineComponent> _logger;
         private readonly IUmbracoIndexesCreator _indexCreator;
         private readonly BackgroundTaskRunner<IBackgroundTask> _indexItemTaskRunner;
 
@@ -43,7 +43,7 @@ namespace Umbraco.Web.Search
         private const int EnlistPriority = 80;
 
         public ExamineComponent(IMainDom mainDom,
-            IExamineManager examineManager, IProfilingLogger profilingLogger, 
+            IExamineManager examineManager, IProfilingLogger profilingLogger,
             ILoggerFactory loggerFactory,
             IScopeProvider scopeProvider, IUmbracoIndexesCreator indexCreator,
             ServiceContext services,

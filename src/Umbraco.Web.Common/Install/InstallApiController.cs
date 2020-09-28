@@ -32,10 +32,10 @@ namespace Umbraco.Web.Common.Install
         private readonly InstallStatusTracker _installStatusTracker;
         private readonly IUmbracoApplicationLifetime _umbracoApplicationLifetime;
         private readonly InstallStepCollection _installSteps;
-        private readonly Microsoft.Extensions.Logging.ILogger<InstallApiController> _logger;
+        private readonly ILogger<InstallApiController> _logger;
         private readonly IProfilingLogger _proflog;
 
-        public InstallApiController(DatabaseBuilder databaseBuilder, IProfilingLogger proflog, Microsoft.Extensions.Logging.ILogger<InstallApiController> logger,
+        public InstallApiController(DatabaseBuilder databaseBuilder, IProfilingLogger proflog, ILogger<InstallApiController> logger,
             InstallHelper installHelper, InstallStepCollection installSteps, InstallStatusTracker installStatusTracker,
             IUmbracoApplicationLifetime umbracoApplicationLifetime)
         {

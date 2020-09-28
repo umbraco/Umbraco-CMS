@@ -18,7 +18,7 @@ namespace Umbraco.Web.Common.Profiler
         private readonly IUmbracoRequestLifetime _umbracoRequestLifetime;
         private readonly List<Action> _terminate = new List<Action>();
 
-        public WebProfilerComponent(IProfiler profiler, Microsoft.Extensions.Logging.ILogger<WebProfilerComponent> logger, IUmbracoRequestLifetime umbracoRequestLifetime,
+        public WebProfilerComponent(IProfiler profiler, ILogger<WebProfilerComponent> logger, IUmbracoRequestLifetime umbracoRequestLifetime,
             IUmbracoApplicationLifetime umbracoApplicationLifetime)
         {
             _umbracoRequestLifetime = umbracoRequestLifetime;

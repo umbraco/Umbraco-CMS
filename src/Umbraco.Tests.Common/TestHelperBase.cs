@@ -45,7 +45,7 @@ namespace Umbraco.Tests.Common
 
         public TypeLoader GetMockedTypeLoader()
         {
-            return new TypeLoader(Mock.Of<ITypeFinder>(), Mock.Of<IAppPolicyCache>(), new DirectoryInfo(IOHelper.MapPath("~/App_Data/TEMP")), Mock.Of<Microsoft.Extensions.Logging.ILogger>(), Mock.Of<IProfilingLogger>());
+            return new TypeLoader(Mock.Of<ITypeFinder>(), Mock.Of<IAppPolicyCache>(), new DirectoryInfo(IOHelper.MapPath("~/App_Data/TEMP")), Mock.Of<ILogger>(), Mock.Of<IProfilingLogger>());
         }
 
        // public Configs GetConfigs() => GetConfigsFactory().Create();

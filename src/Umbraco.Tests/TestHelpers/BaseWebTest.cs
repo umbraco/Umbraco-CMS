@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
@@ -105,8 +106,8 @@ namespace Umbraco.Tests.TestHelpers
                 contentFinders ?? new ContentFinderCollection(Enumerable.Empty<IContentFinder>()),
                 new TestLastChanceFinder(),
                 new TestVariationContextAccessor(),
-                new ProfilingLogger(Mock.Of<Microsoft.Extensions.Logging.ILogger>(), Mock.Of<IProfiler>()),
-                Mock.Of<Microsoft.Extensions.Logging.ILogger<PublishedRouter>>(),
+                new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()),
+                Mock.Of<ILogger<PublishedRouter>>(),
                 Mock.Of<IPublishedUrlProvider>(),
                 Mock.Of<IRequestAccessor>(),
                 container?.GetInstance<IPublishedValueFallback>() ?? Current.Factory.GetInstance<IPublishedValueFallback>(),

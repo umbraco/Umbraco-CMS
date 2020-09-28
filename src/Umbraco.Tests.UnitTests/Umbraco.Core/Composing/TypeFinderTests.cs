@@ -68,7 +68,7 @@ namespace Umbraco.Tests.Composing
 
         // TODO: Is console logger the type of logger we want?
         private static ILoggerFactory _factory = LoggerFactory.Create(builder => { builder.AddConsole(); });
-        private static Microsoft.Extensions.Logging.ILogger<TypeFinder> GetLogger()
+        private static ILogger<TypeFinder> GetLogger()
         {
             return _factory.CreateLogger<TypeFinder>();
         }

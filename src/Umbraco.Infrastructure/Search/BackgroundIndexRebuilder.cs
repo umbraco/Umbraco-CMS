@@ -20,7 +20,7 @@ namespace Umbraco.Web.Search
         private readonly IMainDom _mainDom;
         // TODO: Remove unused ProfilingLogger?
         private readonly IProfilingLogger _pLogger;
-        private readonly Microsoft.Extensions.Logging.ILogger<BackgroundIndexRebuilder> _logger;
+        private readonly ILogger<BackgroundIndexRebuilder> _logger;
         private readonly ILoggerFactory _loggerFactory;
         private readonly IApplicationShutdownRegistry _hostingEnvironment;
         private static BackgroundTaskRunner<IBackgroundTask> _rebuildOnStartupRunner;
@@ -72,12 +72,12 @@ namespace Umbraco.Web.Search
             private readonly IMainDom _mainDom;
 
             private readonly IndexRebuilder _indexRebuilder;
-            private readonly Microsoft.Extensions.Logging.ILogger<RebuildOnStartupTask> _logger;
+            private readonly ILogger<RebuildOnStartupTask> _logger;
             private readonly bool _onlyEmptyIndexes;
             private readonly int _waitMilliseconds;
 
             public RebuildOnStartupTask(IMainDom mainDom,
-                IndexRebuilder indexRebuilder, Microsoft.Extensions.Logging.ILogger<RebuildOnStartupTask> logger, bool onlyEmptyIndexes, int waitMilliseconds = 0)
+                IndexRebuilder indexRebuilder, ILogger<RebuildOnStartupTask> logger, bool onlyEmptyIndexes, int waitMilliseconds = 0)
             {
                 _mainDom = mainDom;
                 _indexRebuilder = indexRebuilder ?? throw new ArgumentNullException(nameof(indexRebuilder));

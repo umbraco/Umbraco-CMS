@@ -106,7 +106,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             }
         }
 
-        internal ServerVersionInfo GetSetVersion(string connectionString, string providerName, Microsoft.Extensions.Logging.ILogger logger)
+        internal ServerVersionInfo GetSetVersion(string connectionString, string providerName, ILogger logger)
         {
             //var factory = DbProviderFactories.GetFactory(providerName);
             var factory = SqlClientFactory.Instance;

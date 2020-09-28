@@ -12,7 +12,6 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Configuration.Models;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
-using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Umbraco.Examine
 {

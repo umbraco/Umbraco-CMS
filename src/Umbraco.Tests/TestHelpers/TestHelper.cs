@@ -35,6 +35,7 @@ using Umbraco.Web.Routing;
 using File = System.IO.File;
 using Umbraco.Tests.Common.Builders;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Configuration.Models;
 
 namespace Umbraco.Tests.TestHelpers
@@ -63,7 +64,7 @@ namespace Umbraco.Tests.TestHelpers
             public override IBackOfficeInfo GetBackOfficeInfo()
                 => new AspNetBackOfficeInfo(
                     new GlobalSettings(),
-                    TestHelper.IOHelper, Mock.Of<Microsoft.Extensions.Logging.ILogger<AspNetBackOfficeInfo>>(), Options.Create(new WebRoutingSettings()));
+                    TestHelper.IOHelper, Mock.Of<ILogger<AspNetBackOfficeInfo>>(), Options.Create(new WebRoutingSettings()));
 
             public override IHostingEnvironment GetHostingEnvironment()
                 => new AspNetHostingEnvironment(Options.Create(new HostingSettings()));

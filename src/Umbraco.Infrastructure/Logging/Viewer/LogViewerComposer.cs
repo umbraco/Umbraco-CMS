@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using Microsoft.Extensions.Logging;
 using Serilog;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Hosting;
@@ -16,7 +17,7 @@ namespace Umbraco.Core.Logging.Viewer
             composition.RegisterUnique<ILogViewer>(factory =>
             {
 
-                return new SerilogJsonLogViewer(factory.GetInstance<Microsoft.Extensions.Logging.ILogger<SerilogJsonLogViewer>>(),
+                return new SerilogJsonLogViewer(factory.GetInstance<ILogger<SerilogJsonLogViewer>>(),
                     factory.GetInstance<ILogViewerConfig>(),
                     factory.GetInstance<ILoggingConfiguration>(),
                     Log.Logger);

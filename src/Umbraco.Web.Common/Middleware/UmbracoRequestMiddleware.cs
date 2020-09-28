@@ -22,14 +22,14 @@ namespace Umbraco.Web.Common.Middleware
     /// </remarks>
     public class UmbracoRequestMiddleware : IMiddleware
     {
-        private readonly Microsoft.Extensions.Logging.ILogger<UmbracoRequestMiddleware> _logger;
+        private readonly ILogger<UmbracoRequestMiddleware> _logger;
         private readonly IUmbracoRequestLifetimeManager _umbracoRequestLifetimeManager;
         private readonly IUmbracoContextFactory _umbracoContextFactory;
         private readonly IRequestCache _requestCache;
         private readonly IBackofficeSecurityFactory _backofficeSecurityFactory;
 
         public UmbracoRequestMiddleware(
-            Microsoft.Extensions.Logging.ILogger<UmbracoRequestMiddleware> logger,
+            ILogger<UmbracoRequestMiddleware> logger,
             IUmbracoRequestLifetimeManager umbracoRequestLifetimeManager,
             IUmbracoContextFactory umbracoContextFactory,
             IRequestCache requestCache,
@@ -110,7 +110,7 @@ namespace Umbraco.Web.Common.Middleware
         /// <param name="http"></param>
         /// <param name="requestCache"></param>
         /// <param name="requestUri"></param>
-        private static void DisposeRequestCacheItems(Microsoft.Extensions.Logging.ILogger<UmbracoRequestMiddleware> logger, IRequestCache requestCache, Uri requestUri)
+        private static void DisposeRequestCacheItems(ILogger<UmbracoRequestMiddleware> logger, IRequestCache requestCache, Uri requestUri)
         {
             // do not process if client-side request
             if (requestUri.IsClientSideRequest())

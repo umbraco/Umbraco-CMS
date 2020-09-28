@@ -4,6 +4,7 @@ using System.Data;
 using System.Data.Common;
 using System.Linq;
 using System.Linq.Expressions;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
@@ -44,7 +45,7 @@ namespace Umbraco.Tests.TestHelpers
 
             // can create a database - but don't try to use it!
             if (configured && canConnect)
-                databaseFactoryMock.Setup(x => x.CreateDatabase()).Returns(GetUmbracoSqlCeDatabase(Mock.Of<Microsoft.Extensions.Logging.ILogger<UmbracoDatabase>>()));
+                databaseFactoryMock.Setup(x => x.CreateDatabase()).Returns(GetUmbracoSqlCeDatabase(Mock.Of<ILogger<UmbracoDatabase>>()));
 
             return databaseFactoryMock.Object;
         }

@@ -1,11 +1,11 @@
 ﻿using System.Web.Mvc;
 using System.Web.Services;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Security;
-using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Umbraco.Web
 {

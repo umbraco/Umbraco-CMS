@@ -418,7 +418,7 @@ namespace Umbraco.Extensions
             // services.AddSingleton<IDiagnosticContext>(diagnosticContext);
             var serviceProvider = services.BuildServiceProvider();
             loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
-            return loggerFactory.CreateLogger("Generic Logger");
+            return loggerFactory.CreateLogger("Global Logger");
         }
 
         private static IProfiler GetWebProfiler(Umbraco.Core.Hosting.IHostingEnvironment hostingEnvironment)

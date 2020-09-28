@@ -16,13 +16,13 @@ namespace Umbraco.Web.Scheduling
         private readonly IRequestAccessor _requestAccessor;
         private readonly IMainDom _mainDom;
         private readonly KeepAliveSettings _keepAliveSettings;
-        private readonly Microsoft.Extensions.Logging.ILogger<KeepAlive> _logger;
+        private readonly ILogger<KeepAlive> _logger;
         private readonly IProfilingLogger _profilingLogger;
         private readonly IServerRegistrar _serverRegistrar;
         private static HttpClient _httpClient;
 
         public KeepAlive(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
-            IRequestAccessor requestAccessor, IMainDom mainDom, IOptions<KeepAliveSettings> keepAliveSettings, Microsoft.Extensions.Logging.ILogger<KeepAlive> logger, IProfilingLogger profilingLogger, IServerRegistrar serverRegistrar)
+            IRequestAccessor requestAccessor, IMainDom mainDom, IOptions<KeepAliveSettings> keepAliveSettings, ILogger<KeepAlive> logger, IProfilingLogger profilingLogger, IServerRegistrar serverRegistrar)
             : base(runner, delayMilliseconds, periodMilliseconds)
         {
             _requestAccessor = requestAccessor;

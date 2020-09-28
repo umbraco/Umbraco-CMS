@@ -23,7 +23,7 @@ namespace Umbraco.Web.Macros
     public class MacroRenderer : IMacroRenderer
     {
         private readonly IProfilingLogger _plogger;
-        private readonly Microsoft.Extensions.Logging.ILogger<MacroRenderer> _logger;
+        private readonly ILogger<MacroRenderer> _logger;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly ContentSettings _contentSettings;
         private readonly ILocalizedTextService _textService;
@@ -38,7 +38,7 @@ namespace Umbraco.Web.Macros
 
         public MacroRenderer(
             IProfilingLogger plogger,
-            Microsoft.Extensions.Logging.ILogger<MacroRenderer> logger,
+            ILogger<MacroRenderer> logger,
             IUmbracoContextAccessor umbracoContextAccessor,
             IOptions<ContentSettings> contentSettings,
             ILocalizedTextService textService,

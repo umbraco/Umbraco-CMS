@@ -57,6 +57,7 @@ using IntegerValidator = Umbraco.Core.PropertyEditors.Validators.IntegerValidato
 using TextStringValueConverter = Umbraco.Core.PropertyEditors.ValueConverters.TextStringValueConverter;
 using Umbraco.Core.Configuration.Models;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
 using Umbraco.Web.Media;
 
 namespace Umbraco.Core.Runtime
@@ -148,7 +149,7 @@ namespace Umbraco.Core.Runtime
                     factory.GetInstance<IScopeProvider>(),
                     factory.GetInstance<ISqlContext>(),
                     factory.GetInstance<IProfilingLogger>(),
-                    factory.GetInstance<Microsoft.Extensions.Logging.ILogger<DatabaseServerMessenger>>(),
+                    factory.GetInstance<ILogger<DatabaseServerMessenger>>(),
                     factory.GetInstance<IServerRegistrar>(),
                     true, new DatabaseServerMessengerOptions(),
                     factory.GetInstance<IHostingEnvironment>(),

@@ -97,7 +97,7 @@ namespace Umbraco.Tests.PublishedContent
         }
 
 
-        protected override TypeLoader CreateTypeLoader(IIOHelper ioHelper, ITypeFinder typeFinder, IAppPolicyCache runtimeCache, Microsoft.Extensions.Logging.ILogger logger, IProfilingLogger pLogger, IHostingEnvironment hostingEnvironment)
+        protected override TypeLoader CreateTypeLoader(IIOHelper ioHelper, ITypeFinder typeFinder, IAppPolicyCache runtimeCache, ILogger logger, IProfilingLogger pLogger, IHostingEnvironment hostingEnvironment)
         {
             var baseLoader = base.CreateTypeLoader(ioHelper, typeFinder, runtimeCache, logger, pLogger, hostingEnvironment);
 

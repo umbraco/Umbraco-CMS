@@ -40,17 +40,17 @@ namespace Umbraco.Tests.TestHelpers
             var container = TestHelper.GetRegister();
 
             var ioHelper = TestHelper.IOHelper;
-            var logger = new ProfilingLogger(Mock.Of<Microsoft.Extensions.Logging.ILogger>(), Mock.Of<IProfiler>());
+            var logger = new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>());
             var typeFinder = TestHelper.GetTypeFinder();
             var typeLoader = new TypeLoader(typeFinder, NoAppCache.Instance,
                 new DirectoryInfo(ioHelper.MapPath("~/App_Data/TEMP")),
-                Mock.Of<Microsoft.Extensions.Logging.ILogger>(),
+                Mock.Of<ILogger>(),
                 logger,
                 false);
 
             var composition = new Composition(container, typeLoader, Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.IOHelper, AppCaches.NoCache);
 
-            composition.RegisterUnique<Microsoft.Extensions.Logging.ILogger>(_ => Mock.Of<Microsoft.Extensions.Logging.ILogger>());
+            composition.RegisterUnique<ILogger>(_ => Mock.Of<ILogger>());
             composition.RegisterUnique<ILoggerFactory>(_ => NullLoggerFactory.Instance);
             composition.RegisterUnique<IProfiler>(_ => Mock.Of<IProfiler>());
 

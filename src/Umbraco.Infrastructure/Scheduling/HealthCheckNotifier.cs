@@ -8,7 +8,6 @@ using Umbraco.Core.Scoping;
 using Umbraco.Core.Sync;
 using Umbraco.Web.HealthCheck;
 using Microsoft.Extensions.Logging;
-using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Umbraco.Web.Scheduling
 {
@@ -19,7 +18,7 @@ namespace Umbraco.Web.Scheduling
         private readonly HealthCheckNotificationMethodCollection _notifications;
         private readonly IScopeProvider _scopeProvider;
         private readonly IProfilingLogger _pLogger;
-        private readonly Microsoft.Extensions.Logging.ILogger<HealthCheckNotifier> _logger;
+        private readonly ILogger<HealthCheckNotifier> _logger;
         private readonly HealthChecksSettings _healthChecksSettings;
         private readonly IServerRegistrar _serverRegistrar;
         private readonly IRuntimeState _runtimeState;
@@ -32,7 +31,7 @@ namespace Umbraco.Web.Scheduling
             HealthCheckNotificationMethodCollection notifications,
             IMainDom mainDom,
             IProfilingLogger pLogger,
-            Microsoft.Extensions.Logging.ILogger<HealthCheckNotifier> logger,
+            ILogger<HealthCheckNotifier> logger,
             HealthChecksSettings healthChecksSettings,
             IServerRegistrar serverRegistrar,
             IRuntimeState runtimeState,

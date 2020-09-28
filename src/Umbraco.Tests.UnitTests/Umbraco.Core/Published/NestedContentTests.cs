@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
@@ -25,7 +26,7 @@ namespace Umbraco.Tests.Published
     {
         private (IPublishedContentType, IPublishedContentType) CreateContentTypes()
         {
-            var logger = Mock.Of<Microsoft.Extensions.Logging.ILogger>();
+            var logger = Mock.Of<ILogger>();
             var loggerFactory = NullLoggerFactory.Instance;
             var profiler = Mock.Of<IProfiler>();
             var proflog = new ProfilingLogger(logger, profiler);

@@ -26,7 +26,7 @@ namespace Umbraco.Web.Routing
         private readonly IContentLastChanceFinder _contentLastChanceFinder;
         private readonly IProfilingLogger _profilingLogger;
         private readonly IVariationContextAccessor _variationContextAccessor;
-        private readonly Microsoft.Extensions.Logging.ILogger<PublishedRouter> _logger;
+        private readonly ILogger<PublishedRouter> _logger;
         private readonly IPublishedUrlProvider _publishedUrlProvider;
         private readonly IRequestAccessor _requestAccessor;
         private readonly IPublishedValueFallback _publishedValueFallback;
@@ -44,7 +44,7 @@ namespace Umbraco.Web.Routing
             IContentLastChanceFinder contentLastChanceFinder,
             IVariationContextAccessor variationContextAccessor,
             IProfilingLogger proflog,
-            Microsoft.Extensions.Logging.ILogger<PublishedRouter> logger,
+            ILogger<PublishedRouter> logger,
             IPublishedUrlProvider publishedUrlProvider,
             IRequestAccessor requestAccessor,
             IPublishedValueFallback publishedValueFallback,

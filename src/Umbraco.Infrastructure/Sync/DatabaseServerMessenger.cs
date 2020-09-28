@@ -48,7 +48,7 @@ namespace Umbraco.Core.Sync
         public DatabaseServerMessengerOptions Options { get; }
 
         public DatabaseServerMessenger(
-            IMainDom mainDom, IScopeProvider scopeProvider, ISqlContext sqlContext, IProfilingLogger proflog, Microsoft.Extensions.Logging.ILogger<DatabaseServerMessenger> logger, IServerRegistrar serverRegistrar,
+            IMainDom mainDom, IScopeProvider scopeProvider, ISqlContext sqlContext, IProfilingLogger proflog, ILogger<DatabaseServerMessenger> logger, IServerRegistrar serverRegistrar,
             bool distributedEnabled, DatabaseServerMessengerOptions options,  IHostingEnvironment hostingEnvironment, CacheRefresherCollection cacheRefreshers)
             : base(distributedEnabled)
         {
@@ -73,7 +73,7 @@ namespace Umbraco.Core.Sync
                 + "] " + Guid.NewGuid().ToString("N").ToUpper(); // make it truly unique
         }
 
-        protected Microsoft.Extensions.Logging.ILogger<DatabaseServerMessenger> Logger { get; }
+        protected ILogger<DatabaseServerMessenger> Logger { get; }
 
         protected IScopeProvider ScopeProvider { get; }
 
