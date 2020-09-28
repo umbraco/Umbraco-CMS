@@ -118,9 +118,6 @@
     <Compile Include="Cache\DistributedCacheBinderTests.cs" />
     <Compile Include="Cache\RefresherTests.cs" />
     <Compile Include="Cache\SnapDictionaryTests.cs" />
-    <Compile Include="Composing\CompositionTests.cs" />
-    <Compile Include="Composing\ContainerConformingTests.cs" />
-    <Compile Include="Components\ComponentTests.cs" />
     <Compile Include="LegacyXmlPublishedCache\ContentXmlDto.cs" />
     <Compile Include="LegacyXmlPublishedCache\PreviewXmlDto.cs" />
     <Compile Include="Logging\LogviewerTests.cs" />
@@ -137,6 +134,7 @@
     <Compile Include="Published\ModelTypeTests.cs" />
     <Compile Include="Routing\BaseUrlProviderTest.cs" />
     <Compile Include="Routing\UrlProviderWithHideTopLevelNodeFromPathTests.cs" />
+    <Compile Include="Scoping\ScopeEventDispatcherTests.cs" />
     <Compile Include="Security\BackOfficeOwinUserManagerTests.cs" />
     <Compile Include="Security\OwinDataProtectorTokenProviderTests.cs" />
     <Compile Include="Services\KeyValueServiceTests.cs" />
@@ -183,7 +181,6 @@
     <Compile Include="Scoping\PassThroughEventDispatcherTests.cs" />
     <Compile Include="Scoping\ScopedRepositoryTests.cs" />
     <Compile Include="Scoping\ScopedXmlTests.cs" />
-    <Compile Include="Scoping\ScopeEventDispatcherTests.cs" />
     <Compile Include="Scoping\ScopeFileSystemsTests.cs" />
     <Compile Include="Scoping\ScopedNuCacheTests.cs" />
     <Compile Include="Scoping\ScopeTests.cs" />
@@ -231,7 +228,6 @@
     <Compile Include="Persistence\Repositories\DomainRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\PartialViewRepositoryTests.cs" />
     <Compile Include="Persistence\Repositories\PublicAccessRepositoryTest.cs" />
-    <Compile Include="Composing\ComposingTestBase.cs" />
     <Compile Include="Routing\RoutesCacheTests.cs" />
     <Compile Include="Routing\UrlRoutingTestBase.cs" />
     <Compile Include="Services\ContentTypeServiceExtensionsTests.cs" />
@@ -337,8 +333,6 @@
     <Compile Include="PublishedContent\PublishedContentMoreTests.cs" />
     <Compile Include="Publishing\PublishingStrategyTests.cs" />
     <Compile Include="Cache\PublishedCache\PublishedContentCacheTests.cs" />
-    <Compile Include="Composing\LazyCollectionBuilderTests.cs" />
-    <Compile Include="Composing\CollectionBuildersTests.cs" />
     <Compile Include="Routing\ContentFinderByAliasWithDomainsTests.cs" />
     <Compile Include="Routing\DomainsAndCulturesTests.cs" />
     <Compile Include="Routing\SiteDomainHelperTests.cs" />
@@ -368,7 +362,6 @@
     <Compile Include="TestHelpers\BaseUsingSqlCeSyntax.cs" />
     <Compile Include="TestHelpers\BaseWebTest.cs" />
     <Compile Include="UmbracoExamine\EventsTest.cs" />
-    <Compile Include="Composing\TypeHelperTests.cs" />
     <Compile Include="UmbracoExamine\ExamineBaseTest.cs" />
     <Compile Include="UmbracoExamine\IndexInitializer.cs" />
     <Compile Include="UmbracoExamine\IndexTest.cs" />
@@ -380,9 +373,6 @@
     </Compile>
     <Compile Include="UmbracoExamine\ExamineDemoDataMediaService.cs" />
     <Compile Include="UmbracoExamine\ExamineDemoDataContentService.cs" />
-    <Compile Include="Composing\PackageActionCollectionTests.cs" />
-    <Compile Include="Composing\TypeLoaderExtensions.cs" />
-    <Compile Include="Composing\TypeLoaderTests.cs" />
     <Compile Include="TestHelpers\Stubs\TestLastChanceFinder.cs" />
     <Compile Include="TestHelpers\TestHelper.cs" />
     <Compile Include="IO\AbstractFileSystemTests.cs" />

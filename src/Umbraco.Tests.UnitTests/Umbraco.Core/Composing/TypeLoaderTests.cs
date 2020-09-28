@@ -8,8 +8,6 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Tests.TestHelpers;
@@ -39,12 +37,9 @@ namespace Umbraco.Tests.Composing
                     this.GetType().Assembly,
                     typeof(System.Guid).Assembly,
                     typeof(NUnit.Framework.Assert).Assembly,
-                    typeof(Microsoft.CSharp.CSharpCodeProvider).Assembly,
                     typeof(System.Xml.NameTable).Assembly,
                     typeof(System.Configuration.GenericEnumConverter).Assembly,
-                    typeof(System.Web.SiteMap).Assembly,
                     //typeof(TabPage).Assembly,
-                    typeof(System.Web.Mvc.ActionResult).Assembly,
                     typeof(TypeFinder).Assembly,
                     typeof(UmbracoContext).Assembly,
                     typeof(CheckBoxListPropertyEditor).Assembly

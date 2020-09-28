@@ -40,7 +40,6 @@ using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Strings;
 using Umbraco.Net;
 using Umbraco.Tests.Common;
-using Umbraco.Tests.Components;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Web;
@@ -151,8 +150,14 @@ namespace Umbraco.Tests.Testing
 
         protected UmbracoMapper Mapper => Factory.GetInstance<UmbracoMapper>();
         protected IHttpContextAccessor HttpContextAccessor => Factory.GetInstance<IHttpContextAccessor>();
-        protected IRuntimeState RuntimeState => ComponentTests.MockRuntimeState(RuntimeLevel.Run);
+        protected IRuntimeState RuntimeState => MockRuntimeState(RuntimeLevel.Run);
 
+        protected static IRuntimeState MockRuntimeState(RuntimeLevel level)
+        {
+            var runtimeState = Mock.Of<IRuntimeState>();
+            Mock.Get(runtimeState).Setup(x => x.Level).Returns(level);
+            return runtimeState;
+        }
         #endregion
 
         #region Setup
@@ -190,7 +195,7 @@ namespace Umbraco.Tests.Testing
 
 
 
-            Composition = new Composition(register, typeLoader, proflogger, ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.IOHelper, AppCaches.NoCache);
+            Composition = new Composition(register, typeLoader, proflogger, MockRuntimeState(RuntimeLevel.Run), TestHelper.IOHelper, AppCaches.NoCache);
 
 
             //TestHelper.GetConfigs().RegisterWith(register);

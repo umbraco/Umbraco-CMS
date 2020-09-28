@@ -22,7 +22,7 @@ namespace Umbraco.Tests.Composing
         {
             var container = TestHelper.GetRegister();
 
-            var composition = new Composition(container, TestHelper.GetMockedTypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.IOHelper, AppCaches.NoCache);
+            var composition = new Composition(container, TestHelper.GetMockedTypeLoader(), Mock.Of<IProfilingLogger>(), Mock.Of<IRuntimeState>(), TestHelper.IOHelper, AppCaches.NoCache);
 
             var expectedPackageActions = TypeLoader.GetPackageActions();
             composition.WithCollectionBuilder<PackageActionCollectionBuilder>()

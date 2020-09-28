@@ -9,7 +9,6 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Tests.Components;
 using Umbraco.Tests.TestHelpers;
-using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.Composing
 {
@@ -21,16 +20,22 @@ namespace Umbraco.Tests.Composing
         [SetUp]
         public void Setup()
         {
-            Current.Reset();
+            // var registerMock = new Mock<IRegister>();
+            // var factoryMock = new Mock<IFactory>();
+            // registerMock.Setup(x => x.CreateFactory()).Returns(factoryMock.Object);
+            // factoryMock.Setup(x => x.GetInstance(typeof(Resolved1))).Returns(new Resolved1());
+            // factoryMock.Setup(x => x.GetInstance(typeof(Resolved2))).Returns(new Resolved2());
+            // factoryMock.Setup(x => x.GetInstance(typeof(Resolved3))).Returns(new Resolved3());
+            // factoryMock.Setup(x => x.GetInstance(typeof(Resolved4))).Returns(new Resolved4());
 
+            
             var register = TestHelper.GetRegister();
-            _composition = new Composition(register, TestHelper.GetMockedTypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.IOHelper, AppCaches.NoCache);
+            _composition = new Composition(register, TestHelper.GetMockedTypeLoader(), Mock.Of<IProfilingLogger>(), Mock.Of<IRuntimeState>(), TestHelper.IOHelper, AppCaches.NoCache);
         }
 
         [TearDown]
         public void TearDown()
         {
-            Current.Reset();
         }
 
         [Test]
