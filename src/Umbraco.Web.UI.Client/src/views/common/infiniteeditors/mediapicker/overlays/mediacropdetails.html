@@ -25,8 +25,7 @@
             </div>
 
             <div class="umb-control-group" ng-if="model.target">
-
-                <div ng-if="vm.cropSet() === false">
+                <div ng-if="vm.hasCrops === false">
                     <h5>
                         <localize key="general_preview">Preview</localize>
                     </h5>
@@ -34,7 +33,7 @@
                     <img ng-src="{{model.target.thumbnail}}" alt="{{model.target.name}}" />
                 </div>
 
-                <div ng-if="vm.cropSet()">
+                <div ng-if="vm.hasCrops">
                     <h5>
                         <localize key="@general_cropSection">Crop section</localize>
                     </h5>
