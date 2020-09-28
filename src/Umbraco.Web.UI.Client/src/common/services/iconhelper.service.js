@@ -31,7 +31,7 @@ function iconHelper($http, $q, $sce, $timeout, umbRequestHelper) {
         { oldIcon: ".sprToPublish", newIcon: "mail-forward" },
         { oldIcon: ".sprTranslate", newIcon: "comments" },
         { oldIcon: ".sprUpdate", newIcon: "save" },
-        
+
         { oldIcon: ".sprTreeSettingDomain", newIcon: "icon-home" },
         { oldIcon: ".sprTreeDoc", newIcon: "icon-document" },
         { oldIcon: ".sprTreeDoc2", newIcon: "icon-diploma-alt" },
@@ -39,21 +39,21 @@ function iconHelper($http, $q, $sce, $timeout, umbRequestHelper) {
         { oldIcon: ".sprTreeDoc4", newIcon: "icon-newspaper-alt" },
         { oldIcon: ".sprTreeDoc5", newIcon: "icon-notepad-alt" },
 
-        { oldIcon: ".sprTreeDocPic", newIcon: "icon-picture" },        
+        { oldIcon: ".sprTreeDocPic", newIcon: "icon-picture" },
         { oldIcon: ".sprTreeFolder", newIcon: "icon-folder" },
         { oldIcon: ".sprTreeFolder_o", newIcon: "icon-folder" },
         { oldIcon: ".sprTreeMediaFile", newIcon: "icon-music" },
         { oldIcon: ".sprTreeMediaMovie", newIcon: "icon-movie" },
         { oldIcon: ".sprTreeMediaPhoto", newIcon: "icon-picture" },
-        
+
         { oldIcon: ".sprTreeMember", newIcon: "icon-user" },
         { oldIcon: ".sprTreeMemberGroup", newIcon: "icon-users" },
         { oldIcon: ".sprTreeMemberType", newIcon: "icon-users" },
-        
+
         { oldIcon: ".sprTreeNewsletter", newIcon: "icon-file-text-alt" },
         { oldIcon: ".sprTreePackage", newIcon: "icon-box" },
         { oldIcon: ".sprTreeRepository", newIcon: "icon-server-alt" },
-        
+
         { oldIcon: ".sprTreeSettingDataType", newIcon: "icon-autofill" },
 
         // TODO: Something needs to be done with the old tree icons that are commented out.
@@ -61,7 +61,7 @@ function iconHelper($http, $q, $sce, $timeout, umbRequestHelper) {
         { oldIcon: ".sprTreeSettingAgent", newIcon: "" },
         { oldIcon: ".sprTreeSettingCss", newIcon: "" },
         { oldIcon: ".sprTreeSettingCssItem", newIcon: "" },
-        
+
         { oldIcon: ".sprTreeSettingDataTypeChild", newIcon: "" },
         { oldIcon: ".sprTreeSettingDomain", newIcon: "" },
         { oldIcon: ".sprTreeSettingLanguage", newIcon: "" },
@@ -94,9 +94,9 @@ function iconHelper($http, $q, $sce, $timeout, umbRequestHelper) {
     var iconCache = [];
     var liveRequests = [];
     var allIconsRequested = false;
-            
+
     return {
-        
+
         /** Used by the create dialogs for content/media types to format the data so that the thumbnails are styled properly */
         formatContentTypeThumbnails: function (contentTypes) {
             for (var i = 0; i < contentTypes.length; i++) {
@@ -261,7 +261,7 @@ function iconHelper($http, $q, $sce, $timeout, umbRequestHelper) {
 
         /** LEGACY - Return a list of icons from icon fonts, optionally filter them */
         /** It fetches them directly from the active stylesheets in the browser */
-        getLegacyIcons: function(){
+        getIcons: function(){
             var deferred = $q.defer();
             $timeout(function(){
                 if(collectedIcons){
@@ -278,7 +278,7 @@ function iconHelper($http, $q, $sce, $timeout, umbRequestHelper) {
                             console.warn("Can't read the css rules of: " + document.styleSheets[i].href, e);
                             continue;
                         }
-                        
+
                         if (classes !== null) {
                             for(var x=0;x<classes.length;x++) {
                                 var cur = classes[x];
@@ -293,13 +293,8 @@ function iconHelper($http, $q, $sce, $timeout, umbRequestHelper) {
                                         s = s.substring(0, hasPseudo);
                                     }
 
-                                    var icon = {
-                                        name: s,
-                                        svgString: undefined
-                                    };
-
-                                    if(collectedIcons.indexOf(icon) < 0 && s !== "icon-chevron-up" && s !== "icon-chevron-down"){
-                                        collectedIcons.push(icon);
+                                    if(collectedIcons.indexOf(s) < 0){
+                                        collectedIcons.push(s);
                                     }
                                 }
                             }
