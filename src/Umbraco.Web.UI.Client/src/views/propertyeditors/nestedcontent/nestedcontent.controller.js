@@ -22,7 +22,9 @@
 
                     // Loop through all inner properties:
                     for (var k in obj) {
-                        propClearingMethod(obj[k], clipboardService.TYPES.RAW);
+                        var innerProp = obj[k];
+
+                        propClearingMethod(innerProp, clipboardService.TYPES.RAW);
                     }
                 }
             }
@@ -441,6 +443,26 @@
         function clearNodeForCopy(clonedData) {
             delete clonedData.key;
             delete clonedData.$$hashKey;
+
+            var variant = clonedData.variants[0];
+            for (var t = 0; t < variant.tabs.length; t++) {
+                var tab = variant.tabs[t];
+                for (var p = 0; p < tab.properties.length; p++) {
+                    var prop = tab.properties[p];
+
+                    // If we have ncSpecific data, lets revert to standard data model.
+                    if (prop.propertyAlias) {
+                        prop.alias = prop.propertyAlias;
+                        delete prop.propertyAlias;
+                    }
+
+                    if(prop.ncMandatory !== undefined) {
+                        prop.validation.mandatory = prop.ncMandatory;
+                        delete prop.ncMandatory;
+                    }
+                }
+            }
+
         }
 
         vm.showCopy = clipboardService.isSupported();
@@ -465,6 +487,31 @@
 
             // generate a new key.
             newNode.key = String.CreateGuid();
+
+            // Ensure we have NC data in place:
+            var variant = newNode.variants[0];
+            for (var t = 0; t < variant.tabs.length; t++) {
+                var tab = variant.tabs[t];
+                for (var p = 0; p < tab.properties.length; p++) {
+                    var prop = tab.properties[p];
+
+                    if (prop.propertyAlias === undefined) {
+                        prop.propertyAlias = prop.alias;
+                        // NOTE: This is super ugly, the reason it is like this is because it controls the label/html id in the umb-property component at a higher level.
+                        // not pretty :/ but we can't change this now since it would require a bunch of plumbing to be able to change the id's higher up.
+                        prop.alias = model.alias + "___" + prop.alias;
+                    }
+
+                    // this is hacky, but we need to make sure we have the right things for the model.
+                    if(prop.ncMandatory === undefined) {
+                        prop.ncMandatory = prop.validation.mandatory;
+                        prop.validation = {
+                            mandatory: false,
+                            pattern: ""
+                        };
+                    }
+                }
+            }
 
             vm.nodes.push(newNode);
             setDirty();
