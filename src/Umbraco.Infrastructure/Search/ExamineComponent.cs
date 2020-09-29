@@ -32,7 +32,7 @@ namespace Umbraco.Web.Search
         private readonly IScopeProvider _scopeProvider;
         private readonly ServiceContext _services;
         private readonly IMainDom _mainDom;
-        private readonly IProfilingLogger _pLogger;
+        private readonly IProfilingLogger _profilingLogger;
         private readonly ILogger<ExamineComponent> _logger;
         private readonly IUmbracoIndexesCreator _indexCreator;
         private readonly BackgroundTaskRunner<IBackgroundTask> _indexItemTaskRunner;
@@ -63,7 +63,7 @@ namespace Umbraco.Web.Search
             _memberValueSetBuilder = memberValueSetBuilder;
             _backgroundIndexRebuilder = backgroundIndexRebuilder;
             _mainDom = mainDom;
-            _pLogger = profilingLogger;
+            _profilingLogger = profilingLogger;
             _logger = loggerFactory.CreateLogger<ExamineComponent>();
             _indexCreator = indexCreator;
             _indexItemTaskRunner = new BackgroundTaskRunner<IBackgroundTask>(loggerFactory.CreateLogger<BackgroundTaskRunner<IBackgroundTask>>(), applicationShutdownRegistry);
@@ -74,7 +74,7 @@ namespace Umbraco.Web.Search
             //let's deal with shutting down Examine with MainDom
             var examineShutdownRegistered = _mainDom.Register(() =>
             {
-                using (_pLogger.TraceDuration<ExamineComponent>("Examine shutting down"))
+                using (_profilingLogger.TraceDuration<ExamineComponent>("Examine shutting down"))
                 {
                     _examineManager.Dispose();
                 }

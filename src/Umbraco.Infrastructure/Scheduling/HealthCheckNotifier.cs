@@ -17,7 +17,7 @@ namespace Umbraco.Web.Scheduling
         private readonly HealthCheckCollection _healthChecks;
         private readonly HealthCheckNotificationMethodCollection _notifications;
         private readonly IScopeProvider _scopeProvider;
-        private readonly IProfilingLogger _pLogger;
+        private readonly IProfilingLogger _profilingLogger;
         private readonly ILogger<HealthCheckNotifier> _logger;
         private readonly HealthChecksSettings _healthChecksSettings;
         private readonly IServerRegistrar _serverRegistrar;
@@ -30,7 +30,7 @@ namespace Umbraco.Web.Scheduling
             HealthCheckCollection healthChecks,
             HealthCheckNotificationMethodCollection notifications,
             IMainDom mainDom,
-            IProfilingLogger pLogger,
+            IProfilingLogger profilingLogger ,
             ILogger<HealthCheckNotifier> logger,
             HealthChecksSettings healthChecksSettings,
             IServerRegistrar serverRegistrar,
@@ -43,7 +43,7 @@ namespace Umbraco.Web.Scheduling
             _mainDom = mainDom;
             _scopeProvider = scopeProvider;
             _runtimeState = runtimeState;
-            _pLogger = pLogger;
+            _profilingLogger = profilingLogger ;
             _logger = logger;
             _healthChecksSettings = healthChecksSettings;
             _serverRegistrar = serverRegistrar;
@@ -76,7 +76,7 @@ namespace Umbraco.Web.Scheduling
             // checks can be making service/database calls so we want to ensure the CallContext/Ambient scope
             // isn't used since that can be problematic.
             using (var scope = _scopeProvider.CreateScope())
-            using (_pLogger.DebugDuration<HealthCheckNotifier>("Health checks executing", "Health checks complete"))
+            using (_profilingLogger.DebugDuration<HealthCheckNotifier>("Health checks executing", "Health checks complete"))
             {
                 var healthCheckConfig = _healthChecksSettings;
 

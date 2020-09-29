@@ -18,8 +18,8 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
     {
         private readonly IGridConfig _config;
 
-        public GridValueConverter(PropertyEditorCollection propertyEditors, IGridConfig config)
-            : base(propertyEditors)
+        public GridValueConverter(PropertyEditorCollection propertyEditors, IGridConfig config, ILogger<GridValueConverter> logger)
+            : base(propertyEditors, logger)
         {
             _config = config;
         }

@@ -63,7 +63,7 @@ namespace Umbraco.Web.Editors
             ISqlContext sqlContext,
             ServiceContext services,
             AppCaches appCaches,
-            IProfilingLogger pLogger,
+            IProfilingLogger profilingLogger ,
             ILogger<AuthenticationController> logger,
             IRuntimeState runtimeState,
             UmbracoMapper umbracoMapper,
@@ -71,7 +71,7 @@ namespace Umbraco.Web.Editors
             IPublishedUrlProvider publishedUrlProvider,
             IRequestAccessor requestAccessor,
             IEmailSender emailSender)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, pLogger, runtimeState, umbracoMapper, publishedUrlProvider)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, profilingLogger , runtimeState, umbracoMapper, publishedUrlProvider)
         {
             _passwordConfiguration = passwordConfiguration ?? throw new ArgumentNullException(nameof(passwordConfiguration));
             _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));

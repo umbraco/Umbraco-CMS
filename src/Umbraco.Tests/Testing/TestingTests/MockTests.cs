@@ -105,14 +105,14 @@ namespace Umbraco.Tests.Testing.TestingTests
         [Test]
         public void Can_Mock_UmbracoApiController_Dependencies_With_Injected_UmbracoMapper()
         {
-            var pLogger = Mock.Of<IProfilingLogger>();
+            var profilingLogger  = Mock.Of<IProfilingLogger>();
             var memberService = Mock.Of<IMemberService>();
             var memberTypeService = Mock.Of<IMemberTypeService>();
             var membershipProvider = new MembersMembershipProvider(memberService, memberTypeService, Mock.Of<IUmbracoVersion>(), TestHelper.GetHostingEnvironment(), TestHelper.GetIpResolver());
             var membershipHelper = new MembershipHelper(Mock.Of<IHttpContextAccessor>(), Mock.Of<IPublishedMemberCache>(), membershipProvider, Mock.Of<RoleProvider>(), memberService, memberTypeService, Mock.Of<IPublicAccessService>(), AppCaches.Disabled, NullLoggerFactory.Instance, ShortStringHelper, Mock.Of<IEntityService>());
             var umbracoMapper = new UmbracoMapper(new MapDefinitionCollection(new[] { Mock.Of<IMapDefinition>() }));
 
-            var umbracoApiController = new FakeUmbracoApiController(new GlobalSettings(), Mock.Of<IUmbracoContextAccessor>(), Mock.Of<ISqlContext>(), ServiceContext.CreatePartial(), AppCaches.NoCache, pLogger, Mock.Of<IRuntimeState>(), umbracoMapper, Mock.Of<IPublishedUrlProvider>());
+            var umbracoApiController = new FakeUmbracoApiController(new GlobalSettings(), Mock.Of<IUmbracoContextAccessor>(), Mock.Of<ISqlContext>(), ServiceContext.CreatePartial(), AppCaches.NoCache, profilingLogger , Mock.Of<IRuntimeState>(), umbracoMapper, Mock.Of<IPublishedUrlProvider>());
 
             Assert.Pass();
         }

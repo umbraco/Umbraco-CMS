@@ -22,7 +22,7 @@ namespace Umbraco.Web.Macros
 {
     public class MacroRenderer : IMacroRenderer
     {
-        private readonly IProfilingLogger _plogger;
+        private readonly IProfilingLogger _profilingLogger;
         private readonly ILogger<MacroRenderer> _logger;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly ContentSettings _contentSettings;
@@ -37,7 +37,7 @@ namespace Umbraco.Web.Macros
         private readonly IHttpContextAccessor _httpContextAccessor;
 
         public MacroRenderer(
-            IProfilingLogger plogger,
+            IProfilingLogger profilingLogger ,
             ILogger<MacroRenderer> logger,
             IUmbracoContextAccessor umbracoContextAccessor,
             IOptions<ContentSettings> contentSettings,
@@ -51,7 +51,7 @@ namespace Umbraco.Web.Macros
             IRequestAccessor requestAccessor,
              IHttpContextAccessor httpContextAccessor)
         {
-            _plogger = plogger ?? throw new ArgumentNullException(nameof(plogger));
+            _profilingLogger = profilingLogger  ?? throw new ArgumentNullException(nameof(profilingLogger ));
             _logger = logger;
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
             _contentSettings = contentSettings.Value ?? throw new ArgumentNullException(nameof(contentSettings));
@@ -223,7 +223,7 @@ namespace Umbraco.Web.Macros
             if (content == null) throw new ArgumentNullException(nameof(content));
 
             var macroInfo = $"Render Macro: {macro.Name}, cache: {macro.CacheDuration}";
-            using (_plogger.DebugDuration<MacroRenderer>(macroInfo, "Rendered Macro."))
+            using (_profilingLogger.DebugDuration<MacroRenderer>(macroInfo, "Rendered Macro."))
             {
                 // parse macro parameters ie replace the special [#key], [$key], etc. syntaxes
                 foreach (var prop in macro.Properties)
@@ -269,7 +269,7 @@ namespace Umbraco.Web.Macros
         /// </summary>
         private Attempt<MacroContent> ExecuteMacroWithErrorWrapper(MacroModel macro, string msgIn, string msgOut, Func<MacroContent> getMacroContent, Func<string> msgErr)
         {
-            using (_plogger.DebugDuration<MacroRenderer>(msgIn, msgOut))
+            using (_profilingLogger.DebugDuration<MacroRenderer>(msgIn, msgOut))
             {
                 return ExecuteProfileMacroWithErrorWrapper(macro, msgIn, getMacroContent, msgErr);
             }

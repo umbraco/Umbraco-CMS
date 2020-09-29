@@ -31,7 +31,7 @@ namespace Umbraco.Web.Scheduling
         private readonly IServerRegistrar _serverRegistrar;
         private readonly IContentService _contentService;
         private readonly IAuditService _auditService;
-        private readonly IProfilingLogger _pLogger;
+        private readonly IProfilingLogger _profilingLogger;
         private readonly ILogger<SchedulerComponent> _logger;
         private readonly ILoggerFactory _loggerFactory;
         private readonly IApplicationShutdownRegistry _applicationShutdownRegistry;
@@ -60,7 +60,7 @@ namespace Umbraco.Web.Scheduling
         public SchedulerComponent(IRuntimeState runtime, IMainDom mainDom, IServerRegistrar serverRegistrar,
             IContentService contentService, IAuditService auditService,
             HealthCheckCollection healthChecks, HealthCheckNotificationMethodCollection notifications,
-            IScopeProvider scopeProvider, IUmbracoContextFactory umbracoContextFactory, IProfilingLogger pLogger, ILoggerFactory loggerFactory,
+            IScopeProvider scopeProvider, IUmbracoContextFactory umbracoContextFactory, IProfilingLogger profilingLogger , ILoggerFactory loggerFactory,
             IApplicationShutdownRegistry applicationShutdownRegistry, IOptions<HealthChecksSettings> healthChecksSettings,
             IServerMessenger serverMessenger, IRequestAccessor requestAccessor,
             IOptions<LoggingSettings> loggingSettings, IOptions<KeepAliveSettings> keepAliveSettings,
@@ -73,7 +73,7 @@ namespace Umbraco.Web.Scheduling
             _contentService = contentService;
             _auditService = auditService;
             _scopeProvider = scopeProvider;
-            _pLogger = pLogger;
+            _profilingLogger = profilingLogger ;
             _loggerFactory = loggerFactory;
             _logger = loggerFactory.CreateLogger<SchedulerComponent>();
             _applicationShutdownRegistry = applicationShutdownRegistry;
@@ -140,7 +140,7 @@ namespace Umbraco.Web.Scheduling
 
                 var healthCheckConfig = _healthChecksSettings;
                 if (healthCheckConfig.NotificationSettings.Enabled)
-                    tasks.Add(RegisterHealthCheckNotifier(healthCheckConfig, _healthChecks, _notifications, _pLogger));
+                    tasks.Add(RegisterHealthCheckNotifier(healthCheckConfig, _healthChecks, _notifications, _profilingLogger));
 
                 return tasks.ToArray();
             });
@@ -150,7 +150,7 @@ namespace Umbraco.Web.Scheduling
         {
             // ping/keepalive
             // on all servers
-            var task = new KeepAlive(_keepAliveRunner, DefaultDelayMilliseconds, FiveMinuteMilliseconds, _requestAccessor, _mainDom, Options.Create(keepAliveSettings), _loggerFactory.CreateLogger<KeepAlive>(), _pLogger, _serverRegistrar);
+            var task = new KeepAlive(_keepAliveRunner, DefaultDelayMilliseconds, FiveMinuteMilliseconds, _requestAccessor, _mainDom, Options.Create(keepAliveSettings), _loggerFactory.CreateLogger<KeepAlive>(), _profilingLogger, _serverRegistrar);
             _keepAliveRunner.TryAdd(task);
             return task;
         }
@@ -194,7 +194,7 @@ namespace Umbraco.Web.Scheduling
         {
             // log scrubbing
             // install on all, will only run on non-replica servers
-            var task = new LogScrubber(_scrubberRunner, DefaultDelayMilliseconds, LogScrubber.GetLogScrubbingInterval(), _mainDom, _serverRegistrar, _auditService, Options.Create(settings), _scopeProvider, _pLogger, _loggerFactory.CreateLogger<LogScrubber>());
+            var task = new LogScrubber(_scrubberRunner, DefaultDelayMilliseconds, LogScrubber.GetLogScrubbingInterval(), _mainDom, _serverRegistrar, _auditService, Options.Create(settings), _scopeProvider, _profilingLogger, _loggerFactory.CreateLogger<LogScrubber>());
             _scrubberRunner.TryAdd(task);
             return task;
         }
@@ -218,7 +218,7 @@ namespace Umbraco.Web.Scheduling
             var task = new TempFileCleanup(_fileCleanupRunner, DefaultDelayMilliseconds, OneHourMilliseconds,
                 tempFolderPaths.Select(x=>new DirectoryInfo(x)),
                 TimeSpan.FromDays(1), //files that are over a day old
-                _mainDom, _pLogger, _loggerFactory.CreateLogger<TempFileCleanup>());
+                _mainDom, _profilingLogger, _loggerFactory.CreateLogger<TempFileCleanup>());
             _scrubberRunner.TryAdd(task);
             return task;
         }

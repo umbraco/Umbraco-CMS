@@ -386,30 +386,30 @@ namespace Umbraco.Tests.Testing
                 .ComposeCoreMappingProfiles();
         }
 
-        protected virtual TypeLoader GetTypeLoader(IIOHelper ioHelper, ITypeFinder typeFinder, IAppPolicyCache runtimeCache, IHostingEnvironment hostingEnvironment, ILogger<TypeLoader> logger, IProfilingLogger pLogger, UmbracoTestOptions.TypeLoader option)
+        protected virtual TypeLoader GetTypeLoader(IIOHelper ioHelper, ITypeFinder typeFinder, IAppPolicyCache runtimeCache, IHostingEnvironment hostingEnvironment, ILogger<TypeLoader> logger, IProfilingLogger profilingLogger , UmbracoTestOptions.TypeLoader option)
         {
             switch (option)
             {
                 case UmbracoTestOptions.TypeLoader.Default:
-                    return _commonTypeLoader ?? (_commonTypeLoader = CreateCommonTypeLoader(typeFinder, runtimeCache, logger, pLogger, hostingEnvironment));
+                    return _commonTypeLoader ?? (_commonTypeLoader = CreateCommonTypeLoader(typeFinder, runtimeCache, logger, profilingLogger , hostingEnvironment));
                 case UmbracoTestOptions.TypeLoader.PerFixture:
-                    return _featureTypeLoader ?? (_featureTypeLoader = CreateTypeLoader(ioHelper, typeFinder, runtimeCache, logger, pLogger, hostingEnvironment));
+                    return _featureTypeLoader ?? (_featureTypeLoader = CreateTypeLoader(ioHelper, typeFinder, runtimeCache, logger, profilingLogger , hostingEnvironment));
                 case UmbracoTestOptions.TypeLoader.PerTest:
-                    return CreateTypeLoader(ioHelper, typeFinder, runtimeCache, logger, pLogger, hostingEnvironment);
+                    return CreateTypeLoader(ioHelper, typeFinder, runtimeCache, logger, profilingLogger , hostingEnvironment);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(option));
             }
         }
 
-        protected virtual TypeLoader CreateTypeLoader(IIOHelper ioHelper, ITypeFinder typeFinder, IAppPolicyCache runtimeCache, ILogger<TypeLoader> logger, IProfilingLogger pLogger, IHostingEnvironment hostingEnvironment)
+        protected virtual TypeLoader CreateTypeLoader(IIOHelper ioHelper, ITypeFinder typeFinder, IAppPolicyCache runtimeCache, ILogger<TypeLoader> logger, IProfilingLogger profilingLogger , IHostingEnvironment hostingEnvironment)
         {
-            return CreateCommonTypeLoader(typeFinder, runtimeCache, logger, pLogger, hostingEnvironment);
+            return CreateCommonTypeLoader(typeFinder, runtimeCache, logger, profilingLogger , hostingEnvironment);
         }
 
         // common to all tests = cannot be overriden
-        private static TypeLoader CreateCommonTypeLoader(ITypeFinder typeFinder, IAppPolicyCache runtimeCache, ILogger<TypeLoader> logger, IProfilingLogger pLogger, IHostingEnvironment hostingEnvironment)
+        private static TypeLoader CreateCommonTypeLoader(ITypeFinder typeFinder, IAppPolicyCache runtimeCache, ILogger<TypeLoader> logger, IProfilingLogger profilingLogger , IHostingEnvironment hostingEnvironment)
         {
-            return new TypeLoader(typeFinder, runtimeCache, new DirectoryInfo(hostingEnvironment.LocalTempPath), logger, pLogger, false, new[]
+            return new TypeLoader(typeFinder, runtimeCache, new DirectoryInfo(hostingEnvironment.LocalTempPath), logger, profilingLogger , false, new[]
             {
                 Assembly.Load("Umbraco.Core"),
                 Assembly.Load("Umbraco.Web"),

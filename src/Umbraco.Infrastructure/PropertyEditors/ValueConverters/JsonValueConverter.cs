@@ -2,9 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Composing;
 
 namespace Umbraco.Core.PropertyEditors.ValueConverters
 {
@@ -18,13 +16,15 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
     public class JsonValueConverter : PropertyValueConverterBase
     {
         private readonly PropertyEditorCollection _propertyEditors;
+        private readonly ILogger<JsonValueConverter> _logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="JsonValueConverter"/> class.
         /// </summary>
-        public JsonValueConverter(PropertyEditorCollection propertyEditors)
+        public JsonValueConverter(PropertyEditorCollection propertyEditors, ILogger<JsonValueConverter> logger)
         {
             _propertyEditors = propertyEditors;
+            _logger = logger;
         }
 
         /// <summary>
@@ -58,7 +58,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
                 }
                 catch (Exception ex)
                 {
-                    Current.Logger.LogError(ex, "Could not parse the string '{JsonString}' to a json object", sourceString);
+                    _logger.LogError(ex, "Could not parse the string '{JsonString}' to a json object", sourceString);
                 }
             }
 

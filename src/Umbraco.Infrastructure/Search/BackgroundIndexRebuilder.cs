@@ -19,16 +19,16 @@ namespace Umbraco.Web.Search
         private readonly IndexRebuilder _indexRebuilder;
         private readonly IMainDom _mainDom;
         // TODO: Remove unused ProfilingLogger?
-        private readonly IProfilingLogger _pLogger;
+        private readonly IProfilingLogger _profilingLogger;
         private readonly ILogger<BackgroundIndexRebuilder> _logger;
         private readonly ILoggerFactory _loggerFactory;
         private readonly IApplicationShutdownRegistry _hostingEnvironment;
         private static BackgroundTaskRunner<IBackgroundTask> _rebuildOnStartupRunner;
 
-        public BackgroundIndexRebuilder(IMainDom mainDom, IProfilingLogger pLogger, ILoggerFactory loggerFactory, IApplicationShutdownRegistry hostingEnvironment, IndexRebuilder indexRebuilder)
+        public BackgroundIndexRebuilder(IMainDom mainDom, IProfilingLogger profilingLogger , ILoggerFactory loggerFactory, IApplicationShutdownRegistry hostingEnvironment, IndexRebuilder indexRebuilder)
         {
             _mainDom = mainDom;
-            _pLogger = pLogger;
+            _profilingLogger = profilingLogger ;
             _loggerFactory = loggerFactory;
             _logger = loggerFactory.CreateLogger<BackgroundIndexRebuilder>();
             _hostingEnvironment = hostingEnvironment;

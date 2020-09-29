@@ -18,11 +18,11 @@ namespace Umbraco.Web
             : this(Current.UmbracoContextAccessor, Current.Services, Current.Logger, Current.ProfilingLogger)
         { }
 
-        protected UmbracoHttpHandler(IUmbracoContextAccessor umbracoContextAccessor,ServiceContext service, ILogger logger, IProfilingLogger plogger)
+        protected UmbracoHttpHandler(IUmbracoContextAccessor umbracoContextAccessor,ServiceContext service, ILogger logger, IProfilingLogger profilingLogger )
         {
             UmbracoContextAccessor = umbracoContextAccessor;
             Logger = logger;
-            ProfilingLogger = plogger;
+            ProfilingLogger = profilingLogger ;
             Services = service;
         }
 

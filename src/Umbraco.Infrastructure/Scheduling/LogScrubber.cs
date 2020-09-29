@@ -17,12 +17,12 @@ namespace Umbraco.Web.Scheduling
         private readonly IServerRegistrar _serverRegistrar;
         private readonly IAuditService _auditService;
         private readonly LoggingSettings _settings;
-        private readonly IProfilingLogger _pLogger;
+        private readonly IProfilingLogger _profilingLogger;
         private readonly ILogger<LogScrubber> _logger;
         private readonly IScopeProvider _scopeProvider;
 
         public LogScrubber(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
-            IMainDom mainDom, IServerRegistrar serverRegistrar, IAuditService auditService, IOptions<LoggingSettings> settings, IScopeProvider scopeProvider, IProfilingLogger pLogger, ILogger<LogScrubber> logger)
+            IMainDom mainDom, IServerRegistrar serverRegistrar, IAuditService auditService, IOptions<LoggingSettings> settings, IScopeProvider scopeProvider, IProfilingLogger profilingLogger , ILogger<LogScrubber> logger)
             : base(runner, delayMilliseconds, periodMilliseconds)
         {
             _mainDom = mainDom;
@@ -30,7 +30,7 @@ namespace Umbraco.Web.Scheduling
             _auditService = auditService;
             _settings = settings.Value;
             _scopeProvider = scopeProvider;
-            _pLogger = pLogger;
+            _profilingLogger = profilingLogger ;
             _logger = logger;
         }
 
@@ -78,7 +78,7 @@ namespace Umbraco.Web.Scheduling
 
             // Ensure we use an explicit scope since we are running on a background thread.
             using (var scope = _scopeProvider.CreateScope())
-            using (_pLogger.DebugDuration<LogScrubber>("Log scrubbing executing", "Log scrubbing complete"))
+            using (_profilingLogger.DebugDuration<LogScrubber>("Log scrubbing executing", "Log scrubbing complete"))
             {
                 _auditService.CleanLogs(GetLogScrubbingMaximumAge(_settings));
                 scope.Complete();

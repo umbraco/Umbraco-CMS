@@ -97,11 +97,11 @@ namespace Umbraco.Tests.PublishedContent
         }
 
 
-        protected override TypeLoader CreateTypeLoader(IIOHelper ioHelper, ITypeFinder typeFinder, IAppPolicyCache runtimeCache, ILogger<TypeLoader> logger, IProfilingLogger pLogger, IHostingEnvironment hostingEnvironment)
+        protected override TypeLoader CreateTypeLoader(IIOHelper ioHelper, ITypeFinder typeFinder, IAppPolicyCache runtimeCache, ILogger<TypeLoader> logger, IProfilingLogger profilingLogger , IHostingEnvironment hostingEnvironment)
         {
-            var baseLoader = base.CreateTypeLoader(ioHelper, typeFinder, runtimeCache, logger, pLogger, hostingEnvironment);
+            var baseLoader = base.CreateTypeLoader(ioHelper, typeFinder, runtimeCache, logger, profilingLogger , hostingEnvironment);
 
-            return new TypeLoader(typeFinder, runtimeCache, new DirectoryInfo(hostingEnvironment.LocalTempPath), logger, pLogger, false,
+            return new TypeLoader(typeFinder, runtimeCache, new DirectoryInfo(hostingEnvironment.LocalTempPath), logger, profilingLogger , false,
                 // this is so the model factory looks into the test assembly
                 baseLoader.AssembliesToScan
                     .Union(new[] { typeof(PublishedContentTests).Assembly })

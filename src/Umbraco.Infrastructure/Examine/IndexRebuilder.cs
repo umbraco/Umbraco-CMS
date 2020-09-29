@@ -15,14 +15,14 @@ namespace Umbraco.Examine
     /// </summary>
     public class IndexRebuilder
     {
-        private readonly IProfilingLogger _pLogger;
+        private readonly IProfilingLogger _profilingLogger;
         private readonly ILogger<IndexRebuilder> _logger;
         private readonly IEnumerable<IIndexPopulator> _populators;
         public IExamineManager ExamineManager { get; }
 
-        public IndexRebuilder(IProfilingLogger pLogger, ILogger<IndexRebuilder> logger, IExamineManager examineManager, IEnumerable<IIndexPopulator> populators)
+        public IndexRebuilder(IProfilingLogger profilingLogger , ILogger<IndexRebuilder> logger, IExamineManager examineManager, IEnumerable<IIndexPopulator> populators)
         {
-            _pLogger = pLogger;
+            _profilingLogger = profilingLogger ;
             _populators = populators;
             _logger = logger;
             ExamineManager = examineManager;

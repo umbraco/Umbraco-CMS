@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Newtonsoft.Json;
@@ -190,7 +191,7 @@ namespace Umbraco.Tests.Routing
             var propertyValueConverters = new PropertyValueConverterCollection(new IPropertyValueConverter[]
             {
                 new UploadPropertyConverter(),
-                new ImageCropperValueConverter(),
+                new ImageCropperValueConverter(Mock.Of<ILogger<ImageCropperValueConverter>>()),
             });
 
             var publishedModelFactory = Mock.Of<IPublishedModelFactory>();
