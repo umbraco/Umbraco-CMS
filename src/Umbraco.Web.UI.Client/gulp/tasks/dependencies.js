@@ -216,7 +216,7 @@ function dependencies() {
                 "./node_modules/@microsoft/signalr/dist/browser/signalr.js",
                 "./node_modules/@microsoft/signalr/dist/browser/signalr.min.js",
             ],
-            "base": "./node_modules/@microsoft/dist/browser"
+            "base": "./node_modules/@microsoft/signalr/dist/browser"
         },
         {
             "name": "spectrum",
