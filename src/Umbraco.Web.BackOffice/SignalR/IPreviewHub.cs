@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Umbraco.Web.BackOffice.SignalR
 {
@@ -7,7 +8,7 @@ namespace Umbraco.Web.BackOffice.SignalR
         // define methods implemented by client
         // ReSharper disable InconsistentNaming
 
-        void refreshed(int id);
+        Task refreshed(int id);
 
         // ReSharper restore InconsistentNaming
     }

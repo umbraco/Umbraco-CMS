@@ -5,7 +5,7 @@
 
 var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.services'])
 
-    .controller("previewController", function ($scope, $window, $location) {
+    .controller("previewController", function ($scope, $window, $location, umbRequestHelper) {
 
         $scope.currentCulture = { iso: '', title: '...', icon: 'icon-loading' }
         var cultures = [];
@@ -46,7 +46,8 @@ var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.servi
         function configureSignalR(iframe) {
             // signalr hub
             var previewHub = new signalR.HubConnectionBuilder()
-                .withUrl("/umbraco/previewHub")
+                .withUrl("/umbraco/PreviewHub")
+                .withAutomaticReconnect()
                 .build();
 
             // visibility tracking

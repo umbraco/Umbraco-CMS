@@ -33,7 +33,7 @@ namespace Umbraco.Web.BackOffice.SignalR
             ContentCacheRefresher.CacheUpdated -= HandleCacheUpdated;
         }
 
-        private void HandleCacheUpdated(ContentCacheRefresher sender, CacheRefresherEventArgs args)
+        private async void HandleCacheUpdated(ContentCacheRefresher sender, CacheRefresherEventArgs args)
         {
             if (args.MessageType != MessageType.RefreshByPayload) return;
             var payloads = (ContentCacheRefresher.JsonPayload[])args.MessageObject;
@@ -41,7 +41,7 @@ namespace Umbraco.Web.BackOffice.SignalR
             foreach (var payload in payloads)
             {
                 var id = payload.Id; // keep it simple for now, ignore ChangeTypes
-                hubContextInstance.Clients.All.refreshed(id);
+                await hubContextInstance.Clients.All.refreshed(id);
             }
         }
     }
