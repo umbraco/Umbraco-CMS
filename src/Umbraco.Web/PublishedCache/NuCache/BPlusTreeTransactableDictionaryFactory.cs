@@ -126,5 +126,19 @@ namespace Umbraco.Web.PublishedCache.NuCache
             return blockSize;
         }
 
+        public bool IsPopulated(ContentCacheEntityType entityType)
+        {
+            switch (entityType)
+            {
+                case ContentCacheEntityType.Document:
+                    return File.Exists(GetContentDbPath());
+                case ContentCacheEntityType.Media:
+                    return File.Exists(GetMediaDbPath());
+                case ContentCacheEntityType.Member:
+                    throw new ArgumentException("Unsupported Entity Type", nameof(entityType));
+                default:
+                    throw new ArgumentException("Unsupported Entity Type", nameof(entityType));
+            }
+        }
     }
 }

@@ -16,5 +16,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
         /// <param name="errors">The errors, if any.</param>
         /// <returns>A value indicating whether the ITransactableDictionaryFactory has the proper environment to run.</returns>
         bool EnsureEnvironment(out IEnumerable<string> errors);
+
+        /// <summary>
+        /// Whether the dictionary has been populated
+        /// </summary>
+        /// <returns></returns>
+        bool IsPopulated(ContentCacheEntityType entityType);
     }
 }
