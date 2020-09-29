@@ -1,14 +1,15 @@
 ﻿namespace Umbraco.Web.PublishedCache
 {
-    public enum RoutingOutcome
-    {
-        NotFound = 0,
-        Found = 1
-    }
+    
     public struct ContentRoutingResult
     {
-        public int Id { get; set; }
+        public ContentRoutingResult(RoutingOutcome outcome, int id = 0)
+        {
+            Outcome = outcome;
+            Id = id;
+        }
+        public int Id { get; }
 
-        public RoutingOutcome Outcome { get; set; }
+        public RoutingOutcome Outcome { get;  }
     }
 }

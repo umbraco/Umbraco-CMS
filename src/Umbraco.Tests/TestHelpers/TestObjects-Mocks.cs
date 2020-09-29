@@ -136,8 +136,7 @@ namespace Umbraco.Tests.TestHelpers
                 globalSettings,
                 urlProviders,
                 mediaUrlProviders,
-                Mock.Of<IUserService>(),
-                Mock.Of<IPublishedSnapshotAccessor>());
+                Mock.Of<IUserService>());
 
             return umbracoContextFactory.EnsureUmbracoContext(httpContext).UmbracoContext;
         }

@@ -22,7 +22,6 @@ namespace Umbraco.Web
     public class UmbracoContext : DisposableObjectSlim, IDisposeOnRequestEnd
     {
         private readonly IGlobalSettings _globalSettings;
-        private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
         private readonly Lazy<IPublishedSnapshot> _publishedSnapshot;
         private string _previewToken;
         private bool? _previewing;
@@ -38,8 +37,7 @@ namespace Umbraco.Web
             IEnumerable<IUrlProvider> urlProviders,
             IEnumerable<IMediaUrlProvider> mediaUrlProviders,
             IGlobalSettings globalSettings,
-            IVariationContextAccessor variationContextAccessor,
-            IPublishedSnapshotAccessor publishedSnapshotAccessor)
+            IVariationContextAccessor variationContextAccessor)
         {
             if (httpContext == null) throw new ArgumentNullException(nameof(httpContext));
             if (publishedSnapshotService == null) throw new ArgumentNullException(nameof(publishedSnapshotService));
@@ -48,7 +46,6 @@ namespace Umbraco.Web
             if (urlProviders == null) throw new ArgumentNullException(nameof(urlProviders));
             if (mediaUrlProviders == null) throw new ArgumentNullException(nameof(mediaUrlProviders));
             VariationContextAccessor = variationContextAccessor ??  throw new ArgumentNullException(nameof(variationContextAccessor));
-            _publishedSnapshotAccessor = publishedSnapshotAccessor ?? throw new ArgumentNullException(nameof(publishedSnapshotAccessor));
             _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
 
             // ensure that this instance is disposed when the request terminates, though we *also* ensure
@@ -66,7 +63,6 @@ namespace Umbraco.Web
             HttpContext = httpContext;
             Security = webSecurity;
 
-            _publishedSnapshotAccessor = publishedSnapshotAccessor;
             // beware - we cannot expect a current user here, so detecting preview mode must be a lazy thing
             _publishedSnapshot = new Lazy<IPublishedSnapshot>(() => publishedSnapshotService.CreatePublishedSnapshot(PreviewToken));
 
@@ -280,8 +276,6 @@ namespace Umbraco.Web
                 return _previewToken;
             }
         }
-
-        public IPublishedSnapshotAccessor PublishedSnapshotAccessor => _publishedSnapshotAccessor;
 
         private void DetectPreviewMode()
         {

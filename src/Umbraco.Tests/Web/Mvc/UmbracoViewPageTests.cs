@@ -443,8 +443,7 @@ namespace Umbraco.Tests.Web.Mvc
                 Enumerable.Empty<IUrlProvider>(),
                 Enumerable.Empty<IMediaUrlProvider>(),
                 globalSettings,
-                new TestVariationContextAccessor(),
-                Mock.Of<IPublishedSnapshotAccessor>());
+                new TestVariationContextAccessor());
 
             //if (setSingleton)
             //{

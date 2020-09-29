@@ -275,6 +275,7 @@
     <Compile Include="PublishedCache\NuCache\Snap\GenRef.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\LinkedNode.cs" />
     <Compile Include="PublishedCache\ContentCacheAdapter.cs" />
+    <Compile Include="PublishedCache\RoutingOutcome.cs" />
     <Compile Include="RoutableDocumentFilter.cs" />
     <Compile Include="Routing\DefaultMediaUrlProvider.cs" />
     <Compile Include="Routing\IMediaUrlProvider.cs" />

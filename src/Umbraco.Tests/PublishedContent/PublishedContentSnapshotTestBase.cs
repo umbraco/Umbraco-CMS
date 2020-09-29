@@ -73,7 +73,7 @@ namespace Umbraco.Tests.PublishedContent
                 Enumerable.Empty<IUrlProvider>(),
                 Enumerable.Empty<IMediaUrlProvider>(),
                 globalSettings,
-                new TestVariationContextAccessor(), new Mock<IPublishedSnapshotAccessor>().Object);
+                new TestVariationContextAccessor());
 
             return umbracoContext;
         }

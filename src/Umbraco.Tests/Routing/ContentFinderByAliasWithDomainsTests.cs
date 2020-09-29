@@ -62,8 +62,7 @@ namespace Umbraco.Tests.Routing
                 Assert.AreEqual(expectedCulture, request.Culture.Name);
 
             var globalSettings = new GlobalSettings();
-            var snapshotAccessor = umbracoContext.PublishedSnapshotAccessor;
-            var contentRouter = new ContentCacheContentRouter(snapshotAccessor, globalSettings,
+            var contentRouter = new ContentCacheContentRouter(globalSettings,
                 new FastDictionaryAppCache(), new FastDictionaryAppCache());
             var finder = new ContentFinderByUrlAlias(Logger, contentRouter);
             var result = finder.TryFindContent(request);

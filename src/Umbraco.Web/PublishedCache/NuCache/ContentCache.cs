@@ -18,6 +18,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly ContentStore.Snapshot _snapshot;
         private readonly IVariationContextAccessor _variationContextAccessor;
 
+        internal ContentStore.Snapshot Snapshot => _snapshot;
+
         #region Constructor
 
         // TODO: figure this out

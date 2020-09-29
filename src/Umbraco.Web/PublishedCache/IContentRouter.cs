@@ -17,7 +17,7 @@
         /// <para>If <param name="hideTopLevelNode" /> is <c>null</c> then the settings value is used.</para>
         /// <para>The value of <paramref name="preview"/> overrides defaults.</para>
         /// </remarks>
-        ContentRoutingResult GetIdByRoute(bool preview, string route, bool? hideTopLevelNode, string culture);
+        ContentRoutingResult GetIdByRoute(IPublishedContentCache currentSnapshot,bool preview, string route, bool? hideTopLevelNode, string culture);
         /// <summary>
         /// Gets content id identified by a route.
         /// </summary>
@@ -29,7 +29,7 @@
         /// <para>If <param name="hideTopLevelNode" /> is <c>null</c> then the settings value is used.</para>
         /// <para>Considers published or unpublished content depending on defaults.</para>
         /// </remarks>
-        ContentRoutingResult GetIdByRoute(string route, bool? hideTopLevelNode, string culture);
+        ContentRoutingResult GetIdByRoute(IPublishedSnapshot currentSnapshot, string route, bool? hideTopLevelNode, string culture);
         /// <summary>
         /// Gets the route for a content identified by its unique identifier.
         /// </summary>
@@ -37,14 +37,14 @@
         /// <param name="contentId">The content unique identifier.</param>
         /// <returns>The route.</returns>
         /// <remarks>The value of <paramref name="preview"/> overrides defaults.</remarks>
-        string GetRouteById(bool preview, int contentId, string culture = null);
+        string GetRouteById(IPublishedContentCache snapshot, IDomainCache domainCache, bool preview, int contentId, string culture = null);
         // <summary>
         /// Gets the route for a content identified by its unique identifier.
         /// </summary>
         /// <param name="contentId">The content unique identifier.</param>
         /// <returns>The route.</returns>
         /// <remarks>Considers published or unpublished content depending on defaults.</remarks>
-        string GetRouteById(int contentId, string culture = null);
+        string GetRouteById(bool defaultPreview, IPublishedContentCache snapshot, IDomainCache domainCache, int contentId, string culture = null);
 
         /// <summary>
         /// Gets the route for a content identified by its alias.
@@ -54,6 +54,6 @@
         /// <param name="culture">Request culture</param>
         /// <param name="alias">Url Alias</param>
         /// <returns>Routing Outcome</returns>
-        ContentRoutingResult GetIdByAlias(bool preview, int rootNodeId, string culture, string alias);
+        ContentRoutingResult GetIdByAlias(IPublishedSnapshot currentSnapshot, bool preview, int rootNodeId, string culture, string alias);
     }
 }

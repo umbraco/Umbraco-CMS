@@ -13,35 +13,38 @@ namespace Umbraco.Web.PublishedCache
 {
     internal class ContentCacheContentRouter : IContentRouter
     {
-        private readonly IPublishedSnapshotAccessor _snapshot;
         private readonly IGlobalSettings _globalSettings;
         private readonly IAppCache _snapshotCache;
         private readonly IAppCache _elementsCache;
 
-        public ContentCacheContentRouter(IPublishedSnapshotAccessor snapshot, IGlobalSettings globalSettings,
+        public ContentCacheContentRouter(IGlobalSettings globalSettings,
             IAppCache snapshotCache, IAppCache elementsCache)
         {
-            _snapshot = snapshot;
             _globalSettings = globalSettings;
             _snapshotCache = snapshotCache;
             _elementsCache = elementsCache;
         }
 
-        public ContentRoutingResult GetIdByRoute(string route, bool? hideTopLevelNode = null, string culture = null)
+        public ContentRoutingResult GetIdByRoute(IPublishedContentCache snapshot,bool defaultPreview,string route, bool? hideTopLevelNode = null, string culture = null)
         {
-            return GetIdByRoute(_snapshot.PublishedSnapshot.DefaultPreview, route, hideTopLevelNode, culture);
+            return GetIdByRoute(snapshot, defaultPreview, route, hideTopLevelNode, culture);
         }
 
-        public ContentRoutingResult GetIdByRoute(bool preview, string route, bool? hideTopLevelNode = null, string culture = null)
+        public ContentRoutingResult GetIdByRoute(IPublishedSnapshot snapshot, bool preview, string route, bool? hideTopLevelNode = null, string culture = null)
         {
             if (route == null) throw new ArgumentNullException(nameof(route));
 
             var cache = preview == false || PublishedSnapshotService.FullCacheWhenPreviewing ? _elementsCache : _snapshotCache;
             var key = CacheKeys.ContentCacheContentIdByRoute(route, preview, culture);
-            return cache.GetCacheItem<ContentRoutingResult>(key, () => GetByRouteInternal(preview, route, hideTopLevelNode, culture));
+            return cache.GetCacheItem<ContentRoutingResult>(key, () => GetByRouteInternal(snapshot,preview, route, hideTopLevelNode, culture));
         }
 
-        public ContentRoutingResult GetByRouteInternal(bool preview, string route, bool? hideTopLevelNode, string culture)
+        public ContentRoutingResult GetIdByRoute(IPublishedSnapshot currentSnapshot, string route, bool? hideTopLevelNode, string culture)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal ContentRoutingResult GetByRouteInternal(IPublishedSnapshot snapshot, bool preview, string route, bool? hideTopLevelNode, string culture)
         {
             hideTopLevelNode = hideTopLevelNode ?? _globalSettings.HideTopLevelNodeFromPath; // default = settings
 
@@ -61,14 +64,14 @@ namespace Umbraco.Web.PublishedCache
                 // and follow the path
                 // note: if domain has a path (eg example.com/en) which is not recommended anymore
                 //  then /en part of the domain is basically ignored here...
-                content = _snapshot.PublishedSnapshot.Content.GetById(preview, startNodeId);
+                content = snapshot.Content.GetById(preview, startNodeId);
                 content = FollowRoute(content, parts, 0, culture);
             }
             else if (parts.Length == 0)
             {
                 // if not in a domain, and path is empty - what is the default page?
                 // let's say it is the first one in the tree, if any -- order by sortOrder
-                content = _snapshot.PublishedSnapshot.Content.GetAtRoot(preview).FirstOrDefault();
+                content = snapshot.Content.GetAtRoot(preview).FirstOrDefault();
             }
             else
             {
@@ -76,8 +79,8 @@ namespace Umbraco.Web.PublishedCache
                 // hideTopLevelNode = support legacy stuff, look for /*/path/to/node
                 // else normal, look for /path/to/node
                 content = hideTopLevelNode.Value
-                    ? _snapshot.PublishedSnapshot.Content.GetAtRoot(preview).SelectMany(x => x.Children(culture)).FirstOrDefault(x => x.UrlSegment(culture) == parts[0])
-                    : _snapshot.PublishedSnapshot.Content.GetAtRoot(preview).FirstOrDefault(x => x.UrlSegment(culture) == parts[0]);
+                    ? snapshot.Content.GetAtRoot(preview).SelectMany(x => x.Children(culture)).FirstOrDefault(x => x.UrlSegment(culture) == parts[0])
+                    : snapshot.Content.GetAtRoot(preview).FirstOrDefault(x => x.UrlSegment(culture) == parts[0]);
                 content = FollowRoute(content, parts, 1, culture);
             }
 
@@ -86,13 +89,13 @@ namespace Umbraco.Web.PublishedCache
             // have to look for /foo (see note in ApplyHideTopLevelNodeFromPath).
             if (content == null && hideTopLevelNode.Value && parts.Length == 1)
             {
-                content = _snapshot.PublishedSnapshot.Content.GetAtRoot(preview).FirstOrDefault(x => x.UrlSegment(culture) == parts[0]);
+                content = snapshot.Content.GetAtRoot(preview).FirstOrDefault(x => x.UrlSegment(culture) == parts[0]);
             }
             ContentRoutingResult result = new ContentRoutingResult
-            {
-                Id = content?.Id ?? 0,
-                Outcome = content != null ? RoutingOutcome.Found : RoutingOutcome.NotFound
-            };
+            (
+                content != null ? RoutingOutcome.Found : RoutingOutcome.NotFound,
+                content?.Id ?? 0
+            );
             return result;
         }
         private IPublishedContent FollowRoute(IPublishedContent content, IReadOnlyList<string> parts, int start, string culture)
@@ -110,22 +113,21 @@ namespace Umbraco.Web.PublishedCache
             return content;
         }
 
-
-        public string GetRouteById(int contentId, string culture = null)
+        public string GetRouteById(bool defaultPreview, IPublishedContentCache snapshot, IDomainCache domainCache, int contentId, string culture = null)
         {
-            return GetRouteById(_snapshot.PublishedSnapshot.DefaultPreview, contentId, culture);
+            return GetRouteById(snapshot, domainCache,defaultPreview, contentId, culture);
         }
 
-        public string GetRouteById(bool preview, int contentId, string culture = null)
+        public string GetRouteById(IPublishedContentCache snapshot, IDomainCache domainCache, bool preview, int contentId, string culture = null)
         {
             var cache = (preview == false || PublishedSnapshotService.FullCacheWhenPreviewing) ? _elementsCache : _snapshotCache;
             var key = CacheKeys.ContentCacheRouteByContent(contentId, preview, culture);
-            return cache.GetCacheItem<string>(key, () => GetRouteByIdInternal(preview, contentId, null, culture));
+            return cache.GetCacheItem<string>(key, () => GetRouteByIdInternal(snapshot, domainCache,preview, contentId, null, culture));
         }
 
-        private string GetRouteByIdInternal(bool preview, int contentId, bool? hideTopLevelNode, string culture)
+        private string GetRouteByIdInternal(IPublishedContentCache snapshot, IDomainCache domainCache, bool preview, int contentId, bool? hideTopLevelNode, string culture)
         {
-            var node = _snapshot.PublishedSnapshot.Content.GetById(preview, contentId);
+            var node = snapshot.GetById(preview, contentId);
             if (node == null)
                 return null;
 
@@ -136,7 +138,7 @@ namespace Umbraco.Web.PublishedCache
             var pathParts = new List<string>();
             var n = node;
             var urlSegment = n.UrlSegment(culture);
-            var hasDomains = _snapshot.PublishedSnapshot.Domains.HasAssigned(n.Id);
+            var hasDomains = domainCache.HasAssigned(n.Id);
             while (hasDomains == false && n != null) // n is null at root
             {
                 // no segment indicates this is not published when this is a variant
@@ -149,7 +151,7 @@ namespace Umbraco.Web.PublishedCache
                 if (n != null)
                     urlSegment = n.UrlSegment(culture);
 
-                hasDomains = n != null && _snapshot.PublishedSnapshot.Domains.HasAssigned(n.Id);
+                hasDomains = n != null && domainCache.HasAssigned(n.Id);
             }
 
             // at this point this will be the urlSegment of the root, no segment indicates this is not published when this is a variant
@@ -157,7 +159,7 @@ namespace Umbraco.Web.PublishedCache
 
             // no domain, respect HideTopLevelNodeFromPath for legacy purposes
             if (hasDomains == false && hideTopLevelNode.Value)
-                ApplyHideTopLevelNodeFromPath(node, pathParts, preview);
+                ApplyHideTopLevelNodeFromPath(snapshot,node, pathParts, preview);
 
             // assemble the route
             pathParts.Reverse();
@@ -169,7 +171,7 @@ namespace Umbraco.Web.PublishedCache
             return route;
         }
 
-        private void ApplyHideTopLevelNodeFromPath(IPublishedContent content, IList<string> segments, bool preview)
+        private void ApplyHideTopLevelNodeFromPath(IPublishedContentCache snapshot, IPublishedContent content, IList<string> segments, bool preview)
         {
             // in theory if hideTopLevelNodeFromPath is true, then there should be only one
             // top-level node, or else domains should be assigned. but for backward compatibility
@@ -181,7 +183,7 @@ namespace Umbraco.Web.PublishedCache
             // that's the way it works pre-4.10 and we try to be backward compat for the time being
             if (content.Parent == null)
             {
-                var rootNode = _snapshot.PublishedSnapshot.Content.GetById(preview, GetIdByRoute(preview, "/", true).Id);
+                var rootNode = snapshot.GetById(preview, GetIdByRoute(snapshot,preview, "/", true).Id);
                 if (rootNode == null)
                     throw new Exception("Failed to get node at /.");
                 if (rootNode.Id == content.Id) // remove only if we're the default node
@@ -193,14 +195,15 @@ namespace Umbraco.Web.PublishedCache
             }
         }
 
-        public ContentRoutingResult GetIdByAlias(bool preview, int rootNodeId, string culture, string alias)
+        public ContentRoutingResult GetIdByAlias(IPublishedSnapshot snapshot, bool preview, int rootNodeId, string culture, string alias)
         {
-            var content = FindContentByAlias(_snapshot.PublishedSnapshot.Content, rootNodeId, culture, alias,preview);
+            var content = FindContentByAlias(snapshot.Content, rootNodeId, culture, alias,preview);
             return new ContentRoutingResult
-            {
-                Id = content?.Id ?? 0,
-                Outcome = content != null ? RoutingOutcome.Found : RoutingOutcome.NotFound
-            };
+            (
+
+                content != null ? RoutingOutcome.Found : RoutingOutcome.NotFound,
+                 content?.Id ?? 0
+            );
         }
         private static IPublishedContent FindContentByAlias(IPublishedContentCache cache, int rootNodeId, string culture, string alias,bool preview)
         {
@@ -263,5 +266,7 @@ namespace Umbraco.Web.PublishedCache
 
             return null;
         }
+
+      
     }
 }
