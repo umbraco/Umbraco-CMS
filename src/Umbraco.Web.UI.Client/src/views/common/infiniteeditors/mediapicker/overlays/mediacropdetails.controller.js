@@ -8,6 +8,14 @@
             vm.close = close;
             vm.hasCrops = cropSet() === true;
 
+            vm.disableFocalPoint = false;
+            if(typeof $scope.model.disableFocalPoint === "boolean") {
+                vm.disableFocalPoint = $scope.model.disableFocalPoint
+            }
+            else {
+                vm.disableFocalPoint = ($scope.model.disableFocalPoint !== undefined && $scope.model.disableFocalPoint !== "0") ? true : false;
+            }
+
             if (!$scope.model.target.coordinates && !$scope.model.target.focalPoint) {
                 $scope.model.target.focalPoint = { left: .5, top: .5 };
             }
