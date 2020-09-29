@@ -25,12 +25,25 @@
             </div>
 
             <div class="umb-control-group" ng-if="model.target">
-                <div ng-if="vm.hasCrops === false">
+                <div ng-if="vm.hasCrops === false && vm.disableFocalPoint">
                     <h5>
                         <localize key="general_preview">Preview</localize>
                     </h5>
 
                     <img ng-src="{{model.target.thumbnail}}" alt="{{model.target.name}}" />
+                </div>
+
+                <div ng-if="vm.hasCrops === false && vm.disableFocalPoint == false">
+                    <h5>
+                        <localize key="@general_focalPoint">Focal point</localize>
+                    </h5>
+
+                    <div ng-if="model.target.image">
+                        <umb-image-gravity src="model.target.image"
+                                           center="model.target.focalPoint"
+                                           on-value-changed="vm.focalPointChanged(left, top)">
+                        </umb-image-gravity>
+                    </div>
                 </div>
 
                 <div ng-if="vm.hasCrops">
