@@ -219,8 +219,6 @@
     <Compile Include="Cache\SingleItemsOnlyCachePolicyTests.cs" />
     <Compile Include="Web\Controllers\AuthenticationControllerTests.cs" />
     <Compile Include="Web\Controllers\BackOfficeControllerUnitTests.cs" />
-    <Compile Include="Web\Controllers\UserEditorAuthorizationHelperTests.cs" />
-    <Compile Include="Web\HealthChecks\HealthCheckResultsTests.cs" />
     <Compile Include="Web\HttpCookieExtensionsTests.cs" />
     <Compile Include="Web\Mvc\HtmlStringUtilitiesTests.cs" />
     <Compile Include="Web\Mvc\RenderIndexActionSelectorAttributeTests.cs" />

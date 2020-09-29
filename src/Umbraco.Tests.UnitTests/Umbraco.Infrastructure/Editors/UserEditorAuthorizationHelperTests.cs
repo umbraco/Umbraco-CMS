@@ -10,6 +10,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
+using Umbraco.Tests.Common.TestHelpers.Entities;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Web.Editors;
 
