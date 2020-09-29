@@ -439,7 +439,14 @@
              * @return {Array} array of strings representing alias.
              */
             getAvailableAliasesForBlockContent: function () {
-                return this.blockConfigurations.map(blockConfiguration => this.getScaffoldFromKey(blockConfiguration.contentElementTypeKey).contentTypeAlias);
+                return this.blockConfigurations.map(
+                    (blockConfiguration) => {
+                        var scaffold = this.getScaffoldFromKey(blockConfiguration.contentElementTypeKey);
+                        if (scaffold) {
+                            return scaffold.contentTypeAlias;
+                        }
+                    }
+                );
             },
 
             /**
