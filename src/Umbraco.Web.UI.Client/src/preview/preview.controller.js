@@ -11,7 +11,7 @@ var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.servi
         var cultures = [];
 
         $scope.tabbingActive = false;
-        // There are a number of ways to detect when a focus state should be shown when using the tab key and this seems to be the simplest solution. 
+        // There are a number of ways to detect when a focus state should be shown when using the tab key and this seems to be the simplest solution.
         // For more information about this approach, see https://hackernoon.com/removing-that-ugly-focus-ring-and-keeping-it-too-6c8727fefcd2
         function handleFirstTab(evt) {
             if (evt.keyCode === 9) {
@@ -45,7 +45,9 @@ var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.servi
 
         function configureSignalR(iframe) {
             // signalr hub
-            var previewHub = $.connection.previewHub;
+            var previewHub = new signalR.HubConnectionBuilder()
+                .withUrl("/umbraco/previewHub")
+                .build();
 
             // visibility tracking
             var dirtyContent = false;
@@ -61,33 +63,31 @@ var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.servi
                 }
             });
 
-            if (previewHub && previewHub.client) {
-                previewHub.client.refreshed = function (message, sender) {
-                    console.log("Notified by SignalR preview hub (" + message + ").");
-
-                    if ($scope.pageId != message) {
-                        console.log("Not a notification for us (" + $scope.pageId + ").");
-                        return;
-                    }
-
-                    if (!visibleContent) {
-                        console.log("Not visible, will reload.");
-                        dirtyContent = true;
-                        return;
-                    }
-
-                    console.log("Reloading.");
-                    var iframeDoc = (iframe.contentWindow || iframe.contentDocument);
-                    iframeDoc.location.reload();
-                };
-            }
+            previewHub.on("refreshed", function (message) {
+                console.log('Notified by SignalR preview hub (' + message + ').');
+                if ($scope.pageId != message) {
+                    console.log('Not a notification for us (' + $scope.pageId + ').');
+                    return;
+                }
+                if (!visibleContent) {
+                    console.log('Not visible, will reload.');
+                    dirtyContent = true;
+                    return;
+                }
+                console.log('Reloading.');
+                var iframeDoc = iframe.contentWindow || iframe.contentDocument;
+                iframeDoc.location.reload();
+            })
 
             try {
-                $.connection.hub.start()
-                    .done(function () { console.log("Connected to SignalR preview hub (ID=" + $.connection.hub.id + ")"); })
-                    .fail(function () { console.log("Could not connect to SignalR preview hub."); });
+                previewHub.start().then(function () {
+                    // console.log('Connected to SignalR preview hub (ID=' + $.connection.hub.id + ')');
+                    console.log('SignalR is ' + previewHub.state);
+                }).catch(function () {
+                    console.log('Could not connect to SignalR preview hub.');
+                });
             } catch (e) {
-                console.error("Could not establish signalr connection. Error: " + e);
+                console.error('Could not establish signalr connection. Error: ' + e);
             }
         }
 
@@ -95,7 +95,7 @@ var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.servi
         if (isInit === "true") {
             //do not continue, this is the first load of this new window, if this is passed in it means it's been
             //initialized by the content editor and then the content editor will actually re-load this window without
-            //this flag. This is a required trick to get around chrome popup mgr. 
+            //this flag. This is a required trick to get around chrome popup mgr.
             return;
         }
 
