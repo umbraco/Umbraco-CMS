@@ -136,7 +136,7 @@ namespace Umbraco.Tests.PublishedContent
             // create a data source for NuCache
             _source = new TestDataSource(kits());
             _contentNestedDataSerializerFactory = new JsonContentNestedDataSerializerFactory();
-            ITransactableDictionaryFactory transactableDictionaryFactory = new BPlusTreeTransactableDictionaryFactory();
+            ITransactableDictionaryFactory transactableDictionaryFactory = new BPlusTreeTransactableDictionaryFactory(globalSettings);
             // at last, create the complete NuCache snapshot service!
             var options = new PublishedSnapshotServiceOptions { IgnoreLocalDb = true };
             _snapshotService = new PublishedSnapshotService(options,

@@ -264,6 +264,7 @@
     <Compile Include="PropertyEditors\ComplexEditorValidator.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\MultipleMediaPickerParameterEditor.cs" />
     <Compile Include="PropertyEditors\RichTextEditorPastedImages.cs" />
+    <Compile Include="PublishedCache\NuCache\ContentCacheEntityType.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\ContentCacheDataSerializationResult.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\ContentCacheDataSerializerEntityType.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\IContentCacheDataSerializer.cs" />
@@ -619,7 +620,6 @@
     <Compile Include="PublishedCache\NuCache\ContentNode.cs" />
     <Compile Include="PublishedCache\NuCache\ContentNodeKit.cs" />
     <Compile Include="PublishedCache\NuCache\ContentStore.cs" />
-    <Compile Include="PublishedCache\NuCache\DataSource\BTree.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\ContentData.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\ContentSourceDto.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\DatabaseDataSource.cs" />

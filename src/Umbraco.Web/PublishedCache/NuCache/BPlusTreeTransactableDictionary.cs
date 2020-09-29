@@ -12,11 +12,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly BPlusTree<TKey, TValue> _bplusTree;
         private bool _disposedValue;
         private readonly string _filePath;
+        private bool _isPopulated;
 
-        public BPlusTreeTransactableDictionary(BPlusTree<TKey, TValue> bplusTree, string filePath)
+        public BPlusTreeTransactableDictionary(BPlusTree<TKey, TValue> bplusTree, string filePath,bool localDbCacheFileExists)
         {
             _bplusTree = bplusTree;
             _filePath = filePath;
+            _isPopulated = localDbCacheFileExists;
         }
 
         #region IDictionary
@@ -128,10 +130,12 @@ namespace Umbraco.Web.PublishedCache.NuCache
         }
         #endregion
 
-        public void DeleteLocalFiles()
+        public void Drop()
         {
             if (File.Exists(_filePath))
                 File.Delete(_filePath);
         }
+
+        public bool IsPopulated() => _isPopulated;
     }
 }

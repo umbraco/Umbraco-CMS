@@ -19,5 +19,16 @@ namespace Umbraco.Web.PublishedCache.NuCache
         /// <param name="value">Removed Value</param>
         /// <returns>Removed</returns>
         bool TryRemove(TKey key, out TValue value);
+
+        /// <summary>
+        /// Whether the dictionary has been populated
+        /// </summary>
+        /// <returns></returns>
+        bool IsPopulated();
+
+        /// <summary>
+        /// Drop the database
+        /// </summary>
+        void Drop();
     }
 }

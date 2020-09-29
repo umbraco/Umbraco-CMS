@@ -183,7 +183,7 @@ namespace Umbraco.Tests.PublishedContent
             // create a variation accessor
             _variationAccesor = new TestVariationContextAccessor();
 
-            ITransactableDictionaryFactory transactableDictionaryFactory = new BPlusTreeTransactableDictionaryFactory();
+            ITransactableDictionaryFactory transactableDictionaryFactory = new BPlusTreeTransactableDictionaryFactory(globalSettings);
 
             // at last, create the complete NuCache snapshot service!
             var options = new PublishedSnapshotServiceOptions { IgnoreLocalDb = true };
