@@ -81,8 +81,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             IPublishedModelFactory publishedModelFactory,
             UrlSegmentProviderCollection urlSegmentProviders,
             ITransactableDictionaryFactory transactableDictionaryFactory, 
-            IContentCacheDataSerializerFactory contentCacheDataSerializerFactory, 
-            ContentDataSerializer contentDataSerializer = null)
+            IContentCacheDataSerializerFactory contentCacheDataSerializerFactory)
             : base(publishedSnapshotAccessor, variationContextAccessor)
         {
             //if (Interlocked.Increment(ref _singletonCheck) > 1)
