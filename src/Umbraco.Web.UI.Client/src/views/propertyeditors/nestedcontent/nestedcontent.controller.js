@@ -22,9 +22,7 @@
 
                     // Loop through all inner properties:
                     for (var k in obj) {
-                        var innerProp = obj[k];
-
-                        propClearingMethod(innerProp, clipboardService.TYPES.RAW);
+                        propClearingMethod(obj[k], clipboardService.TYPES.RAW);
                     }
                 }
             }
