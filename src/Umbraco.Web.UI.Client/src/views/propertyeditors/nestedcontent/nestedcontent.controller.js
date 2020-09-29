@@ -441,6 +441,26 @@
         function clearNodeForCopy(clonedData) {
             delete clonedData.key;
             delete clonedData.$$hashKey;
+
+            var variant = clonedData.variants[0];
+            for (var t = 0; t < variant.tabs.length; t++) {
+                var tab = variant.tabs[t];
+                for (var p = 0; p < tab.properties.length; p++) {
+                    var prop = tab.properties[p];
+
+                    // If we have ncSpecific data, lets revert to standard data model.
+                    if (prop.propertyAlias) {
+                        prop.alias = prop.propertyAlias;
+                        delete prop.propertyAlias;
+                    }
+
+                    if(prop.ncMandatory !== undefined) {
+                        prop.validation.mandatory = prop.ncMandatory;
+                        delete prop.ncMandatory;
+                    }
+                }
+            }
+
         }
 
         vm.showCopy = clipboardService.isSupported();
@@ -465,6 +485,15 @@
 
             // generate a new key.
             newNode.key = String.CreateGuid();
+
+            // Ensure we have NC data in place:
+            var variant = newNode.variants[0];
+            for (var t = 0; t < variant.tabs.length; t++) {
+                var tab = variant.tabs[t];
+                for (var p = 0; p < tab.properties.length; p++) {
+                    extendPropertyWithNCData(tab.properties[p]);
+                }
+            }
 
             vm.nodes.push(newNode);
             setDirty();
@@ -577,6 +606,30 @@
             }
         }
 
+        function extendPropertyWithNCData(prop) {
+
+            if (prop.propertyAlias === undefined) {
+                // store the original alias before we change below, see notes
+                prop.propertyAlias = prop.alias;
+
+                // NOTE: This is super ugly, the reason it is like this is because it controls the label/html id in the umb-property component at a higher level.
+                // not pretty :/ but we can't change this now since it would require a bunch of plumbing to be able to change the id's higher up.
+                prop.alias = model.alias + "___" + prop.alias;
+            }
+
+            // TODO: Do we need to deal with this separately?
+            // Force validation to occur server side as this is the
+            // only way we can have consistency between mandatory and
+            // regex validation messages. Not ideal, but it works.
+            if(prop.ncMandatory === undefined) {
+                prop.ncMandatory = prop.validation.mandatory;
+                prop.validation = {
+                    mandatory: false,
+                    pattern: ""
+                };
+            }
+        }
+
         function createNode(scaffold, fromNcEntry) {
             var node = Utilities.copy(scaffold);
 
@@ -590,22 +643,7 @@
                 for (var p = 0; p < tab.properties.length; p++) {
                     var prop = tab.properties[p];
 
-                    // store the original alias before we change below, see notes
-                    prop.propertyAlias = prop.alias;
-
-                    // NOTE: This is super ugly, the reason it is like this is because it controls the label/html id in the umb-property component at a higher level.
-                    // not pretty :/ but we can't change this now since it would require a bunch of plumbing to be able to change the id's higher up.
-                    prop.alias = model.alias + "___" + prop.alias;
-
-                    // TODO: Do we need to deal with this separately?
-                    // Force validation to occur server side as this is the
-                    // only way we can have consistency between mandatory and
-                    // regex validation messages. Not ideal, but it works.
-                    prop.ncMandatory = prop.validation.mandatory;
-                    prop.validation = {
-                        mandatory: false,
-                        pattern: ""
-                    };
+                    extendPropertyWithNCData(prop);
 
                     if (fromNcEntry && fromNcEntry[prop.propertyAlias]) {
                         prop.value = fromNcEntry[prop.propertyAlias];
