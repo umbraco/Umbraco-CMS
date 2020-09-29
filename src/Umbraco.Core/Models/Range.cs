@@ -6,7 +6,8 @@ namespace Umbraco.Core.Models
     /// Represents a range with a minimum and maximum value.
     /// </summary>
     /// <typeparam name="T">The type of the minimum and maximum values.</typeparam>
-    public class Range<T>
+    /// <seealso cref="System.IEquatable{Umbraco.Core.Models.Range{T}}" />
+    public class Range<T> : IEquatable<Range<T>>
         where T : IComparable<T>
     {
         /// <summary>
@@ -67,5 +68,41 @@ namespace Umbraco.Core.Models
         ///   <c>true</c> if this range contains the specified range; otherwise, <c>false</c>.
         /// </returns>
         public bool ContainsRange(Range<T> range) => this.IsValid() && range.IsValid() && this.ContainsValue(range.Minimum) && this.ContainsValue(range.Maximum);
+
+        /// <summary>
+        /// Determines whether the specified <see cref="System.Object" />, is equal to this instance.
+        /// </summary>
+        /// <param name="obj">The <see cref="System.Object" /> to compare with this instance.</param>
+        /// <returns>
+        ///   <c>true</c> if the specified <see cref="System.Object" /> is equal to this instance; otherwise, <c>false</c>.
+        /// </returns>
+        public override bool Equals(object obj) => obj is Range<T> other && this.Equals(other);
+
+        /// <summary>
+        /// Indicates whether the current object is equal to another object of the same type.
+        /// </summary>
+        /// <param name="other">An object to compare with this object.</param>
+        /// <returns>
+        ///   <see langword="true" /> if the current object is equal to the <paramref name="other" /> parameter; otherwise, <see langword="false" />.
+        /// </returns>
+        public bool Equals(Range<T> other) => other != null && this.Equals(other.Minimum, other.Maximum);
+
+        /// <summary>
+        /// Determines whether the specified <paramref name="minimum" /> and <paramref name="maximum" /> values are equal to this instance values.
+        /// </summary>
+        /// <param name="minimum">The minimum value.</param>
+        /// <param name="maximum">The maximum value.</param>
+        /// <returns>
+        ///   <c>true</c> if the specified <paramref name="minimum" /> and <paramref name="maximum" /> values are equal to this instance values; otherwise, <c>false</c>.
+        /// </returns>
+        public bool Equals(T minimum, T maximum) => this.Minimum.CompareTo(minimum) == 0 && this.Maximum.CompareTo(maximum) == 0;
+
+        /// <summary>
+        /// Returns a hash code for this instance.
+        /// </summary>
+        /// <returns>
+        /// A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table.
+        /// </returns>
+        public override int GetHashCode() => (this.Minimum, this.Maximum).GetHashCode();
     }
 }
