@@ -269,8 +269,6 @@
     <Compile Include="PublishedCache\NuCache\DataSource\IContentCacheDataSerializer.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\IContentCacheDataSerializerFactory.cs" />
     <Compile Include="PublishedCache\NuCache\BPlusTreeTransactionScope.cs" />
-    <Compile Include="PublishedCache\NuCache\DataSource\IContentData.cs" />
-    <Compile Include="PublishedCache\NuCache\DataSource\IContentNestedDataSerializer.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\IDictionaryOfPropertyDataSerializer.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\JsonContentNestedDataSerializer.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\JsonContentNestedDataSerializerFactory.cs" />
@@ -286,6 +284,7 @@
     <Compile Include="PublishedCache\NuCache\DataSource\MsgPackContentNestedDataSerializerFactory.cs" />
     <Compile Include="PublishedCache\NuCache\BPlusTreeTransactableDictionaryFactory.cs" />
     <Compile Include="PublishedCache\NuCache\BPlusTreeTransactableDictionary.cs" />
+    <Compile Include="PublishedCache\NuCache\ITransactable.cs" />
     <Compile Include="PublishedCache\NuCache\ITransactableDictionary.cs" />
     <Compile Include="PublishedCache\NuCache\ITransactableDictionaryFactory.cs" />
     <Compile Include="PublishedCache\NuCache\ITransactionScope.cs" />

@@ -18,7 +18,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         }
         public ITransactableDictionary<int, ContentNodeKit> Get(string filepath, bool exists)
         {
-            return new BPlusTreeTransactableDictionary<int, ContentNodeKit>(BTree.GetTree(filepath, exists, _contentDataSerializer));
+            return new BPlusTreeTransactableDictionary<int, ContentNodeKit>(BTree.GetTree(filepath, exists, _contentDataSerializer), filepath);
         }
     }
 }

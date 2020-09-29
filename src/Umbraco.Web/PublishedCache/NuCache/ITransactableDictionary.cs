@@ -6,17 +6,18 @@ namespace Umbraco.Web.PublishedCache.NuCache
 {
     public interface ITransactableDictionary<TKey, TValue> :
         ITransactable,
-        CSharpTest.Net.Collections.IConcurrentDictionary<TKey, TValue>,
         IDictionary<TKey, TValue>,
         ICollection<KeyValuePair<TKey, TValue>>,
         IEnumerable<KeyValuePair<TKey, TValue>>,
         IEnumerable,
         IDisposable
     {
-    }
-    public interface ITransactable : IDisposable
-    {
-        void Commit();
-        void Rollback();
+        /// <summary>
+        /// Conditionally removes a key/value pair from the dictionary via an implementation
+        /// </summary>
+        /// <param name="key">Key to remove</param>
+        /// <param name="value">Removed Value</param>
+        /// <returns>Removed</returns>
+        bool TryRemove(TKey key, out TValue value);
     }
 }

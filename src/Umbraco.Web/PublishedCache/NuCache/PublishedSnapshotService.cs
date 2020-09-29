@@ -4,7 +4,6 @@ using System.Configuration;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using CSharpTest.Net.Collections;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
