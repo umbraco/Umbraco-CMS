@@ -10,7 +10,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
     {
         public ContentCacheDataModel Deserialize(int contentTypeId, string stringData, byte[] byteData)
         {
-            if (byteData != null)
+            if (byteData != null && byteData.Length >0)
                 throw new NotSupportedException($"{typeof(JsonContentNestedDataSerializer)} does not support byte[] serialization");
 
             // by default JsonConvert will deserialize our numeric values as Int64
