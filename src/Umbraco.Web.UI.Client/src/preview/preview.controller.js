@@ -81,8 +81,7 @@ var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.servi
 
             try {
                 previewHub.start().then(function () {
-                    // console.log('Connected to SignalR preview hub (ID=' + $.connection.hub.id + ')');
-                    console.log('SignalR is ' + previewHub.state);
+                    console.log('Connected to SignalR preview hub (ID=' + previewHub.connectionId + ')');
                 }).catch(function () {
                     console.log('Could not connect to SignalR preview hub.');
                 });
