@@ -747,9 +747,7 @@ namespace Umbraco.Core.Persistence.Querying
 
             var c = exp[0];
             return (c == '"' || c == '`' || c == '\'') && exp[exp.Length - 1] == c
-                ? exp.Length == 1
-                    ? string.Empty
-                    : exp.Substring(1, exp.Length - 2)
+                ? exp.Substring(1, exp.Length - 2)
                 : exp;
         }
     }

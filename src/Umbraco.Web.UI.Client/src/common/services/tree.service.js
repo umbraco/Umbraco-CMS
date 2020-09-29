@@ -54,7 +54,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
             //take the last child
             var childPath = this.getPath(node.children[node.children.length - 1]).join(",");
             //check if this already exists, if so exit
-            if (expandedPaths.includes(childPath)) {
+            if (expandedPaths.indexOf(childPath) !== -1) {
                 return;
             }
 
@@ -65,18 +65,18 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
 
             var clonedPaths = expandedPaths.slice(0); //make a copy to iterate over so we can modify the original in the iteration
 
-            clonedPaths.forEach(p => {
+            _.each(clonedPaths, function (p) {
                 if (childPath.startsWith(p + ",")) {
                     //this means that the node's path supercedes this path stored so we can remove the current 'p' and replace it with node.path
                     expandedPaths.splice(expandedPaths.indexOf(p), 1); //remove it
-                    if (expandedPaths.includes(childPath) === false) {
+                    if (expandedPaths.indexOf(childPath) === -1) {
                         expandedPaths.push(childPath); //replace it
                     }
                 }
                 else if (p.startsWith(childPath + ",")) {
                     //this means we've already tracked a deeper node so we shouldn't track this one
                 }
-                else if (expandedPaths.includes(childPath) === false) {
+                else if (expandedPaths.indexOf(childPath) === -1) {
                     expandedPaths.push(childPath); //track it
                 }
             });

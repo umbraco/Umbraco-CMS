@@ -42,7 +42,7 @@
 
                     <button type="button" ng-if="vm.hasVariants === true && hideChangeVariant !== true" class="umb-variant-switcher__toggle umb-outline" ng-click="vm.dropdownOpen = !vm.dropdownOpen" ng-class="{'--error': vm.errorsOnOtherVariants}">
                         <span ng-bind="editor.content.displayName"></span>
-                        <umb-icon icon="{{vm.dropdownOpen ? 'icon-navigation-up' : 'icon-navigation-down'}}" class="umb-variant-switcher__expand" ng-class="{'icon-navigation-down': !vm.dropdownOpen, 'icon-navigation-up': vm.dropdownOpen}">&nbsp;</umb-icon>
+                        <ins class="umb-variant-switcher__expand" ng-class="{'icon-navigation-down': !vm.dropdownOpen, 'icon-navigation-up': vm.dropdownOpen}">&nbsp;</ins>
                     </button>
 
                     <span ng-if="vm.hasVariants === true && hideChangeVariant" class="umb-variant-switcher__toggle">
@@ -56,9 +56,10 @@
                             ng-class="{'--current': entry.variant === editor.content, '--active': entry.variant.active && vm.dropdownOpen, '--error': entry.variant.active !== true && entry.variant.hasError, '--state-notCreated':entry.variant.state==='NotCreated' && entry.variant.name == null, '--state-draft':entry.variant.state==='Draft' || (entry.variant.state==='NotCreated' && entry.variant.name != null)}"
                         >
                             <button type="button" ng-if="entry.subVariants && entry.subVariants.length > 0" class="umb-variant-switcher__item-expand-button umb-outline" ng-click="entry.open = !entry.open">
-                                <i class="icon {{entry.open ? 'icon-navigation-down' : 'icon-navigation-right'}}"></i>
+                                <i class="icon icon-navigation-down" ng-if="entry.open"></i>
+                                <i class="icon icon-navigation-right" ng-if="!entry.open"></i>
                             </button>
-                            <button type="button" class="umb-variant-switcher__name-wrapper umb-outline" ng-click="selectVariant($event, entry.variant)">
+                            <button type="button" class="umb-variant-switcher__name-wrapper umb-outline" ng-click="selectVariant($event, entry.variant)" prevent-default>
                                 <span class="umb-variant-switcher__name" ng-bind="entry.variant.displayName"></span>
                                 <umb-variant-state variant="entry.variant" class="umb-variant-switcher__state"></umb-variant-state>
                             </button>
@@ -74,7 +75,7 @@
                                 class="umb-variant-switcher__item"
                                 ng-class="{'--current': subVariant === editor.content, '--active': subVariant.active && vm.dropdownOpen, '--error': subVariant.active !== true && subVariant.hasError, '--state-notCreated':subVariant.state==='NotCreated', '--state-draft':subVariant.state==='Draft'}"
                             >
-                                <button type="button" class="umb-variant-switcher__name-wrapper umb-outline" ng-click="selectVariant($event, subVariant)">
+                                <button type="button" class="umb-variant-switcher__name-wrapper umb-outline" ng-click="selectVariant($event, subVariant)" prevent-default>
                                     <span class="umb-variant-switcher__name" ng-bind="subVariant.segment"></span>
                                     <umb-variant-state variant="subVariant" class="umb-variant-switcher__state"></umb-variant-state>
                                 </button>
@@ -90,9 +91,9 @@
         </div>
 
         <div ng-if="splitViewOpen">
-            <button type="button" class="btn-reset umb-editor-header__close-split-view" ng-click="closeSplitView()">
-                <umb-icon icon="icon-delete" class="icon-delete"></umb-icon>
-            </button>
+            <a class="umb-editor-header__close-split-view" href="" ng-click="closeSplitView()">
+                <i class="icon-delete"></i>
+            </a>
         </div>
 
         <div ng-if="editor.variantApps && splitViewOpen !== true">

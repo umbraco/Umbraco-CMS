@@ -1,34 +1,22 @@
 function RowConfigController($scope, localizationService) {
 
-    var vm = this;
-
-    vm.labels = {};
-    
     function init() {
-        
-        var labelKeys = [
-            "grid_addRowConfiguration",
-            "grid_allowAllEditors"
-        ];
-
-        localizationService.localizeMany(labelKeys).then(function (data) {
-
-            vm.labels.title = data[0];
-            vm.labels.allowAllEditors = data[1];
-
-            setTitle(vm.labels.title);
-        });
+        setTitle();
     }
 
-    function setTitle(value) {
+    function setTitle() {
         if (!$scope.model.title) {
-            $scope.model.title = value;
+            localizationService.localize("grid_addRowConfiguration")
+                .then(function(data){
+                    $scope.model.title = data;
+                });
         }
     }
     
+    
     $scope.currentRow = $scope.model.currentRow;
-    $scope.columns = $scope.model.columns;
     $scope.editors = $scope.model.editors;
+    $scope.columns = $scope.model.columns;
 
     $scope.scaleUp = function(section, max, overflow) {
         var add = 1;
@@ -56,7 +44,7 @@ function RowConfigController($scope, localizationService) {
             delete $scope.currentCell;
         }
         else {
-            if (cell === null) {
+            if (cell === undefined) {
                 var available = $scope.availableRowSpace;
                 var space = 4;
 
@@ -70,64 +58,43 @@ function RowConfigController($scope, localizationService) {
 
                 row.areas.push(cell);
             }
-
-            cell.allowed = cell.allowed || [];
-
-            $scope.editors.forEach(function (e) { e.allowed = cell.allowed.indexOf(e.alias) !== -1 });
-
             $scope.currentCell = cell;
             $scope.currentCell.allowAll = cell.allowAll || !cell.allowed || !cell.allowed.length;
         }
     };
 
     $scope.toggleAllowed = function (cell) {
-        cell.allowAll = !cell.allowAll;
-
         if (cell.allowed) {
             delete cell.allowed;
         }
         else {
             cell.allowed = [];
         }
-    };
+    }
 
     $scope.deleteArea = function (cell, row) {
     	if ($scope.currentCell === cell) {
-    		$scope.currentCell = null;
+    		$scope.currentCell = undefined;
     	}
     	var index = row.areas.indexOf(cell)
     	row.areas.splice(index, 1);
     };
 
     $scope.closeArea = function() {
-        $scope.currentCell = null;
-    };
-
-    $scope.selectEditor = function (cell, editor) {
-        cell.allowed = cell.allowed || [];
-
-        var index = cell.allowed.indexOf(editor.alias);
-        if (editor.allowed === true) {
-            if (index === -1) {
-                cell.allowed.push(editor.alias);
-            }
-        }
-        else {
-            cell.allowed.splice(index, 1);
-        }
+        $scope.currentCell = undefined;
     };
     
-    $scope.close = function () {
-        if ($scope.model.close) {
+    $scope.close = function() {
+        if($scope.model.close) {
             $scope.model.close();
         }
-    };
+    }
 
     $scope.submit = function () {
         if ($scope.model.submit) {
             $scope.model.submit($scope.currentRow);
         }
-    };
+    }
 
     $scope.nameChanged = false;
     var originalName = $scope.currentRow.name;
@@ -151,8 +118,11 @@ function RowConfigController($scope, localizationService) {
             }
         }
     }, true);
+
     
     init();
+    
+
 }
 
 angular.module("umbraco").controller("Umbraco.PropertyEditors.GridPrevalueEditor.RowConfigController", RowConfigController);

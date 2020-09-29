@@ -3,19 +3,16 @@
  * The controller that is used for a couple different Property Editors: Multi Node Tree Picker, Content Picker,
  * since this is used by MNTP and it supports content, media and members, there is code to deal with all 3 of those types
  * @param {any} $scope
- * @param {any} $q
- * @param {any} $routeParams
- * @param {any} $location
  * @param {any} entityResource
  * @param {any} editorState
  * @param {any} iconHelper
+ * @param {any} $routeParams
  * @param {any} angularHelper
  * @param {any} navigationService
+ * @param {any} $location
  * @param {any} localizationService
- * @param {any} editorService
- * @param {any} userService
  */
-function contentPickerController($scope, $q, $routeParams, $location, entityResource, editorState, iconHelper, angularHelper, navigationService, localizationService, editorService, userService) {
+function contentPickerController($scope, entityResource, editorState, iconHelper, $routeParams, angularHelper, navigationService, $location, localizationService, editorService, $q) {
 
     var vm = {
         labels: {
@@ -142,8 +139,7 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
         : $scope.model.config.startNode.type === "media"
             ? "Media"
             : "Document";
-    
-    $scope.allowOpenButton = false;
+    $scope.allowOpenButton = entityType === "Document";
     $scope.allowEditButton = entityType === "Document";
     $scope.allowRemoveButton = true;
 
@@ -307,24 +303,16 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
         $scope.model.value = null;
     };
 
-    $scope.openEditor = function (item) {
-        var editor = {
-            id: entityType === "Member" ? item.key : item.id,
+    $scope.openContentEditor = function (node) {
+        var contentEditor = {
+            id: node.id,
             submit: function (model) {
-
-                var node = entityType === "Member" ? model.memberNode :
-                           entityType === "Media" ? model.mediaNode :
-                                                    model.contentNode;
-                
                 // update the node
-                item.name = node.name;
-
+                node.name = model.contentNode.name;
+                node.published = model.contentNode.hasPublishedVersion;
                 if (entityType !== "Member") {
-                    if (entityType === "Document") {
-                        item.published = node.hasPublishedVersion;
-                    }
-                    entityResource.getUrl(node.id, entityType).then(function (data) {
-                        item.url = data;
+                    entityResource.getUrl(model.contentNode.id, entityType).then(function (data) {
+                        node.url = data;
                     });
                 }
                 editorService.close();
@@ -333,18 +321,7 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
                 editorService.close();
             }
         };
-
-        switch (entityType) {
-            case "Document":
-                editorService.contentEditor(editor);
-                break;
-            case "Media":
-                editorService.mediaEditor(editor);
-                break;
-            case "Member":
-                editorService.memberEditor(editor);
-                break;
-        }
+        editorService.contentEditor(contentEditor);
     };
 
     //when the scope is destroyed we need to unsubscribe
@@ -446,7 +423,7 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
         if (entityType !== "Member") {
             entityResource.getUrl(entity.id, entityType).then(function (data) {
                 // update url
-                $scope.renderModel.forEach(function (item) {
+                angular.forEach($scope.renderModel, function (item) {
                     if (item.id === entity.id) {
                         if (entity.trashed) {
                             item.url = vm.labels.general_recycleBin;
@@ -489,7 +466,6 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
             "icon": item.icon,
             "path": item.path,
             "url": item.url,
-            "key": item.key,
             "trashed": item.trashed,
             "published": (item.metaData && item.metaData.IsPublished === false && entityType === "Document") ? false : true
             // only content supports published/unpublished content so we set everything else to published so the UI looks correct
@@ -508,26 +484,6 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
     }
 
     function init() {
-        
-        userService.getCurrentUser().then(function (user) {
-            switch (entityType) {
-                case "Document":
-                    var hasAccessToContent = user.allowedSections.indexOf("content") !== -1;
-                    $scope.allowOpenButton = hasAccessToContent;
-                    break;
-                case "Media":
-                    var hasAccessToMedia = user.allowedSections.indexOf("media") !== -1;
-                    $scope.allowOpenButton = hasAccessToMedia;
-                    break;
-                case "Member":
-                    var hasAccessToMember = user.allowedSections.indexOf("member") !== -1;
-                    $scope.allowOpenButton = hasAccessToMember;
-                    break;
-
-                default:
-            }
-        });
-
         localizationService.localizeMany(["general_recycleBin", "general_add"])
             .then(function(data) {
                 vm.labels.general_recycleBin = data[0];

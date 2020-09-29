@@ -47,17 +47,13 @@
 
         <div ng-hide="vm.hasContentTypes">
             <div class="umb-nested-content__help-text">
-                <localize key="content_nestedContentNoContentTypes">No content types are configured for this property.</localize>
+                <localize key="content_nestedContentNoContentTypes"></localize>
             </div>
         </div>
+
         <div class="umb-nested-content__footer-bar" ng-hide="!vm.inited || vm.hasContentTypes === false || vm.singleMode === true">
-            <button
-                type="button"
-                class="btn-reset umb-nested-content__add-content umb-focus"
-                ng-class="{ '--disabled': (!vm.scaffolds.length || vm.nodes.length >= vm.maxItems) }"
-                ng-click="vm.openNodeTypePicker($event)"
-                aria-disabled="{{!vm.scaffolds.length || vm.nodes.length >= vm.maxItems}}">
-                <localize key="grid_addElement">Add element</localize>
+            <button type="button" class="btn-reset umb-nested-content__add-content umb-focus" ng-class="{ '--disabled': (!vm.scaffolds.length || vm.nodes.length >= vm.maxItems) }" ng-click="vm.openNodeTypePicker($event)" prevent-default>
+                <localize key="grid_addElement"></localize>
             </button>
         </div>
 
@@ -78,5 +74,13 @@
         </div>
 
     </ng-form>
+
+    <umb-overlay
+        ng-if="vm.overlayMenu.show"
+        position="target"
+        size="vm.overlayMenu.size"
+        view="vm.overlayMenu.view"
+        model="vm.overlayMenu">
+    </umb-overlay>
 
 </div>

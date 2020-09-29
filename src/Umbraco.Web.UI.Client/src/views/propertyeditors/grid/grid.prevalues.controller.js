@@ -1,22 +1,6 @@
 angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.GridPrevalueEditorController",
-        function ($scope, gridService, editorService, localizationService, overlayService) {
-
-            var vm = this;
-
-            vm.configureTemplate = configureTemplate;
-            vm.deleteTemplate = deleteTemplate;
-
-            vm.configureLayout = configureLayout;
-            vm.deleteLayout = deleteLayout;
-
-            vm.toggleCollection = toggleCollection;
-            vm.percentage = percentage;
-            vm.zeroWidthFilter = zeroWidthFilter;
-
-            vm.removeConfigValue = removeConfigValue;
-            vm.editConfig = editConfig;
-            vm.editStyles = editStyles;
+        function ($scope, gridService, editorService) {
 
             var emptyModel = {
                 styles: [
@@ -89,17 +73,19 @@ angular.module("umbraco")
             };
 
             /****************
-                Template
+                template
             *****************/
 
-            function configureTemplate(template) {
+            $scope.configureTemplate = function (template) {
 
                 var index = $scope.model.value.templates.indexOf(template);
 
                 if (template === undefined) {
                     template = {
                         name: "",
-                        sections: []
+                        sections: [
+
+                        ]
                     };
                 }
 
@@ -123,24 +109,28 @@ angular.module("umbraco")
                 };
 
                 editorService.open(layoutConfigOverlay);
-            }
 
-            function deleteTemplate(index) {
+            };
+
+            $scope.deleteTemplate = function (index) {
                 $scope.model.value.templates.splice(index, 1);
-            }
+            };
+
 
             /****************
                 Row
             *****************/
 
-            function configureLayout(layout) {
+            $scope.configureLayout = function (layout) {
 
                 var index = $scope.model.value.layouts.indexOf(layout);
 
                 if (layout === undefined) {
                     layout = {
                         name: "",
-                        areas: []
+                        areas: [
+
+                        ]
                     };
                 }
 
@@ -164,37 +154,35 @@ angular.module("umbraco")
                 };
 
                 editorService.open(rowConfigOverlay);
-            }
 
-            function deleteLayout(layout, index, event) {
+            };
 
-                const dialog = {
-                    view: "views/propertyEditors/grid/overlays/rowdeleteconfirm.html",
-                    layout: layout,
-                    submitButtonLabelKey: "contentTypeEditor_yesDelete",
-                    submitButtonStyle: "danger",
+            //var rowDeletesPending = false;
+            $scope.deleteLayout = function (index) {
+
+                var rowDeleteOverlay = {
+                    dialogData: {
+                        rowName: $scope.model.value.layouts[index].name
+                    },
+                    view: "views/propertyEditors/grid/dialogs/rowdeleteconfirm.html",
+                    size: "small",
                     submit: function (model) {
                         $scope.model.value.layouts.splice(index, 1);
-                        overlayService.close();
+                        editorService.close();
                     },
-                    close: function () {
-                        overlayService.close();
+                    close: function (model) {
+                        editorService.close();
                     }
                 };
 
-                localizationService.localize("general_delete").then(value => {
-                    dialog.title = value;
-                    overlayService.open(dialog);
-                });
+                editorService.open(rowDeleteOverlay);
+            };
 
-                event.preventDefault();
-                event.stopPropagation();
-            }
 
             /****************
-                Utilities
+                utillities
             *****************/
-            function toggleCollection(collection, toggle) {
+            $scope.toggleCollection = function (collection, toggle) {
                 if (toggle) {
                     collection = [];
                 } else {
@@ -202,21 +190,21 @@ angular.module("umbraco")
                 }
             };
 
-            function percentage(spans) {
+            $scope.percentage = function (spans) {
                 return ((spans / $scope.model.value.columns) * 100).toFixed(8);
-            }
+            };
 
-            function zeroWidthFilter(cell) {
+            $scope.zeroWidthFilter = function (cell) {
                 return cell.grid > 0;
-            }
+            };
 
             /****************
                 Config
             *****************/
 
-            function removeConfigValue(collection, index) {
+            $scope.removeConfigValue = function (collection, index) {
                 collection.splice(index, 1);
-            }
+            };
 
             var editConfigCollection = function (configValues, title, callback) {
 
@@ -237,27 +225,27 @@ angular.module("umbraco")
                 editorService.open(editConfigCollectionOverlay);
             };
 
-            function editConfig() {
+            $scope.editConfig = function () {
                 editConfigCollection($scope.model.value.config, "Settings", function (data) {
                     $scope.model.value.config = data;
                 });
-            }
+            };
 
-            function editStyles() {
+            $scope.editStyles = function () {
                 editConfigCollection($scope.model.value.styles, "Styling", function (data) {
                     $scope.model.value.styles = data;
                 });
-            }
+            };
 
             /****************
-                Editors
+                editors
             *****************/
             gridService.getGridEditors().then(function (response) {
                 $scope.editors = response.data;
             });
 
 
-            /* Init grid data */
+            /* init grid data */
             if (!$scope.model.value || $scope.model.value === "" || !$scope.model.value.templates) {
                 $scope.model.value = emptyModel;
             } else {

@@ -55,9 +55,7 @@ function dateTimePickerController($scope, angularHelper, dateHelper, validationM
         };
 
         // Don't show calendar if date format has been set to only time
-        const timeFormat = $scope.model.config.format.toLowerCase();
-        const timeFormatPattern = /^h{1,2}:m{1,2}:s{1,2}\s?a?$/gmi;
-        if (timeFormat.match(timeFormatPattern)) {            
+        if ($scope.model.config.format === "HH:mm:ss" || $scope.model.config.format === "HH:mm" || $scope.model.config.format === "HH") {
             $scope.datePickerConfig.enableTime = true;
             $scope.datePickerConfig.noCalendar = true;
         }

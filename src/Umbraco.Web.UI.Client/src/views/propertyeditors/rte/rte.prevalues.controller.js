@@ -29,15 +29,11 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
             // extend commands with properties for font-icon and if it is a custom command
             $scope.tinyMceConfig.commands = _.map($scope.tinyMceConfig.commands, function (obj) {
                 var icon = getFontIcon(obj.alias);
-
-                var objCmd = Utilities.extend(obj, {
+                return angular.extend(obj, {
                     fontIcon: icon.name,
                     isCustom: icon.isCustom,
-                    selected: $scope.model.value.toolbar.indexOf(obj.alias) >= 0,
-                    icon: "mce-ico " + (icon.isCustom ? ' mce-i-custom ' : ' mce-i-') + icon.name
+                    selected: $scope.model.value.toolbar.indexOf(obj.alias) >= 0
                 });
-
-                return objCmd;
             });
         });
 

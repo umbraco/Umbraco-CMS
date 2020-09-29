@@ -12,11 +12,12 @@
                           on-remove="vm.remove(itemType)">
         </umb-node-preview>
 
-        <button type="button"
-                class="umb-node-preview-add"
-                ng-click="vm.add()">
+        <a class="umb-node-preview-add"
+           href=""
+           ng-click="vm.add()"
+           prevent-default>
             <localize key="general_add">Add</localize>
-        </button>
+        </a>
     </div>
 
 </div>

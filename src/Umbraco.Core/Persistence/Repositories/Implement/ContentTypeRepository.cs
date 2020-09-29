@@ -134,7 +134,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             if (objectTypes.Any())
             {
-                sql = sql.Where("umbracoNode.nodeObjectType IN (@objectTypes)", new { objectTypes = objectTypes });
+                sql = sql.Where("umbracoNode.nodeObjectType IN (@objectTypes)", objectTypes);
             }
 
             return Database.Fetch<string>(sql);

@@ -11,7 +11,7 @@
     beforeEach(module('umbraco.resources'));
     beforeEach(module('umbraco.mocks'));
     beforeEach(module('umbraco'));
-
+    
     beforeEach(inject(function ($injector, mocksUtils, _$rootScope_, _$q_, _$timeout_) {
 
         mocksUtils.disableAuth();
@@ -41,7 +41,7 @@
     }));
 
 
-    var blockConfigurationMock = { contentElementTypeKey: "7C5B74D1-E2F9-45A3-AE4B-FC7A829BF8AB", label: "Test label", settingsElementTypeKey: null, view: "/testview.html" };
+    var blockConfigurationMock = { contentTypeKey: "7C5B74D1-E2F9-45A3-AE4B-FC7A829BF8AB", label: "Test label", settingsElementTypeKey: null, view: "testview.html" };
 
     var propertyModelMock = {
         layout: {
@@ -60,7 +60,7 @@
         ]
     };
 
-    var blockWithSettingsConfigurationMock = { contentElementTypeKey: "7C5B74D1-E2F9-45A3-AE4B-FC7A829BF8AB", label: "Test label", settingsElementTypeKey: "7C5B74D1-E2F9-45A3-AE4B-FC7A829BF8AB", view: "/testview.html" };
+    var blockWithSettingsConfigurationMock = { contentTypeKey: "7C5B74D1-E2F9-45A3-AE4B-FC7A829BF8AB", label: "Test label", settingsElementTypeKey: "7C5B74D1-E2F9-45A3-AE4B-FC7A829BF8AB", view: "testview.html" };
     var propertyModelWithSettingsMock = {
         layout: {
             "Umbraco.TestBlockEditor": [
@@ -105,17 +105,17 @@
         it('getBlockConfiguration provide the requested block configurtion', function () {
             var modelObject = blockEditorService.createModelObject({}, "Umbraco.TestBlockEditor", [blockConfigurationMock], $scope, $scope);
 
-            expect(modelObject.getBlockConfiguration(blockConfigurationMock.contentElementTypeKey).label).toBe(blockConfigurationMock.label);
+            expect(modelObject.getBlockConfiguration(blockConfigurationMock.contentTypeKey).label).toBe(blockConfigurationMock.label);
         });
 
         it('load provides data for itemPicker', function (done) {
             var modelObject = blockEditorService.createModelObject({}, "Umbraco.TestBlockEditor", [blockConfigurationMock], $scope, $scope);
 
-            modelObject.load().then(() => {
+            modelObject.load().then(() => {                
                 try {
                     var itemPickerOptions = modelObject.getAvailableBlocksForBlockPicker();
                     expect(itemPickerOptions.length).toBe(1);
-                    expect(itemPickerOptions[0].blockConfigModel.contentElementTypeKey).toBe(blockConfigurationMock.contentElementTypeKey);
+                    expect(itemPickerOptions[0].blockConfigModel.contentTypeKey).toBe(blockConfigurationMock.contentTypeKey);
                     done();
                 } catch (e) {
                     done.fail(e);
@@ -139,7 +139,7 @@
                     expect(layout).not.toBeUndefined();
                     expect(layout.length).toBe(1);
                     expect(layout[0]).toBe(propertyModelMock.layout["Umbraco.TestBlockEditor"][0]);
-                    expect(layout[0].contentUdi).toBe(propertyModelMock.layout["Umbraco.TestBlockEditor"][0].contentUdi);
+                    expect(layout[0].udi).toBe(propertyModelMock.layout["Umbraco.TestBlockEditor"][0].udi);
 
                     done();
                 } catch (e) {
@@ -241,10 +241,10 @@
                         done();
                     });
 
-
+                    
                 } catch (e) {
                     done.fail(e);
-                }
+                }                
             });
 
             $rootScope.$digest();
@@ -362,7 +362,7 @@
 
                     done();
                 });
-
+                
             });
 
             $rootScope.$digest();
@@ -406,7 +406,7 @@
                         done();
                     });
 
-
+                    
                 } catch (e) {
                     done.fail(e);
                 }

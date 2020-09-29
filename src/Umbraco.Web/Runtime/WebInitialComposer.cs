@@ -137,8 +137,8 @@ namespace Umbraco.Web.Runtime
             composition.RegisterUnique<IEventMessagesAccessor, HybridEventMessagesAccessor>();
             composition.RegisterUnique<ITreeService, TreeService>();
             composition.RegisterUnique<ISectionService, SectionService>();
+
             composition.RegisterUnique<IDashboardService, DashboardService>();
-            composition.RegisterUnique<IIconService, IconService>();
 
             composition.RegisterUnique<IExamineManager>(factory => ExamineManager.Instance);
 

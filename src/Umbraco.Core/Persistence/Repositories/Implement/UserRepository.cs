@@ -151,7 +151,7 @@ SELECT '4CountOfLockedOut' AS colName, COUNT(id) AS num FROM umbracoUser WHERE u
 UNION
 SELECT '5CountOfInvited' AS colName, COUNT(id) AS num FROM umbracoUser WHERE lastLoginDate IS NULL AND userDisabled = 1 AND invitedDate IS NOT NULL
 UNION
-SELECT '6CountOfDisabled' AS colName, COUNT(id) AS num FROM umbracoUser WHERE userDisabled = 0 AND userNoConsole = 0 AND lastLoginDate IS NULL
+SELECT '6CountOfDisabled' AS colName, COUNT(id) AS num FROM umbracoUser WHERE userDisabled = 0 AND userNoConsole = 0 AND lastLoginDate IS NULL 
 ORDER BY colName";
 
             var result = Database.Fetch<dynamic>(sql);
@@ -168,7 +168,10 @@ ORDER BY colName";
         }
 
         public Guid CreateLoginSession(int userId, string requestingIpAddress, bool cleanStaleSessions = true)
-        {            
+        {
+            // TODO: I know this doesn't follow the normal repository conventions which would require us to create a UserSessionRepository
+            //and also business logic models for these objects but that's just so overkill for what we are doing
+            //and now that everything is properly in a transaction (Scope) there doesn't seem to be much reason for using that anymore
             var now = DateTime.UtcNow;
             var dto = new UserLoginDto
             {
@@ -198,14 +201,13 @@ ORDER BY colName";
             // that query is going to run a *lot*, make it a template
             var t = SqlContext.Templates.Get("Umbraco.Core.UserRepository.ValidateLoginSession", s => s
                 .Select<UserLoginDto>()
-                .SelectTop(1)
                 .From<UserLoginDto>()
                 .Where<UserLoginDto>(x => x.SessionId == SqlTemplate.Arg<Guid>("sessionId"))
                 .ForUpdate());
 
             var sql = t.Sql(sessionId);
 
-            var found = Database.FirstOrDefault<UserLoginDto>(sql);
+            var found = Database.Query<UserLoginDto>(sql).FirstOrDefault();
             if (found == null || found.UserId != userId || found.LoggedOutUtc.HasValue)
                 return false;
 
@@ -560,9 +562,9 @@ ORDER BY colName";
             {
                 userDto.EmailConfirmedDate = null;
                 userDto.SecurityStampToken = entity.SecurityStamp = Guid.NewGuid().ToString();
-
+                
                 changedCols.Add("emailConfirmedDate");
-                changedCols.Add("securityStampToken");
+                changedCols.Add("securityStampToken");  
             }
 
             //only update the changed cols
@@ -691,13 +693,7 @@ ORDER BY colName";
             else
                 sql.WhereNotIn<UserDto>(x => x.Id, inSql);
 
-
-            var dtos = Database.Fetch<UserDto>(sql);
-
-            //adds missing bits like content and media start nodes
-            PerformGetReferencedDtos(dtos);
-
-            return ConvertFromDtos(dtos);
+            return ConvertFromDtos(Database.Fetch<UserDto>(sql));
         }
 
         /// <summary>

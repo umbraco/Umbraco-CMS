@@ -44,11 +44,6 @@ namespace Umbraco.Core
             public const string Path = "Umbraco.Core.Path";
 
             /// <summary>
-            /// Gets the path to umbraco's icons directory (/umbraco/assets/icons by default).
-            /// </summary>
-            public const string IconsPath = "Umbraco.Icons.Path";
-
-            /// <summary>
             /// Gets the path to the css directory (/css by default).
             /// </summary>
             public const string CssPath = "umbracoCssPath";

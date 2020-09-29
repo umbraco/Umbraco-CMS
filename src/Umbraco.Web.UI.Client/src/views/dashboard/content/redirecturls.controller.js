@@ -107,7 +107,6 @@
                 view: "views/dashboard/content/overlays/delete.html",
                 redirect: redirect,
                 submitButtonLabelKey: "contentTypeEditor_yesDelete",
-                submitButtonStyle: "danger",
                 submit: function (model) {
                     performDelete(model.redirect);
                     overlayService.close();

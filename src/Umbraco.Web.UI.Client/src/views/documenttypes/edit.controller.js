@@ -9,10 +9,7 @@
 (function () {
     "use strict";
 
-    function DocumentTypesEditController($scope, $routeParams, $q,
-        contentTypeResource, editorState, contentEditingHelper,
-        navigationService, iconHelper, contentTypeHelper, notificationsService,
-        localizationService, overlayHelper, eventsService, angularHelper, editorService) {
+    function DocumentTypesEditController($scope, $routeParams, contentTypeResource, dataTypeResource, editorState, contentEditingHelper, formHelper, navigationService, iconHelper, contentTypeHelper, notificationsService, $q, localizationService, overlayHelper, eventsService, angularHelper, editorService) {
 
         var vm = this;
         var evts = [];
@@ -24,7 +21,6 @@
         var isElement = $routeParams.iselement;
         var allowVaryByCulture = $routeParams.culturevary;
         var infiniteMode = $scope.model && $scope.model.infiniteMode;
-        var documentTypeIcon = "";
 
         vm.save = save;
         vm.close = close;
@@ -358,10 +354,6 @@
                     // emit event
                     var args = { documentType: vm.contentType };
                     eventsService.emit("editors.documentType.saved", args);
-                    
-                    if (documentTypeIcon !== vm.contentType.icon) {
-                        eventsService.emit("editors.tree.icon.changed", args);
-                    }
 
                     vm.page.saveButtonState = "success";
 
@@ -395,6 +387,18 @@
 
         function init(contentType) {
 
+            // set all tab to inactive
+            if (contentType.groups.length !== 0) {
+                angular.forEach(contentType.groups, function (group) {
+
+                    angular.forEach(group.properties, function (property) {
+                        // get data type details for each property
+                        getDataTypeDetails(property);
+                    });
+
+                });
+            }
+
             // insert template on new doc types
             if (!noTemplate && contentType.id === 0) {
                 contentType.defaultTemplate = contentTypeHelper.insertDefaultTemplatePlaceholder(contentType.defaultTemplate);
@@ -411,12 +415,10 @@
             // convert icons for content type
             convertLegacyIcons(contentType);
 
-            //set a shared state
-            editorState.set(contentType);
-
             vm.contentType = contentType;
-            
-            documentTypeIcon = contentType.icon;
+
+            //set a shared state
+            editorState.set(vm.contentType);
 
             loadButtons();
         }
@@ -430,7 +432,7 @@
                     contentType.defaultTemplate.alias = contentType.alias;
                 }
                 //sync allowed templates that had the placeholder flag
-                contentType.allowedTemplates.forEach(function (allowedTemplate) {
+                angular.forEach(contentType.allowedTemplates, function (allowedTemplate) {
                     if (allowedTemplate.placeholder) {
                         allowedTemplate.name = contentType.name;
                         allowedTemplate.alias = contentType.alias;
@@ -451,6 +453,16 @@
 
             // set icon back on contentType
             contentType.icon = contentTypeArray[0].icon;
+        }
+
+        function getDataTypeDetails(property) {
+            if (property.propertyState !== "init") {
+                dataTypeResource.getById(property.dataTypeId)
+                    .then(function (dataType) {
+                        property.dataTypeIcon = dataType.icon;
+                        property.dataTypeName = dataType.name;
+                    });
+            }
         }
 
         /** Syncs the content type  to it's tree node - this occurs on first load and after saving */

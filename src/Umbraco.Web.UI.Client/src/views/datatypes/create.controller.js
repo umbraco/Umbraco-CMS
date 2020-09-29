@@ -28,11 +28,10 @@ function DataTypeCreateController($scope, $location, navigationService, dataType
                 var currPath = node.path ? node.path : "-1";
                 navigationService.syncTree({ tree: "datatypes", path: currPath + "," + folderId, forceReload: true, activate: true });
 
-                formHelper.resetForm({ scope: $scope, formCtrl: this.createFolderFor });
+                formHelper.resetForm({ scope: $scope });
 
             }, function(err) {
 
-                formHelper.resetForm({ scope: $scope, formCtrl: this.createFolderFor, hasErrors: true });
                // TODO: Handle errors
             });
         };

@@ -161,17 +161,19 @@
                 var resourceLookup = scope.contentType === "documentType" ? contentTypeResource.getAvailableCompositeContentTypes : mediaTypeResource.getAvailableCompositeContentTypes;
 
                 return resourceLookup(scope.model.id, selectedContentTypeAliases, propAliasesExisting).then(function (filteredAvailableCompositeTypes) {
-                    scope.compositionsDialogModel.availableCompositeContentTypes.forEach(current => {
+                    _.each(scope.compositionsDialogModel.availableCompositeContentTypes, function (current) {
                         //reset first
                         current.allowed = true;
                         //see if this list item is found in the response (allowed) list
-                        var found = filteredAvailableCompositeTypes.find(f => current.contentType.alias === f.contentType.alias);
+                        var found = _.find(filteredAvailableCompositeTypes, function (f) {
+                            return current.contentType.alias === f.contentType.alias;
+                        });
 
                         //allow if the item was  found in the response (allowed) list -
                         // and ensure its set to allowed if it is currently checked,
                         // DO not allow if it's a locked content type.
-                        current.allowed = scope.model.lockedCompositeContentTypes.includes(current.contentType.alias) &&
-                            (selectedContentTypeAliases.includes(current.contentType.alias)) || (found ? found.allowed : false);
+                        current.allowed = scope.model.lockedCompositeContentTypes.indexOf(current.contentType.alias) === -1 &&
+                            (selectedContentTypeAliases.indexOf(current.contentType.alias) !== -1) || ((found !== null && found !== undefined) ? found.allowed : false);
 
                     });
                 });
@@ -190,15 +192,15 @@
             function setupAvailableContentTypesModel(result) {
                 scope.compositionsDialogModel.availableCompositeContentTypes = result;
                 //iterate each one and set it up
-                scope.compositionsDialogModel.availableCompositeContentTypes.forEach(c => {
+                _.each(scope.compositionsDialogModel.availableCompositeContentTypes, function (c) {
                     //enable it if it's part of the selected model
-                    if (scope.compositionsDialogModel.compositeContentTypes.includes(c.contentType.alias)) {
+                    if (scope.compositionsDialogModel.compositeContentTypes.indexOf(c.contentType.alias) !== -1) {
                         c.allowed = true;
                     }
 
                     //set the inherited flags
                     c.inherited = false;
-                    if (scope.model.lockedCompositeContentTypes.includes(c.contentType.alias)) {
+                    if (scope.model.lockedCompositeContentTypes.indexOf(c.contentType.alias) > -1) {
                         c.inherited = true;
                     }
                     // convert icons for composite content types
@@ -279,8 +281,6 @@
                     },
                     selectCompositeContentType: function (selectedContentType) {
 
-                        var deferred = $q.defer();
-
                         //first check if this is a new selection - we need to store this value here before any further digests/async
                         // because after that the scope.model.compositeContentTypes will be populated with the selected value.
                         var newSelection = scope.model.compositeContentTypes.indexOf(selectedContentType.alias) === -1;
@@ -308,10 +308,7 @@
 
                                 //based on the selection, we need to filter the available composite types list
                                 filterAvailableCompositions(selectedContentType, newSelection).then(function () {
-                            deferred.resolve({ selectedContentType, newSelection });
                                     // TODO: Here we could probably re-enable selection if we previously showed a throbber or something
-                        }, function () {
-                                    deferred.reject();
                                 });
                             });
                         }
@@ -321,14 +318,10 @@
 
                             //based on the selection, we need to filter the available composite types list
                             filterAvailableCompositions(selectedContentType, newSelection).then(function () {
-                            deferred.resolve({ selectedContentType, newSelection });
                                 // TODO: Here we could probably re-enable selection if we previously showed a throbber or something
-                    }, function () { 
-                                deferred.reject();
                             });
                         }
 
-                        return deferred.promise; 
                     }
                 };
 

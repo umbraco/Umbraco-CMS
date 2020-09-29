@@ -19,10 +19,10 @@ angular.module("umbraco")
 
         $scope.setEmbed = function () {
 
-            var modify = Utilities.isObject($scope.control.value) ? $scope.control.value : null;
+            var original = Utilities.isObject($scope.control.value) ? $scope.control.value : null;
 
             var embed = {
-                modify: modify,
+                original: original,
                 submit: function (model) {
 
                     var embed = {

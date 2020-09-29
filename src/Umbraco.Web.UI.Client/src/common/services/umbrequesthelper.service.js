@@ -15,7 +15,7 @@ function umbRequestHelper($http, $q, notificationsService, eventsService, formHe
          *
          * @description
          * This will convert a virtual path (i.e. ~/App_Plugins/Blah/Test.html ) to an absolute path
-         *
+         * 
          * @param {string} a virtual path, if this is already an absolute path it will just be returned, if this is a relative path an exception will be thrown
          */
         convertVirtualToAbsolutePath: function(virtualPath) {
@@ -31,7 +31,6 @@ function umbRequestHelper($http, $q, notificationsService, eventsService, formHe
             return Umbraco.Sys.ServerVariables.application.applicationPath + virtualPath.trimStart("~/");
         },
 
-
         /**
          * @ngdoc method
          * @name umbraco.services.umbRequestHelper#dictionaryToQueryString
@@ -40,7 +39,7 @@ function umbRequestHelper($http, $q, notificationsService, eventsService, formHe
          *
          * @description
          * This will turn an array of key/value pairs or a standard dictionary into a query string
-         *
+         * 
          * @param {Array} queryStrings An array of key/value pairs
          */
         dictionaryToQueryString: function (queryStrings) {
@@ -77,9 +76,9 @@ function umbRequestHelper($http, $q, notificationsService, eventsService, formHe
          *
          * @description
          * This will return the webapi Url for the requested key based on the servervariables collection
-         *
+         * 
          * @param {string} apiName The webapi name that is found in the servervariables["umbracoUrls"] dictionary
-         * @param {string} actionName The webapi action name
+         * @param {string} actionName The webapi action name 
          * @param {object} queryStrings Can be either a string or an array containing key/value pairs
          */
         getApiUrl: function (apiName, actionName, queryStrings) {
@@ -104,7 +103,7 @@ function umbRequestHelper($http, $q, notificationsService, eventsService, formHe
          *
          * @description
          * This returns a promise with an underlying http call, it is a helper method to reduce
-         *  the amount of duplicate code needed to query http resources and automatically handle any
+         *  the amount of duplicate code needed to query http resources and automatically handle any 
          *  Http errors. See /docs/source/using-promises-resources.md
          *
          * @param {object} opts A mixed object which can either be a string representing the error message to be
@@ -118,7 +117,7 @@ function umbRequestHelper($http, $q, notificationsService, eventsService, formHe
          *   The error callback must return an object containing: {errorMsg: errorMessage, data: originalData, status: status }
          */
         resourcePromise: function (httpPromise, opts) {
-
+            
             /** The default success callback used if one is not supplied in the opts */
             function defaultSuccess(data, status, headers, config) {
                 //when it's successful, just return the data
@@ -152,7 +151,7 @@ function umbRequestHelper($http, $q, notificationsService, eventsService, formHe
 
             return httpPromise.then(function (response) {
 
-                //invoke the callback
+                //invoke the callback 
                 var result = callbacks.success.apply(this, [response.data, response.status, response.headers, response.config]);
 
                 formHelper.showNotifications(response.data);
@@ -184,7 +183,7 @@ function umbRequestHelper($http, $q, notificationsService, eventsService, formHe
                         overlayService.ysod(error);
                     }
                     else {
-                        //show a simple error notification
+                        //show a simple error notification                         
                         notificationsService.error("Server error", "Contact administrator, see log for full details.<br/><i>" + result.errorMsg + "</i>");
                     }
 
@@ -210,7 +209,7 @@ function umbRequestHelper($http, $q, notificationsService, eventsService, formHe
          *
          * @description
          * Used for saving content/media/members specifically
-         *
+         * 
          * @param {Object} args arguments object
          * @returns {Promise} http promise object.
          */
@@ -234,7 +233,7 @@ function umbRequestHelper($http, $q, notificationsService, eventsService, formHe
             if (args.showNotifications === null || args.showNotifications === undefined) {
                 args.showNotifications = true;
             }
-
+            
             //save the active tab id so we can set it when the data is returned.
             var activeTab = _.find(args.content.tabs, function (item) {
                 return item.active;
@@ -264,7 +263,9 @@ function umbRequestHelper($http, $q, notificationsService, eventsService, formHe
 
                     //reset the tabs and set the active one
                     if (response.data.tabs && response.data.tabs.length > 0) {
-                        response.data.tabs.forEach(item => item.active = false);
+                        _.each(response.data.tabs, function (item) {
+                            item.active = false;
+                        });
                         response.data.tabs[activeTabIndex].active = true;
                     }
 
@@ -299,7 +300,7 @@ function umbRequestHelper($http, $q, notificationsService, eventsService, formHe
                             overlayService.ysod(error);
                         }
                         else {
-                            //show a simple error notification
+                            //show a simple error notification                         
                             notificationsService.error("Server error", "Contact administrator, see log for full details.<br/><i>" + response.data.ExceptionMessage + "</i>");
                         }
 
@@ -325,12 +326,12 @@ function umbRequestHelper($http, $q, notificationsService, eventsService, formHe
             if (!jsonData) { throw "jsonData cannot be null"; }
 
             if (Utilities.isArray(jsonData)) {
-                jsonData.forEach(item => {
+                _.each(jsonData, function (item) {
                     if (!item.key || !item.value) { throw "jsonData array item must have both a key and a value property"; }
                 });
             }
             else if (!jsonData.key || !jsonData.value) { throw "jsonData object must have both a key and a value property"; }
-
+            
             return $http({
                 method: 'POST',
                 url: url,
@@ -343,7 +344,7 @@ function umbRequestHelper($http, $q, notificationsService, eventsService, formHe
                     var formData = new FormData();
                     //add the json data
                     if (Utilities.isArray(data)) {
-                        data.forEach(item => {
+                        _.each(data, function(item) {
                             formData.append(item.key, !Utilities.isString(item.value) ? Utilities.toJson(item.value) : item.value);
                         });
                     }
@@ -365,7 +366,7 @@ function umbRequestHelper($http, $q, notificationsService, eventsService, formHe
                 return $q.reject(response);
             });
         },
-
+        
         /**
          * @ngdoc method
          * @name umbraco.resources.contentResource#downloadFile
@@ -373,7 +374,7 @@ function umbRequestHelper($http, $q, notificationsService, eventsService, formHe
          *
          * @description
          * Downloads a file to the client using AJAX/XHR
-         *
+         * 
          * @param {string} httpPath the path (url) to the resource being downloaded
          * @returns {Promise} http promise object.
          */
@@ -387,7 +388,7 @@ function umbRequestHelper($http, $q, notificationsService, eventsService, formHe
             // Use an arraybuffer
             return $http.get(httpPath, { responseType: 'arraybuffer' })
                 .then(function (response) {
-
+                    
                     var octetStreamMime = 'application/octet-stream';
                     var success = false;
 

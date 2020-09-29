@@ -20,7 +20,7 @@
         controller: umbVariantContentEditorsController
     };
 
-    function umbVariantContentEditorsController($scope, $location, eventsService) {
+    function umbVariantContentEditorsController($scope, $location, contentEditingHelper) {
 
         var prevContentDateUpdated = null;
 
@@ -36,7 +36,6 @@
         vm.selectVariant = selectVariant;
         vm.selectApp = selectApp;
         vm.selectAppAnchor = selectAppAnchor;
-        vm.requestSplitView = requestSplitView;
 
         vm.getScope = getScope;// used by property editors to get a scope that is the root of split view, content apps etc.
 
@@ -69,7 +68,7 @@
 
         /** Allows us to deep watch whatever we want - executes on every digest cycle */
         function doCheck() {
-            if (!Utilities.equals(vm.content.updateDate, prevContentDateUpdated)) {
+            if (!angular.equals(vm.content.updateDate, prevContentDateUpdated)) {
                 setActiveVariant();
                 prevContentDateUpdated = Utilities.copy(vm.content.updateDate);
             }
@@ -87,12 +86,11 @@
         function setActiveVariant() {
             // set the active variant
             var activeVariant = null;
-            vm.content.variants.forEach(v => {
+            _.each(vm.content.variants, function (v) {
                 if ((vm.culture === "invariant" || v.language && v.language.culture === vm.culture) && v.segment === vm.segment) {
                     activeVariant = v;
                 }
             });
-
             if (!activeVariant) {
                 // Set the first variant to active if we can't find it.
                 // If the content item is invariant, then only one item exists in the array.
@@ -105,16 +103,13 @@
                 //now re-sync any other editor content (i.e. if split view is open)
                 for (var s = 1; s < vm.editors.length; s++) {
                     //get the variant from the scope model
-                    var variant = vm.content.variants.find(v =>
-                        (!v.language || v.language.culture === vm.editors[s].content.language.culture) && v.segment === vm.editors[s].content.segment);
-
+                    var variant = _.find(vm.content.variants, function (v) {
+                        return (!v.language || v.language.culture === vm.editors[s].content.language.culture) && v.segment === vm.editors[s].content.segment;
+                    });
                     vm.editors[s].content = variant;
                 }
             }
-            
-            if (vm.content.variants.length > 1) {
-                eventsService.emit('editors.content.cultureChanged', activeVariant.language);
-            }
+
         }
 
         /**
@@ -165,29 +160,31 @@
          */
         function openSplitView(selectedVariant) {
             // enforce content contentApp in splitview.
-            var contentApp = vm.content.apps.find(app => app.alias === "umbContent");
+            var contentApp = vm.content.apps.find((app) => app.alias === "umbContent");
             if(contentApp) {
                 selectApp(contentApp);
             }
             
             insertVariantEditor(vm.editors.length, selectedVariant);
             
-            splitViewChanged();            
+            splitViewChanged();
+            
         }
-        
+
+        $scope.$on("editors.content.splitViewRequest", function(event, args) {requestSplitView(args);});
+        vm.requestSplitView = requestSplitView;
         function requestSplitView(args) {
             var culture = args.culture;
             var segment = args.segment;
 
-            var variant = vm.content.variants.find(v =>
-                (!v.language || v.language.culture === culture) && v.segment === segment);
+            var variant = _.find(vm.content.variants, function (v) {
+                return (!v.language || v.language.culture === culture) && v.segment === segment;
+            });
 
             if (variant != null) {
                 openSplitView(variant);
             }
         }
-
-        eventsService.on("editors.content.splitViewRequest", (_, args) => requestSplitView(args));
 
         /** Closes the split view */
         function closeSplitView(editorIndex) {
@@ -197,9 +194,8 @@
             editor.content.active = false;
             
             //update the current culture to reflect the last open variant (closing the split view corresponds to selecting the other variant)
-            const culture = vm.editors[0].content.language ? vm.editors[0].content.language.culture : null;
-
-            $location.search({"cculture": culture, "csegment": vm.editors[0].content.segment});
+            
+            $location.search({"cculture": vm.editors[0].content.language ? vm.editors[0].content.language.culture : null, "csegment": vm.editors[0].content.segment});
             splitViewChanged();
         }
 
@@ -226,9 +222,11 @@
                 $location.search("cculture", variantCulture).search("csegment", variantSegment);
             }
             else {
+
                 //update the editors collection
-                insertVariantEditor(editorIndex, variant);                
-            }            
+                insertVariantEditor(editorIndex, variant);
+                
+            }
         }
 
         /**
@@ -246,6 +244,7 @@
                 vm.onSelectAppAnchor({"app": app, "anchor": anchor});
             }
         }
+
         function getScope() {
             return $scope;
         }

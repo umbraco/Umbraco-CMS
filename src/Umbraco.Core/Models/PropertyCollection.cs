@@ -7,7 +7,6 @@ using System.Runtime.Serialization;
 
 namespace Umbraco.Core.Models
 {
-
     /// <summary>
     /// Represents a collection of property values.
     /// </summary>

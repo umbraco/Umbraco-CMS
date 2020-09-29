@@ -53,8 +53,8 @@ namespace Umbraco.Tests.Services
             var mediaRepository = Mock.Of<IMediaRepository>();
             var memberRepository = Mock.Of<IMemberRepository>();
 
+            var nestedContentDataSerializer = new JsonContentNestedDataSerializer();
             ITransactableDictionaryFactory transactableDictionaryFactory = new BPlusTreeTransactableDictionaryFactory();
-            var nestedContentDataSerializerFactory = new JsonContentNestedDataSerializerFactory();
             return new PublishedSnapshotService(
                 options,
                 null,
@@ -68,13 +68,13 @@ namespace Umbraco.Tests.Services
                 ScopeProvider,
                 documentRepository, mediaRepository, memberRepository,
                 DefaultCultureAccessor,
-                new DatabaseDataSource(nestedContentDataSerializerFactory),
+                new DatabaseDataSource(nestedContentDataSerializer),
                 Factory.GetInstance<IGlobalSettings>(),
                 Factory.GetInstance<IEntityXmlSerializer>(),
                 Mock.Of<IPublishedModelFactory>(),
                 new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() }),
-                nestedContentDataSerializerFactory,
-                transactableDictionaryFactory);
+                transactableDictionaryFactory,
+                nestedContentDataSerializer);
         }
 
         public class LocalServerMessenger : ServerMessengerBase

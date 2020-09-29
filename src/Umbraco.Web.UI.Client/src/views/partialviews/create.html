@@ -10,20 +10,20 @@
             <div ng-if="!vm.showSnippets">
                 <ul class="umb-actions umb-actions-child">
                     <li class="umb-action">
-                        <button type="button" class="umb-action-link umb-outline btn-reset" ng-click="vm.createPartialView()" umb-auto-focus>
-                            <i class="large icon icon-article" aria-hidden="true"></i>
+                        <button href="" class="umb-action-link umb-outline btn-reset" ng-click="vm.createPartialView()" umb-auto-focus>
+                            <i class="large icon icon-article"></i>
                             <span class="menu-label"><localize key="create_newEmptyPartialView">New empty partial view</localize></span>
                         </button>
                     </li>
                     <li class="umb-action">
-                        <button type="button" class="umb-action-link umb-outline btn-reset" ng-click="vm.showCreateFromSnippet()">
-                            <i class="large icon icon-article" aria-hidden="true"></i>
+                        <button href="" class="umb-action-link umb-outline btn-reset" ng-click="vm.showCreateFromSnippet()">
+                            <i class="large icon icon-article"></i>
                             <span class="menu-label"><localize key="create_newPartialViewFromSnippet">New partial view from snippet</localize>...</span>
                         </button>
                     </li>
                     <li class="umb-action">
-                        <button type="button" class="umb-action-link umb-outline btn-reset" ng-click="vm.showCreateFolder()">
-                            <i class="large icon icon-folder" aria-hidden="true"></i>
+                        <button href="" class="umb-action-link umb-outline btn-reset" ng-click="vm.showCreateFolder()">
+                            <i class="large icon icon-folder"></i>
                             <span class="menu-label"><localize key="general_folder"></localize>...</span>
                         </button>
                     </li>
@@ -34,8 +34,8 @@
             <div ng-if="vm.showSnippets">
                 <ul class="umb-actions umb-actions-child">
                     <li class="umb-action" ng-repeat="snippet in vm.snippets">
-                        <button type="button" class="umb-action-link umb-outline btn-reset" ng-click="vm.createPartialView(snippet)" style="padding-top: 6px; padding-bottom: 6px;">
-                            <i class="icon-article icon" aria-hidden="true" style="font-size: 20px;"></i>
+                        <button href="" class="umb-action-link umb-outline btn-reset" ng-click="vm.createPartialView(snippet)" style="padding-top: 6px; padding-bottom: 6px;">
+                            <i class="icon-article icon" style="font-size: 20px;"></i>
                             <span class="menu-label" style="margin-left: 0; padding-left: 5px;">{{ snippet.name }}</span>
                         </button>
                     </li>
@@ -68,7 +68,7 @@
 
     <!-- Dialog footer -->
     <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar" ng-hide="vm.creatingFolder">
-        <button type="button" class="btn btn-info" ng-click="vm.close()">
+        <button class="btn btn-info" ng-click="vm.close()">
             <localize key="buttons_somethingElse">Do something else</localize>
         </button>
     </div>

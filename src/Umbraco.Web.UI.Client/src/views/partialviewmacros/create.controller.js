@@ -46,13 +46,12 @@
                         activate: true
                     });
 
-                    formHelper.resetForm({ scope: $scope, formCtrl: form });
+                    formHelper.resetForm({ scope: $scope });
 
                     var section = appState.getSectionState("currentSection");
 
                 }, function (err) {
 
-                    formHelper.resetForm({ scope: $scope, formCtrl: form, hasErrors: true });
                     vm.createFolderError = err;
 
                 });

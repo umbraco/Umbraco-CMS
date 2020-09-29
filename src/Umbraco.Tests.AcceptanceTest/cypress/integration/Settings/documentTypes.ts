@@ -10,7 +10,6 @@ context('Document Types', () => {
     const name = "Test document type";
 
     cy.umbracoEnsureDocumentTypeNameNotExists(name);
-    cy.umbracoEnsureTemplateNameNotExists(name);
 
     cy.umbracoSection('settings');
     cy.get('li .umb-tree-root:contains("Settings")').should("be.visible");
@@ -45,7 +44,6 @@ context('Document Types', () => {
 
     //Assert
     cy.umbracoSuccessNotification().should('be.visible');
-    cy.umbracoEnsureTemplateNameNotExists(name);
 
     //Clean up
     cy.umbracoEnsureDocumentTypeNameNotExists(name);

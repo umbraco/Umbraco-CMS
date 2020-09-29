@@ -1,5 +1,5 @@
 angular.module("umbraco.directives")
-    .directive('gridRte', function (tinyMceService, angularHelper, assetsService, $q, $timeout, eventsService, tinyMceAssets) {
+    .directive('gridRte', function (tinyMceService, angularHelper, assetsService, $q, $timeout, eventsService) {
         return {
             scope: {
                 uniqueId: '=',
@@ -22,6 +22,11 @@ angular.module("umbraco.directives")
                 // because now we have to support having 2x (maybe more at some stage) content editors being displayed at once. This is because
                 // we have this mini content editor panel that can be launched with MNTP.
                 scope.textAreaHtmlId = scope.uniqueId + "_" + String.CreateGuid();
+                
+                //queue file loading
+                if (typeof (tinymce) === "undefined") {
+                    promises.push(assetsService.loadJs("lib/tinymce/tinymce.min.js", scope));
+                }
 
                 var editorConfig = scope.configuration ? scope.configuration : null;
                 if (!editorConfig || Utilities.isString(editorConfig)) {
@@ -45,10 +50,6 @@ angular.module("umbraco.directives")
                 //stores a reference to the editor
                 var tinyMceEditor = null;
 
-                //queue file loading
-                tinyMceAssets.forEach(function (tinyJsAsset) {
-                    promises.push(assetsService.loadJs(tinyJsAsset, scope));
-                });
                 promises.push(tinyMceService.getTinyMceEditorConfig({
                     htmlId: scope.textAreaHtmlId,
                     stylesheets: editorConfig.stylesheets,
@@ -86,9 +87,7 @@ angular.module("umbraco.directives")
                         tinyMceService.initializeEditor({
                             editor: editor,
                             model: scope,
-                            // Form is found in the scope of the grid controller above us, not in our isolated scope
-                            // https://github.com/umbraco/Umbraco-CMS/issues/7461
-                            currentForm: angularHelper.getCurrentForm(scope.$parent)
+                            currentForm: angularHelper.getCurrentForm(scope)
                         });
 
                         //custom initialization for this editor within the grid

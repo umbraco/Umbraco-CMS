@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
-using Umbraco.Core.Services;
-using Umbraco.Web.Composing;
 using Umbraco.Web.Features;
 
 namespace Umbraco.Web.Editors
@@ -13,21 +10,7 @@ namespace Umbraco.Web.Editors
         private readonly UmbracoFeatures _features;
         public IEnumerable<ILanguage> Languages { get; }
 
-        [Obsolete("Use the overload that injects IIconService.")]
-        public BackOfficePreviewModel(
-            UmbracoFeatures features,
-            IGlobalSettings globalSettings,
-            IEnumerable<ILanguage> languages)
-            : this(features, globalSettings, languages, Current.IconService)
-        {
-        }
-
-        public BackOfficePreviewModel(
-            UmbracoFeatures features,
-            IGlobalSettings globalSettings,
-            IEnumerable<ILanguage> languages,
-            IIconService iconService)
-            : base(features, globalSettings, iconService)
+        public BackOfficePreviewModel(UmbracoFeatures features, IGlobalSettings globalSettings, IEnumerable<ILanguage> languages) : base(features, globalSettings)
         {
             _features = features;
             Languages = languages;

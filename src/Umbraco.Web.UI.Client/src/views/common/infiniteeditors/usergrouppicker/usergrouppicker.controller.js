@@ -46,9 +46,9 @@
 
         function preSelect(selection) {
 
-            selection.forEach(function (selected) {
-
-                vm.userGroups.forEach(function(userGroup){
+            angular.forEach(selection, function(selected){
+                
+                angular.forEach(vm.userGroups, function(userGroup){
                     if(selected.id === userGroup.id) {
                         userGroup.selected = true;
                     }
@@ -66,7 +66,7 @@
 
             } else {
 
-                $scope.model.selection.forEach(function(selectedUserGroup, index){
+                angular.forEach($scope.model.selection, function(selectedUserGroup, index){
                     if(selectedUserGroup.id === userGroup.id) {
                         userGroup.selected = false;
                         $scope.model.selection.splice(index, 1);

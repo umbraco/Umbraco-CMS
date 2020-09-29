@@ -9,7 +9,6 @@ using Umbraco.Web.Compose;
 
 namespace Umbraco.Tests.PropertyEditors
 {
-
     [TestFixture]
     public class NestedContentPropertyComponentTests
     {

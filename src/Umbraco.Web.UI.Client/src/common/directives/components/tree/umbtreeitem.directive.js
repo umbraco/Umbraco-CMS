@@ -70,7 +70,9 @@ angular.module("umbraco.directives")
                 
                 var css = [];                
                 if (node.cssClasses) {
-                    node.cssClasses.forEach(c => css.push(c));
+                    _.each(node.cssClasses, function(c) {
+                        css.push(c);
+                    });
                 }
                 if (node.selected) {
                     css.push("umb-tree-node-checked");
@@ -190,18 +192,11 @@ angular.module("umbraco.directives")
 
             var evts = [];
 
-            // Listen for section changes
+            //listen for section changes
             evts.push(eventsService.on("appState.sectionState.changed", function(e, args) {
                 if (args.key === "currentSection") {
                     //when the section changes disable all delete animations
                     scope.node.deleteAnimations = false;
-                }
-            }));
-
-            // Update tree icon if changed
-            evts.push(eventsService.on("editors.tree.icon.changed", function (e, args) {          
-                if (args.icon !== scope.node.icon && args.id === scope.node.id) {
-                    scope.node.icon = args.icon;
                 }
             }));
 

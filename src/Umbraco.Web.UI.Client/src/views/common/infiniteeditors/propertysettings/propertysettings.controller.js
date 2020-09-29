@@ -202,7 +202,7 @@
                 var match = false;
 
                 // find and show if a match from the list has been chosen
-                vm.validationTypes.forEach(function (validationType, index) {
+                angular.forEach(vm.validationTypes, function (validationType, index) {
                     if ($scope.model.property.validation.pattern === validationType.pattern) {
                         vm.selectedValidationType = vm.validationTypes[index];
                         vm.showValidationPattern = true;
@@ -212,7 +212,7 @@
 
                 // if there is no match - choose the custom validation option.
                 if (!match) {
-                    vm.validationTypes.forEach(function (validationType) {
+                    angular.forEach(vm.validationTypes, function (validationType) {
                         if (validationType.key === "custom") {
                             vm.selectedValidationType = validationType;
                             vm.showValidationPattern = true;

@@ -1,9 +1,8 @@
 <ng-form name="vm.blockRowForm" val-server-match="{ 'contains' : { 'valServerMatchContent': vm.layout.$block.content.key, 'valServerMatchSettings': vm.layout.$block.settings.key } }">
-    <div class="umb-block-list__block" ng-class="{'--active':vm.layout.$block.active, '--show-validation': vm.layout.$block.showValidation === true}">
+    <div class="umb-block-list__block" ng-class="{'--active':vm.layout.$block.active}">
 
         <umb-block-list-block stylesheet="{{::vm.layout.$block.config.stylesheet}}"
                               class="umb-block-list__block--content"
-                              ng-class="{'blockelement__draggable-element': vm.layout.$block.config.stylesheet}"
                               view="{{vm.layout.$block.view}}"
                               api="vm.blockEditorApi"
                               block="vm.layout.$block"
@@ -20,7 +19,6 @@
                 <span class="sr-only">
                     <localize key="general_settings">Settings</localize>
                 </span>
-                <div class="__error-badge">!</div>
             </button>
             <button type="button" class="btn-reset umb-outline action --copy" localize="title" title="actions_copy"
                     ng-click="vm.blockEditorApi.copyBlock(vm.layout.$block);"

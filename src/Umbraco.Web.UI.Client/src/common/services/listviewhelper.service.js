@@ -419,7 +419,7 @@
             
             if (isSelectedAll(items, selection)) {
                 // unselect all items
-                items.forEach(function (item) {
+                angular.forEach(items, function (item) {
                     item.selected = false;
                 });
                 
@@ -432,7 +432,7 @@
                 selection.length = 0;
                 
                 // select all items
-                items.forEach(function (item) {
+                angular.forEach(items, function (item) {
                     var obj = {
                         id: item.id
                     };

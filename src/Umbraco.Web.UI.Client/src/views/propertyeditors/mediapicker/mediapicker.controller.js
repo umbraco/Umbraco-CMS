@@ -53,20 +53,18 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                         // it's prone to someone "fixing" it at some point without knowing the effects. Rather use toString()
                         // compares and be completely sure it works.
                         var found = medias.find(m => m.udi.toString() === id.toString() || m.id.toString() === id.toString());
-                        
-                        var mediaItem = found ||
-                        {
-                            name: vm.labels.deletedItem,
-                            id: $scope.model.config.idType !== "udi" ? id : null,
-                            udi: $scope.model.config.idType === "udi" ? id : null,
-                            icon: "icon-picture",
-                            thumbnail: null,
-                            trashed: true
-                        };
-
-                        mediaItem.found = found ? true : false;
-
-                        return mediaItem;
+                        if (found) {
+                            return found;
+                        } else {
+                            return {
+                                name: vm.labels.deletedItem,
+                                id: $scope.model.config.idType !== "udi" ? id : null,
+                                udi: $scope.model.config.idType === "udi" ? id : null,
+                                icon: "icon-picture",
+                                thumbnail: null,
+                                trashed: true
+                            };
+                        }
                     });
 
                     medias.forEach(media => {

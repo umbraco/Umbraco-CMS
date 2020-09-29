@@ -18,12 +18,7 @@ namespace Umbraco.Core.Compose
         }
 
         public void Terminate()
-        {
-            ContentService.Moved -= ContentService_Moved;
-            ContentService.Trashed -= ContentService_Trashed;
-            MediaService.Moved -= MediaService_Moved;
-            MediaService.Trashed -= MediaService_Trashed;
-        }
+        { }
 
         private static void ContentService_Moved(IContentService sender, MoveEventArgs<IContent> e)
         {

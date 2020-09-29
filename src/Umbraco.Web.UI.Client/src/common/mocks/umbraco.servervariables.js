@@ -19,8 +19,7 @@ Umbraco.Sys.ServerVariables = {
         "dashboardApiBaseUrl": "/umbraco/UmbracoApi/Dashboard/",
         "updateCheckApiBaseUrl": "/umbraco/Api/UpdateCheck/",
         "relationApiBaseUrl": "/umbraco/UmbracoApi/Relation/",
-        "rteApiBaseUrl": "/umbraco/UmbracoApi/RichTextPreValue/",
-        "iconApiBaseUrl": "/umbraco/UmbracoApi/Icon/"
+        "rteApiBaseUrl": "/umbraco/UmbracoApi/RichTextPreValue/"
     },
     umbracoSettings: {
         "umbracoPath": "/umbraco",

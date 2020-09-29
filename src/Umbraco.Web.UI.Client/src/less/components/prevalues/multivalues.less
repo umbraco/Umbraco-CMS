@@ -6,7 +6,7 @@
         width: 500px;
     }
 
-    p {
+    p{
         margin: 7px 0;
     }
 }
@@ -23,18 +23,21 @@
     align-items: center;
 }
 
-.umb-prevalues-multivalues__add {
+.umb-prevalues-multivalues__add  {
     display: flex;
+}
 
-    input {
-        display: flex;
-        width: 320px;
-    }
+.umb-prevalues-multivalues__add input {
+    width: 320px;
+}
 
-    button {
-        margin: 0 6px 0 0;
-        margin-left: auto;
-    }
+.umb-prevalues-multivalues__add input {
+    display: flex;
+}
+
+.umb-prevalues-multivalues__add button {
+    margin: 0 6px 0 0;
+    margin-left: auto;
 }
 
 .umb-prevalues-multivalues__listitem {
@@ -42,26 +45,20 @@
     padding: 6px;
     margin: 10px 0px !important;
     background: @gray-10;
+    cursor: move;
+}
 
-    &.ui-sortable-handle,
-    .ui-sortable-handle,
-    .handle
-    {
-        cursor: move;
-    }
+.umb-prevalues-multivalues__listitem i {
+    display: flex;
+    align-items: center;
+    margin-right: 5px
+}
 
-    i {
-        display: flex;
-        align-items: center;
-        margin-right: 5px
-    }
+.umb-prevalues-multivalues__listitem a {
+    cursor: pointer;
+    margin-left: auto;
+}
 
-    a {
-        cursor: pointer;
-        margin-left: auto;
-    }
-
-    input {
-        width: 295px;
-    }
+.umb-prevalues-multivalues__listitem input {
+    width: 295px;
 }

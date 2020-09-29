@@ -32,7 +32,9 @@ function memberGroupResource($q, $http, umbRequestHelper) {
         getByIds: function (ids) {
 
             var idQuery = "";
-            ids.forEach(id => idQuery += `ids=${id}&`);
+            _.each(ids, function (item) {
+                idQuery += "ids=" + item + "&";
+            });
 
             return umbRequestHelper.resourcePromise(
                 $http.get(

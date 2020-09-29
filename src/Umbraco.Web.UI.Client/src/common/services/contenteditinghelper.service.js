@@ -117,13 +117,13 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
                         return $q.resolve(data);
 
                     }, function (err) {
-
-                        formHelper.resetForm({ scope: args.scope, hasErrors: true });
-
                         self.handleSaveError({
                             showNotifications: args.showNotifications,
                             softRedirect: args.softRedirect,
-                            err: err
+                            err: err,
+                            rebindCallback: function () {
+                                rebindCallback.apply(self, [args.content, err.data]);
+                            }
                         });
 
                         //update editor state to what is current
@@ -151,7 +151,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
             // first check if tab is already added
             var foundInfoTab = false;
 
-            tabs.forEach(function (tab) {
+            angular.forEach(tabs, function (tab) {
                 if (tab.id === infoTab.id && tab.alias === infoTab.alias) {
                     foundInfoTab = true;
                 }

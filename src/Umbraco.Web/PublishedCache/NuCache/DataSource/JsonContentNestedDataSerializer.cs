@@ -1,18 +1,18 @@
 ﻿using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection.Emit;
+using System.Text;
+using System.Threading.Tasks;
 using Umbraco.Core.Serialization;
 
 namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 {
 
-    public class JsonContentNestedDataSerializer : IContentCacheDataSerializer
+    internal class JsonContentNestedDataSerializer : IContentNestedDataSerializer
     {
-        public ContentCacheDataModel Deserialize(int contentTypeId, string stringData, byte[] byteData)
+        public ContentNestedData Deserialize(int contentTypeId, string data)
         {
-            if (byteData != null)
-                throw new NotSupportedException($"{typeof(JsonContentNestedDataSerializer)} does not support byte[] serialization");
-
             // by default JsonConvert will deserialize our numeric values as Int64
             // which is bad, because they were Int32 in the database - take care
 
@@ -24,19 +24,18 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 DateParseHandling = DateParseHandling.DateTime,
                 DateFormatHandling = DateFormatHandling.IsoDateFormat,
                 DateTimeZoneHandling = DateTimeZoneHandling.Utc,
-                DateFormatString = "o"
+                DateFormatString = "o"                
             };
 
-            return JsonConvert.DeserializeObject<ContentCacheDataModel>(stringData, settings);
+            return JsonConvert.DeserializeObject<ContentNestedData>(data, settings);
         }
 
-        public ContentCacheDataSerializationResult Serialize(int contentTypeId, ContentCacheDataModel model)
+        public string Serialize(int contentTypeId, ContentNestedData nestedData)
         {
             // note that numeric values (which are Int32) are serialized without their
             // type (eg "value":1234) and JsonConvert by default deserializes them as Int64
 
-            var json = JsonConvert.SerializeObject(model);
-            return new ContentCacheDataSerializationResult(json, null);
+            return JsonConvert.SerializeObject(nestedData);
         }
     }
 }

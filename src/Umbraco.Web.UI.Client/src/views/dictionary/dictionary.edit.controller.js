@@ -86,15 +86,13 @@ function DictionaryEditController($scope, $routeParams, $location, dictionaryRes
             dictionaryResource.save(vm.content, vm.nameDirty)
                 .then(function (data) {
 
-                        formHelper.resetForm({ scope: $scope });
+                    formHelper.resetForm({ scope: $scope, notifications: data.notifications });
 
                         bindDictionary(data);
 
                         vm.page.saveButtonState = "success";
                     },
                     function (err) {
-
-                        formHelper.resetForm({ scope: $scope, hasErrors: true });
 
                         contentEditingHelper.handleSaveError({
                             err: err

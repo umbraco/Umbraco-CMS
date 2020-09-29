@@ -196,13 +196,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
                 return "NCHAR";
             }
             else if (dbTypes == SpecialDbTypes.NTEXT)
-            {
                 return "NTEXT";
-            }
-            else if (dbTypes == SpecialDbTypes.NVARCHARMAX)
-            {
-                return "NVARCHAR(MAX)";
-            }
 
             return "NVARCHAR";
         }

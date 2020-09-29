@@ -9,9 +9,9 @@
             hide-icon="true"
             hide-description="true">
         </umb-editor-header>
-
+        
         <umb-editor-container>
-
+            
             <umb-load-indicator
                 ng-if="vm.loading">
             </umb-load-indicator>
@@ -19,7 +19,7 @@
             <umb-box>
                 <umb-box-content>
                     <div class="form-search" style="margin-bottom: 15px;">
-                        <i class="icon-search" aria-hidden="true"></i>
+                        <i class="icon-search"></i>
                         <input type="text"
                             ng-model="vm.usersOptions.filter"
                             ng-change="vm.searchUsers()"
@@ -31,10 +31,10 @@
                             no-dirty-check />
                     </div>
                     <div class="umb-user-picker-item-list">
-                        <button type="button" class="btn-reset umb-user-picker-list-item" ng-repeat="user in vm.users" ng-click="vm.selectUser(user)">
+                        <a href="" class="umb-user-picker-list-item" ng-repeat="user in vm.users" ng-click="vm.selectUser(user)">
                             <div class="umb-user-picker-list-item__avatar">
                                 <umb-checkmark
-                                    class="umb-user-picker-list-item__checkmark"
+                                    class="umb-user-picker-list-item__checkmark" 
                                     ng-if="user.selected"
                                     checked="user.selected">
                                 </umb-checkmark>
@@ -52,9 +52,9 @@
                                     <span ng-repeat="userGroup in user.userGroups">{{ userGroup.name }}<span ng-if="!$last">, </span></span>
                                 </div>
                             </div>
-                        </button>
+                        </a>
                     </div>
-
+            
                     <div class="flex justify-center">
                         <umb-pagination
                             ng-if="vm.usersOptions.totalPages"
@@ -78,9 +78,7 @@
                     action="vm.close()">
                 </umb-button>
                 <umb-button
-                    ng-if="vm.multiPicker"
                     type="button"
-                    disabled="model.selection.length === 0"
                     button-style="success"
                     label-key="general_submit"
                     action="vm.submit(model)">

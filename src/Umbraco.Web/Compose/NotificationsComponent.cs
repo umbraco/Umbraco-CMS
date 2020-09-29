@@ -32,78 +32,42 @@ namespace Umbraco.Web.Compose
         public void Initialize()
         {
             //Send notifications for the send to publish action
-            ContentService.SentToPublish += ContentService_SentToPublish;
-            //Send notifications for the published action
-            ContentService.Published += ContentService_Published;
-            //Send notifications for the saved action
-            ContentService.Sorted += ContentService_Sorted;
-            //Send notifications for the update and created actions
-            ContentService.Saved += ContentService_Saved;
-            //Send notifications for the unpublish action
-            ContentService.Unpublished += ContentService_Unpublished;
-            //Send notifications for the move/move to recycle bin and restore actions
-            ContentService.Moved += ContentService_Moved;
-            //Send notifications for the delete action when content is moved to the recycle bin
-            ContentService.Trashed += ContentService_Trashed;
-            //Send notifications for the copy action
-            ContentService.Copied += ContentService_Copied;
-            //Send notifications for the rollback action
-            ContentService.RolledBack += ContentService_RolledBack;
-            //Send notifications for the public access changed action
-            PublicAccessService.Saved += PublicAccessService_Saved;
+            ContentService.SentToPublish += (sender, args) => _notifier.Notify(_actions.GetAction<ActionToPublish>(), args.Entity);
 
-            UserService.UserGroupPermissionsAssigned += UserService_UserGroupPermissionsAssigned;
+            //Send notifications for the published action
+            ContentService.Published += (sender, args) => _notifier.Notify(_actions.GetAction<ActionPublish>(), args.PublishedEntities.ToArray());
+
+            //Send notifications for the saved action
+            ContentService.Sorted += (sender, args) => ContentServiceSorted(_notifier, sender, args, _actions);
+
+            //Send notifications for the update and created actions
+            ContentService.Saved += (sender, args) => ContentServiceSaved(_notifier, sender, args, _actions);
+
+            //Send notifications for the unpublish action
+            ContentService.Unpublished += (sender, args) => _notifier.Notify(_actions.GetAction<ActionUnpublish>(), args.PublishedEntities.ToArray());
+
+            //Send notifications for the move/move to recycle bin and restore actions
+            ContentService.Moved += (sender, args) => ContentServiceMoved(_notifier, sender, args, _actions);
+
+            //Send notifications for the delete action when content is moved to the recycle bin
+            ContentService.Trashed += (sender, args) => _notifier.Notify(_actions.GetAction<ActionDelete>(), args.MoveInfoCollection.Select(m => m.Entity).ToArray());
+            
+            //Send notifications for the copy action
+            ContentService.Copied += (sender, args) => _notifier.Notify(_actions.GetAction<ActionCopy>(), args.Original);
+			
+            //Send notifications for the rollback action
+            ContentService.RolledBack += (sender, args) => _notifier.Notify(_actions.GetAction<ActionRollback>(), args.Entity);	
+			
+            //Send notifications for the public access changed action
+            PublicAccessService.Saved += (sender, args) => PublicAccessServiceSaved(_notifier, sender, args, _contentService, _actions);
+			
+            UserService.UserGroupPermissionsAssigned += (sender, args) => UserServiceUserGroupPermissionsAssigned(_notifier, sender, args, _contentService, _actions);
         }
 
         public void Terminate()
-        {
-            ContentService.SentToPublish -= ContentService_SentToPublish;
-            ContentService.Published -= ContentService_Published;
-            ContentService.Sorted -= ContentService_Sorted;
-            ContentService.Saved -= ContentService_Saved;
-            ContentService.Unpublished -= ContentService_Unpublished;
-            ContentService.Moved -= ContentService_Moved;
-            ContentService.Trashed -= ContentService_Trashed;
-            ContentService.Copied -= ContentService_Copied;
-            ContentService.RolledBack -= ContentService_RolledBack;
-            PublicAccessService.Saved -= PublicAccessService_Saved;
-            UserService.UserGroupPermissionsAssigned -= UserService_UserGroupPermissionsAssigned;
-        }
+        { }
 
-        private void UserService_UserGroupPermissionsAssigned(IUserService sender, Core.Events.SaveEventArgs<EntityPermission> args)
-            => UserServiceUserGroupPermissionsAssigned(args, _contentService);
-
-        private void PublicAccessService_Saved(IPublicAccessService sender, Core.Events.SaveEventArgs<PublicAccessEntry> args)
-            => PublicAccessServiceSaved(args, _contentService);
-
-        private void ContentService_RolledBack(IContentService sender, Core.Events.RollbackEventArgs<IContent> args)
-            => _notifier.Notify(_actions.GetAction<ActionRollback>(), args.Entity);
-
-        private void ContentService_Copied(IContentService sender, Core.Events.CopyEventArgs<IContent> args)
-            => _notifier.Notify(_actions.GetAction<ActionCopy>(), args.Original);
-
-        private void ContentService_Trashed(IContentService sender, Core.Events.MoveEventArgs<IContent> args)
-            => _notifier.Notify(_actions.GetAction<ActionDelete>(), args.MoveInfoCollection.Select(m => m.Entity).ToArray());
-
-        private void ContentService_Moved(IContentService sender, Core.Events.MoveEventArgs<IContent> args)
-            => ContentServiceMoved(args);
-
-        private void ContentService_Unpublished(IContentService sender, Core.Events.PublishEventArgs<IContent> args)
-            => _notifier.Notify(_actions.GetAction<ActionUnpublish>(), args.PublishedEntities.ToArray());
-
-        private void ContentService_Saved(IContentService sender, Core.Events.ContentSavedEventArgs args)
-            => ContentServiceSaved(args);
-
-        private void ContentService_Sorted(IContentService sender, Core.Events.SaveEventArgs<IContent> args)
-            => ContentServiceSorted(sender, args);
-
-        private void ContentService_Published(IContentService sender, Core.Events.ContentPublishedEventArgs args)
-            => _notifier.Notify(_actions.GetAction<ActionPublish>(), args.PublishedEntities.ToArray());
-
-        private void ContentService_SentToPublish(IContentService sender, Core.Events.SendToPublishEventArgs<IContent> args)
-            => _notifier.Notify(_actions.GetAction<ActionToPublish>(), args.Entity);
-
-        private void ContentServiceSorted(IContentService sender, Core.Events.SaveEventArgs<IContent> args)
+        private void ContentServiceSorted(Notifier notifier, IContentService sender, Core.Events.SaveEventArgs<IContent> args, ActionCollection actions)
         {
             var parentId = args.SavedEntities.Select(x => x.ParentId).Distinct().ToList();
             if (parentId.Count != 1) return; // this shouldn't happen, for sorting all entities will have the same parent id
@@ -115,10 +79,10 @@ namespace Umbraco.Web.Compose
             var parent = sender.GetById(parentId[0]);
             if (parent == null) return; // this shouldn't happen
 
-            _notifier.Notify(_actions.GetAction<ActionSort>(), new[] { parent });
+            notifier.Notify(actions.GetAction<ActionSort>(), new[] { parent });
         }
 
-        private void ContentServiceSaved(Core.Events.SaveEventArgs<IContent> args)
+        private void ContentServiceSaved(Notifier notifier, IContentService sender, Core.Events.SaveEventArgs<IContent> args, ActionCollection actions)
         {
             var newEntities = new List<IContent>();
             var updatedEntities = new List<IContent>();
@@ -138,21 +102,21 @@ namespace Umbraco.Web.Compose
                     updatedEntities.Add(entity);
                 }
             }
-            _notifier.Notify(_actions.GetAction<ActionNew>(), newEntities.ToArray());
-            _notifier.Notify(_actions.GetAction<ActionUpdate>(), updatedEntities.ToArray());
+            notifier.Notify(actions.GetAction<ActionNew>(), newEntities.ToArray());
+            notifier.Notify(actions.GetAction<ActionUpdate>(), updatedEntities.ToArray());
         }
 
-        private void UserServiceUserGroupPermissionsAssigned(Core.Events.SaveEventArgs<EntityPermission> args, IContentService contentService)
+        private void UserServiceUserGroupPermissionsAssigned(Notifier notifier, IUserService sender, Core.Events.SaveEventArgs<EntityPermission> args, IContentService contentService, ActionCollection actions)
         {
             var entities = contentService.GetByIds(args.SavedEntities.Select(e => e.EntityId)).ToArray();
-            if (entities.Any() == false)
+            if(entities.Any() == false)
             {
                 return;
             }
-            _notifier.Notify(_actions.GetAction<ActionRights>(), entities);
+            notifier.Notify(actions.GetAction<ActionRights>(), entities);
         }
-
-        private void ContentServiceMoved(Core.Events.MoveEventArgs<IContent> args)
+                
+        private void ContentServiceMoved(Notifier notifier, IContentService sender, Core.Events.MoveEventArgs<IContent> args, ActionCollection actions)
         {
             // notify about the move for all moved items
             _notifier.Notify(_actions.GetAction<ActionMove>(), args.MoveInfoCollection.Select(m => m.Entity).ToArray());
@@ -162,22 +126,22 @@ namespace Umbraco.Web.Compose
                 .Where(m => m.OriginalPath.Contains(Constants.System.RecycleBinContentString))
                 .Select(m => m.Entity)
                 .ToArray();
-            if (restoredEntities.Any())
+            if(restoredEntities.Any())
             {
                 _notifier.Notify(_actions.GetAction<ActionRestore>(), restoredEntities);
             }
         }
 
-        private void PublicAccessServiceSaved(Core.Events.SaveEventArgs<PublicAccessEntry> args, IContentService contentService)
+        private void PublicAccessServiceSaved(Notifier notifier, IPublicAccessService sender, Core.Events.SaveEventArgs<PublicAccessEntry> args, IContentService contentService, ActionCollection actions)
         {
             var entities = contentService.GetByIds(args.SavedEntities.Select(e => e.ProtectedNodeId)).ToArray();
-            if (entities.Any() == false)
+            if(entities.Any() == false)
             {
                 return;
             }
-            _notifier.Notify(_actions.GetAction<ActionProtect>(), entities);
+            notifier.Notify(actions.GetAction<ActionProtect>(), entities);
         }
-
+		
         /// <summary>
         /// This class is used to send the notifications
         /// </summary>

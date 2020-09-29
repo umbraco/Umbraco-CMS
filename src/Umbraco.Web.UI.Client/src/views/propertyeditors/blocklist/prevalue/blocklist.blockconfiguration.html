@@ -11,7 +11,7 @@
 
         <umb-block-card
             block-config-model="block"
-            element-type-model="vm.getElementTypeByKey(block.contentElementTypeKey)"
+            element-type-model="vm.getElementTypeByKey(block.contentTypeKey)"
             ng-repeat="block in model.value"
             ng-class="{'--isOpen':vm.openBlock === block}"
             ng-click="vm.openBlockOverlay(block)">

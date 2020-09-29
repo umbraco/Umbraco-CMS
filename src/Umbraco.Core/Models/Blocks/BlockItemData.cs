@@ -49,14 +49,8 @@ namespace Umbraco.Core.Models.Blocks
         /// </summary>
         public class BlockPropertyValue
         {
-            public BlockPropertyValue(object value, PropertyType propertyType)
-            {
-                Value = value;
-                PropertyType = propertyType ?? throw new ArgumentNullException(nameof(propertyType));
-            }
-
-            public object Value { get; }
-            public PropertyType PropertyType { get; }
+            public object Value { get; set; }
+            public PropertyType PropertyType { get; set; }
         }
     }
 }

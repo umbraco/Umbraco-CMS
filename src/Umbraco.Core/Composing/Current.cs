@@ -30,7 +30,6 @@ namespace Umbraco.Core.Composing
     public static class Current
     {
         private static IFactory _factory;
-        private static IRuntimeState _state;
 
         // TODO: get rid of these oddities
         // we don't want Umbraco tests to die because the container has not been properly initialized,
@@ -126,17 +125,7 @@ namespace Umbraco.Core.Composing
                ?? new ProfilingLogger(Logger, Profiler);
 
         public static IRuntimeState RuntimeState
-        {
-            get
-            {
-                return _state ?? Factory.GetInstance<IRuntimeState>();
-            }
-            internal set
-            {
-                // this is only used when the boot entirely fails, we need to manually set this so we can report
-                _state = value;
-            }
-        }
+            => Factory.GetInstance<IRuntimeState>();
 
         public static TypeLoader TypeLoader
             => Factory.GetInstance<TypeLoader>();

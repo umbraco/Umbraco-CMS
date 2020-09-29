@@ -58,47 +58,57 @@
         function onInit() {
             vm.variants = $scope.model.variants;
             vm.availableVariants = vm.variants.filter(saveableVariantFilter);
-            vm.isNew = vm.variants.some(variant => variant.state === 'NotCreated');
 
-            if (!$scope.model.title) {
-                localizationService.localize("content_readyToSave").then(value => {
+            if(!$scope.model.title) {
+                localizationService.localize("content_readyToSave").then(function(value){
                     $scope.model.title = value;
                 });
             }
 
-            vm.variants.forEach(variant => {
+            _.each(vm.variants,
+                function (variant) {
 
-                //reset state:
-                variant.save = variant.publish = false;
-                variant.isMandatory = isMandatoryFilter(variant);
+                    //reset state:
+                    variant.save = false;
+                    variant.publish = false;
 
-                if(vm.isNew && hasAnyData(variant)){
-                    variant.save = true;
-                }
-            });
+                    variant.isMandatory = isMandatoryFilter(variant);
+
+                    if(variant.state !== "NotCreated"){
+                        vm.isNew = false;
+                    }
+                });
+
+            _.each(vm.variants,
+                function (variant) {
+                    if(vm.isNew && hasAnyData(variant)){
+                        variant.save = true;
+                    }
+                });
 
             if (vm.variants.length !== 0) {
-                        
-                //ensure that the current one is selected
-                var active = vm.variants.find(v => v.active);
-                if (active) {
-                    active.save = true;
-                }
 
-                vm.availableVariants.sort((a, b) => {
+                _.find(vm.variants, function (v) {
+                    if(v.active) {
+                        //ensure that the current one is selected
+                        v.save = true;
+                    }
+                });
+
+                vm.availableVariants.sort(function (a, b) {
                     if (a.language && b.language) {
-                        if (a.language.name < b.language.name) {
+                        if (a.language.name > b.language.name) {
                             return -1;
                         }
-                        if (a.language.name > b.language.name) {
+                        if (a.language.name < b.language.name) {
                             return 1;
                         }
                     }
                     if (a.segment && b.segment) {
-                        if (a.segment < b.segment) {
+                        if (a.segment > b.segment) {
                             return -1;
                         }
-                        if (a.segment > b.segment) {
+                        if (a.segment < b.segment) {
                             return 1;
                         }
                     }
@@ -116,10 +126,10 @@
         onInit();
 
         //when this dialog is closed, reset all 'save' flags
-        $scope.$on('$destroy', () => {
-            vm.variants.forEach(variant => {
-                variant.save = false;
-            });
+        $scope.$on('$destroy', function () {
+            for (var i = 0; i < vm.variants.length; i++) {
+                vm.variants[i].save = false;
+            }
         });
 
     }

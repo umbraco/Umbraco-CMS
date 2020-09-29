@@ -12,8 +12,8 @@
                 // boardcast the formSubmitting event to trigger syncronization or none-live property-editors
                 $scope.$broadcast("formSubmitting", { scope: $scope });
                 // Some property editors need to performe an action after all property editors have reacted to the formSubmitting.
-                $scope.$broadcast("formSubmittingFinalPhase", { scope: $scope });
-
+                $scope.$broadcast("postFormSubmitting", { scope: $scope });
+                
                 block.active = false;
             } else {
                 $scope.api.activateBlock(block);

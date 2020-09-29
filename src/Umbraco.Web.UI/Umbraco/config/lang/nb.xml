@@ -330,7 +330,6 @@
     <key alias="continue">Fortsett</key>
     <key alias="copy">Kopier</key>
     <key alias="create">Opprett</key>
-    <key alias="cropSection">Utsnitt</key>
     <key alias="database">Database</key>
     <key alias="date">Dato</key>
     <key alias="default">Standard</key>

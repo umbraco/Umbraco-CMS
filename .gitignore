@@ -167,7 +167,6 @@ build/temp/
 # eof
 /src/Umbraco.Web.UI.Client/TESTS-*.xml
 /src/ApiDocs/api/*
-/src/Umbraco.Web.UI.Client/package-lock.json
 
 # Acceptance tests
 cypress.env.json

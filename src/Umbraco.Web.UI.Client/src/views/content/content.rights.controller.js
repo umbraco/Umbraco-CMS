@@ -39,7 +39,7 @@
           //reset this
           vm.selectedUserGroups = [];
           vm.availableUserGroups = userGroups;
-          vm.availableUserGroups.forEach(function (group) {
+          angular.forEach(vm.availableUserGroups, function (group) {
             if (group.permissions) {
               //if there's explicit permissions assigned than it's selected
               assignGroupPermissions(group);
@@ -70,8 +70,8 @@
           group.allowedPermissions = [];
 
           // get list of checked permissions
-          Object.values(group.permissions).forEach(function (permissionGroup) {
-            permissionGroup.forEach(function (permission) {
+          angular.forEach(group.permissions, function (permissionGroup) {
+            angular.forEach(permissionGroup, function (permission) {
               if (permission.checked) {
                 //the `allowedPermissions` is what will get sent up to the server for saving
                 group.allowedPermissions.push(permission);
@@ -117,9 +117,9 @@
         }
 
         function formatSaveModel(permissionsSave, groupCollection) {
-          groupCollection.forEach(function (g) {
+          angular.forEach(groupCollection, function (g) {
             permissionsSave[g.id] = [];
-            g.allowedPermissions.forEach(function (p) {
+            angular.forEach(g.allowedPermissions, function (p) {
               permissionsSave[g.id].push(p.permissionCode);
             });
           });

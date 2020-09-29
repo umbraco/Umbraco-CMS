@@ -30,12 +30,11 @@ function MediaTypesCreateController($scope, $location, navigationService, mediaT
                 var currPath = node.path ? node.path : "-1";
                 navigationService.syncTree({ tree: "mediatypes", path: currPath + "," + folderId, forceReload: true, activate: true });
 
-                formHelper.resetForm({ scope: $scope, formCtrl: this.createFolderForm });
+                formHelper.resetForm({ scope: $scope });
 
                 var section = appState.getSectionState("currentSection");
 
-            }, function (err) {
-                formHelper.resetForm({ scope: $scope, formCtrl: this.createFolderForm, hasErrors: true });
+            }, function(err) {
                 $scope.error = err;
             });
         };

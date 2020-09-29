@@ -102,7 +102,7 @@ function RelationTypeEditController($scope, $routeParams, relationTypeResource, 
     function formatDates(relations) {
         if (relations) {
             userService.getCurrentUser().then(function (currentUser) {
-                relations.forEach(function (relation) {
+                angular.forEach(relations, function (relation) {
                     relation.timestampFormatted = dateHelper.getLocalDate(relation.createDate, currentUser.locale, 'LLL');
                 });
             });
@@ -116,13 +116,12 @@ function RelationTypeEditController($scope, $routeParams, relationTypeResource, 
             vm.page.saveButtonState = "busy";
 
             relationTypeResource.save(vm.relationType).then(function (data) {
-                formHelper.resetForm({ scope: $scope });
+                formHelper.resetForm({ scope: $scope, notifications: data.notifications });
                 bindRelationType(data);
 
                 vm.page.saveButtonState = "success";
 
             }, function (error) {
-                formHelper.resetForm({ scope: $scope, hasErrors: true });
                 contentEditingHelper.handleSaveError({
                     err: error
                 });

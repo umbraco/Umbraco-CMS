@@ -4,16 +4,17 @@
  *
  * @description
  * <b>Added in Umbraco 8.7</b>. Model Object for dealing with data of Block Editors.
- *
+ * 
  * Block Editor Model Object provides the basic features for editing data of a block editor.<br/>
  * Use the Block Editor Service to instantiate the Model Object.<br/>
  * See {@link umbraco.services.blockEditorService blockEditorService}
- *
+ * 
  */
 (function () {
     'use strict';
 
-    function blockEditorModelObjectFactory($interpolate, $q, udiService, contentResource, localizationService, umbRequestHelper, clipboardService) {
+
+    function blockEditorModelObjectFactory($interpolate, $q, udiService, contentResource, localizationService) {
 
         /**
          * Simple mapping from property model content entry to editing model,
@@ -230,13 +231,12 @@
         var notSupportedProperties = [
             "Umbraco.Tags",
             "Umbraco.UploadField",
-            "Umbraco.ImageCropper",
-            "Umbraco.NestedContent"
+            "Umbraco.ImageCropper"
         ];
 
 
         /**
-         * Formats the content apps and ensures unsupported property's have the notsupported view
+         * Formats the content apps and ensures unsupported property's have the notsupported view (returns a promise)
          * @param {any} scaffold
          */
         function formatScaffoldData(scaffold) {
@@ -255,7 +255,7 @@
             // could be empty in tests
             if (!scaffold.apps) {
                 console.warn("No content apps found in scaffold");
-                return scaffold;
+                return $q.resolve(scaffold);
             }
 
             // replace view of content app
@@ -271,27 +271,22 @@
                 scaffold.apps.splice(infoAppIndex, 1);
             }
 
-            return scaffold;
-        }
-
-        /**
-         * Creates a settings content app, we only want to do this if settings is present on the specific block.
-         * @param {any} contentModel
-         */
-        function appendSettingsContentApp(contentModel, settingsName) {
-            if (!contentModel.apps) {
-                return
-            }
-
             // add the settings app
-            var settingsTab = {
-                "name": settingsName,
-                "alias": "settings",
-                "icon": "icon-settings",
-                "view": "views/common/infiniteeditors/blockeditor/blockeditor.settings.html",
-                "hasError": false
-            };
-            contentModel.apps.push(settingsTab);
+            return localizationService.localize("blockEditor_tabBlockSettings").then(
+                function (settingsName) {
+
+                    var settingsTab = {
+                        "name": settingsName,
+                        "alias": "settings",
+                        "icon": "icon-settings",
+                        "view": "views/common/infiniteeditors/blockeditor/blockeditor.settings.html",
+                        "hasError": false
+                    };
+                    scaffold.apps.push(settingsTab);
+
+                    return scaffold;
+                }
+            );
         }
 
         /**
@@ -314,8 +309,6 @@
 
             this.__watchers = [];
 
-            this.__labels = {};
-
             // ensure basic part of data-structure is in place:
             this.value = propertyModelValue;
             this.value.layout = this.value.layout || {};
@@ -325,25 +318,13 @@
             this.propertyEditorAlias = propertyEditorAlias;
             this.blockConfigurations = blockConfigurations;
 
-            this.blockConfigurations.forEach(blockConfiguration => {
-                if (blockConfiguration.view != null && blockConfiguration.view !== "") {
-                    blockConfiguration.view = umbRequestHelper.convertVirtualToAbsolutePath(blockConfiguration.view);
-                }
-                if (blockConfiguration.stylesheet != null && blockConfiguration.stylesheet !== "") {
-                    blockConfiguration.stylesheet = umbRequestHelper.convertVirtualToAbsolutePath(blockConfiguration.stylesheet);
-                }
-                if (blockConfiguration.thumbnail != null && blockConfiguration.thumbnail !== "") {
-                    blockConfiguration.thumbnail = umbRequestHelper.convertVirtualToAbsolutePath(blockConfiguration.thumbnail);
-                }
-            });
-
             this.scaffolds = [];
 
             this.isolatedScope = scopeOfExistance.$new(true);
             this.isolatedScope.blockObjects = {};
 
             this.__watchers.push(this.isolatedScope.$on("$destroy", this.destroy.bind(this)));
-            this.__watchers.push(propertyEditorScope.$on("formSubmittingFinalPhase", this.sync.bind(this)));
+            this.__watchers.push(propertyEditorScope.$on("postFormSubmitting", this.sync.bind(this)));
 
         };
 
@@ -363,25 +344,24 @@
                 // update our values
                 this.value = propertyModelValue;
                 this.value.layout = this.value.layout || {};
-                this.value.contentData = this.value.contentData || [];
-                this.value.settingsData = this.value.settingsData || [];
+                this.value.data = this.value.data || [];
 
                 // re-create the watchers
                 this.__watchers = [];
                 this.__watchers.push(this.isolatedScope.$on("$destroy", this.destroy.bind(this)));
-                this.__watchers.push(propertyEditorScope.$on("formSubmittingFinalPhase", this.sync.bind(this)));
+                this.__watchers.push(propertyEditorScope.$on("postFormSubmitting", this.sync.bind(this)));
             },
 
             /**
              * @ngdoc method
              * @name getBlockConfiguration
              * @methodOf umbraco.services.blockEditorModelObject
-             * @description Get block configuration object for a given contentElementTypeKey.
-             * @param {string} key contentElementTypeKey to recive the configuration model for.
-             * @returns {Object | null} Configuration model for the that specific block. Or ´null´ if the contentElementTypeKey isnt available in the current block configurations.
+             * @description Get block configuration object for a given contentTypeKey.
+             * @param {string} key contentTypeKey to recive the configuration model for.
+             * @returns {Object | null} Configuration model for the that specific block. Or ´null´ if the contentTypeKey isnt available in the current block configurations.
              */
             getBlockConfiguration: function (key) {
-                return this.blockConfigurations.find(bc => bc.contentElementTypeKey === key) || null;
+                return this.blockConfigurations.find(bc => bc.contentTypeKey === key) || null;
             },
 
             /**
@@ -393,24 +373,12 @@
              * @returns {Promise} A Promise object which resolves when all scaffold models are loaded.
              */
             load: function () {
-
-                var self = this;
-
                 var tasks = [];
-
-                tasks.push(localizationService.localize("blockEditor_tabBlockSettings").then(
-                    function (settingsName) {
-                        // self.__labels might not exists anymore, this happens if this instance has been destroyed before the load is complete.
-                        if(self.__labels) {
-                            self.__labels.settingsName = settingsName;
-                        }
-                    }
-                ));
 
                 var scaffoldKeys = [];
 
                 this.blockConfigurations.forEach(blockConfiguration => {
-                    scaffoldKeys.push(blockConfiguration.contentElementTypeKey);
+                    scaffoldKeys.push(blockConfiguration.contentTypeKey);
                     if (blockConfiguration.settingsElementTypeKey != null) {
                         scaffoldKeys.push(blockConfiguration.settingsElementTypeKey);
                     }
@@ -419,11 +387,19 @@
                 // removing duplicates.
                 scaffoldKeys = scaffoldKeys.filter((value, index, self) => self.indexOf(value) === index);
 
+                var self = this;
+
                 scaffoldKeys.forEach(contentTypeKey => {
                     tasks.push(contentResource.getScaffoldByKey(-20, contentTypeKey).then(scaffold => {
                         // self.scaffolds might not exists anymore, this happens if this instance has been destroyed before the load is complete.
                         if (self.scaffolds) {
-                            self.scaffolds.push(formatScaffoldData(scaffold));
+                            return formatScaffoldData(scaffold).then(s => {
+                                self.scaffolds.push(s);
+                                return s;
+                            });
+                        }
+                        else {
+                            return $q.resolve(scaffold);
                         }
                     }));
                 });
@@ -439,7 +415,7 @@
              * @return {Array} array of strings representing alias.
              */
             getAvailableAliasesForBlockContent: function () {
-                return this.blockConfigurations.map(blockConfiguration => this.getScaffoldFromKey(blockConfiguration.contentElementTypeKey).contentTypeAlias);
+                return this.blockConfigurations.map(blockConfiguration => this.getScaffoldFromKey(blockConfiguration.contentTypeKey).contentTypeAlias);
             },
 
             /**
@@ -455,7 +431,7 @@
                 var blocks = [];
 
                 this.blockConfigurations.forEach(blockConfiguration => {
-                    var scaffold = this.getScaffoldFromKey(blockConfiguration.contentElementTypeKey);
+                    var scaffold = this.getScaffoldFromKey(blockConfiguration.contentTypeKey);
                     if (scaffold) {
                         blocks.push({
                             blockConfigModel: blockConfiguration,
@@ -524,29 +500,32 @@
                 }
 
                 var blockConfiguration = this.getBlockConfiguration(dataModel.contentTypeKey);
-                var contentScaffold = null;
+                var contentScaffold;
 
                 if (blockConfiguration === null) {
-                    console.warn("The block of " + contentUdi + " is not being initialized because its contentTypeKey('" + dataModel.contentTypeKey + "') is not allowed for this PropertyEditor");
-                } else {
-                    contentScaffold = this.getScaffoldFromKey(blockConfiguration.contentElementTypeKey);
+                    console.error("The block entry of " + contentUdi + " is not being initialized because its contentTypeKey is not allowed for this PropertyEditor");
+                }
+                else {
+                    contentScaffold = this.getScaffoldFromKey(blockConfiguration.contentTypeKey);
                     if (contentScaffold === null) {
-                        console.error("The block of " + contentUdi + " is not begin initialized cause its Element Type was not loaded.");
+                        console.error("The block entry of " + contentUdi + " is not begin initialized cause its Element Type was not loaded.");
                     }
                 }
 
                 if (blockConfiguration === null || contentScaffold === null) {
 
                     blockConfiguration = {
-                        label: "Unsupported",
+                        label: "Unsupported Block",
                         unsupported: true
                     };
+                    contentScaffold = {};
+
                 }
 
                 var blockObject = {};
                 // Set an angularJS cloneNode method, to avoid this object begin cloned.
                 blockObject.cloneNode = function () {
-                    return null;// angularJS accept this as a cloned value as long as the
+                    return null;// angularJS accept this as a cloned value as long as the 
                 }
                 blockObject.key = String.CreateGuid().replace(/-/g, "");
                 blockObject.config = Utilities.copy(blockConfiguration);
@@ -565,14 +544,10 @@
                     , 10);
 
                 // make basics from scaffold
-                if(contentScaffold !== null) {// We might not have contentScaffold
-                    blockObject.content = Utilities.copy(contentScaffold);
-                    ensureUdiAndKey(blockObject.content, contentUdi);
+                blockObject.content = Utilities.copy(contentScaffold);
+                ensureUdiAndKey(blockObject.content, contentUdi);
 
-                    mapToElementModel(blockObject.content, dataModel);
-                } else {
-                    blockObject.content = null;
-                }
+                mapToElementModel(blockObject.content, dataModel);
 
                 blockObject.data = dataModel;
                 blockObject.layout = layoutEntry;
@@ -602,9 +577,6 @@
                         ensureUdiAndKey(blockObject.settings, settingsUdi);
 
                         mapToElementModel(blockObject.settings, settingsData);
-
-                        // add settings content-app
-                        appendSettingsContentApp(blockObject.content, this.__labels.settingsName);
                     }
                 }
 
@@ -615,7 +587,8 @@
                     if (this.config.settingsElementTypeKey !== null) {
                         mapElementValues(settings, this.settings);
                     }
-                };
+                }
+
 
                 blockObject.sync = function () {
                     if (this.content !== null) {
@@ -624,7 +597,7 @@
                     if (this.config.settingsElementTypeKey !== null) {
                         mapToPropertyModel(this.settings, this.settingsData);
                     }
-                };
+                }
 
                 // first time instant update of label.
                 blockObject.label = getBlockLabel(blockObject);
@@ -650,7 +623,7 @@
 
                     // remove model from isolatedScope.
                     delete this.__scope.blockObjects["_" + this.key];
-                    // NOTE: It seems like we should call this.__scope.$destroy(); since that is the only way to remove a scope from it's parent,
+                    // NOTE: It seems like we should call this.__scope.$destroy(); since that is the only way to remove a scope from it's parent, 
                     // however that is not the case since __scope is actually this.isolatedScope which gets cleaned up when the outer scope is
                     // destroyed. If we do that here it breaks the scope chain and validation.
                     delete this.__scope;
@@ -663,6 +636,7 @@
                 }
 
                 return blockObject;
+
             },
 
             /**
@@ -674,8 +648,11 @@
              * @param {Object} blockObject The BlockObject to be removed and destroyed.
              */
             removeDataAndDestroyModel: function (blockObject) {
-                var udi = blockObject.layout.contentUdi;
-                var settingsUdi = blockObject.layout.settingsUdi || null;
+                var udi = blockObject.content.udi;
+                var settingsUdi = null;
+                if (blockObject.settings) {
+                    settingsUdi = blockObject.settings.udi;
+                }
                 this.destroyBlockObject(blockObject);
                 this.removeDataByUdi(udi);
                 if (settingsUdi) {
@@ -714,18 +691,18 @@
              * @name create
              * @methodOf umbraco.services.blockEditorModelObject
              * @description Create a empty layout entry, notice the layout entry is not added to the property editors model layout object, since the layout sturcture depends on the property editor.
-             * @param {string} contentElementTypeKey the contentElementTypeKey of the block you wish to create, if contentElementTypeKey is not avaiable in the block configuration then ´null´ will be returned.
-             * @return {Object | null} Layout entry object, to be inserted at a decired location in the layout object. Or null if contentElementTypeKey is unavaiaible.
+             * @param {string} contentTypeKey the contentTypeKey of the block you wish to create, if contentTypeKey is not avaiable in the block configuration then ´null´ will be returned.
+             * @return {Object | null} Layout entry object, to be inserted at a decired location in the layout object. Or null if contentTypeKey is unavaiaible.
              */
-            create: function (contentElementTypeKey) {
+            create: function (contentTypeKey) {
 
-                var blockConfiguration = this.getBlockConfiguration(contentElementTypeKey);
+                var blockConfiguration = this.getBlockConfiguration(contentTypeKey);
                 if (blockConfiguration === null) {
                     return null;
                 }
 
                 var entry = {
-                    contentUdi: createDataEntry(contentElementTypeKey, this.value.contentData)
+                    contentUdi: createDataEntry(contentTypeKey, this.value.contentData)
                 }
 
                 if (blockConfiguration.settingsElementTypeKey != null) {
@@ -744,16 +721,16 @@
              */
             createFromElementType: function (elementTypeDataModel) {
 
-                elementTypeDataModel = clipboardService.parseContentForPaste(elementTypeDataModel, clipboardService.TYPES.ELEMENT_TYPE);
+                elementTypeDataModel = Utilities.copy(elementTypeDataModel);
 
-                var contentElementTypeKey = elementTypeDataModel.contentTypeKey;
+                var contentTypeKey = elementTypeDataModel.contentTypeKey;
 
-                var layoutEntry = this.create(contentElementTypeKey);
+                var layoutEntry = this.create(contentTypeKey);
                 if (layoutEntry === null) {
                     return null;
                 }
 
-                var dataModel = getDataByUdi(layoutEntry.contentUdi, this.value.contentData);
+                var dataModel = getDataByUdi(layoutEntry.udi, this.value.contentData);
                 if (dataModel === null) {
                     return null;
                 }

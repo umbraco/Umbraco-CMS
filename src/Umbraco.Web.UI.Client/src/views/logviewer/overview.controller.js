@@ -13,32 +13,16 @@
         vm.commonLogMessagesCount = 10;
         vm.dateRangeLabel = "";
 
-        vm.config = {
-            enableTime: false,
-            dateFormat: "Y-m-d",
-            time_24hr: false,
-            mode: "range",
-            maxDate: "today",
-            conjunction: " to "
-        };
-
         // ChartJS Options - for count/overview of log distribution
         vm.logTypeLabels = ["Debug", "Info", "Warning", "Error", "Fatal"];
         vm.logTypeData = [0, 0, 0, 0, 0];
-        vm.logTypeColors = ['#2e8aea', '#2bc37c', '#ff9412', '#d42054', '#343434'];
+        vm.logTypeColors = ['#eaddd5', '#2bc37c', '#3544b1', '#ff9412', '#d42054'];
         vm.chartOptions = {
             legend: {
                 display: true,
                 position: 'left'
             }
         };
-
-        // Functions
-        vm.searchLogQuery = searchLogQuery;
-        vm.findMessageTemplate = findMessageTemplate;
-        vm.searchErrors = searchErrors;
-        vm.showMore = showMore;
-        vm.dateRangeChange = dateRangeChange;
         
         let querystring = $location.search();
         if (querystring.startDate) {
@@ -63,16 +47,22 @@
 
         vm.period = [vm.startDate, vm.endDate];
 
-        function preFlightCheck() {
+        //functions
+        vm.searchLogQuery = searchLogQuery;
+        vm.findMessageTemplate = findMessageTemplate;
+        vm.searchErrors = searchErrors;
+        vm.showMore = showMore;
+
+        function preFlightCheck(){
             vm.loading = true;
-            // Do our pre-flight check (to see if we can view logs)
-            // IE the log file is NOT too big such as 1GB & crash the site
+            //Do our pre-flight check (to see if we can view logs)
+            //IE the log file is NOT too big such as 1GB & crash the site
             logViewerResource.canViewLogs(vm.startDate, vm.endDate).then(function (result) {
                 vm.loading = false;
                 vm.canLoadLogs = result;
 
                 if (result) {
-                    // Can view logs - so initialize
+                    //Can view logs - so initalise
                     init();
                 }
             });
@@ -89,7 +79,7 @@
             var savedSearches = logViewerResource.getSavedSearches().then(function (data) {
                     vm.searches = data;
                 },
-                // Fallback to some defaults if error from API response
+                // fallback to some defaults if error from API response
                 function () {
                     vm.searches = [
                         {
@@ -144,7 +134,7 @@
                 vm.logLevelColor = index > -1 ? vm.logTypeColors[index] : '#000';
             });
 
-            // Set loading indicator to false when these 3 queries complete
+            //Set loading indicator to false when these 3 queries complete
             $q.all([savedSearches, numOfErrors, logCounts, commonMsgs, logLevel]).then(function () {
                 vm.loading = false;
             });
@@ -156,8 +146,6 @@
                 });
             });
         }
-
-        preFlightCheck();
 
         function searchLogQuery(logQuery) {
             $location.path("/settings/logViewer/search").search({
@@ -176,12 +164,25 @@
             return "Log Overview for " + suffix;
         }
       
-        function searchErrors() {
+        function searchErrors(){
             var logQuery = "@Level='Fatal' or @Level='Error' or Has(@Exception)";
             searchLogQuery(logQuery);
         }
 
-        function dateRangeChange(selectedDates, dateStr, instance) {
+        preFlightCheck();
+
+        /////////////////////
+
+        vm.config = {
+            enableTime: false,
+            dateFormat: "Y-m-d",
+            time_24hr: false,
+            mode: "range",
+            maxDate: "today",
+            conjunction: " to "
+        };
+
+        vm.dateRangeChange = function (selectedDates, dateStr, instance) {
 
             if (selectedDates.length > 0) {
 
@@ -191,13 +192,6 @@
                 // is collapsed to a comma.
                 const startDate = selectedDates[0].toIsoDateString();
                 const endDate = selectedDates[selectedDates.length - 1].toIsoDateString(); // Take the last date as end
-
-                // Check if date range has changed
-                if (startDate === vm.period[0] && endDate === vm.period[1]) {
-                    // Same date range
-                    return;
-                }
-
                 $location.path("/settings/logViewer/overview").search({
                     startDate: startDate,
                     endDate: endDate

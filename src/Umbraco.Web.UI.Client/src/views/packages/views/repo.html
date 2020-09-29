@@ -10,15 +10,16 @@
                 <label for="package-query" class="sr-only">
                     <localize key="packager_packageSearch">Search for packages</localize>
                 </label>
-                <input type="text"
-                       class="-full-width-input"
-                       name="query"
-                       id="package-query"
-                       localize="placeholder"
-                       placeholder="@packager_packageSearch"
-                       ng-model="vm.searchQuery"
-                       ng-change="vm.search()"
-                       no-dirty-check />
+                <input
+                    class="-full-width-input"
+                    type="text"
+                    name="query"
+                    id="package-query"
+                    localize="placeholder"
+                    placeholder="@packager_packageSearch"
+                    umb-auto-focus ng-model="vm.searchQuery"
+                    ng-change="vm.search()"
+                    no-dirty-check>
             </div>
         </div>
 
@@ -43,29 +44,26 @@
                     <div class="umb-package" ng-repeat="package in vm.popular">
                         <button type="button" class="umb-package-link" ng-click="vm.showPackageDetails(package)">
 
-                            <div class="flex flex-column">
-                                <div class="umb-package-icon">
-                                    <img ng-src="{{package.icon}}" alt="" />
-                                </div>
-
-                                <div class="umb-package-info">
-                                    <div class="umb-package-name">{{package.name}}</div>
-                                    <div class="umb-package-description">{{package.excerpt | limitTo: 40}}<span ng-if="package.excerpt > (package.excerpt | limitTo: 40)">...</span></div>
-
-                                    <div class="umb-package-numbers">
-                                        <small class="umb-package-downloads">
-                                            <i class="icon-download-alt" aria-hidden="true"></i>
-                                            <strong>{{package.downloads}}</strong>
-                                        </small>
-                                        <small class="umb-package-likes">
-                                            <i class="icon-hearts" aria-hidden="true"></i>
-                                            <strong>{{package.likes}}</strong>
-                                        </small>
-                                    </div>
-
-                                </div>
+                            <div class="umb-package-icon">
+                                <img ng-src="{{package.icon}}" alt="" />
                             </div>
 
+                            <div class="umb-package-info">
+                                <div class="umb-package-name">{{package.name}}</div>
+                                <div class="umb-package-description">{{package.excerpt | limitTo: 40}}<span ng-if="package.excerpt > (package.excerpt | limitTo: 40)">...</span></div>
+
+                                <div class="umb-package-numbers">
+                                    <small class="umb-package-downloads">
+                                        <i class="icon-download-alt" aria-hidden="true"></i>
+                                        <strong>{{package.downloads}}</strong>
+                                    </small>
+                                    <small class="umb-package-likes">
+                                        <i class="icon-hearts" aria-hidden="true"></i>
+                                        <strong>{{package.likes}}</strong>
+                                    </small>
+                                </div>
+
+                            </div>
                         </button>
                     </div> <!-- end package -->
 
@@ -82,29 +80,26 @@
                     <div class="umb-package" ng-repeat="package in vm.packages">
                         <button type="button" class="umb-package-link" ng-click="vm.showPackageDetails(package)">
 
-                            <div class="flex flex-column">
-                                <div class="umb-package-icon">
-                                    <img ng-src="{{package.icon}}" alt="" />
-                                </div>
-
-                                <div class="umb-package-info">
-                                    <div class="umb-package-name">{{ package.name }}</div>
-                                    <div class="umb-package-description">{{ package.excerpt | limitTo: 40 }}<span ng-if="package.excerpt > (package.excerpt | limitTo: 40)">...</span></div>
-
-                                    <div class="umb-package-numbers">
-                                        <small class="umb-package-downloads">
-                                            <i class="icon-download-alt" aria-hidden="true"></i>
-                                            <strong>{{ package.downloads }}</strong>
-                                        </small>
-                                        <small class="umb-package-likes">
-                                            <i class="icon-hearts" aria-hidden="true"></i>
-                                            <strong>{{ package.likes }}</strong>
-                                        </small>
-                                    </div>
-
-                                </div>
+                            <div class="umb-package-icon">
+                                <img ng-src="{{package.icon}}" alt="" />
                             </div>
-                            
+
+                            <div class="umb-package-info">
+                                <div class="umb-package-name">{{ package.name }}</div>
+                                <div class="umb-package-description">{{ package.excerpt | limitTo: 40 }}<span ng-if="package.excerpt > (package.excerpt | limitTo: 40)">...</span></div>
+
+                                <div class="umb-package-numbers">
+                                    <small class="umb-package-downloads">
+                                        <i class="icon-download-alt" aria-hidden="true"></i>
+                                        <strong>{{ package.downloads }}</strong>
+                                    </small>
+                                    <small class="umb-package-likes">
+                                        <i class="icon-hearts" aria-hidden="true"></i>
+                                        <strong>{{ package.likes }}</strong>
+                                    </small>
+                                </div>
+
+                            </div>
                         </button>
                     </div> <!-- end package -->
 
@@ -355,19 +350,18 @@
                             </div>
 
                             <div class="umb-info-local-item mt4 flex items-center flex-column" ng-if="vm.installState.status == '' && vm.localPackage.isCompatible">
-
-                                <umb-checkbox model="vm.localPackage.packageLicenseAccept" required="true">
-                                    <strong class="label-text"><localize key="packager_accept">I accept</localize> <a href="#" ng-href="{{vm.localPackage.licenseUrl}}" target="_blank" rel="noopener"><localize key="packager_termsOfUse">terms of use</localize></a></strong>
-                                </umb-checkbox>
-
-                                <umb-button ng-if="vm.installState.type !== 'error'"
-                                            class="mt3"
-                                            type="button"
-                                            size="m"
-                                            button-style="success"
-                                            disabled="localPackageForm.$invalid"
-                                            action="vm.installPackage(vm.localPackage)"
-                                            label-key="packager_packageInstall">
+                                <label for="license-accept" class="umb-package-installer-label">
+                                    <input type="checkbox" id="license-accept" ng-model="vm.localPackage.packageLicenseAccept" required no-dirty-check>
+                                    <strong class="label-text"><localize key="packager_accept">I accept</localize> <a href="{{ vm.localPackage.licenseUrl }}" target="_blank"><localize key="packager_termsOfUse">terms of use</localize></a></strong>
+                                </label>
+                                <umb-button
+                                    ng-if="vm.installState.type !== 'error'"
+                                    class="mt3"
+                                    type="button"
+                                    button-style="success"
+                                    disabled="localPackageForm.$invalid"
+                                    action="vm.installPackage(vm.localPackage)"
+                                    label-key="packager_packageInstall">
                                 </umb-button>
                             </div>
 

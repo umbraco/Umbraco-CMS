@@ -671,6 +671,23 @@ When building a custom infinite editor view you can use the same components as a
 
         /**
          * @ngdoc method
+         * @name umbraco.services.editorService#memberTypeEditor
+         * @methodOf umbraco.services.editorService
+         *
+         * @description
+         * Opens the member type editor in infinite editing, the submit callback returns the saved member type
+         * @param {Object} editor rendering options
+         * @param {Callback} editor.submit Submits the editor
+         * @param {Callback} editor.close Closes the editor
+         * @returns {Object} editor object
+         */
+        function memberTypeEditor(editor) {
+            editor.view = "views/membertypes/edit.html";
+            open(editor);
+        }
+
+        /**
+         * @ngdoc method
          * @name umbraco.services.editorService#queryBuilder
          * @methodOf umbraco.services.editorService
          *
@@ -758,23 +775,6 @@ When building a custom infinite editor view you can use the same components as a
         function userGroupPicker(editor) {
             editor.view = "views/common/infiniteeditors/usergrouppicker/usergrouppicker.html";
             if (!editor.size) editor.size = "small";
-            open(editor);
-        }
-
-        /**
-         * @ngdoc method
-         * @name umbraco.services.editorService#userGroupEditor
-         * @methodOf umbraco.services.editorService
-         *
-         * @description
-         * Opens the user group picker in infinite editing, the submit callback returns the saved user group
-         * @param {Object} editor rendering options
-         * @param {Callback} editor.submit Submits the editor
-         * @param {Callback} editor.close Closes the editor
-         * @returns {Object} editor object
-         */
-        function userGroupEditor(editor) {
-            editor.view = "views/users/group.html";
             open(editor);
         }
 
@@ -1045,7 +1045,6 @@ When building a custom infinite editor view you can use the same components as a
             nodePermissions: nodePermissions,
             insertCodeSnippet: insertCodeSnippet,
             userGroupPicker: userGroupPicker,
-            userGroupEditor: userGroupEditor,
             templateEditor: templateEditor,
             sectionPicker: sectionPicker,
             insertField: insertField,

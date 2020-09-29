@@ -128,15 +128,14 @@ namespace Umbraco.Web.Cache
 
         public static void RefreshMemberCache(this DistributedCache dc, params IMember[] members)
         {
-            if (members.Length == 0) return;
-            dc.RefreshByPayload(MemberCacheRefresher.UniqueId, members.Select(x => new MemberCacheRefresher.JsonPayload(x.Id, x.Username)));
+            dc.Refresh(MemberCacheRefresher.UniqueId, x => x.Id, members);
         }
 
         public static void RemoveMemberCache(this DistributedCache dc, params IMember[] members)
         {
-            if (members.Length == 0) return;
-            dc.RefreshByPayload(MemberCacheRefresher.UniqueId, members.Select(x => new MemberCacheRefresher.JsonPayload(x.Id, x.Username)));
+            dc.Remove(MemberCacheRefresher.UniqueId, x => x.Id, members);
         }
+
 
         #endregion
 

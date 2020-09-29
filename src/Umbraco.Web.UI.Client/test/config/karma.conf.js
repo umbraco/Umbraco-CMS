@@ -1,4 +1,3 @@
-const jsdom = require("jsdom");
 module.exports = function (config) {
 
     config.set({
@@ -101,17 +100,15 @@ module.exports = function (config) {
         // - PhantomJS
         // - IE (only Windows)
         // CLI --browsers Chrome,Firefox,Safari
-        browsers: ['jsdom'],
-		
-		// Configure a user agent so the log file gets generated properly
-		jsdomLauncher: {
-		  jsdom: {
-			resources: new jsdom.ResourceLoader({
-			  userAgent: "umbraco-test-suite",
-			})
-		  }
-		},
-		
+        browsers: ['ChromeHeadless'],
+
+        customLaunchers: {
+            ChromeDebugging: {
+                base: 'Chrome',
+                flags: ['--remote-debugging-port=9333']
+            }
+        },
+
         // allow waiting a bit longer, some machines require this
 
         browserNoActivityTimeout: 100000,     // default 10,000ms
@@ -126,9 +123,11 @@ module.exports = function (config) {
 
         plugins: [
             require('karma-jasmine'),
-            require('karma-jsdom-launcher'),
+            require('karma-phantomjs-launcher'),
+            require('karma-chrome-launcher'),
             require('karma-junit-reporter'),
             require('karma-spec-reporter')
+
         ],
 
         // the default configuration

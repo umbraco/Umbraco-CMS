@@ -33,7 +33,7 @@ namespace Umbraco.Tests.PublishedContent
     {
         private IPublishedSnapshotService _snapshotService;
         private IVariationContextAccessor _variationAccesor;
-        private IContentCacheDataSerializerFactory _contentNestedDataSerializerFactory;
+        private IContentNestedDataSerializer _contentNestedDataSerializer;
         private ContentType _contentType;
         private PropertyType _propertyType;
 
@@ -115,7 +115,7 @@ namespace Umbraco.Tests.PublishedContent
 
             // create a data source for NuCache
             var dataSource = new TestDataSource(kit);
-            _contentNestedDataSerializerFactory = new JsonContentNestedDataSerializerFactory();
+            _contentNestedDataSerializer = new JsonContentNestedDataSerializer();
 
             var runtime = Mock.Of<IRuntimeState>();
             Mock.Get(runtime).Setup(x => x.Level).Returns(RuntimeLevel.Run);
@@ -206,8 +206,9 @@ namespace Umbraco.Tests.PublishedContent
                 Mock.Of<IEntityXmlSerializer>(),
                 Mock.Of<IPublishedModelFactory>(),
                 new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() }),
-                _contentNestedDataSerializerFactory,
-                transactableDictionaryFactory);
+                transactableDictionaryFactory,
+                _contentNestedDataSerializer
+                );
 
             // invariant is the current default
             _variationAccesor.VariationContext = new VariationContext();

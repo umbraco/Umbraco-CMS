@@ -200,7 +200,7 @@
                 "event": "click"
             },
             {
-                "element": "[data-element='editor-data-type-picker'] [data-element='datatypeconfig-Textarea']",
+                "element": "[data-element='editor-data-type-picker'] [data-element='datatypeconfig-Textarea'] > a",
                 "title": "Editor settings",
                 "content": "Each property editor can have individual settings. For the textarea editor you can set a character limit but in this case it is not needed.",
                 "event": "click"

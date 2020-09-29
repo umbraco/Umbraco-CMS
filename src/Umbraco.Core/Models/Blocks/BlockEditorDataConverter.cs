@@ -18,35 +18,10 @@ namespace Umbraco.Core.Models.Blocks
             _propertyEditorAlias = propertyEditorAlias;
         }
 
-        public BlockEditorData ConvertFrom(JToken json)
-        {
-            var value = json.ToObject<BlockValue>();
-            return Convert(value);
-        }
-
-        public bool TryDeserialize(string json, out BlockEditorData blockEditorData)
-        {
-            try
-            {
-                var value = JsonConvert.DeserializeObject<BlockValue>(json);
-                blockEditorData = Convert(value);
-                return true;
-            }
-            catch (System.Exception)
-            {
-                blockEditorData = null;
-                return false;
-            }
-        }
-
         public BlockEditorData Deserialize(string json)
         {
             var value = JsonConvert.DeserializeObject<BlockValue>(json);
-            return Convert(value);
-        }
 
-        private BlockEditorData Convert(BlockValue value)
-        {
             if (value.Layout == null)
                 return BlockEditorData.Empty;
 

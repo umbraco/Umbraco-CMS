@@ -5,9 +5,9 @@
   },
   "devDependencies": {
     "cross-env": "^7.0.2",
-    "cypress": "^5.1.0",
     "ncp": "^2.0.0",
-    "umbraco-cypress-testhelpers": "^1.0.0-beta-50"
+    "cypress": "^4.9.0",
+    "umbraco-cypress-testhelpers": "1.0.0-beta-44"
   },
   "dependencies": {
     "typescript": "^3.9.2"

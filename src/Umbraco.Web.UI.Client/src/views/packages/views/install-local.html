@@ -19,6 +19,7 @@
                      ngf-max-size="{{ maxFileSize }}"
                      ng-class="{'is-small': compact!=='false' || (done.length+queue.length) > 0 }">
 
+
                     <div class="content">
 
                         <!-- Drag and drop illustration -->
@@ -62,7 +63,7 @@
             <div class="flex items-center justify-center">
                 <div class="umb-info-local-items">
                     <div class="umb-package-icon">
-                        <i ng-if="!vm.localPackage.iconUrl" class="icon-box" aria-hidden="true"></i>
+                        <i ng-if="!vm.localPackage.iconUrl" class="icon-box"></i>
                     </div>
                     <div class="umb-package-info">
 
@@ -88,7 +89,7 @@
 
         <umb-editor-sub-header>
             <umb-editor-sub-header-content-left>
-                <button type="button" class="umb-package-details__back-action" ng-click="vm.state = 'upload'" prevent-default><span aria-hidden="true">&larr;</span> <localize key="packager_cancelAndUploadAnother">Cancel and upload another package</localize></button>
+                <button type="button" class="umb-package-details__back-action" href="" ng-click="vm.state = 'upload'" prevent-default><span aria-hidden="true">&larr;</span> <localize key="packager_cancelAndUploadAnother">Cancel and upload another package</localize></button>
             </umb-editor-sub-header-content-left>
         </umb-editor-sub-header>
 
@@ -100,7 +101,7 @@
 
                     <form novalidate name="localPackageForm" class="w-100">
                         <div class="umb-package-icon">
-                            <i ng-if="!vm.localPackage.iconUrl" class="icon-box" aria-hidden="true"></i>
+                            <i ng-if="!vm.localPackage.iconUrl" class="icon-box"></i>
                             <img ng-if="vm.localPackage.iconUrl" ng-src="{{vm.localPackage.iconUrl}}" alt="" />
                         </div>
 
@@ -109,7 +110,7 @@
 
                             <div class="umb-info-local-item">
                                 <strong><localize key="packager_packageAuthor">Author</localize></strong><br>
-                                <a href="{{ vm.localPackage.authorUrl }}" target="_blank" rel="noopener">{{ vm.localPackage.author }}</a>
+                                <a href="{{ vm.localPackage.authorUrl }}" target="_blank">{{ vm.localPackage.author }}</a>
                             </div>
 
                             <div class="umb-info-local-item" ng-if="vm.localPackage.contributors && vm.localPackage.contributors.length > 0">
@@ -132,7 +133,7 @@
 
                             <div class="umb-info-local-item">
                                 <strong><localize key="packager_packageLicense">License</localize></strong><br>
-                                <a href="{{ vm.localPackage.licenseUrl }}" target="_blank" rel="noopener">{{ vm.localPackage.license }}</a>
+                                <a href="{{ vm.localPackage.licenseUrl }}" target="_blank">{{ vm.localPackage.license }}</a>
                             </div>
 
                             <div class="umb-info-local-item">
@@ -141,16 +142,15 @@
                             </div>
 
                             <div class="umb-info-local-item mt4 flex items-center flex-column" ng-if="vm.installState.status == '' && vm.localPackage.isCompatible">
-
-                                <umb-checkbox model="vm.localPackage.packageLicenseAccept" required="true">
-                                    <strong class="label-text"><localize key="packager_accept">I accept</localize> <a href="#" ng-href="{{vm.localPackage.licenseUrl}}" target="_blank" rel="noopener"><localize key="packager_termsOfUse">terms of use</localize></a></strong>
-                                </umb-checkbox>
-
+                                <label for="license-accepts" class="umb-package-installer-label">
+                                    <input type="checkbox" id="license-accepts" ng-model="vm.localPackage.packageLicenseAccept" required no-dirty-check>
+                                    <strong class="label-text"><localize key="packager_accept">I accept</localize> <a href="{{ vm.localPackage.licenseUrl }}" target="_blank"><localize key="packager_termsOfUse">terms of use</localize></a></strong>
+                                </label>
                                 <umb-button class="mt3"
                                             type="button"
+                                            disabled="localPackageForm.$invalid"
                                             size="m"
                                             button-style="success"
-                                            disabled="localPackageForm.$invalid"
                                             action="vm.installPackage()"
                                             label-key="packager_packageInstall">
                                 </umb-button>

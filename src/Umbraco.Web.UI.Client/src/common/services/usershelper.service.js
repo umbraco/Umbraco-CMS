@@ -12,23 +12,36 @@
             { "value": 4, "name": "Inactive", "key": "Inactive", "color": "warning" }
         ];
 
-        localizationService.localizeMany(userStates.map(userState => "user_state" + userState.key))
-            .then(data => {
-                var reg = /^\[[\S\s]*]$/g;
-                data.forEach((value, index) => {
-                    if (!reg.test(value)) {
-                        // Only translate if key exists
-                        userStates[index].name = value;
-                    }
-                });
+        localizationService.localizeMany(_.map(userStates, function (userState) {
+            return "user_state" + userState.key;
+        })).then(function (data) {
+            var reg = /^\[[\S\s]*]$/g;
+            _.each(data, function (value, index) {
+                if (!reg.test(value)) {
+                    // Only translate if key exists
+                    userStates[index].name = value;
+                }
             });
+        });
 
-        function getUserStateFromValue(value) {        
-            return userStates.find(userState => userState.value === value);
+        function getUserStateFromValue(value) {
+            var foundUserState;
+            angular.forEach(userStates, function (userState) {
+                if(userState.value === value) {
+                    foundUserState = userState;
+                }
+            });
+            return foundUserState;
         }
 
         function getUserStateByKey(key) {
-            return userStates.find(userState => userState.key === key);           
+            var foundUserState;
+            angular.forEach(userStates, function (userState) {
+                if(userState.key === key) {
+                    foundUserState = userState;
+                }
+            });
+            return foundUserState;
         }
 
         function getUserStatesFilter(userStatesObject) {
@@ -36,7 +49,7 @@
             var userStatesFilter = [];
 
             for (var key in userStatesObject) {
-                if (hasOwnProperty.call(userStatesObject, key)) {
+                if (userStatesObject.hasOwnProperty(key)) {
                     var userState = getUserStateByKey(key);
                     if(userState) {
                         userState.count = userStatesObject[key];
@@ -46,6 +59,7 @@
             }
 
             return userStatesFilter;
+
         }
 
         ////////////
@@ -57,7 +71,10 @@
         };
 
         return service;
+
     }
 
     angular.module('umbraco.services').factory('usersHelper', usersHelperService);
+
+
 })();

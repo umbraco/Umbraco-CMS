@@ -62,7 +62,7 @@ namespace Umbraco.Examine
         /// <param name="onComplete"></param>
         protected override void PerformIndexItems(IEnumerable<ValueSet> values, Action<IndexOperationEventArgs> onComplete)
         {
-            // We don't want to re-enumerate this list, but we need to split it into 2x enumerables: invalid and valid items.
+            //We don't want to re-enumerate this list, but we need to split it into 2x enumerables: invalid and valid items.
             // The Invalid items will be deleted, these are items that have invalid paths (i.e. moved to the recycle bin, etc...)
             // Then we'll index the Value group all together.
             // We return 0 or 1 here so we can order the results and do the invalid first and then the valid.
@@ -80,7 +80,7 @@ namespace Umbraco.Examine
                         || !validator.ValidateProtectedContent(path, v.Category))
                     ? 0
                     : 1;
-            }).ToList();
+            });
 
             var hasDeletes = false;
             var hasUpdates = false;
@@ -99,7 +99,7 @@ namespace Umbraco.Examine
                 {
                     hasUpdates = true;
                     //these are the valid ones, so just index them all at once
-                    base.PerformIndexItems(group.ToList(), onComplete);
+                    base.PerformIndexItems(group, onComplete);
                 }
             }
 

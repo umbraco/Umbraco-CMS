@@ -31,8 +31,6 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
         public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object source, bool preview)
         {
-            if (source == null) return null;
-
             var attemptConvertInt = source.TryConvertTo<int>();
             if (attemptConvertInt.Success)
                 return attemptConvertInt.Result;

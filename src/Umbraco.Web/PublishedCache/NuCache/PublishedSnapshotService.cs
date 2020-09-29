@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
@@ -44,8 +47,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly IPublishedModelFactory _publishedModelFactory;
         private readonly IDefaultCultureAccessor _defaultCultureAccessor;
         private readonly UrlSegmentProviderCollection _urlSegmentProviders;
-        private readonly IContentCacheDataSerializerFactory _contentCacheDataSerializerFactory;
         private readonly ITransactableDictionaryFactory _transactableDictionaryFactory;
+        private readonly IContentNestedDataSerializer _contentNestedDataSerializer;
 
         // volatile because we read it with no lock
         private volatile bool _isReady;
@@ -80,8 +83,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             IEntityXmlSerializer entitySerializer,
             IPublishedModelFactory publishedModelFactory,
             UrlSegmentProviderCollection urlSegmentProviders,
-            IContentCacheDataSerializerFactory contentCacheDataSerializerFactory,
-            ITransactableDictionaryFactory transactableDictionaryFactory)
+            ITransactableDictionaryFactory transactableDictionaryFactory,
+            IContentNestedDataSerializer contentNestedDataSerializer)
             : base(publishedSnapshotAccessor, variationContextAccessor)
         {
             //if (Interlocked.Increment(ref _singletonCheck) > 1)
@@ -99,7 +102,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _globalSettings = globalSettings;
             _urlSegmentProviders = urlSegmentProviders;
             _transactableDictionaryFactory = transactableDictionaryFactory;
-            _contentCacheDataSerializerFactory = contentCacheDataSerializerFactory;
+            _contentNestedDataSerializer = contentNestedDataSerializer;
 
             // we need an Xml serializer here so that the member cache can support XPath,
             // for members this is done by navigating the serialized-to-xml member
@@ -380,9 +383,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // contentStore is wlocked (1 thread)
             // content (and types) are read-locked
 
-            var contentTypes = _serviceContext.ContentTypeService.GetAll().ToList();
+            var contentTypes = _serviceContext.ContentTypeService.GetAll()
+                .Select(x => _publishedContentTypeFactory.CreateContentType(x));
 
-            _contentStore.SetAllContentTypesLocked(contentTypes.Select(x => _publishedContentTypeFactory.CreateContentType(x)));
+            _contentStore.SetAllContentTypesLocked(contentTypes);
 
             using (_logger.TraceDuration<PublishedSnapshotService>("Loading content from database"))
             {
@@ -1279,10 +1283,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var db = args.Scope.Database;
             var content = (Content)args.Entity;
 
-            var serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Document);
-
             // always refresh the edited data
-            OnRepositoryRefreshed(serializer, db, content, false);
+            OnRepositoryRefreshed(db, content, false);
 
             // if unpublishing, remove published data from table
             if (content.PublishedState == PublishedState.Unpublishing)
@@ -1290,37 +1292,33 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             // if publishing, refresh the published data
             else if (content.PublishedState == PublishedState.Publishing)
-                OnRepositoryRefreshed(serializer, db, content, true);
+                OnRepositoryRefreshed(db, content, true);
         }
 
         private void OnMediaRefreshedEntity(MediaRepository sender, MediaRepository.ScopedEntityEventArgs args)
         {
-            var serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Media);
-
             var db = args.Scope.Database;
             var media = args.Entity;
 
             // refresh the edited data
-            OnRepositoryRefreshed(serializer, db, media, false);
+            OnRepositoryRefreshed(db, media, false);
         }
 
         private void OnMemberRefreshedEntity(MemberRepository sender, MemberRepository.ScopedEntityEventArgs args)
         {
-            var serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Member);
-
             var db = args.Scope.Database;
             var member = args.Entity;
 
             // refresh the edited data
-            OnRepositoryRefreshed(serializer, db, member, false);
+            OnRepositoryRefreshed(db, member, false);
         }
 
-        private void OnRepositoryRefreshed(IContentCacheDataSerializer serializer, IUmbracoDatabase db, IContentBase content, bool published)
+        private void OnRepositoryRefreshed(IUmbracoDatabase db, IContentBase content, bool published)
         {
             // use a custom SQL to update row version on each update
             //db.InsertOrUpdate(dto);
 
-            var dto = GetDto(content, published, serializer);
+            var dto = GetDto(content, published);
             db.InsertOrUpdate(dto,
                 "SET data=@data, dataRaw=@dataRaw, rv=rv+1 WHERE nodeId=@id AND published=@published",
                 new
@@ -1374,7 +1372,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
         }
 
-        private ContentNuDto GetDto(IContentBase content, bool published, IContentCacheDataSerializer serializer)
+        private ContentNuDto GetDto(IContentBase content, bool published)
         {
             // should inject these in ctor
             // BUT for the time being we decide not to support ConvertDbToXml/String
@@ -1446,21 +1444,19 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
 
             //the dictionary that will be serialized
-            var contentCacheData = new ContentCacheDataModel
+            var nestedData = new ContentNestedData
             {
                 PropertyData = propertyData,
                 CultureData = cultureData,
                 UrlSegment = content.GetUrlSegment(_urlSegmentProviders)
             };
 
-            var serialized = serializer.Serialize(content.ContentTypeId, contentCacheData);
-
             var dto = new ContentNuDto
             {
                 NodeId = content.Id,
                 Published = published,
-                Data = serialized.StringData,
-                RawData = serialized.ByteData
+                Data = !(_contentNestedDataSerializer is IContentNestedDataByteSerializer) ? _contentNestedDataSerializer.Serialize(content.ContentTypeId, nestedData) : null,
+                RawData = (_contentNestedDataSerializer is IContentNestedDataByteSerializer byteSerializer) ? byteSerializer.SerializeBytes(content.ContentTypeId, nestedData) : null
             };
 
             //Core.Composing.Current.Logger.Debug<PublishedSnapshotService>(dto.Data);
@@ -1483,32 +1479,30 @@ namespace Umbraco.Web.PublishedCache.NuCache
         public override void Rebuild()
         {
             _logger.Debug<PublishedSnapshotService>("Rebuilding...");
-            var serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Document | ContentCacheDataSerializerEntityType.Media | ContentCacheDataSerializerEntityType.Member);
             using (var scope = _scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
                 scope.ReadLock(Constants.Locks.MediaTree);
                 scope.ReadLock(Constants.Locks.MemberTree);
-                RebuildContentDbCacheLocked(serializer, scope, GetSqlPagingSize(), null);
-                RebuildMediaDbCacheLocked(serializer, scope, GetSqlPagingSize(), null);
-                RebuildMemberDbCacheLocked(serializer, scope, GetSqlPagingSize(), null);
+                RebuildContentDbCacheLocked(scope, GetSqlPagingSize(), null);
+                RebuildMediaDbCacheLocked(scope, GetSqlPagingSize(), null);
+                RebuildMemberDbCacheLocked(scope, GetSqlPagingSize(), null);
                 scope.Complete();
             }
         }
 
         public void RebuildContentDbCache(int groupSize = DefaultSqlPagingSize, IEnumerable<int> contentTypeIds = null)
         {
-            var serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Document);
             using (var scope = _scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
-                RebuildContentDbCacheLocked(serializer, scope, groupSize, contentTypeIds);
+                RebuildContentDbCacheLocked(scope, groupSize, contentTypeIds);
                 scope.Complete();
             }
         }
 
         // assumes content tree lock
-        private void RebuildContentDbCacheLocked(IContentCacheDataSerializer serializer, IScope scope, int groupSize, IEnumerable<int> contentTypeIds)
+        private void RebuildContentDbCacheLocked(IScope scope, int groupSize, IEnumerable<int> contentTypeIds)
         {
             var contentTypeIdsA = contentTypeIds?.ToArray();
             var contentObjectType = Constants.ObjectTypes.Document;
@@ -1555,11 +1549,11 @@ WHERE cmsContentNu.nodeId IN (
                 foreach (var c in descendants)
                 {
                     // always the edited version
-                    items.Add(GetDto(c, false, serializer));
+                    items.Add(GetDto(c, false));
 
                     // and also the published version if it makes any sense
                     if (c.Published)
-                        items.Add(GetDto(c, true, serializer));
+                        items.Add(GetDto(c, true));
 
                     count++;
                 }
@@ -1571,17 +1565,16 @@ WHERE cmsContentNu.nodeId IN (
 
         public void RebuildMediaDbCache(int groupSize = DefaultSqlPagingSize, IEnumerable<int> contentTypeIds = null)
         {
-            var serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Media);
             using (var scope = _scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
             {
                 scope.ReadLock(Constants.Locks.MediaTree);
-                RebuildMediaDbCacheLocked(serializer, scope, groupSize, contentTypeIds);
+                RebuildMediaDbCacheLocked(scope, groupSize, contentTypeIds);
                 scope.Complete();
             }
         }
 
         // assumes media tree lock
-        public void RebuildMediaDbCacheLocked(IContentCacheDataSerializer serializer, IScope scope, int groupSize, IEnumerable<int> contentTypeIds)
+        public void RebuildMediaDbCacheLocked(IScope scope, int groupSize, IEnumerable<int> contentTypeIds)
         {
             var contentTypeIdsA = contentTypeIds?.ToArray();
             var mediaObjectType = Constants.ObjectTypes.Media;
@@ -1623,7 +1616,7 @@ WHERE cmsContentNu.nodeId IN (
             {
                 // the tree is locked, counting and comparing to total is safe
                 var descendants = _mediaRepository.GetPage(query, pageIndex++, groupSize, out total, null, Ordering.By("Path"));
-                var items = descendants.Select(m => GetDto(m, false, serializer)).ToList();
+                var items = descendants.Select(m => GetDto(m, false)).ToList();
                 db.BulkInsertRecords(items);
                 processed += items.Count;
             } while (processed < total);
@@ -1631,17 +1624,16 @@ WHERE cmsContentNu.nodeId IN (
 
         public void RebuildMemberDbCache(int groupSize = DefaultSqlPagingSize, IEnumerable<int> contentTypeIds = null)
         {
-            var serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Member);
             using (var scope = _scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
             {
                 scope.ReadLock(Constants.Locks.MemberTree);
-                RebuildMemberDbCacheLocked(serializer, scope, groupSize, contentTypeIds);
+                RebuildMemberDbCacheLocked(scope, groupSize, contentTypeIds);
                 scope.Complete();
             }
         }
 
         // assumes member tree lock
-        public void RebuildMemberDbCacheLocked(IContentCacheDataSerializer serializer, IScope scope, int groupSize, IEnumerable<int> contentTypeIds)
+        public void RebuildMemberDbCacheLocked(IScope scope, int groupSize, IEnumerable<int> contentTypeIds)
         {
             var contentTypeIdsA = contentTypeIds?.ToArray();
             var memberObjectType = Constants.ObjectTypes.Member;
@@ -1682,7 +1674,7 @@ WHERE cmsContentNu.nodeId IN (
             do
             {
                 var descendants = _memberRepository.GetPage(query, pageIndex++, groupSize, out total, null, Ordering.By("Path"));
-                var items = descendants.Select(m => GetDto(m, false, serializer)).ToArray();
+                var items = descendants.Select(m => GetDto(m, false)).ToArray();
                 db.BulkInsertRecords(items);
                 processed += items.Length;
             } while (processed < total);

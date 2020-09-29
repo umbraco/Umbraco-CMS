@@ -27,7 +27,7 @@
 
         function createFolder(form) {
 
-            if (formHelper.submitForm({ scope: $scope, formCtrl: form })) {
+            if (formHelper.submitForm({scope: $scope, formCtrl: form })) {
 
                 codefileResource.createContainer("scripts", node.id, vm.folderName).then(function (saved) {
 
@@ -40,15 +40,14 @@
                         activate: true
                     });
 
-                    formHelper.resetForm({ scope: $scope, formCtrl: form });
+                    formHelper.resetForm({ scope: $scope });
 
                     var section = appState.getSectionState("currentSection");
 
-                }, function (err) {
+                }, function(err) {
 
-                    formHelper.resetForm({ scope: $scope, formCtrl: form, hasErrors: true });
-                    vm.createFolderError = err;
-
+                  vm.createFolderError = err;
+                    
                 });
             }
 

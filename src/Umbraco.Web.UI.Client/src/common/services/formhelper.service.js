@@ -17,10 +17,10 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
          * @function
          *
          * @description
-         * Called by controllers when submitting a form - this ensures that all client validation is checked,
+         * Called by controllers when submitting a form - this ensures that all client validation is checked, 
          * server validation is cleared, that the correct events execute and status messages are displayed.
          * This returns true if the form is valid, otherwise false if form submission cannot continue.
-         *
+         * 
          * @param {object} args An object containing arguments for form submission
          */
         submitForm: function (args) {
@@ -33,7 +33,6 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
             if (!args.scope) {
                 throw "args.scope cannot be null";
             }
-
             if (!args.formCtrl) {
                 //try to get the closest form controller
                 currentForm = angularHelper.getRequiredCurrentForm(args.scope);
@@ -45,18 +44,12 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
             //the first thing any form must do is broadcast the formSubmitting event
             args.scope.$broadcast("formSubmitting", { scope: args.scope, action: args.action });
 
-            this.focusOnFirstError(currentForm);
-            
             // Some property editors need to perform an action after all property editors have reacted to the formSubmitting.
-            args.scope.$broadcast("formSubmittingFinalPhase", { scope: args.scope, action: args.action });
-
-            // Set the form state to submitted
-            currentForm.$setSubmitted();
+            args.scope.$broadcast("postFormSubmitting", { scope: args.scope, action: args.action });
 
             //then check if the form is valid
             if (!args.skipValidation) {
                 if (currentForm.$invalid) {
-
                     return false;
                 }
             }
@@ -72,32 +65,6 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
             return true;
         },
 
-         /**
-         * @ngdoc function
-         * @name umbraco.services.formHelper#focusOnFirstError
-         * @methodOf umbraco.services.formHelper
-         * @function
-         *
-         * @description
-         * Called by submitForm when a form has been submitted, it will fire a focus on the first found invalid umb-property it finds in the form..
-         * 
-         * @param {object} form Pass in a form object.
-         */
-        focusOnFirstError: function(form) {
-            var invalidNgForms = form.$$element.find(`.umb-property ng-form.ng-invalid, .umb-property-editor ng-form.ng-invalid-required`);
-            var firstInvalidNgForm = invalidNgForms.first();
-
-            if(firstInvalidNgForm.length !== 0) {
-                var focusableFields = [...firstInvalidNgForm.find("umb-range-slider .noUi-handle,input,textarea,select,button")];
-                if(focusableFields.length !== 0) { 
-                    var firstErrorEl = focusableFields.find(el => el.type !== "hidden" && el.hasAttribute("readonly") === false);
-                    if(firstErrorEl.length !== 0) {
-                        firstErrorEl.focus();
-                    }
-                }
-            }
-        },
-
         /**
          * @ngdoc function
          * @name umbraco.services.formHelper#submitForm
@@ -106,32 +73,18 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
          *
          * @description
          * Called by controllers when a form has been successfully submitted, this ensures the correct events are raised.
-         *
+         * 
          * @param {object} args An object containing arguments for form submission
          */
         resetForm: function (args) {
-
-            var currentForm;
-
             if (!args) {
                 throw "args cannot be null";
             }
             if (!args.scope) {
                 throw "args.scope cannot be null";
             }
-            if (!args.formCtrl) {
-                //try to get the closest form controller
-                currentForm = angularHelper.getRequiredCurrentForm(args.scope);
-            }
-            else {
-                currentForm = args.formCtrl;
-            }
 
-            // Set the form state to pristine
-            currentForm.$setPristine();
-            currentForm.$setUntouched();
-
-            args.scope.$broadcast(args.hasErrors ? "formSubmittedValidationFailed" : "formSubmitted", { scope: args.scope });
+            args.scope.$broadcast("formSubmitted", { scope: args.scope });
         },
 
         showNotifications: function (args) {
@@ -156,7 +109,7 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
          * @description
          * Needs to be called when a form submission fails, this will wire up all server validation errors in ModelState and
          * add the correct messages to the notifications. If a server error has occurred this will show a ysod.
-         *
+         * 
          * @param {object} err The error object returned from the http promise
          */
         handleError: function (err) {
@@ -195,7 +148,7 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
          *
          * @description
          * This wires up all of the server validation model state so that valServer and valServerField directives work
-         *
+         * 
          * @param {object} err The error object returned from the http promise
          */
         handleServerValidation: function (modelState) {

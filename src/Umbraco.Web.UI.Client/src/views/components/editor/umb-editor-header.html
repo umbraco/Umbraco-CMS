@@ -18,7 +18,7 @@
                     ng-click="openIconPicker()"
                     ng-class="{'-placeholder': $parent.icon==='' || $parent.icon===null}"
                     title="{{$parent.icon}}">
-                        <umb-icon class="icon {{$parent.icon}}" icon="{{$parent.icon}}" ng-if="$parent.icon!=='' && $parent.icon!==null"></umb-icon>
+                        <i class="icon {{$parent.icon}}" ng-if="$parent.icon!=='' && $parent.icon!==null" aria-hidden="true"></i>
                         <span class="umb-panel-header-icon-text" ng-if="$parent.icon==='' || $parent.icon===null">
                             <localize key="settings_addIcon">Add icon</localize>
                         </span>
@@ -48,8 +48,8 @@
                                umb-auto-focus
                                focus-on-filled="true"
                                val-server-field="Name"
-                               ng-required="nameRequired != null ? nameRequired : true"
-                               aria-required="{{nameRequired != null ? nameRequired : true}}"
+                               required
+                               aria-required="true"
                                aria-invalid="{{contentForm.headerNameForm.headerName.$invalid ? true : false}}"
                                autocomplete="off"
                                maxlength="255"/>

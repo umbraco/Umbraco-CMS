@@ -11,7 +11,7 @@ function contentTypeHelper(contentTypeResource, dataTypeResource, $filter, $inje
 
             var newArray = [];
 
-            array.forEach(function (arrayItem) {
+            angular.forEach(array, function (arrayItem) {
 
                 if (Utilities.isObject(arrayItem)) {
                     newArray.push(arrayItem.id);
@@ -116,12 +116,13 @@ function contentTypeHelper(contentTypeResource, dataTypeResource, $filter, $inje
                 throw new Error("Cannot add this composition, these properties already exist on the content type: " + overlappingAliases.join());
             }
 
-            compositeContentType.groups.forEach(function (compositionGroup) {
+            angular.forEach(compositeContentType.groups, function (compositionGroup) {
+
                 // order composition groups based on sort order
                 compositionGroup.properties = $filter('orderBy')(compositionGroup.properties, 'sortOrder');
 
                 // get data type details
-                compositionGroup.properties.forEach(function (property) {
+                angular.forEach(compositionGroup.properties, function (property) {
                     dataTypeResource.getById(property.dataTypeId)
                         .then(function (dataType) {
                             property.dataTypeIcon = dataType.icon;
@@ -133,7 +134,7 @@ function contentTypeHelper(contentTypeResource, dataTypeResource, $filter, $inje
                 compositionGroup.inherited = true;
 
                 // set inherited state on properties
-                compositionGroup.properties.forEach(function (compositionProperty) {
+                angular.forEach(compositionGroup.properties, function (compositionProperty) {
                     compositionProperty.inherited = true;
                 });
 
@@ -141,7 +142,7 @@ function contentTypeHelper(contentTypeResource, dataTypeResource, $filter, $inje
                 compositionGroup.tabState = "inActive";
 
                 // if groups are named the same - merge the groups
-                contentType.groups.forEach(function (contentTypeGroup) {
+                angular.forEach(contentType.groups, function (contentTypeGroup) {
 
                     if (contentTypeGroup.name === compositionGroup.name) {
 
@@ -223,7 +224,7 @@ function contentTypeHelper(contentTypeResource, dataTypeResource, $filter, $inje
 
             var groups = [];
 
-            contentType.groups.forEach(function (contentTypeGroup) {
+            angular.forEach(contentType.groups, function (contentTypeGroup) {
 
                 if (contentTypeGroup.tabState !== "init") {
 
@@ -237,7 +238,7 @@ function contentTypeHelper(contentTypeResource, dataTypeResource, $filter, $inje
                         var properties = [];
 
                         // remove all properties from composite content type
-                        contentTypeGroup.properties.forEach(function (property) {
+                        angular.forEach(contentTypeGroup.properties, function (property) {
                             if (property.contentTypeId !== compositeContentType.id) {
                                 properties.push(property);
                             }
@@ -282,7 +283,7 @@ function contentTypeHelper(contentTypeResource, dataTypeResource, $filter, $inje
 
             var sortOrder = 0;
 
-            properties.forEach(function (property) {
+            angular.forEach(properties, function (property) {
                 if (!property.inherited && property.propertyState !== "init") {
                     property.sortOrder = sortOrder;
                 }

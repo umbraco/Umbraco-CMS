@@ -19,9 +19,6 @@ namespace Umbraco.Web.Models.ContentEditing
             ContentApps = new List<ContentApp>();
         }
 
-        [DataMember(Name = "contentType")]
-        public ContentTypeBasic ContentType { get; set; }
-
         [DataMember(Name = "username")]
         public string Username { get; set; }
 

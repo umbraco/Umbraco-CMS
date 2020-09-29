@@ -42,14 +42,15 @@
                 
                 var filteredConfigs = [];
                 
-                Object.values(configs).forEach(configGroup => {
-                    for(var i = 0; i < configGroup.length; i++) {
-                        if (configGroup[i].alias === $scope.model.editor.alias) {
-                            filteredConfigs.push(configGroup[i]);
+                _.each(configs, function(configGroup) {
+                        for(var i = 0; i<configGroup.length; i++) {
+                            if (configGroup[i].alias === $scope.model.editor.alias) {
+                                filteredConfigs.push(configGroup[i]);
+                            }
                         }
                     }
-                });
-            
+                );
+                
                 vm.configs = filteredConfigs;
                 vm.loading = false;
             });

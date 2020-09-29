@@ -6,7 +6,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
     /// <summary>
     /// Defines a data source for NuCache.
     /// </summary>
-    public interface IDataSource
+    internal interface IDataSource
     {
         //TODO: For these required sort orders, would sorting on Path 'just work'?
 

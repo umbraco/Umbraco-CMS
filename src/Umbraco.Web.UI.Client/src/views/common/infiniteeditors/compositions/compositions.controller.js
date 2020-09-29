@@ -1,17 +1,15 @@
 (function () {
     "use strict";
 
-    function CompositionsController($scope, $location, $filter, $timeout, overlayService, localizationService) {
+    function CompositionsController($scope, $location, $filter, overlayService, localizationService) {
 
         var vm = this;
         var oldModel = null;
 
         vm.showConfirmSubmit = false;
-        vm.loading = false;
 
         vm.isSelected = isSelected;
         vm.openContentType = openContentType;
-        vm.selectCompositeContentType = selectCompositeContentType;
         vm.submit = submit;
         vm.close = close;
 
@@ -25,13 +23,10 @@
                 $scope.model.title = "Compositions";
             }
 
-            // Group the content types by their container paths
+            // group the content types by their container paths
             vm.availableGroups = $filter("orderBy")(
                 _.map(
                     _.groupBy($scope.model.availableCompositeContentTypes, function (compositeContentType) {
-                        
-                        compositeContentType.selected = isSelected(compositeContentType.contentType.alias);
-
                         return compositeContentType.contentType.metaData.containerPath;
                     }), function (group) {
                         return {
@@ -44,54 +39,17 @@
                 });
         }
 
-        
+
+
         function isSelected(alias) {
             if ($scope.model.contentType.compositeContentTypes.indexOf(alias) !== -1) {
                 return true;
             }
-            return false;
         }
 
         function openContentType(contentType, section) {
             var url = (section === "documentType" ? "/settings/documenttypes/edit/" : "/settings/mediaTypes/edit/") + contentType.id;
             $location.path(url);
-        }
-
-        function selectCompositeContentType(compositeContentType) {  
-
-            vm.loading = true;
-            
-            var contentType = compositeContentType.contentType;
-
-            $scope.model.selectCompositeContentType(contentType).then(function (response) {
-
-                Utilities.forEach(vm.availableGroups, function (group) {
-
-                    Utilities.forEach(group.compositeContentTypes, function (obj) {
-                        if (obj.allowed === false) {
-                            obj.selected = false;
-                        }
-                    });
-                });
-
-                $timeout(function () {
-                    vm.loading = false;
-                }, 500);
-                
-            }, function () {
-                $timeout(function () {
-                    vm.loading = false;
-                }, 500);
-            });
-
-            // Check if the template is already selected.
-            var index = $scope.model.contentType.compositeContentTypes.indexOf(contentType.alias);
-
-            if (index === -1) {
-                $scope.model.contentType.compositeContentTypes.push(contentType.alias);
-            } else {
-                $scope.model.contentType.compositeContentTypes.splice(index, 1);
-            }
         }
 
         function submit() {

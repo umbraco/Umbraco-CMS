@@ -160,8 +160,7 @@
                 searchService.searchAll(search).then(function (result) {
                     //result is a dictionary of group Title and it's results
                     var filtered = {};
-                    Object.keys(result).forEach(key => {
-                        let value = result[key];
+                    _.each(result, function (value, key) {
                         if (value.results.length > 0) {
                             filtered[key] = value;
                         }

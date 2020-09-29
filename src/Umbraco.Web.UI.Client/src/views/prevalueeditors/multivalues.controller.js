@@ -38,6 +38,7 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.MultiValuesControl
         $scope.add = function (evt) {
             evt.preventDefault();
             
+            
             if ($scope.newItem) {
                 if (!_.contains($scope.model.value, $scope.newItem)) {                
                     $scope.model.value.push({ value: $scope.newItem });
@@ -78,7 +79,7 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.MultiValuesControl
             if (event.keyCode == 13) {
                 $scope.add(event);
             }
-        };
+        }
 
         function getElementIndexByPrevalueText(value) {
             for (var i = 0; i < $scope.model.value.length; i++) {

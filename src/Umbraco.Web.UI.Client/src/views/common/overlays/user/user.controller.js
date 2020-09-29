@@ -160,7 +160,7 @@ angular.module("umbraco")
                     }, 2000);
 
                 }, function (err) {
-                    formHelper.resetForm({ scope: $scope, hasErrors: true });
+
                     formHelper.handleError(err);
 
                     $scope.changePasswordButtonState = "error";

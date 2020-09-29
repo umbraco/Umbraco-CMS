@@ -549,7 +549,7 @@
             var availableMasterTemplates = [];
 
             // filter out the current template and the selected master template
-            vm.templates.forEach(function (template) {
+            angular.forEach(vm.templates, function (template) {
                 if (template.alias !== vm.template.alias && template.alias !== vm.template.masterTemplateAlias) {
                     var templatePathArray = template.path.split(',');
                     // filter descendant templates of current template
@@ -602,7 +602,7 @@
         function getMasterTemplateName(masterTemplateAlias, templates) {
             if (masterTemplateAlias) {
                 var templateName = "";
-                templates.forEach(function (template) {
+                angular.forEach(templates, function (template) {
                     if (template.alias === masterTemplateAlias) {
                         templateName = template.name;
                     }

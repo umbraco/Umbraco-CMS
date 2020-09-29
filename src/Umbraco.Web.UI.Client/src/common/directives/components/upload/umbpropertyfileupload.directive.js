@@ -78,8 +78,6 @@
         /** Called when the component initializes */
         function onInit() {
             $scope.$on("filesSelected", onFilesSelected);
-            $scope.$on("isDragover", isDragover);
-
             initialize();
         }
 
@@ -120,9 +118,7 @@
                         isImage: mediaHelper.detectIfImageByExtension(file),
                         extension: getExtension(file)
                     };
-
                     f.fileSrc = getThumbnail(f);
-
                     return f;
                 });
 
@@ -232,22 +228,19 @@
                 var index = i; //capture
 
                 var isImage = mediaHelper.detectIfImageByExtension(files[i].name);
-                var extension = getExtension(files[i].name);
 
-                var f = {
+                //save the file object to the files collection
+                vm.files.push({
                     isImage: isImage,
-                    extension: extension,
+                    extension: getExtension(files[i].name),
                     fileName: files[i].name,
                     isClientSide: true
-                };
-
-                // Save the file object to the files collection
-                vm.files.push(f);
+                });
 
                 //special check for a comma in the name
                 newVal += files[i].name.split(',').join('-') + ",";
 
-                if (isImage || extension === "svg") {
+                if (isImage) {
 
                     var deferred = $q.defer();
 
@@ -300,11 +293,6 @@
             }
         }
 
-        function isDragover(e, args) {
-            vm.dragover = args.value;
-            angularHelper.safeApply($scope);
-        }
-
     };
 
     var umbPropertyFileUploadComponent = {
@@ -315,7 +303,6 @@
             propertyAlias: "@",
             value: "<",
             hideSelection: "<",
-            dragover: "<",
             /**
              * Called when a file is selected on this instance
              */

@@ -126,15 +126,15 @@ namespace Umbraco.Web.Editors
         [EnsureUserPermissionForMedia("id")]
         public MediaItemDisplay GetById(int id)
         {
-            var foundMedia = GetObjectFromRequest(() => Services.MediaService.GetById(id));
+            var foundContent = GetObjectFromRequest(() => Services.MediaService.GetById(id));
 
-            if (foundMedia == null)
+            if (foundContent == null)
             {
                 HandleContentNotFound(id);
                 //HandleContentNotFound will throw an exception
                 return null;
             }
-            return Mapper.Map<MediaItemDisplay>(foundMedia);
+            return Mapper.Map<MediaItemDisplay>(foundContent);
         }
 
         /// <summary>
@@ -146,15 +146,15 @@ namespace Umbraco.Web.Editors
         [EnsureUserPermissionForMedia("id")]
         public MediaItemDisplay GetById(Guid id)
         {
-            var foundMedia = GetObjectFromRequest(() => Services.MediaService.GetById(id));
+            var foundContent = GetObjectFromRequest(() => Services.MediaService.GetById(id));
 
-            if (foundMedia == null)
+            if (foundContent == null)
             {
                 HandleContentNotFound(id);
                 //HandleContentNotFound will throw an exception
                 return null;
             }
-            return Mapper.Map<MediaItemDisplay>(foundMedia);
+            return Mapper.Map<MediaItemDisplay>(foundContent);
         }
 
         /// <summary>
@@ -774,13 +774,10 @@ namespace Umbraco.Web.Editors
             var total = long.MaxValue;
             while (page * pageSize < total)
             {
-                var children = Services.MediaService.GetPagedChildren(mediaId, page++, pageSize, out total,
+                var children = Services.MediaService.GetPagedChildren(mediaId, page, pageSize, out total,
                     SqlContext.Query<IMedia>().Where(x => x.Name == nameToFind));
-                var match = children.FirstOrDefault(c => c.ContentType.Alias == contentTypeAlias);
-                if (match != null)
-                {
-                    return match;
-                }
+                foreach (var c in children)
+                    return c; //return first one if any are found
             }
             return null;
         }

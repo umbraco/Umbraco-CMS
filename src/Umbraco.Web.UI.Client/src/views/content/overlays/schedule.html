@@ -23,26 +23,25 @@
                                    on-close="vm.datePickerClose(vm.variants[0], 'publish')">
 
                         <div>
-                            <button type="button" ng-show="vm.variants[0].releaseDate" class="btn btn-reset umb-button--xs" style="outline: none;">
+                            <button ng-show="vm.variants[0].releaseDate" class="btn umb-button--xs" style="outline: none;">
                                 {{vm.variants[0].releaseDateFormatted}}
                             </button>
 
-                            <button type="button" class="btn-reset" ng-hide="vm.variants[0].releaseDate">
+                            <a ng-hide="vm.variants[0].releaseDate" href="">
                                 <localize key="content_setDate">Set date</localize>
-                            </button>
+                            </a>
                         </div>
 
                     </umb-date-time-picker>
 
-                    <button type="button" ng-show="vm.variants[0].releaseDate" ng-click="vm.clearPublishDate(vm.variants[0])" class="btn btn-reset umb-button--xs dropdown-toggle umb-button-group__toggle" style="margin-left: -2px;">
-                        <umb-icon icon="icon-wrong" class="icon icon-wrong"></umb-icon>
-                    </button>
+                    <a ng-show="vm.variants[0].releaseDate" ng-click="vm.clearPublishDate(vm.variants[0])" class="btn umb-button--xs dropdown-toggle umb-button-group__toggle" style="margin-left: -2px;">
+                        <span class="icon icon-wrong"></span>
+                    </a>
 
                 </div>
             </div>
 
             <div class="date-wrapper__date">
-
                 <label class="bold">
                     <localize key="content_unpublishDate"></localize>
                 </label>
@@ -56,20 +55,20 @@
                                    on-close="vm.datePickerClose(vm.variants[0], 'unpublish')">
 
                         <div>
-                            <button type="button" ng-show="vm.variants[0].expireDate" class="btn btn-reset umb-button--xs" style="outline: none;">
+                            <button ng-show="vm.variants[0].expireDate" class="btn umb-button--xs" style="outline: none;">
                                 {{vm.variants[0].expireDateFormatted}}
                             </button>
 
-                            <button type="button" class="btn-reset" ng-hide="vm.variants[0].expireDate">
+                            <a ng-hide="vm.variants[0].expireDate" href="">
                                 <localize key="content_setDate">Set date</localize>
-                            </button>
+                            </a>
                         </div>
 
                     </umb-date-time-picker>
 
-                    <button type="button" ng-show="vm.variants[0].expireDate" ng-click="vm.clearUnpublishDate(vm.variants[0])" class="btn btn-reset umb-button--xs dropdown-toggle umb-button-group__toggle" style="margin-left: -2px;">
-                        <umb-icon icon="icon-wrong" class="icon icon-wrong"></umb-icon>
-                    </button>
+                    <a ng-show="vm.variants[0].expireDate" ng-click="vm.clearUnpublishDate(vm.variants[0])" class="btn umb-button--xs dropdown-toggle umb-button-group__toggle" style="margin-left: -2px;">
+                        <span class="icon icon-wrong"></span>
+                    </a>
 
                 </div>
             </div>
@@ -89,12 +88,13 @@
                 <ng-form name="scheduleSelectorForm" style="width:100%;">
                     <div class="umb-variant-selector-entry" ng-class="{'umb-list-item--error': scheduleSelectorForm.saveVariantReleaseDate.$invalid}">
 
-                        <umb-checkbox input-id="{{variant.htmlId}}"
-                                      name="saveVariantSelector"
-                                      model="variant.save"
-                                      on-change="vm.changeSelection(variant)"
-                                      server-validation-field="{{variant.htmlId}}">
-
+                        <umb-checkbox
+                            input-id="{{variant.htmlId}}"
+                            name="saveVariantSelector"
+                            model="variant.save"
+                            on-change="vm.changeSelection(variant)"
+                            server-validation-field="{{variant.htmlId}}"
+                        >
                             <span class="umb-variant-selector-entry__title" ng-if="!(variant.segment && variant.language)">
                                 <span ng-bind="variant.displayName"></span>
                                 <strong ng-if="variant.isMandatory" class="umb-control-required">*</strong>
@@ -105,14 +105,16 @@
                                 <strong ng-if="variant.isMandatory" class="umb-control-required">*</strong>
                             </span>
                             <span class="umb-variant-selector-entry__description"
-                                  ng-if="!scheduleSelectorForm.$invalid && !(variant.notifications && variant.notifications.length > 0)">
+                                ng-if="!scheduleSelectorForm.$invalid && !(variant.notifications && variant.notifications.length > 0)">
                                 <umb-variant-state variant="variant"></umb-variant-state>
                                 <span ng-show="variant.language.isMandatory"> - <localize key="languages_mandatoryLanguage"></localize></span>
                             </span>
-
                         </umb-checkbox>
 
                         <div>
+
+
+
                             <div class="date-wrapper-mini date-wrapper-mini--checkbox">
                                 <div class="date-wrapper-mini__date" ng-if="(variant.releaseDate || variant.save)">
 
@@ -126,17 +128,17 @@
                                                        on-open="vm.datePickerShow(variant, 'publish')"
                                                        on-close="vm.datePickerClose(variant, 'publish')">
                                             <div>
-                                                <button type="button" ng-show="variant.releaseDate" class="btn btn-reset umb-button--xxs btn-outline umb-outline">
+                                                <button ng-show="variant.releaseDate" class="btn umb-button--xxs btn-outline umb-outline">
                                                     {{variant.releaseDateFormatted}}
                                                 </button>
 
-                                                <button type="button" class="btn-reset" ng-hide="variant.releaseDate">
+                                                <a ng-hide="variant.releaseDate" href="">
                                                     <localize key="content_setDate">Set date</localize>
-                                                </button>
+                                                </a>
                                             </div>
                                         </umb-date-time-picker>
-                                        <button type="button" ng-show="variant.releaseDate" ng-click="vm.clearPublishDate(variant)" class="btn umb-button--xxs dropdown-toggle umb-button-group__toggle btn-outline umb-outline" style="margin-left: -2px;">
-                                            <umb-icon icon="icon-wrong" class="icon icon-wrong"></umb-icon>
+                                        <button ng-show="variant.releaseDate" ng-click="vm.clearPublishDate(variant)" class="btn umb-button--xxs dropdown-toggle umb-button-group__toggle btn-outline umb-outline" style="margin-left: -2px;">
+                                            <span class="icon icon-wrong"></span>
                                         </button>
                                     </div>
                                 </div>
@@ -152,18 +154,18 @@
                                                        on-open="vm.datePickerShow(variant, 'unpublish')"
                                                        on-close="vm.datePickerClose(variant, 'unpublish')">
                                             <div>
-                                                <button type="button" ng-show="variant.expireDate" class="btn btm-reset umb-button--xxs btn-outline umb-outline">
+                                                <button ng-show="variant.expireDate" class="btn umb-button--xxs btn-outline umb-outline">
                                                     {{variant.expireDateFormatted}}
                                                 </button>
 
-                                                <button type="button" class="btn-reset" ng-hide="variant.expireDate">
+                                                <a ng-hide="variant.expireDate" href="">
                                                     <localize key="content_setDate">Set date</localize>
-                                                </button>
+                                                </a>
                                             </div>
                                         </umb-date-time-picker>
-                                        <button type="button" ng-show="variant.expireDate" ng-click="vm.clearUnpublishDate(variant)" class="btn btn-reset umb-button--xxs dropdown-toggle umb-button-group__toggle btn-outline umb-outline" style="margin-left: -2px;">
-                                            <umb-icon icon="icon-wrong" class="icon icon-wrong"></umb-icon>
-                                        </button>
+                                        <a ng-show="variant.expireDate" ng-click="vm.clearUnpublishDate(variant)" class="btn umb-button--xxs dropdown-toggle umb-button-group__toggle btn-outline umb-outline" style="margin-left: -2px;">
+                                            <span class="icon icon-wrong"></span>
+                                        </a>
                                     </div>
                                 </div>
                             </div>
@@ -181,9 +183,12 @@
 
                         </div>
                     </div>
+
                 </ng-form>
             </div>
             <br />
         </div>
+
     </div>
+
 </div>

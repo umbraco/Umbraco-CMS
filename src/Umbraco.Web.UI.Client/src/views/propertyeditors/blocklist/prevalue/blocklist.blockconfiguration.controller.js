@@ -50,8 +50,8 @@
         unsubscribe.push(eventsService.on("editors.documentType.saved", updateUsedElementTypes));
 
         vm.requestRemoveBlockByIndex = function (index) {
-            localizationService.localizeMany(["general_delete", "blockEditor_confirmDeleteBlockTypeMessage", "blockEditor_confirmDeleteBlockTypeNotice"]).then(function (data) {
-                var contentElementType = vm.getElementTypeByKey($scope.model.value[index].contentElementTypeKey);
+            localizationService.localizeMany(["general_delete", "blockEditor_confirmDeleteBlockMessage", "blockEditor_confirmDeleteBlockNotice"]).then(function (data) {
+                var contentElementType = vm.getElementTypeByKey($scope.model.value[index].contentTypeKey);
                 overlayService.confirmDelete({
                     title: data[0],
                     content: localizationService.tokenReplace(data[1], [contentElementType.name]),
@@ -70,19 +70,19 @@
         vm.removeBlockByIndex = function (index) {
             $scope.model.value.splice(index, 1);
         };
-
+        
         vm.sortableOptions = {
             "ui-floating": true,
             items: "umb-block-card",
             cursor: "grabbing",
             placeholder: 'umb-block-card --sortable-placeholder'
         };
-
+        
 
         vm.getAvailableElementTypes = function () {
             return vm.elementTypes.filter(function (type) {
                 return !$scope.model.value.find(function (entry) {
-                    return type.key === entry.contentElementTypeKey;
+                    return type.key === entry.contentTypeKey;
                 });
             });
         };
@@ -99,14 +99,14 @@
 
             //we have to add the 'alias' property to the objects, to meet the data requirements of itempicker.
             var selectedItems = Utilities.copy($scope.model.value).forEach((obj) => {
-                obj.alias = vm.getElementTypeByKey(obj.contentElementTypeKey).alias;
+                obj.alias = vm.getElementTypeByKey(obj.contentTypeKey).alias;
                 return obj;
             });
 
             var availableItems = vm.getAvailableElementTypes()
 
             localizationService.localizeMany(["blockEditor_headlineCreateBlock", "blockEditor_labelcreateNewElementType"]).then(function(localized) {
-
+                
                 var elemTypeSelectorOverlay = {
                     view: "itempicker",
                     title: localized[0],
@@ -133,7 +133,7 @@
                 };
 
                 overlayService.open(elemTypeSelectorOverlay);
-
+                
             });
         };
 
@@ -158,7 +158,7 @@
         vm.addBlockFromElementTypeKey = function(key) {
 
             var entry = {
-                "contentElementTypeKey": key,
+                "contentTypeKey": key,
                 "settingsElementTypeKey": null,
                 "labelTemplate": "",
                 "view": null,
@@ -178,7 +178,7 @@
 
         vm.openBlockOverlay = function (block) {
 
-            localizationService.localize("blockEditor_blockConfigurationOverlayTitle", [vm.getElementTypeByKey(block.contentElementTypeKey).name]).then(function (data) {
+            localizationService.localize("blockEditor_blockConfigurationOverlayTitle", [vm.getElementTypeByKey(block.contentTypeKey).name]).then(function (data) {
 
                 var clonedBlockData = Utilities.copy(block);
                 vm.openBlock = block;
@@ -209,7 +209,7 @@
         $scope.$on('$destroy', function () {
             unsubscribe.forEach(u => { u(); });
         });
-
+        
         onInit();
 
     }

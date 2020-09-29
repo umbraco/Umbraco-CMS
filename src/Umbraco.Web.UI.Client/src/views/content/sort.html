@@ -19,19 +19,21 @@
                             <tr>
                                 <th colspan="2">
                                     <button type="button" class="btn-reset" ng-click="vm.sort('name')">
-                                        <strong><localize key="general_name">Name</localize></strong>
+                                        <b><localize key="general_name">Name</localize></b>
                                         <span ng-if="vm.sortOrder.column === 'name'" aria-hidden="true">
-                                            <i ng-class="{ 'icon-navigation-up': vm.sortOrder.reverse, 'icon-navigation-down': !vm.sortOrder.reverse }"></i>
+                                            <i ng-if="vm.sortOrder.reverse" class="icon-navigation-up"></i>
+                                            <i ng-if="!vm.sortOrder.reverse" class="icon-navigation-down"></i>
                                         </span>
                                     </button>
                                 </th>
                                 <th>
                                     <button type="button" class="btn-reset" ng-click="vm.sort('createDate')">
-                                        <strong><localize key="sort_sortCreationDate">Creation date</localize></strong>
+                                        <b><localize key="sort_sortCreationDate">Creation date</localize></b>
                                         <span ng-if="vm.sortOrder.column === 'createDate'" aria-hidden="true">
-                                            <i ng-class="{ 'icon-navigation-up': vm.sortOrder.reverse, 'icon-navigation-down': !vm.sortOrder.reverse }"></i>
+                                            <i ng-if="vm.sortOrder.reverse" class="icon-navigation-up"></i>
+                                            <i ng-if="!vm.sortOrder.reverse" class="icon-navigation-down"></i>
                                         </span>
-                                    </button>
+                                    </a>
                                 </th>
                             </tr>
                         </thead>

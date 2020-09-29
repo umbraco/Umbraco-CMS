@@ -88,8 +88,9 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
             /** Helper function to emit tree events */
             function emitEvent(eventName, args) {
                 if (registeredCallbacks[eventName] && Utilities.isArray(registeredCallbacks[eventName])) {
-                    // call it
-                    registeredCallbacks[eventName].forEach(c => c(args));
+                    _.each(registeredCallbacks[eventName], function (c) {
+                        c(args);//call it
+                    });
                 }
             }
 
@@ -341,17 +342,26 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
 
                 var css = [];
                 if (node.cssClasses) {
-                    node.cssClasses.forEach(c => css.push(c));
+                    _.each(node.cssClasses, function (c) {
+                        css.push(c);
+                    });
                 }
 
                 return css.join(" ");
             };
 
-            $scope.selectEnabledNodeClass = node =>
-                node && node.selected ? 'icon umb-tree-icon sprTree icon-check green temporary' : '';            
+            $scope.selectEnabledNodeClass = function (node) {
+                return node ?
+                    node.selected ?
+                        'icon umb-tree-icon sprTree icon-check green temporary' :
+                        '' :
+                    '';
+            };
 
             /* helper to force reloading children of a tree node */
-            $scope.loadChildren = (node, forceReload) => loadChildren(node, forceReload);
+            $scope.loadChildren = function (node, forceReload) {
+                return loadChildren(node, forceReload);
+            };
 
             /**
               Method called when the options button next to the root node is called.

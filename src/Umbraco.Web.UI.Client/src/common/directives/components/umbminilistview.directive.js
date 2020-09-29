@@ -63,7 +63,7 @@
                         }
                         // update children
                         miniListView.children = data.items;
-                        miniListView.children.forEach(c => {
+                        _.each(miniListView.children, function(c) {
                             // child allowed by default
                             c.allowed = true;
  
@@ -95,8 +95,7 @@
                             var filtered = angular.isFunction(scope.entityTypeFilter.filter)
                                 ? _.filter(miniListView.children, scope.entityTypeFilter.filter)
                                 : _.where(miniListView.children, scope.entityTypeFilter.filter);
-                            
-                            filtered.forEach(node => node.allowed = false);
+                            _.each(filtered, (node) => node.allowed = false);
                         }
 
                         // update pagination

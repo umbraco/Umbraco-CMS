@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function UserPickerController($scope, usersResource, localizationService, eventsService) {
+    function UserPickerController($scope, usersResource, localizationService) {
         
         var vm = this;
 
@@ -15,18 +15,15 @@
         vm.submit = submit;
         vm.close = close;
 
-        vm.multiPicker = $scope.model.multiPicker === false ? false : true;
+        //////////
 
         function onInit() {
 
             vm.loading = true;
 
             // set default title
-            if (!$scope.model.title) {
-
-                var labelKey = vm.multiPicker ? "defaultdialogs_selectUsers" : "defaultdialogs_selectUser";
-
-                localizationService.localize(labelKey).then(function(value){
+            if(!$scope.model.title) {
+                localizationService.localize("defaultdialogs_selectUsers").then(function(value){
                     $scope.model.title = value;
                 });
             }
@@ -38,11 +35,12 @@
 
             // get users
             getUsers();
+            
         }
 
         function preSelect(selection, users) {
-            Utilities.forEach(selection, function(selected){
-                Utilities.forEach(users, function(user){
+            angular.forEach(selection, function(selected){
+                angular.forEach(users, function(user){
                     if(selected.id === user.id) {
                         user.selected = true;
                     }
@@ -52,39 +50,22 @@
 
         function selectUser(user) {
 
-            if (!user.selected) {
+            if(!user.selected) {
+                
                 user.selected = true;
                 $scope.model.selection.push(user);
+
             } else {
 
-                if (user.selected) {
-                    Utilities.forEach($scope.model.selection, function (selectedUser, index) {
-                        if (selectedUser.id === user.id) {
-                            user.selected = false;
-                            $scope.model.selection.splice(index, 1);
-                        }
-                    });
-                } else {
-                    if (!vm.multiPicker) {
-                        deselectAllUsers($scope.model.selection);
+                angular.forEach($scope.model.selection, function(selectedUser, index){
+                    if(selectedUser.id === user.id) {
+                        user.selected = false;
+                        $scope.model.selection.splice(index, 1);
                     }
-                    eventsService.emit("dialogs.userPicker.select", user);
-                    user.selected = true;
-                    $scope.model.selection.push(user);
-                }
+                });
+
             }
 
-            if (!vm.multiPicker) {
-                submit($scope.model);
-            }
-        }
-
-        function deselectAllUsers(users) {
-            for (var i = 0; i < users.length; i++) {
-                var user = users[i];
-                user.selected = false;
-            }
-            users.length = 0;
         }
 
         var search = _.debounce(function () {
@@ -114,6 +95,7 @@
                 preSelect($scope.model.selection, vm.users);
 
                 vm.loading = false;
+
             });
         }
 
@@ -123,14 +105,14 @@
         }
 
         function submit(model) {
-            if ($scope.model.submit) {
+            if($scope.model.submit) {
                 $scope.model.submit(model);
             }
         }
 
         function close() {
-            if ($scope.model.close) {
-               $scope.model.close();
+            if($scope.model.close) {
+                $scope.model.close();
             }
         }
 

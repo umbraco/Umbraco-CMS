@@ -77,7 +77,6 @@ namespace Umbraco.Web.Models.Mapping
         private void Map(IMember source, MemberDisplay target, MapperContext context)
         {
             target.ContentApps = _commonMapper.GetContentApps(source);
-            target.ContentType = _commonMapper.GetContentType(source, context);
             target.ContentTypeId = source.ContentType.Id;
             target.ContentTypeAlias = source.ContentType.Alias;
             target.ContentTypeName = source.ContentType.Name;

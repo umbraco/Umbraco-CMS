@@ -60,11 +60,6 @@ namespace Umbraco.Examine
                 scope.Complete();
             }
 
-            return GetValueSetsEnumerable(content, creatorIds, writerIds);
-        }
-
-        private IEnumerable<ValueSet> GetValueSetsEnumerable(IContent[] content, Dictionary<int, IProfile> creatorIds, Dictionary<int, IProfile> writerIds)
-        {
             // TODO: There is a lot of boxing going on here and ultimately all values will be boxed by Lucene anyways
             // but I wonder if there's a way to reduce the boxing that we have to do or if it will matter in the end since
             // Lucene will do it no matter what? One idea was to create a `FieldValue` struct which would contain `object`, `object[]`, `ValueType` and `ValueType[]`

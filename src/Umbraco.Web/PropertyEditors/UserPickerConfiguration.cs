@@ -7,8 +7,7 @@ namespace Umbraco.Web.PropertyEditors
     {
         public override IDictionary<string, object> DefaultConfiguration => new Dictionary<string, object>
         {
-            { "entityType", "User" },
-            { "multiPicker", "0" }
+            {"entityType", "User"}
         };
     }
 }

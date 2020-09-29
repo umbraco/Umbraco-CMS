@@ -177,7 +177,7 @@ namespace Umbraco.Web.Scheduling
                 new[] { new DirectoryInfo(IOHelper.MapPath(SystemDirectories.TempFileUploads)) },
                 TimeSpan.FromDays(1), //files that are over a day old
                 _runtime, _logger);
-            _fileCleanupRunner.TryAdd(task);
+            _scrubberRunner.TryAdd(task);
             return task;
         }
     }

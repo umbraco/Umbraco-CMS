@@ -7,7 +7,7 @@ using Umbraco.Core.Migrations.Upgrade.V_8_0_0;
 using Umbraco.Core.Migrations.Upgrade.V_8_0_1;
 using Umbraco.Core.Migrations.Upgrade.V_8_1_0;
 using Umbraco.Core.Migrations.Upgrade.V_8_6_0;
-using Umbraco.Core.Migrations.Upgrade.V_8_9_0;
+using Umbraco.Core.Migrations.Upgrade.V_8_8_0;
 
 namespace Umbraco.Core.Migrations.Upgrade
 {
@@ -194,9 +194,9 @@ namespace Umbraco.Core.Migrations.Upgrade
 
             // to 8.7.0...
             To<MissingDictionaryIndex>("{a78e3369-8ea3-40ec-ad3f-5f76929d2b20}");
-
-            // to 8.9.0...
             To<AddCmsContentNuByteColumn>("{8DDDCD0B-D7D5-4C97-BD6A-6B38CA65752F}");
+
+            // to 8.8.0...
             To<UpgradedIncludeIndexes>("{4695D0C9-0729-4976-985B-048D503665D8}");
 
             //FINAL

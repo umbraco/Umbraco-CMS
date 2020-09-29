@@ -16,16 +16,13 @@
 
         <div class="umb-sub-views-nav-item umb-sub-views-nav-item-more">
 
-            <umb-button-ellipsis
-                element="sub-view-{{moreButton.alias}}"
-                action="toggleDropdown()"
-                color="#1b264f"
-                text="{{moreButton.name}}"
-                show-text="true"
-                mode="tab"
-                css-class="umb-sub-views-nav-item__action umb-outline umb-outline--thin {{moreButton.active ? 'is-active' : ''}}"
-                >
-            </umb-button-ellipsis>
+            <a data-element="sub-view-{{moreButton.alias}}"
+                href=""
+                ng-click="toggleDropdown()"
+                ng-class="{'is-active': moreButton.active}">
+                <div class="umb-sub-views-nav-item-more__icon"><i></i><i></i><i></i></div>
+                <span class="umb-sub-views-nav-item-text">{{ moreButton.name }}</span>
+            </a>
 
             <umb-dropdown ng-show="showDropdown" on-close="hideDropdown()" class="umb-sub-views-nav-item-more__dropdown">
                 <umb-dropdown-item ng-repeat="navItem in navigation | limitTo: overflowingItems">

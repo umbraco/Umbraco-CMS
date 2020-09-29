@@ -168,7 +168,6 @@
                         vm.inviteStep = 2;
 
                     }, function (err) {
-                        formHelper.resetForm({ scope: $scope, hasErrors: true });
                         formHelper.handleError(err);
                         vm.invitedUserPasswordModel.buttonState = "error";
                     });

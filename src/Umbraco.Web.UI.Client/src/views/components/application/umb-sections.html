@@ -14,12 +14,9 @@
             </li>
 
             <li data-element="section-expand" class="expand" ng-class="{ 'open': showTray === true, current: currentSectionInOverflow() }" ng-show="visibleSections < sections.length">
-                <umb-button-ellipsis
-                    action="trayClick()"
-                    text="More sections"
-                    color="#ffffff"
-                    >
-                </umb-button-ellipsis>
+                <a href="#" ng-click="trayClick()" prevent-default aria-label="More sections">
+                    <span class="section__name">&bull;&bull;&bull;</span>
+                </a>
 
                 <ul id="applications-tray" class="sections-tray shadow-depth-2" ng-if="showTray" on-outside-click="trayClick()">
                     <li ng-repeat="section in sections | limitTo: sections.length | limitTo: -(sections.length - visibleSections)" ng-class="{current: section.alias == currentSection}">

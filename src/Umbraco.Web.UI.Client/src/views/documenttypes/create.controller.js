@@ -47,13 +47,12 @@ function DocumentTypesCreateController($scope, $location, navigationService, con
                     activate: true
                 });
 
-                formHelper.resetForm({ scope: $scope, formCtrl: this.createFolderForm });
+                formHelper.resetForm({ scope: $scope });
 
                 var section = appState.getSectionState("currentSection");
 
             }, function (err) {
 
-                formHelper.resetForm({ scope: $scope, formCtrl: this.createFolderForm, hasErrors: true });
                 $scope.error = err;
 
             });
@@ -84,7 +83,9 @@ function DocumentTypesCreateController($scope, $location, navigationService, con
                         $location.search('create', null);
                         $location.search('notemplate', null);
 
-                        formHelper.resetForm({ scope: $scope, formCtrl: this.createDoctypeCollectionForm });
+                        formHelper.resetForm({
+                            scope: $scope
+                        });
 
                         var section = appState.getSectionState("currentSection");
 
@@ -93,7 +94,6 @@ function DocumentTypesCreateController($scope, $location, navigationService, con
 
                     }, function (err) {
 
-                        formHelper.resetForm({ scope: $scope, formCtrl: this.createDoctypeCollectionForm, hasErrors: true });
                         $scope.error = err;
 
                         //show any notifications

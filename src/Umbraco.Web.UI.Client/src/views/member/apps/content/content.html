@@ -7,7 +7,7 @@
         </div>
 
         <div class="umb-group-panel__content">
-            <umb-property data-element="property-{{group.alias}}" ng-repeat="property in group.properties | filter:vm.hideSystemProperties track by property.alias" property="property">
+            <umb-property data-element="property-{{group.alias}}" ng-repeat="property in group.properties | filter: {view:'!readonlyvalue'} | filter: {alias:'!_umb_id'} | filter: {alias:'!_umb_doctype'} track by property.alias" property="property">
                 <umb-property-editor model="property"></umb-property-editor>
             </umb-property>
         </div>

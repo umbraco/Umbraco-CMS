@@ -538,10 +538,6 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
 
         public override IPublishedContentType GetContentType(Guid key) => _contentTypeCache.Get(PublishedItemType.Content, key);
 
-        public void Dispose()
-        {
-        }
-
         #endregion
     }
 }

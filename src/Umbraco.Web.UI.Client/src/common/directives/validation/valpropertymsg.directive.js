@@ -306,15 +306,7 @@ function valPropertyMsg(serverValidationManager, localizationService, angularHel
                                 formCtrl.$setValidity('valPropertyMsg', false);
                                 startWatch();
 
-                                // This check is required in order to be able to reset ourselves and is typically for complex editor
-                                // scenarios where the umb-property itself doesn't contain any ng-model controls which means that the
-                                // above serverValidityResetter technique will not work to clear valPropertyMsg errors.
-                                // In order for this to work we rely on the current form controller's $pristine state. This means that anytime
-                                // the form is submitted whether there are validation errors or not the state must be reset... this is automatically
-                                // taken care of with the formHelper.resetForm method that should be used in all cases. $pristine is required because it's
-                                // a value that is cascaded to all form controls based on the hierarchy of child ng-model controls. This allows us to easily
-                                // know if a value has changed. The alternative is what we used to do which was to put a deep $watch on the entire complex value
-                                // which is hugely inefficient. 
+                                
                                 if (propertyErrors.length === 1 && hadError && !formCtrl.$pristine) {
                                     var propertyValidationPath = umbPropCtrl.getValidationPath();
                                     serverValidationManager.removePropertyError(propertyValidationPath, currentCulture, "", currentSegment);

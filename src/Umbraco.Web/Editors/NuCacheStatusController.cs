@@ -35,11 +35,6 @@ namespace Umbraco.Web.Editors
             service.RebuildContentDbCache();
             service.RebuildMediaDbCache();
             service.RebuildMemberDbCache();
-
-            // TODO: Shouldn't this just be ??
-            // service.Rebuild();
-
-
             return service.GetStatus();
         }
 

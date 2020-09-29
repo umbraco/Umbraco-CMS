@@ -106,10 +106,10 @@
                                 <div class="umb-el-wrap">
                                     <label class="control-label"><localize key="blockEditor_labelContentElementType">Content ElementType</localize></label>
                                     <div class="controls">
-                                        <div class="__settings-input --hasValue" ng-if="vm.block.contentElementTypeKey !== null" >
+                                        <div class="__settings-input --hasValue" ng-if="vm.block.contentTypeKey !== null" >
                                             <umb-node-preview icon="vm.contentPreview.icon" name="vm.contentPreview.name" alias="vm.contentPreview.alias"></umb-node-preview>
                                             <div class="__control-actions">
-                                                <button type="button" class="btn-reset __control-actions-btn --open umb-outline" ng-click="vm.openElementType(vm.block.contentElementTypeKey)">
+                                                <button type="button" class="btn-reset __control-actions-btn --open umb-outline" ng-click="vm.openElementType(vm.block.contentTypeKey)">
                                                     <i class="icon icon-edit"></i>
                                                 </button>
                                             </div>
@@ -227,7 +227,6 @@
 
                     <umb-button
                         action="vm.close()"
-                        shortcut="esc"
                         button-style="link"
                         label-key="general_close"
                         type="button">

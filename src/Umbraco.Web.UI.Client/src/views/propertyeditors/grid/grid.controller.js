@@ -405,16 +405,14 @@ angular.module("umbraco")
 
                 eventsService.emit("grid.rowAdded", { scope: $scope, element: $element, row: row });
 
-                if (!isInit) {
-                    // TODO: find a nicer way to do this without relying on setTimeout
-                    setTimeout(function () {
-                        var newRowEl = $element.find("[data-rowid='" + row.$uniqueId + "']");
+                // TODO: find a nicer way to do this without relying on setTimeout
+                setTimeout(function () {
+                    var newRowEl = $element.find("[data-rowid='" + row.$uniqueId + "']");
 
-                        if (newRowEl !== null) {
-                            newRowEl.focus();
-                        }
-                    }, 0);
-                }
+                    if (newRowEl !== null) {
+                        newRowEl.focus();
+                    }
+                }, 0);
 
             };
 
@@ -627,8 +625,21 @@ angular.module("umbraco")
 
             }
 
-            $scope.setUniqueId = function () {
-                return String.CreateGuid();
+
+            var guid = (function () {
+                function s4() {
+                    return Math.floor((1 + Math.random()) * 0x10000)
+                        .toString(16)
+                        .substring(1);
+                }
+                return function () {
+                    return s4() + s4() + "-" + s4() + "-" + s4() + "-" +
+                        s4() + "-" + s4() + s4() + s4();
+                };
+            })();
+
+            $scope.setUniqueId = function (cell, index) {
+                return guid();
             };
 
             $scope.addControl = function (editor, cell, index, initialize) {
@@ -942,7 +953,7 @@ angular.module("umbraco")
                 $scope.availableEditors = response.data;
 
                 //Localize the grid editor names
-                $scope.availableEditors.forEach(function (value) {
+                angular.forEach($scope.availableEditors, function (value, key) {
                     //If no translation is provided, keep using the editor name from the manifest
                     localizationService.localize("grid_" + value.alias, undefined, value.name).then(function (v) {
                         value.name = v;

@@ -20,10 +20,10 @@
         loadElementTypes();
 
         function loadElementTypes() {
-            return elementTypeResource.getAll().then(function(elementTypes) {
+            return elementTypeResource.getAll().then(function (elementTypes) {
                 vm.elementTypes = elementTypes;
 
-                vm.contentPreview = vm.getElementTypeByKey(vm.block.contentElementTypeKey);
+                vm.contentPreview = vm.getElementTypeByKey(vm.block.contentTypeKey);
                 vm.settingsPreview = vm.getElementTypeByKey(vm.block.settingsElementTypeKey);
             });
         }
@@ -46,7 +46,7 @@
                 }
             };
             editorService.documentTypeEditor(editor);
-        };
+        }
 
         vm.createElementTypeAndCallback = function(callback) {
             const editor = {
@@ -62,9 +62,9 @@
                 }
             };
             editorService.documentTypeEditor(editor);
-        };
+        }
 
-        vm.addSettingsForBlock = function($event, block) {
+        vm.addSettingsForBlock = function ($event, block) {
 
             localizationService.localizeMany(["blockEditor_headlineAddSettingsElementType", "blockEditor_labelcreateNewElementType"]).then(function(localized) {
 
@@ -95,12 +95,11 @@
                 };
 
                 overlayService.open(elemTypeSelectorOverlay);
+
             });
         };
-
         vm.applySettingsToBlock = function(block, key) {
             block.settingsElementTypeKey = key;
-            vm.settingsPreview = vm.getElementTypeByKey(vm.block.settingsElementTypeKey);
         };
 
         vm.requestRemoveSettingsForBlock = function(block) {
@@ -121,10 +120,10 @@
                 });
             });
         };
-
         vm.removeSettingsForBlock = function(block) {
             block.settingsElementTypeKey = null;
         };
+
 
         function updateUsedElementTypes(event, args) {
             var key = args.documentType.key;
@@ -141,12 +140,13 @@
                 vm.settingsPreview = args.documentType;
                 $scope.$evalAsync();
             }
-        }
 
+        }
         unsubscribe.push(eventsService.on("editors.documentType.saved", updateUsedElementTypes));
 
+
         vm.addViewForBlock = function(block) {
-            localizationService.localize("blockEditor_headlineAddCustomView").then(function (localizedTitle) {
+            localizationService.localize("blockEditor_headlineSelectView").then(function(localizedTitle) {
 
                 const filePicker = {
                     title: localizedTitle,
@@ -159,7 +159,7 @@
                     },
                     select: function (node) {
                         const filepath = decodeURIComponent(node.id.replace(/\+/g, " "));
-                        block.view = "~/" + filepath;
+                        block.view = filepath;
                         editorService.close();
                     },
                     close: function () {
@@ -167,10 +167,9 @@
                     }
                 };
                 editorService.treePicker(filePicker);
-
+            
             });
-        };
-
+        }
         vm.requestRemoveViewForBlock = function(block) {
             localizationService.localizeMany(["general_remove", "defaultdialogs_confirmremoveusageof"]).then(function (data) {
                 overlayService.confirmRemove({
@@ -186,14 +185,15 @@
                 });
             });
         };
-
         vm.removeViewForBlock = function(block) {
             block.view = null;
         };
 
-        vm.addStylesheetForBlock = function(block) {
-            localizationService.localize("blockEditor_headlineAddCustomStylesheet").then(function (localizedTitle) {
 
+        
+        vm.addStylesheetForBlock = function(block) {
+            localizationService.localize("blockEditor_headlineAddCustomStylesheet").then(function(localizedTitle) {
+                    
                 const filePicker = {
                     title: localizedTitle,
                     section: "settings",
@@ -205,7 +205,7 @@
                     },
                     select: function (node) {
                         const filepath = decodeURIComponent(node.id.replace(/\+/g, " "));
-                        block.stylesheet = "~/" + filepath;
+                        block.stylesheet = filepath;
                         editorService.close();
                     },
                     close: function () {
@@ -215,8 +215,7 @@
                 editorService.treePicker(filePicker);
 
             });
-        };
-
+        }
         vm.requestRemoveStylesheetForBlock = function(block) {
             localizationService.localizeMany(["general_remove", "defaultdialogs_confirmremoveusageof"]).then(function (data) {
                 overlayService.confirmRemove({
@@ -232,14 +231,15 @@
                 });
             });
         };
-
         vm.removeStylesheetForBlock = function(block) {
             block.stylesheet = null;
         };
 
+
+
         vm.addThumbnailForBlock = function(block) {
 
-            localizationService.localize("blockEditor_headlineAddThumbnail").then(function (localizedTitle) {
+            localizationService.localize("blockEditor_headlineAddThumbnail").then(function(localizedTitle) {
 
                 const thumbnailPicker = {
                     title: localizedTitle,
@@ -250,10 +250,8 @@
                     filter: function (i) {
                         return !(i.name.indexOf(".jpg") !== -1 || i.name.indexOf(".jpeg") !== -1 || i.name.indexOf(".png") !== -1 || i.name.indexOf(".svg") !== -1 || i.name.indexOf(".webp") !== -1 || i.name.indexOf(".gif") !== -1);
                     },
-                    filterCssClass: "not-allowed",
                     select: function (file) {
-                        const id = decodeURIComponent(file.id.replace(/\+/g, " "));
-                        block.thumbnail = "~/" + id;
+                        block.thumbnail = file.name;
                         editorService.close();
                     },
                     close: function () {
@@ -263,25 +261,27 @@
                 editorService.treePicker(thumbnailPicker);
 
             });
-        };
-
+        }
         vm.removeThumbnailForBlock = function(entry) {
             entry.thumbnail = null;
         };
 
-        vm.submit = function() {
+
+
+
+        vm.submit = function () {
             if ($scope.model && $scope.model.submit) {
                 $scope.model.submit($scope.model);
             }
-        };
+        }
 
         vm.close = function() {
             if ($scope.model && $scope.model.close) {
                 $scope.model.close($scope.model);
             }
-        };
+        }
 
-        $scope.$on('$destroy', function() {
+        $scope.$on('$destroy', function () {
             unsubscribe.forEach(u => { u(); });
         });
 

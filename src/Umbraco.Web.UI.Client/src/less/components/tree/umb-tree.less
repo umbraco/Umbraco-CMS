@@ -15,16 +15,6 @@
         text-decoration: none;
     }
 
-    .umb-tree-item__arrow {
-        visibility: hidden;
-        text-decoration: none;
-        font-size: 12px;
-        transition: color 120ms;
-
-        &:hover {
-            color: @ui-option-type-hover;
-        }
-    }
     i.noSpr {
         display: inline-block;
         margin-top: 1px;
@@ -85,8 +75,8 @@ body.touch .umb-tree {
     
     &:hover {
         background: @ui-option-hover;
+        
         color: @ui-option-type-hover;
-
         a {
             color: @ui-option-type-hover;
         }
@@ -95,13 +85,10 @@ body.touch .umb-tree {
             position: relative;
             width: auto;
             height: auto;
-            margin: 0 5px 0 auto;
+            margin: 0 10px 0 auto;
+            padding: 9px 5px;
             overflow: visible;
             clip: auto;
-        }
-
-        .umb-button-ellipsis--hidden {
-            opacity: 1;
         }
         
         .umb-tree-icon {
@@ -184,14 +171,11 @@ body.touch .umb-tree {
     display: flex;
     flex: 0 0 auto;
     justify-content: flex-end;
+    padding: 9px 5px;
     text-align: center;
-    margin: 0 5px 0 auto;
+    margin: 0 10px 0 auto;
     cursor: pointer;
     border-radius: @baseBorderRadius;
-
-    .umb-button-ellipsis {
-        padding: 3px 5px;
-    }
 
     i {
         height: 5px !important;
@@ -200,20 +184,18 @@ body.touch .umb-tree {
         display: inline-block;
         margin: 0 2px 0 0;
         background: @ui-active-type;
-
+        
         &:last-child {
             margin: 0;
         }
     }
-
     &:hover {
         background: rgba(255, 255, 255, .5);
-
         i {
             background: @ui-active-type-hover;
         }
     }
-
+    
     // NOTE - We're having to repeat ourselves here due to an .sr-only class appearing in umbraco/lib/font-awesome/css/font-awesome.min.css
     &.sr-only--hoverable:hover,
     &.sr-only--focusable:focus {
@@ -221,9 +203,9 @@ body.touch .umb-tree {
         display: flex;
         flex: 0 0 auto;
         justify-content: flex-end;
-        padding: 7px 5px;
+        padding: 9px 5px;
         text-align: center;
-        margin: 0 auto;
+        margin: 0 10px 0 auto;
         cursor: pointer;
         border-radius: 3px;
     }

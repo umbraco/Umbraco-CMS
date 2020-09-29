@@ -7,7 +7,6 @@
     public enum SpecialDbTypes
     {
         NTEXT,
-        NCHAR,
-        NVARCHARMAX
+        NCHAR
     }
 }
