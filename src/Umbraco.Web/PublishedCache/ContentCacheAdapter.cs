@@ -10,13 +10,17 @@ namespace Umbraco.Web.PublishedCache
 {
     internal class ContentCacheAdapter : IPublishedContentCache, IPublishedContentCache2
     {
-        private readonly IPublishedCache2 _contentCache;
+        private readonly IPublishedContentCache _contentCache;
+        private readonly ContentCache _contentCache1;
         private readonly IContentRouter _contentRouter;
+        private readonly IDomainCache _domainCache;
 
-        public ContentCacheAdapter(IPublishedCache2 contentCache, IContentRouter contentRouter)
+        public ContentCacheAdapter(ContentCache contentCache, IContentRouter contentRouter,IDomainCache domainCache)
         {
-            _contentCache = contentCache;
+            _contentCache = contentCache as IPublishedContentCache;
+            _contentCache1 = contentCache;
             _contentRouter = contentRouter;
+            _domainCache = domainCache;
         }
 
         public XPathNavigator CreateNavigator(bool preview)
@@ -36,7 +40,7 @@ namespace Umbraco.Web.PublishedCache
 
         public void Dispose()
         {
-            _contentCache.Dispose();
+            _contentCache1.Dispose();
         }
 
         public IEnumerable<IPublishedContent> GetAtRoot(bool preview, string culture = null)
@@ -86,12 +90,13 @@ namespace Umbraco.Web.PublishedCache
 
         public IPublishedContent GetByRoute(bool preview, string route, bool? hideTopLevelNode = null, string culture = null)
         {
-            return _contentCache.GetById(_contentRouter.GetIdByRoute(preview, route, hideTopLevelNode, culture).Id);
+            return _contentCache.GetById(_contentRouter.GetIdByRoute(_contentCache, preview, route, hideTopLevelNode, culture).Id);
         }
 
         public IPublishedContent GetByRoute(string route, bool? hideTopLevelNode = null, string culture = null)
         {
-            return _contentCache.GetById(_contentRouter.GetIdByRoute(route, hideTopLevelNode, culture).Id);
+            bool preview = _contentCache1.PreviewDefault;
+            return _contentCache.GetById(_contentRouter.GetIdByRoute(_contentCache, preview,route, hideTopLevelNode, culture).Id);
         }
 
         public IEnumerable<IPublishedContent> GetByXPath(bool preview, string xpath, params XPathVariable[] vars)
@@ -116,7 +121,7 @@ namespace Umbraco.Web.PublishedCache
 
         public IPublishedContentType GetContentType(Guid key)
         {
-            return _contentCache.GetContentType(key);
+            return _contentCache1.GetContentType(key);
         }
 
         public IPublishedContentType GetContentType(int id)
@@ -131,12 +136,12 @@ namespace Umbraco.Web.PublishedCache
 
         public string GetRouteById(bool preview, int contentId, string culture = null)
         {
-            return _contentRouter.GetRouteById(preview, contentId, culture);
+            return _contentRouter.GetRouteById(_contentCache, _domainCache,preview, contentId, culture);
         }
 
         public string GetRouteById(int contentId, string culture = null)
         {
-            return _contentRouter.GetRouteById(contentId, culture);
+            return _contentRouter.GetRouteById(_contentCache1.PreviewDefault, _contentCache, _domainCache, contentId, culture);
         }
 
         public IPublishedContent GetSingleByXPath(bool preview, string xpath, params XPathVariable[] vars)

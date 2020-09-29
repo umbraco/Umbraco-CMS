@@ -136,7 +136,7 @@ namespace Umbraco.Tests.PublishedContent
             // create a data source for NuCache
             _source = new TestDataSource(kits());
 
-            var contentRouter = new ContentCacheContentRouter(_snapshotAccessor, globalSettings,
+            var contentRouter = new ContentCacheContentRouter( globalSettings,
                 new FastDictionaryAppCache(), new FastDictionaryAppCache());
 
             // at last, create the complete NuCache snapshot service!
