@@ -35,6 +35,27 @@ namespace Umbraco.Core.Models
         public override string ToString() => string.Format("{0},{1}", this.Minimum, this.Maximum);
 
         /// <summary>
+        /// Returns a <see cref="System.String" /> that represents this instance.
+        /// </summary>
+        /// <param name="format">A composite format string for a single value (minimum and maximum are equal). Use {0} for the minimum and {1} for the maximum value.</param>
+        /// <param name="formatRange">A composite format string for the range values. Use {0} for the minimum and {1} for the maximum value.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>
+        /// A <see cref="System.String" /> that represents this instance.
+        /// </returns>
+        public string ToString(string format, string formatRange, IFormatProvider provider = null) => this.ToString(this.Minimum.CompareTo(this.Maximum) == 0 ? format : formatRange, provider);
+
+        /// <summary>
+        /// Returns a <see cref="System.String" /> that represents this instance.
+        /// </summary>
+        /// <param name="format">A composite format string for the range values. Use {0} for the minimum and {1} for the maximum value.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>
+        /// A <see cref="System.String" /> that represents this instance.
+        /// </returns>
+        public string ToString(string format, IFormatProvider provider = null) => string.Format(provider, format, this.Minimum, this.Maximum);
+
+        /// <summary>
         /// Determines whether this range is valid (the minimum value is lower than or equal to the maximum value).
         /// </summary>
         /// <returns>
