@@ -186,7 +186,6 @@
     <Compile Include="Scoping\ScopeTests.cs" />
     <Compile Include="Services\CachedDataTypeServiceTests.cs" />
     <Compile Include="Services\ConsentServiceTests.cs" />
-    <Compile Include="Services\SectionServiceTests.cs" />
     <Compile Include="TestHelpers\ControllerTesting\AuthenticateEverythingExtensions.cs" />
     <Compile Include="TestHelpers\ControllerTesting\AuthenticateEverythingMiddleware.cs" />
     <Compile Include="TestHelpers\ControllerTesting\SpecificAssemblyResolver.cs" />
@@ -485,9 +484,6 @@
     <Content Include="Services\Importing\TemplateOnly-Updated-Package.xml" />
     <Content Include="Services\Importing\uBlogsy-Package.xml" />
     <Content Include="Services\Importing\XsltSearch-Package.xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Web\Validation\" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
