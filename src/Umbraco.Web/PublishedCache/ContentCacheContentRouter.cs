@@ -3,46 +3,32 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Umbraco.Core;
-using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Web.PublishedCache.NuCache;
-using CacheKeys = Umbraco.Web.PublishedCache.NuCache.CacheKeys;
 
 namespace Umbraco.Web.PublishedCache
 {
     internal class ContentCacheContentRouter : IContentRouter
     {
         private readonly IGlobalSettings _globalSettings;
-        private readonly IAppCache _snapshotCache;
-        private readonly IAppCache _elementsCache;
 
-        public ContentCacheContentRouter(IGlobalSettings globalSettings,
-            IAppCache snapshotCache, IAppCache elementsCache)
+        public ContentCacheContentRouter(IGlobalSettings globalSettings)
         {
             _globalSettings = globalSettings;
-            _snapshotCache = snapshotCache;
-            _elementsCache = elementsCache;
         }
 
-        public ContentRoutingResult GetIdByRoute(IPublishedContentCache snapshot,bool defaultPreview,string route, bool? hideTopLevelNode = null, string culture = null)
+        public ContentRoutingResult GetIdByRoute(IPublishedCache2 contentCache,bool defaultPreview,string route, bool? hideTopLevelNode = null, string culture = null)
         {
-            return GetIdByRoute(snapshot, defaultPreview, route, hideTopLevelNode, culture);
+            return GetIdByRoute(contentCache, defaultPreview, route, hideTopLevelNode, culture);
         }
 
         public ContentRoutingResult GetIdByRoute(IPublishedSnapshot snapshot, bool preview, string route, bool? hideTopLevelNode = null, string culture = null)
         {
             if (route == null) throw new ArgumentNullException(nameof(route));
 
-            var cache = preview == false || PublishedSnapshotService.FullCacheWhenPreviewing ? _elementsCache : _snapshotCache;
-            var key = CacheKeys.ContentCacheContentIdByRoute(route, preview, culture);
-            return cache.GetCacheItem<ContentRoutingResult>(key, () => GetByRouteInternal(snapshot,preview, route, hideTopLevelNode, culture));
+            return GetByRouteInternal(snapshot,preview, route, hideTopLevelNode, culture);
         }
 
-        public ContentRoutingResult GetIdByRoute(IPublishedSnapshot currentSnapshot, string route, bool? hideTopLevelNode, string culture)
-        {
-            throw new NotImplementedException();
-        }
 
         internal ContentRoutingResult GetByRouteInternal(IPublishedSnapshot snapshot, bool preview, string route, bool? hideTopLevelNode, string culture)
         {
@@ -113,21 +99,19 @@ namespace Umbraco.Web.PublishedCache
             return content;
         }
 
-        public string GetRouteById(bool defaultPreview, IPublishedContentCache snapshot, IDomainCache domainCache, int contentId, string culture = null)
+        public string GetRouteById(bool defaultPreview, IPublishedCache2 publishedCache, IDomainCache domainCache, int contentId, string culture = null)
         {
-            return GetRouteById(snapshot, domainCache,defaultPreview, contentId, culture);
+            return GetRouteById(publishedCache, domainCache,defaultPreview, contentId, culture);
         }
 
-        public string GetRouteById(IPublishedContentCache snapshot, IDomainCache domainCache, bool preview, int contentId, string culture = null)
+        public string GetRouteById(IPublishedCache2 snapshot, IDomainCache domainCache, bool preview, int contentId, string culture = null)
         {
-            var cache = (preview == false || PublishedSnapshotService.FullCacheWhenPreviewing) ? _elementsCache : _snapshotCache;
-            var key = CacheKeys.ContentCacheRouteByContent(contentId, preview, culture);
-            return cache.GetCacheItem<string>(key, () => GetRouteByIdInternal(snapshot, domainCache,preview, contentId, null, culture));
+            return GetRouteByIdInternal(snapshot, domainCache,preview, contentId, null, culture);
         }
 
-        private string GetRouteByIdInternal(IPublishedContentCache snapshot, IDomainCache domainCache, bool preview, int contentId, bool? hideTopLevelNode, string culture)
+        private string GetRouteByIdInternal(IPublishedCache2 publishedCache, IDomainCache domainCache, bool preview, int contentId, bool? hideTopLevelNode, string culture)
         {
-            var node = snapshot.GetById(preview, contentId);
+            var node = publishedCache.GetById(preview, contentId);
             if (node == null)
                 return null;
 
@@ -159,7 +143,7 @@ namespace Umbraco.Web.PublishedCache
 
             // no domain, respect HideTopLevelNodeFromPath for legacy purposes
             if (hasDomains == false && hideTopLevelNode.Value)
-                ApplyHideTopLevelNodeFromPath(snapshot,node, pathParts, preview);
+                ApplyHideTopLevelNodeFromPath(publishedCache,node, pathParts, preview);
 
             // assemble the route
             pathParts.Reverse();
@@ -171,7 +155,7 @@ namespace Umbraco.Web.PublishedCache
             return route;
         }
 
-        private void ApplyHideTopLevelNodeFromPath(IPublishedContentCache snapshot, IPublishedContent content, IList<string> segments, bool preview)
+        private void ApplyHideTopLevelNodeFromPath(IPublishedCache2 publishedCache, IPublishedContent content, IList<string> segments, bool preview)
         {
             // in theory if hideTopLevelNodeFromPath is true, then there should be only one
             // top-level node, or else domains should be assigned. but for backward compatibility
@@ -183,7 +167,7 @@ namespace Umbraco.Web.PublishedCache
             // that's the way it works pre-4.10 and we try to be backward compat for the time being
             if (content.Parent == null)
             {
-                var rootNode = snapshot.GetById(preview, GetIdByRoute(snapshot,preview, "/", true).Id);
+                var rootNode = publishedCache.GetById(preview, GetIdByRoute(publishedCache,preview, "/", true).Id);
                 if (rootNode == null)
                     throw new Exception("Failed to get node at /.");
                 if (rootNode.Id == content.Id) // remove only if we're the default node
@@ -195,9 +179,9 @@ namespace Umbraco.Web.PublishedCache
             }
         }
 
-        public ContentRoutingResult GetIdByAlias(IPublishedSnapshot snapshot, bool preview, int rootNodeId, string culture, string alias)
+        public ContentRoutingResult GetIdByAlias(IPublishedContentCache snapshot, bool preview, int rootNodeId, string culture, string alias)
         {
-            var content = FindContentByAlias(snapshot.Content, rootNodeId, culture, alias,preview);
+            var content = FindContentByAlias(snapshot, rootNodeId, culture, alias,preview);
             return new ContentRoutingResult
             (
 
@@ -205,7 +189,7 @@ namespace Umbraco.Web.PublishedCache
                  content?.Id ?? 0
             );
         }
-        private static IPublishedContent FindContentByAlias(IPublishedContentCache cache, int rootNodeId, string culture, string alias,bool preview)
+        private static IPublishedContent FindContentByAlias(IPublishedCache2 publishedCache, int rootNodeId, string culture, string alias,bool preview)
         {
             if (alias == null) throw new ArgumentNullException(nameof(alias));
 
@@ -254,11 +238,72 @@ namespace Umbraco.Web.PublishedCache
 
             if (rootNodeId > 0)
             {
-                var rootNode = cache.GetById(preview,rootNodeId);
+                var rootNode = publishedCache.GetById(preview,rootNodeId);
                 return rootNode?.Descendants().FirstOrDefault(x => IsMatch(x, test1, test2));
             }
 
-            foreach (var rootContent in cache.GetAtRoot())
+            foreach (var rootContent in publishedCache.GetAtRoot())
+            {
+                var c = rootContent.DescendantsOrSelf().FirstOrDefault(x => IsMatch(x, test1, test2));
+                if (c != null) return c;
+            }
+
+            return null;
+        }
+        private static IPublishedContent FindContentByAlias(IPublishedContentCache publishedCache, int rootNodeId, string culture, string alias, bool preview)
+        {
+            if (alias == null) throw new ArgumentNullException(nameof(alias));
+
+            // the alias may be "foo/bar" or "/foo/bar"
+            // there may be spaces as in "/foo/bar,  /foo/nil"
+            // these should probably be taken care of earlier on
+
+            // TODO: can we normalize the values so that they contain no whitespaces, and no leading slashes?
+            // and then the comparisons in IsMatch can be way faster - and allocate way less strings
+
+            const string propertyAlias = Constants.Conventions.Content.UrlAlias;
+
+            var test1 = alias.TrimStart('/') + ",";
+            var test2 = ",/" + test1; // test2 is ",/alias,"
+            test1 = "," + test1; // test1 is ",alias,"
+
+            bool IsMatch(IPublishedContent c, string a1, string a2)
+            {
+                // this basically implements the original XPath query ;-(
+                //
+                // "//* [@isDoc and (" +
+                // "contains(concat(',',translate(umbracoUrlAlias, ' ', ''),','),',{0},')" +
+                // " or contains(concat(',',translate(umbracoUrlAlias, ' ', ''),','),',/{0},')" +
+                // ")]"
+
+                if (!c.HasProperty(propertyAlias)) return false;
+                var p = c.GetProperty(propertyAlias);
+                var varies = p.PropertyType.VariesByCulture();
+                string v;
+                if (varies)
+                {
+                    if (!c.HasCulture(culture)) return false;
+                    v = c.Value<string>(propertyAlias, culture);
+                }
+                else
+                {
+                    v = c.Value<string>(propertyAlias);
+                }
+                if (string.IsNullOrWhiteSpace(v)) return false;
+                v = "," + v.Replace(" ", "") + ",";
+                return v.InvariantContains(a1) || v.InvariantContains(a2);
+            }
+
+            // TODO: even with Linq, what happens below has to be horribly slow
+            // but the only solution is to entirely refactor url providers to stop being dynamic
+
+            if (rootNodeId > 0)
+            {
+                var rootNode = publishedCache.GetById(preview, rootNodeId);
+                return rootNode?.Descendants().FirstOrDefault(x => IsMatch(x, test1, test2));
+            }
+
+            foreach (var rootContent in publishedCache.GetAtRoot())
             {
                 var c = rootContent.DescendantsOrSelf().FirstOrDefault(x => IsMatch(x, test1, test2));
                 if (c != null) return c;
@@ -267,6 +312,6 @@ namespace Umbraco.Web.PublishedCache
             return null;
         }
 
-      
+
     }
 }

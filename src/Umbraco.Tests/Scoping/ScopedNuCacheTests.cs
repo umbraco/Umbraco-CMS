@@ -81,8 +81,7 @@ namespace Umbraco.Tests.Scoping
             var documentRepository = Mock.Of<IDocumentRepository>();
             var mediaRepository = Mock.Of<IMediaRepository>();
             var memberRepository = Mock.Of<IMemberRepository>();
-            var contentRouter = new ContentCacheContentRouter(Factory.GetInstance<IGlobalSettings>(),
-                new FastDictionaryAppCache(), new FastDictionaryAppCache());
+            var contentRouter = new ContentCacheContentRouter(Factory.GetInstance<IGlobalSettings>());
 
             return new PublishedSnapshotService(
                 options,

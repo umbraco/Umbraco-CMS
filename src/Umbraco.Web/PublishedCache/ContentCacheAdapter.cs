@@ -10,14 +10,14 @@ namespace Umbraco.Web.PublishedCache
 {
     internal class ContentCacheAdapter : IPublishedContentCache, IPublishedContentCache2
     {
-        private readonly IPublishedContentCache _contentCache;
+        private readonly IPublishedCache2 _contentCache;
         private readonly ContentCache _contentCache1;
         private readonly IContentRouter _contentRouter;
         private readonly IDomainCache _domainCache;
 
         public ContentCacheAdapter(ContentCache contentCache, IContentRouter contentRouter,IDomainCache domainCache)
         {
-            _contentCache = contentCache as IPublishedContentCache;
+            _contentCache = contentCache as IPublishedCache2;
             _contentCache1 = contentCache;
             _contentRouter = contentRouter;
             _domainCache = domainCache;

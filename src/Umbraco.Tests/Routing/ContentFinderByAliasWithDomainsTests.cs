@@ -62,8 +62,7 @@ namespace Umbraco.Tests.Routing
                 Assert.AreEqual(expectedCulture, request.Culture.Name);
 
             var globalSettings = new GlobalSettings();
-            var contentRouter = new ContentCacheContentRouter(globalSettings,
-                new FastDictionaryAppCache(), new FastDictionaryAppCache());
+            var contentRouter = new ContentCacheContentRouter(globalSettings);
             var finder = new ContentFinderByUrlAlias(Logger, contentRouter);
             var result = finder.TryFindContent(request);
 

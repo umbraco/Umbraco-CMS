@@ -52,11 +52,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
         // a valid ID in the database at that point, whereas content and properties
         // may be virtual (and not in umbracoNode).
 
-        public static string ContentCacheRouteByContent(int id, bool previewing, string culture)
-        {
-            return "NuCache.ContentCache.RouteByContent[" + DraftOrPub(previewing) + id + LangId(culture) + "]";
-        }
-
         public static string ContentCacheContentByRoute(string route, bool previewing, string culture)
         {
             return "NuCache.ContentCache.ContentByRoute[" + DraftOrPub(previewing) + route + LangId(culture) + "]";

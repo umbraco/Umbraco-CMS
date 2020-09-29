@@ -183,8 +183,7 @@ namespace Umbraco.Tests.PublishedContent
             _variationAccesor = new TestVariationContextAccessor();
 
             var snapshotAccessor = new TestPublishedSnapshotAccessor();
-            var contentRouter = new ContentCacheContentRouter( globalSettings,
-                new FastDictionaryAppCache(), new FastDictionaryAppCache());
+            var contentRouter = new ContentCacheContentRouter(globalSettings);
 
             // at last, create the complete NuCache snapshot service!
             var options = new PublishedSnapshotServiceOptions { IgnoreLocalDb = true };

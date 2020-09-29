@@ -39,7 +39,7 @@ namespace Umbraco.Web.Routing
 
             if (frequest.Uri.AbsolutePath != "/") // no alias if "/"
             {
-                var result = _contentRouter.GetIdByAlias(frequest.UmbracoContext.PublishedSnapshot,
+                var result = _contentRouter.GetIdByAlias(frequest.UmbracoContext.PublishedSnapshot.Content,
                     frequest.UmbracoContext.InPreviewMode,
                     frequest.HasDomain ? frequest.Domain.ContentId : 0,
                     frequest.Culture.Name,

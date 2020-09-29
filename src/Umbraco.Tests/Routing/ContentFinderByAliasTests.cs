@@ -53,8 +53,7 @@ namespace Umbraco.Tests.Routing
             var publishedRouter = CreatePublishedRouter();
             var frequest = publishedRouter.CreateRequest(umbracoContext);
             var globalSettings = new GlobalSettings();
-            var contentRouter = new ContentCacheContentRouter(globalSettings,
-                new FastDictionaryAppCache(), new FastDictionaryAppCache());
+            var contentRouter = new ContentCacheContentRouter(globalSettings);
             var lookup = new ContentFinderByUrlAlias(Logger, contentRouter);
 
             var result = lookup.TryFindContent(frequest);
