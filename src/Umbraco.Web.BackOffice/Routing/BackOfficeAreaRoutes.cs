@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Routing;
+﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Web.BackOffice.Controllers;
+using Umbraco.Web.BackOffice.SignalR;
 using Umbraco.Web.Common.Controllers;
 using Umbraco.Web.Common.Routing;
 using Umbraco.Web.WebApi;
@@ -50,8 +52,8 @@ namespace Umbraco.Web.BackOffice.Routing
 
                     MapMinimalBackOffice(endpoints);
                     endpoints.MapUmbracoRoute<PreviewController>(_umbracoPathSegment, Constants.Web.Mvc.BackOfficeArea, null);
+                    endpoints.MapHub<PreviewHub>("/umbraco/previewHub");
                     AutoRouteBackOfficeControllers(endpoints);
-
                     break;
                 case RuntimeLevel.BootFailed:
                 case RuntimeLevel.Unknown:
