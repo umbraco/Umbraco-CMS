@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -8,7 +9,7 @@ using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Tests.Common;
-using Umbraco.Tests.Testing.Objects;
+using Umbraco.Tests.UnitTests.TestHelpers.Objects;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Templates;
 
@@ -75,7 +76,7 @@ namespace Umbraco.Tests.Templates
 
             var webRoutingSettings = new WebRoutingSettings();
             var publishedUrlProvider = new UrlProvider(umbracoContextAccessor,
-                Microsoft.Extensions.Options.Options.Create(webRoutingSettings),
+                Options.Create(webRoutingSettings),
                 new UrlProviderCollection(Enumerable.Empty<IUrlProvider>()),
                 new MediaUrlProviderCollection(new []{mediaUrlProvider.Object}),
                 Mock.Of<IVariationContextAccessor>()

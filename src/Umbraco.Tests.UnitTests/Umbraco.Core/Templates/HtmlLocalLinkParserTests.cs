@@ -7,7 +7,7 @@ using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Tests.Common;
-using Umbraco.Tests.Testing.Objects;
+using Umbraco.Tests.UnitTests.TestHelpers.Objects;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Templates;
 
