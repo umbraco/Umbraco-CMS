@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using Microsoft.AspNetCore.Hosting;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -30,6 +31,8 @@ using Umbraco.Web.Routing;
 using File = System.IO.File;
 using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration.Models;
+using Umbraco.Web.Common.AspNetCore;
+using IHostingEnvironment = Umbraco.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -58,7 +61,11 @@ namespace Umbraco.Tests.TestHelpers
                 => Mock.Of<IBackOfficeInfo>();
 
             public override IHostingEnvironment GetHostingEnvironment()
-                => Mock.Of<IHostingEnvironment>();
+            {
+                return new AspNetCoreHostingEnvironment(
+                    Mock.Of<IOptionsMonitor<HostingSettings>>(x=>x.CurrentValue == new HostingSettings()),
+                    Mock.Of<IWebHostEnvironment>(x=>x.WebRootPath == "/"));
+            }
 
             public override IApplicationShutdownRegistry GetHostingEnvironmentLifetime()
                 => Mock.Of<IApplicationShutdownRegistry>();
@@ -308,7 +315,7 @@ namespace Umbraco.Tests.TestHelpers
         public static IIpResolver GetIpResolver() => _testHelperInternal.GetIpResolver();
 
         public static IRequestCache GetRequestCache() => _testHelperInternal.GetRequestCache();
-        
+
         public static IPublishedUrlProvider GetPublishedUrlProvider() => _testHelperInternal.GetPublishedUrlProvider();
     }
 }

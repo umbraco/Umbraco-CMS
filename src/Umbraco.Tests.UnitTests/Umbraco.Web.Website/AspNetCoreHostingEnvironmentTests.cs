@@ -1,29 +1,34 @@
 ﻿using System;
+using AutoFixture.NUnit3;
+using Moq;
 using NUnit.Framework;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.UnitTests.AutoFixture;
+using Umbraco.Web.Common.AspNetCore;
 
 namespace Umbraco.Tests.IO
 {
     [TestFixture]
-    public class IoHelperTests
+    public class AspNetCoreHostingEnvironmentTests
     {
-        private IIOHelper _ioHelper => TestHelper.IOHelper;
 
-        [TestCase("~/Scripts", "/Scripts", null)]
-        [TestCase("/Scripts", "/Scripts", null)]
-        [TestCase("../Scripts", "/Scripts", typeof(ArgumentException))]
-        public void IOHelper_ResolveUrl(string input, string expected, Type expectedExceptionType)
+        [InlineAutoMoqData("~/Scripts", "/Scripts", null)]
+        [InlineAutoMoqData("/Scripts", "/Scripts", null)]
+        [InlineAutoMoqData("../Scripts", "/Scripts", typeof(InvalidOperationException))]
+        public void IOHelper_ResolveUrl(string input, string expected, Type expectedExceptionType, AspNetCoreHostingEnvironment sut)
         {
 
             if (expectedExceptionType != null)
             {
-                Assert.Throws(expectedExceptionType, () =>_ioHelper.ResolveUrl(input));
+                Assert.Throws(expectedExceptionType, () =>sut.ToAbsolute(input));
             }
             else
             {
-                var result = _ioHelper.ResolveUrl(input);
+
+                var result = sut.ToAbsolute(input);
                 Assert.AreEqual(expected, result);
             }
         }
