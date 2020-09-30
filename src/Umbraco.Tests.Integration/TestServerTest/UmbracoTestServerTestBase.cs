@@ -68,6 +68,7 @@ namespace Umbraco.Tests.Integration.TestServerTest
                  builder.ConfigureServices((c, s) =>
                  {
                      c.HostingEnvironment = TestHelper.GetWebHostEnvironment();
+                     s.AddSignalR();
                  });
 
                  // call startup
