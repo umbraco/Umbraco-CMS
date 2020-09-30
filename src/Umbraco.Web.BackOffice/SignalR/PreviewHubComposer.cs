@@ -10,8 +10,6 @@ namespace Umbraco.Web.SignalR
         public override void Compose(Composition composition)
         {
             base.Compose(composition);
-
-            // composition.RegisterUnique(_ => GlobalHost.ConnectionManager.GetHubContext<PreviewHub, IPreviewHub>());
         }
     }
 }

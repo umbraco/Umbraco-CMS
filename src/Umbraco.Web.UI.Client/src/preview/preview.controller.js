@@ -5,7 +5,7 @@
 
 var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.services'])
 
-    .controller("previewController", function ($scope, $window, $location, umbRequestHelper) {
+    .controller("previewController", function ($scope, $window, $location) {
 
         $scope.currentCulture = { iso: '', title: '...', icon: 'icon-loading' }
         var cultures = [];
@@ -70,29 +70,29 @@ var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.servi
                 .build();
 
             $.connection.on("refreshed", function (message) {
-                console.log('Notified by SignalR preview hub (' + message + ').');
+                console.log("Notified by SignalR preview hub (" + message + ").");
                 if ($scope.pageId != message) {
-                    console.log('Not a notification for us (' + $scope.pageId + ').');
+                    console.log("Not a notification for us (" + $scope.pageId + ").");
                     return;
                 }
                 if (!visibleContent) {
-                    console.log('Not visible, will reload.');
+                    console.log("Not visible, will reload.");
                     dirtyContent = true;
                     return;
                 }
-                console.log('Reloading.');
+                console.log("Reloading.");
                 var iframeDoc = iframe.contentWindow || iframe.contentDocument;
                 iframeDoc.location.reload();
             })
 
             try {
                 $.connection.start().then(function () {
-                    console.log('Connected to SignalR preview hub (ID=' + $.connection.connectionId + ')');
+                    console.log("Connected to SignalR preview hub (ID=" + $.connection.connectionId + ")");
                 }).catch(function () {
-                    console.log('Could not connect to SignalR preview hub.');
+                    console.log("Could not connect to SignalR preview hub.");
                 });
             } catch (e) {
-                console.error('Could not establish signalr connection. Error: ' + e);
+                console.error("Could not establish signalr connection. Error: " + e);
             }
         }
 

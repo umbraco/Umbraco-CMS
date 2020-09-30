@@ -45,7 +45,6 @@ namespace Umbraco.Extensions
             services.ConfigureOptions<ConfigureBackOfficeCookieOptions>();
         }
 
-        // AddUmbracoPreview -> Use in UmbracoBuilderExtensions
         public static void AddUmbracoPreview(this IServiceCollection services)
         {
             services.AddSignalR();

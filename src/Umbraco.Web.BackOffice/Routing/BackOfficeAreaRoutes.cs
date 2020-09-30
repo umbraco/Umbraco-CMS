@@ -62,6 +62,10 @@ namespace Umbraco.Web.BackOffice.Routing
             }
         }
 
+        /// <summary>
+        /// Returns the path to the signalR hub used for preview
+        /// </summary>
+        /// <returns>Path to signalR hub</returns>
         public string GetPreviewHubRoute()
         {
             return $"/{_umbracoPathSegment}/{nameof(PreviewHub)}";
