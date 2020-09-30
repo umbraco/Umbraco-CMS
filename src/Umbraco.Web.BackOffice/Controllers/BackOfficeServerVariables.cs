@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -16,6 +16,7 @@ using Umbraco.Core.WebAssets;
 using Umbraco.Extensions;
 using Umbraco.Web.BackOffice.Profiling;
 using Umbraco.Web.BackOffice.PropertyEditors;
+using Umbraco.Web.BackOffice.Routing;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Features;
@@ -43,6 +44,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IRuntimeMinifier _runtimeMinifier;
         private readonly IAuthenticationSchemeProvider _authenticationSchemeProvider;
         private readonly IImageUrlGenerator _imageUrlGenerator;
+        private readonly BackOfficeAreaRoutes _backOfficeAreaRoutes;
 
         public BackOfficeServerVariables(
             LinkGenerator linkGenerator,
@@ -58,7 +60,8 @@ namespace Umbraco.Web.BackOffice.Controllers
             IOptions<SecuritySettings> securitySettings,
             IRuntimeMinifier runtimeMinifier,
             IAuthenticationSchemeProvider authenticationSchemeProvider,
-            IImageUrlGenerator imageUrlGenerator)
+            IImageUrlGenerator imageUrlGenerator,
+            BackOfficeAreaRoutes backOfficeAreaRoutes)
         {
             _linkGenerator = linkGenerator;
             _runtimeState = runtimeState;
@@ -74,6 +77,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _runtimeMinifier = runtimeMinifier;
             _authenticationSchemeProvider = authenticationSchemeProvider;
             _imageUrlGenerator = imageUrlGenerator;
+            _backOfficeAreaRoutes = backOfficeAreaRoutes;
         }
 
         /// <summary>
@@ -85,7 +89,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             //this is the filter for the keys that we'll keep based on the full version of the server vars
             var keepOnlyKeys = new Dictionary<string, string[]>
             {
-                {"umbracoUrls", new[] {"authenticationApiBaseUrl", "serverVarsJs", "externalLoginsUrl", "currentUserApiBaseUrl"}},
+                {"umbracoUrls", new[] {"authenticationApiBaseUrl", "serverVarsJs", "externalLoginsUrl", "currentUserApiBaseUrl", "previewHubUrl"}},
                 {"umbracoSettings", new[] {"allowPasswordReset", "imageFileTypes", "maxFileSize", "loginBackgroundImage", "canSendRequiredEmail", "usernameIsEmail"}},
                 {"application", new[] {"applicationPath", "cacheBuster"}},
                 {"isDebuggingEnabled", new string[] { }},
@@ -356,6 +360,9 @@ namespace Umbraco.Web.BackOffice.Controllers
                         {
                             "elementTypeApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<ElementTypeController>(
                                 controller => controller.GetAll())
+                        },
+                        {
+                            "previewHubUrl", _backOfficeAreaRoutes.GetPreviewHubRoute()
                         },
                     }
                 },

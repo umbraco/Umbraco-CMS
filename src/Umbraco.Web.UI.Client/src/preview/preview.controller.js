@@ -61,10 +61,10 @@ var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.servi
             // signalr hub
             // If connection already exists and is connected just return
             // otherwise we'll have multiple connections
-            if( $.connection && $.connection.connectionState === "Connected") return;
+            if( $.connection && $.connection.connectionState === signalR.HubConnectionState.Connected) return;
 
             $.connection = new signalR.HubConnectionBuilder()
-                .withUrl("/umbraco/PreviewHub")
+                .withUrl(Umbraco.Sys.ServerVariables.umbracoUrls.previewHubUrl)
                 .withAutomaticReconnect()
                 .build();
 

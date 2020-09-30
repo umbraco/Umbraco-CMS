@@ -52,7 +52,7 @@ namespace Umbraco.Web.BackOffice.Routing
 
                     MapMinimalBackOffice(endpoints);
                     endpoints.MapUmbracoRoute<PreviewController>(_umbracoPathSegment, Constants.Web.Mvc.BackOfficeArea, null);
-                    endpoints.MapHub<PreviewHub>("/umbraco/previewHub");
+                    endpoints.MapHub<PreviewHub>(GetPreviewHubRoute());
                     AutoRouteBackOfficeControllers(endpoints);
                     break;
                 case RuntimeLevel.BootFailed:
@@ -60,6 +60,11 @@ namespace Umbraco.Web.BackOffice.Routing
                 case RuntimeLevel.Boot:
                     break;
             }
+        }
+
+        public string GetPreviewHubRoute()
+        {
+            return $"/{_umbracoPathSegment}/{nameof(PreviewHub)}";
         }
 
         /// <summary>
