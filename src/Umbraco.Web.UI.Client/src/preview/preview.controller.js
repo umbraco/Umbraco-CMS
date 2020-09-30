@@ -44,12 +44,6 @@ var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.servi
         }
 
         function configureSignalR(iframe) {
-            // signalr hub
-            var previewHub = new signalR.HubConnectionBuilder()
-                .withUrl("/umbraco/PreviewHub")
-                .withAutomaticReconnect()
-                .build();
-
             // visibility tracking
             var dirtyContent = false;
             var visibleContent = true;
@@ -64,7 +58,17 @@ var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.servi
                 }
             });
 
-            previewHub.on("refreshed", function (message) {
+            // signalr hub
+            // If connection already exists and is connected just return
+            // otherwise we'll have multiple connections
+            if( $.connection && $.connection.connectionState === "Connected") return;
+
+            $.connection = new signalR.HubConnectionBuilder()
+                .withUrl("/umbraco/PreviewHub")
+                .withAutomaticReconnect()
+                .build();
+
+            $.connection.on("refreshed", function (message) {
                 console.log('Notified by SignalR preview hub (' + message + ').');
                 if ($scope.pageId != message) {
                     console.log('Not a notification for us (' + $scope.pageId + ').');
@@ -81,8 +85,8 @@ var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.servi
             })
 
             try {
-                previewHub.start().then(function () {
-                    console.log('Connected to SignalR preview hub (ID=' + previewHub.connectionId + ')');
+                $.connection.start().then(function () {
+                    console.log('Connected to SignalR preview hub (ID=' + $.connection.connectionId + ')');
                 }).catch(function () {
                     console.log('Could not connect to SignalR preview hub.');
                 });
