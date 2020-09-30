@@ -1271,13 +1271,35 @@ namespace Umbraco.Web
         #region Axes: custom
 
         /// <summary>
-        /// Gets the root content for this content.
+        /// Gets the root content (ancestor or self at level 1) for the specified <paramref name="content" />.
         /// </summary>
         /// <param name="content">The content.</param>
-        /// <returns>The 'site' content ie AncestorOrSelf(1).</returns>
+        /// <returns>
+        /// The root content (ancestor or self at level 1) for the specified <paramref name="content" />.
+        /// </returns>
+        /// <remarks>
+        /// This is the same as calling <see cref="Umbraco.Web.PublishedContentExtensions.AncestorOrSelf(IPublishedContent, int)" /> with <c>maxLevel</c> set to 1.
+        /// </remarks>
         public static IPublishedContent Root(this IPublishedContent content)
         {
             return content.AncestorOrSelf(1);
+        }
+
+        /// <summary>
+        /// Gets the root content (ancestor or self at level 1) for the specified <paramref name="content" /> if it's of the specified content type <typeparamref name="T" />.
+        /// </summary>
+        /// <typeparam name="T">The content type.</typeparam>
+        /// <param name="content">The content.</param>
+        /// <returns>
+        /// The root content (ancestor or self at level 1) for the specified <paramref name="content" /> of content type <typeparamref name="T" />.
+        /// </returns>
+        /// <remarks>
+        /// This is the same as calling <see cref="Umbraco.Web.PublishedContentExtensions.AncestorOrSelf{T}(IPublishedContent, int)" /> with <c>maxLevel</c> set to 1.
+        /// </remarks>
+        public static T Root<T>(this IPublishedContent content)
+            where T : class, IPublishedContent
+        {
+            return content.AncestorOrSelf<T>(1);
         }
 
         #endregion
