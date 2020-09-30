@@ -66,6 +66,7 @@ var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.servi
             $.connection = new signalR.HubConnectionBuilder()
                 .withUrl(Umbraco.Sys.ServerVariables.umbracoUrls.previewHubUrl)
                 .withAutomaticReconnect()
+                .configureLogging(signalR.LogLevel.Warning)
                 .build();
 
             $.connection.on("refreshed", function (message) {
