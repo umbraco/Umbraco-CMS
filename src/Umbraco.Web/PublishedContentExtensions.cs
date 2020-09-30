@@ -1155,8 +1155,8 @@ namespace Umbraco.Web
                                     { "NodeTypeAlias", n.ContentType.Alias },
                                     { "CreateDate", n.CreateDate },
                                     { "UpdateDate", n.UpdateDate },
-                                    { "CreatorName", n.CreatorName },
-                                    { "WriterName", n.WriterName },
+                                    { "CreatorName", n.CreatorName(services.UserService) },
+                                    { "WriterName", n.WriterName(services.UserService) },
                                     { "Url", n.Url() }
                                 };
 
