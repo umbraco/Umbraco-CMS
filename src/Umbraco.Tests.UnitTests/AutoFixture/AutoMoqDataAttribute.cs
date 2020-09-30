@@ -12,9 +12,12 @@ using Umbraco.Core;
 using Umbraco.Core.BackOffice;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.Hosting;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Web.BackOffice.Controllers;
+using Umbraco.Web.BackOffice.Routing;
 using Umbraco.Web.Common.Install;
+using Umbraco.Web.WebApi;
 
 namespace Umbraco.Tests.UnitTests.AutoFixture
 {
@@ -74,6 +77,13 @@ namespace Umbraco.Tests.UnitTests.AutoFixture
                         u => u.FromFactory(
                             () => new UmbracoVersion()));
 
+                    fixture.Customize<BackOfficeAreaRoutes>(u => u.FromFactory(
+                        () => new BackOfficeAreaRoutes(
+                            Options.Create(new GlobalSettings()),
+                            Mock.Of<IHostingEnvironment>(x => x.ToAbsolute(It.IsAny<string>()) == "/umbraco" && x.ApplicationVirtualPath == string.Empty),
+                            Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Run),
+                            new UmbracoApiControllerTypeCollection(Array.Empty<Type>()))));
+                    
                     var connectionStrings = new ConnectionStrings();
                     fixture.Customize<ConnectionStrings>(x => x.FromFactory(() => connectionStrings ));
 

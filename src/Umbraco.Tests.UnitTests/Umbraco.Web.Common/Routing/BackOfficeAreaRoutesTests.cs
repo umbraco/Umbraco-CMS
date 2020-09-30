@@ -54,9 +54,12 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Routing
             var endpoints = new TestRouteBuilder();
             routes.CreateRoutes(endpoints);
 
-            Assert.AreEqual(1, endpoints.DataSources.Count);
+            Assert.AreEqual(2, endpoints.DataSources.Count); // first = ControllerActionEndpointDataSource, Second = ModelEndpointDataSource (SignalR hubs)
             var route = endpoints.DataSources.First();
             Assert.AreEqual(4, route.Endpoints.Count);
+            var hubs = endpoints.DataSources.Last();
+            Assert.AreEqual(2, hubs.Endpoints.Count);
+            
             AssertMinimalBackOfficeRoutes(route);
 
             var endpoint3 = (RouteEndpoint)route.Endpoints[2];
