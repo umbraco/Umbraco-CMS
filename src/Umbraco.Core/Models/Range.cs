@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 
 namespace Umbraco.Core.Models
 {
@@ -32,7 +33,7 @@ namespace Umbraco.Core.Models
         /// <returns>
         /// A <see cref="System.String" /> that represents this instance.
         /// </returns>
-        public override string ToString() => string.Format("{0},{1}", this.Minimum, this.Maximum);
+        public override string ToString() => string.Format(CultureInfo.InvariantCulture, "{0},{1}", this.Minimum, this.Maximum);
 
         /// <summary>
         /// Returns a <see cref="System.String" /> that represents this instance.
