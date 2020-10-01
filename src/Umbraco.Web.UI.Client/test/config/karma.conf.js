@@ -1,3 +1,4 @@
+const jsdom = require("jsdom");
 module.exports = function (config) {
 
     config.set({
@@ -101,7 +102,16 @@ module.exports = function (config) {
         // - IE (only Windows)
         // CLI --browsers Chrome,Firefox,Safari
         browsers: ['jsdom'],
-
+		
+		// Configure a user agent so the log file gets generated properly
+		jsdomLauncher: {
+		  jsdom: {
+			resources: new jsdom.ResourceLoader({
+			  userAgent: "umbraco-test-suite",
+			})
+		  }
+		},
+		
         // allow waiting a bit longer, some machines require this
 
         browserNoActivityTimeout: 100000,     // default 10,000ms

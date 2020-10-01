@@ -253,13 +253,14 @@
             });
 
             dialog.title = dialog.pasteItems.length > 0 ? labels.grid_addElement : labels.content_createEmpty;
+            dialog.hideHeader = dialog.pasteItems.length > 0;
 
             dialog.clickClearPaste = function ($event) {
                 $event.stopPropagation();
                 $event.preventDefault();
                 clipboardService.clearEntriesOfType(clipboardService.TYPES.ELEMENT_TYPE, contentTypeAliases);
                 dialog.pasteItems = [];// This dialog is not connected via the clipboardService events, so we need to update manually.
-                dialog.overlayMenu.hideHeader = false;
+                dialog.hideHeader = false;
             };
 
             if (dialog.availableItems.length === 1 && dialog.pasteItems.length === 0) {
