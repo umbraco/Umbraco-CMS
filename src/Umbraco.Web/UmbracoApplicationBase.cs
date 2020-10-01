@@ -36,9 +36,11 @@ namespace Umbraco.Web
     /// </summary>
     public abstract class UmbracoApplicationBase : HttpApplication
     {
+        private readonly ILogger<UmbracoApplicationBase> _logger;
         private readonly SecuritySettings _securitySettings;
         private readonly GlobalSettings _globalSettings;
         private readonly ConnectionStrings _connectionStrings;
+        private readonly IIOHelper _ioHelper;
         private IRuntime _runtime;
         private IFactory _factory;
         private ILoggerFactory _loggerFactory;
@@ -61,7 +63,6 @@ namespace Umbraco.Web
                 var backOfficeInfo = new AspNetBackOfficeInfo(globalSettings, ioHelper, _loggerFactory.CreateLogger<AspNetBackOfficeInfo>(), Options.Create(webRoutingSettings));
                 var profiler = GetWebProfiler(hostingEnvironment);
                 Umbraco.Composing.Current.Initialize(NullLogger<object>.Instance,
-                    _loggerFactory,
                     securitySettings,
                     globalSettings,
                     ioHelper, hostingEnvironment, backOfficeInfo, profiler);
@@ -87,15 +88,17 @@ namespace Umbraco.Web
 
         protected UmbracoApplicationBase(ILogger<UmbracoApplicationBase> logger, ILoggerFactory loggerFactory, SecuritySettings securitySettings, GlobalSettings globalSettings, ConnectionStrings connectionStrings, IIOHelper ioHelper, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)
         {
+            _logger = logger;
             _securitySettings = securitySettings;
             _globalSettings = globalSettings;
             _connectionStrings = connectionStrings;
+            _ioHelper = ioHelper;
             _loggerFactory = loggerFactory;
 
             if (!Umbraco.Composing.Current.IsInitialized)
             {
                 Logger = logger;
-                Umbraco.Composing.Current.Initialize(logger, _loggerFactory, securitySettings, globalSettings, ioHelper, hostingEnvironment, backOfficeInfo, profiler);
+                Umbraco.Composing.Current.Initialize(logger, securitySettings, globalSettings, ioHelper, hostingEnvironment, backOfficeInfo, profiler);
             }
         }
 
@@ -187,9 +190,9 @@ namespace Umbraco.Web
                 _globalSettings,
                 _connectionStrings,
                 umbracoVersion,
-                Umbraco.Composing.Current.IOHelper,
-                Umbraco.Composing.Current.Logger,
-                Umbraco.Composing.Current.LoggerFactory,
+                _ioHelper,
+                _logger,
+                _loggerFactory,
                 Umbraco.Composing.Current.Profiler,
                 Umbraco.Composing.Current.HostingEnvironment,
                 Umbraco.Composing.Current.BackOfficeInfo);

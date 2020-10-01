@@ -89,7 +89,6 @@ namespace Umbraco.Core.Composing
                 // after cross wiring, configure "Current"
                 Current.Initialize(
                     _container.GetInstance<ILogger<object>>(),
-                    _container.GetInstance<ILoggerFactory>(),
                     _container.GetInstance<IOptions<SecuritySettings>>().Value,
                     _container.GetInstance<IOptions<GlobalSettings>>().Value,
                     _container.GetInstance<IIOHelper>(),
