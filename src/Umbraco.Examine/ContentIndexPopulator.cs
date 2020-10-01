@@ -109,14 +109,20 @@ namespace Umbraco.Examine
             {
                 //add the published filter
                 //note: We will filter for published variants in the validator
-                content = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out _,
-                    _publishedQuery, Ordering.By("Path", Direction.Ascending)).ToArray();
-
+                content = _contentService.GetPagedChildren(contentParentId, pageIndex, pageSize, out _, _publishedQuery,
+                    Ordering.By("Path", Direction.Ascending)).ToArray();
+               
                 if (content.Length > 0)
                 {
                     // ReSharper disable once PossibleMultipleEnumeration
                     foreach (var index in indexes)
                         index.IndexItems(_contentValueSetBuilder.GetValueSets(content));
+
+
+                    foreach (var c in content)
+                    {
+                        IndexPublishedContent(c.Id,0, 10000, indexes);
+                    }
                 }
 
                 pageIndex++;
