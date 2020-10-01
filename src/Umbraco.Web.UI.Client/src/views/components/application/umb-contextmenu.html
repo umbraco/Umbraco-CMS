@@ -11,7 +11,7 @@
             <ul class="umb-actions">
                 <li data-element="action-{{action.alias}}" class="umb-action"
                     ng-class="{sep:action.separator, '-opens-dialog': action.opensDialog}" ng-repeat="action in menuActions">
-                    <button type="button" umb-auto-focus="{{$index === 0}}" ng-click="executeMenuItem(action)"
+                    <button type="button" ng-click="executeMenuItem(action)"
                         class="umb-action-link btn-reset umb-outline">
                         <i class="icon icon-{{action.cssclass}}" aria-hidden="true"></i>
                         <!-- TODO: Investiage a proper fix for the weird sizing of the blueprint icon before switching to umb-icon -->
