@@ -48,7 +48,14 @@
                             </div>
 
                         </div>
-
+                        <div class="flex">
+                            <!-- Polling Button -->
+                            <umb-button-group default-button="vm.polling.defaultButton"
+                                              sub-buttons="vm.polling.subButtons"
+                                              icon="{{ vm.polling.defaultButton.icon }}"
+                                              direction="down">
+                            </umb-button-group>
+                        </div>
                         <div class="flex search-box">
                             <div class="flex-auto">
                                 <!-- Search/expression filter -->

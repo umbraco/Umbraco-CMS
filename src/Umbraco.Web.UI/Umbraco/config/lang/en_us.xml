@@ -2346,6 +2346,17 @@ To manage your website, simply open the Umbraco back office and start adding con
       <key alias="findLogsWithNamespace">Find Logs with Namespace</key>
       <key alias="findLogsWithMachineName">Find Logs with Machine Name</key>
       <key alias="open">Open</key>
+      <key alias="polling">Polling</key>
+      <key alias="every2">Every 2 seconds</key>
+      <key alias="every5">Every 5 seconds</key>
+      <key alias="every10">Every 10 seconds</key>
+      <key alias="every20">Every 20 seconds</key>
+      <key alias="every30">Every 30 seconds</key>
+      <key alias="pollingEvery2">Polling every 2s</key>
+      <key alias="pollingEvery5">Polling every 5s</key>
+      <key alias="pollingEvery10">Polling every 10s</key>
+      <key alias="pollingEvery20">Polling every 20s</key>
+      <key alias="pollingEvery30">Polling every 30s</key>
   </area>
   <area alias="clipboard">
     <key alias="labelForCopyAllEntries">Copy %0%</key>
