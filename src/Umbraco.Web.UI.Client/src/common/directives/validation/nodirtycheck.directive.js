@@ -11,7 +11,7 @@ function noDirtyCheck() {
         link: function (scope, elm, attrs, ctrl) {
 
             // If no attribute value is "false", then skip and use default behaviour.
-            var dirtyCheck = Object.toBoolean(attrs.noDirtyCheck) === false;
+            var dirtyCheck = !!attrs.noDirtyCheck && Object.toBoolean(attrs.noDirtyCheck) === false;
             if (dirtyCheck)
                 return;
 

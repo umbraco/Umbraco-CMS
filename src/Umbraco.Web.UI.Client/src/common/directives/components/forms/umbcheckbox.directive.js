@@ -50,7 +50,7 @@
 
         function onInit() {
             vm.inputId = vm.inputId || "umb-check_" + String.CreateGuid();
-            vm.disableDirtyCheck = Object.toBoolean(vm.disableDirtyCheck) === true;
+            vm.disableDirtyCheck = vm.disableDirtyCheck === undefined || Object.toBoolean(vm.disableDirtyCheck) === true;
             vm.icon = vm.icon || vm.iconClass || null;
 
             // If a labelKey is passed let's update the returned text if it's does not contain an opening square bracket [
