@@ -48,7 +48,6 @@
             var activeApp = vm.content.apps.find((app) => app.active);
 
             onAppChanged(activeApp);
-
         }
         
         function showBackButton() {
@@ -108,7 +107,7 @@
 
             // disable the name field if the active content app is not "Content" or "Info"
             vm.nameDisabled = (activeApp && activeApp.alias !== "umbContent" && activeApp.alias !== "umbInfo" && activeApp.alias !== "umbListView");
-
+            vm.disableActionsMenu = activeApp && activeApp.alias === "umbListView";
         }
 
         /**
