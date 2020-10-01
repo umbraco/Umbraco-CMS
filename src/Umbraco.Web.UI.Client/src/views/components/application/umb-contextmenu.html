@@ -1,7 +1,10 @@
-<div id="contextMenu" class="umb-modalcolumn fill shadow" ng-animate="'slide'" on-outside-click="outSideClick()">
+<div id="contextMenu" class="umb-modalcolumn fill shadow" ng-animate="'slide'" umb-focus-lock role="dialog"
+    aria-labelledby="contextmenu-title" aria-describedby="contextmenu-description" on-outside-click="outSideClick()">
     <div>
         <div class="umb-modalcolumn-header">
-            <h1>{{menuDialogTitle}}</h1>
+            <h1 id="contextmenu-title">{{ menuDialogTitle }}</h1>
+            <p id="contextmenu-description" class="sr-only">You have the following edit options available on the node:
+                {{ menuDialogTitle }}</p>
         </div>
 
         <div class="umb-modalcolumn-body">
@@ -9,9 +12,11 @@
                 <li data-element="action-{{action.alias}}" class="umb-action"
                     ng-class="{sep:action.separator, '-opens-dialog': action.opensDialog}" ng-repeat="action in menuActions">
                     <button type="button" umb-auto-focus="{{$index === 0}}" ng-click="executeMenuItem(action)"
-                        class="umb-action-link btn-reset umb-outline" prevent-default>
+                        class="umb-action-link btn-reset umb-outline">
                         <i class="icon icon-{{action.cssclass}}" aria-hidden="true"></i>
-                        <span class="menu-label">{{action.name}}</span>
+                        <!-- TODO: Investiage a proper fix for the weird sizing of the blueprint icon before switching to umb-icon -->
+                        <!-- <umb-icon icon="icon-{{action.cssclass}}" class="icon icon-{{action.cssclass}}"></umb-icon> -->
+                        <span class="menu-label">{{ action.name }}</span>
                     </button>
                 </li>
             </ul>
