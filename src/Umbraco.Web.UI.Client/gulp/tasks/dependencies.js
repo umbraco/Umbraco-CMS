@@ -213,7 +213,6 @@ function dependencies() {
         {
             "name": "signalr",
             "src":  [
-                "./node_modules/@microsoft/signalr/dist/browser/signalr.js",
                 "./node_modules/@microsoft/signalr/dist/browser/signalr.min.js",
             ],
             "base": "./node_modules/@microsoft/signalr/dist/browser"
