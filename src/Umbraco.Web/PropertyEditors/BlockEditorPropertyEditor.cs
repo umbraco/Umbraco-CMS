@@ -91,23 +91,6 @@ namespace Umbraco.Web.PropertyEditors
                 return result;
             }
 
-
-            /// <inheritdoc />
-            public override object Configuration
-            {
-                get => base.Configuration;
-                set
-                {
-                    if (value == null)
-                        throw new ArgumentNullException(nameof(value));
-                    if (!(value is BlockListConfiguration configuration))
-                        throw new ArgumentException($"Expected a {typeof(BlockListConfiguration).Name}, but got {value.GetType().Name}.", nameof(value));
-                    base.Configuration = value;
-
-                    LabelOnTop = configuration.LabelOnTop.TryConvertTo<bool>().Result;
-                }
-            }
-
             #region Convert database // editor
 
             // note: there is NO variant support here
