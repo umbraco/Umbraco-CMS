@@ -118,10 +118,13 @@
     <Compile Include="Cache\DistributedCacheBinderTests.cs" />
     <Compile Include="Cache\RefresherTests.cs" />
     <Compile Include="Cache\SnapDictionaryTests.cs" />
+    <Compile Include="IO\AbstractFileSystemTests.cs" />
+    <Compile Include="IO\FileSystemsTests.cs" />
+    <Compile Include="IO\PhysicalFileSystemTests.cs" />
+    <Compile Include="IO\ShadowFileSystemTests.cs" />
     <Compile Include="LegacyXmlPublishedCache\ContentXmlDto.cs" />
     <Compile Include="LegacyXmlPublishedCache\PreviewXmlDto.cs" />
     <Compile Include="Logging\LogviewerTests.cs" />
-    <Compile Include="Manifest\ManifestContentAppTests.cs" />
     <Compile Include="Migrations\MigrationPlanTests.cs" />
     <Compile Include="Migrations\MigrationTests.cs" />
     <Compile Include="Models\ContentXmlTest.cs" />
@@ -164,7 +167,6 @@
     <Compile Include="TestHelpers\RandomIdRamDirectory.cs" />
     <Compile Include="TestHelpers\Stubs\TestUserPasswordConfig.cs" />
     <Compile Include="Testing\Objects\TestDataSource.cs" />
-    <Compile Include="IO\ShadowFileSystemTests.cs" />
     <Compile Include="Issues\U9560.cs" />
     <Compile Include="Integration\ContentEventsTests.cs" />
     <Compile Include="Migrations\AdvancedMigrationTests.cs" />
@@ -277,7 +279,6 @@
     <Compile Include="Services\RelationServiceTests.cs" />
     <Compile Include="Services\MacroServiceTests.cs" />
     <Compile Include="Services\UserServiceTests.cs" />
-    <Compile Include="Manifest\ManifestParserTests.cs" />
     <Compile Include="Cache\PublishedCache\PublishedMediaCacheTests.cs" />
     <Compile Include="Migrations\AlterMigrationTests.cs" />
     <Compile Include="Migrations\SqlScripts\SqlResources.Designer.cs">
@@ -303,7 +304,6 @@
     <Compile Include="PublishedContent\PublishedContentTests.cs" />
     <Compile Include="PublishedContent\PublishedMediaTests.cs" />
     <Compile Include="Web\Mvc\HtmlHelperExtensionMethodsTests.cs" />
-    <Compile Include="IO\IoHelperTests.cs" />
     <Compile Include="Models\ContentTests.cs" />
     <Compile Include="Persistence\SqlCeTableByTableTest.cs" />
     <Compile Include="Persistence\DatabaseContextTests.cs" />
@@ -372,9 +372,6 @@
     <Compile Include="UmbracoExamine\ExamineDemoDataContentService.cs" />
     <Compile Include="TestHelpers\Stubs\TestLastChanceFinder.cs" />
     <Compile Include="TestHelpers\TestHelper.cs" />
-    <Compile Include="IO\AbstractFileSystemTests.cs" />
-    <Compile Include="IO\FileSystemsTests.cs" />
-    <Compile Include="IO\PhysicalFileSystemTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestHelpers\FakeHttpContextFactory.cs" />
     <Compile Include="Routing\UmbracoModuleTests.cs" />
