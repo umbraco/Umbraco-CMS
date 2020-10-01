@@ -13,7 +13,9 @@
                         ng-click="vm.showCreateDialog($index, $event)"
                         ng-controller="Umbraco.PropertyEditors.BlockListPropertyEditor.CreateButtonController as inlineCreateButtonCtrl"
                         ng-mousemove="inlineCreateButtonCtrl.onMouseMove($event)">
-                    <div class="__plus" ng-style="{'left':inlineCreateButtonCtrl.plusPosX}">+</div>
+                    <div class="__plus" ng-style="{'left':inlineCreateButtonCtrl.plusPosX}">
+                        <i class="icon icon-add" aria-hidden="true"></i>
+                    </div>
                 </button>
 
                 <umb-block-list-row block-editor-api="vm.blockEditorApi"
