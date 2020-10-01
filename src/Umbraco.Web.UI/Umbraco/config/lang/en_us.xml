@@ -1715,6 +1715,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="elementCannotToggle">A document type cannot be changed to an element type once it has been used to create one or more content items.</key>
     <key alias="elementDoesNotSupport">This is not applicable for an element type</key>
     <key alias="propertyHasChanges">You have made changes to this property. Are you sure you want to discard them?</key>
+    <key alias="displaySettingsHeadline">Appearance</key>
+    <key alias="displaySettingsLabelOnTop">Display label on top of editor.</key>
   </area>
   <area alias="languages">
     <key alias="addLanguage">Add language</key>
