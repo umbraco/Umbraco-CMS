@@ -68,7 +68,6 @@ namespace Umbraco.Tests.Integration.TestServerTest
                  builder.ConfigureServices((c, s) =>
                  {
                      c.HostingEnvironment = TestHelper.GetWebHostEnvironment();
-                     s.AddSignalR();
                  });
 
                  // call startup
@@ -142,6 +141,7 @@ namespace Umbraco.Tests.Integration.TestServerTest
                 .WithRuntimeMinifier()
                 .WithBackOffice()
                 .WithBackOfficeIdentity()
+                .WithPreview()
                 //.WithMiniProfiler() // we don't want this running in tests
                 .WithMvcAndRazor(mvcBuilding: mvcBuilder =>
                 {
