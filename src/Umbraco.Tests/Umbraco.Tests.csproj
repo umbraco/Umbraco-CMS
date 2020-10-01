@@ -111,8 +111,8 @@
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.7.0" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="4.7.0" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
-    <PackageReference Include="Umbraco.SqlServerCE" Version="4.0.0.1" />
     <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.2" />
+    <PackageReference Include="Umbraco.SqlServerCE" Version="4.0.0.1" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Cache\DistributedCacheBinderTests.cs" />
