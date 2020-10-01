@@ -21,7 +21,7 @@ using File = System.IO.File;
 
 namespace Umbraco.ModelsBuilder.Embedded
 {
-    internal class PureLiveModelFactory : ILivePublishedModelFactory, IRegisteredObject
+    internal class PureLiveModelFactory : ILivePublishedModelFactory2, IRegisteredObject
     {
         private Assembly _modelsAssembly;
         private Infos _infos = new Infos { ModelInfos = null, ModelTypeMap = new Dictionary<string, Type>() };
@@ -132,6 +132,16 @@ namespace Umbraco.ModelsBuilder.Embedded
             var listType = typeof(List<>).MakeGenericType(modelInfo.ModelType);
             ctor = modelInfo.ListCtor = ReflectionUtilities.EmitConstructor<Func<IList>>(declaring: listType);
             return ctor();
+        }
+
+        /// <inheritdoc />
+        public bool Enabled => _config.Enable;
+
+        /// <inheritdoc />
+        public void Reset()
+        {
+            if (_config.Enable)
+                ResetModels();
         }
 
         #endregion
@@ -532,8 +542,10 @@ namespace Umbraco.ModelsBuilder.Embedded
                 if (modelInfos.TryGetValue(typeName, out var modelInfo))
                     throw new InvalidOperationException($"Both types {type.FullName} and {modelInfo.ModelType.FullName} want to be a model type for content type with alias \"{typeName}\".");
 
-                // fixme use Core's ReflectionUtilities.EmitCtor !!
+                // TODO: use Core's ReflectionUtilities.EmitCtor !!
                 // Yes .. DynamicMethod is uber slow
+                // TODO: But perhaps https://docs.microsoft.com/en-us/dotnet/api/system.reflection.emit.constructorbuilder?view=netcore-3.1 is better still?
+                // See CtorInvokeBenchmarks
                 var meth = new DynamicMethod(string.Empty, typeof(IPublishedElement), ctorArgTypes, type.Module, true);
                 var gen = meth.GetILGenerator();
                 gen.Emit(OpCodes.Ldarg_0);

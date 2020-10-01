@@ -18,7 +18,7 @@
             $scope.model.disableSubmitButton = !firstSelected;
 
             if (language.isMandatory) {
-                angular.forEach($scope.model.languages, function (lang) {
+                $scope.model.languages.forEach(function (lang) {
                     if (lang !== language) {
                         lang.unpublish = true;
                         lang.disabled = language.unpublish;

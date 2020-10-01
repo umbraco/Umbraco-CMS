@@ -32,12 +32,14 @@
         ], $scope).then(function () {
             var elem = $element.find("input[name='newColor']");
             elem.spectrum({
-                color: null,
+                type: "color",
+                color: defaultColor,
+                showAlpha: false,
                 showInitial: false,
+                showInput: true,
                 chooseText: $scope.labels.choose,
                 cancelText: $scope.labels.cancel,
                 preferredFormat: "hex",
-                showInput: true,
                 clickoutFiresChange: true,
                 hide: function (color) {
                     //show the add butotn
@@ -55,7 +57,7 @@
             });
         });
 
-        if (!angular.isArray($scope.model.value)) {
+        if (!Utilities.isArray($scope.model.value)) {
             //make an array from the dictionary
             var items = [];
             for (var i in $scope.model.value) {

@@ -1184,7 +1184,7 @@ AND umbracoNode.id <> @id",
         {
             // first clear dependencies
             Database.Delete<TagRelationshipDto>("WHERE propertyTypeId = @Id", new { Id = propertyTypeId });
-            Database.Delete<PropertyDataDto>("WHERE propertytypeid = @Id", new { Id = propertyTypeId });
+            Database.Delete<PropertyDataDto>("WHERE propertyTypeId = @Id", new { Id = propertyTypeId });
 
             // then delete the property type
             Database.Delete<PropertyTypeDto>("WHERE contentTypeId = @Id AND id = @PropertyTypeId",
@@ -1309,18 +1309,31 @@ WHERE cmsContentType." + aliasColumn + @" LIKE @pattern",
             return test;
         }
 
-        /// <summary>
-        /// Given the path of a content item, this will return true if the content item exists underneath a list view content item
-        /// </summary>
-        /// <param name="contentPath"></param>
-        /// <returns></returns>
+        /// <inheritdoc />
         public bool HasContainerInPath(string contentPath)
         {
-            var ids = contentPath.Split(',').Select(int.Parse);
+            var ids = contentPath.Split(',').Select(int.Parse).ToArray();
+            return HasContainerInPath(ids);
+        }
+
+        /// <inheritdoc />
+        public bool HasContainerInPath(params int[] ids)
+        {
             var sql = new Sql($@"SELECT COUNT(*) FROM cmsContentType
 INNER JOIN {Constants.DatabaseSchema.Tables.Content} ON cmsContentType.nodeId={Constants.DatabaseSchema.Tables.Content}.contentTypeId
 WHERE {Constants.DatabaseSchema.Tables.Content}.nodeId IN (@ids) AND cmsContentType.isContainer=@isContainer", new { ids, isContainer = true });
             return Database.ExecuteScalar<int>(sql) > 0;
+        }
+
+        /// <summary>
+        /// Returns true or false depending on whether content nodes have been created based on the provided content type id.
+        /// </summary>
+        public bool HasContentNodes(int id)
+        {
+            var sql = new Sql(
+                $"SELECT CASE WHEN EXISTS (SELECT * FROM {Constants.DatabaseSchema.Tables.Content} WHERE contentTypeId = @id) THEN 1 ELSE 0 END",
+                new { id });
+            return Database.ExecuteScalar<int>(sql) == 1;
         }
 
         protected override IEnumerable<string> GetDeleteClauses()

@@ -37,9 +37,9 @@ namespace Umbraco.Web.Routing
                 reason = "No template exists to render the document at url '{0}'.";
 
             response.Write("<html><body><h1>Page not found</h1>");
-            response.Write("<h3>");
+            response.Write("<h2>");
             response.Write(string.Format(reason, HttpUtility.HtmlEncode(Current.UmbracoContext.OriginalRequestUrl.PathAndQuery)));
-            response.Write("</h3>");
+            response.Write("</h2>");
             if (string.IsNullOrWhiteSpace(_message) == false)
                 response.Write("<p>" + _message + "</p>");
             response.Write("<p>This page can be replaced with a custom 404. Check the documentation for \"custom 404\".</p>");

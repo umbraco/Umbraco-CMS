@@ -2,7 +2,7 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyTitle("Umbraco.ModelsBuilder")]
+[assembly: AssemblyTitle("Umbraco.ModelsBuilder.Embedded")]
 [assembly: AssemblyDescription("Umbraco ModelsBuilder")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyProduct("Umbraco CMS")]

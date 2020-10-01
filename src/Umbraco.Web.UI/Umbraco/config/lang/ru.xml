@@ -155,7 +155,7 @@
     <key alias="saveToPublish">Направить на публикацию</key>
     <key alias="saveListView">Сохранить список</key>
     <key alias="select">Выбрать</key>
-    <key alias="showPage">Предварительный просмотр</key>
+    <key alias="saveAndPreview">Предварительный просмотр</key>
     <key alias="showPageDisabled">Предварительный просмотр запрещен, так как документу не сопоставлен шаблон</key>
     <key alias="somethingElse">Другие действия</key>
     <key alias="styleChoose">Выбрать стиль</key>

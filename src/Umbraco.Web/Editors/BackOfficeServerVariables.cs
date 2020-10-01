@@ -58,7 +58,7 @@ namespace Umbraco.Web.Editors
             //this is the filter for the keys that we'll keep based on the full version of the server vars
             var keepOnlyKeys = new Dictionary<string, string[]>
             {
-                {"umbracoUrls", new[] {"authenticationApiBaseUrl", "serverVarsJs", "externalLoginsUrl", "currentUserApiBaseUrl"}},
+                {"umbracoUrls", new[] {"authenticationApiBaseUrl", "serverVarsJs", "externalLoginsUrl", "currentUserApiBaseUrl", "iconApiBaseUrl"}},
                 {"umbracoSettings", new[] {"allowPasswordReset", "imageFileTypes", "maxFileSize", "loginBackgroundImage", "canSendRequiredEmail", "usernameIsEmail"}},
                 {"application", new[] {"applicationPath", "cacheBuster"}},
                 {"isDebuggingEnabled", new string[] { }},
@@ -281,7 +281,7 @@ namespace Umbraco.Web.Editors
                         {
                             "dictionaryApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<DictionaryController>(
                                 controller => controller.DeleteById(int.MaxValue))
-						},
+                        },
                         {
                             "nuCacheStatusBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<NuCacheStatusController>(
                                 controller => controller.GetStatus())
@@ -299,12 +299,16 @@ namespace Umbraco.Web.Editors
                                 controller => controller.GetAllLanguages())
                         },
                         {
-						    "relationTypeApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<RelationTypeController>(
+                            "relationTypeApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<RelationTypeController>(
                                 controller => controller.GetById(1))
                         },
-						{
+                        {
                             "logViewerApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<LogViewerController>(
                                 controller => controller.GetNumberOfErrors(null, null))
+                        },
+                        {
+                            "iconApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<IconController>(
+                                controller => controller.GetIcon(""))
                         },
                         {
                             "webProfilingBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<WebProfilingController>(
@@ -313,6 +317,14 @@ namespace Umbraco.Web.Editors
                         {
                             "tinyMceApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<TinyMceController>(
                                 controller => controller.UploadImage())
+                        },
+                        {
+                            "imageUrlGeneratorApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ImageUrlGeneratorController>(
+                                controller => controller.GetCropUrl(null, null, null, null, null))
+                        },
+                        {
+                            "elementTypeApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ElementTypeController>(
+                                controller => controller.GetAll())
                         },
                     }
                 },
@@ -345,6 +357,7 @@ namespace Umbraco.Web.Editors
                         {"loginBackgroundImage",  Current.Configs.Settings().Content.LoginBackgroundImage},
                         {"showUserInvite", EmailSender.CanSendRequiredEmail},
                         {"canSendRequiredEmail", EmailSender.CanSendRequiredEmail},
+                        {"showAllowSegmentationForDocumentTypes", false},
                     }
                 },
                 {

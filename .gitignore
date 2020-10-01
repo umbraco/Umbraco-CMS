@@ -100,6 +100,9 @@ src/Umbraco.Web.UI/[Uu]mbraco/[Jj]s/loader.dev.js
 src/Umbraco.Web.UI/[Uu]mbraco/[Jj]s/main.js
 src/Umbraco.Web.UI/[Uu]mbraco/[Jj]s/app.js
 src/Umbraco.Web.UI/[Uu]mbraco/[Jj]s/canvasdesigner.*.js
+src/Umbraco.Web.UI/[Uu]mbraco/[Jj]s/navigation.controller.js
+src/Umbraco.Web.UI/[Uu]mbraco/[Jj]s/main.controller.js
+src/Umbraco.Web.UI/[Uu]mbraco/[Jj]s/utilities.js
 
 src/Umbraco.Web.UI/[Uu]mbraco/[Vv]iews/
 src/Umbraco.Web.UI/[Uu]mbraco/[Vv]iews/**/*.js
@@ -164,3 +167,11 @@ build/temp/
 # eof
 /src/Umbraco.Web.UI.Client/TESTS-*.xml
 /src/ApiDocs/api/*
+/src/Umbraco.Web.UI.Client/package-lock.json
+
+# Acceptance tests
+cypress.env.json
+/src/Umbraco.Tests.AcceptanceTest/cypress/support/chainable.ts
+/src/Umbraco.Tests.AcceptanceTest/package-lock.json
+/src/Umbraco.Tests.AcceptanceTest/cypress/videos/
+/src/Umbraco.Tests.AcceptanceTest/cypress/screenshots/

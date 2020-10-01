@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Configuration;
 using System.IO;
+using System.Threading;
 using System.Web.Configuration;
 using Umbraco.Core;
 using Umbraco.Core.IO;
@@ -12,6 +13,13 @@ namespace Umbraco.ModelsBuilder.Embedded.Configuration
     /// </summary>
     public class ModelsBuilderConfig : IModelsBuilderConfig
     {
+        private const string Prefix = "Umbraco.ModelsBuilder.";
+        private object _modelsModelLock;
+        private bool _modelsModelConfigured;
+        private ModelsMode _modelsMode;
+        private object _flagOutOfDateModelsLock;
+        private bool _flagOutOfDateModelsConfigured;
+        private bool _flagOutOfDateModels;
         public const string DefaultModelsNamespace = "Umbraco.Web.PublishedModels";
         public const string DefaultModelsDirectory = "~/App_Data/Models";
 
@@ -20,11 +28,9 @@ namespace Umbraco.ModelsBuilder.Embedded.Configuration
         /// </summary>
         public ModelsBuilderConfig()
         {
-            const string prefix = "Umbraco.ModelsBuilder.";
-
             // giant kill switch, default: false
             // must be explicitely set to true for anything else to happen
-            Enable = ConfigurationManager.AppSettings[prefix + "Enable"] == "true";
+            Enable = ConfigurationManager.AppSettings[Prefix + "Enable"] == "true";
 
             // ensure defaults are initialized for tests
             ModelsNamespace = DefaultModelsNamespace;
@@ -34,44 +40,19 @@ namespace Umbraco.ModelsBuilder.Embedded.Configuration
             // stop here, everything is false
             if (!Enable) return;
 
-            // mode
-            var modelsMode = ConfigurationManager.AppSettings[prefix + "ModelsMode"];
-            if (!string.IsNullOrWhiteSpace(modelsMode))
-            {
-                switch (modelsMode)
-                {
-                    case nameof(ModelsMode.Nothing):
-                        ModelsMode = ModelsMode.Nothing;
-                        break;
-                    case nameof(ModelsMode.PureLive):
-                        ModelsMode = ModelsMode.PureLive;
-                        break;
-                    case nameof(ModelsMode.AppData):
-                        ModelsMode = ModelsMode.AppData;
-                        break;
-                    case nameof(ModelsMode.LiveAppData):
-                        ModelsMode = ModelsMode.LiveAppData;
-                        break;
-                    default:
-                        throw new ConfigurationErrorsException($"ModelsMode \"{modelsMode}\" is not a valid mode."
-                            + " Note that modes are case-sensitive. Possible values are: " + string.Join(", ", Enum.GetNames(typeof(ModelsMode))));
-                }
-            }
-
             // default: false
-            AcceptUnsafeModelsDirectory = ConfigurationManager.AppSettings[prefix + "AcceptUnsafeModelsDirectory"].InvariantEquals("true");
+            AcceptUnsafeModelsDirectory = ConfigurationManager.AppSettings[Prefix + "AcceptUnsafeModelsDirectory"].InvariantEquals("true");
 
             // default: true
-            EnableFactory = !ConfigurationManager.AppSettings[prefix + "EnableFactory"].InvariantEquals("false");
-            FlagOutOfDateModels = !ConfigurationManager.AppSettings[prefix + "FlagOutOfDateModels"].InvariantEquals("false");
+            EnableFactory = !ConfigurationManager.AppSettings[Prefix + "EnableFactory"].InvariantEquals("false");
 
             // default: initialized above with DefaultModelsNamespace const
-            var value = ConfigurationManager.AppSettings[prefix + "ModelsNamespace"];
+            var value = ConfigurationManager.AppSettings[Prefix + "ModelsNamespace"];
             if (!string.IsNullOrWhiteSpace(value))
                 ModelsNamespace = value;
 
             // default: initialized above with DefaultModelsDirectory const
-            value = ConfigurationManager.AppSettings[prefix + "ModelsDirectory"];
+            value = ConfigurationManager.AppSettings[Prefix + "ModelsDirectory"];
             if (!string.IsNullOrWhiteSpace(value))
             {
                 var root = IOHelper.MapPath("~/");
@@ -83,18 +64,14 @@ namespace Umbraco.ModelsBuilder.Embedded.Configuration
             }
 
             // default: 0
-            value = ConfigurationManager.AppSettings[prefix + "DebugLevel"];
+            value = ConfigurationManager.AppSettings[Prefix + "DebugLevel"];
             if (!string.IsNullOrWhiteSpace(value))
             {
-                int debugLevel;
-                if (!int.TryParse(value, out debugLevel))
+                if (!int.TryParse(value, out var debugLevel))
                     throw new ConfigurationErrorsException($"Invalid debug level \"{value}\".");
                 DebugLevel = debugLevel;
             }
 
-            // not flagging if not generating, or live (incl. pure)
-            if (ModelsMode == ModelsMode.Nothing || ModelsMode.IsLive())
-                FlagOutOfDateModels = false;
         }
 
         /// <summary>
@@ -111,11 +88,11 @@ namespace Umbraco.ModelsBuilder.Embedded.Configuration
             int debugLevel = 0)
         {
             Enable = enable;
-            ModelsMode = modelsMode;
+            _modelsMode = modelsMode;
 
             ModelsNamespace = string.IsNullOrWhiteSpace(modelsNamespace) ? DefaultModelsNamespace : modelsNamespace;
             EnableFactory = enableFactory;
-            FlagOutOfDateModels = flagOutOfDateModels;
+            _flagOutOfDateModels = flagOutOfDateModels;
             ModelsDirectory = string.IsNullOrWhiteSpace(modelsDirectory) ? DefaultModelsDirectory : modelsDirectory;
             AcceptUnsafeModelsDirectory = acceptUnsafeModelsDirectory;
             DebugLevel = debugLevel;
@@ -164,7 +141,26 @@ namespace Umbraco.ModelsBuilder.Embedded.Configuration
         /// <summary>
         /// Gets the models mode.
         /// </summary>
-        public ModelsMode ModelsMode { get; }
+        public ModelsMode ModelsMode =>
+            LazyInitializer.EnsureInitialized(ref _modelsMode, ref _modelsModelConfigured, ref _modelsModelLock, () =>
+            {
+                // mode
+                var modelsMode = ConfigurationManager.AppSettings[Prefix + "ModelsMode"];
+                if (string.IsNullOrWhiteSpace(modelsMode)) return ModelsMode.Nothing; //default
+                switch (modelsMode)
+                {
+                    case nameof(ModelsMode.Nothing):
+                        return ModelsMode.Nothing;
+                    case nameof(ModelsMode.PureLive):
+                        return ModelsMode.PureLive;
+                    case nameof(ModelsMode.AppData):
+                        return ModelsMode.AppData;
+                    case nameof(ModelsMode.LiveAppData):
+                        return ModelsMode.LiveAppData;
+                    default:
+                        throw new ConfigurationErrorsException($"ModelsMode \"{modelsMode}\" is not a valid mode." + " Note that modes are case-sensitive. Possible values are: " + string.Join(", ", Enum.GetNames(typeof(ModelsMode))));
+                }
+            });
 
         /// <summary>
         /// Gets a value indicating whether system.web/compilation/@debug is true.
@@ -196,7 +192,17 @@ namespace Umbraco.ModelsBuilder.Embedded.Configuration
         /// <remarks>Models become out-of-date when data types or content types are updated. When this
         /// setting is activated the ~/App_Data/Models/ood.txt file is then created. When models are
         /// generated through the dashboard, the files is cleared. Default value is <c>false</c>.</remarks>
-        public bool FlagOutOfDateModels { get; }
+        public bool FlagOutOfDateModels
+            => LazyInitializer.EnsureInitialized(ref _flagOutOfDateModels, ref _flagOutOfDateModelsConfigured, ref _flagOutOfDateModelsLock, () =>
+            {
+                var flagOutOfDateModels = !ConfigurationManager.AppSettings[Prefix + "FlagOutOfDateModels"].InvariantEquals("false");
+                if (ModelsMode == ModelsMode.Nothing || ModelsMode.IsLive())
+                {
+                    flagOutOfDateModels = false;
+                }
+
+                return flagOutOfDateModels;
+            });
 
         /// <summary>
         /// Gets the models directory.

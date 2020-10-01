@@ -1,6 +1,7 @@
-﻿using NUnit.Framework;
-using Umbraco.Web.Trees;
+﻿using System;
+using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Web.Trees;
 
 namespace Umbraco.Tests.CoreThings
 {
@@ -22,6 +23,7 @@ namespace Umbraco.Tests.CoreThings
                 Assert.IsFalse(value.HasFlag(test));
         }
 
+        [Obsolete]
         [TestCase(TreeUse.Dialog, TreeUse.Dialog, true)]
         [TestCase(TreeUse.Dialog, TreeUse.Main, false)]
         [TestCase(TreeUse.Dialog | TreeUse.Main, TreeUse.Dialog, true)]
@@ -50,48 +52,6 @@ namespace Umbraco.Tests.CoreThings
                 Assert.IsTrue(value.HasFlagAny(test));
             else
                 Assert.IsFalse(value.HasFlagAny(test));
-        }
-
-        [TestCase(TreeUse.None, TreeUse.None, TreeUse.None)]
-        [TestCase(TreeUse.None, TreeUse.Main, TreeUse.Main)]
-        [TestCase(TreeUse.None, TreeUse.Dialog, TreeUse.Dialog)]        
-        [TestCase(TreeUse.None, TreeUse.Main | TreeUse.Dialog, TreeUse.Main | TreeUse.Dialog)]        
-        [TestCase(TreeUse.Main, TreeUse.None, TreeUse.Main)]
-        [TestCase(TreeUse.Main, TreeUse.Main, TreeUse.Main)]
-        [TestCase(TreeUse.Main, TreeUse.Dialog, TreeUse.Main | TreeUse.Dialog)]                
-        [TestCase(TreeUse.Main, TreeUse.Main | TreeUse.Dialog, TreeUse.Main | TreeUse.Dialog)]                
-        [TestCase(TreeUse.Dialog, TreeUse.None, TreeUse.Dialog)]
-        [TestCase(TreeUse.Dialog, TreeUse.Main, TreeUse.Main | TreeUse.Dialog)]
-        [TestCase(TreeUse.Dialog, TreeUse.Dialog, TreeUse.Dialog)]                             
-        [TestCase(TreeUse.Dialog, TreeUse.Main | TreeUse.Dialog, TreeUse.Main | TreeUse.Dialog)]
-        [TestCase(TreeUse.Main | TreeUse.Dialog, TreeUse.None, TreeUse.Main | TreeUse.Dialog)]
-        [TestCase(TreeUse.Main | TreeUse.Dialog, TreeUse.Main, TreeUse.Main | TreeUse.Dialog)]
-        [TestCase(TreeUse.Main | TreeUse.Dialog, TreeUse.Dialog, TreeUse.Main | TreeUse.Dialog)]
-        [TestCase(TreeUse.Main | TreeUse.Dialog, TreeUse.Main | TreeUse.Dialog, TreeUse.Main | TreeUse.Dialog)]
-        public void SetFlagTests(TreeUse value, TreeUse flag, TreeUse expected)
-        {
-            Assert.AreEqual(expected, value.SetFlag(flag));
-        }
-
-        [TestCase(TreeUse.None, TreeUse.None, TreeUse.None)]
-        [TestCase(TreeUse.None, TreeUse.Main, TreeUse.None)]
-        [TestCase(TreeUse.None, TreeUse.Dialog, TreeUse.None)]
-        [TestCase(TreeUse.None, TreeUse.Main | TreeUse.Dialog, TreeUse.None)]
-        [TestCase(TreeUse.Main, TreeUse.None, TreeUse.Main)]
-        [TestCase(TreeUse.Main, TreeUse.Main, TreeUse.None)]
-        [TestCase(TreeUse.Main, TreeUse.Dialog, TreeUse.Main)]
-        [TestCase(TreeUse.Main, TreeUse.Main | TreeUse.Dialog, TreeUse.None)]
-        [TestCase(TreeUse.Dialog, TreeUse.None, TreeUse.Dialog)]
-        [TestCase(TreeUse.Dialog, TreeUse.Main, TreeUse.Dialog)]
-        [TestCase(TreeUse.Dialog, TreeUse.Dialog, TreeUse.None)]
-        [TestCase(TreeUse.Dialog, TreeUse.Main | TreeUse.Dialog, TreeUse.None)]
-        [TestCase(TreeUse.Main | TreeUse.Dialog, TreeUse.None, TreeUse.Main | TreeUse.Dialog)]
-        [TestCase(TreeUse.Main | TreeUse.Dialog, TreeUse.Main, TreeUse.Dialog)]
-        [TestCase(TreeUse.Main | TreeUse.Dialog, TreeUse.Dialog, TreeUse.Main)]                
-        [TestCase(TreeUse.Main | TreeUse.Dialog, TreeUse.Main | TreeUse.Dialog, TreeUse.None)]
-        public void UnsetFlagTests(TreeUse value, TreeUse flag, TreeUse expected)
-        {
-            Assert.AreEqual(expected, value.UnsetFlag(flag));
         }
     }
 }

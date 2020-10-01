@@ -85,7 +85,7 @@
     <key alias="saveAndPublish">保存及び公開</key>
     <key alias="saveToPublish">保存して承認に送る</key>
     <key alias="saveListView">リスト ビューの保存</key>
-    <key alias="showPage">プレビュー</key>
+    <key alias="saveAndPreview">プレビュー</key>
     <key alias="showPageDisabled">テンプレートが指定されていないのでプレビューは無効になっています</key>
     <key alias="styleChoose">スタイルの選択</key>
     <key alias="styleShow">スタイルの表示</key>

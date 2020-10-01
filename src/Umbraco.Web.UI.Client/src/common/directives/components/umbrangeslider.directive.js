@@ -57,13 +57,13 @@ For extra details about options and events take a look here: https://refreshless
 **/
 
 
-(function() {
-	'use strict';
+(function () {
+    'use strict';
 
-	var umbRangeSlider = {
+    var umbRangeSlider = {
         template: '<div class="umb-range-slider"></div>',
-		controller: UmbRangeSliderController,
-		bindings: {
+        controller: UmbRangeSliderController,
+        bindings: {
             ngModel: '<',
             options: '<',
             onSetup: '&?',
@@ -73,15 +73,15 @@ For extra details about options and events take a look here: https://refreshless
             onChange: '&?',
             onStart: '&?',
             onEnd: '&?'
-		}
+        }
     };
-    
-	function UmbRangeSliderController($element, $timeout, $scope, assetsService) {
-        
+
+    function UmbRangeSliderController($element, $timeout, $scope, assetsService) {
+
         const ctrl = this;
         let sliderInstance = null;
 
-		ctrl.$onInit = function() {
+        ctrl.$onInit = function () {
 
             // load css file for the date picker
             assetsService.loadCss('lib/nouislider/nouislider.min.css', $scope);
@@ -94,13 +94,13 @@ For extra details about options and events take a look here: https://refreshless
 
         };
 
-		function grabElementAndRun() {
-			$timeout(function() {
+        function grabElementAndRun() {
+            $timeout(function () {
                 const element = $element.find('.umb-range-slider')[0];
-				setSlider(element);
-			}, 0, true);
+                setSlider(element);
+            }, 0, true);
         }
-        
+
         function setSlider(element) {
 
             sliderInstance = element;
@@ -117,82 +117,84 @@ For extra details about options and events take a look here: https://refreshless
 
             // create new slider
             noUiSlider.create(sliderInstance, options);
-            
-			if (ctrl.onSetup) {
-				ctrl.onSetup({
-					slider: sliderInstance
-				});
+
+            mergeTooltips(sliderInstance, 15, ' - ');
+
+            if (ctrl.onSetup) {
+                ctrl.onSetup({
+                    slider: sliderInstance
+                });
             }
 
             // If has ngModel set the date
-			if (ctrl.ngModel) {
+            if (ctrl.ngModel) {
                 sliderInstance.noUiSlider.set(ctrl.ngModel);
             }
 
             // destroy the slider instance when the dom element is removed
-			angular.element(element).on('$destroy', function() {
+            $(element).on('$destroy', function () {
                 sliderInstance.noUiSlider.off();
             });
 
             setUpCallbacks();
 
-			// Refresh the scope
-			$scope.$applyAsync();
+            // Refresh the scope
+            $scope.$applyAsync();
         }
-        
+
         function setUpCallbacks() {
-			if(sliderInstance) {
+            if (sliderInstance) {
 
                 // bind hook for update
-                if(ctrl.onUpdate) {
-                    sliderInstance.noUiSlider.on('update', function (values, handle, unencoded, tap, positions) { 
-                        $timeout(function() {
-                            ctrl.onUpdate({values: values, handle: handle, unencoded: unencoded, tap: tap, positions: positions});
+                if (ctrl.onUpdate) {
+                    sliderInstance.noUiSlider.on('update', function (values, handle, unencoded, tap, positions) {
+                        $timeout(function () {
+                            ctrl.onUpdate({ values: values, handle: handle, unencoded: unencoded, tap: tap, positions: positions });
                         });
                     });
                 }
 
                 // bind hook for slide
-                if(ctrl.onSlide) {
-                    sliderInstance.noUiSlider.on('slide', function (values, handle, unencoded, tap, positions) { 
-                        $timeout(function() {
-                            ctrl.onSlide({values: values, handle: handle, unencoded: unencoded, tap: tap, positions: positions});
+                if (ctrl.onSlide) {
+                    sliderInstance.noUiSlider.on('slide', function (values, handle, unencoded, tap, positions) {
+                        $timeout(function () {
+                            ctrl.onSlide({ values: values, handle: handle, unencoded: unencoded, tap: tap, positions: positions });
                         });
                     });
                 }
 
                 // bind hook for set
-                if(ctrl.onSet) {
-                    sliderInstance.noUiSlider.on('set', function (values, handle, unencoded, tap, positions) { 
-                        $timeout(function() {
-                            ctrl.onSet({values: values, handle: handle, unencoded: unencoded, tap: tap, positions: positions});
+                if (ctrl.onSet) {
+                    sliderInstance.noUiSlider.on('set', function (values, handle, unencoded, tap, positions) {
+                        $timeout(function () {
+                            ctrl.onSet({ values: values, handle: handle, unencoded: unencoded, tap: tap, positions: positions });
                         });
                     });
                 }
 
                 // bind hook for change
-                if(ctrl.onChange) {
-                    sliderInstance.noUiSlider.on('change', function (values, handle, unencoded, tap, positions) { 
-                        $timeout(function() {
-                            ctrl.onChange({values: values, handle: handle, unencoded: unencoded, tap: tap, positions: positions});
+                if (ctrl.onChange) {
+                    sliderInstance.noUiSlider.on('change', function (values, handle, unencoded, tap, positions) {
+                        $timeout(function () {
+                            ctrl.onChange({ values: values, handle: handle, unencoded: unencoded, tap: tap, positions: positions });
                         });
                     });
                 }
 
                 // bind hook for start
-                if(ctrl.onStart) {
-                    sliderInstance.noUiSlider.on('start', function (values, handle, unencoded, tap, positions) { 
-                        $timeout(function() {
-                            ctrl.onStart({values: values, handle: handle, unencoded: unencoded, tap: tap, positions: positions});
+                if (ctrl.onStart) {
+                    sliderInstance.noUiSlider.on('start', function (values, handle, unencoded, tap, positions) {
+                        $timeout(function () {
+                            ctrl.onStart({ values: values, handle: handle, unencoded: unencoded, tap: tap, positions: positions });
                         });
                     });
                 }
 
                 // bind hook for end
-                if(ctrl.onEnd) {
-                    sliderInstance.noUiSlider.on('end', function (values, handle, unencoded, tap, positions) { 
-                        $timeout(function() {
-                            ctrl.onEnd({values: values, handle: handle, unencoded: unencoded, tap: tap, positions: positions});
+                if (ctrl.onEnd) {
+                    sliderInstance.noUiSlider.on('end', function (values, handle, unencoded, tap, positions) {
+                        $timeout(function () {
+                            ctrl.onEnd({ values: values, handle: handle, unencoded: unencoded, tap: tap, positions: positions });
                         });
                     });
                 }
@@ -200,8 +202,93 @@ For extra details about options and events take a look here: https://refreshless
             }
         }
 
+        // Merging overlapping tooltips: https://refreshless.com/nouislider/examples/#section-merging-tooltips
+
+        /**
+         * @param slider HtmlElement with an initialized slider
+         * @param threshold Minimum proximity (in percentages) to merge tooltips
+         * @param separator String joining tooltips
+         */
+        function mergeTooltips(slider, threshold, separator) {
+
+            var textIsRtl = getComputedStyle(slider).direction === 'rtl';
+            var isRtl = slider.noUiSlider.options.direction === 'rtl';
+            var isVertical = slider.noUiSlider.options.orientation === 'vertical';
+            var tooltips = slider.noUiSlider.getTooltips();
+            var origins = slider.noUiSlider.getOrigins();
+
+            // Move tooltips into the origin element. The default stylesheet handles this.
+            tooltips.forEach(function (tooltip, index) {
+                if (tooltip) {
+                    origins[index].appendChild(tooltip);
+                }
+            });
+
+            slider.noUiSlider.on('update', function (values, handle, unencoded, tap, positions) {
+
+                var pools = [[]];
+                var poolPositions = [[]];
+                var poolValues = [[]];
+                var atPool = 0;
+
+                // Assign the first tooltip to the first pool, if the tooltip is configured
+                if (tooltips[0]) {
+                    pools[0][0] = 0;
+                    poolPositions[0][0] = positions[0];
+                    poolValues[0][0] = values[0];
+                }
+
+                for (var i = 1; i < positions.length; i++) {
+                    if (!tooltips[i] || (positions[i] - positions[i - 1]) > threshold) {
+                        atPool++;
+                        pools[atPool] = [];
+                        poolValues[atPool] = [];
+                        poolPositions[atPool] = [];
+                    }
+
+                    if (tooltips[i]) {
+                        pools[atPool].push(i);
+                        poolValues[atPool].push(values[i]);
+                        poolPositions[atPool].push(positions[i]);
+                    }
+                }
+
+                pools.forEach(function (pool, poolIndex) {
+                    var handlesInPool = pool.length;
+
+                    for (var j = 0; j < handlesInPool; j++) {
+                        var handleNumber = pool[j];
+
+                        if (j === handlesInPool - 1) {
+                            var offset = 0;
+
+                            poolPositions[poolIndex].forEach(function (value) {
+                                offset += 1000 - 10 * value;
+                            });
+
+                            var direction = isVertical ? 'bottom' : 'right';
+                            var last = isRtl ? 0 : handlesInPool - 1;
+                            var lastOffset = 1000 - 10 * poolPositions[poolIndex][last];
+                            offset = (textIsRtl && !isVertical ? 100 : 0) + (offset / handlesInPool) - lastOffset;
+
+                            // Filter to unique values
+                            var tooltipValues = poolValues[poolIndex].filter((v, i, a) => a.indexOf(v) === i); 
+
+                            // Center this tooltip over the affected handles
+                            tooltips[handleNumber].innerHTML = tooltipValues.join(separator);
+                            tooltips[handleNumber].style.display = 'block';
+                            tooltips[handleNumber].style[direction] = offset + '%';
+                        } else {
+                            // Hide this tooltip
+                            tooltips[handleNumber].style.display = 'none';
+                        }
+                    }
+                });
+            });
+        }
+
     }
-    
+
     angular.module('umbraco.directives').component('umbRangeSlider', umbRangeSlider);
-    
+
 })();

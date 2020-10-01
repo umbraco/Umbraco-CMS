@@ -27,12 +27,14 @@ namespace Umbraco.Web
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly IMacroRenderer _macroRenderer;
         private readonly ITemplateRenderer _templateRenderer;
+        private readonly HtmlLocalLinkParser _linkParser;
 
-        public UmbracoComponentRenderer(IUmbracoContextAccessor umbracoContextAccessor, IMacroRenderer macroRenderer, ITemplateRenderer templateRenderer)
+        public UmbracoComponentRenderer(IUmbracoContextAccessor umbracoContextAccessor, IMacroRenderer macroRenderer, ITemplateRenderer templateRenderer, HtmlLocalLinkParser linkParser)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
             _macroRenderer = macroRenderer;
             _templateRenderer = templateRenderer ?? throw new ArgumentNullException(nameof(templateRenderer));
+            _linkParser = linkParser;
         }
 
         /// <summary>
@@ -96,6 +98,15 @@ namespace Umbraco.Web
 
             if (content == null)
                 throw new InvalidOperationException("Cannot render a macro, no content found by id " + contentId);
+
+            return RenderMacro(content, alias, parameters);
+        }
+
+
+        public IHtmlString RenderMacroForContent(IPublishedContent content, string alias, IDictionary<string, object> parameters)
+        {
+            if(content == null)
+                throw new InvalidOperationException("Cannot render a macro, IPublishedContent is null");
 
             return RenderMacro(content, alias, parameters);
         }

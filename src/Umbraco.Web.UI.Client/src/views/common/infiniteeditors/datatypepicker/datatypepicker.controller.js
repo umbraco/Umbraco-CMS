@@ -13,30 +13,23 @@
     function DataTypePicker($scope, $filter, dataTypeResource, contentTypeResource, localizationService, editorService) {
 
         var vm = this;
-
+        
+        vm.showDataTypes = true;
+        vm.dataTypes = [];
+        vm.loading = true;
+        vm.loadingConfigs = false;
         vm.searchTerm = "";
-        vm.showTabs = false;
-        vm.tabsLoaded = 0;
-        vm.typesAndEditors = [];
-        vm.userConfigured = [];
-        vm.loading = false;
-        vm.tabs = [];
-        vm.labels = {};
-
-        vm.onTabChange = onTabChange;
-        vm.filterItems = filterItems;
-        vm.showDetailsOverlay = showDetailsOverlay;
-        vm.hideDetailsOverlay = hideDetailsOverlay;
-        vm.pickEditor = pickEditor;
+        vm.searchResult = null;
+        
+        vm.viewOptionsForEditor = viewOptionsForEditor;
         vm.pickDataType = pickDataType;
+        vm.pickEditor = pickEditor;
         vm.close = close;
+        vm.searchTermChanged = searchTermChanged;
 
         function activate() {
             setTitle();
-            loadTabs();
-            getGroupedDataTypes();
-            getGroupedPropertyEditors();
-
+            loadTypes();
         }
 
         function setTitle() {
@@ -44,128 +37,104 @@
                 localizationService.localize("defaultdialogs_selectEditor")
                     .then(function(data){
                         $scope.model.title = data;
-                    });
+                    }
+                );
             }
         }
-
-        function loadTabs() {
-
-            var labels = ["contentTypeEditor_availableEditors", "contentTypeEditor_reuse"];
-
-            localizationService.localizeMany(labels)
-                .then(function(data){
-                    vm.labels.availableDataTypes = data[0];
-                    vm.labels.reuse = data[1];
-
-                    vm.tabs = [{
-                        active: true,
-                        id: 1,
-                        label: vm.labels.availableDataTypes,
-                        alias: "Default",
-                        typesAndEditors: []
-                    }, {
-                        active: false,
-                        id: 2,
-                        label: vm.labels.reuse,
-                        alias: "Reuse",
-                        userConfigured: []
-                    }];
-
-                });
-        }
-
-        function getGroupedPropertyEditors() {
-
-            vm.loading = true;
-
-            dataTypeResource.getGroupedPropertyEditors().then(function(data) {
-                vm.tabs[0].typesAndEditors = data;
-                vm.typesAndEditors = data;
-                vm.tabsLoaded = vm.tabsLoaded + 1;
-                checkIfTabContentIsLoaded();
-            });
-
-        }
-
-        function getGroupedDataTypes() {
-
-            vm.loading = true;
-
-            dataTypeResource.getGroupedDataTypes().then(function(data) {
-                vm.tabs[1].userConfigured = data;
-                vm.userConfigured = data;
-                vm.tabsLoaded = vm.tabsLoaded + 1;
-                checkIfTabContentIsLoaded();
-            });
-
-        }
-
-        function checkIfTabContentIsLoaded() {
-            if (vm.tabsLoaded === 2) {
+        
+        function loadTypes() {
+            
+            dataTypeResource.getGroupedPropertyEditors().then(function(dataTypes) {
+                vm.dataTypes = dataTypes;
                 vm.loading = false;
-                vm.showTabs = true;
-            }
-        }
-
-        function onTabChange(selectedTab) {
-            vm.tabs.forEach(function(tab) {
-                tab.active = false;
             });
-            selectedTab.active = true;
+
+        }
+        
+        function loadConfigurations() {
+            
+            vm.loading = true;
+            vm.loadingConfigs = true;
+            
+            dataTypeResource.getGroupedDataTypes().then(function(configs) {
+                vm.configs = configs;
+                vm.loading = false;
+                performeSearch();
+            });
+
         }
 
-        function filterItems() {
-            // clear item details
-            $scope.model.itemDetails = null;
-
-            if (vm.searchTerm) {
-                vm.showTabs = false;
-
-                var regex = new RegExp(vm.searchTerm, "i");
-
-                var userConfigured = filterCollection(vm.userConfigured, regex),
-                    typesAndEditors = filterCollection(vm.typesAndEditors, regex);
-
-                var totalResults = _.reduce(_.pluck(_.union(userConfigured, typesAndEditors), 'count'), (m, n) => m + n, 0);
-
-                vm.filterResult = {
-                    userConfigured: userConfigured,
-                    typesAndEditors: typesAndEditors,
-                    totalResults: totalResults
-                };
-
+        
+        function searchTermChanged() {
+            
+            vm.showDataTypes = (vm.searchTerm === "");
+            
+            if(vm.loadingConfigs !== true) {
+                loadConfigurations()
             } else {
-                vm.filterResult = null;
-                vm.showTabs = true;
+                performeSearch();
             }
+            
         }
-
+        
+        function performeSearch() {
+            
+            if (vm.searchTerm) {
+                if (vm.configs) {
+                    
+                    var regex = new RegExp(vm.searchTerm, "i");
+                    vm.searchResult = {
+                        configs: filterCollection(vm.configs, regex),
+                        dataTypes: filterCollection(vm.dataTypes, regex)
+                    };
+                }
+            } else {
+                vm.searchResult = null;
+            }
+            
+        }
+        
         function filterCollection(collection, regex) {
             return _.map(_.keys(collection), function (key) {
-
-                var filteredDataTypes = $filter('filter')(collection[key], function (dataType) {
-                    return regex.test(dataType.name) || regex.test(dataType.alias);
-                });
-
                 return {
                     group: key,
-                    count: filteredDataTypes.length,
-                    dataTypes: filteredDataTypes
+                    entries: $filter('filter')(collection[key], function (dataType) {
+                        return regex.test(dataType.name) || regex.test(dataType.alias);
+                    })
                 }
             });
         }
 
-        function showDetailsOverlay(property) {
+        
+        function viewOptionsForEditor(editor) {
+            
+            var dataTypeConfigurationPicker = {
+                editor: editor,
+                property: $scope.model.property,
+                contentTypeName: $scope.model.contentTypeName,
+                view: "views/common/infiniteeditors/datatypeconfigurationpicker/datatypeconfigurationpicker.html",
+                size: "small",
+                submit: function(dataType, propertyType, isNew) {
+                    submit(dataType, propertyType, isNew);
+                    editorService.close();
+                },
+                close: function() {
+                    editorService.close();
+                }
+            };
 
-            var propertyDetails = {};
-            propertyDetails.icon = property.icon;
-            propertyDetails.title = property.name;
+            editorService.open(dataTypeConfigurationPicker);
 
-            $scope.model.itemDetails = propertyDetails;
         }
 
-        function hideDetailsOverlay() {
-            $scope.model.itemDetails = null;
+        function pickDataType(selectedDataType) {
+            selectedDataType.loading = true;
+            dataTypeResource.getById(selectedDataType.id).then(function(dataType) {
+                contentTypeResource.getPropertyTypeScaffold(dataType.id).then(function(propertyType) {
+                    selectedDataType.loading = false;
+                    submit(dataType, propertyType, false);
+                });
+            });
         }
 
         function pickEditor(propertyEditor) {
@@ -188,16 +157,7 @@
             };
 
             editorService.open(dataTypeSettings);
-        }
 
-        function pickDataType(selectedDataType) {
-            selectedDataType.loading = true;
-            dataTypeResource.getById(selectedDataType.id).then(function(dataType) {
-                contentTypeResource.getPropertyTypeScaffold(dataType.id).then(function(propertyType) {
-                    selectedDataType.loading = false;
-                    submit(dataType, propertyType, false);
-                });
-            });
         }
 
         function submit(dataType, propertyType, isNew) {
@@ -213,9 +173,9 @@
 
             $scope.model.submit($scope.model);
         }
-
+        
         function close() {
-            if ($scope.model.close) {
+            if($scope.model.close) {
                 $scope.model.close();
             }
         }

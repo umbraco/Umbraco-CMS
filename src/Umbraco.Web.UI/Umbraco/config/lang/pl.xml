@@ -121,7 +121,7 @@
     <key alias="saveAndPublish">Zapisz i publikuj</key>
     <key alias="saveToPublish">Zapisz i wyślij do zaakceptowania</key>
     <key alias="saveListView">Zapisz widok listy</key>
-    <key alias="showPage">Podgląd</key>
+    <key alias="saveAndPreview">Podgląd</key>
     <key alias="showPageDisabled">Podgląd jest wyłączony, ponieważ żaden szablon nie został przydzielony</key>
     <key alias="styleChoose">Wybierz styl</key>
     <key alias="styleShow">Pokaż style</key>

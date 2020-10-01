@@ -5,6 +5,7 @@ using Newtonsoft.Json.Linq;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
@@ -13,6 +14,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     /// <summary>
     /// Provides an implementation for <see cref="T:Umbraco.Core.PropertyEditors.IPropertyValueConverter" /> for nested content.
     /// </summary>
+    [DefaultPropertyValueConverter(typeof(JsonValueConverter))]
     public class NestedContentSingleValueConverter : NestedContentValueConverterBase
     {
         private readonly IProfilingLogger _proflog;
@@ -54,7 +56,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         {
             using (_proflog.DebugDuration<NestedContentSingleValueConverter>($"ConvertPropertyToNestedContent ({propertyType.DataType.Id})"))
             {
-                var value = (string) inter;
+                var value = (string)inter;
                 if (string.IsNullOrWhiteSpace(value)) return null;
 
                 var objects = JsonConvert.DeserializeObject<List<JObject>>(value);

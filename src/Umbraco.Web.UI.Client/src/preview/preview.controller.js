@@ -6,8 +6,8 @@
 var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.services'])
 
     .controller("previewController", function ($scope, $window, $location) {
-        
-        $scope.currentCulture = {iso:'', title:'...', icon:'icon-loading'}
+
+        $scope.currentCulture = { iso: '', title: '...', icon: 'icon-loading' }
         var cultures = [];
 
         $scope.tabbingActive = false;
@@ -21,7 +21,7 @@ var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.servi
                 window.addEventListener('mousedown', disableTabbingActive);
             }
         }
-        
+
         function disableTabbingActive(evt) {
             $scope.tabbingActive = false;
             $scope.$digest();
@@ -113,10 +113,10 @@ var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.servi
         $scope.sizeOpen = false;
         $scope.cultureOpen = false;
 
-        $scope.toggleSizeOpen = function() {
+        $scope.toggleSizeOpen = function () {
             $scope.sizeOpen = toggleMenu($scope.sizeOpen);
         }
-        $scope.toggleCultureOpen = function() {
+        $scope.toggleCultureOpen = function () {
             $scope.cultureOpen = toggleMenu($scope.cultureOpen);
         }
 
@@ -132,8 +132,8 @@ var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.servi
             $scope.sizeOpen = false;
             $scope.cultureOpen = false;
         }
-        
-        $scope.windowClickHandler = function() {
+
+        $scope.windowClickHandler = function () {
             closeOthers();
         }
         function windowBlurHandler() {
@@ -141,16 +141,16 @@ var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.servi
             $scope.$digest();
         }
 
-        var win = angular.element($window);
+        var win = $($window);
 
         win.on("blur", windowBlurHandler);
-        
+
         $scope.$on("$destroy", function () {
-            win.off("blur", handleBlwindowBlurHandlerur );
+            win.off("blur", handleBlwindowBlurHandlerur);
         });
 
-        
-        function setPageUrl(){
+
+        function setPageUrl() {
             $scope.pageId = $location.search().id || getParameterByName("id");
             var culture = $location.search().culture || getParameterByName("culture");
 
@@ -204,27 +204,27 @@ var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.servi
         /* Change culture */
         /*****************************************************************************/
         $scope.changeCulture = function (iso) {
-            if($location.search().culture !== iso) {
+            if ($location.search().culture !== iso) {
                 $scope.frameLoaded = false;
                 $scope.currentCultureIso = iso;
                 $location.search("culture", iso);
                 setPageUrl();
             }
         };
-        $scope.registerCulture = function(iso, title, isDefault) {
-            var cultureObject = {iso: iso, title: title, isDefault: isDefault};
+        $scope.registerCulture = function (iso, title, isDefault) {
+            var cultureObject = { iso: iso, title: title, isDefault: isDefault };
             cultures.push(cultureObject);
         }
 
-        $scope.$watch("currentCultureIso", function(oldIso, newIso) {
+        $scope.$watch("currentCultureIso", function (oldIso, newIso) {
             // if no culture is selected, we will pick the default one:
             if ($scope.currentCultureIso === null) {
-                $scope.currentCulture = cultures.find(function(culture) {
+                $scope.currentCulture = cultures.find(function (culture) {
                     return culture.isDefault === true;
                 })
                 return;
             }
-            $scope.currentCulture = cultures.find(function(culture) {
+            $scope.currentCulture = cultures.find(function (culture) {
                 return culture.iso === $scope.currentCultureIso;
             })
         });
@@ -252,7 +252,7 @@ var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.servi
                 });
             }
 
-            function hideUmbracoPreviewBadge (iframe) {
+            function hideUmbracoPreviewBadge(iframe) {
                 if (iframe && iframe.contentDocument && iframe.contentDocument.getElementById("umbracoPreviewBadge")) {
                     iframe.contentDocument.getElementById("umbracoPreviewBadge").style.display = "none";
                 }

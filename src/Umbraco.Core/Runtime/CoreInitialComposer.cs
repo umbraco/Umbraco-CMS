@@ -18,6 +18,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.Validators;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
+using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
 using IntegerValidator = Umbraco.Core.PropertyEditors.Validators.IntegerValidator;
@@ -43,7 +44,7 @@ namespace Umbraco.Core.Runtime
             // register persistence mappers - required by database factory so needs to be done here
             // means the only place the collection can be modified is in a runtime - afterwards it
             // has been frozen and it is too late
-            composition.WithCollectionBuilder<MapperCollectionBuilder>().AddCoreMappers();
+            composition.Mappers().AddCoreMappers();
 
             // register the scope provider
             composition.RegisterUnique<ScopeProvider>(); // implements both IScopeProvider and IScopeAccessor
@@ -70,10 +71,14 @@ namespace Umbraco.Core.Runtime
             composition.ManifestFilters();
 
             // properties and parameters derive from data editors
-            composition.WithCollectionBuilder<DataEditorCollectionBuilder>()
+            composition.DataEditors()
                 .Add(() => composition.TypeLoader.GetDataEditors());
             composition.RegisterUnique<PropertyEditorCollection>();
             composition.RegisterUnique<ParameterEditorCollection>();
+
+            // Used to determine if a datatype/editor should be storing/tracking
+            // references to media item/s
+            composition.DataValueReferenceFactories();
 
             // register a server registrar, by default it's the db registrar
             composition.RegisterUnique<IServerRegistrar>(f =>
@@ -101,13 +106,13 @@ namespace Umbraco.Core.Runtime
                     factory.GetInstance<IGlobalSettings>(),
                     true, new DatabaseServerMessengerOptions()));
 
-            composition.WithCollectionBuilder<CacheRefresherCollectionBuilder>()
+            composition.CacheRefreshers()
                 .Add(() => composition.TypeLoader.GetCacheRefreshers());
 
-            composition.WithCollectionBuilder<PackageActionCollectionBuilder>()
+            composition.PackageActions()
                 .Add(() => composition.TypeLoader.GetPackageActions());
 
-            composition.WithCollectionBuilder<PropertyValueConverterCollectionBuilder>()
+            composition.PropertyValueConverters()
                 .Append(composition.TypeLoader.GetTypes<IPropertyValueConverter>());
 
             composition.RegisterUnique<IPublishedContentTypeFactory, PublishedContentTypeFactory>();
@@ -115,7 +120,7 @@ namespace Umbraco.Core.Runtime
             composition.RegisterUnique<IShortStringHelper>(factory
                 => new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(factory.GetInstance<IUmbracoSettingsSection>())));
 
-            composition.WithCollectionBuilder<UrlSegmentProviderCollectionBuilder>()
+            composition.UrlSegmentProviders()
                 .Append<DefaultUrlSegmentProvider>();
 
             composition.RegisterUnique<IMigrationBuilder>(factory => new MigrationBuilder(factory));
@@ -125,6 +130,10 @@ namespace Umbraco.Core.Runtime
 
             // by default, register a noop rebuilder
             composition.RegisterUnique<IPublishedSnapshotRebuilder, PublishedSnapshotRebuilder>();
+
+            // will be injected in controllers when needed to invoke rest endpoints on Our
+            composition.RegisterUnique<IInstallationService, InstallationService>();
+            composition.RegisterUnique<IUpgradeService, UpgradeService>();
         }
     }
 }

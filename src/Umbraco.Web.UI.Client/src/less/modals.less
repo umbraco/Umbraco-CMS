@@ -24,18 +24,18 @@
 }
 
 .umb-modalcolumn-body {
-	padding: 0px;
+	padding: 0;
 	background: @white;
 	top: @editorHeaderHeight;
 	position: absolute;
-	left: 0px;
-	right: 0px;
-	bottom: 0px;
+	left: 0;
+	right: 0;
+	bottom: 0;
 	overflow: auto;
 }
 
 .no-padding .umb-modalcolumn-body {
-	padding: 0px
+	padding: 0;
 }
 
 .umb-modalcolumn .umb-modalcolumn-header .btn {
@@ -46,12 +46,12 @@
 
 .umb-modalcolumn iframe.auto-expand, .umb-modal iframe.auto-expand {
 	border: none;
-	padding: 0px;
-	margin: 0px;
-	top: 0px;
-	bottom: 0px;
-	left: 0px;
-	right: 0px;
+	padding: 0;
+	margin: 0;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
 	position: absolute;
 }
 
@@ -79,26 +79,30 @@
 /* umb.dialog is used for the dialogs on the conent tree*/
 .umb-dialog {
 	outline: none;
-	top: 0px;
-	left: 0px;
-	right: 0px;
-	bottom: 0px;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
 	position: absolute;
-	padding: 0px;
+	padding: 0;
   	background: @white;
 }
 
-.umb-dialog .umb-btn-toolbar .umb-control-group{
-	border: none;
-	padding: none;
+.umb-dialog .abstract{
+    margin-bottom:20px;
+}
+
+.umb-dialog .umb-btn-toolbar .umb-control-group {
+    border: none;
+    padding: none;
 }
 
 .umb-dialog-body{
 	position: absolute;
     overflow:auto;
-    top: 0px;
-    left: 0px;
-    right: 0px;
+    top: 0;
+    left: 0;
+    right: 0;
     bottom: 49px;
 }
 .umb-dialog-body .umb-pane{margin-top: 15px;}
@@ -108,9 +112,9 @@
 	overflow:auto;
 	text-align: right;
 	height: 32px;
-	left: 0px;
-	right: 0px;
-	bottom: 0px;
+	left: 0;
+	right: 0;
+	bottom: 0;
     padding: 8px;
     margin: 0;
 
@@ -125,13 +129,13 @@
 	height: auto !Important;
     padding: 20px;
 }
-.umbracoDialog .umb-pane{margin-left: 0px; margin-right: 0px; margin-top: 0px;}
+.umbracoDialog .umb-pane{margin-left: 0; margin-right: 0; margin-top: 0;}
 .umbracoDialog .umb-dialog-body .umb-pane{margin-left: 20px; margin-right: 20px; margin-top: 20px;}
 .umbracoDialog form{height: 100%;}
 
 /*ensures dialogs doesnt have side-by-side labels*/
 .umbracoDialog .controls-row,
-.umb-modal .controls-row{margin-left: 0px !important;}
+.umb-modal .controls-row{margin-left: 0 !important;}
 
 /* modal and umb-modal are used for right.hand dialogs */
 .modal {
@@ -181,7 +185,7 @@
   height: auto;
 }
 .umb-modal .umb-panel-body{
-	padding: 0px 20px 0px 20px;
+	padding: 0 20px 0 20px;
 }
 
 .umb-modal.fade.in.wide {

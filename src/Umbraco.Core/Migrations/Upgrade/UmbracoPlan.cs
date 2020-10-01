@@ -166,6 +166,7 @@ namespace Umbraco.Core.Migrations.Upgrade
             .As("{0576E786-5C30-4000-B969-302B61E90CA3}");
 
             To<FixLanguageIsoCodeLength>("{48AD6CCD-C7A4-4305-A8AB-38728AD23FC5}");
+            To<AddPackagesSectionAccess>("{DF470D86-E5CA-42AC-9780-9D28070E25F9}");
 
             // finish migrating from v7 - recreate all keys and indexes
             To<CreateKeysAndIndexes>("{3F9764F5-73D0-4D45-8804-1240A66E43A2}");
@@ -183,10 +184,16 @@ namespace Umbraco.Core.Migrations.Upgrade
             To<RenameUserLoginDtoDateIndex>("{0372A42B-DECF-498D-B4D1-6379E907EB94}");
             To<FixContentNuCascade>("{5B1E0D93-F5A3-449B-84BA-65366B84E2D4}");
 
-            // to 8.6.0
+            // to 8.6.0...
+            To<UpdateRelationTypeTable>("{4759A294-9860-46BC-99F9-B4C975CAE580}");
+            To<AddNewRelationTypes>("{0BC866BC-0665-487A-9913-0290BD0169AD}");
             To<AddPropertyTypeValidationMessageColumns>("{3D67D2C8-5E65-47D0-A9E1-DC2EE0779D6B}");
             To<MissingContentVersionsIndexes>("{EE288A91-531B-4995-8179-1D62D9AA3E2E}");
+            To<AddMainDomLock>("{2AB29964-02A1-474D-BD6B-72148D2A53A2}");
 
+            // to 8.7.0...
+            To<MissingDictionaryIndex>("{a78e3369-8ea3-40ec-ad3f-5f76929d2b20}");
+            
             //FINAL
         }
     }

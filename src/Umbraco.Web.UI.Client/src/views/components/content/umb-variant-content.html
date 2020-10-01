@@ -5,16 +5,16 @@
 
     <div class="umb-split-view__content" ng-show="!vm.editor.loading">
 
-        <ng-form name="contentHeaderForm" ng-if="vm.editor.content.apps.length > 0">
+        <ng-form name="contentHeaderForm" ng-if="vm.content.apps.length > 0">
             <umb-editor-content-header
                 menu="vm.page.menu"
                 hide-menu="vm.page.hideActionsMenu"
                 name="vm.editor.content.name"
                 name-disabled="vm.nameDisabled"
-                content="vm.editor.content"
+                editor="vm.editor"
+                content="vm.content"
                 on-select-navigation-item="vm.selectApp(item)"
                 on-select-anchor-item="vm.selectAppAnchor(item, anchor)"
-                open-variants="vm.openVariants"
                 hide-change-variant="vm.page.hideChangeVariant"
                 show-back-button="vm.showBackButton()"
                 on-back="vm.onBack()"
@@ -26,7 +26,7 @@
             </umb-editor-content-header>
         </ng-form>
 
-        <umb-editor-container ng-if="vm.editor.content.apps.length > 0">
+        <umb-editor-container ng-if="vm.content.apps.length > 0">
 
             <!-- Deleted Context Message Bar (Displayed when viewing node in recycle bin) -->
             <div ng-show="vm.content.trashed" class="umb-editor--trashed-message">
@@ -34,14 +34,14 @@
             </div>
 
             <div class="umb-editor-sub-views">
-                <div ng-repeat="app in vm.editor.content.apps track by app.alias">
-                    <umb-editor-sub-view model="app" content="vm.content" />
+                <div ng-repeat="app in vm.editor.variantApps track by app.alias">
+                    <umb-editor-sub-view model="app" content="vm.content" variant-content="vm.editor.content"/>
                 </div>
             </div>
         </umb-editor-container>
 
         <umb-empty-state
-            ng-if="vm.editor.content.apps.length === 0"
+            ng-if="vm.content.apps.length === 0"
             position="center">
             <localize key="content_noProperties"></localize>
         </umb-empty-state>

@@ -14,7 +14,7 @@
             <umb-box>
                 <umb-box-content>
 
-                    <div class="flex">
+                    <div ng-class="{'flex': showAnchor}">
 
                         <umb-control-group label="@defaultdialogs_urlLinkPicker" class="umb-linkpicker__url">
                             <input type="text"
@@ -27,7 +27,7 @@
                                     ng-disabled="model.target.id || model.target.udi" />
                         </umb-control-group>
 
-                        <umb-control-group label="@defaultdialogs_anchorLinkPicker" class="umb-linkpicker__anchor">
+                        <umb-control-group label="@defaultdialogs_anchorLinkPicker" class="umb-linkpicker__anchor" ng-if="showAnchor">
                             <input type="text"
                                     list="anchors"
                                     localize="placeholder"
@@ -76,7 +76,8 @@
                             <umb-tree-search-results
                                 ng-if="searchInfo.showSearch"
                                 results="searchInfo.results"
-                                select-result-callback="selectResult">
+                                select-result-callback="selectResult"
+                                empty-search-result-position="default">
                             </umb-tree-search-results>
 
                             <div ng-hide="searchInfo.showSearch">

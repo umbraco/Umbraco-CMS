@@ -10,7 +10,7 @@
  *
  * it is possible to modify this object, so should be used with care
  */
-angular.module('umbraco.services').factory("editorState", function ($rootScope) {
+angular.module('umbraco.services').factory("editorState", function ($rootScope, eventsService) {
 
     var current = null;
 
@@ -30,6 +30,7 @@ angular.module('umbraco.services').factory("editorState", function ($rootScope) 
          */
         set: function (entity) {
             current = entity;
+            eventsService.emit("editorState.changed", { entity: entity });
         },
 
         /**

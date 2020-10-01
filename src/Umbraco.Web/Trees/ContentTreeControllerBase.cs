@@ -322,8 +322,10 @@ namespace Umbraco.Web.Trees
 
                 var nodes = GetTreeNodesInternal(id, queryStrings);
 
-                //only render the recycle bin if we are not in dialog and the start id id still the root
-                if (IsDialog(queryStrings) == false && id == Constants.System.RootString)
+                //only render the recycle bin if we are not in dialog and the start id is still the root
+                //we need to check for the "application" key in the queryString because its value is required here,
+                //and for some reason when there are no dashboards, this parameter is missing  
+                if (IsDialog(queryStrings) == false && id == Constants.System.RootString && queryStrings.HasKey("application"))
                 {
                     nodes.Add(CreateTreeNode(
                         RecycleBinId.ToInvariantString(),
@@ -364,7 +366,12 @@ namespace Umbraco.Web.Trees
                 var startNodes = Services.EntityService.GetAll(UmbracoObjectType, UserStartNodes);
                 //if any of these start nodes' parent is current, then we need to render children normally so we need to switch some logic and tell
                 // the UI that this node does have children and that it isn't a container
-                if (startNodes.Any(x => x.ParentId == e.Id))
+
+                if (startNodes.Any(x =>
+                {
+                    var pathParts = x.Path.Split(',');
+                    return pathParts.Contains(e.Id.ToInvariantString());
+                }))
                 {
                     renderChildren = true;
                 }

@@ -60,6 +60,19 @@ namespace Umbraco.Core
 
         #endregion
 
+        internal static bool IsMoving(this IContentBase entity)
+        {
+            // Check if this entity is being moved as a descendant as part of a bulk moving operations.
+            // When this occurs, only Path + Level + UpdateDate are being changed. In this case we can bypass a lot of the below
+            // operations which will make this whole operation go much faster. When moving we don't need to create
+            // new versions, etc... because we cannot roll this operation back anyways. 
+            var isMoving = entity.IsPropertyDirty(nameof(entity.Path))
+                           && entity.IsPropertyDirty(nameof(entity.Level))
+                           && entity.IsPropertyDirty(nameof(entity.UpdateDate));
+
+            return isMoving;
+        }
+
         /// <summary>
         /// Removes characters that are not valid XML characters from all entity properties
         /// of type string. See: http://stackoverflow.com/a/961504/5018
@@ -105,6 +118,15 @@ namespace Umbraco.Core
             }
             return false;
         }
+
+        /// <summary>
+        /// Returns all properties based on the editorAlias
+        /// </summary>
+        /// <param name="content"></param>
+        /// <param name="editorAlias"></param>
+        /// <returns></returns>
+        public static IEnumerable<Property> GetPropertiesByEditor(this IContentBase content, string editorAlias)
+            => content.Properties.Where(x => x.PropertyType.PropertyEditorAlias == editorAlias);
 
         /// <summary>
         /// Returns properties that do not belong to a group

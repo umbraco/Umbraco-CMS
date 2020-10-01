@@ -55,8 +55,8 @@ Use this directive to render an umbraco button. The directive can be used to gen
 </pre>
 
 @param {callback} action The button action which should be performed when the button is clicked.
-@param {string=} href Url/Path to navigato to.
-@param {string=} type Set the button type ("button" or "submit").
+@param {string=} href Url/Path to navigato to. (requires "type" to be set to "link")
+@param {string=} type Set the button type ("button", "link", "submit").
 @param {string=} buttonStyle Set the style of the button. The directive uses the default bootstrap styles ("primary", "info", "success", "warning", "danger", "inverse", "link", "block"). Pass in array to add multple styles [success,block].
 @param {string=} state Set a progress state on the button ("init", "busy", "success", "error").
 @param {string=} shortcut Set a keyboard shortcut for the button ("ctrl+c").
@@ -99,7 +99,7 @@ Use this directive to render an umbraco button. The directive can be used to gen
                 alias: "@?",
                 addEllipsis: "@?",
                 showCaret: "@?",
-                autoFocus: "@?",
+                autoFocus: "<?",
                 hasPopup: "@?",
                 isExpanded: "<?"
             }

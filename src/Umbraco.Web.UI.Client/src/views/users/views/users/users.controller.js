@@ -14,7 +14,7 @@
         vm.userStates = [];
         vm.selection = [];
         vm.newUser = {};
-        vm.usersOptions = {filter:null};
+        vm.usersOptions = {};
         vm.userSortData = [
             { label: "Name (A-Z)", key: "Name", direction: "Ascending" },
             { label: "Name (Z-A)", key: "Name", direction: "Descending" },
@@ -67,7 +67,7 @@
         ];
 
         // Get last selected layout for "users" (defaults to first layout = card layout)
-        vm.activeLayout = listViewHelper.getLayout("users", vm.layouts); 
+        vm.activeLayout = listViewHelper.getLayout("users", vm.layouts);
 
         // Don't show the invite button if no email is configured
         if (Umbraco.Sys.ServerVariables.umbracoSettings.showUserInvite) {
@@ -112,6 +112,7 @@
         vm.selectAll = selectAll;
         vm.areAllSelected = areAllSelected;
         vm.searchUsers = searchUsers;
+        vm.onBlurSearch = onBlurSearch;
         vm.getFilterName = getFilterName;
         vm.setUserStatesFilter = setUserStatesFilter;
         vm.setUserGroupFilter = setUserGroupFilter;
@@ -150,10 +151,12 @@
         function initViewOptions() {
 
             // Start with default view options.
+            vm.usersOptions.filter = "";
             vm.usersOptions.orderBy = "Name";
             vm.usersOptions.orderDirection = "Ascending";
 
             // Update from querystring if available.
+            initViewOptionFromQueryString("filter");
             initViewOptionFromQueryString("orderBy");
             initViewOptionFromQueryString("orderDirection");
             initViewOptionFromQueryString("pageNumber");
@@ -244,19 +247,19 @@
 
         function selectLayout(selectedLayout) {
             // save the selected layout for "users" so it's applied next time the user visits this section
-            vm.activeLayout = listViewHelper.setLayout("users", selectedLayout, vm.layouts); 
+            vm.activeLayout = listViewHelper.setLayout("users", selectedLayout, vm.layouts);
         }
-        
+
         function isSelectable(user) {
             return !user.isCurrentUser;
         }
-        
+
         function selectUser(user) {
-            
+
             if (!isSelectable(user)) {
                 return;
             }
-            
+
             if (user.selected) {
                 var index = vm.selection.indexOf(user.id);
                 vm.selection.splice(index, 1);
@@ -265,25 +268,25 @@
                 user.selected = true;
                 vm.selection.push(user.id);
             }
-            
+
             setBulkActions(vm.users);
-            
+
         }
 
         function clearSelection() {
-            angular.forEach(vm.users, function (user) {
+            vm.users.forEach(function (user) {
                 user.selected = false;
             });
             vm.selection = [];
         }
-        
+
         function clickUser(user, $event) {
-            
+
             $event.stopPropagation();
-            
+
             if ($event) {
                 // targeting a new tab/window?
-                if ($event.ctrlKey || 
+                if ($event.ctrlKey ||
                     $event.shiftKey ||
                     $event.metaKey || // apple
                     ($event.button && $event.button === 1) // middle click, >IE9 + everyone else
@@ -292,7 +295,7 @@
                     return;
                 }
             }
-            
+
             goToUser(user);
             $event.preventDefault();
 
@@ -302,7 +305,7 @@
             vm.disableUserButtonState = "busy";
             usersResource.disableUsers(vm.selection).then(function (data) {
                 // update userState
-                angular.forEach(vm.selection, function (userId) {
+                vm.selection.forEach(function (userId) {
                     var user = getUserFromArrayById(userId, vm.users);
                     if (user) {
                         user.userState = 1;
@@ -323,7 +326,7 @@
             vm.enableUserButtonState = "busy";
             usersResource.enableUsers(vm.selection).then(function (data) {
                 // update userState
-                angular.forEach(vm.selection, function (userId) {
+                vm.selection.forEach(function (userId) {
                     var user = getUserFromArrayById(userId, vm.users);
                     if (user) {
                         user.userState = 0;
@@ -342,7 +345,7 @@
             vm.unlockUserButtonState = "busy";
             usersResource.unlockUsers(vm.selection).then(function (data) {
                 // update userState
-                angular.forEach(vm.selection, function (userId) {
+                vm.selection.forEach(function (userId) {
                     var user = getUserFromArrayById(userId, vm.users);
                     if (user) {
                         user.userState = 0;
@@ -383,7 +386,7 @@
                         vm.selectedBulkUserGroups = [];
                         editorService.close();
                         clearSelection();
-                    }, angular.noop);
+                    }, Utilities.noop);
                 },
                 close: function () {
                     vm.selectedBulkUserGroups = [];
@@ -395,7 +398,7 @@
 
         function openUserGroupPicker() {
             var currentSelection = [];
-            angular.copy(vm.newUser.userGroups, currentSelection);
+            Utilities.copy(vm.newUser.userGroups, currentSelection);
             var userGroupPicker = {
                 selection: currentSelection,
                 submit: function (model) {
@@ -420,14 +423,14 @@
         function selectAll() {
             if (areAllSelected()) {
                 vm.selection = [];
-                angular.forEach(vm.users, function (user) {
+                vm.users.forEach(function (user) {
                     user.selected = false;
                 });
             } else {
                 // clear selection so we don't add the same user twice
                 vm.selection = [];
                 // select all users
-                angular.forEach(vm.users, function (user) {
+                vm.users.forEach(function (user) {
                     // prevent the current user to be selected
                     if (!user.isCurrentUser) {
                         user.selected = true;
@@ -451,6 +454,7 @@
 
         var search = _.debounce(function () {
             $scope.$apply(function () {
+                vm.usersOptions.pageNumber = 1;
                 getUsers();
             });
         }, 500);
@@ -459,10 +463,14 @@
             search();
         }
 
+        function onBlurSearch() {
+            updateLocation("filter", vm.usersOptions.filter);
+        }
+
         function getFilterName(array) {
             var name = vm.labels.all;
             var found = false;
-            angular.forEach(array, function (item) {
+            array.forEach(function (item) {
                 if (item.selected) {
                     if (!found) {
                         name = item.name
@@ -483,7 +491,7 @@
 
             //If the selection is "ALL" then we need to unselect everything else since this is an 'odd' filter
             if (userState.key === "All") {
-                angular.forEach(vm.userStatesFilter, function (i) {
+                vm.userStatesFilter.forEach(function (i) {
                     i.selected = false;
                 });
                 //we can't unselect All
@@ -492,7 +500,7 @@
                 vm.usersOptions.userStates = [];
             }
             else {
-                angular.forEach(vm.userStatesFilter, function (i) {
+                vm.userStatesFilter.forEach(function (i) {
                     if (i.key === "All") {
                         i.selected = false;
                     }
@@ -512,7 +520,7 @@
             }
 
             updateLocation("userStates", vm.usersOptions.userStates.join(","));
-            getUsers();
+            changePageNumber(1);
         }
 
         function setUserGroupFilter(userGroup) {
@@ -529,7 +537,7 @@
             }
 
             updateLocation("userGroups", vm.usersOptions.userGroups.join(","));
-            getUsers();
+            changePageNumber(1);
         }
 
         function setOrderByFilter(value, direction) {
@@ -547,6 +555,7 @@
         }
 
         function updateLocation(key, value) {
+            $location.search("filter", vm.usersOptions.filter);// update filter, but first when something else requests a url update.
             $location.search(key, value);
         }
 
@@ -602,7 +611,7 @@
         // copy to clip board success
         function copySuccess() {
             if (vm.page.copyPasswordButtonState !== "success") {
-                $timeout(function(){
+                $timeout(function () {
                     vm.page.copyPasswordButtonState = "success";
                 });
                 $timeout(function () {
@@ -614,7 +623,7 @@
         // copy to clip board error
         function copyError() {
             if (vm.page.copyPasswordButtonState !== "error") {
-                $timeout(function() {
+                $timeout(function () {
                     vm.page.copyPasswordButtonState = "error";
                 });
                 $timeout(function () {
@@ -645,7 +654,7 @@
 
             return null;
         }
-        
+
         function getEditPath(user) {
             return pathToUser(user) + usersOptionsAsQueryString();
         }
@@ -657,7 +666,8 @@
         function usersOptionsAsQueryString() {
             var qs = "?orderBy=" + vm.usersOptions.orderBy +
                 "&orderDirection=" + vm.usersOptions.orderDirection +
-                "&pageNumber=" + vm.usersOptions.pageNumber;
+                "&pageNumber=" + vm.usersOptions.pageNumber +
+                "&filter=" + vm.usersOptions.filter;
 
             qs += addUsersOptionsFilterCollectionToQueryString("userStates", vm.usersOptions.userStates);
             qs += addUsersOptionsFilterCollectionToQueryString("userGroups", vm.usersOptions.userGroups);
@@ -689,7 +699,7 @@
                 vm.usersOptions.pageSize = data.pageSize;
                 vm.usersOptions.totalItems = data.totalItems;
                 vm.usersOptions.totalPages = data.totalPages;
-                
+
                 formatDates(vm.users);
                 setUserDisplayState(vm.users);
                 vm.userStatesFilter = usersHelper.getUserStatesFilter(data.userStates);
@@ -705,13 +715,13 @@
         }
 
         function setUserDisplayState(users) {
-            angular.forEach(users, function (user) {
+            users.forEach(function (user) {
                 user.userDisplayState = usersHelper.getUserStateFromValue(user.userState);
             });
         }
 
         function formatDates(users) {
-            angular.forEach(users, function (user) {
+            users.forEach(function (user) {
                 if (user.lastLoginDate) {
                     var dateVal;
                     var serverOffset = Umbraco.Sys.ServerVariables.application.serverTimeOffset;
@@ -742,20 +752,20 @@
 
             var firstSelectedUserGroups;
 
-            angular.forEach(users, function (user) {
-                
+            users.forEach(function (user) {
+
                 if (!user.selected) {
                     return;
                 }
-                
-                
+
+
                 // if the current user is selected prevent any bulk actions with the user included
                 if (user.isCurrentUser) {
                     vm.allowDisableUser = false;
                     vm.allowEnableUser = false;
                     vm.allowUnlockUser = false;
                     vm.allowSetUserGroup = false;
-                    
+
                     return false;
                 }
 
@@ -804,6 +814,7 @@
             vm.newUser.message = "";
             // clear button state
             vm.page.createButtonState = "init";
+            $scope.$emit("$setAccessibleHeader", true, "general_user", false, "", "", true);
         }
 
         init();

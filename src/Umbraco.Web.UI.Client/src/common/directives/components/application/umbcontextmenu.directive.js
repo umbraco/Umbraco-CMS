@@ -1,5 +1,5 @@
 angular.module("umbraco.directives")
-.directive('umbContextMenu', function (navigationService, keyboardService) {
+.directive('umbContextMenu', function (navigationService, keyboardService, backdropService) {
     return {
         scope: {
             menuDialogTitle: "@",
@@ -30,7 +30,6 @@ angular.module("umbraco.directives")
             scope.$on('$destroy', function () {
                 keyboardService.unbind("esc");
             });
-
         }
     };
 });

@@ -85,7 +85,7 @@
     <key alias="save">Kaydet</key>
     <key alias="saveAndPublish">Kaydet ve Yayınla</key>
     <key alias="saveToPublish">Kaydet ve Onay için gönder</key>
-    <key alias="showPage">Önizle</key>
+    <key alias="saveAndPreview">Önizle</key>
     <key alias="showPageDisabled">Önizleme kapalı, Atanmış şablon yok</key>
     <key alias="styleChoose">Stili seçin</key>
     <key alias="styleShow">Stilleri Göster</key>
@@ -796,7 +796,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="macro">Macro</key>
     <key alias="insertControl">Insert control</key>
     <key alias="addRows">Choose a layout for the page</key>
-    <key alias="addElement"><![CDATA[To start, click the <i class="icon icon-add blue"></i> below and add your first element]]></key>
+    <key alias="addElement">Add content</key>
     <key alias="clickToEmbed">Click to embed</key>
     <key alias="clickToInsertImage">Click to insert image</key>
     <key alias="placeholderImageCaption">Image caption...</key>

@@ -15,25 +15,85 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
     var fallbackStyles = [{ title: "Page header", block: "h2" }, { title: "Section header", block: "h3" }, { title: "Paragraph header", block: "h4" }, { title: "Normal", block: "p" }, { title: "Quote", block: "blockquote" }, { title: "Code", block: "code" }];
     // these languages are available for localization
     var availableLanguages = [
+        'ar',
+        'ar_SA',
+        'hy',
+        'az',
+        'eu',
+        'be',
+        'bn_BD',
+        'bs',
+        'bg_BG',
+        'ca',
+        'zh_CN',
+        'zh_TW',
+        'hr',
+        'cs',
         'da',
-        'de',
-        'en',
-        'en_us',
+        'dv',
+        'nl',
+        'en_CA',
+        'en_GB',
+        'et',
+        'fo',
         'fi',
-        'fr',
-        'he',
+        'fr_FR',
+        'gd',
+        'gl',
+        'ka_GE',
+        'de',
+        'de_AT',
+        'el',
+        'he_IL',
+        'hi_IN',
+        'hu_HU',
+        'is_IS',
+        'id',
         'it',
         'ja',
-        'nl',
-        'no',
+        'kab',
+        'kk',
+        'km_KH',
+        'ko_KR',
+        'ku',
+        'ku_IQ',
+        'lv',
+        'lt',
+        'lb',
+        'ml',
+        'ml_IN',
+        'mn_MN',
+        'nb_NO',
+        'fa',
+        'fa_IR',
         'pl',
-        'pt',
+        'pt_BR',
+        'pt_PT',
+        'ro',
         'ru',
-        'sv',
-        'zh'
+        'sr',
+        'si_LK',
+        'sk',
+        'sl_SI',
+        'es',
+        'es_MX',
+        'sv_SE',
+        'tg',
+        'ta',
+        'ta_IN',
+        'tt',
+        'th_TH',
+        'tr',
+        'tr_TR',
+        'ug',
+        'uk',
+        'uk_UA',
+        'vi',
+        'vi_VN',
+        'cy'
     ];
     //define fallback language
-    var defaultLanguage = 'en_us';
+    var defaultLanguage = 'en_US';
 
     /**
      * Returns a promise of an object containing the stylesheets and styleFormats collections
@@ -47,7 +107,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
         //queue rules loading
         if (configuredStylesheets) {
-            angular.forEach(configuredStylesheets, function (val, key) {
+            configuredStylesheets.forEach(function (val, key) {
 
                 if (val.indexOf(Umbraco.Sys.ServerVariables.umbracoSettings.cssPath + "/") === 0) {
                     // current format (full path to stylesheet)
@@ -59,7 +119,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 }
 
                 promises.push(stylesheetResource.getRulesByName(val).then(function (rules) {
-                    angular.forEach(rules, function (rule) {
+                    rules.forEach(function (rule) {
                         var r = {};
                         r.title = rule.name;
                         if (rule.selector[0] == ".") {
@@ -73,7 +133,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                         else if (rule.selector[0] !== "." && rule.selector.indexOf(".") > -1) {
                             var split = rule.selector.split(".");
                             r.block = split[0];
-                            r.classes = rule.selector.substring(rule.selector.indexOf(".") + 1).replace(".", " ");
+                            r.classes = rule.selector.substring(rule.selector.indexOf(".") + 1).replace(/\./g, " ");
                         }
                         else if (rule.selector[0] != "#" && rule.selector.indexOf("#") > -1) {
                             var split = rule.selector.split("#");
@@ -109,7 +169,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         //wheras tinymce is in the format of ru, de, en, en_us, etc.
         var localeId = $locale.id.replace('-', '_');
         //try matching the language using full locale format
-        var languageMatch = _.find(availableLanguages, function (o) { return o === localeId; });
+        var languageMatch = _.find(availableLanguages, function (o) { return o.toLowerCase() === localeId; });
         //if no matches, try matching using only the language
         if (languageMatch === undefined) {
             var localeParts = localeId.split('_');
@@ -248,6 +308,8 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 var src = imgUrl + "?width=" + newSize.width + "&height=" + newSize.height;
                 editor.dom.setAttrib(imageDomElement, 'data-mce-src', src);
             }
+
+            editor.execCommand("mceAutoResize", false, null, null);
         }
     }
 
@@ -418,7 +480,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                                     //now we need to check if this custom config key is defined in our baseline, if it is we don't want to
                                     //overwrite the baseline config item if it is an array, we want to concat the items in the array, otherwise
                                     //if it's an object it will overwrite the baseline
-                                    if (angular.isArray(config[i]) && angular.isArray(tinyMceConfig.customConfig[i])) {
+                                    if (Utilities.isArray(config[i]) && Utilities.isArray(tinyMceConfig.customConfig[i])) {
                                         //concat it and below this concat'd array will overwrite the baseline in angular.extend
                                         tinyMceConfig.customConfig[i] = config[i].concat(tinyMceConfig.customConfig[i]);
                                     }
@@ -1305,6 +1367,9 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             //    throw "args.model.value is required";
             //}
 
+            // force TinyMCE to load plugins/themes from minified files (see http://archive.tinymce.com/wiki.php/api4:property.tinymce.suffix.static)
+            args.editor.suffix = ".min";
+
             var unwatch = null;
 
             //Starts a watch on the model value so that we can update TinyMCE if the model changes behind the scenes or from the server
@@ -1442,6 +1507,8 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             });
 
             args.editor.on('Dirty', function (e) {
+            	syncContent(); // Set model.value to the RTE's content
+
                 //make the form dirty manually so that the track changes works, setting our model doesn't trigger
                 // the angular bits because tinymce replaces the textarea.
                 if (args.currentForm) {

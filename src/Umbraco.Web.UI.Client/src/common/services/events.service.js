@@ -1,7 +1,7 @@
 /** Used to broadcast and listen for global events and allow the ability to add async listeners to the callbacks */
 
 /*
-    Core app events: 
+    Core app events:
 
     app.ready
     app.authenticated
@@ -12,9 +12,9 @@
 */
 
 function eventsService($q, $rootScope) {
-	
+
     return {
-        
+
         /** raise an event with a given name */
         emit: function (name, args) {
 

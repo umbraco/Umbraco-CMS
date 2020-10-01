@@ -41,6 +41,9 @@ using Umbraco.Web.Composing.CompositionExtensions;
 using Umbraco.Web.Sections;
 using Current = Umbraco.Core.Composing.Current;
 using FileSystems = Umbraco.Core.IO.FileSystems;
+using Umbraco.Web.Templates;
+using Umbraco.Web.PropertyEditors;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Tests.Testing
 {
@@ -215,6 +218,9 @@ namespace Umbraco.Tests.Testing
             Composition.RegisterUnique(_ => Umbraco.Web.Composing.Current.UmbracoContextAccessor);
             Composition.RegisterUnique<IPublishedRouter, PublishedRouter>();
             Composition.WithCollectionBuilder<ContentFinderCollectionBuilder>();
+
+            Composition.DataValueReferenceFactories();
+
             Composition.RegisterUnique<IContentLastChanceFinder, TestLastChanceFinder>();
             Composition.RegisterUnique<IVariationContextAccessor, TestVariationContextAccessor>();
             Composition.RegisterUnique<IPublishedSnapshotAccessor, TestPublishedSnapshotAccessor>();
@@ -230,6 +236,11 @@ namespace Umbraco.Tests.Testing
                 .Append<TranslationSection>();
             Composition.RegisterUnique<ISectionService, SectionService>();
 
+            Composition.RegisterUnique<HtmlLocalLinkParser>();
+            Composition.RegisterUnique<HtmlUrlParser>();
+            Composition.RegisterUnique<HtmlImageSourceParser>();
+            Composition.RegisterUnique<RichTextEditorPastedImages>();
+
         }
 
         protected virtual void ComposeMisc()
@@ -238,6 +249,7 @@ namespace Umbraco.Tests.Testing
             var runtimeStateMock = new Mock<IRuntimeState>();
             runtimeStateMock.Setup(x => x.Level).Returns(RuntimeLevel.Run);
             Composition.RegisterUnique(f => runtimeStateMock.Object);
+            Composition.Register(_ => Mock.Of<IImageUrlGenerator>());
 
             // ah...
             Composition.WithCollectionBuilder<ActionCollectionBuilder>();

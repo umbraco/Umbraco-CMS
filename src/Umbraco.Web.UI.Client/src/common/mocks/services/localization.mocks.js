@@ -84,7 +84,7 @@ angular.module('umbraco.mocks').
                   "buttons_save": "Save",
                   "buttons_saveAndPublish": "Save and publish",
                   "buttons_saveToPublish": "Save and send for approval",
-                  "buttons_showPage": "Preview",
+                  "buttons_saveAndPreview": "Save and preview",
                   "buttons_showPageDisabled": "Preview is disabled because there's no template assigned",
                   "buttons_styleChoose": "Choose style",
                   "buttons_styleShow": "Show styles",

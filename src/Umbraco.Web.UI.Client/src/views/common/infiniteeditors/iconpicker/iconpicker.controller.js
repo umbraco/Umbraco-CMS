@@ -6,7 +6,7 @@
  * @description
  * The controller for the content type editor icon picker
  */
-function IconPickerController($scope, iconHelper, localizationService) {
+function IconPickerController($scope, localizationService, iconHelper) {
 
     var vm = this;
 
@@ -16,7 +16,7 @@ function IconPickerController($scope, iconHelper, localizationService) {
     vm.close = close;
 
     vm.colors = [
-        { name: "Black", value: "color-black" },
+        { name: "Black", value: "color-black", default: true },
         { name: "Blue Grey", value: "color-blue-grey" },
         { name: "Grey", value: "color-grey" },
         { name: "Brown", value: "color-brown" },
@@ -42,14 +42,15 @@ function IconPickerController($scope, iconHelper, localizationService) {
         vm.loading = true;
 
         setTitle();
-    
+
         iconHelper.getIcons().then(function (icons) {
             vm.icons = icons;
             vm.loading = false;
         });
 
         // set a default color if nothing is passed in
-        vm.color = $scope.model.color ? findColor($scope.model.color) : vm.colors[0];
+        vm.color = $scope.model.color ? findColor($scope.model.color) : vm.colors.find(x => x.default);
+
 
         // if an icon is passed in - preselect it
         vm.icon = $scope.model.icon ? $scope.model.icon : undefined;
@@ -71,12 +72,13 @@ function IconPickerController($scope, iconHelper, localizationService) {
     }
 
     function findColor(value) {
-        return _.findWhere(vm.colors, {value: value});
+        return vm.colors.find(x => x.value === value);
     }
 
-    function selectColor(color, $index, $event) {
-        $scope.model.color = color.value;
-        vm.color = color;
+    function selectColor(color) {
+        let newColor = (color || vm.colors.find(x => x.default));
+        $scope.model.color = newColor.value;
+        vm.color = newColor;
     }
 
     function close() {
@@ -86,7 +88,7 @@ function IconPickerController($scope, iconHelper, localizationService) {
     }
 
     function submit() {
-        if ($scope.model && $scope.model.submit) {            
+        if ($scope.model && $scope.model.submit) {
             $scope.model.submit($scope.model);
         }
     }

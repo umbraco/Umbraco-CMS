@@ -57,7 +57,7 @@
                 };
 
                 if ($routeParams.create) {
-                    vm.page.name = vm.labels.addLanguage;                    
+                    vm.page.name = vm.labels.addLanguage;
                 }
             });
 
@@ -68,7 +68,7 @@
             //load all culture/languages
             promises.push(languageResource.getCultures().then(function (culturesDictionary) {
                 var cultures = [];
-                angular.forEach(culturesDictionary, function (value, key) {
+                Object.entries(culturesDictionary).forEach(function ([key, value]) {
                     cultures.push({
                         name: key,
                         displayName: value
@@ -87,14 +87,14 @@
 
             if (!$routeParams.create) {
 
-                promises.push(languageResource.getById($routeParams.id).then(function(lang) {
+                promises.push(languageResource.getById($routeParams.id).then(function (lang) {
                     vm.language = lang;
 
                     vm.page.name = vm.language.name;
 
                     /* we need to store the initial default state so we can disable the toggle if it is the default.
                     we need to prevent from not having a default language. */
-                    vm.initIsDefault = angular.copy(vm.language.isDefault);
+                    vm.initIsDefault = Utilities.copy(vm.language.isDefault);
 
                     makeBreadcrumbs();
 
@@ -161,7 +161,7 @@
 
             }, function (err) {
                 vm.page.saveButtonState = "error";
-
+                formHelper.resetForm({ scope: $scope, hasErrors: true });
                 formHelper.handleError(err);
 
             });
@@ -182,12 +182,12 @@
         function toggleDefault() {
 
             // it shouldn't be possible to uncheck the default language
-            if(vm.initIsDefault) {
+            if (vm.initIsDefault) {
                 return;
             }
 
             vm.language.isDefault = !vm.language.isDefault;
-            if(vm.language.isDefault) {
+            if (vm.language.isDefault) {
                 vm.showDefaultLanguageInfo = true;
             } else {
                 vm.showDefaultLanguageInfo = false;

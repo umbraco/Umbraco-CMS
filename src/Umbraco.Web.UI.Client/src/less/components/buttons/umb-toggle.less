@@ -41,9 +41,6 @@
     }
 }
 
-
-
-
 .umb-toggle__handler {
     position: absolute;
     top: 1px;
@@ -59,9 +56,7 @@
         transform: translateX(20px);
         background-color: @white;
     }
-
 }
-
 
 /* Icons */
 
@@ -78,9 +73,7 @@
     color:@white;
     transition: opacity 120ms;
     opacity: 0;
-    // .umb-toggle:hover & {
-    //     color: @ui-btn-hover;
-    // }
+
     .umb-toggle--checked & {
         opacity: 1;
     }
@@ -93,6 +86,7 @@
     right: 5px;
     color: @ui-btn;
     transition: opacity 120ms;
+
     .umb-toggle--checked & {
         opacity: 0;
     }
@@ -101,16 +95,41 @@
     }
 }
 
-
-
-
 .umb-toggle.umb-toggle--disabled {
     .umb-toggle__toggle {
         cursor: not-allowed;
-        border-color: @gray-5;
     }
-    .umb-toggle__handler {
-        background-color: @gray-5;
+
+    &, &.umb-toggle--checked {
+
+        .umb-toggle__toggle {
+            .umb-toggle__handler {
+                background-color: @gray-10;
+            }
+        }
+    }
+
+    &:not(.umb-toggle--checked) {
+        .umb-toggle__toggle {
+            background-color: @gray-8;
+            border-color: @gray-8;
+        }
+
+        .umb-toggle__icon--left,
+        .umb-toggle__icon--right {
+            color: @gray-6;
+        }
+    }
+
+    &.umb-toggle--checked {
+        .umb-toggle__toggle {
+            background-color: lighten(@ui-btn, 50%);
+            border-color: lighten(@ui-btn, 50%);
+        }
+        .umb-toggle__icon--left,
+        .umb-toggle__icon--right {
+            color: @gray-9;
+        }
     }
 }
 
