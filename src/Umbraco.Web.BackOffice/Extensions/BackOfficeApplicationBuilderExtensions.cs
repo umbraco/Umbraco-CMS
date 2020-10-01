@@ -20,6 +20,7 @@ namespace Umbraco.Extensions
             app.UseRequestLocalization();
             app.UseUmbracoRequestLogging();
             app.UseUmbracoBackOffice();
+            app.UseUmbracoPreview();
             app.UseUmbracoInstaller();
 
             return app;
@@ -49,5 +50,15 @@ namespace Umbraco.Extensions
             return app;
         }
 
+        public static IApplicationBuilder UseUmbracoPreview(this IApplicationBuilder app)
+        {
+            app.UseEndpoints(endpoints =>
+            {
+                var previewRoutes = app.ApplicationServices.GetRequiredService<PreviewRoutes>();
+                previewRoutes.CreateRoutes(endpoints);
+            });
+
+            return app;
+        }
     }
 }

@@ -84,6 +84,12 @@ namespace Umbraco.Tests.UnitTests.AutoFixture
                             Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Run),
                             new UmbracoApiControllerTypeCollection(Array.Empty<Type>()))));
                     
+                    fixture.Customize<PreviewRoutes>(u => u.FromFactory(
+                        () => new PreviewRoutes(
+                            Options.Create(new GlobalSettings()),
+                            Mock.Of<IHostingEnvironment>(x => x.ToAbsolute(It.IsAny<string>()) == "/umbraco" && x.ApplicationVirtualPath == string.Empty),
+                            Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Run))));
+                    
                     var connectionStrings = new ConnectionStrings();
                     fixture.Customize<ConnectionStrings>(x => x.FromFactory(() => connectionStrings ));
 

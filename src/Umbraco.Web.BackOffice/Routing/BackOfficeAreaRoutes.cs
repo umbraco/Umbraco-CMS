@@ -1,12 +1,10 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Routing;
+﻿using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Web.BackOffice.Controllers;
-using Umbraco.Web.BackOffice.SignalR;
 using Umbraco.Web.Common.Controllers;
 using Umbraco.Web.Common.Routing;
 using Umbraco.Web.WebApi;
@@ -52,7 +50,6 @@ namespace Umbraco.Web.BackOffice.Routing
 
                     MapMinimalBackOffice(endpoints);
                     endpoints.MapUmbracoRoute<PreviewController>(_umbracoPathSegment, Constants.Web.Mvc.BackOfficeArea, null);
-                    endpoints.MapHub<PreviewHub>(GetPreviewHubRoute());
                     AutoRouteBackOfficeControllers(endpoints);
                     break;
                 case RuntimeLevel.BootFailed:
@@ -60,15 +57,6 @@ namespace Umbraco.Web.BackOffice.Routing
                 case RuntimeLevel.Boot:
                     break;
             }
-        }
-
-        /// <summary>
-        /// Returns the path to the signalR hub used for preview
-        /// </summary>
-        /// <returns>Path to signalR hub</returns>
-        public string GetPreviewHubRoute()
-        {
-            return $"/{_umbracoPathSegment}/{nameof(PreviewHub)}";
         }
 
         /// <summary>

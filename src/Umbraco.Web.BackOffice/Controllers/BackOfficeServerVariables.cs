@@ -44,7 +44,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IRuntimeMinifier _runtimeMinifier;
         private readonly IAuthenticationSchemeProvider _authenticationSchemeProvider;
         private readonly IImageUrlGenerator _imageUrlGenerator;
-        private readonly BackOfficeAreaRoutes _backOfficeAreaRoutes;
+        private readonly PreviewRoutes _previewRoutes;
 
         public BackOfficeServerVariables(
             LinkGenerator linkGenerator,
@@ -61,7 +61,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             IRuntimeMinifier runtimeMinifier,
             IAuthenticationSchemeProvider authenticationSchemeProvider,
             IImageUrlGenerator imageUrlGenerator,
-            BackOfficeAreaRoutes backOfficeAreaRoutes)
+            PreviewRoutes previewRoutes)
         {
             _linkGenerator = linkGenerator;
             _runtimeState = runtimeState;
@@ -77,7 +77,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _runtimeMinifier = runtimeMinifier;
             _authenticationSchemeProvider = authenticationSchemeProvider;
             _imageUrlGenerator = imageUrlGenerator;
-            _backOfficeAreaRoutes = backOfficeAreaRoutes;
+            _previewRoutes = previewRoutes;
         }
 
         /// <summary>
@@ -362,7 +362,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                                 controller => controller.GetAll())
                         },
                         {
-                            "previewHubUrl", _backOfficeAreaRoutes.GetPreviewHubRoute()
+                            "previewHubUrl", _previewRoutes.GetPreviewHubRoute()
                         },
                     }
                 },
