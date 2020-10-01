@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function AppHeaderDirective(eventsService, appState, userService, focusService, backdropService, overlayService) {
+    function AppHeaderDirective(eventsService, userService, overlayService, headerResource) {
 
         function link(scope, el, attr, ctrl) {
 
@@ -38,6 +38,9 @@
                     }
                 }
 
+                headerResource.getApps().then(function (apps) {
+                    scope.apps = apps;
+                });
             }));
 
             evts.push(eventsService.on("app.userRefresh", function (evt) {
@@ -68,11 +71,6 @@
 
                 overlayService.open(dialog);
             };
-
-            scope.apps = [
-                { view: "views/header/apps/search/search.html" },
-                { view: "views/header/apps/help/help.html" }
-            ]
         }
 
         var directive = {

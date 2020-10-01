@@ -326,6 +326,10 @@ namespace Umbraco.Web.Editors
                             "elementTypeApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ElementTypeController>(
                                 controller => controller.GetAll())
                         },
+                        {
+                            "headerApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<HeaderController>(
+                                controller => controller.GetApps())
+                        }
                     }
                 },
                 {

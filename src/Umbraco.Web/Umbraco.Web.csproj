@@ -162,6 +162,7 @@
     <Compile Include="Editors\ElementTypeController.cs" />
     <Compile Include="Editors\Filters\ContentSaveModelValidator.cs" />
     <Compile Include="Editors\Filters\MediaSaveModelValidator.cs" />
+    <Compile Include="Editors\HeaderController.cs" />
     <Compile Include="Editors\IconController.cs" />
     <Compile Include="Editors\ImageUrlGeneratorController.cs" />
     <Compile Include="Editors\PackageController.cs" />
