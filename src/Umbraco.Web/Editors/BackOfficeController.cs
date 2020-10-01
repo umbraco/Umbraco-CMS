@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,7 +14,6 @@ using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.Models.Identity;
@@ -26,6 +24,7 @@ using Umbraco.Web.Composing;
 using Umbraco.Web.Features;
 using Umbraco.Web.JavaScript;
 using Umbraco.Web.Security;
+using Umbraco.Web.Services;
 using Constants = Umbraco.Core.Constants;
 using JArray = Newtonsoft.Json.Linq.JArray;
 
@@ -42,15 +41,52 @@ namespace Umbraco.Web.Editors
         private readonly ManifestParser _manifestParser;
         private readonly UmbracoFeatures _features;
         private readonly IRuntimeState _runtimeState;
+        private readonly IIconService _iconService;
         private BackOfficeUserManager<BackOfficeIdentityUser> _userManager;
         private BackOfficeSignInManager _signInManager;
 
-        public BackOfficeController(ManifestParser manifestParser, UmbracoFeatures features, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
+        [Obsolete("Use the constructor that injects IIconService.")]
+        public BackOfficeController(
+            ManifestParser manifestParser,
+            UmbracoFeatures features,
+            IGlobalSettings globalSettings,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            ServiceContext services,
+            AppCaches appCaches,
+            IProfilingLogger profilingLogger,
+            IRuntimeState runtimeState,
+            UmbracoHelper umbracoHelper)
+            : this(manifestParser,
+                features,
+                globalSettings,
+                umbracoContextAccessor,
+                services,
+                appCaches,
+                profilingLogger,
+                runtimeState,
+                umbracoHelper,
+                Current.IconService)
+        {
+
+        }
+
+        public BackOfficeController(
+            ManifestParser manifestParser,
+            UmbracoFeatures features,
+            IGlobalSettings globalSettings,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            ServiceContext services,
+            AppCaches appCaches,
+            IProfilingLogger profilingLogger,
+            IRuntimeState runtimeState,
+            UmbracoHelper umbracoHelper,
+            IIconService iconService)
             : base(globalSettings, umbracoContextAccessor, services, appCaches, profilingLogger, umbracoHelper)
         {
             _manifestParser = manifestParser;
             _features = features;
             _runtimeState = runtimeState;
+            _iconService = iconService;
         }
 
         protected BackOfficeSignInManager SignInManager => _signInManager ?? (_signInManager = OwinContext.GetBackOfficeSignInManager());
@@ -65,9 +101,10 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public async Task<ActionResult> Default()
         {
+            var backofficeModel = new BackOfficeModel(_features, GlobalSettings, _iconService);
             return await RenderDefaultOrProcessExternalLoginAsync(
-                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Default.cshtml", new BackOfficeModel(_features, GlobalSettings)),
-                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Default.cshtml", new BackOfficeModel(_features, GlobalSettings)));
+                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Default.cshtml", backofficeModel),
+                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Default.cshtml", backofficeModel));
         }
 
         [HttpGet]
@@ -150,7 +187,7 @@ namespace Umbraco.Web.Editors
         {
             return await RenderDefaultOrProcessExternalLoginAsync(
                 //The default view to render when there is no external login info or errors
-                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/AuthorizeUpgrade.cshtml", new BackOfficeModel(_features, GlobalSettings)),
+                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/AuthorizeUpgrade.cshtml", new BackOfficeModel(_features, GlobalSettings, _iconService)),
                 //The ActionResult to perform if external login is successful
                 () => Redirect("/"));
         }

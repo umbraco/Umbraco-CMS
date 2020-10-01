@@ -46,7 +46,7 @@
         }
 
         &.is-active {
-            color: @ui-light-active-type;
+            color: @ui-light-active-type !important;
 
             &::before {
                 opacity: 1;
@@ -93,8 +93,8 @@
         .box-shadow(~"inset 0 2px 4px rgba(0,0,0,.15), 0 1px 2px rgba(0,0,0,.05)");
     }
 
-    &:focus-within &__anchor_dropdown,
-    &:hover &__anchor_dropdown {
+    &:focus-within > &__anchor_dropdown,
+    &:hover > &__anchor_dropdown {
         visibility: visible;
         opacity: 1;
         transition: opacity 20ms 0;

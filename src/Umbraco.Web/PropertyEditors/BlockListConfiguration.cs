@@ -4,14 +4,11 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
-
     /// <summary>
     /// The configuration object for the Block List editor
     /// </summary>
     public class BlockListConfiguration
     {
-
-
         [ConfigurationField("blocks", "Available Blocks", "views/propertyeditors/blocklist/prevalue/blocklist.blockconfiguration.html", Description = "Define the available blocks.")]
         public BlockConfiguration[] Blocks { get; set; }
 
@@ -61,7 +58,7 @@ namespace Umbraco.Web.PropertyEditors
             public int? Max { get; set; }
         }
 
-        [ConfigurationField("useLiveEditing", "Live editing mode", "boolean", Description = "Live editing in editor overlays for live updated custom views.")]
+        [ConfigurationField("useLiveEditing", "Live editing mode", "boolean", Description = "Live editing in editor overlays for live updated custom views or labels using custom expression.")]
         public bool UseLiveEditing { get; set; }
 
         [ConfigurationField("useInlineEditingAsDefault", "Inline editing mode", "boolean", Description = "Use the inline editor as the default block view.")]
@@ -69,10 +66,5 @@ namespace Umbraco.Web.PropertyEditors
 
         [ConfigurationField("maxPropertyWidth", "Property editor width", "textstring", Description = "optional css overwrite, example: 800px or 100%")]
         public string MaxPropertyWidth { get; set; }
-
-        [ConfigurationField("labelOnTop", "Label on top", "boolean", Description = "Move the property label on top to provide move space for the editor.")]
-        public bool LabelOnTop { get; set; }
-
-
     }
 }

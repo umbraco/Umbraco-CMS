@@ -204,7 +204,7 @@ function valFormManager(serverValidationManager, $rootScope, $timeout, $location
                                 var parts = nextPath.split("?");
                                 var query = {};
                                 if (parts.length > 1) {
-                                    _.each(parts[1].split("&"), function (q) {
+                                    parts[1].split("&").forEach(q => {
                                         var keyVal = q.split("=");
                                         query[keyVal[0]] = keyVal[1];
                                     });

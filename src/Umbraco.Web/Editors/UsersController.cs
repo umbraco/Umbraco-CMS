@@ -179,6 +179,33 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
+        /// Get users by integer ids
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        [OutgoingEditorModelEvent]
+        [AdminUsersAuthorize]
+        public IEnumerable<UserDisplay> GetByIds([FromJsonPath]int[] ids)
+        {
+            if (ids == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            if (ids.Length == 0)
+                return Enumerable.Empty<UserDisplay>();
+
+            var users = Services.UserService.GetUsersById(ids);
+            if (users == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            var result = Mapper.MapEnumerable<IUser, UserDisplay>(users);
+            return result;
+        }
+
+        /// <summary>
         /// Returns a paged users collection
         /// </summary>
         /// <param name="pageNumber"></param>
