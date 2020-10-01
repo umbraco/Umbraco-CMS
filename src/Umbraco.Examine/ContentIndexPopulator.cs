@@ -70,21 +70,47 @@ namespace Umbraco.Examine
             {
                 contentParentId = _parentId.Value;
             }
+
+            if (_publishedValuesOnly)
+            {
+                IndexPublishedContent(contentParentId, pageIndex, pageSize, indexes);
+            }
+            else
+            {
+                IndexAllContent(contentParentId, pageIndex, pageSize, indexes);
+            }
+        }
+
+        protected void IndexAllContent(int contentParentId, int pageIndex, int pageSize, IReadOnlyList<IIndex> indexes)
+        {
             IContent[] content;
 
             do
             {
-                if (!_publishedValuesOnly)
+                content = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out _).ToArray();
+
+                if (content.Length > 0)
                 {
-                    content = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out _).ToArray();
+                    // ReSharper disable once PossibleMultipleEnumeration
+                    foreach (var index in indexes)
+                        index.IndexItems(_contentValueSetBuilder.GetValueSets(content));
                 }
-                else
-                {
-                    //add the published filter
-                    //note: We will filter for published variants in the validator
-                    content = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out _,
-                        _publishedQuery, Ordering.By("Path", Direction.Ascending)).ToArray();
-                }
+
+                pageIndex++;
+            } while (content.Length == pageSize);
+        }
+
+        protected void IndexPublishedContent(int contentParentId, int pageIndex, int pageSize,
+            IReadOnlyList<IIndex> indexes)
+        {
+            IContent[] content;
+
+            do
+            {
+                //add the published filter
+                //note: We will filter for published variants in the validator
+                content = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out _,
+                    _publishedQuery, Ordering.By("Path", Direction.Ascending)).ToArray();
 
                 if (content.Length > 0)
                 {
@@ -97,4 +123,6 @@ namespace Umbraco.Examine
             } while (content.Length == pageSize);
         }
     }
+
+
 }
