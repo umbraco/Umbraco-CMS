@@ -3,8 +3,9 @@
     <div>
         <div class="umb-modalcolumn-header">
             <h1 id="contextmenu-title">{{ menuDialogTitle }}</h1>
-            <p id="contextmenu-description" class="sr-only">You have the following edit options available on the node:
-                {{ menuDialogTitle }}</p>
+            <p id="contextmenu-description" class="sr-only">
+                <localize key="visuallyHiddenTexts_contextMenuDescription">Select one of the options to edit the node.</localize>
+            </p>
         </div>
 
         <div class="umb-modalcolumn-body">
@@ -14,8 +15,6 @@
                     <button type="button" ng-click="executeMenuItem(action)"
                         class="umb-action-link btn-reset umb-outline">
                         <i class="icon icon-{{action.cssclass}}" aria-hidden="true"></i>
-                        <!-- TODO: Investiage a proper fix for the weird sizing of the blueprint icon before switching to umb-icon -->
-                        <!-- <umb-icon icon="icon-{{action.cssclass}}" class="icon icon-{{action.cssclass}}"></umb-icon> -->
                         <span class="menu-label">{{ action.name }}</span>
                     </button>
                 </li>
