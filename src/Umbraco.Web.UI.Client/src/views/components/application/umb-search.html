@@ -27,9 +27,9 @@
             id="app-search"
             focus-when="{{vm.searchHasFocus}}"
             aria-describedby="search-input-description"
-            aria-expanded="false"
+            aria-expanded="{{vm.hasResults}}"
             aria-owns="search-results"
-            aria-autocomplete="both"
+            aria-autocomplete="list"
         />
         <button ng-show="vm.searchQuery.length > 0" class="umb-search-input-clear umb-animated" ng-click="vm.clearSearch()">
             <localize key="general_clear">Clear</localize>
@@ -42,7 +42,7 @@
             <ul class="umb-search-items">
                 <li class="umb-search-item" ng-repeat="result in group.results" active-result="{{result === vm.activeResult}}">
                     <a class="umb-search-result__link" ng-href="#/{{result.editorPath}}" ng-click="vm.clickItem(result)">
-                        <i class="umb-search-result__icon {{result.icon}}"></i>
+                        <umb-icon icon="{{result.icon}}" class="umb-search-result__icon {{result.icon}}"></umb-icon>
                         <span class="umb-search-result__meta">
                             <span class="umb-search-result__name">{{result.name}}</span>
                             <span class="umb-search-result__description" ng-show="result.subTitle">
