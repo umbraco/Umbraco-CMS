@@ -5,7 +5,6 @@ using Umbraco.Core.Hosting;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Features;
-using Umbraco.Web.Services;
 using Umbraco.Web.Trees;
 
 namespace Umbraco.Web.Editors

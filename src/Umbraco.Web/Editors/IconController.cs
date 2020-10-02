@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using Umbraco.Core.Models;
+using Umbraco.Core.Services;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using Umbraco.Core.Logging;
@@ -6,9 +8,7 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Mapping;
-using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Services;
 using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Editors

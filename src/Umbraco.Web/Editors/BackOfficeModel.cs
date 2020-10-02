@@ -1,9 +1,8 @@
 ﻿using Umbraco.Core.Configuration;
+using Umbraco.Core.Services;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.Services;
 using Umbraco.Web.Features;
-using Umbraco.Web.Services;
 using Umbraco.Web.Trees;
 
 namespace Umbraco.Web.Editors

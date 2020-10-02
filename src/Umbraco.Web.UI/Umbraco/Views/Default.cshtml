@@ -94,31 +94,32 @@
     <umb-overlay ng-if="overlay.show"
                  model="overlay"
                  position="{{overlay.position}}"
+                 size="overlay.size"
                  view="overlay.view"
+                 name="overlay.name"
                  parent-scope="overlay.parentScope">
     </umb-overlay>
 
     <umb-editors ng-show="infiniteMode"></umb-editors>
 
-    <umb-login ng-if="login.show"
-               on-login="hideLoginScreen()">
+    <umb-login
+        ng-if="login.show"
+        on-login="hideLoginScreen()">
     </umb-login>
 
 @Html.BareMinimumServerVariablesScript(Url, Model.Features, Model.GlobalSettings, Model.UmbracoVersion, Model.ContentSettings, Model.TreeCollection, Model.HttpContextAccessor, Model.HostingEnvironment, Model.RuntimeSettings, Model.SecuritySettings, Current.RuntimeMinifier)
 
 <script>
-
         document.angularReady = function(app) {
             @Html.AngularValueExternalLoginInfoScript(ViewData.GetExternalSignInError())
             @Html.AngularValueResetPasswordCodeInfoScript(ViewData["PasswordResetCode"])
-            @Html.AngularValueTinyMceAssets(Current.RuntimeMinifier)
+            @Html.AngularValueTinyMceAssets(runtimeMinifier)
 
             app.run(["iconHelper", function (iconHelper) {
                 @* We inject icons to the icon helper(service), since icons can only be loaded if user is authorized. By injecting these to the service they will not be requested as they will become cached. *@
                 iconHelper.defineIcon("icon-check", '@Html.Raw(Model.IconCheckData)');
                 iconHelper.defineIcon("icon-delete", '@Html.Raw(Model.IconDeleteData)');
             }]);
-
             //required for the noscript trick
             document.getElementById("mainwrapper").style.display = "inherit";
         }
