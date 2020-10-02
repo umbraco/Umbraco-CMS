@@ -1,5 +1,12 @@
 
-<div class="umb-search" on-outside-click="vm.closeSearch()" ng-keydown="vm.handleKeyDown($event)">
+<div class="umb-search" on-outside-click="vm.closeSearch()" ng-keydown="vm.handleKeyDown($event)" role="dialog"
+    aria-labelledby="search-overlay-title" aria-describedby="search-overlay-description">
+
+    <div class="sr-only">
+        <h1 id="search-overlay-title">Search the Umbraco backoffice</h1>
+        <p id="search-overlay-description">Search for content nodes, media nodes etc. - This will do a search for the
+            entire backoffice.</p>
+    </div>
 
     <div class="flex items-center">
         <label for="app-search" class="umb-search__label">
@@ -15,10 +22,10 @@
             ng-model-options="{ debounce: 200 }"
             ng-change="vm.search(vm.searchQuery)"
             localize="placeholder"
-            placeholder="@placeholders_search" 
+            placeholder="@placeholders_search"
             id="app-search"
             focus-when="{{vm.searchHasFocus}}" />
-        <button ng-show="vm.searchQuery.length > 0" tabindex="-1" class="umb-search-input-clear umb-animated" ng-click="vm.clearSearch()">
+        <button ng-show="vm.searchQuery.length > 0" class="umb-search-input-clear umb-animated" ng-click="vm.clearSearch()">
             <localize key="general_clear">Clear</localize>
         </button>
     </div>
