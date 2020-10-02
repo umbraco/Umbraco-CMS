@@ -160,7 +160,6 @@
     <Compile Include="Services\ContentServiceTagsTests.cs" />
     <Compile Include="Services\ContentTypeServiceVariantsTests.cs" />
     <Compile Include="Services\EntityXmlSerializerTests.cs" />
-    <Compile Include="Packaging\CreatedPackagesRepositoryTests.cs" />
     <Compile Include="Services\MemberGroupServiceTests.cs" />
     <Compile Include="Services\MediaTypeServiceTests.cs" />
     <Compile Include="Services\PropertyValidationServiceTests.cs" />
@@ -186,7 +185,6 @@
     <Compile Include="Scoping\ScopedNuCacheTests.cs" />
     <Compile Include="Scoping\ScopeTests.cs" />
     <Compile Include="Services\CachedDataTypeServiceTests.cs" />
-    <Compile Include="Services\ConsentServiceTests.cs" />
     <Compile Include="TestHelpers\ControllerTesting\AuthenticateEverythingExtensions.cs" />
     <Compile Include="TestHelpers\ControllerTesting\AuthenticateEverythingMiddleware.cs" />
     <Compile Include="TestHelpers\ControllerTesting\SpecificAssemblyResolver.cs" />

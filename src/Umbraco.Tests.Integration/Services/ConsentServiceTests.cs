@@ -2,19 +2,21 @@
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
-using Umbraco.Tests.TestHelpers;
+using Umbraco.Core.Services;
+using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Services
 {
     [TestFixture]
+    [Explicit]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
-    public class ConsentServiceTests : TestWithDatabaseBase
+    public class ConsentServiceTests : UmbracoIntegrationTest
     {
         [Test]
         public void CanCrudConsent()
         {
-            var consentService = ServiceContext.ConsentService;
+            var consentService = GetRequiredService<IConsentService>();
 
             // can register
 
@@ -109,7 +111,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void CanRegisterConsentWithoutComment()
         {
-            var consentService = ServiceContext.ConsentService;
+            var consentService = GetRequiredService<IConsentService>();
 
             // Attept to add consent without a comment
             consentService.RegisterConsent("user/1234", "app1", "consentWithoutComment", ConsentState.Granted);
