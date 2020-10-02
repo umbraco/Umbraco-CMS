@@ -348,6 +348,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(contentType.Path.Contains(","), Is.True);
                 Assert.That(contentType.SortOrder, Is.GreaterThan(0));
 
+
                 Assert.That(contentType.PropertyGroups.ElementAt(0).Name == "testGroup", Is.True);
                 var groupId = contentType.PropertyGroups.ElementAt(0).Id;
 
@@ -355,6 +356,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.AreEqual("gen", propertyTypes[0].Alias); // just to be sure
                 Assert.IsNull(propertyTypes[0].PropertyGroupId);
                 Assert.IsTrue(propertyTypes.Skip(1).All((x => x.PropertyGroupId.Value == groupId)));
+                Assert.That(propertyTypes[0].LabelOnTop, Is.True);
             }
 
         }
@@ -377,7 +379,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                     Description = "Optional Subtitle",
                     Mandatory = false,
                     SortOrder = 1,
-                    DataTypeId = -88
+                    DataTypeId = -88,
+                    LabelOnTop = true
                 });
                 repository.Save(contentType);
 
@@ -389,6 +392,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(dirty, Is.False);
                 Assert.That(contentType.Thumbnail, Is.EqualTo("Doc2.png"));
                 Assert.That(contentType.PropertyTypes.Any(x => x.Alias == "subtitle"), Is.True);
+                Assert.That(contentType.PropertyTypes.Single(x => x.Alias == "subtitle").LabelOnTop, Is.True);
+
             }
 
 
@@ -467,7 +472,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                             Pattern = ""
                         },
                         SortOrder = 1,
-                        DataTypeId = -88
+                        DataTypeId = -88,
+                        LabelOnTop = true
                     }
                 });
 
@@ -476,6 +482,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // just making sure
                 Assert.AreEqual(mapped.Thumbnail, "Doc2.png");
                 Assert.IsTrue(mapped.PropertyTypes.Any(x => x.Alias == "subtitle"));
+                Assert.IsTrue(mapped.PropertyTypes.Single(x => x.Alias == "subtitle").LabelOnTop);
 
                 repository.Save(mapped);
 
@@ -490,6 +497,9 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(dirty, Is.False);
                 Assert.That(contentType.Thumbnail, Is.EqualTo("Doc2.png"));
                 Assert.That(contentType.PropertyTypes.Any(x => x.Alias == "subtitle"), Is.True);
+
+                Assert.That(contentType.PropertyTypes.Single(x => x.Alias == "subtitle").LabelOnTop, Is.True);
+
                 foreach (var propertyType in contentType.PropertyTypes)
                 {
                     Assert.IsTrue(propertyType.HasIdentity);
