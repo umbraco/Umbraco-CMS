@@ -9,7 +9,6 @@ using Umbraco.Tests.Testing;
 namespace Umbraco.Tests.Services
 {
     [TestFixture]
-    [Explicit]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
     public class ConsentServiceTests : UmbracoIntegrationTest
     {

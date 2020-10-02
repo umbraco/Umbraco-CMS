@@ -20,7 +20,6 @@ using Umbraco.Tests.Testing;
 namespace Umbraco.Tests.Packaging
 {
     [TestFixture]
-    [Explicit] // TODO: find out why tests only run one at at time, the tests get blocked after the first test
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
     public class CreatedPackagesRepositoryTests : UmbracoIntegrationTest
     {

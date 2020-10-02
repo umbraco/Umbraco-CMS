@@ -365,6 +365,23 @@ namespace Umbraco.Tests.Integration.Testing
 
                     break;
                 case UmbracoTestOptions.Database.NewSchemaPerFixture:
+                    // If we try to AttachSchema before the old schema has been detached
+                    // the process will be blocked since readyQueue remain empty
+                    // Probably because the DB is blocked because it hasn't been detached
+                    // Also if we attach a new schema for every test isn't it just essentially
+                    // the same as NewSchemaPerTest?
+                    if (db.HasSchema)
+                    {
+                        // We must re-configure our current factory since attaching a new LocalDb from the pool changes connection strings
+                        if (!databaseFactory.Configured)
+                        {
+                            databaseFactory.Configure(db.ConnectionString, Constants.DatabaseProviders.SqlServer);
+                        }
+
+                        // re-run the runtime level check
+                        runtimeState.DetermineRuntimeLevel();
+                        return;
+                    }
 
                     // New DB + Schema
                     var newSchemaFixtureDbId = db.AttachSchema();
