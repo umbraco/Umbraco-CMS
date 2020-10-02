@@ -8,7 +8,7 @@
                 type="text"
                 ng-change="vm.change()"
                 ng-model="vm.model"
-                class="umb-search-field search-query search-input input-block-level"
+                class="umb-search-field search-query search-input input-block-level {{vm.cssClass}}"
                 placeholder="{{vm.text}}"
                 umb-auto-focus="{{vm.autoFocus === true}}"
                 prevent-enter-submit
