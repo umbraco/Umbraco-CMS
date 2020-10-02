@@ -5,6 +5,7 @@ using Umbraco.Web.Actions;
 using Umbraco.Web.ContentApps;
 using Umbraco.Web.Dashboards;
 using Umbraco.Web.Editors;
+using Umbraco.Web.HeaderApps;
 using Umbraco.Web.HealthCheck;
 using Umbraco.Web.Media.EmbedProviders;
 using Umbraco.Web.Mvc;
@@ -45,6 +46,9 @@ namespace Umbraco.Web
         /// <returns></returns>
         public static ContentAppFactoryCollectionBuilder ContentApps(this Composition composition)
             => composition.WithCollectionBuilder<ContentAppFactoryCollectionBuilder>();
+
+        public static HeaderAppFactoryCollectionBuilder HeaderApps(this Composition composition)
+            => composition.WithCollectionBuilder<HeaderAppFactoryCollectionBuilder>();
 
         /// <summary>
         /// Gets the content finders collection builder.

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core.Models;
+using Umbraco.Core.Models.Header;
+using Umbraco.Web.HeaderApps;
 using Umbraco.Web.Mvc;
 
 namespace Umbraco.Web.Editors
@@ -8,14 +9,16 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     public class HeaderController : UmbracoAuthorizedJsonController
     {
+        private readonly HeaderAppFactoryCollection _headerAppDefinitions;
+
+        public HeaderController(HeaderAppFactoryCollection headerAppDefinitions)
+        {
+            _headerAppDefinitions = headerAppDefinitions;
+        }
+
         public IEnumerable<HeaderApp> GetApps()
         {
-            //TODO: Get this from somewhere else than here
-            return new List<HeaderApp>
-            {
-                new HeaderApp{Alias = "help", Weight = -100, View = "views/header/apps/search/search.html"},
-                new HeaderApp{Alias = "search", Weight = -200, View = "views/header/apps/help/help.html"}
-            }.OrderByDescending(it => it.Weight);
+            return _headerAppDefinitions.GetHeaderAppsFor();
         }
     }
 }

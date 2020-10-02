@@ -9,7 +9,13 @@
 
         <div class="flex items-center">
             <ul class="umb-app-header__actions">
-                <li ng-repeat="app in apps" ng-include="app.view" class="umb-app-header__action">
+                <li ng-repeat="app in apps" class="umb-app-header__action">
+                    <button type="button" class="umb-app-header__button btn-reset" hotkey="app.hotkey" ng-click="app.action" ng-mousedown="rememberFocus()">
+                        <span class="sr-only">
+                            <localize key="visuallyHiddenTexts_{{app.alias}}">{{app.name}}</localize>...
+                        </span>
+                        <i class="umb-app-header__action-icon {{app.icon}}" aria-hidden="true"></i>
+                    </button>
                 </li>
                 <li data-element="global-user" class="umb-app-header__action">
                    <button type="button" class="umb-app-header__button btn-reset" ng-click="avatarClick()" hotkey="ctrl+shift+u" title="{{user.name}}">
