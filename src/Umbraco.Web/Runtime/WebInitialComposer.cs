@@ -98,7 +98,7 @@ namespace Umbraco.Web.Runtime
             composition.Register<IPublishedContentQuery>(factory =>
             {
                 var umbCtx = factory.GetInstance<IUmbracoContextAccessor>();
-                return new PublishedContentQuery(umbCtx.UmbracoContext.PublishedSnapshot, factory.GetInstance<IVariationContextAccessor>());
+                return new PublishedContentQuery(umbCtx.UmbracoContext.PublishedSnapshot, factory.GetInstance<IVariationContextAccessor>(), factory.GetInstance<IExamineManager>());
             }, Lifetime.Request);
             composition.Register<ITagQuery, TagQuery>(Lifetime.Request);
 

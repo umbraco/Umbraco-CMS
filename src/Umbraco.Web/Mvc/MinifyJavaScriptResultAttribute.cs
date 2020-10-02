@@ -1,4 +1,5 @@
-﻿using System.Web.Mvc;
+﻿using System.IO;
+using System.Web.Mvc;
 using System.Web.UI;
 using ClientDependency.Core;
 using ClientDependency.Core.CompositeFiles;
@@ -29,7 +30,7 @@ namespace Umbraco.Web.Mvc
             //minify the result
             var result = jsResult.Script;
             var minifier = new JSMin();
-            var minified = minifier.Minify(result);
+            var minified = minifier.Minify(new StringReader(result));
             jsResult.Script = minified;
         }
 

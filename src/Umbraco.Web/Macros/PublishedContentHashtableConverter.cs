@@ -6,6 +6,7 @@ using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Editors;
@@ -29,14 +30,14 @@ namespace Umbraco.Web.Macros
         /// that the PublishedRequest takes into account how a template is assigned during the routing process whereas
         /// with an IPublishedContent item, the template id is assigned purely based on the default.
         /// </remarks>
-        internal PublishedContentHashtableConverter(PublishedRequest frequest)
+        internal PublishedContentHashtableConverter(PublishedRequest frequest, IUserService userService)
         {
             if (!frequest.HasPublishedContent)
                 throw new ArgumentException("Document request has no node.", nameof(frequest));
 
             PopulatePageData(frequest.PublishedContent.Id,
                 frequest.PublishedContent.Name, frequest.PublishedContent.ContentType.Id, frequest.PublishedContent.ContentType.Alias,
-                frequest.PublishedContent.WriterName, frequest.PublishedContent.CreatorName, frequest.PublishedContent.CreateDate, frequest.PublishedContent.UpdateDate,
+                frequest.PublishedContent.WriterName(userService), frequest.PublishedContent.CreatorName(userService), frequest.PublishedContent.CreateDate, frequest.PublishedContent.UpdateDate,
                 frequest.PublishedContent.Path, frequest.PublishedContent.Parent?.Id ?? -1);
 
             if (frequest.HasTemplate)
@@ -52,13 +53,13 @@ namespace Umbraco.Web.Macros
         /// Initializes a new instance of the page for a published document
         /// </summary>
         /// <param name="doc"></param>
-        internal PublishedContentHashtableConverter(IPublishedContent doc)
+        internal PublishedContentHashtableConverter(IPublishedContent doc, IUserService userService)
         {
             if (doc == null) throw new ArgumentNullException(nameof(doc));
 
             PopulatePageData(doc.Id,
                 doc.Name, doc.ContentType.Id, doc.ContentType.Alias,
-                doc.WriterName, doc.CreatorName, doc.CreateDate, doc.UpdateDate,
+                doc.WriterName(userService), doc.CreatorName(userService), doc.CreateDate, doc.UpdateDate,
                 doc.Path, doc.Parent?.Id ?? -1);
 
             if (doc.TemplateId.HasValue)
@@ -69,16 +70,6 @@ namespace Umbraco.Web.Macros
 
             PopulateElementData(doc);
         }
-
-        /// <summary>
-        /// Initializes a new instance of the page for a content.
-        /// </summary>
-        /// <param name="content">The content.</param>
-        /// <param name="variationContextAccessor"></param>
-        /// <remarks>This is for <see cref="MacroRenderingController"/> usage only.</remarks>
-        internal PublishedContentHashtableConverter(IContent content, IVariationContextAccessor variationContextAccessor)
-            : this(new PagePublishedContent(content, variationContextAccessor))
-        { }
 
         #endregion
 
