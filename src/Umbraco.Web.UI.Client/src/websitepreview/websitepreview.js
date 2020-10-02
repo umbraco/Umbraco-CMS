@@ -10,6 +10,8 @@
         return;
     }
 
+    const scriptElement = document.currentScript;
+
     function setCookie(cname, cvalue, exminutes) {
         var d = new Date();
         d.setTime(d.getTime() + (exminutes * 60 * 1000));
@@ -18,24 +20,24 @@
 
     function getCookie(cname) {
         var name = cname + "=";
-        var ca = document.cookie.split(';');
+        var ca = document.cookie.split(";");
         for(var i = 0; i < ca.length; i++) {
             var c = ca[i];
-            while (c.charAt(0) == ' ') {
-            c = c.substring(1);
+            while (c.charAt(0) == " ") {
+                c = c.substring(1);
             }
             if (c.indexOf(name) == 0) {
-            return c.substring(name.length, c.length);
+                return c.substring(name.length, c.length);
             }
         }
         return "";
     }
 
     function exitPreviewMode() {
-        window.top.location.href = "../preview/end?redir=" + encodeURIComponent(window.location.pathname+window.location.search);
+        window.top.location.href = scriptElement.getAttribute("data-umbraco-path")+"/preview/end?redir=" + encodeURIComponent(window.location.pathname+window.location.search);
     }
     function continuePreviewMode() {
-        setCookie("UMB-WEBSITE-PREVIEW-ACCEPT", "true", 1);
+        setCookie("UMB-WEBSITE-PREVIEW-ACCEPT", "true", 5);
     }
 
     var user = getCookie("UMB-WEBSITE-PREVIEW-ACCEPT");
@@ -105,42 +107,45 @@
             }
         `;
 
+        var bodyEl = document.getElementsByTagName("BODY")[0];
+
         var fragment = document.createDocumentFragment();
 
-        var con = document.createElement("style");
-        con.innerHTML = modelStyles;
-        fragment.appendChild(con);
+        var style = document.createElement("style");
+        style.innerHTML = modelStyles;
+        fragment.appendChild(style);
 
         var con = document.createElement("div");
         con.className = "umbraco-preview-dialog";
+        fragment.appendChild(con);
 
-
-        var model = document.createElement("div");
-        model.className = "umbraco-preview-dialog";
-        model.innerHTML = `<div class="umbraco-preview-dialog__headline">Preview mode</div>
+        var modal = document.createElement("div");
+        modal.className = "umbraco-preview-dialog__modal";
+        modal.innerHTML = `<div class="umbraco-preview-dialog__headline">Preview mode</div>
             <div class="umbraco-preview-dialog__question">Do you want to continue viewing latest saved version?</div>`;
+        con.appendChild(modal);
 
         var continueButton = document.createElement("button");
         continueButton.type = "button";
+        continueButton.className = "umbraco-preview-dialog__continue";
         continueButton.innerHTML = "Continue";
-        model.appendChild(continueButton);
-
-        continueButton.addEventListener("click", continuePreviewMode);
+        continueButton.addEventListener("click", function() {
+            bodyEl.removeChild(style);
+            bodyEl.removeChild(con);
+            continuePreviewMode();
+        });
+        modal.appendChild(continueButton);
 
         var exitButton = document.createElement("button");
         exitButton.type = "button";
-        exitButton.className = "umbraco-preview-dialog__continue";
         exitButton.innerHTML = "Exit preview mode";
-        model.appendChild(exitButton);
+        exitButton.addEventListener("click", exitPreviewMode);
+        modal.appendChild(exitButton);
 
-        continueButton.addEventListener("click", exitPreviewMode);
-
-        fragment.appendChild(con);
-
-        document.getElementsByTagName("BODY")[0].appendChild(fragment);
+        bodyEl.appendChild(fragment);
+        continueButton.focus();
     } else {
         continuePreviewMode();
-        console.log("already set");
     }
 
 })();
