@@ -2278,6 +2278,11 @@ To manage your website, simply open the Umbraco back office and start adding con
       <key alias="hasTranslation">Has translation</key>
       <key alias="noTranslation">Missing translation</key>
       <key alias="dictionaryListCaption">Dictionary items</key>
+      <key alias="searchOverlayTitle">Search the Umbraco backoffice</key>
+      <key alias="searchOverlayDescription">Search for content nodes, media nodes etc. across the backoffice.</key>
+      <key alias="searchInputDescription">When autocomplete results are available, press up and down arrows, or use the tab key and use the enter key to select.</key>
+      <key alias="path">Path: </key>
+      <key alias="foundIn">Found in</key>
   </area>
   <area alias="references">
     <key alias="tabName">References</key>

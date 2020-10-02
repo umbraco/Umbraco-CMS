@@ -3,8 +3,13 @@
     aria-labelledby="search-overlay-title" aria-describedby="search-overlay-description">
 
     <div class="sr-only">
-        <h1 id="search-overlay-title">Search the Umbraco backoffice</h1>
-        <p id="search-overlay-description">Search for content nodes, media nodes etc. across the backoffice.</p>
+        <h1 id="search-overlay-title">
+            <localize key="visuallyHiddenTexts_searchOverlayTitle">Search the Umbraco backoffice</localize>
+        </h1>
+        <p id="search-overlay-description">
+            <localize key="visuallyHiddenTexts_searchOverlayDescription">Search for content nodes, media nodes etc. across the
+                backoffice.</localize>
+        </p>
     </div>
 
     <div class="flex items-center">
@@ -14,8 +19,11 @@
                 <localize key="general_search">Search...</localize>
             </span>
         </label>
-        <span class="sr-only" id="search-input-description">When autocomplete results are available, press up and down arrows,
-            or use the tab key and use the enter key to select.</span>
+        <span class="sr-only" id="search-input-description">
+            <localize key="visuallyHiddenTexts_searchInputDescription">When autocomplete results are available, press up and
+                down arrows,
+                or use the tab key and use the enter key to select.</localize>
+        </span>
         <input
             class="umb-search-input"
             type="text"
@@ -46,12 +54,16 @@
                         <span class="umb-search-result__meta">
                             <span class="umb-search-result__name">{{result.name}}</span>
                             <span class="umb-search-result__description" ng-show="result.subTitle">
-                                <span class="sr-only">Path: </span>
+                                <span class="sr-only">
+                                    <localize key="visuallyHiddenTexts_path">Path:</localize>
+                                </span>
                                 <span>{{result.subTitle}}</span>
                             </span>
                         </span>
                     </a>
-                    <span class="sr-only">Found in {{key}}</span>
+                    <span class="sr-only">
+                        <localize key="visuallyHiddenTexts_foundIn">Found in</localize> {{key}}
+                    </span>
                 </li>
             </ul>
         </div>
