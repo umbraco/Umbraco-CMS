@@ -648,7 +648,8 @@
                         mandatoryMessage: null,
                         pattern: null,
                         patternMessage: null
-                    }
+                    },
+                    labelOnTop: false
                 };
 
                 // check if there already is an init property
