@@ -1,11 +1,14 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Packaging;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.UnitTests.AutoFixture;
 
 namespace Umbraco.Tests.Packaging
 {
@@ -16,9 +19,11 @@ namespace Umbraco.Tests.Packaging
 
         private static FileInfo GetTestPackagePath(string packageName)
         {
-            const string testPackagesDirName = "Packaging\\Packages";
-            var hosting = TestHelper.GetHostingEnvironment();
-            string path = Path.Combine(hosting.ApplicationPhysicalPath, testPackagesDirName, packageName);
+            const string testPackagesDirName = "Umbraco.Core\\Packaging\\Packages";
+            var testDir = TestContext.CurrentContext.TestDirectory.Split("bin")[0];
+            var hostingEnvironment = Mock.Of<IHostingEnvironment>(
+                x => x.ToAbsolute(It.IsAny<string>()) == "/" && x.ApplicationPhysicalPath == testDir);
+            var path = Path.Combine(hostingEnvironment.ApplicationPhysicalPath, testPackagesDirName, packageName);
             return new FileInfo(path);
         }
 
