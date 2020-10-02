@@ -19,10 +19,10 @@
 
                 <div class="umb-expansion-panel">
 
-                    <div class="umb-expansion-panel__header" ng-click="vm.propertiesOpen = !vm.propertiesOpen">
-                        <div><localize key="packager_packageProperties">Package Properties</localize></div>
+                    <button type="button" aria-expanded="{{vm.propertiesOpen}}" class="btn-reset umb-expansion-panel__header" ng-click="vm.propertiesOpen = !vm.propertiesOpen">
+                        <span><localize key="packager_packageProperties">Package Properties</localize></span>
                         <umb-icon icon="{{vm.propertiesOpen ? 'icon-navigation-up' : 'icon-navigation-down'}}" class="umb-expansion-panel__expand" ng-class="{'icon-navigation-down': !vm.propertiesOpen, 'icon-navigation-up': vm.propertiesOpen}">&nbsp;</umb-icon>
-                    </div>
+                    </button>
 
                     <div class="umb-expansion-panel__content" ng-show="vm.propertiesOpen">
 
@@ -103,10 +103,10 @@
 
                 <div class="umb-expansion-panel">
 
-                    <div class="umb-expansion-panel__header" ng-click="vm.contentOpen = !vm.contentOpen">
-                        <div><localize key="packager_packageContent">Package Content</localize></div>
-                        <umb-icon icon="vm.contentOpen ? 'icon-navigation-up' : 'icon-navigation-down'" class="umb-expansion-panel__expand" ng-class="{'icon-navigation-down': !vm.contentOpen, 'icon-navigation-up': vm.contentOpen}">&nbsp;</umb-icon>
-                    </div>
+                    <button type="button" aria-expanded="{{vm.contentOpen}}" class="btn-reset umb-expansion-panel__header" ng-click="vm.contentOpen = !vm.contentOpen">
+                        <span><localize key="packager_packageContent">Package Content</localize></span>
+                        <umb-icon icon="{{vm.contentOpen ? 'icon-navigation-up' : 'icon-navigation-down'}}" class="umb-expansion-panel__expand" ng-class="{'icon-navigation-down': !vm.contentOpen, 'icon-navigation-up': vm.contentOpen}">&nbsp;</umb-icon>
+                    </button>
 
                     <div class="umb-expansion-panel__content" ng-show="vm.contentOpen">
 
@@ -206,15 +206,13 @@
 
                 <div class="umb-expansion-panel">
 
-                    <div class="umb-expansion-panel__header" ng-click="vm.filesOpen = !vm.filesOpen">
-                        <div><localize key="packager_packageFiles">Package Files</localize></div>
+                    <button type="button" aria-expanded="{{vm.filesOpen}}" class="btn-reset umb-expansion-panel__header" ng-click="vm.filesOpen = !vm.filesOpen">
+                        <span><localize key="packager_packageFiles">Package Files</localize></span>
                         <umb-icon icon="{{vm.filesOpen ? 'icon-navigation-up' : 'icon-navigation-down'}}" class="umb-expansion-panel__expand" ng-class="{'icon-navigation-down': !vm.filesOpen, 'icon-navigation-up': vm.filesOpen}">&nbsp;</umb-icon>
-                    </div>
+                    </button>
 
                     <div class="umb-expansion-panel__content" ng-show="vm.filesOpen">
-                        <!--
-                        <p>Remember: .xslt and .ascx files for your macros will be added automaticly, but you will still need to add assemblies, images and script files manually to the list below.</p>
-                        -->
+
                         <umb-control-group
                             label="@packager_pathToFile"
                             description="@packager_pathToFileDescription">
@@ -263,10 +261,10 @@
                 </div>
 
                 <div class="umb-expansion-panel">
-                    <div class="umb-expansion-panel__header" ng-click="vm.actionsOpen = !vm.actionsOpen">
-                        <div><localize key="packager_packageActions">Package Actions</localize></div>
-                        <umb-icon icon="vm.actionsOpen ? 'icon-navigation-up' : 'icon-navigation-down'" class="umb-expansion-panel__expand" ng-class="{'icon-navigation-down': !vm.actionsOpen, 'icon-navigation-up': vm.actionsOpen}">&nbsp;</umb-icon>
-                    </div>
+                    <button type="button" aria-expanded="{{vm.actionsOpen}}" class="btn-reset umb-expansion-panel__header" ng-click="vm.actionsOpen = !vm.actionsOpen">
+                        <span><localize key="packager_packageActions">Package Actions</localize></span>
+                        <umb-icon icon="{{vm.actionsOpen ? 'icon-navigation-up' : 'icon-navigation-down'}}" class="umb-expansion-panel__expand" ng-class="{'icon-navigation-down': !vm.actionsOpen, 'icon-navigation-up': vm.actionsOpen}">&nbsp;</umb-icon>
+                    </button>
                     <div class="umb-expansion-panel__content" ng-show="vm.actionsOpen">
                         <umb-control-group
                             label="@packager_actions"
