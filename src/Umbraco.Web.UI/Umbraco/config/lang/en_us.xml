@@ -316,7 +316,7 @@
     <key alias="untouchedLanguagesForFirstTime">These languages haven't been created</key>
 
     <key alias="variantsWillBeSaved">All new variants will be saved.</key>
-    <key alias="variantsToPublish">Which variants you would like to publish?</key>
+    <key alias="variantsToPublish">Which variants would you like to publish?</key>
     <key alias="variantsToSave">Choose which variants to be saved.</key>
     <key alias="variantsToSendForApproval">Pick variants to send for approval.</key>
     <key alias="variantsToSchedule">Set scheduled publishing...</key>
