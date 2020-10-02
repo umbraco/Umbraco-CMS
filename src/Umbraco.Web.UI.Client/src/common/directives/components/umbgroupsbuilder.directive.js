@@ -18,6 +18,7 @@
             scope.sortableOptionsProperty = {};
             scope.sortingButtonKey = "general_reorder";
             scope.compositionsButtonState = "init";
+            scope.autoFocusItem = null;
 
             function activate() {
 
@@ -205,16 +206,6 @@
                     iconHelper.formatContentTypeIcons([c.contentType]);
                 });
             }
-
-            /* ---------- DELETE PROMT ---------- */
-
-            scope.togglePrompt = function (object) {
-                object.deletePrompt = !object.deletePrompt;
-            };
-
-            scope.hidePrompt = function (object) {
-                object.deletePrompt = false;
-            };
 
             /* ---------- TOOLBAR ---------- */
 
@@ -430,7 +421,21 @@
             }
 
             scope.removeGroup = function (groupIndex) {
-                scope.model.groups.splice(groupIndex, 1);
+                scope.autoFocusItem = null;
+
+                performDelete(() => {
+                    scope.model.groups.splice(groupIndex, 1);
+
+                    if (scope.model.groups.length > 0) {
+                        groupIndex = groupIndex > 0 ? groupIndex - 1 : 0; 
+                        scope.autoFocusItem = scope.model.groups[groupIndex];
+                    }
+                    else {
+                        scope.autoFocusItem = null;
+                    }
+                }, () => {
+                    scope.autoFocusItem = scope.model.groups[groupIndex];
+                });
             };
 
             scope.updateGroupTitle = function (group) {
@@ -446,6 +451,14 @@
                 }
                 scope.model.groups = $filter('orderBy')(scope.model.groups, 'sortOrder');
             };
+
+            scope.groupKeyHandler = function (groupIndex, event) {
+                if (event.which == 46) {
+                    scope.removeGroup(groupIndex);
+                    event.stopPropagation();
+                    event.preventDefault();
+                }
+            }
 
             function addInitGroup(groups) {
 
@@ -624,12 +637,59 @@
             };
 
             scope.deleteProperty = function (tab, propertyIndex) {
+                scope.autoFocusItem = null;
 
-                // remove property
-                tab.properties.splice(propertyIndex, 1);
+                performDelete(() => {
+                    // remove property
+                    tab.properties.splice(propertyIndex, 1);
 
-                notifyChanged();
+                    // note: last property in tab.properties is actually a placeholder for new properties
+                    if (tab.properties.length > 1) {
+                        propertyIndex = propertyIndex > 0 ? propertyIndex - 1 : 0;
+                        scope.autoFocusItem = tab.properties[propertyIndex];
+                    }
+                    else {
+                        scope.autoFocusItem = tab;
+                    }
+
+                    notifyChanged();
+                }, () => {
+                    scope.autoFocusItem = tab.properties[propertyIndex];
+                });
             };
+
+            scope.propertyKeyHandler = function (tab, propertyIndex, event) {
+                if (event.which == 46) {
+                    scope.deleteProperty(tab, propertyIndex);
+                    event.stopPropagation();
+                    event.preventDefault();
+                }
+            }
+
+            function performDelete(confirmCallback, cancelCallback) {
+                localizationService.localizeMany(["general_delete", "defaultdialogs_confirmdelete", "general_cancel"])
+                    .then(function (data) {
+                        const overlay = {
+                            title: data[0],
+                            content: data[1] + "?",
+                            closeButtonLabel: data[2],
+                            submitButtonLabel: data[0],
+                            submitButtonStyle: "danger",
+                            close: function () {
+                                if (cancelCallback) {
+                                    cancelCallback();
+                                }
+                                overlayService.close();
+                            },
+                            submit: function () {
+                                confirmCallback();
+                                overlayService.close();
+                            }
+                        };
+
+                        overlayService.open(overlay);
+                    });
+            }
 
             function notifyChanged() {
                 eventsService.emit("editors.groupsBuilder.changed");

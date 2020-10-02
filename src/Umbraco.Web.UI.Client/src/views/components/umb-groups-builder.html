@@ -49,7 +49,8 @@
             </button>
 
             <!-- TAB ACTIVE OR INACTIVE STATE -->
-            <div class="umb-group-builder__group" ng-if="tab.tabState !== 'init'" ng-class="{'-active':tab.tabState=='active', '-inherited': tab.inherited, 'umb-group-builder__group-handle -sortable': sortingMode && !tab.inherited}" tabindex="0" ng-focus="activateGroup(tab)">
+            <div class="umb-group-builder__group" ng-if="tab.tabState !== 'init'" ng-class="{'-active':tab.tabState=='active', '-inherited': tab.inherited, 'umb-group-builder__group-handle -sortable': sortingMode && !tab.inherited}" tabindex="0" ng-focus="activateGroup(tab)"
+                 ng-keydown="groupKeyHandler($index, $event)" umb-auto-focus="{{tab === autoFocusItem}}">
 
                 <div class="umb-group-builder__group-title-wrapper">
 
@@ -101,13 +102,9 @@
                     </ng-form>
 
                     <div class="umb-group-builder__group-remove" ng-if="!sortingMode && canRemoveGroup(tab)">
-                        <umb-confirm-action
-                            show="tab.deletePrompt"
-                            direction="left"
-                            on-delete="togglePrompt(tab)"
-                            on-confirm="removeGroup($index)"
-                            on-cancel="hidePrompt(tab)">
-                        </umb-confirm-action>
+                        <button aria-label="Delete group" class="btn-icon" ng-click="removeGroup($index)" localize="title" title="@general_delete">
+                            <umb-icon icon="icon-trash" class="icon-trash"></umb-icon>
+                        </button>
                     </div>
 
                 </div>
@@ -248,7 +245,8 @@
                                     </umb-property-editor>
                                 </ng-form>
 
-                                <button aria-label="Open settings" class="umb-group-builder__open-settings" ng-if="!property.inherited && !property.locked" ng-click="editPropertyTypeSettings(property, tab)"></button>
+                                <button aria-label="Open settings" class="umb-group-builder__open-settings" ng-if="!property.inherited && !property.locked" ng-click="editPropertyTypeSettings(property, tab)"
+                                        ng-keydown="propertyKeyHandler(tab, $index, $event)" umb-auto-focus="{{property === autoFocusItem}}"></button>
 
                             </div>
 
@@ -266,13 +264,9 @@
 
                                     <!-- delete property -->
                                     <div ng-if="!property.locked" class="umb-group-builder__property-action">
-                                        <umb-confirm-action
-                                            show="property.deletePrompt"
-                                            direction="left"
-                                            on-delete="togglePrompt(property)"
-                                            on-confirm="deleteProperty(tab, $index)"
-                                            on-cancel="hidePrompt(property)">
-                                        </umb-confirm-action>
+                                        <button aria-label="Delete property" class="btn-icon" ng-click="deleteProperty(tab, $index)" localize="title" title="@general_delete">
+                                            <umb-icon icon="icon-trash" class="icon-trash"></umb-icon>
+                                        </button>
                                     </div>
 
                                 </div>
