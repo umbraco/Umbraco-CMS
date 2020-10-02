@@ -184,7 +184,6 @@
     <Compile Include="Scoping\ScopeFileSystemsTests.cs" />
     <Compile Include="Scoping\ScopedNuCacheTests.cs" />
     <Compile Include="Scoping\ScopeTests.cs" />
-    <Compile Include="Services\CachedDataTypeServiceTests.cs" />
     <Compile Include="TestHelpers\ControllerTesting\AuthenticateEverythingExtensions.cs" />
     <Compile Include="TestHelpers\ControllerTesting\AuthenticateEverythingMiddleware.cs" />
     <Compile Include="TestHelpers\ControllerTesting\SpecificAssemblyResolver.cs" />
