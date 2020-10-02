@@ -798,7 +798,10 @@ namespace Umbraco.Core.Packaging
                     SortOrder = sortOrder,
                     Variations = property.Element("Variations") != null
                         ? (ContentVariation)Enum.Parse(typeof(ContentVariation), property.Element("Variations").Value)
-                        : ContentVariation.Nothing
+                        : ContentVariation.Nothing,
+                    LabelOnTop = property.Element("LabelOnTop") != null
+                        ? property.Element("LabelOnTop").Value.ToLowerInvariant().Equals("true")
+                        : false
                 };
 
                 var tab = (string)property.Element("Tab");

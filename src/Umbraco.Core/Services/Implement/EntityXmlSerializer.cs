@@ -363,6 +363,7 @@ namespace Umbraco.Core.Services.Implement
                                                    new XElement("MandatoryMessage", propertyType.MandatoryMessage),
                                                    new XElement("Validation", propertyType.ValidationRegExp),
                                                    new XElement("ValidationRegExpMessage", propertyType.ValidationRegExpMessage),
+                                                   new XElement("LabelOnTop", propertyType.LabelOnTop),
                                                    new XElement("Description", new XCData(propertyType.Description)));
                 genericProperties.Add(genericProperty);
             }
