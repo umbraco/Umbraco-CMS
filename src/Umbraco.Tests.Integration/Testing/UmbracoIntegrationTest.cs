@@ -370,24 +370,23 @@ namespace Umbraco.Tests.Integration.Testing
                     // Probably because the DB is blocked because it hasn't been detached
                     // Also if we attach a new schema for every test isn't it just essentially
                     // the same as NewSchemaPerTest?
-                    if (db.HasSchema)
+                    if (!db.HasSchema)
                     {
-                        // We must re-configure our current factory since attaching a new LocalDb from the pool changes connection strings
-                        if (!databaseFactory.Configured)
-                        {
-                            databaseFactory.Configure(db.ConnectionString, Constants.DatabaseProviders.SqlServer);
-                        }
+                        // New DB + Schema
+                        var newSchemaFixtureDbId = db.AttachSchema();
 
-                        // re-run the runtime level check
-                        runtimeState.DetermineRuntimeLevel();
-                        return;
+                        // Add teardown callback
+                        OnFixtureTearDown(() => db.Detach(newSchemaFixtureDbId));
                     }
 
-                    // New DB + Schema
-                    var newSchemaFixtureDbId = db.AttachSchema();
+                    // We must re-configure our current factory since attaching a new LocalDb from the pool changes connection strings
+                    if (!databaseFactory.Configured)
+                    {
+                        databaseFactory.Configure(db.ConnectionString, Constants.DatabaseProviders.SqlServer);
+                    }
 
-                    // Add teardown callback
-                    OnFixtureTearDown(() => db.Detach(newSchemaFixtureDbId));
+                    // re-run the runtime level check
+                    runtimeState.DetermineRuntimeLevel();
 
                     break;
                 case UmbracoTestOptions.Database.NewEmptyPerFixture:
