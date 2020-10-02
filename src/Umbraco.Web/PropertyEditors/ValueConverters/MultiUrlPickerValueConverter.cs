@@ -53,7 +53,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 foreach (var dto in dtos)
                 {
                     var type = LinkType.External;
-                    var url = dto.Url;
+                    var url = dto.Url.StartsWith("http") ? dto.Url : "http://" + dto.Url;
 
                     if (dto.Udi != null)
                     {
