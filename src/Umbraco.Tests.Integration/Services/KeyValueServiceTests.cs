@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using NUnit.Framework;
-using NUnit.Framework.Internal;
 using Umbraco.Core.Services;
+using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Services
@@ -14,13 +14,15 @@ namespace Umbraco.Tests.Services
     [TestFixture]
     [Apartment(ApartmentState.STA)]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-    public class KeyValueServiceTests : TestWithSomeContentBase
+    public class KeyValueServiceTests : UmbracoIntegrationTest
     {
+        private IKeyValueService KeyValueService => GetRequiredService<IKeyValueService>();
+
         [Test]
         public void GetValue_ForMissingKey_ReturnsNull()
         {
             // Arrange
-            var keyValueService = ServiceContext.KeyValueService;
+            var keyValueService = KeyValueService;
 
             // Act
             var value = keyValueService.GetValue("foo");
@@ -33,7 +35,7 @@ namespace Umbraco.Tests.Services
         public void GetValue_ForExistingKey_ReturnsValue()
         {
             // Arrange
-            var keyValueService = ServiceContext.KeyValueService;
+            var keyValueService = KeyValueService;
             keyValueService.SetValue("foo", "bar");
 
             // Act
@@ -47,7 +49,7 @@ namespace Umbraco.Tests.Services
         public void SetValue_ForExistingKey_SavesValue()
         {
             // Arrange
-            var keyValueService = ServiceContext.KeyValueService;
+            var keyValueService = KeyValueService;
             keyValueService.SetValue("foo", "bar");
 
             // Act
@@ -62,7 +64,7 @@ namespace Umbraco.Tests.Services
         public void TrySetValue_ForExistingKeyWithProvidedValue_ReturnsTrueAndSetsValue()
         {
             // Arrange
-            var keyValueService = ServiceContext.KeyValueService;
+            var keyValueService = KeyValueService;
             keyValueService.SetValue("foo", "bar");
 
             // Act
@@ -78,7 +80,7 @@ namespace Umbraco.Tests.Services
         public void TrySetValue_ForExistingKeyWithoutProvidedValue_ReturnsFalseAndDoesNotSetValue()
         {
             // Arrange
-            var keyValueService = ServiceContext.KeyValueService;
+            var keyValueService = KeyValueService;
             keyValueService.SetValue("foo", "bar");
 
             // Act
