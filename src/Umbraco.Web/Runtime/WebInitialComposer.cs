@@ -110,6 +110,7 @@ namespace Umbraco.Web.Runtime
             composition.RegisterUnique<HtmlUrlParser>();
             composition.RegisterUnique<HtmlImageSourceParser>();
             composition.RegisterUnique<RichTextEditorPastedImages>();
+            composition.RegisterUnique<PropertyEditors.ValueConverters.BlockEditorConverter>();
 
             // register the umbraco helper - this is Transient! very important!
             // also, if not level.Run, we cannot really use the helper (during upgrade...)
@@ -136,8 +137,8 @@ namespace Umbraco.Web.Runtime
             composition.RegisterUnique<IEventMessagesAccessor, HybridEventMessagesAccessor>();
             composition.RegisterUnique<ITreeService, TreeService>();
             composition.RegisterUnique<ISectionService, SectionService>();
-
             composition.RegisterUnique<IDashboardService, DashboardService>();
+            composition.RegisterUnique<IIconService, IconService>();
 
             composition.RegisterUnique<IExamineManager>(factory => ExamineManager.Instance);
 
@@ -238,7 +239,11 @@ namespace Umbraco.Web.Runtime
             composition.ContentApps()
                 .Append<ListViewContentAppFactory>()
                 .Append<ContentEditorContentAppFactory>()
-                .Append<ContentInfoContentAppFactory>();
+                .Append<ContentInfoContentAppFactory>()
+                .Append<ContentTypeDesignContentAppFactory>()
+                .Append<ContentTypeListViewContentAppFactory>()
+                .Append<ContentTypePermissionsContentAppFactory>()
+                .Append<ContentTypeTemplatesContentAppFactory>();
 
             // register back office sections in the order we want them rendered
             composition.Sections()

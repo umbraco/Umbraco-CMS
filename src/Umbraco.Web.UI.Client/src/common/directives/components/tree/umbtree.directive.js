@@ -3,7 +3,7 @@
 * @name umbraco.directives.directive:umbTree
 * @restrict E
 **/
-function umbTreeDirective($q, $rootScope, treeService, notificationsService, userService) {
+function umbTreeDirective($q, $rootScope, treeService, notificationsService, userService, backdropService) {
 
     return {
         restrict: 'E',
@@ -88,9 +88,8 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
             /** Helper function to emit tree events */
             function emitEvent(eventName, args) {
                 if (registeredCallbacks[eventName] && Utilities.isArray(registeredCallbacks[eventName])) {
-                    _.each(registeredCallbacks[eventName], function (c) {
-                        c(args);//call it
-                    });
+                    // call it
+                    registeredCallbacks[eventName].forEach(c => c(args));
                 }
             }
 
@@ -319,6 +318,18 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
                 }
             }
 
+            // Close any potential backdrop and remove the #leftcolumn modifier class
+            function closeBackdrop() {
+                var aboveClass = 'above-backdrop';
+                var leftColumn = $('#leftcolumn');
+                var isLeftColumnOnTop = leftColumn.hasClass(aboveClass);
+
+                if(isLeftColumnOnTop){
+                    backdropService.close();
+                    leftColumn.removeClass(aboveClass);
+                }
+            }
+
             /** Returns the css classses assigned to the node (div element) */
             $scope.getNodeCssClass = function (node) {
                 if (!node) {
@@ -330,26 +341,17 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
 
                 var css = [];
                 if (node.cssClasses) {
-                    _.each(node.cssClasses, function (c) {
-                        css.push(c);
-                    });
+                    node.cssClasses.forEach(c => css.push(c));
                 }
 
                 return css.join(" ");
             };
 
-            $scope.selectEnabledNodeClass = function (node) {
-                return node ?
-                    node.selected ?
-                        'icon umb-tree-icon sprTree icon-check green temporary' :
-                        '' :
-                    '';
-            };
+            $scope.selectEnabledNodeClass = node =>
+                node && node.selected ? 'icon umb-tree-icon sprTree icon-check green temporary' : '';            
 
             /* helper to force reloading children of a tree node */
-            $scope.loadChildren = function (node, forceReload) {
-                return loadChildren(node, forceReload);
-            };
+            $scope.loadChildren = (node, forceReload) => loadChildren(node, forceReload);
 
             /**
               Method called when the options button next to the root node is called.
@@ -368,6 +370,8 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
             */
             $scope.select = function (n, ev) {
 
+                closeBackdrop()
+                
                 if (n.metaData && n.metaData.noAccess === true) {
                     ev.preventDefault();
                     return;

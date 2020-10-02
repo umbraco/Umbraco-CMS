@@ -65,6 +65,9 @@
     <PackageReference Include="CSharpTest.Net.Collections" Version="14.906.1403.1082" />
     <PackageReference Include="Examine" Version="1.0.2" />
     <PackageReference Include="HtmlAgilityPack" Version="1.8.14" />
+    <PackageReference Include="HtmlSanitizer">
+      <Version>4.0.217</Version>
+    </PackageReference>
     <PackageReference Include="ImageProcessor">
       <Version>2.7.0.100</Version>
     </PackageReference>
@@ -121,6 +124,7 @@
     <Compile Include="AppBuilderExtensions.cs" />
     <Compile Include="AreaRegistrationContextExtensions.cs" />
     <Compile Include="AspNetHttpContextAccessor.cs" />
+    <Compile Include="BlockListTemplateExtensions.cs" />
     <Compile Include="Cache\DistributedCacheBinder.cs" />
     <Compile Include="Cache\DistributedCacheBinderComposer.cs" />
     <Compile Include="Cache\DistributedCacheBinder_Handlers.cs" />
@@ -129,12 +133,18 @@
     <Compile Include="Cache\UserGroupCacheRefresher.cs" />
     <Compile Include="Cache\UserGroupPermissionsCacheRefresher.cs" />
     <Compile Include="Compose\BackOfficeUserAuditEventsComposer.cs" />
+    <Compile Include="Compose\BlockEditorComponent.cs" />
+    <Compile Include="Compose\BlockEditorComposer.cs" />
     <Compile Include="Compose\NestedContentPropertyComponent.cs" />
     <Compile Include="Compose\NotificationsComposer.cs" />
     <Compile Include="Compose\PublicAccessComposer.cs" />
     <Compile Include="Composing\CompositionExtensions\Installer.cs" />
     <Compile Include="Composing\LightInject\LightInjectContainer.cs" />
     <Compile Include="Compose\BackOfficeUserAuditEventsComponent.cs" />
+    <Compile Include="ContentApps\ContentTypeTemplatesContentAppFactory.cs" />
+    <Compile Include="ContentApps\ContentTypePermissionsContentAppFactory.cs" />
+    <Compile Include="ContentApps\ContentTypeListViewContentAppFactory.cs" />
+    <Compile Include="ContentApps\ContentTypeDesignContentAppFactory.cs" />
     <Compile Include="ContentApps\ListViewContentAppFactory.cs" />
     <Compile Include="Dashboards\ContentDashboard.cs" />
     <Compile Include="Dashboards\DashboardCollection.cs" />
@@ -149,8 +159,10 @@
     <Compile Include="Dashboards\RedirectUrlDashboard.cs" />
     <Compile Include="Dashboards\SettingsDashboards.cs" />
     <Compile Include="Editors\BackOfficePreviewModel.cs" />
+    <Compile Include="Editors\ElementTypeController.cs" />
     <Compile Include="Editors\Filters\ContentSaveModelValidator.cs" />
     <Compile Include="Editors\Filters\MediaSaveModelValidator.cs" />
+    <Compile Include="Editors\IconController.cs" />
     <Compile Include="Editors\ImageUrlGeneratorController.cs" />
     <Compile Include="Editors\PackageController.cs" />
     <Compile Include="Editors\KeepAliveController.cs" />
@@ -238,9 +250,21 @@
     <Compile Include="Mvc\SurfaceControllerTypeCollectionBuilder.cs" />
     <Compile Include="Mvc\ValidateUmbracoFormRouteStringAttribute.cs" />
     <Compile Include="Profiling\WebProfilingController.cs" />
+    <Compile Include="PropertyEditors\BlockEditorPropertyEditor.cs" />
+    <Compile Include="PropertyEditors\BlockListConfiguration.cs" />
+    <Compile Include="PropertyEditors\BlockListConfigurationEditor.cs" />
+    <Compile Include="PropertyEditors\BlockListPropertyEditor.cs" />
     <Compile Include="Compose\NestedContentPropertyComposer.cs" />
+    <Compile Include="PropertyEditors\ComplexEditorValidator.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\MultipleMediaPickerParameterEditor.cs" />
     <Compile Include="PropertyEditors\RichTextEditorPastedImages.cs" />
+    <Compile Include="PropertyEditors\Validation\ComplexEditorElementTypeValidationResult.cs" />
+    <Compile Include="PropertyEditors\Validation\ComplexEditorPropertyTypeValidationResult.cs" />
+    <Compile Include="PropertyEditors\Validation\ComplexEditorValidationResult.cs" />
+    <Compile Include="PropertyEditors\Validation\ContentPropertyValidationResult.cs" />
+    <Compile Include="PropertyEditors\Validation\ValidationResultConverter.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\BlockEditorConverter.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\BlockListPropertyValueConverter.cs" />
     <Compile Include="PublishedCache\NuCache\PublishedSnapshotServiceOptions.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\GenObj.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\GenRef.cs" />
@@ -251,6 +275,7 @@
     <Compile Include="Routing\IPublishedRouter.cs" />
     <Compile Include="Routing\MediaUrlProviderCollection.cs" />
     <Compile Include="Routing\MediaUrlProviderCollectionBuilder.cs" />
+    <Compile Include="Scheduling\SimpleTask.cs" />
     <Compile Include="Scheduling\TempFileCleanup.cs" />
     <Compile Include="Search\BackgroundIndexRebuilder.cs" />
     <Compile Include="Search\ExamineFinalComponent.cs" />
@@ -259,6 +284,7 @@
     <Compile Include="Search\IUmbracoTreeSearcherFields.cs" />
     <Compile Include="Search\UmbracoTreeSearcherFields.cs" />
     <Compile Include="Services\DashboardService.cs" />
+    <Compile Include="Services\IconService.cs" />
     <Compile Include="Services\IDashboardService.cs" />
     <Compile Include="Models\Link.cs" />
     <Compile Include="Models\LinkType.cs" />

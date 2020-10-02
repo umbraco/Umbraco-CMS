@@ -923,7 +923,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="insertControl">Item toevoegen</key>
     <key alias="chooseLayout">Kies de indeling</key>
     <key alias="addRows">Kies een indeling voor deze pagina om content toe te kunnen voegen</key>
-    <key alias="addElement"><![CDATA[<i class="icon icon-add blue"></i> Plaats een (extra) content blok]]></key>
+    <key alias="addElement">Plaats een (extra) content blok</key>
     <key alias="dropElement">Drop content</key>
     <key alias="settingsApplied">Instellingen toegepast</key>
     <key alias="contentNotAllowed">Deze content is hier niet toegestaan</key>

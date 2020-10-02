@@ -32,6 +32,26 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
         return true;
     }
 
+    function showNotificationsForModelsState(ms) {
+        for (const [key, value] of Object.entries(ms)) {
+
+            var errorMsg = value[0];
+            // if the error message is json it's a complex editor validation response that we need to parse
+            if ((Utilities.isString(errorMsg) && errorMsg.startsWith("[")) || Utilities.isArray(errorMsg)) {
+                // flatten the json structure, create validation paths for each property and add each as a property error
+                var idsToErrors = serverValidationManager.parseComplexEditorError(errorMsg, "");
+                idsToErrors.forEach(x => {
+                    if (x.modelState) {
+                        showNotificationsForModelsState(x.modelState);
+                    }
+                });
+            }
+            else if (value[0]) {
+                notificationsService.error("Validation", value[0]);
+            }
+        }
+    }
+
     return {
 
         //TODO: We need to move some of this to formHelper for saving, too many editors use this method for saving when this entire
@@ -97,13 +117,13 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
                         return $q.resolve(data);
 
                     }, function (err) {
+
+                        formHelper.resetForm({ scope: args.scope, hasErrors: true });
+
                         self.handleSaveError({
                             showNotifications: args.showNotifications,
                             softRedirect: args.softRedirect,
-                            err: err,
-                            rebindCallback: function () {
-                                rebindCallback.apply(self, [args.content, err.data]);
-                            }
+                            err: err
                         });
 
                         //update editor state to what is current
@@ -131,7 +151,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
             // first check if tab is already added
             var foundInfoTab = false;
 
-            angular.forEach(tabs, function (tab) {
+            tabs.forEach(function (tab) {
                 if (tab.id === infoTab.id && tab.alias === infoTab.alias) {
                     foundInfoTab = true;
                 }
@@ -615,9 +635,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
 
                     //add model state errors to notifications
                     if (args.showNotifications) {
-                        for (var e in args.err.data.ModelState) {
-                            notificationsService.error("Validation", args.err.data.ModelState[e][0]);
-                        }
+                        showNotificationsForModelsState(args.err.data.ModelState);
                     }
 
                     if (!this.redirectToCreatedContent(args.err.data.id, args.softRedirect) || args.softRedirect) {

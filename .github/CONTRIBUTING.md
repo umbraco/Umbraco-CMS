@@ -123,7 +123,7 @@ You can get in touch with [the core contributors team](#the-core-contributors-te
 
 In order to build the Umbraco source code locally, first make sure you have the following installed.
 
-  * [Visual Studio 2017 v15.9.7+](https://visualstudio.microsoft.com/vs/)
+  * [Visual Studio 2019 v16.3+ (with .NET Core 3.0)](https://visualstudio.microsoft.com/vs/)
   * [Node.js v10+](https://nodejs.org/en/download/)
   * npm v6.4.1+ (installed with Node.js)
   * [Git command line](https://git-scm.com/download/)

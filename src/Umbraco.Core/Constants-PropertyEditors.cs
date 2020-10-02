@@ -37,6 +37,11 @@ namespace Umbraco.Core
             public static class Aliases
             {
                 /// <summary>
+                /// Block List.
+                /// </summary>
+                public const string BlockList = "Umbraco.BlockList";
+
+                /// <summary>
                 /// CheckBox List.
                 /// </summary>
                 public const string CheckBoxList = "Umbraco.CheckBoxList";

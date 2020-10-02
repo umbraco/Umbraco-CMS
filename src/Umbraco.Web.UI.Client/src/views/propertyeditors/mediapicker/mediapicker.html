@@ -3,7 +3,7 @@
     <p ng-if="(mediaItems|filter:{trashed:true}).length == 1"><localize key="mediaPicker_pickedTrashedItem"></localize></p>
     <p ng-if="(mediaItems|filter:{trashed:true}).length > 1"><localize key="mediaPicker_pickedTrashedItems"></localize></p>
 
-    <div data-element="sortable-thumbnails" class="flex flex-wrap error">
+    <div data-element="sortable-thumbnails" class="umb-sortable-thumbnails-container error">
         <ul ui-sortable="sortableOptions" ng-model="mediaItems" class="umb-sortable-thumbnails">
             <li data-element="sortable-thumbnail-{{$index}}" class="umb-sortable-thumbnails__wrapper" ng-repeat="media in mediaItems track by $index">
 
@@ -31,12 +31,13 @@
                 <!-- FILE -->
                 <umb-file-icon ng-hide="media.thumbnail" ng-class="{'trashed': media.trashed}"
                                extension="{{media.extension}}"
+                               icon="{{media.icon}}"
                                size="s"
                                text="{{media.name}}">
                 </umb-file-icon>
 
                 <div class="umb-sortable-thumbnails__actions" data-element="sortable-thumbnail-actions">
-                    <button type="button" aria-label="Edit media" ng-if="allowEditMedia" class="umb-sortable-thumbnails__action btn-reset" data-element="action-edit" ng-click="vm.editItem(media)">
+                    <button type="button" aria-label="Edit media" ng-if="allowEditMedia && media.found" class="umb-sortable-thumbnails__action btn-reset" data-element="action-edit" ng-click="vm.editItem(media)">
                         <i class="icon icon-edit" aria-hidden="true"></i>
                     </button>
                     <button type="button" aria-label="Remove" class="umb-sortable-thumbnails__action -red btn-reset" data-element="action-remove" ng-click="vm.remove($index)">
