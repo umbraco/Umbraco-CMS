@@ -19,7 +19,6 @@
 
         vm.colorPickerOptions = {
             type: "color",
-            color: "000000",
             allowEmpty: false,
             showAlpha: true
         };
