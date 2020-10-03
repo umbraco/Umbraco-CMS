@@ -10,12 +10,19 @@
 (function () {
     "use strict";
 
-    function BlockConfigurationOverlayController($scope, overlayService, localizationService, editorService, elementTypeResource, eventsService) {
+    function BlockConfigurationOverlayController($scope, overlayService, localizationService, editorService, elementTypeResource, eventsService, angularHelper) {
 
         var unsubscribe = [];
 
         var vm = this;
         vm.block = $scope.model.block;
+
+        vm.colorPickerOptions = {
+            type: "color",
+            color: "000000",
+            allowEmpty: false,
+            showAlpha: true
+        };
 
         loadElementTypes();
 
@@ -267,6 +274,22 @@
 
         vm.removeThumbnailForBlock = function(entry) {
             entry.thumbnail = null;
+        };
+
+        vm.changeIconColor = function (color) {
+            angularHelper.safeApply($scope, function () {
+                if (color) {
+                    vm.block.iconColor = color.toString();
+                }
+            });
+        };
+
+        vm.changeBackgroundColor = function (color) {
+            angularHelper.safeApply($scope, function () {
+                if (color) {
+                    vm.block.backgroundColor = color.toString();
+                }
+            });
         };
 
         vm.submit = function() {
