@@ -36,16 +36,44 @@ namespace Umbraco.Web
             string cacheKey,
             ViewDataDictionary viewData = null)
         {
+            return appCaches.CachedPartialView(htmlHelper,
+                partialViewName,
+                () => model,
+                cachedSeconds,
+                cacheKey,
+                viewData);
+        }
+
+        /// <summary>
+        /// Outputs and caches a partial view in MVC
+        /// </summary>
+        /// <param name="appCaches"></param>
+        /// <param name="htmlHelper"></param>
+        /// <param name="partialViewName"></param>
+        /// <param name="builder"></param>
+        /// <param name="cachedSeconds"></param>
+        /// <param name="cacheKey">used to cache the partial view, this key could change if it is cached by page or by member</param>
+        /// <param name="viewData"></param>
+        /// <returns></returns>
+        public static IHtmlString CachedPartialView(
+            this AppCaches appCaches,
+            HtmlHelper htmlHelper,
+            string partialViewName,
+            Func<object> builder,
+            int cachedSeconds,
+            string cacheKey,
+            ViewDataDictionary viewData = null)
+        {
             //disable cached partials in debug mode: http://issues.umbraco.org/issue/U4-5940
             if (htmlHelper.ViewContext.HttpContext.IsDebuggingEnabled)
             {
                 // just return a normal partial view instead
-                return htmlHelper.Partial(partialViewName, model, viewData);
+                return htmlHelper.Partial(partialViewName, builder(), viewData);
             }
 
             return appCaches.RuntimeCache.GetCacheItem<IHtmlString>(
                 PartialViewCacheKey + cacheKey,
-                () => htmlHelper.Partial(partialViewName, model, viewData),
+                () => htmlHelper.Partial(partialViewName, builder(), viewData),
                 priority: CacheItemPriority.NotRemovable, //not removable, the same as macros (apparently issue #27610)
                 timeout: new TimeSpan(0, 0, 0, cachedSeconds));
         }
