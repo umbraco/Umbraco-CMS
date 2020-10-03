@@ -82,7 +82,7 @@ namespace Umbraco.Web
             ViewDataDictionary viewData = null,
             Func<object, ViewDataDictionary, string> contextualKeyBuilder = null)
         {
-            var cacheKey = BuildCacheKey(partialViewName, cacheByPage, cacheByMember);
+            var cacheKey = BuildCachedPartialCacheKey(partialViewName, cacheByPage, cacheByMember);
             if (contextualKeyBuilder != null)
             {
                 var contextualKey = contextualKeyBuilder(model, viewData);
@@ -101,7 +101,7 @@ namespace Umbraco.Web
             ViewDataDictionary viewData = null,
             Func<ViewDataDictionary, string> contextualKeyBuilder = null)
         {
-            var cacheKey = BuildCacheKey(partialViewName, cacheByPage, cacheByMember);
+            var cacheKey = BuildCachedPartialCacheKey(partialViewName, cacheByPage, cacheByMember);
             if (contextualKeyBuilder != null)
             {
                 var contextualKey = contextualKeyBuilder(viewData);
@@ -110,7 +110,7 @@ namespace Umbraco.Web
             return Current.AppCaches.CachedPartialView(htmlHelper, partialViewName, builder, cachedSeconds, cacheKey, viewData);
         }
 
-        private static string BuildCacheKey(
+        private static string BuildCachedPartialCacheKey(
             string partialViewName,
             bool cacheByPage = false,
             bool cacheByMember = false)
@@ -205,7 +205,7 @@ namespace Umbraco.Web
             if (string.IsNullOrWhiteSpace(actionName)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(actionName));
             if (surfaceType == null) throw new ArgumentNullException(nameof(surfaceType));
 
-            var routeVals = new RouteValueDictionary(new {area = ""});
+            var routeVals = new RouteValueDictionary(new { area = "" });
 
             var surfaceController = Current.SurfaceControllerTypes.SingleOrDefault(x => x == surfaceType);
             if (surfaceController == null)
