@@ -24,13 +24,14 @@
     align-items: center;
     height: @appHeaderHeight;
     outline: none;
-    
+    position: relative;
+
     &:focus {
         .tabbing-active & {
             .umb-app-header__action-icon::after {
                 content: '';
                 position: absolute;
-                z-index:10000;
+                z-index: 10000;
                 top: 50%;
                 left: 50%;
                 width: 36px;
@@ -39,6 +40,29 @@
                 border-radius: 3px;
                 box-shadow: 0 0 2px @pinkLight, inset 0 0 2px 1px @pinkLight;
             }
+        }
+    }
+
+    .badge {
+        position: absolute;
+        top: 8px;
+        right: 2px;
+        min-width: 8px;
+        color: #d9d9d9;
+        background-color: #1b264f;
+        border: 2px solid #d9d9d9;
+        border-radius: 50%;
+        font-size: 10px;
+        font-weight: 700;
+        padding: 2px;
+        line-height: 8px;
+
+        &.-type-alert {
+            background-color: @red;
+        }
+
+        &.-type-warning {
+            background-color: @yellow-d2;
         }
     }
 }

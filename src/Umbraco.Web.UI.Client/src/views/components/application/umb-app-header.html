@@ -14,7 +14,8 @@
                         <span class="sr-only">
                             <localize key="visuallyHiddenTexts_{{app.alias}}">{{app.name}}</localize>...
                         </span>
-                        <umb-icon icon="app.icon" class="umb-app-header__action-icon {{app.icon}}"></umb-icon>
+                        <umb-icon icon="{{app.icon}}" class="umb-app-header__action-icon {{app.icon}}"></umb-icon>
+                        <div ng-show="app.badge" class="badge -type-{{app.badge.type}}">{{app.badge.count}}</div>
                     </button>
                 </li>
                 <li data-element="global-user" class="umb-app-header__action">

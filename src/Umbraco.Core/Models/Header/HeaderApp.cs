@@ -22,5 +22,8 @@ namespace Umbraco.Core.Models.Header
 
         [DataMember(Name = "action")]
         public string Action { get; set; }
+
+        [DataMember(Name = "badge")]
+        public HeaderAppBadge Badge { get; set; }
     }
 }
