@@ -275,7 +275,10 @@
                             <div>
                                 <a href="" ng-href="https://our.umbraco.com/documentation/Reference/Packaging/" target="_blank" rel="noopener">Documentation</a>
                                 <div>
-                                    <textarea class="umb-property-editor" rows="10" ng-model="vm.package.actions"></textarea>
+                                    <div data-element="package-actions"
+                                         umb-ace-editor="vm.aceOption"
+                                         model="vm.package.actions">
+                                    </div>
                                 </div>
                             </div>
                         </umb-control-group>
