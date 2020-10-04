@@ -106,7 +106,7 @@
                 return obj;
             });
 
-            var availableItems = vm.getAvailableElementTypes()
+            var availableItems = vm.getAvailableElementTypes();
 
             localizationService.localizeMany(["blockEditor_headlineCreateBlock", "blockEditor_labelcreateNewElementType"]).then(function(localized) {
 
