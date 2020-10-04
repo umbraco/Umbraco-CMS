@@ -998,7 +998,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="groupPermissions"></param>
         /// <param name="pathIds"></param>
         /// <returns></returns>
-        internal static EntityPermissionSet CalculatePermissionsForPathForUser(
+        public static EntityPermissionSet CalculatePermissionsForPathForUser(
             EntityPermission[] groupPermissions,
             int[] pathIds)
         {
@@ -1075,7 +1075,7 @@ namespace Umbraco.Core.Services.Implement
         /// Flag indicating if we want to include the default group permissions for each result if there are not explicit permissions set
         /// </param>
         /// <returns></returns>
-        internal static EntityPermission GetPermissionsForPathForGroup(
+        public static EntityPermission GetPermissionsForPathForGroup(
             IEnumerable<EntityPermission> pathPermissions,
             int[] pathIds,
             bool fallbackToDefaultPermissions = false)

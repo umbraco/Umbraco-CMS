@@ -1,6 +1,7 @@
 ﻿using Moq;
 using System;
 using System.Collections.Generic;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Tests.Common.TestHelpers.Entities
@@ -21,5 +22,41 @@ namespace Umbraco.Tests.Common.TestHelpers.Entities
             return userMock;
         }
 
+        public static User CreateUser(string suffix = "")
+        {
+            var globalSettings = new GlobalSettings();
+            var user = new User(globalSettings)
+            {
+                Language = "en",
+                IsApproved = true,
+                Name = "TestUser" + suffix,
+                RawPasswordValue = "testing",
+                IsLockedOut = false,
+                Email = "test" + suffix + "@test.com",
+                Username = "TestUser" + suffix
+            };
+
+            return user;
+        }
+
+        public static IEnumerable<IUser> CreateMulipleUsers(int amount, Action<int, IUser> onCreating = null)
+        {
+            var list = new List<IUser>();
+
+            var globalSettings = new GlobalSettings();
+            for (var i = 0; i < amount; i++)
+            {
+                var name = "Member No-" + i;
+                var user = new User(globalSettings, name, "test" + i + "@test.com", "test" + i, "test" + i);
+
+                onCreating?.Invoke(i, user);
+
+                user.ResetDirtyProperties(false);
+
+                list.Add(user);
+            }
+
+            return list;
+        }
     }
 }
