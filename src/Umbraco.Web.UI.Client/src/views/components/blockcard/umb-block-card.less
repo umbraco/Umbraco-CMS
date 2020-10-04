@@ -8,9 +8,7 @@ umb-block-card {
     border-radius: @doubleBorderRadius;
     box-shadow: 0 1px 2px rgba(0,0,0,.2);
     overflow: hidden;
-
     transition: box-shadow 120ms;
-
     cursor: pointer;
 
     &:hover {
@@ -104,17 +102,20 @@ umb-block-card {
     .__actions {
         position: absolute;
         top: 10px;
-        right: 0;
+        right: 10px;
         opacity: 0;
         transition: opacity 120ms;
+
         .__action {
-            display: inline-block;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             border-radius: 50%;
             width: 28px;
             height: 28px;
-            margin-right: 10px;
             background-color: white;
             color:@ui-action-type;
+
             &:hover {
                 color: @ui-action-type-hover;
             }
