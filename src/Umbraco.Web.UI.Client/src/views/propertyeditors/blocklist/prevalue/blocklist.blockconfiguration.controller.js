@@ -30,7 +30,6 @@
             }
 
             loadElementTypes();
-
         }
 
         function loadElementTypes() {
@@ -47,9 +46,11 @@
                 }
             }
         }
+
         unsubscribe.push(eventsService.on("editors.documentType.saved", updateUsedElementTypes));
 
-        vm.requestRemoveBlockByIndex = function (index) {
+        vm.requestRemoveBlockByIndex = function ($event, index) {
+
             localizationService.localizeMany(["general_delete", "blockEditor_confirmDeleteBlockTypeMessage", "blockEditor_confirmDeleteBlockTypeNotice"]).then(function (data) {
                 var contentElementType = vm.getElementTypeByKey($scope.model.value[index].contentElementTypeKey);
                 overlayService.confirmDelete({
@@ -65,6 +66,9 @@
                     }
                 });
             });
+
+            $event.preventDefault();
+            $event.stopPropagation();
         }
 
         vm.removeBlockByIndex = function (index) {
@@ -77,7 +81,6 @@
             cursor: "grabbing",
             placeholder: 'umb-block-card --sortable-placeholder'
         };
-
 
         vm.getAvailableElementTypes = function () {
             return vm.elementTypes.filter(function (type) {
@@ -133,7 +136,6 @@
                 };
 
                 overlayService.open(elemTypeSelectorOverlay);
-
             });
         };
 
@@ -172,10 +174,6 @@
             $scope.model.value.push(entry);
         };
 
-
-
-
-
         vm.openBlockOverlay = function (block) {
 
             localizationService.localize("blockEditor_blockConfigurationOverlayTitle", [vm.getElementTypeByKey(block.contentElementTypeKey).name]).then(function (data) {
@@ -201,7 +199,6 @@
 
                 // open property settings editor
                 editorService.open(overlayModel);
-
             });
 
         };
