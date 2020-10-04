@@ -15,16 +15,7 @@ Simple icon
 
 Icon with additional attribute. It can be treated like any other dom element
 <pre>
-    <umb-icon icon="icon-alert" class="icon-class" ng-click="doSomething()"></umb-icon>
-</pre>
-
-Manual svg string
-This format is only used in the iconpicker.html
-<pre>
-    <umb-icon
-        icon="icon-alert"
-        svg-string='<svg height="50" width="50"><circle cx="25" cy="25" r="25" fill="red" /></svg>'>
-    </umb-icon>
+    <umb-icon icon="icon-alert" class="icon-class"></umb-icon>
 </pre>
 @example
  **/
