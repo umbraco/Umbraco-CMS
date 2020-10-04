@@ -67,8 +67,8 @@
                 });
             });
 
-            $event.preventDefault();
             $event.stopPropagation();
+            $event.preventDefault();
         }
 
         vm.removeBlockByIndex = function (index) {
