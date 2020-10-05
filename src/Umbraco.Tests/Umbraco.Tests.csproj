@@ -261,7 +261,6 @@
     <Compile Include="PublishedContent\PublishedRouterTests.cs" />
     <Compile Include="PublishedContent\RootNodeTests.cs" />
     <Compile Include="Scheduling\BackgroundTaskRunnerTests.cs" />
-    <Compile Include="Services\LocalizedTextServiceTests.cs" />
     <Compile Include="Services\TagServiceTests.cs" />
     <Compile Include="Services\LocalizationServiceTests.cs" />
     <Compile Include="Services\MemberServiceTests.cs" />
