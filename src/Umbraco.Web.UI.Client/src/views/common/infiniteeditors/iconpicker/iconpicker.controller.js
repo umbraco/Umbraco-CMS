@@ -53,7 +53,7 @@ function IconPickerController($scope, localizationService, iconHelper) {
                         if (icons && icons.length > 0) {
                             let legacyIcons = icons
                                 .filter(icon => !vm.icons.find(x => x.name == icon))
-                                .map(icon => { return { name: icon, svgString: undefined }; });
+                                .map(icon => { return { name: icon, svgString: null }; });
 
                             vm.icons = legacyIcons.concat(vm.icons);
                         }
