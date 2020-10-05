@@ -2,15 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
-using Umbraco.Tests.Common.Builders;
-using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
 
@@ -22,44 +22,55 @@ namespace Umbraco.Tests.Services
     [TestFixture]
     [Apartment(ApartmentState.STA)]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
-    public class EntityServiceTests : TestWithSomeContentBase
+    public class EntityServiceTests : UmbracoIntegrationTest
     {
         private Language _langFr;
         private Language _langEs;
 
-        public override void SetUp()
+        private ILocalizationService LocalizationService => GetRequiredService<ILocalizationService>();
+        private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
+        private IContentService ContentService => GetRequiredService<IContentService>();
+        private IEntityService EntityService => GetRequiredService<IEntityService>();
+        private ISqlContext SqlContext => GetRequiredService<ISqlContext>();
+        private IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();
+        private IMediaService MediaService => GetRequiredService<IMediaService>();
+        private IFileService FileService => GetRequiredService<IFileService>();
+
+        public override async Task Setup()
         {
-            base.SetUp();
+            await base.Setup();
 
             if (_langFr == null && _langEs == null)
             {
                 var globalSettings = new GlobalSettings();
                 _langFr = new Language(globalSettings, "fr-FR");
                 _langEs = new Language(globalSettings, "es-ES");
-                ServiceContext.LocalizationService.Save(_langFr);
-                ServiceContext.LocalizationService.Save(_langEs);
+                LocalizationService.Save(_langFr);
+                LocalizationService.Save(_langEs);
             }
+
+            CreateTestData();
         }
 
         [Test]
         public void EntityService_Can_Get_Paged_Descendants_Ordering_Path()
         {
 
-            var contentType = ServiceContext.ContentTypeService.Get("umbTextpage");
+            var contentType = ContentTypeService.Get("umbTextpage");
 
             var root = MockedContent.CreateSimpleContent(contentType);
-            ServiceContext.ContentService.Save(root);
+            ContentService.Save(root);
             var rootId = root.Id;
             var ids = new List<int>();
             for (int i = 0; i < 10; i++)
             {
                 var c1 = MockedContent.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), root);
-                ServiceContext.ContentService.Save(c1);
+                ContentService.Save(c1);
                 ids.Add(c1.Id);
                 root = c1; // make a hierarchy
             }
 
-            var service = ServiceContext.EntityService;
+            var service = EntityService;
 
             long total;
 
@@ -92,19 +103,19 @@ namespace Umbraco.Tests.Services
         public void EntityService_Can_Get_Paged_Content_Children()
         {
 
-            var contentType = ServiceContext.ContentTypeService.Get("umbTextpage");
+            var contentType = ContentTypeService.Get("umbTextpage");
 
             var root = MockedContent.CreateSimpleContent(contentType);
-            ServiceContext.ContentService.Save(root);
+            ContentService.Save(root);
             var ids = new List<int>();
             for (int i = 0; i < 10; i++)
             {
                 var c1 = MockedContent.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), root);
-                ServiceContext.ContentService.Save(c1);
+                ContentService.Save(c1);
                 ids.Add(c1.Id);
             }
 
-            var service = ServiceContext.EntityService;
+            var service = EntityService;
 
             long total;
 
@@ -136,26 +147,26 @@ namespace Umbraco.Tests.Services
         [Test]
         public void EntityService_Can_Get_Paged_Content_Descendants()
         {
-            var contentType = ServiceContext.ContentTypeService.Get("umbTextpage");
+            var contentType = ContentTypeService.Get("umbTextpage");
 
             var root = MockedContent.CreateSimpleContent(contentType);
-            ServiceContext.ContentService.Save(root);
+            ContentService.Save(root);
             var count = 0;
             for (int i = 0; i < 10; i++)
             {
                 var c1 = MockedContent.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), root);
-                ServiceContext.ContentService.Save(c1);
+                ContentService.Save(c1);
                 count++;
 
                 for (int j = 0; j < 5; j++)
                 {
                     var c2 = MockedContent.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), c1);
-                    ServiceContext.ContentService.Save(c2);
+                    ContentService.Save(c2);
                     count++;
                 }
             }
 
-            var service = ServiceContext.EntityService;
+            var service = EntityService;
 
             long total;
             var entities = service.GetPagedDescendants(root.Id, UmbracoObjectTypes.Document, 0, 31, out total).ToArray();
@@ -169,15 +180,15 @@ namespace Umbraco.Tests.Services
         [Test]
         public void EntityService_Can_Get_Paged_Content_Descendants_Including_Recycled()
         {
-            var contentType = ServiceContext.ContentTypeService.Get("umbTextpage");
+            var contentType = ContentTypeService.Get("umbTextpage");
 
             var root = MockedContent.CreateSimpleContent(contentType);
-            ServiceContext.ContentService.Save(root);
+            ContentService.Save(root);
             var toDelete = new List<IContent>();
             for (int i = 0; i < 10; i++)
             {
                 var c1 = MockedContent.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), root);
-                ServiceContext.ContentService.Save(c1);
+                ContentService.Save(c1);
 
                 if (i % 2 == 0)
                 {
@@ -187,16 +198,16 @@ namespace Umbraco.Tests.Services
                 for (int j = 0; j < 5; j++)
                 {
                     var c2 = MockedContent.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), c1);
-                    ServiceContext.ContentService.Save(c2);
+                    ContentService.Save(c2);
                 }
             }
 
             foreach (var content in toDelete)
             {
-                ServiceContext.ContentService.MoveToRecycleBin(content);
+                ContentService.MoveToRecycleBin(content);
             }
 
-            var service = ServiceContext.EntityService;
+            var service = EntityService;
 
             long total;
             //search at root to see if it returns recycled
@@ -213,15 +224,15 @@ namespace Umbraco.Tests.Services
         [Test]
         public void EntityService_Can_Get_Paged_Content_Descendants_Without_Recycled()
         {
-            var contentType = ServiceContext.ContentTypeService.Get("umbTextpage");
+            var contentType = ContentTypeService.Get("umbTextpage");
 
             var root = MockedContent.CreateSimpleContent(contentType);
-            ServiceContext.ContentService.Save(root);
+            ContentService.Save(root);
             var toDelete = new List<IContent>();
             for (int i = 0; i < 10; i++)
             {
                 var c1 = MockedContent.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), root);
-                ServiceContext.ContentService.Save(c1);
+                ContentService.Save(c1);
 
                 if (i % 2 == 0)
                 {
@@ -231,16 +242,16 @@ namespace Umbraco.Tests.Services
                 for (int j = 0; j < 5; j++)
                 {
                     var c2 = MockedContent.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), c1);
-                    ServiceContext.ContentService.Save(c2);
+                    ContentService.Save(c2);
                 }
             }
 
             foreach (var content in toDelete)
             {
-                ServiceContext.ContentService.MoveToRecycleBin(content);
+                ContentService.MoveToRecycleBin(content);
             }
 
-            var service = ServiceContext.EntityService;
+            var service = EntityService;
 
             long total;
             //search at root to see if it returns recycled
@@ -257,24 +268,24 @@ namespace Umbraco.Tests.Services
         [Test]
         public void EntityService_Can_Get_Paged_Content_Descendants_With_Search()
         {
-            var contentType = ServiceContext.ContentTypeService.Get("umbTextpage");
+            var contentType = ContentTypeService.Get("umbTextpage");
 
             var root = MockedContent.CreateSimpleContent(contentType);
-            ServiceContext.ContentService.Save(root);
+            ContentService.Save(root);
 
             for (int i = 0; i < 10; i++)
             {
                 var c1 = MockedContent.CreateSimpleContent(contentType, "ssss" + Guid.NewGuid(), root);
-                ServiceContext.ContentService.Save(c1);
+                ContentService.Save(c1);
 
                 for (int j = 0; j < 5; j++)
                 {
                     var c2 = MockedContent.CreateSimpleContent(contentType, "tttt" + Guid.NewGuid(), c1);
-                    ServiceContext.ContentService.Save(c2);
+                    ContentService.Save(c2);
                 }
             }
 
-            var service = ServiceContext.EntityService;
+            var service = EntityService;
 
             long total;
             var entities = service.GetPagedDescendants(root.Id, UmbracoObjectTypes.Document, 0, 10, out total,
@@ -290,18 +301,18 @@ namespace Umbraco.Tests.Services
         [Test]
         public void EntityService_Can_Get_Paged_Media_Children()
         {
-            var folderType = ServiceContext.MediaTypeService.Get(1031);
-            var imageMediaType = ServiceContext.MediaTypeService.Get(1032);
+            var folderType = MediaTypeService.Get(1031);
+            var imageMediaType = MediaTypeService.Get(1032);
 
             var root = MockedMedia.CreateMediaFolder(folderType, -1);
-            ServiceContext.MediaService.Save(root);
+            MediaService.Save(root);
             for (int i = 0; i < 10; i++)
             {
                 var c1 = MockedMedia.CreateMediaImage(imageMediaType, root.Id);
-                ServiceContext.MediaService.Save(c1);
+                MediaService.Save(c1);
             }
 
-            var service = ServiceContext.EntityService;
+            var service = EntityService;
 
             long total;
             var entities = service.GetPagedChildren(root.Id, UmbracoObjectTypes.Media, 0, 6, out total).ToArray();
@@ -315,27 +326,27 @@ namespace Umbraco.Tests.Services
         [Test]
         public void EntityService_Can_Get_Paged_Media_Descendants()
         {
-            var folderType = ServiceContext.MediaTypeService.Get(1031);
-            var imageMediaType = ServiceContext.MediaTypeService.Get(1032);
+            var folderType = MediaTypeService.Get(1031);
+            var imageMediaType = MediaTypeService.Get(1032);
 
             var root = MockedMedia.CreateMediaFolder(folderType, -1);
-            ServiceContext.MediaService.Save(root);
+            MediaService.Save(root);
             var count = 0;
             for (int i = 0; i < 10; i++)
             {
                 var c1 = MockedMedia.CreateMediaImage(imageMediaType, root.Id);
-                ServiceContext.MediaService.Save(c1);
+                MediaService.Save(c1);
                 count++;
 
                 for (int j = 0; j < 5; j++)
                 {
                     var c2 = MockedMedia.CreateMediaImage(imageMediaType, c1.Id);
-                    ServiceContext.MediaService.Save(c2);
+                    MediaService.Save(c2);
                     count++;
                 }
             }
 
-            var service = ServiceContext.EntityService;
+            var service = EntityService;
 
             long total;
             var entities = service.GetPagedDescendants(root.Id, UmbracoObjectTypes.Media, 0, 31, out total).ToArray();
@@ -349,16 +360,16 @@ namespace Umbraco.Tests.Services
         [Test]
         public void EntityService_Can_Get_Paged_Media_Descendants_Including_Recycled()
         {
-            var folderType = ServiceContext.MediaTypeService.Get(1031);
-            var imageMediaType = ServiceContext.MediaTypeService.Get(1032);
+            var folderType = MediaTypeService.Get(1031);
+            var imageMediaType = MediaTypeService.Get(1032);
 
             var root = MockedMedia.CreateMediaFolder(folderType, -1);
-            ServiceContext.MediaService.Save(root);
+            MediaService.Save(root);
             var toDelete = new List<IMedia>();
             for (int i = 0; i < 10; i++)
             {
                 var c1 = MockedMedia.CreateMediaImage(imageMediaType, root.Id);
-                ServiceContext.MediaService.Save(c1);
+                MediaService.Save(c1);
 
                 if (i % 2 == 0)
                 {
@@ -368,16 +379,16 @@ namespace Umbraco.Tests.Services
                 for (int j = 0; j < 5; j++)
                 {
                     var c2 = MockedMedia.CreateMediaImage(imageMediaType, c1.Id);
-                    ServiceContext.MediaService.Save(c2);
+                    MediaService.Save(c2);
                 }
             }
 
             foreach (var content in toDelete)
             {
-                ServiceContext.MediaService.MoveToRecycleBin(content);
+                MediaService.MoveToRecycleBin(content);
             }
 
-            var service = ServiceContext.EntityService;
+            var service = EntityService;
 
             long total;
             //search at root to see if it returns recycled
@@ -394,16 +405,16 @@ namespace Umbraco.Tests.Services
         [Test]
         public void EntityService_Can_Get_Paged_Media_Descendants_Without_Recycled()
         {
-            var folderType = ServiceContext.MediaTypeService.Get(1031);
-            var imageMediaType = ServiceContext.MediaTypeService.Get(1032);
+            var folderType = MediaTypeService.Get(1031);
+            var imageMediaType = MediaTypeService.Get(1032);
 
             var root = MockedMedia.CreateMediaFolder(folderType, -1);
-            ServiceContext.MediaService.Save(root);
+            MediaService.Save(root);
             var toDelete = new List<IMedia>();
             for (int i = 0; i < 10; i++)
             {
                 var c1 = MockedMedia.CreateMediaImage(imageMediaType, root.Id);
-                ServiceContext.MediaService.Save(c1);
+                MediaService.Save(c1);
 
                 if (i % 2 == 0)
                 {
@@ -413,16 +424,16 @@ namespace Umbraco.Tests.Services
                 for (int j = 0; j < 5; j++)
                 {
                     var c2 = MockedMedia.CreateMediaImage(imageMediaType, c1.Id);
-                    ServiceContext.MediaService.Save(c2);
+                    MediaService.Save(c2);
                 }
             }
 
             foreach (var content in toDelete)
             {
-                ServiceContext.MediaService.MoveToRecycleBin(content);
+                MediaService.MoveToRecycleBin(content);
             }
 
-            var service = ServiceContext.EntityService;
+            var service = EntityService;
 
             long total;
             //search at root to see if it returns recycled
@@ -439,27 +450,27 @@ namespace Umbraco.Tests.Services
         [Test]
         public void EntityService_Can_Get_Paged_Media_Descendants_With_Search()
         {
-            var folderType = ServiceContext.MediaTypeService.Get(1031);
-            var imageMediaType = ServiceContext.MediaTypeService.Get(1032);
+            var folderType = MediaTypeService.Get(1031);
+            var imageMediaType = MediaTypeService.Get(1032);
 
             var root = MockedMedia.CreateMediaFolder(folderType, -1);
-            ServiceContext.MediaService.Save(root);
+            MediaService.Save(root);
 
             for (int i = 0; i < 10; i++)
             {
                 var c1 = MockedMedia.CreateMediaImage(imageMediaType, root.Id);
                 c1.Name = "ssss" + Guid.NewGuid();
-                ServiceContext.MediaService.Save(c1);
+                MediaService.Save(c1);
 
                 for (int j = 0; j < 5; j++)
                 {
                     var c2 = MockedMedia.CreateMediaImage(imageMediaType, c1.Id);
                     c2.Name = "tttt" + Guid.NewGuid();
-                    ServiceContext.MediaService.Save(c2);
+                    MediaService.Save(c2);
                 }
             }
 
-            var service = ServiceContext.EntityService;
+            var service = EntityService;
 
             long total;
             var entities = service.GetPagedDescendants(root.Id, UmbracoObjectTypes.Media, 0, 10, out total,
@@ -475,7 +486,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void EntityService_Can_Find_All_Content_By_UmbracoObjectTypes()
         {
-            var service = ServiceContext.EntityService;
+            var service = EntityService;
 
             var entities = service.GetAll(UmbracoObjectTypes.Document).ToArray();
 
@@ -487,7 +498,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void EntityService_Can_Find_All_Content_By_UmbracoObjectType_Id()
         {
-            var service = ServiceContext.EntityService;
+            var service = EntityService;
 
             var objectTypeId = Constants.ObjectTypes.Document;
             var entities = service.GetAll(objectTypeId).ToArray();
@@ -500,7 +511,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void EntityService_Can_Find_All_Content_By_Type()
         {
-            var service = ServiceContext.EntityService;
+            var service = EntityService;
 
             var entities = service.GetAll<IContent>().ToArray();
 
@@ -512,7 +523,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void EntityService_Can_Get_Child_Content_By_ParentId_And_UmbracoObjectType()
         {
-            var service = ServiceContext.EntityService;
+            var service = EntityService;
 
             var entities = service.GetChildren(-1, UmbracoObjectTypes.Document).ToArray();
 
@@ -524,17 +535,17 @@ namespace Umbraco.Tests.Services
         [Test]
         public void EntityService_Can_Get_Content_By_UmbracoObjectType_With_Variant_Names()
         {
-            var service = ServiceContext.EntityService;
+            var service = EntityService;
 
             var alias = "test" + Guid.NewGuid();
             var contentType = MockedContentTypes.CreateSimpleContentType(alias, alias, false);
             contentType.Variations = ContentVariation.Culture;
-            ServiceContext.ContentTypeService.Save(contentType);
+            ContentTypeService.Save(contentType);
 
             var c1 = MockedContent.CreateSimpleContent(contentType, "Test", -1);
             c1.SetCultureName("Test - FR", _langFr.IsoCode);
             c1.SetCultureName("Test - ES", _langEs.IsoCode);
-            ServiceContext.ContentService.Save(c1);
+            ContentService.Save(c1);
 
             var result = service.Get(c1.Id, UmbracoObjectTypes.Document);
             Assert.AreEqual("Test - FR", result.Name); // got name from default culture
@@ -548,15 +559,15 @@ namespace Umbraco.Tests.Services
         [Test]
         public void EntityService_Can_Get_Child_Content_By_ParentId_And_UmbracoObjectType_With_Variant_Names()
         {
-            var service = ServiceContext.EntityService;
+            var service = EntityService;
 
             var contentType = MockedContentTypes.CreateSimpleContentType("test1", "Test1", false);
             contentType.Variations = ContentVariation.Culture;
-            ServiceContext.ContentTypeService.Save(contentType);
+            ContentTypeService.Save(contentType);
 
             var root = MockedContent.CreateSimpleContent(contentType);
             root.SetCultureName("Root", _langFr.IsoCode); // else cannot save
-            ServiceContext.ContentService.Save(root);
+            ContentService.Save(root);
 
             for (int i = 0; i < 10; i++)
             {
@@ -570,7 +581,7 @@ namespace Umbraco.Tests.Services
                 {
                     c1.SetCultureName("Test", _langFr.IsoCode); // else cannot save
                 }
-                ServiceContext.ContentService.Save(c1);
+                ContentService.Save(c1);
             }
 
             var entities = service.GetChildren(root.Id, UmbracoObjectTypes.Document).ToArray();
@@ -601,7 +612,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void EntityService_Can_Get_Children_By_ParentId()
         {
-            var service = ServiceContext.EntityService;
+            var service = EntityService;
 
             var entities = service.GetChildren(folderId);
 
@@ -613,7 +624,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void EntityService_Can_Get_Descendants_By_ParentId()
         {
-            var service = ServiceContext.EntityService;
+            var service = EntityService;
 
             var entities = service.GetDescendants(folderId);
 
@@ -625,7 +636,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void EntityService_Throws_When_Getting_All_With_Invalid_Type()
         {
-            var service = ServiceContext.EntityService;
+            var service = EntityService;
             var objectTypeId = Constants.ObjectTypes.ContentItem;
 
             Assert.Throws<NotSupportedException>(() => service.GetAll<IContentBase>());
@@ -635,7 +646,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void EntityService_Can_Find_All_ContentTypes_By_UmbracoObjectTypes()
         {
-            var service = ServiceContext.EntityService;
+            var service = EntityService;
 
             var entities = service.GetAll(UmbracoObjectTypes.DocumentType).ToArray();
 
@@ -646,7 +657,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void EntityService_Can_Find_All_ContentTypes_By_UmbracoObjectType_Id()
         {
-            var service = ServiceContext.EntityService;
+            var service = EntityService;
 
             var objectTypeId = Constants.ObjectTypes.DocumentType;
             var entities = service.GetAll(objectTypeId).ToArray();
@@ -658,7 +669,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void EntityService_Can_Find_All_ContentTypes_By_Type()
         {
-            var service = ServiceContext.EntityService;
+            var service = EntityService;
 
             var entities = service.GetAll<IContentType>().ToArray();
 
@@ -669,7 +680,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void EntityService_Can_Find_All_Media_By_UmbracoObjectTypes()
         {
-            var service = ServiceContext.EntityService;
+            var service = EntityService;
 
             var entities = service.GetAll(UmbracoObjectTypes.Media).ToArray();
 
@@ -687,7 +698,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void EntityService_Can_Get_ObjectType()
         {
-            var service = ServiceContext.EntityService;
+            var service = EntityService;
             var mediaObjectType = service.GetObjectType(1031);
 
             Assert.NotNull(mediaObjectType);
@@ -697,8 +708,8 @@ namespace Umbraco.Tests.Services
         [Test]
         public void EntityService_Can_Get_Key_For_Id_With_Unknown_Type()
         {
-            var service = ServiceContext.EntityService;
-            var result = service.GetKey(1061, UmbracoObjectTypes.Unknown);
+            var service = EntityService;
+            var result = service.GetKey(1052, UmbracoObjectTypes.Unknown);
 
             Assert.IsTrue(result.Success);
             Assert.AreEqual(Guid.Parse("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522"), result.Result);
@@ -707,8 +718,8 @@ namespace Umbraco.Tests.Services
         [Test]
         public void EntityService_Can_Get_Key_For_Id()
         {
-            var service = ServiceContext.EntityService;
-            var result = service.GetKey(1061, UmbracoObjectTypes.DocumentType);
+            var service = EntityService;
+            var result = service.GetKey(1052, UmbracoObjectTypes.DocumentType);
 
             Assert.IsTrue(result.Success);
             Assert.AreEqual(Guid.Parse("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522"), result.Result);
@@ -717,9 +728,9 @@ namespace Umbraco.Tests.Services
         [Test]
         public void EntityService_Cannot_Get_Key_For_Id_With_Incorrect_Object_Type()
         {
-            var service = ServiceContext.EntityService;
-            var result1 = service.GetKey(1061, UmbracoObjectTypes.DocumentType);
-            var result2 = service.GetKey(1061, UmbracoObjectTypes.MediaType);
+            var service = EntityService;
+            var result1 = service.GetKey(1052, UmbracoObjectTypes.DocumentType);
+            var result2 = service.GetKey(1052, UmbracoObjectTypes.MediaType);
 
             Assert.IsTrue(result1.Success);
             Assert.IsFalse(result2.Success);
@@ -728,27 +739,27 @@ namespace Umbraco.Tests.Services
         [Test]
         public void EntityService_Can_Get_Id_For_Key_With_Unknown_Type()
         {
-            var service = ServiceContext.EntityService;
+            var service = EntityService;
             var result = service.GetId(Guid.Parse("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522"), UmbracoObjectTypes.Unknown);
 
             Assert.IsTrue(result.Success);
-            Assert.AreEqual(1061, result.Result);
+            Assert.AreEqual(1052, result.Result);
         }
 
         [Test]
         public void EntityService_Can_Get_Id_For_Key()
         {
-            var service = ServiceContext.EntityService;
+            var service = EntityService;
             var result = service.GetId(Guid.Parse("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522"), UmbracoObjectTypes.DocumentType);
 
             Assert.IsTrue(result.Success);
-            Assert.AreEqual(1061, result.Result);
+            Assert.AreEqual(1052, result.Result);
         }
 
         [Test]
         public void EntityService_Cannot_Get_Id_For_Key_With_Incorrect_Object_Type()
         {
-            var service = ServiceContext.EntityService;
+            var service = EntityService;
             var result1 = service.GetId(Guid.Parse("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522"), UmbracoObjectTypes.DocumentType);
             var result2 = service.GetId(Guid.Parse("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522"), UmbracoObjectTypes.MediaType);
 
@@ -759,7 +770,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void ReserveId()
         {
-            var service = ServiceContext.EntityService;
+            var service = EntityService;
             var guid = Guid.NewGuid();
 
             // can reserve
@@ -784,34 +795,59 @@ namespace Umbraco.Tests.Services
 
         private int folderId;
 
-        public override void CreateTestData()
+        public void CreateTestData()
         {
             if (_isSetup == false)
             {
                 _isSetup = true;
 
-                base.CreateTestData();
+                //Create and Save ContentType "umbTextpage" -> 1052
+                ContentType contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage", "Textpage");
+                contentType.Key = new Guid("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522");
+                FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
+                ContentTypeService.Save(contentType);
 
-                //Create and Save folder-Media -> 1050
-                var folderMediaType = ServiceContext.MediaTypeService.Get(1031);
+                //Create and Save Content "Homepage" based on "umbTextpage" -> 1053
+                Content textpage = MockedContent.CreateSimpleContent(contentType);
+                textpage.Key = new Guid("B58B3AD4-62C2-4E27-B1BE-837BD7C533E0");
+                ContentService.Save(textpage, 0);
+
+                //Create and Save Content "Text Page 1" based on "umbTextpage" -> 1054
+                Content subpage = MockedContent.CreateSimpleContent(contentType, "Text Page 1", textpage.Id);
+                subpage.ContentSchedule.Add(DateTime.Now.AddMinutes(-5), null);
+                ContentService.Save(subpage, 0);
+
+                //Create and Save Content "Text Page 2" based on "umbTextpage" -> 1055
+                Content subpage2 = MockedContent.CreateSimpleContent(contentType, "Text Page 2", textpage.Id);
+                ContentService.Save(subpage2, 0);
+
+                //Create and Save Content "Text Page Deleted" based on "umbTextpage" -> 1056
+                Content trashed = MockedContent.CreateSimpleContent(contentType, "Text Page Deleted", -20);
+                trashed.Trashed = true;
+                ContentService.Save(trashed, 0);
+
+                //Create and Save folder-Media -> 1057
+                var folderMediaType = MediaTypeService.Get(1031);
                 var folder = MockedMedia.CreateMediaFolder(folderMediaType, -1);
-                ServiceContext.MediaService.Save(folder, 0);
+                MediaService.Save(folder, 0);
                 folderId = folder.Id;
 
-                //Create and Save image-Media -> 1051
-                var imageMediaType = ServiceContext.MediaTypeService.Get(1032);
+                //Create and Save image-Media -> 1058
+                var imageMediaType = MediaTypeService.Get(1032);
                 var image = MockedMedia.CreateMediaImage(imageMediaType, folder.Id);
-                ServiceContext.MediaService.Save(image, 0);
+                MediaService.Save(image, 0);
 
-                //Create and Save file-Media -> 1052
-                var fileMediaType = ServiceContext.MediaTypeService.Get(1033);
+                //Create and Save file-Media -> 1059
+                var fileMediaType = MediaTypeService.Get(1033);
                 var file = MockedMedia.CreateMediaFile(fileMediaType, folder.Id);
-                ServiceContext.MediaService.Save(file, 0);
+                MediaService.Save(file, 0);
 
+                // Create and save sub folder -> 1060
                 var subfolder = MockedMedia.CreateMediaFolder(folderMediaType, folder.Id);
-                ServiceContext.MediaService.Save(subfolder, 0);
+                MediaService.Save(subfolder, 0);
+                // Create and save sub folder -> 1061
                 var subfolder2 = MockedMedia.CreateMediaFolder(folderMediaType, subfolder.Id);
-                ServiceContext.MediaService.Save(subfolder2, 0);
+                MediaService.Save(subfolder2, 0);
             }
         }
     }
