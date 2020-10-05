@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-
-using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Scoping;
+using Umbraco.Core.Services;
+using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Services
@@ -17,13 +18,22 @@ namespace Umbraco.Tests.Services
     [TestFixture]
     [Apartment(ApartmentState.STA)]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-    public class MacroServiceTests : TestWithSomeContentBase
+    public class MacroServiceTests : UmbracoIntegrationTest
     {
-        public override void CreateTestData()
-        {
-            base.CreateTestData();
+        private IMacroService MacroService => GetRequiredService<IMacroService>();
 
-            var provider = TestObjects.GetScopeProvider(Logger);
+        public override Task Setup()
+        {
+            var setup = base.Setup();
+            CreateTestData();
+            return setup;
+        }
+
+        public void CreateTestData()
+        {
+            // base.CreateTestData();
+
+            var provider = ScopeProvider;
             using (var scope = provider.CreateScope())
             {
                 var repository = new MacroRepository((IScopeAccessor) provider, AppCaches.Disabled, Mock.Of<ILogger>(), ShortStringHelper);
@@ -45,7 +55,7 @@ namespace Umbraco.Tests.Services
         public void Can_Get_By_Alias()
         {
             // Arrange
-            var macroService = ServiceContext.MacroService;
+            var macroService = MacroService;
 
             // Act
             var macro = macroService.GetByAlias("test1");
@@ -59,7 +69,7 @@ namespace Umbraco.Tests.Services
         public void Can_Get_All()
         {
             // Arrange
-            var macroService = ServiceContext.MacroService;
+            var macroService = MacroService;
 
             // Act
             var result = macroService.GetAll();
@@ -72,7 +82,7 @@ namespace Umbraco.Tests.Services
         public void Can_Create()
         {
             // Arrange
-            var macroService = ServiceContext.MacroService;
+            var macroService = MacroService;
 
             // Act
             var macro = new Macro(ShortStringHelper, "test", "Test", "~/Views/MacroPartials/Test.cshtml", cacheDuration: 1234);
@@ -99,7 +109,7 @@ namespace Umbraco.Tests.Services
         public void Can_Delete()
         {
             // Arrange
-            var macroService = ServiceContext.MacroService;
+            var macroService = MacroService;
             var macro = new Macro(ShortStringHelper, "test", "Test", "~/Views/MacroPartials/Test.cshtml", cacheDuration: 1234);
             macroService.Save(macro);
 
@@ -118,7 +128,7 @@ namespace Umbraco.Tests.Services
         public void Can_Update()
         {
             // Arrange
-            var macroService = ServiceContext.MacroService;
+            var macroService = MacroService;
             IMacro macro = new Macro(ShortStringHelper, "test", "Test", "~/Views/MacroPartials/Test.cshtml", cacheDuration: 1234);
             macroService.Save(macro);
 
@@ -142,7 +152,7 @@ namespace Umbraco.Tests.Services
         public void Can_Update_Property()
         {
             // Arrange
-            var macroService = ServiceContext.MacroService;
+            var macroService = MacroService;
             IMacro macro = new Macro(ShortStringHelper, "test", "Test", "~/Views/MacroPartials/Test.cshtml", cacheDuration: 1234);
             macro.Properties.Add(new MacroProperty("blah", "Blah", 0, "blah"));
             macroService.Save(macro);
@@ -173,7 +183,7 @@ namespace Umbraco.Tests.Services
         public void Can_Update_Remove_Property()
         {
             // Arrange
-            var macroService = ServiceContext.MacroService;
+            var macroService = MacroService;
             IMacro macro = new Macro(ShortStringHelper, "test", "Test", "~/Views/MacroPartials/Test.cshtml", cacheDuration: 1234);
             macro.Properties.Add(new MacroProperty("blah1", "Blah1", 0, "blah1"));
             macro.Properties.Add(new MacroProperty("blah2", "Blah2", 1, "blah2"));
@@ -217,7 +227,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Can_Add_And_Remove_Properties()
         {
-            var macroService = ServiceContext.MacroService;
+            var macroService = MacroService;
             var macro = new Macro(ShortStringHelper, "test", "Test", "~/Views/MacroPartials/Test.cshtml", cacheDuration: 1234);
 
             //adds some properties
@@ -252,7 +262,7 @@ namespace Umbraco.Tests.Services
         public void Cannot_Save_Macro_With_Empty_Name()
         {
             // Arrange
-            var macroService = ServiceContext.MacroService;
+            var macroService = MacroService;
             var macro = new Macro(ShortStringHelper, "test", string.Empty, "~/Views/MacroPartials/Test.cshtml", cacheDuration: 1234);
 
             // Act & Assert
@@ -263,7 +273,7 @@ namespace Umbraco.Tests.Services
         //public void Can_Get_Many_By_Alias()
         //{
         //    // Arrange
-        //    var macroService = ServiceContext.MacroService;
+        //    var macroService = MacroService;
 
         //    // Act
         //    var result = macroService.GetAll("test1", "test2");

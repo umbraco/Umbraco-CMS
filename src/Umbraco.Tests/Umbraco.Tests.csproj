@@ -268,7 +268,6 @@
     <Compile Include="Packaging\PackageInstallationTest.cs" />
     <Compile Include="Services\PerformanceTests.cs" />
     <Compile Include="Services\RelationServiceTests.cs" />
-    <Compile Include="Services\MacroServiceTests.cs" />
     <Compile Include="Services\UserServiceTests.cs" />
     <Compile Include="Cache\PublishedCache\PublishedMediaCacheTests.cs" />
     <Compile Include="Migrations\AlterMigrationTests.cs" />
