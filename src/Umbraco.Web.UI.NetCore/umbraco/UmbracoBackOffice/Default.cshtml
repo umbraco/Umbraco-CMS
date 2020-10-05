@@ -95,6 +95,7 @@
     <umb-overlay ng-if="overlay.show"
                  model="overlay"
                  position="{{overlay.position}}"
+                 size="overlay.size"
                  view="overlay.view"
                  name="overlay.name"
                  parent-scope="overlay.parentScope">
@@ -102,8 +103,9 @@
 
     <umb-editors ng-show="infiniteMode"></umb-editors>
 
-    <umb-login ng-if="login.show"
-               on-login="hideLoginScreen()">
+    <umb-login
+        ng-if="login.show"
+        on-login="hideLoginScreen()">
     </umb-login>
 
     @await Html.BareMinimumServerVariablesScriptAsync(backOfficeServerVariables)
@@ -119,7 +121,6 @@
                 iconHelper.defineIcon("icon-check", '@Html.Raw(IconService.GetIcon("icon-check")?.SvgString)');
                 iconHelper.defineIcon("icon-delete", '@Html.Raw(IconService.GetIcon("icon-delete")?.SvgString)');
             }]);
-
             //required for the noscript trick
             document.getElementById("mainwrapper").style.display = "inherit";
         }

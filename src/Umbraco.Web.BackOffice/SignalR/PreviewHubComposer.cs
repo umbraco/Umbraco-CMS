@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNet.SignalR;
-using Umbraco.Core;
+﻿using Umbraco.Core;
 using Umbraco.Core.Composing;
+using Umbraco.Web.BackOffice.SignalR;
 
 namespace Umbraco.Web.SignalR
 {
@@ -10,8 +10,6 @@ namespace Umbraco.Web.SignalR
         public override void Compose(Composition composition)
         {
             base.Compose(composition);
-
-            composition.RegisterUnique(_ => GlobalHost.ConnectionManager.GetHubContext<PreviewHub, IPreviewHub>());
         }
     }
 }

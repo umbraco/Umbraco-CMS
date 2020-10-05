@@ -230,6 +230,8 @@ namespace Umbraco.Tests.Integration.Testing
                 CreateTestRuntime,
                 out _);
 
+            services.AddSignalR();
+
             services.AddUmbracoWebComponents();
             services.AddUmbracoRuntimeMinifier(Configuration);
             services.AddUmbracoBackOffice();

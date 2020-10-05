@@ -57,6 +57,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Routing
             Assert.AreEqual(1, endpoints.DataSources.Count);
             var route = endpoints.DataSources.First();
             Assert.AreEqual(4, route.Endpoints.Count);
+            
             AssertMinimalBackOfficeRoutes(route);
 
             var endpoint3 = (RouteEndpoint)route.Endpoints[2];

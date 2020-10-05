@@ -6,7 +6,7 @@
  * @description
  * The controller for the content type editor icon picker
  */
-function IconPickerController($scope, $http, $sce, localizationService, iconHelper) {
+function IconPickerController($scope, localizationService, iconHelper) {
 
     var vm = this;
 
@@ -42,19 +42,11 @@ function IconPickerController($scope, $http, $sce, localizationService, iconHelp
         vm.loading = true;
 
         setTitle();
-    
-        iconHelper.getAllIcons()
-            .then(icons => {
-                vm.icons = icons;
-                vm.loading = false;
 
-                iconHelper.getLegacyIcons()
-                    .then(icons => {
-                        if(icons && icons.length > 0) {
-                            vm.icons = icons.concat(vm.icons);
-                        }
-                    });
-            });
+        iconHelper.getIcons().then(function (icons) {
+            vm.icons = icons;
+            vm.loading = false;
+        });
 
         // set a default color if nothing is passed in
         vm.color = $scope.model.color ? findColor($scope.model.color) : vm.colors.find(x => x.default);
@@ -96,7 +88,7 @@ function IconPickerController($scope, $http, $sce, localizationService, iconHelp
     }
 
     function submit() {
-        if ($scope.model && $scope.model.submit) {            
+        if ($scope.model && $scope.model.submit) {
             $scope.model.submit($scope.model);
         }
     }
