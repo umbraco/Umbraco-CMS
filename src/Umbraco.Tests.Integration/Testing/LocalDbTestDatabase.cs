@@ -25,13 +25,7 @@ namespace Umbraco.Tests.Integration.Testing
         public const string InstanceName = "UmbracoTests";
         public const string DatabaseName = "UmbracoTests";
 
-        public bool HasSchema
-        {
-            get
-            {
-                return !(_schemaPool is null) && !_schemaPool.CanAttach;
-            }
-        }
+        public bool CanAttachSchema => _schemaPool is null || _schemaPool.CanAttach;
 
         private readonly ILogger _logger;
         private readonly LocalDb _localDb;

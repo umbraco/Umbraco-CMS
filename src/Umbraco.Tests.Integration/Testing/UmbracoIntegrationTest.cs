@@ -370,7 +370,7 @@ namespace Umbraco.Tests.Integration.Testing
                     // Probably because the DB is blocked because it hasn't been detached
                     // Also if we attach a new schema for every test isn't it just essentially
                     // the same as NewSchemaPerTest?
-                    if (!db.HasSchema)
+                    if (db.CanAttachSchema)
                     {
                         // New DB + Schema
                         var newSchemaFixtureDbId = db.AttachSchema();
