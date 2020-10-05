@@ -66,7 +66,7 @@ namespace Umbraco.Web.Common.Security
         /// <inheritdoc />
         public Attempt<int> GetUserId()
         {
-            var identity = _httpContextAccessor.GetRequiredHttpContext().GetCurrentIdentity();
+            var identity = _httpContextAccessor.HttpContext?.GetCurrentIdentity();
             return identity == null ? Attempt.Fail<int>() : Attempt.Succeed(identity.Id);
         }
 

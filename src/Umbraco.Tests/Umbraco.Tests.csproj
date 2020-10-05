@@ -230,7 +230,6 @@
     <Compile Include="Routing\RoutesCacheTests.cs" />
     <Compile Include="Routing\UrlRoutingTestBase.cs" />
     <Compile Include="Services\ContentTypeServiceExtensionsTests.cs" />
-    <Compile Include="Services\PublicAccessServiceTests.cs" />
     <Compile Include="Web\Mvc\RenderNoContentControllerTests.cs" />
     <Compile Include="Web\Mvc\ValidateUmbracoFormRouteStringAttributeTests.cs" />
     <Compile Include="Web\PublishedContentQueryTests.cs" />
@@ -268,17 +267,13 @@
     <Compile Include="Scheduling\BackgroundTaskRunnerTests.cs" />
     <Compile Include="Services\FileServiceTests.cs" />
     <Compile Include="Services\LocalizedTextServiceTests.cs" />
-    <Compile Include="Services\TagServiceTests.cs" />
-    <Compile Include="Services\LocalizationServiceTests.cs" />
     <Compile Include="Services\MemberServiceTests.cs" />
-    <Compile Include="Services\MediaServiceTests.cs" />
     <Compile Include="Services\MemberTypeServiceTests.cs" />
     <Compile Include="Packaging\PackageInstallationTest.cs" />
     <Compile Include="Services\PackagingServiceTests.cs" />
     <Compile Include="Services\PerformanceTests.cs" />
     <Compile Include="Services\RelationServiceTests.cs" />
     <Compile Include="Services\MacroServiceTests.cs" />
-    <Compile Include="Services\UserServiceTests.cs" />
     <Compile Include="Cache\PublishedCache\PublishedMediaCacheTests.cs" />
     <Compile Include="Migrations\AlterMigrationTests.cs" />
     <Compile Include="Migrations\SqlScripts\SqlResources.Designer.cs">

@@ -20,7 +20,15 @@ namespace Umbraco.Core.Scoping
         /// <param name="name">The name with which to associate the new item in the call context.</param>
         /// <param name="data">The object to store in the call context.</param>
         public static void SetData(string name, T data) => _state.GetOrAdd(name, _ => new AsyncLocal<T>()).Value = data;
-
+       
+        //Replace the SetData with the following when you need to debug AsyncLocal. The args.ThreadContextChanged can be usefull
+        //public static void SetData(string name, T data) => _state.GetOrAdd(name, _ => new AsyncLocal<T>(OnValueChanged)).Value = data;
+        // public static void OnValueChanged(AsyncLocalValueChangedArgs<T> args)
+        // {
+        //     var typeName = typeof(T).ToString();
+        //     Console.WriteLine($"OnValueChanged!, Type: {typeName} Prev: #{args.PreviousValue} Current: #{args.CurrentValue}");
+        // }
+        
         /// <summary>
         /// Retrieves an object with the specified name from the <see cref="CallContext{T}"/>.
         /// </summary>
