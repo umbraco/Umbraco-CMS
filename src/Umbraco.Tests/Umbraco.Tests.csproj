@@ -266,7 +266,6 @@
     <Compile Include="Services\MediaServiceTests.cs" />
     <Compile Include="Services\MemberTypeServiceTests.cs" />
     <Compile Include="Packaging\PackageInstallationTest.cs" />
-    <Compile Include="Services\PackagingServiceTests.cs" />
     <Compile Include="Services\PerformanceTests.cs" />
     <Compile Include="Services\RelationServiceTests.cs" />
     <Compile Include="Services\MacroServiceTests.cs" />
