@@ -199,6 +199,7 @@ Use this directive to construct a header inside the main editor window.
 @param {boolean=} aliasLocked Set to <code>true</code> to lock the alias.
 @param {boolean=} hideAlias Set to <code>true</code> to hide alias.
 @param {string=} description Add a description to the content.
+@param {boolean=} descriptionLocked Set to <code>true</code> to lock the description.
 @param {boolean=} hideDescription Set to <code>true</code> to hide description.
 @param {boolean=} setpagetitle If true the page title will be set to reflect the type of data the header is working with
 @param {string=} editorfor The localization to use to aid accessibility on the edit and create screen

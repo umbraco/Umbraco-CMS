@@ -6,7 +6,15 @@
 
             vm.submit = submit;
             vm.close = close;
-            vm.cropSet = cropSet;
+            vm.hasCrops = cropSet() === true;
+
+            vm.disableFocalPoint = false;
+            if(typeof $scope.model.disableFocalPoint === "boolean") {
+                vm.disableFocalPoint = $scope.model.disableFocalPoint
+            }
+            else {
+                vm.disableFocalPoint = ($scope.model.disableFocalPoint !== undefined && $scope.model.disableFocalPoint !== "0") ? true : false;
+            }
 
             if (!$scope.model.target.coordinates && !$scope.model.target.focalPoint) {
                 $scope.model.target.focalPoint = { left: .5, top: .5 };
@@ -59,6 +67,6 @@
 
             function cropSet() {
                 var model = $scope.model;
-                return (model.cropSize || {}).width && model.target.thumbnail;
+                return (model.cropSize || {}).width !== undefined && (model.cropSize || {}).height !== undefined;
             }
         });

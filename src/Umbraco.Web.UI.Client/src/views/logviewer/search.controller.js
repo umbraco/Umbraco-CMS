@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function LogViewerSearchController($location, logViewerResource, overlayService, localizationService) {
+    function LogViewerSearchController($location, $timeout, logViewerResource, overlayService, localizationService) {
 
         var vm = this;
 
@@ -39,6 +39,83 @@
                 logTypeColor: 'dark'
             }
         ];
+
+        vm.polling = {
+            enabled: false,
+            interval: 0,
+            promise: null,
+            
+            defaultButton: {
+                labelKey: "logViewer_polling",
+                handler: function() {
+                    if (vm.polling.enabled) {
+                        vm.polling.enabled = false;
+                        vm.polling.interval = 0;
+                        vm.polling.defaultButton.icon = null;
+                        vm.polling.defaultButton.labelKey = "logViewer_polling";
+                    }
+                    else {
+                        vm.polling.subButtons[0].handler();
+                    }
+                }
+            },
+            subButtons: [
+                {
+                    labelKey: "logViewer_every2",
+                    handler: function() {
+                        enablePolling(2);
+                    }
+                },
+                {
+                    labelKey: "logViewer_every5",
+                    handler: function() {
+                        enablePolling(5);
+                    }
+                },
+                {
+                    labelKey: "logViewer_every10",
+                    handler: function() {
+                        enablePolling(10);
+                    }
+                },
+                {
+                    labelKey: "logViewer_every20",
+                    handler: function() {
+                        enablePolling(20);
+                    }
+                },
+                {
+                    labelKey: "logViewer_every30",
+                    handler: function() {
+                        enablePolling(30);
+                    }
+                }
+            ]
+
+        }
+
+        function enablePolling(interval) {
+            vm.polling.enabled = true;
+            vm.polling.interval = interval;
+            vm.polling.defaultButton.icon = "icon-axis-rotation fa-spin";
+            vm.polling.defaultButton.labelKey = "logViewer_pollingEvery" + interval;
+
+            if (vm.polling.promise)
+            {
+                $timeout.cancel(vm.polling.promise);
+            }
+            vm.polling.promise = poll(interval);
+        }
+
+        function poll(interval) {
+            vm.polling.promise = $timeout(function() {
+                getLogs(true, true);
+                if (vm.polling.enabled && vm.polling.interval > 0) {
+                    poll(vm.polling.interval);
+                }
+            }, interval*1000);
+        }
+
 
         vm.searches = [];
 
@@ -161,10 +238,17 @@
             getLogs();
         }
 
-        function getLogs(){
-            vm.logsLoading = true;
+        function getLogs(hideLoadingIndicator, keepOpenItems){
+            vm.logsLoading = !hideLoadingIndicator;
 
             logViewerResource.getLogs(vm.logOptions).then(function (data) {
+                if (keepOpenItems) {
+                    var openItemTimestamps = vm.logItems.items.filter(item => item.open).map(item => item.Timestamp);
+                    data.items = data.items.map(item => {
+                        item.open = openItemTimestamps.indexOf(item.Timestamp) > -1;
+                        return item;
+                    });
+                }
                 vm.logItems = data;
                 vm.logsLoading = false;
 
