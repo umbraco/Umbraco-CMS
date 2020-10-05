@@ -1,12 +1,9 @@
-﻿using NUnit.Framework;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading;
-using Umbraco.Core;
-using Umbraco.Core.Composing;
+using NUnit.Framework;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
-using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.Services;
@@ -21,8 +18,8 @@ namespace Umbraco.Tests.Services
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class SectionServiceTests : UmbracoIntegrationTest
     {
-        private ISectionService SectionService => GetRequiredService<ISectionService>();
-        private IUserService UserService => GetRequiredService<IUserService>();
+        private ISectionService _sectionService => GetRequiredService<ISectionService>();
+        private IUserService _userService => GetRequiredService<IUserService>();
 
         [Test]
         public void SectionService_Can_Get_Allowed_Sections_For_User()
@@ -31,7 +28,7 @@ namespace Umbraco.Tests.Services
             var user = CreateTestUser();
 
             // Act
-            var result = SectionService.GetAllowedSections(user.Id).ToList();
+            var result = _sectionService.GetAllowedSections(user.Id).ToList();
 
             // Assert
             Assert.AreEqual(3, result.Count);
@@ -46,7 +43,7 @@ namespace Umbraco.Tests.Services
                 Username = "testUser",
                 Email = "testuser@test.com",
             };
-            UserService.Save(user, false);
+            _userService.Save(user, false);
 
             var userGroupA = new UserGroup(ShortStringHelper)
             {
@@ -56,7 +53,7 @@ namespace Umbraco.Tests.Services
             userGroupA.AddAllowedSection("media");
             userGroupA.AddAllowedSection("settings");
             // TODO: This is failing the test
-            UserService.Save(userGroupA, new[] { user.Id }, false);
+            _userService.Save(userGroupA, new[] { user.Id }, false);
 
             var userGroupB = new UserGroup(ShortStringHelper)
             {
@@ -65,9 +62,9 @@ namespace Umbraco.Tests.Services
             };
             userGroupB.AddAllowedSection("settings");
             userGroupB.AddAllowedSection("member");
-            UserService.Save(userGroupB, new[] { user.Id }, false);
+            _userService.Save(userGroupB, new[] { user.Id }, false);
 
-            return UserService.GetUserById(user.Id);
+            return _userService.GetUserById(user.Id);
         }
     }
 }

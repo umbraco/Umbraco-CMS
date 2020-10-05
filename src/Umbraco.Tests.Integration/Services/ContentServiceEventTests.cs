@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
@@ -7,7 +8,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
-using Umbraco.Tests.Common.Builders;
+using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
 
@@ -18,13 +19,18 @@ namespace Umbraco.Tests.Services
         PublishedRepositoryEvents = true,
         WithApplication = true,
         Logger = UmbracoTestOptions.Logger.Console)]
-    public class ContentServiceEventTests : TestWithSomeContentBase
+    public class ContentServiceEventTests : UmbracoIntegrationTest
     {
+        private IContentTypeService _contentTypeService => GetRequiredService<IContentTypeService>();
+        private IContentService _contentService => GetRequiredService<IContentService>();
+        private ILocalizationService _localizationService => GetRequiredService<ILocalizationService>();
+        private IFileService _fileService => GetRequiredService<IFileService>();
+
         private GlobalSettings _globalSettings;
 
-        public override void SetUp()
+        public override async Task Setup()
         {
-            base.SetUp();
+            await base.Setup();
             ContentRepositoryBase.ThrowOnWarning = true;
             _globalSettings = new GlobalSettings();
         }
@@ -38,28 +44,22 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Saving_Culture()
         {
-            var languageService = ServiceContext.LocalizationService;
-
-            languageService.Save(new Language(_globalSettings, "fr-FR"));
-
-            var contentTypeService = ServiceContext.ContentTypeService;
+            _localizationService.Save(new Language(_globalSettings, "fr-FR"));
 
             var contentType = MockedContentTypes.CreateTextPageContentType();
-            ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate);
+            _fileService.SaveTemplate(contentType.DefaultTemplate);
             contentType.Variations = ContentVariation.Culture;
             foreach (var propertyType in contentType.PropertyTypes)
                 propertyType.Variations = ContentVariation.Culture;
-            contentTypeService.Save(contentType);
-
-            var contentService = ServiceContext.ContentService;
+            _contentTypeService.Save(contentType);
 
             IContent document = new Content("content", -1, contentType);
             document.SetCultureName("hello", "en-US");
             document.SetCultureName("bonjour", "fr-FR");
-            contentService.Save(document);
+            _contentService.Save(document);
 
             //re-get - dirty properties need resetting
-            document = contentService.GetById(document.Id);
+            document = _contentService.GetById(document.Id);
 
             // properties: title, bodyText, keywords, description
             document.SetValue("title", "title-en", "en-US");
@@ -88,7 +88,7 @@ namespace Umbraco.Tests.Services
             ContentService.Saved += OnSaved;
             try
             {
-                contentService.Save(document);
+                _contentService.Save(document);
             }
             finally
             {
@@ -100,13 +100,9 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Saving_Set_Value()
         {
-            var contentTypeService = ServiceContext.ContentTypeService;
-
             var contentType = MockedContentTypes.CreateTextPageContentType();
-            ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate);
-            contentTypeService.Save(contentType);
-
-            var contentService = ServiceContext.ContentService;
+            _fileService.SaveTemplate(contentType.DefaultTemplate);
+            _contentTypeService.Save(contentType);
 
             IContent document = new Content("content", -1, contentType);
 
@@ -136,44 +132,37 @@ namespace Umbraco.Tests.Services
             ContentService.Saved += OnSaved;
             try
             {
-                contentService.Save(document);
+                _contentService.Save(document);
             }
             finally
             {
                 ContentService.Saving -= OnSaving;
                 ContentService.Saved -= OnSaved;
             }
-
         }
 
         [Test]
         public void Publishing_Culture()
         {
-            var languageService = ServiceContext.LocalizationService;
-
-            languageService.Save(new Language(_globalSettings, "fr-FR"));
-
-            var contentTypeService = ServiceContext.ContentTypeService;
+            _localizationService.Save(new Language(_globalSettings, "fr-FR"));
 
             var contentType = MockedContentTypes.CreateTextPageContentType();
-            ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate);
+            _fileService.SaveTemplate(contentType.DefaultTemplate);
             contentType.Variations = ContentVariation.Culture;
             foreach (var propertyType in contentType.PropertyTypes)
                 propertyType.Variations = ContentVariation.Culture;
-            contentTypeService.Save(contentType);
-
-            var contentService = ServiceContext.ContentService;
+            _contentTypeService.Save(contentType);
 
             IContent document = new Content("content", -1, contentType);
             document.SetCultureName("hello", "en-US");
             document.SetCultureName("bonjour", "fr-FR");
-            contentService.Save(document);
+            _contentService.Save(document);
 
             Assert.IsFalse(document.IsCulturePublished("fr-FR"));
             Assert.IsFalse(document.IsCulturePublished("en-US"));
 
             //re-get - dirty properties need resetting
-            document = contentService.GetById(document.Id);
+            document = _contentService.GetById(document.Id);
 
             void OnPublishing(IContentService sender, ContentPublishingEventArgs e)
             {
@@ -199,7 +188,7 @@ namespace Umbraco.Tests.Services
             ContentService.Published += OnPublished;
             try
             {
-                contentService.SaveAndPublish(document, "fr-FR");
+                _contentService.SaveAndPublish(document, "fr-FR");
             }
             finally
             {
@@ -207,7 +196,7 @@ namespace Umbraco.Tests.Services
                 ContentService.Published -= OnPublished;
             }
 
-            document = contentService.GetById(document.Id);
+            document = _contentService.GetById(document.Id);
 
             // ensure it works and does not throw
             Assert.IsTrue(document.IsCulturePublished("fr-FR"));
@@ -217,13 +206,9 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Publishing_Set_Value()
         {
-            var contentTypeService = ServiceContext.ContentTypeService;
-
             var contentType = MockedContentTypes.CreateTextPageContentType();
-            ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate);
-            contentTypeService.Save(contentType);
-
-            var contentService = ServiceContext.ContentService;
+            _fileService.SaveTemplate(contentType.DefaultTemplate);
+            _contentTypeService.Save(contentType);
 
             IContent document = new Content("content", -1, contentType);
 
@@ -242,21 +227,21 @@ namespace Umbraco.Tests.Services
 
                 Assert.AreSame("title", document.GetValue<string>("title"));
 
-                //we're only dealing with invariant here
+                // We're only dealing with invariant here.
                 var propValue = saved.Properties["title"].Values.First(x => x.Culture == null && x.Segment == null);
 
                 Assert.AreEqual("title", propValue.EditedValue);
                 Assert.AreEqual("title", propValue.PublishedValue);
             }
 
-            //We are binding to Saving (not Publishing), because the Publishing event is really just used for cancelling, it should not be
-            //used for setting values and it won't actually work! This is because the Publishing event is raised AFTER the values on the model
-            //are published, but Saving is raised BEFORE.
+            // We are binding to Saving (not Publishing), because the Publishing event is really just used for cancelling, it should not be
+            // used for setting values and it won't actually work! This is because the Publishing event is raised AFTER the values on the model
+            // are published, but Saving is raised BEFORE.
             ContentService.Saving += OnSaving;
             ContentService.Saved += OnSaved;
             try
             {
-                contentService.SaveAndPublish(document);
+                _contentService.SaveAndPublish(document);
             }
             finally
             {
@@ -268,19 +253,15 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Publishing_Set_Mandatory_Value()
         {
-            var contentTypeService = ServiceContext.ContentTypeService;
-
             var contentType = MockedContentTypes.CreateTextPageContentType();
             var titleProperty = contentType.PropertyTypes.First(x => x.Alias == "title");
             titleProperty.Mandatory = true; // make this required!
-            ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate);
-            contentTypeService.Save(contentType);
-
-            var contentService = ServiceContext.ContentService;
+            _fileService.SaveTemplate(contentType.DefaultTemplate);
+            _contentTypeService.Save(contentType);
 
             IContent document = new Content("content", -1, contentType);
 
-            var result = contentService.SaveAndPublish(document);
+            var result = _contentService.SaveAndPublish(document);
             Assert.IsFalse(result.Success);
             Assert.AreEqual("title", result.InvalidProperties.First().Alias);
 
@@ -297,13 +278,13 @@ namespace Umbraco.Tests.Services
                 saved.SetValue("title", "title");
             }
 
-            //We are binding to Saving (not Publishing), because the Publishing event is really just used for cancelling, it should not be
-            //used for setting values and it won't actually work! This is because the Publishing event is raised AFTER the values on the model
-            //are published, but Saving is raised BEFORE.
+            // We are binding to Saving (not Publishing), because the Publishing event is really just used for cancelling, it should not be
+            // used for setting values and it won't actually work! This is because the Publishing event is raised AFTER the values on the model
+            // are published, but Saving is raised BEFORE.
             ContentService.Saving += OnSaving;
             try
             {
-                result = contentService.SaveAndPublish(document);
+                result = _contentService.SaveAndPublish(document);
                 Assert.IsTrue(result.Success); //will succeed now because we were able to specify the required value in the Saving event
             }
             finally
@@ -315,20 +296,16 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Unpublishing_Culture()
         {
-            var languageService = ServiceContext.LocalizationService;
-
-            languageService.Save(new Language(_globalSettings, "fr-FR"));
-
-            var contentTypeService = ServiceContext.ContentTypeService;
+            _localizationService.Save(new Language(_globalSettings, "fr-FR"));
 
             var contentType = MockedContentTypes.CreateTextPageContentType();
-            ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate);
+            _fileService.SaveTemplate(contentType.DefaultTemplate);
             contentType.Variations = ContentVariation.Culture;
             foreach (var propertyType in contentType.PropertyTypes)
                 propertyType.Variations = ContentVariation.Culture;
-            contentTypeService.Save(contentType);
+            _contentTypeService.Save(contentType);
 
-            var contentService = (ContentService)ServiceContext.ContentService;
+            var contentService = (ContentService)_contentService;
 
             IContent document = new Content("content", -1, contentType);
             document.SetCultureName("hello", "en-US");
