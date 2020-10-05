@@ -320,14 +320,9 @@
                     return;
                 }
 
-                // find the urls for the currently selected language
-                if (scope.node.variants.length > 1) {
-                    // nodes with variants
-                    scope.currentUrls = _.filter(scope.node.urls, (url) => (scope.currentVariant.language && scope.currentVariant.language.culture === url.culture));
-                } else {
-                    // invariant nodes
-                    scope.currentUrls = scope.node.urls;
-                }
+                // find the urls for the currently selected language.
+                // when there is no selected language (allow vary by culture == false), show all urls of the node.
+                scope.currentUrls = _.filter(scope.node.urls, (url) => (scope.currentVariant.language == null || scope.currentVariant.language.culture === url.culture));
 
                 // figure out if multiple cultures apply across the content urls
                 scope.currentUrlsHaveMultipleCultures = _.keys(_.groupBy(scope.currentUrls, url => url.culture)).length > 1;
