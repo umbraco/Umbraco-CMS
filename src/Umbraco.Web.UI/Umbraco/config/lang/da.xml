@@ -245,8 +245,8 @@
     <key alias="parentNotPublished">Dette dokument er udgivet, men ikke synligt da den overliggende side '%0%' ikke er udgivet!</key>
     <key alias="parentCultureNotPublished">Dette sprog er udgivet, men ikke synligt, da den overliggende side '%0%' ikke er udgivet!</key>
     <key alias="parentNotPublishedAnomaly">Ups: dette dokument er udgivet, men er ikke i cachen (intern fejl)</key>
-    <key alias="getUrlException">Kunne ikke hente url'en</key>
-    <key alias="routeError">Dette dokument er udgivet, men dets url ville kollidere med indholdet %0%</key>
+    <key alias="getUrlException">Kunne ikke hente URL'en</key>
+    <key alias="routeError">Dette dokument er udgivet, men dets URL ville kollidere med indholdet %0%</key>
     <key alias="routeErrorCannotRoute">Dette dokument er udgivet, men dets URL kan ikke dirigeres</key>
     <key alias="publish">Udgiv</key>
     <key alias="published">Udgivet</key>
@@ -440,7 +440,7 @@
     <key alias="recycleBinIsEmpty">Papirkurven er nu tom</key>
     <key alias="recycleBinWarning">Når elementer slettes fra papirkurven, slettes de for altid</key>
     <key alias="regexSearchError"><![CDATA[<a target='_blank' href='http://regexlib.com'>regexlib.com</a>'s webservice oplever i øjeblikket problemer, vi ikke har kontrol over. Beklager ulejligheden. ]]></key>
-    <key alias="regexSearchHelp">Søg efter et regulært udtryk for at tilføje validering til et formularfelt. Eksempel: 'e-mail', 'postnr.', 'url'</key>
+    <key alias="regexSearchHelp">Søg efter et regulært udtryk for at tilføje validering til et formularfelt. Eksempel: 'e-mail', 'postnr.', 'URL'</key>
     <key alias="removeMacro">Fjern makro</key>
     <key alias="requiredField">Obligatorisk</key>
     <key alias="sitereindexed">Sitet er genindekseret</key>
@@ -741,7 +741,7 @@
     <key alias="update">Opdatér</key>
     <key alias="upgrade">Opdatér</key>
     <key alias="upload">Upload</key>
-    <key alias="url">Url</key>
+    <key alias="url">URL</key>
     <key alias="user">Bruger</key>
     <key alias="username">Brugernavn</key>
     <key alias="value">Værdi</key>
@@ -1497,7 +1497,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="standardFields">Standard felter</key>
     <key alias="uppercase">Store bogstaver</key>
     <key alias="urlEncode">URL encode</key>
-    <key alias="urlEncodeHelp">Hvis indholdet af felterne skal sendes til en url, skal denne slåes til så specialtegn formateres</key>
+    <key alias="urlEncodeHelp">Hvis indholdet af felterne skal sendes til en URL, skal denne slåes til så specialtegn formateres</key>
     <key alias="usedIfAllEmpty">Denne tekst bruges hvis ovenstående felter er tomme</key>
     <key alias="usedIfEmpty">Dette felt vil blive brugt hvis ovenstående felt er tomt</key>
     <key alias="withTime">Ja, med klokkeslæt. Dato/tid separator: </key>
@@ -1674,7 +1674,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="validation">Validering</key>
     <key alias="validateAsEmail">Valider som e-mail</key>
     <key alias="validateAsNumber">Valider som tal</key>
-    <key alias="validateAsUrl">Valider som Url</key>
+    <key alias="validateAsUrl">Valider som URL</key>
     <key alias="enterCustomValidation">...eller indtast din egen validering</key>
     <key alias="fieldIsMandatory">Feltet er påkrævet</key>
     <key alias="validationRegExp">Indtast et regulært udtryk</key>
