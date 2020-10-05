@@ -19,25 +19,23 @@
                                   name="publishVariantSelector"
                                   model="variant.publish"
                                   on-change="vm.changeSelection(variant)"
-                                  server-validation-field="{{variant.htmlId}}"
-                    >
-                        <span class="umb-variant-selector-entry__title" ng-if="!(variant.segment && variant.language)">
-                            <span ng-bind="variant.displayName"></span>
-                            <strong ng-if="variant.isMandatory" class="umb-control-required">*</strong>
-                        </span>
-                        <span class="umb-variant-selector-entry__title" ng-if="variant.segment && variant.language">
-                            <span ng-bind="variant.segment"></span>
-                            <span class="__secondarytitle"> — {{variant.language.name}}</span>
-                            <strong ng-if="variant.isMandatory" class="umb-control-required">*</strong>
+                                  server-validation-field="{{variant.htmlId}}">
+
+                        <span class="umb-variant-selector-entry__title">
+                            <span ng-bind="variant.displayName" ng-if="!(variant.segment && variant.language)"></span>
+                            <span ng-bind="variant.segment" ng-if="variant.segment && variant.language"></span>
+                            <span class="__secondarytitle" ng-if="variant.segment && variant.language"> — {{variant.language.name}}</span>
+                            <strong ng-if="variant.isMandatory && variant.state !== 'Published' && variant.state !== 'PublishedPendingChanges'" class="umb-control-required">*</strong>
                         </span>
                         <span class="umb-variant-selector-entry__description" ng-if="!publishVariantSelectorForm.publishVariantSelector.$invalid && !(variant.notifications && variant.notifications.length > 0)">
                             <umb-variant-state variant="variant"></umb-variant-state>
                             <span ng-if="variant.isMandatory"> - </span>
-                            <span ng-if="variant.isMandatory" ng-class="{'text-error': (variant.publish === false) }"><localize key="languages_mandatoryLanguage"></localize></span>
+                            <span ng-if="variant.isMandatory" ng-class="{'text-error': (variant.state !== 'Published' && variant.state !== 'PublishedPendingChanges' && variant.publish === false) }"><localize key="languages_mandatoryLanguage"></localize></span>
                         </span>
                         <span class="umb-variant-selector-entry__description" ng-messages="publishVariantSelectorForm.publishVariantSelector.$error" show-validation-on-submit>
                             <span class="text-error" ng-message="valServerField">{{publishVariantSelectorForm.publishVariantSelector.errorMsg}}</span>
                         </span>
+
                     </umb-checkbox>
 
                     <umb-variant-notification-list notifications="variant.notifications"></umb-variant-notification-list>

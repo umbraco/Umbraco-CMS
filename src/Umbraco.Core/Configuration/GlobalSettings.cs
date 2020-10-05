@@ -68,9 +68,9 @@ namespace Umbraco.Core.Configuration
         internal static bool? HasSmtpServer { get; set; }
 
         /// <summary>
-        /// Gets the reserved urls from web.config.
+        /// Gets the reserved URLs from web.config.
         /// </summary>
-        /// <value>The reserved urls.</value>
+        /// <value>The reserved URLs.</value>
         public string ReservedUrls
         {
             get
@@ -142,6 +142,20 @@ namespace Umbraco.Core.Configuration
                 return ConfigurationManager.AppSettings.ContainsKey(Constants.AppSettings.Path)
                     ? IOHelper.ResolveUrl(ConfigurationManager.AppSettings[Constants.AppSettings.Path])
                     : string.Empty;
+            }
+        }
+
+        /// <summary>
+        /// Gets the path to folder containing the icons used in the umbraco backoffice (/umbraco/assets/icons by default).
+        /// </summary>
+        /// <value>The icons path.</value>
+        public string IconsPath
+        {
+            get
+            {
+                return ConfigurationManager.AppSettings.ContainsKey(Constants.AppSettings.IconsPath)
+                    ? IOHelper.ResolveUrl(Constants.AppSettings.IconsPath)
+                    : $"{Path}/assets/icons";
             }
         }
 
@@ -340,10 +354,10 @@ namespace Umbraco.Core.Configuration
         }
 
         /// <summary>
-        /// Gets a value indicating whether umbraco should hide top level nodes from generated urls.
+        /// Gets a value indicating whether umbraco should hide top level nodes from generated URLs.
         /// </summary>
         /// <value>
-        ///     <c>true</c> if umbraco hides top level nodes from urls; otherwise, <c>false</c>.
+        ///     <c>true</c> if umbraco hides top level nodes from URLs; otherwise, <c>false</c>.
         /// </value>
         public bool HideTopLevelNodeFromPath
         {

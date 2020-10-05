@@ -24,7 +24,7 @@ namespace Umbraco.Tests.Routing
         [TestCase("/home/sub1", -1)] // should fail
 
         // these two are special. getNiceUrl(1046) returns "/" but getNiceUrl(1172) cannot also return "/" so
-        // we've made it return "/test-page" => we have to support that url back in the lookup...
+        // we've made it return "/test-page" => we have to support that URL back in the lookup...
         [TestCase("/home", 1046)]
         [TestCase("/test-page", 1172)]
         public void Match_Document_By_Url_Hide_Top_Level(string urlString, int expectedId)

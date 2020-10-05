@@ -138,7 +138,9 @@
 // additional targetting of the ng-invalid class.
 .formFieldState(@textColor: @gray-4, @borderColor: @gray-7, @backgroundColor: @gray-10) {
   // Set the text color
-  .control-label,
+  > .control-label,
+  > .umb-el-wrap > .control-label,
+  > .umb-el-wrap > .control-header > .control-label,
   .help-block,
   .help-inline {
     color: @textColor;
@@ -448,9 +450,11 @@
   }
 
   // in these cases the gradient won't cover the background, so we override
+  &:focus,
   &:hover {
     color: @textColorHover;
     background-color: @hoverColor;
+    text-decoration: none;
   }
 
   &.disabled, &[disabled] {

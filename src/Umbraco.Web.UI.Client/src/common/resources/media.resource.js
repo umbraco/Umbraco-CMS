@@ -226,9 +226,7 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
         getByIds: function (ids) {
 
             var idQuery = "";
-            _.each(ids, function (item) {
-                idQuery += "ids=" + item + "&";
-            });
+            ids.forEach(id => idQuery += `ids=${id}&`);
 
             return umbRequestHelper.resourcePromise(
                 $http.get(

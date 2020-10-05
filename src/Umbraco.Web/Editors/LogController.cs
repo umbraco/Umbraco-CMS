@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Web.Models.ContentEditing;
@@ -61,7 +62,14 @@ namespace Umbraco.Web.Editors
                 Items = MapAvatarsAndNames(mapped)
             };
         }
-        
+
+        public IEnumerable<AuditLog> GetLog(AuditType logType, DateTime? sinceDate = null)
+        {
+            var result = Services.AuditService.GetLogs(Enum<AuditType>.Parse(logType.ToString()), sinceDate);
+            var mapped = Mapper.MapEnumerable<IAuditItem, AuditLog>(result);
+            return mapped;
+        }
+
         private IEnumerable<AuditLog> MapAvatarsAndNames(IEnumerable<AuditLog> items)
         {
             var mappedItems = items.ToList();

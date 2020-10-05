@@ -9,7 +9,10 @@
 (function () {
     "use strict";
 
-    function DocumentTypesEditController($scope, $routeParams, contentTypeResource, dataTypeResource, editorState, contentEditingHelper, formHelper, navigationService, iconHelper, contentTypeHelper, notificationsService, $q, localizationService, overlayHelper, eventsService, angularHelper, editorService) {
+    function DocumentTypesEditController($scope, $routeParams, $q,
+        contentTypeResource, editorState, contentEditingHelper,
+        navigationService, iconHelper, contentTypeHelper, notificationsService,
+        localizationService, overlayHelper, eventsService, angularHelper, editorService) {
 
         var vm = this;
         var evts = [];
@@ -21,6 +24,7 @@
         var isElement = $routeParams.iselement;
         var allowVaryByCulture = $routeParams.culturevary;
         var infiniteMode = $scope.model && $scope.model.infiniteMode;
+        var documentTypeIcon = "";
 
         vm.save = save;
         vm.close = close;
@@ -38,7 +42,7 @@
         vm.page.loading = false;
         vm.page.saveButtonState = "init";
         vm.page.navigation = [];
-     
+
         var labelKeys = [
             "general_design",
             "general_listView",
@@ -91,33 +95,6 @@
             vm.labels.addChildNode = values[12];
             vm.labels.addTemplate = values[13];
             vm.labels.allowCultureVariants = values[14];
-
-            var buttons = [
-                {
-                    "name": vm.labels.design,
-                    "alias": "design",
-                    "icon": "icon-document-dashed-line",
-                    "view": "views/documenttypes/views/design/design.html"
-                },
-                {
-                    "name": vm.labels.listview,
-                    "alias": "listView",
-                    "icon": "icon-list",
-                    "view": "views/documenttypes/views/listview/listview.html"
-                },
-                {
-                    "name": vm.labels.permissions,
-                    "alias": "permissions",
-                    "icon": "icon-keychain",
-                    "view": "views/documenttypes/views/permissions/permissions.html"
-                },
-                {
-                    "name": vm.labels.templates,
-                    "alias": "templates",
-                    "icon": "icon-layout",
-                    "view": "views/documenttypes/views/templates/templates.html"
-                }
-            ];
 
             vm.page.keyboardShortcutsOverview = [
                 {
@@ -187,9 +164,6 @@
                     ]
                 }
             ];
-
-            loadButtons(buttons);
-
         });
 
         contentTypeHelper.checkModelsBuilderStatus().then(function (result) {
@@ -279,25 +253,25 @@
             contentTypeResource.getById(documentTypeId).then(function (dt) {
                 init(dt);
                 // we don't need to sync the tree in infinite mode
-                if(!infiniteMode) { 
+                if (!infiniteMode) {
                     syncTreeNode(vm.contentType, dt.path, true);
                 }
                 vm.page.loading = false;
             });
         }
 
-        function loadButtons(buttons) {
+        function loadButtons() {
+            vm.page.navigation = vm.contentType.apps;
 
-            angular.forEach(buttons,
-                function (val, index) {
+            if (disableTemplates === true) {
+                Utilities.forEach(vm.contentType.apps,
+                    (app, index) => {
+                        if (app.alias === "templates") {
+                            vm.page.navigation.splice(index, 1);
+                        }
+                    });
+            }
 
-                    if (disableTemplates === true && val.alias === "templates") {
-                        buttons.splice(index, 1);
-                    }
-
-                });
-
-            vm.page.navigation = buttons;
             initializeActiveNavigationPanel();
         }
 
@@ -307,16 +281,14 @@
             var initialViewSetFromRouteParams = false;
             var view = $routeParams.view;
             if (view) {
-                var viewPath = "views/documenttypes/views/" + view + "/" + view + ".html";
                 for (var i = 0; i < vm.page.navigation.length; i++) {
-                    if (vm.page.navigation[i].view === viewPath) {
+                    if (vm.page.navigation[i].alias.localeCompare(view, undefined, { sensitivity: 'accent' }) === 0) {
                         vm.page.navigation[i].active = true;
                         initialViewSetFromRouteParams = true;
                         break;
                     }
                 }
             }
-
             if (initialViewSetFromRouteParams === false) {
                 vm.page.navigation[0].active = true;
             }
@@ -379,7 +351,7 @@
                 }).then(function (data) {
                     //success
                     // we don't need to sync the tree in infinite mode
-                    if(!infiniteMode) {
+                    if (!infiniteMode) {
                         syncTreeNode(vm.contentType, data.path);
                     }
 
@@ -387,10 +359,15 @@
                     var args = { documentType: vm.contentType };
                     eventsService.emit("editors.documentType.saved", args);
                     
+                    if (documentTypeIcon !== vm.contentType.icon) {
+                        eventsService.emit("editors.tree.icon.changed", args);
+                    }
+
                     vm.page.saveButtonState = "success";
 
-                    if(infiniteMode && $scope.model.submit) {
+                    if (infiniteMode && $scope.model.submit) {
                         $scope.model.documentTypeAlias = vm.contentType.alias;
+                        $scope.model.documentTypeKey = vm.contentType.key;
                         $scope.model.submit($scope.model);
                     }
 
@@ -418,18 +395,6 @@
 
         function init(contentType) {
 
-            // set all tab to inactive
-            if (contentType.groups.length !== 0) {
-                angular.forEach(contentType.groups, function (group) {
-
-                    angular.forEach(group.properties, function (property) {
-                        // get data type details for each property
-                        getDataTypeDetails(property);
-                    });
-
-                });
-            }
-
             // insert template on new doc types
             if (!noTemplate && contentType.id === 0) {
                 contentType.defaultTemplate = contentTypeHelper.insertDefaultTemplatePlaceholder(contentType.defaultTemplate);
@@ -450,6 +415,10 @@
             editorState.set(contentType);
 
             vm.contentType = contentType;
+            
+            documentTypeIcon = contentType.icon;
+
+            loadButtons();
         }
 
         /** Syncs the template alias for new doc types before saving if a template is to be created */
@@ -461,7 +430,7 @@
                     contentType.defaultTemplate.alias = contentType.alias;
                 }
                 //sync allowed templates that had the placeholder flag
-                angular.forEach(contentType.allowedTemplates, function (allowedTemplate) {
+                contentType.allowedTemplates.forEach(function (allowedTemplate) {
                     if (allowedTemplate.placeholder) {
                         allowedTemplate.name = contentType.name;
                         allowedTemplate.alias = contentType.alias;
@@ -482,16 +451,6 @@
 
             // set icon back on contentType
             contentType.icon = contentTypeArray[0].icon;
-        }
-
-        function getDataTypeDetails(property) {
-            if (property.propertyState !== "init") {
-                dataTypeResource.getById(property.dataTypeId)
-                    .then(function (dataType) {
-                        property.dataTypeIcon = dataType.icon;
-                        property.dataTypeName = dataType.name;
-                    });
-            }
         }
 
         /** Syncs the content type  to it's tree node - this occurs on first load and after saving */
@@ -525,11 +484,10 @@
                     if (treeExists) {
                         navigationService.syncTree({ tree: "templates", path: [], forceReload: true })
                             .then(function (syncArgs) {
-                                navigationService.reloadNode(syncArgs.node)
-                            }
-                        );
+                                navigationService.reloadNode(syncArgs.node);
+                            });
                     }
-                }); 
+                });
             }
         }));
 

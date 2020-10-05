@@ -4,7 +4,6 @@
 @using Umbraco.Core.Composing
 @using Umbraco.Core.IO
 @using Umbraco.Web
-@using Umbraco.Core.Configuration
 
 @inherits WebViewPage<Umbraco.Web.Editors.BackOfficeModel>
 
@@ -73,14 +72,14 @@
 
             </div>
 
-            <umb-tour
-                ng-if="tour.show"
-                model="tour">
-            </umb-tour>
-
             <umb-notifications></umb-notifications>
 
         </div>
+
+        <umb-tour
+            ng-if="tour.show"
+            model="tour">
+        </umb-tour>
 
         <!-- help dialog controller by the help button - this also forces the backoffice UI to shift 400px  -->
         <umb-drawer data-element="drawer" ng-if="drawer.show" model="drawer.model" view="drawer.view"></umb-drawer>
@@ -99,7 +98,9 @@
     <umb-overlay ng-if="overlay.show"
                  model="overlay"
                  position="{{overlay.position}}"
+                 size="overlay.size"
                  view="overlay.view"
+                 name="overlay.name"
                  parent-scope="overlay.parentScope">
     </umb-overlay>
 
@@ -115,12 +116,19 @@
     <script>
 
         document.angularReady = function(app) {
-            @Html.AngularValueExternalLoginInfoScript(ViewData.GetExternalSignInError())
+            @Html.AngularValueExternalLoginInfoScript(ViewData.GetExternalSignInProviderErrors())
             @Html.AngularValueResetPasswordCodeInfoScript(ViewData["PasswordResetCode"])
             @Html.AngularValueTinyMceAssets()
 
+            app.run(["iconHelper", function (iconHelper) {
+                @* We inject icons to the icon helper(service), since icons can only be loaded if user is authorized. By injecting these to the service they will not be requested as they will become cached. *@
+                iconHelper.defineIcon("icon-check", '@Html.Raw(Model.IconCheckData)');
+                iconHelper.defineIcon("icon-delete", '@Html.Raw(Model.IconDeleteData)');
+            }]);
+
             //required for the noscript trick
             document.getElementById("mainwrapper").style.display = "inherit";
+
         }
     </script>
 

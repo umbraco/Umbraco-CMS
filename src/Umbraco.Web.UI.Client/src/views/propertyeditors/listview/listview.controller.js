@@ -1,4 +1,4 @@
-function listViewController($scope, $interpolate, $routeParams, $injector, $timeout, currentUserResource, notificationsService, iconHelper, editorState, localizationService, appState, $location, listViewHelper, navigationService, editorService, overlayService, languageResource, mediaHelper) {
+function listViewController($scope, $interpolate, $routeParams, $injector, $timeout, currentUserResource, notificationsService, iconHelper, editorState, localizationService, appState, $location, listViewHelper, navigationService, editorService, overlayService, languageResource, mediaHelper, eventsService) {
 
     //this is a quick check to see if we're in create mode, if so just exit - we cannot show children for content
     // that isn't created yet, if we continue this will use the parent id in the route params which isn't what
@@ -227,26 +227,21 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
         if (err.status && err.status >= 500) {
 
             // Open ysod overlay
-            $scope.ysodOverlay = {
-                view: "ysod",
-                error: err,
-                show: true
-            };
+            overlayService.ysod(err);
         }
 
         $timeout(function () {
             $scope.bulkStatus = "";
             $scope.actionInProgress = false;
-        },
-            500);
+        }, 500);
 
-        if (successMsgPromise) {
-            localizationService.localize("bulk_done")
-                .then(function (v) {
-                    successMsgPromise.then(function (successMsg) {
-                        notificationsService.success(v, successMsg);
-                    })
-                });
+        if (successMsgPromise)
+        {
+            localizationService.localize("bulk_done").then(function (v) {
+                successMsgPromise.then(function (successMsg) {
+                    notificationsService.success(v, successMsg);
+                })
+            });
         }
     }
 
@@ -271,7 +266,6 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
     with simple values */
 
     $scope.getContent = function (contentId) {
-
         $scope.reloadView($scope.contentId, true);
     }
 
@@ -326,8 +320,6 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
             }
         });
     };
-
-    
 
     $scope.makeSearch = function() {
         if ($scope.options.filter !== null && $scope.options.filter !== undefined) {
@@ -408,7 +400,6 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
             dialog.title = value;
             overlayService.open(dialog);
         });
-
     };
 
     function performDelete() {
@@ -704,8 +695,6 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
             // set what we've got on the result
             result[alias] = value;
         });
-
-
     }
 
     function isDate(val) {
@@ -837,6 +826,19 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
     $scope.createFromBlueprint = createFromBlueprint;
     $scope.toggleDropdown = toggleDropdown;
     $scope.leaveDropdown = leaveDropdown;
+
+    // if this listview has sort order in it, make sure it is updated when sorting is performed on the current content
+    if (_.find($scope.options.includeProperties, property => property.alias === "sortOrder")) {
+        var eventSubscription = eventsService.on("sortCompleted", function (e, args) {
+            if (parseInt(args.id) === parseInt($scope.contentId)) {
+                $scope.reloadView($scope.contentId);
+            }
+        });
+
+        $scope.$on('$destroy', function () {
+            eventsService.unsubscribe(eventSubscription);
+        });
+    }
 
     //GO!
     initView();

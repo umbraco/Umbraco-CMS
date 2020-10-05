@@ -2,21 +2,21 @@
 
     <div class="umbracoDialog umb-dialog-body with-footer" ng-cloak>
 
-        <div class="umb-pane" ng-if="!model.creatingFolder && !model.creatingDoctypeCollection">
+        <div class="umb-pane" ng-show="!model.creatingFolder && !model.creatingDoctypeCollection">
             <h5><localize key="create_createUnder">Create an item under</localize> {{currentNode.name}}</h5>
 
             <ul class="umb-actions umb-actions-child">
                 <li data-element="action-documentType" class="umb-action" ng-hide="model.disableTemplates">
-                    <button href="" ng-click="createDocType()" class="umb-action-link umb-outline btn-reset" umb-auto-focus>
-                        <i class="large icon icon-item-arrangement"></i>
+                    <button type="button" ng-click="createDocType()" class="umb-action-link umb-outline btn-reset" umb-auto-focus>
+                        <i class="large icon icon-item-arrangement" aria-hidden="true"></i>
                         <span class="menu-label">
                             <localize key="content_documentType">Document type</localize>
                         </span>
                     </button>
                 </li>
                 <li data-element="action-documentTypeWithoutTemplate" class="umb-action">
-                    <button href="" ng-click="createComponent()" class="umb-action-link umb-outline btn-reset">
-                        <i class="large icon icon-item-arrangement"></i>
+                    <button type="button" ng-click="createComponent()" class="umb-action-link umb-outline btn-reset">
+                        <i class="large icon icon-item-arrangement" aria-hidden="true"></i>
                         <span class="menu-label">
                             <localize ng-if="model.disableTemplates === false" key="create_documentTypeWithoutTemplate"></localize>
                             <localize ng-if="model.disableTemplates === true" key="content_documentType">Document type></localize>
@@ -24,8 +24,8 @@
                     </button>
                 </li>
                 <li data-element="action-documentTypeCollection" class="umb-action">
-                    <button href="" ng-click="showCreateDocTypeCollection()" class="umb-action-link umb-outline btn-reset">
-                        <i class="large icon icon-thumbnail-list"></i>
+                    <button type="button" ng-click="showCreateDocTypeCollection()" class="umb-action-link umb-outline btn-reset">
+                        <i class="large icon icon-thumbnail-list" aria-hidden="true"></i>
                         <span class="menu-label">
                             Document Type Collection...
                             <!--<localize key="content_documentType_collection">Document Type Collection</localize>-->
@@ -33,15 +33,15 @@
                     </button>
                 </li>
                 <li data-element="action-folder" ng-if="model.allowCreateFolder" class="umb-action">
-                    <button href="" ng-click="showCreateFolder()" class="umb-action-link umb-outline btn-reset">
-                        <i class="large icon icon-folder"></i>
+                    <button type="button" ng-click="showCreateFolder()" class="umb-action-link umb-outline btn-reset">
+                        <i class="large icon icon-folder" aria-hidden="true"></i>
                         <span class="menu-label"><localize key="general_folder"></localize>...</span>
                     </button>
                 </li>
             </ul>
         </div>
 
-        <div class="umb-pane" ng-if="model.creatingFolder">
+        <div class="umb-pane" ng-show="model.creatingFolder">
             <form novalidate name="createFolderForm"
                 ng-submit="createContainer()"
                 val-form-manager>
@@ -86,7 +86,9 @@
                     <umb-checkbox ng-if="model.disableTemplates === false"
                                   name="collectionCreateTemplate"
                                   model="model.collectionCreateTemplate"
-                                  text="Create template for the Parent Document Type" />
+                                  text="Create template for the Parent Document Type">
+                    </umb-checkbox>
+
                 </umb-control-group>
 
                 <umb-control-group>
@@ -96,7 +98,9 @@
                     <umb-checkbox ng-if="model.disableTemplates === false"
                                   name="collectionItemCreateTemplate"
                                   model="model.collectionItemCreateTemplate"
-                                  text="Create template for the Item Document Type" />
+                                  text="Create template for the Item Document Type">
+                    </umb-checkbox>
+
                 </umb-control-group>
 
                 <div class="mt3">

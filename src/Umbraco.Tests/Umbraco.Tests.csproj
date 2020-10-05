@@ -147,7 +147,10 @@
     <Compile Include="Persistence\Mappers\MapperTestBase.cs" />
     <Compile Include="Persistence\Repositories\DocumentRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\EntityRepositoryTest.cs" />
+    <Compile Include="PropertyEditors\BlockEditorComponentTests.cs" />
+    <Compile Include="PropertyEditors\BlockListPropertyValueConverterTests.cs" />
     <Compile Include="PropertyEditors\DataValueReferenceFactoryCollectionTests.cs" />
+    <Compile Include="PropertyEditors\NestedContentPropertyComponentTests.cs" />
     <Compile Include="PublishedContent\NuCacheChildrenTests.cs" />
     <Compile Include="PublishedContent\PublishedContentLanguageVariantTests.cs" />
     <Compile Include="PublishedContent\PublishedContentSnapshotTestBase.cs" />
@@ -164,6 +167,7 @@
     <Compile Include="Services\ContentTypeServiceVariantsTests.cs" />
     <Compile Include="Services\EntityXmlSerializerTests.cs" />
     <Compile Include="Packaging\CreatedPackagesRepositoryTests.cs" />
+    <Compile Include="Services\ExternalLoginServiceTests.cs" />
     <Compile Include="Services\MemberGroupServiceTests.cs" />
     <Compile Include="Services\MediaTypeServiceTests.cs" />
     <Compile Include="Services\PropertyValidationServiceTests.cs" />
@@ -265,7 +269,7 @@
     <Compile Include="Web\HttpCookieExtensionsTests.cs" />
     <Compile Include="Templates\HtmlImageSourceParserTests.cs" />
     <Compile Include="Web\Mvc\HtmlStringUtilitiesTests.cs" />
-    <Compile Include="Web\ModelStateExtensionsTests.cs" />
+    <Compile Include="Web\Validation\ModelStateExtensionsTests.cs" />
     <Compile Include="Web\Mvc\RenderIndexActionSelectorAttributeTests.cs" />
     <Compile Include="Persistence\NPocoTests\PetaPocoCachesTest.cs" />
     <Compile Include="Persistence\Repositories\AuditRepositoryTest.cs" />
@@ -512,6 +516,7 @@
     <Compile Include="CoreThings\VersionExtensionTests.cs" />
     <Compile Include="Web\TemplateUtilitiesTests.cs" />
     <Compile Include="Web\UrlHelperExtensionTests.cs" />
+    <Compile Include="Web\Validation\ContentModelValidatorTests.cs" />
     <Compile Include="Web\WebExtensionMethodTests.cs" />
     <Compile Include="CoreThings\XmlExtensionsTests.cs" />
     <Compile Include="Misc\XmlHelperTests.cs" />

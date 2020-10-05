@@ -62,6 +62,10 @@ namespace Umbraco.Core.Manifest
                     partA = "member";
                     partB = member.ContentType.Alias;
                     break;
+                case IContentType contentType:
+                    partA = "contentType";
+                    partB = contentType.Alias;
+                    break;
 
                 default:
                     return null;

@@ -16,21 +16,25 @@ namespace Umbraco.Web
     public sealed class HtmlStringUtilities
     {
         /// <summary>
-        /// Replaces text line breaks with HTML line breaks
+        /// Replaces text line breaks with HTML line breaks.
         /// </summary>
         /// <param name="text">The text.</param>
-        /// <returns>The text with text line breaks replaced with HTML line breaks (<c>&lt;br /&gt;</c>).
+        /// <returns>
+        /// The text with text line breaks replaced with HTML line breaks (<c>&lt;br /&gt;</c>).
+        /// </returns>
         [Obsolete("This method doesn't HTML encode the text. Use ReplaceLineBreaks instead.")]
         public HtmlString ReplaceLineBreaksForHtml(string text)
         {
-            return new HtmlString(text.Replace("\r\n", @"<br />").Replace("\n", @"<br />").Replace("\r", @"<br />"));            
+            return new HtmlString(text.Replace("\r\n", @"<br />").Replace("\n", @"<br />").Replace("\r", @"<br />"));
         }
-        
+
         /// <summary>
         /// HTML encodes the text and replaces text line breaks with HTML line breaks.
         /// </summary>
         /// <param name="text">The text.</param>
-        /// <returns>The HTML encoded text with text line breaks replaced with HTML line breaks (<c>&lt;br /&gt;</c>).</returns>
+        /// <returns>
+        /// The HTML encoded text with text line breaks replaced with HTML line breaks (<c>&lt;br /&gt;</c>).
+        /// </returns>
         public IHtmlString ReplaceLineBreaks(string text)
         {
             var value = HttpUtility.HtmlEncode(text)?

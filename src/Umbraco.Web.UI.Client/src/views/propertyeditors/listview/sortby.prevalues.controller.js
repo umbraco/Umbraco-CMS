@@ -46,7 +46,7 @@ function sortByPreValsController($rootScope, $scope, localizationService, editor
         var systemFields = [
             { value: "SortOrder", key: "general_sort" },
             { value: "Name", key: "general_name" },
-            { value: "VersionDate", key: "content_updateDate" },
+            { value: "UpdateDate", key: "content_updateDate" },
             { value: "Updater", key: "content_updatedBy" },
             { value: "CreateDate", key: "content_createDate" },
             { value: "Owner", key: "content_createBy" },
@@ -57,26 +57,17 @@ function sortByPreValsController($rootScope, $scope, localizationService, editor
         ];
         _.each(systemFields, function (e) {
             localizationService.localize(e.key).then(function (v) {
-
                 var sortByListValue = findFromSortByFields(e.value);
                 if (sortByListValue) {
                     sortByListValue.name = v;
-                    switch (e.value) {
-                        case "Updater":
-                            e.name += " (Content only)";
-                            break;
-                        case "Published":
-                            e.name += " (Content only)";
-                            break;
-                        case "Email":
-                            e.name += " (Members only)";
-                            break;
-                        case "Username":
-                            e.name += " (Members only)";
-                            break;
-                    }
                 }
             });
+        });
+
+        _.each($scope.sortByFields, function (sortByField) {
+            if (!sortByField.name) {
+                sortByField.name = "(" + sortByField.value + ")";
+            }
         });
 
         // Check existing model value is available in list and ensure a value is set

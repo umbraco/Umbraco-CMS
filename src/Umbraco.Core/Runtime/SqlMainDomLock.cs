@@ -21,12 +21,11 @@ namespace Umbraco.Core.Runtime
         private const string MainDomKeyPrefix = "Umbraco.Core.Runtime.SqlMainDom";
         private const string UpdatedSuffix = "_updated";
         private readonly ILogger _logger;
-        private IUmbracoDatabase _db;
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
         private SqlServerSyntaxProvider _sqlServerSyntax = new SqlServerSyntaxProvider();
         private bool _mainDomChanging = false;
         private readonly UmbracoDatabaseFactory _dbFactory;
-        private bool _hasError;
+        private bool _errorDuringAcquiring;
         private object _locker = new object();
 
         public SqlMainDomLock(ILogger logger)
@@ -56,25 +55,24 @@ namespace Umbraco.Core.Runtime
 
             _logger.Debug<SqlMainDomLock>("Acquiring lock...");
 
-            var db = GetDatabase();
-
             var tempId = Guid.NewGuid().ToString();
+
+            using var db = _dbFactory.CreateDatabase();
+            using var transaction = db.GetTransaction(IsolationLevel.ReadCommitted);
 
             try
             {
-                db.BeginTransaction(IsolationLevel.ReadCommitted);
-
                 try
                 {
                     // wait to get a write lock
                     _sqlServerSyntax.WriteLock(db, TimeSpan.FromMilliseconds(millisecondsTimeout), Constants.Locks.MainDom);                    
                 }
-                catch (Exception ex)
+                catch(SqlException ex)
                 {
                     if (IsLockTimeoutException(ex))
                     {
                         _logger.Error<SqlMainDomLock>(ex, "Sql timeout occurred, could not acquire MainDom.");
-                        _hasError = true;
+                        _errorDuringAcquiring = true;
                         return false;
                     }
 
@@ -82,15 +80,12 @@ namespace Umbraco.Core.Runtime
                     throw;
                 }
 
-                var result = InsertLockRecord(tempId); //we change the row to a random Id to signal other MainDom to shutdown
+                var result = InsertLockRecord(tempId, db); //we change the row to a random Id to signal other MainDom to shutdown
                 if (result == RecordPersistenceType.Insert)
                 {
                     // if we've inserted, then there was no MainDom so we can instantly acquire
 
-                    // TODO: see the other TODO, could we just delete the row and that would indicate that we
-                    // are MainDom? then we don't leave any orphan rows behind.
-
-                    InsertLockRecord(_lockId); // so update with our appdomain id
+                    InsertLockRecord(_lockId, db); // so update with our appdomain id
                     _logger.Debug<SqlMainDomLock>("Acquired with ID {LockId}", _lockId);
                     return true;
                 }
@@ -100,23 +95,23 @@ namespace Umbraco.Core.Runtime
             }
             catch (Exception ex)
             {
-                ResetDatabase();
                 // unexpected
                 _logger.Error<SqlMainDomLock>(ex, "Unexpected error, cannot acquire MainDom");
-                _hasError = true;
+                _errorDuringAcquiring = true;
                 return false;
             }
             finally
             {
-                db?.CompleteTransaction();
+                transaction.Complete();
             }
+            
 
             return await WaitForExistingAsync(tempId, millisecondsTimeout);
         }
 
         public Task ListenAsync()
         {
-            if (_hasError)
+            if (_errorDuringAcquiring)
             {
                 _logger.Warn<SqlMainDomLock>("Could not acquire MainDom, listening is canceled.");
                 return Task.CompletedTask;
@@ -142,8 +137,15 @@ namespace Umbraco.Core.Runtime
         {
             while (true)
             {
-                // poll every 1 second
-                Thread.Sleep(1000);
+                // poll every couple of seconds
+                // local testing shows the actual query to be executed from client/server is approx 300ms but would change depending on environment/IO
+                Thread.Sleep(2000);
+
+                if (!_dbFactory.Configured)
+                {
+                    // if we aren't configured, we just keep looping since we can't query the db
+                    continue;
+                }
 
                 if (!_dbFactory.Configured)
                 {
@@ -160,20 +162,14 @@ namespace Umbraco.Core.Runtime
                     if (_cancellationTokenSource.IsCancellationRequested)
                         return;
 
-                    var db = GetDatabase();
-
+                    using var db = _dbFactory.CreateDatabase();
+                    using var transaction = db.GetTransaction(IsolationLevel.ReadCommitted);
                     try
                     {
-                        db.BeginTransaction(IsolationLevel.ReadCommitted);
-
                         // get a read lock
                         _sqlServerSyntax.ReadLock(db, Constants.Locks.MainDom);
 
-                        // TODO: We could in theory just check if the main dom row doesn't exist, that could indicate that
-                        // we are still the maindom. An empty value might be better because then we won't have any orphan rows
-                        // if the app is terminated. Could that work?
-
-                        if (!IsMainDomValue(_lockId))
+                        if (!IsMainDomValue(_lockId, db))
                         {
                             // we are no longer main dom, another one has come online, exit
                             _mainDomChanging = true;
@@ -183,36 +179,21 @@ namespace Umbraco.Core.Runtime
                     }
                     catch (Exception ex)
                     {
-                        ResetDatabase();
-                        // unexpected
-                        _logger.Error<SqlMainDomLock>(ex, "Unexpected error, listening is canceled.");
-                        _hasError = true;
-                        return;
+                        _logger.Error<SqlMainDomLock>(ex, "Unexpected error during listening.");
+
+                        // We need to keep on listening unless we've been notified by our own AppDomain to shutdown since
+                        // we don't want to shutdown resources controlled by MainDom inadvertently. We'll just keep listening otherwise.
+                        if (_cancellationTokenSource.IsCancellationRequested)
+                            return;
+
                     }
                     finally
                     {
-                        db?.CompleteTransaction();
+                        transaction.Complete();
                     }
                 }
 
             }
-        }
-
-        private void ResetDatabase()
-        {
-            if (_db.InTransaction)
-                _db.AbortTransaction();
-            _db.Dispose();
-            _db = null;
-        }
-
-        private IUmbracoDatabase GetDatabase()
-        {
-            if (_db != null)
-                return _db;
-
-            _db = _dbFactory.CreateDatabase();
-            return _db;
         }
 
         /// <summary>
@@ -227,121 +208,131 @@ namespace Umbraco.Core.Runtime
 
             return Task.Run(() =>
             {
-                var db = GetDatabase();
+                using var db = _dbFactory.CreateDatabase();
+
                 var watch = new Stopwatch();
                 watch.Start();
-                while(true)
+                while (true)
                 {
                     // poll very often, we need to take over as fast as we can
-                    Thread.Sleep(100);
+                    // local testing shows the actual query to be executed from client/server is approx 300ms but would change depending on environment/IO
+                    Thread.Sleep(1000);
 
-                    try
-                    {
-                        db.BeginTransaction(IsolationLevel.ReadCommitted);
-
-                        // get a read lock
-                        _sqlServerSyntax.ReadLock(db, Constants.Locks.MainDom);
-
-                        // the row 
-                        var mainDomRows = db.Fetch<KeyValueDto>("SELECT * FROM umbracoKeyValue WHERE [key] = @key", new { key = MainDomKey });
-
-                        if (mainDomRows.Count == 0 || mainDomRows[0].Value == updatedTempId)
-                        {
-                            // the other main dom has updated our record
-                            // Or the other maindom shutdown super fast and just deleted the record
-                            // which indicates that we
-                            // can acquire it and it has shutdown.
-
-                            _sqlServerSyntax.WriteLock(db, Constants.Locks.MainDom);
-
-                            // so now we update the row with our appdomain id
-                            InsertLockRecord(_lockId);
-                            _logger.Debug<SqlMainDomLock>("Acquired with ID {LockId}", _lockId);
-                            return true; 
-                        }
-                        else if (mainDomRows.Count == 1 && !mainDomRows[0].Value.StartsWith(tempId))
-                        {
-                            // in this case, the prefixed ID is different which  means
-                            // another new AppDomain has come online and is wanting to take over. In that case, we will not
-                            // acquire.
-
-                            _logger.Debug<SqlMainDomLock>("Cannot acquire, another booting application detected.");
-
-                            return false;
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        ResetDatabase();
-
-                        if (IsLockTimeoutException(ex))
-                        {
-                            _logger.Error<SqlMainDomLock>(ex, "Sql timeout occurred, waiting for existing MainDom is canceled.");
-                            _hasError = true;
-                            return false;
-                        }
-                        // unexpected
-                        _logger.Error<SqlMainDomLock>(ex, "Unexpected error, waiting for existing MainDom is canceled.");
-                        _hasError = true;
-                        return false;
-                    }
-                    finally
-                    {
-                        db?.CompleteTransaction();
-                    }
+                    var acquired = TryAcquire(db, tempId, updatedTempId);
+                    if (acquired.HasValue)
+                        return acquired.Value;
 
                     if (watch.ElapsedMilliseconds >= millisecondsTimeout)
                     {
-                        // if the timeout has elapsed, it either means that the other main dom is taking too long to shutdown,
-                        // or it could mean that the previous appdomain was terminated and didn't clear out the main dom SQL row
-                        // and it's just been left as an orphan row.
-                        // There's really know way of knowing unless we are constantly updating the row for the current maindom
-                        // which isn't ideal.
-                        // So... we're going to 'just' take over, if the writelock works then we'll assume we're ok
-
-                        _logger.Debug<SqlMainDomLock>("Timeout elapsed, assuming orphan row, acquiring MainDom.");
-
-                        try
-                        {
-                            db.BeginTransaction(IsolationLevel.ReadCommitted);
-
-                            _sqlServerSyntax.WriteLock(db, Constants.Locks.MainDom);
-
-                            // so now we update the row with our appdomain id
-                            InsertLockRecord(_lockId);
-                            _logger.Debug<SqlMainDomLock>("Acquired with ID {LockId}", _lockId);
-                            return true;
-                        }
-                        catch (Exception ex)
-                        {
-                            ResetDatabase();
-
-                            if (IsLockTimeoutException(ex))
-                            {
-                                // something is wrong, we cannot acquire, not much we can do
-                                _logger.Error<SqlMainDomLock>(ex, "Sql timeout occurred, could not forcibly acquire MainDom.");
-                                _hasError = true;
-                                return false;
-                            }
-                            _logger.Error<SqlMainDomLock>(ex, "Unexpected error, could not forcibly acquire MainDom.");
-                            _hasError = true;
-                            return false;
-                        }
-                        finally
-                        {
-                            db?.CompleteTransaction();
-                        }
+                        return AcquireWhenMaxWaitTimeElapsed(db);
                     }
                 }
             }, _cancellationTokenSource.Token);
         }
 
+        private bool? TryAcquire(IUmbracoDatabase db, string tempId, string updatedTempId)
+        {
+            using var transaction = db.GetTransaction(IsolationLevel.ReadCommitted);
+
+            try
+            {
+                // get a read lock
+                _sqlServerSyntax.ReadLock(db, Constants.Locks.MainDom);
+
+                // the row 
+                var mainDomRows = db.Fetch<KeyValueDto>("SELECT * FROM umbracoKeyValue WHERE [key] = @key", new { key = MainDomKey });
+
+                if (mainDomRows.Count == 0 || mainDomRows[0].Value == updatedTempId)
+                {
+                    // the other main dom has updated our record
+                    // Or the other maindom shutdown super fast and just deleted the record
+                    // which indicates that we
+                    // can acquire it and it has shutdown.
+
+                    _sqlServerSyntax.WriteLock(db, Constants.Locks.MainDom);
+
+                    // so now we update the row with our appdomain id
+                    InsertLockRecord(_lockId, db);
+                    _logger.Debug<SqlMainDomLock>("Acquired with ID {LockId}", _lockId);
+                    return true;
+                }
+                else if (mainDomRows.Count == 1 && !mainDomRows[0].Value.StartsWith(tempId))
+                {
+                    // in this case, the prefixed ID is different which  means
+                    // another new AppDomain has come online and is wanting to take over. In that case, we will not
+                    // acquire.
+
+                    _logger.Debug<SqlMainDomLock>("Cannot acquire, another booting application detected.");
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                if (IsLockTimeoutException(ex as SqlException))
+                {
+                    _logger.Error<SqlMainDomLock>(ex, "Sql timeout occurred, waiting for existing MainDom is canceled.");
+                    _errorDuringAcquiring = true;
+                    return false;
+                }
+                // unexpected
+                _logger.Error<SqlMainDomLock>(ex, "Unexpected error, waiting for existing MainDom is canceled.");
+                _errorDuringAcquiring = true;
+                return false;
+            }
+            finally
+            {
+                transaction.Complete();
+            }
+
+            return null; // continue
+        }
+
+        private bool AcquireWhenMaxWaitTimeElapsed(IUmbracoDatabase db)
+        {
+            // if the timeout has elapsed, it either means that the other main dom is taking too long to shutdown,
+            // or it could mean that the previous appdomain was terminated and didn't clear out the main dom SQL row
+            // and it's just been left as an orphan row.
+            // There's really know way of knowing unless we are constantly updating the row for the current maindom
+            // which isn't ideal.
+            // So... we're going to 'just' take over, if the writelock works then we'll assume we're ok
+
+            _logger.Debug<SqlMainDomLock>("Timeout elapsed, assuming orphan row, acquiring MainDom.");
+
+            using var transaction = db.GetTransaction(IsolationLevel.ReadCommitted);
+
+            try
+            {
+                _sqlServerSyntax.WriteLock(db, Constants.Locks.MainDom);
+
+                // so now we update the row with our appdomain id
+                InsertLockRecord(_lockId, db);
+                _logger.Debug<SqlMainDomLock>("Acquired with ID {LockId}", _lockId);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                if (IsLockTimeoutException(ex as SqlException))
+                {
+                    // something is wrong, we cannot acquire, not much we can do
+                    _logger.Error<SqlMainDomLock>(ex, "Sql timeout occurred, could not forcibly acquire MainDom.");
+                    _errorDuringAcquiring = true;
+                    return false;
+                }
+                _logger.Error<SqlMainDomLock>(ex, "Unexpected error, could not forcibly acquire MainDom.");
+                _errorDuringAcquiring = true;
+                return false;
+            }
+            finally
+            {
+                transaction.Complete();
+            }
+        }
+
         /// <summary>
         /// Inserts or updates the key/value row 
         /// </summary>
-        private RecordPersistenceType InsertLockRecord(string id)
+        private RecordPersistenceType InsertLockRecord(string id, IUmbracoDatabase db)
         {
-            var db = GetDatabase();
             return db.InsertOrUpdate(new KeyValueDto
             {
                 Key = MainDomKey,
@@ -354,9 +345,8 @@ namespace Umbraco.Core.Runtime
         /// Checks if the DB row value is equals the value
         /// </summary>
         /// <returns></returns>
-        private bool IsMainDomValue(string val)
+        private bool IsMainDomValue(string val, IUmbracoDatabase db)
         {
-            var db = GetDatabase();
             return db.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoKeyValue WHERE [key] = @key AND [value] = @val",
                 new { key = MainDomKey, val = val }) == 1;
         }
@@ -366,7 +356,7 @@ namespace Umbraco.Core.Runtime
         /// </summary>
         /// <param name="exception"></param>
         /// <returns></returns>
-        private bool IsLockTimeoutException(Exception exception) => exception is SqlException sqlException && sqlException.Number == 1222;
+        private bool IsLockTimeoutException(SqlException sqlException) => sqlException?.Number == 1222;
 
         #region IDisposable Support
         private bool _disposedValue = false; // To detect redundant calls
@@ -385,11 +375,11 @@ namespace Umbraco.Core.Runtime
 
                         if (_dbFactory.Configured)
                         {
-                            var db = GetDatabase();
+                            using var db = _dbFactory.CreateDatabase();
+                            using var transaction = db.GetTransaction(IsolationLevel.ReadCommitted);
+
                             try
                             {
-                                db.BeginTransaction(IsolationLevel.ReadCommitted);
-
                                 // get a write lock
                                 _sqlServerSyntax.WriteLock(db, Constants.Locks.MainDom);
 
@@ -402,24 +392,21 @@ namespace Umbraco.Core.Runtime
                                 if (_mainDomChanging)
                                 {
                                     _logger.Debug<SqlMainDomLock>("Releasing MainDom, updating row, new application is booting.");
-                                    db.Execute($"UPDATE umbracoKeyValue SET [value] = [value] + '{UpdatedSuffix}' WHERE [key] = @key", new { key = MainDomKey });
+                                    var count = db.Execute($"UPDATE umbracoKeyValue SET [value] = [value] + '{UpdatedSuffix}' WHERE [key] = @key", new { key = MainDomKey });
                                 }
                                 else
                                 {
                                     _logger.Debug<SqlMainDomLock>("Releasing MainDom, deleting row, application is shutting down.");
-                                    db.Execute("DELETE FROM umbracoKeyValue WHERE [key] = @key", new { key = MainDomKey });
+                                    var count = db.Execute("DELETE FROM umbracoKeyValue WHERE [key] = @key", new { key = MainDomKey });
                                 }
                             }
                             catch (Exception ex)
                             {
-                                ResetDatabase();
                                 _logger.Error<SqlMainDomLock>(ex, "Unexpected error during dipsose.");
-                                _hasError = true;
                             }
                             finally
                             {
-                                db?.CompleteTransaction();
-                                ResetDatabase();
+                                transaction.Complete();
                             }
                         }
                     }

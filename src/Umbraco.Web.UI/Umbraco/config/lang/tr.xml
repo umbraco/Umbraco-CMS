@@ -210,7 +210,7 @@
     <key alias="recycleBinIsEmpty">Geri dönüşüm kutusu artık boş</key>
     <key alias="recycleBinWarning">Öğeleri geri dönüşüm kutusu silindiğinde, onlar sonsuza kadar gitmiş olacak</key>
     <key alias="regexSearchError"><![CDATA[<a target='_blank' href='http://regexlib.com'>regexlib.com</a>'s webcoder şu anda üzerinde hiçbir kontrole sahip bazı sorunları, yaşanıyor. Bu rahatsızlıktan dolayı çok üzgünüz.]]></key>
-    <key alias="regexSearchHelp">Bir düzenli ifade arama form alanına doğrulama ekleyin. Örnek: 'E-posta', zip code 'url'</key>
+    <key alias="regexSearchHelp">Bir düzenli ifade arama form alanına doğrulama ekleyin. Örnek: 'E-posta', 'zip code', 'URL'.</key>
     <key alias="removeMacro">Makro kaldır</key>
     <key alias="requiredField">Gerekli alan</key>
     <key alias="sitereindexed">Site yeniden indekslendi</key>
@@ -796,7 +796,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="macro">Macro</key>
     <key alias="insertControl">Insert control</key>
     <key alias="addRows">Choose a layout for the page</key>
-    <key alias="addElement"><![CDATA[To start, click the <i class="icon icon-add blue"></i> below and add your first element]]></key>
+    <key alias="addElement">Add content</key>
     <key alias="clickToEmbed">Click to embed</key>
     <key alias="clickToInsertImage">Click to insert image</key>
     <key alias="placeholderImageCaption">Image caption...</key>
