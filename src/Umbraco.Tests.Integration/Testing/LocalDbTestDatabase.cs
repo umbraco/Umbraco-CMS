@@ -25,8 +25,6 @@ namespace Umbraco.Tests.Integration.Testing
         public const string InstanceName = "UmbracoTests";
         public const string DatabaseName = "UmbracoTests";
 
-        public bool CanAttachSchema => _schemaPool is null || _schemaPool.CanAttach;
-
         private readonly ILogger _logger;
         private readonly LocalDb _localDb;
         private readonly IUmbracoVersion _umbracoVersion;
@@ -256,7 +254,6 @@ namespace Umbraco.Tests.Integration.Testing
 
         private class DatabasePool
         {
-            public bool CanAttach => _readyQueue.Count > 0;
             private readonly LocalDb _localDb;
             private readonly LocalDb.Instance _instance;
             private readonly string _filesPath;

@@ -36,10 +36,9 @@ namespace Umbraco.Tests.Services
         private IMediaService MediaService => GetRequiredService<IMediaService>();
         private IFileService FileService => GetRequiredService<IFileService>();
 
-        public override async Task Setup()
+        [SetUp]
+        public void SetupTestData()
         {
-            await base.Setup();
-
             if (_langFr == null && _langEs == null)
             {
                 var globalSettings = new GlobalSettings();

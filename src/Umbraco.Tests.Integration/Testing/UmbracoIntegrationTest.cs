@@ -46,7 +46,7 @@ namespace Umbraco.Tests.Integration.Testing
     [NonParallelizable]
     public abstract class UmbracoIntegrationTest
     {
-        
+
         public static LightInjectContainer CreateUmbracoContainer(out UmbracoServiceProviderFactory serviceProviderFactory)
         {
             var container = UmbracoServiceProviderFactory.CreateServiceContainer();
@@ -251,13 +251,6 @@ namespace Umbraco.Tests.Integration.Testing
         {
             Services.GetRequiredService<IBackofficeSecurityFactory>().EnsureBackofficeSecurity();
             Services.GetRequiredService<IUmbracoContextFactory>().EnsureUmbracoContext();
-            OnTestTearDown(() =>
-            {
-                var caches = GetRequiredService<AppCaches>();
-                caches.IsolatedCaches.ClearAllCaches();
-                caches.RuntimeCache.Clear();
-                caches.RequestCache.Clear();
-            });
 
             // get the currently set ptions
             var testOptions = TestOptionAttributeBase.GetTestOptions<UmbracoTestAttribute>();
@@ -353,7 +346,14 @@ namespace Umbraco.Tests.Integration.Testing
                     var newSchemaDbId = db.AttachSchema();
 
                     // Add teardown callback
-                    OnTestTearDown(() => db.Detach(newSchemaDbId));
+                    OnTestTearDown(() =>
+                    {
+                        db.Detach(newSchemaDbId);
+                        var caches = GetRequiredService<AppCaches>();
+                        caches.IsolatedCaches.ClearAllCaches();
+                        caches.RuntimeCache.Clear();
+                        caches.RequestCache.Clear();
+                    });
 
                     // We must re-configure our current factory since attaching a new LocalDb from the pool changes connection strings
                     if (!databaseFactory.Configured)
@@ -388,7 +388,14 @@ namespace Umbraco.Tests.Integration.Testing
                         var newSchemaFixtureDbId = db.AttachSchema();
 
                         // Add teardown callback
-                        OnFixtureTearDown(() => db.Detach(newSchemaFixtureDbId));
+                        OnFixtureTearDown(() =>
+                        {
+                            db.Detach(newSchemaFixtureDbId);
+                            var caches = GetRequiredService<AppCaches>();
+                            caches.IsolatedCaches.ClearAllCaches();
+                            caches.RuntimeCache.Clear();
+                            caches.RequestCache.Clear();
+                        });
                     }
 
                     // We must re-configure our current factory since attaching a new LocalDb from the pool changes connection strings

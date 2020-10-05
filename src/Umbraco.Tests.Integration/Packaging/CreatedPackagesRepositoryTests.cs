@@ -24,10 +24,10 @@ namespace Umbraco.Tests.Packaging
     {
         private Guid _testBaseFolder;
 
-        public override Task Setup()
+        [SetUp]
+        public void SetupTestData()
         {
             _testBaseFolder = Guid.NewGuid();
-            return base.Setup();
         }
 
         public override void TearDown()

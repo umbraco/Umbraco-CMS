@@ -22,11 +22,10 @@ namespace Umbraco.Tests.Services
     {
         private IMacroService MacroService => GetRequiredService<IMacroService>();
 
-        public override Task Setup()
+        [SetUp]
+        public void SetupTestData()
         {
-            var setup = base.Setup();
             CreateTestData();
-            return setup;
         }
 
         public void CreateTestData()
