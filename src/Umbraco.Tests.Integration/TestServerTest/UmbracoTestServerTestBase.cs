@@ -31,7 +31,7 @@ namespace Umbraco.Tests.Integration.TestServerTest
     public abstract class UmbracoTestServerTestBase : UmbracoIntegrationTest
     {
         [SetUp]
-        public override Task Setup()
+        public override void Setup()
         {
             InMemoryConfiguration["ConnectionStrings:" + Constants.System.UmbracoConnectionName] = null;
             InMemoryConfiguration["Umbraco:CMS:Hosting:Debug"] = "true";
@@ -55,8 +55,6 @@ namespace Umbraco.Tests.Integration.TestServerTest
             });
 
             LinkGenerator = Factory.Services.GetRequiredService<LinkGenerator>();
-
-            return Task.CompletedTask;
         }
 
         public override IHostBuilder CreateHostBuilder()
@@ -141,6 +139,7 @@ namespace Umbraco.Tests.Integration.TestServerTest
                 .WithRuntimeMinifier()
                 .WithBackOffice()
                 .WithBackOfficeIdentity()
+                .WithPreview()
                 //.WithMiniProfiler() // we don't want this running in tests
                 .WithMvcAndRazor(mvcBuilding: mvcBuilder =>
                 {

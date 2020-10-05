@@ -45,6 +45,11 @@ namespace Umbraco.Extensions
             services.ConfigureOptions<ConfigureBackOfficeCookieOptions>();
         }
 
+        public static void AddUmbracoPreview(this IServiceCollection services)
+        {
+            services.AddSignalR();
+        }
+
         /// <summary>
         /// Adds the services required for using Umbraco back office Identity
         /// </summary>
