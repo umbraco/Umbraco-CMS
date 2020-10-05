@@ -1867,7 +1867,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="administrators">Administrator</key>
     <key alias="categoryField">Category field</key>
     <key alias="createDate">User created</key>
-    <key alias="changePassword">Change Your Password</key>
+    <key alias="changePassword">Change your password</key>
     <key alias="changePhoto">Change photo</key>
     <key alias="newPassword">New password</key>
     <key alias="noLockouts">hasn't been locked out</key>
