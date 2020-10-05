@@ -77,6 +77,8 @@ namespace Umbraco.Tests.Integration.Testing
         {
             foreach (var a in _testTeardown) a();
             _testTeardown = null;
+            FirstTestInFixture = false;
+            FirstTestInSession = false;
         }
 
         [SetUp]
@@ -246,6 +248,13 @@ namespace Umbraco.Tests.Integration.Testing
         {
             Services.GetRequiredService<IBackofficeSecurityFactory>().EnsureBackofficeSecurity();
             Services.GetRequiredService<IUmbracoContextFactory>().EnsureUmbracoContext();
+            OnTestTearDown(() =>
+            {
+                var caches = GetRequiredService<AppCaches>();
+                caches.IsolatedCaches.ClearAllCaches();
+                caches.RuntimeCache.Clear();
+                caches.RequestCache.Clear();
+            });
 
             // get the currently set ptions
             var testOptions = TestOptionAttributeBase.GetTestOptions<UmbracoTestAttribute>();
@@ -370,7 +379,7 @@ namespace Umbraco.Tests.Integration.Testing
                     // Probably because the DB is blocked because it hasn't been detached
                     // Also if we attach a new schema for every test isn't it just essentially
                     // the same as NewSchemaPerTest?
-                    if (db.CanAttachSchema)
+                    if (FirstTestInFixture)
                     {
                         // New DB + Schema
                         var newSchemaFixtureDbId = db.AttachSchema();
@@ -456,5 +465,9 @@ namespace Umbraco.Tests.Integration.Testing
         protected UserGroupBuilder UserGroupBuilder = new UserGroupBuilder();
 
         #endregion
+
+        protected static bool FirstTestInSession = true;
+
+        protected bool FirstTestInFixture = true;
     }
 }

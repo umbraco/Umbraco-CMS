@@ -155,7 +155,6 @@
     <Compile Include="Routing\GetContentUrlsTests.cs" />
     <Compile Include="Services\AmbiguousEventTests.cs" />
     <Compile Include="Services\ContentServiceEventTests.cs" />
-    <Compile Include="Services\ContentServicePublishBranchTests.cs" />
     <Compile Include="Services\ContentServiceTagsTests.cs" />
     <Compile Include="Services\ContentTypeServiceVariantsTests.cs" />
     <Compile Include="Services\EntityXmlSerializerTests.cs" />
