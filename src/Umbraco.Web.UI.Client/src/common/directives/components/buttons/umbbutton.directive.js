@@ -171,7 +171,7 @@ Use this directive to render an umbraco button. The directive can be used to gen
                     vm.innerState = changes.state.currentValue;
                 }
                 if (changes.state.currentValue === 'success' || changes.state.currentValue === 'error') {
-                    // set the state back to 'init' after a success or error 
+                    // set the state back to 'init' after a success or error
                     $timeout(function () {
                         vm.innerState = 'init';
                     }, 2000);
@@ -194,6 +194,13 @@ Use this directive to render an umbraco button. The directive can be used to gen
             // watch for label key changes
             if(changes.labelKey && changes.labelKey.currentValue) {
                 setButtonLabel();
+            }
+
+            // watch for type changes
+            if(changes.type) {
+                if (!vm.type) {
+                    vm.type = "button";// set the default
+                }
             }
 
         }
