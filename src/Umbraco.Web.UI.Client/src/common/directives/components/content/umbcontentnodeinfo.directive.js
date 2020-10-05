@@ -1,4 +1,4 @@
-(function () {
+﻿(function () {
     'use strict';
 
     function ContentNodeInfoDirective($timeout, logResource, eventsService, userService, localizationService, dateHelper, editorService, redirectUrlsResource, overlayService, entityResource) {
@@ -161,7 +161,7 @@
             }
 
             scope.openTemplate = function () {
-                var template = _.findWhere(scope.allTemplates, {alias: scope.node.template})
+                var template = _.findWhere(scope.allTemplates, { alias: scope.node.template })
                 if (!template) {
                     return;
                 }
@@ -202,7 +202,7 @@
 
                 //don't load this if it's already done
                 if (auditTrailLoaded && !forceReload) {
-                    return; 
+                    return;
                 }
 
                 scope.loadingAuditTrail = true;
@@ -253,7 +253,7 @@
 
             function setAuditTrailLogTypeColor(auditTrail) {
                 angular.forEach(auditTrail, function (item) {
-                    
+
                     switch (item.logType) {
                         case "Save":
                             item.logTypeColor = "primary";
@@ -265,7 +265,7 @@
                         case "Unpublish":
                         case "UnpublishVariant":
                             item.logTypeColor = "warning";
-                        break;
+                            break;
                         case "Delete":
                             item.logTypeColor = "danger";
                             break;
