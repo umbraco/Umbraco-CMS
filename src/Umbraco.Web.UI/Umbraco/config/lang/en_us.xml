@@ -254,9 +254,9 @@
     <key alias="parentNotPublished">This document is published but is not visible because the parent '%0%' is unpublished</key>
     <key alias="parentCultureNotPublished">This culture is published but is not visible because it is unpublished on parent '%0%'</key>
     <key alias="parentNotPublishedAnomaly">This document is published but is not in the cache</key>
-    <key alias="getUrlException">Could not get the url</key>
-    <key alias="routeError">This document is published but its url would collide with content %0%</key>
-    <key alias="routeErrorCannotRoute">This document is published but its url cannot be routed</key>
+    <key alias="getUrlException">Could not get the URL</key>
+    <key alias="routeError">This document is published but its URL would collide with content %0%</key>
+    <key alias="routeErrorCannotRoute">This document is published but its URL cannot be routed</key>
     <key alias="publish">Publish</key>
     <key alias="published">Published</key>
     <key alias="publishedPendingChanges">Published (pending changes)</key>&gt;
@@ -472,7 +472,7 @@
     <key alias="recycleBinIsEmpty">The recycle bin is now empty</key>
     <key alias="recycleBinWarning">When items are deleted from the recycle bin, they will be gone forever</key>
     <key alias="regexSearchError"><![CDATA[<a target='_blank' href='http://regexlib.com'>regexlib.com</a>'s webservice is currently experiencing some problems, which we have no control over. We are very sorry for this inconvenience.]]></key>
-    <key alias="regexSearchHelp">Search for a regular expression to add validation to a form field. Example: 'email, 'zip-code' 'url'</key>
+    <key alias="regexSearchHelp">Search for a regular expression to add validation to a form field. Example: 'email, 'zip-code', 'URL'.</key>
     <key alias="removeMacro">Remove Macro</key>
     <key alias="requiredField">Required Field</key>
     <key alias="sitereindexed">Site is reindexed</key>
@@ -781,7 +781,7 @@
     <key alias="update">Update</key>
     <key alias="upgrade">Upgrade</key>
     <key alias="upload">Upload</key>
-    <key alias="url">Url</key>
+    <key alias="url">URL</key>
     <key alias="user">User</key>
     <key alias="username">Username</key>
     <key alias="value">Value</key>
@@ -2073,8 +2073,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="maxCount">You can only have</key>
     <key alias="addUpTo">Add up to</key>
     <key alias="items">items</key>
-    <key alias="urls">url(s)</key>
-    <key alias="urlsSelected">url(s) selected</key>
+    <key alias="urls">URL(s)</key>
+    <key alias="urlsSelected">URL(s) selected</key>
     <key alias="itemsSelected">items selected</key>
     <key alias="invalidDate">Invalid date</key>
     <key alias="invalidNumber">Not a number</key>
@@ -2203,7 +2203,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="culture">Culture</key>
     <key alias="originalUrl">Original URL</key>
     <key alias="redirectedTo">Redirected To</key>
-    <key alias="redirectUrlManagement">Redirect Url Management</key>
+    <key alias="redirectUrlManagement">Redirect URL Management</key>
     <key alias="panelInformation">The following URLs redirect to this content item:</key>
     <key alias="noRedirects">No redirects have been made</key>
     <key alias="noRedirectsDescription">When a published page gets renamed or moved a redirect will automatically be made to the new page.</key>
