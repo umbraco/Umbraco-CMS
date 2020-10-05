@@ -76,7 +76,7 @@ namespace Umbraco.Web.Routing
             if (domainUris == null)
             {
                 // no domain
-                // if the property is invariant, then url "/<alias>" is ok
+                // if the property is invariant, then URL "/<alias>" is ok
                 // if the property varies, then what are we supposed to do?
                 //  the content finder may work, depending on the 'current' culture,
                 //  but there's no way we can return something meaningful here
@@ -98,11 +98,11 @@ namespace Umbraco.Web.Routing
             }
             else
             {
-                // some domains: one url per domain, which is "<domain>/<alias>"
-                foreach(var domainUri in domainUris)
+                // some domains: one URL per domain, which is "<domain>/<alias>"
+                foreach (var domainUri in domainUris)
                 {
-                    // if the property is invariant, get the invariant value, url is "<domain>/<invariant-alias>"
-                    // if the property varies, get the variant value, url is "<domain>/<variant-alias>"
+                    // if the property is invariant, get the invariant value, URL is "<domain>/<invariant-alias>"
+                    // if the property varies, get the variant value, URL is "<domain>/<variant-alias>"
 
                     // but! only if the culture is published, else ignore
                     if (varies && !node.HasCulture(domainUri.Culture.Name)) continue;

@@ -50,7 +50,7 @@ namespace Umbraco.Core.Sync
         /// </summary>
         public string GetCurrentServerUmbracoApplicationUrl()
         {
-            // this registrar does not provide the umbraco application url
+            // this registrar does not provide the umbraco application URL
             return null;
         }
 

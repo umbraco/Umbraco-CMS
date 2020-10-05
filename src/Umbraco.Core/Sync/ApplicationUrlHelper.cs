@@ -67,7 +67,7 @@ namespace Umbraco.Core.Sync
             }
 
             // try the server registrar
-            // which is assumed to return a url that:
+            // which is assumed to return a URL that:
             // - end with SystemDirectories.Umbraco
             // - contain a scheme
             // - end or not with a slash, it will be taken care of

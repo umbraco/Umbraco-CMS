@@ -55,7 +55,7 @@ namespace Umbraco.Web.Routing
                 ? null
                 : DomainUtilities.DomainForNode(umbracoContext.PublishedSnapshot.Domains, _siteDomainHelper, int.Parse(route.Substring(0, pos)), current, culture);
 
-            // assemble the url from domainUri (maybe null) and path
+            // assemble the URL from domainUri (maybe null) and path
             var url = AssembleUrl(domainUri, path, current, mode).ToString();
 
             return UrlInfo.Url(url, culture);
@@ -166,7 +166,7 @@ namespace Umbraco.Web.Routing
             }
 
             // UriFromUmbraco will handle vdir
-            // meaning it will add vdir into domain urls too!
+            // meaning it will add vdir into domain URLs too!
             return UriUtility.UriFromUmbraco(uri, _globalSettings, _requestSettings);
         }
 

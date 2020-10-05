@@ -106,7 +106,7 @@ namespace Umbraco.Core
         /// </remarks>
         internal static Attempt<string> DetectIsJavaScriptPath(this string input)
         {
-            //validate that this is a url, if it is not, we'll assume that it is a text block and render it as a text
+            //validate that this is a URL, if it is not, we'll assume that it is a text block and render it as a text
             //block instead.
             var isValid = true;
 
@@ -114,7 +114,7 @@ namespace Umbraco.Core
             {
                 //ok it validates, but so does alert('hello'); ! so we need to do more checks
 
-                //here are the valid chars in a url without escaping
+                //here are the valid chars in a URL without escaping
                 if (Regex.IsMatch(input, @"[^a-zA-Z0-9-._~:/?#\[\]@!$&'\(\)*\+,%;=]"))
                     isValid = false;
 
@@ -856,7 +856,7 @@ namespace Umbraco.Core
             var pos = str.IndexOf('=');
             if (pos < 0) pos = str.Length;
 
-            // replace chars that would cause problems in urls
+            // replace chars that would cause problems in URLs
             var chArray = new char[pos];
             for (var i = 0; i < pos; i++)
             {
@@ -1095,7 +1095,7 @@ namespace Umbraco.Core
             return Current.ShortStringHelper.CleanStringForSafeAlias(alias, culture);
         }
 
-        // the new methods to get a url segment
+        // the new methods to get a URL segment
 
         /// <summary>
         /// Cleans a string to produce a string that can safely be used in an URL segment.
@@ -1124,7 +1124,7 @@ namespace Umbraco.Core
             return Current.ShortStringHelper.CleanStringForUrlSegment(text, culture);
         }
 
-        // the new methods to clean a string (to alias, url segment...)
+        // the new methods to clean a string (to alias, URL segment...)
 
         /// <summary>
         /// Cleans a string.

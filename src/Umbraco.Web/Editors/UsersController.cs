@@ -478,7 +478,7 @@ namespace Umbraco.Web.Editors
                 WebUtility.UrlEncode("|"),
                 token.ToUrlBase64());
 
-            // Get an mvc helper to get the url
+            // Get an mvc helper to get the URL
             var http = EnsureHttpContext();
             var urlHelper = new UrlHelper(http.Request.RequestContext);
             var action = urlHelper.Action("VerifyInvite", "BackOffice",
