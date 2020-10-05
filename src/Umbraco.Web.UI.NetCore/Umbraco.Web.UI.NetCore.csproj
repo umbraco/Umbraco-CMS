@@ -22,7 +22,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="config\BackOfficeTours" />
         <Folder Include="Views" />
         <Folder Include="wwwroot\Media" />
       <Folder Include="umbraco" />
