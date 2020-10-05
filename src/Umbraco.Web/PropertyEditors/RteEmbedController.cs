@@ -60,7 +60,7 @@ namespace Umbraco.Web.PropertyEditors
             }
             catch(Exception ex)
             {
-                Logger.Error<RteEmbedController>(ex, "Error embedding url {Url} - width: {Width} height: {Height}", url, width, height);
+                Logger.Error<RteEmbedController>(ex, "Error embedding URL {Url} - width: {Width} height: {Height}", url, width, height);
                 result.OEmbedStatus = OEmbedStatus.Error;
             }
 

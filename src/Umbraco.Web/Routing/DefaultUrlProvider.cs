@@ -31,7 +31,7 @@ namespace Umbraco.Web.Routing
         /// <inheritdoc />
         public virtual UrlInfo GetUrl(UmbracoContext umbracoContext, IPublishedContent content, UrlMode mode, string culture, Uri current)
         {
-            if (!current.IsAbsoluteUri) throw new ArgumentException("Current url must be absolute.", nameof(current));
+            if (!current.IsAbsoluteUri) throw new ArgumentException("Current URL must be absolute.", nameof(current));
 
             // will not use cache if previewing
             var route = umbracoContext.Content.GetRouteById(content.Id, culture);

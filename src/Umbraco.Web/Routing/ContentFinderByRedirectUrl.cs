@@ -48,14 +48,14 @@ namespace Umbraco.Web.Routing
             var url = content == null ? "#" : content.Url(redirectUrl.Culture);
             if (url.StartsWith("#"))
             {
-                _logger.Debug<ContentFinderByRedirectUrl>("Route {Route} matches content {ContentId} which has no url.", route, redirectUrl.ContentId);
+                _logger.Debug<ContentFinderByRedirectUrl>("Route {Route} matches content {ContentId} which has no URL.", route, redirectUrl.ContentId);
                 return false;
             }
 
             // Appending any querystring from the incoming request to the redirect url.
             url = string.IsNullOrEmpty(frequest.Uri.Query) ? url : url + frequest.Uri.Query;
 
-            _logger.Debug<ContentFinderByRedirectUrl>("Route {Route} matches content {ContentId} with url '{Url}', redirecting.", route, content.Id, url);
+            _logger.Debug<ContentFinderByRedirectUrl>("Route {Route} matches content {ContentId} with URL '{Url}', redirecting.", route, content.Id, url);
             frequest.SetRedirectPermanent(url);
 
 
