@@ -7,14 +7,15 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.Validators;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
-using Umbraco.Tests.Testing;
 using Umbraco.Web.PropertyEditors;
 
 namespace Umbraco.Tests.Services
 {
     [TestFixture]
-    public class PropertyValidationServiceTests : UmbracoTestBase
+    public class PropertyValidationServiceTests
     {
+        private IShortStringHelper ShortStringHelper => new DefaultShortStringHelper(new DefaultShortStringHelperConfig());
+
         private void MockObjects(out PropertyValidationService validationService, out IDataType dt)
         {
             var textService = new Mock<ILocalizedTextService>();
