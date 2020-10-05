@@ -247,11 +247,12 @@ namespace Umbraco.Tests.Integration.Testing
             CustomTestSetup(services);
         }
 
+
         public virtual void Configure(IApplicationBuilder app)
         {
             Services.GetRequiredService<IBackofficeSecurityFactory>().EnsureBackofficeSecurity();
             Services.GetRequiredService<IUmbracoContextFactory>().EnsureUmbracoContext();
-
+            
             // get the currently set ptions
             var testOptions = TestOptionAttributeBase.GetTestOptions<UmbracoTestAttribute>();
             if (testOptions.Boot)
@@ -261,7 +262,7 @@ namespace Umbraco.Tests.Integration.Testing
         }
 
         #endregion
-
+        
         #region LocalDb
 
 
@@ -349,10 +350,6 @@ namespace Umbraco.Tests.Integration.Testing
                     OnTestTearDown(() =>
                     {
                         db.Detach(newSchemaDbId);
-                        var caches = GetRequiredService<AppCaches>();
-                        caches.IsolatedCaches.ClearAllCaches();
-                        caches.RuntimeCache.Clear();
-                        caches.RequestCache.Clear();
                     });
 
                     // We must re-configure our current factory since attaching a new LocalDb from the pool changes connection strings
@@ -391,10 +388,6 @@ namespace Umbraco.Tests.Integration.Testing
                         OnFixtureTearDown(() =>
                         {
                             db.Detach(newSchemaFixtureDbId);
-                            var caches = GetRequiredService<AppCaches>();
-                            caches.IsolatedCaches.ClearAllCaches();
-                            caches.RuntimeCache.Clear();
-                            caches.RequestCache.Clear();
                         });
                     }
 
