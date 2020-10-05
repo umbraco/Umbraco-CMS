@@ -183,20 +183,20 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Get parent entities for child id
                 var parents = repository.GetPagedParentEntitiesByChildId(createdMedia[0].Id, 0, 11, out var totalRecords).ToList();
-                Assert.AreEqual(20, totalRecords);
+                Assert.AreEqual(30, totalRecords);
                 Assert.AreEqual(11, parents.Count);
 
                 //add the next page
                 parents.AddRange(repository.GetPagedParentEntitiesByChildId(createdMedia[0].Id, 1, 11, out totalRecords));
-                Assert.AreEqual(20, totalRecords);
-                Assert.AreEqual(20, parents.Count);
+                Assert.AreEqual(30, totalRecords);
+                Assert.AreEqual(22, parents.Count);
 
                 var contentEntities = parents.OfType<IDocumentEntitySlim>().ToList();
                 var mediaEntities = parents.OfType<IMediaEntitySlim>().ToList();
                 var memberEntities = parents.OfType<IMemberEntitySlim>().ToList();
 
                 Assert.AreEqual(10, contentEntities.Count);
-                Assert.AreEqual(0, mediaEntities.Count);
+                Assert.AreEqual(2, mediaEntities.Count);
                 Assert.AreEqual(10, memberEntities.Count);
 
                 //only of a certain type
@@ -207,7 +207,33 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.AreEqual(10, totalRecords);
 
                 parents.AddRange(repository.GetPagedParentEntitiesByChildId(createdMedia[0].Id, 0, 100, out totalRecords, UmbracoObjectTypes.Media.GetGuid()));
-                Assert.AreEqual(0, totalRecords);
+                Assert.AreEqual(10, totalRecords);
+
+                // test relations on content
+                var contentParents = repository.GetPagedParentEntitiesByChildId(createdContent[0].Id, 0, int.MaxValue, out  totalRecords).ToList();
+                Assert.AreEqual(20, totalRecords);
+                Assert.AreEqual(20, contentParents.Count);
+
+                // test getting relations of specified relation types
+                var relatedMediaRelType = ServiceContext.RelationService.GetRelationTypeByAlias(Constants.Conventions.RelationTypes.RelatedMediaAlias);
+                var relatedContentRelType = ServiceContext.RelationService.GetRelationTypeByAlias(Constants.Conventions.RelationTypes.RelatedDocumentAlias);
+
+                parents = repository.GetPagedParentEntitiesByChildId(createdMedia[0].Id, 0, 11, out  totalRecords, new int[] { relatedContentRelType.Id, relatedMediaRelType.Id }).ToList();
+                Assert.AreEqual(20, totalRecords);
+                Assert.AreEqual(11, parents.Count);
+
+                parents = repository.GetPagedParentEntitiesByChildId(createdMedia[0].Id, 1, 11, out totalRecords, new int[] { relatedContentRelType.Id, relatedMediaRelType.Id }).ToList();
+                Assert.AreEqual(20, totalRecords);
+                Assert.AreEqual(9, parents.Count);
+
+                parents = repository.GetPagedParentEntitiesByChildId(createdContent[0].Id, 0, 6, out totalRecords, new int[] { relatedContentRelType.Id, relatedMediaRelType.Id }).ToList();
+                Assert.AreEqual(10, totalRecords);
+                Assert.AreEqual(6, parents.Count);
+
+                parents = repository.GetPagedParentEntitiesByChildId(createdContent[0].Id, 1, 6, out totalRecords, new int[] { relatedContentRelType.Id, relatedMediaRelType.Id }).ToList();
+                Assert.AreEqual(10, totalRecords);
+                Assert.AreEqual(4, parents.Count);
+
             }
         }
 
@@ -251,19 +277,19 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Get parent entities for child id
                 var parents = repository.GetPagedChildEntitiesByParentId(createdContent[0].Id, 0, 6, out var totalRecords).ToList();
-                Assert.AreEqual(10, totalRecords);
+                Assert.AreEqual(20, totalRecords);
                 Assert.AreEqual(6, parents.Count);
 
                 //add the next page
                 parents.AddRange(repository.GetPagedChildEntitiesByParentId(createdContent[0].Id, 1, 6, out totalRecords));
-                Assert.AreEqual(10, totalRecords);
-                Assert.AreEqual(10, parents.Count);
+                Assert.AreEqual(20, totalRecords);
+                Assert.AreEqual(12, parents.Count);
 
                 var contentEntities = parents.OfType<IDocumentEntitySlim>().ToList();
                 var mediaEntities = parents.OfType<IMediaEntitySlim>().ToList();
                 var memberEntities = parents.OfType<IMemberEntitySlim>().ToList();
 
-                Assert.AreEqual(0, contentEntities.Count);
+                Assert.AreEqual(2, contentEntities.Count);
                 Assert.AreEqual(10, mediaEntities.Count);
                 Assert.AreEqual(0, memberEntities.Count);
 
@@ -276,6 +302,18 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 parents.AddRange(repository.GetPagedChildEntitiesByParentId(createdContent[0].Id, 0, 100, out totalRecords, UmbracoObjectTypes.Member.GetGuid()));
                 Assert.AreEqual(0, totalRecords);
+
+                // test getting relations of specified relation types
+                var relatedMediaRelType = ServiceContext.RelationService.GetRelationTypeByAlias(Constants.Conventions.RelationTypes.RelatedMediaAlias);
+                var relatedContentRelType = ServiceContext.RelationService.GetRelationTypeByAlias(Constants.Conventions.RelationTypes.RelatedDocumentAlias);
+
+                parents = repository.GetPagedChildEntitiesByParentId(createdContent[0].Id, 0, 6, out totalRecords, new int[] { relatedContentRelType.Id, relatedMediaRelType.Id }).ToList();
+                Assert.AreEqual(10, totalRecords);
+                Assert.AreEqual(6, parents.Count);
+
+                parents = repository.GetPagedChildEntitiesByParentId(createdContent[0].Id, 1, 6, out totalRecords, new int[] { relatedContentRelType.Id, relatedMediaRelType.Id }).ToList();
+                Assert.AreEqual(10, totalRecords);
+                Assert.AreEqual(4, parents.Count);
             }
         }
 
@@ -290,6 +328,16 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var c1 = MockedContent.CreateBasicContent(contentType);
                 ServiceContext.ContentService.Save(c1);
                 createdContent.Add(c1);
+            }
+
+            //Related content
+            var relatedContents = new List<IContent>();
+            
+            for (int i = 0; i < 10; i++)
+            {
+                var c1 = MockedContent.CreateBasicContent(contentType);
+                ServiceContext.ContentService.Save(c1);
+                relatedContents.Add(c1);
             }
 
             //Create media
@@ -309,16 +357,94 @@ namespace Umbraco.Tests.Persistence.Repositories
             createdMembers = MockedMember.CreateSimpleMember(memberType, 10).ToList();
             ServiceContext.MemberService.Save(createdMembers);
 
-            var relType = ServiceContext.RelationService.GetRelationTypeByAlias(Constants.Conventions.RelationTypes.RelatedMediaAlias);
+            var relatedMediaRelType = ServiceContext.RelationService.GetRelationTypeByAlias(Constants.Conventions.RelationTypes.RelatedMediaAlias);
+            var relatedContentRelType = ServiceContext.RelationService.GetRelationTypeByAlias(Constants.Conventions.RelationTypes.RelatedDocumentAlias);
 
             // Relate content to media
             foreach (var content in createdContent)
                 foreach (var media in createdMedia)
-                    ServiceContext.RelationService.Relate(content.Id, media.Id, relType);
+                    ServiceContext.RelationService.Relate(content.Id, media.Id, relatedMediaRelType);
+
+            // Relate content to content
+            foreach (var relContent in relatedContents)
+                foreach (var content in createdContent)
+                    ServiceContext.RelationService.Relate(relContent.Id, content.Id, relatedContentRelType);
+
             // Relate members to media
             foreach (var member in createdMembers)
                 foreach (var media in createdMedia)
-                    ServiceContext.RelationService.Relate(member.Id, media.Id, relType);
+                    ServiceContext.RelationService.Relate(member.Id, media.Id, relatedMediaRelType);
+
+
+            //Create "copied" content
+            var copiedContents = new List<IContent>();
+            for (int i = 0; i < 10; i++)
+            {
+                var c1 = MockedContent.CreateBasicContent(contentType);
+                ServiceContext.ContentService.Save(c1);
+                copiedContents.Add(c1);
+            }
+
+            var copiedContentRelType =
+                ServiceContext.RelationService.GetRelationTypeByAlias(Constants.Conventions.RelationTypes
+                    .RelateDocumentOnCopyAlias);
+
+            // Relate content to content (mimics copy)
+            foreach (var content in createdContent)
+            {
+                foreach (var copiedContent in copiedContents)
+                {
+                    ServiceContext.RelationService.Relate(content.Id, copiedContent.Id, copiedContentRelType);
+                }
+                   
+            }
+
+            // create trashed content
+            var trashedContents = new List<IContent>();
+            for (int i = 0; i < 10; i++)
+            {
+                var c1 = MockedContent.CreateBasicContent(contentType);
+                ServiceContext.ContentService.Save(c1);
+                trashedContents.Add(c1);
+            }
+
+            var trashedRelType =
+                ServiceContext.RelationService.GetRelationTypeByAlias(Constants.Conventions.RelationTypes
+                    .RelateParentDocumentOnDeleteAlias);
+
+            // Relate to trashed content
+            foreach (var trashedContent in trashedContents)
+            {
+                foreach (var content in createdContent)
+                {
+                    ServiceContext.RelationService.Relate(trashedContent.Id, content.Id, trashedRelType);
+                }
+
+            }
+
+            // create trashed media
+            var trashedMedias = new List<IMedia>();
+            for (int i = 0; i < 10; i++)
+            {
+                var c1 = MockedMedia.CreateMediaImage(imageType, -1);
+                ServiceContext.MediaService.Save(c1);
+                trashedMedias.Add(c1);
+            }
+
+            var trashedMediaRelType =
+                ServiceContext.RelationService.GetRelationTypeByAlias(Constants.Conventions.RelationTypes
+                    .RelateParentMediaFolderOnDeleteAlias);
+
+            // Relate to trashed media
+            foreach (var trashedMedia in trashedMedias)
+            {
+                foreach (var media in createdMedia)
+                {
+                    ServiceContext.RelationService.Relate(trashedMedia.Id, media.Id, trashedMediaRelType);
+                }
+
+            }
+
         }
 
         [Test]
