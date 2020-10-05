@@ -243,9 +243,9 @@ namespace Umbraco.Core.IO
         }
 
         /// <summary>
-        /// Gets the filesystem-relative path of a full path or of an url.
+        /// Gets the filesystem-relative path of a full path or of an URL.
         /// </summary>
-        /// <param name="fullPathOrUrl">The full path or url.</param>
+        /// <param name="fullPathOrUrl">The full path or URL.</param>
         /// <returns>The path, relative to this filesystem's root.</returns>
         /// <remarks>
         /// <para>The relative path is relative to this filesystem's root, not starting with any
@@ -319,10 +319,10 @@ namespace Umbraco.Core.IO
         }
 
         /// <summary>
-        /// Gets the url.
+        /// Gets the URL.
         /// </summary>
         /// <param name="path">The filesystem-relative path.</param>
-        /// <returns>The url.</returns>
+        /// <returns>The URL.</returns>
         /// <remarks>All separators are forward-slashes.</remarks>
         public string GetUrl(string path)
         {

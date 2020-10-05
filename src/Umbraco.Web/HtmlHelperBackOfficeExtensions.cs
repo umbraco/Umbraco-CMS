@@ -26,7 +26,7 @@ namespace Umbraco.Web
         /// <param name="html"></param>
         /// <param name="uri"></param>
         /// <param name="externalLoginsUrl">
-        /// The post url used to sign in with external logins - this can change depending on for what service the external login is service.
+        /// The post URL used to sign in with external logins - this can change depending on for what service the external login is service.
         /// Example: normal back office login or authenticating upgrade login
         /// </param>
         /// <param name="features"></param>

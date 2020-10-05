@@ -9,7 +9,7 @@ using Umbraco.Core.Models.PublishedContent;
 namespace Umbraco.Web.Routing
 {
     /// <summary>
-    /// Provides urls using the <c>umbracoUrlAlias</c> property.
+    /// Provides URLs using the <c>umbracoUrlAlias</c> property.
     /// </summary>
     public class AliasUrlProvider : IUrlProvider
     {
@@ -41,15 +41,15 @@ namespace Umbraco.Web.Routing
         #region GetOtherUrls
 
         /// <summary>
-        /// Gets the other urls of a published content.
+        /// Gets the other URLs of a published content.
         /// </summary>
         /// <param name="umbracoContext">The Umbraco context.</param>
         /// <param name="id">The published content id.</param>
-        /// <param name="current">The current absolute url.</param>
-        /// <returns>The other urls for the published content.</returns>
+        /// <param name="current">The current absolute URL.</param>
+        /// <returns>The other URLs for the published content.</returns>
         /// <remarks>
-        /// <para>Other urls are those that <c>GetUrl</c> would not return in the current context, but would be valid
-        /// urls for the node in other contexts (different domain for current request, umbracoUrlAlias...).</para>
+        /// <para>Other URLs are those that <c>GetUrl</c> would not return in the current context, but would be valid
+        /// URLs for the node in other contexts (different domain for current request, umbracoUrlAlias...).</para>
         /// </remarks>
         public IEnumerable<UrlInfo> GetOtherUrls(UmbracoContext umbracoContext, int id, Uri current)
         {

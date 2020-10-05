@@ -49,7 +49,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Returns a list of the sizes of gravatar urls for the user or null if the gravatar server cannot be reached
+        /// Returns a list of the sizes of gravatar URLs for the user or null if the gravatar server cannot be reached
         /// </summary>
         /// <returns></returns>
         public string[] GetCurrentUserAvatarUrls()

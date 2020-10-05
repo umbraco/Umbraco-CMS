@@ -7,7 +7,7 @@ using Umbraco.Core.Services;
 namespace Umbraco.Web.Routing
 {
     /// <summary>
-    /// Provides an implementation of <see cref="IContentFinder"/> that handles page url rewrites
+    /// Provides an implementation of <see cref="IContentFinder"/> that handles page URL rewrites
     /// that are stored when moving, saving, or deleting a node.
     /// </summary>
     /// <remarks>

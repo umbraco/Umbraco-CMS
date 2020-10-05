@@ -1098,10 +1098,10 @@ namespace Umbraco.Core
         // the new methods to get a url segment
 
         /// <summary>
-        /// Cleans a string to produce a string that can safely be used in an url segment.
+        /// Cleans a string to produce a string that can safely be used in an URL segment.
         /// </summary>
         /// <param name="text">The text to filter.</param>
-        /// <returns>The safe url segment.</returns>
+        /// <returns>The safe URL segment.</returns>
         public static string ToUrlSegment(this string text)
         {
             if (text == null) throw new ArgumentNullException(nameof(text));
@@ -1111,11 +1111,11 @@ namespace Umbraco.Core
         }
 
         /// <summary>
-        /// Cleans a string, in the context of a specified culture, to produce a string that can safely be used in an url segment.
+        /// Cleans a string, in the context of a specified culture, to produce a string that can safely be used in an URL segment.
         /// </summary>
         /// <param name="text">The text to filter.</param>
         /// <param name="culture">The culture.</param>
-        /// <returns>The safe url segment.</returns>
+        /// <returns>The safe URL segment.</returns>
         public static string ToUrlSegment(this string text, string culture)
         {
             if (text == null) throw new ArgumentNullException(nameof(text));
@@ -1205,7 +1205,7 @@ namespace Umbraco.Core
 
         /// <summary>
         /// Cleans a string, in the context of the invariant culture, to produce a string that can safely be used as a filename,
-        /// both internally (on disk) and externally (as a url).
+        /// both internally (on disk) and externally (as a URL).
         /// </summary>
         /// <param name="text">The text to filter.</param>
         /// <returns>The safe filename.</returns>
@@ -1216,7 +1216,7 @@ namespace Umbraco.Core
 
         /// <summary>
         /// Cleans a string, in the context of the invariant culture, to produce a string that can safely be used as a filename,
-        /// both internally (on disk) and externally (as a url).
+        /// both internally (on disk) and externally (as a URL).
         /// </summary>
         /// <param name="text">The text to filter.</param>
         /// <param name="culture">The culture.</param>

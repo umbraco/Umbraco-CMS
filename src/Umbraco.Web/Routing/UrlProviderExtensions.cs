@@ -11,11 +11,11 @@ namespace Umbraco.Web.Routing
     internal static class UrlProviderExtensions
     {
         /// <summary>
-        /// Gets the Urls of the content item.
+        /// Gets the URLs of the content item.
         /// </summary>
         /// <remarks>
-        /// <para>Use when displaying Urls. If errors occur when generating the Urls, they will show in the list.</para>
-        /// <para>Contains all the Urls that we can figure out (based upon domains, etc).</para>
+        /// <para>Use when displaying URLs. If errors occur when generating the URLs, they will show in the list.</para>
+        /// <para>Contains all the URLs that we can figure out (based upon domains, etc).</para>
         /// </remarks>
         public static IEnumerable<UrlInfo> GetContentUrls(this IContent content,
             IPublishedRouter publishedRouter,
