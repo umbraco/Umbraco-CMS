@@ -82,17 +82,7 @@ namespace Umbraco.Web.WebApi.Filters
                     return culture != null && culture.ToString() != identity.Culture;
                 },
                 () => user.AllowedSections.UnsortedSequenceEqual(identity.AllowedApplications) == false,
-                () => user.Groups.Select(x => x.Alias).UnsortedSequenceEqual(identity.Roles) == false,
-                () =>
-                {
-                    var startContentIds = UserExtensions.CalculateContentStartNodeIds(user, Current.Services.EntityService);
-                    return startContentIds.UnsortedSequenceEqual(identity.StartContentNodes) == false;
-                },
-                () =>
-                {
-                    var startMediaIds = UserExtensions.CalculateMediaStartNodeIds(user, Current.Services.EntityService);
-                    return startMediaIds.UnsortedSequenceEqual(identity.StartMediaNodes) == false;
-                }
+                () => user.Groups.Select(x => x.Alias).UnsortedSequenceEqual(identity.Roles) == false
             };
 
             if (checks.Any(check => check()))
