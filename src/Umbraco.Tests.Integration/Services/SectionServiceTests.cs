@@ -8,7 +8,7 @@ using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.Services;
 
-namespace Umbraco.Tests.Services
+namespace Umbraco.Tests.Integration.Services
 {
     /// <summary>
     /// Tests covering the SectionService

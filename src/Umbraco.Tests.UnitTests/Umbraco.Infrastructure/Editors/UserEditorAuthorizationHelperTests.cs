@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -10,8 +7,6 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
-using Umbraco.Tests.Common.TestHelpers.Entities;
-using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Web.Editors;
 
 namespace Umbraco.Tests.Web.Controllers
@@ -23,7 +18,7 @@ namespace Umbraco.Tests.Web.Controllers
         public void Admin_Is_Authorized()
         {
             var currentUser = GetAdminUser();
-            var savingUser = MockedUser.GetUserMock();
+            var savingUser = GetUserMock();
 
             var contentService = new Mock<IContentService>();
             var mediaService = new Mock<IMediaService>();
@@ -44,7 +39,7 @@ namespace Umbraco.Tests.Web.Controllers
         [Test]
         public void Non_Admin_Cannot_Save_Admin()
         {
-            var currentUser = MockedUser.GetUserMock();
+            var currentUser = GetUserMock();
             var savingUser = GetAdminUser();
 
             var contentService = new Mock<IContentService>();
@@ -66,12 +61,12 @@ namespace Umbraco.Tests.Web.Controllers
         [Test]
         public void Cannot_Grant_Group_Membership_Without_Being_A_Member()
         {
-            var currentUser = MockedUser.GetUserMock();
+            var currentUser = GetUserMock();
             currentUser.Setup(x => x.Groups).Returns(new[]
             {
                 new ReadOnlyUserGroup(1, "Test", "icon-user", null, null, "test", new string[0], new string[0])
             });
-            var savingUser = MockedUser.GetUserMock();
+            var savingUser = GetUserMock();
 
             var contentService = new Mock<IContentService>();
             var mediaService = new Mock<IMediaService>();
@@ -92,12 +87,12 @@ namespace Umbraco.Tests.Web.Controllers
         [Test]
         public void Can_Grant_Group_Membership_With_Being_A_Member()
         {
-            var currentUser = MockedUser.GetUserMock();
+            var currentUser = GetUserMock();
             currentUser.Setup(x => x.Groups).Returns(new[]
             {
                 new ReadOnlyUserGroup(1, "Test", "icon-user", null, null, "test", new string[0], new string[0])
             });
-            var savingUser = MockedUser.GetUserMock();
+            var savingUser = GetUserMock();
 
             var contentService = new Mock<IContentService>();
             var mediaService = new Mock<IMediaService>();
@@ -126,9 +121,9 @@ namespace Umbraco.Tests.Web.Controllers
                 {4567, "-1,4567"},
             };
 
-            var currentUser = MockedUser.GetUserMock();
+            var currentUser = GetUserMock();
             currentUser.Setup(x => x.StartContentIds).Returns(new[] { 9876 });
-            var savingUser = MockedUser.GetUserMock();
+            var savingUser = GetUserMock();
             savingUser.Setup(x => x.StartContentIds).Returns(new[] { 1234 });
 
             var contentService = new Mock<IContentService>();
@@ -166,9 +161,9 @@ namespace Umbraco.Tests.Web.Controllers
                 {4567, "-1,4567"},
             };
 
-            var currentUser = MockedUser.GetUserMock();
+            var currentUser = GetUserMock();
             currentUser.Setup(x => x.StartContentIds).Returns(new[] { 9876 });
-            var savingUser = MockedUser.GetUserMock();
+            var savingUser = GetUserMock();
             savingUser.Setup(x => x.StartContentIds).Returns(new[] { 1234, 4567 });
 
             var contentService = new Mock<IContentService>();
@@ -206,9 +201,9 @@ namespace Umbraco.Tests.Web.Controllers
                 {4567, "-1,4567"},
             };
 
-            var currentUser = MockedUser.GetUserMock();
+            var currentUser = GetUserMock();
             currentUser.Setup(x => x.StartContentIds).Returns(new[] { 9876 });
-            var savingUser = MockedUser.GetUserMock();
+            var savingUser = GetUserMock();
 
             var contentService = new Mock<IContentService>();
             contentService.Setup(x => x.GetById(It.IsAny<int>()))
@@ -245,9 +240,9 @@ namespace Umbraco.Tests.Web.Controllers
                 {4567, "-1,4567"},
             };
 
-            var currentUser = MockedUser.GetUserMock();
+            var currentUser = GetUserMock();
             currentUser.Setup(x => x.StartContentIds).Returns(new[] { 9876 });
-            var savingUser = MockedUser.GetUserMock();
+            var savingUser = GetUserMock();
 
             var contentService = new Mock<IContentService>();
             contentService.Setup(x => x.GetById(It.IsAny<int>()))
@@ -285,9 +280,9 @@ namespace Umbraco.Tests.Web.Controllers
             };
 
 
-            var currentUser = MockedUser.GetUserMock();
+            var currentUser = GetUserMock();
             currentUser.Setup(x => x.StartContentIds).Returns(new[] { 9876 });
-            var savingUser = MockedUser.GetUserMock();
+            var savingUser = GetUserMock();
 
             var contentService = new Mock<IContentService>();
             var mediaService = new Mock<IMediaService>();
@@ -324,9 +319,9 @@ namespace Umbraco.Tests.Web.Controllers
                 {4567, "-1,4567"},
             };
 
-            var currentUser = MockedUser.GetUserMock();
+            var currentUser = GetUserMock();
             currentUser.Setup(x => x.StartMediaIds).Returns(new[] { 9876 });
-            var savingUser = MockedUser.GetUserMock();
+            var savingUser = GetUserMock();
 
             var contentService = new Mock<IContentService>();
             var mediaService = new Mock<IMediaService>();
@@ -363,9 +358,9 @@ namespace Umbraco.Tests.Web.Controllers
                 {4567, "-1,4567"},
             };
 
-            var currentUser = MockedUser.GetUserMock();
+            var currentUser = GetUserMock();
             currentUser.Setup(x => x.StartMediaIds).Returns(new[] { 9876 });
-            var savingUser = MockedUser.GetUserMock();
+            var savingUser = GetUserMock();
             savingUser.Setup(x => x.StartMediaIds).Returns(new[] { 1234 });
 
             var contentService = new Mock<IContentService>();
@@ -403,9 +398,9 @@ namespace Umbraco.Tests.Web.Controllers
                 {4567, "-1,4567"},
             };
 
-            var currentUser = MockedUser.GetUserMock();
+            var currentUser = GetUserMock();
             currentUser.Setup(x => x.StartMediaIds).Returns(new[] { 9876 });
-            var savingUser = MockedUser.GetUserMock();
+            var savingUser = GetUserMock();
             savingUser.Setup(x => x.StartMediaIds).Returns(new[] { 1234, 4567 });
 
             var contentService = new Mock<IContentService>();
@@ -432,9 +427,23 @@ namespace Umbraco.Tests.Web.Controllers
             Assert.IsTrue(result.Success);
         }
 
+        /// <summary>
+        /// Returns a <see cref="Mock{IUser}"/> and ensures that the ToUserCache and FromUserCache methods are mapped correctly for
+        /// dealing with start node caches
+        /// </summary>
+        /// <returns></returns>
+        private static Mock<IUser> GetUserMock()
+        {
+            var userCache = new Dictionary<string, object>();
+            var userMock = new Mock<IUser>();
+            userMock.Setup(x => x.FromUserCache<int[]>(It.IsAny<string>())).Returns((string key) => userCache.TryGetValue(key, out var val) ? val is int[] iVal ? iVal : null : null);
+            userMock.Setup(x => x.ToUserCache<int[]>(It.IsAny<string>(), It.IsAny<int[]>())).Callback((string key, int[] val) => userCache[key] = val);
+            return userMock;
+        }
+
         private IUser GetAdminUser()
         {
-            var admin = MockedUser.GetUserMock();
+            var admin = GetUserMock();
             admin.Setup(x => x.Groups).Returns(new[]
             {
                 new ReadOnlyUserGroup(1, "Admin", "icon-user", null, null, Constants.Security.AdminGroupAlias, new string[0], new string[0])

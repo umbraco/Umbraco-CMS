@@ -19,8 +19,8 @@ namespace Umbraco.Tests.Integration.Services
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, PublishedRepositoryEvents = true)]
     public class MediaServiceTests : UmbracoIntegrationTest
     {
-        private IMediaService MediaService => GetRequiredService<IMediaService>();
-        private IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();
+        private IMediaService _mediaService => GetRequiredService<IMediaService>();
+        private IMediaTypeService _mediaTypeService => GetRequiredService<IMediaTypeService>();
 
         /// <summary>
         /// Used to list out all ambiguous events that will require dispatching with a name
@@ -28,7 +28,7 @@ namespace Umbraco.Tests.Integration.Services
         [Test, Explicit]
         public void List_Ambiguous_Events()
         {
-            var events = MediaService.GetType().GetEvents(BindingFlags.Static | BindingFlags.Public);
+            var events = _mediaService.GetType().GetEvents(BindingFlags.Static | BindingFlags.Public);
             var typedEventHandler = typeof(TypedEventHandler<,>);
             foreach (var e in events)
             {
@@ -52,30 +52,30 @@ namespace Umbraco.Tests.Integration.Services
         public void Get_Paged_Children_With_Media_Type_Filter()
         {
             var mediaType1 = MockedContentTypes.CreateImageMediaType("Image2");
-            MediaTypeService.Save(mediaType1);
+            _mediaTypeService.Save(mediaType1);
             var mediaType2 = MockedContentTypes.CreateImageMediaType("Image3");
-            MediaTypeService.Save(mediaType2);
+            _mediaTypeService.Save(mediaType2);
 
             for (var i = 0; i < 10; i++)
             {
                 var m1 = MockedMedia.CreateMediaImage(mediaType1, -1);
-                MediaService.Save(m1);
+                _mediaService.Save(m1);
                 var m2 = MockedMedia.CreateMediaImage(mediaType2, -1);
-                MediaService.Save(m2);
+                _mediaService.Save(m2);
             }
 
             long total;
             var provider = ScopeProvider;
             using (provider.CreateScope())
             {
-                var result = MediaService.GetPagedChildren(-1, 0, 11, out total,
+                var result = _mediaService.GetPagedChildren(-1, 0, 11, out total,
                     provider.SqlContext.Query<IMedia>()
                         .Where(x => new[] { mediaType1.Id, mediaType2.Id }.Contains(x.ContentTypeId)),
                     Ordering.By("SortOrder", Direction.Ascending));
                 Assert.AreEqual(11, result.Count());
                 Assert.AreEqual(20, total);
 
-                result = MediaService.GetPagedChildren(-1, 1, 11, out total,
+                result = _mediaService.GetPagedChildren(-1, 1, 11, out total,
                     provider.SqlContext.Query<IMedia>()
                         .Where(x => new[] { mediaType1.Id, mediaType2.Id }.Contains(x.ContentTypeId)),
                     Ordering.By("SortOrder", Direction.Ascending));
@@ -89,10 +89,10 @@ namespace Umbraco.Tests.Integration.Services
         {
             // Arrange
             var mediaItems = CreateTrashedTestMedia();
-            var media = MediaService.GetById(mediaItems.Item3.Id);
+            var media = _mediaService.GetById(mediaItems.Item3.Id);
 
             // Act
-            MediaService.Move(media, mediaItems.Item2.Id);
+            _mediaService.Move(media, mediaItems.Item2.Id);
 
             // Assert
             Assert.That(media.ParentId, Is.EqualTo(mediaItems.Item2.Id));
@@ -104,10 +104,10 @@ namespace Umbraco.Tests.Integration.Services
         {
             // Arrange
             var mediaItems = CreateTrashedTestMedia();
-            var media = MediaService.GetById(mediaItems.Item1.Id);
+            var media = _mediaService.GetById(mediaItems.Item1.Id);
 
             // Act
-            MediaService.MoveToRecycleBin(media);
+            _mediaService.MoveToRecycleBin(media);
 
             // Assert
             Assert.That(media.ParentId, Is.EqualTo(-21));
@@ -119,11 +119,11 @@ namespace Umbraco.Tests.Integration.Services
         {
             // Arrange
             var mediaItems = CreateTrashedTestMedia();
-            var media = MediaService.GetById(mediaItems.Item4.Id);
+            var media = _mediaService.GetById(mediaItems.Item4.Id);
 
             // Act - moving out of recycle bin
-            MediaService.Move(media, mediaItems.Item1.Id);
-            var mediaChild = MediaService.GetById(mediaItems.Item5.Id);
+            _mediaService.Move(media, mediaItems.Item1.Id);
+            var mediaChild = _mediaService.GetById(mediaItems.Item5.Id);
 
             // Assert
             Assert.That(media.ParentId, Is.EqualTo(mediaItems.Item1.Id));
@@ -137,11 +137,11 @@ namespace Umbraco.Tests.Integration.Services
         {
             // Arrange
             var mediaType = MockedContentTypes.CreateVideoMediaType();
-            MediaTypeService.Save(mediaType);
-            var media = MediaService.CreateMedia(string.Empty, -1, "video");
+            _mediaTypeService.Save(mediaType);
+            var media = _mediaService.CreateMedia(string.Empty, -1, "video");
 
             // Act & Assert
-            Assert.Throws<ArgumentException>(() => MediaService.Save(media));
+            Assert.Throws<ArgumentException>(() => _mediaService.Save(media));
         }
         /*
         [Test]
@@ -163,13 +163,13 @@ namespace Umbraco.Tests.Integration.Services
         public void Can_Get_Media_By_Path()
         {
             var mediaType = MockedContentTypes.CreateImageMediaType("Image2");
-            MediaTypeService.Save(mediaType);
+            _mediaTypeService.Save(mediaType);
 
             var media = MockedMedia.CreateMediaImage(mediaType, -1);
-            MediaService.Save(media);
+            _mediaService.Save(media);
 
             var mediaPath = "/media/test-image.png";
-            var resolvedMedia = MediaService.GetMediaByPath(mediaPath);
+            var resolvedMedia = _mediaService.GetMediaByPath(mediaPath);
 
             Assert.IsNotNull(resolvedMedia);
             Assert.That(resolvedMedia.GetValue(Constants.Conventions.Media.File).ToString() == mediaPath);
@@ -179,13 +179,13 @@ namespace Umbraco.Tests.Integration.Services
         public void Can_Get_Media_With_Crop_By_Path()
         {
             var mediaType = MockedContentTypes.CreateImageMediaTypeWithCrop("Image2");
-            MediaTypeService.Save(mediaType);
+            _mediaTypeService.Save(mediaType);
 
             var media = MockedMedia.CreateMediaImageWithCrop(mediaType, -1);
-            MediaService.Save(media);
+            _mediaService.Save(media);
 
             var mediaPath = "/media/test-image.png";
-            var resolvedMedia = MediaService.GetMediaByPath(mediaPath);
+            var resolvedMedia = _mediaService.GetMediaByPath(mediaPath);
 
             Assert.IsNotNull(resolvedMedia);
             Assert.That(resolvedMedia.GetValue(Constants.Conventions.Media.File).ToString().Contains(mediaPath));
@@ -195,14 +195,14 @@ namespace Umbraco.Tests.Integration.Services
         public void Can_Get_Paged_Children()
         {
             var mediaType = MockedContentTypes.CreateImageMediaType("Image2");
-            MediaTypeService.Save(mediaType);
+            _mediaTypeService.Save(mediaType);
             for (var i = 0; i < 10; i++)
             {
                 var c1 = MockedMedia.CreateMediaImage(mediaType, -1);
-                MediaService.Save(c1);
+                _mediaService.Save(c1);
             }
 
-            var service = MediaService;
+            var service = _mediaService;
 
             long total;
             var entities = service.GetPagedChildren(-1, 0, 6, out total).ToArray();
@@ -217,25 +217,25 @@ namespace Umbraco.Tests.Integration.Services
         public void Can_Get_Paged_Children_Dont_Get_Descendants()
         {
             var mediaType = MockedContentTypes.CreateImageMediaType("Image2");
-            MediaTypeService.Save(mediaType);
+            _mediaTypeService.Save(mediaType);
             // only add 9 as we also add a folder with children
             for (var i = 0; i < 9; i++)
             {
                 var m1 = MockedMedia.CreateMediaImage(mediaType, -1);
-                MediaService.Save(m1);
+                _mediaService.Save(m1);
             }
 
             var mediaTypeForFolder = MockedContentTypes.CreateImageMediaType("Folder2");
-            MediaTypeService.Save(mediaTypeForFolder);
+            _mediaTypeService.Save(mediaTypeForFolder);
             var mediaFolder = MockedMedia.CreateMediaFolder(mediaTypeForFolder, -1);
-            MediaService.Save(mediaFolder);
+            _mediaService.Save(mediaFolder);
             for (var i = 0; i < 10; i++)
             {
                 var m1 = MockedMedia.CreateMediaImage(mediaType, mediaFolder.Id);
-                MediaService.Save(m1);
+                _mediaService.Save(m1);
             }
 
-            var service = MediaService;
+            var service = _mediaService;
 
             long total;
             // children in root including the folder - not the descendants in the folder
@@ -258,28 +258,28 @@ namespace Umbraco.Tests.Integration.Services
         private Tuple<IMedia, IMedia, IMedia, IMedia, IMedia> CreateTrashedTestMedia()
         {
             //Create and Save folder-Media -> 1050
-            var folderMediaType = MediaTypeService.Get(1031);
+            var folderMediaType = _mediaTypeService.Get(1031);
             var folder = MockedMedia.CreateMediaFolder(folderMediaType, -1);
-            MediaService.Save(folder);
+            _mediaService.Save(folder);
 
             //Create and Save folder-Media -> 1051
             var folder2 = MockedMedia.CreateMediaFolder(folderMediaType, -1);
-            MediaService.Save(folder2);
+            _mediaService.Save(folder2);
 
             //Create and Save image-Media  -> 1052
-            var imageMediaType = MediaTypeService.Get(1032);
+            var imageMediaType = _mediaTypeService.Get(1032);
             var image = (Media)MockedMedia.CreateMediaImage(imageMediaType, 1050);
-            MediaService.Save(image);
+            _mediaService.Save(image);
 
             //Create and Save folder-Media that is trashed -> 1053
             var folderTrashed = (Media)MockedMedia.CreateMediaFolder(folderMediaType, -21);
             folderTrashed.Trashed = true;
-            MediaService.Save(folderTrashed);
+            _mediaService.Save(folderTrashed);
 
             //Create and Save image-Media child of folderTrashed -> 1054
             var imageTrashed = (Media)MockedMedia.CreateMediaImage(imageMediaType, folderTrashed.Id);
             imageTrashed.Trashed = true;
-            MediaService.Save(imageTrashed);
+            _mediaService.Save(imageTrashed);
 
             return new Tuple<IMedia, IMedia, IMedia, IMedia, IMedia>(folder, folder2, image, folderTrashed, imageTrashed);
         }
