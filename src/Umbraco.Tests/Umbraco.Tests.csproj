@@ -203,9 +203,6 @@
     <Compile Include="TestHelpers\TestObjects.cs" />
     <Compile Include="UmbracoExamine\RandomIdRamDirectory.cs" />
     <Compile Include="Web\AngularIntegration\AngularAntiForgeryTests.cs" />
-    <Compile Include="Web\AngularIntegration\ContentModelSerializationTests.cs" />
-    <Compile Include="Web\AngularIntegration\JsInitializationTests.cs" />
-    <Compile Include="Web\AngularIntegration\ServerVariablesParserTests.cs" />
     <Compile Include="Migrations\Stubs\DropForeignKeyMigrationStub.cs" />
     <Compile Include="Cache\DeepCloneAppCacheTests.cs" />
     <Compile Include="Cache\DefaultCachePolicyTests.cs" />
