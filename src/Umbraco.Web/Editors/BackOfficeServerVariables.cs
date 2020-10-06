@@ -59,7 +59,7 @@ namespace Umbraco.Web.Editors
             var keepOnlyKeys = new Dictionary<string, string[]>
             {
                 {"umbracoUrls", new[] {"authenticationApiBaseUrl", "serverVarsJs", "externalLoginsUrl", "currentUserApiBaseUrl", "iconApiBaseUrl"}},
-                {"umbracoSettings", new[] {"allowPasswordReset", "imageFileTypes", "maxFileSize", "loginBackgroundImage", "canSendRequiredEmail", "usernameIsEmail"}},
+                {"umbracoSettings", new[] {"allowPasswordReset", "imageFileTypes", "maxFileSize", "loginBackgroundImage", "loginLogoImage", "canSendRequiredEmail", "usernameIsEmail"}},
                 {"application", new[] {"applicationPath", "cacheBuster"}},
                 {"isDebuggingEnabled", new string[] { }},
                 {"features", new [] {"disabledFeatures"}}
@@ -355,6 +355,7 @@ namespace Umbraco.Web.Editors
                         {"cssPath", IOHelper.ResolveUrl(SystemDirectories.Css).TrimEnd('/')},
                         {"allowPasswordReset", Current.Configs.Settings().Security.AllowPasswordReset},
                         {"loginBackgroundImage",  Current.Configs.Settings().Content.LoginBackgroundImage},
+                        {"loginLogoImage", Current.Configs.Settings().Content.LoginLogoImage },
                         {"showUserInvite", EmailSender.CanSendRequiredEmail},
                         {"canSendRequiredEmail", EmailSender.CanSendRequiredEmail},
                         {"showAllowSegmentationForDocumentTypes", false},
