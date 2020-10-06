@@ -140,8 +140,6 @@
     <Compile Include="Scoping\ScopeEventDispatcherTests.cs" />
     <Compile Include="Security\BackOfficeOwinUserManagerTests.cs" />
     <Compile Include="Security\OwinDataProtectorTokenProviderTests.cs" />
-    <Compile Include="Services\ContentServicePublishBranchTests.cs" />
-    <Compile Include="Services\KeyValueServiceTests.cs" />
     <Compile Include="Persistence\Repositories\UserRepositoryTest.cs" />
     <Compile Include="TestHelpers\Entities\MockedEntity.cs" />
     <Compile Include="TestHelpers\Entities\MockedPropertyTypes.cs" />
@@ -155,8 +153,6 @@
     <Compile Include="Routing\RoutableDocumentFilterTests.cs" />
     <Compile Include="Runtimes\StandaloneTests.cs" />
     <Compile Include="Routing\GetContentUrlsTests.cs" />
-    <Compile Include="Services\AmbiguousEventTests.cs" />
-    <Compile Include="Services\ContentServiceEventTests.cs" />
     <Compile Include="Services\ContentServiceTagsTests.cs" />
     <Compile Include="Services\ContentTypeServiceVariantsTests.cs" />
     <Compile Include="Services\EntityXmlSerializerTests.cs" />
