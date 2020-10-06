@@ -20,16 +20,16 @@ namespace Umbraco.Tests.Integration.Services
         Logger = UmbracoTestOptions.Logger.Console)]
     public class ContentServiceEventTests : UmbracoIntegrationTest
     {
-        private IContentTypeService _contentTypeService => GetRequiredService<IContentTypeService>();
-        private IContentService _contentService => GetRequiredService<IContentService>();
-        private ILocalizationService _localizationService => GetRequiredService<ILocalizationService>();
-        private IFileService _fileService => GetRequiredService<IFileService>();
+        private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
+        private ContentService ContentService => (ContentService)GetRequiredService<IContentService>();
+        private ILocalizationService LocalizationService => GetRequiredService<ILocalizationService>();
+        private IFileService FileService => GetRequiredService<IFileService>();
 
         private GlobalSettings _globalSettings;
 
-        public override void Setup()
+        [SetUp]
+        public void SetupTest()
         {
-            base.Setup();
             ContentRepositoryBase.ThrowOnWarning = true;
             _globalSettings = new GlobalSettings();
         }
@@ -43,22 +43,22 @@ namespace Umbraco.Tests.Integration.Services
         [Test]
         public void Saving_Culture()
         {
-            _localizationService.Save(new Language(_globalSettings, "fr-FR"));
+            LocalizationService.Save(new Language(_globalSettings, "fr-FR"));
 
             var contentType = MockedContentTypes.CreateTextPageContentType();
-            _fileService.SaveTemplate(contentType.DefaultTemplate);
+            FileService.SaveTemplate(contentType.DefaultTemplate);
             contentType.Variations = ContentVariation.Culture;
             foreach (var propertyType in contentType.PropertyTypes)
                 propertyType.Variations = ContentVariation.Culture;
-            _contentTypeService.Save(contentType);
+            ContentTypeService.Save(contentType);
 
             IContent document = new Content("content", -1, contentType);
             document.SetCultureName("hello", "en-US");
             document.SetCultureName("bonjour", "fr-FR");
-            _contentService.Save(document);
+            ContentService.Save(document);
 
             //re-get - dirty properties need resetting
-            document = _contentService.GetById(document.Id);
+            document = ContentService.GetById(document.Id);
 
             // properties: title, bodyText, keywords, description
             document.SetValue("title", "title-en", "en-US");
@@ -87,7 +87,7 @@ namespace Umbraco.Tests.Integration.Services
             ContentService.Saved += OnSaved;
             try
             {
-                _contentService.Save(document);
+                ContentService.Save(document);
             }
             finally
             {
@@ -100,8 +100,8 @@ namespace Umbraco.Tests.Integration.Services
         public void Saving_Set_Value()
         {
             var contentType = MockedContentTypes.CreateTextPageContentType();
-            _fileService.SaveTemplate(contentType.DefaultTemplate);
-            _contentTypeService.Save(contentType);
+            FileService.SaveTemplate(contentType.DefaultTemplate);
+            ContentTypeService.Save(contentType);
 
             IContent document = new Content("content", -1, contentType);
 
@@ -131,7 +131,7 @@ namespace Umbraco.Tests.Integration.Services
             ContentService.Saved += OnSaved;
             try
             {
-                _contentService.Save(document);
+                ContentService.Save(document);
             }
             finally
             {
@@ -143,25 +143,25 @@ namespace Umbraco.Tests.Integration.Services
         [Test]
         public void Publishing_Culture()
         {
-            _localizationService.Save(new Language(_globalSettings, "fr-FR"));
+            LocalizationService.Save(new Language(_globalSettings, "fr-FR"));
 
             var contentType = MockedContentTypes.CreateTextPageContentType();
-            _fileService.SaveTemplate(contentType.DefaultTemplate);
+            FileService.SaveTemplate(contentType.DefaultTemplate);
             contentType.Variations = ContentVariation.Culture;
             foreach (var propertyType in contentType.PropertyTypes)
                 propertyType.Variations = ContentVariation.Culture;
-            _contentTypeService.Save(contentType);
+            ContentTypeService.Save(contentType);
 
             IContent document = new Content("content", -1, contentType);
             document.SetCultureName("hello", "en-US");
             document.SetCultureName("bonjour", "fr-FR");
-            _contentService.Save(document);
+            ContentService.Save(document);
 
             Assert.IsFalse(document.IsCulturePublished("fr-FR"));
             Assert.IsFalse(document.IsCulturePublished("en-US"));
 
             //re-get - dirty properties need resetting
-            document = _contentService.GetById(document.Id);
+            document = ContentService.GetById(document.Id);
 
             void OnPublishing(IContentService sender, ContentPublishingEventArgs e)
             {
@@ -187,7 +187,7 @@ namespace Umbraco.Tests.Integration.Services
             ContentService.Published += OnPublished;
             try
             {
-                _contentService.SaveAndPublish(document, "fr-FR");
+                ContentService.SaveAndPublish(document, "fr-FR");
             }
             finally
             {
@@ -195,7 +195,7 @@ namespace Umbraco.Tests.Integration.Services
                 ContentService.Published -= OnPublished;
             }
 
-            document = _contentService.GetById(document.Id);
+            document = ContentService.GetById(document.Id);
 
             // ensure it works and does not throw
             Assert.IsTrue(document.IsCulturePublished("fr-FR"));
@@ -206,8 +206,8 @@ namespace Umbraco.Tests.Integration.Services
         public void Publishing_Set_Value()
         {
             var contentType = MockedContentTypes.CreateTextPageContentType();
-            _fileService.SaveTemplate(contentType.DefaultTemplate);
-            _contentTypeService.Save(contentType);
+            FileService.SaveTemplate(contentType.DefaultTemplate);
+            ContentTypeService.Save(contentType);
 
             IContent document = new Content("content", -1, contentType);
 
@@ -240,7 +240,7 @@ namespace Umbraco.Tests.Integration.Services
             ContentService.Saved += OnSaved;
             try
             {
-                _contentService.SaveAndPublish(document);
+                ContentService.SaveAndPublish(document);
             }
             finally
             {
@@ -255,12 +255,12 @@ namespace Umbraco.Tests.Integration.Services
             var contentType = MockedContentTypes.CreateTextPageContentType();
             var titleProperty = contentType.PropertyTypes.First(x => x.Alias == "title");
             titleProperty.Mandatory = true; // make this required!
-            _fileService.SaveTemplate(contentType.DefaultTemplate);
-            _contentTypeService.Save(contentType);
+            FileService.SaveTemplate(contentType.DefaultTemplate);
+            ContentTypeService.Save(contentType);
 
             IContent document = new Content("content", -1, contentType);
 
-            var result = _contentService.SaveAndPublish(document);
+            var result = ContentService.SaveAndPublish(document);
             Assert.IsFalse(result.Success);
             Assert.AreEqual("title", result.InvalidProperties.First().Alias);
 
@@ -283,7 +283,7 @@ namespace Umbraco.Tests.Integration.Services
             ContentService.Saving += OnSaving;
             try
             {
-                result = _contentService.SaveAndPublish(document);
+                result = ContentService.SaveAndPublish(document);
                 Assert.IsTrue(result.Success); //will succeed now because we were able to specify the required value in the Saving event
             }
             finally
@@ -295,16 +295,16 @@ namespace Umbraco.Tests.Integration.Services
         [Test]
         public void Unpublishing_Culture()
         {
-            _localizationService.Save(new Language(_globalSettings, "fr-FR"));
+            LocalizationService.Save(new Language(_globalSettings, "fr-FR"));
 
             var contentType = MockedContentTypes.CreateTextPageContentType();
-            _fileService.SaveTemplate(contentType.DefaultTemplate);
+            FileService.SaveTemplate(contentType.DefaultTemplate);
             contentType.Variations = ContentVariation.Culture;
             foreach (var propertyType in contentType.PropertyTypes)
                 propertyType.Variations = ContentVariation.Culture;
-            _contentTypeService.Save(contentType);
+            ContentTypeService.Save(contentType);
 
-            var contentService = (ContentService)_contentService;
+            var contentService = (ContentService)ContentService;
 
             IContent document = new Content("content", -1, contentType);
             document.SetCultureName("hello", "en-US");

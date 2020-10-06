@@ -18,8 +18,8 @@ namespace Umbraco.Tests.Integration.Services
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class SectionServiceTests : UmbracoIntegrationTest
     {
-        private ISectionService _sectionService => GetRequiredService<ISectionService>();
-        private IUserService _userService => GetRequiredService<IUserService>();
+        private ISectionService SectionService => GetRequiredService<ISectionService>();
+        private IUserService UserService => GetRequiredService<IUserService>();
 
         [Test]
         public void SectionService_Can_Get_Allowed_Sections_For_User()
@@ -28,7 +28,7 @@ namespace Umbraco.Tests.Integration.Services
             var user = CreateTestUser();
 
             // Act
-            var result = _sectionService.GetAllowedSections(user.Id).ToList();
+            var result = SectionService.GetAllowedSections(user.Id).ToList();
 
             // Assert
             Assert.AreEqual(3, result.Count);
@@ -43,7 +43,7 @@ namespace Umbraco.Tests.Integration.Services
                 Username = "testUser",
                 Email = "testuser@test.com",
             };
-            _userService.Save(user, false);
+            UserService.Save(user, false);
 
             var userGroupA = new UserGroup(ShortStringHelper)
             {
@@ -53,7 +53,7 @@ namespace Umbraco.Tests.Integration.Services
             userGroupA.AddAllowedSection("media");
             userGroupA.AddAllowedSection("settings");
             // TODO: This is failing the test
-            _userService.Save(userGroupA, new[] { user.Id }, false);
+            UserService.Save(userGroupA, new[] { user.Id }, false);
 
             var userGroupB = new UserGroup(ShortStringHelper)
             {
@@ -62,9 +62,9 @@ namespace Umbraco.Tests.Integration.Services
             };
             userGroupB.AddAllowedSection("settings");
             userGroupB.AddAllowedSection("member");
-            _userService.Save(userGroupB, new[] { user.Id }, false);
+            UserService.Save(userGroupB, new[] { user.Id }, false);
 
-            return _userService.GetUserById(user.Id);
+            return UserService.GetUserById(user.Id);
         }
     }
 }
