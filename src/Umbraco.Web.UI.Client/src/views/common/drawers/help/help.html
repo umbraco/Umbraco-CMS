@@ -2,8 +2,8 @@
     <umb-drawer-view>
 
         <umb-drawer-header
-            title="{{ vm.title }}"
-            description="{{ vm.subtitle }}">
+            title="{{vm.title}}"
+            description="{{vm.subtitle}}">
         </umb-drawer-header>
 
         <umb-drawer-content>
@@ -13,7 +13,6 @@
                 <h5>Need help editing current item '{{vm.nodeName}}' ?</h5>
 
                 <div class="umb-help-list">
-
 
                     <div ng-repeat="tour in vm.docTypeTours | orderBy:'groupOrder'">
                         <div data-element="tour-{{tour.alias}}" class="umb-help-list-item">
@@ -98,7 +97,7 @@
                 </h5>
                 <ul class="umb-help-list">
                     <li class="umb-help-list-item" ng-repeat="topic in vm.topics track by $index">
-                        <a class="umb-help-list-item__content" data-element="help-article-{{topic.name}}" target="_blank" ng-href="{{topic.url}}?utm_source=core&utm_medium=help&utm_content=link&utm_campaign=tv">
+                        <a class="umb-help-list-item__content" data-element="help-article-{{topic.name}}" target="_blank" rel="noopener" href="" ng-href="{{topic.url}}?utm_source=core&utm_medium=help&utm_content=link&utm_campaign=tv">
                             <span>
                                 <span class="umb-help-list-item__title">
                                     <span class="bold">{{topic.name}}</span>
@@ -118,7 +117,7 @@
                 </h5>
                 <ul class="umb-help-list">
                     <li class="umb-help-list-item" ng-repeat="video in vm.videos track by $index">
-                    <a class="umb-help-list-item__content" data-element="help-article-{{video.title}}" target="_blank" ng-href="{{video.link}}?utm_source=core&utm_medium=help&utm_content=link&utm_campaign=tv">
+                    <a class="umb-help-list-item__content" data-element="help-article-{{video.title}}" target="_blank" rel="noopener" href="" ng-href="{{video.link}}?utm_source=core&utm_medium=help&utm_content=link&utm_campaign=tv">
                             <i class="umb-help-list-item__icon icon-tv-old" aria-hidden="true"></i>
                             <span class="umb-help-list-item__title">{{video.title}}</span>
                             <i class="umb-help-list-item__open-icon icon-out" aria-hidden="true"></i>
@@ -129,7 +128,7 @@
 
             <!--  Links -->
             <div class="umb-help-section" data-element="help-links" ng-if="vm.hasAccessToSettings">
-                <a data-element="help-link-umbraco-tv" class="umb-help-badge" target="_blank" href="https://umbraco.tv?utm_source=core&utm_medium=help&utm_content=link&utm_campaign=tv">
+                <a data-element="help-link-umbraco-tv" class="umb-help-badge" target="_blank" rel="noopener" href="https://umbraco.tv?utm_source=core&utm_medium=help&utm_content=link&utm_campaign=tv">
                     <i class="umb-help-badge__icon icon-tv-old" aria-hidden="true"></i>
                     <div class="umb-help-badge__title">
                         <localize key="help_umbracoTv">Visit umbraco.tv</localize>
@@ -139,7 +138,7 @@
                     </small>
                 </a>
 
-                <a data-element="help-link-our-umbraco" class="umb-help-badge" target="_blank" href="https://our.umbraco.com?utm_source=core&utm_medium=help&utm_content=link&utm_campaign=our">
+                <a data-element="help-link-our-umbraco" class="umb-help-badge" target="_blank" rel="noopener" href="https://our.umbraco.com?utm_source=core&utm_medium=help&utm_content=link&utm_campaign=our">
                     <i class="umb-help-badge__icon icon-favorite" aria-hidden="true"></i>
 
                     <div class="umb-help-badge__title">
