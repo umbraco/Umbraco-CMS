@@ -128,7 +128,7 @@ namespace Umbraco.Tests.Integration.Testing
         {
             UmbracoContainer = CreateUmbracoContainer(out var serviceProviderFactory);
             _serviceProviderFactory = serviceProviderFactory;
-            // TODO: Is this the right way to do this?
+
             var hostBuilder = Host.CreateDefaultBuilder()
                 // IMPORTANT: We Cannot use UseStartup, there's all sorts of threads about this with testing. Although this can work
                 // if you want to setup your tests this way, it is a bit annoying to do that as the WebApplicationFactory will

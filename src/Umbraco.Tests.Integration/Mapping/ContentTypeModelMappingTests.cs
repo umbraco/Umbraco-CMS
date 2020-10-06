@@ -16,13 +16,12 @@ using Umbraco.Web.Models.ContentEditing;
 namespace Umbraco.Tests.Models.Mapping
 {
     [TestFixture]
-    [UmbracoTest(Mapper = true, Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Mock)]
+    [UmbracoTest(Mapper = true, Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class ContentTypeModelMappingTests : UmbracoIntegrationTest
     {
         private IDataTypeService _dataTypeService;
         private UmbracoMapper _sut;
         private IFileService _fileService;
-        private IEntityService _entityService;
 
 
         [SetUp]
@@ -31,7 +30,6 @@ namespace Umbraco.Tests.Models.Mapping
             _sut = Services.GetRequiredService<UmbracoMapper>();
             _dataTypeService = Services.GetRequiredService<IDataTypeService>();
             _fileService = Services.GetRequiredService<IFileService>();
-            _entityService = Services.GetRequiredService<IEntityService>();
         }
 
         [Test]

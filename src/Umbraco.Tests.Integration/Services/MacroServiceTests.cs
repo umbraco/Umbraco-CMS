@@ -25,9 +25,10 @@ namespace Umbraco.Tests.Integration.Services
         [SetUp]
         public void SetupTest()
         {
-            using (var scope = ScopeProvider.CreateScope())
+            var scopeProvider = ScopeProvider;
+            using (var scope = scopeProvider.CreateScope())
             {
-                var repository = new MacroRepository((IScopeAccessor) sp, AppCaches.Disabled, Mock.Of<ILogger<MacroRepository>>(), ShortStringHelper);
+                var repository = new MacroRepository((IScopeAccessor) scopeProvider, AppCaches.Disabled, Mock.Of<ILogger<MacroRepository>>(), ShortStringHelper);
 
                 repository.Save(new Macro(ShortStringHelper, "test1", "Test1", "~/views/macropartials/test1.cshtml"));
                 repository.Save(new Macro(ShortStringHelper, "test2", "Test2", "~/views/macropartials/test2.cshtml"));
