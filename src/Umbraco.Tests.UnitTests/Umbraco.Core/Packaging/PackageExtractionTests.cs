@@ -1,14 +1,9 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
 using Umbraco.Core.Packaging;
-using Umbraco.Tests.TestHelpers;
-using Umbraco.Tests.UnitTests.AutoFixture;
 
 namespace Umbraco.Tests.Packaging
 {

@@ -6,9 +6,7 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
-using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Integration.Testing;
-using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 
 // ReSharper disable CommentTypo

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 using NUnit.Framework;
 using Umbraco.Core;

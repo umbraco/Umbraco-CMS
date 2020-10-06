@@ -2,13 +2,10 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 
 namespace Umbraco.Tests.Services
