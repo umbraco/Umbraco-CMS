@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.Logging;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
@@ -40,7 +41,7 @@ namespace Umbraco.Tests.Composing
         [Test]
         public void Find_Class_Of_Type_With_Attribute()
         {
-            var typeFinder = new TypeFinder(GetLogger(), new DefaultUmbracoAssemblyProvider(GetType().Assembly), new VaryingRuntimeHash());
+            var typeFinder = new TypeFinder(Mock.Of<ILogger<TypeFinder>>(), new DefaultUmbracoAssemblyProvider(GetType().Assembly), new VaryingRuntimeHash());
             var typesFound = typeFinder.FindClassesOfTypeWithAttribute<TestEditor, MyTestAttribute>(_assemblies);
             Assert.AreEqual(2, typesFound.Count());
         }
@@ -48,7 +49,7 @@ namespace Umbraco.Tests.Composing
         [Test]
         public void Find_Classes_With_Attribute()
         {
-            var typeFinder = new TypeFinder(GetLogger(), new DefaultUmbracoAssemblyProvider(GetType().Assembly), new VaryingRuntimeHash());
+            var typeFinder = new TypeFinder(Mock.Of<ILogger<TypeFinder>>(), new DefaultUmbracoAssemblyProvider(GetType().Assembly), new VaryingRuntimeHash());
             var typesFound = typeFinder.FindClassesWithAttribute<TreeAttribute>(_assemblies);
             Assert.AreEqual(0, typesFound.Count()); // 0 classes in _assemblies are marked with [Tree]
 
@@ -64,13 +65,6 @@ namespace Umbraco.Tests.Composing
             var logger = LoggerFactory.Create(builder => builder.AddDebug()).CreateLogger("ProfilingLogger");
             var profiler = new TestProfiler();
             return new ProfilingLogger(logger, profiler);
-        }
-
-        // TODO: Is console logger the type of logger we want?
-        private static ILoggerFactory _factory = LoggerFactory.Create(builder => { builder.AddConsole(); });
-        private static ILogger<TypeFinder> GetLogger()
-        {
-            return _factory.CreateLogger<TypeFinder>();
         }
 
         [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
