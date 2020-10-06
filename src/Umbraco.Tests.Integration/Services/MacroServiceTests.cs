@@ -248,9 +248,6 @@ namespace Umbraco.Tests.Services
         //[Test]
         //public void Can_Get_Many_By_Alias()
         //{
-        //    // Arrange
-        //    var MacroService = MacroService;
-
         //    // Act
         //    var result = MacroService.GetAll("test1", "test2");
 
