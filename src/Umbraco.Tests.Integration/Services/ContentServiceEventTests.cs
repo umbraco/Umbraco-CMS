@@ -28,9 +28,9 @@ namespace Umbraco.Tests.Services
 
         private GlobalSettings _globalSettings;
 
-        public override async Task Setup()
+        public override void Setup()
         {
-            await base.Setup();
+            base.Setup();
             ContentRepositoryBase.ThrowOnWarning = true;
             _globalSettings = new GlobalSettings();
         }
