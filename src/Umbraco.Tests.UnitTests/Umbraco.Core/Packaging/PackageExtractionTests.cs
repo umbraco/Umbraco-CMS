@@ -16,9 +16,7 @@ namespace Umbraco.Tests.Packaging
         {
             const string testPackagesDirName = "Umbraco.Core\\Packaging\\Packages";
             var testDir = TestContext.CurrentContext.TestDirectory.Split("bin")[0];
-            var hostingEnvironment = Mock.Of<IHostingEnvironment>(
-                x => x.ToAbsolute(It.IsAny<string>()) == "/" && x.ApplicationPhysicalPath == testDir);
-            var path = Path.Combine(hostingEnvironment.ApplicationPhysicalPath, testPackagesDirName, packageName);
+            var path = Path.Combine(testDir, testPackagesDirName, packageName);
             return new FileInfo(path);
         }
 

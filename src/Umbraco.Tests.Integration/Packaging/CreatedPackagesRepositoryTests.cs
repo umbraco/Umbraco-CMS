@@ -29,12 +29,11 @@ namespace Umbraco.Tests.Packaging
             _testBaseFolder = Guid.NewGuid();
         }
 
-        public override void TearDown()
+        [TearDown]
+        public void DeleteTestFolder()
         {
-            base.TearDown();
             //clear out files/folders
             Directory.Delete(HostingEnvironment.MapPathContentRoot("~/" + _testBaseFolder), true);
-
         }
 
         private IContentService ContentService => GetRequiredService<IContentService>();

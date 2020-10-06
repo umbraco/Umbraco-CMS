@@ -46,7 +46,6 @@ namespace Umbraco.Tests.Integration.Testing
     [NonParallelizable]
     public abstract class UmbracoIntegrationTest
     {
-
         public static LightInjectContainer CreateUmbracoContainer(out UmbracoServiceProviderFactory serviceProviderFactory)
         {
             var container = UmbracoServiceProviderFactory.CreateServiceContainer();
@@ -247,13 +246,12 @@ namespace Umbraco.Tests.Integration.Testing
             CustomTestSetup(services);
         }
 
-
         public virtual void Configure(IApplicationBuilder app)
         {
             Services.GetRequiredService<IBackofficeSecurityFactory>().EnsureBackofficeSecurity();
             Services.GetRequiredService<IUmbracoContextFactory>().EnsureUmbracoContext();
-            
-            // get the currently set ptions
+
+            // get the currently set options
             var testOptions = TestOptionAttributeBase.GetTestOptions<UmbracoTestAttribute>();
             if (testOptions.Boot)
             {
@@ -262,7 +260,7 @@ namespace Umbraco.Tests.Integration.Testing
         }
 
         #endregion
-        
+
         #region LocalDb
 
 
@@ -347,10 +345,7 @@ namespace Umbraco.Tests.Integration.Testing
                     var newSchemaDbId = db.AttachSchema();
 
                     // Add teardown callback
-                    OnTestTearDown(() =>
-                    {
-                        db.Detach(newSchemaDbId);
-                    });
+                    OnTestTearDown(() => db.Detach(newSchemaDbId));
 
                     // We must re-configure our current factory since attaching a new LocalDb from the pool changes connection strings
                     if (!databaseFactory.Configured)
@@ -374,21 +369,16 @@ namespace Umbraco.Tests.Integration.Testing
 
                     break;
                 case UmbracoTestOptions.Database.NewSchemaPerFixture:
-                    // If we try to AttachSchema before the old schema has been detached
-                    // the process will be blocked since readyQueue remain empty
-                    // Probably because the DB is blocked because it hasn't been detached
-                    // Also if we attach a new schema for every test isn't it just essentially
-                    // the same as NewSchemaPerTest?
+                    // Only attach schema once per fixture
+                    // Doing it more than once will block the process since the old db hasn't been detached
+                    // and it would be the same as NewSchemaPerTest even if it didn't block
                     if (FirstTestInFixture)
                     {
                         // New DB + Schema
                         var newSchemaFixtureDbId = db.AttachSchema();
 
                         // Add teardown callback
-                        OnFixtureTearDown(() =>
-                        {
-                            db.Detach(newSchemaFixtureDbId);
-                        });
+                        OnFixtureTearDown(() => db.Detach(newSchemaFixtureDbId));
                     }
 
                     // We must re-configure our current factory since attaching a new LocalDb from the pool changes connection strings

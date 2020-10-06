@@ -28,7 +28,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void DataTypeService_Can_Get_All()
         {
-            var dataTypeService = (DataTypeService) GetRequiredService<IDataTypeService>();
+            var dataTypeService = GetRequiredService<IDataTypeService>();
 
             IDataType dataType = new DataType(new LabelPropertyEditor(Logger, IOHelper, DataTypeService, LocalizedTextService, LocalizationService, ShortStringHelper)) { Name = "Testing Textfield", DatabaseType = ValueStorageType.Ntext };
             dataTypeService.Save(dataType);

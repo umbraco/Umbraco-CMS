@@ -29,8 +29,6 @@ namespace Umbraco.Tests.Services
 
         public void CreateTestData()
         {
-            // base.CreateTestData();
-
             var provider = ScopeProvider;
             using (var scope = provider.CreateScope())
             {
