@@ -28,15 +28,13 @@ namespace Umbraco.Tests.Services
         [Test]
         public void DataTypeService_Can_Get_All()
         {
-            var dataTypeService = GetRequiredService<IDataTypeService>();
-
             IDataType dataType = new DataType(new LabelPropertyEditor(Logger, IOHelper, DataTypeService, LocalizedTextService, LocalizationService, ShortStringHelper)) { Name = "Testing Textfield", DatabaseType = ValueStorageType.Ntext };
-            dataTypeService.Save(dataType);
+            DataTypeService.Save(dataType);
 
             //Get all the first time (no cache)
-            var all = dataTypeService.GetAll();
+            var all = DataTypeService.GetAll();
             //Get all a second time (with cache)
-            all = dataTypeService.GetAll();
+            all = DataTypeService.GetAll();
 
             Assert.Pass();
         }
