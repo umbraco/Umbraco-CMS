@@ -214,7 +214,6 @@
     <Compile Include="Mvc\ContainerControllerFactory.cs" />
     <Compile Include="OwinExtensions.cs" />
     <Compile Include="Security\BackOfficeCookieAuthenticationProvider.cs" />
-    <Compile Include="SignalR\PreviewHubComposer.cs" />
     <Compile Include="WebAssets\CDF\ClientDependencyConfiguration.cs" />
     <Compile Include="UmbracoApplicationBase.cs" />
     <Compile Include="WebApi\Filters\HttpQueryStringModelBinder.cs" />
@@ -233,9 +232,6 @@
     <Compile Include="Security\AuthenticationExtensions.cs" />
     <Compile Include="Security\UmbracoSecureDataFormat.cs" />
     <Compile Include="Security\UmbracoAuthTicketDataProtector.cs" />
-    <Compile Include="SignalR\IPreviewHub.cs" />
-    <Compile Include="SignalR\PreviewHub.cs" />
-    <Compile Include="SignalR\PreviewHubComponent.cs" />
     <Compile Include="UmbracoModule.cs" />
     <Compile Include="WebApi\EnableDetailedErrorsAttribute.cs" />
     <Compile Include="WebApi\Filters\AppendUserModifiedHeaderAttribute.cs" />

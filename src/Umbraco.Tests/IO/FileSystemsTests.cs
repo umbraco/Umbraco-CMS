@@ -15,7 +15,6 @@ using Umbraco.Core.IO.MediaPathSchemes;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
-using Current = Umbraco.Web.Composing.Current;
 using FileSystems = Umbraco.Core.IO.FileSystems;
 
 namespace Umbraco.Tests.IO
@@ -50,9 +49,6 @@ namespace Umbraco.Tests.IO
 
             _factory = composition.CreateFactory();
 
-            Current.Reset();
-            Current.Factory = _factory;
-
             // make sure we start clean
             // because some tests will create corrupt or weird filesystems
             FileSystems.Reset();
@@ -64,7 +60,6 @@ namespace Umbraco.Tests.IO
             // stay clean (see note in Setup)
             FileSystems.Reset();
 
-            Current.Reset();
             _register.DisposeIfDisposable();
         }
 
@@ -119,7 +114,7 @@ namespace Umbraco.Tests.IO
             fs.DeleteMediaFiles(new[] { virtPath });
             Assert.IsFalse(File.Exists(physPath));
 
-            var scheme = Current.Factory.GetInstance<IMediaPathScheme>();
+            var scheme = _factory.GetInstance<IMediaPathScheme>();
             if (scheme is UniqueMediaPathScheme)
             {
                 // ~/media/1234 is *not* gone

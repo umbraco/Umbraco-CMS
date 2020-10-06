@@ -49,6 +49,7 @@ namespace Umbraco.Tests.Integration.Testing
     [NonParallelizable]
     public abstract class UmbracoIntegrationTest
     {
+        
         public static LightInjectContainer CreateUmbracoContainer(out UmbracoServiceProviderFactory serviceProviderFactory)
         {
             var container = UmbracoServiceProviderFactory.CreateServiceContainer();
@@ -83,10 +84,10 @@ namespace Umbraco.Tests.Integration.Testing
         }
 
         [SetUp]
-        public virtual async Task Setup()
+        public virtual void Setup()
         {
             var hostBuilder = CreateHostBuilder();
-            var host = await hostBuilder.StartAsync();
+            var host = hostBuilder.StartAsync().GetAwaiter().GetResult();
             Services = host.Services;
             var app = new ApplicationBuilder(host.Services);
             Configure(app);
@@ -240,6 +241,8 @@ namespace Umbraco.Tests.Integration.Testing
                 Configuration,
                 CreateTestRuntime,
                 out _);
+
+            services.AddSignalR();
 
             services.AddUmbracoWebComponents();
             services.AddUmbracoRuntimeMinifier(Configuration);
