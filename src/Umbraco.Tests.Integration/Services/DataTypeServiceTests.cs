@@ -28,18 +28,15 @@ namespace Umbraco.Tests.Services
         [Test]
         public void DataTypeService_Can_Persist_New_DataTypeDefinition()
         {
-            // Arrange
-            var dataTypeService = DataTypeService;
-
             // Act
             IDataType dataType = new DataType(new LabelPropertyEditor(Logger, IOHelper, DataTypeService, LocalizedTextService, LocalizationService, ShortStringHelper)) { Name = "Testing Textfield", DatabaseType = ValueStorageType.Ntext };
-            dataTypeService.Save(dataType);
+            DataTypeService.Save(dataType);
 
             // Assert
             Assert.That(dataType, Is.Not.Null);
             Assert.That(dataType.HasIdentity, Is.True);
 
-            dataType = dataTypeService.GetDataType(dataType.Id);
+            dataType = DataTypeService.GetDataType(dataType.Id);
             Assert.That(dataType, Is.Not.Null);
         }
 
@@ -47,9 +44,8 @@ namespace Umbraco.Tests.Services
         public void DataTypeService_Can_Delete_Textfield_DataType_And_Clear_Usages()
         {
             // Arrange
-            var dataTypeService = DataTypeService;
             var textfieldId = "Umbraco.Textbox";
-            var dataTypeDefinitions = dataTypeService.GetByEditorAlias(textfieldId);
+            var dataTypeDefinitions = DataTypeService.GetByEditorAlias(textfieldId);
             var doctype = MockedContentTypes.CreateSimpleContentType("umbTextpage", "Textpage");
             ContentTypeService.Save(doctype);
 
@@ -57,9 +53,9 @@ namespace Umbraco.Tests.Services
             // Act
             var definition = dataTypeDefinitions.First();
             var definitionId = definition.Id;
-            dataTypeService.Delete(definition);
+            DataTypeService.Delete(definition);
 
-            var deletedDefinition = dataTypeService.GetDataType(definitionId);
+            var deletedDefinition = DataTypeService.GetDataType(definitionId);
 
             // Assert
             Assert.That(deletedDefinition, Is.Null);
@@ -73,14 +69,11 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Cannot_Save_DataType_With_Empty_Name()
         {
-            // Arrange
-            var dataTypeService = DataTypeService;
-
             // Act
             var dataTypeDefinition = new DataType(new LabelPropertyEditor(Logger, IOHelper, DataTypeService, LocalizedTextService,LocalizationService, ShortStringHelper)) { Name = string.Empty, DatabaseType = ValueStorageType.Ntext };
 
             // Act & Assert
-            Assert.Throws<ArgumentException>(() => dataTypeService.Save(dataTypeDefinition));
+            Assert.Throws<ArgumentException>(() => DataTypeService.Save(dataTypeDefinition));
         }
     }
 }

@@ -21,11 +21,8 @@ namespace Umbraco.Tests.Services
         [Test]
         public void GetValue_ForMissingKey_ReturnsNull()
         {
-            // Arrange
-            var keyValueService = KeyValueService;
-
             // Act
-            var value = keyValueService.GetValue("foo");
+            var value = KeyValueService.GetValue("foo");
 
             // Assert
             Assert.IsNull(value);
@@ -34,12 +31,10 @@ namespace Umbraco.Tests.Services
         [Test]
         public void GetValue_ForExistingKey_ReturnsValue()
         {
-            // Arrange
-            var keyValueService = KeyValueService;
-            keyValueService.SetValue("foo", "bar");
+            KeyValueService.SetValue("foo", "bar");
 
             // Act
-            var value = keyValueService.GetValue("foo");
+            var value = KeyValueService.GetValue("foo");
 
             // Assert
             Assert.AreEqual("bar", value);
@@ -48,13 +43,11 @@ namespace Umbraco.Tests.Services
         [Test]
         public void SetValue_ForExistingKey_SavesValue()
         {
-            // Arrange
-            var keyValueService = KeyValueService;
-            keyValueService.SetValue("foo", "bar");
+            KeyValueService.SetValue("foo", "bar");
 
             // Act
-            keyValueService.SetValue("foo", "buzz");
-            var value = keyValueService.GetValue("foo");
+            KeyValueService.SetValue("foo", "buzz");
+            var value = KeyValueService.GetValue("foo");
 
             // Assert
             Assert.AreEqual("buzz", value);
@@ -63,13 +56,11 @@ namespace Umbraco.Tests.Services
         [Test]
         public void TrySetValue_ForExistingKeyWithProvidedValue_ReturnsTrueAndSetsValue()
         {
-            // Arrange
-            var keyValueService = KeyValueService;
-            keyValueService.SetValue("foo", "bar");
+            KeyValueService.SetValue("foo", "bar");
 
             // Act
-            var result = keyValueService.TrySetValue("foo", "bar", "buzz");
-            var value = keyValueService.GetValue("foo");
+            var result = KeyValueService.TrySetValue("foo", "bar", "buzz");
+            var value = KeyValueService.GetValue("foo");
 
             // Assert
             Assert.IsTrue(result);
@@ -79,13 +70,11 @@ namespace Umbraco.Tests.Services
         [Test]
         public void TrySetValue_ForExistingKeyWithoutProvidedValue_ReturnsFalseAndDoesNotSetValue()
         {
-            // Arrange
-            var keyValueService = KeyValueService;
-            keyValueService.SetValue("foo", "bar");
+            KeyValueService.SetValue("foo", "bar");
 
             // Act
-            var result = keyValueService.TrySetValue("foo", "bang", "buzz");
-            var value = keyValueService.GetValue("foo");
+            var result = KeyValueService.TrySetValue("foo", "bang", "buzz");
+            var value = KeyValueService.GetValue("foo");
 
             // Assert
             Assert.IsFalse(result);
