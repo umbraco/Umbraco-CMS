@@ -117,6 +117,7 @@ namespace Umbraco.Web.Services
             var pluginIcons = appPlugins.Exists == false
                 ? new List<FileInfo>()
                 : appPlugins.GetDirectories()
+                    // Find all directories in App_Plugins that are named "Icons" and get a list of SVGs from them
                     .SelectMany(x => x.GetDirectories("Icons", SearchOption.AllDirectories))
                     .SelectMany(x => x.GetFiles("*.svg", SearchOption.TopDirectoryOnly));
 
