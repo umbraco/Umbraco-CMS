@@ -15,7 +15,6 @@ namespace Umbraco.Composing
     public static class Current
     {
         private static ILogger<object> _logger = new NullLogger<object>();
-        private static ILoggerFactory _loggerFactory;
         private static IIOHelper _ioHelper;
         private static IHostingEnvironment _hostingEnvironment;
         private static IBackOfficeInfo _backOfficeInfo;
