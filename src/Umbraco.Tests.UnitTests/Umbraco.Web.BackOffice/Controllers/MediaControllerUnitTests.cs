@@ -5,7 +5,8 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
-using Umbraco.Tests.Common.TestHelpers.Entities;
+using Umbraco.Tests.Common.Builders;
+using Umbraco.Tests.Common.Builders.Extensions;
 using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.Common.Exceptions;
 
@@ -18,10 +19,7 @@ namespace Umbraco.Tests.Web.Controllers
         public void Access_Allowed_By_Path()
         {
             //arrange
-            var userMock = MockedUser.GetUserMock();
-            userMock.Setup(u => u.Id).Returns(9);
-            userMock.Setup(u => u.Groups).Returns(new[] { new ReadOnlyUserGroup(1, "admin", "", -1, -1, "admin", new string[0], new List<string>()) });
-            var user = userMock.Object;
+            var user = CreateUser(id: 9);
             var mediaMock = new Mock<IMedia>();
             mediaMock.Setup(m => m.Path).Returns("-1,1234,5678");
             var media = mediaMock.Object;
@@ -42,9 +40,7 @@ namespace Umbraco.Tests.Web.Controllers
         public void Throws_Exception_When_No_Media_Found()
         {
             //arrange
-            var userMock = MockedUser.GetUserMock();
-            userMock.Setup(u => u.Id).Returns(9);
-            var user = userMock.Object;
+            var user = CreateUser(id: 9);
             var mediaMock = new Mock<IMedia>();
             mediaMock.Setup(m => m.Path).Returns("-1,1234,5678");
             var media = mediaMock.Object;
@@ -62,10 +58,7 @@ namespace Umbraco.Tests.Web.Controllers
         public void No_Access_By_Path()
         {
             //arrange
-            var userMock = MockedUser.GetUserMock();
-            userMock.Setup(u => u.Id).Returns(9);
-            userMock.Setup(u => u.StartMediaIds).Returns(new[] { 9876 });
-            var user = userMock.Object;
+            var user = CreateUser(id: 9, startMediaId: 9876);
             var mediaMock = new Mock<IMedia>();
             mediaMock.Setup(m => m.Path).Returns("-1,1234,5678");
             var media = mediaMock.Object;
@@ -88,10 +81,7 @@ namespace Umbraco.Tests.Web.Controllers
         public void Access_To_Root_By_Path()
         {
             //arrange
-            var userMock = MockedUser.GetUserMock();
-            userMock.Setup(u => u.Id).Returns(0);
-            userMock.Setup(u => u.Groups).Returns(new[] { new ReadOnlyUserGroup(1, "admin", "", -1, -1, "admin", new string[0], new List<string>()) });
-            var user = userMock.Object;
+            var user = CreateUser();
             var mediaServiceMock = new Mock<IMediaService>();
             var mediaService = mediaServiceMock.Object;
             var entityServiceMock = new Mock<IEntityService>();
@@ -108,10 +98,7 @@ namespace Umbraco.Tests.Web.Controllers
         public void No_Access_To_Root_By_Path()
         {
             //arrange
-            var userMock = MockedUser.GetUserMock();
-            userMock.Setup(u => u.Id).Returns(0);
-            userMock.Setup(u => u.StartMediaIds).Returns(new[] { 1234 });
-            var user = userMock.Object;
+            var user = CreateUser(startMediaId: 1234);
             var mediaServiceMock = new Mock<IMediaService>();
             var mediaService = mediaServiceMock.Object;
             var entityServiceMock = new Mock<IEntityService>();
@@ -130,10 +117,7 @@ namespace Umbraco.Tests.Web.Controllers
         public void Access_To_Recycle_Bin_By_Path()
         {
             //arrange
-            var userMock = MockedUser.GetUserMock();
-            userMock.Setup(u => u.Id).Returns(0);
-            userMock.Setup(u => u.Groups).Returns(new[] { new ReadOnlyUserGroup(1, "admin", "", -1, -1, "admin", new string[0], new List<string>()) });
-            var user = userMock.Object;
+            var user = CreateUser();
             var mediaServiceMock = new Mock<IMediaService>();
             var mediaService = mediaServiceMock.Object;
             var entityServiceMock = new Mock<IEntityService>();
@@ -150,10 +134,7 @@ namespace Umbraco.Tests.Web.Controllers
         public void No_Access_To_Recycle_Bin_By_Path()
         {
             //arrange
-            var userMock = MockedUser.GetUserMock();
-            userMock.Setup(u => u.Id).Returns(0);
-            userMock.Setup(u => u.StartMediaIds).Returns(new[] { 1234 });
-            var user = userMock.Object;
+            var user = CreateUser(startMediaId: 1234);
             var mediaServiceMock = new Mock<IMediaService>();
             var mediaService = mediaServiceMock.Object;
             var entityServiceMock = new Mock<IEntityService>();
@@ -166,6 +147,19 @@ namespace Umbraco.Tests.Web.Controllers
 
             //assert
             Assert.IsFalse(result);
+        }
+
+        private IUser CreateUser(int id = 0, int? startMediaId = null)
+        {
+            return new UserBuilder()
+                .WithId(id)
+                .WithStartMediaIds(startMediaId.HasValue ? new[] { startMediaId.Value } : new int[0])
+                .AddUserGroup()
+                    .WithId(1)
+                    .WithName("admin")
+                    .WithAlias("admin")
+                    .Done()
+                .Build();
         }
     }
 }
