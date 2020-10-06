@@ -5,15 +5,16 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers.Entities;
-using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Services
 {
     [TestFixture]
-    [UmbracoTest(WithApplication = true)]
-    public class ContentTypeServiceExtensionsTests : UmbracoTestBase
+    public class ContentTypeServiceExtensionsTests
     {
+        private IShortStringHelper ShortStringHelper => new DefaultShortStringHelper(new DefaultShortStringHelperConfig());
+
         [Test]
         public void GetAvailableCompositeContentTypes_No_Overlap_By_Content_Type_And_Property_Type_Alias()
         {

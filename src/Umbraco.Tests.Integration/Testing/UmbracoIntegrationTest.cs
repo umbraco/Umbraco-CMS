@@ -50,7 +50,6 @@ namespace Umbraco.Tests.Integration.Testing
     [NonParallelizable]
     public abstract class UmbracoIntegrationTest
     {
-
         public static LightInjectContainer CreateUmbracoContainer(out UmbracoServiceProviderFactory serviceProviderFactory)
         {
             var container = UmbracoServiceProviderFactory.CreateServiceContainer();
@@ -82,6 +81,8 @@ namespace Umbraco.Tests.Integration.Testing
         {
             foreach (var a in _testTeardown) a();
             _testTeardown = null;
+            FirstTestInFixture = false;
+            FirstTestInSession = false;
         }
 
         [SetUp]
@@ -278,7 +279,7 @@ namespace Umbraco.Tests.Integration.Testing
             Services.GetRequiredService<IBackofficeSecurityFactory>().EnsureBackofficeSecurity();
             Services.GetRequiredService<IUmbracoContextFactory>().EnsureUmbracoContext();
 
-            // get the currently set ptions
+            // get the currently set options
             var testOptions = TestOptionAttributeBase.GetTestOptions<UmbracoTestAttribute>();
             if (testOptions.Boot)
             {
@@ -399,12 +400,26 @@ namespace Umbraco.Tests.Integration.Testing
 
                     break;
                 case UmbracoTestOptions.Database.NewSchemaPerFixture:
+                    // Only attach schema once per fixture
+                    // Doing it more than once will block the process since the old db hasn't been detached
+                    // and it would be the same as NewSchemaPerTest even if it didn't block
+                    if (FirstTestInFixture)
+                    {
+                        // New DB + Schema
+                        var newSchemaFixtureDbId = db.AttachSchema();
 
-                    // New DB + Schema
-                    var newSchemaFixtureDbId = db.AttachSchema();
+                        // Add teardown callback
+                        OnFixtureTearDown(() => db.Detach(newSchemaFixtureDbId));
+                    }
 
-                    // Add teardown callback
-                    OnFixtureTearDown(() => db.Detach(newSchemaFixtureDbId));
+                    // We must re-configure our current factory since attaching a new LocalDb from the pool changes connection strings
+                    if (!databaseFactory.Configured)
+                    {
+                        databaseFactory.Configure(db.ConnectionString, Constants.DatabaseProviders.SqlServer);
+                    }
+
+                    // re-run the runtime level check
+                    runtimeState.DetermineRuntimeLevel();
 
                     break;
                 case UmbracoTestOptions.Database.NewEmptyPerFixture:
@@ -474,5 +489,9 @@ namespace Umbraco.Tests.Integration.Testing
         protected UserGroupBuilder UserGroupBuilder = new UserGroupBuilder();
 
         #endregion
+
+        protected static bool FirstTestInSession = true;
+
+        protected bool FirstTestInFixture = true;
     }
 }

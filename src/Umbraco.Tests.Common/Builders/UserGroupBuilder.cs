@@ -26,7 +26,7 @@ namespace Umbraco.Tests.Common.Builders
         private string _icon;
         private string _name;
         private IEnumerable<string> _permissions = Enumerable.Empty<string>();
-        private IEnumerable<string> _sectionCollection = Enumerable.Empty<string>();
+        private IEnumerable<string> _allowedSections = Enumerable.Empty<string>();
         private string _suffix;
         private int? _startContentId;
         private int? _startMediaId;
@@ -55,13 +55,19 @@ namespace Umbraco.Tests.Common.Builders
 
         public UserGroupBuilder<TParent> WithPermissions(string permissions)
         {
-            _permissions = permissions.Split();
+            _permissions = permissions.ToCharArray().Select(x => x.ToString());
             return this;
         }
 
         public UserGroupBuilder<TParent> WithPermissions(IList<string> permissions)
         {
             _permissions = permissions;
+            return this;
+        }
+
+        public UserGroupBuilder<TParent> WithAllowedSections(IList<string> allowedSections)
+        {
+            _allowedSections = allowedSections;
             return this;
         }
 
@@ -107,9 +113,9 @@ namespace Umbraco.Tests.Common.Builders
             userGroup.StartContentId = startContentId;
             userGroup.StartMediaId = startMediaId;
 
-            foreach (var item in _sectionCollection)
+            foreach (var section in _allowedSections)
             {
-                userGroup.AddAllowedSection(item);
+                userGroup.AddAllowedSection(section);
             }
 
             return userGroup;

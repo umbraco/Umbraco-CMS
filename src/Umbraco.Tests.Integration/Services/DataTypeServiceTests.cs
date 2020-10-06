@@ -3,8 +3,10 @@ using System.Linq;
 using System.Threading;
 using NUnit.Framework;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
+using Umbraco.Tests.Integration.Testing;
+using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Services
@@ -15,23 +17,26 @@ namespace Umbraco.Tests.Services
     [TestFixture]
     [Apartment(ApartmentState.STA)]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-    public class DataTypeServiceTests : TestWithSomeContentBase
+    public class DataTypeServiceTests : UmbracoIntegrationTest
     {
+
+        private IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
+        private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
+        private ILocalizedTextService LocalizedTextService => GetRequiredService<ILocalizedTextService>();
+        private ILocalizationService LocalizationService => GetRequiredService<ILocalizationService>();
+
         [Test]
         public void DataTypeService_Can_Persist_New_DataTypeDefinition()
         {
-            // Arrange
-            var dataTypeService = ServiceContext.DataTypeService;
-
             // Act
-            IDataType dataType = new DataType(new LabelPropertyEditor(LoggerFactory, IOHelper, DataTypeService, LocalizedTextService,LocalizationService, ShortStringHelper)) { Name = "Testing Textfield", DatabaseType = ValueStorageType.Ntext };
-            dataTypeService.Save(dataType);
+            IDataType dataType = new DataType(new LabelPropertyEditor(LoggerFactory, IOHelper, DataTypeService, LocalizedTextService, LocalizationService, ShortStringHelper)) { Name = "Testing Textfield", DatabaseType = ValueStorageType.Ntext };
+            DataTypeService.Save(dataType);
 
             // Assert
             Assert.That(dataType, Is.Not.Null);
             Assert.That(dataType.HasIdentity, Is.True);
 
-            dataType = dataTypeService.GetDataType(dataType.Id);
+            dataType = DataTypeService.GetDataType(dataType.Id);
             Assert.That(dataType, Is.Not.Null);
         }
 
@@ -39,22 +44,24 @@ namespace Umbraco.Tests.Services
         public void DataTypeService_Can_Delete_Textfield_DataType_And_Clear_Usages()
         {
             // Arrange
-            var dataTypeService = ServiceContext.DataTypeService;
             var textfieldId = "Umbraco.Textbox";
-            var dataTypeDefinitions = dataTypeService.GetByEditorAlias(textfieldId);
+            var dataTypeDefinitions = DataTypeService.GetByEditorAlias(textfieldId);
+            var doctype = MockedContentTypes.CreateSimpleContentType("umbTextpage", "Textpage");
+            ContentTypeService.Save(doctype);
+
 
             // Act
             var definition = dataTypeDefinitions.First();
             var definitionId = definition.Id;
-            dataTypeService.Delete(definition);
+            DataTypeService.Delete(definition);
 
-            var deletedDefinition = dataTypeService.GetDataType(definitionId);
+            var deletedDefinition = DataTypeService.GetDataType(definitionId);
 
             // Assert
             Assert.That(deletedDefinition, Is.Null);
 
             //Further assertions against the ContentType that contains PropertyTypes based on the TextField
-            var contentType = ServiceContext.ContentTypeService.Get(NodeDto.NodeIdSeed+1);
+            var contentType = ContentTypeService.Get(doctype.Id);
             Assert.That(contentType.Alias, Is.EqualTo("umbTextpage"));
             Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(1));
         }
@@ -62,14 +69,11 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Cannot_Save_DataType_With_Empty_Name()
         {
-            // Arrange
-            var dataTypeService = ServiceContext.DataTypeService;
-
             // Act
             var dataTypeDefinition = new DataType(new LabelPropertyEditor(LoggerFactory, IOHelper, DataTypeService, LocalizedTextService,LocalizationService, ShortStringHelper)) { Name = string.Empty, DatabaseType = ValueStorageType.Ntext };
 
             // Act & Assert
-            Assert.Throws<ArgumentException>(() => dataTypeService.Save(dataTypeDefinition));
+            Assert.Throws<ArgumentException>(() => DataTypeService.Save(dataTypeDefinition));
         }
     }
 }
