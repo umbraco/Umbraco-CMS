@@ -107,6 +107,7 @@ namespace Umbraco.Core.Manifest
             var contentApps = new List<ManifestContentAppDefinition>();
             var dashboards = new List<ManifestDashboard>();
             var sections = new List<ManifestSection>();
+            var headerApps = new List<ManifestHeaderAppDefinition>();
 
             foreach (var manifest in manifests)
             {
@@ -118,6 +119,7 @@ namespace Umbraco.Core.Manifest
                 if (manifest.ContentApps != null) contentApps.AddRange(manifest.ContentApps);
                 if (manifest.Dashboards != null) dashboards.AddRange(manifest.Dashboards);
                 if (manifest.Sections != null) sections.AddRange(manifest.Sections.DistinctBy(x => x.Alias.ToLowerInvariant()));
+                if (manifest.HeaderApps != null) headerApps.AddRange(manifest.HeaderApps);
             }
 
             return new PackageManifest
@@ -129,7 +131,8 @@ namespace Umbraco.Core.Manifest
                 GridEditors = gridEditors.ToArray(),
                 ContentApps = contentApps.ToArray(),
                 Dashboards = dashboards.ToArray(),
-                Sections = sections.ToArray()
+                Sections = sections.ToArray(),
+                HeaderApps = headerApps.ToArray()
             };
         }
 

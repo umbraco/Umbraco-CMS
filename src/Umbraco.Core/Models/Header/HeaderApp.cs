@@ -20,8 +20,8 @@ namespace Umbraco.Core.Models.Header
         [DataMember(Name = "hotkey")]
         public string Hotkey { get; set; }
 
-        [DataMember(Name = "action")]
-        public string Action { get; set; }
+        [DataMember(Name = "view")]
+        public string View { get; set; }
 
         [DataMember(Name = "badge")]
         public HeaderAppBadge Badge { get; set; }

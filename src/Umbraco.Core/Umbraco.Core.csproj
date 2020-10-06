@@ -129,6 +129,8 @@
     -->
     <Compile Include="AssemblyExtensions.cs" />
     <Compile Include="Constants-SqlTemplates.cs" />
+    <Compile Include="Manifest\ManifestHeaderAppDefinition.cs" />
+    <Compile Include="Manifest\ManifestHeaderAppFactory.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\Models\ContentTypeDto80.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\Models\PropertyDataDto80.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\Models\PropertyTypeDto80.cs" />
@@ -143,6 +145,7 @@
     <Compile Include="Models\ContentDataIntegrityReport.cs" />
     <Compile Include="Models\ContentDataIntegrityReportEntry.cs" />
     <Compile Include="Models\ContentDataIntegrityReportOptions.cs" />
+    <Compile Include="Models\Header\DefaultHeaderApp.cs" />
     <Compile Include="Models\Header\HeaderAppBadgeType.cs" />
     <Compile Include="Models\Header\HeaderApp.cs" />
     <Compile Include="Models\Header\HeaderAppBadge.cs" />

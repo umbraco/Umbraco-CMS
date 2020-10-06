@@ -1,0 +1,9 @@
+﻿<div data-element="global-help" ng-controller="Umbraco.Editors.Header.Apps.HelpController">
+    <button type="button" class="umb-app-header__button btn-reset" hotkey="app.hotkey" ng-click="helpClick()" ng-mousedown="rememberFocus()">
+        <span class="sr-only">
+            <localize key="visuallyHiddenTexts_{{app.alias}}">{{app.name}}</localize>...
+        </span>
+        <umb-icon icon="{{app.icon}}" class="umb-app-header__action-icon {{app.icon}}"></umb-icon>
+        <div ng-show="app.badge" class="badge -type-{{app.badge.type}}">{{app.badge.count}}</div>
+    </button>
+</div>

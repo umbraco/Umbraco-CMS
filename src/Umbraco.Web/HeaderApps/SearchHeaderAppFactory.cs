@@ -17,7 +17,7 @@ namespace Umbraco.Web.HeaderApps
                 Weight = -200,
                 Icon = "icon-search",
                 Hotkey = "ctrl+space",
-                Action = "searchClick()"
+                View = "views/header/apps/search/search.html"
             });
         }
     }

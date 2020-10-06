@@ -17,7 +17,7 @@ namespace Umbraco.Web.HeaderApps
                 Weight = -100,
                 Icon = "icon-help-alt",
                 Hotkey = "ctrl+shift+h",
-                Action = "helpClick()"
+                View = "views/header/apps/help/help.html"
             });
         }
     }
