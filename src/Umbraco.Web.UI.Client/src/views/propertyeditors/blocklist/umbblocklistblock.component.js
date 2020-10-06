@@ -51,10 +51,17 @@
             $scope.valFormManager = model.valFormManager;
 
             if (model.stylesheet) {
+                var stylesheetUrl = model.stylesheet;
+                if (Umbraco.Sys.ServerVariables.application) {
+                    var rnd = Umbraco.Sys.ServerVariables.application.cacheBuster;
+                    var _op = (stylesheetUrl.indexOf("?") > 0) ? "&" : "?";
+                    stylesheetUrl = stylesheetUrl + _op + "umb__rnd=" + rnd;
+                }
+
                 var shadowRoot = $element[0].attachShadow({ mode: 'open' });
                 shadowRoot.innerHTML = `
                     <style>
-                    @import "${model.stylesheet}"
+                    @import "${stylesheetUrl}"
                     </style>
                     <div ng-include="'${model.view}'"></div>
                 `;
