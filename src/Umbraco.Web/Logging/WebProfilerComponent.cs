@@ -10,7 +10,6 @@ namespace Umbraco.Web.Logging
     {
         private readonly WebProfiler _profiler;
         private readonly bool _profile;
-        private readonly List<Action> _terminate = new List<Action>();
 
         public WebProfilerComponent(IProfiler profiler, ILogger logger)
         {
