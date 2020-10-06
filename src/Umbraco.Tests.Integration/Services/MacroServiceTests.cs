@@ -9,7 +9,6 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
-using Umbraco.Core.Services.Implement;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Common.Builders.Extensions;
 using Umbraco.Tests.Integration.Testing;
@@ -22,8 +21,7 @@ namespace Umbraco.Tests.Integration.Services
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class MacroServiceTests : UmbracoIntegrationTest
     {
-        private MacroService MacroService => (MacroService)GetRequiredService<IMacroService>();
-
+        private IMacroService MacroService => GetRequiredService<IMacroService>();
         [SetUp]
         public void SetupTest()
         {
@@ -42,8 +40,6 @@ namespace Umbraco.Tests.Integration.Services
         [Test]
         public void Can_Get_By_Alias()
         {
-            // Arrange
-
             // Act
             var macro = MacroService.GetByAlias("test1");
 
@@ -55,8 +51,6 @@ namespace Umbraco.Tests.Integration.Services
         [Test]
         public void Can_Get_All()
         {
-            // Arrange
-
             // Act
             var result = MacroService.GetAll();
 
@@ -67,11 +61,8 @@ namespace Umbraco.Tests.Integration.Services
         [Test]
         public void Can_Create()
         {
-            // Arrange
-
             // Act
             var macro = CreateMacro();
-
             MacroService.Save(macro);
 
             // Assert

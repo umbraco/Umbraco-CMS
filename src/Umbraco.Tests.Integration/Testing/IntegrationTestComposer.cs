@@ -1,6 +1,7 @@
 ﻿using Moq;
 using NUnit.Framework;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Microsoft.Extensions.Options;
@@ -14,6 +15,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
+using Umbraco.Core.Sync;
 using Umbraco.Core.WebAssets;
 using Umbraco.Examine;
 using Umbraco.Web.Compose;
@@ -50,6 +52,10 @@ namespace Umbraco.Tests.Integration.Testing
 
             // replace this service so that it can lookup the correct file locations
             composition.RegisterUnique<ILocalizedTextService>(GetLocalizedTextService);
+            
+            composition.RegisterUnique<IServerMessenger, NoopServerMessenger>();
+            
+            
         }
 
         /// <summary>
@@ -97,6 +103,52 @@ namespace Umbraco.Tests.Integration.Testing
             public override void RebuildIndexes(bool onlyEmptyIndexes, int waitMilliseconds = 0)
             {
                 // noop
+            }
+        }
+
+        private class NoopServerMessenger : IServerMessenger
+        {
+            public NoopServerMessenger()
+            { }
+
+            public void PerformRefresh<TPayload>(ICacheRefresher refresher, TPayload[] payload)
+            {
+
+            }
+
+            public void PerformRefresh<T>(ICacheRefresher refresher, Func<T, int> getNumericId, params T[] instances)
+            {
+
+            }
+
+            public void PerformRefresh<T>(ICacheRefresher refresher, Func<T, Guid> getGuidId, params T[] instances)
+            {
+
+            }
+
+            public void PerformRemove<T>(ICacheRefresher refresher, Func<T, int> getNumericId, params T[] instances)
+            {
+ 
+            }
+
+            public void PerformRemove(ICacheRefresher refresher, params int[] numericIds)
+            {
+
+            }
+
+            public void PerformRefresh(ICacheRefresher refresher, params int[] numericIds)
+            {
+
+            }
+
+            public void PerformRefresh(ICacheRefresher refresher, params Guid[] guidIds)
+            {
+
+            }
+
+            public void PerformRefreshAll(ICacheRefresher refresher)
+            {
+
             }
         }
 

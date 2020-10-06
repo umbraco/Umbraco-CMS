@@ -6,40 +6,51 @@ using System.Linq;
 using System.Xml.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.Models.Packaging;
 using Umbraco.Core.Packaging;
 using Umbraco.Core.Services;
-using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Packaging
 {
     [TestFixture]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
-    public class CreatedPackagesRepositoryTests : TestWithDatabaseBase
+    public class CreatedPackagesRepositoryTests : UmbracoIntegrationTest
     {
         private Guid _testBaseFolder;
 
-        public override void SetUp()
+        [SetUp]
+        public void SetupTestData()
         {
-            base.SetUp();
             _testBaseFolder = Guid.NewGuid();
         }
 
-        public override void TearDown()
+        [TearDown]
+        public void DeleteTestFolder()
         {
-            base.TearDown();
-
             //clear out files/folders
-            Directory.Delete(IOHelper.MapPath("~/" + _testBaseFolder), true);
+            Directory.Delete(HostingEnvironment.MapPathContentRoot("~/" + _testBaseFolder), true);
         }
 
+        private IContentService ContentService => GetRequiredService<IContentService>();
+        private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
+        private IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
+        private IFileService FileService => GetRequiredService<IFileService>();
+        private IMacroService MacroService => GetRequiredService<IMacroService>();
+        private ILocalizationService LocalizationService => GetRequiredService<ILocalizationService>();
+        private IEntityXmlSerializer EntityXmlSerializer => GetRequiredService<IEntityXmlSerializer>();
+        private IHostingEnvironment HostingEnvironment => GetRequiredService<IHostingEnvironment>();
+        private IUmbracoVersion UmbracoVersion => GetRequiredService<IUmbracoVersion>();
+
         public ICreatedPackagesRepository PackageBuilder => new PackagesRepository(
-            ServiceContext.ContentService, ServiceContext.ContentTypeService, ServiceContext.DataTypeService,
-            ServiceContext.FileService, ServiceContext.MacroService, ServiceContext.LocalizationService,
+            ContentService, ContentTypeService, DataTypeService,
+            FileService, MacroService, LocalizationService,
             HostingEnvironment,
-            Factory.GetInstance<IEntityXmlSerializer>(), Logger,
+            EntityXmlSerializer, Logger,
             UmbracoVersion,
             Microsoft.Extensions.Options.Options.Create(new GlobalSettings()),
             "createdPackages.config",
