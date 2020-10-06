@@ -1,27 +1,23 @@
-﻿using System.Collections.Generic;
-using Moq;
+﻿using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
-using Umbraco.Tests.Common.TestHelpers.Entities;
+using Umbraco.Tests.Common.Builders;
+using Umbraco.Tests.Common.Builders.Extensions;
 
 namespace Umbraco.Tests.Web.Controllers
 {
     [TestFixture]
     public class ContentControllerUnitTests
     {
-
         [Test]
         public void Access_Allowed_By_Path()
         {
             //arrange
-            var userMock = MockedUser.GetUserMock();
-            userMock.Setup(u => u.Id).Returns(9);
-            userMock.Setup(u => u.Groups).Returns(new[] { new ReadOnlyUserGroup(1, "admin", "", -1, -1, "admin", new string[0], new List<string>()) });
-            var user = userMock.Object;
+            var user = CreateUser(id: 9);
             var contentMock = new Mock<IContent>();
             contentMock.Setup(c => c.Path).Returns("-1,1234,5678");
             var content = contentMock.Object;
@@ -44,9 +40,7 @@ namespace Umbraco.Tests.Web.Controllers
         public void No_Content_Found()
         {
             //arrange
-            var userMock = MockedUser.GetUserMock();
-            userMock.Setup(u => u.Id).Returns(9);
-            var user = userMock.Object;
+            var user = CreateUser(id: 9);
             var contentMock = new Mock<IContent>();
             contentMock.Setup(c => c.Path).Returns("-1,1234,5678");
             var content = contentMock.Object;
@@ -72,10 +66,7 @@ namespace Umbraco.Tests.Web.Controllers
         public void No_Access_By_Path()
         {
             //arrange
-            var userMock = MockedUser.GetUserMock();
-            userMock.Setup(u => u.Id).Returns(9);
-            userMock.Setup(u => u.StartContentIds).Returns(new[] { 9876 });
-            var user = userMock.Object;
+            var user = CreateUser(id: 9, startContentId: 9876);
             var contentMock = new Mock<IContent>();
             contentMock.Setup(c => c.Path).Returns("-1,1234,5678");
             var content = contentMock.Object;
@@ -103,9 +94,7 @@ namespace Umbraco.Tests.Web.Controllers
         public void No_Access_By_Permission()
         {
             //arrange
-            var userMock = MockedUser.GetUserMock();
-            userMock.Setup(u => u.Id).Returns(9);
-            var user = userMock.Object;
+            var user = CreateUser(id: 9);
             var contentMock = new Mock<IContent>();
             contentMock.Setup(c => c.Path).Returns("-1,1234,5678");
             var content = contentMock.Object;
@@ -134,10 +123,7 @@ namespace Umbraco.Tests.Web.Controllers
         public void Access_Allowed_By_Permission()
         {
             //arrange
-            var userMock = MockedUser.GetUserMock();
-            userMock.Setup(u => u.Id).Returns(9);
-            userMock.Setup(u => u.Groups).Returns(new[] { new ReadOnlyUserGroup(1, "admin", "", -1, -1, "admin", new string[0], new List<string>()) });
-            var user = userMock.Object;
+            var user = CreateUser(id: 9);
             var contentMock = new Mock<IContent>();
             contentMock.Setup(c => c.Path).Returns("-1,1234,5678");
             var content = contentMock.Object;
@@ -166,10 +152,7 @@ namespace Umbraco.Tests.Web.Controllers
         public void Access_To_Root_By_Path()
         {
             //arrange
-            var userMock = MockedUser.GetUserMock();
-            userMock.Setup(u => u.Id).Returns(0);
-            userMock.Setup(u => u.Groups).Returns(new[] { new ReadOnlyUserGroup(1, "admin", "", -1, -1, "admin", new string[0], new List<string>()) });
-            var user = userMock.Object;
+            var user = CreateUser();
             var contentServiceMock = new Mock<IContentService>();
             var contentService = contentServiceMock.Object;
             var userServiceMock = new Mock<IUserService>();
@@ -188,10 +171,7 @@ namespace Umbraco.Tests.Web.Controllers
         public void Access_To_Recycle_Bin_By_Path()
         {
             //arrange
-            var userMock = MockedUser.GetUserMock();
-            userMock.Setup(u => u.Id).Returns(0);
-            userMock.Setup(u => u.Groups).Returns(new[] { new ReadOnlyUserGroup(1, "admin", "", -1, -1, "admin", new string[0], new List<string>()) });
-            var user = userMock.Object;
+            var user = CreateUser();
             var contentServiceMock = new Mock<IContentService>();
             var contentService = contentServiceMock.Object;
             var userServiceMock = new Mock<IUserService>();
@@ -210,10 +190,7 @@ namespace Umbraco.Tests.Web.Controllers
         public void No_Access_To_Recycle_Bin_By_Path()
         {
             //arrange
-            var userMock = MockedUser.GetUserMock();
-            userMock.Setup(u => u.Id).Returns(0);
-            userMock.Setup(u => u.StartContentIds).Returns(new[] { 1234 });
-            var user = userMock.Object;
+            var user = CreateUser(startContentId: 1234);
             var contentServiceMock = new Mock<IContentService>();
             var contentService = contentServiceMock.Object;
             var userServiceMock = new Mock<IUserService>();
@@ -234,10 +211,8 @@ namespace Umbraco.Tests.Web.Controllers
         public void No_Access_To_Root_By_Path()
         {
             //arrange
-            var userMock = MockedUser.GetUserMock();
-            userMock.Setup(u => u.Id).Returns(0);
-            userMock.Setup(u => u.StartContentIds).Returns(new[] { 1234 });
-            var user = userMock.Object;
+            var user = CreateUser(startContentId: 1234);
+
             var contentServiceMock = new Mock<IContentService>();
             var contentService = contentServiceMock.Object;
             var userServiceMock = new Mock<IUserService>();
@@ -258,10 +233,7 @@ namespace Umbraco.Tests.Web.Controllers
         public void Access_To_Root_By_Permission()
         {
             //arrange
-            var userMock = MockedUser.GetUserMock();
-            userMock.Setup(u => u.Id).Returns(0);
-            userMock.Setup(u => u.Groups).Returns(new[] { new ReadOnlyUserGroup(1, "admin", "", -1, -1, "admin", new string[0], new List<string>()) });
-            var user = userMock.Object;
+            var user = CreateUser();
 
             var userServiceMock = new Mock<IUserService>();
             var permissions = new EntityPermissionCollection
@@ -276,7 +248,6 @@ namespace Umbraco.Tests.Web.Controllers
             var entityServiceMock = new Mock<IEntityService>();
             var entityService = entityServiceMock.Object;
 
-
             //act
             var result = ContentPermissionsHelper.CheckPermissions(-1, user, userService, contentService, entityService, out var foundContent, new[] { 'A' });
 
@@ -288,9 +259,7 @@ namespace Umbraco.Tests.Web.Controllers
         public void No_Access_To_Root_By_Permission()
         {
             //arrange
-            var userMock = MockedUser.GetUserMock();
-            userMock.Setup(u => u.Id).Returns(0);
-            var user = userMock.Object;
+            var user = CreateUser(withUserGroup: false);
 
             var userServiceMock = new Mock<IUserService>();
             var permissions = new EntityPermissionCollection
@@ -316,10 +285,7 @@ namespace Umbraco.Tests.Web.Controllers
         public void Access_To_Recycle_Bin_By_Permission()
         {
             //arrange
-            var userMock = MockedUser.GetUserMock();
-            userMock.Setup(u => u.Id).Returns(0);
-            userMock.Setup(u => u.Groups).Returns(new[] { new ReadOnlyUserGroup(1, "admin", "", -1, -1, "admin", new string[0], new List<string>()) });
-            var user = userMock.Object;
+            var user = CreateUser();
 
             var userServiceMock = new Mock<IUserService>();
             var permissions = new EntityPermissionCollection
@@ -346,9 +312,7 @@ namespace Umbraco.Tests.Web.Controllers
         public void No_Access_To_Recycle_Bin_By_Permission()
         {
             //arrange
-            var userMock = MockedUser.GetUserMock();
-            userMock.Setup(u => u.Id).Returns(0);
-            var user = userMock.Object;
+            var user = CreateUser(withUserGroup: false);
 
             var userServiceMock = new Mock<IUserService>();
             var permissions = new EntityPermissionCollection
@@ -368,6 +332,24 @@ namespace Umbraco.Tests.Web.Controllers
 
             //assert
             Assert.AreEqual(ContentPermissionsHelper.ContentAccess.Denied, result);
+        }
+
+        private IUser CreateUser(int id = 0, int startContentId = -1, bool withUserGroup = true)
+        {
+            var builder = new UserBuilder()
+                .WithId(id)
+                .WithStartContentIds(startContentId == -1 ? new int[0] : new[] { startContentId });
+            if (withUserGroup)
+            {
+                builder = builder
+                .AddUserGroup()
+                    .WithId(1)
+                    .WithName("admin")
+                    .WithAlias("admin")
+                    .Done();
+            }
+
+            return builder.Build();
         }
     }
 

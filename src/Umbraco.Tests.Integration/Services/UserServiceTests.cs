@@ -1052,19 +1052,16 @@ namespace Umbraco.Tests.Integration.Services
 
         private UserGroup CreateTestUserGroup(string alias = "testGroup", string name = "Test Group")
         {
-            var userGroup = new UserGroup(ShortStringHelper)
-            {
-                Alias = alias,
-                Name = name,
-                Permissions = "ABCDEFGHIJ1234567".ToCharArray().Select(x => x.ToString())
-            };
-
-            userGroup.AddAllowedSection("content");
-            userGroup.AddAllowedSection("media");
+            var userGroup = new UserGroupBuilder()
+                .WithAlias(alias)
+                .WithName(name)
+                .WithPermissions("ABCDEFGHIJ1234567")
+                .WithAllowedSections(new[] { "content", "media" })
+                .Build();
 
             _userService.Save(userGroup);
 
-            return userGroup;
+            return (UserGroup)userGroup;
         }
     }
 }
