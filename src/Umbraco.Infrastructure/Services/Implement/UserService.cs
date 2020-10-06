@@ -950,7 +950,7 @@ namespace Umbraco.Core.Services.Implement
         {
             var nodeIds = path.GetIdsFromPathReversed();
 
-            if (nodeIds.Length == 0)
+            if (nodeIds.Length == 0 || user is null)
                 return EntityPermissionSet.Empty();
 
             //collect all permissions structures for all nodes for all groups belonging to the user

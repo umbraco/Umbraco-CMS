@@ -8,7 +8,6 @@ using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
-using File = System.IO.File;
 
 namespace Umbraco.Web.BackOffice.Services
 {
@@ -73,13 +72,13 @@ namespace Umbraco.Web.BackOffice.Services
         private IconModel CreateIconModel(string iconName, string iconPath)
         {
             var sanitizer = new HtmlSanitizer();
-            sanitizer.AllowedAttributes.UnionWith(Core.Constants.SvgSanitizer.Attributes);
-            sanitizer.AllowedCssProperties.UnionWith(Core.Constants.SvgSanitizer.Attributes);
-            sanitizer.AllowedTags.UnionWith(Core.Constants.SvgSanitizer.Tags);
+            sanitizer.AllowedAttributes.UnionWith(Constants.SvgSanitizer.Attributes);
+            sanitizer.AllowedCssProperties.UnionWith(Constants.SvgSanitizer.Attributes);
+            sanitizer.AllowedTags.UnionWith(Constants.SvgSanitizer.Tags);
 
             try
             {
-                var svgContent = File.ReadAllText(iconPath);
+                var svgContent = System.IO.File.ReadAllText(iconPath);
                 var sanitizedString = sanitizer.Sanitize(svgContent);
 
                 var svg = new IconModel

@@ -1,19 +1,20 @@
 ﻿using System;
-using Microsoft.AspNet.SignalR;
+using System.Configuration;
+using Microsoft.AspNetCore.SignalR;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Sync;
 using Umbraco.Web.Cache;
 
-namespace Umbraco.Web.SignalR
+namespace Umbraco.Web.BackOffice.SignalR
 {
     public class PreviewHubComponent : IComponent
     {
-        private readonly Lazy<IHubContext<IPreviewHub>> _hubContext;
+        private readonly Lazy<IHubContext<PreviewHub, IPreviewHub>> _hubContext;
 
         // using a lazy arg here means that we won't create the hub until necessary
         // and therefore we won't have too bad an impact on boot time
-        public PreviewHubComponent(Lazy<IHubContext<IPreviewHub>> hubContext)
+        public PreviewHubComponent(Lazy<IHubContext<PreviewHub, IPreviewHub>> hubContext)
         {
             _hubContext = hubContext;
         }
@@ -32,7 +33,7 @@ namespace Umbraco.Web.SignalR
             ContentCacheRefresher.CacheUpdated -= HandleCacheUpdated;
         }
 
-        private void HandleCacheUpdated(ContentCacheRefresher sender, CacheRefresherEventArgs args)
+        private async void HandleCacheUpdated(ContentCacheRefresher sender, CacheRefresherEventArgs args)
         {
             if (args.MessageType != MessageType.RefreshByPayload) return;
             var payloads = (ContentCacheRefresher.JsonPayload[])args.MessageObject;
@@ -40,7 +41,7 @@ namespace Umbraco.Web.SignalR
             foreach (var payload in payloads)
             {
                 var id = payload.Id; // keep it simple for now, ignore ChangeTypes
-                hubContextInstance.Clients.All.refreshed(id);
+                await hubContextInstance.Clients.All.refreshed(id);
             }
         }
     }
