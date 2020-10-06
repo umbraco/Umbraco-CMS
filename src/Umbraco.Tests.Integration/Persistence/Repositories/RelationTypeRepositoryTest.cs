@@ -23,7 +23,7 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
 
         private RelationTypeRepository CreateRepository(IScopeProvider provider)
         {
-            return new RelationTypeRepository((IScopeAccessor) provider, AppCaches.Disabled, ConsoleLoggerFactory.CreateLogger<RelationTypeRepository>());
+            return new RelationTypeRepository((IScopeAccessor) provider, AppCaches.Disabled, LoggerFactory.CreateLogger<RelationTypeRepository>());
         }
 
         [Test]
@@ -222,7 +222,7 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
             var provider = ScopeProvider;
             using (var scope = provider.CreateScope())
             {
-                var repository = new RelationTypeRepository((IScopeAccessor) provider, AppCaches.Disabled, ConsoleLoggerFactory.CreateLogger<RelationTypeRepository>());
+                var repository = new RelationTypeRepository((IScopeAccessor) provider, AppCaches.Disabled, LoggerFactory.CreateLogger<RelationTypeRepository>());
 
                 repository.Save(relateContent);//Id 2
                 repository.Save(relateContentType);//Id 3

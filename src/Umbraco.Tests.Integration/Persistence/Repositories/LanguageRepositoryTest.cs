@@ -30,7 +30,7 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
 
         private LanguageRepository CreateRepository(IScopeProvider provider)
         {
-            return new LanguageRepository((IScopeAccessor) provider, AppCaches.Disabled, ConsoleLoggerFactory.CreateLogger<LanguageRepository>(), Microsoft.Extensions.Options.Options.Create(_globalSettings));
+            return new LanguageRepository((IScopeAccessor) provider, AppCaches.Disabled, LoggerFactory.CreateLogger<LanguageRepository>(), Microsoft.Extensions.Options.Options.Create(_globalSettings));
         }
 
         [Test]

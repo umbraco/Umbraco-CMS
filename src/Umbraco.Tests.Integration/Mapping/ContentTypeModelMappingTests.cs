@@ -16,7 +16,7 @@ using Umbraco.Web.Models.ContentEditing;
 namespace Umbraco.Tests.Models.Mapping
 {
     [TestFixture]
-    [UmbracoTest(Mapper = true, Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
+    [UmbracoTest(Mapper = true, Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Mock)]
     public class ContentTypeModelMappingTests : UmbracoIntegrationTest
     {
         private IDataTypeService _dataTypeService;

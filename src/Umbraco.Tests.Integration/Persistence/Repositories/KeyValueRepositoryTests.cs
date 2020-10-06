@@ -67,7 +67,7 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
 
         private IKeyValueRepository CreateRepository(IScopeProvider provider)
         {
-            return new KeyValueRepository((IScopeAccessor) provider, ConsoleLoggerFactory.CreateLogger<KeyValueRepository>());
+            return new KeyValueRepository((IScopeAccessor) provider, LoggerFactory.CreateLogger<KeyValueRepository>());
         }
     }
 }

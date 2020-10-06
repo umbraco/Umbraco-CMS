@@ -27,7 +27,7 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
 
         private ServerRegistrationRepository CreateRepository(IScopeProvider provider)
         {
-            return new ServerRegistrationRepository((IScopeAccessor) provider, ConsoleLoggerFactory.CreateLogger<ServerRegistrationRepository>());
+            return new ServerRegistrationRepository((IScopeAccessor) provider, LoggerFactory.CreateLogger<ServerRegistrationRepository>());
         }
 
         [Test]

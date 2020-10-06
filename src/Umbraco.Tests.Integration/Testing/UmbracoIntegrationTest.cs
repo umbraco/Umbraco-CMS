@@ -31,6 +31,7 @@ using System.IO;
 using Umbraco.Core.Configuration.Models;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Serilog;
 using Umbraco.Core.Logging.Serilog;
 using ConnectionStrings = Umbraco.Core.Configuration.Models.ConnectionStrings;
@@ -49,7 +50,7 @@ namespace Umbraco.Tests.Integration.Testing
     [NonParallelizable]
     public abstract class UmbracoIntegrationTest
     {
-        
+
         public static LightInjectContainer CreateUmbracoContainer(out UmbracoServiceProviderFactory serviceProviderFactory)
         {
             var container = UmbracoServiceProviderFactory.CreateServiceContainer();
@@ -97,6 +98,27 @@ namespace Umbraco.Tests.Integration.Testing
 
         #region Generic Host Builder and Runtime
 
+        private ILoggerFactory CreateLoggerFactory()
+        {
+            ILoggerFactory factory;
+            var testOptions = TestOptionAttributeBase.GetTestOptions<UmbracoTestAttribute>();
+            switch (testOptions.Logger)
+            {
+                case UmbracoTestOptions.Logger.Mock:
+                    factory = NullLoggerFactory.Instance;
+                    break;
+                case UmbracoTestOptions.Logger.Serilog:
+                    factory = Microsoft.Extensions.Logging.LoggerFactory.Create(builder => { builder.AddSerilog(); });
+                    break;
+                case UmbracoTestOptions.Logger.Console:
+                    factory = Microsoft.Extensions.Logging.LoggerFactory.Create(builder => { builder.AddConsole(); });
+                    break;
+                default:
+                    throw new NotSupportedException($"Logger option {testOptions.Logger} is not supported.");
+            }
+
+            return factory;
+        }
         /// <summary>
         /// Create the Generic Host and execute startup ConfigureServices/Configure calls
         /// </summary>
@@ -106,9 +128,6 @@ namespace Umbraco.Tests.Integration.Testing
             UmbracoContainer = CreateUmbracoContainer(out var serviceProviderFactory);
             _serviceProviderFactory = serviceProviderFactory;
             // TODO: Is this the right way to do this?
-            var loggerConfig = new LoggerConfiguration().WriteTo.Console();
-            var logger = new SerilogLogger(loggerConfig);
-
             var hostBuilder = Host.CreateDefaultBuilder()
                 // IMPORTANT: We Cannot use UseStartup, there's all sorts of threads about this with testing. Although this can work
                 // if you want to setup your tests this way, it is a bit annoying to do that as the WebApplicationFactory will
@@ -122,9 +141,9 @@ namespace Umbraco.Tests.Integration.Testing
                     Configuration = context.Configuration;
                     configBuilder.AddInMemoryCollection(InMemoryConfiguration);
                 })
-                .UseSerilog(logger.SerilogLog, false)
                 .ConfigureServices((hostContext, services) =>
                 {
+                    services.AddTransient(_ => CreateLoggerFactory());
                     ConfigureServices(services);
                 });
             return hostBuilder;
@@ -437,14 +456,9 @@ namespace Umbraco.Tests.Integration.Testing
         protected IScopeAccessor ScopeAccessor => Services.GetRequiredService<IScopeAccessor>();
 
         /// <summary>
-        /// Returns the <see cref="ILogger"/>
-        /// </summary>
-        protected ILogger Logger => Services.GetRequiredService<ILogger>();
-
-        /// <summary>
         /// Returns the <see cref="ILoggerFactory"/>
         /// </summary>
-        protected ILoggerFactory ConsoleLoggerFactory => Services.GetRequiredService<ILoggerFactory>();
+        protected ILoggerFactory LoggerFactory => Services.GetRequiredService<ILoggerFactory>();
 
         protected AppCaches AppCaches => Services.GetRequiredService<AppCaches>();
         protected IIOHelper IOHelper => Services.GetRequiredService<IIOHelper>();

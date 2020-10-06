@@ -31,7 +31,7 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
 
         private ITemplateRepository CreateRepository(IScopeProvider provider)
         {
-            return new TemplateRepository((IScopeAccessor) provider, AppCaches.Disabled, ConsoleLoggerFactory.CreateLogger<TemplateRepository>(), _fileSystems, IOHelper, ShortStringHelper);
+            return new TemplateRepository((IScopeAccessor) provider, AppCaches.Disabled, LoggerFactory.CreateLogger<TemplateRepository>(), _fileSystems, IOHelper, ShortStringHelper);
         }
 
         [SetUp]
@@ -39,7 +39,7 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
         {
             var testHelper = new TestHelper();
             _fileSystems = Mock.Of<IFileSystems>();
-            var viewsFileSystem = new PhysicalFileSystem(IOHelper, testHelper.GetHostingEnvironment(), ConsoleLoggerFactory.CreateLogger<PhysicalFileSystem>(), Constants.SystemDirectories.MvcViews);
+            var viewsFileSystem = new PhysicalFileSystem(IOHelper, testHelper.GetHostingEnvironment(), LoggerFactory.CreateLogger<PhysicalFileSystem>(), Constants.SystemDirectories.MvcViews);
             Mock.Get(_fileSystems).Setup(x => x.MvcViewsFileSystem).Returns(viewsFileSystem);
         }
 
@@ -262,16 +262,16 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
             {
                 var templateRepository = CreateRepository(provider);
                 var globalSettings = new GlobalSettings();
-                var tagRepository = new TagRepository(scopeAccessor, AppCaches.Disabled, ConsoleLoggerFactory.CreateLogger<TagRepository>());
+                var tagRepository = new TagRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<TagRepository>());
                 var commonRepository = new ContentTypeCommonRepository(scopeAccessor, templateRepository, AppCaches, ShortStringHelper);
-                var languageRepository = new LanguageRepository(scopeAccessor, AppCaches.Disabled, ConsoleLoggerFactory.CreateLogger<LanguageRepository>(), Microsoft.Extensions.Options.Options.Create(globalSettings));
-                var contentTypeRepository = new ContentTypeRepository(scopeAccessor, AppCaches.Disabled, ConsoleLoggerFactory.CreateLogger<ContentTypeRepository>(), commonRepository, languageRepository, ShortStringHelper);
-                var relationTypeRepository = new RelationTypeRepository(scopeAccessor, AppCaches.Disabled, ConsoleLoggerFactory.CreateLogger<RelationTypeRepository>());
+                var languageRepository = new LanguageRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<LanguageRepository>(), Microsoft.Extensions.Options.Options.Create(globalSettings));
+                var contentTypeRepository = new ContentTypeRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<ContentTypeRepository>(), commonRepository, languageRepository, ShortStringHelper);
+                var relationTypeRepository = new RelationTypeRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<RelationTypeRepository>());
                 var entityRepository = new EntityRepository(scopeAccessor);
-                var relationRepository = new RelationRepository(scopeAccessor, ConsoleLoggerFactory.CreateLogger<RelationRepository>(), relationTypeRepository, entityRepository);
+                var relationRepository = new RelationRepository(scopeAccessor, LoggerFactory.CreateLogger<RelationRepository>(), relationTypeRepository, entityRepository);
                 var propertyEditors = new Lazy<PropertyEditorCollection>(() => new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>())));
                 var dataValueReferences = new DataValueReferenceFactoryCollection(Enumerable.Empty<IDataValueReferenceFactory>());
-                var contentRepo = new DocumentRepository(scopeAccessor, AppCaches.Disabled, ConsoleLoggerFactory.CreateLogger<DocumentRepository>(), ConsoleLoggerFactory, contentTypeRepository, templateRepository, tagRepository, languageRepository, relationRepository, relationTypeRepository, propertyEditors, dataValueReferences, dataTypeService);
+                var contentRepo = new DocumentRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<DocumentRepository>(), LoggerFactory, contentTypeRepository, templateRepository, tagRepository, languageRepository, relationRepository, relationTypeRepository, propertyEditors, dataValueReferences, dataTypeService);
 
                 var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage2", "Textpage");
                 fileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
@@ -571,7 +571,7 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
             _fileSystems  = null;
 
             //Delete all files
-            var fsViews = new PhysicalFileSystem(IOHelper, testHelper.GetHostingEnvironment(), ConsoleLoggerFactory.CreateLogger<PhysicalFileSystem>(), Constants.SystemDirectories.MvcViews);
+            var fsViews = new PhysicalFileSystem(IOHelper, testHelper.GetHostingEnvironment(), LoggerFactory.CreateLogger<PhysicalFileSystem>(), Constants.SystemDirectories.MvcViews);
             var views = fsViews.GetFiles("", "*.cshtml");
             foreach (var file in views)
                 fsViews.DeleteFile(file);

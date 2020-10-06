@@ -17,7 +17,7 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
     {
         private UserGroupRepository CreateRepository(IScopeProvider provider)
         {
-            return new UserGroupRepository((IScopeAccessor) provider, Core.Cache.AppCaches.Disabled, ConsoleLoggerFactory.CreateLogger<UserGroupRepository>(), ConsoleLoggerFactory, ShortStringHelper);
+            return new UserGroupRepository((IScopeAccessor) provider, Core.Cache.AppCaches.Disabled, LoggerFactory.CreateLogger<UserGroupRepository>(), LoggerFactory, ShortStringHelper);
         }
 
         [Test]
@@ -128,7 +128,7 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
 
                 var id = userGroup.Id;
 
-                var repository2 = new UserGroupRepository((IScopeAccessor) provider, Core.Cache.AppCaches.Disabled, ConsoleLoggerFactory.CreateLogger<UserGroupRepository>(), ConsoleLoggerFactory, ShortStringHelper);
+                var repository2 = new UserGroupRepository((IScopeAccessor) provider, Core.Cache.AppCaches.Disabled, LoggerFactory.CreateLogger<UserGroupRepository>(), LoggerFactory, ShortStringHelper);
                 repository2.Delete(userGroup);
                 scope.Complete();
 

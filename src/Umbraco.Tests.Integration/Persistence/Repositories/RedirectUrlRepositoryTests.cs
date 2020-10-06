@@ -188,7 +188,7 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
 
         private IRedirectUrlRepository CreateRepository(IScopeProvider provider)
         {
-            return new RedirectUrlRepository((IScopeAccessor) provider, AppCaches, ConsoleLoggerFactory.CreateLogger<RedirectUrlRepository>());
+            return new RedirectUrlRepository((IScopeAccessor) provider, AppCaches, LoggerFactory.CreateLogger<RedirectUrlRepository>());
         }
 
         private IContent _textpage, _subpage, _otherpage, _trashed;
