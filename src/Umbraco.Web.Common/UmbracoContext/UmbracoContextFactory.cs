@@ -96,7 +96,6 @@ namespace Umbraco.Web
             if (currentUmbracoContext != null)
                 return new UmbracoContextReference(currentUmbracoContext, false, _umbracoContextAccessor);
 
-
             var umbracoContext = CreateUmbracoContext();
             _umbracoContextAccessor.UmbracoContext = umbracoContext;
 

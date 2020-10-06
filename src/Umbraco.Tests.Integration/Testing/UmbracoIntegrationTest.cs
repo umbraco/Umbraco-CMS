@@ -45,8 +45,7 @@ namespace Umbraco.Tests.Integration.Testing
     [SingleThreaded]
     [NonParallelizable]
     public abstract class UmbracoIntegrationTest
-    {
-        
+    {        
         public static LightInjectContainer CreateUmbracoContainer(out UmbracoServiceProviderFactory serviceProviderFactory)
         {
             var container = UmbracoServiceProviderFactory.CreateServiceContainer();

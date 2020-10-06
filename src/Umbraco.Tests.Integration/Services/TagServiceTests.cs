@@ -26,7 +26,7 @@ namespace Umbraco.Tests.Integration.Services
         private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
         private ITagService TagService => GetRequiredService<ITagService>();
         private IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
-        public PropertyEditorCollection PropertyEditorCollection => GetRequiredService<PropertyEditorCollection>();
+        private PropertyEditorCollection PropertyEditorCollection => GetRequiredService<PropertyEditorCollection>();
 
         [Test]
         public void TagApiConsistencyTest()

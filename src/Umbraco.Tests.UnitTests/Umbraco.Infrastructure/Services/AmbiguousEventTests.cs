@@ -5,7 +5,7 @@ using NUnit.Framework;
 using Umbraco.Core.Events;
 using Umbraco.Core.Services.Implement;
 
-namespace Umbraco.Tests.Services
+namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Services
 {
     [TestFixture]
     public class AmbiguousEventTests

@@ -12,11 +12,12 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
+using Umbraco.Tests.Common.Builders;
+using Umbraco.Tests.Common.Builders.Extensions;
 using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.Actions;
-using MockedUser = Umbraco.Tests.Common.TestHelpers.Entities.MockedUser;
 
 namespace Umbraco.Tests.Integration.Services
 {
@@ -495,10 +496,10 @@ namespace Umbraco.Tests.Integration.Services
         [Test]
         public void Find_By_Email_Starts_With()
         {
-            var users = MockedUser.CreateMulipleUsers(10);
+            var users = CreateMulipleUsers(10);
             UserService.Save(users);
             //don't find this
-            var customUser = MockedUser.CreateUser();
+            var customUser = CreateUser();
             customUser.Email = "hello@hello.com";
             UserService.Save(customUser);
 
@@ -510,10 +511,10 @@ namespace Umbraco.Tests.Integration.Services
         [Test]
         public void Find_By_Email_Ends_With()
         {
-            var users = MockedUser.CreateMulipleUsers(10);
+            var users = CreateMulipleUsers(10);
             UserService.Save(users);
             //include this
-            var customUser = MockedUser.CreateUser();
+            var customUser = CreateUser();
             customUser.Email = "hello@test.com";
             UserService.Save(customUser);
 
@@ -525,10 +526,10 @@ namespace Umbraco.Tests.Integration.Services
         [Test]
         public void Find_By_Email_Contains()
         {
-            var users = MockedUser.CreateMulipleUsers(10);
+            var users = CreateMulipleUsers(10);
             UserService.Save(users);
             //include this
-            var customUser = MockedUser.CreateUser();
+            var customUser = CreateUser();
             customUser.Email = "hello@test.com";
             UserService.Save(customUser);
 
@@ -540,10 +541,10 @@ namespace Umbraco.Tests.Integration.Services
         [Test]
         public void Find_By_Email_Exact()
         {
-            var users = MockedUser.CreateMulipleUsers(10);
+            var users = CreateMulipleUsers(10);
             UserService.Save(users);
             //include this
-            var customUser = MockedUser.CreateUser();
+            var customUser = CreateUser();
             customUser.Email = "hello@test.com";
             UserService.Save(customUser);
 
@@ -555,7 +556,7 @@ namespace Umbraco.Tests.Integration.Services
         [Test]
         public void Get_All_Paged_Users()
         {
-            var users = MockedUser.CreateMulipleUsers(10);
+            var users = CreateMulipleUsers(10);
             UserService.Save(users);
 
             var found = UserService.GetAll(0, 2, out var totalRecs);
@@ -570,7 +571,7 @@ namespace Umbraco.Tests.Integration.Services
         [Test]
         public void Get_All_Paged_Users_With_Filter()
         {
-            var users = MockedUser.CreateMulipleUsers(10).ToArray();
+            var users = CreateMulipleUsers(10).ToArray();
             UserService.Save(users);
 
             var found = UserService.GetAll(0, 2, out var totalRecs, "username", Direction.Ascending, filter: "test");
@@ -587,7 +588,7 @@ namespace Umbraco.Tests.Integration.Services
             var userGroup = MockedUserGroup.CreateUserGroup();
             UserService.Save(userGroup);
 
-            var users = MockedUser.CreateMulipleUsers(10).ToArray();
+            var users = CreateMulipleUsers(10).ToArray();
             for (var i = 0; i < 10;)
             {
                 users[i].AddGroup(userGroup.ToReadOnlyGroup());
@@ -610,7 +611,7 @@ namespace Umbraco.Tests.Integration.Services
             var userGroup = MockedUserGroup.CreateUserGroup();
             UserService.Save(userGroup);
 
-            var users = MockedUser.CreateMulipleUsers(10).ToArray();
+            var users = CreateMulipleUsers(10).ToArray();
             for (var i = 0; i < 10;)
             {
                 users[i].AddGroup(userGroup.ToReadOnlyGroup());
@@ -635,9 +636,9 @@ namespace Umbraco.Tests.Integration.Services
         [Test]
         public void Count_All_Users()
         {
-            var users = MockedUser.CreateMulipleUsers(10);
+            var users = CreateMulipleUsers(10);
             UserService.Save(users);
-            var customUser = MockedUser.CreateUser();
+            var customUser = CreateUser();
             UserService.Save(customUser);
 
             var found = UserService.GetCount(MemberCountType.All);
@@ -650,20 +651,20 @@ namespace Umbraco.Tests.Integration.Services
         [Test]
         public void Count_All_Online_Users()
         {
-            var users = MockedUser.CreateMulipleUsers(10, (i, member) => member.LastLoginDate = DateTime.Now.AddMinutes(i * -2));
+            var users = CreateMulipleUsers(10, (i, member) => member.LastLoginDate = DateTime.Now.AddMinutes(i * -2));
             UserService.Save(users);
 
-            var customUser = MockedUser.CreateUser();
+            var customUser = CreateUser();
             throw new NotImplementedException();
         }
 
         [Test]
         public void Count_All_Locked_Users()
         {
-            var users = MockedUser.CreateMulipleUsers(10, (i, member) => member.IsLockedOut = i % 2 == 0);
+            var users = CreateMulipleUsers(10, (i, member) => member.IsLockedOut = i % 2 == 0);
             UserService.Save(users);
 
-            var customUser = MockedUser.CreateUser();
+            var customUser = CreateUser();
             customUser.IsLockedOut = true;
             UserService.Save(customUser);
 
@@ -675,10 +676,10 @@ namespace Umbraco.Tests.Integration.Services
         [Test]
         public void Count_All_Approved_Users()
         {
-            var users = MockedUser.CreateMulipleUsers(10, (i, member) => member.IsApproved = i % 2 == 0);
+            var users = CreateMulipleUsers(10, (i, member) => member.IsApproved = i % 2 == 0);
             UserService.Save(users);
 
-            var customUser = MockedUser.CreateUser();
+            var customUser = CreateUser();
             customUser.IsApproved = false;
             UserService.Save(customUser);
 
@@ -896,7 +897,7 @@ namespace Umbraco.Tests.Integration.Services
         public void Get_By_Profile_Id()
         {
             // Arrange
-            var user = (IUser)UserService.CreateUserWithIdentity("test1", "test1@test.com");
+            var user = UserService.CreateUserWithIdentity("test1", "test1@test.com");
 
             // Act
             var profile = UserService.GetProfileById((int)user.Id);
@@ -908,7 +909,7 @@ namespace Umbraco.Tests.Integration.Services
         }
 
         [Test]
-        public void Get_By_Profile_Id_Must_return_null_if_user_not_exists()
+        public void Get_By_Profile_Id_Must_Return_Null_If_User_Does_Not_Exist()
         {
             var profile = UserService.GetProfileById(42);
 
@@ -917,7 +918,7 @@ namespace Umbraco.Tests.Integration.Services
         }
 
         [Test]
-        public void GetProfilesById_Must_empty_if_users_not_exists()
+        public void GetProfilesById_Must_Return_Empty_If_User_Does_Not_Exist()
         {
             var profiles = UserService.GetProfilesById(42);
 
@@ -983,6 +984,39 @@ namespace Umbraco.Tests.Integration.Services
             return startContentItems.ToArray();
         }
 
+        private static IEnumerable<IUser> CreateMulipleUsers(int amount, Action<int, IUser> onCreating = null)
+        {
+            var list = new List<IUser>();
+
+            for (var i = 0; i < amount; i++)
+            {
+                var name = "User No-" + i;
+                var user = new UserBuilder()
+                    .WithName(name)
+                    .WithEmail("test" + i + "@test.com")
+                    .WithLogin("test" + i, "test" + i)
+                    .Build();
+                
+                onCreating?.Invoke(i, user);
+
+                user.ResetDirtyProperties(false);
+
+                list.Add(user);
+            }
+
+            return list;
+        }
+
+        private static User CreateUser(string suffix = "")
+        {
+            return new UserBuilder()
+                .WithIsApproved(true)
+                .WithName("TestUser" + suffix)
+                .WithLogin("TestUser" + suffix, "testing")
+                .WithEmail("test" + suffix + "@test.com")
+                .Build();
+        }
+
         private IUser CreateTestUser(out IUserGroup userGroup)
         {
             userGroup = CreateTestUserGroup();
@@ -1018,19 +1052,16 @@ namespace Umbraco.Tests.Integration.Services
 
         private UserGroup CreateTestUserGroup(string alias = "testGroup", string name = "Test Group")
         {
-            var userGroup = new UserGroup(ShortStringHelper)
-            {
-                Alias = alias,
-                Name = name,
-                Permissions = "ABCDEFGHIJ1234567".ToCharArray().Select(x => x.ToString())
-            };
-
-            userGroup.AddAllowedSection("content");
-            userGroup.AddAllowedSection("media");
+            var userGroup = new UserGroupBuilder()
+                .WithAlias(alias)
+                .WithName(name)
+                .WithPermissions("ABCDEFGHIJ1234567")
+                .WithAllowedSections(new[] { "content", "media" })
+                .Build();
 
             UserService.Save(userGroup);
 
-            return userGroup;
+            return (UserGroup)userGroup;
         }
     }
 }
