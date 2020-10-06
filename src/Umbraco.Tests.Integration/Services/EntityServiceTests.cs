@@ -68,29 +68,27 @@ namespace Umbraco.Tests.Services
                 root = c1; // make a hierarchy
             }
 
-            var service = EntityService;
-
             long total;
 
-            var entities = service.GetPagedDescendants(rootId, UmbracoObjectTypes.Document, 0, 6, out total).ToArray();
+            var entities = EntityService.GetPagedDescendants(rootId, UmbracoObjectTypes.Document, 0, 6, out total).ToArray();
             Assert.That(entities.Length, Is.EqualTo(6));
             Assert.That(total, Is.EqualTo(10));
             Assert.AreEqual(ids[0], entities[0].Id);
 
-            entities = service.GetPagedDescendants(rootId, UmbracoObjectTypes.Document, 1, 6, out total).ToArray();
+            entities = EntityService.GetPagedDescendants(rootId, UmbracoObjectTypes.Document, 1, 6, out total).ToArray();
             Assert.That(entities.Length, Is.EqualTo(4));
             Assert.That(total, Is.EqualTo(10));
             Assert.AreEqual(ids[6], entities[0].Id);
 
             //Test ordering direction
 
-            entities = service.GetPagedDescendants(rootId, UmbracoObjectTypes.Document, 0, 6, out total,
+            entities = EntityService.GetPagedDescendants(rootId, UmbracoObjectTypes.Document, 0, 6, out total,
                 ordering: Ordering.By("Path", Direction.Descending)).ToArray();
             Assert.That(entities.Length, Is.EqualTo(6));
             Assert.That(total, Is.EqualTo(10));
             Assert.AreEqual(ids[ids.Count - 1], entities[0].Id);
 
-            entities = service.GetPagedDescendants(rootId, UmbracoObjectTypes.Document, 1, 6, out total,
+            entities = EntityService.GetPagedDescendants(rootId, UmbracoObjectTypes.Document, 1, 6, out total,
                 ordering: Ordering.By("Path", Direction.Descending)).ToArray();
             Assert.That(entities.Length, Is.EqualTo(4));
             Assert.That(total, Is.EqualTo(10));
@@ -113,29 +111,27 @@ namespace Umbraco.Tests.Services
                 ids.Add(c1.Id);
             }
 
-            var service = EntityService;
-
             long total;
 
-            var entities = service.GetPagedChildren(root.Id, UmbracoObjectTypes.Document, 0, 6, out total).ToArray();
+            var entities = EntityService.GetPagedChildren(root.Id, UmbracoObjectTypes.Document, 0, 6, out total).ToArray();
             Assert.That(entities.Length, Is.EqualTo(6));
             Assert.That(total, Is.EqualTo(10));
             Assert.AreEqual(ids[0], entities[0].Id);
 
-            entities = service.GetPagedChildren(root.Id, UmbracoObjectTypes.Document, 1, 6, out total).ToArray();
+            entities = EntityService.GetPagedChildren(root.Id, UmbracoObjectTypes.Document, 1, 6, out total).ToArray();
             Assert.That(entities.Length, Is.EqualTo(4));
             Assert.That(total, Is.EqualTo(10));
             Assert.AreEqual(ids[6], entities[0].Id);
 
             //Test ordering direction
 
-            entities = service.GetPagedChildren(root.Id, UmbracoObjectTypes.Document, 0, 6, out total,
+            entities = EntityService.GetPagedChildren(root.Id, UmbracoObjectTypes.Document, 0, 6, out total,
                 ordering: Ordering.By("SortOrder", Direction.Descending)).ToArray();
             Assert.That(entities.Length, Is.EqualTo(6));
             Assert.That(total, Is.EqualTo(10));
             Assert.AreEqual(ids[ids.Count - 1], entities[0].Id);
 
-            entities = service.GetPagedChildren(root.Id, UmbracoObjectTypes.Document, 1, 6, out total,
+            entities = EntityService.GetPagedChildren(root.Id, UmbracoObjectTypes.Document, 1, 6, out total,
                 ordering: Ordering.By("SortOrder", Direction.Descending)).ToArray();
             Assert.That(entities.Length, Is.EqualTo(4));
             Assert.That(total, Is.EqualTo(10));
@@ -164,13 +160,11 @@ namespace Umbraco.Tests.Services
                 }
             }
 
-            var service = EntityService;
-
             long total;
-            var entities = service.GetPagedDescendants(root.Id, UmbracoObjectTypes.Document, 0, 31, out total).ToArray();
+            var entities = EntityService.GetPagedDescendants(root.Id, UmbracoObjectTypes.Document, 0, 31, out total).ToArray();
             Assert.That(entities.Length, Is.EqualTo(31));
             Assert.That(total, Is.EqualTo(60));
-            entities = service.GetPagedDescendants(root.Id, UmbracoObjectTypes.Document, 1, 31, out total).ToArray();
+            entities = EntityService.GetPagedDescendants(root.Id, UmbracoObjectTypes.Document, 1, 31, out total).ToArray();
             Assert.That(entities.Length, Is.EqualTo(29));
             Assert.That(total, Is.EqualTo(60));
         }
@@ -205,11 +199,9 @@ namespace Umbraco.Tests.Services
                 ContentService.MoveToRecycleBin(content);
             }
 
-            var service = EntityService;
-
             long total;
             //search at root to see if it returns recycled
-            var entities = service.GetPagedDescendants(-1, UmbracoObjectTypes.Document, 0, 1000, out total)
+            var entities = EntityService.GetPagedDescendants(-1, UmbracoObjectTypes.Document, 0, 1000, out total)
                 .Select(x => x.Id)
                 .ToArray();
 
@@ -249,11 +241,9 @@ namespace Umbraco.Tests.Services
                 ContentService.MoveToRecycleBin(content);
             }
 
-            var service = EntityService;
-
             long total;
             //search at root to see if it returns recycled
-            var entities = service.GetPagedDescendants(UmbracoObjectTypes.Document, 0, 1000, out total, includeTrashed: false)
+            var entities = EntityService.GetPagedDescendants(UmbracoObjectTypes.Document, 0, 1000, out total, includeTrashed: false)
                 .Select(x => x.Id)
                 .ToArray();
 
@@ -283,14 +273,12 @@ namespace Umbraco.Tests.Services
                 }
             }
 
-            var service = EntityService;
-
             long total;
-            var entities = service.GetPagedDescendants(root.Id, UmbracoObjectTypes.Document, 0, 10, out total,
+            var entities = EntityService.GetPagedDescendants(root.Id, UmbracoObjectTypes.Document, 0, 10, out total,
                 filter: SqlContext.Query<IUmbracoEntity>().Where(x => x.Name.Contains("ssss"))).ToArray();
             Assert.That(entities.Length, Is.EqualTo(10));
             Assert.That(total, Is.EqualTo(10));
-            entities = service.GetPagedDescendants(root.Id, UmbracoObjectTypes.Document, 0, 50, out total,
+            entities = EntityService.GetPagedDescendants(root.Id, UmbracoObjectTypes.Document, 0, 50, out total,
                 filter: SqlContext.Query<IUmbracoEntity>().Where(x => x.Name.Contains("tttt"))).ToArray();
             Assert.That(entities.Length, Is.EqualTo(50));
             Assert.That(total, Is.EqualTo(50));
@@ -310,13 +298,11 @@ namespace Umbraco.Tests.Services
                 MediaService.Save(c1);
             }
 
-            var service = EntityService;
-
             long total;
-            var entities = service.GetPagedChildren(root.Id, UmbracoObjectTypes.Media, 0, 6, out total).ToArray();
+            var entities = EntityService.GetPagedChildren(root.Id, UmbracoObjectTypes.Media, 0, 6, out total).ToArray();
             Assert.That(entities.Length, Is.EqualTo(6));
             Assert.That(total, Is.EqualTo(10));
-            entities = service.GetPagedChildren(root.Id, UmbracoObjectTypes.Media, 1, 6, out total).ToArray();
+            entities = EntityService.GetPagedChildren(root.Id, UmbracoObjectTypes.Media, 1, 6, out total).ToArray();
             Assert.That(entities.Length, Is.EqualTo(4));
             Assert.That(total, Is.EqualTo(10));
         }
@@ -344,13 +330,11 @@ namespace Umbraco.Tests.Services
                 }
             }
 
-            var service = EntityService;
-
             long total;
-            var entities = service.GetPagedDescendants(root.Id, UmbracoObjectTypes.Media, 0, 31, out total).ToArray();
+            var entities = EntityService.GetPagedDescendants(root.Id, UmbracoObjectTypes.Media, 0, 31, out total).ToArray();
             Assert.That(entities.Length, Is.EqualTo(31));
             Assert.That(total, Is.EqualTo(60));
-            entities = service.GetPagedDescendants(root.Id, UmbracoObjectTypes.Media, 1, 31, out total).ToArray();
+            entities = EntityService.GetPagedDescendants(root.Id, UmbracoObjectTypes.Media, 1, 31, out total).ToArray();
             Assert.That(entities.Length, Is.EqualTo(29));
             Assert.That(total, Is.EqualTo(60));
         }
@@ -386,11 +370,9 @@ namespace Umbraco.Tests.Services
                 MediaService.MoveToRecycleBin(content);
             }
 
-            var service = EntityService;
-
             long total;
             //search at root to see if it returns recycled
-            var entities = service.GetPagedDescendants(-1, UmbracoObjectTypes.Media, 0, 1000, out total)
+            var entities = EntityService.GetPagedDescendants(-1, UmbracoObjectTypes.Media, 0, 1000, out total)
                 .Select(x => x.Id)
                 .ToArray();
 
@@ -431,11 +413,9 @@ namespace Umbraco.Tests.Services
                 MediaService.MoveToRecycleBin(content);
             }
 
-            var service = EntityService;
-
             long total;
             //search at root to see if it returns recycled
-            var entities = service.GetPagedDescendants(UmbracoObjectTypes.Media, 0, 1000, out total, includeTrashed: false)
+            var entities = EntityService.GetPagedDescendants(UmbracoObjectTypes.Media, 0, 1000, out total, includeTrashed: false)
                 .Select(x => x.Id)
                 .ToArray();
 
@@ -468,14 +448,12 @@ namespace Umbraco.Tests.Services
                 }
             }
 
-            var service = EntityService;
-
             long total;
-            var entities = service.GetPagedDescendants(root.Id, UmbracoObjectTypes.Media, 0, 10, out total,
+            var entities = EntityService.GetPagedDescendants(root.Id, UmbracoObjectTypes.Media, 0, 10, out total,
                 filter: SqlContext.Query<IUmbracoEntity>().Where(x => x.Name.Contains("ssss"))).ToArray();
             Assert.That(entities.Length, Is.EqualTo(10));
             Assert.That(total, Is.EqualTo(10));
-            entities = service.GetPagedDescendants(root.Id, UmbracoObjectTypes.Media, 0, 50, out total,
+            entities = EntityService.GetPagedDescendants(root.Id, UmbracoObjectTypes.Media, 0, 50, out total,
                 filter: SqlContext.Query<IUmbracoEntity>().Where(x => x.Name.Contains("tttt"))).ToArray();
             Assert.That(entities.Length, Is.EqualTo(50));
             Assert.That(total, Is.EqualTo(50));
@@ -484,9 +462,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void EntityService_Can_Find_All_Content_By_UmbracoObjectTypes()
         {
-            var service = EntityService;
-
-            var entities = service.GetAll(UmbracoObjectTypes.Document).ToArray();
+            var entities = EntityService.GetAll(UmbracoObjectTypes.Document).ToArray();
 
             Assert.That(entities.Any(), Is.True);
             Assert.That(entities.Length, Is.EqualTo(4));
@@ -496,10 +472,8 @@ namespace Umbraco.Tests.Services
         [Test]
         public void EntityService_Can_Find_All_Content_By_UmbracoObjectType_Id()
         {
-            var service = EntityService;
-
             var objectTypeId = Constants.ObjectTypes.Document;
-            var entities = service.GetAll(objectTypeId).ToArray();
+            var entities = EntityService.GetAll(objectTypeId).ToArray();
 
             Assert.That(entities.Any(), Is.True);
             Assert.That(entities.Length, Is.EqualTo(4));
@@ -509,9 +483,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void EntityService_Can_Find_All_Content_By_Type()
         {
-            var service = EntityService;
-
-            var entities = service.GetAll<IContent>().ToArray();
+            var entities = EntityService.GetAll<IContent>().ToArray();
 
             Assert.That(entities.Any(), Is.True);
             Assert.That(entities.Length, Is.EqualTo(4));
@@ -521,9 +493,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void EntityService_Can_Get_Child_Content_By_ParentId_And_UmbracoObjectType()
         {
-            var service = EntityService;
-
-            var entities = service.GetChildren(-1, UmbracoObjectTypes.Document).ToArray();
+            var entities = EntityService.GetChildren(-1, UmbracoObjectTypes.Document).ToArray();
 
             Assert.That(entities.Any(), Is.True);
             Assert.That(entities.Length, Is.EqualTo(1));
@@ -533,8 +503,6 @@ namespace Umbraco.Tests.Services
         [Test]
         public void EntityService_Can_Get_Content_By_UmbracoObjectType_With_Variant_Names()
         {
-            var service = EntityService;
-
             var alias = "test" + Guid.NewGuid();
             var contentType = MockedContentTypes.CreateSimpleContentType(alias, alias, false);
             contentType.Variations = ContentVariation.Culture;
@@ -545,7 +513,7 @@ namespace Umbraco.Tests.Services
             c1.SetCultureName("Test - ES", _langEs.IsoCode);
             ContentService.Save(c1);
 
-            var result = service.Get(c1.Id, UmbracoObjectTypes.Document);
+            var result = EntityService.Get(c1.Id, UmbracoObjectTypes.Document);
             Assert.AreEqual("Test - FR", result.Name); // got name from default culture
             Assert.IsNotNull(result as IDocumentEntitySlim);
             var doc = (IDocumentEntitySlim)result;
@@ -557,8 +525,6 @@ namespace Umbraco.Tests.Services
         [Test]
         public void EntityService_Can_Get_Child_Content_By_ParentId_And_UmbracoObjectType_With_Variant_Names()
         {
-            var service = EntityService;
-
             var contentType = MockedContentTypes.CreateSimpleContentType("test1", "Test1", false);
             contentType.Variations = ContentVariation.Culture;
             ContentTypeService.Save(contentType);
@@ -582,7 +548,7 @@ namespace Umbraco.Tests.Services
                 ContentService.Save(c1);
             }
 
-            var entities = service.GetChildren(root.Id, UmbracoObjectTypes.Document).ToArray();
+            var entities = EntityService.GetChildren(root.Id, UmbracoObjectTypes.Document).ToArray();
 
             Assert.AreEqual(10, entities.Length);
 
@@ -610,9 +576,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void EntityService_Can_Get_Children_By_ParentId()
         {
-            var service = EntityService;
-
-            var entities = service.GetChildren(folderId);
+            var entities = EntityService.GetChildren(folderId);
 
             Assert.That(entities.Any(), Is.True);
             Assert.That(entities.Count(), Is.EqualTo(3));
@@ -622,9 +586,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void EntityService_Can_Get_Descendants_By_ParentId()
         {
-            var service = EntityService;
-
-            var entities = service.GetDescendants(folderId);
+            var entities = EntityService.GetDescendants(folderId);
 
             Assert.That(entities.Any(), Is.True);
             Assert.That(entities.Count(), Is.EqualTo(4));
@@ -634,19 +596,16 @@ namespace Umbraco.Tests.Services
         [Test]
         public void EntityService_Throws_When_Getting_All_With_Invalid_Type()
         {
-            var service = EntityService;
             var objectTypeId = Constants.ObjectTypes.ContentItem;
 
-            Assert.Throws<NotSupportedException>(() => service.GetAll<IContentBase>());
-            Assert.Throws<NotSupportedException>(() => service.GetAll(objectTypeId));
+            Assert.Throws<NotSupportedException>(() => EntityService.GetAll<IContentBase>());
+            Assert.Throws<NotSupportedException>(() => EntityService.GetAll(objectTypeId));
         }
 
         [Test]
         public void EntityService_Can_Find_All_ContentTypes_By_UmbracoObjectTypes()
         {
-            var service = EntityService;
-
-            var entities = service.GetAll(UmbracoObjectTypes.DocumentType).ToArray();
+            var entities = EntityService.GetAll(UmbracoObjectTypes.DocumentType).ToArray();
 
             Assert.That(entities.Any(), Is.True);
             Assert.That(entities.Count(), Is.EqualTo(1));
@@ -655,10 +614,8 @@ namespace Umbraco.Tests.Services
         [Test]
         public void EntityService_Can_Find_All_ContentTypes_By_UmbracoObjectType_Id()
         {
-            var service = EntityService;
-
             var objectTypeId = Constants.ObjectTypes.DocumentType;
-            var entities = service.GetAll(objectTypeId).ToArray();
+            var entities = EntityService.GetAll(objectTypeId).ToArray();
 
             Assert.That(entities.Any(), Is.True);
             Assert.That(entities.Count(), Is.EqualTo(1));
@@ -667,9 +624,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void EntityService_Can_Find_All_ContentTypes_By_Type()
         {
-            var service = EntityService;
-
-            var entities = service.GetAll<IContentType>().ToArray();
+            var entities = EntityService.GetAll<IContentType>().ToArray();
 
             Assert.That(entities.Any(), Is.True);
             Assert.That(entities.Count(), Is.EqualTo(1));
@@ -678,9 +633,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void EntityService_Can_Find_All_Media_By_UmbracoObjectTypes()
         {
-            var service = EntityService;
-
-            var entities = service.GetAll(UmbracoObjectTypes.Media).ToArray();
+            var entities = EntityService.GetAll(UmbracoObjectTypes.Media).ToArray();
 
             Assert.That(entities.Any(), Is.True);
             Assert.That(entities.Length, Is.EqualTo(5));
@@ -695,9 +648,8 @@ namespace Umbraco.Tests.Services
 
         [Test]
         public void EntityService_Can_Get_ObjectType()
-        {
-            var service = EntityService;
-            var mediaObjectType = service.GetObjectType(1031);
+        { ;
+            var mediaObjectType = EntityService.GetObjectType(1031);
 
             Assert.NotNull(mediaObjectType);
             Assert.AreEqual(mediaObjectType, UmbracoObjectTypes.MediaType);
@@ -706,8 +658,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void EntityService_Can_Get_Key_For_Id_With_Unknown_Type()
         {
-            var service = EntityService;
-            var result = service.GetKey(1052, UmbracoObjectTypes.Unknown);
+            var result = EntityService.GetKey(1052, UmbracoObjectTypes.Unknown);
 
             Assert.IsTrue(result.Success);
             Assert.AreEqual(Guid.Parse("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522"), result.Result);
@@ -716,8 +667,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void EntityService_Can_Get_Key_For_Id()
         {
-            var service = EntityService;
-            var result = service.GetKey(1052, UmbracoObjectTypes.DocumentType);
+            var result = EntityService.GetKey(1052, UmbracoObjectTypes.DocumentType);
 
             Assert.IsTrue(result.Success);
             Assert.AreEqual(Guid.Parse("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522"), result.Result);
@@ -726,9 +676,8 @@ namespace Umbraco.Tests.Services
         [Test]
         public void EntityService_Cannot_Get_Key_For_Id_With_Incorrect_Object_Type()
         {
-            var service = EntityService;
-            var result1 = service.GetKey(1052, UmbracoObjectTypes.DocumentType);
-            var result2 = service.GetKey(1052, UmbracoObjectTypes.MediaType);
+            var result1 = EntityService.GetKey(1052, UmbracoObjectTypes.DocumentType);
+            var result2 = EntityService.GetKey(1052, UmbracoObjectTypes.MediaType);
 
             Assert.IsTrue(result1.Success);
             Assert.IsFalse(result2.Success);
@@ -737,8 +686,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void EntityService_Can_Get_Id_For_Key_With_Unknown_Type()
         {
-            var service = EntityService;
-            var result = service.GetId(Guid.Parse("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522"), UmbracoObjectTypes.Unknown);
+            var result = EntityService.GetId(Guid.Parse("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522"), UmbracoObjectTypes.Unknown);
 
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1052, result.Result);
@@ -747,8 +695,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void EntityService_Can_Get_Id_For_Key()
         {
-            var service = EntityService;
-            var result = service.GetId(Guid.Parse("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522"), UmbracoObjectTypes.DocumentType);
+            var result = EntityService.GetId(Guid.Parse("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522"), UmbracoObjectTypes.DocumentType);
 
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1052, result.Result);
@@ -757,9 +704,8 @@ namespace Umbraco.Tests.Services
         [Test]
         public void EntityService_Cannot_Get_Id_For_Key_With_Incorrect_Object_Type()
         {
-            var service = EntityService;
-            var result1 = service.GetId(Guid.Parse("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522"), UmbracoObjectTypes.DocumentType);
-            var result2 = service.GetId(Guid.Parse("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522"), UmbracoObjectTypes.MediaType);
+            var result1 = EntityService.GetId(Guid.Parse("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522"), UmbracoObjectTypes.DocumentType);
+            var result2 = EntityService.GetId(Guid.Parse("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522"), UmbracoObjectTypes.MediaType);
 
             Assert.IsTrue(result1.Success);
             Assert.IsFalse(result2.Success);
@@ -768,25 +714,24 @@ namespace Umbraco.Tests.Services
         [Test]
         public void ReserveId()
         {
-            var service = EntityService;
             var guid = Guid.NewGuid();
 
             // can reserve
-            var reservedId = service.ReserveId(guid);
+            var reservedId = EntityService.ReserveId(guid);
             Assert.IsTrue(reservedId > 0);
 
             // can get it back
-            var id = service.GetId(guid, UmbracoObjectTypes.DocumentType);
+            var id = EntityService.GetId(guid, UmbracoObjectTypes.DocumentType);
             Assert.IsTrue(id.Success);
             Assert.AreEqual(reservedId, id.Result);
 
             // anything goes
-            id = service.GetId(guid, UmbracoObjectTypes.Media);
+            id = EntityService.GetId(guid, UmbracoObjectTypes.Media);
             Assert.IsTrue(id.Success);
             Assert.AreEqual(reservedId, id.Result);
 
             // a random guid won't work
-            Assert.IsFalse(service.GetId(Guid.NewGuid(), UmbracoObjectTypes.DocumentType).Success);
+            Assert.IsFalse(EntityService.GetId(Guid.NewGuid(), UmbracoObjectTypes.DocumentType).Success);
         }
 
         private static bool _isSetup = false;
