@@ -65,8 +65,6 @@ namespace Umbraco.Tests.Integration.Services
             var macro = CreateMacro();
             MacroService.Save(macro);
 
-            MacroService.Save(macro);
-
             // Assert
             Assert.IsTrue(macro.HasIdentity);
             Assert.Greater(macro.Id, 0);
