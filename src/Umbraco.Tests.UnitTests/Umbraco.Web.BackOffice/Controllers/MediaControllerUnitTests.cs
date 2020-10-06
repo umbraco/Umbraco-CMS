@@ -149,11 +149,11 @@ namespace Umbraco.Tests.Web.Controllers
             Assert.IsFalse(result);
         }
 
-        private IUser CreateUser(int id = 0, int startMediaId = -1)
+        private IUser CreateUser(int id = 0, int? startMediaId = null)
         {
             return new UserBuilder()
                 .WithId(id)
-                .WithStartMediaIds(new[] { startMediaId })
+                .WithStartMediaIds(startMediaId.HasValue ? new[] { startMediaId.Value } : new int[0])
                 .AddUserGroup()
                     .WithId(1)
                     .WithName("admin")

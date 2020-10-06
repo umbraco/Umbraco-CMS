@@ -7,6 +7,8 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
+using Umbraco.Tests.Common.Builders;
+using Umbraco.Tests.Common.Builders.Extensions;
 using Umbraco.Web.Editors;
 
 namespace Umbraco.Tests.Web.Controllers
@@ -17,8 +19,8 @@ namespace Umbraco.Tests.Web.Controllers
         [Test]
         public void Admin_Is_Authorized()
         {
-            var currentUser = GetAdminUser();
-            var savingUser = GetUserMock();
+            var currentUser = CreateAdminUser();
+            var savingUser = CreateUser();
 
             var contentService = new Mock<IContentService>();
             var mediaService = new Mock<IMediaService>();
@@ -31,7 +33,7 @@ namespace Umbraco.Tests.Web.Controllers
                 userService.Object,
                 entityService.Object);
 
-            var result = authHelper.IsAuthorized(currentUser, savingUser.Object, new int[0], new int[0], new string[0]);
+            var result = authHelper.IsAuthorized(currentUser, savingUser, new int[0], new int[0], new string[0]);
 
             Assert.IsTrue(result.Success);
         }
@@ -39,8 +41,8 @@ namespace Umbraco.Tests.Web.Controllers
         [Test]
         public void Non_Admin_Cannot_Save_Admin()
         {
-            var currentUser = GetUserMock();
-            var savingUser = GetAdminUser();
+            var currentUser = CreateUser();
+            var savingUser = CreateAdminUser();
 
             var contentService = new Mock<IContentService>();
             var mediaService = new Mock<IMediaService>();
@@ -53,7 +55,7 @@ namespace Umbraco.Tests.Web.Controllers
                 userService.Object,
                 entityService.Object);
 
-            var result = authHelper.IsAuthorized(currentUser.Object, savingUser, new int[0], new int[0], new string[0]);
+            var result = authHelper.IsAuthorized(currentUser, savingUser, new int[0], new int[0], new string[0]);
 
             Assert.IsFalse(result.Success);
         }
@@ -61,12 +63,8 @@ namespace Umbraco.Tests.Web.Controllers
         [Test]
         public void Cannot_Grant_Group_Membership_Without_Being_A_Member()
         {
-            var currentUser = GetUserMock();
-            currentUser.Setup(x => x.Groups).Returns(new[]
-            {
-                new ReadOnlyUserGroup(1, "Test", "icon-user", null, null, "test", new string[0], new string[0])
-            });
-            var savingUser = GetUserMock();
+            var currentUser = CreateUser(withGroup: true);
+            var savingUser = CreateUser();
 
             var contentService = new Mock<IContentService>();
             var mediaService = new Mock<IMediaService>();
@@ -79,7 +77,7 @@ namespace Umbraco.Tests.Web.Controllers
                 userService.Object,
                 entityService.Object);
 
-            var result = authHelper.IsAuthorized(currentUser.Object, savingUser.Object, new int[0], new int[0], new[] {"FunGroup"});
+            var result = authHelper.IsAuthorized(currentUser, savingUser, new int[0], new int[0], new[] {"FunGroup"});
 
             Assert.IsFalse(result.Success);
         }
@@ -87,12 +85,8 @@ namespace Umbraco.Tests.Web.Controllers
         [Test]
         public void Can_Grant_Group_Membership_With_Being_A_Member()
         {
-            var currentUser = GetUserMock();
-            currentUser.Setup(x => x.Groups).Returns(new[]
-            {
-                new ReadOnlyUserGroup(1, "Test", "icon-user", null, null, "test", new string[0], new string[0])
-            });
-            var savingUser = GetUserMock();
+            var currentUser = CreateUser(withGroup: true);
+            var savingUser = CreateUser();
 
             var contentService = new Mock<IContentService>();
             var mediaService = new Mock<IMediaService>();
@@ -105,7 +99,7 @@ namespace Umbraco.Tests.Web.Controllers
                 userService.Object,
                 entityService.Object);
 
-            var result = authHelper.IsAuthorized(currentUser.Object, savingUser.Object, new int[0], new int[0], new[] { "test" });
+            var result = authHelper.IsAuthorized(currentUser, savingUser, new int[0], new int[0], new[] { "test" });
 
             Assert.IsTrue(result.Success);
         }
@@ -121,10 +115,8 @@ namespace Umbraco.Tests.Web.Controllers
                 {4567, "-1,4567"},
             };
 
-            var currentUser = GetUserMock();
-            currentUser.Setup(x => x.StartContentIds).Returns(new[] { 9876 });
-            var savingUser = GetUserMock();
-            savingUser.Setup(x => x.StartContentIds).Returns(new[] { 1234 });
+            var currentUser = CreateUser(startContentIds: new[] { 9876 });
+            var savingUser = CreateUser(startContentIds: new[] { 1234 });
 
             var contentService = new Mock<IContentService>();
             contentService.Setup(x => x.GetById(It.IsAny<int>()))
@@ -145,7 +137,7 @@ namespace Umbraco.Tests.Web.Controllers
                 entityService.Object);
 
             //adding 5555 which currentUser has access to since it's a child of 9876 ... adding is still ok even though currentUser doesn't have access to 1234
-            var result = authHelper.IsAuthorized(currentUser.Object, savingUser.Object, new[] { 1234, 5555 }, new int[0], new string[0]);
+            var result = authHelper.IsAuthorized(currentUser, savingUser, new[] { 1234, 5555 }, new int[0], new string[0]);
 
             Assert.IsTrue(result.Success);
         }
@@ -161,10 +153,8 @@ namespace Umbraco.Tests.Web.Controllers
                 {4567, "-1,4567"},
             };
 
-            var currentUser = GetUserMock();
-            currentUser.Setup(x => x.StartContentIds).Returns(new[] { 9876 });
-            var savingUser = GetUserMock();
-            savingUser.Setup(x => x.StartContentIds).Returns(new[] { 1234, 4567 });
+            var currentUser = CreateUser(startContentIds: new[] { 9876 });
+            var savingUser = CreateUser(startContentIds: new[] { 1234, 4567 });
 
             var contentService = new Mock<IContentService>();
             contentService.Setup(x => x.GetById(It.IsAny<int>()))
@@ -185,7 +175,7 @@ namespace Umbraco.Tests.Web.Controllers
                 entityService.Object);
 
             //removing 4567 start node even though currentUser doesn't have acces to it ... removing is ok
-            var result = authHelper.IsAuthorized(currentUser.Object, savingUser.Object, new[] { 1234 }, new int[0], new string[0]);
+            var result = authHelper.IsAuthorized(currentUser, savingUser, new[] { 1234 }, new int[0], new string[0]);
 
             Assert.IsTrue(result.Success);
         }
@@ -201,9 +191,8 @@ namespace Umbraco.Tests.Web.Controllers
                 {4567, "-1,4567"},
             };
 
-            var currentUser = GetUserMock();
-            currentUser.Setup(x => x.StartContentIds).Returns(new[] { 9876 });
-            var savingUser = GetUserMock();
+            var currentUser = CreateUser(startContentIds: new[] { 9876 });
+            var savingUser = CreateUser();
 
             var contentService = new Mock<IContentService>();
             contentService.Setup(x => x.GetById(It.IsAny<int>()))
@@ -224,7 +213,7 @@ namespace Umbraco.Tests.Web.Controllers
                 entityService.Object);
 
             //adding 1234 but currentUser doesn't have access to it ... nope
-            var result = authHelper.IsAuthorized(currentUser.Object, savingUser.Object, new []{1234}, new int[0], new string[0]);
+            var result = authHelper.IsAuthorized(currentUser, savingUser, new []{1234}, new int[0], new string[0]);
 
             Assert.IsFalse(result.Success);
         }
@@ -240,9 +229,8 @@ namespace Umbraco.Tests.Web.Controllers
                 {4567, "-1,4567"},
             };
 
-            var currentUser = GetUserMock();
-            currentUser.Setup(x => x.StartContentIds).Returns(new[] { 9876 });
-            var savingUser = GetUserMock();
+            var currentUser = CreateUser(startContentIds: new[] { 9876 });
+            var savingUser = CreateUser();
 
             var contentService = new Mock<IContentService>();
             contentService.Setup(x => x.GetById(It.IsAny<int>()))
@@ -263,7 +251,7 @@ namespace Umbraco.Tests.Web.Controllers
                 entityService.Object);
 
             //adding 5555 which currentUser has access to since it's a child of 9876 ... ok
-            var result = authHelper.IsAuthorized(currentUser.Object, savingUser.Object, new[] { 5555 }, new int[0], new string[0]);
+            var result = authHelper.IsAuthorized(currentUser, savingUser, new[] { 5555 }, new int[0], new string[0]);
 
             Assert.IsTrue(result.Success);
         }
@@ -280,9 +268,8 @@ namespace Umbraco.Tests.Web.Controllers
             };
 
 
-            var currentUser = GetUserMock();
-            currentUser.Setup(x => x.StartContentIds).Returns(new[] { 9876 });
-            var savingUser = GetUserMock();
+            var currentUser = CreateUser(startMediaIds: new[] { 9876 });
+            var savingUser = CreateUser();
 
             var contentService = new Mock<IContentService>();
             var mediaService = new Mock<IMediaService>();
@@ -303,7 +290,7 @@ namespace Umbraco.Tests.Web.Controllers
                 entityService.Object);
 
             //adding 1234 but currentUser doesn't have access to it ... nope
-            var result = authHelper.IsAuthorized(currentUser.Object, savingUser.Object, new int[0], new[] {1234}, new string[0]);
+            var result = authHelper.IsAuthorized(currentUser, savingUser, new int[0], new[] {1234}, new string[0]);
 
             Assert.IsFalse(result.Success);
         }
@@ -319,9 +306,8 @@ namespace Umbraco.Tests.Web.Controllers
                 {4567, "-1,4567"},
             };
 
-            var currentUser = GetUserMock();
-            currentUser.Setup(x => x.StartMediaIds).Returns(new[] { 9876 });
-            var savingUser = GetUserMock();
+            var currentUser = CreateUser(startMediaIds: new[] { 9876 });
+            var savingUser = CreateUser();
 
             var contentService = new Mock<IContentService>();
             var mediaService = new Mock<IMediaService>();
@@ -342,7 +328,7 @@ namespace Umbraco.Tests.Web.Controllers
                 entityService.Object);
 
             //adding 5555 which currentUser has access to since it's a child of 9876 ... ok
-            var result = authHelper.IsAuthorized(currentUser.Object, savingUser.Object, new int[0], new[] { 5555 }, new string[0]);
+            var result = authHelper.IsAuthorized(currentUser, savingUser, new int[0], new[] { 5555 }, new string[0]);
 
             Assert.IsTrue(result.Success);
         }
@@ -358,10 +344,8 @@ namespace Umbraco.Tests.Web.Controllers
                 {4567, "-1,4567"},
             };
 
-            var currentUser = GetUserMock();
-            currentUser.Setup(x => x.StartMediaIds).Returns(new[] { 9876 });
-            var savingUser = GetUserMock();
-            savingUser.Setup(x => x.StartMediaIds).Returns(new[] { 1234 });
+            var currentUser = CreateUser(startMediaIds: new[] { 9876 });
+            var savingUser = CreateUser(startMediaIds: new[] { 1234 });
 
             var contentService = new Mock<IContentService>();
             var mediaService = new Mock<IMediaService>();
@@ -382,7 +366,7 @@ namespace Umbraco.Tests.Web.Controllers
                 entityService.Object);
 
             //adding 5555 which currentUser has access to since it's a child of 9876 ... adding is still ok even though currentUser doesn't have access to 1234
-            var result = authHelper.IsAuthorized(currentUser.Object, savingUser.Object, new int[0], new[] { 1234, 5555 }, new string[0]);
+            var result = authHelper.IsAuthorized(currentUser, savingUser, new int[0], new[] { 1234, 5555 }, new string[0]);
 
             Assert.IsTrue(result.Success);
         }
@@ -398,10 +382,8 @@ namespace Umbraco.Tests.Web.Controllers
                 {4567, "-1,4567"},
             };
 
-            var currentUser = GetUserMock();
-            currentUser.Setup(x => x.StartMediaIds).Returns(new[] { 9876 });
-            var savingUser = GetUserMock();
-            savingUser.Setup(x => x.StartMediaIds).Returns(new[] { 1234, 4567 });
+            var currentUser = CreateUser(startMediaIds: new[] { 9876 });
+            var savingUser = CreateUser(startMediaIds: new[] { 1234, 4567 });
 
             var contentService = new Mock<IContentService>();
             var mediaService = new Mock<IMediaService>();
@@ -422,33 +404,37 @@ namespace Umbraco.Tests.Web.Controllers
                 entityService.Object);
 
             //removing 4567 start node even though currentUser doesn't have acces to it ... removing is ok
-            var result = authHelper.IsAuthorized(currentUser.Object, savingUser.Object, new int[0], new[] { 1234 }, new string[0]);
+            var result = authHelper.IsAuthorized(currentUser, savingUser, new int[0], new[] { 1234 }, new string[0]);
 
             Assert.IsTrue(result.Success);
         }
 
-        /// <summary>
-        /// Returns a <see cref="Mock{IUser}"/> and ensures that the ToUserCache and FromUserCache methods are mapped correctly for
-        /// dealing with start node caches
-        /// </summary>
-        /// <returns></returns>
-        private static Mock<IUser> GetUserMock()
+        private static IUser CreateUser(bool withGroup = false, int[] startContentIds = null, int[] startMediaIds = null)
         {
-            var userCache = new Dictionary<string, object>();
-            var userMock = new Mock<IUser>();
-            userMock.Setup(x => x.FromUserCache<int[]>(It.IsAny<string>())).Returns((string key) => userCache.TryGetValue(key, out var val) ? val is int[] iVal ? iVal : null : null);
-            userMock.Setup(x => x.ToUserCache<int[]>(It.IsAny<string>(), It.IsAny<int[]>())).Callback((string key, int[] val) => userCache[key] = val);
-            return userMock;
+            var builder = new UserBuilder()
+                .WithStartContentIds(startContentIds != null ? startContentIds : new int[0])
+                .WithStartMediaIds(startMediaIds != null ? startMediaIds : new int[0]);
+            if (withGroup)
+            {
+                builder = (UserBuilder)builder
+                    .AddUserGroup()
+                        .WithName("Test")
+                        .WithAlias("test")
+                        .Done();
+            }
+
+            return builder.Build();
         }
 
-        private IUser GetAdminUser()
+        private static IUser CreateAdminUser()
         {
-            var admin = GetUserMock();
-            admin.Setup(x => x.Groups).Returns(new[]
-            {
-                new ReadOnlyUserGroup(1, "Admin", "icon-user", null, null, Constants.Security.AdminGroupAlias, new string[0], new string[0])
-            });
-            return admin.Object;
+            return new UserBuilder()
+                .AddUserGroup()
+                    .WithId(1)
+                    .WithName("Admin")
+                    .WithAlias(Constants.Security.AdminGroupAlias)
+                    .Done()
+                .Build();
         }
     }
 }

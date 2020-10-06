@@ -334,11 +334,11 @@ namespace Umbraco.Tests.Web.Controllers
             Assert.AreEqual(ContentPermissionsHelper.ContentAccess.Denied, result);
         }
 
-        private IUser CreateUser(int id = 0, int startContentId = -1, bool withUserGroup = true)
+        private IUser CreateUser(int id = 0, int? startContentId = null, bool withUserGroup = true)
         {
             var builder = new UserBuilder()
                 .WithId(id)
-                .WithStartContentIds(startContentId == -1 ? new int[0] : new[] { startContentId });
+                .WithStartContentIds(startContentId.HasValue ? new[] { startContentId.Value } : new int[0]);
             if (withUserGroup)
             {
                 builder = builder

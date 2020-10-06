@@ -25,10 +25,8 @@ namespace Umbraco.Tests.Integration.Services
         private MacroService MacroService => (MacroService)GetRequiredService<IMacroService>();
 
         [SetUp]
-        public override void Setup()
+        public void SetupTest()
         {
-            base.Setup();
-
             var sp = ScopeProvider;
             using (var scope = sp.CreateScope())
             {

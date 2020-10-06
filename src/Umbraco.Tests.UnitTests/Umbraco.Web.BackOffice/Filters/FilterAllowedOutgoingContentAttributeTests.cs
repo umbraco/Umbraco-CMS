@@ -148,16 +148,11 @@ namespace Umbraco.Tests.Web.Controllers
             Assert.AreEqual(3, list.ElementAt(2).Id);
         }
 
-        private IUser CreateUser(int id = 0, int startContentId = -1)
+        private IUser CreateUser(int id = 0, int? startContentId = null)
         {
             return new UserBuilder()
                 .WithId(id)
-                .WithStartContentIds(new[] { startContentId })
-                .AddUserGroup()
-                    .WithId(1)
-                    .WithName("admin")
-                    .WithAlias("admin")
-                    .Done()
+                .WithStartContentIds(startContentId.HasValue ? new[] { startContentId.Value } : new int[0])
                 .Build();
         }
 
