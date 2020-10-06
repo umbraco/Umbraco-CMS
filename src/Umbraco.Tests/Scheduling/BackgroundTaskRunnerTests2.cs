@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Scheduling;
@@ -13,7 +14,7 @@ namespace Umbraco.Tests.Scheduling
     [Timeout(60000)]
     public class BackgroundTaskRunnerTests2
     {
-        private static ILoggerFactory _loggerFactory = LoggerFactory.Create(builder => builder.AddDebug());
+        private static ILoggerFactory _loggerFactory = NullLoggerFactory.Instance;
         // this tests was used to debug a background task runner issue that was unearthed by Deploy,
         // where work items would never complete under certain circumstances, due to threading issues.
         // (fixed now)

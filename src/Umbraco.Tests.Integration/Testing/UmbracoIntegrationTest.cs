@@ -170,7 +170,7 @@ namespace Umbraco.Tests.Integration.Testing
             GlobalSettings globalSettings,
             ConnectionStrings connectionStrings,
             IUmbracoVersion umbracoVersion, IIOHelper ioHelper,
-            ILogger logger, ILoggerFactory loggerFactory, IProfiler profiler, Core.Hosting.IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo,
+            ILoggerFactory loggerFactory, IProfiler profiler, Core.Hosting.IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo,
             ITypeFinder typeFinder, AppCaches appCaches, IDbProviderFactoryCreator dbProviderFactoryCreator)
         {
             var runtime = CreateTestRuntime(
@@ -178,7 +178,6 @@ namespace Umbraco.Tests.Integration.Testing
                 connectionStrings,
                 umbracoVersion,
                 ioHelper,
-                logger,
                 loggerFactory,
                 profiler,
                 hostingEnvironment,
@@ -215,7 +214,7 @@ namespace Umbraco.Tests.Integration.Testing
             GlobalSettings globalSettings,
             ConnectionStrings connectionStrings,
             IUmbracoVersion umbracoVersion, IIOHelper ioHelper,
-            ILogger logger, ILoggerFactory loggerFactory, IProfiler profiler, Core.Hosting.IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo,
+            ILoggerFactory loggerFactory, IProfiler profiler, Core.Hosting.IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo,
             ITypeFinder typeFinder, AppCaches appCaches, IDbProviderFactoryCreator dbProviderFactoryCreator,
             IMainDom mainDom, Action<CoreRuntime, RuntimeEssentialsEventArgs> eventHandler)
         {
@@ -224,7 +223,6 @@ namespace Umbraco.Tests.Integration.Testing
                 connectionStrings,
                 umbracoVersion,
                 ioHelper,
-                logger,
                 loggerFactory,
                 profiler,
                 Mock.Of<IUmbracoBootPermissionChecker>(),

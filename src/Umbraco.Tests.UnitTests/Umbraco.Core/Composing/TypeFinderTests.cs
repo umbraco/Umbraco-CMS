@@ -60,13 +60,6 @@ namespace Umbraco.Tests.Composing
             Assert.AreEqual(22, typesFound.Count()); // + classes in Umbraco.Web are marked with [Tree]
         }
 
-        private static IProfilingLogger GetTestProfilingLogger()
-        {
-            var logger = LoggerFactory.Create(builder => builder.AddDebug()).CreateLogger("ProfilingLogger");
-            var profiler = new TestProfiler();
-            return new ProfilingLogger(logger, profiler);
-        }
-
         [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
         public class MyTestAttribute : Attribute
         {

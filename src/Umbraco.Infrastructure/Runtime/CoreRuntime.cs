@@ -38,7 +38,6 @@ namespace Umbraco.Core.Runtime
             ConnectionStrings connectionStrings,
             IUmbracoVersion umbracoVersion,
             IIOHelper ioHelper,
-            ILogger logger,
             ILoggerFactory loggerFactory,
             IProfiler profiler,
             IUmbracoBootPermissionChecker umbracoBootPermissionChecker,
@@ -63,7 +62,7 @@ namespace Umbraco.Core.Runtime
             RuntimeLoggerFactory = loggerFactory;
             _umbracoBootPermissionChecker = umbracoBootPermissionChecker;
 
-            Logger = logger;
+            Logger = loggerFactory.CreateLogger<CoreRuntime>();
             MainDom = mainDom;
             TypeFinder = typeFinder;
 
@@ -75,7 +74,7 @@ namespace Umbraco.Core.Runtime
         /// <summary>
         /// Gets the logger.
         /// </summary>
-        public ILogger Logger { get; }
+        private ILogger<CoreRuntime> Logger { get; }
 
         public ILoggerFactory RuntimeLoggerFactory { get; }
 

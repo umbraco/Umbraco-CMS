@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
@@ -63,9 +64,9 @@ namespace Umbraco.Tests.Services
 
         private static IProfilingLogger GetTestProfilingLogger()
         {
-            var logger = Microsoft.Extensions.Logging.LoggerFactory.Create(builder => builder.AddDebug()).CreateLogger("ProfilingLogger");
+
             var profiler = new TestProfiler();
-            return new ProfilingLogger(logger, profiler);
+            return new ProfilingLogger(new NullLogger<ProfilingLogger>(), profiler);
         }
 
         [Test]

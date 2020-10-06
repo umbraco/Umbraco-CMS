@@ -4,6 +4,7 @@ using System.Data;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
@@ -27,7 +28,7 @@ namespace Umbraco.Tests.Persistence.NPocoTests
             // create the db
             // prob not what we want, this is not a real database, but hey, the test is ignored anyways
             // we'll fix this when we have proper testing infrastructure
-            var dbSqlServer = TestObjects.GetUmbracoSqlServerDatabase(Microsoft.Extensions.Logging.LoggerFactory.Create(builder => builder.AddDebug()).CreateLogger<UmbracoDatabase>());
+            var dbSqlServer = TestObjects.GetUmbracoSqlServerDatabase(new NullLogger<UmbracoDatabase>());
 
             //drop the table
             dbSqlServer.Execute("DROP TABLE [umbracoServer]");

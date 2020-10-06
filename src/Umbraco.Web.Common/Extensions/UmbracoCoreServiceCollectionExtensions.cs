@@ -233,7 +233,7 @@ namespace Umbraco.Extensions
             ILoggingConfiguration loggingConfiguration,
             IConfiguration configuration,
             //TODO: Yep that's extremely ugly
-            Func<GlobalSettings, ConnectionStrings, IUmbracoVersion, IIOHelper, ILogger, ILoggerFactory, IProfiler, IHostingEnvironment, IBackOfficeInfo, ITypeFinder, AppCaches, IDbProviderFactoryCreator, IRuntime> getRuntime,
+            Func<GlobalSettings, ConnectionStrings, IUmbracoVersion, IIOHelper, ILoggerFactory, IProfiler, IHostingEnvironment, IBackOfficeInfo, ITypeFinder, AppCaches, IDbProviderFactoryCreator, IRuntime> getRuntime,
             out IFactory factory)
         {
             if (services is null) throw new ArgumentNullException(nameof(services));
@@ -273,8 +273,9 @@ namespace Umbraco.Extensions
                 hostingSettings,
                 webHostEnvironment,
                 loggingConfiguration,
-                configuration,
-                out var logger, out var loggerFactory, out var ioHelper, out var hostingEnvironment, out var backOfficeInfo, out var profiler);
+                configuration, out var ioHelper, out var hostingEnvironment, out var backOfficeInfo, out var profiler);
+
+            var loggerFactory = serviceProvider.GetService<ILoggerFactory>();
 
             var umbracoVersion = new UmbracoVersion();
             var typeFinder = CreateTypeFinder(loggerFactory, profiler, webHostEnvironment, entryAssembly, typeFinderSettings);
@@ -284,7 +285,6 @@ namespace Umbraco.Extensions
                 connectionStrings.Value,
                 umbracoVersion,
                 ioHelper,
-                logger,
                 loggerFactory,
                 profiler,
                 hostingEnvironment,
@@ -314,7 +314,7 @@ namespace Umbraco.Extensions
         }
 
         private static IRuntime GetCoreRuntime(
-           GlobalSettings globalSettings, ConnectionStrings connectionStrings, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, ILoggerFactory loggerFactory,
+           GlobalSettings globalSettings, ConnectionStrings connectionStrings, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILoggerFactory loggerFactory,
             IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo,
             ITypeFinder typeFinder, AppCaches appCaches, IDbProviderFactoryCreator dbProviderFactoryCreator)
         {
@@ -333,7 +333,6 @@ namespace Umbraco.Extensions
                 connectionStrings,
                 umbracoVersion,
                 ioHelper,
-                logger,
                 loggerFactory,
                 profiler,
                 new AspNetCoreBootPermissionsChecker(),
@@ -354,8 +353,6 @@ namespace Umbraco.Extensions
             IWebHostEnvironment webHostEnvironment,
             ILoggingConfiguration loggingConfiguration,
             IConfiguration configuration,
-            out ILogger logger,
-            out ILoggerFactory loggerFactory,
             out IIOHelper ioHelper,
             out Core.Hosting.IHostingEnvironment hostingEnvironment,
             out IBackOfficeInfo backOfficeInfo,
@@ -366,7 +363,7 @@ namespace Umbraco.Extensions
 
             hostingEnvironment = new AspNetCoreHostingEnvironment(hostingSettings, webHostEnvironment);
             ioHelper = new IOHelper(hostingEnvironment);
-            logger = AddLogger(services, hostingEnvironment, loggingConfiguration, configuration, out loggerFactory);
+            AddLogger(services, hostingEnvironment, loggingConfiguration, configuration);
             backOfficeInfo = new AspNetCoreBackOfficeInfo(globalSettings);
             profiler = GetWebProfiler(hostingEnvironment);
 
@@ -377,12 +374,11 @@ namespace Umbraco.Extensions
         /// Create and configure the logger
         /// </summary>
         /// <param name="hostingEnvironment"></param>
-        private static ILogger AddLogger(
+        private static void AddLogger(
             IServiceCollection services,
             Core.Hosting.IHostingEnvironment hostingEnvironment,
             ILoggingConfiguration loggingConfiguration,
-            IConfiguration configuration,
-            out ILoggerFactory loggerFactory)
+            IConfiguration configuration)
         {
             // Create a serilog logger
             var logger = SerilogLogger.CreateWithDefaultConfiguration(hostingEnvironment, loggingConfiguration, configuration);
@@ -402,23 +398,17 @@ namespace Umbraco.Extensions
                 configure.AddSerilog(logger.SerilogLog, false);
             });
 
+            // This won't (and shouldn't) take ownership of the logger.
+            services.AddSingleton(logger.SerilogLog);
 
-            //services.AddSingleton<ILoggerFactory>(services => new SerilogLoggerFactory(logger.SerilogLog, false));
+            // Registered to provide two services...
+            var diagnosticContext = new DiagnosticContext(logger.SerilogLog);
 
-            // // This won't (and shouldn't) take ownership of the logger.
-            // services.AddSingleton(logger.SerilogLog);
-            //
-            // // Registered to provide two services...
-            // var diagnosticContext = new DiagnosticContext(logger.SerilogLog);
-            //
-            // // Consumed by e.g. middleware
-            // services.AddSingleton(diagnosticContext);
-            //
-            // // Consumed by user code
-            // services.AddSingleton<IDiagnosticContext>(diagnosticContext);
-            var serviceProvider = services.BuildServiceProvider();
-            loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
-            return loggerFactory.CreateLogger("Global Logger");
+            // Consumed by e.g. middleware
+            services.AddSingleton(diagnosticContext);
+
+            // Consumed by user code
+            services.AddSingleton<IDiagnosticContext>(diagnosticContext);
         }
 
         private static IProfiler GetWebProfiler(Umbraco.Core.Hosting.IHostingEnvironment hostingEnvironment)

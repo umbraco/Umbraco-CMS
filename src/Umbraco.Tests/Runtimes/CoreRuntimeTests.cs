@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Examine;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -83,28 +84,15 @@ namespace Umbraco.Tests.Runtimes
         // test application
         public class TestUmbracoApplication : UmbracoApplicationBase
         {
-            public TestUmbracoApplication() : base(CreateLoggerFactory().CreateLogger<TestUmbracoApplication>(),
-                CreateLoggerFactory(),
+            public TestUmbracoApplication() : base(new NullLogger<UmbracoApplicationBase>(),
+                NullLoggerFactory.Instance,
                 new SecuritySettings(),
                 new GlobalSettings(),
                 new ConnectionStrings(),
-                _ioHelper, _profiler, new AspNetHostingEnvironment(Options.Create(new HostingSettings())), new AspNetBackOfficeInfo(_globalSettings, _ioHelper,  CreateLoggerFactory().CreateLogger<AspNetBackOfficeInfo>(), Options.Create(new WebRoutingSettings())))
+                _ioHelper, _profiler, new AspNetHostingEnvironment(Options.Create(new HostingSettings())), new AspNetBackOfficeInfo(_globalSettings, _ioHelper,  new NullLogger<AspNetBackOfficeInfo>(), Options.Create(new WebRoutingSettings())))
             {
-                _loggerFactory = CreateLoggerFactory();
             }
 
-            // Since we can't pass ILoggerFactory before it's created this will take care of it.
-            private static ILoggerFactory CreateLoggerFactory()
-            {
-                if (_loggerFactory is null)
-                {
-                    _loggerFactory = LoggerFactory.Create(builder => builder.AddDebug());
-                }
-
-                return _loggerFactory;
-            }
-
-            private static ILoggerFactory _loggerFactory;
             private static readonly IIOHelper _ioHelper = TestHelper.IOHelper;
             private static readonly IProfiler _profiler = new TestProfiler();
             private static readonly GlobalSettings _globalSettings = new GlobalSettings();
@@ -121,7 +109,7 @@ namespace Umbraco.Tests.Runtimes
         public class TestRuntime : CoreRuntime
         {
             public TestRuntime(GlobalSettings globalSettings, ConnectionStrings connectionStrings, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, ILoggerFactory loggerFactory, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)
-                :base(globalSettings, connectionStrings,umbracoVersion, ioHelper, logger, loggerFactory, profiler, new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, TestHelper.DbProviderFactoryCreator, TestHelper.MainDom, TestHelper.GetTypeFinder(), AppCaches.NoCache)
+                :base(globalSettings, connectionStrings,umbracoVersion, ioHelper, loggerFactory, profiler, new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, TestHelper.DbProviderFactoryCreator, TestHelper.MainDom, TestHelper.GetTypeFinder(), AppCaches.NoCache)
             {
 
             }
@@ -141,7 +129,7 @@ namespace Umbraco.Tests.Runtimes
                 container.Register<IApplicationShutdownRegistry, AspNetApplicationShutdownRegistry>(Lifetime.Singleton);
                 container.Register<ISessionIdResolver, NullSessionIdResolver>(Lifetime.Singleton);
                 container.Register(typeof(ILogger<>), typeof(Logger<>), Lifetime.Singleton);
-                
+
 
                 var factory = base.Configure(container);
                 return factory;

@@ -21,7 +21,7 @@ namespace Umbraco.Tests.Migrations
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewEmptyPerTest)]
     public class AdvancedMigrationTests : TestWithDatabaseBase
     {
-        private ILoggerFactory _loggerFactory = Microsoft.Extensions.Logging.LoggerFactory.Create(builder => builder.AddDebug());
+        private ILoggerFactory _loggerFactory = NullLoggerFactory.Instance;
 
         [Test]
         public void CreateTableOfTDto()
