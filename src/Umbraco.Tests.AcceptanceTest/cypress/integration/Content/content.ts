@@ -317,11 +317,11 @@ context('Content', () => {
         // Rollback
         cy.get('.umb-box-header :button').click();
 
-        cy.get('.umb-box-content > .ng-scope > .input-block-level')
+        cy.get('.umb-box-content > div > .input-block-level')
             .find('option[label*=' + new Date().getDate() + ']')
             .then(elements => {
                 const option = elements[[elements.length - 1]].getAttribute('value');
-                cy.get('.umb-box-content > .ng-scope > .input-block-level')
+                cy.get('.umb-box-content > div > .input-block-level')
                     .select(option);
             });
 
@@ -330,8 +330,8 @@ context('Content', () => {
         cy.reload();
 
         // Assert
-        cy.get('.history').find('.umb-badge').eq(0).should('contain.text', "Rollback");
-        cy.get('.history').find('.umb-badge').eq(1).should('contain.text', "Save");
+        cy.get('.history').find('.umb-badge').eq(0).should('contain.text', "Save");
+        cy.get('.history').find('.umb-badge').eq(1).should('contain.text', "Rollback");
         cy.get('#headerName').should('have.value', initialNodeName);
 
         // Clean up (content is automatically deleted when document types are gone)
