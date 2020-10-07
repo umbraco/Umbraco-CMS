@@ -16,6 +16,7 @@ using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
+using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Integration.Implementations;
 using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.TestHelpers.Entities;
@@ -273,27 +274,24 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
                 var dataValueReferences = new DataValueReferenceFactoryCollection(Enumerable.Empty<IDataValueReferenceFactory>());
                 var contentRepo = new DocumentRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<DocumentRepository>(), LoggerFactory, contentTypeRepository, templateRepository, tagRepository, languageRepository, relationRepository, relationTypeRepository, propertyEditors, dataValueReferences, dataTypeService);
 
-                var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage2", "Textpage");
-                fileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
-                contentTypeRepository.Save(contentType);
-                var textpage = MockedContent.CreateSimpleContent(contentType);
-                contentRepo.Save(textpage);
+                var template = TemplateBuilder.CreateTextPageTemplate();
+                fileService.SaveTemplate(template); // else, FK violation on contentType!
 
-                var template = new Template(ShortStringHelper, "test", "test")
-                {
-                    Content = @"<%@ Master Language=""C#"" %>"
-                };
-                templateRepository.Save(template);
+                var contentType = ContentTypeBuilder.CreateSimpleContentType("umbTextpage2", "Textpage", defaultTemplateId: template.Id);
+                contentTypeRepository.Save(contentType);
+
+                var textpage = ContentBuilder.CreateSimpleContent(contentType);
+                contentRepo.Save(textpage);
 
                 textpage.TemplateId = template.Id;
                 contentRepo.Save(textpage);
 
                 // Act
-                var templates = templateRepository.Get("test");
+                var templates = templateRepository.Get("textPage");
                 templateRepository.Delete(templates);
 
                 // Assert
-                Assert.IsNull(templateRepository.Get("test"));
+                Assert.IsNull(templateRepository.Get("textPage"));
             }
         }
 

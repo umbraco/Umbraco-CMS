@@ -4,8 +4,8 @@ using System.Threading;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
+using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Integration.Testing;
-using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Integration.Services
@@ -20,18 +20,28 @@ namespace Umbraco.Tests.Integration.Services
         private IFileService FileService => GetRequiredService<IFileService>();
         private IPublicAccessService PublicAccessService => GetRequiredService<IPublicAccessService>();
 
+        private Content _content;
+
+        [SetUp]
+        public void CreateTestData()
+        {
+            var template = TemplateBuilder.CreateTextPageTemplate();
+            FileService.SaveTemplate(template); // else, FK violation on contentType!
+
+            var ct = ContentTypeBuilder.CreateSimpleContentType("blah", "Blah", defaultTemplateId: template.Id);
+            ContentTypeService.Save(ct);
+
+            _content = ContentBuilder.CreateSimpleContent(ct, "Test", -1);
+            ContentService.Save(_content);
+        }
+
         [Test]
         public void Can_Add_New_Entry()
         {
             // Arrange
-            var ct = MockedContentTypes.CreateSimpleContentType("blah", "Blah");
-            FileService.SaveTemplate(ct.DefaultTemplate);
-            ContentTypeService.Save(ct);
-            var c = MockedContent.CreateSimpleContent(ct, "Test", -1);
-            ContentService.Save(c);
 
             // Act
-            var entry = new PublicAccessEntry(c, c, c, new[]
+            var entry = new PublicAccessEntry(_content, _content, _content, new[]
             {
                 new PublicAccessRule()
                 {
@@ -46,21 +56,16 @@ namespace Umbraco.Tests.Integration.Services
             Assert.AreEqual(OperationResultType.Success, result.Result.Result);
             Assert.IsTrue(entry.HasIdentity);
             Assert.AreNotEqual(entry.Key, Guid.Empty);
-            Assert.AreEqual(c.Id, entry.LoginNodeId);
-            Assert.AreEqual(c.Id, entry.NoAccessNodeId);
-            Assert.AreEqual(c.Id, entry.ProtectedNodeId);
+            Assert.AreEqual(_content.Id, entry.LoginNodeId);
+            Assert.AreEqual(_content.Id, entry.NoAccessNodeId);
+            Assert.AreEqual(_content.Id, entry.ProtectedNodeId);
         }
 
         [Test]
         public void Can_Add_Rule()
         {
             // Arrange
-            var ct = MockedContentTypes.CreateSimpleContentType("blah", "Blah");
-            FileService.SaveTemplate(ct.DefaultTemplate);
-            ContentTypeService.Save(ct);
-            var c = MockedContent.CreateSimpleContent(ct, "Test", -1);
-            ContentService.Save(c);
-            var entry = new PublicAccessEntry(c, c, c, new[]
+            var entry = new PublicAccessEntry(_content, _content, _content, new[]
             {
                 new PublicAccessRule()
                 {
@@ -71,9 +76,9 @@ namespace Umbraco.Tests.Integration.Services
             PublicAccessService.Save(entry);
 
             // Act
-            var updated = PublicAccessService.AddRule(c, "TestType2", "AnotherVal");
+            var updated = PublicAccessService.AddRule(_content, "TestType2", "AnotherVal");
             //re-get
-            entry = PublicAccessService.GetEntryForContent(c);
+            entry = PublicAccessService.GetEntryForContent(_content);
 
             // Assert
             Assert.IsTrue(updated.Success);
@@ -85,12 +90,7 @@ namespace Umbraco.Tests.Integration.Services
         public void Can_Add_Multiple_Value_For_Same_Rule_Type()
         {
             // Arrange
-            var ct = MockedContentTypes.CreateSimpleContentType("blah", "Blah");
-            FileService.SaveTemplate(ct.DefaultTemplate);
-            ContentTypeService.Save(ct);
-            var c = MockedContent.CreateSimpleContent(ct, "Test", -1);
-            ContentService.Save(c);
-            var entry = new PublicAccessEntry(c, c, c, new[]
+            var entry = new PublicAccessEntry(_content, _content, _content, new[]
             {
                 new PublicAccessRule()
                 {
@@ -101,11 +101,11 @@ namespace Umbraco.Tests.Integration.Services
             PublicAccessService.Save(entry);
 
             // Act
-            var updated1 = PublicAccessService.AddRule(c, "TestType", "AnotherVal1");
-            var updated2 = PublicAccessService.AddRule(c, "TestType", "AnotherVal2");
+            var updated1 = PublicAccessService.AddRule(_content, "TestType", "AnotherVal1");
+            var updated2 = PublicAccessService.AddRule(_content, "TestType", "AnotherVal2");
 
             //re-get
-            entry = PublicAccessService.GetEntryForContent(c);
+            entry = PublicAccessService.GetEntryForContent(_content);
 
             // Assert
             Assert.IsTrue(updated1.Success);
@@ -119,12 +119,7 @@ namespace Umbraco.Tests.Integration.Services
         public void Can_Remove_Rule()
         {
             // Arrange
-            var ct = MockedContentTypes.CreateSimpleContentType("blah", "Blah");
-            FileService.SaveTemplate(ct.DefaultTemplate);
-            ContentTypeService.Save(ct);
-            var c = MockedContent.CreateSimpleContent(ct, "Test", -1);
-            ContentService.Save(c);
-            var entry = new PublicAccessEntry(c, c, c, new[]
+            var entry = new PublicAccessEntry(_content, _content, _content, new[]
             {
                 new PublicAccessRule()
                 {
@@ -140,9 +135,9 @@ namespace Umbraco.Tests.Integration.Services
             PublicAccessService.Save(entry);
 
             // Act
-            var removed = PublicAccessService.RemoveRule(c, "TestType", "TestValue1");
+            var removed = PublicAccessService.RemoveRule(_content, "TestType", "TestValue1");
             //re-get
-            entry = PublicAccessService.GetEntryForContent(c);
+            entry = PublicAccessService.GetEntryForContent(_content);
 
             // Assert
             Assert.IsTrue(removed.Success);

@@ -4,6 +4,7 @@ using Moq;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.Common.Builders.Interfaces;
+using Umbraco.Tests.Common.Builders.Extensions;
 
 namespace Umbraco.Tests.Common.Builders
 {
@@ -121,7 +122,17 @@ namespace Umbraco.Tests.Common.Builders
             return userGroup;
         }
 
-       int? IWithIdBuilder.Id
+        public static UserGroup CreateUserGroup(string suffix = "", string[] permissions = null, string[] allowedSections = null)
+        {
+            return (UserGroup)new UserGroupBuilder()
+                .WithAlias("testUserGroup" + suffix)
+                .WithName("TestUserGroup" + suffix)
+                .WithPermissions(permissions ?? new[] { "A", "B", "C" })
+                .WithAllowedSections(allowedSections ?? new[] { "content", "media" })
+                .Build();
+        }
+
+        int? IWithIdBuilder.Id
         {
             get => _id;
             set => _id = value;

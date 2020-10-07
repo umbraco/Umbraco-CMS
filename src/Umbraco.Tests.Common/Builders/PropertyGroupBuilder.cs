@@ -25,7 +25,8 @@ namespace Umbraco.Tests.Common.Builders
             IWithCreateDateBuilder,
             IWithUpdateDateBuilder,
             IWithNameBuilder,
-            IWithSortOrderBuilder where TParent: IBuildPropertyGroups
+            IWithSortOrderBuilder,
+            IWithSupportsPublishing where TParent: IBuildPropertyGroups
     {
         private readonly List<PropertyTypeBuilder<PropertyGroupBuilder<TParent>>> _propertyTypeBuilders = new List<PropertyTypeBuilder<PropertyGroupBuilder<TParent>>>();
 
@@ -35,6 +36,7 @@ namespace Umbraco.Tests.Common.Builders
         private DateTime? _updateDate;
         private string _name;
         private int? _sortOrder;
+        private bool? _supportsPublishing;
 
         public PropertyGroupBuilder(TParent parentBuilder) : base(parentBuilder)
         {
@@ -55,8 +57,9 @@ namespace Umbraco.Tests.Common.Builders
             var updateDate = _updateDate ?? DateTime.Now;
             var name = _name ?? Guid.NewGuid().ToString();
             var sortOrder = _sortOrder ?? 0;
+            var supportsPublishing = _supportsPublishing ?? false;
 
-            var properties = new PropertyTypeCollection(false);
+            var properties = new PropertyTypeCollection(supportsPublishing);
             foreach (var propertyType in _propertyTypeBuilders.Select(x => x.Build()))
             {
                 properties.Add(propertyType);
@@ -107,6 +110,12 @@ namespace Umbraco.Tests.Common.Builders
         {
             get => _sortOrder;
             set => _sortOrder = value;
+        }
+
+        bool? IWithSupportsPublishing.SupportsPublishing
+        {
+            get => _supportsPublishing;
+            set => _supportsPublishing = value;
         }
     }
 }

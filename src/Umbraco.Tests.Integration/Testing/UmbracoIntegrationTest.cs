@@ -483,8 +483,8 @@ namespace Umbraco.Tests.Integration.Testing
 
         #region Builders
 
-        protected UserBuilder UserBuilder = new UserBuilder();
-        protected UserGroupBuilder UserGroupBuilder = new UserGroupBuilder();
+        protected UserBuilder UserBuilderInstance = new UserBuilder();
+        protected UserGroupBuilder UserGroupBuilderInstance = new UserGroupBuilder();
 
         #endregion
 

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using Umbraco.Core.Models;
 using Umbraco.Tests.Common.Builders.Interfaces;
+using Umbraco.Tests.Common.Builders.Extensions;
+using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Common.Builders
 {
@@ -39,6 +41,9 @@ namespace Umbraco.Tests.Common.Builders
         private CultureInfo _cultureInfo;
         private IContentType _contentType;
         private IDictionary<string, string> _cultureNames = new Dictionary<string, string>();
+        private object _propertyValues;
+        private string _propertyValuesCulture;
+        private string _propertyValuesSegment;
 
         public ContentTypeBuilder AddContentType()
         {
@@ -48,24 +53,67 @@ namespace Umbraco.Tests.Common.Builders
             return builder;
         }
 
+        public ContentBuilder WithContentType(IContentType contentType)
+        {
+            _contentTypeBuilder = null;
+            _contentType = contentType;
+
+            return this;
+        }
+
+        public ContentBuilder WithCultureName(string culture, string name = "")
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                if (_cultureNames.TryGetValue(culture, out _))
+                {
+                    _cultureNames.Remove(culture);
+                }
+            }
+            else
+            {
+                _cultureNames[culture] = name;
+            }
+
+            return this;
+        }
+
+        public ContentBuilder WithPropertyValues(object propertyValues, string culture = null, string segment = null)
+        {
+            _propertyValues = propertyValues;
+            _propertyValuesCulture = culture;
+            _propertyValuesSegment = segment;
+            return this;
+        }
+
+        public GenericDictionaryBuilder<ContentBuilder, string, object> AddPropertyData()
+        {
+            var builder = new GenericDictionaryBuilder<ContentBuilder, string, object>(this);
+            _propertyDataBuilder = builder;
+            return builder;
+        }
+
         public override Content Build()
         {
-            var id = _id ?? 1;
+            var id = _id ?? 0;
             var key = _key ?? Guid.NewGuid();
             var parentId = _parentId ?? -1;
             var createDate = _createDate ?? DateTime.Now;
             var updateDate = _updateDate ?? DateTime.Now;
             var name = _name ?? Guid.NewGuid().ToString();
-            var creatorId = _creatorId ?? 1;
+            var creatorId = _creatorId ?? 0;
             var level = _level ?? 1;
             var path = _path ?? $"-1,{id}";
             var sortOrder = _sortOrder ?? 0;
             var trashed = _trashed ?? false;
             var culture = _cultureInfo?.Name ?? null;
+            var propertyValues = _propertyValues ?? null;
+            var propertyValuesCulture = _propertyValuesCulture ?? null;
+            var propertyValuesSegment = _propertyValuesSegment ?? null;
 
             if (_contentTypeBuilder is null && _contentType is null)
             {
-                throw new InvalidOperationException("A member cannot be constructed without providing a member type. Use AddContentType() or WithContentType().");
+                throw new InvalidOperationException("A content item cannot be constructed without providing a member type. Use AddContentType() or WithContentType().");
             }
 
             var contentType = _contentType ?? _contentTypeBuilder.Build();
@@ -88,13 +136,19 @@ namespace Umbraco.Tests.Common.Builders
                 content.SetCultureName(cultureName.Value, cultureName.Key);
             }
 
-
-            if (_propertyDataBuilder != null)
+            if (_propertyDataBuilder != null || propertyValues != null)
             {
-                var propertyData = _propertyDataBuilder.Build();
-                foreach (var kvp in propertyData)
+                if (_propertyDataBuilder != null)
                 {
-                    content.SetValue(kvp.Key, kvp.Value);
+                    var propertyData = _propertyDataBuilder.Build();
+                    foreach (var kvp in propertyData)
+                    {
+                        content.SetValue(kvp.Key, kvp.Value);
+                    }
+                }
+                else
+                {
+                    content.PropertyValues(propertyValues, propertyValuesCulture, propertyValuesSegment);
                 }
 
                 content.ResetDirtyProperties(false);
@@ -103,36 +157,58 @@ namespace Umbraco.Tests.Common.Builders
             return content;
         }
 
-        public ContentBuilder WithContentType(IContentType contentType)
+        public static Content CreateBasicContent(IContentType contentType)
         {
-            _contentTypeBuilder = null;
-            _contentType = contentType;
-
-            return this;
+            return new ContentBuilder()
+                .WithContentType(contentType)
+                .WithName("Home")
+                .Build();
         }
 
-        public ContentBuilder WithCultureName(string culture, string name)
+        public static Content CreateSimpleContent(IContentType contentType)
         {
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                if (_cultureNames.TryGetValue(culture, out _))
-                {
-                    _cultureNames.Remove(culture);
-                }
-            }
-            else
-            {
-                _cultureNames[culture] = name;
-            }
-
-            return this;
+            return new ContentBuilder()
+                .WithContentType(contentType)
+                .WithName("Home")
+                .WithPropertyValues(new
+                    {
+                        title = "Welcome to our Home page",
+                        bodyText = "This is the welcome message on the first page",
+                        author = "John Doe"
+                    })
+                .Build();
         }
 
-        public GenericDictionaryBuilder<ContentBuilder, string, object> AddPropertyData()
+        public static Content CreateSimpleContent(IContentType contentType, string name, int parentId = -1, string culture = null, string segment = null)
         {
-            var builder = new GenericDictionaryBuilder<ContentBuilder, string, object>(this);
-            _propertyDataBuilder = builder;
-            return builder;
+            return new ContentBuilder()
+                .WithContentType(contentType)
+                .WithName(name)
+                .WithParentId(parentId)
+                .WithPropertyValues(new
+                    {
+                        title = "Welcome to our Home page",
+                        bodyText = "This is the welcome message on the first page",
+                        author = "John Doe"
+                    }, culture, segment)
+                .Build();
+        }
+
+        public static Content CreateTextpageContent(IContentType contentType, string name, int parentId)
+        {
+            return new ContentBuilder()
+                .WithId(0)
+                .WithContentType(contentType)
+                .WithName(name)
+                .WithParentId(parentId)
+                .WithPropertyValues(new
+                    {
+                        title = name + " textpage",
+                        bodyText = string.Format("This is a textpage based on the {0} ContentType", contentType.Alias),
+                        keywords = "text,page,meta",
+                        description = "This is the meta description for a textpage"
+                    })
+                .Build();
         }
 
         int? IWithIdBuilder.Id

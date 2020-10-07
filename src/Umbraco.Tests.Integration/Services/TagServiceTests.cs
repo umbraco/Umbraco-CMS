@@ -6,6 +6,7 @@ using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
+using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
@@ -24,22 +25,31 @@ namespace Umbraco.Tests.Integration.Services
     {
         private IContentService ContentService => GetRequiredService<IContentService>();
         private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
+        private IFileService FileService => GetRequiredService<IFileService>();
         private ITagService TagService => GetRequiredService<ITagService>();
         private IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
         private PropertyEditorCollection PropertyEditorCollection => GetRequiredService<PropertyEditorCollection>();
+        private IContentType _contentType;
+
+        [SetUp]
+        public void CreateTestData()
+        {
+            var template = TemplateBuilder.CreateTextPageTemplate();
+            FileService.SaveTemplate(template); // else, FK violation on contentType!
+
+            _contentType = ContentTypeBuilder.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", defaultTemplateId: template.Id);
+            _contentType.PropertyGroups.First().PropertyTypes.Add(
+                new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "tags")
+                {
+                    DataTypeId = Constants.DataTypes.Tags,
+                });
+            ContentTypeService.Save(_contentType);
+        }
 
         [Test]
         public void TagApiConsistencyTest()
         {
-            var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
-            contentType.PropertyGroups.First().PropertyTypes.Add(
-                new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "tags")
-                {
-                    DataTypeId = 1041
-                });
-            ContentTypeService.Save(contentType);
-
-            IContent content1 = MockedContent.CreateSimpleContent(contentType, "Tagged content 1", -1);
+            IContent content1 = ContentBuilder.CreateSimpleContent(_contentType, "Tagged content 1", -1);
             content1.AssignTags(PropertyEditorCollection, DataTypeService, "tags", new[] { "cow", "pig", "goat" });
             ContentService.SaveAndPublish(content1);
 
@@ -76,23 +86,15 @@ namespace Umbraco.Tests.Integration.Services
         [Test]
         public void TagList_Contains_NodeCount()
         {
-            var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
-            contentType.PropertyGroups.First().PropertyTypes.Add(
-                new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.Tags, ValueStorageType.Ntext, "tags")
-                {
-                    DataTypeId = Constants.DataTypes.Tags
-                });
-            ContentTypeService.Save(contentType);
-
-            var content1 = MockedContent.CreateSimpleContent(contentType, "Tagged content 1", -1);
+            var content1 = ContentBuilder.CreateSimpleContent(_contentType, "Tagged content 1", -1);
             content1.AssignTags(PropertyEditorCollection, DataTypeService, "tags", new[] { "cow", "pig", "goat" });
             ContentService.SaveAndPublish(content1);
 
-            var content2 = MockedContent.CreateSimpleContent(contentType, "Tagged content 2", -1);
+            var content2 = ContentBuilder.CreateSimpleContent(_contentType, "Tagged content 2", -1);
             content2.AssignTags(PropertyEditorCollection, DataTypeService, "tags", new[] { "cow", "pig" });
             ContentService.SaveAndPublish(content2);
 
-            var content3 = MockedContent.CreateSimpleContent(contentType, "Tagged content 3", -1);
+            var content3 = ContentBuilder.CreateSimpleContent(_contentType, "Tagged content 3", -1);
             content3.AssignTags(PropertyEditorCollection, DataTypeService, "tags", new[] { "cow" });
             ContentService.SaveAndPublish(content3);
 

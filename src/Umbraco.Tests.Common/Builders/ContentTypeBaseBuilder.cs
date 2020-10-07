@@ -43,7 +43,6 @@ namespace Umbraco.Tests.Common.Builders
         private string _thumbnail;
         private bool? _trashed;
         private bool? _isContainer;
-        protected ContentVariation? ContentVariation { get; set; }
 
         protected IShortStringHelper ShortStringHelper => new DefaultShortStringHelper(new DefaultShortStringHelperConfig());
 
@@ -51,7 +50,7 @@ namespace Umbraco.Tests.Common.Builders
         {
         }
 
-        protected int GetId() => _id ?? 1;
+        protected int GetId() => _id ?? 0;
 
         protected Guid GetKey() => _key ?? Guid.NewGuid();
 
@@ -82,8 +81,6 @@ namespace Umbraco.Tests.Common.Builders
         protected bool GetTrashed() => _trashed ?? false;
 
         protected bool GetIsContainer() => _isContainer ?? false;
-        protected ContentVariation GetContentVariation() => ContentVariation ?? Core.Models.ContentVariation.Nothing;
-
 
         protected void BuildPropertyGroups(ContentTypeCompositionBase contentType, IEnumerable<PropertyGroup> propertyGroups)
         {
@@ -92,8 +89,6 @@ namespace Umbraco.Tests.Common.Builders
                 contentType.PropertyGroups.Add(propertyGroup);
             }
         }
-
-
 
         protected void BuildPropertyTypeIds(ContentTypeCompositionBase contentType, int? propertyTypeIdsIncrementingFrom)
         {
@@ -104,6 +99,23 @@ namespace Umbraco.Tests.Common.Builders
                 {
                     propertyType.Id = ++i;
                 }
+            }
+        }
+
+        public static void EnsureAllIds(ContentTypeCompositionBase contentType, int seedId)
+        {
+            // Ensure everything has IDs (it will have if builder is used to create the object, but still useful to reset
+            // and ensure there are no clashes).
+            contentType.Id = seedId;
+            var itemid = seedId + 1;
+            foreach (var propertyGroup in contentType.PropertyGroups)
+            {
+                propertyGroup.Id = itemid++;
+            }
+
+            foreach (var propertyType in contentType.PropertyTypes)
+            {
+                propertyType.Id = itemid++;
             }
         }
 

@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="TestHelpers\Entities\" />
     <Folder Include="TestHelpers\Objects" />
   </ItemGroup>
 </Project>

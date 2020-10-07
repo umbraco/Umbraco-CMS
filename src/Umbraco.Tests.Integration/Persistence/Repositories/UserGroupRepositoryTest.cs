@@ -5,6 +5,7 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Scoping;
+using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
@@ -29,7 +30,7 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
             {
                 var repository = CreateRepository(provider);
 
-                var userGroup = MockedUserGroup.CreateUserGroup();
+                var userGroup = UserGroupBuilder.CreateUserGroup();
 
                 // Act
                 repository.Save(userGroup);
@@ -49,8 +50,8 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
             {
                 var repository = CreateRepository(provider);
 
-                var userGroup1 = MockedUserGroup.CreateUserGroup("1");
-                var userGroup2 = MockedUserGroup.CreateUserGroup("2");
+                var userGroup1 = UserGroupBuilder.CreateUserGroup("1");
+                var userGroup2 = UserGroupBuilder.CreateUserGroup("2");
 
                 // Act
                 repository.Save(userGroup1);
@@ -73,7 +74,7 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
             {
                 var repository = CreateRepository(provider);
 
-                var userGroup = MockedUserGroup.CreateUserGroup();
+                var userGroup = UserGroupBuilder.CreateUserGroup();
                 repository.Save(userGroup);
                 scope.Complete();
 
@@ -95,7 +96,7 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
             {
                 var repository = CreateRepository(provider);
 
-                var userGroup = MockedUserGroup.CreateUserGroup();
+                var userGroup = UserGroupBuilder.CreateUserGroup();
                 repository.Save(userGroup);
 
                 // Act
@@ -121,7 +122,7 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
             {
                 var repository = CreateRepository(provider);
 
-                var userGroup = MockedUserGroup.CreateUserGroup();
+                var userGroup = UserGroupBuilder.CreateUserGroup();
 
                 // Act
                 repository.Save(userGroup);
@@ -148,7 +149,7 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
             {
                 var repository = CreateRepository(provider);
 
-                var userGroup = MockedUserGroup.CreateUserGroup();
+                var userGroup = UserGroupBuilder.CreateUserGroup();
                 repository.Save(userGroup);
                 scope.Complete();
 
@@ -389,9 +390,9 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
             {
                 var repository = CreateRepository(provider);
 
-                var user1 = MockedUserGroup.CreateUserGroup("1", allowedSections: new[] { "test1" });
-                var user2 = MockedUserGroup.CreateUserGroup("2", allowedSections: new[] { "test2" });
-                var user3 = MockedUserGroup.CreateUserGroup("3", allowedSections: new[] { "test1" });
+                var user1 = UserGroupBuilder.CreateUserGroup("1", allowedSections: new[] { "test1" });
+                var user2 = UserGroupBuilder.CreateUserGroup("2", allowedSections: new[] { "test2" });
+                var user3 = UserGroupBuilder.CreateUserGroup("3", allowedSections: new[] { "test1" });
                 repository.Save(user1);
                 repository.Save(user2);
                 repository.Save(user3);
@@ -411,9 +412,9 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
 
         private IUserGroup[] CreateAndCommitMultipleUserGroups(IUserGroupRepository repository)
         {
-            var userGroup1 = MockedUserGroup.CreateUserGroup("1");
-            var userGroup2 = MockedUserGroup.CreateUserGroup("2");
-            var userGroup3 = MockedUserGroup.CreateUserGroup("3");
+            var userGroup1 = UserGroupBuilder.CreateUserGroup("1");
+            var userGroup2 = UserGroupBuilder.CreateUserGroup("2");
+            var userGroup3 = UserGroupBuilder.CreateUserGroup("3");
             repository.Save(userGroup1);
             repository.Save(userGroup2);
             repository.Save(userGroup3);
