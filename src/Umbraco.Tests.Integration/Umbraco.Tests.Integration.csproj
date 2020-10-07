@@ -18,11 +18,11 @@
 
     <ItemGroup>
         <PackageReference Include="Examine.Lucene" Version="2.0.0-alpha.20200128.15" />
-        <PackageReference Include="LightInject.Microsoft.DependencyInjection" Version="3.3.1" />
+        <PackageReference Include="LightInject.Microsoft.DependencyInjection" Version="3.3.3" />
         <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="3.1.8" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.1" />
-        <PackageReference Include="Moq" Version="4.14.5" />
+        <PackageReference Include="Moq" Version="4.14.6" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.6.1" />
         <PackageReference Include="nunit" Version="3.12.0" />
         <PackageReference Include="NUnit3TestAdapter" Version="3.17.0">

@@ -1,7 +1,7 @@
 ﻿using System;
 using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
+using Perfolizer.Horology;
 
 namespace Umbraco.Tests.Benchmarks.Config
 {

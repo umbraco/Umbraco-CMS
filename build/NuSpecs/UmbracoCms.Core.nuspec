@@ -61,7 +61,7 @@
                 <dependency id="System.Threading.Tasks.Dataflow" version="[4.11.1,4.999999)" />
                 <dependency id="Examine.Core" version="[2.0.0-alpha.20200128.15,2.999999)" />
                 <dependency id="CSharpTest.Net.Collections-NetStd2" version="[14.906.1403.1084,14.999999)" />
-                <dependency id="SecurityCodeScan" version="[3.4.0,3.999999)" />
+                <dependency id="SecurityCodeScan" version="[3.5.3,3.999999)" />
             </group>
 
         </dependencies>

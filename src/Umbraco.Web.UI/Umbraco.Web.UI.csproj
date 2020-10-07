@@ -102,7 +102,7 @@
     <PackageReference Include="MiniProfiler" Version="4.2.1" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="SecurityCodeScan">
-      <Version>3.4.0</Version>
+      <Version>3.5.3</Version>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>

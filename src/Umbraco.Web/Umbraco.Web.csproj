@@ -68,12 +68,12 @@
     </PackageReference>
     <PackageReference Include="HtmlAgilityPack" Version="1.11.24" />
     <PackageReference Include="HtmlSanitizer">
-      <Version>5.0.343</Version>
+      <Version>5.0.353</Version>
     </PackageReference>
     <PackageReference Include="ImageProcessor">
       <Version>2.7.0.100</Version>
     </PackageReference>
-    <PackageReference Include="LightInject" Version="6.3.4" />
+    <PackageReference Include="LightInject" Version="6.3.5" />
     <PackageReference Include="LightInject.Annotation" Version="1.1.0" />
     <PackageReference Include="LightInject.Mvc" Version="2.0.0" />
     <PackageReference Include="LightInject.Web">
@@ -103,7 +103,7 @@
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="NPoco" Version="4.0.2" />
     <PackageReference Include="SecurityCodeScan">
-      <Version>3.4.0</Version>
+      <Version>3.5.3</Version>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
