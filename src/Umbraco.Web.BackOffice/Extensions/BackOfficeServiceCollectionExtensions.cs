@@ -86,7 +86,7 @@ namespace Umbraco.Extensions
             services.TryAddScoped<IPasswordValidator<BackOfficeIdentityUser>, PasswordValidator<BackOfficeIdentityUser>>();
             services.TryAddScoped<IPasswordHasher<BackOfficeIdentityUser>>(
                 services => new BackOfficePasswordHasher(
-                    new LegacyPasswordSecurity(services.GetRequiredService<IOptions<UserPasswordConfigurationSettings>>().Value),
+                    new LegacyPasswordSecurity(),
                     services.GetRequiredService<IJsonSerializer>()));
             services.TryAddScoped<IUserConfirmation<BackOfficeIdentityUser>, DefaultUserConfirmation<BackOfficeIdentityUser>>();
             services.TryAddScoped<IUserClaimsPrincipalFactory<BackOfficeIdentityUser>, UserClaimsPrincipalFactory<BackOfficeIdentityUser>>();

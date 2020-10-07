@@ -305,18 +305,22 @@ namespace Umbraco.Web.BackOffice.Controllers
 
         private IMember CreateMemberData(MemberSave contentItem)
         {
-            var memberType = _memberTypeService.Get(contentItem.ContentTypeAlias);
-            if (memberType == null)
-                throw new InvalidOperationException($"No member type found with alias {contentItem.ContentTypeAlias}");
-            var member = new Member(contentItem.Name, contentItem.Email, contentItem.Username, memberType, true)
-            {
-                CreatorId = _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.Id,
-                RawPasswordValue = _passwordSecurity.HashPasswordForStorage(contentItem.Password.NewPassword),
-                Comments = contentItem.Comments,
-                IsApproved = contentItem.IsApproved
-            };
+            throw new NotImplementedException("Members have not been migrated to netcore");
 
-            return member;
+            // TODO: all member password processing and creation needs to be done with a new aspnet identity MemberUserManager that hasn't been created yet.
+
+            //var memberType = _memberTypeService.Get(contentItem.ContentTypeAlias);
+            //if (memberType == null)
+            //    throw new InvalidOperationException($"No member type found with alias {contentItem.ContentTypeAlias}");
+            //var member = new Member(contentItem.Name, contentItem.Email, contentItem.Username, memberType, true)
+            //{
+            //    CreatorId = _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.Id,
+            //    RawPasswordValue = _passwordSecurity.HashPasswordForStorage(contentItem.Password.NewPassword),
+            //    Comments = contentItem.Comments,
+            //    IsApproved = contentItem.IsApproved
+            //};
+
+            //return member;
         }
 
         /// <summary>
@@ -372,8 +376,10 @@ namespace Umbraco.Web.BackOffice.Controllers
             if (contentItem.Password == null)
                 return;
 
+            throw new NotImplementedException("Members have not been migrated to netcore");
+            // TODO: all member password processing and creation needs to be done with a new aspnet identity MemberUserManager that hasn't been created yet.
             // set the password
-            contentItem.PersistedContent.RawPasswordValue = _passwordSecurity.HashPasswordForStorage(contentItem.Password.NewPassword);
+            //contentItem.PersistedContent.RawPasswordValue = _passwordSecurity.HashPasswordForStorage(contentItem.Password.NewPassword);
         }
 
         private static void UpdateName(MemberSave memberSave)

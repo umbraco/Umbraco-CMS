@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Security.Cryptography;
 using System.Text;
 using Umbraco.Core.Configuration;
@@ -11,111 +12,28 @@ namespace Umbraco.Core.Security
     /// </summary>
     public class LegacyPasswordSecurity
     {
-        private readonly IPasswordConfiguration _passwordConfiguration;
-        private readonly PasswordGenerator _generator;
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="passwordConfiguration"></param>
-        public LegacyPasswordSecurity(IPasswordConfiguration passwordConfiguration)
-        {
-            _passwordConfiguration = passwordConfiguration;
-            _generator = new PasswordGenerator(passwordConfiguration);
-        }
-
-        public string GeneratePassword() => _generator.GeneratePassword();
-
-        /// <summary>
-        /// Returns a hashed password value used to store in a data store
-        /// </summary>
-        /// <param name="password"></param>
-        /// <returns></returns>
-        // TODO: Do we need this method? We shouldn't be using this class to create new password hashes for storage
-        public string HashPasswordForStorage(string password)
+        // Used for tests
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public string HashPasswordForStorage(string algorithmType, string password)
         {
             if (string.IsNullOrWhiteSpace(password))
                 throw new ArgumentException("password cannot be empty", nameof(password));
 
             string salt;
-            var hashed = HashNewPassword(_passwordConfiguration.HashAlgorithmType, password, out salt);
-            return FormatPasswordForStorage(hashed, salt);
+            var hashed = HashNewPassword(algorithmType, password, out salt);
+            return FormatPasswordForStorage(algorithmType, hashed, salt);
         }
 
-        /// <summary>
-        /// If the password format is a hashed keyed algorithm then we will pre-pend the salt used to hash the password
-        /// to the hashed password itself.
-        /// </summary>
-        /// <param name="hashedPassword"></param>
-        /// <param name="salt"></param>
-        /// <returns></returns>
-        // TODO: Do we need this method? We shouldn't be using this class to create new password hashes for storage
-        public string FormatPasswordForStorage(string hashedPassword, string salt)
-        {
-            return salt + hashedPassword;
-        }
-
-        /// <summary>
-        /// Hashes a password with a given salt
-        /// </summary>
-        /// <param name="algorithmType">The hashing algorithm for the password.</param>
-        /// <param name="pass"></param>
-        /// <param name="salt"></param>
-        /// <returns></returns>
-        public string HashPassword(string algorithmType, string pass, string salt)
+        // Used for tests
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public string FormatPasswordForStorage(string algorithmType, string hashedPassword, string salt)
         {
             if (IsLegacySHA1Algorithm(algorithmType))
             {
-                return HashLegacySHA1Password(pass);
+                return hashedPassword;
             }
 
-            //This is the correct way to implement this (as per the sql membership provider)
-
-            var bytes = Encoding.Unicode.GetBytes(pass);
-            var saltBytes = Convert.FromBase64String(salt);
-            byte[] inArray;
-
-            var hashAlgorithm = GetHashAlgorithm(algorithmType);
-            var algorithm = hashAlgorithm as KeyedHashAlgorithm;
-            if (algorithm != null)
-            {
-                var keyedHashAlgorithm = algorithm;
-                if (keyedHashAlgorithm.Key.Length == saltBytes.Length)
-                {
-                    //if the salt bytes is the required key length for the algorithm, use it as-is
-                    keyedHashAlgorithm.Key = saltBytes;
-                }
-                else if (keyedHashAlgorithm.Key.Length < saltBytes.Length)
-                {
-                    //if the salt bytes is too long for the required key length for the algorithm, reduce it
-                    var numArray2 = new byte[keyedHashAlgorithm.Key.Length];
-                    Buffer.BlockCopy(saltBytes, 0, numArray2, 0, numArray2.Length);
-                    keyedHashAlgorithm.Key = numArray2;
-                }
-                else
-                {
-                    //if the salt bytes is too short for the required key length for the algorithm, extend it
-                    var numArray2 = new byte[keyedHashAlgorithm.Key.Length];
-                    var dstOffset = 0;
-                    while (dstOffset < numArray2.Length)
-                    {
-                        var count = Math.Min(saltBytes.Length, numArray2.Length - dstOffset);
-                        Buffer.BlockCopy(saltBytes, 0, numArray2, dstOffset, count);
-                        dstOffset += count;
-                    }
-                    keyedHashAlgorithm.Key = numArray2;
-                }
-                inArray = keyedHashAlgorithm.ComputeHash(bytes);
-            }
-            else
-            {
-                var buffer = new byte[saltBytes.Length + bytes.Length];
-                Buffer.BlockCopy(saltBytes, 0, buffer, 0, saltBytes.Length);
-                Buffer.BlockCopy(bytes, 0, buffer, saltBytes.Length, bytes.Length);
-                inArray = hashAlgorithm.ComputeHash(buffer);
-            }
-
-            return Convert.ToBase64String(inArray);
+            return salt + hashedPassword;
         }
 
         /// <summary>
@@ -180,6 +98,69 @@ namespace Umbraco.Core.Security
             var numArray = new byte[16];
             new RNGCryptoServiceProvider().GetBytes(numArray);
             return Convert.ToBase64String(numArray);
+        }
+
+        /// <summary>
+        /// Hashes a password with a given salt
+        /// </summary>
+        /// <param name="algorithmType">The hashing algorithm for the password.</param>
+        /// <param name="pass"></param>
+        /// <param name="salt"></param>
+        /// <returns></returns>
+        private string HashPassword(string algorithmType, string pass, string salt)
+        {
+            if (IsLegacySHA1Algorithm(algorithmType))
+            {
+                return HashLegacySHA1Password(pass);
+            }
+
+            //This is the correct way to implement this (as per the sql membership provider)
+
+            var bytes = Encoding.Unicode.GetBytes(pass);
+            var saltBytes = Convert.FromBase64String(salt);
+            byte[] inArray;
+
+            var hashAlgorithm = GetHashAlgorithm(algorithmType);
+            var algorithm = hashAlgorithm as KeyedHashAlgorithm;
+            if (algorithm != null)
+            {
+                var keyedHashAlgorithm = algorithm;
+                if (keyedHashAlgorithm.Key.Length == saltBytes.Length)
+                {
+                    //if the salt bytes is the required key length for the algorithm, use it as-is
+                    keyedHashAlgorithm.Key = saltBytes;
+                }
+                else if (keyedHashAlgorithm.Key.Length < saltBytes.Length)
+                {
+                    //if the salt bytes is too long for the required key length for the algorithm, reduce it
+                    var numArray2 = new byte[keyedHashAlgorithm.Key.Length];
+                    Buffer.BlockCopy(saltBytes, 0, numArray2, 0, numArray2.Length);
+                    keyedHashAlgorithm.Key = numArray2;
+                }
+                else
+                {
+                    //if the salt bytes is too short for the required key length for the algorithm, extend it
+                    var numArray2 = new byte[keyedHashAlgorithm.Key.Length];
+                    var dstOffset = 0;
+                    while (dstOffset < numArray2.Length)
+                    {
+                        var count = Math.Min(saltBytes.Length, numArray2.Length - dstOffset);
+                        Buffer.BlockCopy(saltBytes, 0, numArray2, dstOffset, count);
+                        dstOffset += count;
+                    }
+                    keyedHashAlgorithm.Key = numArray2;
+                }
+                inArray = keyedHashAlgorithm.ComputeHash(bytes);
+            }
+            else
+            {
+                var buffer = new byte[saltBytes.Length + bytes.Length];
+                Buffer.BlockCopy(saltBytes, 0, buffer, 0, saltBytes.Length);
+                Buffer.BlockCopy(bytes, 0, buffer, saltBytes.Length, bytes.Length);
+                inArray = hashAlgorithm.ComputeHash(buffer);
+            }
+
+            return Convert.ToBase64String(inArray);
         }
 
         /// <summary>

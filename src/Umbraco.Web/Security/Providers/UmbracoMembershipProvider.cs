@@ -85,7 +85,7 @@ namespace Umbraco.Web.Security.Providers
             string salt;
             var encodedPassword = PasswordSecurity.HashNewPassword(Membership.HashAlgorithmType, newPassword, out salt);
 
-            m.RawPasswordValue = PasswordSecurity.FormatPasswordForStorage(encodedPassword, salt);
+            m.RawPasswordValue = PasswordSecurity.FormatPasswordForStorage(Membership.HashAlgorithmType, encodedPassword, salt);
             m.LastPasswordChangeDate = DateTime.Now;
 
             MemberService.Save(m);
@@ -148,7 +148,7 @@ namespace Umbraco.Web.Security.Providers
             var member = MemberService.CreateWithIdentity(
                 username,
                 email,
-                PasswordSecurity.FormatPasswordForStorage(encodedPassword, salt),
+                PasswordSecurity.FormatPasswordForStorage(Membership.HashAlgorithmType, encodedPassword, salt),
                 memberTypeAlias,
                 isApproved);
 
@@ -407,7 +407,7 @@ namespace Umbraco.Web.Security.Providers
 
             string salt;
             var encodedPassword = PasswordSecurity.HashNewPassword(Membership.HashAlgorithmType, generatedPassword, out salt);
-            m.RawPasswordValue = PasswordSecurity.FormatPasswordForStorage(encodedPassword, salt);
+            m.RawPasswordValue = PasswordSecurity.FormatPasswordForStorage(Membership.HashAlgorithmType, encodedPassword, salt);
             m.LastPasswordChangeDate = DateTime.Now;
             MemberService.Save(m);
 
