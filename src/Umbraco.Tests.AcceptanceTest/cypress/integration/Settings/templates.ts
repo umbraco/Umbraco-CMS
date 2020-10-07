@@ -27,12 +27,14 @@ context('Templates', () => {
         createTemplate();
         //Type name
         cy.umbracoEditorHeaderName(name);
-        /* Make an edit, if you don't the file will be create twice,
-        only happens in testing though, probably because the test is too fast
-        Certifiably mega wonk regardless */
-        cy.get('.ace_text-input').type("var num = 5;", {force:true} );
-
-        //Save
+        /*
+        Click the content area, if we don't do this we wont get redirected
+        to the new edit url, this will cause the test to save two copies at best
+        worst case, we'll get an error "The process cannot access the file" on the
+        template.
+         */
+        cy.get('.ace_content').click();
+        // Save
         cy.get('.btn-success').click();
 
         //Assert
