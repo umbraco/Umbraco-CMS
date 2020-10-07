@@ -203,7 +203,7 @@ namespace Umbraco.Tests.Integration
             private readonly IPublishedContentQuery _publishedContentQuery;
 
             public TestSurfaceController(IUmbracoContextAccessor umbracoContextAccessor, IPublishedContentQuery publishedContentQuery, IPublishedUrlProvider publishedUrlProvider)
-                : base(umbracoContextAccessor, null, ServiceContext.CreatePartial(), AppCaches.Disabled, null, null, publishedUrlProvider)
+                : base(umbracoContextAccessor, null, ServiceContext.CreatePartial(), AppCaches.Disabled, null, publishedUrlProvider)
             {
                 _publishedContentQuery = publishedContentQuery;
             }

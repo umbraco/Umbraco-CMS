@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Events;
 using Umbraco.Core.Exceptions;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Querying;
@@ -28,9 +28,9 @@ namespace Umbraco.Core.Services.Implement
 
         #region Constructor
 
-        public MemberService(IScopeProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory, IMemberGroupService memberGroupService,
+        public MemberService(IScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory, IMemberGroupService memberGroupService,
             IMemberRepository memberRepository, IMemberTypeRepository memberTypeRepository, IMemberGroupRepository memberGroupRepository, IAuditRepository auditRepository)
-            : base(provider, logger, eventMessagesFactory)
+            : base(provider, loggerFactory, eventMessagesFactory)
         {
             _memberRepository = memberRepository;
             _memberTypeRepository = memberTypeRepository;
@@ -981,7 +981,7 @@ namespace Umbraco.Core.Services.Implement
                 return result.Select(x => x.Id).Distinct();
             }
         }
-        
+
         public IEnumerable<IMember> GetMembersInRole(string roleName)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))

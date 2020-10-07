@@ -7,10 +7,10 @@ using System.Net.Mime;
 using System.Text;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Events;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.ContentEditing;
@@ -72,12 +72,13 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IMemberGroupService _memberGroupService;
         private readonly ISqlContext _sqlContext;
         private readonly Lazy<IDictionary<string, ILanguage>> _allLangs;
+        private readonly ILogger<ContentController> _logger;
 
         public object Domains { get; private set; }
 
         public ContentController(
             ICultureDictionary cultureDictionary,
-            ILogger logger,
+            ILoggerFactory loggerFactory,
             IShortStringHelper shortStringHelper,
             IEventMessagesFactory eventMessages,
             ILocalizedTextService localizedTextService,
@@ -99,7 +100,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             ActionCollection actionCollection,
             IMemberGroupService memberGroupService,
             ISqlContext sqlContext)
-            : base(cultureDictionary, logger, shortStringHelper, eventMessages, localizedTextService)
+            : base(cultureDictionary, loggerFactory, shortStringHelper, eventMessages, localizedTextService)
         {
             _propertyEditors = propertyEditors;
             _contentService = contentService;
@@ -120,6 +121,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _actionCollection = actionCollection;
             _memberGroupService = memberGroupService;
             _sqlContext = sqlContext;
+            _logger = loggerFactory.CreateLogger<ContentController>();
 
             _allLangs = new Lazy<IDictionary<string, ILanguage>>(() => _localizationService.GetAllLanguages().ToDictionary(x => x.IsoCode, x => x, StringComparer.InvariantCultureIgnoreCase));
 
@@ -1619,7 +1621,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 var sortResult = contentService.Sort(sorted.IdSortOrder, _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.Id);
                 if (!sortResult.Success)
                 {
-                    Logger.Warn<ContentController>("Content sorting failed, this was probably caused by an event being cancelled");
+                    _logger.LogWarning("Content sorting failed, this was probably caused by an event being cancelled");
                     // TODO: Now you can cancel sorting, does the event messages bubble up automatically?
                     throw HttpResponseException.CreateValidationErrorResponse("Content sorting failed, this was probably caused by an event being cancelled");
                 }
@@ -1628,7 +1630,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
             catch (Exception ex)
             {
-                Logger.Error<ContentController>(ex, "Could not update content sort order");
+                _logger.LogError(ex, "Could not update content sort order");
                 throw;
             }
         }
@@ -2001,7 +2003,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 if (template == null)
                 {
                     //ModelState.AddModelError("Template", "No template exists with the specified alias: " + contentItem.TemplateAlias);
-                    Logger.Warn<ContentController>("No template exists with the specified alias: {TemplateAlias}", contentSave.TemplateAlias);
+                    _logger.LogWarning("No template exists with the specified alias: {TemplateAlias}", contentSave.TemplateAlias);
                 }
                 else if (template.Id != contentSave.PersistedContent.TemplateId)
                 {

@@ -2,11 +2,11 @@
 using System.Threading;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Configuration;
 using Umbraco.Configuration;
 using Umbraco.Core;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.Logging;
 using Umbraco.ModelsBuilder.Embedded.Building;
 using Umbraco.Web.Cache;
 using Umbraco.Core.Configuration.Models;
@@ -19,7 +19,7 @@ namespace Umbraco.ModelsBuilder.Embedded
     {
         private static Mutex _mutex;
         private static int _req;
-        private readonly ILogger _logger;
+        private readonly ILogger<LiveModelsProvider> _logger;
         private readonly ModelsBuilderSettings _config;
         private readonly ModelsGenerator _modelGenerator;
         private readonly ModelsGenerationError _mbErrors;
@@ -28,7 +28,7 @@ namespace Umbraco.ModelsBuilder.Embedded
         // we do not manage pure live here
         internal bool IsEnabled => _config.ModelsMode.IsLiveNotPure();
 
-        public LiveModelsProvider(ILogger logger, IOptions<ModelsBuilderSettings> config, ModelsGenerator modelGenerator, ModelsGenerationError mbErrors, IHostingEnvironment hostingEnvironment)
+        public LiveModelsProvider(ILogger<LiveModelsProvider> logger, IOptions<ModelsBuilderSettings> config, ModelsGenerator modelGenerator, ModelsGenerationError mbErrors, IHostingEnvironment hostingEnvironment)
         {
             _logger = logger;
             _config = config.Value ?? throw new ArgumentNullException(nameof(config));
@@ -70,7 +70,7 @@ namespace Umbraco.ModelsBuilder.Embedded
         private void RequestModelsGeneration(object sender, EventArgs args)
         {
             //HttpContext.Current.Items[this] = true;
-            _logger.Debug<LiveModelsProvider>("Requested to generate models.");
+            _logger.LogDebug("Requested to generate models.");
             Interlocked.Exchange(ref _req, 1);
         }
 
@@ -84,22 +84,22 @@ namespace Umbraco.ModelsBuilder.Embedded
 
             try
             {
-                _logger.Debug<LiveModelsProvider>("Generate models...");
+                _logger.LogDebug("Generate models...");
                 const int timeout = 2 * 60 * 1000; // 2 mins
                 _mutex.WaitOne(timeout); // wait until it is safe, and acquire
-                _logger.Info<LiveModelsProvider>("Generate models now.");
+                _logger.LogInformation("Generate models now.");
                 GenerateModels();
                 _mbErrors.Clear();
-                _logger.Info<LiveModelsProvider>("Generated.");
+                _logger.LogInformation("Generated.");
             }
             catch (TimeoutException)
             {
-                _logger.Warn<LiveModelsProvider>("Timeout, models were NOT generated.");
+                _logger.LogWarning("Timeout, models were NOT generated.");
             }
             catch (Exception e)
             {
                 _mbErrors.Report("Failed to build Live models.", e);
-                _logger.Error<LiveModelsProvider>("Failed to generate models.", e);
+                _logger.LogError("Failed to generate models.", e);
             }
             finally
             {

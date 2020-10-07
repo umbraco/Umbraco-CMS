@@ -1,7 +1,7 @@
 using System;
 using System.Text;
 using System.Linq;
-using Umbraco.Core.Logging;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Xml;
@@ -20,13 +20,13 @@ namespace Umbraco.Web.Routing
     {
         private readonly IPublishedValueFallback _publishedValueFallback;
         private readonly IVariationContextAccessor _variationContextAccessor;
-        protected ILogger Logger { get; }
+        private readonly ILogger<ContentFinderByUrlAlias> _logger;
 
-        public ContentFinderByUrlAlias(ILogger logger, IPublishedValueFallback publishedValueFallback, IVariationContextAccessor variationContextAccessor)
+        public ContentFinderByUrlAlias(ILogger<ContentFinderByUrlAlias> logger, IPublishedValueFallback publishedValueFallback, IVariationContextAccessor variationContextAccessor)
         {
             _publishedValueFallback = publishedValueFallback;
             _variationContextAccessor = variationContextAccessor;
-            Logger = logger;
+            _logger = logger;
         }
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace Umbraco.Web.Routing
                 if (node != null)
                 {
                     frequest.PublishedContent = node;
-                    Logger.Debug<ContentFinderByUrlAlias>("Path '{UriAbsolutePath}' is an alias for id={PublishedContentId}", frequest.Uri.AbsolutePath, frequest.PublishedContent.Id);
+                    _logger.LogDebug("Path '{UriAbsolutePath}' is an alias for id={PublishedContentId}", frequest.Uri.AbsolutePath, frequest.PublishedContent.Id);
                 }
             }
 

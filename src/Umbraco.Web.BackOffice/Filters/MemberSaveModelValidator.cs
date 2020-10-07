@@ -4,8 +4,8 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
@@ -25,7 +25,7 @@ namespace Umbraco.Web.BackOffice.Filters
         private readonly IShortStringHelper _shortStringHelper;
 
         public MemberSaveModelValidator(
-            ILogger logger,
+            ILogger<MemberSaveModelValidator> logger,
             IBackofficeSecurity backofficeSecurity,
             ILocalizedTextService textService,
             IMemberTypeService memberTypeService,

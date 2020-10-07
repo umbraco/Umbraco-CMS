@@ -8,10 +8,10 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Persistence;
 
@@ -25,7 +25,7 @@ namespace Umbraco.Tests.Integration.Testing
         public const string InstanceName = "UmbracoTests";
         public const string DatabaseName = "UmbracoTests";
 
-        private readonly ILogger _logger;
+        private readonly ILoggerFactory _loggerFactory;
         private readonly LocalDb _localDb;
         private readonly IUmbracoVersion _umbracoVersion;
         private static LocalDb.Instance _instance;
@@ -38,10 +38,10 @@ namespace Umbraco.Tests.Integration.Testing
         private DatabasePool _currentPool;
 
         //It's internal because `Umbraco.Core.Persistence.LocalDb` is internal
-        internal LocalDbTestDatabase(ILogger logger, LocalDb localDb, string filesPath, IUmbracoDatabaseFactory dbFactory)
+        internal LocalDbTestDatabase(ILoggerFactory loggerFactory, LocalDb localDb, string filesPath, IUmbracoDatabaseFactory dbFactory)
         {
             _umbracoVersion = new UmbracoVersion();
-            _logger = logger;
+            _loggerFactory = loggerFactory;
             _localDb = localDb;
             _filesPath = filesPath;
             _dbFactory = dbFactory;
@@ -129,7 +129,7 @@ namespace Umbraco.Tests.Integration.Testing
 
                 using var trans = database.GetTransaction();
 
-                var creator = new DatabaseSchemaCreator(database, _logger, _umbracoVersion);
+                var creator = new DatabaseSchemaCreator(database, _loggerFactory.CreateLogger<DatabaseSchemaCreator>(), _loggerFactory, _umbracoVersion);
                 creator.InitializeDatabaseSchema();
 
                 trans.Complete(); // commit it
@@ -236,10 +236,10 @@ namespace Umbraco.Tests.Integration.Testing
                     action();
                     return;
                 }
-                catch (SqlException e)
+                catch (SqlException)
                 {
 
-                    Console.Error.WriteLine($"SqlException occured, but we try again {i+1}/{maxIterations}.\n{e}");
+                    //Console.Error.WriteLine($"SqlException occured, but we try again {i+1}/{maxIterations}.\n{e}");
                     // This can occur when there's a transaction deadlock which means (i think) that the database is still in use and hasn't been closed properly yet
                     // so we need to just wait a little bit
                     Thread.Sleep(100 * i);
@@ -248,6 +248,10 @@ namespace Umbraco.Tests.Integration.Testing
                         Debugger.Launch();
                         throw;
                     }
+                }
+                catch (InvalidOperationException)
+                {
+
                 }
             }
         }

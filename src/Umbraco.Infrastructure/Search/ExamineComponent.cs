@@ -14,6 +14,7 @@ using Umbraco.Core.Services.Changes;
 using Umbraco.Core.Sync;
 using Umbraco.Web.Cache;
 using Umbraco.Examine;
+using Microsoft.Extensions.Logging;
 using Umbraco.Web.Scheduling;
 
 namespace Umbraco.Web.Search
@@ -31,7 +32,8 @@ namespace Umbraco.Web.Search
         private readonly IScopeProvider _scopeProvider;
         private readonly ServiceContext _services;
         private readonly IMainDom _mainDom;
-        private readonly IProfilingLogger _logger;
+        private readonly IProfilingLogger _profilingLogger;
+        private readonly ILogger<ExamineComponent> _logger;
         private readonly IUmbracoIndexesCreator _indexCreator;
         private readonly BackgroundTaskRunner<IBackgroundTask> _indexItemTaskRunner;
 
@@ -42,6 +44,7 @@ namespace Umbraco.Web.Search
 
         public ExamineComponent(IMainDom mainDom,
             IExamineManager examineManager, IProfilingLogger profilingLogger,
+            ILoggerFactory loggerFactory,
             IScopeProvider scopeProvider, IUmbracoIndexesCreator indexCreator,
             ServiceContext services,
             IContentValueSetBuilder contentValueSetBuilder,
@@ -60,9 +63,10 @@ namespace Umbraco.Web.Search
             _memberValueSetBuilder = memberValueSetBuilder;
             _backgroundIndexRebuilder = backgroundIndexRebuilder;
             _mainDom = mainDom;
-            _logger = profilingLogger;
+            _profilingLogger = profilingLogger;
+            _logger = loggerFactory.CreateLogger<ExamineComponent>();
             _indexCreator = indexCreator;
-            _indexItemTaskRunner = new BackgroundTaskRunner<IBackgroundTask>(_logger, applicationShutdownRegistry);
+            _indexItemTaskRunner = new BackgroundTaskRunner<IBackgroundTask>(loggerFactory.CreateLogger<BackgroundTaskRunner<IBackgroundTask>>(), applicationShutdownRegistry);
         }
 
         public void Initialize()
@@ -70,7 +74,7 @@ namespace Umbraco.Web.Search
             //let's deal with shutting down Examine with MainDom
             var examineShutdownRegistered = _mainDom.Register(() =>
             {
-                using (_logger.TraceDuration<ExamineComponent>("Examine shutting down"))
+                using (_profilingLogger.TraceDuration<ExamineComponent>("Examine shutting down"))
                 {
                     _examineManager.Dispose();
                 }
@@ -78,7 +82,7 @@ namespace Umbraco.Web.Search
 
             if (!examineShutdownRegistered)
             {
-                _logger.Info<ExamineComponent>("Examine shutdown not registered, this AppDomain is not the MainDom, Examine will be disabled");
+                _logger.LogInformation("Examine shutdown not registered, this AppDomain is not the MainDom, Examine will be disabled");
 
                 //if we could not register the shutdown examine ourselves, it means we are not maindom! in this case all of examine should be disabled!
                 Suspendable.ExamineEvents.SuspendIndexers(_logger);
@@ -89,11 +93,11 @@ namespace Umbraco.Web.Search
             foreach(var index in _indexCreator.Create())
                 _examineManager.AddIndex(index);
 
-            _logger.Debug<ExamineComponent>("Examine shutdown registered with MainDom");
+            _logger.LogDebug("Examine shutdown registered with MainDom");
 
             var registeredIndexers = _examineManager.Indexes.OfType<IUmbracoIndex>().Count(x => x.EnableDefaultEventHandler);
 
-            _logger.Info<ExamineComponent>("Adding examine event handlers for {RegisteredIndexers} index providers.", registeredIndexers);
+            _logger.LogInformation("Adding examine event handlers for {RegisteredIndexers} index providers.", registeredIndexers);
 
             // don't bind event handlers if we're not suppose to listen
             if (registeredIndexers == 0)

@@ -1,5 +1,5 @@
-﻿using Umbraco.Core;
-using Umbraco.Core.Logging;
+﻿using Microsoft.Extensions.Logging;
+using Umbraco.Core;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.Validators;
 using Umbraco.Core.Services;
@@ -21,12 +21,13 @@ namespace Umbraco.Web.PropertyEditors
         /// <summary>
         /// Initializes a new instance of the <see cref="DecimalPropertyEditor"/> class.
         /// </summary>
-        public DecimalPropertyEditor(ILogger logger,
+        public DecimalPropertyEditor(
+            ILoggerFactory loggerFactory,
             IDataTypeService dataTypeService,
             ILocalizationService localizationService,
             ILocalizedTextService localizedTextService,
             IShortStringHelper shortStringHelper)
-            : base(logger, dataTypeService, localizationService, localizedTextService, shortStringHelper)
+            : base(loggerFactory, dataTypeService, localizationService, localizedTextService, shortStringHelper)
         { }
 
         /// <inheritdoc />

@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.BackOffice;
 using Umbraco.Core.Cache;
@@ -18,7 +19,6 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Media;
 using Umbraco.Core.Models;
@@ -73,7 +73,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IContentService _contentService;
         private readonly GlobalSettings _globalSettings;
         private readonly IBackOfficeUserManager _backOfficeUserManager;
-        private readonly ILogger _logger;
+        private readonly ILoggerFactory _loggerFactory;
         private readonly LinkGenerator _linkGenerator;
 
         public UsersController(
@@ -96,7 +96,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             IContentService contentService,
             IOptions<GlobalSettings> globalSettings,
             IBackOfficeUserManager backOfficeUserManager,
-            ILogger logger,
+            ILoggerFactory loggerFactory,
             LinkGenerator linkGenerator)
         {
             _mediaFileSystem = mediaFileSystem;
@@ -118,7 +118,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _contentService = contentService;
             _globalSettings = globalSettings.Value;
             _backOfficeUserManager = backOfficeUserManager;
-            _logger = logger;
+            _loggerFactory = loggerFactory;
             _linkGenerator = linkGenerator;
         }
 
@@ -661,7 +661,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            var passwordChanger = new PasswordChanger(_logger);
+            var passwordChanger = new PasswordChanger(_loggerFactory.CreateLogger<PasswordChanger>());
             var passwordChangeResult = await passwordChanger.ChangePasswordWithIdentityAsync(_backofficeSecurityAccessor.BackofficeSecurity.CurrentUser, found, changingPasswordModel, _backOfficeUserManager);
 
             if (passwordChangeResult.Success)

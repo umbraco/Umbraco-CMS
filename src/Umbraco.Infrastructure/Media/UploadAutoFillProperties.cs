@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Drawing;
 using System.IO;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Media;
 using Umbraco.Core.Models;
 
@@ -16,12 +16,12 @@ namespace Umbraco.Web.Media
     public class UploadAutoFillProperties
     {
         private readonly IMediaFileSystem _mediaFileSystem;
-        private readonly ILogger _logger;
+        private readonly ILogger<UploadAutoFillProperties> _logger;
         private readonly IImageUrlGenerator _imageUrlGenerator;
 
         public UploadAutoFillProperties(
             IMediaFileSystem mediaFileSystem,
-            ILogger logger,
+            ILogger<UploadAutoFillProperties> logger,
             IImageUrlGenerator imageUrlGenerator)
         {
             _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
@@ -77,7 +77,7 @@ namespace Umbraco.Web.Media
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error(typeof(UploadAutoFillProperties), ex, "Could not populate upload auto-fill properties for file '{File}'.", filepath);
+                    _logger.LogError(ex, "Could not populate upload auto-fill properties for file '{File}'.", filepath);
                     ResetProperties(content, autoFillConfig, culture, segment);
                 }
             }

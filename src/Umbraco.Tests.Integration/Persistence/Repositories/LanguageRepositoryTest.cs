@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.Models;
@@ -29,7 +30,7 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
 
         private LanguageRepository CreateRepository(IScopeProvider provider)
         {
-            return new LanguageRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger, Microsoft.Extensions.Options.Options.Create(_globalSettings));
+            return new LanguageRepository((IScopeAccessor) provider, AppCaches.Disabled, LoggerFactory.CreateLogger<LanguageRepository>(), Microsoft.Extensions.Options.Options.Create(_globalSettings));
         }
 
         [Test]

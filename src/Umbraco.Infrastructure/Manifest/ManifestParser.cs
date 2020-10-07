@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Umbraco.Core.Cache;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
@@ -19,13 +19,14 @@ namespace Umbraco.Core.Manifest
     /// </summary>
     public class ManifestParser : IManifestParser
     {
+        private readonly ILoggerFactory _loggerFactory;
         private readonly IJsonSerializer _jsonSerializer;
         private readonly ILocalizedTextService _localizedTextService;
         private readonly IShortStringHelper _shortStringHelper;
         private static readonly string Utf8Preamble = Encoding.UTF8.GetString(Encoding.UTF8.GetPreamble());
 
         private readonly IAppPolicyCache _cache;
-        private readonly ILogger _logger;
+        private readonly ILogger<ManifestParser> _logger;
         private readonly IIOHelper _ioHelper;
         private readonly IDataTypeService _dataTypeService;
         private readonly ILocalizationService _localizationService;
@@ -41,15 +42,17 @@ namespace Umbraco.Core.Manifest
             AppCaches appCaches,
             ManifestValueValidatorCollection validators,
             ManifestFilterCollection filters,
-            ILogger logger,
+            ILogger<ManifestParser> logger,
+            ILoggerFactory loggerFactory,
             IIOHelper ioHelper,
             IDataTypeService dataTypeService,
             ILocalizationService localizationService,
             IJsonSerializer jsonSerializer,
             ILocalizedTextService localizedTextService,
             IShortStringHelper shortStringHelper)
-            : this(appCaches, validators, filters, "~/App_Plugins", logger, ioHelper, dataTypeService, localizationService)
+            : this(appCaches, validators, filters, "~/App_Plugins", logger, loggerFactory, ioHelper, dataTypeService, localizationService)
         {
+            _loggerFactory = loggerFactory;
             _jsonSerializer = jsonSerializer;
             _localizedTextService = localizedTextService;
             _shortStringHelper = shortStringHelper;
@@ -58,7 +61,7 @@ namespace Umbraco.Core.Manifest
         /// <summary>
         /// Initializes a new instance of the <see cref="ManifestParser"/> class.
         /// </summary>
-        private ManifestParser(AppCaches appCaches, ManifestValueValidatorCollection validators, ManifestFilterCollection filters, string path, ILogger logger, IIOHelper ioHelper, IDataTypeService dataTypeService, ILocalizationService localizationService)
+        private ManifestParser(AppCaches appCaches, ManifestValueValidatorCollection validators, ManifestFilterCollection filters, string path, ILogger<ManifestParser> logger, ILoggerFactory loggerFactory, IIOHelper ioHelper, IDataTypeService dataTypeService, ILocalizationService localizationService)
         {
             if (appCaches == null) throw new ArgumentNullException(nameof(appCaches));
             _cache = appCaches.RuntimeCache;
@@ -70,6 +73,7 @@ namespace Umbraco.Core.Manifest
             if (path == null) throw new ArgumentNullException(nameof(path));
             if (string.IsNullOrWhiteSpace(path)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(path));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
             _ioHelper = ioHelper;
 
             Path = path;
@@ -115,7 +119,7 @@ namespace Umbraco.Core.Manifest
                 }
                 catch (Exception e)
                 {
-                    _logger.Error<ManifestParser>(e, "Failed to parse manifest at '{Path}', ignoring.", path);
+                    _logger.LogError(e, "Failed to parse manifest at '{Path}', ignoring.", path);
                 }
             }
 
@@ -189,7 +193,7 @@ namespace Umbraco.Core.Manifest
             if (string.IsNullOrWhiteSpace(text)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(text));
 
             var manifest = JsonConvert.DeserializeObject<PackageManifest>(text,
-                new DataEditorConverter(_logger, _ioHelper, _dataTypeService, _localizationService, _localizedTextService, _shortStringHelper),
+                new DataEditorConverter(_loggerFactory, _ioHelper, _dataTypeService, _localizationService, _localizedTextService, _shortStringHelper),
                 new ValueValidatorConverter(_validators),
                 new DashboardAccessRuleConverter());
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
@@ -12,7 +13,6 @@ using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Search;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Security;
 using Constants = Umbraco.Core.Constants;
 using Umbraco.Web.BackOffice.Filters;
@@ -58,7 +58,7 @@ namespace Umbraco.Web.Trees
             IMenuItemCollectionFactory menuItemCollectionFactory,
             IEntityService entityService,
             IBackofficeSecurityAccessor backofficeSecurityAccessor,
-            ILogger logger,
+            ILogger<ContentTreeController> logger,
             ActionCollection actionCollection,
             IUserService userService,
             IDataTypeService dataTypeService,

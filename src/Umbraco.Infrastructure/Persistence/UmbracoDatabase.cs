@@ -5,9 +5,9 @@ using System.Data.Common;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
+using Microsoft.Extensions.Logging;
 using NPoco;
 using StackExchange.Profiling;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.FaultHandling;
 using Umbraco.Core.Persistence.SqlSyntax;
 
@@ -23,7 +23,7 @@ namespace Umbraco.Core.Persistence
     /// </remarks>
     public class UmbracoDatabase : Database, IUmbracoDatabase
     {
-        private readonly ILogger _logger;
+        private readonly ILogger<UmbracoDatabase> _logger;
         private readonly IBulkSqlInsertProvider _bulkSqlInsertProvider;
         private readonly RetryPolicy _connectionRetryPolicy;
         private readonly RetryPolicy _commandRetryPolicy;
@@ -39,7 +39,7 @@ namespace Umbraco.Core.Persistence
         /// <para>Used by UmbracoDatabaseFactory to create databases.</para>
         /// <para>Also used by DatabaseBuilder for creating databases and installing/upgrading.</para>
         /// </remarks>
-        public UmbracoDatabase(string connectionString, ISqlContext sqlContext, DbProviderFactory provider, ILogger logger, IBulkSqlInsertProvider bulkSqlInsertProvider, RetryPolicy connectionRetryPolicy = null, RetryPolicy commandRetryPolicy = null)
+        public UmbracoDatabase(string connectionString, ISqlContext sqlContext, DbProviderFactory provider, ILogger<UmbracoDatabase> logger, IBulkSqlInsertProvider bulkSqlInsertProvider, RetryPolicy connectionRetryPolicy = null, RetryPolicy commandRetryPolicy = null)
             : base(connectionString, sqlContext.DatabaseType, provider, sqlContext.SqlSyntax.DefaultIsolationLevel)
         {
             SqlContext = sqlContext;
@@ -58,7 +58,7 @@ namespace Umbraco.Core.Persistence
         /// Initializes a new instance of the <see cref="UmbracoDatabase"/> class.
         /// </summary>
         /// <remarks>Internal for unit tests only.</remarks>
-        internal UmbracoDatabase(DbConnection connection, ISqlContext sqlContext, ILogger logger, IBulkSqlInsertProvider bulkSqlInsertProvider)
+        internal UmbracoDatabase(DbConnection connection, ISqlContext sqlContext, ILogger<UmbracoDatabase> logger, IBulkSqlInsertProvider bulkSqlInsertProvider)
             : base(connection, sqlContext.DatabaseType, sqlContext.SqlSyntax.DefaultIsolationLevel)
         {
             SqlContext = sqlContext;
@@ -226,10 +226,10 @@ namespace Umbraco.Core.Persistence
 
         protected override void OnException(Exception ex)
         {
-            _logger.Error<UmbracoDatabase>(ex, "Exception ({InstanceId}).", InstanceId);
-            _logger.Debug<UmbracoDatabase>("At:\r\n{StackTrace}", Environment.StackTrace);
+            _logger.LogError(ex, "Exception ({InstanceId}).", InstanceId);
+            _logger.LogDebug("At:\r\n{StackTrace}", Environment.StackTrace);
             if (EnableSqlTrace == false)
-                _logger.Debug<UmbracoDatabase>("Sql:\r\n{Sql}", CommandToString(LastSQL, LastArgs));
+                _logger.LogDebug("Sql:\r\n{Sql}", CommandToString(LastSQL, LastArgs));
             base.OnException(ex);
         }
 
@@ -242,13 +242,13 @@ namespace Umbraco.Core.Persistence
                 cmd.CommandTimeout = cmd.Connection.ConnectionTimeout;
 
             if (EnableSqlTrace)
-                _logger.Debug<UmbracoDatabase>("SQL Trace:\r\n{Sql}", CommandToString(cmd).Replace("{", "{{").Replace("}", "}}")); // TODO: these escapes should be builtin
+                _logger.LogDebug("SQL Trace:\r\n{Sql}", CommandToString(cmd).Replace("{", "{{").Replace("}", "}}")); // TODO: these escapes should be builtin
 
 #if DEBUG_DATABASES
             // detects whether the command is already in use (eg still has an open reader...)
             DatabaseDebugHelper.SetCommand(cmd, InstanceId + " [T" + System.Threading.Thread.CurrentThread.ManagedThreadId + "]");
             var refsobj = DatabaseDebugHelper.GetReferencedObjects(cmd.Connection);
-            if (refsobj != null) _logger.Debug<UmbracoDatabase>("Oops!" + Environment.NewLine + refsobj);
+            if (refsobj != null) _logger.LogDebug("Oops!" + Environment.NewLine + refsobj);
 #endif
 
             _cmd = cmd;

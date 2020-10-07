@@ -3,6 +3,7 @@ using System.Configuration;
 using System.IO;
 using System.Linq;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NPoco;
 using Umbraco.Core;
@@ -14,7 +15,6 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Events;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -45,7 +45,7 @@ namespace Umbraco.Tests.TestHelpers
         /// <returns>An UmbracoDatabase.</returns>
         /// <remarks>This is just a void database that has no actual database but pretends to have an open connection
         /// that can begin a transaction.</remarks>
-        public UmbracoDatabase GetUmbracoSqlCeDatabase(ILogger logger)
+        public UmbracoDatabase GetUmbracoSqlCeDatabase(ILogger<UmbracoDatabase> logger)
         {
             var syntax = new SqlCeSyntaxProvider();
             var connection = GetDbConnection();
@@ -60,7 +60,7 @@ namespace Umbraco.Tests.TestHelpers
         /// <returns>An UmbracoDatabase.</returns>
         /// <remarks>This is just a void database that has no actual database but pretends to have an open connection
         /// that can begin a transaction.</remarks>
-        public UmbracoDatabase GetUmbracoSqlServerDatabase(ILogger logger)
+        public UmbracoDatabase GetUmbracoSqlServerDatabase(ILogger<UmbracoDatabase> logger)
         {
             var syntax = new SqlServerSyntaxProvider(); // do NOT try to get the server's version!
             var connection = GetDbConnection();
@@ -80,7 +80,7 @@ namespace Umbraco.Tests.TestHelpers
             return container?.TryGetInstance<T>() ?? Mock.Of<T>();
         }
 
-        public IScopeProvider GetScopeProvider(ILogger logger, ITypeFinder typeFinder = null, FileSystems fileSystems = null, IUmbracoDatabaseFactory databaseFactory = null)
+        public IScopeProvider GetScopeProvider(ILoggerFactory loggerFactory, ITypeFinder typeFinder = null, FileSystems fileSystems = null, IUmbracoDatabaseFactory databaseFactory = null)
         {
             var globalSettings = new GlobalSettings();
             var connectionString = ConfigurationManager.ConnectionStrings[Constants.System.UmbracoConnectionName].ConnectionString;
@@ -93,18 +93,20 @@ namespace Umbraco.Tests.TestHelpers
                 // mappersBuilder.AddCore();
                 // var mappers = mappersBuilder.CreateCollection();
                 var mappers = Current.Factory.GetInstance<IMapperCollection>();
-                databaseFactory = new UmbracoDatabaseFactory(logger,
+                databaseFactory = new UmbracoDatabaseFactory(
+                    loggerFactory.CreateLogger<UmbracoDatabaseFactory>(),
+                    loggerFactory,
                     globalSettings,
                     connectionStrings,
                     new Lazy<IMapperCollection>(() => mappers),
                     TestHelper.DbProviderFactoryCreator);
             }
 
-            typeFinder ??= new TypeFinder(logger, new DefaultUmbracoAssemblyProvider(GetType().Assembly), new VaryingRuntimeHash());
-            fileSystems ??= new FileSystems(Current.Factory, logger, TestHelper.IOHelper, Options.Create(globalSettings), TestHelper.GetHostingEnvironment());
+            typeFinder ??= new TypeFinder(loggerFactory.CreateLogger<TypeFinder>(), new DefaultUmbracoAssemblyProvider(GetType().Assembly), new VaryingRuntimeHash());
+            fileSystems ??= new FileSystems(Current.Factory, loggerFactory.CreateLogger<FileSystems>(), loggerFactory, TestHelper.IOHelper, Options.Create(globalSettings), TestHelper.GetHostingEnvironment());
             var coreDebug = TestHelper.CoreDebugSettings;
             var mediaFileSystem = Mock.Of<IMediaFileSystem>();
-            return new ScopeProvider(databaseFactory, fileSystems, Microsoft.Extensions.Options.Options.Create(coreDebugSettings), mediaFileSystem, logger, typeFinder, NoAppCache.Instance);
+            return new ScopeProvider(databaseFactory, fileSystems, Microsoft.Extensions.Options.Options.Create(coreDebugSettings), mediaFileSystem, loggerFactory.CreateLogger<ScopeProvider>(), loggerFactory, typeFinder, NoAppCache.Instance);
         }
 
     }

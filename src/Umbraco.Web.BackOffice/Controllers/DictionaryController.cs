@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Security;
@@ -33,7 +33,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     [UmbracoTreeAuthorize(Constants.Trees.Dictionary)]
     public class DictionaryController : BackOfficeNotificationsController
     {
-        private readonly ILogger _logger;
+        private readonly ILogger<DictionaryController> _logger;
         private readonly ILocalizationService _localizationService;
         private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly GlobalSettings _globalSettings;
@@ -41,7 +41,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly UmbracoMapper _umbracoMapper;
 
         public DictionaryController(
-            ILogger logger,
+            ILogger<DictionaryController> logger,
             ILocalizationService localizationService,
             IBackofficeSecurityAccessor backofficeSecurityAccessor,
             IOptions<GlobalSettings> globalSettings,
@@ -127,7 +127,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
             catch (Exception ex)
             {
-                _logger.Error(GetType(), ex, "Error creating dictionary with {Name} under {ParentId}", key, parentId);
+                _logger.LogError(ex, "Error creating dictionary with {Name} under {ParentId}", key, parentId);
                 throw HttpResponseException.CreateNotificationValidationErrorResponse("Error creating dictionary item");
             }
         }
@@ -260,7 +260,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
             catch (Exception ex)
             {
-                _logger.Error(GetType(), ex, "Error saving dictionary with {Name} under {ParentId}", dictionary.Name, dictionary.ParentId);
+                _logger.LogError(ex, "Error saving dictionary with {Name} under {ParentId}", dictionary.Name, dictionary.ParentId);
                 throw HttpResponseException.CreateNotificationValidationErrorResponse("Something went wrong saving dictionary");
             }
         }

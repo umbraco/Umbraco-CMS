@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.BackOffice;
@@ -13,7 +14,6 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Media;
 using Umbraco.Core.Security;
@@ -44,7 +44,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IUserService _userService;
         private readonly UmbracoMapper _umbracoMapper;
         private readonly IBackOfficeUserManager _backOfficeUserManager;
-        private readonly ILogger _logger;
+        private readonly ILoggerFactory _loggerFactory;
         private readonly ILocalizedTextService _localizedTextService;
         private readonly AppCaches _appCaches;
         private readonly IShortStringHelper _shortStringHelper;
@@ -58,7 +58,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             IUserService userService,
             UmbracoMapper umbracoMapper,
             IBackOfficeUserManager backOfficeUserManager,
-            ILogger logger,
+            ILoggerFactory loggerFactory,
             ILocalizedTextService localizedTextService,
             AppCaches appCaches,
             IShortStringHelper shortStringHelper)
@@ -71,7 +71,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _userService = userService;
             _umbracoMapper = umbracoMapper;
             _backOfficeUserManager = backOfficeUserManager;
-            _logger = logger;
+            _loggerFactory = loggerFactory;
             _localizedTextService = localizedTextService;
             _appCaches = appCaches;
             _shortStringHelper = shortStringHelper;
@@ -216,7 +216,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </returns>
         public async Task<ModelWithNotifications<string>> PostChangePassword(ChangingPasswordModel data)
         {
-            var passwordChanger = new PasswordChanger(_logger);
+            var passwordChanger = new PasswordChanger(_loggerFactory.CreateLogger<PasswordChanger>());
             var passwordChangeResult = await passwordChanger.ChangePasswordWithIdentityAsync(_backofficeSecurityAccessor.BackofficeSecurity.CurrentUser, _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser, data, _backOfficeUserManager);
 
             if (passwordChangeResult.Success)

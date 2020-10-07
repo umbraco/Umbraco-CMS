@@ -20,7 +20,6 @@ using Umbraco.Tests.Integration.Implementations;
 using Umbraco.Extensions;
 using Umbraco.Tests.Testing;
 using Umbraco.Web;
-using ILogger = Umbraco.Core.Logging.ILogger;
 using Umbraco.Core.Runtime;
 using Umbraco.Core;
 using Moq;
@@ -31,7 +30,12 @@ using System.Data.Common;
 using System.IO;
 using Umbraco.Core.Configuration.Models;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+using Serilog;
+using Umbraco.Core.Logging.Serilog;
 using ConnectionStrings = Umbraco.Core.Configuration.Models.ConnectionStrings;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Umbraco.Tests.Integration.Testing
 {
@@ -95,6 +99,27 @@ namespace Umbraco.Tests.Integration.Testing
 
         #region Generic Host Builder and Runtime
 
+        private ILoggerFactory CreateLoggerFactory()
+        {
+            ILoggerFactory factory;
+            var testOptions = TestOptionAttributeBase.GetTestOptions<UmbracoTestAttribute>();
+            switch (testOptions.Logger)
+            {
+                case UmbracoTestOptions.Logger.Mock:
+                    factory = NullLoggerFactory.Instance;
+                    break;
+                case UmbracoTestOptions.Logger.Serilog:
+                    factory = Microsoft.Extensions.Logging.LoggerFactory.Create(builder => { builder.AddSerilog(); });
+                    break;
+                case UmbracoTestOptions.Logger.Console:
+                    factory = Microsoft.Extensions.Logging.LoggerFactory.Create(builder => { builder.AddConsole(); });
+                    break;
+                default:
+                    throw new NotSupportedException($"Logger option {testOptions.Logger} is not supported.");
+            }
+
+            return factory;
+        }
         /// <summary>
         /// Create the Generic Host and execute startup ConfigureServices/Configure calls
         /// </summary>
@@ -119,6 +144,7 @@ namespace Umbraco.Tests.Integration.Testing
                 })
                 .ConfigureServices((hostContext, services) =>
                 {
+                    services.AddTransient(_ => CreateLoggerFactory());
                     ConfigureServices(services);
                 });
             return hostBuilder;
@@ -131,6 +157,7 @@ namespace Umbraco.Tests.Integration.Testing
         /// <param name="umbracoVersion"></param>
         /// <param name="ioHelper"></param>
         /// <param name="logger"></param>
+        /// <param name="loggerFactory"></param>
         /// <param name="profiler"></param>
         /// <param name="hostingEnvironment"></param>
         /// <param name="backOfficeInfo"></param>
@@ -143,7 +170,7 @@ namespace Umbraco.Tests.Integration.Testing
             GlobalSettings globalSettings,
             ConnectionStrings connectionStrings,
             IUmbracoVersion umbracoVersion, IIOHelper ioHelper,
-            ILogger logger, IProfiler profiler, Core.Hosting.IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo,
+            ILoggerFactory loggerFactory, IProfiler profiler, Core.Hosting.IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo,
             ITypeFinder typeFinder, AppCaches appCaches, IDbProviderFactoryCreator dbProviderFactoryCreator)
         {
             var runtime = CreateTestRuntime(
@@ -151,7 +178,7 @@ namespace Umbraco.Tests.Integration.Testing
                 connectionStrings,
                 umbracoVersion,
                 ioHelper,
-                logger,
+                loggerFactory,
                 profiler,
                 hostingEnvironment,
                 backOfficeInfo,
@@ -172,6 +199,7 @@ namespace Umbraco.Tests.Integration.Testing
         /// <param name="umbracoVersion"></param>
         /// <param name="ioHelper"></param>
         /// <param name="logger"></param>
+        /// <param name="loggerFactory"></param>
         /// <param name="profiler"></param>
         /// <param name="hostingEnvironment"></param>
         /// <param name="backOfficeInfo"></param>
@@ -186,7 +214,7 @@ namespace Umbraco.Tests.Integration.Testing
             GlobalSettings globalSettings,
             ConnectionStrings connectionStrings,
             IUmbracoVersion umbracoVersion, IIOHelper ioHelper,
-            ILogger logger, IProfiler profiler, Core.Hosting.IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo,
+            ILoggerFactory loggerFactory, IProfiler profiler, Core.Hosting.IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo,
             ITypeFinder typeFinder, AppCaches appCaches, IDbProviderFactoryCreator dbProviderFactoryCreator,
             IMainDom mainDom, Action<CoreRuntime, RuntimeEssentialsEventArgs> eventHandler)
         {
@@ -195,7 +223,7 @@ namespace Umbraco.Tests.Integration.Testing
                 connectionStrings,
                 umbracoVersion,
                 ioHelper,
-                logger,
+                loggerFactory,
                 profiler,
                 Mock.Of<IUmbracoBootPermissionChecker>(),
                 hostingEnvironment,
@@ -241,8 +269,6 @@ namespace Umbraco.Tests.Integration.Testing
 
             services.AddMvc();
 
-            services.AddSingleton<ILogger>(new ConsoleLogger(new MessageTemplates()));
-
             CustomTestSetup(services);
         }
 
@@ -278,7 +304,7 @@ namespace Umbraco.Tests.Integration.Testing
             OnTestTearDown(() => runtime.Terminate());
 
             // This will create a db, install the schema and ensure the app is configured to run
-            InstallTestLocalDb(args.DatabaseFactory, runtime.ProfilingLogger, runtime.State, TestHelper.WorkingDirectory, out var connectionString);
+            InstallTestLocalDb(args.DatabaseFactory, runtime.RuntimeLoggerFactory, runtime.State, TestHelper.WorkingDirectory, out var connectionString);
             TestDBConnectionString = connectionString;
             InMemoryConfiguration["ConnectionStrings:" + Constants.System.UmbracoConnectionName] = TestDBConnectionString;
         }
@@ -288,13 +314,14 @@ namespace Umbraco.Tests.Integration.Testing
         /// </summary>
         /// <param name="filesPath"></param>
         /// <param name="logger"></param>
+        /// <param name="loggerFactory"></param>
         /// <param name="globalSettings"></param>
         /// <param name="dbFactory"></param>
         /// <returns></returns>
         /// <remarks>
         /// There must only be ONE instance shared between all tests in a session
         /// </remarks>
-        private static LocalDbTestDatabase GetOrCreateDatabase(string filesPath, ILogger logger, IUmbracoDatabaseFactory dbFactory)
+        private static LocalDbTestDatabase GetOrCreateDatabase(string filesPath, ILoggerFactory loggerFactory, IUmbracoDatabaseFactory dbFactory)
         {
             lock (_dbLocker)
             {
@@ -303,7 +330,7 @@ namespace Umbraco.Tests.Integration.Testing
                 var localDb = new LocalDb();
                 if (localDb.IsAvailable == false)
                     throw new InvalidOperationException("LocalDB is not available.");
-                _dbInstance = new LocalDbTestDatabase(logger, localDb, filesPath, dbFactory);
+                _dbInstance = new LocalDbTestDatabase(loggerFactory, localDb, filesPath, dbFactory);
                 return _dbInstance;
             }
         }
@@ -311,13 +338,15 @@ namespace Umbraco.Tests.Integration.Testing
         /// <summary>
         /// Creates a LocalDb instance to use for the test
         /// </summary>
-        /// <param name="serviceProvider"></param>
+        /// <param name="runtimeState"></param>
         /// <param name="workingDirectory"></param>
-        /// <param name="integrationTest"></param>
         /// <param name="connectionString"></param>
+        /// <param name="databaseFactory"></param>
+        /// <param name="loggerFactory"></param>
+        /// <param name="globalSettings"></param>
         /// <returns></returns>
         private void InstallTestLocalDb(
-            IUmbracoDatabaseFactory databaseFactory, IProfilingLogger logger,
+            IUmbracoDatabaseFactory databaseFactory, ILoggerFactory loggerFactory,
             IRuntimeState runtimeState, string workingDirectory, out string connectionString)
         {
             connectionString = null;
@@ -335,7 +364,7 @@ namespace Umbraco.Tests.Integration.Testing
             if (!Directory.Exists(dbFilePath))
                 Directory.CreateDirectory(dbFilePath);
 
-            var db = GetOrCreateDatabase(dbFilePath, logger, databaseFactory);
+            var db = GetOrCreateDatabase(dbFilePath, loggerFactory, databaseFactory);
 
             switch (testOptions.Database)
             {
@@ -440,9 +469,9 @@ namespace Umbraco.Tests.Integration.Testing
         protected IScopeAccessor ScopeAccessor => Services.GetRequiredService<IScopeAccessor>();
 
         /// <summary>
-        /// Returns the <see cref="ILogger"/>
+        /// Returns the <see cref="ILoggerFactory"/>
         /// </summary>
-        protected ILogger Logger => Services.GetRequiredService<ILogger>();
+        protected ILoggerFactory LoggerFactory => Services.GetRequiredService<ILoggerFactory>();
 
         protected AppCaches AppCaches => Services.GetRequiredService<AppCaches>();
         protected IIOHelper IOHelper => Services.GetRequiredService<IIOHelper>();

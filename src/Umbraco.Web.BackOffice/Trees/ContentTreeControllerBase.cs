@@ -3,9 +3,9 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Services;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Core.Models.Entities;
@@ -26,7 +26,7 @@ namespace Umbraco.Web.Trees
     {
         private readonly IEntityService _entityService;
         private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
-        private readonly ILogger _logger;
+        private readonly ILogger<ContentTreeControllerBase> _logger;
         private readonly ActionCollection _actionCollection;
         private readonly IUserService _userService;
         private readonly IDataTypeService _dataTypeService;
@@ -39,7 +39,7 @@ namespace Umbraco.Web.Trees
             IMenuItemCollectionFactory menuItemCollectionFactory,
             IEntityService entityService,
             IBackofficeSecurityAccessor backofficeSecurityAccessor,
-            ILogger logger,
+            ILogger<ContentTreeControllerBase> logger,
             ActionCollection actionCollection,
             IUserService userService,
             IDataTypeService dataTypeService
@@ -196,7 +196,7 @@ namespace Umbraco.Web.Trees
                 // TODO: in the future we could return a validation statement so we can have some UI to notify the user they don't have access
                 if (ignoreUserStartNodes == false && HasPathAccess(id, queryStrings) == false)
                 {
-                    _logger.Warn<ContentTreeControllerBase>("User {Username} does not have access to node with id {Id}", _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.Username, id);
+                    _logger.LogWarning("User {Username} does not have access to node with id {Id}", _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.Username, id);
                     return nodes;
                 }
 

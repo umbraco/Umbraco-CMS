@@ -1,9 +1,9 @@
 ﻿using System.Linq;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 using Umbraco.Extensions;
 using Umbraco.Web.BackOffice.Controllers;
@@ -44,7 +44,7 @@ namespace Umbraco.Web.BackOffice.Runtime
                 new PhysicalFileSystem(
                     factory.GetInstance<IIOHelper>(),
                     factory.GetInstance<IHostingEnvironment>(),
-                    factory.GetInstance<ILogger>(),
+                    factory.GetInstance<ILogger<PhysicalFileSystem>>(),
                     "~/"));
 
             composition.RegisterUnique<IIconService, IconService>();

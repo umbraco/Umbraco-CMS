@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Dtos;
@@ -28,7 +28,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         private readonly IMemberGroupRepository _memberGroupRepository;
         private readonly IRepositoryCachePolicy<IMember, string> _memberByUsernameCachePolicy;
 
-        public MemberRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger,
+        public MemberRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<MemberRepository> logger,
             IMemberTypeRepository memberTypeRepository, IMemberGroupRepository memberGroupRepository, ITagRepository tagRepository, ILanguageRepository languageRepository, IRelationRepository relationRepository, IRelationTypeRepository relationTypeRepository,
             IPasswordHasher passwordHasher,
             Lazy<PropertyEditorCollection> propertyEditors,

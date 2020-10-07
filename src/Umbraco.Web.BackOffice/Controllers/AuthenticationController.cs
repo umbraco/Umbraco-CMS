@@ -8,10 +8,10 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.BackOffice;
 using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
@@ -47,7 +47,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly UmbracoMapper _umbracoMapper;
         private readonly GlobalSettings _globalSettings;
         private readonly SecuritySettings _securitySettings;
-        private readonly ILogger _logger;
+        private readonly ILogger<AuthenticationController> _logger;
         private readonly IIpResolver _ipResolver;
         private readonly UserPasswordConfigurationSettings _passwordConfiguration;
         private readonly IEmailSender _emailSender;
@@ -67,7 +67,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             UmbracoMapper umbracoMapper,
             IOptions<GlobalSettings> globalSettings,
             IOptions<SecuritySettings> securitySettings,
-            ILogger logger,
+            ILogger<AuthenticationController> logger,
             IIpResolver ipResolver,
             IOptions<UserPasswordConfigurationSettings> passwordConfiguration,
             IEmailSender emailSender,
@@ -151,7 +151,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 //NOTE: We are using 30 seconds because that is what is coded into angular to force logout to give some headway in
                 // the timeout process.
 
-                _logger.Info<AuthenticationController>(
+                _logger.LogInformation(
                     "User logged will be logged out due to timeout: {Username}, IP Address: {IPAddress}",
                     backOfficeIdentity.Name,
                     _ipResolver.GetCurrentRequestIpAddress());
@@ -354,19 +354,19 @@ namespace Umbraco.Web.BackOffice.Controllers
                 var lockedOut = await _userManager.IsLockedOutAsync(identityUser);
                 if (lockedOut)
                 {
-                    _logger.Info<AuthenticationController>("User {UserId} is currently locked out, unlocking and resetting AccessFailedCount", model.UserId);
+                    _logger.LogInformation("User {UserId} is currently locked out, unlocking and resetting AccessFailedCount", model.UserId);
 
                     //// var user = await UserManager.FindByIdAsync(model.UserId);
                     var unlockResult = await _userManager.SetLockoutEndDateAsync(identityUser, DateTimeOffset.Now);
                     if (unlockResult.Succeeded == false)
                     {
-                        _logger.Warn<AuthenticationController>("Could not unlock for user {UserId} - error {UnlockError}", model.UserId, unlockResult.Errors.First().Description);
+                        _logger.LogWarning("Could not unlock for user {UserId} - error {UnlockError}", model.UserId, unlockResult.Errors.First().Description);
                     }
 
                     var resetAccessFailedCountResult = await _userManager.ResetAccessFailedCountAsync(identityUser);
                     if (resetAccessFailedCountResult.Succeeded == false)
                     {
-                        _logger.Warn<AuthenticationController>("Could not reset access failed count {UserId} - error {UnlockError}", model.UserId, unlockResult.Errors.First().Description);
+                        _logger.LogWarning("Could not reset access failed count {UserId} - error {UnlockError}", model.UserId, unlockResult.Errors.First().Description);
                     }
                 }
 
@@ -412,7 +412,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         {
             HttpContext.SignOutAsync(Core.Constants.Security.BackOfficeAuthenticationType);
 
-            _logger.Info<AuthenticationController>("User {UserName} from IP address {RemoteIpAddress} has logged out", User.Identity == null ? "UNKNOWN" : User.Identity.Name, HttpContext.Connection.RemoteIpAddress);
+            _logger.LogInformation("User {UserName} from IP address {RemoteIpAddress} has logged out", User.Identity == null ? "UNKNOWN" : User.Identity.Name, HttpContext.Connection.RemoteIpAddress);
 
             _userManager.RaiseLogoutSuccessEvent(User, int.Parse(User.Identity.GetUserId()));
 

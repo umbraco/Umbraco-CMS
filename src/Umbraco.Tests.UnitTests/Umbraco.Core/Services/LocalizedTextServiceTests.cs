@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Xml.Linq;
-using Moq;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Services.Implement;
 
 namespace Umbraco.Tests.Services
@@ -13,6 +13,7 @@ namespace Umbraco.Tests.Services
     [TestFixture]
     public class LocalizedTextServiceTests
     {
+        private static ILoggerFactory _loggerFactory = NullLoggerFactory.Instance;
         [Test]
         public void Using_Dictionary_Gets_All_Stored_Values()
         {
@@ -39,7 +40,7 @@ namespace Umbraco.Tests.Services
                             },
                         }
                     }
-                }, Mock.Of<ILogger>());
+                }, _loggerFactory.CreateLogger<LocalizedTextService>());
 
             var result = txtService.GetAllStoredValues(culture);
 
@@ -71,7 +72,7 @@ namespace Umbraco.Tests.Services
                                     new XElement("key", new XAttribute("alias", "blah1"), "blahValue1"),
                                     new XElement("key", new XAttribute("alias", "blah2"), "blahValue2")))))
                     }
-                }, Mock.Of<ILogger>());
+                }, _loggerFactory.CreateLogger<LocalizedTextService>());
 
             var result = txtService.GetAllStoredValues(culture);
 
@@ -102,7 +103,7 @@ namespace Umbraco.Tests.Services
                                     new XElement("key", new XAttribute("alias", "testKey1"), "testValue1"),
                                     new XElement("key", new XAttribute("alias", "testKey1"), "testValue1")))))
                     }
-                }, Mock.Of<ILogger>());
+                }, _loggerFactory.CreateLogger<LocalizedTextService>());
 
             var result = txtService.GetAllStoredValues(culture);
 
@@ -128,7 +129,7 @@ namespace Umbraco.Tests.Services
                             }
                         }
                     }
-                }, Mock.Of<ILogger>());
+                }, _loggerFactory.CreateLogger<LocalizedTextService>());
 
             var result = txtService.Localize("testArea/testKey", culture);
 
@@ -153,7 +154,7 @@ namespace Umbraco.Tests.Services
                             }
                         }
                     }
-                }, Mock.Of<ILogger>());
+                }, _loggerFactory.CreateLogger<LocalizedTextService>());
 
             var result = txtService.Localize("testKey", culture);
 
@@ -178,7 +179,7 @@ namespace Umbraco.Tests.Services
                             }
                         }
                     }
-                }, Mock.Of<ILogger>());
+                }, _loggerFactory.CreateLogger<LocalizedTextService>());
 
             var result = txtService.Localize("testArea/doNotFind", culture);
 
@@ -204,7 +205,7 @@ namespace Umbraco.Tests.Services
                             }
                         }
                     }
-                }, Mock.Of<ILogger>());
+                }, _loggerFactory.CreateLogger<LocalizedTextService>());
 
             var result = txtService.Localize("doNotFind", culture);
 
@@ -229,7 +230,7 @@ namespace Umbraco.Tests.Services
                             }
                         }
                     }
-                }, Mock.Of<ILogger>());
+                }, _loggerFactory.CreateLogger<LocalizedTextService>());
 
             var result = txtService.Localize("testKey", culture,
                 new Dictionary<string, string> { { "0", "world" }, { "1", "great" }, { "2", "planet" } });
@@ -250,7 +251,7 @@ namespace Umbraco.Tests.Services
                                 new XElement("key", new XAttribute("alias", "testKey"),
                                     "testValue"))))
                     }
-                }, Mock.Of<ILogger>());
+                }, _loggerFactory.CreateLogger<LocalizedTextService>());
 
             var result = txtService.Localize("testArea/testKey", culture);
 
@@ -270,7 +271,7 @@ namespace Umbraco.Tests.Services
                                 new XElement("key", new XAttribute("alias", "testKey"),
                                     "testValue"))))
                     }
-                }, Mock.Of<ILogger>());
+                }, _loggerFactory.CreateLogger<LocalizedTextService>());
 
             var result = txtService.Localize("testKey", culture);
 
@@ -290,7 +291,7 @@ namespace Umbraco.Tests.Services
                                 new XElement("key", new XAttribute("alias", "testKey"),
                                     "testValue"))))
                     }
-                }, Mock.Of<ILogger>());
+                }, _loggerFactory.CreateLogger<LocalizedTextService>());
 
             var result = txtService.Localize("testArea/doNotFind", culture);
 
@@ -311,7 +312,7 @@ namespace Umbraco.Tests.Services
                                 new XElement("key", new XAttribute("alias", "testKey"),
                                     "testValue"))))
                     }
-                }, Mock.Of<ILogger>());
+                }, _loggerFactory.CreateLogger<LocalizedTextService>());
 
             var result = txtService.Localize("doNotFind", culture);
 
@@ -331,7 +332,7 @@ namespace Umbraco.Tests.Services
                                 new XElement("key", new XAttribute("alias", "testKey"),
                                     "Hello %0%, you are such a %1% %2%"))))
                     }
-                }, Mock.Of<ILogger>());
+                }, _loggerFactory.CreateLogger<LocalizedTextService>());
 
             var result = txtService.Localize("testKey", culture,
                 new Dictionary<string, string> { { "0", "world" }, { "1", "great" }, { "2", "planet" } });
@@ -357,7 +358,7 @@ namespace Umbraco.Tests.Services
                             }
                         }
                     }
-                }, Mock.Of<ILogger>());
+                }, _loggerFactory.CreateLogger<LocalizedTextService>());
 
             Assert.AreEqual("[testKey]", txtService.Localize("testArea/testKey", CultureInfo.GetCultureInfo("en-AU")));
         }
@@ -375,7 +376,7 @@ namespace Umbraco.Tests.Services
                                 new XElement("key", new XAttribute("alias", "testKey"),
                                     "testValue"))))
                     }
-                }, Mock.Of<ILogger>());
+                }, _loggerFactory.CreateLogger<LocalizedTextService>());
 
             Assert.AreEqual("[testKey]", txtService.Localize("testArea/testKey", CultureInfo.GetCultureInfo("en-AU")));
         }

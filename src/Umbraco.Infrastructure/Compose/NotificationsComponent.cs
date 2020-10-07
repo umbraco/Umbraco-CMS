@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Membership;
@@ -189,7 +189,7 @@ namespace Umbraco.Web.Compose
             private readonly IUserService _userService;
             private readonly ILocalizedTextService _textService;
             private readonly GlobalSettings _globalSettings;
-            private readonly ILogger _logger;
+            private readonly ILogger<Notifier> _logger;
 
             /// <summary>
             /// Constructor
@@ -208,7 +208,7 @@ namespace Umbraco.Web.Compose
                 IUserService userService,
                 ILocalizedTextService textService,
                 IOptions<GlobalSettings> globalSettings,
-                ILogger logger)
+                ILogger<Notifier> logger)
             {
                 _umbracoContextAccessor = umbracoContextAccessor;
                 _requestAccessor = requestAccessor;
@@ -226,11 +226,11 @@ namespace Umbraco.Web.Compose
                 //if there is no current user, then use the admin
                 if (user == null)
                 {
-                    _logger.Debug(typeof(Notifier), "There is no current Umbraco user logged in, the notifications will be sent from the administrator");
+                    _logger.LogDebug("There is no current Umbraco user logged in, the notifications will be sent from the administrator");
                     user = _userService.GetUserById(Constants.Security.SuperUserId);
                     if (user == null)
                     {
-                        _logger.Warn(typeof(Notifier), "Notifications can not be sent, no admin user with id {SuperUserId} could be resolved", Constants.Security.SuperUserId);
+                        _logger.LogWarning("Notifications can not be sent, no admin user with id {SuperUserId} could be resolved", Constants.Security.SuperUserId);
                         return;
                     }
                 }
@@ -243,7 +243,7 @@ namespace Umbraco.Web.Compose
                 if (sender == null) throw new ArgumentNullException(nameof(sender));
                 if (siteUri == null)
                 {
-                    _logger.Warn(typeof(Notifier), "Notifications can not be sent, no site url is set (might be during boot process?)");
+                    _logger.LogWarning("Notifications can not be sent, no site url is set (might be during boot process?)");
                     return;
                 }
 

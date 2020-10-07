@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
+using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Core;
@@ -15,7 +16,6 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Packaging;
 using Umbraco.Core.PropertyEditors;
@@ -62,7 +62,8 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IShortStringHelper _shortStringHelper;
         private readonly ILocalizedTextService _localizedTextService;
         private readonly IFileService _fileService;
-        private readonly ILogger _logger;
+        private readonly ILogger<ContentTypeController> _logger;
+        private readonly ILoggerFactory _loggerFactory;
         private readonly IContentService _contentService;
         private readonly IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
         private readonly ILocalizationService _LocalizationService;
@@ -86,7 +87,8 @@ namespace Umbraco.Web.BackOffice.Controllers
             IDataTypeService dataTypeService,
             IShortStringHelper shortStringHelper,
             IFileService fileService,
-            ILogger logger,
+            ILogger<ContentTypeController> logger,
+            ILoggerFactory loggerFactory,
             IContentService contentService,
             IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
             ILocalizationService localizationService,
@@ -115,6 +117,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _localizedTextService = localizedTextService;
             _fileService = fileService;
             _logger = logger;
+            _loggerFactory = loggerFactory;
             _contentService = contentService;
             _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
             _LocalizationService = localizationService;
@@ -463,7 +466,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 var tryCreateTemplate = _fileService.CreateTemplateForContentType(contentTypeAlias, contentTypeName);
                 if (tryCreateTemplate == false)
                 {
-                    _logger.Warn<ContentTypeController>("Could not create a template for Content Type: \"{ContentTypeAlias}\", status: {Status}",
+                    _logger.LogWarning("Could not create a template for Content Type: \"{ContentTypeAlias}\", status: {Status}",
                         contentTypeAlias, tryCreateTemplate.Result.Result);
                 }
 
@@ -617,7 +620,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 return NotFound();
             }
 
-            var dataInstaller = new PackageDataInstallation(_logger, _fileService, _macroService, _LocalizationService,
+            var dataInstaller = new PackageDataInstallation(_loggerFactory.CreateLogger<PackageDataInstallation>(), _loggerFactory, _fileService, _macroService, _LocalizationService,
                 _dataTypeService, _entityService, _contentTypeService, _contentService, _propertyEditors, _scopeProvider, _shortStringHelper, Options.Create(_globalSettings), _localizedTextService);
 
             var xd = new XmlDocument {XmlResolver = null};
@@ -634,7 +637,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
             catch (Exception ex)
             {
-                _logger.Error<ContentTypeController>(ex, "Error cleaning up temporary udt file in App_Data: {File}", filePath);
+                _logger.LogError(ex, "Error cleaning up temporary udt file in App_Data: {File}", filePath);
             }
 
             return Ok();

@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Threading;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Runtime
 {
@@ -20,7 +20,7 @@ namespace Umbraco.Core.Runtime
     {
         #region Vars
 
-        private readonly ILogger _logger;
+        private readonly ILogger<MainDom> _logger;
         private IApplicationShutdownRegistry _hostingEnvironment;
         private readonly IMainDomLock _mainDomLock;
 
@@ -42,7 +42,7 @@ namespace Umbraco.Core.Runtime
         #region Ctor
 
         // initializes a new instance of MainDom
-        public MainDom(ILogger logger, IMainDomLock systemLock)
+        public MainDom(ILogger<MainDom> logger, IMainDomLock systemLock)
         {
             _logger = logger;
             _mainDomLock = systemLock;
@@ -86,7 +86,7 @@ namespace Umbraco.Core.Runtime
                 if (_signaled) return false;
                 if (_isMainDom == false)
                 {
-                    _logger.Warn<MainDom>("Register called when MainDom has not been acquired");
+                    _logger.LogWarning("Register called when MainDom has not been acquired");
                     return false;
                 }
 
@@ -105,14 +105,14 @@ namespace Umbraco.Core.Runtime
 
             lock (_locko)
             {
-                _logger.Debug<MainDom>("Signaled ({Signaled}) ({SignalSource})", _signaled ? "again" : "first", source);
+                _logger.LogDebug("Signaled ({Signaled}) ({SignalSource})", _signaled ? "again" : "first", source);
                 if (_signaled) return;
                 if (_isMainDom == false) return; // probably not needed
                 _signaled = true;
 
                 try
                 {
-                    _logger.Info<MainDom>("Stopping ({SignalSource})", source);
+                    _logger.LogInformation("Stopping ({SignalSource})", source);
                     foreach (var callback in _callbacks.OrderBy(x => x.Key).Select(x => x.Value))
                     {
                         try
@@ -121,19 +121,19 @@ namespace Umbraco.Core.Runtime
                         }
                         catch (Exception e)
                         {
-                            _logger.Error<MainDom>(e, "Error while running callback");
+                            _logger.LogError(e, "Error while running callback");
                             continue;
                         }
                     }
 
-                    _logger.Debug<MainDom>("Stopped ({SignalSource})", source);
+                    _logger.LogDebug("Stopped ({SignalSource})", source);
                 }
                 finally
                 {
                     // in any case...
                     _isMainDom = false;
                     _mainDomLock.Dispose();
-                    _logger.Info<MainDom>("Released ({SignalSource})", source);
+                    _logger.LogInformation("Released ({SignalSource})", source);
                 }
 
             }
@@ -146,18 +146,18 @@ namespace Umbraco.Core.Runtime
             // the handler is not installed so that would be the hosting environment
             if (_signaled)
             {
-                _logger.Info<MainDom>("Cannot acquire (signaled).");
+                _logger.LogInformation("Cannot acquire (signaled).");
                 return false;
             }
 
-            _logger.Info<MainDom>("Acquiring.");
+            _logger.LogInformation("Acquiring.");
 
             // Get the lock
             var acquired = _mainDomLock.AcquireLockAsync(LockTimeoutMilliseconds).GetAwaiter().GetResult();
 
             if (!acquired)
             {
-                _logger.Info<MainDom>("Cannot acquire (timeout).");
+                _logger.LogInformation("Cannot acquire (timeout).");
 
                 // In previous versions we'd let a TimeoutException be thrown
                 // and the appdomain would not start. We have the opportunity to allow it to
@@ -177,10 +177,10 @@ namespace Umbraco.Core.Runtime
             catch (OperationCanceledException ex)
             {
                 // the waiting task could be canceled if this appdomain is naturally shutting down, we'll just swallow this exception
-                _logger.Warn<MainDom>(ex, ex.Message);
+                _logger.LogWarning(ex, ex.Message);
             }
 
-            _logger.Info<MainDom>("Acquired.");
+            _logger.LogInformation("Acquired.");
             return true;
         }
 

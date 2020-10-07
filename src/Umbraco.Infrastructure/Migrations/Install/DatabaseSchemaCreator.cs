@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Events;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Dtos;
@@ -19,13 +19,15 @@ namespace Umbraco.Core.Migrations.Install
     public class DatabaseSchemaCreator
     {
         private readonly IUmbracoDatabase _database;
-        private readonly ILogger _logger;
+        private readonly ILogger<DatabaseSchemaCreator> _logger;
+        private readonly ILoggerFactory _loggerFactory;
         private readonly IUmbracoVersion _umbracoVersion;
 
-        public DatabaseSchemaCreator(IUmbracoDatabase database, ILogger logger, IUmbracoVersion umbracoVersion)
+        public DatabaseSchemaCreator(IUmbracoDatabase database, ILogger<DatabaseSchemaCreator> logger, ILoggerFactory loggerFactory, IUmbracoVersion umbracoVersion)
         {
             _database = database;
             _logger = logger;
+            _loggerFactory = loggerFactory;
             _umbracoVersion = umbracoVersion;
         }
 
@@ -92,14 +94,14 @@ namespace Umbraco.Core.Migrations.Install
         /// </summary>
         internal void UninstallDatabaseSchema()
         {
-            _logger.Info<DatabaseSchemaCreator>("Start UninstallDatabaseSchema");
+            _logger.LogInformation("Start UninstallDatabaseSchema");
 
             foreach (var table in OrderedTables.AsEnumerable().Reverse())
             {
                 var tableNameAttribute = table.FirstAttribute<TableNameAttribute>();
                 var tableName = tableNameAttribute == null ? table.Name : tableNameAttribute.Value;
 
-                _logger.Info<DatabaseSchemaCreator>("Uninstall {TableName}", tableName);
+                _logger.LogInformation("Uninstall {TableName}", tableName);
 
                 try
                 {
@@ -110,7 +112,7 @@ namespace Umbraco.Core.Migrations.Install
                 {
                     //swallow this for now, not sure how best to handle this with diff databases... though this is internal
                     // and only used for unit tests. If this fails its because the table doesn't exist... generally!
-                    _logger.Error<DatabaseSchemaCreator>(ex, "Could not drop table {TableName}", tableName);
+                    _logger.LogError(ex, "Could not drop table {TableName}", tableName);
                 }
             }
         }
@@ -129,7 +131,7 @@ namespace Umbraco.Core.Migrations.Install
 
             if (e.Cancel == false)
             {
-                var dataCreation = new DatabaseDataCreator(_database, _logger, _umbracoVersion);
+                var dataCreation = new DatabaseDataCreator(_database, _loggerFactory.CreateLogger<DatabaseDataCreator>(), _umbracoVersion);
                 foreach (var table in OrderedTables)
                     CreateTable(false, table, dataCreation);
             }
@@ -399,7 +401,7 @@ namespace Umbraco.Core.Migrations.Install
             where T : new()
         {
             var tableType = typeof(T);
-            CreateTable(overwrite, tableType, new DatabaseDataCreator(_database, _logger, _umbracoVersion));
+            CreateTable(overwrite, tableType, new DatabaseDataCreator(_database, _loggerFactory.CreateLogger<DatabaseDataCreator>(), _umbracoVersion));
         }
 
         /// <summary>
@@ -435,7 +437,7 @@ namespace Umbraco.Core.Migrations.Install
             var tableExist = TableExists(tableName);
             if (overwrite && tableExist)
             {
-                _logger.Info<DatabaseSchemaCreator>("Table {TableName} already exists, but will be recreated", tableName);
+                _logger.LogInformation("Table {TableName} already exists, but will be recreated", tableName);
 
                 DropTable(tableName);
                 tableExist = false;
@@ -444,19 +446,19 @@ namespace Umbraco.Core.Migrations.Install
             if (tableExist)
             {
                 // The table exists and was not recreated/overwritten.
-                _logger.Info<Database>("Table {TableName} already exists - no changes were made", tableName);
+                _logger.LogInformation("Table {TableName} already exists - no changes were made", tableName);
                 return;
             }
 
             //Execute the Create Table sql
             var created = _database.Execute(new Sql(createSql));
-            _logger.Info<DatabaseSchemaCreator>("Create Table {TableName} ({Created}): \n {Sql}", tableName, created, createSql);
+            _logger.LogInformation("Create Table {TableName} ({Created}): \n {Sql}", tableName, created, createSql);
 
             //If any statements exists for the primary key execute them here
             if (string.IsNullOrEmpty(createPrimaryKeySql) == false)
             {
                 var createdPk = _database.Execute(new Sql(createPrimaryKeySql));
-                _logger.Info<DatabaseSchemaCreator>("Create Primary Key ({CreatedPk}):\n {Sql}", createdPk, createPrimaryKeySql);
+                _logger.LogInformation("Create Primary Key ({CreatedPk}):\n {Sql}", createdPk, createPrimaryKeySql);
             }
 
             if (SqlSyntax.SupportsIdentityInsert() && tableDefinition.Columns.Any(x => x.IsIdentity))
@@ -474,23 +476,23 @@ namespace Umbraco.Core.Migrations.Install
             foreach (var sql in indexSql)
             {
                 var createdIndex = _database.Execute(new Sql(sql));
-                _logger.Info<DatabaseSchemaCreator>("Create Index ({CreatedIndex}):\n {Sql}", createdIndex, sql);
+                _logger.LogInformation("Create Index ({CreatedIndex}):\n {Sql}", createdIndex, sql);
             }
 
             //Loop through foreignkey statements and execute sql
             foreach (var sql in foreignSql)
             {
                 var createdFk = _database.Execute(new Sql(sql));
-                _logger.Info<DatabaseSchemaCreator>("Create Foreign Key ({CreatedFk}):\n {Sql}", createdFk, sql);
+                _logger.LogInformation("Create Foreign Key ({CreatedFk}):\n {Sql}", createdFk, sql);
             }
 
             if (overwrite)
             {
-                _logger.Info<Database>("Table {TableName} was recreated", tableName);
+                _logger.LogInformation("Table {TableName} was recreated", tableName);
             }
             else
             {
-                _logger.Info<Database>("New table {TableName} was created", tableName);
+                _logger.LogInformation("New table {TableName} was created", tableName);
 
             }
         }

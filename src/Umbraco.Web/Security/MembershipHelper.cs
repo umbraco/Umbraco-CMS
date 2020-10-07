@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Security;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models;
 using Umbraco.Web.PublishedCache;
@@ -30,6 +30,7 @@ namespace Umbraco.Web.Security
         private readonly IMemberTypeService _memberTypeService;
         private readonly IPublicAccessService _publicAccessService;
         private readonly AppCaches _appCaches;
+        private readonly ILoggerFactory _loggerFactory;
         private readonly ILogger _logger;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly IEntityService _entityService;
@@ -46,7 +47,7 @@ namespace Umbraco.Web.Security
             IMemberTypeService memberTypeService,
             IPublicAccessService publicAccessService,
             AppCaches appCaches,
-            ILogger logger,
+            ILoggerFactory loggerFactory,
             IShortStringHelper shortStringHelper,
             IEntityService entityService
         )
@@ -57,7 +58,8 @@ namespace Umbraco.Web.Security
             _memberTypeService = memberTypeService;
             _publicAccessService = publicAccessService;
             _appCaches = appCaches;
-            _logger = logger;
+            _loggerFactory = loggerFactory;
+            _logger = _loggerFactory.CreateLogger<MembershipHelper>();
             _shortStringHelper = shortStringHelper;
 
             _membershipProvider = membershipProvider ?? throw new ArgumentNullException(nameof(membershipProvider));
@@ -305,7 +307,7 @@ namespace Umbraco.Web.Security
             if (member == null)
             {
                 //this should not happen
-                Current.Logger.Warn<MembershipHelper>("The member validated but then no member was returned with the username {Username}", username);
+                _logger.LogWarning("The member validated but then no member was returned with the username {Username}", username);
                 return false;
             }
             //Log them in
@@ -705,7 +707,7 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         public virtual Attempt<PasswordChangedModel> ChangePassword(string username, ChangingPasswordModel passwordModel, MembershipProvider membershipProvider)
         {
-            var passwordChanger = new PasswordChanger(_logger);
+            var passwordChanger = new PasswordChanger(_loggerFactory.CreateLogger<PasswordChanger>());
             return ChangePasswordWithMembershipProvider(username, passwordModel, membershipProvider);
         }
 
@@ -830,7 +832,7 @@ namespace Umbraco.Web.Security
             }
             catch (Exception ex)
             {
-                _logger.Warn<PasswordChanger>(ex, "Could not change member password");
+                _logger.LogWarning(ex, "Could not change member password");
                 return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, error: " + ex.Message + " (see log for full details)", new[] { "value" }) });
             }
 

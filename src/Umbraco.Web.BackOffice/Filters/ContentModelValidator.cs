@@ -6,7 +6,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Umbraco.Core.Logging;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
@@ -24,9 +24,9 @@ namespace Umbraco.Web.BackOffice.Filters
 
         protected IBackofficeSecurity BackofficeSecurity { get; }
         public IPropertyValidationService PropertyValidationService { get; }
-        protected ILogger Logger { get; }
+        protected ILogger<ContentModelValidator> Logger { get; }
 
-        protected ContentModelValidator(ILogger logger, IBackofficeSecurity backofficeSecurity, IPropertyValidationService propertyValidationService)
+        protected ContentModelValidator(ILogger<ContentModelValidator> logger, IBackofficeSecurity backofficeSecurity, IPropertyValidationService propertyValidationService)
         {
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
             BackofficeSecurity = backofficeSecurity ?? throw new ArgumentNullException(nameof(backofficeSecurity));
@@ -52,7 +52,7 @@ namespace Umbraco.Web.BackOffice.Filters
         private readonly ILocalizedTextService _textService;
 
         protected ContentModelValidator(
-            ILogger logger,
+            ILogger<ContentModelValidator> logger,
             IBackofficeSecurity backofficeSecurity,
             ILocalizedTextService textService,
             IPropertyValidationService propertyValidationService)
@@ -144,7 +144,7 @@ namespace Umbraco.Web.BackOffice.Filters
                 {
                     var message = $"Could not find property editor \"{p.DataType.EditorAlias}\" for property with id {p.Id}.";
 
-                    Logger.Warn<ContentModelValidator>(message);
+                    Logger.LogWarning(message);
                     continue;
                 }
 

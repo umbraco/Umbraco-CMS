@@ -5,15 +5,12 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Common.Builders.Extensions;
-using Umbraco.Tests.Testing;
 using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.Common.Formatters;
-using Umbraco.Web.Editors;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Tests.Integration.TestServerTest.Controllers

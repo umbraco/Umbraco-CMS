@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Dtos;
@@ -45,7 +45,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         public UserRepository(
             IScopeAccessor scopeAccessor,
             AppCaches appCaches,
-            ILogger logger,
+            ILogger<UserRepository> logger,
             IMapperCollection mapperCollection,
             IOptions<GlobalSettings> globalSettings,
             IOptions<UserPasswordConfigurationSettings> passwordConfiguration,

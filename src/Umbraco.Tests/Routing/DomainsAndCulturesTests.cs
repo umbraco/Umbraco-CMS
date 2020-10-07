@@ -1,9 +1,9 @@
 ﻿using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration.Models;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Web.Routing;
+using Umbraco.Core;
+using Umbraco.Core.Configuration.Models;
 
 namespace Umbraco.Tests.Routing
 {
@@ -275,7 +275,7 @@ namespace Umbraco.Tests.Routing
 
             Assert.AreEqual(expectedCulture, frequest.Culture.Name);
 
-            var finder = new ContentFinderByUrl(Logger);
+            var finder = new ContentFinderByUrl(LoggerFactory.CreateLogger<ContentFinderByUrl>());
             var result = finder.TryFindContent(frequest);
 
             Assert.IsTrue(result);
@@ -322,7 +322,7 @@ namespace Umbraco.Tests.Routing
             publishedRouter.FindDomain(frequest);
 
             // find document
-            var finder = new ContentFinderByUrl(Logger);
+            var finder = new ContentFinderByUrl(LoggerFactory.CreateLogger<ContentFinderByUrl>());
             var result = finder.TryFindContent(frequest);
 
             // apply wildcard domain
@@ -377,7 +377,7 @@ namespace Umbraco.Tests.Routing
 
             Assert.AreEqual(expectedCulture, frequest.Culture.Name);
 
-            var finder = new ContentFinderByUrl(Logger);
+            var finder = new ContentFinderByUrl(LoggerFactory.CreateLogger<ContentFinderByUrl>());
             var result = finder.TryFindContent(frequest);
 
             Assert.IsTrue(result);

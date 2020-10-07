@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Web;
 using System.Web.Mvc;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
@@ -14,14 +15,14 @@ namespace Umbraco.Web
         private UrlHelper _url;
 
         protected UmbracoHttpHandler()
-            : this(Current.UmbracoContextAccessor, Current.Services, Current.ProfilingLogger)
+            : this(Current.UmbracoContextAccessor, Current.Services, Current.Logger, Current.ProfilingLogger)
         { }
 
-        protected UmbracoHttpHandler(IUmbracoContextAccessor umbracoContextAccessor,ServiceContext service, IProfilingLogger plogger)
+        protected UmbracoHttpHandler(IUmbracoContextAccessor umbracoContextAccessor,ServiceContext service, ILogger logger, IProfilingLogger profilingLogger )
         {
             UmbracoContextAccessor = umbracoContextAccessor;
-            Logger = plogger;
-            ProfilingLogger = plogger;
+            Logger = logger;
+            ProfilingLogger = profilingLogger ;
             Services = service;
         }
 

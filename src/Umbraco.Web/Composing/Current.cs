@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Dictionary;
@@ -246,7 +247,9 @@ namespace Umbraco.Web.Composing
 
         public static IShortStringHelper ShortStringHelper => Factory.GetInstance<IShortStringHelper>();
 
-        public static ILogger Logger => Umbraco.Composing.Current.Logger;
+        public static ILogger<object> Logger => Factory.GetInstance<ILogger<object>>();
+
+        public static ILoggerFactory LoggerFactory => Factory.GetInstance<ILoggerFactory>();
 
         public static IProfiler Profiler => Factory.GetInstance<IProfiler>();
 

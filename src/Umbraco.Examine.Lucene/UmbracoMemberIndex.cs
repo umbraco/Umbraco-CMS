@@ -1,5 +1,6 @@
 ﻿using Examine;
 using Lucene.Net.Analysis;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
@@ -31,10 +32,12 @@ namespace Umbraco.Examine
             Directory luceneDirectory,
             Analyzer analyzer,
             IProfilingLogger profilingLogger,
+            ILogger<UmbracoMemberIndex> logger,
+            ILoggerFactory loggerFactory,
             IHostingEnvironment hostingEnvironment,
             IRuntimeState runtimeState,
             IValueSetValidator validator = null) :
-            base(name, luceneDirectory, fieldDefinitions, analyzer, profilingLogger, hostingEnvironment, runtimeState, validator)
+            base(name, luceneDirectory, fieldDefinitions, analyzer, profilingLogger, logger, loggerFactory, hostingEnvironment, runtimeState, validator)
         {
         }
 

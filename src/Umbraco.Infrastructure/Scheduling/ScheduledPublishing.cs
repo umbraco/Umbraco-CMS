@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Linq;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 using Umbraco.Core.Sync;
+using Microsoft.Extensions.Logging;
 
 namespace Umbraco.Web.Scheduling
 {
     public class ScheduledPublishing : RecurringTaskBase
     {
         private readonly IContentService _contentService;
-        private readonly ILogger _logger;
+        private readonly ILogger<ScheduledPublishing> _logger;
         private readonly IMainDom _mainDom;
         private readonly IRuntimeState _runtime;
         private readonly IServerMessenger _serverMessenger;
@@ -21,7 +21,7 @@ namespace Umbraco.Web.Scheduling
         public ScheduledPublishing(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds,
             int periodMilliseconds,
             IRuntimeState runtime, IMainDom mainDom, IServerRegistrar serverRegistrar, IContentService contentService,
-            IUmbracoContextFactory umbracoContextFactory, ILogger logger, IServerMessenger serverMessenger, IBackofficeSecurityFactory backofficeSecurityFactory)
+            IUmbracoContextFactory umbracoContextFactory, ILogger<ScheduledPublishing> logger, IServerMessenger serverMessenger, IBackofficeSecurityFactory backofficeSecurityFactory)
             : base(runner, delayMilliseconds, periodMilliseconds)
         {
             _runtime = runtime;
@@ -44,24 +44,24 @@ namespace Umbraco.Web.Scheduling
             switch (_serverRegistrar.GetCurrentServerRole())
             {
                 case ServerRole.Replica:
-                    _logger.Debug<ScheduledPublishing>("Does not run on replica servers.");
+                    _logger.LogDebug("Does not run on replica servers.");
                     return true; // DO repeat, server role can change
                 case ServerRole.Unknown:
-                    _logger.Debug<ScheduledPublishing>("Does not run on servers with unknown role.");
+                    _logger.LogDebug("Does not run on servers with unknown role.");
                     return true; // DO repeat, server role can change
             }
 
             // ensure we do not run if not main domain, but do NOT lock it
             if (_mainDom.IsMainDom == false)
             {
-                _logger.Debug<ScheduledPublishing>("Does not run if not MainDom.");
+                _logger.LogDebug("Does not run if not MainDom.");
                 return false; // do NOT repeat, going down
             }
 
             // do NOT run publishing if not properly running
             if (_runtime.Level != RuntimeLevel.Run)
             {
-                _logger.Debug<ScheduledPublishing>("Does not run if run level is not Run.");
+                _logger.LogDebug("Does not run if run level is not Run.");
                 return true; // repeat/wait
             }
 
@@ -86,7 +86,7 @@ namespace Umbraco.Web.Scheduling
                         // run
                         var result = _contentService.PerformScheduledPublish(DateTime.Now);
                         foreach (var grouped in result.GroupBy(x => x.Result))
-                            _logger.Info<ScheduledPublishing>(
+                            _logger.LogInformation(
                                 "Scheduled publishing result: '{StatusCount}' items with status {Status}",
                                 grouped.Count(), grouped.Key);
                     }
@@ -101,7 +101,7 @@ namespace Umbraco.Web.Scheduling
             catch (Exception ex)
             {
                 // important to catch *everything* to ensure the task repeats
-                _logger.Error<ScheduledPublishing>(ex, "Failed.");
+                _logger.LogError(ex, "Failed.");
             }
 
             return true; // repeat

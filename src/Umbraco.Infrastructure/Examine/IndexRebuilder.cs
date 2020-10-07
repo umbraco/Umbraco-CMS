@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 using Examine;
 using Umbraco.Core.Composing;
@@ -14,12 +15,14 @@ namespace Umbraco.Examine
     /// </summary>
     public class IndexRebuilder
     {
-        private readonly IProfilingLogger _logger;
+        private readonly IProfilingLogger _profilingLogger;
+        private readonly ILogger<IndexRebuilder> _logger;
         private readonly IEnumerable<IIndexPopulator> _populators;
         public IExamineManager ExamineManager { get; }
 
-        public IndexRebuilder(IProfilingLogger logger, IExamineManager examineManager, IEnumerable<IIndexPopulator> populators)
+        public IndexRebuilder(IProfilingLogger profilingLogger , ILogger<IndexRebuilder> logger, IExamineManager examineManager, IEnumerable<IIndexPopulator> populators)
         {
+            _profilingLogger = profilingLogger ;
             _populators = populators;
             _logger = logger;
             ExamineManager = examineManager;
@@ -65,7 +68,7 @@ namespace Umbraco.Examine
                 }
                 catch (Exception e)
                 {
-                    _logger.Error<IndexRebuilder>(e, "Index populating failed for populator {Populator}", populator.GetType());
+                    _logger.LogError(e, "Index populating failed for populator {Populator}", populator.GetType());
                 }
             }
         }

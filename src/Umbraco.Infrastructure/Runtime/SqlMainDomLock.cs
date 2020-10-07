@@ -6,10 +6,10 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Mappers;
@@ -22,7 +22,7 @@ namespace Umbraco.Core.Runtime
         private string _lockId;
         private const string MainDomKeyPrefix = "Umbraco.Core.Runtime.SqlMainDom";
         private const string UpdatedSuffix = "_updated";
-        private readonly ILogger _logger;
+        private readonly ILogger<SqlMainDomLock> _logger;
         private readonly IHostingEnvironment _hostingEnvironment;
         private IUmbracoDatabase _db;
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
@@ -32,13 +32,14 @@ namespace Umbraco.Core.Runtime
         private bool _errorDuringAcquiring;
         private object _locker = new object();
 
-        public SqlMainDomLock(ILogger logger, GlobalSettings globalSettings, ConnectionStrings connectionStrings, IDbProviderFactoryCreator dbProviderFactoryCreator, IHostingEnvironment hostingEnvironment)
+        public SqlMainDomLock(ILogger<SqlMainDomLock> logger, ILoggerFactory loggerFactory, GlobalSettings globalSettings, ConnectionStrings connectionStrings, IDbProviderFactoryCreator dbProviderFactoryCreator, IHostingEnvironment hostingEnvironment)
         {
             // unique id for our appdomain, this is more unique than the appdomain id which is just an INT counter to its safer
             _lockId = Guid.NewGuid().ToString();
             _logger = logger;
             _hostingEnvironment = hostingEnvironment;
-            _dbFactory = new UmbracoDatabaseFactory(_logger,
+            _dbFactory = new UmbracoDatabaseFactory(loggerFactory.CreateLogger<UmbracoDatabaseFactory>(),
+                loggerFactory,
                globalSettings,
                connectionStrings,
                new Lazy<IMapperCollection>(() => new MapperCollection(Enumerable.Empty<BaseMapper>())),
@@ -60,7 +61,7 @@ namespace Umbraco.Core.Runtime
 
             _sqlServerSyntax = sqlServerSyntaxProvider;
 
-            _logger.Debug<SqlMainDomLock>("Acquiring lock...");
+            _logger.LogDebug("Acquiring lock...");
 
             var tempId = Guid.NewGuid().ToString();
 
@@ -78,7 +79,7 @@ namespace Umbraco.Core.Runtime
                 {
                     if (IsLockTimeoutException(ex))
                     {
-                        _logger.Error<SqlMainDomLock>(ex, "Sql timeout occurred, could not acquire MainDom.");
+                        _logger.LogError(ex, "Sql timeout occurred, could not acquire MainDom.");
                         _errorDuringAcquiring = true;
                         return false;
                     }
@@ -93,7 +94,7 @@ namespace Umbraco.Core.Runtime
                     // if we've inserted, then there was no MainDom so we can instantly acquire
 
                     InsertLockRecord(_lockId, db); // so update with our appdomain id
-                    _logger.Debug<SqlMainDomLock>("Acquired with ID {LockId}", _lockId);
+                    _logger.LogDebug("Acquired with ID {LockId}", _lockId);
                     return true;
                 }
 
@@ -103,7 +104,7 @@ namespace Umbraco.Core.Runtime
             catch (Exception ex)
             {
                 // unexpected
-                _logger.Error<SqlMainDomLock>(ex, "Unexpected error, cannot acquire MainDom");
+                _logger.LogError(ex, "Unexpected error, cannot acquire MainDom");
                 _errorDuringAcquiring = true;
                 return false;
             }
@@ -120,7 +121,7 @@ namespace Umbraco.Core.Runtime
         {
             if (_errorDuringAcquiring)
             {
-                _logger.Warn<SqlMainDomLock>("Could not acquire MainDom, listening is canceled.");
+                _logger.LogWarning("Could not acquire MainDom, listening is canceled.");
                 return Task.CompletedTask;
             }
 
@@ -180,13 +181,13 @@ namespace Umbraco.Core.Runtime
                         {
                             // we are no longer main dom, another one has come online, exit
                             _mainDomChanging = true;
-                            _logger.Debug<SqlMainDomLock>("Detected new booting application, releasing MainDom lock.");
+                            _logger.LogDebug("Detected new booting application, releasing MainDom lock.");
                             return;
                         }
                     }
                     catch (Exception ex)
                     {
-                        _logger.Error<SqlMainDomLock>(ex, "Unexpected error during listening.");
+                        _logger.LogError(ex, "Unexpected error during listening.");
 
                         // We need to keep on listening unless we've been notified by our own AppDomain to shutdown since
                         // we don't want to shutdown resources controlled by MainDom inadvertently. We'll just keep listening otherwise.
@@ -260,7 +261,7 @@ namespace Umbraco.Core.Runtime
 
                     // so now we update the row with our appdomain id
                     InsertLockRecord(_lockId, db);
-                            _logger.Debug<SqlMainDomLock>("Acquired with ID {LockId}", _lockId);
+                            _logger.LogDebug("Acquired with ID {LockId}", _lockId);
                             return true;
                         }
                         else if (mainDomRows.Count == 1 && !mainDomRows[0].Value.StartsWith(tempId))
@@ -269,7 +270,7 @@ namespace Umbraco.Core.Runtime
                             // another new AppDomain has come online and is wanting to take over. In that case, we will not
                             // acquire.
 
-                    _logger.Debug<SqlMainDomLock>("Cannot acquire, another booting application detected.");
+                    _logger.LogDebug("Cannot acquire, another booting application detected.");
                     return false;
                 }
             }
@@ -277,12 +278,12 @@ namespace Umbraco.Core.Runtime
             {
                 if (IsLockTimeoutException(ex as SqlException))
                 {
-                    _logger.Error<SqlMainDomLock>(ex, "Sql timeout occurred, waiting for existing MainDom is canceled.");
+                    _logger.LogError(ex, "Sql timeout occurred, waiting for existing MainDom is canceled.");
                     _errorDuringAcquiring = true;
                     return false;
                 }
                 // unexpected
-                _logger.Error<SqlMainDomLock>(ex, "Unexpected error, waiting for existing MainDom is canceled.");
+                _logger.LogError(ex, "Unexpected error, waiting for existing MainDom is canceled.");
                 _errorDuringAcquiring = true;
                 return false;
             }
@@ -303,7 +304,7 @@ namespace Umbraco.Core.Runtime
             // which isn't ideal.
             // So... we're going to 'just' take over, if the writelock works then we'll assume we're ok
 
-            _logger.Debug<SqlMainDomLock>("Timeout elapsed, assuming orphan row, acquiring MainDom.");
+            _logger.LogDebug("Timeout elapsed, assuming orphan row, acquiring MainDom.");
 
             using var transaction = db.GetTransaction(IsolationLevel.ReadCommitted);
 
@@ -313,7 +314,7 @@ namespace Umbraco.Core.Runtime
 
                 // so now we update the row with our appdomain id
                 InsertLockRecord(_lockId, db);
-                _logger.Debug<SqlMainDomLock>("Acquired with ID {LockId}", _lockId);
+                _logger.LogDebug("Acquired with ID {LockId}", _lockId);
                 return true;
             }
             catch (Exception ex)
@@ -321,11 +322,11 @@ namespace Umbraco.Core.Runtime
                 if (IsLockTimeoutException(ex as SqlException))
                 {
                     // something is wrong, we cannot acquire, not much we can do
-                    _logger.Error<SqlMainDomLock>(ex, "Sql timeout occurred, could not forcibly acquire MainDom.");
+                    _logger.LogError(ex, "Sql timeout occurred, could not forcibly acquire MainDom.");
                     _errorDuringAcquiring = true;
                     return false;
                 }
-                _logger.Error<SqlMainDomLock>(ex, "Unexpected error, could not forcibly acquire MainDom.");
+                _logger.LogError(ex, "Unexpected error, could not forcibly acquire MainDom.");
                 _errorDuringAcquiring = true;
                 return false;
             }
@@ -398,18 +399,18 @@ namespace Umbraco.Core.Runtime
                                 // Otherwise, if we are just shutting down, we want to just delete the row.
                                 if (_mainDomChanging)
                                 {
-                                    _logger.Debug<SqlMainDomLock>("Releasing MainDom, updating row, new application is booting.");
+                                    _logger.LogDebug("Releasing MainDom, updating row, new application is booting.");
                                     var count = db.Execute($"UPDATE umbracoKeyValue SET [value] = [value] + '{UpdatedSuffix}' WHERE [key] = @key", new { key = MainDomKey });
                                 }
                                 else
                                 {
-                                    _logger.Debug<SqlMainDomLock>("Releasing MainDom, deleting row, application is shutting down.");
+                                    _logger.LogDebug("Releasing MainDom, deleting row, application is shutting down.");
                                     var count = db.Execute("DELETE FROM umbracoKeyValue WHERE [key] = @key", new { key = MainDomKey });
                                 }
                             }
                             catch (Exception ex)
                             {
-                                _logger.Error<SqlMainDomLock>(ex, "Unexpected error during dipsose.");
+                                _logger.LogError(ex, "Unexpected error during dipsose.");
                             }
                             finally
                             {

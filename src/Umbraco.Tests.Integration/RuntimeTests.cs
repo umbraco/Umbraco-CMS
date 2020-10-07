@@ -5,11 +5,11 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Runtime;
 using Umbraco.Extensions;
 using Umbraco.Tests.Common;
@@ -58,7 +58,7 @@ namespace Umbraco.Tests.Integration
 
             // Create the core runtime
             var coreRuntime = new CoreRuntime(globalSettings, connectionStrings, testHelper.GetUmbracoVersion(),
-                testHelper.IOHelper, testHelper.Logger, testHelper.Profiler, testHelper.UmbracoBootPermissionChecker,
+                testHelper.IOHelper, testHelper.ConsoleLoggerFactory, testHelper.Profiler, testHelper.UmbracoBootPermissionChecker,
                 testHelper.GetHostingEnvironment(), testHelper.GetBackOfficeInfo(), testHelper.DbProviderFactoryCreator,
                 testHelper.MainDom, testHelper.GetTypeFinder(), AppCaches.NoCache);
 
@@ -88,7 +88,7 @@ namespace Umbraco.Tests.Integration
             umbracoContainer.Register(x => Options.Create(requestHandlerSettings));
             umbracoContainer.Register(x => Options.Create(userPasswordConfigurationSettings));
             umbracoContainer.Register(x => Options.Create(webRoutingSettings));
-
+            umbracoContainer.Register(typeof(ILogger<>), typeof(Logger<>), Lifetime.Singleton);
             coreRuntime.Start();
 
             Assert.IsTrue(MyComponent.IsInit);
@@ -206,9 +206,9 @@ namespace Umbraco.Tests.Integration
             public static bool IsInit { get; private set; }
             public static bool IsTerminated { get; private set; }
 
-            private readonly ILogger _logger;
+            private readonly ILogger<MyComponent> _logger;
 
-            public MyComponent(ILogger logger)
+            public MyComponent(ILogger<MyComponent> logger)
             {
                 _logger = logger;
             }

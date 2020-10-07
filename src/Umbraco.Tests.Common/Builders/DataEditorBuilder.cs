@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
@@ -38,7 +39,7 @@ namespace Umbraco.Tests.Common.Builders
             var explicitValueEditor = _explicitValueEditorBuilder.Build();
 
             return new DataEditor(
-                Mock.Of<ILogger>(),
+                NullLoggerFactory.Instance,
                 Mock.Of<IDataTypeService>(),
                 Mock.Of<ILocalizationService>(),
                 Mock.Of<ILocalizedTextService>(),

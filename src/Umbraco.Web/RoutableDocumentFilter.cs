@@ -81,7 +81,7 @@ namespace Umbraco.Web
             //NOTE: No need to warn, plus if we do we should log the document, as this message doesn't really tell us anything :)
             //if (!maybeDoc)
             //{
-            //    Logger.Warn<UmbracoModule>("Not a document");
+            //    Logger.LogWarning<UmbracoModule>("Not a document");
             //}
             return maybeDoc;
         }

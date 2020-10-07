@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Media;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
@@ -36,12 +36,13 @@ namespace Umbraco.Web.PropertyEditors
         private readonly IDataTypeService _dataTypeService;
         private readonly IIOHelper _ioHelper;
         private readonly UploadAutoFillProperties _autoFillProperties;
+        private readonly ILogger<ImageCropperPropertyEditor> _logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ImageCropperPropertyEditor"/> class.
         /// </summary>
         public ImageCropperPropertyEditor(
-            ILogger logger,
+            ILoggerFactory loggerFactory,
             IMediaFileSystem mediaFileSystem,
             IOptions<ContentSettings> contentSettings,
             IDataTypeService dataTypeService,
@@ -50,13 +51,14 @@ namespace Umbraco.Web.PropertyEditors
             IShortStringHelper shortStringHelper,
             ILocalizedTextService localizedTextService,
             UploadAutoFillProperties uploadAutoFillProperties)
-            : base(logger, dataTypeService, localizationService, localizedTextService, shortStringHelper)
+            : base(loggerFactory, dataTypeService, localizationService, localizedTextService, shortStringHelper)
         {
             _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
             _contentSettings = contentSettings.Value ?? throw new ArgumentNullException(nameof(contentSettings));
             _dataTypeService = dataTypeService ?? throw new ArgumentNullException(nameof(dataTypeService));
             _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
             _autoFillProperties = uploadAutoFillProperties ?? throw new ArgumentNullException(nameof(uploadAutoFillProperties));
+            _logger = loggerFactory.CreateLogger<ImageCropperPropertyEditor>();
         }
 
         public bool TryGetMediaPath(string alias, object value, out string mediaPath)
@@ -74,7 +76,7 @@ namespace Umbraco.Web.PropertyEditors
         /// Creates the corresponding property value editor.
         /// </summary>
         /// <returns>The corresponding property value editor.</returns>
-        protected override IDataValueEditor CreateValueEditor() => new ImageCropperPropertyValueEditor(Attribute, Logger, _mediaFileSystem, DataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper, _contentSettings);
+        protected override IDataValueEditor CreateValueEditor() => new ImageCropperPropertyValueEditor(Attribute, LoggerFactory.CreateLogger<ImageCropperPropertyValueEditor>(), _mediaFileSystem, DataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper, _contentSettings);
 
         /// <summary>
         /// Creates the corresponding preValue editor.
@@ -111,7 +113,7 @@ namespace Umbraco.Web.PropertyEditors
             catch (Exception ex)
             {
                 if (writeLog)
-                    Logger.Error<ImageCropperPropertyEditor>(ex, "Could not parse image cropper value '{Json}'", value);
+                    _logger.LogError(ex, "Could not parse image cropper value '{Json}'", value);
                 return null;
             }
         }

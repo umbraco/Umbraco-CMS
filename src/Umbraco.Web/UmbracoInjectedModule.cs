@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Web;
 using System.Web.Routing;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Security;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Routing;
@@ -227,7 +227,7 @@ namespace Umbraco.Web
             if (context.Content.HasContent())
                 return true;
 
-            _logger.Warn<UmbracoModule>("Umbraco has no content");
+            _logger.LogWarning("Umbraco has no content");
 
             if (RouteTable.Routes[Constants.Web.NoContentRouteName] is Route route)
             {

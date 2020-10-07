@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.BackOffice;
 using Umbraco.Core.Cache;
@@ -14,7 +15,6 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Grid;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Security;
 using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
@@ -47,7 +47,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly AppCaches _appCaches;
         private readonly BackOfficeSignInManager _signInManager;
         private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
-        private readonly ILogger _logger;
+        private readonly ILogger<BackOfficeController> _logger;
         private readonly IJsonSerializer _jsonSerializer;
 
         public BackOfficeController(
@@ -61,7 +61,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             AppCaches appCaches,
             BackOfficeSignInManager signInManager,
             IBackofficeSecurityAccessor backofficeSecurityAccessor,
-            ILogger logger,
+            ILogger<BackOfficeController> logger,
             IJsonSerializer jsonSerializer)
         {
             _userManager = userManager;
@@ -102,7 +102,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             if (invite == null)
             {
-                _logger.Warn<BackOfficeController>("VerifyUser endpoint reached with invalid token: NULL");
+                _logger.LogWarning("VerifyUser endpoint reached with invalid token: NULL");
                 return RedirectToAction(nameof(Default));
             }
 
@@ -110,7 +110,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             if (parts.Length != 2)
             {
-                _logger.Warn<BackOfficeController>("VerifyUser endpoint reached with invalid token: {Invite}", invite);
+                _logger.LogWarning("VerifyUser endpoint reached with invalid token: {Invite}", invite);
                 return RedirectToAction(nameof(Default));
             }
 
@@ -119,7 +119,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             var decoded = token.FromUrlBase64();
             if (decoded.IsNullOrWhiteSpace())
             {
-                _logger.Warn<BackOfficeController>("VerifyUser endpoint reached with invalid token: {Invite}", invite);
+                _logger.LogWarning("VerifyUser endpoint reached with invalid token: {Invite}", invite);
                 return RedirectToAction(nameof(Default));
             }
 
@@ -128,7 +128,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             var identityUser = await _userManager.FindByIdAsync(id);
             if (identityUser == null)
             {
-                _logger.Warn<BackOfficeController>("VerifyUser endpoint reached with non existing user: {UserId}", id);
+                _logger.LogWarning("VerifyUser endpoint reached with non existing user: {UserId}", id);
                 return RedirectToAction(nameof(Default));
             }
 
@@ -136,7 +136,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             if (result.Succeeded == false)
             {
-                _logger.Warn<BackOfficeController>("Could not verify email, Error: {Errors}, Token: {Invite}", result.Errors.ToErrorMessage(), invite);
+                _logger.LogWarning("Could not verify email, Error: {Errors}, Token: {Invite}", result.Errors.ToErrorMessage(), invite);
                 return new RedirectResult(Url.Action(nameof(Default)) + "#/login/false?invite=3");
             }
 

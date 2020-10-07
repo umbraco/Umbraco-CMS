@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.Extensions.Logging;
 using Umbraco.Web.Common.Lifetime;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
@@ -21,14 +22,14 @@ namespace Umbraco.Web.Common.Middleware
     /// </remarks>
     public class UmbracoRequestMiddleware : IMiddleware
     {
-        private readonly ILogger _logger;
+        private readonly ILogger<UmbracoRequestMiddleware> _logger;
         private readonly IUmbracoRequestLifetimeManager _umbracoRequestLifetimeManager;
         private readonly IUmbracoContextFactory _umbracoContextFactory;
         private readonly IRequestCache _requestCache;
         private readonly IBackofficeSecurityFactory _backofficeSecurityFactory;
 
         public UmbracoRequestMiddleware(
-            ILogger logger,
+            ILogger<UmbracoRequestMiddleware> logger,
             IUmbracoRequestLifetimeManager umbracoRequestLifetimeManager,
             IUmbracoContextFactory umbracoContextFactory,
             IRequestCache requestCache,
@@ -60,7 +61,7 @@ namespace Umbraco.Web.Common.Middleware
                 if (umbracoContextReference.UmbracoContext.IsFrontEndUmbracoRequest)
                 {
                     LogHttpRequest.TryGetCurrentHttpRequestId(out var httpRequestId, _requestCache);
-                   _logger.Verbose<UmbracoRequestMiddleware>("Begin request [{HttpRequestId}]: {RequestUrl}", httpRequestId, requestUri);
+                   _logger.LogTrace("Begin request [{HttpRequestId}]: {RequestUrl}", httpRequestId, requestUri);
                 }
 
                 try
@@ -70,7 +71,7 @@ namespace Umbraco.Web.Common.Middleware
                 catch (Exception ex)
                 {
                     // try catch so we don't kill everything in all requests
-                    _logger.Error<UmbracoRequestMiddleware>(ex);
+                    _logger.LogError(ex.Message);
                 }
                 finally
                 {
@@ -89,7 +90,7 @@ namespace Umbraco.Web.Common.Middleware
                 if (umbracoContextReference.UmbracoContext.IsFrontEndUmbracoRequest)
                 {
                     LogHttpRequest.TryGetCurrentHttpRequestId(out var httpRequestId, _requestCache);
-                    _logger.Verbose<UmbracoRequestMiddleware>("End Request [{HttpRequestId}]: {RequestUrl} ({RequestDuration}ms)", httpRequestId, requestUri, DateTime.Now.Subtract(umbracoContextReference.UmbracoContext.ObjectCreated).TotalMilliseconds);
+                    _logger.LogTrace("End Request [{HttpRequestId}]: {RequestUrl} ({RequestDuration}ms)", httpRequestId, requestUri, DateTime.Now.Subtract(umbracoContextReference.UmbracoContext.ObjectCreated).TotalMilliseconds);
                 }
 
                 try
@@ -109,7 +110,7 @@ namespace Umbraco.Web.Common.Middleware
         /// <param name="http"></param>
         /// <param name="requestCache"></param>
         /// <param name="requestUri"></param>
-        private static void DisposeRequestCacheItems(ILogger logger, IRequestCache requestCache, Uri requestUri)
+        private static void DisposeRequestCacheItems(ILogger<UmbracoRequestMiddleware> logger, IRequestCache requestCache, Uri requestUri)
         {
             // do not process if client-side request
             if (requestUri.IsClientSideRequest())
@@ -133,7 +134,7 @@ namespace Umbraco.Web.Common.Middleware
                 }
                 catch (Exception ex)
                 {
-                    logger.Error<UmbracoRequestMiddleware>("Could not dispose item with key " + k, ex);
+                    logger.LogError("Could not dispose item with key " + k, ex);
                 }
                 try
                 {
@@ -141,7 +142,7 @@ namespace Umbraco.Web.Common.Middleware
                 }
                 catch (Exception ex)
                 {
-                    logger.Error<UmbracoRequestMiddleware>("Could not dispose item key " + k, ex);
+                    logger.LogError("Could not dispose item key " + k, ex);
                 }
             }
         }

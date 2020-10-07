@@ -50,7 +50,7 @@ namespace Umbraco.Tests.Packaging
             ContentService, ContentTypeService, DataTypeService,
             FileService, MacroService, LocalizationService,
             HostingEnvironment,
-            EntityXmlSerializer, Logger,
+            EntityXmlSerializer, LoggerFactory,
             UmbracoVersion,
             Microsoft.Extensions.Options.Options.Create(new GlobalSettings()),
             "createdPackages.config",

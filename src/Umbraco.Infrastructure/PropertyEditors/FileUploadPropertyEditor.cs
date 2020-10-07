@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Media;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
@@ -32,7 +32,7 @@ namespace Umbraco.Web.PropertyEditors
         private readonly ILocalizedTextService _localizedTextService;
 
         public FileUploadPropertyEditor(
-            ILogger logger,
+            ILoggerFactory loggerFactory,
             IMediaFileSystem mediaFileSystem,
             IOptions<ContentSettings> contentSettings,
             IDataTypeService dataTypeService,
@@ -40,7 +40,7 @@ namespace Umbraco.Web.PropertyEditors
             ILocalizedTextService localizedTextService,
             IShortStringHelper shortStringHelper,
             UploadAutoFillProperties uploadAutoFillProperties)
-            : base(logger, dataTypeService, localizationService, localizedTextService, shortStringHelper)
+            : base(loggerFactory, dataTypeService, localizationService, localizedTextService, shortStringHelper)
         {
             _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
             _contentSettings = contentSettings.Value;

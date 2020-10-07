@@ -1,9 +1,10 @@
 ﻿using NUnit.Framework;
+using Microsoft.Extensions.Logging;
+using Umbraco.Tests.TestHelpers;
+using Umbraco.Web.Routing;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models;
-using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
-using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.Routing
 {
@@ -34,7 +35,7 @@ namespace Umbraco.Tests.Routing
             var publishedRouter = CreatePublishedRouter();
             var frequest = publishedRouter.CreateRequest(umbracoContext);
             var webRoutingSettings = new WebRoutingSettings();
-            var lookup = new ContentFinderByUrlAndTemplate(Logger, ServiceContext.FileService, ServiceContext.ContentTypeService, Microsoft.Extensions.Options.Options.Create(webRoutingSettings));
+            var lookup = new ContentFinderByUrlAndTemplate(LoggerFactory.CreateLogger<ContentFinderByUrlAndTemplate>(), ServiceContext.FileService, ServiceContext.ContentTypeService, Microsoft.Extensions.Options.Options.Create(webRoutingSettings));
 
             var result = lookup.TryFindContent(frequest);
 

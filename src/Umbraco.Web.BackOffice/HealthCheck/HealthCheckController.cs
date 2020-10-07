@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Configuration.HealthChecks;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.HealthCheck;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Core.Configuration.Models;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -22,9 +22,9 @@ namespace Umbraco.Web.BackOffice.Controllers
     {
         private readonly HealthCheckCollection _checks;
         private readonly IList<Guid> _disabledCheckIds;
-        private readonly ILogger _logger;
+        private readonly ILogger<HealthCheckController> _logger;
 
-        public HealthCheckController(HealthCheckCollection checks, ILogger logger, IOptions<HealthChecksSettings> healthChecksSettings)
+        public HealthCheckController(HealthCheckCollection checks, ILogger<HealthCheckController> logger, IOptions<HealthChecksSettings> healthChecksSettings)
         {
             _checks = checks ?? throw new ArgumentNullException(nameof(checks));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -73,7 +73,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
             catch (Exception ex)
             {
-                _logger.Error<HealthCheckController>(ex, "Exception in health check: {HealthCheckName}", check.Name);
+                _logger.LogError(ex, "Exception in health check: {HealthCheckName}", check.Name);
                 throw;
             }
         }

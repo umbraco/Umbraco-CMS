@@ -3,6 +3,7 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging.Abstractions;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -34,7 +35,7 @@ namespace Umbraco.Tests.PropertyEditors
 
             // label does not implement IDataValueReference
             var labelEditor = new LabelPropertyEditor(
-                Mock.Of<ILogger>(),
+                NullLoggerFactory.Instance,
                 IOHelper,
                 DataTypeService,
                 LocalizedTextService,
@@ -102,7 +103,7 @@ namespace Umbraco.Tests.PropertyEditors
 
             // mediaPicker does implement IDataValueReference
             var mediaPicker = new MediaPickerPropertyEditor(
-                Mock.Of<ILogger>(),
+                NullLoggerFactory.Instance,
                 DataTypeService,
                 LocalizationService,
                 IOHelper,
@@ -170,7 +171,7 @@ namespace Umbraco.Tests.PropertyEditors
 
             // mediaPicker does implement IDataValueReference
             var mediaPicker = new MediaPickerPropertyEditor(
-                Mock.Of<ILogger>(),
+                NullLoggerFactory.Instance,
                 DataTypeService,
                 LocalizationService,
                 IOHelper,

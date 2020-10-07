@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Events;
 using Serilog.Extensions.Logging;
@@ -12,7 +13,7 @@ namespace Umbraco.Core.Logging.Serilog
     ///<summary>
     /// Implements <see cref="ILogger"/> on top of Serilog.
     ///</summary>
-    public class SerilogLogger : ILogger, IDisposable
+    public class SerilogLogger : IDisposable
     {
         public global::Serilog.ILogger SerilogLog { get; }
 
@@ -215,5 +216,6 @@ namespace Umbraco.Core.Logging.Serilog
         {
             SerilogLog.DisposeIfDisposable();
         }
+
     }
 }

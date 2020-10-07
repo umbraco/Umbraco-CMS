@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -36,18 +37,18 @@ namespace Umbraco.Tests.Persistence.Repositories
             appCaches = appCaches ?? AppCaches;
             var scopeAccessor = (IScopeAccessor) provider;
             var globalSettings = new GlobalSettings();
-            var templateRepository = new TemplateRepository(scopeAccessor, appCaches, Logger, TestObjects.GetFileSystemsMock(), IOHelper, ShortStringHelper);
+            var templateRepository = new TemplateRepository(scopeAccessor, appCaches, LoggerFactory.CreateLogger<TemplateRepository>(), TestObjects.GetFileSystemsMock(), IOHelper, ShortStringHelper);
             var commonRepository = new ContentTypeCommonRepository(scopeAccessor, templateRepository, appCaches, ShortStringHelper);
-            var languageRepository = new LanguageRepository(scopeAccessor, appCaches, Logger, Microsoft.Extensions.Options.Options.Create(globalSettings));
-            mediaTypeRepository = new MediaTypeRepository(scopeAccessor, appCaches, Logger, commonRepository, languageRepository, ShortStringHelper);
-            var tagRepository = new TagRepository(scopeAccessor, appCaches, Logger);
-            var relationTypeRepository = new RelationTypeRepository(scopeAccessor, AppCaches.Disabled, Logger);
+            var languageRepository = new LanguageRepository(scopeAccessor, appCaches, LoggerFactory.CreateLogger<LanguageRepository>(), Microsoft.Extensions.Options.Options.Create(globalSettings));
+            mediaTypeRepository = new MediaTypeRepository(scopeAccessor, appCaches, LoggerFactory.CreateLogger<MediaTypeRepository>(), commonRepository, languageRepository, ShortStringHelper);
+            var tagRepository = new TagRepository(scopeAccessor, appCaches, LoggerFactory.CreateLogger<TagRepository>());
+            var relationTypeRepository = new RelationTypeRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<RelationTypeRepository>());
             var entityRepository = new EntityRepository(scopeAccessor);
-            var relationRepository = new RelationRepository(scopeAccessor, Logger, relationTypeRepository, entityRepository);
+            var relationRepository = new RelationRepository(scopeAccessor, LoggerFactory.CreateLogger<RelationRepository>(), relationTypeRepository, entityRepository);
             var propertyEditors = new Lazy<PropertyEditorCollection>(() => new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>())));
             var mediaUrlGenerators = new MediaUrlGeneratorCollection(Enumerable.Empty<IMediaUrlGenerator>());
             var dataValueReferences = new DataValueReferenceFactoryCollection(Enumerable.Empty<IDataValueReferenceFactory>());
-            var repository = new MediaRepository(scopeAccessor, appCaches, Logger, mediaTypeRepository, tagRepository, Mock.Of<ILanguageRepository>(), relationRepository, relationTypeRepository, propertyEditors, mediaUrlGenerators, dataValueReferences, DataTypeService);
+            var repository = new MediaRepository(scopeAccessor, appCaches, LoggerFactory.CreateLogger<MediaRepository>(), LoggerFactory, mediaTypeRepository, tagRepository, Mock.Of<ILanguageRepository>(), relationRepository, relationTypeRepository, propertyEditors, mediaUrlGenerators, dataValueReferences, DataTypeService);
             return repository;
         }
 
@@ -61,7 +62,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 new DictionaryAppCache(),
                 new IsolatedCaches(t => new ObjectCacheAppCache()));
 
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository(provider, out mediaTypeRepository, appCaches: realCache);
@@ -103,7 +104,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void SaveMedia()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (var scope = provider.CreateScope())
             {
                 MediaTypeRepository mediaTypeRepository;
@@ -130,7 +131,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void SaveMediaMultiple()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (var scope = provider.CreateScope())
             {
                 MediaTypeRepository mediaTypeRepository;
@@ -159,7 +160,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void GetMediaIsNotDirty()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (var scope = provider.CreateScope())
             {
                 MediaTypeRepository mediaTypeRepository;
@@ -178,7 +179,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void UpdateMedia()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (var scope = provider.CreateScope())
             {
                 MediaTypeRepository mediaTypeRepository;
@@ -201,7 +202,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void DeleteMedia()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (var scope = provider.CreateScope())
             {
                 MediaTypeRepository mediaTypeRepository;
@@ -224,7 +225,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void GetMedia()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (var scope = provider.CreateScope())
             {
                 MediaTypeRepository mediaTypeRepository;
@@ -251,7 +252,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void QueryMedia()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (var scope = provider.CreateScope())
             {
                 MediaTypeRepository mediaTypeRepository;
@@ -271,7 +272,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // Arrange
             var folderMediaType = ServiceContext.MediaTypeService.Get(1031);
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository(provider, out MediaTypeRepository mediaTypeRepository);
@@ -302,7 +303,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
             // Arrange
             var folderMediaType = ServiceContext.MediaTypeService.Get(1031);
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository(provider, out MediaTypeRepository mediaTypeRepository);
@@ -328,7 +329,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void GetPagedResultsByQuery_FirstPage()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository(provider, out MediaTypeRepository mediaTypeRepository);
@@ -349,7 +350,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void GetPagedResultsByQuery_SecondPage()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (var scope = provider.CreateScope())
             {
                 MediaTypeRepository mediaTypeRepository;
@@ -371,7 +372,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void GetPagedResultsByQuery_SinglePage()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (var scope = provider.CreateScope())
             {
                 MediaTypeRepository mediaTypeRepository;
@@ -393,7 +394,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void GetPagedResultsByQuery_DescendingOrder()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (var scope = provider.CreateScope())
             {
                 MediaTypeRepository mediaTypeRepository;
@@ -415,7 +416,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void GetPagedResultsByQuery_AlternateOrder()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (var scope = provider.CreateScope())
             {
                 MediaTypeRepository mediaTypeRepository;
@@ -436,7 +437,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void GetPagedResultsByQuery_FilterMatchingSome()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (var scope = provider.CreateScope())
             {
                 MediaTypeRepository mediaTypeRepository;
@@ -459,7 +460,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void GetPagedResultsByQuery_FilterMatchingAll()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository(provider, out _);
@@ -481,7 +482,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void GetAllMediaByIds()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (var scope = provider.CreateScope())
             {
                 MediaTypeRepository mediaTypeRepository;
@@ -501,7 +502,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void GetAllMedia()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (var scope = provider.CreateScope())
             {
                 MediaTypeRepository mediaTypeRepository;
@@ -531,7 +532,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void ExistMedia()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (var scope = provider.CreateScope())
             {
                 MediaTypeRepository mediaTypeRepository;
@@ -553,7 +554,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void CountMedia()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (var scope = provider.CreateScope())
             {
                 MediaTypeRepository mediaTypeRepository;

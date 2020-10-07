@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Linq;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
@@ -32,14 +33,14 @@ namespace Umbraco.Tests.Routing
         {
             base.SetUp();
 
-            var logger = Mock.Of<ILogger>();
+            var loggerFactory = NullLoggerFactory.Instance;
             var mediaFileSystemMock = Mock.Of<IMediaFileSystem>();
             var contentSettings = new ContentSettings();
             var dataTypeService = Mock.Of<IDataTypeService>();
             var propertyEditors = new MediaUrlGeneratorCollection(new IMediaUrlGenerator[]
             {
-                new FileUploadPropertyEditor(logger, mediaFileSystemMock, Microsoft.Extensions.Options.Options.Create(contentSettings), dataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper, UploadAutoFillProperties),
-                new ImageCropperPropertyEditor(logger, mediaFileSystemMock, Microsoft.Extensions.Options.Options.Create(contentSettings), dataTypeService, LocalizationService, IOHelper, ShortStringHelper, LocalizedTextService, UploadAutoFillProperties),
+                new FileUploadPropertyEditor(loggerFactory, mediaFileSystemMock, Microsoft.Extensions.Options.Options.Create(contentSettings), dataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper, UploadAutoFillProperties),
+                new ImageCropperPropertyEditor(loggerFactory, mediaFileSystemMock, Microsoft.Extensions.Options.Options.Create(contentSettings), dataTypeService, LocalizationService, IOHelper, ShortStringHelper, LocalizedTextService, UploadAutoFillProperties),
             });
             _mediaUrlProvider = new DefaultMediaUrlProvider(propertyEditors, UriUtility);
         }
@@ -190,7 +191,7 @@ namespace Umbraco.Tests.Routing
             var propertyValueConverters = new PropertyValueConverterCollection(new IPropertyValueConverter[]
             {
                 new UploadPropertyConverter(),
-                new ImageCropperValueConverter(),
+                new ImageCropperValueConverter(Mock.Of<ILogger<ImageCropperValueConverter>>()),
             });
 
             var publishedModelFactory = Mock.Of<IPublishedModelFactory>();

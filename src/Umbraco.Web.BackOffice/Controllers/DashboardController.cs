@@ -9,8 +9,8 @@ using System;
 using System.Linq;
 using System.Text;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
@@ -34,7 +34,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     {
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly AppCaches _appCaches;
-        private readonly ILogger _logger;
+        private readonly ILogger<DashboardController> _logger;
         private readonly IDashboardService _dashboardService;
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly IShortStringHelper _shortStringHelper;
@@ -47,7 +47,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             ISqlContext sqlContext,
             ServiceContext services,
             AppCaches appCaches,
-            ILogger logger,
+            ILogger<DashboardController> logger,
             IRuntimeState runtimeState,
             IDashboardService dashboardService,
             IUmbracoVersion umbracoVersion,
@@ -97,7 +97,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 }
                 catch (HttpRequestException ex)
                 {
-                    _logger.Error<DashboardController>(ex.InnerException ?? ex, "Error getting dashboard content from {Url}", url);
+                    _logger.LogError(ex.InnerException ?? ex, "Error getting dashboard content from {Url}", url);
 
                     //it's still new JObject() - we return it like this to avoid error codes which triggers UI warnings
                     _appCaches.RuntimeCache.InsertCacheItem<JObject>(key, () => result, new TimeSpan(0, 5, 0));
@@ -135,7 +135,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 }
                 catch (HttpRequestException ex)
                 {
-                    _logger.Error<DashboardController>(ex.InnerException ?? ex, "Error getting dashboard CSS from {Url}", url);
+                    _logger.LogError(ex.InnerException ?? ex, "Error getting dashboard CSS from {Url}", url);
 
                     //it's still string.Empty - we return it like this to avoid error codes which triggers UI warnings
                     _appCaches.RuntimeCache.InsertCacheItem<string>(key, () => result, new TimeSpan(0, 5, 0));
@@ -198,7 +198,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 }
                 catch (HttpRequestException ex)
                 {
-                    _logger.Error<DashboardController>(ex.InnerException ?? ex, "Error getting remote dashboard data from {UrlPrefix}{Url}", urlPrefix, url);
+                    _logger.LogError(ex.InnerException ?? ex, "Error getting remote dashboard data from {UrlPrefix}{Url}", urlPrefix, url);
 
                     //it's still string.Empty - we return it like this to avoid error codes which triggers UI warnings
                     _appCaches.RuntimeCache.InsertCacheItem<string>(key, () => result, new TimeSpan(0, 5, 0));

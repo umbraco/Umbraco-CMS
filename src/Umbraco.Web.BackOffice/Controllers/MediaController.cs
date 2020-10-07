@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
@@ -16,7 +17,6 @@ using Umbraco.Core.Dictionary;
 using Umbraco.Core.Events;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Media;
 using Umbraco.Core.Models;
@@ -64,10 +64,11 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
         private readonly IRelationService _relationService;
         private readonly IImageUrlGenerator _imageUrlGenerator;
+        private readonly ILogger<MediaController> _logger;
 
         public MediaController(
             ICultureDictionary cultureDictionary,
-            ILogger logger,
+            ILoggerFactory loggerFactory,
             IShortStringHelper shortStringHelper,
             IEventMessagesFactory eventMessages,
             ILocalizedTextService localizedTextService,
@@ -85,7 +86,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             IMediaFileSystem mediaFileSystem,
             IHostingEnvironment hostingEnvironment,
             IImageUrlGenerator imageUrlGenerator)
-            : base(cultureDictionary, logger, shortStringHelper, eventMessages, localizedTextService)
+            : base(cultureDictionary, loggerFactory, shortStringHelper, eventMessages, localizedTextService)
         {
             _shortStringHelper = shortStringHelper;
             _contentSettings = contentSettings.Value;
@@ -102,6 +103,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _propertyEditors = propertyEditors;
             _mediaFileSystem = mediaFileSystem;
             _hostingEnvironment = hostingEnvironment;
+            _logger = loggerFactory.CreateLogger<MediaController>();
             _imageUrlGenerator = imageUrlGenerator;
         }
 
@@ -626,14 +628,14 @@ namespace Umbraco.Web.BackOffice.Controllers
                 // Save Media with new sort order and update content xml in db accordingly
                 if (mediaService.Sort(sortedMedia) == false)
                 {
-                    Logger.Warn<MediaController>("Media sorting failed, this was probably caused by an event being cancelled");
+                    _logger.LogWarning("Media sorting failed, this was probably caused by an event being cancelled");
                     throw HttpResponseException.CreateValidationErrorResponse("Media sorting failed, this was probably caused by an event being cancelled");
                 }
                 return Ok();
             }
             catch (Exception ex)
             {
-                Logger.Error<MediaController>(ex, "Could not update media sort order");
+                _logger.LogError(ex, "Could not update media sort order");
                 throw;
             }
         }

@@ -2,13 +2,13 @@
 using System.Linq;
 using System.Threading;
 using System.Xml.Linq;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Composing.CompositionExtensions;
 using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Packaging;
 using Umbraco.Core.Packaging;
@@ -32,8 +32,8 @@ namespace Umbraco.Tests.Packaging
         [DataEditor("7e062c13-7c41-4ad9-b389-41d88aeef87c", "Editor1", "editor1")]
         public class Editor1 : DataEditor
         {
-            public Editor1(ILogger logger)
-                : base(logger, Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>())
+            public Editor1(ILoggerFactory loggerFactory)
+                : base(loggerFactory, Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>())
             {
             }
         }
@@ -42,8 +42,8 @@ namespace Umbraco.Tests.Packaging
         [DataEditor("d15e1281-e456-4b24-aa86-1dda3e4299d5", "Editor2", "editor2")]
         public class Editor2 : DataEditor
         {
-            public Editor2(ILogger logger)
-                : base(logger, Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(),Mock.Of<IShortStringHelper>())
+            public Editor2(ILoggerFactory loggerFactory)
+                : base(loggerFactory, Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(),Mock.Of<IShortStringHelper>())
             {
             }
         }

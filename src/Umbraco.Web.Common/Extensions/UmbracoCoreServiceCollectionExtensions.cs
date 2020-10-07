@@ -13,6 +13,7 @@ using Microsoft.Extensions.Options;
 using Serilog;
 using Serilog.Extensions.Hosting;
 using Serilog.Extensions.Logging;
+using Umbraco.Composing;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
@@ -30,7 +31,7 @@ using Umbraco.Web.Common.Profiler;
 using ConnectionStrings = Umbraco.Core.Configuration.Models.ConnectionStrings;
 using CoreDebugSettings = Umbraco.Core.Configuration.Models.CoreDebugSettings;
 using IHostingEnvironment = Umbraco.Core.Hosting.IHostingEnvironment;
-using ILogger = Umbraco.Core.Logging.ILogger;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Umbraco.Extensions
 {
@@ -232,7 +233,7 @@ namespace Umbraco.Extensions
             ILoggingConfiguration loggingConfiguration,
             IConfiguration configuration,
             //TODO: Yep that's extremely ugly
-            Func<GlobalSettings, ConnectionStrings, IUmbracoVersion, IIOHelper, ILogger, IProfiler, IHostingEnvironment, IBackOfficeInfo, ITypeFinder, AppCaches, IDbProviderFactoryCreator, IRuntime> getRuntime,
+            Func<GlobalSettings, ConnectionStrings, IUmbracoVersion, IIOHelper, ILoggerFactory, IProfiler, IHostingEnvironment, IBackOfficeInfo, ITypeFinder, AppCaches, IDbProviderFactoryCreator, IRuntime> getRuntime,
             out IFactory factory)
         {
             if (services is null) throw new ArgumentNullException(nameof(services));
@@ -272,18 +273,19 @@ namespace Umbraco.Extensions
                 hostingSettings,
                 webHostEnvironment,
                 loggingConfiguration,
-                configuration,
-                out var logger, out var ioHelper, out var hostingEnvironment, out var backOfficeInfo, out var profiler);
+                configuration, out var ioHelper, out var hostingEnvironment, out var backOfficeInfo, out var profiler);
+
+            var loggerFactory = serviceProvider.GetService<ILoggerFactory>();
 
             var umbracoVersion = new UmbracoVersion();
-            var typeFinder = CreateTypeFinder(logger, profiler, webHostEnvironment, entryAssembly, typeFinderSettings);
+            var typeFinder = CreateTypeFinder(loggerFactory, profiler, webHostEnvironment, entryAssembly, typeFinderSettings);
 
             var coreRuntime = getRuntime(
                 globalSettings.CurrentValue,
                 connectionStrings.Value,
                 umbracoVersion,
                 ioHelper,
-                logger,
+                loggerFactory,
                 profiler,
                 hostingEnvironment,
                 backOfficeInfo,
@@ -303,16 +305,16 @@ namespace Umbraco.Extensions
             return services;
         }
 
-        private static ITypeFinder CreateTypeFinder(Core.Logging.ILogger logger, IProfiler profiler, IWebHostEnvironment webHostEnvironment, Assembly entryAssembly, IOptionsMonitor<TypeFinderSettings> typeFinderSettings)
+        private static ITypeFinder CreateTypeFinder(ILoggerFactory loggerFactory, IProfiler profiler, IWebHostEnvironment webHostEnvironment, Assembly entryAssembly, IOptionsMonitor<TypeFinderSettings> typeFinderSettings)
         {
             var runtimeHashPaths = new RuntimeHashPaths();
             runtimeHashPaths.AddFolder(new DirectoryInfo(Path.Combine(webHostEnvironment.ContentRootPath, "bin")));
-            var runtimeHash = new RuntimeHash(new ProfilingLogger(logger, profiler), runtimeHashPaths);
-            return new TypeFinder(logger, new DefaultUmbracoAssemblyProvider(entryAssembly), runtimeHash, new TypeFinderConfig(typeFinderSettings));
+            var runtimeHash = new RuntimeHash(new ProfilingLogger(loggerFactory.CreateLogger("RuntimeHash"), profiler), runtimeHashPaths);
+            return new TypeFinder(loggerFactory.CreateLogger<TypeFinder>(), new DefaultUmbracoAssemblyProvider(entryAssembly), runtimeHash, new TypeFinderConfig(typeFinderSettings));
         }
 
         private static IRuntime GetCoreRuntime(
-           GlobalSettings globalSettings, ConnectionStrings connectionStrings, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger,
+           GlobalSettings globalSettings, ConnectionStrings connectionStrings, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILoggerFactory loggerFactory,
             IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo,
             ITypeFinder typeFinder, AppCaches appCaches, IDbProviderFactoryCreator dbProviderFactoryCreator)
         {
@@ -321,17 +323,17 @@ namespace Umbraco.Extensions
 
             var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
             var mainDomLock = appSettingMainDomLock == "SqlMainDomLock" || isWindows == false
-                ? (IMainDomLock)new SqlMainDomLock(logger, globalSettings, connectionStrings, dbProviderFactoryCreator, hostingEnvironment)
-                : new MainDomSemaphoreLock(logger, hostingEnvironment);
+                ? (IMainDomLock)new SqlMainDomLock(loggerFactory.CreateLogger<SqlMainDomLock>(), loggerFactory, globalSettings, connectionStrings, dbProviderFactoryCreator, hostingEnvironment)
+                : new MainDomSemaphoreLock(loggerFactory.CreateLogger<MainDomSemaphoreLock>(), hostingEnvironment);
 
-            var mainDom = new MainDom(logger, mainDomLock);
+            var mainDom = new MainDom(loggerFactory.CreateLogger<MainDom>(), mainDomLock);
 
             var coreRuntime = new CoreRuntime(
                 globalSettings,
                 connectionStrings,
                 umbracoVersion,
                 ioHelper,
-                logger,
+                loggerFactory,
                 profiler,
                 new AspNetCoreBootPermissionsChecker(),
                 hostingEnvironment,
@@ -351,7 +353,6 @@ namespace Umbraco.Extensions
             IWebHostEnvironment webHostEnvironment,
             ILoggingConfiguration loggingConfiguration,
             IConfiguration configuration,
-            out Core.Logging.ILogger logger,
             out IIOHelper ioHelper,
             out Core.Hosting.IHostingEnvironment hostingEnvironment,
             out IBackOfficeInfo backOfficeInfo,
@@ -362,7 +363,7 @@ namespace Umbraco.Extensions
 
             hostingEnvironment = new AspNetCoreHostingEnvironment(hostingSettings, webHostEnvironment);
             ioHelper = new IOHelper(hostingEnvironment);
-            logger = AddLogger(services, hostingEnvironment, loggingConfiguration, configuration);
+            AddLogger(services, hostingEnvironment, loggingConfiguration, configuration);
             backOfficeInfo = new AspNetCoreBackOfficeInfo(globalSettings);
             profiler = GetWebProfiler(hostingEnvironment);
 
@@ -373,7 +374,11 @@ namespace Umbraco.Extensions
         /// Create and configure the logger
         /// </summary>
         /// <param name="hostingEnvironment"></param>
-        private static Core.Logging.ILogger AddLogger(IServiceCollection services, Core.Hosting.IHostingEnvironment hostingEnvironment, ILoggingConfiguration loggingConfiguration, IConfiguration configuration)
+        private static void AddLogger(
+            IServiceCollection services,
+            Core.Hosting.IHostingEnvironment hostingEnvironment,
+            ILoggingConfiguration loggingConfiguration,
+            IConfiguration configuration)
         {
             // Create a serilog logger
             var logger = SerilogLogger.CreateWithDefaultConfiguration(hostingEnvironment, loggingConfiguration, configuration);
@@ -393,9 +398,6 @@ namespace Umbraco.Extensions
                 configure.AddSerilog(logger.SerilogLog, false);
             });
 
-
-            //services.AddSingleton<ILoggerFactory>(services => new SerilogLoggerFactory(logger.SerilogLog, false));
-
             // This won't (and shouldn't) take ownership of the logger.
             services.AddSingleton(logger.SerilogLog);
 
@@ -407,8 +409,6 @@ namespace Umbraco.Extensions
 
             // Consumed by user code
             services.AddSingleton<IDiagnosticContext>(diagnosticContext);
-
-            return logger;
         }
 
         private static IProfiler GetWebProfiler(Umbraco.Core.Hosting.IHostingEnvironment hostingEnvironment)

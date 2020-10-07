@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Web.Routing
@@ -15,13 +15,13 @@ namespace Umbraco.Web.Routing
     public class DefaultUrlProvider : IUrlProvider
     {
         private readonly RequestHandlerSettings _requestSettings;
-        private readonly ILogger _logger;
+        private readonly ILogger<DefaultUrlProvider> _logger;
         private readonly GlobalSettings _globalSettings;
         private readonly ISiteDomainHelper _siteDomainHelper;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly UriUtility _uriUtility;
 
-        public DefaultUrlProvider(IOptions<RequestHandlerSettings> requestSettings, ILogger logger, IOptions<GlobalSettings> globalSettings, ISiteDomainHelper siteDomainHelper, IUmbracoContextAccessor umbracoContextAccessor, UriUtility uriUtility)
+        public DefaultUrlProvider(IOptions<RequestHandlerSettings> requestSettings, ILogger<DefaultUrlProvider> logger, IOptions<GlobalSettings> globalSettings, ISiteDomainHelper siteDomainHelper, IUmbracoContextAccessor umbracoContextAccessor, UriUtility uriUtility)
         {
             _requestSettings = requestSettings.Value;
             _logger = logger;
@@ -49,7 +49,7 @@ namespace Umbraco.Web.Routing
         {
             if (string.IsNullOrWhiteSpace(route))
             {
-                _logger.Debug<DefaultUrlProvider>("Couldn't find any page with nodeId={NodeId}. This is most likely caused by the page not being published.", id);
+                _logger.LogDebug("Couldn't find any page with nodeId={NodeId}. This is most likely caused by the page not being published.", id);
                 return null;
             }
 

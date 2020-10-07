@@ -2,12 +2,12 @@
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Upgrade;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
@@ -27,7 +27,8 @@ namespace Umbraco.Core.Migrations.Install
         private readonly IMigrationBuilder _migrationBuilder;
         private readonly IKeyValueService _keyValueService;
         private readonly IHostingEnvironment _hostingEnvironment;
-        private readonly ILogger _logger;
+        private readonly ILogger<DatabaseBuilder> _logger;
+        private readonly ILoggerFactory _loggerFactory;
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly IDbProviderFactoryCreator _dbProviderFactoryCreator;
         private readonly IConfigManipulator _configManipulator;
@@ -41,7 +42,8 @@ namespace Umbraco.Core.Migrations.Install
             IScopeProvider scopeProvider,
             IUmbracoDatabaseFactory databaseFactory,
             IRuntimeState runtime,
-            ILogger logger,
+            ILogger<DatabaseBuilder> logger,
+            ILoggerFactory loggerFactory,
             IMigrationBuilder migrationBuilder,
             IKeyValueService keyValueService,
             IHostingEnvironment hostingEnvironment,
@@ -53,6 +55,7 @@ namespace Umbraco.Core.Migrations.Install
             _databaseFactory = databaseFactory;
             _runtime = runtime;
             _logger = logger;
+            _loggerFactory = loggerFactory;
             _migrationBuilder = migrationBuilder;
             _keyValueService = keyValueService;
             _hostingEnvironment = hostingEnvironment;
@@ -318,7 +321,7 @@ namespace Umbraco.Core.Migrations.Install
                 return _databaseSchemaValidationResult;
 
             var database = scope.Database;
-            var dbSchema = new DatabaseSchemaCreator(database, _logger, _umbracoVersion);
+            var dbSchema = new DatabaseSchemaCreator(database, _loggerFactory.CreateLogger<DatabaseSchemaCreator>(), _loggerFactory, _umbracoVersion);
             _databaseSchemaValidationResult = dbSchema.ValidateSchema();
             return _databaseSchemaValidationResult;
         }
@@ -350,7 +353,7 @@ namespace Umbraco.Core.Migrations.Install
                     return readyForInstall.Result;
                 }
 
-                _logger.Info<DatabaseBuilder>("Database configuration status: Started");
+                _logger.LogInformation("Database configuration status: Started");
 
                 var database = scope.Database;
 
@@ -366,18 +369,18 @@ namespace Umbraco.Core.Migrations.Install
                     if (_runtime.Level == RuntimeLevel.Run)
                         throw new Exception("Umbraco is already configured!");
 
-                    var creator = new DatabaseSchemaCreator(database, _logger, _umbracoVersion);
+                    var creator = new DatabaseSchemaCreator(database, _loggerFactory.CreateLogger<DatabaseSchemaCreator>(), _loggerFactory, _umbracoVersion);
                     creator.InitializeDatabaseSchema();
 
                     message = message + "<p>Installation completed!</p>";
 
                     //now that everything is done, we need to determine the version of SQL server that is executing
-                    _logger.Info<DatabaseBuilder>("Database configuration status: {DbConfigStatus}", message);
+                    _logger.LogInformation("Database configuration status: {DbConfigStatus}", message);
                     return new Result { Message = message, Success = true, Percentage = "100" };
                 }
 
                 //we need to do an upgrade so return a new status message and it will need to be done during the next step
-                _logger.Info<DatabaseBuilder>("Database requires upgrade");
+                _logger.LogInformation("Database requires upgrade");
                 message = "<p>Upgrading database, this may take some time...</p>";
                 return new Result
                 {
@@ -411,17 +414,17 @@ namespace Umbraco.Core.Migrations.Install
                     return readyForInstall.Result;
                 }
 
-                _logger.Info<DatabaseBuilder>("Database upgrade started");
+                _logger.LogInformation("Database upgrade started");
 
                 // upgrade
                 var upgrader = new Upgrader(plan);
-                upgrader.Execute(_scopeProvider, _migrationBuilder, _keyValueService, _logger);
+                upgrader.Execute(_scopeProvider, _migrationBuilder, _keyValueService, _loggerFactory.CreateLogger<Upgrader>(), _loggerFactory);
 
                 var message = "<p>Upgrade completed!</p>";
 
                 //now that everything is done, we need to determine the version of SQL server that is executing
 
-                _logger.Info<DatabaseBuilder>("Database configuration status: {DbConfigStatus}", message);
+                _logger.LogInformation("Database configuration status: {DbConfigStatus}", message);
 
                 return new Result { Message = message, Success = true, Percentage = "100" };
             }
@@ -448,11 +451,11 @@ namespace Umbraco.Core.Migrations.Install
 
         private Result HandleInstallException(Exception ex)
         {
-            _logger.Error<DatabaseBuilder>(ex, "Database configuration failed");
+            _logger.LogError(ex, "Database configuration failed");
 
             if (_databaseSchemaValidationResult != null)
             {
-                _logger.Info<DatabaseBuilder>("The database schema validation produced the following summary: {DbSchemaSummary}", _databaseSchemaValidationResult.GetSummary());
+                _logger.LogInformation("The database schema validation produced the following summary: {DbSchemaSummary}", _databaseSchemaValidationResult.GetSummary());
             }
 
             return new Result

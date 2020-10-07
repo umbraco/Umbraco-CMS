@@ -2,8 +2,9 @@
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
-using Umbraco.Core.Logging;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Scheduling;
 
@@ -13,6 +14,7 @@ namespace Umbraco.Tests.Scheduling
     [Timeout(60000)]
     public class BackgroundTaskRunnerTests2
     {
+        private static ILoggerFactory _loggerFactory = NullLoggerFactory.Instance;
         // this tests was used to debug a background task runner issue that was unearthed by Deploy,
         // where work items would never complete under certain circumstances, due to threading issues.
         // (fixed now)
@@ -21,8 +23,7 @@ namespace Umbraco.Tests.Scheduling
         [Timeout(4000)]
         public async Task ThreadResumeIssue()
         {
-            var logger = new DebugDiagnosticsLogger(new MessageTemplates());
-            var runner = new BackgroundTaskRunner<IBackgroundTask>(new BackgroundTaskRunnerOptions { KeepAlive = true, LongRunning = true }, logger, TestHelper.GetHostingEnvironmentLifetime());
+            var runner = new BackgroundTaskRunner<IBackgroundTask>(new BackgroundTaskRunnerOptions { KeepAlive = true, LongRunning = true }, _loggerFactory.CreateLogger<BackgroundTaskRunner<IBackgroundTask>>(), TestHelper.GetHostingEnvironmentLifetime());
             var work = new ThreadResumeIssueWorkItem();
             runner.Add(work);
 
@@ -76,8 +77,7 @@ namespace Umbraco.Tests.Scheduling
         [Ignore("Only runs in the debugger.")]
         public async Task DebuggerInterferenceIssue()
         {
-            var logger = new DebugDiagnosticsLogger(new MessageTemplates());
-            var runner = new BackgroundTaskRunner<IBackgroundTask>(new BackgroundTaskRunnerOptions { KeepAlive = true, LongRunning = true }, logger, TestHelper.GetHostingEnvironmentLifetime());
+            var runner = new BackgroundTaskRunner<IBackgroundTask>(new BackgroundTaskRunnerOptions { KeepAlive = true, LongRunning = true }, _loggerFactory.CreateLogger<BackgroundTaskRunner<IBackgroundTask>>(), TestHelper.GetHostingEnvironmentLifetime());
             var taskCompleted = false;
             runner.TaskCompleted += (sender, args) =>
             {

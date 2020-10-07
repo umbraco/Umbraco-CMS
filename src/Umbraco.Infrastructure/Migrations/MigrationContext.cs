@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Umbraco.Core.Logging;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Persistence;
 
 namespace Umbraco.Core.Migrations
@@ -13,14 +13,14 @@ namespace Umbraco.Core.Migrations
         /// <summary>
         /// Initializes a new instance of the <see cref="MigrationContext"/> class.
         /// </summary>
-        public MigrationContext(IUmbracoDatabase database, ILogger logger)
+        public MigrationContext(IUmbracoDatabase database, ILogger<MigrationContext> logger)
         {
             Database = database ?? throw new ArgumentNullException(nameof(database));
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <inheritdoc />
-        public ILogger Logger { get; }
+        public ILogger<IMigrationContext> Logger { get; }
 
         /// <inheritdoc />
         public IUmbracoDatabase Database { get; }

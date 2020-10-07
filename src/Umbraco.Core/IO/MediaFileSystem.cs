@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Umbraco.Core.Logging;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Strings;
 
@@ -15,13 +15,13 @@ namespace Umbraco.Core.IO
     public class MediaFileSystem : FileSystemWrapper, IMediaFileSystem
     {
         private readonly IMediaPathScheme _mediaPathScheme;
-        private readonly ILogger _logger;
+        private readonly ILogger<MediaFileSystem> _logger;
         private readonly IShortStringHelper _shortStringHelper;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MediaFileSystem"/> class.
         /// </summary>
-        public MediaFileSystem(IFileSystem innerFileSystem, IMediaPathScheme mediaPathScheme, ILogger logger, IShortStringHelper shortStringHelper)
+        public MediaFileSystem(IFileSystem innerFileSystem, IMediaPathScheme mediaPathScheme, ILogger<MediaFileSystem> logger, IShortStringHelper shortStringHelper)
             : base(innerFileSystem)
         {
             _mediaPathScheme = mediaPathScheme;
@@ -51,7 +51,7 @@ namespace Umbraco.Core.IO
                 }
                 catch (Exception e)
                 {
-                    _logger.Error<MediaFileSystem>(e, "Failed to delete media file '{File}'.", file);
+                    _logger.LogError(e, "Failed to delete media file '{File}'.", file);
                 }
             });
         }

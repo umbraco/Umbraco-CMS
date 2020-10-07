@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
@@ -66,7 +67,7 @@ namespace Umbraco.Tests.Integration.Testing
         private ILocalizedTextService GetLocalizedTextService(IFactory factory)
         {
             var globalSettings = factory.GetInstance<IOptions<GlobalSettings>>();
-            var logger = factory.GetInstance<ILogger>();
+            var loggerFactory = factory.GetInstance<ILoggerFactory>();
             var appCaches = factory.GetInstance<AppCaches>();
 
             var localizedTextService = new LocalizedTextService(
@@ -82,12 +83,12 @@ namespace Umbraco.Tests.Integration.Testing
                     var mainLangFolder = new DirectoryInfo(Path.Combine(netcoreUI.FullName, globalSettings.Value.UmbracoPath.TrimStart("~/"), "config", "lang"));
 
                     return new LocalizedTextServiceFileSources(
-                        logger,
+                        loggerFactory.CreateLogger<LocalizedTextServiceFileSources>(),
                         appCaches,
                         mainLangFolder);
 
                 }),
-                logger);
+                loggerFactory.CreateLogger<LocalizedTextService>());
 
             return localizedTextService;
         }
@@ -95,8 +96,8 @@ namespace Umbraco.Tests.Integration.Testing
         // replace the default so there is no background index rebuilder
         private class TestBackgroundIndexRebuilder : BackgroundIndexRebuilder
         {
-            public TestBackgroundIndexRebuilder(IMainDom mainDom, IProfilingLogger logger, IApplicationShutdownRegistry hostingEnvironment, IndexRebuilder indexRebuilder)
-                : base(mainDom, logger, hostingEnvironment, indexRebuilder)
+            public TestBackgroundIndexRebuilder(IMainDom mainDom, IProfilingLogger profilingLogger , ILoggerFactory loggerFactory, IApplicationShutdownRegistry hostingEnvironment, IndexRebuilder indexRebuilder)
+                : base(mainDom, profilingLogger , loggerFactory, hostingEnvironment, indexRebuilder)
             {
             }
 

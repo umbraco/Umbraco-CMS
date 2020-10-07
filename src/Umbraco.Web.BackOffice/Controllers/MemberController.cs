@@ -8,12 +8,12 @@ using System.Net.Mime;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Events;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.ContentEditing;
@@ -59,7 +59,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
         public MemberController(
             ICultureDictionary cultureDictionary,
-            ILogger logger,
+            ILoggerFactory loggerFactory,
             IShortStringHelper shortStringHelper,
             IEventMessagesFactory eventMessages,
             ILocalizedTextService localizedTextService,
@@ -72,7 +72,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             IDataTypeService dataTypeService,
             IBackofficeSecurityAccessor backofficeSecurityAccessor,
             IJsonSerializer jsonSerializer)
-            : base(cultureDictionary, logger, shortStringHelper, eventMessages, localizedTextService)
+            : base(cultureDictionary, loggerFactory, shortStringHelper, eventMessages, localizedTextService)
         {
             _passwordConfig = passwordConfig.Value;
             _propertyEditors = propertyEditors;

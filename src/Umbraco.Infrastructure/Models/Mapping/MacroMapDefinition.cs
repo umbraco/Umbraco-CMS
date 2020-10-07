@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
@@ -13,9 +13,9 @@ namespace Umbraco.Web.Models.Mapping
     public class MacroMapDefinition : IMapDefinition
     {
         private readonly ParameterEditorCollection _parameterEditors;
-        private readonly ILogger _logger;
+        private readonly ILogger<MacroMapDefinition> _logger;
 
-        public MacroMapDefinition(ParameterEditorCollection parameterEditors, ILogger logger)
+        public MacroMapDefinition(ParameterEditorCollection parameterEditors, ILogger<MacroMapDefinition> logger)
         {
             _parameterEditors = parameterEditors;
             _logger = logger;
@@ -73,7 +73,7 @@ namespace Umbraco.Web.Models.Mapping
             {
                 //we'll just map this to a text box
                 paramEditor = _parameterEditors[Constants.PropertyEditors.Aliases.TextBox];
-                _logger.Warn<MacroMapDefinition>("Could not resolve a parameter editor with alias {PropertyEditorAlias}, a textbox will be rendered in it's place", source.EditorAlias);
+                _logger.LogWarning("Could not resolve a parameter editor with alias {PropertyEditorAlias}, a textbox will be rendered in it's place", source.EditorAlias);
             }
 
             target.View = paramEditor.GetValueEditor().View;

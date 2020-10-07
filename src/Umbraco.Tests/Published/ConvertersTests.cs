@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -57,10 +59,10 @@ namespace Umbraco.Tests.Published
             var converters = registerFactory.GetInstance<PropertyValueConverterCollection>();
 
             var dataTypeServiceMock = new Mock<IDataTypeService>();
-            var dataType1 = new DataType(new VoidEditor(Mock.Of<ILogger>(), dataTypeServiceMock.Object,
+            var dataType1 = new DataType(new VoidEditor(NullLoggerFactory.Instance, dataTypeServiceMock.Object,
                     Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>()))
                 { Id = 1 };
-            var dataType2 = new DataType(new VoidEditor("2", Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(),
+            var dataType2 = new DataType(new VoidEditor("2", NullLoggerFactory.Instance, Mock.Of<IDataTypeService>(),
                     Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>()))
                 { Id = 2 };
 

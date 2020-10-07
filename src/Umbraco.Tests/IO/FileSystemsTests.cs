@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -30,8 +32,9 @@ namespace Umbraco.Tests.IO
 
             var composition = new Composition(_register, TestHelper.GetMockedTypeLoader(), Mock.Of<IProfilingLogger>(), Mock.Of<IRuntimeState>(), TestHelper.IOHelper, AppCaches.NoCache);
 
-            composition.Register(_ => Mock.Of<ILogger>());
             composition.Register(_ => Mock.Of<IDataTypeService>());
+            composition.Register<ILoggerFactory>(NullLoggerFactory.Instance);
+            composition.Register(typeof(ILogger<>), typeof(Logger<>));
             composition.Register(_ => TestHelper.ShortStringHelper);
             composition.Register(_ => TestHelper.IOHelper);
             composition.RegisterUnique<IMediaPathScheme, UniqueMediaPathScheme>();
@@ -40,6 +43,7 @@ namespace Umbraco.Tests.IO
 
             var globalSettings = new GlobalSettings();
             composition.Register(x => Microsoft.Extensions.Options.Options.Create(globalSettings));
+
 
             composition.ComposeFileSystems();
 

@@ -6,10 +6,10 @@ using System.IO.Compression;
 using System.Linq;
 using System.Xml.Linq;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Packaging;
 using Umbraco.Core.Services;
@@ -29,7 +29,8 @@ namespace Umbraco.Core.Packaging
         private readonly IMacroService _macroService;
         private readonly ILocalizationService _languageService;
         private readonly IEntityXmlSerializer _serializer;
-        private readonly ILogger _logger;
+        private readonly ILoggerFactory _loggerFactory;
+        private readonly ILogger<PackagesRepository> _logger;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly string _packageRepositoryFileName;
         private readonly string _mediaFolderPath;
@@ -60,7 +61,8 @@ namespace Umbraco.Core.Packaging
             IDataTypeService dataTypeService, IFileService fileService, IMacroService macroService,
             ILocalizationService languageService,
             IHostingEnvironment hostingEnvironment,
-            IEntityXmlSerializer serializer, ILogger logger,
+            IEntityXmlSerializer serializer,
+            ILoggerFactory loggerFactory,
             IUmbracoVersion umbracoVersion,
             IOptions<GlobalSettings> globalSettings,
             string packageRepositoryFileName,
@@ -74,7 +76,8 @@ namespace Umbraco.Core.Packaging
             _macroService = macroService;
             _languageService = languageService;
             _serializer = serializer;
-            _logger = logger;
+            _loggerFactory = loggerFactory;
+            _logger = _loggerFactory.CreateLogger<PackagesRepository>();
             _hostingEnvironment = hostingEnvironment;
             _packageRepositoryFileName = packageRepositoryFileName;
 
@@ -82,7 +85,7 @@ namespace Umbraco.Core.Packaging
             _packagesFolderPath = packagesFolderPath ?? Constants.SystemDirectories.Packages;
             _mediaFolderPath = mediaFolderPath ?? globalSettings.Value.UmbracoMediaPath + "/created-packages";
 
-            _parser = new PackageDefinitionXmlParser(logger, umbracoVersion);
+            _parser = new PackageDefinitionXmlParser(_loggerFactory.CreateLogger<PackageDefinitionXmlParser>(), umbracoVersion);
             _umbracoVersion = umbracoVersion;
         }
 
@@ -214,7 +217,7 @@ namespace Umbraco.Core.Packaging
                     }
                     catch (Exception e)
                     {
-                        _logger.Warn<PackagesRepository>(e, "Could not add package actions to the package, the xml did not parse");
+                        _logger.LogWarning(e, "Could not add package actions to the package, the xml did not parse");
                     }
                 }
 

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
@@ -14,7 +14,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 {
     internal class KeyValueRepository : NPocoRepositoryBase<string, IKeyValue>, IKeyValueRepository
     {
-        public KeyValueRepository(IScopeAccessor scopeAccessor, ILogger logger)
+        public KeyValueRepository(IScopeAccessor scopeAccessor, ILogger<KeyValueRepository> logger)
             : base(scopeAccessor, AppCaches.NoCache, logger)
         { }
 
@@ -111,8 +111,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 Value = dto.Value,
                 UpdateDate = dto.UpdateDate,
             };
-        }        
+        }
 
-        #endregion        
+        #endregion
     }
 }

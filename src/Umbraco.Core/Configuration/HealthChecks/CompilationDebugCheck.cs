@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Web.HealthCheck.Checks.Config
@@ -11,8 +11,8 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         Group = "Live Environment")]
     public class CompilationDebugCheck : AbstractConfigCheck
     {
-        public CompilationDebugCheck(ILocalizedTextService textService, IHostingEnvironment hostingEnvironment, ILogger logger)
-            : base(textService, hostingEnvironment, logger)
+        public CompilationDebugCheck(ILocalizedTextService textService, IHostingEnvironment hostingEnvironment, ILoggerFactory loggerFactory)
+            : base(textService, hostingEnvironment, loggerFactory)
         { }
 
         public override string FilePath => "~/Web.config";

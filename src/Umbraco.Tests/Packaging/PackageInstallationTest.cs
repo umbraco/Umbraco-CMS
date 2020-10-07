@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -50,7 +52,7 @@ namespace Umbraco.Tests.Packaging
                 Microsoft.Extensions.Options.Options.Create(new GlobalSettings()));
 
         private PackageDataInstallation PackageDataInstallation => new PackageDataInstallation(
-            Logger, ServiceContext.FileService, ServiceContext.MacroService, ServiceContext.LocalizationService,
+            NullLoggerFactory.Instance.CreateLogger<PackageDataInstallation>(), NullLoggerFactory.Instance, ServiceContext.FileService, ServiceContext.MacroService, ServiceContext.LocalizationService,
             ServiceContext.DataTypeService, ServiceContext.EntityService,
             ServiceContext.ContentTypeService, ServiceContext.ContentService,
             Factory.GetInstance<PropertyEditorCollection>(),
@@ -122,7 +124,7 @@ namespace Umbraco.Tests.Packaging
         public void Can_Read_Compiled_Package_Warnings()
         {
             //copy a file to the same path that the package will install so we can detect file conflicts
-            
+
             var filePath = Path.Combine(_testBaseFolder.FullName, "bin", "Auros.DocumentTypePicker.dll");
             Directory.CreateDirectory(Path.GetDirectoryName(filePath));
             File.WriteAllText(filePath, "test");

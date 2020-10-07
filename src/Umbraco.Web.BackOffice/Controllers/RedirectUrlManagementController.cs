@@ -2,7 +2,7 @@
 using System.Xml;
 using System.Security;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Core.Logging;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Core;
@@ -22,7 +22,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     public class RedirectUrlManagementController : UmbracoAuthorizedApiController
     {
-        private readonly ILogger _logger;
+        private readonly ILogger<RedirectUrlManagementController> _logger;
         private readonly WebRoutingSettings _webRoutingSettings;
         private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly IRedirectUrlService _redirectUrlService;
@@ -31,7 +31,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IConfigManipulator _configManipulator;
 
         public RedirectUrlManagementController(
-            ILogger logger,
+            ILogger<RedirectUrlManagementController> logger,
             IOptions<WebRoutingSettings> webRoutingSettings,
             IBackofficeSecurityAccessor backofficeSecurityAccessor,
             IRedirectUrlService redirectUrlService,
@@ -116,7 +116,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             if (userIsAdmin == false)
             {
                 var errorMessage = "User is not a member of the administrators group and so is not allowed to toggle the URL tracker";
-                _logger.Debug<RedirectUrlManagementController>(errorMessage);
+                _logger.LogDebug(errorMessage);
                 throw new SecurityException(errorMessage);
             }
 

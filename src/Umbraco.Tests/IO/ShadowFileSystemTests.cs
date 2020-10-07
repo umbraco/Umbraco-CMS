@@ -3,13 +3,14 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Tests.TestHelpers;
 using IHostingEnvironment = Umbraco.Core.Hosting.IHostingEnvironment;
 
@@ -23,7 +24,7 @@ namespace Umbraco.Tests.IO
         // SetUp and TearDown run before/after each test
         // SetUp does not start before the previous TearDown returns
 
-        private readonly ILogger _logger = Mock.Of<ILogger>();
+        private readonly ILogger<PhysicalFileSystem> _logger = Mock.Of<ILogger<PhysicalFileSystem>>();
         private readonly IHostingEnvironment _hostingEnvironment = TestHelper.GetHostingEnvironment();
         private readonly IIOHelper _ioHelper = TestHelper.IOHelper;
 
@@ -391,6 +392,7 @@ namespace Umbraco.Tests.IO
         [Test]
         public void ShadowScopeComplete()
         {
+            var loggerFactory = NullLoggerFactory.Instance;
             var path = _ioHelper.MapPath("FileSysTests");
             var shadowfs = _ioHelper.MapPath(Constants.SystemDirectories.TempData.EnsureEndsWith('/') + "ShadowFs");
             Directory.CreateDirectory(path);
@@ -402,7 +404,7 @@ namespace Umbraco.Tests.IO
 
             var container = Mock.Of<IFactory>();
             var globalSettings = Options.Create(new GlobalSettings());
-            var fileSystems = new FileSystems(container, _logger, _ioHelper, globalSettings, _hostingEnvironment) { IsScoped = () => scopedFileSystems };
+            var fileSystems = new FileSystems(container, Mock.Of<ILogger<FileSystems>>(), loggerFactory, _ioHelper, globalSettings, _hostingEnvironment) { IsScoped = () => scopedFileSystems };
             var fs = fileSystems.GetFileSystem<FS>(phy);
             var sw = (ShadowWrapper) fs.InnerFileSystem;
 
@@ -495,7 +497,7 @@ namespace Umbraco.Tests.IO
 
             var container = Mock.Of<IFactory>();
             var globalSettings = Options.Create(new GlobalSettings());
-            var fileSystems = new FileSystems(container, _logger, _ioHelper, globalSettings, _hostingEnvironment) { IsScoped = () => scopedFileSystems };
+            var fileSystems = new FileSystems(container, Mock.Of<ILogger<FileSystems>>(), NullLoggerFactory.Instance, _ioHelper, globalSettings, _hostingEnvironment) { IsScoped = () => scopedFileSystems };
             var fs = fileSystems.GetFileSystem<FS>( phy);
             var sw = (ShadowWrapper) fs.InnerFileSystem;
 
@@ -547,7 +549,7 @@ namespace Umbraco.Tests.IO
 
             var container = Mock.Of<IFactory>();
             var globalSettings = Options.Create(new GlobalSettings());
-            var fileSystems = new FileSystems(container, _logger, _ioHelper, globalSettings, _hostingEnvironment) { IsScoped = () => scopedFileSystems };
+            var fileSystems = new FileSystems(container, Mock.Of<ILogger<FileSystems>>(), NullLoggerFactory.Instance, _ioHelper, globalSettings, _hostingEnvironment) { IsScoped = () => scopedFileSystems };
             var fs = fileSystems.GetFileSystem<FS>( phy);
             var sw = (ShadowWrapper)fs.InnerFileSystem;
 

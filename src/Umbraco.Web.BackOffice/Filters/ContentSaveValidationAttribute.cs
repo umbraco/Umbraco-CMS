@@ -4,8 +4,8 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
@@ -32,14 +32,14 @@ namespace Umbraco.Web.BackOffice.Filters
             private readonly IContentService _contentService;
             private readonly IEntityService _entityService;
             private readonly IPropertyValidationService _propertyValidationService;
-            private readonly ILogger _logger;
+            private readonly ILoggerFactory _loggerFactory;
             private readonly ILocalizedTextService _textService;
             private readonly IUserService _userService;
             private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
 
 
             public ContentSaveValidationFilter(
-                ILogger logger,
+                ILoggerFactory loggerFactory,
                 IBackofficeSecurityAccessor backofficeSecurityAccessor,
                 ILocalizedTextService textService,
                 IContentService contentService,
@@ -47,7 +47,7 @@ namespace Umbraco.Web.BackOffice.Filters
                 IEntityService entityService,
                 IPropertyValidationService propertyValidationService)
             {
-                _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+                _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
                 _backofficeSecurityAccessor = backofficeSecurityAccessor ?? throw new ArgumentNullException(nameof(backofficeSecurityAccessor));
                 _textService = textService ?? throw new ArgumentNullException(nameof(textService));
                 _contentService = contentService ?? throw new ArgumentNullException(nameof(contentService));
@@ -59,7 +59,7 @@ namespace Umbraco.Web.BackOffice.Filters
             public void OnActionExecuting(ActionExecutingContext context)
             {
                 var model = (ContentItemSave) context.ActionArguments["contentItem"];
-                var contentItemValidator = new ContentSaveModelValidator(_logger, _backofficeSecurityAccessor.BackofficeSecurity, _textService, _propertyValidationService);
+                var contentItemValidator = new ContentSaveModelValidator(_loggerFactory.CreateLogger<ContentSaveModelValidator>(), _backofficeSecurityAccessor.BackofficeSecurity, _textService, _propertyValidationService);
 
                 if (!ValidateAtLeastOneVariantIsBeingSaved(model, context)) return;
                 if (!contentItemValidator.ValidateExistingContent(model, context)) return;

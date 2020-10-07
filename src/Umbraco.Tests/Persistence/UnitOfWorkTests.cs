@@ -13,7 +13,7 @@ namespace Umbraco.Tests.Persistence
         [Test]
         public void ReadLockNonExisting()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             Assert.Throws<ArgumentException>(() =>
             {
                 using (var scope = provider.CreateScope())
@@ -27,7 +27,7 @@ namespace Umbraco.Tests.Persistence
         [Test]
         public void ReadLockExisting()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (var scope = provider.CreateScope())
             {
                 scope.ReadLock(Constants.Locks.Servers);
@@ -38,7 +38,7 @@ namespace Umbraco.Tests.Persistence
         [Test]
         public void WriteLockNonExisting()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             Assert.Throws<ArgumentException>(() =>
             {
                 using (var scope = provider.CreateScope())
@@ -52,7 +52,7 @@ namespace Umbraco.Tests.Persistence
         [Test]
         public void WriteLockExisting()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (var scope = provider.CreateScope())
             {
                 scope.WriteLock(Constants.Locks.Servers);

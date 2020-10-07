@@ -1,5 +1,6 @@
 ﻿using System;
 using NUnit.Framework;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
@@ -66,7 +67,7 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
 
         private IKeyValueRepository CreateRepository(IScopeProvider provider)
         {
-            return new KeyValueRepository((IScopeAccessor) provider, Logger);
-        }        
+            return new KeyValueRepository((IScopeAccessor) provider, LoggerFactory.CreateLogger<KeyValueRepository>());
+        }
     }
 }

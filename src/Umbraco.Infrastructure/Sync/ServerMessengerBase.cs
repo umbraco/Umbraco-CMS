@@ -4,7 +4,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using Umbraco.Composing;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Logging;
+using Microsoft.Extensions.Logging;
 
 namespace Umbraco.Core.Sync
 {
@@ -157,7 +157,7 @@ namespace Umbraco.Core.Sync
         {
             if (refresher == null) throw new ArgumentNullException(nameof(refresher));
 
-            Current.Logger.Debug<ServerMessengerBase>("Invoking refresher {RefresherType} on local server for message type RefreshByPayload", refresher.GetType());
+            Current.Logger.LogDebug("Invoking refresher {RefresherType} on local server for message type RefreshByPayload", refresher.GetType());
 
             var payloadRefresher = refresher as IPayloadCacheRefresher<TPayload>;
             if (payloadRefresher == null)
@@ -179,7 +179,7 @@ namespace Umbraco.Core.Sync
         {
             if (refresher == null) throw new ArgumentNullException(nameof(refresher));
 
-            Current.Logger.Debug<ServerMessengerBase>("Invoking refresher {RefresherType} on local server for message type {MessageType}", refresher.GetType(), messageType);
+            Current.Logger.LogDebug("Invoking refresher {RefresherType} on local server for message type {MessageType}", refresher.GetType(), messageType);
 
             switch (messageType)
             {
@@ -240,7 +240,7 @@ namespace Umbraco.Core.Sync
         {
             if (refresher == null) throw new ArgumentNullException(nameof(refresher));
 
-            Current.Logger.Debug<ServerMessengerBase>("Invoking refresher {RefresherType} on local server for message type {MessageType}", refresher.GetType(), messageType);
+            Current.Logger.LogDebug("Invoking refresher {RefresherType} on local server for message type {MessageType}", refresher.GetType(), messageType);
 
             var typedRefresher = refresher as ICacheRefresher<T>;
 
@@ -276,7 +276,7 @@ namespace Umbraco.Core.Sync
         //{
         //    if (refresher == null) throw new ArgumentNullException("refresher");
 
-        //    Current.Logger.Debug<ServerMessengerBase>("Invoking refresher {0} on local server for message type Notify",
+        //    Current.Logger.LogDebug("Invoking refresher {0} on local server for message type Notify",
         //        () => refresher.GetType());
 
         //    refresher.Notify(payload);
