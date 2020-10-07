@@ -26,12 +26,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-
-.padded {
-  padding: 20px
-}
-
-
 #layout {
   position: relative;
   height: 100%;
@@ -39,13 +33,12 @@ body {
   z-index: 1;
 }
 
-#mainwrapper {
+#mainwrapper, #contentwrapper, #contentcolumn {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  margin: 0;
 }
 
 body.umb-drawer-is-visible #mainwrapper{
@@ -53,17 +46,7 @@ body.umb-drawer-is-visible #mainwrapper{
 }
 
 #contentwrapper, #contentcolumn {
-  position: absolute;
-  top: 0px;
-  bottom: 0px;
-  right: 0px;
-  left: 0px;
   z-index: 10;
-  margin: 0;
-}
-
-#contentcolumn {
-  left: 0px;
 }
 
 #contentcolumn iframe#right {
