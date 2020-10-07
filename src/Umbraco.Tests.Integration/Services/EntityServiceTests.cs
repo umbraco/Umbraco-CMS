@@ -11,7 +11,6 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Integration.Testing;
-using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Services
@@ -61,7 +60,7 @@ namespace Umbraco.Tests.Services
             ContentService.Save(root);
             var rootId = root.Id;
             var ids = new List<int>();
-            for (int i = 0; i < 10; i++)
+            for (var i = 0; i < 10; i++)
             {
                 var c1 = ContentBuilder.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), root);
                 ContentService.Save(c1);
@@ -505,7 +504,9 @@ namespace Umbraco.Tests.Services
         public void EntityService_Can_Get_Content_By_UmbracoObjectType_With_Variant_Names()
         {
             var alias = "test" + Guid.NewGuid();
-            var contentType = ContentTypeBuilder.CreateSimpleContentType(alias, alias);
+            var template = TemplateBuilder.CreateTextPageTemplate(alias);
+            FileService.SaveTemplate(template);
+            var contentType = ContentTypeBuilder.CreateSimpleContentType("test1", "Test1", defaultTemplateId: template.Id);
             contentType.Variations = ContentVariation.Culture;
             ContentTypeService.Save(contentType);
 
@@ -526,7 +527,9 @@ namespace Umbraco.Tests.Services
         [Test]
         public void EntityService_Can_Get_Child_Content_By_ParentId_And_UmbracoObjectType_With_Variant_Names()
         {
-            var contentType = ContentTypeBuilder.CreateSimpleContentType("test1", "Test1");
+            var template = TemplateBuilder.CreateTextPageTemplate();
+            FileService.SaveTemplate(template);
+            var contentType = ContentTypeBuilder.CreateSimpleContentType("test1", "Test1", defaultTemplateId: template.Id);
             contentType.Variations = ContentVariation.Culture;
             ContentTypeService.Save(contentType);
 
@@ -745,28 +748,30 @@ namespace Umbraco.Tests.Services
             {
                 _isSetup = true;
 
+                var template = TemplateBuilder.CreateTextPageTemplate();
+                FileService.SaveTemplate(template); // else, FK violation on contentType!
+
                 //Create and Save ContentType "umbTextpage" -> 1052
-                ContentType contentType = ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage");
+                var contentType = ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateId: template.Id);
                 contentType.Key = new Guid("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522");
-                FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
                 ContentTypeService.Save(contentType);
 
                 //Create and Save Content "Homepage" based on "umbTextpage" -> 1053
-                Content textpage = ContentBuilder.CreateSimpleContent(contentType);
+                var textpage = ContentBuilder.CreateSimpleContent(contentType);
                 textpage.Key = new Guid("B58B3AD4-62C2-4E27-B1BE-837BD7C533E0");
                 ContentService.Save(textpage, 0);
 
                 //Create and Save Content "Text Page 1" based on "umbTextpage" -> 1054
-                Content subpage = ContentBuilder.CreateSimpleContent(contentType, "Text Page 1", textpage.Id);
+                var subpage = ContentBuilder.CreateSimpleContent(contentType, "Text Page 1", textpage.Id);
                 subpage.ContentSchedule.Add(DateTime.Now.AddMinutes(-5), null);
                 ContentService.Save(subpage, 0);
 
                 //Create and Save Content "Text Page 2" based on "umbTextpage" -> 1055
-                Content subpage2 = ContentBuilder.CreateSimpleContent(contentType, "Text Page 2", textpage.Id);
+                var subpage2 = ContentBuilder.CreateSimpleContent(contentType, "Text Page 2", textpage.Id);
                 ContentService.Save(subpage2, 0);
 
                 //Create and Save Content "Text Page Deleted" based on "umbTextpage" -> 1056
-                Content trashed = ContentBuilder.CreateSimpleContent(contentType, "Text Page Deleted", -20);
+                var trashed = ContentBuilder.CreateSimpleContent(contentType, "Text Page Deleted", -20);
                 trashed.Trashed = true;
                 ContentService.Save(trashed, 0);
 

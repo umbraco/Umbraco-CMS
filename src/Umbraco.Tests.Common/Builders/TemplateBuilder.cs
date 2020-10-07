@@ -82,10 +82,10 @@ namespace Umbraco.Tests.Common.Builders
             return template;
         }
 
-        public static Template CreateTextPageTemplate()
+        public static Template CreateTextPageTemplate(string alias = "textPage")
         {
             return (Template)new TemplateBuilder()
-                .WithAlias("textPage")
+                .WithAlias(alias)
                 .WithName("Text page")
                 .Build();
         }
