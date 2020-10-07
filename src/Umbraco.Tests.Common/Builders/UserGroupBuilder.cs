@@ -122,11 +122,11 @@ namespace Umbraco.Tests.Common.Builders
             return userGroup;
         }
 
-        public static UserGroup CreateUserGroup(string suffix = "", string[] permissions = null, string[] allowedSections = null)
+        public static UserGroup CreateUserGroup(string alias = "testGroup", string name = "Test Group", string suffix = "", string[] permissions = null, string[] allowedSections = null)
         {
             return (UserGroup)new UserGroupBuilder()
-                .WithAlias("testUserGroup" + suffix)
-                .WithName("TestUserGroup" + suffix)
+                .WithAlias(alias + suffix)
+                .WithName(name + suffix)
                 .WithPermissions(permissions ?? new[] { "A", "B", "C" })
                 .WithAllowedSections(allowedSections ?? new[] { "content", "media" })
                 .Build();

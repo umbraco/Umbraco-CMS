@@ -209,6 +209,16 @@ namespace Umbraco.Tests.Common.Builders
             return list;
         }
 
+        public static User CreateUser(string suffix = "")
+        {
+            return new UserBuilder()
+                .WithIsApproved(true)
+                .WithName("TestUser" + suffix)
+                .WithLogin("TestUser" + suffix, "testing")
+                .WithEmail("test" + suffix + "@test.com")
+                .Build();
+        }
+
         int? IWithIdBuilder.Id
         {
             get => _id;

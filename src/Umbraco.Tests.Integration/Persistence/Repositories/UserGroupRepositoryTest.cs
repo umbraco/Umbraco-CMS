@@ -50,8 +50,8 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
             {
                 var repository = CreateRepository(provider);
 
-                var userGroup1 = UserGroupBuilder.CreateUserGroup("1");
-                var userGroup2 = UserGroupBuilder.CreateUserGroup("2");
+                var userGroup1 = UserGroupBuilder.CreateUserGroup(suffix: "1");
+                var userGroup2 = UserGroupBuilder.CreateUserGroup(suffix: "2");
 
                 // Act
                 repository.Save(userGroup1);
@@ -178,7 +178,7 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
                 CreateAndCommitMultipleUserGroups(repository);
 
                 // Act
-                var query = scope.SqlContext.Query<IUserGroup>().Where(x => x.Alias == "testUserGroup1");
+                var query = scope.SqlContext.Query<IUserGroup>().Where(x => x.Alias == "testGroup1");
                 var result = repository.Get(query);
 
                 // Assert
@@ -259,7 +259,7 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
                 var userGroups = CreateAndCommitMultipleUserGroups(repository);
 
                 // Act
-                var query = scope.SqlContext.Query<IUserGroup>().Where(x => x.Alias == "testUserGroup1" || x.Alias == "testUserGroup2");
+                var query = scope.SqlContext.Query<IUserGroup>().Where(x => x.Alias == "testGroup1" || x.Alias == "testGroup2");
                 var result = repository.Count(query);
 
                 // Assert
@@ -380,7 +380,6 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
             }
         }
 
-
         [Test]
         public void Get_Groups_Assigned_To_Section()
         {
@@ -390,9 +389,9 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
             {
                 var repository = CreateRepository(provider);
 
-                var user1 = UserGroupBuilder.CreateUserGroup("1", allowedSections: new[] { "test1" });
-                var user2 = UserGroupBuilder.CreateUserGroup("2", allowedSections: new[] { "test2" });
-                var user3 = UserGroupBuilder.CreateUserGroup("3", allowedSections: new[] { "test1" });
+                var user1 = UserGroupBuilder.CreateUserGroup(suffix: "1", allowedSections: new[] { "test1" });
+                var user2 = UserGroupBuilder.CreateUserGroup(suffix: "2", allowedSections: new[] { "test2" });
+                var user3 = UserGroupBuilder.CreateUserGroup(suffix: "3", allowedSections: new[] { "test1" });
                 repository.Save(user1);
                 repository.Save(user2);
                 repository.Save(user3);
@@ -404,17 +403,17 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
                 // Assert
                 Assert.AreEqual(2, groups.Count());
                 var names = groups.Select(x => x.Name).ToArray();
-                Assert.IsTrue(names.Contains("TestUserGroup1"));
-                Assert.IsFalse(names.Contains("TestUserGroup2"));
-                Assert.IsTrue(names.Contains("TestUserGroup3"));
+                Assert.IsTrue(names.Contains("Test Group1"));
+                Assert.IsFalse(names.Contains("Test Group2"));
+                Assert.IsTrue(names.Contains("Test Group3"));
             }
         }
 
         private IUserGroup[] CreateAndCommitMultipleUserGroups(IUserGroupRepository repository)
         {
-            var userGroup1 = UserGroupBuilder.CreateUserGroup("1");
-            var userGroup2 = UserGroupBuilder.CreateUserGroup("2");
-            var userGroup3 = UserGroupBuilder.CreateUserGroup("3");
+            var userGroup1 = UserGroupBuilder.CreateUserGroup(suffix: "1");
+            var userGroup2 = UserGroupBuilder.CreateUserGroup(suffix: "2");
+            var userGroup3 = UserGroupBuilder.CreateUserGroup(suffix: "3");
             repository.Save(userGroup1);
             repository.Save(userGroup2);
             repository.Save(userGroup3);
