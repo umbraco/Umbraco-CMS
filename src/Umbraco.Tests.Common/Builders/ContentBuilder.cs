@@ -32,6 +32,7 @@ namespace Umbraco.Tests.Common.Builders
         private DateTime? _createDate;
         private DateTime? _updateDate;
         private int? _parentId;
+        private IContent _parent;
         private string _name;
         private int? _creatorId;
         private int? _level;
@@ -53,11 +54,17 @@ namespace Umbraco.Tests.Common.Builders
             return builder;
         }
 
+        public ContentBuilder WithParent(IContent parent)
+        {
+            _parentId = null;
+            _parent = parent;
+            return this;
+        }
+
         public ContentBuilder WithContentType(IContentType contentType)
         {
             _contentTypeBuilder = null;
             _contentType = contentType;
-
             return this;
         }
 
@@ -98,6 +105,7 @@ namespace Umbraco.Tests.Common.Builders
             var id = _id ?? 0;
             var key = _key ?? Guid.NewGuid();
             var parentId = _parentId ?? -1;
+            var parent = _parent ?? null;
             var createDate = _createDate ?? DateTime.Now;
             var updateDate = _updateDate ?? DateTime.Now;
             var name = _name ?? Guid.NewGuid().ToString();
@@ -118,18 +126,28 @@ namespace Umbraco.Tests.Common.Builders
 
             var contentType = _contentType ?? _contentTypeBuilder.Build();
 
-            var content = new Content(name, parentId, contentType, culture)
+            Content content;
+            if (parent != null)
             {
-                Id = id,
-                Key = key,
-                CreateDate = createDate,
-                UpdateDate = updateDate,
-                CreatorId = creatorId,
-                Level = level,
-                Path = path,
-                SortOrder = sortOrder,
-                Trashed = trashed,
-            };
+                content = new Content(name, parent, contentType, culture)
+                {
+                    ParentId = parent.Id
+                };
+            }
+            else
+            {
+                content = new Content(name, parentId, contentType, culture);
+            }
+
+            content.Id = id;
+            content.Key = key;
+            content.CreateDate = createDate;
+            content.UpdateDate = updateDate;
+            content.CreatorId = creatorId;
+            content.Level = level;
+            content.Path = path;
+            content.SortOrder = sortOrder;
+            content.Trashed = trashed;
 
             foreach (var cultureName in _cultureNames)
             {
@@ -192,6 +210,30 @@ namespace Umbraco.Tests.Common.Builders
                         author = "John Doe"
                     }, culture, segment)
                 .Build();
+        }
+
+        public static Content CreateSimpleContent(IContentType contentType, string name, IContent parent, string culture = null, string segment = null, bool setPropertyValues = true)
+        {
+            var builder = new ContentBuilder()
+                .WithContentType(contentType)
+                .WithName(name)
+                .WithParent(parent);
+
+            if (setPropertyValues)
+            {
+                builder = builder.WithPropertyValues(new
+                {
+                    title = name + " Subpage",
+                    bodyText = "This is a subpage",
+                    author = "John Doe"
+                }, culture, segment);
+            }
+
+            var content = builder.Build();
+
+            content.ResetDirtyProperties(false);
+
+            return content;
         }
 
         public static Content CreateTextpageContent(IContentType contentType, string name, int parentId)

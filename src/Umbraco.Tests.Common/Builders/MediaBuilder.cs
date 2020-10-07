@@ -143,6 +143,20 @@ namespace Umbraco.Tests.Common.Builders
                 .Build();
         }
 
+        public static Media CreateMediaFile(IMediaType mediaType, int parentId)
+        {
+            return new MediaBuilder()
+                .WithMediaType(mediaType)
+                .WithName("Test File")
+                .WithParentId(parentId)
+                .AddPropertyData()
+                    .WithKeyValue(Constants.Conventions.Media.File, "/media/test-file.txt")
+                    .WithKeyValue(Constants.Conventions.Media.Bytes, "100")
+                    .WithKeyValue(Constants.Conventions.Media.Extension, "png")
+                    .Done()
+                .Build();
+        }
+
         int? IWithIdBuilder.Id
         {
             get => _id;

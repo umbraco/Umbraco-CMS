@@ -77,6 +77,13 @@ namespace Umbraco.Tests.Common.Builders.Extensions
             return builder;
         }
 
+        public static T WithParentContentType<T>(this T builder, IContentTypeComposition parent)
+            where T : IWithParentContentTypeBuilder
+        {
+            builder.Parent = parent;
+            return builder;
+        }
+
         public static T WithTrashed<T>(this T builder, bool trashed)
             where T : IWithTrashedBuilder
         {

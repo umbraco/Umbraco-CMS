@@ -15,6 +15,7 @@ namespace Umbraco.Tests.Common.Builders
             IWithAliasBuilder,
             IWithNameBuilder,
             IWithParentIdBuilder,
+            IWithParentContentTypeBuilder,
             IWithPathBuilder,
             IWithLevelBuilder,
             IWithSortOrderBuilder,
@@ -32,6 +33,7 @@ namespace Umbraco.Tests.Common.Builders
         private string _alias;
         private string _name;
         private int? _parentId;
+        private IContentTypeComposition _parent;
         private int? _level;
         private string _path;
         private int? _sortOrder;
@@ -63,6 +65,8 @@ namespace Umbraco.Tests.Common.Builders
         protected string GetAlias() => _alias ?? GetName().ToCamelCase();
 
         protected int GetParentId() => _parentId ?? -1;
+
+        protected IContentTypeComposition GetParent() => _parent ?? null;
 
         protected int GetLevel() => _level ?? 0;
 
@@ -146,7 +150,21 @@ namespace Umbraco.Tests.Common.Builders
         int? IWithParentIdBuilder.ParentId
         {
             get => _parentId;
-            set => _parentId = value;
+            set
+            {
+                _parent = null;
+                _parentId = value;
+            }
+        }
+
+        IContentTypeComposition IWithParentContentTypeBuilder.Parent
+        {
+            get => _parent;
+            set
+            {
+                _parentId = null;
+                _parent = value;
+            }
         }
 
         int? IWithLevelBuilder.Level

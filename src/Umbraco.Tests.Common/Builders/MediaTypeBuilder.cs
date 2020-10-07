@@ -81,24 +81,35 @@ namespace Umbraco.Tests.Common.Builders
 
         public override IMediaType Build()
         {
-            var mediaType = new MediaType(ShortStringHelper, GetParentId())
+            MediaType mediaType;
+            var parent = GetParent();
+            if (parent != null)
             {
-                Id = GetId(),
-                Key = GetKey(),
-                CreateDate = GetCreateDate(),
-                UpdateDate = GetUpdateDate(),
-                Alias = GetAlias(),
-                Name = GetName(),
-                Level = GetLevel(),
-                Path = GetPath(),
-                SortOrder = GetSortOrder(),
-                Description = GetDescription(),
-                Icon = GetIcon(),
-                Thumbnail = GetThumbnail(),
-                CreatorId = GetCreatorId(),
-                Trashed = GetTrashed(),
-                IsContainer = GetIsContainer(),
-            };
+                mediaType = new MediaType(ShortStringHelper, (IMediaType)parent, GetAlias());
+            }
+            else
+            {
+                mediaType = new MediaType(ShortStringHelper, GetParentId())
+                {
+                    Alias = GetAlias(),
+                };
+            }
+
+            mediaType.Id = GetId();
+            mediaType.Key = GetKey();
+            mediaType.CreateDate = GetCreateDate();
+            mediaType.UpdateDate = GetUpdateDate();
+            mediaType.Alias = GetAlias();
+            mediaType.Name = GetName();
+            mediaType.Level = GetLevel();
+            mediaType.Path = GetPath();
+            mediaType.SortOrder = GetSortOrder();
+            mediaType.Description = GetDescription();
+            mediaType.Icon = GetIcon();
+            mediaType.Thumbnail = GetThumbnail();
+            mediaType.CreatorId = GetCreatorId();
+            mediaType.Trashed = GetTrashed();
+            mediaType.IsContainer = GetIsContainer();
 
             BuildPropertyGroups(mediaType, _propertyGroupBuilders.Select(x => x.Build()));
             BuildPropertyTypeIds(mediaType, _propertyTypeIdsIncrementingFrom);
@@ -114,7 +125,7 @@ namespace Umbraco.Tests.Common.Builders
             var mediaType = builder
                 .WithAlias(alias)
                 .WithName(name)
-                .WithParentId(parent?.Id ?? -1)
+                .WithParentContentType(parent)
                 .AddPropertyGroup()
                     .WithName(propertyGroupName)
                     .WithSortOrder(1)

@@ -19,7 +19,7 @@ namespace Umbraco.Tests.Common.Builders
 
         private int? _propertyTypeIdsIncrementingFrom;
         private int? _defaultTemplateId;
-        protected ContentVariation? _contentVariation;
+        private ContentVariation? _contentVariation;
 
         public ContentTypeBuilder() : base(null)
         {
@@ -71,26 +71,37 @@ namespace Umbraco.Tests.Common.Builders
 
         public override IContentType Build()
         {
-            var contentType = new ContentType(ShortStringHelper, GetParentId())
-            {
-                Id = GetId(),
-                Key = GetKey(),
-                CreateDate = GetCreateDate(),
-                UpdateDate = GetUpdateDate(),
-                Alias = GetAlias(),
-                Name = GetName(),
-                Level = GetLevel(),
-                Path = GetPath(),
-                SortOrder = GetSortOrder(),
-                Description = GetDescription(),
-                Icon = GetIcon(),
-                Thumbnail = GetThumbnail(),
-                CreatorId = GetCreatorId(),
-                Trashed = GetTrashed(),
-                IsContainer = GetIsContainer(),
-            };
-
             var contentVariation = _contentVariation ?? ContentVariation.Nothing;
+
+            ContentType contentType;
+            var parent = GetParent();
+            if (parent != null)
+            {
+                contentType = new ContentType(ShortStringHelper, (IContentType)parent, GetAlias());
+            }
+            else
+            {
+                contentType = new ContentType(ShortStringHelper, GetParentId())
+                {
+                    Alias = GetAlias(),
+                };
+            }
+ 
+            contentType.Id = GetId();
+            contentType.Key = GetKey();
+            contentType.CreateDate = GetCreateDate();
+            contentType.UpdateDate = GetUpdateDate();
+            contentType.Name = GetName();
+            contentType.Level = GetLevel();
+            contentType.Path = GetPath();
+            contentType.SortOrder = GetSortOrder();
+            contentType.Description = GetDescription();
+            contentType.Icon = GetIcon();
+            contentType.Thumbnail = GetThumbnail();
+            contentType.CreatorId = GetCreatorId();
+            contentType.Trashed = GetTrashed();
+            contentType.IsContainer = GetIsContainer();
+            
             contentType.Variations = contentVariation;
 
             contentType.NoGroupPropertyTypes =  _noGroupPropertyTypeBuilders.Select(x => x.Build());
@@ -117,7 +128,7 @@ namespace Umbraco.Tests.Common.Builders
             return (ContentType)builder
                 .WithAlias(alias)
                 .WithName(name)
-                .WithParentId(parent?.Id ?? -1)
+                .WithParentContentType(parent)
                 .Build();
         }
 
@@ -126,7 +137,7 @@ namespace Umbraco.Tests.Common.Builders
             return (ContentType)new ContentTypeBuilder()
                 .WithAlias(alias ?? "simple")
                 .WithName(name ?? "Simple Page")
-                .WithParentId(parent?.Id ?? -1)
+                .WithParentContentType(parent)
                 .AddPropertyGroup()
                     .WithName(propertyGroupName)
                     .WithSortOrder(1)
