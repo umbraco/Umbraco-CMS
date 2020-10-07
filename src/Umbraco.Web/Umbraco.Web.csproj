@@ -166,8 +166,6 @@
     <Compile Include="Editors\Filters\ContentSaveModelValidator.cs" />
     <Compile Include="Editors\Filters\DataTypeValidateAttribute.cs" />
     <Compile Include="Editors\ChallengeResult.cs" />
-    <Compile Include="Editors\ElementTypeController.cs" />
-    <Compile Include="Editors\Filters\ContentSaveModelValidator.cs" />
     <Compile Include="Editors\Filters\DenyLocalLoginAuthorizationAttribute.cs" />
     <Compile Include="Editors\Filters\MediaSaveModelValidator.cs" />
     <Compile Include="Editors\IconController.cs" />
