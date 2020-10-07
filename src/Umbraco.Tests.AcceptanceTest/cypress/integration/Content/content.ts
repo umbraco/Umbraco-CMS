@@ -313,6 +313,7 @@ context('Content', () => {
 
         // Save and publish
         cy.get('.btn-success').first().click();
+        cy.umbracoSuccessNotification().should('be.visible');
 
         // Rollback
         cy.get('.umb-box-header :button').click();
