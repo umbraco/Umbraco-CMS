@@ -150,7 +150,6 @@
     <Compile Include="Routing\BaseUrlProviderTest.cs" />
     <Compile Include="Routing\UrlProviderWithHideTopLevelNodeFromPathTests.cs" />
     <Compile Include="Scoping\ScopeEventDispatcherTests.cs" />
-    <Compile Include="Security\BackOfficeOwinUserManagerTests.cs" />
     <Compile Include="Security\OwinDataProtectorTokenProviderTests.cs" />
     <Compile Include="Persistence\Repositories\UserRepositoryTest.cs" />
     <Compile Include="TestHelpers\Entities\MockedEntity.cs" />
@@ -233,8 +232,6 @@
     <Compile Include="Web\Mvc\ValidateUmbracoFormRouteStringAttributeTests.cs" />
     <Compile Include="Web\PublishedContentQueryTests.cs" />
     <Compile Include="Web\UmbracoHelperTests.cs" />
-    <Compile Include="Membership\MembershipProviderBaseTests.cs" />
-    <Compile Include="Membership\UmbracoServiceMembershipProviderTests.cs" />
     <Compile Include="Migrations\Stubs\FiveZeroMigration.cs" />
     <Compile Include="Migrations\Stubs\FourElevenMigration.cs" />
     <Compile Include="Migrations\Stubs\SixZeroMigration2.cs" />

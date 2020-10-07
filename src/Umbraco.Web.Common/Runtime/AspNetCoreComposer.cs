@@ -39,7 +39,7 @@ namespace Umbraco.Web.Common.Runtime
     [ComposeAfter(typeof(CoreInitialComposer))]
     public class AspNetCoreComposer : ComponentComposer<AspNetCoreComponent>, IComposer
     {
-        public new void Compose(Composition composition)
+        public override void Compose(Composition composition)
         {
             base.Compose(composition);
 
@@ -99,7 +99,7 @@ namespace Umbraco.Web.Common.Runtime
 
             composition.RegisterUnique<ITemplateRenderer, TemplateRenderer>();
             composition.RegisterUnique<IPublicAccessChecker, PublicAccessChecker>();
-            composition.RegisterUnique(factory => new LegacyPasswordSecurity(factory.GetInstance<IOptions<UserPasswordConfigurationSettings>>().Value));
+            composition.RegisterUnique(factory => new LegacyPasswordSecurity());
         }
     }
 }

@@ -194,7 +194,6 @@
     <Compile Include="Security\OwinDataProtectorTokenProvider.cs" />
     <Compile Include="Security\PublicAccessChecker.cs" />
     <Compile Include="Security\UmbracoMembershipProviderBase.cs" />
-    <Compile Include="Security\UserAwarePasswordHasher.cs" />
     <Compile Include="StringExtensions.cs" />
     <Compile Include="UmbracoContext.cs" />
     <Compile Include="UmbracoContextFactory.cs" />

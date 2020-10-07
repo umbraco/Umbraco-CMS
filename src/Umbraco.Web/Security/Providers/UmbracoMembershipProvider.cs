@@ -83,9 +83,9 @@ namespace Umbraco.Web.Security.Providers
             if (m == null) return false;
 
             string salt;
-            var encodedPassword = PasswordSecurity.HashNewPassword(newPassword, out salt);
+            var encodedPassword = PasswordSecurity.HashNewPassword(Membership.HashAlgorithmType, newPassword, out salt);
 
-            m.RawPasswordValue = PasswordSecurity.FormatPasswordForStorage(encodedPassword, salt);
+            m.RawPasswordValue = PasswordSecurity.FormatPasswordForStorage(Membership.HashAlgorithmType, encodedPassword, salt);
             m.LastPasswordChangeDate = DateTime.Now;
 
             MemberService.Save(m);
@@ -143,12 +143,12 @@ namespace Umbraco.Web.Security.Providers
             }
 
             string salt;
-            var encodedPassword = PasswordSecurity.HashNewPassword(password, out salt);
+            var encodedPassword = PasswordSecurity.HashNewPassword(Membership.HashAlgorithmType, password, out salt);
 
             var member = MemberService.CreateWithIdentity(
                 username,
                 email,
-                PasswordSecurity.FormatPasswordForStorage(encodedPassword, salt),
+                PasswordSecurity.FormatPasswordForStorage(Membership.HashAlgorithmType, encodedPassword, salt),
                 memberTypeAlias,
                 isApproved);
 
@@ -406,8 +406,8 @@ namespace Umbraco.Web.Security.Providers
             }
 
             string salt;
-            var encodedPassword = PasswordSecurity.HashNewPassword(generatedPassword, out salt);
-            m.RawPasswordValue = PasswordSecurity.FormatPasswordForStorage(encodedPassword, salt);
+            var encodedPassword = PasswordSecurity.HashNewPassword(Membership.HashAlgorithmType, generatedPassword, out salt);
+            m.RawPasswordValue = PasswordSecurity.FormatPasswordForStorage(Membership.HashAlgorithmType, encodedPassword, salt);
             m.LastPasswordChangeDate = DateTime.Now;
             MemberService.Save(m);
 
@@ -519,7 +519,7 @@ namespace Umbraco.Web.Security.Providers
                 };
             }
 
-            var authenticated = PasswordSecurity.VerifyPassword(password, member.RawPasswordValue);
+            var authenticated = PasswordSecurity.VerifyPassword(Membership.HashAlgorithmType, password, member.RawPasswordValue);
 
             var requiresFullSave = false;
 

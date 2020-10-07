@@ -7,15 +7,14 @@ using Microsoft.Extensions.Options;
 using Microsoft.Owin.Security.DataProtection;
 using Umbraco.Core;
 using Umbraco.Core.BackOffice;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Mapping;
-using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Net;
 
 namespace Umbraco.Web.Security
 {
+    // TODO: Most of this is already migrated to netcore, there's probably not much more to go and then we can complete remove it
     public class BackOfficeOwinUserManager : BackOfficeUserManager
     {
         public const string OwinMarkerKey = "Umbraco.Web.Security.Identity.BackOfficeUserManagerMarker";
@@ -117,11 +116,6 @@ namespace Umbraco.Web.Security
         }
 
         #endregion
-
-        protected override IPasswordHasher<BackOfficeIdentityUser> GetDefaultPasswordHasher(IPasswordConfiguration passwordConfiguration)
-        {
-            return new UserAwarePasswordHasher<BackOfficeIdentityUser>(new LegacyPasswordSecurity(passwordConfiguration));
-        }
 
         protected void InitUserManager(BackOfficeOwinUserManager manager, IDataProtectionProvider dataProtectionProvider)
         {
