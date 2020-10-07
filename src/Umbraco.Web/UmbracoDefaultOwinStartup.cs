@@ -6,7 +6,6 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
 using Umbraco.Core.Mapping;
 using Umbraco.Net;
 using Umbraco.Core.Services;
@@ -76,6 +75,9 @@ namespace Umbraco.Web
             // Configure OWIN for authentication.
             ConfigureUmbracoAuthentication(app);
 
+            // must come after all authentication
+            app.UseUmbracoBackOfficeExternalLoginErrors();
+
             app
                 .UseSignalR(GlobalSettings, HostingEnvironment)
                 .FinalizeMiddlewareConfiguration();
@@ -107,6 +109,7 @@ namespace Umbraco.Web
             app
                 .UseUmbracoBackOfficeCookieAuthentication(UmbracoContextAccessor, RuntimeState, Services.UserService, GlobalSettings, SecuritySettings, HostingEnvironment, RequestCache, PipelineStage.Authenticate)
                 .UseUmbracoBackOfficeExternalCookieAuthentication(UmbracoContextAccessor, RuntimeState, GlobalSettings, HostingEnvironment, RequestCache, PipelineStage.Authenticate)
+                // TODO: this would be considered a breaking change but this must come after all authentication so should be moved within ConfigureMiddleware
                 .UseUmbracoPreviewAuthentication(UmbracoContextAccessor, RuntimeState, GlobalSettings, SecuritySettings, HostingEnvironment, RequestCache, PipelineStage.Authorize);
         }
 

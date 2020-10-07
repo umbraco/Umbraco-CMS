@@ -14,6 +14,7 @@ using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Profiling;
 using Umbraco.Web.PropertyEditors;
+using Umbraco.Web.Security;
 using Umbraco.Web.Trees;
 using Constants = Umbraco.Core.Constants;
 using Umbraco.Core.Configuration.UmbracoSettings;
@@ -401,8 +402,7 @@ namespace Umbraco.Web.Editors
                     "externalLogins", new Dictionary<string, object>
                     {
                         {
-                            "providers", _httpContextAccessor.GetRequiredHttpContext().GetOwinContext().Authentication.GetExternalAuthenticationTypes()
-                                .Where(p => p.Properties.ContainsKey("UmbracoBackOffice"))
+                            "providers", _httpContextAccessor.GetRequiredHttpContext().GetOwinContext().Authentication.GetBackOfficeExternalLoginProviders()
                                 .Select(p => new
                                 {
                                     authType = p.AuthenticationType, caption = p.Caption,

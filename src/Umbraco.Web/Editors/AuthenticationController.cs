@@ -28,8 +28,8 @@ using Umbraco.Core.Mapping;
 using Umbraco.Web.Models.Identity;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
 using Umbraco.Web.Routing;
+using Umbraco.Web.Editors.Filters;
 
 namespace Umbraco.Web.Editors
 {
@@ -89,6 +89,7 @@ namespace Umbraco.Web.Editors
             return _passwordConfiguration.GetConfiguration(userId != UmbracoContext.Security.CurrentUser.Id);
         }
 
+
         /// <summary>
         /// Checks if a valid token is specified for an invited user and if so logs the user in and returns the user object
         /// </summary>
@@ -99,6 +100,7 @@ namespace Umbraco.Web.Editors
         /// This will also update the security stamp for the user so it can only be used once
         /// </remarks>
         [ValidateAngularAntiForgeryToken]
+        [DenyLocalLoginAuthorization]
         public async Task<UserDisplay> PostVerifyInvite([FromUri]int id, [FromUri]string token)
         {
             if (string.IsNullOrWhiteSpace(token))
@@ -134,6 +136,23 @@ namespace Umbraco.Web.Editors
         [ValidateAngularAntiForgeryToken]
         public async Task<HttpResponseMessage> PostUnLinkLogin(UnLinkLoginModel unlinkLoginModel)
         {
+            var owinContext = TryGetOwinContext().Result;
+            ExternalSignInAutoLinkOptions autoLinkOptions = null;
+            var authType = owinContext.Authentication.GetExternalAuthenticationTypes().FirstOrDefault(x => x.AuthenticationType == unlinkLoginModel.LoginProvider);
+            if (authType == null)
+            {
+                Logger.Warn<BackOfficeController>("Could not find external authentication provider registered: {LoginProvider}", unlinkLoginModel.LoginProvider);
+            }
+            else
+            {
+                autoLinkOptions = authType.GetExternalSignInAutoLinkOptions();
+                if (!autoLinkOptions.AllowManualLinking)
+                {
+                    // If AllowManualLinking is disabled for this provider we cannot unlink
+                    return Request.CreateResponse(HttpStatusCode.BadRequest);
+                }
+            }
+
             var user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
             if (user == null) throw new InvalidOperationException("Could not find user");
 
@@ -232,7 +251,12 @@ namespace Umbraco.Web.Editors
         public async Task<Dictionary<string, string>> GetCurrentUserLinkedLogins()
         {
             var identityUser = await UserManager.FindByIdAsync(UmbracoContext.Security.GetUserId().ResultOr(0).ToString());
-            return identityUser.Logins.ToDictionary(x => x.LoginProvider, x => x.ProviderKey);
+            var result = new Dictionary<string, string>();
+            foreach (var l in identityUser.Logins)
+            {
+                result[l.LoginProvider] = l.ProviderKey;
+            }
+            return result;
         }
 
         /// <summary>
@@ -240,6 +264,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <returns></returns>
         [SetAngularAntiForgeryTokens]
+        [DenyLocalLoginAuthorization]
         public async Task<HttpResponseMessage> PostLogin(LoginModel loginModel)
         {
             var http = EnsureHttpContext();
@@ -310,6 +335,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <returns></returns>
         [SetAngularAntiForgeryTokens]
+        [DenyLocalLoginAuthorization]
         public async Task<HttpResponseMessage> PostRequestPasswordReset(RequestPasswordResetModel model)
         {
             // If this feature is switched off in configuration the UI will be amended to not make the request to reset password available.
@@ -512,7 +538,12 @@ namespace Umbraco.Web.Editors
             if (UserManager != null)
             {
                 int.TryParse(User.Identity.GetUserId(), out var userId);
-                UserManager.RaiseLogoutSuccessEvent(userId);
+                var args = UserManager.RaiseLogoutSuccessEvent(userId);
+                if (!args.SignOutRedirectUrl.IsNullOrWhiteSpace())
+                    return Request.CreateResponse(new
+                    {
+                        signOutRedirectUrl = args.SignOutRedirectUrl
+                    });
             }
 
             return Request.CreateResponse(HttpStatusCode.OK);

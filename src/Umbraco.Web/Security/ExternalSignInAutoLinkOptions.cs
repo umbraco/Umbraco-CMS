@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Runtime.Serialization;
 using Umbraco.Core;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Models.Identity;
 
 namespace Umbraco.Web.Security
 {
+
     /// <summary>
     /// Options used to configure auto-linking external OAuth providers
     /// </summary>
@@ -29,14 +31,22 @@ namespace Umbraco.Web.Security
         private readonly string[] _defaultUserGroups;
 
         /// <summary>
+        /// By default this is true which allows the user to manually link and unlink the external provider, if set to false the back office user
+        /// will not see and cannot perform manual linking or unlinking of the external provider.
+        /// </summary>
+        public bool AllowManualLinking { get; set; } = true;
+
+        /// <summary>
         /// A callback executed during account auto-linking and before the user is persisted
         /// </summary>
+        [IgnoreDataMember]
         public Action<BackOfficeIdentityUser, ExternalLoginInfo> OnAutoLinking { get; set; }
 
         /// <summary>
         /// A callback executed during every time a user authenticates using an external login.
         /// returns a boolean indicating if sign in should continue or not.
         /// </summary>
+        [IgnoreDataMember]
         public Func<BackOfficeIdentityUser, ExternalLoginInfo, bool> OnExternalLogin { get; set; }
 
 
@@ -46,7 +56,7 @@ namespace Umbraco.Web.Security
         /// <param name="umbracoContext"></param>
         /// <param name="loginInfo"></param>
         /// <returns></returns>
-        public string[] GetDefaultUserGroups(IUmbracoContext umbracoContext, ExternalLoginInfo loginInfo)
+        public virtual string[] GetDefaultUserGroups(IUmbracoContext umbracoContext, ExternalLoginInfo loginInfo)
         {
             return _defaultUserGroups;
         }
@@ -59,7 +69,7 @@ namespace Umbraco.Web.Security
         ///
         /// For public auth providers this should always be false!!!
         /// </summary>
-        public bool ShouldAutoLinkExternalAccount(IUmbracoContext umbracoContext, ExternalLoginInfo loginInfo)
+        public virtual bool ShouldAutoLinkExternalAccount(IUmbracoContext umbracoContext, ExternalLoginInfo loginInfo)
         {
             return _autoLinkExternalAccount;
         }
@@ -69,7 +79,7 @@ namespace Umbraco.Web.Security
         /// <summary>
         /// The default Culture to use for auto-linking users
         /// </summary>
-        public string GetDefaultCulture(IUmbracoContext umbracoContext, ExternalLoginInfo loginInfo)
+        public virtual string GetDefaultCulture(IUmbracoContext umbracoContext, ExternalLoginInfo loginInfo)
         {
             return _defaultCulture;
         }

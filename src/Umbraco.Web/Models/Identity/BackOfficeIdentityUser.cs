@@ -279,16 +279,23 @@ namespace Umbraco.Web.Models.Identity
         {
             get
             {
-                if (_getLogins != null && _getLogins.IsValueCreated == false)
+                // return if it exists
+                if (_logins != null) return _logins;
+
+                _logins = new ObservableCollection<IIdentityUserLogin>();
+
+                // if the callback is there and hasn't been created yet then execute it and populate the logins
+                if (_getLogins != null && !_getLogins.IsValueCreated)
                 {
-                    _logins = new ObservableCollection<IIdentityUserLogin>();
                     foreach (var l in _getLogins.Value)
                     {
                         _logins.Add(l);
                     }
-                    //now assign events
-                    _logins.CollectionChanged += Logins_CollectionChanged;
                 }
+
+                //now assign events
+                _logins.CollectionChanged += Logins_CollectionChanged;
+
                 return _logins;
             }
         }

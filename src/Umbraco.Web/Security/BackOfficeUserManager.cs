@@ -36,9 +36,9 @@ namespace Umbraco.Web.Security
         {
             InitUserManager(this, dataProtectionProvider);
         }
-        
+
         #region Static Create methods
-        
+
         /// <summary>
         /// Creates a BackOfficeUserManager instance with all default options and the default BackOfficeUserManager
         /// </summary>
@@ -55,7 +55,7 @@ namespace Umbraco.Web.Security
             ILogger<UserManager<BackOfficeIdentityUser>> logger)
         {
             var store = new BackOfficeUserStore(userService, entityService, externalLoginService, globalSettings, mapper);
-            
+
             return Create(
                 passwordConfiguration,
                 ipResolver,
@@ -89,7 +89,7 @@ namespace Umbraco.Web.Security
             options.Password.RequireDigit = passwordConfiguration.RequireDigit;
             options.Password.RequireLowercase = passwordConfiguration.RequireLowercase;
             options.Password.RequireUppercase = passwordConfiguration.RequireUppercase;
-            
+
             // Ensure Umbraco security stamp claim type is used
             options.ClaimsIdentity.UserIdClaimType = ClaimTypes.NameIdentifier;
             options.ClaimsIdentity.UserNameClaimType = ClaimTypes.Name;
@@ -110,7 +110,7 @@ namespace Umbraco.Web.Security
                 new OptionsWrapper<IdentityOptions>(options),
                 userValidators,
                 passwordValidators,
-                new NopLookupNormalizer(), 
+                new NopLookupNormalizer(),
                 errors,
                 dataProtectionProvider,
                 logger);
@@ -144,7 +144,7 @@ namespace Umbraco.Web.Security
         #region What we do not currently support
         // TODO: We could support this - but a user claims will mostly just be what is in the auth cookie
         public override bool SupportsUserClaim => false;
-        
+
         // TODO: Support this
         public override bool SupportsQueryableUsers => false;
 
@@ -208,7 +208,7 @@ namespace Umbraco.Web.Security
             //we can use the user aware password hasher (which will be the default and preferred way)
             return new UserAwarePasswordHasher<T>(new PasswordSecurity(passwordConfiguration));
         }
-        
+
         /// <summary>
         /// Gets/sets the default back office user password checker
         /// </summary>
@@ -291,7 +291,7 @@ namespace Umbraco.Web.Security
             //use the default behavior
             return await base.CheckPasswordAsync(user, password);
         }
-        
+
         /// <summary>
         /// This is a special method that will reset the password but will raise the Password Changed event instead of the reset event
         /// </summary>
@@ -319,7 +319,7 @@ namespace Umbraco.Web.Security
             if (result.Succeeded) RaisePasswordChangedEvent(user.Id);
             return result;
         }
-        
+
         /// <summary>
         /// Override to determine how to hash the password
         /// </summary>
@@ -497,9 +497,11 @@ namespace Umbraco.Web.Security
             OnLoginSuccess(new IdentityAuditEventArgs(AuditEvent.LoginSucces, IpResolver.GetCurrentRequestIpAddress(), affectedUser: userId));
         }
 
-        internal void RaiseLogoutSuccessEvent(int userId)
+        internal SignOutAuditEventArgs RaiseLogoutSuccessEvent(int userId)
         {
-            OnLogoutSuccess(new IdentityAuditEventArgs(AuditEvent.LogoutSuccess, IpResolver.GetCurrentRequestIpAddress(), affectedUser: userId));
+            var args = new SignOutAuditEventArgs(AuditEvent.LogoutSuccess, IpResolver.GetCurrentRequestIpAddress(), affectedUser: userId);
+            OnLogoutSuccess(args);
+            return args;
         }
 
         internal void RaisePasswordChangedEvent(int userId)
@@ -512,6 +514,10 @@ namespace Umbraco.Web.Security
             OnResetAccessFailedCount(new IdentityAuditEventArgs(AuditEvent.ResetAccessFailedCount, IpResolver.GetCurrentRequestIpAddress(), affectedUser: userId));
         }
 
+        internal void RaiseSendingUserInvite(UserInviteEventArgs args) => OnSendingUserInvite(args);
+        internal bool HasSendingUserInviteEventHandler => SendingUserInvite != null;
+
+        // TODO: Not sure why these are not strongly typed events?? They should be in netcore!
         public static event EventHandler AccountLocked;
         public static event EventHandler AccountUnlocked;
         public static event EventHandler ForgotPasswordRequested;
@@ -524,55 +530,30 @@ namespace Umbraco.Web.Security
         public static event EventHandler PasswordReset;
         public static event EventHandler ResetAccessFailedCount;
 
-        protected virtual void OnAccountLocked(IdentityAuditEventArgs e)
-        {
-            if (AccountLocked != null) AccountLocked(this, e);
-        }
+        /// <summary>
+        /// Raised when a user is invited
+        /// </summary>
+        public static event EventHandler SendingUserInvite; // this event really has nothing to do with the user manager but was the most convenient place to put it
 
-        protected virtual void OnAccountUnlocked(IdentityAuditEventArgs e)
-        {
-            if (AccountUnlocked != null) AccountUnlocked(this, e);
-        }
+        protected virtual void OnSendingUserInvite(UserInviteEventArgs e) => SendingUserInvite?.Invoke(this, e);
 
-        protected virtual void OnForgotPasswordRequested(IdentityAuditEventArgs e)
-        {
-            if (ForgotPasswordRequested != null) ForgotPasswordRequested(this, e);
-        }
+        protected virtual void OnAccountLocked(IdentityAuditEventArgs e) => AccountLocked?.Invoke(this, e);
 
-        protected virtual void OnForgotPasswordChangedSuccess(IdentityAuditEventArgs e)
-        {
-            if (ForgotPasswordChangedSuccess != null) ForgotPasswordChangedSuccess(this, e);
-        }
+        protected virtual void OnAccountUnlocked(IdentityAuditEventArgs e) => AccountUnlocked?.Invoke(this, e);
 
-        protected virtual void OnLoginFailed(IdentityAuditEventArgs e)
-        {
-            if (LoginFailed != null) LoginFailed(this, e);
-        }
+        protected virtual void OnForgotPasswordRequested(IdentityAuditEventArgs e) => ForgotPasswordRequested?.Invoke(this, e);
 
-        protected virtual void OnLoginRequiresVerification(IdentityAuditEventArgs e)
-        {
-            if (LoginRequiresVerification != null) LoginRequiresVerification(this, e);
-        }
+        protected virtual void OnForgotPasswordChangedSuccess(IdentityAuditEventArgs e) => ForgotPasswordChangedSuccess?.Invoke(this, e);
 
-        protected virtual void OnLoginSuccess(IdentityAuditEventArgs e)
-        {
-            if (LoginSuccess != null) LoginSuccess(this, e);
-        }
+        protected virtual void OnLoginFailed(IdentityAuditEventArgs e) => LoginFailed?.Invoke(this, e);
 
-        protected virtual void OnLogoutSuccess(IdentityAuditEventArgs e)
-        {
-            if (LogoutSuccess != null) LogoutSuccess(this, e);
-        }
+        protected virtual void OnLoginRequiresVerification(IdentityAuditEventArgs e) => LoginRequiresVerification?.Invoke(this, e);
 
-        protected virtual void OnPasswordChanged(IdentityAuditEventArgs e)
-        {
-            if (PasswordChanged != null) PasswordChanged(this, e);
-        }
+        protected virtual void OnLoginSuccess(IdentityAuditEventArgs e) => LoginSuccess?.Invoke(this, e);
 
-        protected virtual void OnPasswordReset(IdentityAuditEventArgs e)
-        {
-            if (PasswordReset != null) PasswordReset(this, e);
-        }
+        protected virtual void OnLogoutSuccess(IdentityAuditEventArgs e) => LogoutSuccess?.Invoke(this, e);
+
+        protected virtual void OnPasswordChanged(IdentityAuditEventArgs e) => PasswordChanged?.Invoke(this, e);
 
         protected virtual void OnResetAccessFailedCount(IdentityAuditEventArgs e)
         {

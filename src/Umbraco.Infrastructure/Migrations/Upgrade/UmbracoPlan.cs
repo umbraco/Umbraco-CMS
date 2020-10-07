@@ -7,6 +7,7 @@ using Umbraco.Core.Migrations.Upgrade.V_8_0_0;
 using Umbraco.Core.Migrations.Upgrade.V_8_0_1;
 using Umbraco.Core.Migrations.Upgrade.V_8_1_0;
 using Umbraco.Core.Migrations.Upgrade.V_8_6_0;
+using Umbraco.Core.Migrations.Upgrade.V_8_8_0;
 
 namespace Umbraco.Core.Migrations.Upgrade
 {
@@ -196,6 +197,9 @@ namespace Umbraco.Core.Migrations.Upgrade
 
             // to 8.7.0...
             To<MissingDictionaryIndex>("{a78e3369-8ea3-40ec-ad3f-5f76929d2b20}");
+
+            // to 8.8.0
+            To<ExternalLoginTableUserData>("{B5838FF5-1D22-4F6C-BCEB-F83ACB14B575}");
             
             //FINAL
         }

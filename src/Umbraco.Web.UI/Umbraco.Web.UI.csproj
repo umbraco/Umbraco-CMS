@@ -348,8 +348,9 @@
           <IISUrl>http://localhost:8610</IISUrl>
           <IISUrl>http://localhost:8700</IISUrl>          
           <DevelopmentServerPort>8800</DevelopmentServerPort>
+          <DevelopmentServerPort>8900</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:8800</IISUrl>
+          <IISUrl>http://localhost:8900</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

@@ -4,7 +4,7 @@
     function UsersController($scope, $timeout, $location, $routeParams, usersResource,
         userGroupsResource, userService, localizationService,
         usersHelper, formHelper, dateHelper, editorService,
-        listViewHelper) {
+        listViewHelper, externalLoginInfoService) {
 
         var vm = this;
 
@@ -69,31 +69,42 @@
         // Get last selected layout for "users" (defaults to first layout = card layout)
         vm.activeLayout = listViewHelper.getLayout("users", vm.layouts);
 
+        vm.denyLocalLogin = externalLoginInfoService.hasDenyLocalLogin();
+
+        // returns the object representing the user create button, returns null if deny local login is true
+        function getCreateUserButton() {
+            if (!vm.denyLocalLogin) {
+                return {
+                    type: "button",
+                    labelKey: "user_createUser",
+                    handler: function () {
+                        vm.setUsersViewState('createUser');
+                    }
+                };
+            }
+            return null;
+        }
+
+        // No default buttons with denyLocalLogin
         // Don't show the invite button if no email is configured
         if (Umbraco.Sys.ServerVariables.umbracoSettings.showUserInvite) {
             vm.defaultButton = {
+                type: "button",
                 labelKey: "user_inviteUser",
                 handler: function () {
                     vm.setUsersViewState('inviteUser');
                 }
             };
-            vm.subButtons = [
-                {
-                    labelKey: "user_createUser",
-                    handler: function () {
-                        vm.setUsersViewState('createUser');
-                    }
-                }
-            ];
+            var createUserBtn = getCreateUserButton();
+            if (createUserBtn) {
+                vm.subButtons = [createUserBtn];
+            }
         }
         else {
-            vm.defaultButton = {
-                labelKey: "user_createUser",
-                handler: function () {
-                    vm.setUsersViewState('createUser');
-                }
-            };
+            vm.defaultButton = getCreateUserButton();
         }
+
+            
 
         vm.toggleFilter = toggleFilter;
         vm.setUsersViewState = setUsersViewState;

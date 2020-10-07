@@ -127,9 +127,10 @@ namespace Umbraco.Web.Security
                 IsLockedOut = user.IsLockedOut,
             };
 
-            UpdateMemberProperties(userEntity, user);
+            // we have to remember whether Logins property is dirty, since the UpdateMemberProperties will reset it.
+            var isLoginsPropertyDirty = user.IsPropertyDirty(nameof(BackOfficeIdentityUser.Logins));
 
-            // TODO: We should deal with Roles --> User Groups here which we currently are not doing
+            UpdateMemberProperties(userEntity, user);
 
             _userService.Save(userEntity);
 
@@ -137,6 +138,16 @@ namespace Umbraco.Web.Security
 
             //re-assign id
             user.Id = userEntity.Id;
+
+            if (isLoginsPropertyDirty)
+            {
+                _externalLoginService.Save(
+                    user.Id,
+                    user.Logins.Select(x => new ExternalLogin(
+                        x.LoginProvider,
+                        x.ProviderKey,
+                        (x is IIdentityUserLoginExtended extended) ? extended.UserData : null)));
+            }
 
             return Task.FromResult(IdentityResult.Success);
         }
@@ -153,11 +164,19 @@ namespace Umbraco.Web.Security
             ThrowIfDisposed();
             if (user == null) throw new ArgumentNullException(nameof(user));
 
-            var found = _userService.GetUserById(user.Id);
+            var asInt = user.Id.TryConvertTo<int>();
+            if (asInt == false)
+            {
+                throw new InvalidOperationException("The user id must be an integer to work with the Umbraco");
+            }
+
+            // TODO: Wrap this in a scope!
+
+            var found = _userService.GetUserById(asInt.Result);
             if (found != null)
             {
                 // we have to remember whether Logins property is dirty, since the UpdateMemberProperties will reset it.
-                var isLoginsPropertyDirty = user.IsPropertyDirty("Logins");
+                var isLoginsPropertyDirty = user.IsPropertyDirty(nameof(BackOfficeIdentityUser.Logins));
 
                 if (UpdateMemberProperties(found, user))
                 {
@@ -166,8 +185,12 @@ namespace Umbraco.Web.Security
 
                 if (isLoginsPropertyDirty)
                 {
-                    var logins = await GetLoginsAsync(user);
-                    _externalLoginService.SaveUserLogins(found.Id, logins.Select(UserLoginInfoWrapper.Wrap));
+                    _externalLoginService.Save(
+                        found.Id,
+                        user.Logins.Select(x => new ExternalLogin(
+                            x.LoginProvider,
+                            x.ProviderKey,
+                            (x is IIdentityUserLoginExtended extended) ? extended.UserData : null)));
                 }
             }
 
@@ -439,7 +462,7 @@ namespace Umbraco.Web.Security
             ThrowIfDisposed();
 
             //get all logins associated with the login id
-            var result = _externalLoginService.Find(UserLoginInfoWrapper.Wrap(new UserLoginInfo(loginProvider, providerKey, loginProvider))).ToArray();
+            var result = _externalLoginService.Find(loginProvider, providerKey).ToArray();
             if (result.Any())
             {
                 //return the first user that matches the result
@@ -759,7 +782,7 @@ namespace Umbraco.Web.Security
 
             //don't assign anything if nothing has changed as this will trigger the track changes of the model
 
-            if (identityUser.IsPropertyDirty("LastLoginDateUtc")
+            if (identityUser.IsPropertyDirty(nameof(BackOfficeIdentityUser.LastLoginDateUtc))
                 || (user.LastLoginDate != default(DateTime) && identityUser.LastLoginDateUtc.HasValue == false)
                 || identityUser.LastLoginDateUtc.HasValue && user.LastLoginDate.ToUniversalTime() != identityUser.LastLoginDateUtc.Value)
             {
@@ -768,33 +791,33 @@ namespace Umbraco.Web.Security
                 var dt = identityUser.LastLoginDateUtc == DateTime.MinValue ? DateTime.MinValue : identityUser.LastLoginDateUtc.Value.ToLocalTime();
                 user.LastLoginDate = dt;
             }
-            if (identityUser.IsPropertyDirty("LastPasswordChangeDateUtc")
+            if (identityUser.IsPropertyDirty(nameof(BackOfficeIdentityUser.LastPasswordChangeDateUtc))
                 || (user.LastPasswordChangeDate != default(DateTime) && identityUser.LastPasswordChangeDateUtc.HasValue == false)
                 || identityUser.LastPasswordChangeDateUtc.HasValue && user.LastPasswordChangeDate.ToUniversalTime() != identityUser.LastPasswordChangeDateUtc.Value)
             {
                 anythingChanged = true;
                 user.LastPasswordChangeDate = identityUser.LastPasswordChangeDateUtc.Value.ToLocalTime();
             }
-            if (identityUser.IsPropertyDirty("EmailConfirmed")
+            if (identityUser.IsPropertyDirty(nameof(BackOfficeIdentityUser.EmailConfirmed))
                 || (user.EmailConfirmedDate.HasValue && user.EmailConfirmedDate.Value != default(DateTime) && identityUser.EmailConfirmed == false)
                 || ((user.EmailConfirmedDate.HasValue == false || user.EmailConfirmedDate.Value == default(DateTime)) && identityUser.EmailConfirmed))
             {
                 anythingChanged = true;
                 user.EmailConfirmedDate = identityUser.EmailConfirmed ? (DateTime?)DateTime.Now : null;
             }
-            if (identityUser.IsPropertyDirty("Name")
+            if (identityUser.IsPropertyDirty(nameof(BackOfficeIdentityUser.Name))
                 && user.Name != identityUser.Name && identityUser.Name.IsNullOrWhiteSpace() == false)
             {
                 anythingChanged = true;
                 user.Name = identityUser.Name;
             }
-            if (identityUser.IsPropertyDirty("Email")
+            if (identityUser.IsPropertyDirty(nameof(BackOfficeIdentityUser.Email))
                 && user.Email != identityUser.Email && identityUser.Email.IsNullOrWhiteSpace() == false)
             {
                 anythingChanged = true;
                 user.Email = identityUser.Email;
             }
-            if (identityUser.IsPropertyDirty("AccessFailedCount")
+            if (identityUser.IsPropertyDirty(nameof(BackOfficeIdentityUser.AccessFailedCount))
                 && user.FailedPasswordAttempts != identityUser.AccessFailedCount)
             {
                 anythingChanged = true;
@@ -812,32 +835,32 @@ namespace Umbraco.Web.Security
                 }
 
             }
-            if (identityUser.IsPropertyDirty("UserName")
+            if (identityUser.IsPropertyDirty(nameof(BackOfficeIdentityUser.UserName))
                 && user.Username != identityUser.UserName && identityUser.UserName.IsNullOrWhiteSpace() == false)
             {
                 anythingChanged = true;
                 user.Username = identityUser.UserName;
             }
-            if (identityUser.IsPropertyDirty("PasswordHash")
+            if (identityUser.IsPropertyDirty(nameof(BackOfficeIdentityUser.PasswordHash))
                 && user.RawPasswordValue != identityUser.PasswordHash && identityUser.PasswordHash.IsNullOrWhiteSpace() == false)
             {
                 anythingChanged = true;
                 user.RawPasswordValue = identityUser.PasswordHash;
             }
 
-            if (identityUser.IsPropertyDirty("Culture")
+            if (identityUser.IsPropertyDirty(nameof(BackOfficeIdentityUser.Culture))
                 && user.Language != identityUser.Culture && identityUser.Culture.IsNullOrWhiteSpace() == false)
             {
                 anythingChanged = true;
                 user.Language = identityUser.Culture;
             }
-            if (identityUser.IsPropertyDirty("StartMediaIds")
+            if (identityUser.IsPropertyDirty(nameof(BackOfficeIdentityUser.StartMediaIds))
                 && user.StartMediaIds.UnsortedSequenceEqual(identityUser.StartMediaIds) == false)
             {
                 anythingChanged = true;
                 user.StartMediaIds = identityUser.StartMediaIds;
             }
-            if (identityUser.IsPropertyDirty("StartContentIds")
+            if (identityUser.IsPropertyDirty(nameof(BackOfficeIdentityUser.StartContentIds))
                 && user.StartContentIds.UnsortedSequenceEqual(identityUser.StartContentIds) == false)
             {
                 anythingChanged = true;
@@ -850,7 +873,7 @@ namespace Umbraco.Web.Security
             }
 
             // TODO: Fix this for Groups too
-            if (identityUser.IsPropertyDirty("Roles") || identityUser.IsPropertyDirty("Groups"))
+            if (identityUser.IsPropertyDirty(nameof(BackOfficeIdentityUser.Roles)) || identityUser.IsPropertyDirty(nameof(BackOfficeIdentityUser.Groups)))
             {
                 var userGroupAliases = user.Groups.Select(x => x.Alias).ToArray();
 

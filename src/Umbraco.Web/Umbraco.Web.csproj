@@ -165,6 +165,10 @@
     <Compile Include="Editors\ElementTypeController.cs" />
     <Compile Include="Editors\Filters\ContentSaveModelValidator.cs" />
     <Compile Include="Editors\Filters\DataTypeValidateAttribute.cs" />
+    <Compile Include="Editors\ChallengeResult.cs" />
+    <Compile Include="Editors\ElementTypeController.cs" />
+    <Compile Include="Editors\Filters\ContentSaveModelValidator.cs" />
+    <Compile Include="Editors\Filters\DenyLocalLoginAuthorizationAttribute.cs" />
     <Compile Include="Editors\Filters\MediaSaveModelValidator.cs" />
     <Compile Include="Editors\IconController.cs" />
     <Compile Include="Editors\ImageUrlGeneratorController.cs" />
@@ -233,6 +237,11 @@
     <Compile Include="Trees\ITreeNodeController.cs" />
     <Compile Include="Trees\TreeCollectionBuilder.cs" />
     <Compile Include="UmbracoContext.cs" />
+    <Compile Include="Security\BackOfficeExternalLoginProviderErrorMiddlware.cs" />
+    <Compile Include="Security\BackOfficeExternalLoginProviderErrors.cs" />
+    <Compile Include="Security\BackOfficeExternalLoginProviderOptions.cs" />
+    <Compile Include="Security\SignOutAuditEventArgs.cs" />
+    <Compile Include="Security\UserInviteEventArgs.cs" />
     <Compile Include="Services\IconService.cs" />
     <Compile Include="UmbracoContextFactory.cs" />
     <Compile Include="Mvc\UmbracoVirtualNodeByUdiRouteHandler.cs" />

@@ -26,9 +26,16 @@ namespace Umbraco.Web.Security
 
             var baseIdentity = await base.GenerateClaimsAsync(user);
 
+            // now we can flow any custom claims that the actual user has currently assigned which could be done in the OnExternalLogin callback
+            foreach (var claim in user.Claims)
+            {
+                baseIdentity.AddClaim(new Claim(claim.ClaimType, claim.ClaimValue));
+            }
+
+
             // Required by ASP.NET 4.x anti-forgery implementation
             baseIdentity.AddClaim(new Claim(_identityProviderClaimType, _identityProviderClaimValue));
-            
+
             var umbracoIdentity = new UmbracoBackOfficeIdentity(
                 baseIdentity,
                 user.Id,

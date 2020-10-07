@@ -60,6 +60,14 @@ umb-block-card {
         background-size: cover;
         background-position: 50% 50%;
         background-repeat: no-repeat;
+
+        &.--error {
+            border: 2px solid @errorBackground;
+            border-bottom: none;
+            border-top-left-radius: 6px;
+            border-top-right-radius: 6px;
+            box-sizing: border-box;
+        }
         
         .__icon {
             position: absolute;
@@ -75,26 +83,35 @@ umb-block-card {
     .__info {
         width: 100%;
         background-color: #fff;
+        padding-top: 10px;
         padding-bottom: 11px;// 10 + 1 to compentiate for the -1 substraction in margin-bottom.
+
+        &.--error {
+            background-color: @errorBackground;
+            .__name, .__subname {
+                color: @errorText;
+            }
+        }
 
         .__name {
             font-weight: bold;
             font-size: 14px;
             color: @ui-action-type;
             margin-left: 16px;
-            margin-top: 10px;
             margin-bottom: -1px;
         }
         .__subname {
             color: @gray-4;
             font-size: 12px;
             margin-left: 16px;
+            margin-top: 1px;
             margin-bottom: -1px;
+            line-height: 1.5em;
         }
     }
 
     &:hover {
-        .__info {
+        .__info:not(.--error) {
             .__name {
                 color: @ui-action-type-hover;
             }
