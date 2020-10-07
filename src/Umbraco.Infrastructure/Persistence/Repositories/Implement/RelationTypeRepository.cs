@@ -50,9 +50,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             var sql = GetBaseQuery(false);
 
-            // should not happen due to the cache policy
-            if (ids.Any())
-                throw new NotImplementedException();
+            // // should not happen due to the cache policy
+            // if (ids.Any())
+            //     throw new NotImplementedException();
 
             var dtos = Database.Fetch<RelationTypeDto>(sql);
 
