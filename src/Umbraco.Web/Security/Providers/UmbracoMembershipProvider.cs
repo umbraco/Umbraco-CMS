@@ -83,7 +83,7 @@ namespace Umbraco.Web.Security.Providers
             if (m == null) return false;
 
             string salt;
-            var encodedPassword = PasswordSecurity.HashNewPassword(newPassword, out salt);
+            var encodedPassword = PasswordSecurity.HashNewPassword(Membership.HashAlgorithmType, newPassword, out salt);
 
             m.RawPasswordValue = PasswordSecurity.FormatPasswordForStorage(encodedPassword, salt);
             m.LastPasswordChangeDate = DateTime.Now;
@@ -143,7 +143,7 @@ namespace Umbraco.Web.Security.Providers
             }
 
             string salt;
-            var encodedPassword = PasswordSecurity.HashNewPassword(password, out salt);
+            var encodedPassword = PasswordSecurity.HashNewPassword(Membership.HashAlgorithmType, password, out salt);
 
             var member = MemberService.CreateWithIdentity(
                 username,
@@ -406,7 +406,7 @@ namespace Umbraco.Web.Security.Providers
             }
 
             string salt;
-            var encodedPassword = PasswordSecurity.HashNewPassword(generatedPassword, out salt);
+            var encodedPassword = PasswordSecurity.HashNewPassword(Membership.HashAlgorithmType, generatedPassword, out salt);
             m.RawPasswordValue = PasswordSecurity.FormatPasswordForStorage(encodedPassword, salt);
             m.LastPasswordChangeDate = DateTime.Now;
             MemberService.Save(m);
@@ -519,7 +519,7 @@ namespace Umbraco.Web.Security.Providers
                 };
             }
 
-            var authenticated = PasswordSecurity.VerifyPassword(password, member.RawPasswordValue);
+            var authenticated = PasswordSecurity.VerifyPassword(Membership.HashAlgorithmType, password, member.RawPasswordValue);
 
             var requiresFullSave = false;
 

@@ -13,12 +13,12 @@ namespace Umbraco.Web.BackOffice.Security
     /// </summary>
     public class BackOfficePasswordHasher : PasswordHasher<BackOfficeIdentityUser>
     {
-        private readonly LegacyPasswordSecurity _passwordSecurity;
+        private readonly LegacyPasswordSecurity _legacyPasswordSecurity;
         private readonly IJsonSerializer _jsonSerializer;
 
         public BackOfficePasswordHasher(LegacyPasswordSecurity passwordSecurity, IJsonSerializer jsonSerializer)
         {
-            _passwordSecurity = passwordSecurity;
+            _legacyPasswordSecurity = passwordSecurity;
             _jsonSerializer = jsonSerializer;
         }
 
@@ -27,9 +27,12 @@ namespace Umbraco.Web.BackOffice.Security
             if (!user.PasswordConfig.IsNullOrWhiteSpace())
             {
                 // check if the (legacy) password security supports this hash algorith and if so then use it
+                // TODO: I don't think we really want to do this because we want to migrate all old password formats
+                // to the new format, not keep using it. AFAIK this block should be removed along with the code within the
+                // LegacyPasswordSecurity except the part that just validates old ones.
                 var deserialized = _jsonSerializer.Deserialize<UserPasswordSettings>(user.PasswordConfig);
-                if (_passwordSecurity.SupportHashAlgorithm(deserialized.HashAlgorithm))
-                    return _passwordSecurity.HashPasswordForStorage(password);
+                if (_legacyPasswordSecurity.SupportHashAlgorithm(deserialized.HashAlgorithm))
+                    return _legacyPasswordSecurity.HashPasswordForStorage(password);
 
                 // We will explicitly detect names here since this allows us to future proof these checks.
                 // The default is PBKDF2.ASPNETCORE.V3:
@@ -58,9 +61,9 @@ namespace Umbraco.Web.BackOffice.Security
             {
                 // check if the (legacy) password security supports this hash algorith and if so then use it
                 var deserialized = _jsonSerializer.Deserialize<UserPasswordSettings>(user.PasswordConfig);
-                if (_passwordSecurity.SupportHashAlgorithm(deserialized.HashAlgorithm))
+                if (_legacyPasswordSecurity.SupportHashAlgorithm(deserialized.HashAlgorithm))
                 {
-                    var result = _passwordSecurity.VerifyPassword(providedPassword, hashedPassword);
+                    var result = _legacyPasswordSecurity.VerifyPassword(deserialized.HashAlgorithm, providedPassword, hashedPassword);
                     return result
                         ? PasswordVerificationResult.Success
                         : PasswordVerificationResult.Failed;
