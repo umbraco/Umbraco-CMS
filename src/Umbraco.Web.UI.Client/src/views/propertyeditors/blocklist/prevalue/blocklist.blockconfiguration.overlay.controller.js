@@ -41,17 +41,20 @@
         };
 
         vm.openElementType = function(elementTypeKey) {
-            var elementTypeId = vm.getElementTypeByKey(elementTypeKey).id;
-            const editor = {
-                id: elementTypeId,
-                submit: function (model) {
-                    editorService.close();
-                },
-                close: function () {
-                    editorService.close();
-                }
-            };
-            editorService.documentTypeEditor(editor);
+            var elementType = vm.getElementTypeByKey(elementTypeKey);
+            if (elementType) {
+                var elementTypeId = elementType.id;
+                const editor = {
+                    id: elementTypeId,
+                    submit: function (model) {
+                        editorService.close();
+                    },
+                    close: function () {
+                        editorService.close();
+                    }
+                };
+                editorService.documentTypeEditor(editor);
+            }
         };
 
         vm.createElementTypeAndCallback = function(callback) {
@@ -116,7 +119,7 @@
 
                 overlayService.confirmRemove({
                     title: data[0],
-                    content: localizationService.tokenReplace(data[1], [settingsElementType.name]),
+                    content: localizationService.tokenReplace(data[1], [(settingsElementType ? settingsElementType.name : "(Unavailable ElementType)")]),
                     close: function () {
                         overlayService.close();
                     },

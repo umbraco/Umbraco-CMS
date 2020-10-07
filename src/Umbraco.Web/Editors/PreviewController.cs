@@ -107,7 +107,7 @@ namespace Umbraco.Web.Editors
 
             Response.Cookies.Set(new HttpCookie(Constants.Web.PreviewCookieName, previewToken));
 
-            // use a numeric url because content may not be in cache and so .Url would fail
+            // use a numeric URL because content may not be in cache and so .Url would fail
             var query = culture.IsNullOrWhiteSpace() ? string.Empty : $"?culture={culture}";
             Response.Redirect($"../../{id}.aspx{query}", true);
 

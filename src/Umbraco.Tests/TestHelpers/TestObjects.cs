@@ -81,7 +81,7 @@ namespace Umbraco.Tests.TestHelpers
         /// <param name="globalSettings"></param>
         /// <param name="umbracoSettings"></param>
         /// <param name="eventMessagesFactory">An event messages factory.</param>
-        /// <param name="urlSegmentProviders">Some url segment providers.</param>
+        /// <param name="urlSegmentProviders">Some URL segment providers.</param>
         /// <param name="typeLoader"></param>
         /// <param name="factory">A container.</param>
         /// <param name="scopeProvider"></param>
