@@ -506,7 +506,7 @@ namespace Umbraco.Tests.Services
             var alias = "test" + Guid.NewGuid();
             var template = TemplateBuilder.CreateTextPageTemplate(alias);
             FileService.SaveTemplate(template);
-            var contentType = ContentTypeBuilder.CreateSimpleContentType("test1", "Test1", defaultTemplateId: template.Id);
+            var contentType = ContentTypeBuilder.CreateSimpleContentType("test2", "Test2", defaultTemplateId: template.Id);
             contentType.Variations = ContentVariation.Culture;
             ContentTypeService.Save(contentType);
 
