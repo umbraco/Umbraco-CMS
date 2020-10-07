@@ -641,6 +641,7 @@ namespace Umbraco.Tests.Models.Mapping
             Assert.AreEqual(basic.Validation.MandatoryMessage, result.MandatoryMessage);
             Assert.AreEqual(basic.Validation.Pattern, result.ValidationRegExp);
             Assert.AreEqual(basic.Validation.PatternMessage, result.ValidationRegExpMessage);
+            Assert.AreEqual(basic.LabelOnTop, result.LabelOnTop);
         }
 
         [Test]
@@ -679,6 +680,7 @@ namespace Umbraco.Tests.Models.Mapping
             Assert.AreEqual(basic.Validation.MandatoryMessage, result.MandatoryMessage);
             Assert.AreEqual(basic.Validation.Pattern, result.ValidationRegExp);
             Assert.AreEqual(basic.Validation.PatternMessage, result.ValidationRegExpMessage);
+            Assert.AreEqual(basic.LabelOnTop, result.LabelOnTop);
         }
 
         [Test]

@@ -356,7 +356,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.AreEqual("gen", propertyTypes[0].Alias); // just to be sure
                 Assert.IsNull(propertyTypes[0].PropertyGroupId);
                 Assert.IsTrue(propertyTypes.Skip(1).All((x => x.PropertyGroupId.Value == groupId)));
-                Assert.That(propertyTypes[0].LabelOnTop, Is.True);
+                Assert.That(propertyTypes.Single(x=> x.Alias == "title").LabelOnTop, Is.True);
             }
 
         }
