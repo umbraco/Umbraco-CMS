@@ -280,17 +280,13 @@
 
         vm.changeIconColor = function (color) {
             angularHelper.safeApply($scope, function () {
-                if (color) {
-                    vm.block.iconColor = color.toString();
-                }
+                vm.block.iconColor = color ? color.toString() : null;
             });
         };
 
         vm.changeBackgroundColor = function (color) {
             angularHelper.safeApply($scope, function () {
-                if (color) {
-                    vm.block.backgroundColor = color.toString();
-                }
+                vm.block.backgroundColor = color ? color.toString() : null;
             });
         };
 
