@@ -6,7 +6,6 @@
 
   <ItemGroup>
     <PackageReference Include="AutoFixture.AutoMoq" Version="4.14.0" />
-    <PackageReference Include="AutoFixture.NUnit3" Version="4.11.0" />
     <PackageReference Include="MiniProfiler" Version="4.1.0" />
     <PackageReference Include="Moq" Version="4.13.1" />
     <PackageReference Include="AutoFixture.NUnit3" Version="4.14.0" />
