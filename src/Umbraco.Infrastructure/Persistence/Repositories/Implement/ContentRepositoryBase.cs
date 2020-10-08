@@ -984,7 +984,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 }).WhereNotNull();
 
             // Save bulk relations
-            RelationRepository.Save(toSave);
+            RelationRepository.SaveBulk(toSave);
 
         }
 

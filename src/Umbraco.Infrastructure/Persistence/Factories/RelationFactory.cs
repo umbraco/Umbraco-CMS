@@ -28,7 +28,7 @@ namespace Umbraco.Core.Persistence.Factories
             }
         }
 
-        public static RelationDto BuildDto(IRelation entity)
+        public static RelationDto BuildDto(IRelationReadOnly entity)
         {
             var dto = new RelationDto
             {
