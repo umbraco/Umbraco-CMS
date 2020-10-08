@@ -76,7 +76,7 @@ namespace Umbraco.Tests.Common.Builders
 
             if (_mediaTypeBuilder is null && _mediaType is null)
             {
-                throw new InvalidOperationException("A media item cannot be constructed without providing a member type. Use AddMediaType() or WithMediaType().");
+                throw new InvalidOperationException("A media item cannot be constructed without providing a media type. Use AddMediaType() or WithMediaType().");
             }
 
             var mediaType = _mediaType ?? _mediaTypeBuilder.Build();
