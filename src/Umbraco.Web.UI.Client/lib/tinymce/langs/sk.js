@@ -144,7 +144,7 @@ tinymce.addI18n('sk',{
 "Insert link": "Vlo\u017ei\u0165 odkaz",
 "Insert\/edit link": "Vlo\u017ei\u0165\/upravi\u0165 odkaz",
 "Text to display": "Zobrazen\u00fd text",
-"Url": "Url",
+"Url": "URL",
 "Target": "Cie\u013e",
 "None": "\u017diadne",
 "New window": "Nov\u00e9 okno",

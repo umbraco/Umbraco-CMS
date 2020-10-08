@@ -13,7 +13,9 @@
                         ng-click="vm.showCreateDialog($index, $event)"
                         ng-controller="Umbraco.PropertyEditors.BlockListPropertyEditor.CreateButtonController as inlineCreateButtonCtrl"
                         ng-mousemove="inlineCreateButtonCtrl.onMouseMove($event)">
-                    <div class="__plus" ng-style="{'left':inlineCreateButtonCtrl.plusPosX}">+</div>
+                    <div class="__plus" ng-style="{'left':inlineCreateButtonCtrl.plusPosX}">
+                        <i class="icon icon-add" aria-hidden="true"></i>
+                    </div>
                 </button>
 
                 <umb-block-list-row block-editor-api="vm.blockEditorApi"
@@ -36,13 +38,13 @@
         <input type="hidden" name="minCount" ng-model="vm.layout" val-server="minCount" />
         <input type="hidden" name="maxCount" ng-model="vm.layout" val-server="maxCount" />
 
-        <div ng-messages="vm.propertyForm.minCount.$error" show-validation-on-submit>
+        <div ng-messages="vm.propertyForm.minCount.$error">
             <div class="help text-error" ng-message="minCount">
                 <localize key="validation_entriesShort" tokens="[vm.validationLimit.min, vm.validationLimit.min - vm.layout.length]" watch-tokens="true">Minimum %0% entries, needs <strong>%1%</strong> more.</localize>
             </div>
             <span class="help-inline" ng-message="valServer" ng-bind-html="vm.propertyForm.minCount.errorMsg">></span>
         </div>
-        <div ng-messages="vm.propertyForm.maxCount.$error" show-validation-on-submit>
+        <div ng-messages="vm.propertyForm.maxCount.$error">
             <div class="help text-error" ng-message="maxCount">
                 <localize key="validation_entriesExceed" tokens="[vm.validationLimit.max, vm.layout.length - vm.validationLimit.max]" watch-tokens="true">Maximum %0% entries, <strong>%1%</strong> too many.</localize>
             </div>

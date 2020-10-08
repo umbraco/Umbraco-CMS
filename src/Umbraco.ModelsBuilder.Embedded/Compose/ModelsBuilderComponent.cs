@@ -58,7 +58,7 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
 
         private void InstallServerVars()
         {
-            // register our url - for the backoffice api
+            // register our URL - for the backoffice API
             ServerVariablesParser.Parsing += ServerVariablesParser_Parsing;
         }
 

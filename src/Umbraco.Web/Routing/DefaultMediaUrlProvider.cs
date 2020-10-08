@@ -6,7 +6,7 @@ using Umbraco.Core.PropertyEditors;
 namespace Umbraco.Web.Routing
 {
     /// <summary>
-    /// Default media url provider.
+    /// Default media URL provider.
     /// </summary>
     public class DefaultMediaUrlProvider : IMediaUrlProvider
     {
