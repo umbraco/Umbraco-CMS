@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web.Http;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
@@ -58,6 +59,7 @@ namespace Umbraco.Web.Editors
             };
         }
 
+        [HttpGet]
         public bool HasReferencesInDescendants(int id, string entityType)
         {
             return false;

@@ -93,7 +93,7 @@ function trackedReferencesResource($q, $http, umbRequestHelper) {
                 $http.get(
                     umbRequestHelper.getApiUrl(
                         "trackedReferencesApiBaseUrl",
-                        "HasReferencesInChildNode",
+                        "HasReferencesInDescendants",
                         {
                             id: id,
                             entityType: entityType

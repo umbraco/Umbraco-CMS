@@ -42,6 +42,29 @@
         function onInit() {
 
             $q.all([loadContentRelations(), loadMediaRelations(), loadMemberRelations()]).then(function () {
+                
+
+                if (!vm.hasContentReferences) {
+                    trackedReferencesResource.hasReferencesInDescendants(vm.id, vm.contentOptions.entityType)
+                        .then(function(data) {
+                            vm.hasContentReferencesInDescendants = data;
+                        });
+                }
+
+                if (!vm.hasMediaReferences) {
+                    trackedReferencesResource.hasReferencesInDescendants(vm.id, vm.mediaOptions.entityType)
+                        .then(function (data) {
+                            vm.hasMediaReferencesInDescendants = data;
+                        });
+                }
+
+                if (!vm.hasMemberReferences) {
+                    trackedReferencesResource.hasReferencesInDescendants(vm.id, vm.memberOptions.entityType)
+                        .then(function (data) {
+                            vm.hasMemberReferencesInDescendants = data;
+                        });
+                }
+
                 vm.loading = false;
             });
 
