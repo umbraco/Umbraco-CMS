@@ -4,7 +4,17 @@
     function UnpublishController($scope, localizationService) {
 
         var vm = this;
+       
         var autoSelectedVariants = [];
+
+        vm.id = $scope.content.id;
+        vm.checkingReferences = true;
+
+        vm.warningText = "The item or one of the underlying items is being used.";
+
+        localizationService.localize("references_deleteWarning").then(function (value) {
+            vm.warningText = value;
+        });
 
         vm.changeSelection = changeSelection;
 

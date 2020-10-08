@@ -5,11 +5,15 @@
         <p><localize key="prompt_confirmUnpublish"></localize></p>
     </div>
 
+    <umb-tracked-references id="vm.id" loading="vm.checkingReferences" hide-no-result="true" warning-text="vm.warningText"></umb-tracked-references>
+
     <!-- Multiple languages -->
     <div ng-if="vm.variants.length > 1">
         <div style="margin-bottom: 15px;">
             <p><localize key="content_languagesToUnpublish"></localize></p>
         </div>
+
+
 
         <div class="umb-list umb-list--condensed">
 
