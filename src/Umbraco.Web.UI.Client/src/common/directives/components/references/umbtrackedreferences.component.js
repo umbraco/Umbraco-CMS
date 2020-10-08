@@ -43,29 +43,28 @@
 
             $q.all([loadContentRelations(), loadMediaRelations(), loadMemberRelations()]).then(function () {
                 
+                if (vm.hasContentReferences && vm.hasMediaReferences && vm.hasMemberReferences) {
+                    vm.loading = false;
+                } else {
+                    var descendantsPromises = [];
 
-                if (!vm.hasContentReferences) {
-                    trackedReferencesResource.hasReferencesInDescendants(vm.id, vm.contentOptions.entityType)
-                        .then(function(data) {
-                            vm.hasContentReferencesInDescendants = data;
-                        });
+                    if (!vm.hasContentReferences) {
+                        descendantsPromises.push(checkContentDescendantsUsage());
+                    }
+
+                    if (!vm.hasMediaReferences) {
+                        descendantsPromises.push(checkMediaDescendantsUsage());
+                    }
+
+                    if (!vm.hasMemberReferences) {
+                        descendantsPromises.push(checkMemberDescendantsUsage())
+                    }
+
+                    $q.all(descendantsPromises).then(function() {
+                        vm.loading = false;
+                    });
+
                 }
-
-                if (!vm.hasMediaReferences) {
-                    trackedReferencesResource.hasReferencesInDescendants(vm.id, vm.mediaOptions.entityType)
-                        .then(function (data) {
-                            vm.hasMediaReferencesInDescendants = data;
-                        });
-                }
-
-                if (!vm.hasMemberReferences) {
-                    trackedReferencesResource.hasReferencesInDescendants(vm.id, vm.memberOptions.entityType)
-                        .then(function (data) {
-                            vm.hasMemberReferencesInDescendants = data;
-                        });
-                }
-
-                vm.loading = false;
             });
 
            
@@ -107,6 +106,27 @@
                 .then(function (data) {
                     vm.memberReferences = data;
                     vm.hasMemberReferences = data.items.length > 0;
+                });
+        }
+
+        function checkContentDescendantsUsage() {
+           return trackedReferencesResource.hasReferencesInDescendants(vm.id, vm.contentOptions.entityType)
+                .then(function (data) {
+                    vm.hasContentReferencesInDescendants = data;
+                });
+        }
+
+        function checkMediaDescendantsUsage() {
+            return trackedReferencesResource.hasReferencesInDescendants(vm.id, vm.mediaOptions.entityType)
+                .then(function (data) {
+                    vm.hasMediaReferencesInDescendants = data;
+                });
+        }
+
+        function checkMemberDescendantsUsage() {
+            return trackedReferencesResource.hasReferencesInDescendants(vm.id, vm.memberOptions.entityType)
+                .then(function (data) {
+                    vm.hasMemberReferencesInDescendants = data;
                 });
         }
     }
