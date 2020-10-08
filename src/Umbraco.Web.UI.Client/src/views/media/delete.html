@@ -14,7 +14,7 @@
                 <localize key="defaultdialogs_confirmdelete">Are you sure you want to delete</localize> <strong>{{currentNode.name}}</strong>?
             </p>
 
-            <umb-tracked-references id="currentNode.id" loading="checkingReferences"></umb-tracked-references>
+            <umb-tracked-references id="currentNode.id" loading="checkingReferences" hide-no-result="true"></umb-tracked-references>
 
             <div class="umb-alert umb-alert--warning" ng-show="currentNode.trashed">
                 <localize key="defaultdialogs_recycleBinWarning">When items are deleted from the recycle bin, they will be gone forever</localize>.

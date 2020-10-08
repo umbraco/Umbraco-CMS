@@ -1,6 +1,6 @@
 ﻿<umb-load-indicator ng-if="vm.loading === true"></umb-load-indicator>
 
-<umb-box ng-if="(vm.hasContentReferences === false) && (vm.hasContentReferencesInDescendants === false) && (vm.hasMediaReferences === false) && (vm.hasMediaReferencesInDescendants === false) && (vm.hasMemberReferences === false) && (vm.hasMemberReferencesInDescendants === false) && vm.loading === false">
+<umb-box ng-if="(vm.hasContentReferences === false) && (vm.hasContentReferencesInDescendants === false) && (vm.hasMediaReferences === false) && (vm.hasMediaReferencesInDescendants === false) && (vm.hasMemberReferences === false) && (vm.hasMemberReferencesInDescendants === false) && vm.loading === false && vm.hideNoResult === false">
     <umb-box-header title-key="references_tabName"></umb-box-header>
     <umb-box-content>
         <umb-empty-state size="small">

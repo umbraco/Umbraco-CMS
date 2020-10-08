@@ -11,6 +11,7 @@
             controllerAs: 'vm',
             bindings: {
                 id: "<",
+                hideNoResult : "<?",
                 loading : "=?"
             }
         });
@@ -18,6 +19,7 @@
     function UmbTrackedReferencesController($q, trackedReferencesResource) {
 
         this.loading = this.loading || true;
+        this.hideNoResult = this.hideNoResult || false;
 
         var vm = this;
 
@@ -59,7 +61,7 @@
                     }
 
                     if (!vm.hasMemberReferences) {
-                        descendantsPromises.push(checkMemberDescendantsUsage())
+                        descendantsPromises.push(checkMemberDescendantsUsage());
                     }
 
                     $q.all(descendantsPromises).then(function() {
