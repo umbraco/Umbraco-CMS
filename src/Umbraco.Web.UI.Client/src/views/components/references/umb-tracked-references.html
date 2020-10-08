@@ -11,6 +11,11 @@
 
 <!-- Media Tracking (With Items) -->
 <div ng-if="vm.loading === false">
+
+    <div class="abstract umb-alert umb-alert--warning" ng-show="vm.showWarning">
+       {{vm.warningText}}
+    </div>
+
     <!-- Content -->
     <div ng-if="vm.hasContentReferences">
 
@@ -24,7 +29,7 @@
                     <div class="umb-table-cell"></div>
                     <div class="umb-table-cell umb-table__name not-fixed"><localize key="general_name">Name</localize></div>
                     <div class="umb-table-cell"><localize key="content_alias">Alias</localize></div>
-                    <div class="umb-table-cell umb-table-cell--nano"><localize key="general_open" style="visibility:hidden;">Open</localize></div>
+                    <div class="umb-table-cell umb-table-cell--nano"><localize key="general_open" style="visibility: hidden;">Open</localize></div>
                 </div>
             </div>
             <div class="umb-table-body">
@@ -72,7 +77,7 @@
                     <div class="umb-table-cell"></div>
                     <div class="umb-table-cell umb-table__name not-fixed"><localize key="general_name">Name</localize></div>
                     <div class="umb-table-cell"><localize key="content_alias">Alias</localize></div>
-                    <div class="umb-table-cell umb-table-cell--nano"><localize key="general_open" style="visibility:hidden;">Open</localize></div>
+                    <div class="umb-table-cell umb-table-cell--nano"><localize key="general_open" style="visibility: hidden;">Open</localize></div>
                 </div>
             </div>
             <div class="umb-table-body">
@@ -120,7 +125,7 @@
                     <div class="umb-table-cell"></div>
                     <div class="umb-table-cell umb-table__name not-fixed"><localize key="general_name">Name</localize></div>
                     <div class="umb-table-cell"><localize key="content_alias">Alias</localize></div>
-                    <div class="umb-table-cell umb-table-cell--nano"><localize key="general_open" style="visibility:hidden;">Open</localize></div>
+                    <div class="umb-table-cell umb-table-cell--nano"><localize key="general_open" style="visibility: hidden;">Open</localize></div>
                 </div>
             </div>
             <div class="umb-table-body">

@@ -6,9 +6,15 @@
  * @description
  * The controller for deleting content
  */
-function MediaDeleteController($scope, mediaResource, treeService, navigationService, editorState, $location, overlayService) {
+function MediaDeleteController($scope, mediaResource, treeService, navigationService, editorState, $location, overlayService,localizationService) {
 
     $scope.checkingReferences = true;
+
+    $scope.warningText = "The item or one of the underlying items is being used.";
+
+    localizationService.localize("references_deleteWarning").then(function(value) {
+        $scope.warningText = value;
+    });
 
     $scope.performDelete = function() {
 

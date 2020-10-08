@@ -11,17 +11,18 @@
             controllerAs: 'vm',
             bindings: {
                 id: "<",
-                hideNoResult : "<?",
+                hideNoResult: "<?",
+                warningText: "<?",
                 loading : "=?"
             }
         });
 
     function UmbTrackedReferencesController($q, trackedReferencesResource) {
 
-        this.loading = this.loading || true;
-        this.hideNoResult = this.hideNoResult || false;
-
+      
         var vm = this;
+
+      
 
         vm.changeContentPageNumber = changeContentPageNumber;
         vm.contentOptions = {};
@@ -44,6 +45,13 @@
         vm.$onInit = onInit;
 
         function onInit() {
+
+            this.loading = this.loading || true;
+            this.hideNoResult = this.hideNoResult || false;
+            this.warningText = this.warningText || '';
+
+            vm.showWarning = false;
+            vm.hasWarningText = this.warningText !== '';
 
             $q.all([loadContentRelations(), loadMediaRelations(), loadMemberRelations()]).then(function () {
                 
@@ -93,7 +101,11 @@
             return trackedReferencesResource.getPagedReferences(vm.id, vm.contentOptions)
                 .then(function (data) {
                     vm.contentReferences = data;
-                    vm.hasContentReferences = data.items.length > 0;
+
+                    if (data.items.length > 0) {
+                        vm.hasContentReferences = data.items.length > 0;
+                        activateWarning();
+                    }
                 });
         }
 
@@ -101,7 +113,11 @@
             return trackedReferencesResource.getPagedReferences(vm.id, vm.mediaOptions)
                 .then(function (data) {
                     vm.mediaReferences = data;
-                    vm.hasMediaReferences = data.items.length > 0;
+
+                    if (data.items.length > 0) {
+                        vm.hasMediaReferences = data.items.length > 0;
+                        activateWarning();
+                    }
                 });
         }
 
@@ -109,14 +125,22 @@
             return trackedReferencesResource.getPagedReferences(vm.id, vm.memberOptions)
                 .then(function (data) {
                     vm.memberReferences = data;
-                    vm.hasMemberReferences = data.items.length > 0;
+                   
+                    if (data.items.length > 0) {
+                        vm.hasMemberReferences = data.items.length > 0;
+                        activateWarning();
+                    }
                 });
         }
 
         function checkContentDescendantsUsage() {
            return trackedReferencesResource.hasReferencesInDescendants(vm.id, vm.contentOptions.entityType)
-                .then(function (data) {
-                    vm.hasContentReferencesInDescendants = data;
+               .then(function (data) {
+                   vm.hasContentReferencesInDescendants = data;
+
+                   if (vm.hasContentReferencesInDescendants) {
+                       activateWarning();
+                   }
                 });
         }
 
@@ -124,6 +148,10 @@
             return trackedReferencesResource.hasReferencesInDescendants(vm.id, vm.mediaOptions.entityType)
                 .then(function (data) {
                     vm.hasMediaReferencesInDescendants = data;
+
+                    if (vm.hasMediaReferencesInDescendants) {
+                        activateWarning();
+                    }
                 });
         }
 
@@ -131,7 +159,17 @@
             return trackedReferencesResource.hasReferencesInDescendants(vm.id, vm.memberOptions.entityType)
                 .then(function (data) {
                     vm.hasMemberReferencesInDescendants = data;
+
+                    if (vm.hasMemberReferencesInDescendants) {
+                        activateWarning();
+                    }
                 });
+        }
+
+        function activateWarning() {
+            if (vm.hasWarningText && !vm.showWarning) {
+                vm.showWarning = true;
+            }
         }
     }
 
