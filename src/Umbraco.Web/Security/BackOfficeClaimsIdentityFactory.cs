@@ -26,7 +26,13 @@ namespace Umbraco.Web.Security
         public override async Task<ClaimsIdentity> CreateAsync(UserManager<T, int> manager, T user, string authenticationType)
         {
             var baseIdentity = await base.CreateAsync(manager, user, authenticationType);
-            
+
+            // now we can flow any custom claims that the actual user has currently assigned which could be done in the OnExternalLogin callback
+            foreach (var claim in user.Claims)
+            {
+                baseIdentity.AddClaim(new Claim(claim.ClaimType, claim.ClaimValue));
+            }
+
             var umbracoIdentity = new UmbracoBackOfficeIdentity(baseIdentity,
                 user.Id,
                 user.UserName,
