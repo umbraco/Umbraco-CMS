@@ -30,20 +30,31 @@
                 return c.substring(name.length, c.length);
             }
         }
-        return "";
+        return null;
     }
 
     function exitPreviewMode() {
         window.top.location.href = scriptElement.getAttribute("data-umbraco-path")+"/preview/end?redir=" + encodeURIComponent(window.location.pathname+window.location.search);
     }
-    function continuePreviewMode() {
-        setCookie("UMB-WEBSITE-PREVIEW-ACCEPT", "true", 5);
+    function continuePreviewMode(minutsToExpire) {
+        setCookie("UMB-WEBSITE-PREVIEW-ACCEPT", "true", minutsToExpire || 2);
     }
 
     var user = getCookie("UMB-WEBSITE-PREVIEW-ACCEPT");
     if (user != "true") {
 
+        // This modal is also used in preview.js
         var modelStyles = `
+            /* Webfont: LatoLatin-Bold */
+            @font-face {
+                font-family: 'Lato';
+                src: url('https://fonts.googleapis.com/css2?family=Lato:wght@700&display=swap');
+                font-style: normal;
+                font-weight: 700;
+                font-display: swap;
+                text-rendering: optimizeLegibility;
+            }
+
             .umbraco-preview-dialog {
                 position: fixed;
                 display: flex;
@@ -68,6 +79,7 @@
                 max-width: 540px;
                 font-family: Lato,Helvetica Neue,Helvetica,Arial,sans-serif;
                 font-size: 15px;
+                line-height: 1.5;
             }
 
             .umbraco-preview-dialog__headline {
@@ -75,19 +87,22 @@
                 font-size: 22px;
                 color: #1b264f;
                 margin-top:10px;
-                margin-bottom:10px;
+                margin-bottom:20px;
             }
             .umbraco-preview-dialog__question {
                 margin-bottom:30px;
             }
             .umbraco-preview-dialog__modal > button {
                 display: inline-block;
+                cursor: pointer;
                 padding: 8px 18px;
                 text-align: center;
                 vertical-align: middle;
                 border-radius: 3px;
                 border:none;
+                font-family: inherit;
                 font-weight: 700;
+                font-size: 15px;
                 float:right;
                 margin-left:10px;
 
@@ -109,37 +124,37 @@
 
         var bodyEl = document.getElementsByTagName("BODY")[0];
 
-        var fragment = document.createDocumentFragment();
+        var fragment = document.createElement("div");
+        var shadowRoot = fragment.attachShadow({ mode: 'open' });
 
         var style = document.createElement("style");
         style.innerHTML = modelStyles;
-        fragment.appendChild(style);
+        shadowRoot.appendChild(style);
 
         var con = document.createElement("div");
         con.className = "umbraco-preview-dialog";
-        fragment.appendChild(con);
+        shadowRoot.appendChild(con);
 
         var modal = document.createElement("div");
         modal.className = "umbraco-preview-dialog__modal";
-        modal.innerHTML = `<div class="umbraco-preview-dialog__headline">Preview mode</div>
-            <div class="umbraco-preview-dialog__question">Do you want to continue viewing latest saved version?</div>`;
+        modal.innerHTML = `<div class="umbraco-preview-dialog__headline">View published version?</div>
+            <div class="umbraco-preview-dialog__question">You are in Preview Mode, do you want exit in order to view the published version of your website?</div>`;
         con.appendChild(modal);
 
         var continueButton = document.createElement("button");
         continueButton.type = "button";
         continueButton.className = "umbraco-preview-dialog__continue";
-        continueButton.innerHTML = "Continue";
-        continueButton.addEventListener("click", function() {
-            bodyEl.removeChild(style);
-            bodyEl.removeChild(con);
-            continuePreviewMode();
-        });
+        continueButton.innerHTML = "View published version";
+        continueButton.addEventListener("click", exitPreviewMode);
         modal.appendChild(continueButton);
 
         var exitButton = document.createElement("button");
         exitButton.type = "button";
-        exitButton.innerHTML = "Exit preview mode";
-        exitButton.addEventListener("click", exitPreviewMode);
+        exitButton.innerHTML = "Stay in preview mode";
+        exitButton.addEventListener("click", function() {
+            bodyEl.removeChild(fragment);
+            continuePreviewMode(5);
+        });
         modal.appendChild(exitButton);
 
         bodyEl.appendChild(fragment);
