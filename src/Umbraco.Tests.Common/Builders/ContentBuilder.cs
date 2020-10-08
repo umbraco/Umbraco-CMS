@@ -121,7 +121,7 @@ namespace Umbraco.Tests.Common.Builders
 
             if (_contentTypeBuilder is null && _contentType is null)
             {
-                throw new InvalidOperationException("A content item cannot be constructed without providing a member type. Use AddContentType() or WithContentType().");
+                throw new InvalidOperationException("A content item cannot be constructed without providing a content type. Use AddContentType() or WithContentType().");
             }
 
             var contentType = _contentType ?? _contentTypeBuilder.Build();
