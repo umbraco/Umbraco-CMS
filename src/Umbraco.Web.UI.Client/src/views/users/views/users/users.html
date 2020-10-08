@@ -143,10 +143,17 @@
                     <umb-dropdown class="pull-right" ng-if="vm.page.showGroupFilter" on-close="vm.page.showGroupFilter = false;">
                         <umb-dropdown-item ng-repeat="userGroup in vm.userGroups" style="padding: 8px 20px 8px 16px;">
                             <div class="flex items-center">
-                                <umb-checkbox model="userGroup.selected"
-                                              on-change="vm.setUserGroupFilter(userGroup)"
-                                              text="{{ userGroup.name }}">
+                                <umb-checkbox input-id="usergroup-{{$index}}"
+                                              name="usergroup"
+                                              model="userGroup.selected"
+                                              on-change="vm.setUserGroupFilter(userGroup)">
                                 </umb-checkbox>
+                                <label for="usergroup-{{$index}}">
+                                    <span class="flex items-center">
+                                        <i class="{{userGroup.icon}}" aria-hidden="true"></i>
+                                        <span class="ml1">{{userGroup.name}}</span>
+                                    </span>
+                                </label>
                             </div>
                         </umb-dropdown-item>
                     </umb-dropdown>
