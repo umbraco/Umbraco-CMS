@@ -62,6 +62,50 @@ namespace Umbraco.Web.Editors
         [HttpGet]
         public bool HasReferencesInDescendants(int id, string entityType)
         {
+            //this.Services.EntityService.GetChildren()
+            //var childCount = this.Services.ContentService.CountChildren(id);
+            var currentEntity = this.Services.EntityService.Get(id);
+
+
+            if (currentEntity != null)
+            {
+                var currentObjectType = ObjectTypes.GetUmbracoObjectType(currentEntity.NodeObjectType);
+
+                var objectType = ObjectTypes.GetUmbracoObjectType(entityType);
+                var relationTypes = new string[]
+                {
+                    Constants.Conventions.RelationTypes.RelatedDocumentAlias,
+                    Constants.Conventions.RelationTypes.RelatedMediaAlias
+                };
+
+                var pageSize = 1000;
+                var currentPage = 0;
+
+                IEntity[] entities;
+
+                do
+                {
+                    entities = this.Services.EntityService.GetPagedDescendants(id, currentObjectType, currentPage, pageSize, out _)
+                        .ToArray();
+
+                    currentPage++;
+
+                    foreach (var descendant in entities)
+                    {
+                        var relations = Services.RelationService.GetPagedParentEntitiesByChildId(descendant.Id, 0,
+                            int.MaxValue, out _, relationTypes, objectType);
+
+                        if (relations.Any())
+                        {
+                            return true;
+                        }
+                    }
+
+
+                } while (entities.Length == pageSize);
+            }
+
+
             return false;
         }
     }
