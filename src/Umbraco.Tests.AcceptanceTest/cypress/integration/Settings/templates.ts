@@ -21,20 +21,21 @@ context('Templates', () => {
 
 
     it('Create template', () => {
-        const name = "Test template test";
+        const name = "Create Template test";
         cy.umbracoEnsureTemplateNameNotExists(name);
 
         createTemplate();
         //Type name
         cy.umbracoEditorHeaderName(name);
-        /*
-        Click the content area, if we don't do this we wont get redirected
-        to the new edit url, this will cause the test to save two copies at best
-        worst case, we'll get an error "The process cannot access the file" on the
-        template.
-         */
-        cy.get('.ace_content').click();
         // Save
+        // We must drop focus for the auto save event to occur.
+        cy.get('.btn-success').focus();
+        // And then wait for the auto save event to finish but finding the page in the tree view
+        // This is a bit of a roundabout way to find items in a treev view since we dont use umbracoTreeItem
+        // But we must be able to wait for the save evnent to finish, and we can't do that with umbracoTreeItem
+        cy.get('[data-element="tree-item-templates"] > :nth-child(2) > .umb-animated > .umb-tree-item__inner > .umb-tree-item__label').contains(name).should('be.visible', {timeout:10000});
+        // Now that the auto save event has finished we can save
+        // And there wont be any duplicates or file in use errors.
         cy.get('.btn-success').click();
 
         //Assert
