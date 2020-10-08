@@ -10,15 +10,17 @@
             controller: UmbTrackedReferencesController,
             controllerAs: 'vm',
             bindings: {
-                id: "<"
+                id: "<",
+                loading : "=?"
             }
         });
 
     function UmbTrackedReferencesController($q, trackedReferencesResource) {
+
+        this.loading = this.loading || true;
+
         var vm = this;
 
-        vm.loading = true;
-      
         vm.changeContentPageNumber = changeContentPageNumber;
         vm.contentOptions = {};
         vm.contentOptions.entityType = "DOCUMENT";
