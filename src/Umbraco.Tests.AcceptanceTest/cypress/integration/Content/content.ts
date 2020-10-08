@@ -331,8 +331,8 @@ context('Content', () => {
         cy.reload();
 
         // Assert
-        cy.get('.history').find('.umb-badge').eq(0).should('contain.text', "Save");
-        cy.get('.history').find('.umb-badge').eq(1).should('contain.text', "Rollback");
+        cy.get('.history').find('.umb-badge').contains('Save').should('be.visible');
+        cy.get('.history').find('.umb-badge').contains('Rollback').should('be.visible');
         cy.get('#headerName').should('have.value', initialNodeName);
 
         // Clean up (content is automatically deleted when document types are gone)
