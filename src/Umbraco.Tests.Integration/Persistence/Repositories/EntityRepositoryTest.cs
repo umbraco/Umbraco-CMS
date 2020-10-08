@@ -9,7 +9,6 @@ using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Integration.Testing;
-using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Integration.Persistence.Repositories
@@ -42,7 +41,7 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
             }
 
             //Create media
-            
+
             var mediaService = GetRequiredService<IMediaService>();
             var mediaTypeService = GetRequiredService<IMediaTypeService>();
             var createdMedia = new List<IMedia>();
@@ -64,7 +63,7 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
             var createdMembers = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10).ToList();
             memberService.Save(createdMembers);
 
-            
+
             var provider = ScopeProvider;
             using (provider.CreateScope())
             {
@@ -78,7 +77,7 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
                     .WhereIn(e => e.Id, ids);
 
                 var entities = repo.GetPagedResultsByQuery(query, objectTypes, 0, 20, out var totalRecords, null, null).ToList();
-                
+
                 Assert.AreEqual(20, entities.Count);
                 Assert.AreEqual(30, totalRecords);
 

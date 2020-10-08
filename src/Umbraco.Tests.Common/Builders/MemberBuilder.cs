@@ -113,10 +113,10 @@ namespace Umbraco.Tests.Common.Builders
             var lastLockoutDate = _lastLockoutDate ?? DateTime.Now;
             var lastLoginDate = _lastLoginDate ?? DateTime.Now;
             var lastPasswordChangeDate = _lastPasswordChangeDate ?? DateTime.Now;
-            
+
             if (_memberTypeBuilder is null && _memberType is null)
             {
-                throw new InvalidOperationException("A membercannot be constructed without providing a member type. Use AddMemberType() or WithMemberType().");
+                throw new InvalidOperationException("A member cannot be constructed without providing a member type. Use AddMemberType() or WithMemberType().");
             }
 
             var memberType = _memberType ?? _memberTypeBuilder.Build();

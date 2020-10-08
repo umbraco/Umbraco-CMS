@@ -19,9 +19,4 @@
     <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj" />
     <ProjectReference Include="..\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="TestHelpers\Entities\" />
-    <Folder Include="TestHelpers\Objects" />
-  </ItemGroup>
 </Project>

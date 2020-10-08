@@ -10,7 +10,6 @@ using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
