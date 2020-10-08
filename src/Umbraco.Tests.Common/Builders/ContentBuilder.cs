@@ -159,9 +159,9 @@ namespace Umbraco.Tests.Common.Builders
                 if (_propertyDataBuilder != null)
                 {
                     var propertyData = _propertyDataBuilder.Build();
-                    foreach (var kvp in propertyData)
+                    foreach (var keyValuePair in propertyData)
                     {
-                        content.SetValue(kvp.Key, kvp.Value);
+                        content.SetValue(keyValuePair.Key, keyValuePair.Value);
                     }
                 }
                 else
