@@ -96,7 +96,7 @@ function trackedReferencesResource($q, $http, umbRequestHelper) {
                         "HasReferencesInChildNode",
                         {
                             id: id,
-                            entitytype: entitype,
+                            entityType: entityType
                         }
                     )),
                 "Failed to check for references in child nodes");

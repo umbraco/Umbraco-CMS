@@ -23,16 +23,19 @@
         vm.contentOptions = {};
         vm.contentOptions.entityType = "DOCUMENT";
         vm.hasContentReferences = false;
+        vm.hasContentReferencesInDescendants = false;
 
         vm.changeMediaPageNumber = changeMediaPageNumber;
         vm.mediaOptions = {};
         vm.mediaOptions.entityType = "MEDIA";
         vm.hasMediaReferences = false;
+        vm.hasMediaReferencesInDescendants = false;
 
         vm.changeMemberPageNumber = changeMemberPageNumber;
         vm.memberOptions = {};
         vm.memberOptions.entityType = "MEMBER";
         vm.hasMemberReferences = false;
+        vm.hasMemberReferencesInDescendants = false;
 
         vm.$onInit = onInit;
 

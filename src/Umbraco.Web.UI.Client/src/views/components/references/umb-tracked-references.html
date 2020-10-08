@@ -47,6 +47,18 @@
         </div>
     </div>
 
+    <div ng-if="vm.hasContentReferencesInDescendants">
+        <h5 class="mt0" style="margin-bottom: 20px;">
+            <localize key="references_labelUsedByDocuments">Used in Documents</localize>
+        </h5>
+
+        <umb-box>
+            <umb-box-content>
+                <localize key="references_labelUsedInContentDescendants">One of the underlying items is being used in content item</localize>
+            </umb-box-content>
+        </umb-box>
+    </div>
+
     <!-- Members -->
     <div ng-if="vm.hasMemberReferences > 0">
 
@@ -83,6 +95,18 @@
         </div>
     </div>
 
+    <div ng-if="vm.hasMemberReferencesInDescendants">
+        <h5 class="mt0" style="margin-bottom: 20px;">
+            <localize key="references_labelUsedByMembers">Used in Members</localize>
+        </h5>
+
+        <umb-box>
+            <umb-box-content>
+                <localize key="references_labelUsedInMemberDescendants">One of the underlying items is being used in a member</localize>
+            </umb-box-content>
+        </umb-box>
+    </div>
+
     <!-- Media -->
     <div ng-if="vm.hasMediaReferences">
 
@@ -117,6 +141,18 @@
                             on-change="vm.changeMediaPageNumber(pageNumber)">
             </umb-pagination>
         </div>
+    </div>
+
+    <div ng-if="vm.hasMediaReferencesInDescendants">
+        <h5 class="mt0" style="margin-bottom: 20px;">
+            <localize key="references_labelUsedByMedia">Used in Media</localize>
+        </h5>
+
+        <umb-box>
+            <umb-box-content>
+                <localize key="references_labelUsedInMediaDescendants">One of the underlying items is being used in a media item</localize>
+            </umb-box-content>
+        </umb-box>
     </div>
 
 </div>
