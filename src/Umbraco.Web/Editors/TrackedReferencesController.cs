@@ -57,5 +57,10 @@ namespace Umbraco.Web.Editors
                 })
             };
         }
+
+        public bool HasReferencesInDescendants(int id, string entityType)
+        {
+            return false;
+        }
     }
 }

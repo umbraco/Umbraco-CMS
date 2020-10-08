@@ -64,6 +64,43 @@ function trackedReferencesResource($q, $http, umbRequestHelper) {
                         }
                     )),
                 "Failed to retrieve usages for entity of id " + id);
+        },
+
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.trackedReferencesResource#hasReferencesInChildNodes
+        * @methodOf umbraco.resources.trackedReferencesResource
+         *
+         * @description
+         * Checks 
+         *
+         * ##usage
+         * <pre>         
+         * trackedReferencesResource.hasReferencesInDescendants(1,'MEDIA')
+         *    .then(function(data) {
+         *        console.log(data);
+         *    });
+         * </pre>
+         *
+         * @param {int} id Id of the  item to query for tracked references
+         * @param {string} entityType  the type of tracked entity (default : DOCUMENT). Possible values DOCUMENT, MEDIA
+         * @returns {Promise} resourcePromise object.
+         *
+         */
+        hasReferencesInDescendants: function (id, entityType) {
+
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "trackedReferencesApiBaseUrl",
+                        "HasReferencesInChildNode",
+                        {
+                            id: id,
+                            entitytype: entitype,
+                        }
+                    )),
+                "Failed to check for references in child nodes");
+
         }
 
     }
