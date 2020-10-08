@@ -81,26 +81,26 @@ namespace Umbraco.Web.Editors
                 var pageSize = 1000;
                 var currentPage = 0;
 
-                IEntity[] entities;
+                IEntitySlim[] entities;
+
 
                 do
                 {
                     entities = this.Services.EntityService.GetPagedDescendants(id, currentObjectType, currentPage, pageSize, out _)
                         .ToArray();
 
-                    currentPage++;
+                    var ids = entities.Select(x => x.Id).ToArray();
 
-                    foreach (var descendant in entities)
+                    var relations =
+                        this.Services.RelationService.GetPagedParentEntitiesByChildIds(ids, 0, int.MaxValue, out _,
+                            relationTypes, objectType);
+
+                    if (relations.Any())
                     {
-                        var relations = Services.RelationService.GetPagedParentEntitiesByChildId(descendant.Id, 0,
-                            int.MaxValue, out _, relationTypes, objectType);
-
-                        if (relations.Any())
-                        {
-                            return true;
-                        }
+                        return true;
                     }
 
+                    currentPage++;
 
                 } while (entities.Length == pageSize);
             }
