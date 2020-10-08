@@ -31,6 +31,7 @@ namespace Umbraco.Tests.Integration.Services
     {
         private UserService UserService => (UserService) GetRequiredService<IUserService>();
         private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
+        private IFileService FileService => GetRequiredService<IFileService>();
         private IContentService ContentService => GetRequiredService<IContentService>();
 
         [Test]
@@ -38,13 +39,17 @@ namespace Umbraco.Tests.Integration.Services
         {
             // Arrange
             var user = CreateTestUser(out _);
-            var contentType = MockedContentTypes.CreateSimpleContentType();
+
+            var template = TemplateBuilder.CreateTextPageTemplate();
+            FileService.SaveTemplate(template);
+            var contentType = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: template.Id);
             ContentTypeService.Save(contentType);
+
             var content = new[]
                 {
-                    MockedContent.CreateSimpleContent(contentType),
-                    MockedContent.CreateSimpleContent(contentType),
-                    MockedContent.CreateSimpleContent(contentType)
+                    ContentBuilder.CreateSimpleContent(contentType),
+                    ContentBuilder.CreateSimpleContent(contentType),
+                    ContentBuilder.CreateSimpleContent(contentType)
                 };
             ContentService.Save(content);
 
@@ -64,13 +69,16 @@ namespace Umbraco.Tests.Integration.Services
             // Arrange
             var user = CreateTestUser(out var userGroup);
 
-            var contentType = MockedContentTypes.CreateSimpleContentType();
+            var template = TemplateBuilder.CreateTextPageTemplate();
+            FileService.SaveTemplate(template);
+            var contentType = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: template.Id);
             ContentTypeService.Save(contentType);
+
             var content = new[]
                 {
-                    MockedContent.CreateSimpleContent(contentType),
-                    MockedContent.CreateSimpleContent(contentType),
-                    MockedContent.CreateSimpleContent(contentType)
+                    ContentBuilder.CreateSimpleContent(contentType),
+                    ContentBuilder.CreateSimpleContent(contentType),
+                    ContentBuilder.CreateSimpleContent(contentType)
                 };
             ContentService.Save(content);
             ContentService.SetPermission(content[0], ActionBrowse.ActionLetter, new int[] { userGroup.Id });
@@ -96,13 +104,16 @@ namespace Umbraco.Tests.Integration.Services
             // Arrange
             var userGroup = CreateTestUserGroup();
 
-            var contentType = MockedContentTypes.CreateSimpleContentType();
+            var template = TemplateBuilder.CreateTextPageTemplate();
+            FileService.SaveTemplate(template);
+            var contentType = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: template.Id);
             ContentTypeService.Save(contentType);
+
             var content = new[]
                 {
-                    MockedContent.CreateSimpleContent(contentType),
-                    MockedContent.CreateSimpleContent(contentType),
-                    MockedContent.CreateSimpleContent(contentType)
+                    ContentBuilder.CreateSimpleContent(contentType),
+                    ContentBuilder.CreateSimpleContent(contentType),
+                    ContentBuilder.CreateSimpleContent(contentType)
                 };
             ContentService.Save(content);
             ContentService.SetPermission(content.ElementAt(0), ActionBrowse.ActionLetter, new int[] { userGroup.Id });
@@ -128,13 +139,16 @@ namespace Umbraco.Tests.Integration.Services
             // Arrange
             var userGroup = CreateTestUserGroup();
 
-            var contentType = MockedContentTypes.CreateSimpleContentType();
+            var template = TemplateBuilder.CreateTextPageTemplate();
+            FileService.SaveTemplate(template);
+            var contentType = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: template.Id);
             ContentTypeService.Save(contentType);
+
             var content = new[]
                 {
-                    MockedContent.CreateSimpleContent(contentType),
-                    MockedContent.CreateSimpleContent(contentType),
-                    MockedContent.CreateSimpleContent(contentType)
+                    ContentBuilder.CreateSimpleContent(contentType),
+                    ContentBuilder.CreateSimpleContent(contentType),
+                    ContentBuilder.CreateSimpleContent(contentType)
                 };
             ContentService.Save(content);
             ContentService.SetPermission(content[0], ActionBrowse.ActionLetter, new int[] { userGroup.Id });
@@ -170,13 +184,16 @@ namespace Umbraco.Tests.Integration.Services
             user.AddGroup(userGroup3);
             UserService.Save(user);
 
-            var contentType = MockedContentTypes.CreateSimpleContentType();
+            var template = TemplateBuilder.CreateTextPageTemplate();
+            FileService.SaveTemplate(template);
+            var contentType = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: template.Id);
             ContentTypeService.Save(contentType);
+
             var content = new[]
             {
-                MockedContent.CreateSimpleContent(contentType),
-                MockedContent.CreateSimpleContent(contentType),
-                MockedContent.CreateSimpleContent(contentType)
+                ContentBuilder.CreateSimpleContent(contentType),
+                ContentBuilder.CreateSimpleContent(contentType),
+                ContentBuilder.CreateSimpleContent(contentType)
             };
             ContentService.Save(content);
             //assign permissions - we aren't assigning anything explicit for group3 and nothing explicit for content[2] /w group2
@@ -239,13 +256,16 @@ namespace Umbraco.Tests.Integration.Services
             // Arrange
             var userGroup = CreateTestUserGroup();
 
-            var contentType = MockedContentTypes.CreateSimpleContentType();
+            var template = TemplateBuilder.CreateTextPageTemplate();
+            FileService.SaveTemplate(template);
+            var contentType = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: template.Id);
             ContentTypeService.Save(contentType);
+
             var content = new[]
             {
-                MockedContent.CreateSimpleContent(contentType),
-                MockedContent.CreateSimpleContent(contentType),
-                MockedContent.CreateSimpleContent(contentType)
+                ContentBuilder.CreateSimpleContent(contentType),
+                ContentBuilder.CreateSimpleContent(contentType),
+                ContentBuilder.CreateSimpleContent(contentType)
             };
             ContentService.Save(content);
             ContentService.SetPermission(content[0], ActionBrowse.ActionLetter, new int[] { userGroup.Id });
@@ -400,13 +420,16 @@ namespace Umbraco.Tests.Integration.Services
             // Arrange
             var userGroup = CreateTestUserGroup();
 
-            var contentType = MockedContentTypes.CreateSimpleContentType();
+            var template = TemplateBuilder.CreateTextPageTemplate();
+            FileService.SaveTemplate(template);
+            var contentType = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: template.Id);
             ContentTypeService.Save(contentType);
-            var parent = MockedContent.CreateSimpleContent(contentType);
+
+            var parent = ContentBuilder.CreateSimpleContent(contentType);
             ContentService.Save(parent);
-            var child1 = MockedContent.CreateSimpleContent(contentType, "child1", parent);
+            var child1 = ContentBuilder.CreateSimpleContent(contentType, "child1", parent.Id);
             ContentService.Save(child1);
-            var child2 = MockedContent.CreateSimpleContent(contentType, "child2", child1);
+            var child2 = ContentBuilder.CreateSimpleContent(contentType, "child2", child1.Id);
             ContentService.Save(child2);
 
             ContentService.SetPermission(parent, ActionBrowse.ActionLetter, new int[] { userGroup.Id });
@@ -496,10 +519,10 @@ namespace Umbraco.Tests.Integration.Services
         [Test]
         public void Find_By_Email_Starts_With()
         {
-            var users = CreateMulipleUsers(10);
+            var users = UserBuilder. CreateMulipleUsers(10);
             UserService.Save(users);
             //don't find this
-            var customUser = CreateUser();
+            var customUser = UserBuilder.CreateUser();
             customUser.Email = "hello@hello.com";
             UserService.Save(customUser);
 
@@ -511,10 +534,10 @@ namespace Umbraco.Tests.Integration.Services
         [Test]
         public void Find_By_Email_Ends_With()
         {
-            var users = CreateMulipleUsers(10);
+            var users = UserBuilder. CreateMulipleUsers(10);
             UserService.Save(users);
             //include this
-            var customUser = CreateUser();
+            var customUser = UserBuilder.CreateUser();
             customUser.Email = "hello@test.com";
             UserService.Save(customUser);
 
@@ -526,10 +549,10 @@ namespace Umbraco.Tests.Integration.Services
         [Test]
         public void Find_By_Email_Contains()
         {
-            var users = CreateMulipleUsers(10);
+            var users = UserBuilder. CreateMulipleUsers(10);
             UserService.Save(users);
             //include this
-            var customUser = CreateUser();
+            var customUser = UserBuilder.CreateUser();
             customUser.Email = "hello@test.com";
             UserService.Save(customUser);
 
@@ -541,10 +564,10 @@ namespace Umbraco.Tests.Integration.Services
         [Test]
         public void Find_By_Email_Exact()
         {
-            var users = CreateMulipleUsers(10);
+            var users = UserBuilder. CreateMulipleUsers(10);
             UserService.Save(users);
             //include this
-            var customUser = CreateUser();
+            var customUser = UserBuilder.CreateUser();
             customUser.Email = "hello@test.com";
             UserService.Save(customUser);
 
@@ -556,7 +579,7 @@ namespace Umbraco.Tests.Integration.Services
         [Test]
         public void Get_All_Paged_Users()
         {
-            var users = CreateMulipleUsers(10);
+            var users = UserBuilder. CreateMulipleUsers(10);
             UserService.Save(users);
 
             var found = UserService.GetAll(0, 2, out var totalRecs);
@@ -571,7 +594,7 @@ namespace Umbraco.Tests.Integration.Services
         [Test]
         public void Get_All_Paged_Users_With_Filter()
         {
-            var users = CreateMulipleUsers(10).ToArray();
+            var users = UserBuilder. CreateMulipleUsers(10).ToArray();
             UserService.Save(users);
 
             var found = UserService.GetAll(0, 2, out var totalRecs, "username", Direction.Ascending, filter: "test");
@@ -585,10 +608,10 @@ namespace Umbraco.Tests.Integration.Services
         [Test]
         public void Get_All_Paged_Users_For_Group()
         {
-            var userGroup = MockedUserGroup.CreateUserGroup();
+            var userGroup = UserGroupBuilder.CreateUserGroup();
             UserService.Save(userGroup);
 
-            var users = CreateMulipleUsers(10).ToArray();
+            var users = UserBuilder. CreateMulipleUsers(10).ToArray();
             for (var i = 0; i < 10;)
             {
                 users[i].AddGroup(userGroup.ToReadOnlyGroup());
@@ -608,10 +631,10 @@ namespace Umbraco.Tests.Integration.Services
         [Test]
         public void Get_All_Paged_Users_For_Group_With_Filter()
         {
-            var userGroup = MockedUserGroup.CreateUserGroup();
+            var userGroup = UserGroupBuilder.CreateUserGroup();
             UserService.Save(userGroup);
 
-            var users = CreateMulipleUsers(10).ToArray();
+            var users = UserBuilder. CreateMulipleUsers(10).ToArray();
             for (var i = 0; i < 10;)
             {
                 users[i].AddGroup(userGroup.ToReadOnlyGroup());
@@ -636,9 +659,9 @@ namespace Umbraco.Tests.Integration.Services
         [Test]
         public void Count_All_Users()
         {
-            var users = CreateMulipleUsers(10);
+            var users = UserBuilder. CreateMulipleUsers(10);
             UserService.Save(users);
-            var customUser = CreateUser();
+            var customUser = UserBuilder.CreateUser();
             UserService.Save(customUser);
 
             var found = UserService.GetCount(MemberCountType.All);
@@ -651,20 +674,20 @@ namespace Umbraco.Tests.Integration.Services
         [Test]
         public void Count_All_Online_Users()
         {
-            var users = CreateMulipleUsers(10, (i, member) => member.LastLoginDate = DateTime.Now.AddMinutes(i * -2));
+            var users = UserBuilder. CreateMulipleUsers(10, (i, member) => member.LastLoginDate = DateTime.Now.AddMinutes(i * -2));
             UserService.Save(users);
 
-            var customUser = CreateUser();
+            var customUser = UserBuilder.CreateUser();
             throw new NotImplementedException();
         }
 
         [Test]
         public void Count_All_Locked_Users()
         {
-            var users = CreateMulipleUsers(10, (i, member) => member.IsLockedOut = i % 2 == 0);
+            var users = UserBuilder.CreateMulipleUsers(10, (i, member) => member.IsLockedOut = i % 2 == 0);
             UserService.Save(users);
 
-            var customUser = CreateUser();
+            var customUser = UserBuilder.CreateUser();
             customUser.IsLockedOut = true;
             UserService.Save(customUser);
 
@@ -676,10 +699,10 @@ namespace Umbraco.Tests.Integration.Services
         [Test]
         public void Count_All_Approved_Users()
         {
-            var users = CreateMulipleUsers(10, (i, member) => member.IsApproved = i % 2 == 0);
+            var users = UserBuilder.CreateMulipleUsers(10, (i, member) => member.IsApproved = i % 2 == 0);
             UserService.Save(users);
 
-            var customUser = CreateUser();
+            var customUser = UserBuilder.CreateUser();
             customUser.IsApproved = false;
             UserService.Save(customUser);
 
@@ -970,51 +993,19 @@ namespace Umbraco.Tests.Integration.Services
 
         private Content[] BuildContentItems(int numberToCreate)
         {
-            var contentType = MockedContentTypes.CreateSimpleContentType();
-
+            var template = TemplateBuilder.CreateTextPageTemplate();
+            FileService.SaveTemplate(template);
+            var contentType = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: template.Id);
             ContentTypeService.Save(contentType);
 
             var startContentItems = new List<Content>();
 
             for (var i = 0; i < numberToCreate; i++)
-                startContentItems.Add(MockedContent.CreateSimpleContent(contentType));
+                startContentItems.Add(ContentBuilder.CreateSimpleContent(contentType));
 
             ContentService.Save(startContentItems);
 
             return startContentItems.ToArray();
-        }
-
-        private static IEnumerable<IUser> CreateMulipleUsers(int amount, Action<int, IUser> onCreating = null)
-        {
-            var list = new List<IUser>();
-
-            for (var i = 0; i < amount; i++)
-            {
-                var name = "User No-" + i;
-                var user = new UserBuilder()
-                    .WithName(name)
-                    .WithEmail("test" + i + "@test.com")
-                    .WithLogin("test" + i, "test" + i)
-                    .Build();
-                
-                onCreating?.Invoke(i, user);
-
-                user.ResetDirtyProperties(false);
-
-                list.Add(user);
-            }
-
-            return list;
-        }
-
-        private static User CreateUser(string suffix = "")
-        {
-            return new UserBuilder()
-                .WithIsApproved(true)
-                .WithName("TestUser" + suffix)
-                .WithLogin("TestUser" + suffix, "testing")
-                .WithEmail("test" + suffix + "@test.com")
-                .Build();
         }
 
         private IUser CreateTestUser(out IUserGroup userGroup)
@@ -1052,16 +1043,12 @@ namespace Umbraco.Tests.Integration.Services
 
         private UserGroup CreateTestUserGroup(string alias = "testGroup", string name = "Test Group")
         {
-            var userGroup = new UserGroupBuilder()
-                .WithAlias(alias)
-                .WithName(name)
-                .WithPermissions("ABCDEFGHIJ1234567")
-                .WithAllowedSections(new[] { "content", "media" })
-                .Build();
+            var permissions = "ABCDEFGHIJ1234567".ToCharArray().Select(x => x.ToString()).ToArray();
+            var userGroup = UserGroupBuilder.CreateUserGroup(alias, name, permissions: permissions);
 
             UserService.Save(userGroup);
 
-            return (UserGroup)userGroup;
+            return userGroup;
         }
     }
 }

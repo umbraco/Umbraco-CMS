@@ -4,6 +4,7 @@ using System.Linq;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Tests.Common.Builders.Interfaces;
+using Umbraco.Tests.Common.Builders.Extensions;
 
 namespace Umbraco.Tests.Common.Builders
 {
@@ -183,6 +184,39 @@ namespace Umbraco.Tests.Common.Builders
             }
 
             return result;
+        }
+
+        public static IEnumerable<IUser> CreateMulipleUsers(int amount, Action<int, IUser> onCreating = null)
+        {
+            var list = new List<IUser>();
+
+            for (var i = 0; i < amount; i++)
+            {
+                var name = "User No-" + i;
+                var user = new UserBuilder()
+                    .WithName(name)
+                    .WithEmail("test" + i + "@test.com")
+                    .WithLogin("test" + i, "test" + i)
+                    .Build();
+
+                onCreating?.Invoke(i, user);
+
+                user.ResetDirtyProperties(false);
+
+                list.Add(user);
+            }
+
+            return list;
+        }
+
+        public static User CreateUser(string suffix = "")
+        {
+            return new UserBuilder()
+                .WithIsApproved(true)
+                .WithName("TestUser" + suffix)
+                .WithLogin("TestUser" + suffix, "testing")
+                .WithEmail("test" + suffix + "@test.com")
+                .Build();
         }
 
         int? IWithIdBuilder.Id

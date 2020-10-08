@@ -7,8 +7,8 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
+using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Integration.Testing;
-using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Integration.Services
@@ -26,12 +26,25 @@ namespace Umbraco.Tests.Integration.Services
         private IFileService FileService => GetRequiredService<IFileService>();
 
         private GlobalSettings _globalSettings;
+        private IContentType _contentType;
 
         [SetUp]
         public void SetupTest()
         {
             ContentRepositoryBase.ThrowOnWarning = true;
             _globalSettings = new GlobalSettings();
+            // TODO: remove this once IPublishedSnapShotService has been implemented with nucache.
+            Umbraco.Core.Services.Implement.ContentTypeService.ClearScopeEvents();
+            CreateTestData();
+        }
+
+        private void CreateTestData()
+        {
+            var template = TemplateBuilder.CreateTextPageTemplate();
+            FileService.SaveTemplate(template); // else, FK violation on contentType!
+
+            _contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id);
+            ContentTypeService.Save(_contentType);
         }
 
         public override void TearDown()
@@ -45,14 +58,12 @@ namespace Umbraco.Tests.Integration.Services
         {
             LocalizationService.Save(new Language(_globalSettings, "fr-FR"));
 
-            var contentType = MockedContentTypes.CreateTextPageContentType();
-            FileService.SaveTemplate(contentType.DefaultTemplate);
-            contentType.Variations = ContentVariation.Culture;
-            foreach (var propertyType in contentType.PropertyTypes)
+            _contentType.Variations = ContentVariation.Culture;
+            foreach (var propertyType in _contentType.PropertyTypes)
                 propertyType.Variations = ContentVariation.Culture;
-            ContentTypeService.Save(contentType);
+            ContentTypeService.Save(_contentType);
 
-            IContent document = new Content("content", -1, contentType);
+            IContent document = new Content("content", -1, _contentType);
             document.SetCultureName("hello", "en-US");
             document.SetCultureName("bonjour", "fr-FR");
             ContentService.Save(document);
@@ -99,11 +110,7 @@ namespace Umbraco.Tests.Integration.Services
         [Test]
         public void Saving_Set_Value()
         {
-            var contentType = MockedContentTypes.CreateTextPageContentType();
-            FileService.SaveTemplate(contentType.DefaultTemplate);
-            ContentTypeService.Save(contentType);
-
-            IContent document = new Content("content", -1, contentType);
+            IContent document = new Content("content", -1, _contentType);
 
             void OnSaving(IContentService sender, ContentSavingEventArgs e)
             {
@@ -145,14 +152,12 @@ namespace Umbraco.Tests.Integration.Services
         {
             LocalizationService.Save(new Language(_globalSettings, "fr-FR"));
 
-            var contentType = MockedContentTypes.CreateTextPageContentType();
-            FileService.SaveTemplate(contentType.DefaultTemplate);
-            contentType.Variations = ContentVariation.Culture;
-            foreach (var propertyType in contentType.PropertyTypes)
+            _contentType.Variations = ContentVariation.Culture;
+            foreach (var propertyType in _contentType.PropertyTypes)
                 propertyType.Variations = ContentVariation.Culture;
-            ContentTypeService.Save(contentType);
+            ContentTypeService.Save(_contentType);
 
-            IContent document = new Content("content", -1, contentType);
+            IContent document = new Content("content", -1, _contentType);
             document.SetCultureName("hello", "en-US");
             document.SetCultureName("bonjour", "fr-FR");
             ContentService.Save(document);
@@ -205,11 +210,7 @@ namespace Umbraco.Tests.Integration.Services
         [Test]
         public void Publishing_Set_Value()
         {
-            var contentType = MockedContentTypes.CreateTextPageContentType();
-            FileService.SaveTemplate(contentType.DefaultTemplate);
-            ContentTypeService.Save(contentType);
-
-            IContent document = new Content("content", -1, contentType);
+            IContent document = new Content("content", -1, _contentType);
 
             void OnSaving(IContentService sender, ContentSavingEventArgs e)
             {
@@ -252,13 +253,11 @@ namespace Umbraco.Tests.Integration.Services
         [Test]
         public void Publishing_Set_Mandatory_Value()
         {
-            var contentType = MockedContentTypes.CreateTextPageContentType();
-            var titleProperty = contentType.PropertyTypes.First(x => x.Alias == "title");
+            var titleProperty = _contentType.PropertyTypes.First(x => x.Alias == "title");
             titleProperty.Mandatory = true; // make this required!
-            FileService.SaveTemplate(contentType.DefaultTemplate);
-            ContentTypeService.Save(contentType);
+            ContentTypeService.Save(_contentType);
 
-            IContent document = new Content("content", -1, contentType);
+            IContent document = new Content("content", -1, _contentType);
 
             var result = ContentService.SaveAndPublish(document);
             Assert.IsFalse(result.Success);
@@ -266,7 +265,7 @@ namespace Umbraco.Tests.Integration.Services
 
             // when a service operation fails, the object is dirty and should not be re-used,
             // re-create it
-            document = new Content("content", -1, contentType);
+            document = new Content("content", -1, _contentType);
 
             void OnSaving(IContentService sender, ContentSavingEventArgs e)
             {
@@ -297,16 +296,14 @@ namespace Umbraco.Tests.Integration.Services
         {
             LocalizationService.Save(new Language(_globalSettings, "fr-FR"));
 
-            var contentType = MockedContentTypes.CreateTextPageContentType();
-            FileService.SaveTemplate(contentType.DefaultTemplate);
-            contentType.Variations = ContentVariation.Culture;
-            foreach (var propertyType in contentType.PropertyTypes)
+            _contentType.Variations = ContentVariation.Culture;
+            foreach (var propertyType in _contentType.PropertyTypes)
                 propertyType.Variations = ContentVariation.Culture;
-            ContentTypeService.Save(contentType);
+            ContentTypeService.Save(_contentType);
 
             var contentService = (ContentService)ContentService;
 
-            IContent document = new Content("content", -1, contentType);
+            IContent document = new Content("content", -1, _contentType);
             document.SetCultureName("hello", "en-US");
             document.SetCultureName("bonjour", "fr-FR");
             contentService.SaveAndPublish(document);
