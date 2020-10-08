@@ -18,8 +18,6 @@ context('Templates', () => {
         cy.umbracoContextMenuAction("action-create").click();
     }
 
-
-
     it('Create template', () => {
         const name = "Create Template test";
         cy.umbracoEnsureTemplateNameNotExists(name);
@@ -40,6 +38,9 @@ context('Templates', () => {
 
         //Assert
         cy.umbracoSuccessNotification().should('be.visible');
+        // For some reason cy.umbracoErrorNotification tries to click the element which is not possible
+        // if it doesn't actually exist, making should('not.be.visible') impossible.
+        cy.get('.umb-notifications__notifications > .alert-error', {timeout: 5000}).should('not.be.visible');
 
         //Clean up
         cy.umbracoEnsureTemplateNameNotExists(name);
