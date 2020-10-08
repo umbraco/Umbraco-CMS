@@ -8,6 +8,8 @@
  */
 function MediaDeleteController($scope, mediaResource, treeService, navigationService, editorState, $location, overlayService) {
 
+    $scope.checkingReferences = true;
+
     $scope.performDelete = function() {
 
         // stop from firing again on double-click
