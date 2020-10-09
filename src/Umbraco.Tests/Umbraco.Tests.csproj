@@ -143,7 +143,6 @@
     <Compile Include="Models\ImageProcessorImageUrlGeneratorTest.cs" />
     <Compile Include="Models\VariationTests.cs" />
     <Compile Include="Persistence\Mappers\MapperTestBase.cs" />
-    <Compile Include="Persistence\Repositories\DocumentRepositoryTest.cs" />
     <Compile Include="PublishedContent\SolidPublishedSnapshot.cs" />
     <Compile Include="Published\ConvertersTests.cs" />
     <Compile Include="Published\ModelTypeTests.cs" />
