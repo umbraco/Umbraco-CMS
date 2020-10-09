@@ -144,6 +144,10 @@ var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.servi
         window.addEventListener("blur", windowBlurHandler);
 
         function windowVisibilityHandler(e) {
+
+            var amountOfPreviewSessions = localStorage.getItem('UmbPreviewSessionAmount');
+            console.log("windowVisibilityHandler", amountOfPreviewSessions)
+
             // When tab is visible again:
             if(document.hidden === false) {
                 checkPreviewState();
@@ -151,9 +155,15 @@ var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.servi
         }
         document.addEventListener("visibilitychange", windowVisibilityHandler);
 
+        function beforeUnloadHandler(e) {
+            endPreviewSession();
+        }
+        window.addEventListener("beforeunload", beforeUnloadHandler, false);
+
         $scope.$on("$destroy", function () {
             window.removeEventListener("blur", windowBlurHandler);
-            window.removeEventListener("visibilitychange", windowVisibilityHandler);
+            document.removeEventListener("visibilitychange", windowVisibilityHandler);
+            window.removeEventListener("beforeunload", beforeUnloadHandler);
         });
 
 
@@ -291,14 +301,14 @@ var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.servi
 
                 var modal = document.createElement("div");
                 modal.className = "umbraco-preview-dialog__modal";
-                modal.innerHTML = `<div class="umbraco-preview-dialog__headline">Preview content?</div>
-                    <div class="umbraco-preview-dialog__question">You have ended preview mode, do you want to continue previewing this content?</div>`;
+                modal.innerHTML = `<div class="umbraco-preview-dialog__headline">${$window.umbLocalizedVars.returnToPreviewHeadline}</div>
+                    <div class="umbraco-preview-dialog__question">${$window.umbLocalizedVars.returnToPreviewDescription}</div>`;
                 con.appendChild(modal);
 
                 var continueButton = document.createElement("button");
                 continueButton.type = "button";
                 continueButton.className = "umbraco-preview-dialog__continue";
-                continueButton.innerHTML = "Preview content";
+                continueButton.innerHTML = $window.umbLocalizedVars.returnToPreviewButton;
                 continueButton.addEventListener("click", () => {
                     bodyEl.removeChild(fragment);
                     reenterPreviewMode();
@@ -320,6 +330,7 @@ var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.servi
                     id: $scope.pageId
                 }
             })
+            startPreviewSession();
         }
         function getPageURL() {
             var culture = $location.search().culture || getParameterByName("culture");
@@ -329,6 +340,29 @@ var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.servi
             }
             return relativeUrl;
         }
+
+        function startPreviewSession() {
+            // lets registrer this preview session.
+        var amountOfPreviewSessions = Math.max(localStorage.getItem('UmbPreviewSessionAmount') || 0, 0);
+            amountOfPreviewSessions++;
+            localStorage.setItem('UmbPreviewSessionAmount', amountOfPreviewSessions);
+            console.log("UmbPreviewSessionAmount", amountOfPreviewSessions)
+        }
+        function resetPreviewSessions() {
+            localStorage.setItem('UmbPreviewSessionAmount', 0);
+        }
+        function endPreviewSession() {
+            var amountOfPreviewSessions = localStorage.getItem('UmbPreviewSessionAmount') || 0;
+            amountOfPreviewSessions--;
+            localStorage.setItem('UmbPreviewSessionAmount', amountOfPreviewSessions);
+            console.log("ENDDDD", amountOfPreviewSessions)
+
+            if(amountOfPreviewSessions <= 0) {
+                // We are good to secretly end preview mode.
+                navigator.sendBeacon("../preview/end");
+            }
+        }
+        startPreviewSession();
 
         /*****************************************************************************/
         /* Preview devices */
@@ -353,10 +387,12 @@ var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.servi
         /*****************************************************************************/
 
         $scope.exitPreview = function () {
+            resetPreviewSessions();
             window.top.location.href = "../preview/end?redir=" + encodeURIComponent(getPageURL());
         };
 
         $scope.onFrameLoaded = function (iframe) {
+
             $scope.frameLoaded = true;
             configureSignalR(iframe);
 

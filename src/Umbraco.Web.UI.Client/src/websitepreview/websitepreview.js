@@ -5,6 +5,7 @@
 
 (function() {
 
+
     if ( window.location !== window.parent.location ) {
         //we are in an iFrame, so lets skip the dialog.
         return;
@@ -33,7 +34,37 @@
         return null;
     }
 
-    function exitPreviewMode() {
+
+    function beforeUnloadHandler(e) {
+        endPreviewSession();
+    }
+    window.addEventListener("beforeunload", beforeUnloadHandler, false);
+
+    function startPreviewSession() {
+        // lets registrer this preview session.
+        var amountOfPreviewSessions = Math.max(localStorage.getItem('UmbPreviewSessionAmount') || 0, 0);
+        amountOfPreviewSessions++;
+        localStorage.setItem('UmbPreviewSessionAmount', amountOfPreviewSessions);
+        console.log("UmbPreviewSessionAmount", amountOfPreviewSessions)
+    }
+    function resetPreviewSessions() {
+        localStorage.setItem('UmbPreviewSessionAmount', 0);
+    }
+    function endPreviewSession() {
+        var amountOfPreviewSessions = localStorage.getItem('UmbPreviewSessionAmount') || 0;
+        amountOfPreviewSessions--;
+        localStorage.setItem('UmbPreviewSessionAmount', amountOfPreviewSessions);
+        console.log("ENDDDD", amountOfPreviewSessions)
+
+        if(amountOfPreviewSessions <= 0) {
+            // We are good to secretly end preview mode.
+            navigator.sendBeacon(scriptElement.getAttribute("data-umbraco-path")+"/preview/end");
+        }
+    }
+    startPreviewSession();
+
+    function endPreviewMode() {
+        resetPreviewSessions();
         window.top.location.href = scriptElement.getAttribute("data-umbraco-path")+"/preview/end?redir=" + encodeURIComponent(window.location.pathname+window.location.search);
     }
     function continuePreviewMode(minutsToExpire) {
@@ -42,6 +73,28 @@
 
     var user = getCookie("UMB-WEBSITE-PREVIEW-ACCEPT");
     if (user != "true") {
+        askToViewPublishedVersion();
+    } else {
+        continuePreviewMode();
+    }
+
+    function askToViewPublishedVersion() {
+
+        scriptElement.getAttribute("data-umbraco-path");
+
+        const request = new XMLHttpRequest();
+        request.open("GET", scriptElement.getAttribute("data-umbraco-path") + "/LocalizedText");
+        request.send();
+
+        request.onreadystatechange = (e) => {
+            if (request.readyState == 4 && request.status == 200) {
+                const jsonLocalization = JSON.parse(request.responseText);
+                createAskUserAboutVersionDialog(jsonLocalization);
+            }
+        }
+
+    }
+    function createAskUserAboutVersionDialog(jsonLocalization) {
 
         // This modal is also used in preview.js
         var modelStyles = `
@@ -137,20 +190,20 @@
 
         var modal = document.createElement("div");
         modal.className = "umbraco-preview-dialog__modal";
-        modal.innerHTML = `<div class="umbraco-preview-dialog__headline">View published version?</div>
-            <div class="umbraco-preview-dialog__question">You are in Preview Mode, do you want exit in order to view the published version of your website?</div>`;
+        modal.innerHTML = `<div class="umbraco-preview-dialog__headline">${jsonLocalization.preview.viewPublishedContentHeadline}</div>
+            <div class="umbraco-preview-dialog__question">${jsonLocalization.preview.viewPublishedContentDescription}</div>`;
         con.appendChild(modal);
 
         var continueButton = document.createElement("button");
         continueButton.type = "button";
         continueButton.className = "umbraco-preview-dialog__continue";
-        continueButton.innerHTML = "View published version";
-        continueButton.addEventListener("click", exitPreviewMode);
+        continueButton.innerHTML = jsonLocalization.preview.viewPublishedContentAcceptButton;
+        continueButton.addEventListener("click", endPreviewMode);
         modal.appendChild(continueButton);
 
         var exitButton = document.createElement("button");
         exitButton.type = "button";
-        exitButton.innerHTML = "Stay in preview mode";
+        exitButton.innerHTML = jsonLocalization.preview.viewPublishedContentDeclineButton;
         exitButton.addEventListener("click", function() {
             bodyEl.removeChild(fragment);
             continuePreviewMode(5);
@@ -159,8 +212,6 @@
 
         bodyEl.appendChild(fragment);
         continueButton.focus();
-    } else {
-        continuePreviewMode();
     }
 
 })();
