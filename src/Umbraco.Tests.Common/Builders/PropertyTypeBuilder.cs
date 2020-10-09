@@ -27,7 +27,8 @@ namespace Umbraco.Tests.Common.Builders
             IWithCreateDateBuilder,
             IWithUpdateDateBuilder,
             IWithSortOrderBuilder,
-            IWithDescriptionBuilder where TParent : IBuildPropertyTypes
+            IWithDescriptionBuilder,
+            IWithSupportsPublishing where TParent : IBuildPropertyTypes
     {
         private int? _id;
         private Guid? _key;
@@ -45,6 +46,7 @@ namespace Umbraco.Tests.Common.Builders
         private string _mandatoryMessage;
         private string _validationRegExp;
         private string _validationRegExpMessage;
+        private bool? _supportsPublishing;
 
         public PropertyTypeBuilder(TParent parentBuilder) : base(parentBuilder)
         {
@@ -106,10 +108,11 @@ namespace Umbraco.Tests.Common.Builders
             var mandatoryMessage = _mandatoryMessage ?? string.Empty;
             var validationRegExp = _validationRegExp ?? string.Empty;
             var validationRegExpMessage = _validationRegExpMessage ?? string.Empty;
+            var supportsPublishing = _supportsPublishing ?? false;
 
             var shortStringHelper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig());
 
-            return new PropertyType(shortStringHelper, propertyEditorAlias, valueStorageType)
+            var propertyType = new PropertyType(shortStringHelper, propertyEditorAlias, valueStorageType)
             {
                 Id = id,
                 Key = key,
@@ -125,7 +128,10 @@ namespace Umbraco.Tests.Common.Builders
                 MandatoryMessage = mandatoryMessage,
                 ValidationRegExp = validationRegExp,
                 ValidationRegExpMessage = validationRegExpMessage,
+                SupportsPublishing = supportsPublishing,
             };
+
+            return propertyType;
         }
         
         int? IWithIdBuilder.Id
@@ -174,6 +180,12 @@ namespace Umbraco.Tests.Common.Builders
         {
             get => _description;
             set => _description = value;
+        }
+
+        bool? IWithSupportsPublishing.SupportsPublishing
+        {
+            get => _supportsPublishing;
+            set => _supportsPublishing = value;
         }
     }
 }

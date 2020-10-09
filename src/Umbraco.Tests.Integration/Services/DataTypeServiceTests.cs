@@ -5,6 +5,7 @@ using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
+using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
@@ -19,9 +20,9 @@ namespace Umbraco.Tests.Services
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class DataTypeServiceTests : UmbracoIntegrationTest
     {
-
         private IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
         private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
+        private IFileService FileService => GetRequiredService<IFileService>();
         private ILocalizedTextService LocalizedTextService => GetRequiredService<ILocalizedTextService>();
         private ILocalizationService LocalizationService => GetRequiredService<ILocalizationService>();
 
@@ -46,7 +47,9 @@ namespace Umbraco.Tests.Services
             // Arrange
             var textfieldId = "Umbraco.Textbox";
             var dataTypeDefinitions = DataTypeService.GetByEditorAlias(textfieldId);
-            var doctype = MockedContentTypes.CreateSimpleContentType("umbTextpage", "Textpage");
+            var template = TemplateBuilder.CreateTextPageTemplate();
+            FileService.SaveTemplate(template);
+            var doctype = ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateId: template.Id);
             ContentTypeService.Save(doctype);
 
 

@@ -8,6 +8,7 @@ using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
+using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
@@ -51,16 +52,16 @@ namespace Umbraco.Tests.Integration.Services
         [Test]
         public void Get_Paged_Children_With_Media_Type_Filter()
         {
-            var mediaType1 = MockedContentTypes.CreateImageMediaType("Image2");
+            var mediaType1 = MediaTypeBuilder.CreateImageMediaType("Image2");
             MediaTypeService.Save(mediaType1);
-            var mediaType2 = MockedContentTypes.CreateImageMediaType("Image3");
+            var mediaType2 = MediaTypeBuilder.CreateImageMediaType("Image3");
             MediaTypeService.Save(mediaType2);
 
             for (var i = 0; i < 10; i++)
             {
-                var m1 = MockedMedia.CreateMediaImage(mediaType1, -1);
+                var m1 = MediaBuilder.CreateMediaImage(mediaType1, -1);
                 MediaService.Save(m1);
-                var m2 = MockedMedia.CreateMediaImage(mediaType2, -1);
+                var m2 = MediaBuilder.CreateMediaImage(mediaType2, -1);
                 MediaService.Save(m2);
             }
 
@@ -136,7 +137,7 @@ namespace Umbraco.Tests.Integration.Services
         public void Cannot_Save_Media_With_Empty_Name()
         {
             // Arrange
-            var mediaType = MockedContentTypes.CreateVideoMediaType();
+            var mediaType = MediaTypeBuilder.CreateVideoMediaType();
             MediaTypeService.Save(mediaType);
             var media = MediaService.CreateMedia(string.Empty, -1, "video");
 
@@ -162,10 +163,10 @@ namespace Umbraco.Tests.Integration.Services
         [Test]
         public void Can_Get_Media_By_Path()
         {
-            var mediaType = MockedContentTypes.CreateImageMediaType("Image2");
+            var mediaType = MediaTypeBuilder.CreateImageMediaType("Image2");
             MediaTypeService.Save(mediaType);
 
-            var media = MockedMedia.CreateMediaImage(mediaType, -1);
+            var media = MediaBuilder.CreateMediaImage(mediaType, -1);
             MediaService.Save(media);
 
             var mediaPath = "/media/test-image.png";
@@ -178,10 +179,10 @@ namespace Umbraco.Tests.Integration.Services
         [Test]
         public void Can_Get_Media_With_Crop_By_Path()
         {
-            var mediaType = MockedContentTypes.CreateImageMediaTypeWithCrop("Image2");
+            var mediaType = MediaTypeBuilder.CreateImageMediaTypeWithCrop("Image2");
             MediaTypeService.Save(mediaType);
 
-            var media = MockedMedia.CreateMediaImageWithCrop(mediaType, -1);
+            var media = MediaBuilder.CreateMediaImageWithCrop(mediaType, -1);
             MediaService.Save(media);
 
             var mediaPath = "/media/test-image.png";
@@ -194,11 +195,11 @@ namespace Umbraco.Tests.Integration.Services
         [Test]
         public void Can_Get_Paged_Children()
         {
-            var mediaType = MockedContentTypes.CreateImageMediaType("Image2");
+            var mediaType = MediaTypeBuilder.CreateImageMediaType("Image2");
             MediaTypeService.Save(mediaType);
             for (var i = 0; i < 10; i++)
             {
-                var c1 = MockedMedia.CreateMediaImage(mediaType, -1);
+                var c1 = MediaBuilder.CreateMediaImage(mediaType, -1);
                 MediaService.Save(c1);
             }
 
@@ -216,22 +217,22 @@ namespace Umbraco.Tests.Integration.Services
         [Test]
         public void Can_Get_Paged_Children_Dont_Get_Descendants()
         {
-            var mediaType = MockedContentTypes.CreateImageMediaType("Image2");
+            var mediaType = MediaTypeBuilder.CreateImageMediaType("Image2");
             MediaTypeService.Save(mediaType);
             // only add 9 as we also add a folder with children
             for (var i = 0; i < 9; i++)
             {
-                var m1 = MockedMedia.CreateMediaImage(mediaType, -1);
+                var m1 = MediaBuilder.CreateMediaImage(mediaType, -1);
                 MediaService.Save(m1);
             }
 
-            var mediaTypeForFolder = MockedContentTypes.CreateImageMediaType("Folder2");
+            var mediaTypeForFolder = MediaTypeBuilder.CreateImageMediaType("Folder2");
             MediaTypeService.Save(mediaTypeForFolder);
-            var mediaFolder = MockedMedia.CreateMediaFolder(mediaTypeForFolder, -1);
+            var mediaFolder = MediaBuilder.CreateMediaFolder(mediaTypeForFolder, -1);
             MediaService.Save(mediaFolder);
             for (var i = 0; i < 10; i++)
             {
-                var m1 = MockedMedia.CreateMediaImage(mediaType, mediaFolder.Id);
+                var m1 = MediaBuilder.CreateMediaImage(mediaType, mediaFolder.Id);
                 MediaService.Save(m1);
             }
 
@@ -259,25 +260,25 @@ namespace Umbraco.Tests.Integration.Services
         {
             //Create and Save folder-Media -> 1050
             var folderMediaType = MediaTypeService.Get(1031);
-            var folder = MockedMedia.CreateMediaFolder(folderMediaType, -1);
+            var folder = MediaBuilder.CreateMediaFolder(folderMediaType, -1);
             MediaService.Save(folder);
 
             //Create and Save folder-Media -> 1051
-            var folder2 = MockedMedia.CreateMediaFolder(folderMediaType, -1);
+            var folder2 = MediaBuilder.CreateMediaFolder(folderMediaType, -1);
             MediaService.Save(folder2);
 
             //Create and Save image-Media  -> 1052
             var imageMediaType = MediaTypeService.Get(1032);
-            var image = (Media)MockedMedia.CreateMediaImage(imageMediaType, 1050);
+            var image = MediaBuilder.CreateMediaImage(imageMediaType, 1050);
             MediaService.Save(image);
 
             //Create and Save folder-Media that is trashed -> 1053
-            var folderTrashed = (Media)MockedMedia.CreateMediaFolder(folderMediaType, -21);
+            var folderTrashed = MediaBuilder.CreateMediaFolder(folderMediaType, -21);
             folderTrashed.Trashed = true;
             MediaService.Save(folderTrashed);
 
             //Create and Save image-Media child of folderTrashed -> 1054
-            var imageTrashed = (Media)MockedMedia.CreateMediaImage(imageMediaType, folderTrashed.Id);
+            var imageTrashed = MediaBuilder.CreateMediaImage(imageMediaType, folderTrashed.Id);
             imageTrashed.Trashed = true;
             MediaService.Save(imageTrashed);
 

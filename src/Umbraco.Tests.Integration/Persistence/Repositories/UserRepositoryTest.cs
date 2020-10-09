@@ -46,7 +46,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var repository = CreateRepository(provider);
 
-                var user = UserBuilder.Build();
+                var user = UserBuilderInstance.Build();
 
                 // Act
                 repository.Save(user);
@@ -66,8 +66,8 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var repository = CreateRepository(provider);
 
-                var user1 = UserBuilder.WithSuffix("1").Build();
-                var use2 = UserBuilder.WithSuffix("2").Build();
+                var user1 = UserBuilderInstance.WithSuffix("1").Build();
+                var use2 = UserBuilderInstance.WithSuffix("2").Build();
 
                 // Act
                 repository.Save(user1);
@@ -90,7 +90,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var repository = CreateRepository(provider);
 
-                var user = UserBuilder.WithoutIdentity().Build();
+                var user = UserBuilderInstance.WithoutIdentity().Build();
                 repository.Save(user);
 
 
@@ -112,7 +112,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var repository = CreateRepository(provider);
 
-                var user = UserBuilder.Build();
+                var user = UserBuilderInstance.Build();
 
                 // Act
                 repository.Save(user);
@@ -368,22 +368,22 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private User CreateAndCommitUserWithGroup(IUserRepository repository, IUserGroupRepository userGroupRepository)
         {
-            var user = UserBuilder.WithoutIdentity().Build();
+            var user = UserBuilderInstance.WithoutIdentity().Build();
             repository.Save(user);
 
-            var group = UserGroupBuilder.Build();
+            var group = UserGroupBuilderInstance.Build();
             userGroupRepository.AddOrUpdateGroupWithUsers(@group, new[] { user.Id });
 
-            user.AddGroup(UserGroupBuilder.BuildReadOnly(group));
+            user.AddGroup(UserGroupBuilderInstance.BuildReadOnly(group));
 
             return user;
         }
 
         private IUser[] CreateAndCommitMultipleUsers(IUserRepository repository)
         {
-            var user1 = UserBuilder.WithoutIdentity().WithSuffix("1").Build();
-            var user2 = UserBuilder.WithoutIdentity().WithSuffix("2").Build();
-            var user3 = UserBuilder.WithoutIdentity().WithSuffix("3").Build();
+            var user1 = UserBuilderInstance.WithoutIdentity().WithSuffix("1").Build();
+            var user2 = UserBuilderInstance.WithoutIdentity().WithSuffix("2").Build();
+            var user3 = UserBuilderInstance.WithoutIdentity().WithSuffix("3").Build();
             repository.Save(user1);
             repository.Save(user2);
             repository.Save(user3);

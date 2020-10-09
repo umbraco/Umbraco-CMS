@@ -152,9 +152,14 @@
     <Compile Include="Scoping\ScopeEventDispatcherTests.cs" />
     <Compile Include="Security\OwinDataProtectorTokenProviderTests.cs" />
     <Compile Include="Persistence\Repositories\UserRepositoryTest.cs" />
+    <Compile Include="TestHelpers\Entities\MockedContent.cs" />
+    <Compile Include="TestHelpers\Entities\MockedContentTypes.cs" />
     <Compile Include="TestHelpers\Entities\MockedEntity.cs" />
+    <Compile Include="TestHelpers\Entities\MockedMedia.cs" />
+    <Compile Include="TestHelpers\Entities\MockedMember.cs" />
     <Compile Include="TestHelpers\Entities\MockedPropertyTypes.cs" />
     <Compile Include="TestHelpers\Entities\MockedUser.cs" />
+    <Compile Include="TestHelpers\Entities\MockedUserGroup.cs" />
     <Compile Include="UmbracoExamine\ExamineExtensions.cs" />
     <Compile Include="PublishedContent\NuCacheChildrenTests.cs" />
     <Compile Include="PublishedContent\PublishedContentLanguageVariantTests.cs" />

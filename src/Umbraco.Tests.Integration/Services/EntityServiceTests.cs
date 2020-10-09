@@ -9,8 +9,8 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
+using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Integration.Testing;
-using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Services
@@ -56,13 +56,13 @@ namespace Umbraco.Tests.Services
 
             var contentType = ContentTypeService.Get("umbTextpage");
 
-            var root = MockedContent.CreateSimpleContent(contentType);
+            var root = ContentBuilder.CreateSimpleContent(contentType);
             ContentService.Save(root);
             var rootId = root.Id;
             var ids = new List<int>();
-            for (int i = 0; i < 10; i++)
+            for (var i = 0; i < 10; i++)
             {
-                var c1 = MockedContent.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), root);
+                var c1 = ContentBuilder.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), root);
                 ContentService.Save(c1);
                 ids.Add(c1.Id);
                 root = c1; // make a hierarchy
@@ -101,12 +101,12 @@ namespace Umbraco.Tests.Services
 
             var contentType = ContentTypeService.Get("umbTextpage");
 
-            var root = MockedContent.CreateSimpleContent(contentType);
+            var root = ContentBuilder.CreateSimpleContent(contentType);
             ContentService.Save(root);
             var ids = new List<int>();
             for (int i = 0; i < 10; i++)
             {
-                var c1 = MockedContent.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), root);
+                var c1 = ContentBuilder.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), root);
                 ContentService.Save(c1);
                 ids.Add(c1.Id);
             }
@@ -143,18 +143,18 @@ namespace Umbraco.Tests.Services
         {
             var contentType = ContentTypeService.Get("umbTextpage");
 
-            var root = MockedContent.CreateSimpleContent(contentType);
+            var root = ContentBuilder.CreateSimpleContent(contentType);
             ContentService.Save(root);
             var count = 0;
             for (int i = 0; i < 10; i++)
             {
-                var c1 = MockedContent.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), root);
+                var c1 = ContentBuilder.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), root);
                 ContentService.Save(c1);
                 count++;
 
                 for (int j = 0; j < 5; j++)
                 {
-                    var c2 = MockedContent.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), c1);
+                    var c2 = ContentBuilder.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), c1);
                     ContentService.Save(c2);
                     count++;
                 }
@@ -174,12 +174,12 @@ namespace Umbraco.Tests.Services
         {
             var contentType = ContentTypeService.Get("umbTextpage");
 
-            var root = MockedContent.CreateSimpleContent(contentType);
+            var root = ContentBuilder.CreateSimpleContent(contentType);
             ContentService.Save(root);
             var toDelete = new List<IContent>();
             for (int i = 0; i < 10; i++)
             {
-                var c1 = MockedContent.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), root);
+                var c1 = ContentBuilder.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), root);
                 ContentService.Save(c1);
 
                 if (i % 2 == 0)
@@ -189,7 +189,7 @@ namespace Umbraco.Tests.Services
 
                 for (int j = 0; j < 5; j++)
                 {
-                    var c2 = MockedContent.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), c1);
+                    var c2 = ContentBuilder.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), c1);
                     ContentService.Save(c2);
                 }
             }
@@ -216,12 +216,12 @@ namespace Umbraco.Tests.Services
         {
             var contentType = ContentTypeService.Get("umbTextpage");
 
-            var root = MockedContent.CreateSimpleContent(contentType);
+            var root = ContentBuilder.CreateSimpleContent(contentType);
             ContentService.Save(root);
             var toDelete = new List<IContent>();
             for (int i = 0; i < 10; i++)
             {
-                var c1 = MockedContent.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), root);
+                var c1 = ContentBuilder.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), root);
                 ContentService.Save(c1);
 
                 if (i % 2 == 0)
@@ -231,7 +231,7 @@ namespace Umbraco.Tests.Services
 
                 for (int j = 0; j < 5; j++)
                 {
-                    var c2 = MockedContent.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), c1);
+                    var c2 = ContentBuilder.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), c1);
                     ContentService.Save(c2);
                 }
             }
@@ -258,17 +258,17 @@ namespace Umbraco.Tests.Services
         {
             var contentType = ContentTypeService.Get("umbTextpage");
 
-            var root = MockedContent.CreateSimpleContent(contentType);
+            var root = ContentBuilder.CreateSimpleContent(contentType);
             ContentService.Save(root);
 
             for (int i = 0; i < 10; i++)
             {
-                var c1 = MockedContent.CreateSimpleContent(contentType, "ssss" + Guid.NewGuid(), root);
+                var c1 = ContentBuilder.CreateSimpleContent(contentType, "ssss" + Guid.NewGuid(), root);
                 ContentService.Save(c1);
 
                 for (int j = 0; j < 5; j++)
                 {
-                    var c2 = MockedContent.CreateSimpleContent(contentType, "tttt" + Guid.NewGuid(), c1);
+                    var c2 = ContentBuilder.CreateSimpleContent(contentType, "tttt" + Guid.NewGuid(), c1);
                     ContentService.Save(c2);
                 }
             }
@@ -290,11 +290,11 @@ namespace Umbraco.Tests.Services
             var folderType = MediaTypeService.Get(1031);
             var imageMediaType = MediaTypeService.Get(1032);
 
-            var root = MockedMedia.CreateMediaFolder(folderType, -1);
+            var root = MediaBuilder.CreateMediaFolder(folderType, -1);
             MediaService.Save(root);
             for (int i = 0; i < 10; i++)
             {
-                var c1 = MockedMedia.CreateMediaImage(imageMediaType, root.Id);
+                var c1 = MediaBuilder.CreateMediaImage(imageMediaType, root.Id);
                 MediaService.Save(c1);
             }
 
@@ -313,18 +313,18 @@ namespace Umbraco.Tests.Services
             var folderType = MediaTypeService.Get(1031);
             var imageMediaType = MediaTypeService.Get(1032);
 
-            var root = MockedMedia.CreateMediaFolder(folderType, -1);
+            var root = MediaBuilder.CreateMediaFolder(folderType, -1);
             MediaService.Save(root);
             var count = 0;
             for (int i = 0; i < 10; i++)
             {
-                var c1 = MockedMedia.CreateMediaImage(imageMediaType, root.Id);
+                var c1 = MediaBuilder.CreateMediaImage(imageMediaType, root.Id);
                 MediaService.Save(c1);
                 count++;
 
                 for (int j = 0; j < 5; j++)
                 {
-                    var c2 = MockedMedia.CreateMediaImage(imageMediaType, c1.Id);
+                    var c2 = MediaBuilder.CreateMediaImage(imageMediaType, c1.Id);
                     MediaService.Save(c2);
                     count++;
                 }
@@ -345,12 +345,12 @@ namespace Umbraco.Tests.Services
             var folderType = MediaTypeService.Get(1031);
             var imageMediaType = MediaTypeService.Get(1032);
 
-            var root = MockedMedia.CreateMediaFolder(folderType, -1);
+            var root = MediaBuilder.CreateMediaFolder(folderType, -1);
             MediaService.Save(root);
             var toDelete = new List<IMedia>();
             for (int i = 0; i < 10; i++)
             {
-                var c1 = MockedMedia.CreateMediaImage(imageMediaType, root.Id);
+                var c1 = MediaBuilder.CreateMediaImage(imageMediaType, root.Id);
                 MediaService.Save(c1);
 
                 if (i % 2 == 0)
@@ -360,7 +360,7 @@ namespace Umbraco.Tests.Services
 
                 for (int j = 0; j < 5; j++)
                 {
-                    var c2 = MockedMedia.CreateMediaImage(imageMediaType, c1.Id);
+                    var c2 = MediaBuilder.CreateMediaImage(imageMediaType, c1.Id);
                     MediaService.Save(c2);
                 }
             }
@@ -388,12 +388,12 @@ namespace Umbraco.Tests.Services
             var folderType = MediaTypeService.Get(1031);
             var imageMediaType = MediaTypeService.Get(1032);
 
-            var root = MockedMedia.CreateMediaFolder(folderType, -1);
+            var root = MediaBuilder.CreateMediaFolder(folderType, -1);
             MediaService.Save(root);
             var toDelete = new List<IMedia>();
             for (int i = 0; i < 10; i++)
             {
-                var c1 = MockedMedia.CreateMediaImage(imageMediaType, root.Id);
+                var c1 = MediaBuilder.CreateMediaImage(imageMediaType, root.Id);
                 MediaService.Save(c1);
 
                 if (i % 2 == 0)
@@ -403,7 +403,7 @@ namespace Umbraco.Tests.Services
 
                 for (int j = 0; j < 5; j++)
                 {
-                    var c2 = MockedMedia.CreateMediaImage(imageMediaType, c1.Id);
+                    var c2 = MediaBuilder.CreateMediaImage(imageMediaType, c1.Id);
                     MediaService.Save(c2);
                 }
             }
@@ -431,18 +431,18 @@ namespace Umbraco.Tests.Services
             var folderType = MediaTypeService.Get(1031);
             var imageMediaType = MediaTypeService.Get(1032);
 
-            var root = MockedMedia.CreateMediaFolder(folderType, -1);
+            var root = MediaBuilder.CreateMediaFolder(folderType, -1);
             MediaService.Save(root);
 
             for (int i = 0; i < 10; i++)
             {
-                var c1 = MockedMedia.CreateMediaImage(imageMediaType, root.Id);
+                var c1 = MediaBuilder.CreateMediaImage(imageMediaType, root.Id);
                 c1.Name = "ssss" + Guid.NewGuid();
                 MediaService.Save(c1);
 
                 for (int j = 0; j < 5; j++)
                 {
-                    var c2 = MockedMedia.CreateMediaImage(imageMediaType, c1.Id);
+                    var c2 = MediaBuilder.CreateMediaImage(imageMediaType, c1.Id);
                     c2.Name = "tttt" + Guid.NewGuid();
                     MediaService.Save(c2);
                 }
@@ -504,11 +504,13 @@ namespace Umbraco.Tests.Services
         public void EntityService_Can_Get_Content_By_UmbracoObjectType_With_Variant_Names()
         {
             var alias = "test" + Guid.NewGuid();
-            var contentType = MockedContentTypes.CreateSimpleContentType(alias, alias, false);
+            var template = TemplateBuilder.CreateTextPageTemplate(alias);
+            FileService.SaveTemplate(template);
+            var contentType = ContentTypeBuilder.CreateSimpleContentType("test2", "Test2", defaultTemplateId: template.Id);
             contentType.Variations = ContentVariation.Culture;
             ContentTypeService.Save(contentType);
 
-            var c1 = MockedContent.CreateSimpleContent(contentType, "Test", -1);
+            var c1 = ContentBuilder.CreateSimpleContent(contentType, "Test", -1);
             c1.SetCultureName("Test - FR", _langFr.IsoCode);
             c1.SetCultureName("Test - ES", _langEs.IsoCode);
             ContentService.Save(c1);
@@ -525,17 +527,19 @@ namespace Umbraco.Tests.Services
         [Test]
         public void EntityService_Can_Get_Child_Content_By_ParentId_And_UmbracoObjectType_With_Variant_Names()
         {
-            var contentType = MockedContentTypes.CreateSimpleContentType("test1", "Test1", false);
+            var template = TemplateBuilder.CreateTextPageTemplate();
+            FileService.SaveTemplate(template);
+            var contentType = ContentTypeBuilder.CreateSimpleContentType("test1", "Test1", defaultTemplateId: template.Id);
             contentType.Variations = ContentVariation.Culture;
             ContentTypeService.Save(contentType);
 
-            var root = MockedContent.CreateSimpleContent(contentType);
+            var root = ContentBuilder.CreateSimpleContent(contentType);
             root.SetCultureName("Root", _langFr.IsoCode); // else cannot save
             ContentService.Save(root);
 
             for (int i = 0; i < 10; i++)
             {
-                var c1 = MockedContent.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), root);
+                var c1 = ContentBuilder.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), root);
                 if (i % 2 == 0)
                 {
                     c1.SetCultureName("Test " + i + " - FR", _langFr.IsoCode);
@@ -744,52 +748,54 @@ namespace Umbraco.Tests.Services
             {
                 _isSetup = true;
 
+                var template = TemplateBuilder.CreateTextPageTemplate();
+                FileService.SaveTemplate(template); // else, FK violation on contentType!
+
                 //Create and Save ContentType "umbTextpage" -> 1052
-                ContentType contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage", "Textpage");
+                var contentType = ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateId: template.Id);
                 contentType.Key = new Guid("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522");
-                FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
                 ContentTypeService.Save(contentType);
 
                 //Create and Save Content "Homepage" based on "umbTextpage" -> 1053
-                Content textpage = MockedContent.CreateSimpleContent(contentType);
+                var textpage = ContentBuilder.CreateSimpleContent(contentType);
                 textpage.Key = new Guid("B58B3AD4-62C2-4E27-B1BE-837BD7C533E0");
                 ContentService.Save(textpage, 0);
 
                 //Create and Save Content "Text Page 1" based on "umbTextpage" -> 1054
-                Content subpage = MockedContent.CreateSimpleContent(contentType, "Text Page 1", textpage.Id);
+                var subpage = ContentBuilder.CreateSimpleContent(contentType, "Text Page 1", textpage.Id);
                 subpage.ContentSchedule.Add(DateTime.Now.AddMinutes(-5), null);
                 ContentService.Save(subpage, 0);
 
                 //Create and Save Content "Text Page 2" based on "umbTextpage" -> 1055
-                Content subpage2 = MockedContent.CreateSimpleContent(contentType, "Text Page 2", textpage.Id);
+                var subpage2 = ContentBuilder.CreateSimpleContent(contentType, "Text Page 2", textpage.Id);
                 ContentService.Save(subpage2, 0);
 
                 //Create and Save Content "Text Page Deleted" based on "umbTextpage" -> 1056
-                Content trashed = MockedContent.CreateSimpleContent(contentType, "Text Page Deleted", -20);
+                var trashed = ContentBuilder.CreateSimpleContent(contentType, "Text Page Deleted", -20);
                 trashed.Trashed = true;
                 ContentService.Save(trashed, 0);
 
                 //Create and Save folder-Media -> 1057
                 var folderMediaType = MediaTypeService.Get(1031);
-                var folder = MockedMedia.CreateMediaFolder(folderMediaType, -1);
+                var folder = MediaBuilder.CreateMediaFolder(folderMediaType, -1);
                 MediaService.Save(folder, 0);
                 folderId = folder.Id;
 
                 //Create and Save image-Media -> 1058
                 var imageMediaType = MediaTypeService.Get(1032);
-                var image = MockedMedia.CreateMediaImage(imageMediaType, folder.Id);
+                var image = MediaBuilder.CreateMediaImage(imageMediaType, folder.Id);
                 MediaService.Save(image, 0);
 
                 //Create and Save file-Media -> 1059
                 var fileMediaType = MediaTypeService.Get(1033);
-                var file = MockedMedia.CreateMediaFile(fileMediaType, folder.Id);
+                var file = MediaBuilder.CreateMediaFile(fileMediaType, folder.Id);
                 MediaService.Save(file, 0);
 
                 // Create and save sub folder -> 1060
-                var subfolder = MockedMedia.CreateMediaFolder(folderMediaType, folder.Id);
+                var subfolder = MediaBuilder.CreateMediaFolder(folderMediaType, folder.Id);
                 MediaService.Save(subfolder, 0);
                 // Create and save sub folder -> 1061
-                var subfolder2 = MockedMedia.CreateMediaFolder(folderMediaType, subfolder.Id);
+                var subfolder2 = MediaBuilder.CreateMediaFolder(folderMediaType, subfolder.Id);
                 MediaService.Save(subfolder2, 0);
             }
         }

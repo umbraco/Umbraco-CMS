@@ -7,8 +7,8 @@ using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
+using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Integration.Testing;
-using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Integration.Persistence.Repositories
@@ -196,31 +196,33 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
         public void CreateTestData()
         {
             var fileService = GetRequiredService<IFileService>();
+            var template = TemplateBuilder.CreateTextPageTemplate();
+            fileService.SaveTemplate(template); // else, FK violation on contentType!
+
             var contentService = GetRequiredService<IContentService>();
             var contentTypeService = GetRequiredService<IContentTypeService>();
             //Create and Save ContentType "umbTextpage" -> (NodeDto.NodeIdSeed)
-            var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage", "Textpage");
+            var contentType = ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateId: template.Id);
             contentType.Key = Guid.NewGuid();
-            fileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
             contentTypeService.Save(contentType);
 
             //Create and Save Content "Homepage" based on "umbTextpage" -> (NodeDto.NodeIdSeed + 1)
-            _textpage = MockedContent.CreateSimpleContent(contentType);
+            _textpage = ContentBuilder.CreateSimpleContent(contentType);
             _textpage.Key = Guid.NewGuid();
             contentService.Save(_textpage);
 
             //Create and Save Content "Text Page 1" based on "umbTextpage" -> (NodeDto.NodeIdSeed + 2)
-            _subpage = MockedContent.CreateSimpleContent(contentType, "Text Page 1", _textpage.Id);
+            _subpage = ContentBuilder.CreateSimpleContent(contentType, "Text Page 1", _textpage.Id);
             _subpage.Key = Guid.NewGuid();
             contentService.Save(_subpage);
 
             //Create and Save Content "Text Page 1" based on "umbTextpage" -> (NodeDto.NodeIdSeed + 3)
-            _otherpage = MockedContent.CreateSimpleContent(contentType, "Text Page 2", _textpage.Id);
+            _otherpage = ContentBuilder.CreateSimpleContent(contentType, "Text Page 2", _textpage.Id);
             _otherpage.Key = Guid.NewGuid();
             contentService.Save(_otherpage);
 
             //Create and Save Content "Text Page Deleted" based on "umbTextpage" -> (NodeDto.NodeIdSeed + 4)
-            _trashed = MockedContent.CreateSimpleContent(contentType, "Text Page Deleted", -20);
+            _trashed = ContentBuilder.CreateSimpleContent(contentType, "Text Page Deleted", -20);
             _trashed.Key = Guid.NewGuid();
             ((Content) _trashed).Trashed = true;
             contentService.Save(_trashed);
