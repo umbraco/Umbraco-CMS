@@ -29,7 +29,7 @@
         }
     );
 
-    function BlockListBlockController($scope, $compile, $element, umbRequestHelper) {
+    function BlockListBlockController($scope, $compile, $element, assetsService, umbRequestHelper) {
         var model = this;
 
         model.$onInit = function () {
@@ -49,26 +49,20 @@
             $scope.index = model.index;
             $scope.parentForm = model.parentForm;
             $scope.valFormManager = model.valFormManager;
+            $scope.view = assetsService.appendCacheBuster(model.view);
 
             if (model.stylesheet) {
-                var stylesheetUrl = model.stylesheet;
-                if (Umbraco.Sys.ServerVariables.application) {
-                    var rnd = Umbraco.Sys.ServerVariables.application.cacheBuster;
-                    var _op = (stylesheetUrl.indexOf("?") > 0) ? "&" : "?";
-                    stylesheetUrl = stylesheetUrl + _op + "umb__rnd=" + rnd;
-                }
-
                 var shadowRoot = $element[0].attachShadow({ mode: 'open' });
                 shadowRoot.innerHTML = `
                     <style>
-                    @import "${stylesheetUrl}"
+                    @import "${assetsService.appendCacheBuster(model.stylesheet)}"
                     </style>
-                    <div ng-include="'${model.view}'"></div>
+                    <div ng-include="'${$scope.view}'"></div>
                 `;
                 $compile(shadowRoot)($scope);
             }
             else {
-                $element.append($compile('<div ng-include="model.view"></div>')($scope));
+                $element.append($compile('<div ng-include="view"></div>')($scope));
             }
         };
 
