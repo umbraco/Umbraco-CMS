@@ -10,7 +10,7 @@ using Umbraco.Web.PublishedCache.NuCache;
 
 namespace Umbraco.Web.PublishedCache
 {
-    internal class ContentCacheAdapter :  IPublishedContentCache2
+    internal class ContentCacheAdapter : IPublishedContentCache2
     {
         private readonly IPublishedCache3 _contentCache;
         private readonly IContentRouter _contentRouter;
@@ -96,6 +96,15 @@ namespace Umbraco.Web.PublishedCache
             return _contentCache.GetById(contentId);
         }
 
+        // routes can be
+        // "/"
+        // "123/"
+        // "/path/to/node"
+        // "123/path/to/node"
+
+        // at the moment we try our best to be backward compatible, but really,
+        // should get rid of hideTopLevelNode and other oddities entirely, eventually
+
         public IPublishedContent GetByRoute(bool preview, string route, bool? hideTopLevelNode = null, string culture = null)
         {
             if (route == null) throw new ArgumentNullException(nameof(route));
@@ -148,23 +157,22 @@ namespace Umbraco.Web.PublishedCache
 
         public string GetRouteById(bool preview, int contentId, string culture = null)
         {
-            var result = _contentRouter.GetRouteById(_contentCache, _domainCache,preview, contentId, culture);
-            if(result.Outcome == RoutingOutcome.NotFound)
+            var cache = (preview == false || PublishedSnapshotService.FullCacheWhenPreviewing) ? _elementsCache : _snapshotCache;
+            var key = NuCache.CacheKeys.ContentCacheRouteByContent(contentId, preview, culture);
+            return cache.GetCacheItem<string>(key, () =>
             {
-                return null;
-            }
-            return (result.DomainId?.ToString(CultureInfo.InvariantCulture) ?? "") + result.Url;
+                var result = _contentRouter.GetRouteById(_contentCache, _domainCache, preview, contentId, culture);
+                if (result.Outcome == RoutingOutcome.NotFound)
+                {
+                    return null;
+                }
+                return (result.DomainId?.ToString(CultureInfo.InvariantCulture) ?? "") + result.Url;
+            });
         }
 
         public string GetRouteById(int contentId, string culture = null)
         {
-            var result = _contentRouter.GetRouteById(_contentCache, _domainCache, _contentCache.PreviewDefault,contentId, culture);
-
-            if (result.Outcome == RoutingOutcome.NotFound)
-            {
-                return null;
-            }
-            return (result.DomainId?.ToString(CultureInfo.InvariantCulture) ?? "") + result.Url;
+            return GetRouteById(_contentCache.PreviewDefault, contentId,  culture);
         }
 
         public IPublishedContent GetSingleByXPath(bool preview, string xpath, params XPathVariable[] vars)

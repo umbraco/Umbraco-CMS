@@ -11,7 +11,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.CheckboxListContro
 
             vm.uniqueId = String.CreateGuid();
             
-            // currently the property editor will onyl work if our input is an object.
+            // currently the property editor will only work if our input is an object.
             if (Utilities.isObject($scope.model.config.items)) {
 
                 // formatting the items in the dictionary into an array

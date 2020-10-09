@@ -57,6 +57,5 @@ namespace Umbraco.Web.Routing
 
             return node != null;
         }
-
     }
 }

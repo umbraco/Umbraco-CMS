@@ -30,9 +30,8 @@
                             </div>
 
                             <ul class="umb-card-grid -three-in-row">
-                                <li ng-repeat="availableItem in macros | orderBy:'name' | filter:searchTerm"
-                                    ng-click="selectMacro(availableItem)">
-                                    <button class="btn-reset umb-card-grid-item" title="{{availableItem.name}}">
+                                <li ng-repeat="availableItem in macros | orderBy:'name' | filter:searchTerm">
+                                    <button class="btn-reset umb-card-grid-item" title="{{availableItem.name}}" ng-click="selectMacro(availableItem)">
                                         <span>
                                             <i class="icon-settings-alt" aria-hidden="true"></i>
                                             {{availableItem.name}}

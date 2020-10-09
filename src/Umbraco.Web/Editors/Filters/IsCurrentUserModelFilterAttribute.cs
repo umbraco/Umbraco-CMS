@@ -22,9 +22,9 @@ namespace Umbraco.Web.Editors.Filters
             if (objectContent != null)
             {
                 var model = objectContent.Value as UserBasic;
-                if (model != null)
+                if (model != null && model.Id is int userId)
                 {
-                    model.IsCurrentUser = (int) model.Id == user.Id;
+                    model.IsCurrentUser = userId == user.Id;
                 }
                 else
                 {
@@ -33,7 +33,10 @@ namespace Umbraco.Web.Editors.Filters
                     {
                         foreach (var userBasic in collection)
                         {
-                            userBasic.IsCurrentUser = (int) userBasic.Id == user.Id;
+                            if (userBasic.Id is int uid)
+                            {
+                                userBasic.IsCurrentUser = uid == user.Id;
+                            }
                         }
                     }
                     else
@@ -43,7 +46,10 @@ namespace Umbraco.Web.Editors.Filters
                         {
                             foreach (var userBasic in paged.Items)
                             {
-                                userBasic.IsCurrentUser = (int)userBasic.Id == user.Id;
+                                if (userBasic.Id is int uid)
+                                {
+                                    userBasic.IsCurrentUser = uid == user.Id;
+                                }
                             }
                         }
                     }
