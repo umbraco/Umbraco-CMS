@@ -12,7 +12,7 @@
 
         vm.warningText = "The item or one of the underlying items is being used.";
 
-        localizationService.localize("references_deleteWarning").then(function (value) {
+        localizationService.localize("references_unpublishWarning").then(function (value) {
             vm.warningText = value;
         });
 
