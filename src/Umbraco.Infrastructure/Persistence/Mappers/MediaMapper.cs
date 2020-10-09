@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
 
@@ -13,8 +12,8 @@ namespace Umbraco.Core.Persistence.Mappers
     [MapperFor(typeof(Umbraco.Core.Models.Media))]
     public sealed class MediaMapper : BaseMapper
     {
-        public MediaMapper(Lazy<ISqlContext> sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
-            : base(sqlContext, maps)
+        public MediaMapper(Lazy<ISqlContext> sqlContext)
+            : base(sqlContext)
         { }
 
         protected override void DefineMaps()

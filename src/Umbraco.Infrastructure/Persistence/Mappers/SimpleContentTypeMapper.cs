@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
 
@@ -16,8 +15,8 @@ namespace Umbraco.Core.Persistence.Mappers
     [MapperFor(typeof(SimpleContentType))]
     public sealed class SimpleContentTypeMapper : BaseMapper
     {
-        public SimpleContentTypeMapper(Lazy<ISqlContext> sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
-            : base(sqlContext, maps)
+        public SimpleContentTypeMapper(Lazy<ISqlContext> sqlContext)
+            : base(sqlContext)
         { }
 
         protected override void DefineMaps()

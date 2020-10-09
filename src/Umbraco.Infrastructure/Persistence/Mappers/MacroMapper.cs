@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
 
@@ -9,8 +8,8 @@ namespace Umbraco.Core.Persistence.Mappers
     [MapperFor(typeof(IMacro))]
     internal sealed class MacroMapper : BaseMapper
     {
-        public MacroMapper(Lazy<ISqlContext> sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
-            : base(sqlContext, maps)
+        public MacroMapper(Lazy<ISqlContext> sqlContext)
+            : base(sqlContext)
         { }
 
         protected override void DefineMaps()

@@ -2,7 +2,6 @@
 using System.Collections.Concurrent;
 using NPoco;
 using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.Persistence.Mappers
 {
@@ -15,15 +14,16 @@ namespace Umbraco.Core.Persistence.Mappers
 
         private readonly Lazy<ISqlContext> _sqlContext;
         private readonly object _definedLock = new object();
-        private readonly ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> _maps;
+
+        private static readonly ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> _maps =
+            new ConcurrentDictionary<Type, ConcurrentDictionary<string, string>>();
 
         private ISqlSyntaxProvider _sqlSyntax;
         private bool _defined;
 
-        protected BaseMapper(Lazy<ISqlContext> sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
+        protected BaseMapper(Lazy<ISqlContext> sqlContext)
         {
             _sqlContext = sqlContext;
-            _maps = maps;
         }
 
         protected abstract void DefineMaps();

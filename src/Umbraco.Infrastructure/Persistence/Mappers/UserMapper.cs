@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Dtos;
 
@@ -9,8 +8,8 @@ namespace Umbraco.Core.Persistence.Mappers
     [MapperFor(typeof(User))]
     public sealed class UserMapper : BaseMapper
     {
-        public UserMapper(Lazy<ISqlContext> sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
-            : base(sqlContext, maps)
+        public UserMapper(Lazy<ISqlContext> sqlContext)
+            : base(sqlContext)
         { }
 
         protected override void DefineMaps()

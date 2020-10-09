@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Concurrent;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.Persistence.Mappers
 {
     public class MapperCollectionBuilder : SetCollectionBuilderBase<MapperCollectionBuilder, MapperCollection, BaseMapper>
     {
-        private readonly ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> _maps
-            = new ConcurrentDictionary<Type, ConcurrentDictionary<string, string>>();
-
         protected override MapperCollectionBuilder This => this;
 
         public override void RegisterWith(IServiceCollection services)
@@ -24,12 +19,7 @@ namespace Umbraco.Core.Persistence.Mappers
 
             services.Add(new ServiceDescriptor(typeof(IMapperCollection),factory => factory.GetRequiredService<MapperCollection>(), ServiceLifetime.Transient));
         }
-
-        protected override BaseMapper CreateItem(IServiceProvider serviceProvider, Type itemType)
-        {
-            return (BaseMapper) ActivatorUtilities.CreateInstance(serviceProvider, itemType, _maps);
-        }
-
+        
         public MapperCollectionBuilder AddCoreMappers()
         {
             Add<AccessMapper>();

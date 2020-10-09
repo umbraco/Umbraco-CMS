@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
 
@@ -13,8 +12,8 @@ namespace Umbraco.Core.Persistence.Mappers
     [MapperFor(typeof(IDataType))]
     public sealed class DataTypeMapper : BaseMapper
     {
-        public DataTypeMapper(Lazy<ISqlContext> sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
-            : base(sqlContext, maps)
+        public DataTypeMapper(Lazy<ISqlContext> sqlContext)
+            : base(sqlContext)
         { }
 
         protected override void DefineMaps()

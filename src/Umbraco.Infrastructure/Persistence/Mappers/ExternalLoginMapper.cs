@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Persistence.Dtos;
 
@@ -9,10 +8,9 @@ namespace Umbraco.Core.Persistence.Mappers
     [MapperFor(typeof(IdentityUserLogin))]
     public sealed class ExternalLoginMapper : BaseMapper
     {
-        public ExternalLoginMapper(Lazy<ISqlContext> sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
-            : base(sqlContext, maps)
+        public ExternalLoginMapper(Lazy<ISqlContext> sqlContext)
+            : base(sqlContext)
         { }
-
         protected override void DefineMaps()
         {
             DefineMap<IdentityUserLogin, ExternalLoginDto>(nameof(IdentityUserLogin.Id), nameof(ExternalLoginDto.Id));
