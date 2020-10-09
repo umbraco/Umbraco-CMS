@@ -18,7 +18,7 @@
         /// <para>The value of <paramref name="preview"/> overrides defaults.</para>
         /// </remarks>
         ContentRoutingResult GetIdByRoute(IPublishedCache2 currentSnapshot,bool preview, string route, bool? hideTopLevelNode, string culture);
-       
+
         /// <summary>
         /// Gets the route for a content identified by its unique identifier.
         /// </summary>
@@ -26,14 +26,7 @@
         /// <param name="contentId">The content unique identifier.</param>
         /// <returns>The route.</returns>
         /// <remarks>The value of <paramref name="preview"/> overrides defaults.</remarks>
-        string GetRouteById(IPublishedCache2 snapshot, IDomainCache domainCache, bool preview, int contentId, string culture = null);
-        // <summary>
-        /// Gets the route for a content identified by its unique identifier.
-        /// </summary>
-        /// <param name="contentId">The content unique identifier.</param>
-        /// <returns>The route.</returns>
-        /// <remarks>Considers published or unpublished content depending on defaults.</remarks>
-        string GetRouteById(bool defaultPreview, IPublishedCache2 snapshot, IDomainCache domainCache, int contentId, string culture = null);
+        RouteByIdResult GetRouteById(IPublishedCache2 snapshot, IDomainCache domainCache, bool preview, int contentId, string culture = null);
 
         /// <summary>
         /// Gets the route for a content identified by its alias.

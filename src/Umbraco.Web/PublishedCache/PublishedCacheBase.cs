@@ -8,7 +8,7 @@ using Umbraco.Core.Xml;
 
 namespace Umbraco.Web.PublishedCache
 {
-    internal abstract class PublishedCacheBase : IPublishedCache2
+    internal abstract class PublishedCacheBase : IPublishedCache3
     {
         public bool PreviewDefault { get; }
 

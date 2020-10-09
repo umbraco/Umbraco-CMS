@@ -7,6 +7,13 @@ using Umbraco.Core.Xml;
 
 namespace Umbraco.Web.PublishedCache
 {
+    public interface IPublishedCache3 : IPublishedCache2, IDisposable
+    {
+        /// <summary>
+        /// Whether Preview mode is default for this cache
+        /// </summary>
+        public bool PreviewDefault { get; }
+    }
     public interface IPublishedCache2 : IPublishedCache, IDisposable
     {
         /// <summary>
