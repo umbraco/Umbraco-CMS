@@ -503,10 +503,8 @@ context('Content', () => {
 
     it('Content with contentpicker', () => {
         const pickerDocTypeName = 'Content picker doc type';
-        const groupName = 'ContentPickerGroup';
-        const alias = AliasHelper.toAlias(pickerDocTypeName);
+        const pickerDocTypeAlias = AliasHelper.toAlias(pickerDocTypeName);
         const pickedDocTypeName = 'Picked content document type';
-        const pickedNodeName = 'Content to pick';
 
         cy.deleteAllContent();
         cy.umbracoEnsureDocumentTypeNameNotExists(pickerDocTypeName);
@@ -529,7 +527,7 @@ context('Content', () => {
                 .withContentTypeAlias(generatedType["alias"])
                 .withAction("publishNew")
                 .addVariant()
-                .withName(pickedNodeName)
+                .withName('Content to pick')
                 .withSave(true)
                 .withPublish(true)
                 .addProperty()
@@ -546,11 +544,11 @@ context('Content', () => {
         // Create the doctype with a the picker
         const pickerDocType = new DocumentTypeBuilder()
             .withName(pickerDocTypeName)
-            .withAlias(alias)
+            .withAlias(pickerDocTypeAlias)
             .withAllowAsRoot(true)
-            .withDefaultTemplate(alias)
+            .withDefaultTemplate(pickerDocTypeAlias)
             .addGroup()
-                .withName(groupName)
+                .withName('ContentPickerGroup')
                 .addContentPickerProperty()
                     .withAlias('picker')
                 .done()
@@ -560,7 +558,7 @@ context('Content', () => {
         cy.saveDocumentType(pickerDocType);
 
         // Edit it the template to allow us to verify the rendered view.
-        cy.editTemplate(pickerDocTypeName, `@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.ContentPickerType>
+        cy.editTemplate(pickerDocTypeName, `@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.ContentPickerDocType>
         @using ContentModels = Umbraco.Web.PublishedModels;
         @{
             Layout = null;
@@ -577,7 +575,7 @@ context('Content', () => {
         // Create content with content picker
         cy.get('.umb-tree-root-link').rightclick();
         cy.get('.-opens-dialog > .umb-action-link').click();
-        cy.get('[data-element="action-create-contentPickerType"] > .umb-action-link').click();
+        cy.get('[data-element="action-create-' + pickerDocTypeAlias + '"] > .umb-action-link').click();
         // Fill out content
         cy.umbracoEditorHeaderName('ContentPickerContent');
         cy.get('.umb-node-preview-add').click();
@@ -590,6 +588,7 @@ context('Content', () => {
         cy.umbracoSuccessNotification().should('be.visible');
 
         // Assert
+        cy.log('Checking that content is rendered correctly.')
         const expectedContent = '<p>Acceptance test</p>'
         cy.umbracoVerifyRenderedViewContent('contentpickercontent', expectedContent, true).should('be.true');
         // clean
