@@ -8,7 +8,7 @@ context('Members', () => {
     it('Create member', () => {
         const name = "Alice Bobson";
         const email = "alice-bobson@acceptancetest.umbraco";
-        const password = "$AUlkoF*St0kgPiyyVEk5iU5JWdN*F7&@OSl5Y4pOofnidfifkBj5Ns2ONv%FzsTl36V1E924Gw97zcuSeT7UwK&qb5l&O9h!d!w";
+        const password = "$AUlkoF*St0kgPiyyVEk5iU5JWdN*F7&";
         const passwordTimeout = 20000
 
         cy.umbracoEnsureMemberEmailNotExists(email);
