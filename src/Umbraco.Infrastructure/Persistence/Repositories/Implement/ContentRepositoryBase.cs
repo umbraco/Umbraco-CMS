@@ -983,8 +983,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     return new ReadOnlyRelation(entity.Id, id, relationType.Id);
                 }).WhereNotNull();
 
-            // Save bulk relations<
+            // Save bulk relations
             RelationRepository.SaveBulk(toSave);
+
         }
 
         private class NodeIdKey
