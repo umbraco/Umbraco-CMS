@@ -42,5 +42,4 @@ namespace Umbraco.Core.Models
         [IgnoreDataMember]
         int RelationTypeId { get; }
     }
-
 }
