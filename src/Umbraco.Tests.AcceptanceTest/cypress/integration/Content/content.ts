@@ -517,8 +517,8 @@ context('Content', () => {
             .withAllowAsRoot(true)
             .addGroup()
                 .addTextBoxProperty()
-                .withAlias('text')
-            .done()
+                    .withAlias('text')
+                .done()
             .done()
             .build();
             
