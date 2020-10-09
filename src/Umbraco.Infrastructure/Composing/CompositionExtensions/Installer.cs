@@ -13,19 +13,19 @@ namespace Umbraco.Web.Composing.CompositionExtensions
         {
             // register the installer steps
 
-            composition.Services.AddScoped<NewInstallStep>();
-            composition.Services.AddScoped<UpgradeStep>();
-            composition.Services.AddScoped<FilePermissionsStep>();
-            composition.Services.AddScoped<DatabaseConfigureStep>();
-            composition.Services.AddScoped<DatabaseInstallStep>();
-            composition.Services.AddScoped<DatabaseUpgradeStep>();
+            composition.Services.AddScoped<InstallSetupStep,NewInstallStep>();
+            composition.Services.AddScoped<InstallSetupStep,UpgradeStep>();
+            composition.Services.AddScoped<InstallSetupStep,FilePermissionsStep>();
+            composition.Services.AddScoped<InstallSetupStep,DatabaseConfigureStep>();
+            composition.Services.AddScoped<InstallSetupStep,DatabaseInstallStep>();
+            composition.Services.AddScoped<InstallSetupStep,DatabaseUpgradeStep>();
 
             // TODO: Add these back once we have a compatible Starter kit
             // composition.Register<StarterKitDownloadStep>(Lifetime.Scope);
             // composition.Register<StarterKitInstallStep>(Lifetime.Scope);
             // composition.Register<StarterKitCleanupStep>(Lifetime.Scope);
 
-            composition.Services.AddScoped<CompleteInstallStep>();
+            composition.Services.AddScoped<InstallSetupStep,CompleteInstallStep>();
 
             composition.Services.AddTransient<InstallStepCollection>();
             composition.Services.AddUnique<InstallHelper>();
