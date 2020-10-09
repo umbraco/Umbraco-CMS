@@ -89,6 +89,11 @@ namespace Umbraco.Extensions
             services.TryAddScoped<BackOfficeLookupNormalizer>();
             services.TryAddScoped<BackOfficeIdentityErrorDescriber>();
 
+            // TODO: MSDI, without the following registrations container validation fails for UserManager<BackOfficeIdentityUser>
+            // I am not sure if we should be registering the Identity defaults or the custom ones as above.
+            services.TryAddScoped<ILookupNormalizer, UpperInvariantLookupNormalizer>();
+            services.TryAddScoped<IdentityErrorDescriber>();
+
             return new IdentityBuilder(typeof(BackOfficeIdentityUser), services);
         }
     }
