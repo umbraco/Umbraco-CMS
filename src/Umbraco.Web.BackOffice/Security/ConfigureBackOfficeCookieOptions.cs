@@ -37,7 +37,6 @@ namespace Umbraco.Web.BackOffice.Security
         private readonly IUserService _userService;
         private readonly IIpResolver _ipResolver;
         private readonly ISystemClock _systemClock;
-        private readonly BackOfficeSessionIdValidator _sessionIdValidator;
         private readonly LinkGenerator _linkGenerator;
 
         public ConfigureBackOfficeCookieOptions(
@@ -51,7 +50,6 @@ namespace Umbraco.Web.BackOffice.Security
             IUserService userService,
             IIpResolver ipResolver,
             ISystemClock systemClock,
-            BackOfficeSessionIdValidator sessionIdValidator,
             LinkGenerator linkGenerator)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
@@ -64,7 +62,6 @@ namespace Umbraco.Web.BackOffice.Security
             _userService = userService;
             _ipResolver = ipResolver;
             _systemClock = systemClock;
-            _sessionIdValidator = sessionIdValidator;
             _linkGenerator = linkGenerator;
         }
 
@@ -226,7 +223,12 @@ namespace Umbraco.Web.BackOffice.Security
         private async Task EnsureValidSessionId(CookieValidatePrincipalContext context)
         {
             if (_runtimeState.Level == RuntimeLevel.Run)
-                await _sessionIdValidator.ValidateSessionAsync(TimeSpan.FromMinutes(1), context);
+            {
+                // TODO: MSDI this class is Singleton, BackOfficeSessionIdValidator is scoped
+                // Are we OK to service locate in this instance?
+                var validator = context.HttpContext.RequestServices.GetRequiredService<BackOfficeSessionIdValidator>();
+                await validator.ValidateSessionAsync(TimeSpan.FromMinutes(1), context);
+            }
         }
 
         /// <summary>
