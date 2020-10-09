@@ -292,7 +292,7 @@ var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.servi
                 var modal = document.createElement("div");
                 modal.className = "umbraco-preview-dialog__modal";
                 modal.innerHTML = `<div class="umbraco-preview-dialog__headline">Preview content?</div>
-                    <div class="umbraco-preview-dialog__question">You have exited preview mode, do you want to continue previewing this content?</div>`;
+                    <div class="umbraco-preview-dialog__question">You have ended preview mode, do you want to continue previewing this content?</div>`;
                 con.appendChild(modal);
 
                 var continueButton = document.createElement("button");

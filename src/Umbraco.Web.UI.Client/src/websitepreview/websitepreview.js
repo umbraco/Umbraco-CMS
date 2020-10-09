@@ -37,7 +37,7 @@
         window.top.location.href = scriptElement.getAttribute("data-umbraco-path")+"/preview/end?redir=" + encodeURIComponent(window.location.pathname+window.location.search);
     }
     function continuePreviewMode(minutsToExpire) {
-        setCookie("UMB-WEBSITE-PREVIEW-ACCEPT", "true", minutsToExpire || 2);
+        setCookie("UMB-WEBSITE-PREVIEW-ACCEPT", "true", minutsToExpire || 4);
     }
 
     var user = getCookie("UMB-WEBSITE-PREVIEW-ACCEPT");
