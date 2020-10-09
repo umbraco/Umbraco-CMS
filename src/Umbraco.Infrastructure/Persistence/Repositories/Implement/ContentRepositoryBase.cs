@@ -980,12 +980,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     if (!keyToIds.TryGetValue(guid, out var id))
                         return null; // This shouldn't happen!
 
-                    return new Relation(entity.Id, id, relationType);
+                    return new ReadOnlyRelation(entity.Id, id, relationType.Id);
                 }).WhereNotNull();
 
-            // Save bulk relations
+            // Save bulk relations<
             RelationRepository.SaveBulk(toSave);
-
         }
 
         private class NodeIdKey

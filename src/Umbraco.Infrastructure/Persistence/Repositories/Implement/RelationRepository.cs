@@ -253,7 +253,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
         }
 
-        public void SaveBulk(IEnumerable<IRelationReadOnly> relations)
+        public void SaveBulk(IEnumerable<ReadOnlyRelation> relations)
         {
             foreach (var hasIdentityGroup in relations.GroupBy(r => r.HasIdentity))
             {
@@ -265,7 +265,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     // it's the bulk inserts we care about.
                     foreach (var relation in hasIdentityGroup)
                     {
-                        relation.UpdatingEntity();
                         var dto = RelationFactory.BuildDto(relation);
                         Database.Update(dto);
                     }
@@ -273,16 +272,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 else
                 {
                     // Do bulk inserts
-                    var entitiesAndDtos = hasIdentityGroup.ToDictionary(
-                        r =>                        // key = entity
-                        {
-                            r.AddingEntity();
-                            return r;
-                        },
-                        RelationFactory.BuildDto);  // value = DTO
+                    var dtos = hasIdentityGroup.Select(RelationFactory.BuildDto);
 
-
-                    Database.InsertBulk(entitiesAndDtos.Values);
+                    Database.InsertBulk(dtos);
 
                 }
             }

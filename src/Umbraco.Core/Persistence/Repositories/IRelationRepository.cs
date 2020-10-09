@@ -21,7 +21,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// Persist multiple <see cref="IRelation"/> at once but Ids are not returned on created relations
         /// </summary>
         /// <param name="relations"></param>
-        void SaveBulk(IEnumerable<IRelationReadOnly> relations);
+        void SaveBulk(IEnumerable<ReadOnlyRelation> relations);
 
         /// <summary>
         /// Deletes all relations for a parent for any specified relation type alias
