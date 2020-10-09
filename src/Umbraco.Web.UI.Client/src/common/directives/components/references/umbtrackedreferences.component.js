@@ -17,12 +17,26 @@
             }
         });
 
-    function UmbTrackedReferencesController($q, trackedReferencesResource) {
+    function UmbTrackedReferencesController($q, trackedReferencesResource, localizationService) {
 
       
         var vm = this;
 
-      
+        vm.contentReferencesTitle = "Used in documents";
+        vm.memberReferencesTitle = "Used in members";
+        vm.mediaReferencesTitle = "Used in media";
+
+        localizationService.localize("references_labelUsedByDocuments").then(function (value) {
+            vm.contentReferencesTitle = value;
+        });
+
+        localizationService.localize("references_labelUsedByMembers").then(function (value) {
+            vm.memberReferencesTitle = value;
+        });
+
+        localizationService.localize("references_labelUsedByMedia").then(function (value) {
+            vm.mediaReferencesTitle = value;
+        });
 
         vm.changeContentPageNumber = changeContentPageNumber;
         vm.contentOptions = {};
