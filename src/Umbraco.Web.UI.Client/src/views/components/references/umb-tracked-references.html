@@ -13,43 +13,17 @@
 <div ng-if="vm.loading === false">
 
     <div class="abstract umb-alert umb-alert--warning" ng-show="vm.showWarning">
-       {{vm.warningText}}
+        {{vm.warningText}}
     </div>
 
     <!-- Content -->
     <div ng-if="vm.hasContentReferences">
-
-        <h5 class="mt0" style="margin-bottom: 20px;">
-            <localize key="references_labelUsedByDocuments">Used in Documents</localize>
-        </h5>
-
-        <div class="umb-table">
-            <div class="umb-table-head">
-                <div class="umb-table-row">
-                    <div class="umb-table-cell"></div>
-                    <div class="umb-table-cell umb-table__name not-fixed"><localize key="general_name">Name</localize></div>
-                    <div class="umb-table-cell"><localize key="content_alias">Alias</localize></div>
-                    <div class="umb-table-cell umb-table-cell--nano"><localize key="general_open" style="visibility: hidden;">Open</localize></div>
-                </div>
-            </div>
-            <div class="umb-table-body">
-                <div class="umb-table-row" ng-repeat="reference in vm.contentReferences.items">
-                    <div class="umb-table-cell"><i class="umb-table-body__icon {{reference.icon}}"></i></div>
-                    <div class="umb-table-cell umb-table__name"><span>{{::reference.name}}</span></div>
-                    <div class="umb-table-cell"><span title="{{::reference.alias}}">{{::reference.alias}}</span></div>
-                    <div class="umb-table-cell umb-table-cell--nano"><a ng-href="#/content/content/edit/{{::reference.id}}"><localize key="general_open">Open</localize></a></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Pagination -->
-        <div class="flex justify-center">
-            <umb-pagination ng-if="vm.contentReferences.totalPages"
-                            page-number="vm.contentReferences.pageNumber"
-                            total-pages="vm.contentReferences.totalPages"
-                            on-change="vm.changeContentPageNumber(pageNumber)">
-            </umb-pagination>
-        </div>
+        <umb-tracked-references-table items="vm.contentReferences.items"
+                                      total-pages="vm.contentReferences.totalPages"
+                                      page-number="vm.contentReferences.pageNumber"
+                                      title="vm.contentReferencesTitle"
+                                      on-page-changed="vm.changeContentPageNumber(pageNumber)">
+        </umb-tracked-references-table>
     </div>
 
     <div ng-if="vm.hasContentReferencesInDescendants">
@@ -65,39 +39,13 @@
     </div>
 
     <!-- Members -->
-    <div ng-if="vm.hasMemberReferences > 0">
-
-        <h5 class="mt0" style="margin-bottom: 20px;">
-            <localize key="references_labelUsedByMembers">Used in Members</localize>
-        </h5>
-
-        <div class="umb-table">
-            <div class="umb-table-head">
-                <div class="umb-table-row">
-                    <div class="umb-table-cell"></div>
-                    <div class="umb-table-cell umb-table__name not-fixed"><localize key="general_name">Name</localize></div>
-                    <div class="umb-table-cell"><localize key="content_alias">Alias</localize></div>
-                    <div class="umb-table-cell umb-table-cell--nano"><localize key="general_open" style="visibility: hidden;">Open</localize></div>
-                </div>
-            </div>
-            <div class="umb-table-body">
-                <div class="umb-table-row" ng-repeat="reference in vm.memberReferences.items">
-                    <div class="umb-table-cell"><i class="umb-table-body__icon {{reference.icon}}"></i></div>
-                    <div class="umb-table-cell umb-table__name"><span>{{::reference.name}}</span></div>
-                    <div class="umb-table-cell"><span title="{{::reference.alias}}">{{::reference.alias}}</span></div>
-                    <div class="umb-table-cell umb-table-cell--nano"><a href="#/member/member/edit/{{::reference.key}}"><localize key="general_open">Open</localize></a></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Pagination -->
-        <div class="flex justify-center">
-            <umb-pagination ng-if="vm.memberReferences.totalPages"
-                            page-number="vm.memberReferences.pageNumber"
-                            total-pages="vm.memberReferences.totalPages"
-                            on-change="vm.changeMemberPageNumber(pageNumber)">
-            </umb-pagination>
-        </div>
+    <div ng-if="vm.hasMemberReferences">
+        <umb-tracked-references-table items="vm.memberReferences.items"
+                                      total-pages="vm.memberReferences.totalPages"
+                                      page-number="vm.memberReferences.pageNumber"
+                                      title="vm.memberReferencesTitle"
+                                      on-page-changed="vm.changeMemberPageNumber(pageNumber)">
+        </umb-tracked-references-table>
     </div>
 
     <div ng-if="vm.hasMemberReferencesInDescendants">
@@ -114,38 +62,12 @@
 
     <!-- Media -->
     <div ng-if="vm.hasMediaReferences">
-
-        <h5 class="mt0" style="margin-bottom: 20px;">
-            <localize key="references_labelUsedByMedia">Used in Media</localize>
-        </h5>
-
-        <div class="umb-table">
-            <div class="umb-table-head">
-                <div class="umb-table-row">
-                    <div class="umb-table-cell"></div>
-                    <div class="umb-table-cell umb-table__name not-fixed"><localize key="general_name">Name</localize></div>
-                    <div class="umb-table-cell"><localize key="content_alias">Alias</localize></div>
-                    <div class="umb-table-cell umb-table-cell--nano"><localize key="general_open" style="visibility: hidden;">Open</localize></div>
-                </div>
-            </div>
-            <div class="umb-table-body">
-                <div class="umb-table-row" ng-repeat="reference in vm.mediaReferences.items">
-                    <div class="umb-table-cell"><i class="umb-table-body__icon {{reference.icon}}"></i></div>
-                    <div class="umb-table-cell umb-table__name"><span>{{::reference.name}}</span></div>
-                    <div class="umb-table-cell"><span title="{{::reference.alias}}">{{::reference.alias}}</span></div>
-                    <div class="umb-table-cell umb-table-cell--nano"><a href="#/media/media/edit/{{::reference.id}}"><localize key="general_open">Open</localize></a></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Pagination -->
-        <div class="flex justify-center">
-            <umb-pagination ng-if="vm.mediaReferences.totalPages"
-                            page-number="vm.mediaReferences.pageNumber"
-                            total-pages="vm.mediaReferences.totalPages"
-                            on-change="vm.changeMediaPageNumber(pageNumber)">
-            </umb-pagination>
-        </div>
+        <umb-tracked-references-table items="vm.mediaReferences.items"
+                                      total-pages="vm.mediaReferences.totalPages"
+                                      page-number="vm.mediaReferences.pageNumber"
+                                      title="vm.mediaReferencesTitle"
+                                      on-page-changed="vm.changeMediaPageNumber(pageNumber)">
+        </umb-tracked-references-table>
     </div>
 
     <div ng-if="vm.hasMediaReferencesInDescendants">
