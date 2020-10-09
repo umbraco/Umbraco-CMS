@@ -136,6 +136,12 @@
             });
         });
 
+        $scope.$watch('vm.checkingReferences',
+            function(newVal) {
+
+                $scope.model.hideSubmitButton = Object.toBoolean(newVal);
+            });
+
         onInit();
 
     }
