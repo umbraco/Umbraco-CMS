@@ -71,7 +71,10 @@ namespace Umbraco.Web.Common.Runtime
             composition.RegisterUnique<IMacroRenderer, MacroRenderer>();
             composition.RegisterUnique<IMemberUserKeyProvider, MemberUserKeyProvider>();
 
-            composition.RegisterUnique<AngularJsonMediaTypeFormatter>();
+            // TODO: MSDI, this doesn't appear to ever be resolved from container,
+            // when registered in this way with the new container validation fails as it's required dependencies
+            // e.g. JsonSerializerSettings are not found in the container.
+            //composition.RegisterUnique<AngularJsonMediaTypeFormatter>();
 
             // register the umbraco context factory
             composition.RegisterUnique<IUmbracoContextFactory, UmbracoContextFactory>();
