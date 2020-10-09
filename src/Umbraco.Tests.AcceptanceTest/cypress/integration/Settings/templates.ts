@@ -28,19 +28,20 @@ context('Templates', () => {
         // Save
         // We must drop focus for the auto save event to occur.
         cy.get('.btn-success').focus();
-        // And then wait for the auto save event to finish but finding the page in the tree view
+        // And then wait for the auto save event to finish by finding the page in the tree view.
         // This is a bit of a roundabout way to find items in a treev view since we dont use umbracoTreeItem
-        // But we must be able to wait for the save evnent to finish, and we can't do that with umbracoTreeItem
-        cy.get('[data-element="tree-item-templates"] > :nth-child(2) > .umb-animated > .umb-tree-item__inner > .umb-tree-item__label').contains(name).should('be.visible', {timeout:10000});
+        // but we must be able to wait for the save evnent to finish, and we can't do that with umbracoTreeItem
+        cy.get('[data-element="tree-item-templates"] > :nth-child(2) > .umb-animated > .umb-tree-item__inner > .umb-tree-item__label')
+            .contains(name).should('be.visible', { timeout: 10000 });
         // Now that the auto save event has finished we can save
-        // And there wont be any duplicates or file in use errors.
+        // and there wont be any duplicates or file in use errors.
         cy.get('.btn-success').click();
 
         //Assert
         cy.umbracoSuccessNotification().should('be.visible');
         // For some reason cy.umbracoErrorNotification tries to click the element which is not possible
         // if it doesn't actually exist, making should('not.be.visible') impossible.
-        cy.get('.umb-notifications__notifications > .alert-error', {timeout: 5000}).should('not.be.visible');
+        cy.get('.umb-notifications__notifications > .alert-error').should('not.be.visible');
 
         //Clean up
         cy.umbracoEnsureTemplateNameNotExists(name);

@@ -9,6 +9,7 @@ context('Members', () => {
         const name = "Alice Bobson";
         const email = "alice-bobson@acceptancetest.umbraco";
         const password = "$AUlkoF*St0kgPiyyVEk5iU5JWdN*F7&@OSl5Y4pOofnidfifkBj5Ns2ONv%FzsTl36V1E924Gw97zcuSeT7UwK&qb5l&O9h!d!w";
+        const passwordTimeout = 20000
 
         cy.umbracoEnsureMemberEmailNotExists(email);
         cy.umbracoSection('member');
@@ -24,8 +25,8 @@ context('Members', () => {
 
         cy.get('input#_umb_login').clear().type(email);
         cy.get('input#_umb_email').clear().type(email);
-        cy.get('input#password').clear().type(password);
-        cy.get('input#confirmPassword').clear().type(password);
+        cy.get('input#password').clear().type(password, { timeout: passwordTimeout });
+        cy.get('input#confirmPassword').clear().type(password, { timeout: passwordTimeout });
 
         // Save
         cy.get('.btn-success').click();
