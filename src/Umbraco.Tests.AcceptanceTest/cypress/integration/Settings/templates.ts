@@ -19,7 +19,7 @@ context('Templates', () => {
     }
 
     it('Create template', () => {
-        const name = "Create Template test";
+        const name = "Create template test";
         cy.umbracoEnsureTemplateNameNotExists(name);
 
         createTemplate();
