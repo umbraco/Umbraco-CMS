@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Xml.XPath;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Xml;
 using Umbraco.Web.PublishedCache.NuCache;
@@ -14,12 +15,20 @@ namespace Umbraco.Web.PublishedCache
         private readonly IPublishedCache3 _contentCache;
         private readonly IContentRouter _contentRouter;
         private readonly IDomainCache _domainCache;
+        private readonly IAppCache _snapshotCache;
+        private readonly IAppCache _elementsCache;
 
-        public ContentCacheAdapter(IPublishedCache3 contentCache, IContentRouter contentRouter,IDomainCache domainCache)
+        public ContentCacheAdapter(IPublishedCache3 contentCache,
+            IContentRouter contentRouter,
+            IDomainCache domainCache,
+            IAppCache snapshotCache,
+            IAppCache elementsCache)
         {
             _contentCache = contentCache;
             _contentRouter = contentRouter;
             _domainCache = domainCache;
+            _snapshotCache = snapshotCache;
+            _elementsCache = elementsCache;
         }
 
         public XPathNavigator CreateNavigator(bool preview)
@@ -89,13 +98,17 @@ namespace Umbraco.Web.PublishedCache
 
         public IPublishedContent GetByRoute(bool preview, string route, bool? hideTopLevelNode = null, string culture = null)
         {
-            return _contentCache.GetById(_contentRouter.GetIdByRoute(_contentCache, preview, route, hideTopLevelNode, culture).Id);
+            if (route == null) throw new ArgumentNullException(nameof(route));
+
+            var cache = preview == false || PublishedSnapshotService.FullCacheWhenPreviewing ? _elementsCache : _snapshotCache;
+            var key = NuCache.CacheKeys.ContentCacheContentByRoute(route, preview, culture);
+            return cache.GetCacheItem<IPublishedContent>(key, () => _contentCache.GetById(_contentRouter.GetIdByRoute(_contentCache, preview, route, hideTopLevelNode, culture).Id));
         }
 
         public IPublishedContent GetByRoute(string route, bool? hideTopLevelNode = null, string culture = null)
         {
             bool preview = _contentCache.PreviewDefault;
-            return _contentCache.GetById(_contentRouter.GetIdByRoute(_contentCache, preview,route, hideTopLevelNode, culture).Id);
+            return GetByRoute(preview, route, hideTopLevelNode, culture);
         }
 
         public IEnumerable<IPublishedContent> GetByXPath(bool preview, string xpath, params XPathVariable[] vars)

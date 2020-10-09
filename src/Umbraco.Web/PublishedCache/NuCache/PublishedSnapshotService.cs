@@ -1220,7 +1220,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             return new PublishedSnapshot.PublishedSnapshotElements
             {
-                ContentCache = new ContentCacheAdapter(new ContentCache(previewDefault, contentSnap, VariationContextAccessor),_contentRouter, domainCache),
+                ContentCache = new ContentCacheAdapter(new ContentCache(previewDefault, contentSnap, VariationContextAccessor),_contentRouter, domainCache,snapshotCache,elementsCache),
                 MediaCache = new MediaCache(previewDefault, mediaSnap, VariationContextAccessor),
                 MemberCache = new MemberCache(previewDefault, snapshotCache, _serviceContext.MemberService, memberTypeCache, PublishedSnapshotAccessor, VariationContextAccessor, _entitySerializer),
                 DomainCache = domainCache,

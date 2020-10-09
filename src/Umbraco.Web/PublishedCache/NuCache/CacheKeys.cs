@@ -57,11 +57,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
             return "NuCache.ContentCache.ContentByRoute[" + DraftOrPub(previewing) + route + LangId(culture) + "]";
         }
 
-        public static string ContentCacheContentIdByRoute(string route, bool previewing, string culture)
-        {
-            return "NuCache.ContentCache.ContentIdByRoute[" + DraftOrPub(previewing) + route + LangId(culture) + "]";
-        }
-
         //public static string ContentCacheRouteByContentStartsWith()
         //{
         //    return "NuCache.ContentCache.RouteByContent[";
