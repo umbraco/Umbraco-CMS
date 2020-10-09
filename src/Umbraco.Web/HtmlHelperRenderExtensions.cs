@@ -83,6 +83,12 @@ namespace Umbraco.Web
             Func<object, ViewDataDictionary, string> contextualKeyBuilder = null)
         {
             var cacheKey = new StringBuilder(partialViewName);
+             //let's always cache by the current culture to allow variants to have different cache results
+            var cultureName = System.Threading.Thread.CurrentThread.CurrentUICulture.Name;
+            if (!String.IsNullOrEmpty(cultureName))
+            {
+                cacheKey.AppendFormat("{0}-", cultureName);
+            }
             if (cacheByPage)
             {
                 if (Current.UmbracoContext == null)

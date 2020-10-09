@@ -1,28 +1,27 @@
 ﻿using K4os.Compression.LZ4;
 using MessagePack;
-using MessagePack.Formatters;
 using MessagePack.Resolvers;
-using NPoco.FluentMappings;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Umbraco.Web.PropertyEditors;
+using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 {
+
     /// <summary>
-    /// Serializes/Deserializes <see cref="ContentNestedData"/> document to the SQL Database as bytes using MessagePack
+    /// Serializes/Deserializes <see cref="ContentCacheDataModel"/> document to the SQL Database as bytes using MessagePack
     /// </summary>
-    internal class MsgPackContentNestedDataSerializer : IContentNestedDataByteSerializer
+    public class MsgPackContentNestedDataSerializer : IContentCacheDataSerializer
     {
-        private MessagePackSerializerOptions _options;
+        private readonly MessagePackSerializerOptions _options;
         private readonly IPropertyCompressionOptions _propertyOptions;
 
-        public MsgPackContentNestedDataSerializer(IPropertyCompressionOptions propertyOptions = null)
+        public MsgPackContentNestedDataSerializer(IPropertyCompressionOptions propertyOptions)
         {
-            var defaultOptions = ContractlessStandardResolver.Options;
+            _propertyOptions = propertyOptions ?? throw new ArgumentNullException(nameof(propertyOptions));
 
+            var defaultOptions = ContractlessStandardResolver.Options;
             var resolver = CompositeResolver.Create(
 
                 // TODO: We want to be able to intern the strings for aliases when deserializing like we do for Newtonsoft but I'm unsure exactly how
@@ -38,52 +37,51 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 
             _options = defaultOptions
                 .WithResolver(resolver)
-                .WithCompression(MessagePackCompression.Lz4BlockArray);
-            _propertyOptions = propertyOptions ?? new NoopPropertyCompressionOptions();
+                .WithCompression(MessagePackCompression.Lz4BlockArray);            
         }
 
-        public string ToJson(string serialized)
+        public string ToJson(byte[] bin)
         {
-            var bin = Convert.FromBase64String(serialized);
             var json = MessagePackSerializer.ConvertToJson(bin, _options);
             return json;
         }
 
-        public ContentNestedData Deserialize(int contentTypeId, string data)
+        public ContentCacheDataModel Deserialize(int contentTypeId, string stringData, byte[] byteData)
         {
-            var bin = Convert.FromBase64String(data);
-            var nestedData = MessagePackSerializer.Deserialize<ContentNestedData>(bin, _options);
-            Expand(contentTypeId, nestedData);
-            return nestedData;
+            if (stringData != null)
+            {
+                // NOTE: We don't really support strings but it's possible if manually used (i.e. tests)
+                var bin = Convert.FromBase64String(stringData);
+                var content = MessagePackSerializer.Deserialize<ContentCacheDataModel>(bin, _options);
+                Expand(contentTypeId, content);
+                return content;
+            }
+            else if (byteData != null)
+            {
+                var content = MessagePackSerializer.Deserialize<ContentCacheDataModel>(byteData, _options);
+                Expand(contentTypeId, content);
+                return content;
+            }
+            else
+            {
+                return null;
+            }
         }
 
-        public string Serialize(int contentTypeId, ContentNestedData nestedData)
+        public ContentCacheDataSerializationResult Serialize(int contentTypeId, ContentCacheDataModel model)
         {
-            Compress(contentTypeId, nestedData);
-            var bin = MessagePackSerializer.Serialize(nestedData, _options);
-            return Convert.ToBase64String(bin);
-        }
-
-        public ContentNestedData DeserializeBytes(int contentTypeId, byte[] data)
-        {
-            var nestedData = MessagePackSerializer.Deserialize<ContentNestedData>(data, _options);
-            Expand(contentTypeId, nestedData);
-            return nestedData;
-        }
-
-        public byte[] SerializeBytes(int contentTypeId, ContentNestedData nestedData)
-        {
-            Compress(contentTypeId, nestedData);
-            return MessagePackSerializer.Serialize(nestedData, _options);
+            Compress(contentTypeId, model);
+            var bytes = MessagePackSerializer.Serialize(model, _options);
+            return new ContentCacheDataSerializationResult(null, bytes);
         }
 
         /// <summary>
         /// Used during serialization to compress properties
         /// </summary>
-        /// <param name="nestedData"></param>
-        private void Compress(int contentTypeId, ContentNestedData nestedData)
+        /// <param name="model"></param>
+        private void Compress(int contentTypeId, ContentCacheDataModel model)
         {
-            foreach(var propertyAliasToData in nestedData.PropertyData)
+            foreach(var propertyAliasToData in model.PropertyData)
             {
                 if (_propertyOptions.IsCompressed(contentTypeId, propertyAliasToData.Key))
                 {
@@ -99,7 +97,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         /// Used during deserialization to map the property data as lazy or expand the value
         /// </summary>
         /// <param name="nestedData"></param>
-        private void Expand(int contentTypeId, ContentNestedData nestedData)
+        private void Expand(int contentTypeId, ContentCacheDataModel nestedData)
         {
             foreach (var propertyAliasToData in nestedData.PropertyData)
             {
@@ -115,6 +113,8 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 }
             }
         }
+
+       
 
         //private class ContentNestedDataResolver : IFormatterResolver
         //{

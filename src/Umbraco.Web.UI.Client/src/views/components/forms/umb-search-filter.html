@@ -1,0 +1,28 @@
+<div class="umb-control-group -no-border">
+    <div class="form-search form-search-filter">
+        <label for="{{vm.inputId}}" class="sr-only">{{vm.text}}</label>
+        <i class="icon-search" aria-hidden="true"></i>
+        <input
+                ng-if="vm.preventSubmitOnEnter"
+                id="{{vm.inputId}}"
+                type="text"
+                ng-change="vm.change()"
+                ng-model="vm.model"
+                class="umb-search-field search-query search-input input-block-level"
+                placeholder="{{vm.text}}"
+                umb-auto-focus="{{vm.autoFocus === true}}"
+                prevent-enter-submit
+                no-dirty-check />
+
+        <input
+                ng-if="!vm.preventSubmitOnEnter"
+                id="{{vm.inputId}}"
+                type="text"
+                ng-change="vm.change()"
+                ng-model="vm.model"
+                class="umb-search-field search-query search-input input-block-level"
+                placeholder="{{vm.text}}"
+                umb-auto-focus="{{vm.autoFocus === true}}"
+                no-dirty-check />
+    </div>
+</div>

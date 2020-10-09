@@ -11,6 +11,8 @@
         vm.saveButtonState = "init";
         vm.sortOrder = {};
         vm.sortableOptions = {
+            axis: "y",
+            containment: "parent",
             distance: 10,
             tolerance: "pointer",
             opacity: 0.7,
@@ -68,7 +70,7 @@
 
         function sort(column) {
             // reverse if it is already ordered by that column
-            if(vm.sortOrder.column === column) {
+            if (vm.sortOrder.column === column) {
                 vm.sortOrder.reverse = !vm.sortOrder.reverse
             } else {
                 vm.sortOrder.column = column;
@@ -82,7 +84,6 @@
         }
 
         onInit();
-
     }
 
     angular.module("umbraco").controller("Umbraco.Editors.Content.SortController", ContentSortController);

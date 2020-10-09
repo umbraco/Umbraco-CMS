@@ -17,6 +17,7 @@ namespace Umbraco.Web.PropertyEditors
     /// <summary>
     /// Represents a rich text property editor.
     /// </summary>
+    [CompressedStorage]
     [DataEditor(
         Constants.PropertyEditors.Aliases.TinyMce,
         "Rich Text Editor",

@@ -354,6 +354,7 @@
     <key alias="createFolderFailed">Failed to create a folder under parent id %0%</key>
     <key alias="renameFolderFailed">Failed to rename the folder with id %0%</key>
     <key alias="dragAndDropYourFilesIntoTheArea">Drag and drop your file(s) into the area</key>
+    <key alias="uploadNotAllowed">Upload is not allowed in this location.</key>
   </area>
   <area alias="member">
     <key alias="createNewMember">Create a new member</key>
@@ -503,6 +504,7 @@
     <key alias="selectMemberType">Select member type</key>
     <key alias="selectNode">Select node</key>
     <key alias="selectSections">Select sections</key>
+    <key alias="selectUser">Select user</key>
     <key alias="selectUsers">Select users</key>
     <key alias="noIconsFound">No icons were found</key>
     <key alias="noMacroParams">There are no parameters for this macro</key>
@@ -518,6 +520,9 @@
     <key alias="selectEditorConfiguration">Select configuration</key>
     <key alias="selectSnippet">Select snippet</key>
     <key alias="variantdeletewarning">This will delete the node and all its languages. If you only want to delete one language, you should unpublish the node in that language instead.</key>
+    <key alias="propertyuserpickerremovewarning"><![CDATA[This will remove the user <b>%0%</b>.]]></key>
+    <key alias="userremovewarning"><![CDATA[This will remove the user <b>%0%</b> from the <b>%1%</b> group]]></key>
+    <key alias="yesRemove">Yes, remove</key>
   </area>
   <area alias="dictionary">
     <key alias="noItems">There are no dictionary items.</key>
@@ -673,6 +678,7 @@
     <key alias="continue">Continue</key>
     <key alias="copy">Copy</key>
     <key alias="create">Create</key>
+    <key alias="cropSection">Crop section</key>
     <key alias="database">Database</key>
     <key alias="date">Date</key>
     <key alias="default">Default</key>
@@ -682,6 +688,7 @@
     <key alias="design">Design</key>
     <key alias="dictionary">Dictionary</key>
     <key alias="dimensions">Dimensions</key>
+    <key alias="discard">Discard</key>
     <key alias="down">Down</key>
     <key alias="download">Download</key>
     <key alias="edit">Edit</key>
@@ -1614,10 +1621,12 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="gridLayouts">Grid Layouts</key>
     <key alias="gridLayoutsDetail">Layouts are the overall work area for the grid editor, usually you only need one or two different layouts</key>
     <key alias="addGridLayout">Add Grid Layout</key>
+    <key alias="editGridLayout">Edit Grid Layout</key>
     <key alias="addGridLayoutDetail">Adjust the layout by setting column widths and adding additional sections</key>
     <key alias="rowConfigurations">Row configurations</key>
     <key alias="rowConfigurationsDetail">Rows are predefined cells arranged horizontally</key>
     <key alias="addRowConfiguration">Add row configuration</key>
+    <key alias="editRowConfiguration">Edit row configuration</key>
     <key alias="addRowConfigurationDetail">Adjust the row by setting cell widths and adding additional cells</key>
     <key alias="columns">Columns</key>
     <key alias="columnsDetails">Total combined number of columns in the grid layout</key>
@@ -2062,7 +2071,10 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="validationRegExpMessage">Enter a custom validation error message (optional)</key>
     <key alias="minCount">You need to add at least</key>
     <key alias="maxCount">You can only have</key>
+    <key alias="addUpTo">Add up to</key>
     <key alias="items">items</key>
+    <key alias="urls">url(s)</key>
+    <key alias="urlsSelected">url(s) selected</key>
     <key alias="itemsSelected">items selected</key>
     <key alias="invalidDate">Invalid date</key>
     <key alias="invalidNumber">Not a number</key>
@@ -2284,6 +2296,9 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="name">Name</key>
     <key alias="addNewRow">Add new row</key>
     <key alias="tabExpand">View more options</key>
+      <key alias="hasTranslation">Has translation</key>
+      <key alias="noTranslation">Missing translation</key>
+      <key alias="dictionaryListCaption">Dictionary items</key>
   </area>
   <area alias="references">
     <key alias="tabName">References</key>
@@ -2300,8 +2315,12 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="labelUsedByMedia">Used in Media</key>
   </area>
   <area alias="logViewer">
+      <key alias="deleteSavedSearch">Delete Saved Search</key>
       <key alias="logLevels">Log Levels</key>
       <key alias="savedSearches">Saved Searches</key>
+      <key alias="saveSearch">Save Search</key>
+      <key alias="saveSearchDescription">Enter a friendly name for your search query</key>
+      <key alias="filterSearch">Filter Search</key>
       <key alias="totalItems">Total Items</key>
       <key alias="timestamp">Timestamp</key>
       <key alias="level">Level</key>
@@ -2335,6 +2354,7 @@ To manage your website, simply open the Umbraco back office and start adding con
   </area>
   <area alias="propertyActions">
     <key alias="tooltipForPropertyActionsMenu">Open Property Actions</key>
+    <key alias="tooltipForPropertyActionsMenuClose">Close Property Actions</key>
   </area>
   <area alias="nuCache">
     <key alias="wait">Wait</key>
@@ -2477,8 +2497,9 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="addCustomView">Add custom view</key>
     <key alias="addSettingsElementType">Add settings</key>
     <key alias="labelTemplatePlaceholder">Overwrite label template</key>
-    <key alias="confirmDeleteBlockMessage"><![CDATA[Are you sure you want to delete block of <strong>%0%</strong>.]]></key>
-    <key alias="confirmDeleteBlockNotice">Content using this block will be lost.</key>
+    <key alias="confirmDeleteBlockMessage"><![CDATA[Are you sure you want to delete content of <strong>%0%</strong>.]]></key>
+    <key alias="confirmDeleteBlockTypeMessage"><![CDATA[Are you sure you want to delete block configuration of <strong>%0%</strong>.]]></key>
+    <key alias="confirmDeleteBlockTypeNotice">The content of this block will still be present, editing of this content will no longer be available and will be shown as unsupported content.</key>
     <key alias="blockConfigurationOverlayTitle"><![CDATA[Configuration of '%0%']]></key>
     <key alias="thumbnail">Thumbnail</key>
     <key alias="addThumbnail">Add thumbnail</key>
@@ -2487,6 +2508,9 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="tabBlockSettings">Settings</key>
     <key alias="headlineAdvanced">Advanced</key>
     <key alias="forceHideContentEditor">Force hide content editor</key>
+    <key alias="blockHasChanges">You have made changes to this content. Are you sure you want to discard them?</key>
+    <key alias="confirmCancelBlockCreationHeadline">Discard creation?</key>
+    <key alias="confirmCancelBlockCreationMessage"><![CDATA[Are you sure you want to cancel the creation.]]></key>
   </area>
   <area alias="contentTemplatesDashboard">
     <key alias="whatHeadline">What are Content Templates?</key>

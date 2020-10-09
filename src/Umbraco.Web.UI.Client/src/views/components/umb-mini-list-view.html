@@ -11,10 +11,10 @@
 
         <div class="umb-mini-list-view__breadcrumb">
 
-            <a ng-if="showBackButton()" href="" class="umb-mini-list-view__back" ng-click="exitMiniListView()">
+            <button type="button" ng-if="showBackButton()" class="btn-reset umb-mini-list-view__back" ng-click="exitMiniListView()">
                 <i class="icon-arrow-left umb-mini-list-view__back-icon" aria-hidden="true"></i>
                 <span class="umb-mini-list-view__back-text"><localize key="general_back">Back</localize></span> /
-            </a>
+            </button>
 
             <umb-breadcrumbs
                 ng-if="breadcrumb && breadcrumb.length > 0"
@@ -66,9 +66,9 @@
                     ng-class="{'-selected':child.selected, 'not-allowed':!child.allowed}">
                     <div class="umb-table-cell umb-table-cell--auto-width" ng-class="{'umb-table-cell--faded':child.published === false}">
                         <div class="flex items-center">
-                            <ins class="icon-navigation-right umb-table__row-expand" ng-click="openNode($event, child)" ng-class="{'umb-table__row-expand--hidden': child.metaData.hasChildren !== true}">&nbsp;</ins>
-                            <i class="umb-table-body__icon umb-table-body__fileicon {{child.icon}}" aria-hidden="true"></i>
-                            <i class="umb-table-body__icon umb-table-body__checkicon icon-check" aria-hidden="true"></i>
+                            <umb-icon icon="icon-navigation-right" class="icon-navigation-right umb-table__row-expand" ng-click="openNode($event, child)" ng-class="{'umb-table__row-expand--hidden': child.metaData.hasChildren !== true}">&nbsp;</umb-icon>
+                            <umb-icon icon="{{child.icon}}" class="umb-table-body__icon umb-table-body__fileicon {{child.icon}}"></umb-icon>
+                            <umb-icon icon="icon-check" class="umb-table-body__icon umb-table-body__checkicon icon-check"></umb-icon>
                         </div>
                     </div>
                     <div class="umb-table-cell black" ng-class="{'umb-table-cell--faded':child.published === false}">{{ child.name }}</div>

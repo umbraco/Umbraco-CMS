@@ -4,10 +4,6 @@
     <name>The Umbraco community</name>
     <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
-  <!--???-->
-  <!-- = unklar-->
-  <!--!!!-->
-  <!-- = ToDo-->
   <area alias="actions">
     <key alias="assignDomain">Kulturen und Hostnamen</key>
     <key alias="auditTrail">Protokoll</key>

@@ -7,6 +7,7 @@ namespace Umbraco.Web.PropertyEditors
     /// <summary>
     /// Represents a textarea property and parameter editor.
     /// </summary>
+    [CompressedStorage]
     [DataEditor(
         Constants.PropertyEditors.Aliases.TextArea,
         EditorType.PropertyValue | EditorType.MacroParameter,

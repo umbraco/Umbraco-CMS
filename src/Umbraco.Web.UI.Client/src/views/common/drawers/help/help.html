@@ -18,16 +18,16 @@
                     <div ng-repeat="tour in vm.docTypeTours | orderBy:'groupOrder'">
                         <div data-element="tour-{{tour.alias}}" class="umb-help-list-item">
                             <div class="umb-help-list-item__content justify-between">
-                                <div class="flex items-center">                                   
+                                <div class="flex items-center">
                                     <span class="umb-help-list-item__title">{{ tour.name }}</span>
                                 </div>
                                 <div>
-                                    <umb-button  button-style="primary" size="xxs" type="button" label="Start" action="vm.startTour(tour)"></umb-button>                                   
+                                    <umb-button  button-style="primary" size="xxs" type="button" label="Start" action="vm.startTour(tour)"></umb-button>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>           
+                </div>
             </div>
 
             <!-- Tours -->
@@ -102,10 +102,10 @@
                             <span>
                                 <span class="umb-help-list-item__title">
                                     <span class="bold">{{topic.name}}</span>
-                                    <span class="umb-help-list-item__open-icon icon-out"></span>
+                                    <umb-icon icon="icon-out" class="umb-help-list-item__open-icon icon-out"></umb-icon>
                                 </span>
                                 <span class="umb-help-list-item__description">{{topic.description}}</span>
-                            </span>                            
+                            </span>
                     </a>
                 </li>
             </ul>

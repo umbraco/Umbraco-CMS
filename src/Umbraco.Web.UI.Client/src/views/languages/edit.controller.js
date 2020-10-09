@@ -68,7 +68,7 @@
             //load all culture/languages
             promises.push(languageResource.getCultures().then(function (culturesDictionary) {
                 var cultures = [];
-                angular.forEach(culturesDictionary, function (value, key) {
+                Object.entries(culturesDictionary).forEach(function ([key, value]) {
                     cultures.push({
                         name: key,
                         displayName: value
@@ -161,7 +161,7 @@
 
             }, function (err) {
                 vm.page.saveButtonState = "error";
-
+                formHelper.resetForm({ scope: $scope, hasErrors: true });
                 formHelper.handleError(err);
 
             });
