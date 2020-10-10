@@ -4,12 +4,10 @@ using Umbraco.Core.Services;
 using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;
 
-namespace Umbraco.Tests.Services
+namespace Umbraco.Tests.Integration.Services
 {
     /// <summary>
     /// Tests covering methods in the KeyValueService class.
-    /// This is more of an integration test as it involves multiple layers
-    /// as well as configuration.
     /// </summary>
     [TestFixture]
     [Apartment(ApartmentState.STA)]

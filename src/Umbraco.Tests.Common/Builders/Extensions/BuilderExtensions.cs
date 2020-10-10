@@ -202,10 +202,10 @@ namespace Umbraco.Tests.Common.Builders.Extensions
             return builder;
         }
 
-        public static T WithCultureInfo<T>(this T builder, string name)
+        public static T WithCultureInfo<T>(this T builder, string cultureCode)
             where T : IWithCultureInfoBuilder
         {
-            builder.CultureInfo = CultureInfo.GetCultureInfo(name);
+            builder.CultureInfo = CultureInfo.GetCultureInfo(cultureCode);
             return builder;
         }
 
