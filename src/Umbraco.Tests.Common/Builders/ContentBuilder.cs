@@ -22,7 +22,8 @@ namespace Umbraco.Tests.Common.Builders
             IWithLevelBuilder,
             IWithPathBuilder,
             IWithSortOrderBuilder,
-            IWithCultureInfoBuilder
+            IWithCultureInfoBuilder,
+            IWithPropertyValues
     {
         private ContentTypeBuilder _contentTypeBuilder;
         private GenericDictionaryBuilder<ContentBuilder, string, object> _propertyDataBuilder;
@@ -82,14 +83,6 @@ namespace Umbraco.Tests.Common.Builders
                 _cultureNames[culture] = name;
             }
 
-            return this;
-        }
-
-        public ContentBuilder WithPropertyValues(object propertyValues, string culture = null, string segment = null)
-        {
-            _propertyValues = propertyValues;
-            _propertyValuesCulture = culture;
-            _propertyValuesSegment = segment;
             return this;
         }
 
@@ -253,6 +246,32 @@ namespace Umbraco.Tests.Common.Builders
                 .Build();
         }
 
+        public static IEnumerable<Content> CreateMultipleTextpageContent(IContentType contentType, int parentId, int amount)
+        {
+            var list = new List<Content>();
+
+            for (var i = 0; i < amount; i++)
+            {
+                var name = "Textpage No-" + i;
+                var content = new ContentBuilder()
+                    .WithName(name)
+                    .WithParentId(parentId)
+                    .WithContentType(contentType)
+                    .WithPropertyValues(new
+                        {
+                            title = name + " title",
+                            bodyText = $"This is a textpage based on the {contentType.Alias} ContentType",
+                            keywords = "text,page,meta",
+                            description = "This is the meta description for a textpage"
+                        })
+                    .Build();
+
+                list.Add(content);
+            }
+
+            return list;
+        }
+
         int? IWithIdBuilder.Id
         {
             get => _id;
@@ -312,15 +331,35 @@ namespace Umbraco.Tests.Common.Builders
             get => _sortOrder;
             set => _sortOrder = value;
         }
+
         int? IWithParentIdBuilder.ParentId
         {
             get => _parentId;
             set => _parentId = value;
         }
+
         CultureInfo IWithCultureInfoBuilder.CultureInfo
         {
             get => _cultureInfo;
             set => _cultureInfo = value;
+        }
+
+        object IWithPropertyValues.PropertyValues
+        {
+            get => _propertyValues;
+            set => _propertyValues = value;
+        }
+
+        string IWithPropertyValues.PropertyValuesCulture
+        {
+            get => _propertyValuesCulture;
+            set => _propertyValuesCulture = value;
+        }
+
+        string IWithPropertyValues.PropertyValuesSegment
+        {
+            get => _propertyValuesSegment;
+            set => _propertyValuesSegment = value;
         }
     }
 }

@@ -22,6 +22,7 @@ namespace Umbraco.Tests.Integration.Services
     public class MacroServiceTests : UmbracoIntegrationTest
     {
         private IMacroService MacroService => GetRequiredService<IMacroService>();
+
         [SetUp]
         public void SetupTest()
         {

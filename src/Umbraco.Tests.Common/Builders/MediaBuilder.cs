@@ -3,6 +3,7 @@ using Umbraco.Core.Models;
 using Umbraco.Tests.Common.Builders.Interfaces;
 using Umbraco.Tests.Common.Builders.Extensions;
 using Umbraco.Core;
+using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Common.Builders
 {
@@ -19,7 +20,8 @@ namespace Umbraco.Tests.Common.Builders
             IWithTrashedBuilder,
             IWithLevelBuilder,
             IWithPathBuilder,
-            IWithSortOrderBuilder
+            IWithSortOrderBuilder,
+            IWithPropertyValues
     {
         private MediaTypeBuilder _mediaTypeBuilder;
         private GenericDictionaryBuilder<MediaBuilder, string, object> _propertyDataBuilder;
@@ -36,6 +38,9 @@ namespace Umbraco.Tests.Common.Builders
         private int? _sortOrder;
         private bool? _trashed;
         private IMediaType _mediaType;
+        private object _propertyValues;
+        private string _propertyValuesCulture;
+        private string _propertyValuesSegment;
 
         public MediaTypeBuilder AddMediaType()
         {
@@ -73,6 +78,9 @@ namespace Umbraco.Tests.Common.Builders
             var path = _path ?? $"-1,{id}";
             var sortOrder = _sortOrder ?? 0;
             var trashed = _trashed ?? false;
+            var propertyValues = _propertyValues ?? null;
+            var propertyValuesCulture = _propertyValuesCulture ?? null;
+            var propertyValuesSegment = _propertyValuesSegment ?? null;
 
             if (_mediaTypeBuilder is null && _mediaType is null)
             {
@@ -94,18 +102,40 @@ namespace Umbraco.Tests.Common.Builders
                 Trashed = trashed,
             };
 
-            if (_propertyDataBuilder != null)
+            if (_propertyDataBuilder != null || propertyValues != null)
             {
-                var propertyData = _propertyDataBuilder.Build();
-                foreach (var kvp in propertyData)
+                if (_propertyDataBuilder != null)
                 {
-                    media.SetValue(kvp.Key, kvp.Value);
+                    var propertyData = _propertyDataBuilder.Build();
+                    foreach (var keyValuePair in propertyData)
+                    {
+                        media.SetValue(keyValuePair.Key, keyValuePair.Value);
+                    }
+                }
+                else
+                {
+                    media.PropertyValues(propertyValues, propertyValuesCulture, propertyValuesSegment);
                 }
 
                 media.ResetDirtyProperties(false);
             }
 
             return media;
+        }
+
+        public static Media CreateSimpleMedia(IMediaType mediaType, string name, int parentId)
+        {
+            return new MediaBuilder()
+                .WithName(name)
+                .WithMediaType(mediaType)
+                .WithParentId(parentId)
+                .WithPropertyValues(new
+                    {
+                        title = name + " Subpage",
+                        bodyText = "This is a subpage",
+                        author = "John Doe"
+                    })
+                .Build();
         }
 
         public static Media CreateMediaImage(IMediaType mediaType, int parentId)
@@ -220,6 +250,24 @@ namespace Umbraco.Tests.Common.Builders
         {
             get => _parentId;
             set => _parentId = value;
+        }
+
+        object IWithPropertyValues.PropertyValues
+        {
+            get => _propertyValues;
+            set => _propertyValues = value;
+        }
+
+        string IWithPropertyValues.PropertyValuesCulture
+        {
+            get => _propertyValuesCulture;
+            set => _propertyValuesCulture = value;
+        }
+
+        string IWithPropertyValues.PropertyValuesSegment
+        {
+            get => _propertyValuesSegment;
+            set => _propertyValuesSegment = value;
         }
     }
 }

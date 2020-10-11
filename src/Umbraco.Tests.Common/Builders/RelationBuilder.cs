@@ -20,6 +20,7 @@ namespace Umbraco.Tests.Common.Builders
         private DateTime? _createDate;
         private DateTime? _updateDate;
         private string _comment;
+        private IRelationType _relationType;
 
         public RelationBuilder WithComment(string comment)
         {
@@ -34,8 +35,16 @@ namespace Umbraco.Tests.Common.Builders
             return this;
         }
 
+        public RelationBuilder WithRelationType(IRelationType relationType)
+        {
+            _relationType = relationType;
+            _relationTypeBuilder = null;
+            return this;
+        }
+
         public RelationTypeBuilder AddRelationType()
         {
+            _relationType = null;
             var builder = new RelationTypeBuilder(this);
             _relationTypeBuilder = builder;
             return builder;
@@ -51,12 +60,12 @@ namespace Umbraco.Tests.Common.Builders
             var updateDate = _updateDate ?? DateTime.Now;
             var comment = _comment ?? string.Empty;
 
-            if (_relationTypeBuilder == null)
+            if (_relationTypeBuilder == null && _relationType == null)
             {
-                throw new InvalidOperationException("Cannot construct a Relation without a RelationType.  Use AddRelationType().");
+                throw new InvalidOperationException("Cannot construct a Relation without a RelationType.  Use AddRelationType() or WithRelationType().");
             }
 
-            var relationType = _relationTypeBuilder.Build();
+            var relationType = _relationType ?? _relationTypeBuilder.Build();
 
             return new Relation(parentId, childId, relationType)
                 {

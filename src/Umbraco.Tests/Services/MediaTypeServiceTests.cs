@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using NUnit.Framework;
@@ -16,6 +17,19 @@ namespace Umbraco.Tests.Services
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, PublishedRepositoryEvents = true)]
     public class MediaTypeServiceTests : TestWithSomeContentBase
     {
+        [Test]
+        public void Get_With_Missing_Guid()
+        {
+            // Arrange
+            var mediaTypeService = ServiceContext.MediaTypeService;
+
+            //Act
+            var result = mediaTypeService.Get(Guid.NewGuid());
+
+            //Assert
+            Assert.IsNull(result);
+        }
+
         [Test]
         public void Empty_Description_Is_Always_Null_After_Saving_Media_Type()
         {

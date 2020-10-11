@@ -170,12 +170,12 @@ namespace Umbraco.Tests.Common.Builders
                 .Build();
         }
 
-        public static ContentType CreateTextPageContentType(string alias = "textPage", int defaultTemplateId = 1)
+        public static ContentType CreateTextPageContentType(string alias = "textPage", string name = "Text Page", int defaultTemplateId = 1)
         {
             var builder = new ContentTypeBuilder();
             return (ContentType)builder
                 .WithAlias(alias)
-                .WithName("Text Page")
+                .WithName(name)
                 .AddPropertyGroup()
                     .WithId(1)
                     .WithName("Content")
@@ -218,6 +218,51 @@ namespace Umbraco.Tests.Common.Builders
                     .Done()
                 .WithDefaultTemplateId(defaultTemplateId)
                 .Build();
+        }
+
+        public static ContentType CreateMetaContentType(string alias = "meta", string name = "Meta")
+        {
+            var builder = new ContentTypeBuilder();
+            return (ContentType)builder
+                .WithAlias(alias)
+                .WithName(name)
+                .WithDescription($"ContentType used for {name} tags")
+                .AddPropertyGroup()
+                    .WithName(name)
+                    .WithSortOrder(2)
+                    .WithSupportsPublishing(true)
+                    .AddPropertyType()
+                        .WithAlias($"{alias}keywords")
+                        .WithName($"{name} Keywords")
+                        .WithSortOrder(1)
+                        .Done()
+                    .AddPropertyType()
+                        .WithAlias($"{alias}description")
+                        .WithName($"{name} Description")
+                        .WithSortOrder(2)
+                        .Done()
+                    .Done()
+                .Build();
+        }
+
+        public static ContentType CreateContentMetaContentType()
+        {
+            var builder = new ContentTypeBuilder();
+            return (ContentType)builder
+                .WithAlias("contentMeta")
+                .WithName("Content Meta")
+                .WithDescription($"ContentType used for Content Meta")
+                .AddPropertyGroup()
+                    .WithName("Content")
+                    .WithSortOrder(2)
+                    .WithSupportsPublishing(true)
+                    .AddPropertyType()
+                        .WithAlias("title")
+                        .WithName("Title")
+                        .WithSortOrder(1)
+                        .Done()
+                    .Done()
+                .Build();            
         }
 
         int? IWithPropertyTypeIdsIncrementingFrom.PropertyTypeIdsIncrementingFrom
