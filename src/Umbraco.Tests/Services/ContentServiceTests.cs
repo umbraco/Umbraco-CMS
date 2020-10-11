@@ -1197,7 +1197,7 @@ namespace Umbraco.Tests.Services
             Assert.IsFalse(content.HasIdentity);
 
             // content cannot publish values because they are invalid
-            var propertyValidationService = new PropertyValidationService(Factory.GetInstance<PropertyEditorCollection>(), ServiceContext.DataTypeService);
+            var propertyValidationService = new PropertyValidationService(Factory.GetInstance<PropertyEditorCollection>(), ServiceContext.DataTypeService, ServiceContext.TextService);
             var isValid = propertyValidationService.IsPropertyDataValid(content, out var invalidProperties, CultureImpact.Invariant);
             Assert.IsFalse(isValid);
             Assert.IsNotEmpty(invalidProperties);

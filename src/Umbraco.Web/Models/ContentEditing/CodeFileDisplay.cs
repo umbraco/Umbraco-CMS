@@ -27,7 +27,7 @@ namespace Umbraco.Web.Models.ContentEditing
 
         /// <summary>
         /// Path represents the path used by the backoffice tree
-        /// For files stored on disk, this is a urlencoded, comma separated
+        /// For files stored on disk, this is a URL encoded, comma separated
         /// path to the file, always starting with -1.
         ///
         /// -1,Partials,Parials%2FFolder,Partials%2FFolder%2FFile.cshtml

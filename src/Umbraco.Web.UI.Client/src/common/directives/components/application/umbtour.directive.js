@@ -5,14 +5,14 @@
 @scope
 
 @description
-<b>Added in Umbraco 7.8</b>. The tour component is a global component and is already added to the umbraco markup. 
-In the Umbraco UI the tours live in the "Help drawer" which opens when you click the Help-icon in the bottom left corner of Umbraco. 
-You can easily add you own tours to the Help-drawer or show and start tours from 
+<b>Added in Umbraco 7.8</b>. The tour component is a global component and is already added to the umbraco markup.
+In the Umbraco UI the tours live in the "Help drawer" which opens when you click the Help-icon in the bottom left corner of Umbraco.
+You can easily add you own tours to the Help-drawer or show and start tours from
 anywhere in the Umbraco backoffice. To see a real world example of a custom tour implementation, install <a href="https://our.umbraco.com/projects/starter-kits/the-starter-kit/">The Starter Kit</a> in Umbraco 7.8
 
 <h1><b>Extending the help drawer with custom tours</b></h1>
-The easiest way to add new tours to Umbraco is through the Help-drawer. All it requires is a my-tour.json file. 
-Place the file in <i>App_Plugins/{MyPackage}/backoffice/tours/{my-tour}.json</i> and it will automatically be 
+The easiet way to add new tours to Umbraco is through the Help-drawer. All it requires is a my-tour.json file.
+Place the file in <i>App_Plugins/{MyPackage}/backoffice/tours/{my-tour}.json</i> and it will automatically be
 picked up by Umbraco and shown in the Help-drawer.
 
 <h3><b>The tour object</b></h3>
@@ -26,7 +26,7 @@ The tour object consist of two parts - The overall tour configuration and a list
     "groupOrder": 200 // Control the order of tour groups
     "allowDisable": // Adds a "Don't" show this tour again"-button to the intro step
     "culture" : // From v7.11+. Specifies the culture of the tour (eg. en-US), if set the tour will only be shown to users with this culture set on their profile. If omitted or left empty the tour will be visible to all users
-    "requiredSections":["content", "media", "mySection"] // Sections that the tour will access while running, if the user does not have access to the required tour sections, the tour will not load.   
+    "requiredSections":["content", "media", "mySection"] // Sections that the tour will access while running, if the user does not have access to the required tour sections, the tour will not load.
     "steps": [] // tour steps - see next example
 }
 </pre>
@@ -43,11 +43,12 @@ The tour object consist of two parts - The overall tour configuration and a list
     "backdropOpacity": 0.4 // the backdrop opacity
     "view": "" // add a custom view
     "customProperties" : {} // add any custom properties needed for the custom view
+    "skipStepIfVisible": ".dashboard div [data-element='my-tour-button']" // if we can find this DOM element on the page then we will skip this step
 }
 </pre>
 
 <h1><b>Adding tours to other parts of the Umbraco backoffice</b></h1>
-It is also possible to add a list of custom tours to other parts of the Umbraco backoffice, 
+It is also possible to add a list of custom tours to other parts of the Umbraco backoffice,
 as an example on a Dashboard in a Custom section. You can then use the {@link umbraco.services.tourService tourService} to start and stop tours but you don't have to register them as part of the tour service.
 
 <h1><b>Using the tour service</b></h1>
@@ -86,7 +87,8 @@ as an example on a Dashboard in a Custom section. You can then use the {@link um
                         "element": "[data-element='my-tour-button']",
                         "title": "Click the button",
                         "content": "Click the button",
-                        "event": "click"
+                        "event": "click",
+                        "skipStepIfVisible": "[data-element='my-other-tour-button']"
                     }
                 ]
             };
@@ -257,9 +259,26 @@ In the following example you see how to run some custom logic before a step goes
 
                 // make sure we don't go too far
                 if (scope.model.currentStepIndex !== scope.model.steps.length) {
+
+                    var upcomingStep = scope.model.steps[scope.model.currentStepIndex];
+
+                    // If the currentStep JSON object has 'skipStepIfVisible'
+                    // It's a DOM selector - if we find it then we ship over this step
+                    if (upcomingStep.skipStepIfVisible) {
+                        let tryFindDomEl = document.querySelector(upcomingStep.skipStepIfVisible);
+                        if (tryFindDomEl) {
+                            // check if element is visible:
+                            if( tryFindDomEl.offsetWidth || tryFindDomEl.offsetHeight || tryFindDomEl.getClientRects().length ) {
+                                // if it was visible then we skip the step.
+                                nextStep();
+                                return;
+                            }
+                        }
+                    }
+
                     startStep();
-                    // tour completed - final step
                 } else {
+                    // tour completed - final step
                     scope.loadingStep = true;
 
                     waitForPendingRerequests().then(function () {

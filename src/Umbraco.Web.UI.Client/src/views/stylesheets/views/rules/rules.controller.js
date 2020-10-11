@@ -59,7 +59,6 @@ angular.module("umbraco").controller("Umbraco.Editors.StyleSheets.RulesControlle
             };
 
             editorService.open(ruleDialog);
-
         }
 
         function setDirty() {

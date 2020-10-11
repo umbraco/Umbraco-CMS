@@ -3,11 +3,11 @@ using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models.Identity
 {
+
     /// <summary>
     /// Entity type for a user's login (i.e. Facebook, Google)
-    ///
     /// </summary>
-    public class IdentityUserLogin : EntityBase, IIdentityUserLogin
+    public class IdentityUserLogin : EntityBase, IIdentityUserLoginExtended
     {
         public IdentityUserLogin(string loginProvider, string providerKey, int userId)
         {
@@ -25,22 +25,16 @@ namespace Umbraco.Core.Models.Identity
             CreateDate = createDate;
         }
 
-        /// <summary>
-        /// The login provider for the login (i.e. Facebook, Google)
-        ///
-        /// </summary>
+        /// <inheritdoc />
         public string LoginProvider { get; set; }
 
-        /// <summary>
-        /// Key representing the login for the provider
-        ///
-        /// </summary>
+        /// <inheritdoc />
         public string ProviderKey { get; set; }
 
-        /// <summary>
-        /// User Id for the user who owns this login
-        ///
-        /// </summary>
+        /// <inheritdoc />
         public int UserId { get; set; }
+
+        /// <inheritdoc />
+        public string UserData { get; set; }
     }
 }

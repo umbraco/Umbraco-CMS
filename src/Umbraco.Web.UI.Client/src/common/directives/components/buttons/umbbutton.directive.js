@@ -55,8 +55,8 @@ Use this directive to render an umbraco button. The directive can be used to gen
 </pre>
 
 @param {callback} action The button action which should be performed when the button is clicked.
-@param {string=} href Url/Path to navigato to.
-@param {string=} type Set the button type ("button" or "submit").
+@param {string=} href Url/Path to navigato to. (requires "type" to be set to "link")
+@param {string=} type Set the button type ("button", "link", "submit").
 @param {string=} buttonStyle Set the style of the button. The directive uses the default bootstrap styles ("primary", "info", "success", "warning", "danger", "inverse", "link", "block"). Pass in array to add multple styles [success,block].
 @param {string=} state Set a progress state on the button ("init", "busy", "success", "error").
 @param {string=} shortcut Set a keyboard shortcut for the button ("ctrl+c").
@@ -86,6 +86,7 @@ Use this directive to render an umbraco button. The directive can be used to gen
             bindings: {
                 action: "&?",
                 href: "@?",
+                hrefTarget: "@?",
                 type: "@",
                 buttonStyle: "@?",
                 state: "<?",
@@ -122,6 +123,10 @@ Use this directive to render an umbraco button. The directive can be used to gen
             vm.style = null;
             vm.innerState = "init";
             vm.generalActions = vm.labelKey === "general_actions";
+
+            if (!vm.type) {
+                vm.type = "button"; // set the default
+            }
 
             vm.buttonLabel = vm.label;
             // is this a primary button style (i.e. anything but an 'info' button)?
@@ -166,7 +171,7 @@ Use this directive to render an umbraco button. The directive can be used to gen
                     vm.innerState = changes.state.currentValue;
                 }
                 if (changes.state.currentValue === 'success' || changes.state.currentValue === 'error') {
-                    // set the state back to 'init' after a success or error 
+                    // set the state back to 'init' after a success or error
                     $timeout(function () {
                         vm.innerState = 'init';
                     }, 2000);
@@ -189,6 +194,13 @@ Use this directive to render an umbraco button. The directive can be used to gen
             // watch for label key changes
             if(changes.labelKey && changes.labelKey.currentValue) {
                 setButtonLabel();
+            }
+
+            // watch for type changes
+            if(changes.type) {
+                if (!vm.type) {
+                    vm.type = "button";// set the default
+                }
             }
 
         }

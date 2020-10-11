@@ -151,7 +151,7 @@ h6.-black {
     }
 }
 
-.umb-property:last-of-type .umb-control-group {
+umb-property:last-of-type .umb-control-group {
     &::after {
         margin-top: 0px;
         height: 0;
@@ -206,6 +206,13 @@ h6.-black {
     }
 
     .control-description {
+        display: block;
+        clear: both;
+        overflow-wrap: break-word;
+    }
+
+    &::after {
+        content: '';
         display: block;
         clear: both;
     }
@@ -272,6 +279,7 @@ label:not([for]) {
 /* CONTROL VALIDATION */
 .umb-control-required {
     color: @controlRequiredColor;
+    font-weight: 900;
 }
 
 .controls-row {
