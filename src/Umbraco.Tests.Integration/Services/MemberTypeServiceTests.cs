@@ -4,25 +4,28 @@ using System.Threading;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Tests.LegacyXmlPublishedCache;
-using Umbraco.Tests.TestHelpers.Entities;
+using Umbraco.Core.Services;
+using Umbraco.Tests.Common.Builders;
+using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;
 
-namespace Umbraco.Tests.Services
+namespace Umbraco.Tests.Integration.Services
 {
     [TestFixture]
     [Apartment(ApartmentState.STA)]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, PublishedRepositoryEvents = true, WithApplication = true)]
-    public class MemberTypeServiceTests : TestWithSomeContentBase
+    public class MemberTypeServiceTests : UmbracoIntegrationTest
     {
+        private IMemberService MemberService => GetRequiredService<IMemberService>();
+        private IMemberTypeService MemberTypeService => GetRequiredService<IMemberTypeService>();
+
         [Test]
         public void Member_Cannot_Edit_Property()
         {
-            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
-            ServiceContext.MemberTypeService.Save(memberType);
+            IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
+            MemberTypeService.Save(memberType);
             //re-get
-            memberType = ServiceContext.MemberTypeService.Get(memberType.Id);
+            memberType = MemberTypeService.Get(memberType.Id);
             foreach (var p in memberType.PropertyTypes)
             {
                 Assert.IsFalse(memberType.MemberCanEditProperty(p.Alias));
@@ -32,13 +35,13 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Member_Can_Edit_Property()
         {
-            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
-            ServiceContext.MemberTypeService.Save(memberType);
+            IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
+            MemberTypeService.Save(memberType);
             var prop = memberType.PropertyTypes.First().Alias;
             memberType.SetMemberCanEditProperty(prop, true);
-            ServiceContext.MemberTypeService.Save(memberType);
+            MemberTypeService.Save(memberType);
             //re-get
-            memberType = ServiceContext.MemberTypeService.Get(memberType.Id);
+            memberType = MemberTypeService.Get(memberType.Id);
             foreach (var p in memberType.PropertyTypes.Where(x => x.Alias != prop))
             {
                 Assert.IsFalse(memberType.MemberCanEditProperty(p.Alias));
@@ -49,10 +52,10 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Member_Cannot_View_Property()
         {
-            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
-            ServiceContext.MemberTypeService.Save(memberType);
+            IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
+            MemberTypeService.Save(memberType);
             //re-get
-            memberType = ServiceContext.MemberTypeService.Get(memberType.Id);
+            memberType = MemberTypeService.Get(memberType.Id);
             foreach (var p in memberType.PropertyTypes)
             {
                 Assert.IsFalse(memberType.MemberCanViewProperty(p.Alias));
@@ -62,13 +65,13 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Member_Can_View_Property()
         {
-            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
-            ServiceContext.MemberTypeService.Save(memberType);
+            IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
+            MemberTypeService.Save(memberType);
             var prop = memberType.PropertyTypes.First().Alias;
             memberType.SetMemberCanViewProperty(prop, true);
-            ServiceContext.MemberTypeService.Save(memberType);
+            MemberTypeService.Save(memberType);
             //re-get
-            memberType = ServiceContext.MemberTypeService.Get(memberType.Id);
+            memberType = MemberTypeService.Get(memberType.Id);
             foreach (var p in memberType.PropertyTypes.Where(x => x.Alias != prop))
             {
                 Assert.IsFalse(memberType.MemberCanViewProperty(p.Alias));
@@ -79,117 +82,42 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Deleting_PropertyType_Removes_The_Property_From_Member()
         {
-            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
-            ServiceContext.MemberTypeService.Save(memberType);
-            IMember member = MockedMember.CreateSimpleMember(memberType, "test", "test@test.com", "pass", "test");
-            ServiceContext.MemberService.Save(member);
+            IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
+            MemberTypeService.Save(memberType);
+            IMember member = MemberBuilder.CreateSimpleMember(memberType, "test", "test@test.com", "pass", "test");
+            MemberService.Save(member);
             var initProps = member.Properties.Count;
 
             //remove a property (NOT ONE OF THE DEFAULTS)
             var standardProps = ConventionsHelper.GetStandardPropertyTypeStubs(ShortStringHelper);
             memberType.RemovePropertyType(memberType.PropertyTypes.First(x => standardProps.ContainsKey(x.Alias) == false).Alias);
-            ServiceContext.MemberTypeService.Save(memberType);
+            MemberTypeService.Save(memberType);
 
             //re-load it from the db
-            member = ServiceContext.MemberService.GetById(member.Id);
+            member = MemberService.GetById(member.Id);
 
             Assert.AreEqual(initProps - 1, member.Properties.Count);
-        }
-
-        [Test]
-        public void Rebuild_Member_Xml_On_Alias_Change()
-        {
-            var contentType1 = MockedContentTypes.CreateSimpleMemberType("test1", "Test1");
-            var contentType2 = MockedContentTypes.CreateSimpleMemberType("test2", "Test2");
-            ServiceContext.MemberTypeService.Save(contentType1);
-            ServiceContext.MemberTypeService.Save(contentType2);
-            var contentItems1 = MockedMember.CreateSimpleMember(contentType1, 10).ToArray();
-            foreach (var x in contentItems1) ServiceContext.MemberService.Save(x);
-            var contentItems2 = MockedMember.CreateSimpleMember(contentType2, 5).ToArray();
-            foreach (var x in contentItems2) ServiceContext.MemberService.Save(x);
-            //only update the contentType1 alias which will force an xml rebuild for all content of that type
-            contentType1.Alias = "newAlias";
-            ServiceContext.MemberTypeService.Save(contentType1);
-
-            using (var scope = ScopeProvider.CreateScope())
-            {
-                foreach (var c in contentItems1)
-                {
-                    var xml = scope.Database.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new { Id = c.Id });
-                    Assert.IsNotNull(xml);
-                    Assert.IsTrue(xml.Xml.StartsWith("<newAlias"));
-                }
-                foreach (var c in contentItems2)
-                {
-                    var xml = scope.Database.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new { Id = c.Id });
-                    Assert.IsNotNull(xml);
-                    Assert.IsTrue(xml.Xml.StartsWith("<test2")); //should remain the same
-                }
-                scope.Complete();
-            }
-        }
-
-        [Test]
-        public void Rebuild_Member_Xml_On_Property_Removal()
-        {
-            var standardProps = ConventionsHelper.GetStandardPropertyTypeStubs(ShortStringHelper);
-
-            var contentType1 = MockedContentTypes.CreateSimpleMemberType("test1", "Test1");
-            ServiceContext.MemberTypeService.Save(contentType1);
-            var contentItems1 = MockedMember.CreateSimpleMember(contentType1, 10).ToArray();
-            foreach (var x in contentItems1) ServiceContext.MemberService.Save(x);
-
-            var alias = contentType1.PropertyTypes.First(x => standardProps.ContainsKey(x.Alias) == false).Alias;
-            var elementToMatch = "<" + alias + ">";
-
-            using (var scope = ScopeProvider.CreateScope())
-            {
-                foreach (var c in contentItems1)
-                {
-                    var xml = scope.Database.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new { Id = c.Id });
-                    Assert.IsNotNull(xml);
-                    Assert.IsTrue(xml.Xml.Contains(elementToMatch)); //verify that it is there before we remove the property
-                }
-                scope.Complete();
-            }
-
-            //remove a property (NOT ONE OF THE DEFAULTS)
-            contentType1.RemovePropertyType(alias);
-            ServiceContext.MemberTypeService.Save(contentType1);
-
-            var reQueried = ServiceContext.MemberTypeService.Get(contentType1.Id);
-            var reContent = ServiceContext.MemberService.GetById(contentItems1.First().Id);
-            using (var scope = ScopeProvider.CreateScope())
-            {
-                foreach (var c in contentItems1)
-                {
-                    var xml = scope.Database.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new { Id = c.Id });
-                    Assert.IsNotNull(xml);
-                    Assert.IsFalse(xml.Xml.Contains(elementToMatch)); //verify that it is no longer there
-                }
-                scope.Complete();
-            }
         }
 
         [Test]
         public void Cannot_Save_MemberType_With_Empty_Name()
         {
             // Arrange
-            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType("memberTypeAlias", string.Empty);
+            IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType("memberTypeAlias", string.Empty);
 
             // Act & Assert
-            Assert.Throws<ArgumentException>(() => ServiceContext.MemberTypeService.Save(memberType));
+            Assert.Throws<ArgumentException>(() => MemberTypeService.Save(memberType));
         }
 
         [Test]
         public void Empty_Description_Is_Always_Null_After_Saving_Member_Type()
         {
-            var service = ServiceContext.MemberTypeService;
-            var memberType = MockedContentTypes.CreateSimpleMemberType();
+            var service = MemberTypeService;
+            var memberType = MemberTypeBuilder.CreateSimpleMemberType();
             memberType.Description = null;
             service.Save(memberType);
 
-            var memberType2 = MockedContentTypes.CreateSimpleMemberType("memberType2", "Member Type 2");
+            var memberType2 = MemberTypeBuilder.CreateSimpleMemberType("memberType2", "Member Type 2");
             memberType2.Description = string.Empty;
             service.Save(memberType2);
 
@@ -201,9 +129,9 @@ namespace Umbraco.Tests.Services
         //public void Can_Save_MemberType_Structure_And_Create_A_Member_Based_On_It()
         //{
         //    // Arrange
-        //    var cs = ServiceContext.MemberService;
-        //    var cts = ServiceContext.MemberTypeService;
-        //    var dtdYesNo = ServiceContext.DataTypeService.GetDataTypeDefinitionById(-49);
+        //    var cs = MemberService;
+        //    var cts = MemberTypeService;
+        //    var dtdYesNo = DataTypeService.GetDataTypeDefinitionById(-49);
         //    var ctBase = new MemberType(-1) { Name = "Base", Alias = "Base", Icon = "folder.gif", Thumbnail = "folder.png" };
         //    ctBase.AddPropertyType(new PropertyType(dtdYesNo)
         //        {
@@ -243,17 +171,17 @@ namespace Umbraco.Tests.Services
         //     * - Components
         //     * - Category
         //     */
-        //    var service = ServiceContext.ContentTypeService;
-        //    var global = MockedContentTypes.CreateSimpleContentType("global", "Global");
+        //    var service = ContentTypeService;
+        //    var global = MemberTypeBuilder.CreateSimpleContentType("global", "Global");
         //    service.Save(global);
 
-        //    var components = MockedContentTypes.CreateSimpleContentType("components", "Components", global);
+        //    var components = MemberTypeBuilder.CreateSimpleContentType("components", "Components", global);
         //    service.Save(components);
 
-        //    var component = MockedContentTypes.CreateSimpleContentType("component", "Component", components);
+        //    var component = MemberTypeBuilder.CreateSimpleContentType("component", "Component", components);
         //    service.Save(component);
 
-        //    var category = MockedContentTypes.CreateSimpleContentType("category", "Category", global);
+        //    var category = MemberTypeBuilder.CreateSimpleContentType("category", "Category", global);
         //    service.Save(category);
 
         //    var success = category.AddContentType(component);
@@ -265,7 +193,7 @@ namespace Umbraco.Tests.Services
         //public void Can_Remove_ContentType_Composition_From_ContentType()
         //{
         //    //Test for U4-2234
-        //    var cts = ServiceContext.ContentTypeService;
+        //    var cts = ContentTypeService;
         //    //Arrange
         //    var component = CreateComponent();
         //    cts.Save(component);
@@ -305,11 +233,11 @@ namespace Umbraco.Tests.Services
         //public void Can_Copy_ContentType_By_Performing_Clone()
         //{
         //    // Arrange
-        //    var service = ServiceContext.ContentTypeService;
-        //    var metaContentType = MockedContentTypes.CreateMetaContentType();
+        //    var service = ContentTypeService;
+        //    var metaContentType = MemberTypeBuilder.CreateMetaContentType();
         //    service.Save(metaContentType);
 
-        //    var simpleContentType = MockedContentTypes.CreateSimpleContentType("category", "Category", metaContentType);
+        //    var simpleContentType = MemberTypeBuilder.CreateSimpleContentType("category", "Category", metaContentType);
         //    service.Save(simpleContentType);
         //    var categoryId = simpleContentType.Id;
 
@@ -433,16 +361,16 @@ namespace Umbraco.Tests.Services
         //private IEnumerable<IContentType> CreateContentTypeHierarchy()
         //{
         //    //create the master type
-        //    var masterContentType = MockedContentTypes.CreateSimpleContentType("masterContentType", "MasterContentType");
+        //    var masterContentType = MemberTypeBuilder.CreateSimpleContentType("masterContentType", "MasterContentType");
         //    masterContentType.Key = new Guid("C00CA18E-5A9D-483B-A371-EECE0D89B4AE");
-        //    ServiceContext.ContentTypeService.Save(masterContentType);
+        //    ContentTypeService.Save(masterContentType);
 
         //    //add the one we just created
         //    var list = new List<IContentType> { masterContentType };
 
         //    for (var i = 0; i < 10; i++)
         //    {
-        //        var contentType = MockedContentTypes.CreateSimpleContentType("childType" + i, "ChildType" + i,
+        //        var contentType = MemberTypeBuilder.CreateSimpleContentType("childType" + i, "ChildType" + i,
         //                                                                     //make the last entry in the list, this one's parent
         //                                                                     list.Last());
 

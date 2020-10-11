@@ -137,8 +137,8 @@ namespace Umbraco.Tests.Common.Builders
         {
             var builder = new MemberTypeBuilder();
             var memberType = builder
-                .WithAlias("simple")
-                .WithName("Simple Member")
+                .WithAlias(alias)
+                .WithName(name)
                 .AddPropertyGroup()
                     .WithName("Content")
                     .WithSortOrder(1)
