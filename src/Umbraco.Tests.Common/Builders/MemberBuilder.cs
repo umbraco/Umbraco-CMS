@@ -184,6 +184,7 @@ namespace Umbraco.Tests.Common.Builders
                 .WithMemberType(memberType)
                 .WithName(name)
                 .WithEmail(email)
+                .WithIsApproved(true)
                 .WithLogin(username, password);
 
             if (key.HasValue)
