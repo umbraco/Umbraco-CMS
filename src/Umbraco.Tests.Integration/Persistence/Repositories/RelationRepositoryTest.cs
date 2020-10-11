@@ -13,6 +13,7 @@ using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
+using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
@@ -225,9 +226,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Get_Paged_Parent_Child_Entities_With_Same_Entity_Relation()
         {
             //Create a media item and create a relationship between itself (parent -> child)
-            var imageType = MockedContentTypes.CreateImageMediaType("myImage");
+            var imageType = MediaTypeBuilder.CreateImageMediaType("myImage");
             MediaTypeService.Save(imageType);
-            var media = MockedMedia.CreateMediaImage(imageType, -1);
+            var media = MediaBuilder.CreateMediaImage(imageType, -1);
             MediaService.Save(media);
             var relType = RelationService.GetRelationTypeByAlias(Constants.Conventions.RelationTypes.RelatedMediaAlias);
             RelationService.Relate(media.Id, media.Id, relType);
@@ -291,30 +292,30 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             //Create content
             createdContent = new List<IContent>();
-            var contentType = MockedContentTypes.CreateBasicContentType("blah");
+            var contentType = ContentTypeBuilder.CreateBasicContentType("blah");
             ContentTypeService.Save(contentType);
             for (int i = 0; i < 3; i++)
             {
-                var c1 = MockedContent.CreateBasicContent(contentType);
+                var c1 = ContentBuilder.CreateBasicContent(contentType);
                 ContentService.Save(c1);
                 createdContent.Add(c1);
             }
 
             //Create media
             createdMedia = new List<IMedia>();
-            var imageType = MockedContentTypes.CreateImageMediaType("myImage");
+            var imageType = MediaTypeBuilder.CreateImageMediaType("myImage");
             MediaTypeService.Save(imageType);
             for (int i = 0; i < 3; i++)
             {
-                var c1 = MockedMedia.CreateMediaImage(imageType, -1);
+                var c1 = MediaBuilder.CreateMediaImage(imageType, -1);
                 MediaService.Save(c1);
                 createdMedia.Add(c1);
             }
 
             // Create members
-            var memberType = MockedContentTypes.CreateSimpleMemberType("simple");
+            var memberType = MemberTypeBuilder.CreateSimpleMemberType("simple");
             MemberTypeService.Save(memberType);
-            createdMembers = MockedMember.CreateSimpleMember(memberType, 3).ToList();
+            createdMembers = MemberBuilder.CreateSimpleMembers(memberType, 3).ToList();
             MemberService.Save(createdMembers);
 
             var relType = RelationService.GetRelationTypeByAlias(Constants.Conventions.RelationTypes.RelatedMediaAlias);
@@ -438,21 +439,23 @@ namespace Umbraco.Tests.Persistence.Repositories
                 relationTypeRepository.Save(_relateContent);
                 relationTypeRepository.Save(_relateContentType);
 
+                var template = TemplateBuilder.CreateTextPageTemplate();
+                FileService.SaveTemplate(template);
                 //Create and Save ContentType "umbTextpage" -> (NodeDto.NodeIdSeed)
-                _contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage", "Textpage");
-                FileService.SaveTemplate(_contentType.DefaultTemplate); // else, FK violation on contentType!
+                _contentType = ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateId: template.Id);
+
                 ContentTypeService.Save(_contentType);
 
                 //Create and Save Content "Homepage" based on "umbTextpage" -> (NodeDto.NodeIdSeed + 1)
-                _textpage = MockedContent.CreateSimpleContent(_contentType);
+                _textpage = ContentBuilder.CreateSimpleContent(_contentType);
                 ContentService.Save(_textpage, 0);
 
                 //Create and Save Content "Text Page 1" based on "umbTextpage" -> (NodeDto.NodeIdSeed + 2)
-                _subpage = MockedContent.CreateSimpleContent(_contentType, "Text Page 1", _textpage.Id);
+                _subpage = ContentBuilder.CreateSimpleContent(_contentType, "Text Page 1", _textpage.Id);
                 ContentService.Save(_subpage, 0);
 
                 //Create and Save Content "Text Page 1" based on "umbTextpage" -> (NodeDto.NodeIdSeed + 3)
-                _subpage2 = MockedContent.CreateSimpleContent(_contentType, "Text Page 2", _textpage.Id);
+                _subpage2 = ContentBuilder.CreateSimpleContent(_contentType, "Text Page 2", _textpage.Id);
                 ContentService.Save(_subpage2, 0);
 
                 _relation = new Relation(_textpage.Id, _subpage.Id, _relateContent) { Comment = string.Empty };

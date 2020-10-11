@@ -178,6 +178,33 @@ namespace Umbraco.Tests.Common.Builders
             return member;
         }
 
+        public static IEnumerable<IMember> CreateSimpleMembers(IMemberType memberType, int amount, Action<int, IMember> onCreating = null)
+        {
+            var list = new List<IMember>();
+
+            for (int i = 0; i < amount; i++)
+            {
+                var name = "Member No-" + i;
+
+                var builder = new MemberBuilder()
+                    .WithMemberType(memberType)
+                    .WithName(name)
+                    .WithEmail("test" + i + "@test.com")
+                    .WithLogin("test" + i, "test" + i);
+
+
+                builder = builder
+                    .AddPropertyData()
+                    .WithKeyValue("title", name + " member" + i)
+                    .WithKeyValue("bodyText", "This is a subpage" + i)
+                    .WithKeyValue("author", "John Doe" + i)
+                    .Done();
+
+                list.Add(builder.Build());
+            }
+
+            return list;
+        }
         public static Member CreateSimpleMember(IMemberType memberType, string name, string email, string password, string username, Guid? key = null)
         {
             var builder = new MemberBuilder()

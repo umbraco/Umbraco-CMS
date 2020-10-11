@@ -7,6 +7,7 @@ using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
+using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
@@ -30,22 +31,22 @@ namespace Umbraco.Tests.Services
         {
             //Create content
             var createdContent = new List<IContent>();
-            var contentType = MockedContentTypes.CreateBasicContentType("blah");
+            var contentType = ContentTypeBuilder.CreateBasicContentType("blah");
             ContentTypeService.Save(contentType);
             for (int i = 0; i < 3; i++)
             {
-                var c1 = MockedContent.CreateBasicContent(contentType);
+                var c1 = ContentBuilder.CreateBasicContent(contentType);
                 ContentService.Save(c1);
                 createdContent.Add(c1);
             }
 
             //Create media
             var createdMedia = new List<IMedia>();
-            var imageType = MockedContentTypes.CreateImageMediaType("myImage");
+            var imageType = MediaTypeBuilder.CreateImageMediaType("myImage");
             MediaTypeService.Save(imageType);
             for (int i = 0; i < 3; i++)
             {
-                var c1 = MockedMedia.CreateMediaImage(imageType, -1);
+                var c1 = MediaBuilder.CreateMediaImage(imageType, -1);
                 MediaService.Save(c1);
                 createdMedia.Add(c1);
             }
@@ -75,18 +76,18 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Return_List_Of_Content_Items_Where_Media_Item_Referenced()
         {
-            var mt = MockedContentTypes.CreateSimpleMediaType("testMediaType", "Test Media Type");
+            var mt = MediaTypeBuilder.CreateSimpleMediaType("testMediaType", "Test Media Type");
             MediaTypeService.Save(mt);
-            var m1 = MockedMedia.CreateSimpleMedia(mt, "hello 1", -1);
+            var m1 = MediaBuilder.CreateSimpleMedia(mt, "hello 1", -1);
             MediaService.Save(m1);
 
-            var ct = MockedContentTypes.CreateTextPageContentType("richTextTest");
+            var ct = ContentTypeBuilder.CreateTextPageContentType("richTextTest");
             ct.AllowedTemplates = Enumerable.Empty<ITemplate>();
             ContentTypeService.Save(ct);
 
             void createContentWithMediaRefs()
             {
-                var content = MockedContent.CreateTextpageContent(ct, "my content 2", -1);
+                var content = ContentBuilder.CreateTextpageContent(ct, "my content 2", -1);
                 //'bodyText' is a property with a RTE property editor which we knows automatically tracks relations
                 content.Properties["bodyText"].SetValue(@"<p>
         <img src='/media/12312.jpg' data-udi='umb://media/" + m1.Key.ToString("N") + @"' />
@@ -204,14 +205,14 @@ namespace Umbraco.Tests.Services
             var rt = new RelationType(name, alias, false, null, null);
             rs.Save(rt);
 
-            var ct = MockedContentTypes.CreateBasicContentType();
+            var ct = ContentTypeBuilder.CreateBasicContentType();
             ContentTypeService.Save(ct);
 
-            var mt = MockedContentTypes.CreateImageMediaType("img");
+            var mt = MediaTypeBuilder.CreateImageMediaType("img");
             MediaTypeService.Save(mt);
 
-            var c1 = MockedContent.CreateBasicContent(ct);
-            var c2 = MockedMedia.CreateMediaImage(mt, -1);
+            var c1 = ContentBuilder.CreateBasicContent(ct);
+            var c2 = MediaBuilder.CreateMediaImage(mt, -1);
             ContentService.Save(c1);
             MediaService.Save(c2);
 
@@ -233,16 +234,16 @@ namespace Umbraco.Tests.Services
             var rt = new RelationType(rtName, rtName, false, null, null);
             rs.Save(rt);
 
-            var ct = MockedContentTypes.CreateBasicContentType();
+            var ct = ContentTypeBuilder.CreateBasicContentType();
             ContentTypeService.Save(ct);
 
-            var mt = MockedContentTypes.CreateImageMediaType("img");
+            var mt = MediaTypeBuilder.CreateImageMediaType("img");
             MediaTypeService.Save(mt);
 
             return Enumerable.Range(1, count).Select(index =>
             {
-                var c1 = MockedContent.CreateBasicContent(ct);
-                var c2 = MockedMedia.CreateMediaImage(mt, -1);
+                var c1 = ContentBuilder.CreateBasicContent(ct);
+                var c2 = MediaBuilder.CreateMediaImage(mt, -1);
                 ContentService.Save(c1);
                 MediaService.Save(c2);
 
