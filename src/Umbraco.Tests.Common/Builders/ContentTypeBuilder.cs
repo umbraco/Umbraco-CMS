@@ -132,7 +132,7 @@ namespace Umbraco.Tests.Common.Builders
                 .Build();
         }
 
-        public static ContentType CreateSimpleContentType(string alias = null, string name = null, IContentType parent = null, bool randomizeAliases = false, string propertyGroupName = "Content", int defaultTemplateId = 1)
+        public static ContentType CreateSimpleContentType(string alias = null, string name = null, IContentType parent = null, bool randomizeAliases = false, string propertyGroupName = "Content", bool mandatoryProperties = false, int defaultTemplateId = 1)
         {
             return (ContentType)new ContentTypeBuilder()
                 .WithAlias(alias ?? "simple")
@@ -146,6 +146,7 @@ namespace Umbraco.Tests.Common.Builders
                         .WithAlias(RandomAlias("title", randomizeAliases))
                         .WithName("Title")
                         .WithSortOrder(1)
+                        .WithMandatory(mandatoryProperties)
                         .Done()
                     .AddPropertyType()
                         .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TinyMce)
@@ -154,11 +155,13 @@ namespace Umbraco.Tests.Common.Builders
                         .WithName("Body text")
                         .WithSortOrder(2)
                         .WithDataTypeId(-87)
+                        .WithMandatory(mandatoryProperties)
                         .Done()
                     .AddPropertyType()
                         .WithAlias(RandomAlias("author", randomizeAliases))
                         .WithName("Author")
                         .WithSortOrder(3)
+                        .WithMandatory(mandatoryProperties)
                         .Done()
                     .Done()
                     .AddAllowedTemplate()

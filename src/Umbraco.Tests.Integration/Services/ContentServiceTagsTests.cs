@@ -1,35 +1,37 @@
 ﻿using System;
 using System.Linq;
-using Umbraco.Core.Composing;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
-using Umbraco.Tests.TestHelpers.Entities;
-using Umbraco.Tests.Testing;
-using Umbraco.Core.Configuration.Models;
 using Umbraco.Tests.Common.Builders;
+using Umbraco.Tests.Common.Builders.Extensions;
+using Umbraco.Tests.Integration.Testing;
+using Umbraco.Tests.Testing;
 
-namespace Umbraco.Tests.Services
+namespace Umbraco.Tests.Integration.Services
 {
     [TestFixture]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest,
         PublishedRepositoryEvents = true,
         WithApplication = true,
         Logger = UmbracoTestOptions.Logger.Console)]
-    public class ContentServiceTagsTests : TestWithSomeContentBase
+    public class ContentServiceTagsTests : UmbracoIntegrationTest
     {
-        private GlobalSettings _globalSettings;
+        private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
+        private IContentService ContentService => GetRequiredService<IContentService>();
+        private ITagService TagService => GetRequiredService<ITagService>();
+        private IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
+        private ILocalizationService LocalizationService => GetRequiredService<ILocalizationService>();
+        private IFileService FileService => GetRequiredService<IFileService>();
+        public PropertyEditorCollection PropertyEditorCollection => GetRequiredService<PropertyEditorCollection>();
 
-        public PropertyEditorCollection PropertyEditorCollection => Factory.GetInstance<PropertyEditorCollection>();
-
-        public override void SetUp()
+        public override void Setup()
         {
-            base.SetUp();
+            base.Setup();
             ContentRepositoryBase.ThrowOnWarning = true;
-            _globalSettings = new GlobalSettings();
         }
 
         public override void TearDown()
@@ -38,41 +40,29 @@ namespace Umbraco.Tests.Services
             base.TearDown();
         }
 
-        protected override void Compose()
-        {
-            base.Compose();
-
-            // FIXME: do it differently
-            Composition.Register(factory => factory.GetInstance<ServiceContext>().TextService);
-        }
-
         [Test]
         public void TagsCanBeInvariant()
         {
-            var contentService = ServiceContext.ContentService;
-            var contentTypeService = ServiceContext.ContentTypeService;
-            var tagService = ServiceContext.TagService;
-            var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
-            contentType.PropertyGroups.First().PropertyTypes.Add(
-                new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "tags")
-                {
-                    DataTypeId = 1041
-                });
-            contentTypeService.Save(contentType);
+            var template = TemplateBuilder.CreateTextPageTemplate();
+            FileService.SaveTemplate(template);
 
-            IContent content1 = MockedContent.CreateSimpleContent(contentType, "Tagged content 1", -1);
+            var contentType = ContentTypeBuilder.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", mandatoryProperties: true, defaultTemplateId: template.Id);
+            CreateAndAddTagsPropertyType(contentType);
+            ContentTypeService.Save(contentType);
+
+            IContent content1 = ContentBuilder.CreateSimpleContent(contentType, "Tagged content 1", -1);
             content1.AssignTags(PropertyEditorCollection, DataTypeService, "tags", new[] { "hello", "world", "another", "one" });
-            contentService.SaveAndPublish(content1);
+            ContentService.SaveAndPublish(content1);
 
-            content1 = contentService.GetById(content1.Id);
+            content1 = ContentService.GetById(content1.Id);
 
             var enTags = content1.Properties["tags"].GetTagsValue(PropertyEditorCollection, DataTypeService).ToArray();
             Assert.AreEqual(4, enTags.Length);
             Assert.Contains("one", enTags);
             Assert.AreEqual(-1, enTags.IndexOf("plus"));
 
-            var tagGroups = tagService.GetAllTags().GroupBy(x => x.LanguageId);
-            foreach (var tag in tagService.GetAllTags())
+            var tagGroups = TagService.GetAllTags().GroupBy(x => x.LanguageId);
+            foreach (var tag in TagService.GetAllTags())
                 Console.WriteLine($"{tag.Group}:{tag.Text} {tag.LanguageId}");
             Assert.AreEqual(1, tagGroups.Count());
             var enTagGroup = tagGroups.FirstOrDefault(x => x.Key == null);
@@ -85,30 +75,27 @@ namespace Umbraco.Tests.Services
         [Test]
         public void TagsCanBeVariant()
         {
-            var languageService = ServiceContext.LocalizationService;
-            languageService.Save(new Language(_globalSettings, "fr-FR")); // en-US is already there
+            var languageService = LocalizationService;
+            var language = new LanguageBuilder()
+                .WithCultureInfo("fr-FR")
+                .Build();
+            LocalizationService.Save(language); // en-US is already there
 
-            var contentService = ServiceContext.ContentService;
-            var contentTypeService = ServiceContext.ContentTypeService;
-            var tagService = ServiceContext.TagService;
-            var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
-            contentType.PropertyGroups.First().PropertyTypes.Add(
-                new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "tags")
-                {
-                    DataTypeId = 1041,
-                    Variations = ContentVariation.Culture
-                });
-            contentType.Variations = ContentVariation.Culture;
-            contentTypeService.Save(contentType);
+            var template = TemplateBuilder.CreateTextPageTemplate();
+            FileService.SaveTemplate(template);
 
-            IContent content1 = MockedContent.CreateSimpleContent(contentType, "Tagged content 1", -1);
+            var contentType = ContentTypeBuilder.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type",  mandatoryProperties: true, defaultTemplateId: template.Id);
+            CreateAndAddTagsPropertyType(contentType, ContentVariation.Culture);
+            ContentTypeService.Save(contentType);
+
+            IContent content1 = ContentBuilder.CreateSimpleContent(contentType, "Tagged content 1", -1);
             content1.SetCultureName("name-fr", "fr-FR");
             content1.SetCultureName("name-en", "en-US");
             content1.AssignTags(PropertyEditorCollection, DataTypeService, "tags", new[] { "hello", "world", "some", "tags", "plus" }, culture: "fr-FR");
             content1.AssignTags(PropertyEditorCollection, DataTypeService, "tags", new[] { "hello", "world", "another", "one" }, culture: "en-US");
-            contentService.SaveAndPublish(content1);
+            ContentService.SaveAndPublish(content1);
 
-            content1 = contentService.GetById(content1.Id);
+            content1 = ContentService.GetById(content1.Id);
 
             var frTags = content1.Properties["tags"].GetTagsValue(PropertyEditorCollection, DataTypeService, "fr-FR").ToArray();
             Assert.AreEqual(5, frTags.Length);
@@ -120,8 +107,8 @@ namespace Umbraco.Tests.Services
             Assert.Contains("one", enTags);
             Assert.AreEqual(-1, enTags.IndexOf("plus"));
 
-            var tagGroups = tagService.GetAllTags(culture:"*").GroupBy(x => x.LanguageId);
-            foreach (var tag in tagService.GetAllTags())
+            var tagGroups = TagService.GetAllTags(culture:"*").GroupBy(x => x.LanguageId);
+            foreach (var tag in TagService.GetAllTags())
                 Console.WriteLine($"{tag.Group}:{tag.Text} {tag.LanguageId}");
             Assert.AreEqual(2, tagGroups.Count());
             var frTagGroup = tagGroups.FirstOrDefault(x => x.Key == 2);
@@ -139,37 +126,32 @@ namespace Umbraco.Tests.Services
         [Test]
         public void TagsCanBecomeVariant()
         {
-            var enId = ServiceContext.LocalizationService.GetLanguageIdByIsoCode("en-US").Value;
+            var enId = LocalizationService.GetLanguageIdByIsoCode("en-US").Value;
 
-            var contentService = ServiceContext.ContentService;
-            var contentTypeService = ServiceContext.ContentTypeService;
-            var tagService = ServiceContext.TagService;
-            var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
-            PropertyType propertyType;
-            contentType.PropertyGroups.First().PropertyTypes.Add(
-                propertyType = new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "tags")
-                {
-                    DataTypeId = 1041
-                });
-            contentTypeService.Save(contentType);
+            var template = TemplateBuilder.CreateTextPageTemplate();
+            FileService.SaveTemplate(template);
 
-            IContent content1 = MockedContent.CreateSimpleContent(contentType, "Tagged content 1", -1);
+            var contentType = ContentTypeBuilder.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", mandatoryProperties: true, defaultTemplateId: template.Id);
+            var propertyType = CreateAndAddTagsPropertyType(contentType);
+            ContentTypeService.Save(contentType);
+
+            IContent content1 = ContentBuilder.CreateSimpleContent(contentType, "Tagged content 1", -1);
             content1.AssignTags(PropertyEditorCollection, DataTypeService, "tags", new[] { "hello", "world", "another", "one" });
-            contentService.SaveAndPublish(content1);
+            ContentService.SaveAndPublish(content1);
 
             contentType.Variations = ContentVariation.Culture;
-            contentTypeService.Save(contentType);
+            ContentTypeService.Save(contentType);
 
             // no changes
-            content1 = contentService.GetById(content1.Id);
+            content1 = ContentService.GetById(content1.Id);
 
             var tags = content1.Properties["tags"].GetTagsValue(PropertyEditorCollection, DataTypeService).ToArray();
             Assert.AreEqual(4, tags.Length);
             Assert.Contains("one", tags);
             Assert.AreEqual(-1, tags.IndexOf("plus"));
 
-            var tagGroups = tagService.GetAllTags().GroupBy(x => x.LanguageId);
-            foreach (var tag in tagService.GetAllTags())
+            var tagGroups = TagService.GetAllTags().GroupBy(x => x.LanguageId);
+            foreach (var tag in TagService.GetAllTags())
                 Console.WriteLine($"{tag.Group}:{tag.Text} {tag.LanguageId}");
             Assert.AreEqual(1, tagGroups.Count());
             var enTagGroup = tagGroups.FirstOrDefault(x => x.Key == null);
@@ -179,10 +161,10 @@ namespace Umbraco.Tests.Services
             Assert.IsFalse(enTagGroup.Any(x => x.Text == "plus"));
 
             propertyType.Variations = ContentVariation.Culture;
-            contentTypeService.Save(contentType);
+            ContentTypeService.Save(contentType);
 
             // changes
-            content1 = contentService.GetById(content1.Id);
+            content1 = ContentService.GetById(content1.Id);
 
             // property value has been moved from invariant to en-US
             tags = content1.Properties["tags"].GetTagsValue(PropertyEditorCollection, DataTypeService).ToArray();
@@ -194,8 +176,8 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual(-1, tags.IndexOf("plus"));
 
             // tags have been copied from invariant to en-US
-            tagGroups = tagService.GetAllTags(culture: "*").GroupBy(x => x.LanguageId);
-            foreach (var tag in tagService.GetAllTags("*"))
+            tagGroups = TagService.GetAllTags(culture: "*").GroupBy(x => x.LanguageId);
+            foreach (var tag in TagService.GetAllTags("*"))
                 Console.WriteLine($"{tag.Group}:{tag.Text} {tag.LanguageId}");
             Assert.AreEqual(1, tagGroups.Count());
 
@@ -209,37 +191,32 @@ namespace Umbraco.Tests.Services
         [Test]
         public void TagsCanBecomeInvariant()
         {
-            var languageService = ServiceContext.LocalizationService;
-            languageService.Save(new Language(_globalSettings, "fr-FR")); // en-US is already there
+            var language = new LanguageBuilder()
+                .WithCultureInfo("fr-FR")
+                .Build();
+            LocalizationService.Save(language); // en-US is already there
 
-            var enId = ServiceContext.LocalizationService.GetLanguageIdByIsoCode("en-US").Value;
+            var enId = LocalizationService.GetLanguageIdByIsoCode("en-US").Value;
 
-            var contentService = ServiceContext.ContentService;
-            var contentTypeService = ServiceContext.ContentTypeService;
-            var tagService = ServiceContext.TagService;
-            var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
-            PropertyType propertyType;
-            contentType.PropertyGroups.First().PropertyTypes.Add(
-                propertyType = new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "tags")
-                {
-                    DataTypeId = 1041,
-                    Variations = ContentVariation.Culture
-                });
-            contentType.Variations = ContentVariation.Culture;
-            contentTypeService.Save(contentType);
+            var template = TemplateBuilder.CreateTextPageTemplate();
+            FileService.SaveTemplate(template);
 
-            IContent content1 = MockedContent.CreateSimpleContent(contentType, "Tagged content 1", -1);
+            var contentType = ContentTypeBuilder.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", mandatoryProperties: true, defaultTemplateId: template.Id);
+            CreateAndAddTagsPropertyType(contentType, ContentVariation.Culture);
+            ContentTypeService.Save(contentType);
+
+            IContent content1 = ContentBuilder.CreateSimpleContent(contentType, "Tagged content 1", -1);
             content1.SetCultureName("name-fr", "fr-FR");
             content1.SetCultureName("name-en", "en-US");
             content1.AssignTags(PropertyEditorCollection, DataTypeService, "tags", new[] { "hello", "world", "some", "tags", "plus" }, culture: "fr-FR");
             content1.AssignTags(PropertyEditorCollection, DataTypeService, "tags", new[] { "hello", "world", "another", "one" }, culture: "en-US");
-            contentService.SaveAndPublish(content1);
+            ContentService.SaveAndPublish(content1);
 
             contentType.Variations = ContentVariation.Nothing;
-            contentTypeService.Save(contentType);
+            ContentTypeService.Save(contentType);
 
             // changes
-            content1 = contentService.GetById(content1.Id);
+            content1 = ContentService.GetById(content1.Id);
 
             // property value has been moved from en-US to invariant, fr-FR tags are gone
             Assert.IsEmpty(content1.Properties["tags"].GetTagsValue(PropertyEditorCollection, DataTypeService, "fr-FR"));
@@ -251,8 +228,8 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual(-1, tags.IndexOf("plus"));
 
             // tags have been copied from en-US to invariant, fr-FR tags are gone
-            var tagGroups = tagService.GetAllTags(culture: "*").GroupBy(x => x.LanguageId);
-            foreach (var tag in tagService.GetAllTags("*"))
+            var tagGroups = TagService.GetAllTags(culture: "*").GroupBy(x => x.LanguageId);
+            foreach (var tag in TagService.GetAllTags("*"))
                 Console.WriteLine($"{tag.Group}:{tag.Text} {tag.LanguageId}");
             Assert.AreEqual(1, tagGroups.Count());
 
@@ -266,38 +243,33 @@ namespace Umbraco.Tests.Services
         [Test]
         public void TagsCanBecomeInvariant2()
         {
-            var languageService = ServiceContext.LocalizationService;
-            languageService.Save(new Language(_globalSettings, "fr-FR")); // en-US is already there
+            var language = new LanguageBuilder()
+                .WithCultureInfo("fr-FR")
+                .Build();
+            LocalizationService.Save(language); // en-US is already there
 
-            var enId = ServiceContext.LocalizationService.GetLanguageIdByIsoCode("en-US").Value;
+            var enId = LocalizationService.GetLanguageIdByIsoCode("en-US").Value;
 
-            var contentService = ServiceContext.ContentService;
-            var contentTypeService = ServiceContext.ContentTypeService;
-            var tagService = ServiceContext.TagService;
-            var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
-            PropertyType propertyType;
-            contentType.PropertyGroups.First().PropertyTypes.Add(
-                propertyType = new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "tags")
-                {
-                    DataTypeId = 1041,
-                    Variations = ContentVariation.Culture
-                });
-            contentType.Variations = ContentVariation.Culture;
-            contentTypeService.Save(contentType);
+            var template = TemplateBuilder.CreateTextPageTemplate();
+            FileService.SaveTemplate(template);
 
-            IContent content1 = MockedContent.CreateSimpleContent(contentType, "Tagged content 1", -1);
+            var contentType = ContentTypeBuilder.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type",  mandatoryProperties: true, defaultTemplateId: template.Id);
+            var propertyType = CreateAndAddTagsPropertyType(contentType, ContentVariation.Culture);
+            ContentTypeService.Save(contentType);
+
+            IContent content1 = ContentBuilder.CreateSimpleContent(contentType, "Tagged content 1", -1);
             content1.SetCultureName("name-fr", "fr-FR");
             content1.SetCultureName("name-en", "en-US");
             content1.AssignTags(PropertyEditorCollection, DataTypeService, "tags", new[] { "hello", "world", "some", "tags", "plus" }, culture: "fr-FR");
             content1.AssignTags(PropertyEditorCollection, DataTypeService, "tags", new[] { "hello", "world", "another", "one" }, culture: "en-US");
-            contentService.SaveAndPublish(content1);
+            ContentService.SaveAndPublish(content1);
 
-            IContent content2 = MockedContent.CreateSimpleContent(contentType, "Tagged content 2", -1);
+            IContent content2 = ContentBuilder.CreateSimpleContent(contentType, "Tagged content 2", -1);
             content2.SetCultureName("name-fr", "fr-FR");
             content2.SetCultureName("name-en", "en-US");
             content2.AssignTags(PropertyEditorCollection, DataTypeService, "tags", new[] { "hello", "world", "some", "tags", "plus" }, culture: "fr-FR");
             content2.AssignTags(PropertyEditorCollection, DataTypeService, "tags", new[] { "hello", "world", "another", "one" }, culture: "en-US");
-            contentService.SaveAndPublish(content2);
+            ContentService.SaveAndPublish(content2);
 
             //// pretend we already have invariant values
             //using (var scope = ScopeProvider.CreateScope())
@@ -307,43 +279,38 @@ namespace Umbraco.Tests.Services
 
             // this should work
             propertyType.Variations = ContentVariation.Nothing;
-            Assert.DoesNotThrow(() => contentTypeService.Save(contentType));
+            Assert.DoesNotThrow(() => ContentTypeService.Save(contentType));
         }
 
         [Test]
         public void TagsCanBecomeInvariantByPropertyType()
         {
-            var languageService = ServiceContext.LocalizationService;
-            languageService.Save(new Language(_globalSettings, "fr-FR")); // en-US is already there
+            var language = new LanguageBuilder()
+                .WithCultureInfo("fr-FR")
+                .Build();
+            LocalizationService.Save(language); // en-US is already there
 
-            var enId = ServiceContext.LocalizationService.GetLanguageIdByIsoCode("en-US").Value;
+            var enId = LocalizationService.GetLanguageIdByIsoCode("en-US").Value;
 
-            var contentService = ServiceContext.ContentService;
-            var contentTypeService = ServiceContext.ContentTypeService;
-            var tagService = ServiceContext.TagService;
-            var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
-            PropertyType propertyType;
-            contentType.PropertyGroups.First().PropertyTypes.Add(
-                propertyType = new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "tags")
-                {
-                    DataTypeId = 1041,
-                    Variations = ContentVariation.Culture
-                });
-            contentType.Variations = ContentVariation.Culture;
-            contentTypeService.Save(contentType);
+            var template = TemplateBuilder.CreateTextPageTemplate();
+            FileService.SaveTemplate(template);
 
-            IContent content1 = MockedContent.CreateSimpleContent(contentType, "Tagged content 1", -1);
+            var contentType = ContentTypeBuilder.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type",  mandatoryProperties: true, defaultTemplateId: template.Id);
+            var propertyType = CreateAndAddTagsPropertyType(contentType, ContentVariation.Culture);
+            ContentTypeService.Save(contentType);
+
+            IContent content1 = ContentBuilder.CreateSimpleContent(contentType, "Tagged content 1", -1);
             content1.SetCultureName("name-fr", "fr-FR");
             content1.SetCultureName("name-en", "en-US");
             content1.AssignTags(PropertyEditorCollection, DataTypeService, "tags", new[] { "hello", "world", "some", "tags", "plus" }, culture: "fr-FR");
             content1.AssignTags(PropertyEditorCollection, DataTypeService, "tags", new[] { "hello", "world", "another", "one" }, culture: "en-US");
-            contentService.SaveAndPublish(content1);
+            ContentService.SaveAndPublish(content1);
 
             propertyType.Variations = ContentVariation.Nothing;
-            contentTypeService.Save(contentType);
+            ContentTypeService.Save(contentType);
 
             // changes
-            content1 = contentService.GetById(content1.Id);
+            content1 = ContentService.GetById(content1.Id);
 
             // property value has been moved from en-US to invariant, fr-FR tags are gone
             Assert.IsEmpty(content1.Properties["tags"].GetTagsValue(PropertyEditorCollection, DataTypeService, "fr-FR"));
@@ -355,8 +322,8 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual(-1, tags.IndexOf("plus"));
 
             // tags have been copied from en-US to invariant, fr-FR tags are gone
-            var tagGroups = tagService.GetAllTags(culture: "*").GroupBy(x => x.LanguageId);
-            foreach (var tag in tagService.GetAllTags("*"))
+            var tagGroups = TagService.GetAllTags(culture: "*").GroupBy(x => x.LanguageId);
+            foreach (var tag in TagService.GetAllTags("*"))
                 Console.WriteLine($"{tag.Group}:{tag.Text} {tag.LanguageId}");
             Assert.AreEqual(1, tagGroups.Count());
 
@@ -370,38 +337,31 @@ namespace Umbraco.Tests.Services
         [Test]
         public void TagsCanBecomeInvariantByPropertyTypeAndBackToVariant()
         {
-            var languageService = ServiceContext.LocalizationService;
-            languageService.Save(new Language(_globalSettings, "fr-FR")); // en-US is already there
+            var language = new LanguageBuilder()
+                .WithCultureInfo("fr-FR")
+                .Build();
+            LocalizationService.Save(language); // en-US is already there
 
-            var enId = ServiceContext.LocalizationService.GetLanguageIdByIsoCode("en-US").Value;
+            var template = TemplateBuilder.CreateTextPageTemplate();
+            FileService.SaveTemplate(template);
 
-            var contentService = ServiceContext.ContentService;
-            var contentTypeService = ServiceContext.ContentTypeService;
-            var tagService = ServiceContext.TagService;
-            var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
-            PropertyType propertyType;
-            contentType.PropertyGroups.First().PropertyTypes.Add(
-                propertyType = new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "tags")
-                {
-                    DataTypeId = 1041,
-                    Variations = ContentVariation.Culture
-                });
-            contentType.Variations = ContentVariation.Culture;
-            contentTypeService.Save(contentType);
+            var contentType = ContentTypeBuilder.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type",  mandatoryProperties: true, defaultTemplateId: template.Id);
+            var propertyType = CreateAndAddTagsPropertyType(contentType, ContentVariation.Culture);
+            ContentTypeService.Save(contentType);
 
-            IContent content1 = MockedContent.CreateSimpleContent(contentType, "Tagged content 1", -1);
+            IContent content1 = ContentBuilder.CreateSimpleContent(contentType, "Tagged content 1", -1);
             content1.SetCultureName("name-fr", "fr-FR");
             content1.SetCultureName("name-en", "en-US");
             content1.AssignTags(PropertyEditorCollection, DataTypeService, "tags", new[] { "hello", "world", "some", "tags", "plus" }, culture: "fr-FR");
             content1.AssignTags(PropertyEditorCollection, DataTypeService, "tags", new[] { "hello", "world", "another", "one" }, culture: "en-US");
-            contentService.SaveAndPublish(content1);
+            ContentService.SaveAndPublish(content1);
 
             propertyType.Variations = ContentVariation.Nothing;
-            contentTypeService.Save(contentType);
+            ContentTypeService.Save(contentType);
 
             // FIXME: This throws due to index violations
             propertyType.Variations = ContentVariation.Culture;
-            contentTypeService.Save(contentType);
+            ContentTypeService.Save(contentType);
 
             // TODO: Assert results
         }
@@ -409,128 +369,116 @@ namespace Umbraco.Tests.Services
         [Test]
         public void TagsAreUpdatedWhenContentIsTrashedAndUnTrashed_One()
         {
-            var contentService = ServiceContext.ContentService;
-            var contentTypeService = ServiceContext.ContentTypeService;
-            var tagService = ServiceContext.TagService;
-            var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
-            contentType.PropertyGroups.First().PropertyTypes.Add(
-                new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "tags")
-                {
-                    DataTypeId = 1041
-                });
-            contentTypeService.Save(contentType);
+            var template = TemplateBuilder.CreateTextPageTemplate();
+            FileService.SaveTemplate(template);
 
-            var content1 = MockedContent.CreateSimpleContent(contentType, "Tagged content 1", -1);
+            var contentType = ContentTypeBuilder.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type",  mandatoryProperties: true, defaultTemplateId: template.Id);
+            CreateAndAddTagsPropertyType(contentType);
+            ContentTypeService.Save(contentType);
+
+            var content1 = ContentBuilder.CreateSimpleContent(contentType, "Tagged content 1", -1);
             content1.AssignTags(PropertyEditorCollection, DataTypeService, "tags", new[] { "hello", "world", "some", "tags", "plus" });
-            contentService.SaveAndPublish(content1);
+            ContentService.SaveAndPublish(content1);
 
-            var content2 = MockedContent.CreateSimpleContent(contentType, "Tagged content 2", -1);
+            var content2 = ContentBuilder.CreateSimpleContent(contentType, "Tagged content 2", -1);
             content2.AssignTags(PropertyEditorCollection, DataTypeService, "tags", new[] { "hello", "world", "some", "tags" });
-            contentService.SaveAndPublish(content2);
+            ContentService.SaveAndPublish(content2);
 
             // verify
-            var tags = tagService.GetTagsForEntity(content1.Id);
+            var tags = TagService.GetTagsForEntity(content1.Id);
             Assert.AreEqual(5, tags.Count());
-            var allTags = tagService.GetAllContentTags();
+            var allTags = TagService.GetAllContentTags();
             Assert.AreEqual(5, allTags.Count());
 
-            contentService.MoveToRecycleBin(content1);
+            ContentService.MoveToRecycleBin(content1);
         }
 
         [Test]
         public void TagsAreUpdatedWhenContentIsTrashedAndUnTrashed_All()
         {
-            var contentService = ServiceContext.ContentService;
-            var contentTypeService = ServiceContext.ContentTypeService;
-            var tagService = ServiceContext.TagService;
-            var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
-            contentType.PropertyGroups.First().PropertyTypes.Add(
-                new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "tags")
-                {
-                    DataTypeId = 1041
-                });
-            contentTypeService.Save(contentType);
+            var template = TemplateBuilder.CreateTextPageTemplate();
+            FileService.SaveTemplate(template);
 
-            var content1 = MockedContent.CreateSimpleContent(contentType, "Tagged content 1", -1);
+            var contentType = ContentTypeBuilder.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type",  mandatoryProperties: true, defaultTemplateId: template.Id);
+            CreateAndAddTagsPropertyType(contentType);
+            ContentTypeService.Save(contentType);
+
+            var content1 = ContentBuilder.CreateSimpleContent(contentType, "Tagged content 1", -1);
             content1.AssignTags(PropertyEditorCollection, DataTypeService, "tags", new[] { "hello", "world", "some", "tags", "bam" });
-            contentService.SaveAndPublish(content1);
+            ContentService.SaveAndPublish(content1);
 
-            var content2 = MockedContent.CreateSimpleContent(contentType, "Tagged content 2", -1);
+            var content2 = ContentBuilder.CreateSimpleContent(contentType, "Tagged content 2", -1);
             content2.AssignTags(PropertyEditorCollection, DataTypeService, "tags", new[] { "hello", "world", "some", "tags" });
-            contentService.SaveAndPublish(content2);
+            ContentService.SaveAndPublish(content2);
 
             // verify
-            var tags = tagService.GetTagsForEntity(content1.Id);
+            var tags = TagService.GetTagsForEntity(content1.Id);
             Assert.AreEqual(5, tags.Count());
-            var allTags = tagService.GetAllContentTags();
+            var allTags = TagService.GetAllContentTags();
             Assert.AreEqual(5, allTags.Count());
 
-            contentService.Unpublish(content1);
-            contentService.Unpublish(content2);
+            ContentService.Unpublish(content1);
+            ContentService.Unpublish(content2);
         }
 
         [Test]
         [Ignore("https://github.com/umbraco/Umbraco-CMS/issues/3821 (U4-8442), will need to be fixed.")]
         public void TagsAreUpdatedWhenContentIsTrashedAndUnTrashed_Tree()
         {
-            var contentService = ServiceContext.ContentService;
-            var contentTypeService = ServiceContext.ContentTypeService;
-            var tagService = ServiceContext.TagService;
-            var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
-            contentType.PropertyGroups.First().PropertyTypes.Add(
-                new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "tags")
-                {
-                    DataTypeId = 1041
-                });
-            contentTypeService.Save(contentType);
+            var template = TemplateBuilder.CreateTextPageTemplate();
+            FileService.SaveTemplate(template);
 
-            var content1 = MockedContent.CreateSimpleContent(contentType, "Tagged content 1", -1);
+            var contentType = ContentTypeBuilder.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type",  mandatoryProperties: true, defaultTemplateId: template.Id);
+            CreateAndAddTagsPropertyType(contentType);
+            ContentTypeService.Save(contentType);
+
+            var content1 = ContentBuilder.CreateSimpleContent(contentType, "Tagged content 1", -1);
             content1.AssignTags(PropertyEditorCollection, DataTypeService, "tags", new[] { "hello", "world", "some", "tags", "plus" });
-            contentService.SaveAndPublish(content1);
+            ContentService.SaveAndPublish(content1);
 
-            var content2 = MockedContent.CreateSimpleContent(contentType, "Tagged content 2", content1.Id);
+            var content2 = ContentBuilder.CreateSimpleContent(contentType, "Tagged content 2", content1.Id);
             content2.AssignTags(PropertyEditorCollection, DataTypeService, "tags", new[] { "hello", "world", "some", "tags" });
-            contentService.SaveAndPublish(content2);
+            ContentService.SaveAndPublish(content2);
 
             // verify
-            var tags = tagService.GetTagsForEntity(content1.Id);
+            var tags = TagService.GetTagsForEntity(content1.Id);
             Assert.AreEqual(5, tags.Count());
-            var allTags = tagService.GetAllContentTags();
+            var allTags = TagService.GetAllContentTags();
             Assert.AreEqual(5, allTags.Count());
 
-            contentService.MoveToRecycleBin(content1);
+            ContentService.MoveToRecycleBin(content1);
 
             // no more tags
-            tags = tagService.GetTagsForEntity(content1.Id);
+            tags = TagService.GetTagsForEntity(content1.Id);
             Assert.AreEqual(0, tags.Count());
-            tags = tagService.GetTagsForEntity(content2.Id);
+            tags = TagService.GetTagsForEntity(content2.Id);
             Assert.AreEqual(0, tags.Count());
 
             // no more tags
-            allTags = tagService.GetAllContentTags();
+            allTags = TagService.GetAllContentTags();
             Assert.AreEqual(0, allTags.Count());
 
-            contentService.Move(content1, -1);
+            ContentService.Move(content1, -1);
 
             Assert.IsFalse(content1.Published);
 
             // no more tags
-            tags = tagService.GetTagsForEntity(content1.Id);
+            tags = TagService.GetTagsForEntity(content1.Id);
             Assert.AreEqual(0, tags.Count());
-            tags = tagService.GetTagsForEntity(content2.Id);
+            tags = TagService.GetTagsForEntity(content2.Id);
             Assert.AreEqual(0, tags.Count());
 
             // no more tags
-            allTags = tagService.GetAllContentTags();
+            allTags = TagService.GetAllContentTags();
             Assert.AreEqual(0, allTags.Count());
 
             content1.PublishCulture(CultureImpact.Invariant);
-            contentService.SaveAndPublish(content1);
+            ContentService.SaveAndPublish(content1);
 
             Assert.IsTrue(content1.Published);
 
             // tags are back
-            tags = tagService.GetTagsForEntity(content1.Id);
+            tags = TagService.GetTagsForEntity(content1.Id);
             Assert.AreEqual(5, tags.Count());
 
             // FIXME: tag & tree issue
@@ -538,82 +486,74 @@ namespace Umbraco.Tests.Services
             // what we should do is... NOT clear tags when unpublishing or trashing or...
             // and just update the tag service to NOT return anything related to trashed or
             // unpublished entities (since trashed is set on ALL entities in the trashed branch)
-            tags = tagService.GetTagsForEntity(content2.Id); // including that one!
+            tags = TagService.GetTagsForEntity(content2.Id); // including that one!
             Assert.AreEqual(4, tags.Count());
 
             // tags are back
-            allTags = tagService.GetAllContentTags();
+            allTags = TagService.GetAllContentTags();
             Assert.AreEqual(5, allTags.Count());
         }
 
         [Test]
         public void TagsAreUpdatedWhenContentIsUnpublishedAndRePublished()
         {
-            var contentService = ServiceContext.ContentService;
-            var contentTypeService = ServiceContext.ContentTypeService;
-            var tagService = ServiceContext.TagService;
-            var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
-            contentType.PropertyGroups.First().PropertyTypes.Add(
-                new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "tags")
-                {
-                    DataTypeId = 1041
-                });
-            contentTypeService.Save(contentType);
+            var template = TemplateBuilder.CreateTextPageTemplate();
+            FileService.SaveTemplate(template);
 
-            var content1 = MockedContent.CreateSimpleContent(contentType, "Tagged content 1", -1);
+            var contentType = ContentTypeBuilder.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type",  mandatoryProperties: true, defaultTemplateId: template.Id);
+            CreateAndAddTagsPropertyType(contentType);
+            ContentTypeService.Save(contentType);
+
+            var content1 = ContentBuilder.CreateSimpleContent(contentType, "Tagged content 1", -1);
             content1.AssignTags(PropertyEditorCollection, DataTypeService, "tags", new[] { "hello", "world", "some", "tags", "bam" });
-            contentService.SaveAndPublish(content1);
+            ContentService.SaveAndPublish(content1);
 
-            var content2 = MockedContent.CreateSimpleContent(contentType, "Tagged content 2", -1);
+            var content2 = ContentBuilder.CreateSimpleContent(contentType, "Tagged content 2", -1);
             content2.AssignTags(PropertyEditorCollection, DataTypeService, "tags", new[] { "hello", "world", "some", "tags" });
-            contentService.SaveAndPublish(content2);
+            ContentService.SaveAndPublish(content2);
 
-            contentService.Unpublish(content1);
-            contentService.Unpublish(content2);
+            ContentService.Unpublish(content1);
+            ContentService.Unpublish(content2);
         }
 
         [Test]
         [Ignore("https://github.com/umbraco/Umbraco-CMS/issues/3821 (U4-8442), will need to be fixed.")]
         public void TagsAreUpdatedWhenContentIsUnpublishedAndRePublished_Tree()
         {
-            var contentService = ServiceContext.ContentService;
-            var contentTypeService = ServiceContext.ContentTypeService;
-            var tagService = ServiceContext.TagService;
-            var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
-            contentType.PropertyGroups.First().PropertyTypes.Add(
-                new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "tags")
-                {
-                    DataTypeId = 1041
-                });
-            contentTypeService.Save(contentType);
+            var template = TemplateBuilder.CreateTextPageTemplate();
+            FileService.SaveTemplate(template);
 
-            var content1 = MockedContent.CreateSimpleContent(contentType, "Tagged content 1", -1);
+            var contentType = ContentTypeBuilder.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type",  mandatoryProperties: true, defaultTemplateId: template.Id);
+            CreateAndAddTagsPropertyType(contentType);
+            ContentTypeService.Save(contentType);
+
+            var content1 = ContentBuilder.CreateSimpleContent(contentType, "Tagged content 1", -1);
             content1.AssignTags(PropertyEditorCollection, DataTypeService, "tags", new[] { "hello", "world", "some", "tags", "bam" });
-            contentService.SaveAndPublish(content1);
+            ContentService.SaveAndPublish(content1);
 
-            var content2 = MockedContent.CreateSimpleContent(contentType, "Tagged content 2", content1);
+            var content2 = ContentBuilder.CreateSimpleContent(contentType, "Tagged content 2", content1);
             content2.AssignTags(PropertyEditorCollection, DataTypeService, "tags", new[] { "hello", "world", "some", "tags" });
-            contentService.SaveAndPublish(content2);
+            ContentService.SaveAndPublish(content2);
 
-            contentService.Unpublish(content1);
+            ContentService.Unpublish(content1);
 
-            var tags = tagService.GetTagsForEntity(content1.Id);
+            var tags = TagService.GetTagsForEntity(content1.Id);
             Assert.AreEqual(0, tags.Count());
 
             // FIXME: tag & tree issue
             // when we (un)publish, we 'just' publish the top one and not the ones below = fails
             // see similar note above
-            tags = tagService.GetTagsForEntity(content2.Id);
+            tags = TagService.GetTagsForEntity(content2.Id);
             Assert.AreEqual(0, tags.Count());
-            var allTags = tagService.GetAllContentTags();
+            var allTags = TagService.GetAllContentTags();
             Assert.AreEqual(0, allTags.Count());
 
             content1.PublishCulture(CultureImpact.Invariant);
-            contentService.SaveAndPublish(content1);
+            ContentService.SaveAndPublish(content1);
 
-            tags = tagService.GetTagsForEntity(content2.Id);
+            tags = TagService.GetTagsForEntity(content2.Id);
             Assert.AreEqual(4, tags.Count());
-            allTags = tagService.GetAllContentTags();
+            allTags = TagService.GetAllContentTags();
             Assert.AreEqual(5, allTags.Count());
         }
 
@@ -621,41 +561,36 @@ namespace Umbraco.Tests.Services
         public void Create_Tag_Data_Bulk_Publish_Operation()
         {
             //Arrange
-            var contentService = ServiceContext.ContentService;
-            var contentTypeService = ServiceContext.ContentTypeService;
-            var dataTypeService = ServiceContext.DataTypeService;
-
             //set configuration
-            var dataType = dataTypeService.GetDataType(1041);
+            var dataType = DataTypeService.GetDataType(1041);
             dataType.Configuration = new TagConfiguration
             {
                 Group = "test",
                 StorageType = TagsStorageType.Csv
             };
 
-            var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
-            contentType.PropertyGroups.First().PropertyTypes.Add(
-                new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "tags")
-                {
-                    DataTypeId = 1041
-                });
-            contentTypeService.Save(contentType);
+            var template = TemplateBuilder.CreateTextPageTemplate();
+            FileService.SaveTemplate(template);
+
+            var contentType = ContentTypeBuilder.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type",  mandatoryProperties: true, defaultTemplateId: template.Id);
+            CreateAndAddTagsPropertyType(contentType);
+            ContentTypeService.Save(contentType);
             contentType.AllowedContentTypes = new[] { new ContentTypeSort(new Lazy<int>(() => contentType.Id), 0, contentType.Alias) };
 
-            var content = MockedContent.CreateSimpleContent(contentType, "Tagged content", -1);
+            var content = ContentBuilder.CreateSimpleContent(contentType, "Tagged content", -1);
             content.AssignTags(PropertyEditorCollection, DataTypeService, "tags", new[] { "hello", "world", "some", "tags" });
-            contentService.Save(content);
+            ContentService.Save(content);
 
-            var child1 = MockedContent.CreateSimpleContent(contentType, "child 1 content", content.Id);
+            var child1 = ContentBuilder.CreateSimpleContent(contentType, "child 1 content", content.Id);
             child1.AssignTags(PropertyEditorCollection, DataTypeService, "tags", new[] { "hello1", "world1", "some1" });
-            contentService.Save(child1);
+            ContentService.Save(child1);
 
-            var child2 = MockedContent.CreateSimpleContent(contentType, "child 2 content", content.Id);
+            var child2 = ContentBuilder.CreateSimpleContent(contentType, "child 2 content", content.Id);
             child2.AssignTags(PropertyEditorCollection, DataTypeService, "tags", new[] { "hello2", "world2" });
-            contentService.Save(child2);
+            ContentService.Save(child2);
 
             // Act
-            contentService.SaveAndPublishBranch(content, true);
+            ContentService.SaveAndPublishBranch(content, true);
 
             // Assert
             var propertyTypeId = contentType.PropertyTypes.Single(x => x.Alias == "tags").Id;
@@ -681,22 +616,22 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Does_Not_Create_Tag_Data_For_Non_Published_Version()
         {
-            var contentService = ServiceContext.ContentService;
-            var contentTypeService = ServiceContext.ContentTypeService;
+            var template = TemplateBuilder.CreateTextPageTemplate();
+            FileService.SaveTemplate(template);
 
             // create content type with a tag property
-            var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
-            contentType.PropertyGroups.First().PropertyTypes.Add(new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "tags") { DataTypeId = 1041 });
-            contentTypeService.Save(contentType);
+            var contentType = ContentTypeBuilder.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type",  mandatoryProperties: true, defaultTemplateId: template.Id);
+            CreateAndAddTagsPropertyType(contentType);
+            ContentTypeService.Save(contentType);
 
             // create a content with tags and publish
-            var content = MockedContent.CreateSimpleContent(contentType, "Tagged content", -1);
+            var content = ContentBuilder.CreateSimpleContent(contentType, "Tagged content", -1);
             content.AssignTags(PropertyEditorCollection, DataTypeService, "tags", new[] { "hello", "world", "some", "tags" });
-            contentService.SaveAndPublish(content);
+            ContentService.SaveAndPublish(content);
 
             // edit tags and save
             content.AssignTags(PropertyEditorCollection, DataTypeService, "tags", new[] { "another", "world" }, merge: true);
-            contentService.Save(content);
+            ContentService.Save(content);
 
             // the (edit) property does contain all tags
             Assert.AreEqual(5, content.Properties["tags"].GetValue().ToString().Split(',').Distinct().Count());
@@ -715,23 +650,20 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Can_Replace_Tag_Data_To_Published_Content()
         {
-            //Arrange
-            var contentService = ServiceContext.ContentService;
-            var contentTypeService = ServiceContext.ContentTypeService;
-            var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
-            contentType.PropertyGroups.First().PropertyTypes.Add(
-                new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "tags")
-                {
-                    DataTypeId = 1041
-                });
-            contentTypeService.Save(contentType);
+            var template = TemplateBuilder.CreateTextPageTemplate();
+            FileService.SaveTemplate(template);
 
-            var content = MockedContent.CreateSimpleContent(contentType, "Tagged content", -1);
+            //Arrange
+            var contentType = ContentTypeBuilder.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type",  mandatoryProperties: true, defaultTemplateId: template.Id);
+            CreateAndAddTagsPropertyType(contentType);
+            ContentTypeService.Save(contentType);
+
+            var content = ContentBuilder.CreateSimpleContent(contentType, "Tagged content", -1);
 
 
             // Act
             content.AssignTags(PropertyEditorCollection, DataTypeService, "tags", new[] { "hello", "world", "some", "tags" });
-            contentService.SaveAndPublish(content);
+            ContentService.SaveAndPublish(content);
 
             // Assert
             Assert.AreEqual(4, content.Properties["tags"].GetValue().ToString().Split(',').Distinct().Count());
@@ -749,23 +681,20 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Can_Append_Tag_Data_To_Published_Content()
         {
+            var template = TemplateBuilder.CreateTextPageTemplate();
+            FileService.SaveTemplate(template);
+
             //Arrange
-            var contentService = ServiceContext.ContentService;
-            var contentTypeService = ServiceContext.ContentTypeService;
-            var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
-            contentType.PropertyGroups.First().PropertyTypes.Add(
-                new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "tags")
-                {
-                    DataTypeId = 1041
-                });
-            contentTypeService.Save(contentType);
-            var content = MockedContent.CreateSimpleContent(contentType, "Tagged content", -1);
+            var contentType = ContentTypeBuilder.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type",  mandatoryProperties: true, defaultTemplateId: template.Id);
+            CreateAndAddTagsPropertyType(contentType);
+            ContentTypeService.Save(contentType);
+            var content = ContentBuilder.CreateSimpleContent(contentType, "Tagged content", -1);
             content.AssignTags(PropertyEditorCollection, DataTypeService, "tags", new[] { "hello", "world", "some", "tags" });
-            contentService.SaveAndPublish(content);
+            ContentService.SaveAndPublish(content);
 
             // Act
             content.AssignTags(PropertyEditorCollection, DataTypeService, "tags", new[] { "another", "world" }, merge: true);
-            contentService.SaveAndPublish(content);
+            ContentService.SaveAndPublish(content);
 
             // Assert
             Assert.AreEqual(5, content.Properties["tags"].GetValue().ToString().Split(',').Distinct().Count());
@@ -783,23 +712,20 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Can_Remove_Tag_Data_To_Published_Content()
         {
+            var template = TemplateBuilder.CreateTextPageTemplate();
+            FileService.SaveTemplate(template);
+
             //Arrange
-            var contentService = ServiceContext.ContentService;
-            var contentTypeService = ServiceContext.ContentTypeService;
-            var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
-            contentType.PropertyGroups.First().PropertyTypes.Add(
-                new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "tags")
-                {
-                    DataTypeId = 1041
-                });
-            contentTypeService.Save(contentType);
-            var content = MockedContent.CreateSimpleContent(contentType, "Tagged content", -1);
+            var contentType = ContentTypeBuilder.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type",  mandatoryProperties: true, defaultTemplateId: template.Id);
+            CreateAndAddTagsPropertyType(contentType);
+            ContentTypeService.Save(contentType);
+            var content = ContentBuilder.CreateSimpleContent(contentType, "Tagged content", -1);
             content.AssignTags(PropertyEditorCollection, DataTypeService, "tags", new[] { "hello", "world", "some", "tags" });
-            contentService.SaveAndPublish(content);
+            ContentService.SaveAndPublish(content);
 
             // Act
             content.RemoveTags(PropertyEditorCollection, DataTypeService, "tags", new[] { "some", "world" });
-            contentService.SaveAndPublish(content);
+            ContentService.SaveAndPublish(content);
 
             // Assert
             Assert.AreEqual(2, content.Properties["tags"].GetValue().ToString().Split(',').Distinct().Count());
@@ -814,5 +740,17 @@ namespace Umbraco.Tests.Services
             }
         }
 
+        private PropertyType CreateAndAddTagsPropertyType(ContentType contentType, ContentVariation variations = ContentVariation.Nothing)
+        {
+            var propertyType = new PropertyTypeBuilder()
+                .WithPropertyEditorAlias("test")
+                .WithAlias("tags")
+                .WithDataTypeId(1041)
+                .WithVariations(variations)
+                .Build();
+            contentType.PropertyGroups.First().PropertyTypes.Add(propertyType);
+            contentType.Variations = variations;
+            return propertyType;
+        }
     }
 }
