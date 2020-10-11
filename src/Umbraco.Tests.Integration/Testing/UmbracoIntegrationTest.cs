@@ -289,7 +289,6 @@ namespace Umbraco.Tests.Integration.Testing
 
         #region LocalDb
 
-
         private static readonly object _dbLocker = new object();
         private static LocalDbTestDatabase _dbInstance;
 
@@ -478,6 +477,15 @@ namespace Umbraco.Tests.Integration.Testing
         protected IShortStringHelper ShortStringHelper => Services.GetRequiredService<IShortStringHelper>();
         protected GlobalSettings GlobalSettings => Services.GetRequiredService<IOptions<GlobalSettings>>().Value;
         protected IMapperCollection Mappers => Services.GetRequiredService<IMapperCollection>();
+
+        protected IFileSystems GetMockFileSystems()
+        {
+            var testHelper = new TestHelper();
+            var fileSystems = Mock.Of<IFileSystems>();
+            var viewsFileSystem = new PhysicalFileSystem(IOHelper, testHelper.GetHostingEnvironment(), LoggerFactory.CreateLogger<PhysicalFileSystem>(), Constants.SystemDirectories.MvcViews);
+            Mock.Get(fileSystems).Setup(x => x.MvcViewsFileSystem).Returns(viewsFileSystem);
+            return fileSystems;
+        }
 
         #endregion
 

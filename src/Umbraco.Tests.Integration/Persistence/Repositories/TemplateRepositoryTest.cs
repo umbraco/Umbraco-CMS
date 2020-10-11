@@ -37,10 +37,7 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
         [SetUp]
         public void SetUp()
         {
-            var testHelper = new TestHelper();
-            _fileSystems = Mock.Of<IFileSystems>();
-            var viewsFileSystem = new PhysicalFileSystem(IOHelper, testHelper.GetHostingEnvironment(), LoggerFactory.CreateLogger<PhysicalFileSystem>(), Constants.SystemDirectories.MvcViews);
-            Mock.Get(_fileSystems).Setup(x => x.MvcViewsFileSystem).Returns(viewsFileSystem);
+            _fileSystems = GetMockFileSystems();
         }
 
         [Test]

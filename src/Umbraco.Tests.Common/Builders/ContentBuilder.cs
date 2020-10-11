@@ -5,6 +5,7 @@ using Umbraco.Core.Models;
 using Umbraco.Tests.Common.Builders.Interfaces;
 using Umbraco.Tests.Common.Builders.Extensions;
 using Umbraco.Tests.Testing;
+using Umbraco.Core;
 
 namespace Umbraco.Tests.Common.Builders
 {
@@ -122,10 +123,7 @@ namespace Umbraco.Tests.Common.Builders
             Content content;
             if (parent != null)
             {
-                content = new Content(name, parent, contentType, culture)
-                {
-                    ParentId = parent.Id
-                };
+                content = new Content(name, parent, contentType, culture);
             }
             else
             {
@@ -270,6 +268,37 @@ namespace Umbraco.Tests.Common.Builders
             }
 
             return list;
+        }
+
+        public static Content CreateAllTypesContent(IContentType contentType, string name, int parentId)
+        {
+            var content = new ContentBuilder()
+                .WithName(name)
+                .WithParentId(parentId)
+                .WithContentType(contentType)
+                .Build();
+            
+            content.SetValue("isTrue", true);
+            content.SetValue("number", 42);
+            content.SetValue("bodyText", "Lorem Ipsum Body Text Test");
+            content.SetValue("singleLineText", "Single Line Text Test");
+            content.SetValue("multilineText", "Multiple lines \n in one box");
+            content.SetValue("upload", "/media/1234/koala.jpg");
+            content.SetValue("label", "Non-editable label");
+            content.SetValue("dateTime", DateTime.Now.AddDays(-20));
+            content.SetValue("colorPicker", "black");
+            content.SetValue("ddlMultiple", "1234,1235");
+            content.SetValue("rbList", "random");
+            content.SetValue("date", DateTime.Now.AddDays(-10));
+            content.SetValue("ddl", "1234");
+            content.SetValue("chklist", "randomc");
+            content.SetValue("contentPicker", Udi.Create(Constants.UdiEntityType.Document, new Guid("74ECA1D4-934E-436A-A7C7-36CC16D4095C")).ToString());
+            content.SetValue("mediaPicker", Udi.Create(Constants.UdiEntityType.Media, new Guid("44CB39C8-01E5-45EB-9CF8-E70AAF2D1691")).ToString());
+            content.SetValue("memberPicker", Udi.Create(Constants.UdiEntityType.Member, new Guid("9A50A448-59C0-4D42-8F93-4F1D55B0F47D")).ToString());
+            content.SetValue("multiUrlPicker", "[{\"name\":\"https://test.com\",\"url\":\"https://test.com\"}]");
+            content.SetValue("tags", "this,is,tags");
+
+            return content;
         }
 
         int? IWithIdBuilder.Id
