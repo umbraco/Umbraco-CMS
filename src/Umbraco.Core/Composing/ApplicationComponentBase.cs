@@ -1,10 +1,10 @@
 ﻿namespace Umbraco.Core.Composing
 {
     /// <summary>
-    /// Base class for user components that only requires implmenting the <see cref="Initialize" /> method.
+    /// Base class for application components that only requires implementing the <see cref="Initialize" /> method.
     /// </summary>
-    /// <seealso cref="Umbraco.Core.Composing.IUserComponent" />
-    public abstract class UserComponentBase : IUserComponent
+    /// <seealso cref="Umbraco.Core.Composing.IApplicationComponent" />
+    public abstract class ApplicationComponentBase : IApplicationComponent
     {
         /// <summary>
         /// Initializes this component.

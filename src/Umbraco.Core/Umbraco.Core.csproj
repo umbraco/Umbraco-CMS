@@ -224,12 +224,12 @@
     <Compile Include="Composing\ComponentComposer.cs" />
     <Compile Include="Composing\Composers.cs" />
     <Compile Include="Composing\Composition.cs" />
-    <Compile Include="Composing\DisableUserComponentAttribute.cs" />
-    <Compile Include="Composing\EnableUserComponentAttribute.cs" />
-    <Compile Include="Composing\IUserComponent.cs" />
+    <Compile Include="Composing\DisableApplicationComponentAttribute.cs" />
+    <Compile Include="Composing\EnableApplicationComponentAttribute.cs" />
+    <Compile Include="Composing\IApplicationComponent.cs" />
     <Compile Include="Composing\SetCollectionBuilderBase.cs" />
-    <Compile Include="Composing\UserComponentBase.cs" />
-    <Compile Include="Composing\UserComponentComposer.cs" />
+    <Compile Include="Composing\ApplicationComponentBase.cs" />
+    <Compile Include="Composing\ApplicationComponentComposer.cs" />
     <Compile Include="CompositionExtensions.cs" />
     <Compile Include="Composing\DisableAttribute.cs" />
     <Compile Include="Composing\DisableComposerAttribute.cs" />

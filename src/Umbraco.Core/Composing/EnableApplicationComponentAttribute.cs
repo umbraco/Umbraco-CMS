@@ -3,14 +3,14 @@
 namespace Umbraco.Core.Composing
 {
     /// <summary>
-    /// Indicates that an <see cref="IUserComponent" /> should be enabled.
+    /// Indicates that an <see cref="IApplicationComponent" /> should be enabled.
     /// </summary>
     /// <remarks>
     /// This attribute has greater priority than the <see cref="DisableAttribute" /> when it's marking the component itself, but lower priority when it's referencing another.
     /// </remarks>
     /// <seealso cref="System.Attribute" />
     [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
-    public class EnableUserComponentAttribute : Attribute
+    public class EnableApplicationComponentAttribute : Attribute
     {
         /// <summary>
         /// Gets the enabled type.
@@ -21,11 +21,11 @@ namespace Umbraco.Core.Composing
         public Type EnabledType { get; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="EnableUserComponentAttribute" /> class.
+        /// Initializes a new instance of the <see cref="EnableApplicationComponentAttribute" /> class.
         /// </summary>
-        /// <param name="enabledType">The <see cref="IUserComponent" /> type to enable.</param>
+        /// <param name="enabledType">The <see cref="IApplicationComponent" /> type to enable.</param>
         /// <exception cref="System.ArgumentNullException">enabledType</exception>
-        public EnableUserComponentAttribute(Type enabledType)
+        public EnableApplicationComponentAttribute(Type enabledType)
         {
             this.EnabledType = enabledType ?? throw new ArgumentNullException(nameof(enabledType));
         }

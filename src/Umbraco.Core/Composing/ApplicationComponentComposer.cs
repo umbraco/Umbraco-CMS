@@ -7,18 +7,18 @@ using Umbraco.Core;
 namespace Umbraco.Core.Composing
 {
     /// <summary>
-    /// Adds all automatically discovered and enabled <see cref="IUserComponent" /> types.
+    /// Adds all automatically discovered and enabled <see cref="IApplicationComponent" /> types.
     /// </summary>
     /// <seealso cref="Umbraco.Core.Composing.IComposer" />
-    public class UserComponentComposer : IComposer
+    public class ApplicationComponentComposer : IComposer
     {
         /// <summary>
-        /// Compose all <see cref="IUserComponent" /> types.
+        /// Compose all <see cref="IApplicationComponent" /> types.
         /// </summary>
         /// <param name="composition">The composition.</param>
         public void Compose(Composition composition)
         {
-            var types = composition.TypeLoader.GetTypes<IUserComponent>().ToList();
+            var types = composition.TypeLoader.GetTypes<IApplicationComponent>().ToList();
 
             var enabledTypes = new Dictionary<Type, EnableInfo>();
             void UpdateEnableInfo(Type type, int weight, bool enabled)
@@ -37,12 +37,12 @@ namespace Umbraco.Core.Composing
                 enableInfo.Weight = weight;
             }
 
-            foreach (var attr in composition.TypeLoader.GetAssemblyAttributes<EnableUserComponentAttribute>())
+            foreach (var attr in composition.TypeLoader.GetAssemblyAttributes<EnableApplicationComponentAttribute>())
             {
                 UpdateEnableInfo(attr.EnabledType, 2, true);
             }
 
-            foreach (var attr in composition.TypeLoader.GetAssemblyAttributes<DisableUserComponentAttribute>())
+            foreach (var attr in composition.TypeLoader.GetAssemblyAttributes<DisableApplicationComponentAttribute>())
             {
                 UpdateEnableInfo(attr.DisabledType, 2, false);
             }
