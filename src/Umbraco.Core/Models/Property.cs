@@ -50,7 +50,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Represents a property value.
         /// </summary>
-        public class PropertyValue
+        public class PropertyValue : IDeepCloneable, IEquatable<PropertyValue>
         {
             // TODO: Either we allow change tracking at this class level, or we add some special change tracking collections to the Property
             // class to deal with change tracking which variants have changed
@@ -95,6 +95,32 @@ namespace Umbraco.Core.Models
             /// </summary>
             public PropertyValue Clone()
                 => new PropertyValue { _culture = _culture, _segment = _segment, PublishedValue = PublishedValue, EditedValue = EditedValue };
+
+            public object DeepClone() => Clone();
+
+            public override bool Equals(object obj)
+            {
+                return Equals(obj as PropertyValue);
+            }
+
+            public bool Equals(PropertyValue other)
+            {
+                return other != null &&
+                       _culture == other._culture &&
+                       _segment == other._segment &&
+                       EqualityComparer<object>.Default.Equals(EditedValue, other.EditedValue) &&
+                       EqualityComparer<object>.Default.Equals(PublishedValue, other.PublishedValue);
+            }
+
+            public override int GetHashCode()
+            {
+                var hashCode = 1885328050;
+                hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(_culture);
+                hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(_segment);
+                hashCode = hashCode * -1521134295 + EqualityComparer<object>.Default.GetHashCode(EditedValue);
+                hashCode = hashCode * -1521134295 + EqualityComparer<object>.Default.GetHashCode(PublishedValue);
+                return hashCode;
+            }
         }
 
         private static readonly DelegateEqualityComparer<object> PropertyValueComparer = new DelegateEqualityComparer<object>(

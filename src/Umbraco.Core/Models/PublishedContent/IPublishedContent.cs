@@ -31,7 +31,7 @@ namespace Umbraco.Core.Models.PublishedContent
         string Name { get; }
 
         /// <summary>
-        /// Gets the url segment of the content item for the current culture.
+        /// Gets the URL segment of the content item for the current culture.
         /// </summary>
         string UrlSegment { get; }
 
@@ -63,6 +63,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <summary>
         /// Gets the name of the user who created the content item.
         /// </summary>
+        [Obsolete("Use CreatorName(IUserService) extension instead")]
         string CreatorName { get; }
 
         /// <summary>
@@ -78,6 +79,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <summary>
         /// Gets the name of the user who last updated the content item.
         /// </summary>
+        [Obsolete("Use WriterName(IUserService) extension instead")]
         string WriterName { get; }
 
         /// <summary>
@@ -91,12 +93,13 @@ namespace Umbraco.Core.Models.PublishedContent
         DateTime UpdateDate { get; }
 
         /// <summary>
-        /// Gets the url of the content item for the current culture.
+        /// Gets the URL of the content item for the current culture.
         /// </summary>
         /// <remarks>
         /// <para>The value of this property is contextual. It depends on the 'current' request uri,
         /// if any.</para>
         /// </remarks>
+        [Obsolete("Use the Url() extension instead")]
         string Url { get; }
 
         /// <summary>

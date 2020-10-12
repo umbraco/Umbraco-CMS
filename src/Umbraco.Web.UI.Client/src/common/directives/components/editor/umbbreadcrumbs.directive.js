@@ -73,7 +73,7 @@ Use this directive to generate a list of breadcrumbs.
 
                 var path = scope.pathTo(ancestor);
                 $location.path(path);
-                navigationService.clearSearch(["cculture"]);
+                navigationService.clearSearch(["cculture", "csegment"]);
             }
 
             scope.pathTo = function (ancestor) {

@@ -15,7 +15,7 @@ namespace Umbraco.Examine
     /// <summary>
     /// Performs the data lookups required to rebuild a content index
     /// </summary>
-    public class ContentIndexPopulator : IndexPopulator<UmbracoContentIndex>
+    public class ContentIndexPopulator : IndexPopulator<IUmbracoContentIndex>
     {
         private readonly IContentService _contentService;
         private readonly IValueSetBuilder<IContent> _contentValueSetBuilder;
@@ -36,7 +36,7 @@ namespace Umbraco.Examine
         /// <param name="contentValueSetBuilder"></param>
         public ContentIndexPopulator(IContentService contentService, ISqlContext sqlContext, IContentValueSetBuilder contentValueSetBuilder)
             : this(false, null, contentService, sqlContext, contentValueSetBuilder)
-        {   
+        {
         }
 
         /// <summary>

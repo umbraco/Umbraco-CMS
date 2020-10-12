@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using NPoco;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
@@ -129,6 +128,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override void PersistDeletedItem(EntityContainer entity)
         {
+            if (entity == null) throw new ArgumentNullException(nameof(entity));
             EnsureContainerType(entity);
 
             var nodeDto = Database.FirstOrDefault<NodeDto>(Sql().SelectAll()
@@ -162,9 +162,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override void PersistNewItem(EntityContainer entity)
         {
+            if (entity == null) throw new ArgumentNullException(nameof(entity));
             EnsureContainerType(entity);
 
-            if (string.IsNullOrWhiteSpace(entity.Name)) throw new ArgumentNullOrEmptyException("entity.Name");
+            if (entity.Name == null) throw new InvalidOperationException("Entity name can't be null.");
+            if (string.IsNullOrWhiteSpace(entity.Name)) throw new InvalidOperationException("Entity name can't be empty or consist only of white-space characters.");
             entity.Name = entity.Name.Trim();
 
             // guard against duplicates
@@ -184,7 +186,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     .Where<NodeDto>(dto => dto.NodeId == entity.ParentId && dto.NodeObjectType == entity.ContainerObjectType));
 
                 if (parentDto == null)
-                    throw new NullReferenceException("Could not find parent container with id " + entity.ParentId);
+                    throw new InvalidOperationException("Could not find parent container with id " + entity.ParentId);
 
                 level = parentDto.Level;
                 path = parentDto.Path;
@@ -223,10 +225,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         //
         protected override void PersistUpdatedItem(EntityContainer entity)
         {
+            if (entity == null) throw new ArgumentNullException(nameof(entity));
             EnsureContainerType(entity);
 
+            if (entity.Name == null) throw new InvalidOperationException("Entity name can't be null.");
+            if (string.IsNullOrWhiteSpace(entity.Name)) throw new InvalidOperationException("Entity name can't be empty or consist only of white-space characters.");
             entity.Name = entity.Name.Trim();
-            if (string.IsNullOrWhiteSpace(entity.Name)) throw new ArgumentNullOrEmptyException("entity.Name");
 
             // find container to update
             var nodeDto = Database.FirstOrDefault<NodeDto>(Sql().SelectAll()
@@ -255,7 +259,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                         .Where<NodeDto>(dto => dto.NodeId == entity.ParentId && dto.NodeObjectType == entity.ContainerObjectType));
 
                     if (parent == null)
-                        throw new NullReferenceException("Could not find parent container with id " + entity.ParentId);
+                        throw new InvalidOperationException("Could not find parent container with id " + entity.ParentId);
 
                     nodeDto.Level = Convert.ToInt16(parent.Level + 1);
                     nodeDto.Path = parent.Path + "," + nodeDto.NodeId;

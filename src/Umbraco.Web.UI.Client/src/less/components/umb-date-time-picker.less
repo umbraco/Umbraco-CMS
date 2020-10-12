@@ -3,23 +3,28 @@
     box-shadow: 0 5px 10px 0 rgba(0,0,0,0.16);
 }
 
-span.flatpickr-day {
+.flatpickr-day {
     border-radius: @baseBorderRadius;
     border: none;
 
     &.today:not(.active) {
         border: 1px solid;
     }
-}
 
-span.flatpickr-day:hover {
-    background-color: @gray-10;
-}
+    &:hover {
+        background-color: @gray-10;
+    }
 
-span.flatpickr-day.selected {
-    background-color: @ui-selected;
-}
+    &.selected, &.startRange, &.endRange {
+        background-color: @ui-selected-type !important;
+        border-color: @ui-selected-type !important;
 
-span.flatpickr-day.selected:hover {
-    background-color: @ui-selected-hover;
+        &:hover {
+            background-color: @ui-selected-type-hover !important;
+        }
+
+        &.startRange + .endRange:not(:nth-child(7n+1)) {
+            box-shadow: -10px 0 0 @ui-selected-type !important;
+        }
+    }
 }

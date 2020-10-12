@@ -10,12 +10,12 @@
 <pre>
     <div>
         <ul umb-keyboard-list>
-            <li><a href="">Item 1</a></li>
-            <li><a href="">Item 2</a></li>
-            <li><a href="">Item 3</a></li>
-            <li><a href="">Item 4</a></li>
-            <li><a href="">Item 5</a></li>
-            <li><a href="">Item 6</a></li>
+            <li><button type="button" class="btn-reset">Item 1</button></li>
+            <li><button type="button" class="btn-reset">Item 2</button></li>
+            <li><button type="button" class="btn-reset">Item 3</button></li>
+            <li><button type="button" class="btn-reset">Item 4</button></li>
+            <li><button type="button" class="btn-reset">Item 5</button></li>
+            <li><button type="button" class="btn-reset">Item 6</button></li>
         </ul>
     </div>
 </pre>
@@ -33,11 +33,11 @@ angular.module('umbraco.directives')
         return {
             restrict: 'A',
             link: function (scope, element, attr) {
-                
+
                 var listItems = [];
                 var currentIndex = 0;
                 var focusSet = false;
-            
+
                 $timeout(function(){
                     // get list of all links in the list
                     listItems = element.find("li :tabbable");
@@ -82,7 +82,7 @@ angular.module('umbraco.directives')
 
                 function arrowDown() {
                     if (currentIndex < listItems.length - 1) {
-                        // only bump the current index if the focus is already 
+                        // only bump the current index if the focus is already
                         // set else we just want to focus the first element
                         if (focusSet) {
                             currentIndex++;

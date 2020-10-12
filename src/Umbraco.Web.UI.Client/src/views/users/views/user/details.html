@@ -1,4 +1,4 @@
-﻿<div class="umb-user-details-details">
+﻿<div ng-controller="Umbraco.Editors.Users.DetailsController as vm" class="umb-user-details-details">
 
     <div class="umb-user-details-details__main-content">
 
@@ -10,22 +10,31 @@
 
                     <umb-control-group label="@general_email" required="true" alias="email">
 
-                        <input type="email"
-                               localize="placeholder"
-                               placeholder="@placeholders_enteremail"
-                               class="input-block-level"
-                               ng-model="model.user.email"
-                               umb-auto-focus
-                               name="email"
-                               id="email"
-                               val-email
-                               ng-required="true"
-                               val-server-field="Email" />
-                        <span ng-messages="userProfileForm.email.$error" show-validation-on-submit>
-                            <span class="help-inline" ng-message="required"><localize key="general_required">Required</localize></span>
-                            <span class="help-inline" ng-message="valEmail"><localize key="validation_invalidEmail">Invalid email</localize></span>
-                            <span class="help-inline" ng-message="valServerField">{{userProfileForm.email.errorMsg}}</span>
-                        </span>
+                        <div ng-if="!vm.denyLocalLogin">
+                            <input type="email"
+                                   localize="placeholder"
+                                   placeholder="@placeholders_enteremail"
+                                   class="input-block-level"
+                                   ng-model="model.user.email"
+                                   umb-auto-focus
+                                   name="email"
+                                   id="email"
+                                   val-email
+                                   ng-required="true"
+                                   val-server-field="Email" />
+                            <span ng-messages="userProfileForm.email.$error" show-validation-on-submit>
+                                <span class="help-inline" ng-message="required"><localize key="general_required">Required</localize></span>
+                                <span class="help-inline" ng-message="valEmail"><localize key="validation_invalidEmail">Invalid email</localize></span>
+                                <span class="help-inline" ng-message="valServerField">{{userProfileForm.email.errorMsg}}</span>
+                            </span>
+                        </div>
+                        <div ng-if="vm.denyLocalLogin">
+                            <input type="email"
+                                   class="input-block-level"
+                                   ng-model="model.user.email"
+                                   id="email"
+                                   disabled />
+                        </div>
                     </umb-control-group>
 
                     <umb-control-group label="@general_username" ng-if="!model.usernameIsEmail" required="true">
@@ -72,16 +81,16 @@
                                             content-start-node="userGroup.contentStartNode"
                                             media-start-node="userGroup.mediaStartNode"
                                             allow-remove="true"
+                                            allow-edit="model.allowGroupEdit(userGroup)"
+                                            on-edit="model.editSelectedItem($index, model.user.userGroups)"
                                             on-remove="model.removeSelectedItem($index, model.user.userGroups)">
                     </umb-user-group-preview>
 
-                    <a href=""
-                       style="max-width: 100%;"
-                       class="umb-node-preview-add"
-                       ng-click="model.openUserGroupPicker()"
-                       prevent-default>
+                    <button type="button"
+                            class="umb-node-preview-add"
+                            ng-click="model.openUserGroupPicker()">
                         <localize key="general_add">Add</localize>
-                    </a>
+                    </button>
 
                 </umb-control-group>
 
@@ -100,13 +109,12 @@
                                       name="model.labels.noStartNodes">
                     </umb-node-preview>
 
-                    <a href=""
-                       class="umb-node-preview-add"
-                       id="content-start-add"
-                       ng-click="model.openContentPicker()"
-                       prevent-default>
+                    <button type="button"
+                            class="umb-node-preview-add"
+                            id="content-start-add"
+                            ng-click="model.openContentPicker()">
                         <localize key="general_add">Add</localize>
-                    </a>
+                    </button>
 
                 </umb-control-group>
 
@@ -125,13 +133,12 @@
                                       name="model.labels.noStartNodes">
                     </umb-node-preview>
 
-                    <a href=""
-                       class="umb-node-preview-add"
-                       ng-click="model.openMediaPicker()"
-                       id="media-start-add"
-                       prevent-default>
+                    <button type="button"
+                            class="umb-node-preview-add"
+                            ng-click="model.openMediaPicker()"
+                            id="media-start-add">
                         <localize key="general_add">Add</localize>
-                    </a>
+                    </button>
 
                 </umb-control-group>
 
@@ -196,23 +203,22 @@
 
                         <div class="flex items-center" ng-if="model.avatarFile.uploadStatus !== 'uploading'">
 
-                            <a href=""
-                               class="umb-user-group-preview__action"
-                               ngf-select ng-model="filesHolder"
-                               ngf-change="model.changeAvatar($files, $event)"
-                               ngf-multiple="false"
-                               ngf-pattern="{{model.acceptedFileTypes}}"
-                               ngf-max-size="{{ model.maxFileSize }}">
+                            <button class="btn-link umb-user-group-preview__action"
+                                    ngf-select ng-model="filesHolder"
+                                    ngf-change="model.changeAvatar($files, $event)"
+                                    ngf-multiple="false"
+                                    ngf-pattern="{{model.acceptedFileTypes}}"
+                                    ngf-max-size="{{ model.maxFileSize }}">
                                 <localize key="user_changePhoto">Change photo</localize>
-                            </a>
+                            </button>
 
-                            <a href=""
-                               ng-if="model.user.avatars"
-                               class="umb-user-group-preview__action umb-user-group-preview__action--red"
-                               ng-click="model.clearAvatar()"
-                               prevent-default>
+
+                            <button ng-if="model.user.avatars.length > 0"
+                                    class="btn-link umb-user-group-preview__action umb-user-group-preview__action--red"
+                                    ng-click="model.clearAvatar()"
+                                    prevent-default>
                                 <localize key="user_removePhoto">Remove photo</localize>
-                            </a>
+                            </button>
 
                         </div>
 
@@ -249,7 +255,7 @@
                     <div>
                         <umb-button ng-if="model.user.userDisplayState.key !== 'Disabled' && model.user.userDisplayState.key !== 'Invited' && !model.user.isCurrentUser"
                                     type="button"
-                                    button-style="[info,block]"
+                                    button-style="[warning,block]"
                                     action="model.disableUser()"
                                     state="model.disableUserButtonState"
                                     label="Disable"
@@ -257,9 +263,9 @@
                                     size="s">
                         </umb-button>
                     </div>
-                    <div>
+                    <div ng-if="!vm.denyLocalLogin">
 
-                        <umb-button type="button" ng-if="model.user.userDisplayState.key !== 'Invited' && model.changePasswordModel.isChanging === false"
+                        <umb-button type="button" ng-if="model.user.userDisplayState.key !== 'Invited'"
                                     button-style="[action,block]"
                                     action="model.toggleChangePassword()"
                                     label="Change password"
@@ -279,22 +285,7 @@
                         </umb-button>
                     </div>
 
-                    <ng-form ng-if="model.changePasswordModel.isChanging" name="passwordForm" class="block-form" val-form-manager>
-
-                        <change-password password-values="model.user.changePassword"
-                                         config="model.changePasswordModel.config">
-                        </change-password>
-
-                        <umb-button type="button"
-                                    action="model.toggleChangePassword()"
-                                    label="Cancel"
-                                    label-key="general_cancel"
-                                    button-style="cancel">
-                        </umb-button>
-
-                    </ng-form>
-
-                    <div ng-if="model.user.resetPasswordValue">
+                    <div ng-if="!vm.denyLocalLogin && model.user.resetPasswordValue">
                         <p><br />Password reset to value: <strong>{{model.user.resetPasswordValue}}</strong></p>
                     </div>
 
@@ -322,7 +313,7 @@
                               rows="4">
                 </textarea>
                     <umb-button type="button"
-                                button-style="[info,block]"
+                                button-style="[action,block]"
                                 action="model.resendInvite()"
                                 state="model.resendInviteButtonState"
                                 label="Resend Invite"

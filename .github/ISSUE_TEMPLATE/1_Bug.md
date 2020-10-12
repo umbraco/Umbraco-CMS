@@ -7,15 +7,15 @@ A brief description of the issue goes here.
 
 <!--
 
-If you haven't yet done so, please read the "contributing guidelines"
-thoroughly. Then, proceed by filling out the rest of the details in the issue
-template below. The more details you can give us, the easier it will be for us
+Please fill out the rest of the details in the issue template below. 
+The more details you can give us, the easier it will be for us
 to determine the cause of a problem.
-
-See: https://github.com/umbraco/Umbraco-CMS/blob/v8/dev/.github/CONTRIBUTING.md
 
 -->
 
+## Umbraco version
+
+I am seeing this issue on Umbraco version: <!-- please note the version here -->
 
 
 Reproduction

@@ -48,7 +48,7 @@ namespace Umbraco.Web.PropertyEditors
         internal static bool IsValidFileExtension(string fileName)
         {
             if (fileName.IndexOf('.') <= 0) return false;
-            var extension = new FileInfo(fileName).Extension.TrimStart(".");
+            var extension = fileName.GetFileExtension().TrimStart(".");
             return Current.Configs.Settings().Content.IsFileAllowedForUpload(extension);
         }
     }

@@ -75,8 +75,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
             var labelPropertyTypes = Database.Fetch<PropertyTypeDto>(Sql()
                 .Select<PropertyTypeDto>(x => x.Id, x => x.Alias)
                 .From<PropertyTypeDto>()
-                .Where<PropertyTypeDto>(x => x.DataTypeId == Constants.DataTypes.LabelString)
-                );
+                .Where<PropertyTypeDto>(x => x.DataTypeId == Constants.DataTypes.LabelString));
 
             var intPropertyAliases = new[] { Constants.Conventions.Media.Width, Constants.Conventions.Media.Height, Constants.Conventions.Member.FailedPasswordAttempts };
             var bigintPropertyAliases = new[] { Constants.Conventions.Media.Bytes };
@@ -101,16 +100,18 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
             foreach (var value in values)
                 Database.Execute(Sql()
                     .Update<PropertyDataDto>(u => u
-                        .Set(x => x.IntegerValue, string.IsNullOrWhiteSpace(value.VarcharValue) ? (int?) null :  int.Parse(value.VarcharValue, NumberStyles.Any, CultureInfo.InvariantCulture))
-                        .Set(x => x.TextValue, null))
+                        .Set(x => x.IntegerValue, string.IsNullOrWhiteSpace(value.VarcharValue) ? (int?)null : int.Parse(value.VarcharValue, NumberStyles.Any, CultureInfo.InvariantCulture))
+                        .Set(x => x.TextValue, null)
+                        .Set(x => x.VarcharValue, null))
                     .Where<PropertyDataDto>(x => x.Id == value.Id));
 
             values = Database.Fetch<PropertyDataValue>(Sql().Select<PropertyDataDto>(x => x.Id, x => x.VarcharValue).From<PropertyDataDto>().WhereIn<PropertyDataDto>(x => x.PropertyTypeId, dtPropertyTypes));
             foreach (var value in values)
                 Database.Execute(Sql()
                     .Update<PropertyDataDto>(u => u
-                        .Set(x => x.DateValue, string.IsNullOrWhiteSpace(value.VarcharValue) ? (DateTime?) null : DateTime.Parse(value.VarcharValue, CultureInfo.InvariantCulture, DateTimeStyles.None))
-                        .Set(x => x.TextValue, null))
+                        .Set(x => x.DateValue, string.IsNullOrWhiteSpace(value.VarcharValue) ? (DateTime?)null : DateTime.Parse(value.VarcharValue, CultureInfo.InvariantCulture, DateTimeStyles.None))
+                        .Set(x => x.TextValue, null)
+                        .Set(x => x.VarcharValue, null))
                     .Where<PropertyDataDto>(x => x.Id == value.Id));
 
             // anything that's custom... ppl will have to figure it out manually, there isn't much we can do about it

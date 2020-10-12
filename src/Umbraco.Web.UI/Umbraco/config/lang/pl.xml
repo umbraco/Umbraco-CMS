@@ -121,7 +121,7 @@
     <key alias="saveAndPublish">Zapisz i publikuj</key>
     <key alias="saveToPublish">Zapisz i wyślij do zaakceptowania</key>
     <key alias="saveListView">Zapisz widok listy</key>
-    <key alias="showPage">Podgląd</key>
+    <key alias="saveAndPreview">Podgląd</key>
     <key alias="showPageDisabled">Podgląd jest wyłączony, ponieważ żaden szablon nie został przydzielony</key>
     <key alias="styleChoose">Wybierz styl</key>
     <key alias="styleShow">Pokaż style</key>
@@ -322,7 +322,7 @@
     <key alias="recycleBinIsEmpty">Zawartość kosza została usunięta</key>
     <key alias="recycleBinWarning">Usunięcie elementów z kosza powoduje ich trwałe i nieodwracalne skasowanie</key>
     <key alias="regexSearchError"><![CDATA[Serwis <a target='_blank' href='http://regexlib.com'>regexlib.com</a> aktualnie nie jest dostępny, na co nie mamy wpływu. Bardzo przepraszamy za te utrudnienia.]]></key>
-    <key alias="regexSearchHelp">Przeszukaj dla wyrażeń regularnych, aby dodać regułę sprawdzającą do formularza. Np. 'email' 'url'</key>
+    <key alias="regexSearchHelp">Przeszukaj dla wyrażeń regularnych, aby dodać regułę sprawdzającą do formularza. Np. 'email' 'URL'</key>
     <key alias="removeMacro">Usuń Makro</key>
     <key alias="requiredField">Pole wymagane</key>
     <key alias="sitereindexed">Strona została przeindeksowana</key>

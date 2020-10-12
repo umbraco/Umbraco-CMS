@@ -3,7 +3,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Web.Http.Routing;
 using Umbraco.Core;
-using Umbraco.Core.Exceptions;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
@@ -53,7 +52,8 @@ namespace Umbraco.Web
         /// <returns></returns>
         public static string GetUmbracoApiService(this UrlHelper url, string actionName, Type apiControllerType, object id = null)
         {
-            if (string.IsNullOrWhiteSpace(actionName)) throw new ArgumentNullOrEmptyException(nameof(actionName));
+            if (actionName == null) throw new ArgumentNullException(nameof(actionName));
+            if (string.IsNullOrWhiteSpace(actionName)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(actionName));
             if (apiControllerType == null) throw new ArgumentNullException(nameof(apiControllerType));
 
             var area = "";
@@ -95,8 +95,10 @@ namespace Umbraco.Web
         /// <returns></returns>
         public static string GetUmbracoApiService(this UrlHelper url, string actionName, string controllerName, string area, object id = null)
         {
-            if (string.IsNullOrWhiteSpace(actionName)) throw new ArgumentNullOrEmptyException(nameof(actionName));
-            if (string.IsNullOrWhiteSpace(controllerName)) throw new ArgumentNullOrEmptyException(nameof(controllerName));
+            if (actionName == null) throw new ArgumentNullException(nameof(actionName));
+            if (string.IsNullOrWhiteSpace(actionName)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(actionName));
+            if (controllerName == null) throw new ArgumentNullException(nameof(controllerName));
+            if (string.IsNullOrWhiteSpace(controllerName)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(controllerName));
 
             string routeName;
             if (area.IsNullOrWhiteSpace())

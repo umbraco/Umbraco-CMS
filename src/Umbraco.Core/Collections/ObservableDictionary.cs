@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Runtime.Serialization;
 
 namespace Umbraco.Core.Collections
 {
@@ -26,7 +27,7 @@ namespace Umbraco.Core.Collections
         /// <param name="equalityComparer">The equality comparer to use when comparing keys, or null to use the default comparer.</param>
         public ObservableDictionary(Func<TValue, TKey> keySelector, IEqualityComparer<TKey> equalityComparer = null)
         {
-            KeySelector = keySelector ?? throw new ArgumentException("keySelector");
+            KeySelector = keySelector ?? throw new ArgumentException(nameof(keySelector));
             Indecies = new Dictionary<TKey, int>(equalityComparer);
         }
 
@@ -36,7 +37,7 @@ namespace Umbraco.Core.Collections
         {
             var key = KeySelector(item);
             if (Indecies.ContainsKey(key))
-                throw new DuplicateKeyException(key.ToString());
+                throw new ArgumentException($"An element with the same key '{key}' already exists in the dictionary.", nameof(item));
 
             if (index != Count)
             {
@@ -91,7 +92,7 @@ namespace Umbraco.Core.Collections
             {
                 //confirm key matches
                 if (!KeySelector(value).Equals(key))
-                    throw new InvalidOperationException("Key of new value does not match");
+                    throw new InvalidOperationException("Key of new value does not match.");
 
                 if (!Indecies.ContainsKey(key))
                 {
@@ -118,7 +119,7 @@ namespace Umbraco.Core.Collections
 
             //confirm key matches
             if (!KeySelector(value).Equals(key))
-                throw new InvalidOperationException("Key of new value does not match");
+                throw new InvalidOperationException("Key of new value does not match.");
 
             this[Indecies[key]] = value;
             return true;
@@ -155,12 +156,12 @@ namespace Umbraco.Core.Collections
         {
             if (!Indecies.ContainsKey(currentKey))
             {
-                throw new InvalidOperationException("No item with the key " + currentKey + "was found in the collection");
+                throw new InvalidOperationException($"No item with the key '{currentKey}' was found in the dictionary.");
             }
 
             if (ContainsKey(newKey))
             {
-                throw new DuplicateKeyException(newKey.ToString());
+                throw new ArgumentException($"An element with the same key '{newKey}' already exists in the dictionary.", nameof(newKey));
             }
 
             var currentIndex = Indecies[currentKey];
@@ -234,16 +235,5 @@ namespace Umbraco.Core.Collections
         }
 
         #endregion
-
-        internal class DuplicateKeyException : Exception
-        {
-            public DuplicateKeyException(string key)
-                : base("Attempted to insert duplicate key \"" + key + "\" in collection.")
-            {
-                Key = key;
-            }
-
-            public string Key { get; }
-        }
     }
 }

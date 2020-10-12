@@ -35,10 +35,13 @@
    7 = 7th step in spacing scale
 */
 
-.m-center {
-    margin-left: auto;
+.m-center,
+.mx-auto {
+    margin-left: auto; 
     margin-right: auto;
 }
+.ml-auto { margin-left: auto; }
+.mr-auto { margin-right: auto; }
 
 .mt0 { margin-top: @spacing-none; }
 .mt1 { margin-top: @spacing-extra-small; }
@@ -67,4 +70,18 @@
 .ml6 { margin-left: @spacing-extra-extra-large; }
 .ml7 { margin-left: @spacing-extra-extra-extra-large; }
 
+.mr0 { margin-right: @spacing-none; }
+.mr1 { margin-right: @spacing-extra-small; }
+.mr2 { margin-right: @spacing-small; }
+.mr3 { margin-right: @spacing-medium; }
+.mr4 { margin-right: @spacing-large; }
+.mr5 { margin-right: @spacing-extra-large; }
+.mr6 { margin-right: @spacing-extra-extra-large; }
+.mr7 { margin-right: @spacing-extra-extra-extra-large; }
+
 .p0 { padding: @spacing-none; }
+
+.pt0 { padding-top: @spacing-none; }
+.pb0 { padding-bottom: @spacing-none; }
+.pl0 { padding-left: @spacing-none; }
+.pr0 { padding-right: @spacing-none; }

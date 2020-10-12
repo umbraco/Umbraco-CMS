@@ -24,6 +24,9 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     {
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly IMacroRenderer _macroRenderer;
+        private readonly HtmlLocalLinkParser _linkParser;
+        private readonly HtmlUrlParser _urlParser;
+        private readonly HtmlImageSourceParser _imageSourceParser;
 
         public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
         {
@@ -32,10 +35,14 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             return PropertyCacheLevel.Snapshot;
         }
 
-        public RteMacroRenderingValueConverter(IUmbracoContextAccessor umbracoContextAccessor, IMacroRenderer macroRenderer)
+        public RteMacroRenderingValueConverter(IUmbracoContextAccessor umbracoContextAccessor, IMacroRenderer macroRenderer,
+            HtmlLocalLinkParser linkParser, HtmlUrlParser urlParser, HtmlImageSourceParser imageSourceParser)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
             _macroRenderer = macroRenderer;
+            _linkParser = linkParser;
+            _urlParser = urlParser;
+            _imageSourceParser = imageSourceParser;
         }
 
         // NOT thread-safe over a request because it modifies the
@@ -80,10 +87,10 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
             var sourceString = source.ToString();
 
-            // ensures string is parsed for {localLink} and urls and media are resolved correctly
-            sourceString = TemplateUtilities.ParseInternalLinks(sourceString, preview, Current.UmbracoContext);
-            sourceString = TemplateUtilities.ResolveUrlsFromTextString(sourceString);
-            sourceString = TemplateUtilities.ResolveMediaFromTextString(sourceString);
+            // ensures string is parsed for {localLink} and URLs and media are resolved correctly
+            sourceString = _linkParser.EnsureInternalLinks(sourceString, preview);
+            sourceString = _urlParser.EnsureUrls(sourceString);
+            sourceString = _imageSourceParser.EnsureImageSources(sourceString);
 
             // ensure string is parsed for macros and macros are executed correctly
             sourceString = RenderRteMacros(sourceString, preview);

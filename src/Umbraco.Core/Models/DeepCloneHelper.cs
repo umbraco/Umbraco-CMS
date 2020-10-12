@@ -81,9 +81,10 @@ namespace Umbraco.Core.Models
                             if (propertyInfo.PropertyType.IsGenericType
                                 && (propertyInfo.PropertyType.GetGenericTypeDefinition() == typeof(IEnumerable<>)
                                     || propertyInfo.PropertyType.GetGenericTypeDefinition() == typeof(ICollection<>)
-                                    || propertyInfo.PropertyType.GetGenericTypeDefinition() == typeof(IList<>)))
+                                    || propertyInfo.PropertyType.GetGenericTypeDefinition() == typeof(IList<>)
+                                    || propertyInfo.PropertyType.GetGenericTypeDefinition() == typeof(IReadOnlyCollection<>)))
                             {
-                                //if it is a IEnumerable<>, IList<T> or ICollection<> we'll use a List<>
+                                //if it is a IEnumerable<>, IReadOnlyCollection<T>, IList<T> or ICollection<> we'll use a List<> since it implements them all
                                 var genericType = typeof(List<>).MakeGenericType(propertyInfo.PropertyType.GetGenericArguments());
                                 return new ClonePropertyInfo(propertyInfo) { GenericListType = genericType };
                             }

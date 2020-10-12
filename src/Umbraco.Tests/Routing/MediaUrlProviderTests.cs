@@ -4,13 +4,18 @@ using Moq;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
+using Umbraco.Core.Services;
 using Umbraco.Tests.PublishedContent;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
+using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.Routing
@@ -25,7 +30,17 @@ namespace Umbraco.Tests.Routing
         {
             base.SetUp();
 
-            _mediaUrlProvider = new DefaultMediaUrlProvider();
+            var logger = Mock.Of<ILogger>();
+            var mediaFileSystemMock = Mock.Of<IMediaFileSystem>();
+            var contentSection = Mock.Of<IContentSection>();
+            var dataTypeService = Mock.Of<IDataTypeService>();
+
+            var propertyEditors = new PropertyEditorCollection(new DataEditorCollection(new IDataEditor[]
+            {
+                new FileUploadPropertyEditor(logger, mediaFileSystemMock, contentSection),
+                new ImageCropperPropertyEditor(logger, mediaFileSystemMock, contentSection, dataTypeService),
+            }));
+            _mediaUrlProvider = new DefaultMediaUrlProvider(propertyEditors);
         }
 
         public override void TearDown()
@@ -54,10 +69,10 @@ namespace Umbraco.Tests.Routing
             const string expected = "/media/rfeiw584/test.jpg";
 
             var configuration = new ImageCropperConfiguration();
-            var imageCropperValue = new ImageCropperValue
+            var imageCropperValue = JsonConvert.SerializeObject(new ImageCropperValue
             {
                 Src = expected
-            };
+            });
 
             var umbracoContext = GetUmbracoContext("/", mediaUrlProviders: new[] { _mediaUrlProvider });
             var publishedContent = CreatePublishedContent(Constants.PropertyEditors.Aliases.ImageCropper, imageCropperValue, configuration);
@@ -121,21 +136,21 @@ namespace Umbraco.Tests.Routing
                 PropertyType = umbracoFilePropertyType,
             };
 
-            property.SetValue("en", enMediaUrl, true);
-            property.SetValue("da", daMediaUrl);
+            property.SetSourceValue("en", enMediaUrl, true);
+            property.SetSourceValue("da", daMediaUrl);
 
-            var contentType = new PublishedContentType(666, "alias", PublishedItemType.Content, Enumerable.Empty<string>(), new [] { umbracoFilePropertyType }, ContentVariation.Culture);
+            var contentType = new PublishedContentType(Guid.NewGuid(), 666, "alias", PublishedItemType.Content, Enumerable.Empty<string>(), new [] { umbracoFilePropertyType }, ContentVariation.Culture);
             var publishedContent = new SolidPublishedContent(contentType) {Properties = new[] {property}};
 
             var resolvedUrl = umbracoContext.UrlProvider.GetMediaUrl(publishedContent, UrlMode.Auto, "da");
             Assert.AreEqual(daMediaUrl, resolvedUrl);
         }
 
-        private static IPublishedContent CreatePublishedContent(string propertyEditorAlias, object propertyValue, object dataTypeConfiguration)
+        private static IPublishedContent CreatePublishedContent(string propertyEditorAlias, string propertyValue, object dataTypeConfiguration)
         {
             var umbracoFilePropertyType = CreatePropertyType(propertyEditorAlias, dataTypeConfiguration, ContentVariation.Nothing);
 
-            var contentType = new PublishedContentType(666, "alias", PublishedItemType.Content, Enumerable.Empty<string>(),
+            var contentType = new PublishedContentType(Guid.NewGuid(), 666, "alias", PublishedItemType.Content, Enumerable.Empty<string>(),
                 new[] {umbracoFilePropertyType}, ContentVariation.Nothing);
 
             return new SolidPublishedContent(contentType)
@@ -147,7 +162,7 @@ namespace Umbraco.Tests.Routing
                     new SolidPublishedProperty
                     {
                         Alias = "umbracoFile",
-                        SolidValue = propertyValue,
+                        SolidSourceValue = propertyValue,
                         SolidHasValue = true,
                         PropertyType = umbracoFilePropertyType
                     }

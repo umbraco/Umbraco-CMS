@@ -9,9 +9,7 @@ using Umbraco.Core.Dashboards;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Events;
 using Umbraco.Core.Migrations.PostMigrations;
-using Umbraco.Web.Migrations.PostMigrations;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Core.Runtime;
 using Umbraco.Core.Services;
@@ -19,7 +17,6 @@ using Umbraco.Web.Actions;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Composing.CompositionExtensions;
 using Umbraco.Web.ContentApps;
-using Umbraco.Web.Dashboards;
 using Umbraco.Web.Dictionary;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Features;
@@ -37,10 +34,12 @@ using Umbraco.Web.Security.Providers;
 using Umbraco.Web.Services;
 using Umbraco.Web.SignalR;
 using Umbraco.Web.Templates;
-using Umbraco.Web.Tour;
 using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
 using Current = Umbraco.Web.Composing.Current;
+using Umbraco.Web.PropertyEditors;
+using Umbraco.Core.Models;
+using Umbraco.Web.Models;
 
 namespace Umbraco.Web.Runtime
 {
@@ -73,7 +72,7 @@ namespace Umbraco.Web.Runtime
             // register accessors for cultures
             composition.RegisterUnique<IDefaultCultureAccessor, DefaultCultureAccessor>();
             composition.RegisterUnique<IVariationContextAccessor, HybridVariationContextAccessor>();
-            
+
             // register the http context and umbraco context accessors
             // we *should* use the HttpContextUmbracoContextAccessor, however there are cases when
             // we have no http context, eg when booting Umbraco or in background threads, so instead
@@ -95,7 +94,7 @@ namespace Umbraco.Web.Runtime
             // a way to inject the UmbracoContext - DO NOT register this as Lifetime.Request since LI will dispose the context
             // in it's own way but we don't want that to happen, we manage its lifetime ourselves.
             composition.Register(factory => factory.GetInstance<IUmbracoContextAccessor>().UmbracoContext);
-
+            composition.RegisterUnique<IUmbracoTreeSearcherFields, UmbracoTreeSearcherFields>();
             composition.Register<IPublishedContentQuery>(factory =>
             {
                 var umbCtx = factory.GetInstance<IUmbracoContextAccessor>();
@@ -106,6 +105,12 @@ namespace Umbraco.Web.Runtime
             composition.RegisterUnique<ITemplateRenderer, TemplateRenderer>();
             composition.RegisterUnique<IMacroRenderer, MacroRenderer>();
             composition.RegisterUnique<IUmbracoComponentRenderer, UmbracoComponentRenderer>();
+
+            composition.RegisterUnique<HtmlLocalLinkParser>();
+            composition.RegisterUnique<HtmlUrlParser>();
+            composition.RegisterUnique<HtmlImageSourceParser>();
+            composition.RegisterUnique<RichTextEditorPastedImages>();
+            composition.RegisterUnique<PropertyEditors.ValueConverters.BlockEditorConverter>();
 
             // register the umbraco helper - this is Transient! very important!
             // also, if not level.Run, we cannot really use the helper (during upgrade...)
@@ -132,8 +137,8 @@ namespace Umbraco.Web.Runtime
             composition.RegisterUnique<IEventMessagesAccessor, HybridEventMessagesAccessor>();
             composition.RegisterUnique<ITreeService, TreeService>();
             composition.RegisterUnique<ISectionService, SectionService>();
-
             composition.RegisterUnique<IDashboardService, DashboardService>();
+            composition.RegisterUnique<IIconService, IconService>();
 
             composition.RegisterUnique<IExamineManager>(factory => ExamineManager.Instance);
 
@@ -144,19 +149,19 @@ namespace Umbraco.Web.Runtime
                 .ComposeUmbracoControllers(GetType().Assembly)
                 .SetDefaultRenderMvcController<RenderMvcController>(); // default controller for template views
 
-            composition.WithCollectionBuilder<SearchableTreeCollectionBuilder>()
+            composition.SearchableTrees()
                 .Add(() => composition.TypeLoader.GetTypes<ISearchableTree>());
 
             composition.Register<UmbracoTreeSearcher>(Lifetime.Request);
 
-            composition.WithCollectionBuilder<EditorValidatorCollectionBuilder>()
+            composition.EditorValidators()
                 .Add(() => composition.TypeLoader.GetTypes<IEditorValidator>());
 
-            composition.WithCollectionBuilder<TourFilterCollectionBuilder>();
+            composition.TourFilters();
 
             composition.RegisterUnique<UmbracoFeatures>();
 
-            composition.WithCollectionBuilder<ActionCollectionBuilder>()
+            composition.Actions()
                 .Add(() => composition.TypeLoader.GetTypes<IAction>());
 
             //we need to eagerly scan controller types since they will need to be routed
@@ -171,41 +176,47 @@ namespace Umbraco.Web.Runtime
             // here because there cannot be two converters for one property editor - and we want the full
             // RteMacroRenderingValueConverter that converts macros, etc. So remove TinyMceValueConverter.
             // (the limited one, defined in Core, is there for tests) - same for others
-            composition.WithCollectionBuilder<PropertyValueConverterCollectionBuilder>()
+            composition.PropertyValueConverters()
                 .Remove<TinyMceValueConverter>()
                 .Remove<TextStringValueConverter>()
                 .Remove<MarkdownEditorValueConverter>();
 
             // add all known factories, devs can then modify this list on application
             // startup either by binding to events or in their own global.asax
-            composition.WithCollectionBuilder<FilteredControllerFactoryCollectionBuilder>()
+            composition.FilteredControllerFactory()
                 .Append<RenderControllerFactory>();
 
-            composition.WithCollectionBuilder<UrlProviderCollectionBuilder>()
+            composition.UrlProviders()
                 .Append<AliasUrlProvider>()
                 .Append<DefaultUrlProvider>();
 
-            composition.WithCollectionBuilder<MediaUrlProviderCollectionBuilder>()
+            composition.MediaUrlProviders()
                 .Append<DefaultMediaUrlProvider>();
+
+            composition.RegisterUnique<IImageUrlGenerator, ImageProcessorImageUrlGenerator>();
 
             composition.RegisterUnique<IContentLastChanceFinder, ContentFinderByConfigured404>();
 
-            composition.WithCollectionBuilder<ContentFinderCollectionBuilder>()
+            composition.ContentFinders()
                 // all built-in finders in the correct order,
                 // devs can then modify this list on application startup
                 .Append<ContentFinderByPageIdQuery>()
                 .Append<ContentFinderByUrl>()
                 .Append<ContentFinderByIdPath>()
                 //.Append<ContentFinderByUrlAndTemplate>() // disabled, this is an odd finder
-                .Append<ContentFinderByUrlAlias>()
-                .Append<ContentFinderByRedirectUrl>();
+                .Append<ContentFinderByUrlAlias>();
+                //only append ContentFinderByRedirectUrl if RedirectUrlTracking is not disabled
+                if (composition.Configs.Settings().WebRouting.DisableRedirectUrlTracking == false)
+                {
+                    composition.ContentFinders().Append<ContentFinderByRedirectUrl>();
+                }
 
             composition.RegisterUnique<ISiteDomainHelper, SiteDomainHelper>();
 
             composition.RegisterUnique<ICultureDictionaryFactory, DefaultCultureDictionaryFactory>();
 
             // register *all* checks, except those marked [HideFromTypeFinder] of course
-            composition.WithCollectionBuilder<HealthCheckCollectionBuilder>()
+            composition.HealthChecks()
                 .Add(() => composition.TypeLoader.GetTypes<HealthCheck.HealthCheck>());
 
             composition.WithCollectionBuilder<HealthCheckNotificationMethodCollectionBuilder>()
@@ -225,13 +236,17 @@ namespace Umbraco.Web.Runtime
             composition.RegisterUnique<IPublishedValueFallback, PublishedValueFallback>();
 
             // register known content apps
-            composition.WithCollectionBuilder<ContentAppFactoryCollectionBuilder>()
+            composition.ContentApps()
                 .Append<ListViewContentAppFactory>()
                 .Append<ContentEditorContentAppFactory>()
-                .Append<ContentInfoContentAppFactory>();
+                .Append<ContentInfoContentAppFactory>()
+                .Append<ContentTypeDesignContentAppFactory>()
+                .Append<ContentTypeListViewContentAppFactory>()
+                .Append<ContentTypePermissionsContentAppFactory>()
+                .Append<ContentTypeTemplatesContentAppFactory>();
 
             // register back office sections in the order we want them rendered
-            composition.WithCollectionBuilder<SectionCollectionBuilder>()
+            composition.Sections()
                 .Append<ContentSection>()
                 .Append<MediaSection>()
                 .Append<SettingsSection>()
@@ -242,18 +257,18 @@ namespace Umbraco.Web.Runtime
                 .Append<TranslationSection>();
 
             // register core CMS dashboards and 3rd party types - will be ordered by weight attribute & merged with package.manifest dashboards
-            composition.WithCollectionBuilder<DashboardCollectionBuilder>()
+            composition.Dashboards()
                 .Add(composition.TypeLoader.GetTypes<IDashboard>());
 
             // register back office trees
             // the collection builder only accepts types inheriting from TreeControllerBase
             // and will filter out those that are not attributed with TreeAttribute
-            composition.WithCollectionBuilder<TreeCollectionBuilder>()
+            composition.Trees()
                 .AddTreeControllers(umbracoApiControllerTypes.Where(x => typeof(TreeControllerBase).IsAssignableFrom(x)));
 
             // register OEmbed providers - no type scanning - all explicit opt-in of adding types
             // note: IEmbedProvider is not IDiscoverable - think about it if going for type scanning
-            composition.WithCollectionBuilder<EmbedProvidersCollectionBuilder>()
+            composition.OEmbedProviders()
                 .Append<YouTube>()
                 .Append<Instagram>()
                 .Append<Twitter>()
@@ -268,7 +283,7 @@ namespace Umbraco.Web.Runtime
                 .Append<Issuu>()
                 .Append<Hulu>()
                 .Append<Giphy>();
-            
+
 
             // replace with web implementation
             composition.RegisterUnique<IPublishedSnapshotRebuilder, Migrations.PostMigrations.PublishedSnapshotRebuilder>();

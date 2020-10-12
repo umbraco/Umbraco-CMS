@@ -46,7 +46,7 @@ namespace Umbraco.Web.ContentApps
                     dtdId = Core.Constants.DataTypes.DefaultMediaListView;
                     break;
                 default:
-                    throw new NotSupportedException($"Object type {o.GetType()} is not supported here.");
+                    return null;
             }
 
             return CreateContentApp(_dataTypeService, _propertyEditors, entityType, contentTypeAlias, dtdId);

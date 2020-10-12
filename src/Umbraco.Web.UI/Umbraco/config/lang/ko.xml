@@ -67,7 +67,7 @@
     <key alias="save">저장</key>
     <key alias="saveAndPublish">저장 후 발행</key>
     <key alias="saveToPublish">저장 후 승인을 위해 전송</key>
-    <key alias="showPage">미리보기</key>
+    <key alias="saveAndPreview">미리보기</key>
     <key alias="styleChoose">스타일 선택</key>
     <key alias="styleShow">스타일 보기</key>
     <key alias="tableInsert">테이블 삽입</key>
@@ -181,7 +181,7 @@
     <key alias="recycleBinIsEmpty">휴지통이 비었습니다.</key>
     <key alias="recycleBinWarning">휴지통에서 삭제하시면 완전히 삭제됩니다.</key>
     <key alias="regexSearchError"><![CDATA[<a target='_blank' href='http://regexlib.com'>regexlib.com</a>의 웹서비스는 현재 제어할 수 없는 몇가지 문제점이 보고되었습니다. 불편을 드려 대단히 죄송합니다.]]></key>
-    <key alias="regexSearchHelp">필드 유효성검사를 위해 정규표현식을 검색합니다. 예: 'email, 'zip-code' 'url'</key>
+    <key alias="regexSearchHelp">필드 유효성검사를 위해 정규표현식을 검색합니다. 예: 'email, 'zip-code' 'URL'</key>
     <key alias="removeMacro">매크로 삭제</key>
     <key alias="requiredField">필수 필드</key>
     <key alias="sitereindexed">사이트의 색인이 재생성되었습니다.</key>
@@ -326,7 +326,7 @@
     <key alias="update">업데이트</key>
     <key alias="upgrade">업그레이드</key>
     <key alias="upload">업로드</key>
-    <key alias="url">Url</key>
+    <key alias="url">URL</key>
     <key alias="user">사용자</key>
     <key alias="username">사용자</key>
     <key alias="value">값</key>

@@ -11,6 +11,9 @@ function MemberGroupsEditController($scope, $routeParams, appState, navigationSe
     //setup scope vars
     $scope.page = {};
     $scope.page.loading = false;
+    $scope.header = {};
+    $scope.header.editorfor = "content_membergroup";
+    $scope.header.setPageTitle = true;
     $scope.page.menu = {};
     $scope.page.menu.currentSection = appState.getSectionState("currentSection");
     $scope.page.menu.currentNode = null;
@@ -85,6 +88,7 @@ function MemberGroupsEditController($scope, $routeParams, appState, navigationSe
 
                 }, function (err) {
 
+                    formHelper.resetForm({ scope: $scope, hasErrors: true });
                     contentEditingHelper.handleSaveError({
                         err: err
                     });

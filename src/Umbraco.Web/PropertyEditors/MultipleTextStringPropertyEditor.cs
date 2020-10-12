@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
@@ -7,6 +9,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.PropertyEditors.Validators;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PropertyEditors
@@ -86,7 +89,7 @@ namespace Umbraco.Web.PropertyEditors
             /// </summary>
             /// <param name="property"></param>
             /// <param name="dataTypeService"></param>
-            /// <param name="languageId"></param>
+            /// <param name="culture"></param>
             /// <param name="segment"></param>
             /// <returns></returns>
             /// <remarks>
@@ -97,10 +100,40 @@ namespace Umbraco.Web.PropertyEditors
                 var val = property.GetValue(culture, segment);
                 return val?.ToString().Split(new[] {Environment.NewLine}, StringSplitOptions.RemoveEmptyEntries)
                            .Select(x => JObject.FromObject(new {value = x})) ?? new JObject[] { };
-
-
             }
 
+            /// <summary>
+            /// A custom FormatValidator is used as for multiple text strings, each string should individually be checked
+            /// against the configured regular expression, rather than the JSON representing all the strings as a whole.
+            /// </summary>
+            public override IValueFormatValidator FormatValidator => new MultipleTextStringFormatValidator();
+        }
+
+        internal class MultipleTextStringFormatValidator : IValueFormatValidator
+        {
+            public IEnumerable<ValidationResult> ValidateFormat(object value, string valueType, string format)
+            {
+                var asArray = value as JArray;
+                if (asArray == null)
+                {
+                    return Enumerable.Empty<ValidationResult>();
+                }
+
+                var textStrings = asArray.OfType<JObject>()
+                    .Where(x => x["value"] != null)
+                    .Select(x => x["value"].Value<string>());
+                var textStringValidator = new RegexValidator();
+                foreach (var textString in textStrings)
+                {
+                    var validationResults = textStringValidator.ValidateFormat(textString, valueType, format).ToList();
+                    if (validationResults.Any())
+                    {
+                        return validationResults;
+                    }
+                }
+
+                return Enumerable.Empty<ValidationResult>();
+            }
         }
     }
 }

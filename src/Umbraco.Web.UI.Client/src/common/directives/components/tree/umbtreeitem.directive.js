@@ -18,7 +18,7 @@
    </example>
  */
 angular.module("umbraco.directives")
-    .directive('umbTreeItem', function(treeService, $timeout, localizationService, eventsService, appState) {
+    .directive('umbTreeItem', function(treeService, $timeout, localizationService, eventsService, appState, navigationService) {
     return {
         restrict: 'E',
         replace: true,
@@ -34,8 +34,9 @@ angular.module("umbraco.directives")
         },
         
         link: function (scope, element, attrs, umbTreeCtrl) {
-            localizationService.localize("general_search").then(function (value) {
-                scope.searchAltText = value;
+            localizationService.localizeMany(["general_search", "visuallyHiddenTexts_openContextMenu"]).then(function (value) {
+                scope.searchAltText = value[0];
+                scope.optionsText = value[1];
             });
             
             // updates the node's DOM/styles
@@ -69,9 +70,7 @@ angular.module("umbraco.directives")
                 
                 var css = [];                
                 if (node.cssClasses) {
-                    _.each(node.cssClasses, function(c) {
-                        css.push(c);
-                    });
+                    node.cssClasses.forEach(c => css.push(c));
                 }
                 if (node.selected) {
                     css.push("umb-tree-node-checked");
@@ -89,7 +88,9 @@ angular.module("umbraco.directives")
                     css.push("umb-tree-item--deleted");
                 }
 
-                if (actionNode) {
+                // checking the nodeType to ensure that this node and actionNode is from the same treeAlias
+                if (actionNode && actionNode.nodeType === node.nodeType) {
+
                     if (actionNode.id === node.id && String(node.id) !== "-1") {
                         css.push("active");
                     }
@@ -189,11 +190,18 @@ angular.module("umbraco.directives")
 
             var evts = [];
 
-            //listen for section changes
+            // Listen for section changes
             evts.push(eventsService.on("appState.sectionState.changed", function(e, args) {
                 if (args.key === "currentSection") {
                     //when the section changes disable all delete animations
                     scope.node.deleteAnimations = false;
+                }
+            }));
+
+            // Update tree icon if changed
+            evts.push(eventsService.on("editors.tree.icon.changed", function (e, args) {          
+                if (args.icon !== scope.node.icon && args.id === scope.node.id) {
+                    scope.node.icon = args.icon;
                 }
             }));
 

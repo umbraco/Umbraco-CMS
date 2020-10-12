@@ -1,4 +1,4 @@
-<div id="leftcolumn" ng-controller="Umbraco.NavigationController" ng-mouseleave="leaveTree($event)" ng-mouseenter="enterTree($event)">
+<div id="leftcolumn" ng-controller="Umbraco.NavigationController" ng-mouseleave="leaveTree($event)" ng-mouseenter="enterTree($event)" on-outside-click="onOutsideClick()">
 
     <!-- navigation container -->
     <div id="navigation" ng-show="showNavigation" class="fill umb-modalcolumn" ng-animate="'slide'" nav-resize
@@ -10,16 +10,12 @@
                 <button type="button" class="umb-language-picker__toggle" ng-click="toggleLanguageSelector()" aria-haspopup="true" aria-expanded="{{page.languageSelectorIsOpen}}">
                     <span>
                         <span class="sr-only">
-<<<<<<< HEAD
                             <localize key="visuallyHiddenTexts_currentLanguage">Current language</localize>
                             <span>: </span>
-=======
-                            <localize key="visuallyHiddenTexts_currentLanguage">Current language</localize>:
->>>>>>> v8/dev
                         </span>
                         <span>{{selectedLanguage.name}}</span>
                     </span>
-                    <i class="umb-language-picker__expand" ng-class="{'icon-navigation-down': !page.languageSelectorIsOpen, 'icon-navigation-up': page.languageSelectorIsOpen}" class="icon-navigation-right" aria-hidden="true"></i>
+                    <umb-icon icon="{{page.languageSelectorIsOpen ? 'icon-navigation-up' : 'icon-navigation-down'}}" class="umb-language-picker__expand icon-navigation-down" aria-hidden="true">&nbsp;</umb-icon>
                 </button>
                 <div class="umb-language-picker__dropdown" ng-if="page.languageSelectorIsOpen">
                     <button
@@ -27,15 +23,11 @@
                         class="umb-language-picker__dropdown-item"
                         ng-class="{'umb-language-picker__dropdown-item--current': language.active}"
                         ng-click="selectLanguage(language)"
-                        ng-repeat="language in languages"
+                        ng-repeat="language in languages | orderBy:'name'"
                     >
                     <span class="sr-only">
-<<<<<<< HEAD
                         <localize key="visuallyHiddenTexts_switchLanguage">Switch language to</localize>
                         <span>: </span>
-=======
-                        <localize key="visuallyHiddenTexts_switchLanguage">Switch language to</localize>:
->>>>>>> v8/dev
                     </span>
                     <span>{{language.name}}</span>
                     </button>

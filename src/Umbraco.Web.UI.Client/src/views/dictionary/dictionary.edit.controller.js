@@ -12,6 +12,10 @@ function DictionaryEditController($scope, $routeParams, $location, dictionaryRes
 
     //setup scope vars
     vm.nameDirty = false;
+    vm.header = {};
+    vm.header.editorfor = "template_insertDictionaryItem";
+    vm.header.setPageTitle = true;
+
     vm.page = {};
     vm.page.loading = false;
     vm.page.nameLocked = false;
@@ -82,13 +86,15 @@ function DictionaryEditController($scope, $routeParams, $location, dictionaryRes
             dictionaryResource.save(vm.content, vm.nameDirty)
                 .then(function (data) {
 
-                    formHelper.resetForm({ scope: $scope, notifications: data.notifications });
+                        formHelper.resetForm({ scope: $scope });
 
                         bindDictionary(data);
 
                         vm.page.saveButtonState = "success";
                     },
                     function (err) {
+
+                        formHelper.resetForm({ scope: $scope, hasErrors: true });
 
                         contentEditingHelper.handleSaveError({
                             err: err

@@ -5,6 +5,9 @@
 
         var vm = this;
 
+        vm.header = {};
+        vm.header.editorfor = "visuallyHiddenTexts_newPartialViewMacro";
+        vm.header.setPageTitle = true;
         vm.page = {};
         vm.page.loading = true;
         vm.partialViewMacroFile = {};
@@ -77,7 +80,7 @@
                             activate: false
                         });
                         completeSave(saved);
-                    }, angular.noop);
+                    }, Utilities.noop);
 
                     
                 } else {

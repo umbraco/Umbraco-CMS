@@ -84,14 +84,14 @@ namespace Umbraco.Web
             => composition.WithCollectionBuilder<TourFilterCollectionBuilder>();
 
         /// <summary>
-        /// Gets the url providers collection builder.
+        /// Gets the URL providers collection builder.
         /// </summary>
         /// <param name="composition">The composition.</param>
         public static UrlProviderCollectionBuilder UrlProviders(this Composition composition)
             => composition.WithCollectionBuilder<UrlProviderCollectionBuilder>();
 
         /// <summary>
-        /// Gets the media url providers collection builder.
+        /// Gets the media URL providers collection builder.
         /// </summary>
         /// <param name="composition">The composition.</param>
         public static MediaUrlProviderCollectionBuilder MediaUrlProviders(this Composition composition)

@@ -68,7 +68,7 @@
     <key alias="save">שמור</key>
     <key alias="saveAndPublish">שמור ופרסם</key>
     <key alias="saveToPublish">שמור ושלח לאישור</key>
-    <key alias="showPage">תצוגה מקדימה</key>
+    <key alias="saveAndPreview">תצוגה מקדימה</key>
     <key alias="styleChoose">בחר עיצוב</key>
     <key alias="styleShow">הצג עיצוב</key>
     <key alias="tableInsert">הוספת טבלה</key>

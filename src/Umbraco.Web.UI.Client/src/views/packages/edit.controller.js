@@ -37,7 +37,7 @@
 
         vm.labels = {};
 
-        vm.versionRegex = /^(\d+\.)(\d+\.)(\*|\d+)$/;  
+        vm.versionRegex = /^(\d+\.)(\d+\.)(\*|\d+)$/;
 
         function onInit() {
 
@@ -53,8 +53,9 @@
                     vm.loading = false;
                 });
 
-                localizationService.localize("general_create").then(function (value) {
-                    vm.labels.button = value;
+                localizationService.localizeMany(["general_create", "packager_includeAllChildNodes"]).then(function (values) {
+                    vm.labels.button = values[0];
+                    vm.labels.includeAllChildNodes = values[1];
                 });
             } else {
                 // Load package
@@ -77,11 +78,11 @@
 
                 });
 
+
                 localizationService.localizeMany(["buttons_save", "packager_includeAllChildNodes"]).then(function (values) {
                     vm.labels.button = values[0];
                     vm.labels.includeAllChildNodes = values[1];
                 });
-
             }
         }
 
@@ -193,7 +194,7 @@
                     vm.package = updatedPackage;
                     vm.buttonState = "success";
 
-                    formHelper.resetForm({ scope: $scope });
+                    formHelper.resetForm({ scope: $scope, formCtrl: editPackageForm });
 
                     if (create) {
                         //if we are creating, then redirect to the correct url and reload
@@ -201,8 +202,9 @@
                         //don't add a browser history for this
                         $location.replace();
                     }
-                    
-                }, function(err){
+
+                }, function (err) {
+                    formHelper.resetForm({ scope: $scope, formCtrl: editPackageForm, hasErrors: true });
                     formHelper.handleError(err);
                     vm.buttonState = "error";
                 });
@@ -215,14 +217,14 @@
 
         function openContentPicker() {
             const contentPicker = {
-                submit: function(model) {
-                    if(model.selection && model.selection.length > 0) {
+                submit: function (model) {
+                    if (model.selection && model.selection.length > 0) {
                         vm.package.contentNodeId = model.selection[0].id.toString();
                         vm.contentNodeDisplayModel = model.selection[0];
                     }
                     editorService.close();
                 },
-                close: function() {
+                close: function () {
                     editorService.close();
                 }
             };
@@ -231,7 +233,7 @@
 
         function openFilePicker() {
 
-            let selection = angular.copy(vm.package.files);
+            let selection = Utilities.copy(vm.package.files);
 
             const filePicker = {
                 title: "Select files",
@@ -240,25 +242,25 @@
                 entityType: "file",
                 multiPicker: true,
                 isDialog: true,
-                select: function(node) {
+                select: function (node) {
                     node.selected = !node.selected;
 
                     const id = decodeURIComponent(node.id.replace(/\+/g, " "));
                     const index = selection.indexOf(id);
 
-                    if(node.selected) {
-                        if(index === -1) {
+                    if (node.selected) {
+                        if (index === -1) {
                             selection.push(id);
                         }
                     } else {
                         selection.splice(index, 1);
                     }
                 },
-                submit: function() {
+                submit: function () {
                     vm.package.files = selection;
                     editorService.close();
                 },
-                close: function() {
+                close: function () {
                     editorService.close();
                 }
             };
@@ -283,12 +285,12 @@
                     }
                 },
                 filterCssClass: "not-allowed",
-                select: function(node) {
+                select: function (node) {
                     const id = decodeURIComponent(node.id.replace(/\+/g, " "));
                     vm.package.packageView = id;
                     editorService.close();
                 },
-                close: function() {
+                close: function () {
                     editorService.close();
                 }
             };
@@ -384,7 +386,7 @@
         }
 
         function buildContributorsEditor(pkg) {
-            
+
             vm.contributorsEditor = {
                 alias: "contributors",
                 editor: "Umbraco.MultipleTextstring",

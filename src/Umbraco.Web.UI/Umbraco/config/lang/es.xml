@@ -124,7 +124,7 @@
     <key alias="saveAndPublish">Guardar y publicar</key>
     <key alias="saveToPublish">Guardar y enviar para aprobación</key>
     <key alias="saveListView">Guardar vista de lista</key>
-    <key alias="showPage">Previsualizar</key>
+    <key alias="saveAndPreview">Previsualizar</key>
     <key alias="showPageDisabled">La previsualización está deshabilitada porque no hay ninguna plantilla asignada</key>
     <key alias="styleChoose">Elegir estilo</key>
     <key alias="styleShow">Mostrar estilos</key>
@@ -185,8 +185,8 @@
     <key alias="otherElements">Propiedades</key>
     <key alias="parentNotPublished">Este documento ha sido publicado pero no es visible porque el padre '%0%' no esta publicado</key>
         <key alias="parentNotPublishedAnomaly">Ups: este documento está publicado pero no está en la caché (error interno)</key>
-    <key alias="getUrlException">No se pudo obtener la url</key>
-        <key alias="routeError">Este documento está publicado pero tu url colisionará con contenido %0%</key>
+    <key alias="getUrlException">No se pudo obtener la URL</key>
+        <key alias="routeError">Este documento está publicado pero tu URL colisionará con contenido %0%</key>
     <key alias="publish">Publicar</key>
     <key alias="publishStatus">Estado de la Publicación</key>
     <key alias="releaseDate">Publicar el</key>
@@ -321,7 +321,7 @@
     <key alias="recycleBinIsEmpty">La papelera está vacía</key>
         <key alias="recycleBinWarning">No podrás recuperar los elementos una vez sean borrados de la papelera</key>
     <key alias="regexSearchError"><![CDATA[El servicio web <a target='_blank' href='http://regexlib.com'>regexlib.com</a> está experimentando algunos problemas en estos momentos, de los cuales no somos responsables. Pedimos disculpas por las molestias.]]></key>
-    <key alias="regexSearchHelp">Buscar una expresión regular para agregar validación a un campo de formulario. Ejemplo: 'correo electrónico', código postal "," url "</key>
+    <key alias="regexSearchHelp">Buscar una expresión regular para agregar validación a un campo de formulario. Ejemplo: 'correo electrónico', 'código postal', 'URL'.</key>
     <key alias="removeMacro">Eliminar macro</key>
     <key alias="requiredField">Campo obligatorio</key>
     <key alias="sitereindexed">El sitio ha sido reindexado</key>
@@ -562,7 +562,7 @@
     <key alias="update">Actualizar</key>
     <key alias="upgrade">Actualizar</key>
     <key alias="upload">Subir</key>
-    <key alias="url">Url</key>
+    <key alias="url">URL</key>
     <key alias="user">Usuario</key>
     <key alias="username">Nombre de usuario</key>
     <key alias="value">Valor</key>
@@ -1526,7 +1526,7 @@
     <key alias="validation">Validación</key>
     <key alias="validateAsEmail">Validar como email</key>
     <key alias="validateAsNumber">Validar como número</key>
-    <key alias="validateAsUrl">Validar como Url</key>
+    <key alias="validateAsUrl">Validar como URL</key>
         <key alias="enterCustomValidation">...o introduce tu propia validación</key>
     <key alias="fieldIsMandatory">Campo obligatorio</key>
     <key alias="validationRegExp">Introduce una expresión regular</key>

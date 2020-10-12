@@ -3,27 +3,28 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
+
     /// <summary>
     /// Represents the configuration for the nested content value editor.
     /// </summary>
     public class NestedContentConfiguration
     {
-        [ConfigurationField("contentTypes", "Document types", "views/propertyeditors/nestedcontent/nestedcontent.doctypepicker.html", Description = "Select the document types to use as the item blueprints. Only \"element\" types can be used.")]
+        [ConfigurationField("contentTypes", "Element Types", "views/propertyeditors/nestedcontent/nestedcontent.doctypepicker.html", Description = "Select the Element Types to use as models for the items.")]
         public ContentType[] ContentTypes { get; set; }
 
-        [ConfigurationField("minItems", "Min Items", "number", Description = "Set the minimum number of items allowed.")]
+        [ConfigurationField("minItems", "Min Items", "number", Description = "Minimum number of items allowed.")]
         public int? MinItems { get; set; }
 
-        [ConfigurationField("maxItems", "Max Items", "number", Description = "Set the maximum number of items allowed.")]
+        [ConfigurationField("maxItems", "Max Items", "number", Description = "Maximum number of items allowed.")]
         public int? MaxItems { get; set; }
 
-        [ConfigurationField("confirmDeletes", "Confirm Deletes", "boolean", Description = "Set whether item deletions should require confirming.")]
+        [ConfigurationField("confirmDeletes", "Confirm Deletes", "boolean", Description = "Requires editor confirmation for delete actions.")]
         public bool ConfirmDeletes { get; set; } = true;
 
-        [ConfigurationField("showIcons", "Show Icons", "boolean", Description = "Set whether to show the items doc type icon in the list.")]
+        [ConfigurationField("showIcons", "Show Icons", "boolean", Description = "Show the Element Type icons.")]
         public bool ShowIcons { get; set; } = true;
 
-        [ConfigurationField("hideLabel", "Hide Label", "boolean", Description = "Set whether to hide the editor label and have the list take up the full width of the editor window.")]
+        [ConfigurationField("hideLabel", "Hide Label", "boolean", Description = "Hide the property label and let the item list span the full width of the editor window.")]
         public bool HideLabel { get; set; }
 
         public class ContentType

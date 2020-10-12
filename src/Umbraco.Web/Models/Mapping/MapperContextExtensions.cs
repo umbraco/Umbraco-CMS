@@ -8,6 +8,7 @@ namespace Umbraco.Web.Models.Mapping
     internal static class MapperContextExtensions
     {
         private const string CultureKey = "Map.Culture";
+        private const string SegmentKey = "Map.Segment";
         private const string IncludedPropertiesKey = "Map.IncludedProperties";
 
         /// <summary>
@@ -19,11 +20,27 @@ namespace Umbraco.Web.Models.Mapping
         }
 
         /// <summary>
+        /// Gets the context segment.
+        /// </summary>
+        public static string GetSegment(this MapperContext context)
+        {
+            return context.HasItems && context.Items.TryGetValue(SegmentKey, out var obj) && obj is string s ? s : null;
+        }
+
+        /// <summary>
         /// Sets a context culture.
         /// </summary>
         public static void SetCulture(this MapperContext context, string culture)
         {
             context.Items[CultureKey] = culture;
+        }
+
+        /// <summary>
+        /// Sets a context segment.
+        /// </summary>
+        public static void SetSegment(this MapperContext context, string segment)
+        {
+            context.Items[SegmentKey] = segment;
         }
 
         /// <summary>

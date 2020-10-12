@@ -20,7 +20,9 @@ namespace Umbraco.Core.Models.PublishedContent
     {
         private ModelType(string contentTypeAlias)
         {
-            if (string.IsNullOrWhiteSpace(contentTypeAlias)) throw new ArgumentNullOrEmptyException(nameof(contentTypeAlias));
+            if (contentTypeAlias == null) throw new ArgumentNullException(nameof(contentTypeAlias));
+            if (string.IsNullOrWhiteSpace(contentTypeAlias)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(contentTypeAlias));
+
             ContentTypeAlias = contentTypeAlias;
             Name = "{" + ContentTypeAlias + "}";
         }

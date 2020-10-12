@@ -135,14 +135,19 @@ namespace Umbraco.Web.Editors
             // must have an active variation context!
             _variationContextAccessor.VariationContext = new VariationContext(culture);
 
-            var result = Request.CreateResponse();
-            //need to create a specific content result formatted as HTML since this controller has been configured
-            //with only json formatters.
-            result.Content = new StringContent(
-                _componentRenderer.RenderMacro(pageId, m.Alias, macroParams).ToString(),
-                Encoding.UTF8,
-                "text/html");
-            return result;
+            using (UmbracoContext.ForcedPreview(true))
+            {
+
+                var result = Request.CreateResponse();
+                //need to create a specific content result formatted as HTML since this controller has been configured
+                //with only json formatters.
+                result.Content = new StringContent(
+                    _componentRenderer.RenderMacroForContent(publishedContent, m.Alias, macroParams).ToString(),
+                    Encoding.UTF8,
+                    "text/html");
+
+                return result;
+            }
         }
 
         [HttpPost]

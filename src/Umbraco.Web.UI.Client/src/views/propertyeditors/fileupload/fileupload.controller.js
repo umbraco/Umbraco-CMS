@@ -34,6 +34,7 @@
             fileManager.setFiles({
                 propertyAlias: $scope.model.alias,
                 culture: $scope.model.culture,
+                segment: $scope.model.segment,
                 files: []
             });
         }

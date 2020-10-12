@@ -29,5 +29,7 @@ namespace Umbraco.Web.Models
         public string EventElement { get; set; }
         [DataMember(Name = "customProperties")]
         public JObject CustomProperties { get; set; }
+        [DataMember(Name = "skipStepIfVisible")]
+        public string SkipStepIfVisible { get; set; }
     }
 }

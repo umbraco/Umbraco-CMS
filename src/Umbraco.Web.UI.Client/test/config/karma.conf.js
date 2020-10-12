@@ -1,3 +1,4 @@
+const jsdom = require("jsdom");
 module.exports = function (config) {
 
     config.set({
@@ -10,6 +11,8 @@ module.exports = function (config) {
         // list of files / patterns to load in the browser
         files: [
 
+            // Jasmine plugins
+            
             //libraries
             'node_modules/jquery/dist/jquery.min.js',
             'node_modules/angular/angular.js',
@@ -36,7 +39,6 @@ module.exports = function (config) {
             '../Umbraco.Web.UI/Umbraco/js/*.filters.js',
             '../Umbraco.Web.UI/Umbraco/js/*.services.js',
             '../Umbraco.Web.UI/Umbraco/js/*.interceptors.js',
-            '../Umbraco.Web.UI/Umbraco/js/*.security.js',
             '../Umbraco.Web.UI/Umbraco/js/*.resources.js',
 
             //mocked data and routing
@@ -99,8 +101,17 @@ module.exports = function (config) {
         // - PhantomJS
         // - IE (only Windows)
         // CLI --browsers Chrome,Firefox,Safari
-        browsers: ['PhantomJS'],
-
+        browsers: ['jsdom'],
+		
+		// Configure a user agent so the log file gets generated properly
+		jsdomLauncher: {
+		  jsdom: {
+			resources: new jsdom.ResourceLoader({
+			  userAgent: "umbraco-test-suite",
+			})
+		  }
+		},
+		
         // allow waiting a bit longer, some machines require this
 
         browserNoActivityTimeout: 100000,     // default 10,000ms
@@ -115,10 +126,9 @@ module.exports = function (config) {
 
         plugins: [
             require('karma-jasmine'),
-            require('karma-phantomjs-launcher'),
+            require('karma-jsdom-launcher'),
             require('karma-junit-reporter'),
             require('karma-spec-reporter')
-
         ],
 
         // the default configuration

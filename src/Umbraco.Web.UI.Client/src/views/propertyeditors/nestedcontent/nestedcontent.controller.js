@@ -1,323 +1,313 @@
-﻿angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.DocTypePickerController", [
+﻿(function () {
+    'use strict';
 
-    "$scope",
-    "Umbraco.PropertyEditors.NestedContent.Resources",
-    "overlayService",
-    "localizationService",
-    "iconHelper",
-
-    function ($scope, ncResources, overlayService, localizationService, iconHelper) {
-        var selectElementTypeModalTitle = "";
-
-        $scope.elemTypeTabs = [];
+    /**
+     * When performing a copy, we do copy the ElementType Data Model, but each inner Nested Content property is still stored as the Nested Content Model, aka. each property is just storing its value. To handle this we need to ensure we handle both scenarios.
+     */
 
 
-        init();
+    angular.module('umbraco').run(['clipboardService', function (clipboardService) {
 
+        function clearNestedContentPropertiesForStorage(prop, propClearingMethod) {
 
-        function init() {
-            localizationService.localize("content_nestedContentSelectElementTypeModalTitle").then(function (value) {
-                selectElementTypeModalTitle = value;
-            });
+            // if prop.editor is "Umbraco.NestedContent"
+            if ((typeof prop === 'object' && prop.editor === "Umbraco.NestedContent")) {
 
-            ncResources.getContentTypes().then(function (elemTypes) {
-                $scope.model.elemTypes = elemTypes;
+                var value = prop.value;
+                for (var i = 0; i < value.length; i++) {
+                    var obj = value[i];
 
-                // convert legacy icons
-                iconHelper.formatContentTypeIcons($scope.model.elemTypes);
+                    // remove the key
+                    delete obj.key;
 
-                // Count doctype name occurrences
-                var elTypeNameOccurrences= _.countBy(elemTypes, 'name');
-
-                // Populate document type tab dictionary
-                // And append alias to name if multiple doctypes have the same name
-                elemTypes.forEach(function (value) {
-                    $scope.elemTypeTabs[value.alias] = value.tabs;
-                    
-                    if (elTypeNameOccurrences[value.name] > 1) {
-                        value.name += " (" + value.alias + ")";
+                    // Loop through all inner properties:
+                    for (var k in obj) {
+                        propClearingMethod(obj[k], clipboardService.TYPES.RAW);
                     }
-                });
-            });
-
-        }
-
-
-        $scope.add = function () {
-            $scope.model.value.push({
-                // As per PR #4, all stored content type aliases must be prefixed "nc" for easier recognition.
-                // For good measure we'll also prefix the tab alias "nc"
-                ncAlias: "",
-                ncTabAlias: "",
-                nameTemplate: ""
-            });
-        }
-
-        $scope.canAdd = function () {
-            return !$scope.model.docTypes || !$scope.model.value || $scope.model.value.length < $scope.model.docTypes.length;
-        }
-
-        $scope.remove = function (index) {
-            $scope.model.value.splice(index, 1);
-        }
-
-        $scope.sortableOptions = {
-            axis: "y",
-            cursor: "move",
-            handle: ".handle",
-            placeholder: 'sortable-placeholder',
-            forcePlaceholderSize: true,
-            helper: function (e, ui) {
-                // When sorting table rows, the cells collapse. This helper fixes that: https://www.foliotek.com/devblog/make-table-rows-sortable-using-jquery-ui-sortable/
-                ui.children().each(function () {
-                    $(this).width($(this).width());
-                });
-                return ui;
-            },
-            start: function (e, ui) {
-
-                var cellHeight = ui.item.height();
-
-                // Build a placeholder cell that spans all the cells in the row: https://stackoverflow.com/questions/25845310/jquery-ui-sortable-and-table-cell-size
-                var cellCount = 0;
-                $('td, th', ui.helper).each(function () {
-                    // For each td or th try and get it's colspan attribute, and add that or 1 to the total
-                    var colspan = 1;
-                    var colspanAttr = $(this).attr('colspan');
-                    if (colspanAttr > 1) {
-                        colspan = colspanAttr;
-                    }
-                    cellCount += colspan;
-                });
-
-                // Add the placeholder UI - note that this is the item's content, so td rather than tr - and set height of tr
-                ui.placeholder.html('<td colspan="' + cellCount + '"></td>').height(cellHeight);
-            }
-        };
-
-
-        $scope.placeholder = function (config) {
-            return _.find($scope.model.elemTypes, function (elType) {
-                return elType.alias === config.ncAlias;
-            });
-        }
-
-        $scope.selectableElemTypesFor = function (config) {
-            // return all elemTypes that are:
-            // 1. either already selected for this config, or
-            // 2. not selected in any other config
-            return _.filter($scope.model.elemTypes, function (elType) {
-                return elType.alias === config.ncAlias || !_.find($scope.model.value, function (c) {
-                    return elType.alias === c.ncAlias;
-                });
-            });
-        }
-        $scope.canAdd = function () {
-            return !$scope.model.value || _.some($scope.model.elemTypes, function (elType) {
-                return !_.find($scope.model.value, function (c) {
-                    return elType.alias === c.ncAlias;
-                });
-            });
-        }
-
-
-        $scope.openElemTypeModal = function ($event, config) {
-
-            //we have to add the alias to the objects (they are stored as ncAlias)
-            var selectedItems = _.each($scope.model.value, function (obj) {
-                obj.alias = obj.ncAlias;
-                return obj;
-            })
-
-            var elemTypeSelectorOverlay = {
-                view: "itempicker",
-                title: selectElementTypeModalTitle,
-                availableItems: $scope.selectableElemTypesFor(config),
-                selectedItems: selectedItems,
-                position: "target",
-                event: $event,
-                submit: function (model) {
-                    config.ncAlias = model.selectedItem.alias;
-                    overlayService.close();
-                },
-                close: function () {
-                    overlayService.close();
                 }
-            };
-
-            overlayService.open(elemTypeSelectorOverlay);
+            }
         }
 
+        clipboardService.registerClearPropertyResolver(clearNestedContentPropertiesForStorage, clipboardService.TYPES.ELEMENT_TYPE)
 
 
-        if (!$scope.model.value) {
-            $scope.model.value = [];
-            $scope.add();
+        function clearInnerNestedContentPropertiesForStorage(prop, propClearingMethod) {
+
+            // if we got an array, and it has a entry with ncContentTypeAlias this meants that we are dealing with a NestedContent property data.
+            if ((Array.isArray(prop) && prop.length > 0 && prop[0].ncContentTypeAlias !== undefined)) {
+
+                for (var i = 0; i < prop.length; i++) {
+                    var obj = prop[i];
+
+                    // remove the key
+                    delete obj.key;
+
+                    // Loop through all inner properties:
+                    for (var k in obj) {
+                        propClearingMethod(obj[k], clipboardService.TYPES.RAW);
+                    }
+                }
+            }
         }
 
-    }
-]);
+        clipboardService.registerClearPropertyResolver(clearInnerNestedContentPropertiesForStorage, clipboardService.TYPES.RAW)
+    }]);
 
-angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.PropertyEditorController", [
+    angular
+        .module('umbraco')
+        .component('nestedContentPropertyEditor', {
+            templateUrl: 'views/propertyeditors/nestedcontent/nestedcontent.propertyeditor.html',
+            controller: NestedContentController,
+            controllerAs: 'vm',
+            require: {
+                umbProperty: '?^umbProperty',
+                umbVariantContent: '?^^umbVariantContent'
+            }
+        });
 
-    "$scope",
-    "$interpolate",
-    "$filter",
-    "$timeout",
-    "contentResource",
-    "localizationService",
-    "iconHelper",
-    "clipboardService",
-    "eventsService",
-    "overlayService",
-    
-    function ($scope, $interpolate, $filter, $timeout, contentResource, localizationService, iconHelper, clipboardService, eventsService, overlayService, $routeParams, editorState) {
-        
+    function NestedContentController($scope, $interpolate, $filter, serverValidationManager, contentResource, localizationService, iconHelper, clipboardService, eventsService, overlayService) {
+
+        var vm = this;
+        var model = $scope.$parent.$parent.model;
+
         var contentTypeAliases = [];
-        _.each($scope.model.config.contentTypes, function (contentType) {
+        _.each(model.config.contentTypes, function (contentType) {
             contentTypeAliases.push(contentType.ncAlias);
         });
 
-        _.each($scope.model.config.contentTypes, function (contentType) {
+        _.each(model.config.contentTypes, function (contentType) {
             contentType.nameExp = !!contentType.nameTemplate
                 ? $interpolate(contentType.nameTemplate)
                 : undefined;
         });
 
-        $scope.nodes = [];
-        $scope.currentNode = undefined;
-        $scope.realCurrentNode = undefined;
-        $scope.scaffolds = undefined;
-        $scope.sorting = false;
-        $scope.inited = false;
+        vm.nodes = [];
+        vm.currentNode = null;
+        vm.scaffolds = null;
+        vm.sorting = false;
+        vm.inited = false;
 
-        $scope.minItems = $scope.model.config.minItems || 0;
-        $scope.maxItems = $scope.model.config.maxItems || 0;
+        vm.minItems = model.config.minItems || 0;
+        vm.maxItems = model.config.maxItems || 0;
 
-        if ($scope.maxItems === 0)
-            $scope.maxItems = 1000;
+        if (vm.maxItems === 0)
+            vm.maxItems = 1000;
 
-        $scope.singleMode = $scope.minItems === 1 && $scope.maxItems === 1;
-        $scope.showIcons = Object.toBoolean($scope.model.config.showIcons);
-        $scope.wideMode = Object.toBoolean($scope.model.config.hideLabel);
-        $scope.hasContentTypes = $scope.model.config.contentTypes.length > 0;
+        vm.singleMode = vm.minItems === 1 && vm.maxItems === 1 && model.config.contentTypes.length === 1;;
+        vm.showIcons = Object.toBoolean(model.config.showIcons);
+        vm.wideMode = Object.toBoolean(model.config.hideLabel);
+        vm.hasContentTypes = model.config.contentTypes.length > 0;
 
-        $scope.labels = {};
-        localizationService.localizeMany(["grid_addElement", "content_createEmpty"]).then(function (data) {
-            $scope.labels.grid_addElement = data[0];
-            $scope.labels.content_createEmpty = data[1];
+        var cultureChanged = eventsService.on('editors.content.cultureChanged', (name, args) => updateModel());
+
+        var labels = {};
+        vm.labels = labels;
+        localizationService.localizeMany(["grid_addElement", "content_createEmpty", "actions_copy"]).then(function (data) {
+            labels.grid_addElement = data[0];
+            labels.content_createEmpty = data[1];
+            labels.copy_icon_title = data[2]
         });
 
+        function setCurrentNode(node) {
+            updateModel();
+            vm.currentNode = node;
+        }
+
+        var copyAllEntries = function () {
+
+            syncCurrentNode();
+
+            // list aliases
+            var aliases = vm.nodes.map((node) => node.contentTypeAlias);
+
+            // remove dublicates
+            aliases = aliases.filter((item, index) => aliases.indexOf(item) === index);
+
+            var nodeName = "";
+
+            if (vm.umbVariantContent) {
+                nodeName = vm.umbVariantContent.editor.content.name;
+            }
+
+            localizationService.localize("clipboard_labelForArrayOfItemsFrom", [model.label, nodeName]).then(function (data) {
+                clipboardService.copyArray(clipboardService.TYPES.ELEMENT_TYPE, aliases, vm.nodes, data, "icon-thumbnail-list", model.id, clearNodeForCopy);
+            });
+        }
+
+        var copyAllEntriesAction = {
+            labelKey: 'clipboard_labelForCopyAllEntries',
+            labelTokens: [model.label],
+            icon: 'documents',
+            method: copyAllEntries,
+            isDisabled: true
+        }
+
+
+        var removeAllEntries = function () {
+            localizationService.localizeMany(["content_nestedContentDeleteAllItems", "general_delete"]).then(function (data) {
+                overlayService.confirmDelete({
+                    title: data[1],
+                    content: data[0],
+                    close: function () {
+                        overlayService.close();
+                    },
+                    submit: function () {
+                        vm.nodes = [];
+                        setDirty();
+                        updateModel();
+                        overlayService.close();
+                    }
+                });
+            });
+        }
+
+        var removeAllEntriesAction = {
+            labelKey: 'clipboard_labelForRemoveAllEntries',
+            labelTokens: [],
+            icon: 'trash',
+            method: removeAllEntries,
+            isDisabled: true
+        };
         // helper to force the current form into the dirty state
-        $scope.setDirty = function () {
-            if ($scope.propertyForm) {
-                $scope.propertyForm.$setDirty();
+        function setDirty() {
+            if ($scope.$parent.$parent.propertyForm) {
+                $scope.$parent.$parent.propertyForm.$setDirty();
             }
         };
 
-        $scope.addNode = function (alias) {
-            var scaffold = $scope.getScaffold(alias);
+        function addNode(alias) {
+            var scaffold = getScaffold(alias);
 
             var newNode = createNode(scaffold, null);
 
-            $scope.currentNode = newNode;
-            $scope.setDirty();
+            setCurrentNode(newNode);
+            setDirty();
+            validate();
         };
 
-        $scope.openNodeTypePicker = function ($event) {
-            if ($scope.nodes.length >= $scope.maxItems) {
+        vm.openNodeTypePicker = function ($event) {
+            
+            if (vm.nodes.length >= vm.maxItems) {
                 return;
             }
 
-            $scope.overlayMenu = {
-                show: false,
-                style: {},
-                filter: $scope.scaffolds.length > 12 ? true : false,
+            var availableItems = [];
+            _.each(vm.scaffolds, function (scaffold) {
+                availableItems.push({
+                    alias: scaffold.contentTypeAlias,
+                    name: scaffold.contentTypeName,
+                    icon: iconHelper.convertFromLegacyIcon(scaffold.icon),
+                    tooltip: scaffold.documentType.description
+                });
+            });
+
+            const dialog = {
+                view: "itempicker",
                 orderBy: "$index",
                 view: "itempicker",
                 event: $event,
-                clickPasteItem: function(item) {
-                    $scope.pasteFromClipboard(item.data);
-                    $scope.overlayMenu.show = false;
-                    $scope.overlayMenu = null;
+                filter: availableItems.length > 12,
+                size: availableItems.length > 6 ? "medium" : "small",
+                availableItems: availableItems,
+                clickPasteItem: function (item) {
+                    if (Array.isArray(item.data)) {
+                        _.each(item.data, function (entry) {
+                            pasteFromClipboard(entry);
+                        });
+                    } else {
+                        pasteFromClipboard(item.data);
+                    }
+
+                    overlayService.close();
                 },
                 submit: function (model) {
                     if (model && model.selectedItem) {
-                        $scope.addNode(model.selectedItem.alias);
+                        addNode(model.selectedItem.alias);
                     }
-                    $scope.overlayMenu.show = false;
-                    $scope.overlayMenu = null;
+
+                    overlayService.close();
                 },
                 close: function () {
-                    $scope.overlayMenu.show = false;
-                    $scope.overlayMenu = null;
+                    overlayService.close();
                 }
             };
 
-            // this could be used for future limiting on node types
-            $scope.overlayMenu.availableItems = [];
-            _.each($scope.scaffolds, function (scaffold) {
-                $scope.overlayMenu.availableItems.push({
-                    alias: scaffold.contentTypeAlias,
-                    name: scaffold.contentTypeName,
-                    icon: iconHelper.convertFromLegacyIcon(scaffold.icon)
-                });
-            });
-
-            if ($scope.overlayMenu.availableItems.length === 0) {
+            if (dialog.availableItems.length === 0) {
                 return;
             }
-            
-            $scope.overlayMenu.size = $scope.overlayMenu.availableItems.length > 6 ? "medium" : "small";
-            
-            $scope.overlayMenu.pasteItems = [];
-            var availableNodesForPaste = clipboardService.retriveDataOfType("elementType", contentTypeAliases);
-            _.each(availableNodesForPaste, function (node) {
-                $scope.overlayMenu.pasteItems.push({
-                    alias: node.contentTypeAlias,
-                    name: node.name, //contentTypeName
-                    data: node,
-                    icon: iconHelper.convertFromLegacyIcon(node.icon)
+
+            dialog.pasteItems = [];
+
+            var entriesForPaste = clipboardService.retriveEntriesOfType(clipboardService.TYPES.ELEMENT_TYPE, contentTypeAliases);
+            _.each(entriesForPaste, function (entry) {
+                dialog.pasteItems.push({
+                    date: entry.date,
+                    name: entry.label,
+                    data: entry.data,
+                    icon: entry.icon
                 });
             });
 
-            $scope.overlayMenu.title = $scope.overlayMenu.pasteItems.length > 0 ? $scope.labels.grid_addElement : $scope.labels.content_createEmpty;
+            dialog.pasteItems.sort( (a, b) => {
+                return b.date - a.date
+            });
 
-            $scope.overlayMenu.clickClearPaste = function ($event) {
+            dialog.title = dialog.pasteItems.length > 0 ? labels.grid_addElement : labels.content_createEmpty;
+            dialog.hideHeader = dialog.pasteItems.length > 0;
+
+            dialog.clickClearPaste = function ($event) {
                 $event.stopPropagation();
                 $event.preventDefault();
-                clipboardService.clearEntriesOfType("elementType", contentTypeAliases);
-                $scope.overlayMenu.pasteItems = [];// This dialog is not connected via the clipboardService events, so we need to update manually.
+                clipboardService.clearEntriesOfType(clipboardService.TYPES.ELEMENT_TYPE, contentTypeAliases);
+                dialog.pasteItems = [];// This dialog is not connected via the clipboardService events, so we need to update manually.
+                dialog.hideHeader = false;
             };
 
-            if ($scope.overlayMenu.availableItems.length === 1 && $scope.overlayMenu.pasteItems.length === 0) {
+            if (dialog.availableItems.length === 1 && dialog.pasteItems.length === 0) {
                 // only one scaffold type - no need to display the picker
-                $scope.addNode($scope.scaffolds[0].contentTypeAlias);
+                addNode(vm.scaffolds[0].contentTypeAlias);
+
+                dialog.close();
+
                 return;
             }
 
-            $scope.overlayMenu.show = true;
+            overlayService.open(dialog);
         };
 
-        $scope.editNode = function (idx) {
-            if ($scope.currentNode && $scope.currentNode.key === $scope.nodes[idx].key) {
-                $scope.currentNode = undefined;
+        vm.editNode = function (idx) {
+            if (vm.currentNode && vm.currentNode.key === vm.nodes[idx].key) {
+                setCurrentNode(null);
             } else {
-                $scope.currentNode = $scope.nodes[idx];
+                setCurrentNode(vm.nodes[idx]);
             }
         };
 
-        $scope.deleteNode = function (idx) {
-            $scope.nodes.splice(idx, 1);
-            $scope.setDirty();
-            updateModel();
+        vm.canDeleteNode = function (idx) {
+            return (vm.nodes.length > vm.minItems)
+                ? true
+                : model.config.contentTypes.length > 1;
         };
-        $scope.requestDeleteNode = function (idx) {
-            if ($scope.nodes.length <= $scope.model.config.minItems) {
+
+        function deleteNode(idx) {
+            var removed = vm.nodes.splice(idx, 1);
+
+            setDirty();
+
+            removed.forEach(x => {
+                // remove any server validation errors associated
+                serverValidationManager.removePropertyError(x.key, vm.umbProperty.property.culture, vm.umbProperty.property.segment, "", { matchType: "contains" });
+            });
+
+            updateModel();
+            validate();
+        };
+
+        vm.requestDeleteNode = function (idx) {
+            if (!vm.canDeleteNode(idx)) {
                 return;
             }
-
-            if ($scope.model.config.confirmDeletes === true) {
+            if (model.config.confirmDeletes === true) {
                 localizationService.localizeMany(["content_nestedContentDeleteItem", "general_delete", "general_cancel", "contentTypeEditor_yesDelete"]).then(function (data) {
                     const overlay = {
                         title: data[1],
@@ -329,7 +319,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                             overlayService.close();
                         },
                         submit: function () {
-                            $scope.deleteNode(idx);
+                            deleteNode(idx);
                             overlayService.close();
                         }
                     };
@@ -337,23 +327,26 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                     overlayService.open(overlay);
                 });
             } else {
-                $scope.deleteNode(idx);
+                deleteNode(idx);
             }
         };
 
-        $scope.getName = function (idx) {
+        vm.getName = function (idx) {
+            if (!model.value || !model.value.length) {
+                return "";
+            }
 
             var name = "";
 
-            if ($scope.model.value[idx]) {
+            if (model.value[idx]) {
 
-                var contentType = $scope.getContentTypeConfig($scope.model.value[idx].ncContentTypeAlias);
+                var contentType = getContentTypeConfig(model.value[idx].ncContentTypeAlias);
 
                 if (contentType != null) {
                     // first try getting a name using the configured label template
                     if (contentType.nameExp) {
                         // Run the expression against the stored dictionary value, NOT the node object
-                        var item = $scope.model.value[idx];
+                        var item = model.value[idx];
 
                         // Add a temporary index property
                         item["$index"] = (idx + 1);
@@ -368,8 +361,8 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                     }
 
                     // if we still do not have a name and we have multiple content types to choose from, use the content type name (same as is shown in the content type picker)
-                    if (!name && $scope.scaffolds.length > 1) {
-                        var scaffold = $scope.getScaffold(contentType.ncAlias);
+                    if (!name && vm.scaffolds.length > 1) {
+                        var scaffold = getScaffold(contentType.ncAlias);
                         if (scaffold) {
                             name = scaffold.contentTypeName;
                         }
@@ -383,19 +376,25 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             }
 
             // Update the nodes actual name value
-            if ($scope.nodes[idx].name !== name) {
-                $scope.nodes[idx].name = name;
+            if (vm.nodes[idx].name !== name) {
+                vm.nodes[idx].name = name;
             }
 
             return name;
         };
 
-        $scope.getIcon = function (idx) {
-            var scaffold = $scope.getScaffold($scope.model.value[idx].ncContentTypeAlias);
+        vm.getIcon = function (idx) {
+            if (!model.value || !model.value.length) {
+                return "";
+            }
+
+            var scaffold = getScaffold(model.value[idx].ncContentTypeAlias);
             return scaffold && scaffold.icon ? iconHelper.convertFromLegacyIcon(scaffold.icon) : "icon-folder";
-        }
-        $scope.sortableOptions = {
+        };
+
+        vm.sortableOptions = {
             axis: "y",
+            containment: "parent",
             cursor: "move",
             handle: '.umb-nested-content__header-bar',
             distance: 10,
@@ -405,71 +404,107 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             start: function (ev, ui) {
                 updateModel();
                 // Yea, yea, we shouldn't modify the dom, sue me
-                $("#umb-nested-content--" + $scope.model.id + " .umb-rte textarea").each(function () {
+                $("#umb-nested-content--" + model.id + " .umb-rte textarea").each(function () {
                     tinymce.execCommand("mceRemoveEditor", false, $(this).attr("id"));
                     $(this).css("visibility", "hidden");
                 });
                 $scope.$apply(function () {
-                    $scope.sorting = true;
+                    vm.sorting = true;
                 });
             },
             update: function (ev, ui) {
-                $scope.setDirty();
+                setDirty();
             },
             stop: function (ev, ui) {
-                $("#umb-nested-content--" + $scope.model.id + " .umb-rte textarea").each(function () {
+                $("#umb-nested-content--" + model.id + " .umb-rte textarea").each(function () {
                     tinymce.execCommand("mceAddEditor", true, $(this).attr("id"));
                     $(this).css("visibility", "visible");
                 });
                 $scope.$apply(function () {
-                    $scope.sorting = false;
+                    vm.sorting = false;
                     updateModel();
                 });
             }
         };
 
-        $scope.getScaffold = function (alias) {
-            return _.find($scope.scaffolds, function (scaffold) {
+        function getScaffold(alias) {
+            return _.find(vm.scaffolds, function (scaffold) {
                 return scaffold.contentTypeAlias === alias;
             });
         }
 
-        $scope.getContentTypeConfig = function (alias) {
-            return _.find($scope.model.config.contentTypes, function (contentType) {
+        function getContentTypeConfig(alias) {
+            return _.find(model.config.contentTypes, function (contentType) {
                 return contentType.ncAlias === alias;
             });
         }
 
-        $scope.showCopy = clipboardService.isSupported();
+        function clearNodeForCopy(clonedData) {
+            delete clonedData.key;
+            delete clonedData.$$hashKey;
 
-        $scope.showPaste = false;
+            var variant = clonedData.variants[0];
+            for (var t = 0; t < variant.tabs.length; t++) {
+                var tab = variant.tabs[t];
+                for (var p = 0; p < tab.properties.length; p++) {
+                    var prop = tab.properties[p];
 
-        $scope.clickCopy = function ($event, node) {
+                    // If we have ncSpecific data, lets revert to standard data model.
+                    if (prop.propertyAlias) {
+                        prop.alias = prop.propertyAlias;
+                        delete prop.propertyAlias;
+                    }
+
+                    if(prop.ncMandatory !== undefined) {
+                        prop.validation.mandatory = prop.ncMandatory;
+                        delete prop.ncMandatory;
+                    }
+                }
+            }
+
+        }
+
+        vm.showCopy = clipboardService.isSupported();
+        vm.showPaste = false;
+
+        vm.clickCopy = function ($event, node) {
 
             syncCurrentNode();
 
-            clipboardService.copy("elementType", node.contentTypeAlias, node);
+            clipboardService.copy(clipboardService.TYPES.ELEMENT_TYPE, node.contentTypeAlias, node, null, null, null, clearNodeForCopy);
             $event.stopPropagation();
         }
-        
-        $scope.pasteFromClipboard = function(newNode) {
-            
+
+
+        function pasteFromClipboard(newNode) {
+
             if (newNode === undefined) {
                 return;
             }
 
+            newNode = clipboardService.parseContentForPaste(newNode, clipboardService.TYPES.ELEMENT_TYPE);
+
             // generate a new key.
             newNode.key = String.CreateGuid();
 
-            $scope.nodes.push(newNode);
-            $scope.setDirty();
+            // Ensure we have NC data in place:
+            var variant = newNode.variants[0];
+            for (var t = 0; t < variant.tabs.length; t++) {
+                var tab = variant.tabs[t];
+                for (var p = 0; p < tab.properties.length; p++) {
+                    extendPropertyWithNCData(tab.properties[p]);
+                }
+            }
+
+            vm.nodes.push(newNode);
+            setDirty();
             //updateModel();// done by setting current node...
-            
-            $scope.currentNode = newNode;
+
+            setCurrentNode(newNode);
         }
 
         function checkAbilityToPasteContent() {
-            $scope.showPaste = clipboardService.hasEntriesOfType("elementType", contentTypeAliases);
+            vm.showPaste = clipboardService.hasEntriesOfType(clipboardService.TYPES.ELEMENT_TYPE, contentTypeAliases);
         }
 
         eventsService.on("clipboardService.storageUpdate", checkAbilityToPasteContent);
@@ -477,13 +512,14 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
         var notSupported = [
             "Umbraco.Tags",
             "Umbraco.UploadField",
-            "Umbraco.ImageCropper"
+            "Umbraco.ImageCropper",
+            "Umbraco.BlockList"
         ];
 
         // Initialize
         var scaffoldsLoaded = 0;
-        $scope.scaffolds = [];
-        _.each($scope.model.config.contentTypes, function (contentType) {
+        vm.scaffolds = [];
+        _.each(model.config.contentTypes, function (contentType) {
             contentResource.getScaffold(-20, contentType.ncAlias).then(function (scaffold) {
                 // make sure it's an element type before allowing the user to create new ones
                 if (scaffold.isElement) {
@@ -496,8 +532,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                     if (tab) {
                         scaffold.variants[0].tabs.push(tab);
 
-                        angular.forEach(tab.properties,
-                            function (property) {
+                        tab.properties.forEach(function (property) {
                                 if (_.find(notSupported, function (x) { return x === property.editor; })) {
                                     property.notSupported = true;
                                     // TODO: Not supported message to be replaced with 'content_nestedContentEditorNotSupported' dictionary key. Currently not possible due to async/timing quirk.
@@ -507,7 +542,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                     }
 
                     // Store the scaffold object
-                    $scope.scaffolds.push(scaffold);
+                    vm.scaffolds.push(scaffold);
                 }
 
                 scaffoldsLoaded++;
@@ -520,22 +555,22 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
 
         var initIfAllScaffoldsHaveLoaded = function () {
             // Initialize when all scaffolds have loaded
-            if ($scope.model.config.contentTypes.length === scaffoldsLoaded) {
+            if (model.config.contentTypes.length === scaffoldsLoaded) {
                 // Because we're loading the scaffolds async one at a time, we need to
                 // sort them explicitly according to the sort order defined by the data type.
                 contentTypeAliases = [];
-                _.each($scope.model.config.contentTypes, function (contentType) {
+                _.each(model.config.contentTypes, function (contentType) {
                     contentTypeAliases.push(contentType.ncAlias);
                 });
-                $scope.scaffolds = $filter("orderBy")($scope.scaffolds, function (s) {
+                vm.scaffolds = $filter("orderBy")(vm.scaffolds, function (s) {
                     return contentTypeAliases.indexOf(s.contentTypeAlias);
                 });
 
                 // Convert stored nodes
-                if ($scope.model.value) {
-                    for (var i = 0; i < $scope.model.value.length; i++) {
-                        var item = $scope.model.value[i];
-                        var scaffold = $scope.getScaffold(item.ncContentTypeAlias);
+                if (model.value) {
+                    for (var i = 0; i < model.value.length; i++) {
+                        var item = model.value[i];
+                        var scaffold = getScaffold(item.ncContentTypeAlias);
                         if (scaffold == null) {
                             // No such scaffold - the content type might have been deleted. We need to skip it.
                             continue;
@@ -544,26 +579,59 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                     }
                 }
 
-                // Enforce min items
-                if ($scope.nodes.length < $scope.model.config.minItems) {
-                    for (var i = $scope.nodes.length; i < $scope.model.config.minItems; i++) {
-                        $scope.addNode($scope.scaffolds[0].contentTypeAlias);
+                // Enforce min items if we only have one scaffold type
+                var modelWasChanged = false;
+                if (vm.nodes.length < vm.minItems && vm.scaffolds.length === 1) {
+                    for (var i = vm.nodes.length; i < model.config.minItems; i++) {
+                        addNode(vm.scaffolds[0].contentTypeAlias);
                     }
+                    modelWasChanged = true;
                 }
 
                 // If there is only one item, set it as current node
-                if ($scope.singleMode || ($scope.nodes.length === 1 && $scope.maxItems === 1)) {
-                    $scope.currentNode = $scope.nodes[0];
+                if (vm.singleMode || (vm.nodes.length === 1 && vm.maxItems === 1)) {
+                    setCurrentNode(vm.nodes[0]);
                 }
 
-                $scope.inited = true;
+                validate();
 
+                vm.inited = true;
+
+                if (modelWasChanged) {
+                    updateModel();
+                }
+
+                updatePropertyActionStates();
                 checkAbilityToPasteContent();
             }
         }
 
+        function extendPropertyWithNCData(prop) {
+
+            if (prop.propertyAlias === undefined) {
+                // store the original alias before we change below, see notes
+                prop.propertyAlias = prop.alias;
+
+                // NOTE: This is super ugly, the reason it is like this is because it controls the label/html id in the umb-property component at a higher level.
+                // not pretty :/ but we can't change this now since it would require a bunch of plumbing to be able to change the id's higher up.
+                prop.alias = model.alias + "___" + prop.alias;
+            }
+
+            // TODO: Do we need to deal with this separately?
+            // Force validation to occur server side as this is the
+            // only way we can have consistency between mandatory and
+            // regex validation messages. Not ideal, but it works.
+            if(prop.ncMandatory === undefined) {
+                prop.ncMandatory = prop.validation.mandatory;
+                prop.validation = {
+                    mandatory: false,
+                    pattern: ""
+                };
+            }
+        }
+
         function createNode(scaffold, fromNcEntry) {
-            var node = angular.copy(scaffold);
+            var node = Utilities.copy(scaffold);
 
             node.key = fromNcEntry && fromNcEntry.key ? fromNcEntry.key : String.CreateGuid();
 
@@ -575,15 +643,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                 for (var p = 0; p < tab.properties.length; p++) {
                     var prop = tab.properties[p];
 
-                    prop.propertyAlias = prop.alias;
-                    prop.alias = $scope.model.alias + "___" + prop.alias;
-                    // Force validation to occur server side as this is the
-                    // only way we can have consistency between mandatory and
-                    // regex validation messages. Not ideal, but it works.
-                    prop.validation = {
-                        mandatory: false,
-                        pattern: ""
-                    };
+                    extendPropertyWithNCData(prop);
 
                     if (fromNcEntry && fromNcEntry[prop.propertyAlias]) {
                         prop.value = fromNcEntry[prop.propertyAlias];
@@ -591,7 +651,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                 }
             }
 
-            $scope.nodes.push(node);
+            vm.nodes.push(node);
 
             return node;
         }
@@ -614,37 +674,82 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             return obj;
         }
 
+
+
+
         function syncCurrentNode() {
-            if ($scope.realCurrentNode) {
-                $scope.$broadcast("ncSyncVal", { key: $scope.realCurrentNode.key });
+            if (vm.currentNode) {
+                $scope.$broadcast("ncSyncVal", { key: vm.currentNode.key });
             }
         }
 
         function updateModel() {
             syncCurrentNode();
 
-            if ($scope.inited) {
+            if (vm.inited) {
                 var newValues = [];
-                for (var i = 0; i < $scope.nodes.length; i++) {
-                    newValues.push(convertNodeIntoNCEntry($scope.nodes[i]));
+                for (var i = 0; i < vm.nodes.length; i++) {
+                    newValues.push(convertNodeIntoNCEntry(vm.nodes[i]));
                 }
-                $scope.model.value = newValues;
+                model.value = newValues;
             }
+
+            updatePropertyActionStates();
         }
 
-        $scope.$watch("currentNode", function (newVal) {
-            updateModel();
-            $scope.realCurrentNode = newVal;
-        });
+        function updatePropertyActionStates() {
+            copyAllEntriesAction.isDisabled = !model.value || !model.value.length;
+            removeAllEntriesAction.isDisabled = copyAllEntriesAction.isDisabled;
+        }
+
+
+
+        var propertyActions = [
+            copyAllEntriesAction,
+            removeAllEntriesAction
+        ];
+
+        this.$onInit = function () {
+            if (vm.umbProperty) {
+                vm.umbProperty.setPropertyActions(propertyActions);
+            }
+        };
 
         var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
             updateModel();
         });
 
+        var validate = function () {
+            if (vm.nodes.length < vm.minItems) {
+                $scope.nestedContentForm.minCount.$setValidity("minCount", false);
+            }
+            else {
+                $scope.nestedContentForm.minCount.$setValidity("minCount", true);
+            }
+
+            if (vm.nodes.length > vm.maxItems) {
+                $scope.nestedContentForm.maxCount.$setValidity("maxCount", false);
+            }
+            else {
+                $scope.nestedContentForm.maxCount.$setValidity("maxCount", true);
+            }
+        }
+
+        var watcher = $scope.$watch(
+            function () {
+                return vm.nodes.length;
+            },
+            function () {
+                validate();
+            }
+        );
+
         $scope.$on("$destroy", function () {
             unsubscribe();
+            cultureChanged();
+            watcher();
         });
 
     }
 
-]);
+})();

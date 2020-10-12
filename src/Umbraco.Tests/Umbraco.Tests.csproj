@@ -79,7 +79,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Castle.Core" Version="4.3.1" />
-    <PackageReference Include="Examine" Version="1.0.0" />
+    <PackageReference Include="Examine" Version="1.0.2" />
     <PackageReference Include="HtmlAgilityPack">
       <Version>1.8.14</Version>
     </PackageReference>
@@ -134,12 +134,23 @@
     <Compile Include="Mapping\MappingTests.cs" />
     <Compile Include="Migrations\MigrationPlanTests.cs" />
     <Compile Include="Migrations\MigrationTests.cs" />
+    <Compile Include="ModelsBuilder\BuilderTests.cs" />
+    <Compile Include="ModelsBuilder\ConfigTests.cs" />
+    <Compile Include="ModelsBuilder\StringExtensions.cs" />
+    <Compile Include="ModelsBuilder\UmbracoApplicationTests.cs" />
     <Compile Include="Models\ContentScheduleTests.cs" />
     <Compile Include="Models\CultureImpactTests.cs" />
+    <Compile Include="Models\ImageProcessorImageUrlGeneratorTest.cs" />
     <Compile Include="Models\PathValidationTests.cs" />
+    <Compile Include="Models\PropertyTests.cs" />
     <Compile Include="Models\VariationTests.cs" />
     <Compile Include="Persistence\Mappers\MapperTestBase.cs" />
     <Compile Include="Persistence\Repositories\DocumentRepositoryTest.cs" />
+    <Compile Include="Persistence\Repositories\EntityRepositoryTest.cs" />
+    <Compile Include="PropertyEditors\BlockEditorComponentTests.cs" />
+    <Compile Include="PropertyEditors\BlockListPropertyValueConverterTests.cs" />
+    <Compile Include="PropertyEditors\DataValueReferenceFactoryCollectionTests.cs" />
+    <Compile Include="PropertyEditors\NestedContentPropertyComponentTests.cs" />
     <Compile Include="PublishedContent\NuCacheChildrenTests.cs" />
     <Compile Include="PublishedContent\PublishedContentLanguageVariantTests.cs" />
     <Compile Include="PublishedContent\PublishedContentSnapshotTestBase.cs" />
@@ -156,9 +167,11 @@
     <Compile Include="Services\ContentTypeServiceVariantsTests.cs" />
     <Compile Include="Services\EntityXmlSerializerTests.cs" />
     <Compile Include="Packaging\CreatedPackagesRepositoryTests.cs" />
+    <Compile Include="Services\ExternalLoginServiceTests.cs" />
     <Compile Include="Services\MemberGroupServiceTests.cs" />
     <Compile Include="Services\MediaTypeServiceTests.cs" />
     <Compile Include="Services\PropertyValidationServiceTests.cs" />
+    <Compile Include="Templates\HtmlLocalLinkParserTests.cs" />
     <Compile Include="TestHelpers\RandomIdRamDirectory.cs" />
     <Compile Include="Testing\Objects\TestDataSource.cs" />
     <Compile Include="Published\PublishedSnapshotTestObjects.cs" />
@@ -212,6 +225,7 @@
     <Compile Include="Testing\Objects\Accessors\TestVariationContextAccessor.cs" />
     <Compile Include="Testing\ContentBaseExtensions.cs" />
     <Compile Include="Testing\Objects\Accessors\TestDefaultCultureAccessor.cs" />
+    <Compile Include="Testing\Objects\TestUmbracoContextFactory.cs" />
     <Compile Include="Testing\TestDatabase.cs" />
     <Compile Include="Testing\TestingTests\NUnitTests.cs" />
     <Compile Include="Persistence\LocksTests.cs" />
@@ -253,8 +267,9 @@
     <Compile Include="Web\Controllers\UsersControllerTests.cs" />
     <Compile Include="Web\HealthChecks\HealthCheckResultsTests.cs" />
     <Compile Include="Web\HttpCookieExtensionsTests.cs" />
+    <Compile Include="Templates\HtmlImageSourceParserTests.cs" />
     <Compile Include="Web\Mvc\HtmlStringUtilitiesTests.cs" />
-    <Compile Include="Web\ModelStateExtensionsTests.cs" />
+    <Compile Include="Web\Validation\ModelStateExtensionsTests.cs" />
     <Compile Include="Web\Mvc\RenderIndexActionSelectorAttributeTests.cs" />
     <Compile Include="Persistence\NPocoTests\PetaPocoCachesTest.cs" />
     <Compile Include="Persistence\Repositories\AuditRepositoryTest.cs" />
@@ -501,6 +516,7 @@
     <Compile Include="CoreThings\VersionExtensionTests.cs" />
     <Compile Include="Web\TemplateUtilitiesTests.cs" />
     <Compile Include="Web\UrlHelperExtensionTests.cs" />
+    <Compile Include="Web\Validation\ContentModelValidatorTests.cs" />
     <Compile Include="Web\WebExtensionMethodTests.cs" />
     <Compile Include="CoreThings\XmlExtensionsTests.cs" />
     <Compile Include="Misc\XmlHelperTests.cs" />
@@ -548,6 +564,10 @@
     <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj">
       <Project>{31785BC3-256C-4613-B2F5-A1B0BDDED8C1}</Project>
       <Name>Umbraco.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Umbraco.ModelsBuilder.Embedded\Umbraco.ModelsBuilder.Embedded.csproj">
+      <Project>{52ac0ba8-a60e-4e36-897b-e8b97a54ed1c}</Project>
+      <Name>Umbraco.ModelsBuilder.Embedded</Name>
     </ProjectReference>
     <ProjectReference Include="..\Umbraco.Web\Umbraco.Web.csproj">
       <Project>{651E1350-91B6-44B7-BD60-7207006D7003}</Project>

@@ -11,5 +11,6 @@
         public const string TemplateFrontEndCacheKey = "template";
 
         public const string MacroContentCacheKey = "macroContent_"; // used in MacroRenderers
+        public const string MacroFromAliasCacheKey = "macroFromAlias_";
     }
 }

@@ -57,7 +57,7 @@ namespace Umbraco.Core.Services.Implement
             }
             catch (HttpRequestException ex)
             {
-                throw new ConnectionException("An error occurring downloading the package from " + url, ex);
+                throw new HttpRequestException("An error occurring downloading the package from " + url, ex);
             }
 
             //successful

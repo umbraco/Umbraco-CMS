@@ -30,16 +30,16 @@ namespace Umbraco.Web.Routing
             response.Clear();
 
             var frequest = Current.UmbracoContext.PublishedRequest;
-            var reason = "Cannot render the page at url '{0}'.";
+            var reason = "Cannot render the page at URL '{0}'.";
             if (frequest.HasPublishedContent == false)
-                reason = "No umbraco document matches the url '{0}'.";
+                reason = "No umbraco document matches the URL '{0}'.";
             else if (frequest.HasTemplate == false)
-                reason = "No template exists to render the document at url '{0}'.";
+                reason = "No template exists to render the document at URL '{0}'.";
 
             response.Write("<html><body><h1>Page not found</h1>");
-            response.Write("<h3>");
+            response.Write("<h2>");
             response.Write(string.Format(reason, HttpUtility.HtmlEncode(Current.UmbracoContext.OriginalRequestUrl.PathAndQuery)));
-            response.Write("</h3>");
+            response.Write("</h2>");
             if (string.IsNullOrWhiteSpace(_message) == false)
                 response.Write("<p>" + _message + "</p>");
             response.Write("<p>This page can be replaced with a custom 404. Check the documentation for \"custom 404\".</p>");
