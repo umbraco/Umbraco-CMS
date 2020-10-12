@@ -100,7 +100,7 @@ namespace Umbraco.Tests.Routing
         [Test]
         public void Is_Client_Side_Request_InvalidPath_ReturnFalse()
         {
-            //This url is invalid. Default to false when the extension cannot be determined
+            //This URL is invalid. Default to false when the extension cannot be determined
             var uri = new Uri("http://test.com/installing-modules+foobar+\"yipee\"");
             var result = uri.IsClientSideRequest();
             Assert.AreEqual(false, result);

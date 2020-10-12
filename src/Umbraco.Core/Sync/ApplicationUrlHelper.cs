@@ -9,7 +9,7 @@ using Umbraco.Core.Logging;
 namespace Umbraco.Core.Sync
 {
     /// <summary>
-    /// A helper used to determine the current server umbraco application url.
+    /// A helper used to determine the current server umbraco application URL.
     /// </summary>
     public static class ApplicationUrlHelper
     {
@@ -17,12 +17,12 @@ namespace Umbraco.Core.Sync
         private static readonly Type TypeOfApplicationUrlHelper = typeof(ApplicationUrlHelper);
 
         /// <summary>
-        /// Gets or sets a custom provider for the umbraco application url.
+        /// Gets or sets a custom provider for the umbraco application URL.
         /// </summary>
         /// <remarks>
         /// <para>Receives the current request as a parameter, and it may be null. Must return a properly
-        /// formatted url with scheme and umbraco dir and no trailing slash eg "http://www.mysite.com/umbraco",
-        /// or <c>null</c>. To be used in auto-load-balancing scenarios where the application url is not
+        /// formatted URL with scheme and umbraco dir and no trailing slash eg "http://www.mysite.com/umbraco",
+        /// or <c>null</c>. To be used in auto-load-balancing scenarios where the application URL is not
         /// in config files but is determined programmatically.</para>
         /// <para>Must be assigned before resolution is frozen.</para>
         /// </remarks>
@@ -67,7 +67,7 @@ namespace Umbraco.Core.Sync
             }
 
             // try the server registrar
-            // which is assumed to return a url that:
+            // which is assumed to return a URL that:
             // - end with SystemDirectories.Umbraco
             // - contain a scheme
             // - end or not with a slash, it will be taken care of
