@@ -21,7 +21,7 @@ namespace Umbraco.Web.WebApi
     /// before their timeout expires.
     /// </remarks>
     [IsBackOffice]
-    [UmbracoUserTimeoutFilter]
+    // [UmbracoUserTimeoutFilter] has been migrated to netcore
     [UmbracoAuthorize]
     [DisableBrowserCache]
    // [UmbracoWebApiRequireHttps]
