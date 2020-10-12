@@ -4,6 +4,7 @@ using System.Linq;
 using Examine;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Blocks;
 using Umbraco.Core.Services;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
@@ -105,24 +106,47 @@ namespace Umbraco.Examine
         {
             IContent[] content;
 
+            var publishedPages = new HashSet<int>();
+
             do
             {
                 //add the published filter
                 //note: We will filter for published variants in the validator
-                content = _contentService.GetPagedChildren(contentParentId, pageIndex, pageSize, out _, _publishedQuery,
-                    Ordering.By("Path", Direction.Ascending)).ToArray();
+                content = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out _, _publishedQuery,
+                    Ordering.By("Level", Direction.Ascending)).ToArray();
                
                 if (content.Length > 0)
                 {
+                    var indexableContent = new List<IContent>();
+
+                    // get the max level in this result set
+                    int maxLevel = content.Max(x => x.Level);
+
+                    // gets the first level pages, these are always published because _publishedQuery filter
+                    // and store the id in a hash set so we can track them
+                    var firstLevelContent = content.Where(x => x.Level == 1);
+                    
+                    foreach (var item in firstLevelContent)
+                    {
+                        publishedPages.Add(item.Id);
+                        indexableContent.Add(item);
+                    }
+
+                    // get content per level so we can filter the pages that don't have a published parent
+                    for (var level = 2; level <= maxLevel; level++)
+                    {
+                        var levelContent = content.Where(x => x.Level == level && publishedPages.Contains(x.ParentId));
+
+                        foreach (var item in levelContent)
+                        {
+                            publishedPages.Add(item.Id);
+                            indexableContent.Add(item);
+                        }
+                    }
+
                     // ReSharper disable once PossibleMultipleEnumeration
                     foreach (var index in indexes)
-                        index.IndexItems(_contentValueSetBuilder.GetValueSets(content));
-
-
-                    foreach (var c in content)
-                    {
-                        IndexPublishedContent(c.Id,0, 10000, indexes);
-                    }
+                        index.IndexItems(_contentValueSetBuilder.GetValueSets(indexableContent.ToArray()));
                 }
 
                 pageIndex++;
