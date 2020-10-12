@@ -86,7 +86,7 @@ namespace Umbraco.Tests.Common.Builders
                     Alias = GetAlias(),
                 };
             }
- 
+
             contentType.Id = GetId();
             contentType.Key = GetKey();
             contentType.CreateDate = GetCreateDate();
@@ -101,7 +101,7 @@ namespace Umbraco.Tests.Common.Builders
             contentType.CreatorId = GetCreatorId();
             contentType.Trashed = GetTrashed();
             contentType.IsContainer = GetIsContainer();
-            
+
             contentType.Variations = contentVariation;
 
             contentType.NoGroupPropertyTypes =  _noGroupPropertyTypeBuilders.Select(x => x.Build());
@@ -132,9 +132,32 @@ namespace Umbraco.Tests.Common.Builders
                 .Build();
         }
 
-        public static ContentType CreateSimpleContentType(string alias = null, string name = null, IContentType parent = null, bool randomizeAliases = false, string propertyGroupName = "Content", int defaultTemplateId = 1)
+        public static ContentType CreateSimpleContentType2(string alias, string name, IContentType parent = null, bool randomizeAliases = false, string propertyGroupName = "Content")
         {
-            return (ContentType)new ContentTypeBuilder()
+            var builder = CreateSimpleContentTypeHelper(alias, name, parent, randomizeAliases, propertyGroupName);
+
+            builder.AddPropertyType()
+                .WithAlias(RandomAlias("gen", randomizeAliases))
+                .WithName("Gen")
+                .WithSortOrder(1)
+                .WithDataTypeId(-88)
+                .WithMandatory(false)
+                .WithDescription(string.Empty)
+                .Done();
+
+            return (ContentType)builder.Build();
+        }
+
+        public static ContentType CreateSimpleContentType(string alias = null, string name = null,
+            IContentType parent = null, bool randomizeAliases = false, string propertyGroupName = "Content",
+            int defaultTemplateId = 0)
+        {
+            return (ContentType)CreateSimpleContentTypeHelper(alias, name, parent, randomizeAliases, propertyGroupName, defaultTemplateId).Build();
+        }
+
+        public static ContentTypeBuilder CreateSimpleContentTypeHelper(string alias = null, string name = null, IContentType parent = null, bool randomizeAliases = false, string propertyGroupName = "Content", int defaultTemplateId = 0)
+        {
+            return new ContentTypeBuilder()
                 .WithAlias(alias ?? "simple")
                 .WithName(name ?? "Simple Page")
                 .WithParentContentType(parent)
@@ -166,8 +189,7 @@ namespace Umbraco.Tests.Common.Builders
                         .WithAlias("textPage")
                         .WithName("Textpage")
                         .Done()
-                    .WithDefaultTemplateId(defaultTemplateId)
-                .Build();
+                    .WithDefaultTemplateId(defaultTemplateId);
         }
 
         public static ContentType CreateTextPageContentType(string alias = "textPage", int defaultTemplateId = 1)
