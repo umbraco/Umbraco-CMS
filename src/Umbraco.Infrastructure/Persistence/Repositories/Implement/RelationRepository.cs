@@ -235,20 +235,47 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                         },
                         RelationFactory.BuildDto);  // value = DTO
 
-                    // Use NPoco's own InsertBulk command which will automatically re-populate the new Ids on the DTOs, our own
-                    // BulkInsertRecords does not cater for this.
-                    // UPDATE: actually this only seems to work if the database type is SqlServerCEDatabaseType, as this will do
-                    // individual inserts for each record.
-                    // For full SQL and LocalDb, SQL bulk copy is used, and this doesn't update the Ids.
-                    Database.InsertBulk(entitiesAndDtos.Values);
 
-                    // Re-assign ID to the entity if they've been set on the DTO.
+                    foreach (var dto in entitiesAndDtos.Values)
+                    {
+                        Database.Insert(dto);
+                    }
+
+                    // All dtos now have IDs assigned
                     foreach (var de in entitiesAndDtos)
                     {
+                        // re-assign ID to the entity
                         de.Key.Id = de.Value.Id;
                     }
 
                     PopulateObjectTypes(entitiesAndDtos.Keys.ToArray());
+                }
+            }
+        }
+
+        public void SaveBulk(IEnumerable<ReadOnlyRelation> relations)
+        {
+            foreach (var hasIdentityGroup in relations.GroupBy(r => r.HasIdentity))
+            {
+                if (hasIdentityGroup.Key)
+                {
+                    // Do updates, we can't really do a bulk update so this is still a 1 by 1 operation
+                    // however we can bulk populate the object types. It might be possible to bulk update
+                    // with SQL but would be pretty ugly and we're not really too worried about that for perf,
+                    // it's the bulk inserts we care about.
+                    foreach (var relation in hasIdentityGroup)
+                    {
+                        var dto = RelationFactory.BuildDto(relation);
+                        Database.Update(dto);
+                    }
+                }
+                else
+                {
+                    // Do bulk inserts
+                    var dtos = hasIdentityGroup.Select(RelationFactory.BuildDto);
+
+                    Database.InsertBulk(dtos);
+
                 }
             }
         }

@@ -148,10 +148,10 @@ namespace Umbraco.Tests.Common.Builders
             return (ContentType)builder.Build();
         }public static ContentType CreateSimpleContentType(string alias = null, string name = null, IContentType parent = null, bool randomizeAliases = false, string propertyGroupName = "Content", bool mandatoryProperties = false, int defaultTemplateId = 0)
         {
-            return (ContentType)CreateSimpleContentTypeHelper(alias, name, parent, randomizeAliases, propertyGroupName, defaultTemplateId).Build();
+            return (ContentType)CreateSimpleContentTypeHelper(alias, name, parent, randomizeAliases, propertyGroupName, mandatoryProperties, defaultTemplateId).Build();
         }
 
-        public static ContentTypeBuilder CreateSimpleContentTypeHelper(string alias = null, string name = null, IContentType parent = null, bool randomizeAliases = false, string propertyGroupName = "Content", int defaultTemplateId = 0)
+        public static ContentTypeBuilder CreateSimpleContentTypeHelper(string alias = null, string name = null, IContentType parent = null, bool randomizeAliases = false, string propertyGroupName = "Content", bool mandatoryProperties = false, int defaultTemplateId = 0)
         {
             return new ContentTypeBuilder()
                 .WithAlias(alias ?? "simple")
