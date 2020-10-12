@@ -9,8 +9,8 @@ namespace Umbraco.Core.Composing
     /// <summary>
     /// Adds all automatically discovered and enabled <see cref="IApplicationComponent" /> types.
     /// </summary>
-    /// <seealso cref="Umbraco.Core.Composing.IComposer" />
-    public class ApplicationComponentComposer : IComposer
+    /// <seealso cref="Umbraco.Core.Composing.ICoreComposer" />
+    public class ApplicationComponentComposer : ICoreComposer
     {
         /// <summary>
         /// Compose all <see cref="IApplicationComponent" /> types.
