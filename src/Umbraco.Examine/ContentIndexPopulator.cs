@@ -139,6 +139,7 @@ namespace Umbraco.Examine
                     }
 
                     // get content per level so we can filter the pages that don't have a published parent
+                    // this because the paged descendants method does not take unpublished ancestors into account
                     for (var level = 2; level <= maxLevel; level++)
                     {
                         var levelContent = content.Where(x => x.Level == level && publishedPages.Contains(x.ParentId));
