@@ -543,11 +543,11 @@ namespace Umbraco.Tests.Integration.Services
         {
             // Arrange
             // Act
-            var content = ContentService.GetById(NodeIdSeed + 3);
+            var content = ContentService.GetById(Textpage.Id);
 
             // Assert
             Assert.That(content, Is.Not.Null);
-            Assert.That(content.Id, Is.EqualTo(NodeIdSeed + 3));
+            Assert.That(content.Id, Is.EqualTo(Textpage.Id));
         }
 
         [Test]
@@ -559,7 +559,7 @@ namespace Umbraco.Tests.Integration.Services
 
             // Assert
             Assert.That(content, Is.Not.Null);
-            Assert.That(content.Id, Is.EqualTo(NodeIdSeed + 3));
+            Assert.That(content.Id, Is.EqualTo(Textpage.Id));
         }
 
         [Test]
@@ -578,13 +578,13 @@ namespace Umbraco.Tests.Integration.Services
         [Test]
         public void Can_Get_All_Versions_Of_Content()
         {
-            var parent = ContentService.GetById(NodeIdSeed + 3);
+            var parent = ContentService.GetById(Textpage.Id);
             Assert.IsFalse(parent.Published);
             ContentService.SaveAndPublish(parent); // publishing parent, so Text Page 2 can be updated.
 
-            var content = ContentService.GetById(NodeIdSeed + 4);
+            var content = ContentService.GetById(Subpage.Id);
             Assert.IsFalse(content.Published);
-            var versions = ContentService.GetVersions(NodeIdSeed + 4).ToList();
+            var versions = ContentService.GetVersions(Subpage.Id).ToList();
             Assert.AreEqual(1, versions.Count);
 
             var version1 = content.VersionId;
@@ -616,7 +616,7 @@ namespace Umbraco.Tests.Integration.Services
             Assert.AreEqual("John Farr", content1.GetValue("author"));
             Assert.AreEqual("Bob Hope", content1.GetValue("author", published: true));
 
-            versions = ContentService.GetVersions(NodeIdSeed + 4).ToList();
+            versions = ContentService.GetVersions(Subpage.Id).ToList();
             Assert.AreEqual(3, versions.Count);
 
             // versions come with most recent first
@@ -661,9 +661,9 @@ namespace Umbraco.Tests.Integration.Services
         public void Can_Get_Content_For_Expiration()
         {
             // Arrange
-            var root = ContentService.GetById(NodeIdSeed + 3);
+            var root = ContentService.GetById(Textpage.Id);
             ContentService.SaveAndPublish(root);
-            var content = ContentService.GetById(NodeIdSeed + 4);
+            var content = ContentService.GetById(Subpage.Id);
             content.ContentSchedule.Add(null, DateTime.Now.AddSeconds(1));
             ContentService.SaveAndPublish(content);
 
@@ -708,7 +708,7 @@ namespace Umbraco.Tests.Integration.Services
         public void Can_Unpublish_Content()
         {
             // Arrange
-            var content = ContentService.GetById(NodeIdSeed + 3);
+            var content = ContentService.GetById(Textpage.Id);
             var published = ContentService.SaveAndPublish(content, userId: 0);
 
             // Act
@@ -1059,7 +1059,7 @@ namespace Umbraco.Tests.Integration.Services
         public void Can_Publish_Content_1()
         {
             // Arrange
-            var content = ContentService.GetById(NodeIdSeed + 3);
+            var content = ContentService.GetById(Textpage.Id);
 
             // Act
             var published = ContentService.SaveAndPublish(content, userId: Constants.Security.SuperUserId);
@@ -1073,7 +1073,7 @@ namespace Umbraco.Tests.Integration.Services
         public void Can_Publish_Content_2()
         {
             // Arrange
-            var content = ContentService.GetById(NodeIdSeed + 3);
+            var content = ContentService.GetById(Textpage.Id);
 
             // Act
             var published = ContentService.SaveAndPublish(content, userId: 0);
@@ -1109,7 +1109,7 @@ namespace Umbraco.Tests.Integration.Services
 
             try
             {
-                var content = ContentService.GetById(NodeIdSeed + 3);
+                var content = ContentService.GetById(Textpage.Id);
                 Assert.AreEqual("Home", content.Name);
 
                 content.Name = "foo";
@@ -1161,7 +1161,7 @@ namespace Umbraco.Tests.Integration.Services
             var contentType = ContentTypeBuilder.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", mandatoryProperties: true, defaultTemplateId: template.Id);
             ContentTypeService.Save(contentType);
 
-            var parentId = NodeIdSeed + 3;
+            var parentId = Textpage.Id;
 
             var parent = ContentService.GetById(parentId);
 
@@ -1259,7 +1259,7 @@ namespace Umbraco.Tests.Integration.Services
         [Test]
         public void Can_Publish_Content_Children()
         {
-            var parentId = NodeIdSeed + 3;
+            var parentId = Textpage.Id;
 
             var parent = ContentService.GetById(parentId);
 
@@ -1291,19 +1291,19 @@ namespace Umbraco.Tests.Integration.Services
             var children = ContentService.GetPagedChildren(parentId, 0, 500, out var totalChildren); //we only want the first so page size, etc.. is abitrary
 
             // children are published including ... that was released 5 mins ago
-            Assert.IsTrue(children.First(x => x.Id == NodeIdSeed + 4).Published);
+            Assert.IsTrue(children.First(x => x.Id == Subpage.Id).Published);
         }
 
         [Test]
         public void Cannot_Publish_Expired_Content()
         {
             // Arrange
-            var content = ContentService.GetById(NodeIdSeed + 4); //This Content expired 5min ago
+            var content = ContentService.GetById(Subpage.Id); //This Content expired 5min ago
             content.ContentSchedule.Add(null, DateTime.Now.AddMinutes(-5));
             ContentService.Save(content);
 
-            var parent = ContentService.GetById(NodeIdSeed + 3);
-            var parentPublished = ContentService.SaveAndPublish(parent, userId: Constants.Security.SuperUserId);//Publish root Home node to enable publishing of 'NodeIdSeed + 4'
+            var parent = ContentService.GetById(Textpage.Id);
+            var parentPublished = ContentService.SaveAndPublish(parent, userId: Constants.Security.SuperUserId);//Publish root Home node to enable publishing of 'Subpage.Id'
 
             // Act
             var published = ContentService.SaveAndPublish(content, userId: Constants.Security.SuperUserId);
@@ -1338,12 +1338,12 @@ namespace Umbraco.Tests.Integration.Services
         public void Cannot_Publish_Content_Awaiting_Release()
         {
             // Arrange
-            var content = ContentService.GetById(NodeIdSeed + 4);
+            var content = ContentService.GetById(Subpage.Id);
             content.ContentSchedule.Add(DateTime.Now.AddHours(2), null);
             ContentService.Save(content, Constants.Security.SuperUserId);
 
-            var parent = ContentService.GetById(NodeIdSeed + 3);
-            var parentPublished = ContentService.SaveAndPublish(parent, userId: Constants.Security.SuperUserId);//Publish root Home node to enable publishing of 'NodeIdSeed + 4'
+            var parent = ContentService.GetById(Textpage.Id);
+            var parentPublished = ContentService.SaveAndPublish(parent, userId: Constants.Security.SuperUserId);//Publish root Home node to enable publishing of 'Subpage.Id'
 
             // Act
             var published = ContentService.SaveAndPublish(content, userId: Constants.Security.SuperUserId);
@@ -1378,7 +1378,7 @@ namespace Umbraco.Tests.Integration.Services
         public void Cannot_Publish_Content_Where_Parent_Is_Unpublished()
         {
             // Arrange
-            var content = ContentService.Create("Subpage with Unpublished Parent", NodeIdSeed + 3, "umbTextpage", Constants.Security.SuperUserId);
+            var content = ContentService.Create("Subpage with Unpublished Parent", Textpage.Id, "umbTextpage", Constants.Security.SuperUserId);
             ContentService.Save(content, Constants.Security.SuperUserId);
 
             // Act
@@ -1393,7 +1393,7 @@ namespace Umbraco.Tests.Integration.Services
         public void Cannot_Publish_Trashed_Content()
         {
             // Arrange
-            var content = ContentService.GetById(NodeIdSeed + 6);
+            var content = ContentService.GetById(Trashed.Id);
 
             // Act
             var published = ContentService.SaveAndPublish(content, userId: Constants.Security.SuperUserId);
@@ -1456,10 +1456,10 @@ namespace Umbraco.Tests.Integration.Services
         public void Can_Get_Published_Descendant_Versions()
         {
             // Arrange
-            var root = ContentService.GetById(NodeIdSeed + 3);
+            var root = ContentService.GetById(Textpage.Id);
             var rootPublished = ContentService.SaveAndPublish(root);
 
-            var content = ContentService.GetById(NodeIdSeed + 4);
+            var content = ContentService.GetById(Subpage.Id);
             content.Properties["title"].SetValue(content.Properties["title"].GetValue() + " Published");
             var contentPublished = ContentService.SaveAndPublish(content);
             var publishedVersion = content.VersionId;
@@ -1489,7 +1489,7 @@ namespace Umbraco.Tests.Integration.Services
             Assert.That(publishedContentVersion.Properties["title"].GetValue(), Contains.Substring("Saved"));
 
             //Ensure that the latest version of the content is ok
-            var currentContent = ContentService.GetById(NodeIdSeed + 4);
+            var currentContent = ContentService.GetById(Subpage.Id);
             Assert.That(currentContent.Published, Is.True);
             Assert.That(currentContent.Properties["title"].GetValue(published: true), Contains.Substring("Published"));
             Assert.That(currentContent.Properties["title"].GetValue(), Contains.Substring("Saved"));
@@ -1515,8 +1515,8 @@ namespace Umbraco.Tests.Integration.Services
         {
             // Arrange
             var contentType = ContentTypeService.Get("umbTextpage");
-            var subpage = ContentBuilder.CreateSimpleContent(contentType, "Text Subpage 1", NodeIdSeed + 3);
-            var subpage2 = ContentBuilder.CreateSimpleContent(contentType, "Text Subpage 2", NodeIdSeed + 3);
+            var subpage = ContentBuilder.CreateSimpleContent(contentType, "Text Subpage 1", Textpage.Id);
+            var subpage2 = ContentBuilder.CreateSimpleContent(contentType, "Text Subpage 2", Textpage.Id);
             var list = new List<IContent> {subpage, subpage2};
 
             // Act
@@ -1562,11 +1562,11 @@ namespace Umbraco.Tests.Integration.Services
         public void Can_Delete_Content()
         {
             // Arrange
-            var content = ContentService.GetById(NodeIdSeed + 3);
+            var content = ContentService.GetById(Textpage.Id);
 
             // Act
             ContentService.Delete(content, Constants.Security.SuperUserId);
-            var deleted = ContentService.GetById(NodeIdSeed + 3);
+            var deleted = ContentService.GetById(Textpage.Id);
 
             // Assert
             Assert.That(deleted, Is.Null);
@@ -1576,7 +1576,7 @@ namespace Umbraco.Tests.Integration.Services
         public void Can_Move_Content_To_RecycleBin()
         {
             // Arrange
-            var content = ContentService.GetById(NodeIdSeed + 3);
+            var content = ContentService.GetById(Textpage.Id);
 
             // Act
             ContentService.MoveToRecycleBin(content, Constants.Security.SuperUserId);
@@ -1591,10 +1591,10 @@ namespace Umbraco.Tests.Integration.Services
         {
             var contentType = ContentTypeService.Get("umbTextpage");
 
-            var subsubpage = ContentBuilder.CreateSimpleContent(contentType, "Text Page 3", NodeIdSeed + 4);
+            var subsubpage = ContentBuilder.CreateSimpleContent(contentType, "Text Page 3", Subpage.Id);
             ContentService.Save(subsubpage, Constants.Security.SuperUserId);
 
-            var content = ContentService.GetById(NodeIdSeed + 3);
+            var content = ContentService.GetById(Textpage.Id);
             const int pageSize = 500;
             var page = 0;
             var total = long.MaxValue;
@@ -1822,13 +1822,13 @@ namespace Umbraco.Tests.Integration.Services
         public void Can_Move_Content()
         {
             // Arrange
-            var content = ContentService.GetById(NodeIdSeed + 6);
+            var content = ContentService.GetById(Trashed.Id);
 
             // Act - moving out of recycle bin
-            ContentService.Move(content, NodeIdSeed + 3);
+            ContentService.Move(content, Textpage.Id);
 
             // Assert
-            Assert.That(content.ParentId, Is.EqualTo(NodeIdSeed + 3));
+            Assert.That(content.ParentId, Is.EqualTo(Textpage.Id));
             Assert.That(content.Trashed, Is.False);
             Assert.That(content.Published, Is.False);
         }
@@ -1837,11 +1837,11 @@ namespace Umbraco.Tests.Integration.Services
         public void Can_Copy_Content()
         {
             // Arrange
-            var temp = ContentService.GetById(NodeIdSeed + 4);
+            var temp = ContentService.GetById(Subpage.Id);
 
             // Act
             var copy = ContentService.Copy(temp, temp.ParentId, false, Constants.Security.SuperUserId);
-            var content = ContentService.GetById(NodeIdSeed + 4);
+            var content = ContentService.GetById(Subpage.Id);
 
             // Assert
             Assert.That(copy, Is.Not.Null);
@@ -1902,13 +1902,13 @@ namespace Umbraco.Tests.Integration.Services
         public void Can_Copy_Recursive()
         {
             // Arrange
-            var temp = ContentService.GetById(NodeIdSeed + 3);
+            var temp = ContentService.GetById(Textpage.Id);
             Assert.AreEqual("Home", temp.Name);
             Assert.AreEqual(2, ContentService.CountChildren(temp.Id));
 
             // Act
             var copy = ContentService.Copy(temp, temp.ParentId, false, true, Constants.Security.SuperUserId);
-            var content = ContentService.GetById(NodeIdSeed + 3);
+            var content = ContentService.GetById(Textpage.Id);
 
             // Assert
             Assert.That(copy, Is.Not.Null);
@@ -1916,7 +1916,7 @@ namespace Umbraco.Tests.Integration.Services
             Assert.AreNotSame(content, copy);
             Assert.AreEqual(2, ContentService.CountChildren(copy.Id));
 
-            var child = ContentService.GetById(NodeIdSeed + 4);
+            var child = ContentService.GetById(Subpage.Id);
             var childCopy = ContentService.GetPagedChildren(copy.Id, 0, 500, out var total).First();
             Assert.AreEqual(childCopy.Name, child.Name);
             Assert.AreNotEqual(childCopy.Id, child.Id);
@@ -1927,13 +1927,13 @@ namespace Umbraco.Tests.Integration.Services
         public void Can_Copy_NonRecursive()
         {
             // Arrange
-            var temp = ContentService.GetById(NodeIdSeed + 3);
+            var temp = ContentService.GetById(Textpage.Id);
             Assert.AreEqual("Home", temp.Name);
             Assert.AreEqual(2, ContentService.CountChildren(temp.Id));
 
             // Act
             var copy = ContentService.Copy(temp, temp.ParentId, false, false, Constants.Security.SuperUserId);
-            var content = ContentService.GetById(NodeIdSeed + 3);
+            var content = ContentService.GetById(Textpage.Id);
 
             // Assert
             Assert.That(copy, Is.Not.Null);
@@ -2001,14 +2001,14 @@ namespace Umbraco.Tests.Integration.Services
         public void Can_Rollback_Version_On_Content()
         {
             // Arrange
-            var parent = ContentService.GetById(NodeIdSeed + 3);
+            var parent = ContentService.GetById(Textpage.Id);
             Assert.IsFalse(parent.Published);
             ContentService.SaveAndPublish(parent); // publishing parent, so Text Page 2 can be updated.
 
-            var content = ContentService.GetById(NodeIdSeed + 4);
+            var content = ContentService.GetById(Subpage.Id);
             Assert.IsFalse(content.Published);
 
-            var versions = ContentService.GetVersions(NodeIdSeed + 4).ToList();
+            var versions = ContentService.GetVersions(Subpage.Id).ToList();
             Assert.AreEqual(1, versions.Count);
 
             var version1 = content.VersionId;
@@ -2060,7 +2060,7 @@ namespace Umbraco.Tests.Integration.Services
             // version3, third and current published version
 
             // rollback all values to version1
-            var rollback = ContentService.GetById(NodeIdSeed + 4);
+            var rollback = ContentService.GetById(Subpage.Id);
             var rollto = ContentService.GetVersion(version1);
             rollback.CopyFrom(rollto);
             rollback.Name = rollto.Name; // must do it explicitly
@@ -2082,7 +2082,7 @@ namespace Umbraco.Tests.Integration.Services
 
             // rollback all values to current version
             // special because... current has edits... this really is equivalent to rolling back to version2
-            var rollback2 = ContentService.GetById(NodeIdSeed + 4);
+            var rollback2 = ContentService.GetById(Subpage.Id);
             var rollto2 = ContentService.GetVersion(version3);
             rollback2.CopyFrom(rollto2);
             rollback2.Name = rollto2.PublishName; // must do it explicitely AND must pick the publish one!
@@ -2327,7 +2327,7 @@ namespace Umbraco.Tests.Integration.Services
         public void Can_Save_Lazy_Content()
         {
             var contentType = ContentTypeService.Get("umbTextpage");
-            var root = ContentService.GetById(NodeIdSeed + 3);
+            var root = ContentService.GetById(Textpage.Id);
 
             var c = new Lazy<IContent>(() => ContentBuilder.CreateSimpleContent(contentType, "Hierarchy Simple Text Page", root.Id));
             var c2 = new Lazy<IContent>(() => ContentBuilder.CreateSimpleContent(contentType, "Hierarchy Simple Text Subpage", c.Value.Id));
@@ -2396,12 +2396,12 @@ namespace Umbraco.Tests.Integration.Services
         public void Can_Delete_Previous_Versions_Not_Latest()
         {
             // Arrange
-            var content = ContentService.GetById(NodeIdSeed + 6);
+            var content = ContentService.GetById(Trashed.Id);
             var version = content.VersionId;
 
             // Act
-            ContentService.DeleteVersion(NodeIdSeed + 6, version, true, Constants.Security.SuperUserId);
-            var sut = ContentService.GetById(NodeIdSeed + 6);
+            ContentService.DeleteVersion(Trashed.Id, version, true, Constants.Security.SuperUserId);
+            var sut = ContentService.GetById(Trashed.Id);
 
             // Assert
             Assert.That(sut.VersionId, Is.EqualTo(version));
@@ -3159,7 +3159,7 @@ namespace Umbraco.Tests.Integration.Services
         private IEnumerable<IContent> CreateContentHierarchy()
         {
             var contentType = ContentTypeService.Get("umbTextpage");
-            var root = ContentService.GetById(NodeIdSeed + 3);
+            var root = ContentService.GetById(Textpage.Id);
 
             var list = new List<IContent>();
 
