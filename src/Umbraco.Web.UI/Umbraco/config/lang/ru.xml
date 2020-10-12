@@ -372,7 +372,7 @@
     <key alias="recycleBinIsEmpty">Корзина пуста</key>
     <key alias="recycleBinWarning">Вы больше не сможете восстановить элементы, удаленные из корзины</key>
     <key alias="regexSearchError"><![CDATA[Сервис <a target='_blank' href='http://regexlib.com'>regexlib.com</a> испытывает в настоящее время некоторые трудности, не зависящие от нас. Просим извинить за причиненные неудобства.]]></key>
-    <key alias="regexSearchHelp">Используйте поиск регулярных выражений для добавления сервиса проверки к полю Вашей формы. Например: 'email, 'zip-code', 'url'</key>
+    <key alias="regexSearchHelp">Используйте поиск регулярных выражений для добавления сервиса проверки к полю Вашей формы. Например: 'email, 'zip-code', 'URL'</key>
     <key alias="removeMacro">Удалить макрос</key>
     <key alias="requiredField">Обязательное поле</key>
     <key alias="sitereindexed">Сайт переиндексирован</key>
@@ -1829,7 +1829,7 @@
     <key alias="validation">Валидация</key>
     <key alias="validateAsEmail">Валидация по формату email</key>
     <key alias="validateAsNumber">Валидация числового значения</key>
-    <key alias="validateAsUrl">Валидация по формату Url</key>
+    <key alias="validateAsUrl">Валидация по формату URL</key>
     <key alias="enterCustomValidation">...или указать свои правила валидации</key>
     <key alias="fieldIsMandatory">Обязательно к заполнению</key>
     <key alias="validationRegExp">Задайте регулярное выражение</key>
