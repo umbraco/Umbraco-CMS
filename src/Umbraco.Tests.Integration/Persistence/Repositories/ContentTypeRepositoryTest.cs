@@ -7,13 +7,18 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.IO;
+using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
+using Umbraco.Core.Services;
 using Umbraco.Tests.Common.Builders;
+using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
@@ -23,57 +28,36 @@ namespace Umbraco.Tests.Persistence.Repositories
 {
     [TestFixture]
     [UmbracoTest(Mapper = true, Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-    public class ContentTypeRepositoryTest : TestWithDatabaseBase
+    public class ContentTypeRepositoryTest : UmbracoIntegrationTest
     {
-        private IOptions<GlobalSettings> _globalSettings;
+        private ContentType _simpleContentType;
+        private ContentType _textpageContentType;
+        private IFileSystems FileSystems => GetRequiredService<IFileSystems>();
+        private UmbracoMapper Mapper => GetRequiredService<UmbracoMapper>();
+        private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
+        private IDocumentTypeContainerRepository DocumentTypeContainerRepository => GetRequiredService<IDocumentTypeContainerRepository>();
+        private IMediaTypeContainerRepository MediaTypeContainerRepository => GetRequiredService<IMediaTypeContainerRepository>();
+        private IMediaTypeRepository MediaTypeRepository => GetRequiredService<IMediaTypeRepository>();
+        private IDocumentRepository DocumentRepository => GetRequiredService<IDocumentRepository>();
+        private ContentTypeRepository ContentTypeRepository => (ContentTypeRepository) GetRequiredService<IContentTypeRepository>();
 
-        public override void SetUp()
+
+        [SetUp]
+        public void SetUpData()
         {
-            base.SetUp();
-
             CreateTestData();
-
-            _globalSettings = Microsoft.Extensions.Options.Options.Create(new GlobalSettings());
         }
 
-        private DocumentRepository CreateRepository(IScopeAccessor scopeAccessor, out ContentTypeRepository contentTypeRepository)
+        public void CreateTestData()
         {
-            var langRepository = new LanguageRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<LanguageRepository>(), _globalSettings);
-            var templateRepository = new TemplateRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<TemplateRepository>(), TestObjects.GetFileSystemsMock(), IOHelper, ShortStringHelper);
-            var tagRepository = new TagRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<TagRepository>());
-            var commonRepository = new ContentTypeCommonRepository(scopeAccessor, templateRepository, AppCaches.Disabled, ShortStringHelper);
-            contentTypeRepository = new ContentTypeRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<ContentTypeRepository>(), commonRepository, langRepository, ShortStringHelper);
-            var languageRepository = new LanguageRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<LanguageRepository>(), _globalSettings);
-            var relationTypeRepository = new RelationTypeRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<RelationTypeRepository>());
-            var entityRepository = new EntityRepository(scopeAccessor);
-            var relationRepository = new RelationRepository(scopeAccessor, LoggerFactory.CreateLogger<RelationRepository>(), relationTypeRepository, entityRepository);
-            var propertyEditors = new Lazy<PropertyEditorCollection>(() => new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>())));
-            var dataValueReferences = new DataValueReferenceFactoryCollection(Enumerable.Empty<IDataValueReferenceFactory>());
-            var repository = new DocumentRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<DocumentRepository>(), LoggerFactory, contentTypeRepository, templateRepository, tagRepository, languageRepository, relationRepository, relationTypeRepository, propertyEditors, dataValueReferences, DataTypeService);
-            return repository;
-        }
+            //Create and Save ContentType "umbTextpage" -> (_simpleContentType.Id)
+            _simpleContentType = ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateId: 0);
 
-        private ContentTypeRepository CreateRepository(IScopeAccessor scopeAccessor)
-        {
-            var langRepository = new LanguageRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<LanguageRepository>(), _globalSettings);
-            var templateRepository = new TemplateRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<TemplateRepository>(), TestObjects.GetFileSystemsMock(), IOHelper, ShortStringHelper);
-            var commonRepository = new ContentTypeCommonRepository(scopeAccessor, templateRepository, AppCaches.Disabled, ShortStringHelper);
-            var contentTypeRepository = new ContentTypeRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<ContentTypeRepository>(), commonRepository, langRepository, ShortStringHelper);
-            return contentTypeRepository;
-        }
+            ContentTypeService.Save(_simpleContentType);
 
-        private MediaTypeRepository CreateMediaTypeRepository(IScopeAccessor scopeAccessor)
-        {
-            var templateRepository = new TemplateRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<TemplateRepository>(), TestObjects.GetFileSystemsMock(), IOHelper, ShortStringHelper);
-            var commonRepository = new ContentTypeCommonRepository(scopeAccessor, templateRepository, AppCaches.Disabled, ShortStringHelper);
-            var langRepository = new LanguageRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<LanguageRepository>(), _globalSettings);
-            var contentTypeRepository = new MediaTypeRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<MediaTypeRepository>(), commonRepository, langRepository, ShortStringHelper);
-            return contentTypeRepository;
-        }
-
-        private EntityContainerRepository CreateContainerRepository(IScopeAccessor scopeAccessor, Guid containerEntityType)
-        {
-            return new EntityContainerRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<EntityContainerRepository>(), containerEntityType);
+            //Create and Save ContentType "textPage" -> (_textpageContentType.Id)
+            _textpageContentType = ContentTypeBuilder.CreateTextPageContentType( defaultTemplateId: 0);
+            ContentTypeService.Save(_textpageContentType);
         }
 
         // TODO: Add test to verify SetDefaultTemplates updates both AllowedTemplates and DefaultTemplate(id).
@@ -82,11 +66,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Maps_Templates_Correctly()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(LoggerFactory);
+            var provider = ScopeProvider;
             using (var scope = provider.CreateScope())
             {
-                var templateRepo = new TemplateRepository((IScopeAccessor) provider, AppCaches.Disabled, LoggerFactory.CreateLogger<TemplateRepository>(), TestObjects.GetFileSystemsMock(), IOHelper, ShortStringHelper);
-                var repository = CreateRepository((IScopeAccessor) provider);
+                var templateRepo = new TemplateRepository((IScopeAccessor) provider, AppCaches.Disabled, LoggerFactory.CreateLogger<TemplateRepository>(), FileSystems, IOHelper, ShortStringHelper);
+                var repository = ContentTypeRepository;
                 var templates = new[]
                 {
                     new Template(ShortStringHelper, "test1", "test1"),
@@ -99,7 +83,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 }
 
 
-                var contentType = MockedContentTypes.CreateSimpleContentType();
+                var contentType = ContentTypeBuilder.CreateSimpleContentType();
                 contentType.AllowedTemplates = new[] { templates[0], templates[1] };
                 contentType.SetDefaultTemplate(templates[0]);
                 repository.Save(contentType);
@@ -117,20 +101,20 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Move()
         {
-            var provider = TestObjects.GetScopeProvider(LoggerFactory);
+            var provider = ScopeProvider;
             using (var scope = provider.CreateScope())
             {
-                var containerRepository = CreateContainerRepository((IScopeAccessor) provider, Constants.ObjectTypes.DocumentTypeContainer);
-                var repository = CreateRepository((IScopeAccessor) provider);
+
+                var repository = ContentTypeRepository;
                 var container1 = new EntityContainer(Constants.ObjectTypes.DocumentType) { Name = "blah1" };
-                containerRepository.Save(container1);
+                DocumentTypeContainerRepository.Save(container1);
 
 
                 var container2 = new EntityContainer(Constants.ObjectTypes.DocumentType) { Name = "blah2", ParentId = container1.Id };
-                containerRepository.Save(container2);
+                DocumentTypeContainerRepository.Save(container2);
 
 
-                var contentType = (IContentType)MockedContentTypes.CreateBasicContentType("asdfasdf");
+                var contentType = (IContentType)ContentTypeBuilder.CreateBasicContentType("asdfasdf");
                 contentType.ParentId = container2.Id;
                 repository.Save(contentType);
 
@@ -163,16 +147,16 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Create_Container()
         {
-            var provider = TestObjects.GetScopeProvider(LoggerFactory);
+            var provider = ScopeProvider;
             using (var scope = provider.CreateScope())
             {
-                var containerRepository = CreateContainerRepository((IScopeAccessor) provider, Constants.ObjectTypes.DocumentTypeContainer);
+
                 var container = new EntityContainer(Constants.ObjectTypes.DocumentType) { Name = "blah" };
-                containerRepository.Save(container);
+                DocumentTypeContainerRepository.Save(container);
 
                 Assert.That(container.Id, Is.GreaterThan(0));
 
-                var found = containerRepository.Get(container.Id);
+                var found = DocumentTypeContainerRepository.Get(container.Id);
                 Assert.IsNotNull(found);
             }
         }
@@ -182,29 +166,28 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             EntityContainer container1, container2, container3;
 
-            var provider = TestObjects.GetScopeProvider(LoggerFactory);
+            var provider = ScopeProvider;
             using (var scope = provider.CreateScope())
             {
-                var containerRepository = CreateContainerRepository((IScopeAccessor) provider, Constants.ObjectTypes.DocumentTypeContainer);
 
                 container1 = new EntityContainer(Constants.ObjectTypes.DocumentType) { Name = "container1" };
-                containerRepository.Save(container1);
+                DocumentTypeContainerRepository.Save(container1);
                 container2 = new EntityContainer(Constants.ObjectTypes.DocumentType) { Name = "container2" };
-                containerRepository.Save(container2);
+                DocumentTypeContainerRepository.Save(container2);
                 container3 = new EntityContainer(Constants.ObjectTypes.DocumentType) { Name = "container3" };
-                containerRepository.Save(container3);
+                DocumentTypeContainerRepository.Save(container3);
 
                 Assert.That(container1.Id, Is.GreaterThan(0));
                 Assert.That(container2.Id, Is.GreaterThan(0));
                 Assert.That(container3.Id, Is.GreaterThan(0));
 
-                var found1 = containerRepository.Get(container1.Id);
+                var found1 = DocumentTypeContainerRepository.Get(container1.Id);
                 Assert.IsNotNull(found1);
-                var found2 = containerRepository.Get(container2.Id);
+                var found2 = DocumentTypeContainerRepository.Get(container2.Id);
                 Assert.IsNotNull(found2);
-                var found3 = containerRepository.Get(container3.Id);
+                var found3 = DocumentTypeContainerRepository.Get(container3.Id);
                 Assert.IsNotNull(found3);
-                var allContainers = containerRepository.GetMany();
+                var allContainers = DocumentTypeContainerRepository.GetMany();
                 Assert.AreEqual(3, allContainers.Count());
             }
         }
@@ -212,19 +195,18 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Delete_Container()
         {
-            var provider = TestObjects.GetScopeProvider(LoggerFactory);
+            var provider = ScopeProvider;
             using (var scope = provider.CreateScope())
             {
-                var containerRepository = CreateContainerRepository((IScopeAccessor) provider, Constants.ObjectTypes.DocumentTypeContainer);
                 var container = new EntityContainer(Constants.ObjectTypes.DocumentType) { Name = "blah" };
-                containerRepository.Save(container);
+                DocumentTypeContainerRepository.Save(container);
 
 
                 // Act
-                containerRepository.Delete(container);
+                DocumentTypeContainerRepository.Delete(container);
 
 
-                var found = containerRepository.Get(container.Id);
+                var found = DocumentTypeContainerRepository.Get(container.Id);
                 Assert.IsNull(found);
             }
         }
@@ -232,16 +214,15 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Create_Container_Containing_Media_Types()
         {
-            var provider = TestObjects.GetScopeProvider(LoggerFactory);
+            var provider = ScopeProvider;
             using (var scope = provider.CreateScope())
             {
-                var containerRepository = CreateContainerRepository((IScopeAccessor) provider, Constants.ObjectTypes.MediaTypeContainer);
-                var repository = CreateRepository((IScopeAccessor) provider);
+                var repository = ContentTypeRepository;
                 var container = new EntityContainer(Constants.ObjectTypes.MediaType) { Name = "blah" };
-                containerRepository.Save(container);
+                MediaTypeContainerRepository.Save(container);
 
 
-                var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test", propertyGroupName: "testGroup");
+                var contentType = ContentTypeBuilder.CreateSimpleContentType("test", "Test", propertyGroupName: "testGroup", defaultTemplateId:0);
                 contentType.ParentId = container.Id;
                 repository.Save(contentType);
 
@@ -253,28 +234,27 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Delete_Container_Containing_Media_Types()
         {
-            var provider = TestObjects.GetScopeProvider(LoggerFactory);
+            var provider = ScopeProvider;
             using (var scope = provider.CreateScope())
             {
-                var containerRepository = CreateContainerRepository((IScopeAccessor) provider, Constants.ObjectTypes.MediaTypeContainer);
-                var repository = CreateMediaTypeRepository((IScopeAccessor) provider);
+
                 var container = new EntityContainer(Constants.ObjectTypes.MediaType) { Name = "blah" };
-                containerRepository.Save(container);
+                MediaTypeContainerRepository.Save(container);
 
 
-                IMediaType contentType = MockedContentTypes.CreateSimpleMediaType("test", "Test", propertyGroupName: "testGroup");
+                IMediaType contentType = MediaTypeBuilder.CreateSimpleMediaType("test", "Test", propertyGroupName: "testGroup");
                 contentType.ParentId = container.Id;
-                repository.Save(contentType);
+                MediaTypeRepository.Save(contentType);
 
 
                 // Act
-                containerRepository.Delete(container);
+                MediaTypeContainerRepository.Delete(container);
 
 
-                var found = containerRepository.Get(container.Id);
+                var found = MediaTypeContainerRepository.Get(container.Id);
                 Assert.IsNull(found);
 
-                contentType = repository.Get(contentType.Id);
+                contentType = MediaTypeRepository.Get(contentType.Id);
                 Assert.IsNotNull(contentType);
                 Assert.AreEqual(-1, contentType.ParentId);
             }
@@ -284,16 +264,16 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Add_On_ContentTypeRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(LoggerFactory);
+            var provider = ScopeProvider;
             using (var scope = provider.CreateScope())
             {
-                var repository = CreateRepository((IScopeAccessor) provider);
+
                 // Act
-                var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test", propertyGroupName: "testGroup");
-                repository.Save(contentType);
+                var contentType = ContentTypeBuilder.CreateSimpleContentType("test", "Test", propertyGroupName: "testGroup");
+                ContentTypeRepository.Save(contentType);
 
 
-                var fetched = repository.Get(contentType.Id);
+                var fetched = ContentTypeRepository.Get(contentType.Id);
 
                 // Assert
                 Assert.That(contentType.HasIdentity, Is.True);
@@ -319,12 +299,12 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Add_On_ContentTypeRepository_After_Model_Mapping()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(LoggerFactory);
+            var provider = ScopeProvider;
             using (var scope = provider.CreateScope())
             {
-                var repository = CreateRepository((IScopeAccessor) provider);
+                var repository = ContentTypeRepository;
                 // Act
-                var contentType = (IContentType)MockedContentTypes.CreateSimpleContentType2("test", "Test", propertyGroupName: "testGroup");
+                var contentType = (IContentType)ContentTypeBuilder.CreateSimpleContentType2("test", "Test", propertyGroupName: "testGroup");
 
                 Assert.AreEqual(4, contentType.PropertyTypes.Count());
 
@@ -371,12 +351,12 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Update_On_ContentTypeRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(LoggerFactory);
+            var provider = ScopeProvider;
             using (var scope = provider.CreateScope())
             {
-                var repository = CreateRepository((IScopeAccessor) provider);
+                var repository = ContentTypeRepository;
                 // Act
-                var contentType = repository.Get(NodeDto.NodeIdSeed + 1);
+                var contentType = repository.Get(_textpageContentType.Id);
 
                 contentType.Thumbnail = "Doc2.png";
                 contentType.PropertyGroups["Content"].PropertyTypes.Add(new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "subtitle")
@@ -447,12 +427,12 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Update_On_ContentTypeRepository_After_Model_Mapping()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(LoggerFactory);
+            var provider = ScopeProvider;
             using (var scope = provider.CreateScope())
             {
-                var repository = CreateRepository((IScopeAccessor) provider);
+                var repository = ContentTypeRepository;
                 // Act
-                var contentType = repository.Get(NodeDto.NodeIdSeed + 1);
+                var contentType = repository.Get(_textpageContentType.Id);
 
                 // there is NO mapping from display to contentType, but only from save
                 // to contentType, so if we want to test, let's to it properly!
@@ -491,7 +471,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var dirty = mapped.IsDirty();
 
                 //re-get
-                contentType = repository.Get(NodeDto.NodeIdSeed + 1);
+                contentType = repository.Get(_textpageContentType.Id);
 
                 // Assert
                 Assert.That(contentType.HasIdentity, Is.True);
@@ -510,12 +490,12 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Delete_On_ContentTypeRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(LoggerFactory);
+            var provider = ScopeProvider;
             using (var scope = provider.CreateScope())
             {
-                var repository = CreateRepository((IScopeAccessor) provider);
+                var repository = ContentTypeRepository;
                 // Act
-                var contentType = MockedContentTypes.CreateSimpleContentType();
+                var contentType = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId:0);
                 repository.Save(contentType);
 
 
@@ -534,13 +514,13 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Delete_With_Heirarchy_On_ContentTypeRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(LoggerFactory);
+            var provider = ScopeProvider;
             using (var scope = provider.CreateScope())
             {
-                var repository = CreateRepository((IScopeAccessor) provider);
-                var ctMain = MockedContentTypes.CreateSimpleContentType();
-                var ctChild1 = MockedContentTypes.CreateSimpleContentType("child1", "Child 1", ctMain, true);
-                var ctChild2 = MockedContentTypes.CreateSimpleContentType("child2", "Child 2", ctChild1, true);
+                var repository = ContentTypeRepository;
+                var ctMain = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId:0);
+                var ctChild1 = ContentTypeBuilder.CreateSimpleContentType("child1", "Child 1", ctMain, true, defaultTemplateId:0);
+                var ctChild2 = ContentTypeBuilder.CreateSimpleContentType("child2", "Child 2", ctChild1, true, defaultTemplateId:0);
 
                 repository.Save(ctMain);
                 repository.Save(ctChild1);
@@ -566,16 +546,16 @@ namespace Umbraco.Tests.Persistence.Repositories
             IContentType contentType;
 
             // Arrange
-            var provider = TestObjects.GetScopeProvider(LoggerFactory);
+            var provider = ScopeProvider;
             using (var scope = provider.CreateScope())
             {
-                var repository = CreateRepository((IScopeAccessor) provider);
-                contentType = repository.Get(NodeDto.NodeIdSeed + 1);
-                var child1 = MockedContentTypes.CreateSimpleContentType("abc", "abc", contentType, randomizeAliases: true);
+                var repository = ContentTypeRepository;
+                contentType = repository.Get(_textpageContentType.Id);
+                var child1 = ContentTypeBuilder.CreateSimpleContentType("abc", "abc", contentType, randomizeAliases: true, defaultTemplateId:0);
                 repository.Save(child1);
-                var child3 = MockedContentTypes.CreateSimpleContentType("zyx", "zyx", contentType, randomizeAliases: true);
+                var child3 = ContentTypeBuilder.CreateSimpleContentType("zyx", "zyx", contentType, randomizeAliases: true, defaultTemplateId:0);
                 repository.Save(child3);
-                var child2 = MockedContentTypes.CreateSimpleContentType("a123", "a123", contentType, randomizeAliases: true);
+                var child2 = ContentTypeBuilder.CreateSimpleContentType("a123", "a123", contentType, randomizeAliases: true, defaultTemplateId:0);
                 repository.Save(child2);
 
                 scope.Complete();
@@ -583,7 +563,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
             using (var scope = provider.CreateScope())
             {
-                var repository = CreateRepository((IScopeAccessor)provider);
+                var repository = ContentTypeRepository;
 
                 // Act
                 var contentTypes = repository.Get(scope.SqlContext.Query<IContentType>().Where(x => x.ParentId == contentType.Id));
@@ -601,17 +581,17 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Get_On_ContentTypeRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(LoggerFactory);
+            var provider = ScopeProvider;
             using (var scope = provider.CreateScope())
             {
-                var repository = CreateRepository((IScopeAccessor) provider);
+                var repository = ContentTypeRepository;
 
                 // Act
-                var contentType = repository.Get(NodeDto.NodeIdSeed + 1);
+                var contentType = repository.Get(_textpageContentType.Id);
 
                 // Assert
                 Assert.That(contentType, Is.Not.Null);
-                Assert.That(contentType.Id, Is.EqualTo(NodeDto.NodeIdSeed + 1));
+                Assert.That(contentType.Id, Is.EqualTo(_textpageContentType.Id));
             }
         }
 
@@ -619,12 +599,12 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Get_By_Guid_On_ContentTypeRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(LoggerFactory);
+            var provider = ScopeProvider;
             using (var scope = provider.CreateScope())
             {
-                var repository = CreateRepository((IScopeAccessor) provider);
-                var contentType = repository.Get(NodeDto.NodeIdSeed + 1);
-                var childContentType = MockedContentTypes.CreateSimpleContentType("blah", "Blah", contentType, randomizeAliases:true);
+                var repository = ContentTypeRepository;
+                var contentType = repository.Get(_textpageContentType.Id);
+                var childContentType = ContentTypeBuilder.CreateSimpleContentType("blah", "Blah", contentType, randomizeAliases:true, defaultTemplateId:0);
                 repository.Save(childContentType);
 
 
@@ -641,10 +621,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Get_By_Missing_Guid_On_ContentTypeRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(LoggerFactory);
+            var provider = ScopeProvider;
             using (var scope = provider.CreateScope())
             {
-                var repository = CreateRepository((IScopeAccessor) provider);
+                var repository = ContentTypeRepository;
                 // Act
                 var result = repository.Get(Guid.NewGuid());
 
@@ -657,10 +637,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetAll_On_ContentTypeRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(LoggerFactory);
+            var provider = ScopeProvider;
             using (var scope = provider.CreateScope())
             {
-                var repository = CreateRepository((IScopeAccessor) provider);
+                var repository = (ContentTypeRepository)ContentTypeRepository;
 
                 // Act
                 var contentTypes = repository.GetMany();
@@ -679,10 +659,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetAll_By_Guid_On_ContentTypeRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(LoggerFactory);
+            var provider = ScopeProvider;
             using (var scope = provider.CreateScope())
             {
-                var repository = CreateRepository((IScopeAccessor) provider);
+                var repository = (ContentTypeRepository)ContentTypeRepository;
                 var allGuidIds = repository.GetMany().Select(x => x.Key).ToArray();
 
                 // Act
@@ -702,13 +682,13 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Exists_On_ContentTypeRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(LoggerFactory);
+            var provider = ScopeProvider;
             using (var scope = provider.CreateScope())
             {
-                var repository = CreateRepository((IScopeAccessor) provider);
+                var repository = ContentTypeRepository;
 
                 // Act
-                var exists = repository.Exists(NodeDto.NodeIdSeed);
+                var exists = repository.Exists(_simpleContentType.Id);
 
                 // Assert
                 Assert.That(exists, Is.True);
@@ -719,18 +699,18 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Update_ContentType_With_PropertyType_Removed()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(LoggerFactory);
+            var provider = ScopeProvider;
             using (var scope = provider.CreateScope())
             {
-                var repository = CreateRepository((IScopeAccessor) provider);
-                var contentType = repository.Get(NodeDto.NodeIdSeed + 1);
+                var repository = ContentTypeRepository;
+                var contentType = repository.Get(_textpageContentType.Id);
 
                 // Act
                 contentType.PropertyGroups["Meta"].PropertyTypes.Remove("description");
                 repository.Save(contentType);
 
 
-                var result = repository.Get(NodeDto.NodeIdSeed + 1);
+                var result = repository.Get(_textpageContentType.Id);
 
                 // Assert
                 Assert.That(result.PropertyTypes.Any(x => x.Alias == "description"), Is.False);
@@ -743,13 +723,13 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Verify_PropertyTypes_On_SimpleTextpage()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(LoggerFactory);
+            var provider = ScopeProvider;
             using (var scope = provider.CreateScope())
             {
-                var repository = CreateRepository((IScopeAccessor) provider);
+                var repository = ContentTypeRepository;
 
                 // Act
-                var contentType = repository.Get(NodeDto.NodeIdSeed);
+                var contentType = repository.Get(_simpleContentType.Id);
 
                 // Assert
                 Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(3));
@@ -761,13 +741,13 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Verify_PropertyTypes_On_Textpage()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(LoggerFactory);
+            var provider = ScopeProvider;
             using (var scope = provider.CreateScope())
             {
-                var repository = CreateRepository((IScopeAccessor) provider);
+                var repository = ContentTypeRepository;
 
                 // Act
-                var contentType = repository.Get(NodeDto.NodeIdSeed + 1);
+                var contentType = repository.Get(_textpageContentType.Id);
 
                 // Assert
                 Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(4));
@@ -779,11 +759,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Verify_PropertyType_With_No_Group()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(LoggerFactory);
+            var provider = ScopeProvider;
             using (var scope = provider.CreateScope())
             {
-                var repository = CreateRepository((IScopeAccessor) provider);
-                var contentType = repository.Get(NodeDto.NodeIdSeed + 1);
+                var repository = ContentTypeRepository;
+                var contentType = repository.Get(_textpageContentType.Id);
 
                 Assert.That(contentType.PropertyGroups.Count, Is.EqualTo(2));
                 Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(4));
@@ -807,7 +787,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
 
                 // Assert
-                var updated = repository.Get(NodeDto.NodeIdSeed + 1);
+                var updated = repository.Get(_textpageContentType.Id);
                 Assert.That(addedPropertyType, Is.True);
                 Assert.That(updated.PropertyGroups.Count, Is.EqualTo(2));
                 Assert.That(updated.PropertyTypes.Count(), Is.EqualTo(5));
@@ -820,19 +800,19 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Verify_AllowedChildContentTypes_On_ContentType()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(LoggerFactory);
+            var provider = ScopeProvider;
             using (var scope = provider.CreateScope())
             {
-                var repository = CreateRepository((IScopeAccessor) provider);
+                var repository = ContentTypeRepository;
 
-                var subpageContentType = MockedContentTypes.CreateSimpleContentType("umbSubpage", "Subpage");
-                var simpleSubpageContentType = MockedContentTypes.CreateSimpleContentType("umbSimpleSubpage", "Simple Subpage");
+                var subpageContentType = ContentTypeBuilder.CreateSimpleContentType("umbSubpage", "Subpage");
+                var simpleSubpageContentType = ContentTypeBuilder.CreateSimpleContentType("umbSimpleSubpage", "Simple Subpage");
                 repository.Save(subpageContentType);
                 repository.Save(simpleSubpageContentType);
 
 
                 // Act
-                var contentType = repository.Get(NodeDto.NodeIdSeed);
+                var contentType = repository.Get(_simpleContentType.Id);
                 contentType.AllowedContentTypes = new List<ContentTypeSort>
                     {
                         new ContentTypeSort(new Lazy<int>(() => subpageContentType.Id), 0, subpageContentType.Alias),
@@ -842,7 +822,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
 
                 //Assert
-                var updated = repository.Get(NodeDto.NodeIdSeed);
+                var updated = repository.Get(_simpleContentType.Id);
 
                 Assert.That(updated.AllowedContentTypes.Any(), Is.True);
                 Assert.That(updated.AllowedContentTypes.Any(x => x.Alias == subpageContentType.Alias), Is.True);
@@ -854,15 +834,14 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Verify_Removal_Of_Used_PropertyType_From_ContentType()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(LoggerFactory);
+            var provider = ScopeProvider;
             using (var scope = provider.CreateScope())
             {
-                ContentTypeRepository repository;
-                var contentRepository = CreateRepository((IScopeAccessor) provider, out repository);
-                var contentType = repository.Get(NodeDto.NodeIdSeed + 1);
+                var repository = ContentTypeRepository;
+                var contentType = repository.Get(_textpageContentType.Id);
 
-                var subpage = MockedContent.CreateTextpageContent(contentType, "Text Page 1", contentType.Id);
-                contentRepository.Save(subpage);
+                var subpage = ContentBuilder.CreateTextpageContent(contentType, "Text Page 1", contentType.Id);
+                DocumentRepository.Save(subpage);
 
 
                 // Act
@@ -881,15 +860,14 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Verify_Addition_Of_PropertyType_After_ContentType_Is_Used()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(LoggerFactory);
+            var provider = ScopeProvider;
             using (var scope = provider.CreateScope())
             {
-                ContentTypeRepository repository;
-                var contentRepository = CreateRepository((IScopeAccessor) provider, out repository);
-                var contentType = repository.Get(NodeDto.NodeIdSeed + 1);
+                var repository = ContentTypeRepository;
+                var contentType = repository.Get(_textpageContentType.Id);
 
-                var subpage = MockedContent.CreateTextpageContent(contentType, "Text Page 1", contentType.Id);
-                contentRepository.Save(subpage);
+                var subpage = ContentBuilder.CreateTextpageContent(contentType, "Text Page 1", contentType.Id);
+                DocumentRepository.Save(subpage);
 
 
                 // Act
@@ -909,15 +887,15 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Verify_Usage_Of_New_PropertyType_On_Content()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(LoggerFactory);
+            var provider = ScopeProvider;
             using (var scope = provider.CreateScope())
             {
-                ContentTypeRepository repository;
-                var contentRepository = CreateRepository((IScopeAccessor) provider, out repository);
-                var contentType = repository.Get(NodeDto.NodeIdSeed + 1);
+                var repository = ContentTypeRepository;
 
-                var subpage = MockedContent.CreateTextpageContent(contentType, "Text Page 1", contentType.Id);
-                contentRepository.Save(subpage);
+                var contentType = repository.Get(_textpageContentType.Id);
+
+                var subpage = ContentBuilder.CreateTextpageContent(contentType, "Text Page 1", contentType.Id);
+                DocumentRepository.Save(subpage);
 
 
                 var propertyGroup = contentType.PropertyGroups.First(x => x.Name == "Meta");
@@ -926,13 +904,13 @@ namespace Umbraco.Tests.Persistence.Repositories
 
 
                 // Act
-                var content = contentRepository.Get(subpage.Id);
+                var content = DocumentRepository.Get(subpage.Id);
                 content.SetValue("metaAuthor", "John Doe");
-                contentRepository.Save(content);
+                DocumentRepository.Save(content);
 
 
                 //Assert
-                var updated = contentRepository.Get(subpage.Id);
+                var updated = DocumentRepository.Get(subpage.Id);
                 Assert.That(updated.GetValue("metaAuthor").ToString(), Is.EqualTo("John Doe"));
                 Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(5));
                 Assert.That(contentType.PropertyTypes.Any(x => x.Alias == "metaAuthor"), Is.True);
@@ -943,15 +921,15 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Verify_That_A_Combination_Of_Adding_And_Deleting_PropertyTypes_Doesnt_Cause_Issues_For_Content_And_ContentType()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(LoggerFactory);
+            var provider = ScopeProvider;
             using (var scope = provider.CreateScope())
             {
-                ContentTypeRepository repository;
-                var contentRepository = CreateRepository((IScopeAccessor) provider, out repository);
-                var contentType = repository.Get(NodeDto.NodeIdSeed + 1);
+                var repository = ContentTypeRepository;
 
-                var subpage = MockedContent.CreateTextpageContent(contentType, "Text Page 1", contentType.Id);
-                contentRepository.Save(subpage);
+                var contentType = repository.Get(_textpageContentType.Id);
+
+                var subpage = ContentBuilder.CreateTextpageContent(contentType, "Text Page 1", contentType.Id);
+                DocumentRepository.Save(subpage);
 
 
                 //Remove PropertyType
@@ -963,13 +941,13 @@ namespace Umbraco.Tests.Persistence.Repositories
 
 
                 // Act
-                var content = contentRepository.Get(subpage.Id);
+                var content = DocumentRepository.Get(subpage.Id);
                 content.SetValue("metaAuthor", "John Doe");
-                contentRepository.Save(content);
+                DocumentRepository.Save(content);
 
 
                 //Assert
-                var updated = contentRepository.Get(subpage.Id);
+                var updated = DocumentRepository.Get(subpage.Id);
                 Assert.That(updated.GetValue("metaAuthor").ToString(), Is.EqualTo("John Doe"));
                 Assert.That(updated.Properties.First(x => x.Alias == "description").GetValue(), Is.EqualTo("This is the meta description for a textpage"));
 
@@ -983,19 +961,19 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Verify_Content_Type_Has_Content_Nodes()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(LoggerFactory);
+            var provider = ScopeProvider;
             using (var scope = provider.CreateScope())
             {
-                ContentTypeRepository repository;
-                var contentRepository = CreateRepository((IScopeAccessor)provider, out repository);
-                var contentTypeId = NodeDto.NodeIdSeed + 1;
+                var repository = ContentTypeRepository;
+
+                var contentTypeId = _textpageContentType.Id;
                 var contentType = repository.Get(contentTypeId);
 
                 // Act
                 var result = repository.HasContentNodes(contentTypeId);
 
-                var subpage = MockedContent.CreateTextpageContent(contentType, "Test Page 1", contentType.Id);
-                contentRepository.Save(subpage);
+                var subpage = ContentBuilder.CreateTextpageContent(contentType, "Test Page 1", contentType.Id);
+                DocumentRepository.Save(subpage);
 
                 var result2 = repository.HasContentNodes(contentTypeId);
 
@@ -1005,15 +983,6 @@ namespace Umbraco.Tests.Persistence.Repositories
             }
         }
 
-        public void CreateTestData()
-        {
-            //Create and Save ContentType "umbTextpage" -> (NodeDto.NodeIdSeed)
-            ContentType simpleContentType = MockedContentTypes.CreateSimpleContentType("umbTextpage", "Textpage");
-            ServiceContext.ContentTypeService.Save(simpleContentType);
 
-            //Create and Save ContentType "textPage" -> (NodeDto.NodeIdSeed + 1)
-            ContentType textpageContentType = MockedContentTypes.CreateTextPageContentType();
-            ServiceContext.ContentTypeService.Save(textpageContentType);
-        }
     }
 }
