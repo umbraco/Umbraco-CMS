@@ -153,11 +153,15 @@ var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.servi
         function setPageUrl() {
             $scope.pageId = $location.search().id || getParameterByName("id");
             var culture = $location.search().culture || getParameterByName("culture");
+            var segment = $location.search().segment || getParameterByName("segment");
 
             if ($scope.pageId) {
                 var query = 'id=' + $scope.pageId;
                 if (culture) {
                     query += "&culture=" + culture;
+                }
+                if (segment) {
+                    query += "&segment=" + segment;
                 }
                 $scope.pageUrl = "frame?" + query;
             }
