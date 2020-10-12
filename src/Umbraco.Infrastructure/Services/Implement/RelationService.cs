@@ -543,6 +543,18 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
+        /// <inheritdoc />
+        public IRelation GetByParentChildAndType(int parentId, int childId, IRelationType relationType)
+        {
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                var query = Query<IRelation>().Where(x => x.ParentId == parentId &&
+                                                          x.ChildId == childId &&
+                                                          x.RelationTypeId == relationType.Id);
+                return _relationRepository.Get(query).FirstOrDefault();
+            }
+        }
+
         #region Private Methods
 
         private IRelationType GetRelationType(string relationTypeAlias)
