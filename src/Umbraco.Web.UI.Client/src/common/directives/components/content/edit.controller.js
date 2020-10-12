@@ -922,6 +922,19 @@
 
                 query += "#?culture=" + $scope.culture;
             }
+
+            if ($scope.segment) {
+                var prefix = "#?";
+
+                if (query.includes(prefix)) {
+                    query += "&";
+                } else {
+                    query += prefix;
+                }
+
+                query += "segment=" + $scope.segment;
+            }
+
             var redirect = Umbraco.Sys.ServerVariables.umbracoSettings.umbracoPath + '/preview/?' + query;
 
             //The user cannot save if they don't have access to do that, in which case we just want to preview
