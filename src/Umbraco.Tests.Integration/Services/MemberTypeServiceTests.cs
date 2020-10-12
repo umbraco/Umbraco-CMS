@@ -19,6 +19,13 @@ namespace Umbraco.Tests.Integration.Services
         private IMemberService MemberService => GetRequiredService<IMemberService>();
         private IMemberTypeService MemberTypeService => GetRequiredService<IMemberTypeService>();
 
+        [SetUp]
+        public void SetupTest()
+        {
+            // TODO: remove this once IPublishedSnapShotService has been implemented with nucache.
+            Umbraco.Core.Services.Implement.MemberTypeService.ClearScopeEvents();
+        }
+
         [Test]
         public void Member_Cannot_Edit_Property()
         {
