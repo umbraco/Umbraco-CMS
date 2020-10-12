@@ -98,7 +98,6 @@ namespace Umbraco.Tests.Integration.Services
             FileService.SaveTemplate(template);
 
             var contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id);
-            FileService.SaveTemplate(contentType.DefaultTemplate);
             ContentTypeService.Save(contentType);
 
             var blueprint = ContentBuilder.CreateTextpageContent(contentType, "hello", Constants.System.Root);
@@ -124,7 +123,6 @@ namespace Umbraco.Tests.Integration.Services
                 FileService.SaveTemplate(template);
 
                 var contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id);
-                FileService.SaveTemplate(contentType.DefaultTemplate);
                 ContentTypeService.Save(contentType);
 
                 var blueprint = ContentBuilder.CreateTextpageContent(contentType, "hello", Constants.System.Root);
@@ -1655,7 +1653,6 @@ namespace Umbraco.Tests.Integration.Services
             {
                 new ContentTypeSort(new Lazy<int>(() => contentType.Id), 0, contentType.Alias)
             };
-            FileService.SaveTemplate(contentType.DefaultTemplate);
             ContentTypeService.Save(contentType);
 
             var parentPage = ContentBuilder.CreateSimpleContent(contentType);
@@ -1694,7 +1691,6 @@ namespace Umbraco.Tests.Integration.Services
             {
                 new ContentTypeSort(new Lazy<int>(() => contentType.Id), 0, contentType.Alias)
             };
-            FileService.SaveTemplate(contentType.DefaultTemplate);
             ContentTypeService.Save(contentType);
 
             var parentPage = ContentBuilder.CreateSimpleContent(contentType);
@@ -2137,7 +2133,6 @@ namespace Umbraco.Tests.Integration.Services
             contentType.Variations = ContentVariation.Culture;
             var p1 = contentType.PropertyTypes.First();
             p1.Variations = ContentVariation.Culture;
-            FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
             ContentTypeService.Save(contentType);
 
             var page = new Content("Page", Constants.System.Root, contentType)
