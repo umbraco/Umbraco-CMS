@@ -1,5 +1,5 @@
 <div class="umb-control-group -no-border">
-    <div class="umb-search-filter">
+    <div class="umb-search-filter" ng-class="vm.cssClass">
         <label for="{{vm.inputId}}" class="sr-only">{{vm.text}}</label>
         <umb-icon icon="icon-search" class="icon-search"></umb-icon>
         <input
@@ -8,7 +8,7 @@
                 type="text"
                 ng-change="vm.change()"
                 ng-model="vm.model"
-                class="umb-search-filter__input {{vm.cssClass}}"
+                class="umb-search-filter__input"
                 placeholder="{{vm.text}}"
                 umb-auto-focus="{{vm.autoFocus === true}}"
                 prevent-enter-submit
