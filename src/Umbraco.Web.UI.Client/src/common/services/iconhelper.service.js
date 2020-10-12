@@ -252,7 +252,7 @@ function iconHelper($http, $q, $sce, $timeout, umbRequestHelper) {
 
         /** LEGACY - Return a list of icons from icon fonts, optionally filter them */
         /** It fetches them directly from the active stylesheets in the browser */
-        getLegacyIcons: function(){
+        getIcons: function(){
             var deferred = $q.defer();
             $timeout(function(){
                 if(collectedIcons){
@@ -284,13 +284,8 @@ function iconHelper($http, $q, $sce, $timeout, umbRequestHelper) {
                                         s = s.substring(0, hasPseudo);
                                     }
 
-                                    var icon = {
-                                        name: s,
-                                        svgString: undefined
-                                    };
-
-                                    if(collectedIcons.indexOf(icon) < 0 && s !== "icon-chevron-up" && s !== "icon-chevron-down"){
-                                        collectedIcons.push(icon);
+                                    if(collectedIcons.indexOf(s) < 0){
+                                        collectedIcons.push(s);
                                     }
                                 }
                             }
