@@ -48,6 +48,7 @@ namespace Umbraco.Web.BackOffice.Runtime
                     "~/"));
 
             composition.RegisterUnique<IIconService, IconService>();
+            composition.RegisterUnique<UnhandledExceptionLoggerMiddleware>();
         }
     }
 }
