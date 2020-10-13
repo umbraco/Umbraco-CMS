@@ -519,8 +519,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override void PersistUpdatedItem(IContent entity)
         {
-            var entityBase = entity as EntityBase;
-            var isEntityDirty = entityBase != null && entityBase.IsDirty();
+            var isEntityDirty = entity.IsDirty();
 
             // check if we need to make any database changes at all
             if ((entity.PublishedState == PublishedState.Published || entity.PublishedState == PublishedState.Unpublished)
@@ -597,17 +596,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 Database.Insert(documentVersionDto); 
             }
 
-            // replace the property data (rather than updating)
+            // replace the property data
             // only need to delete for the version that existed, the new version (if any) has no property data yet
-            var versionToDelete = publishing ? entity.PublishedVersionId : entity.VersionId;
-            var deletePropertyDataSql = Sql().Delete<PropertyDataDto>().Where<PropertyDataDto>(x => x.VersionId == versionToDelete);
-            Database.Execute(deletePropertyDataSql);
-
-            // insert property data
-            var propertyDataDtos = PropertyFactory.BuildDtos(entity.ContentType.Variations, entity.VersionId, publishing ? entity.PublishedVersionId : 0,
-                entity.Properties, LanguageRepository, out var edited, out var editedCultures);
-            foreach (var propertyDataDto in propertyDataDtos)
-                Database.Insert(propertyDataDto);
+            var versionToDelete = publishing ? entity.PublishedVersionId : entity.VersionId;         
+            ReplacePropertyValues(entity, versionToDelete, publishing ? entity.PublishedVersionId : 0, out var edited, out var editedCultures);
 
             // if !publishing, we may have a new name != current publish name,
             // also impacts 'edited'

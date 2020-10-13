@@ -49,22 +49,25 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
-        public void Can_Update_Member_Property_Value()
+        public void Can_Update_Member_Property_Values()
         {
             IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
             ServiceContext.MemberTypeService.Save(memberType);
             IMember member = MockedMember.CreateSimpleMember(memberType, "hello", "helloworld@test123.com", "hello", "hello");
             member.SetValue("title", "title of mine");
+            member.SetValue("bodyText", "hello world");
             ServiceContext.MemberService.Save(member);
 
             // re-get
             member = ServiceContext.MemberService.GetById(member.Id);
-            member.SetValue("title", "another title of mine");
+            member.SetValue("title", "another title of mine");          // Change a value
+            member.SetValue("bodyText", null);                          // Clear a value
             ServiceContext.MemberService.Save(member);
 
             // re-get
             member = ServiceContext.MemberService.GetById(member.Id);
             Assert.AreEqual("another title of mine", member.GetValue("title"));
+            Assert.IsNull(member.GetValue("bodyText"));
         }
 
         [Test]
