@@ -56,7 +56,7 @@
                 var shadowRoot = $element[0].attachShadow({ mode: 'open' });
                 shadowRoot.innerHTML = `
                     <style>
-                    @import "${assetsService.appendCacheBuster(model.stylesheet)}"
+                    @import "{{$scope.stylesheet}}"
                     </style>
                     <div ng-include="'${$scope.view}'"></div>
                 `;
