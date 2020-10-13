@@ -69,9 +69,9 @@
                                     prevent-default>
                                 Last Updated
                                 <i class="umb-table-head__icon icon"  aria-hidden="true" ng-class="{'icon-navigation-up': isSortDirection('updateDate', 'asc'), 'icon-navigation-down': isSortDirection('updateDate', 'desc')}"></i>
-                            </button>                           
+                            </button>
                         </div>
-               
+
                     </div>
                 </div>
                 <div class="umb-table-body">
@@ -79,15 +79,15 @@
 
                         <div class="umb-table-cell">
                             <i ng-show="item.selected" class="umb-table-body__icon umb-table-body__checkicon icon-check" aria-hidden="true"></i>
-                            <i class="{{item.icon}}" aria-hidden="true" ng-if="!item.thumbnail && item.extension != 'svg' && !item.selected"></i><i class="icon-picture"  aria-hidden="true" ng-if="item.thumbnail && !item.selected"></i>
+                            <i class="{{item.icon}}" class="umb-table-body__icon" aria-hidden="true" ng-if="!item.thumbnail && item.extension != 'svg' && !item.selected"></i><i class="icon-picture"  aria-hidden="true" ng-if="item.thumbnail && !item.selected"></i>
                         </div>
                         <div class="umb-table-cell  umb-table__name">
-                  
+
                             <ins ng-show="item.isFolder" ng-class="{'-locked': item.selected || !item.file || !item.thumbnail}" ng-click="clickItemName(item, $event, $index)" class="icon-navigation-right"></ins> <span data-src="{{item.value.src}}" class="item-name">{{item.name}}</span>
                         </div>
                         <div class="umb-table-cell">
                             <span class="muted small" style="font-size:0.8em">{{item.updateDate | date:'medium'}}</span>
-                        </div>           
+                        </div>
                     </div>
                 </div>
             </div>

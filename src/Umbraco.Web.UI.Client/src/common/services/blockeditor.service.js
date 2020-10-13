@@ -51,7 +51,7 @@
                 } else {
                     // lets crawl through all properties of layout to make sure get captured all `contentUdi` and `settingsUdi` properties.
                     var propType = typeof obj[k];
-                    if(propType === "object" || propType === "array") {
+                    if(propType != null && (propType === "object" || propType === "array")) {
                         replaceUdisOfObject(obj[k], propValue)
                     }
                 }
@@ -65,7 +65,7 @@
 
 
         function replaceRawBlockListUDIsResolver(value, propClearingMethod) {
-            if (typeof value === "object") {
+            if (value != null && typeof value === "object") {
 
                 // we got an object, and it has these three props then we are most likely dealing with a Block Editor.
                 if ((value.layout !== undefined && value.contentData !== undefined && value.settingsData !== undefined)) {

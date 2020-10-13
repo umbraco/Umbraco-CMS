@@ -425,7 +425,11 @@
                         if (self.scaffolds) {
                             self.scaffolds.push(formatScaffoldData(scaffold));
                         }
-                    }));
+                    }).catch(
+                        () => {
+                            // Do nothing if we get an error.
+                        }
+                    ));
                 });
 
                 return $q.all(tasks);
@@ -439,7 +443,14 @@
              * @return {Array} array of strings representing alias.
              */
             getAvailableAliasesForBlockContent: function () {
-                return this.blockConfigurations.map(blockConfiguration => this.getScaffoldFromKey(blockConfiguration.contentElementTypeKey).contentTypeAlias);
+                return this.blockConfigurations.map(
+                    (blockConfiguration) => {
+                        var scaffold = this.getScaffoldFromKey(blockConfiguration.contentElementTypeKey);
+                        if (scaffold) {
+                            return scaffold.contentTypeAlias;
+                        }
+                    }
+                );
             },
 
             /**
@@ -519,7 +530,7 @@
                 var dataModel = getDataByUdi(contentUdi, this.value.contentData);
 
                 if (dataModel === null) {
-                    console.error("Couldn't find content model of " + contentUdi)
+                    console.error("Couldn't find content data of " + contentUdi)
                     return null;
                 }
 
@@ -591,7 +602,7 @@
 
                         var settingsData = getDataByUdi(settingsUdi, this.value.settingsData);
                         if (settingsData === null) {
-                            console.error("Couldnt find content settings data of " + settingsUdi)
+                            console.error("Couldnt find settings data of " + settingsUdi)
                             return null;
                         }
 

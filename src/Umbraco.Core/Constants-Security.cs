@@ -56,6 +56,8 @@ namespace Umbraco.Core
             public const string AllowedApplicationsClaimType = "http://umbraco.org/2015/02/identity/claims/backoffice/allowedapp";
             public const string SessionIdClaimType = "http://umbraco.org/2015/02/identity/claims/backoffice/sessionid";
 
+            public const string BackOfficeExternalLoginOptionsProperty = "UmbracoBackOfficeExternalLoginOptions";
+
         }
     }
 }
