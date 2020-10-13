@@ -97,6 +97,27 @@ namespace Umbraco.Core.Migrations.Upgrade
             base.ThrowOnUnknownInitialState(state);
         }
 
+        private void HandleMigrationMoves()
+        {
+            // This section handles custom cases where a migration had to be moved to an earlier position
+            // after it had already been released.  For example, the AddPropertyTypeValidationMessageColumns
+            // migration originally was released as part of 8.6.0, but as part of 8.7.0 had to be moved up to
+            // 8.1.0 to handle an error that occurred when migration from 7.X to 8.6 directly.
+            //
+            // In these cases, the moved migration will run if migrating from before the move point to after,
+            // but it would be missed by clients who have applied one of the in-between versions (8.1.0 - 8.5.X
+            // in the above example) and are now trying to directly go to the latest version.
+            //
+            // To fix this, you need to change the GUID on the final migration of each released version where
+            // the new migration could be missed, and then add an upgrade plan in here to go from the original
+            // GUID to the new migration (with a GUID different than the one in the main-line plan), and then
+            // an empty-state transition to the new GUID.  See below for an example.
+
+            From("{5B1E0D93-F5A3-449B-84BA-65366B84E2D4}");  // The original end-GUID for 8.1.0.  This was the only version between 8.1.0 and 8.5.X that had a migration
+            To<AddPropertyTypeValidationMessageColumns>("{AFCC9D4C-20BE-4138-B46E-C04409C0FF15}"); // Add the missed migration with a unique GUID
+            To("{E1E02EA0-0A77-4FAC-8D4A-9E4D460C0083}"); // Add an empty migration to the new 8.1.0 end-GUID to get back on track in the state machine.
+        }
+
         // define the plan
         protected void DefinePlan()
         {
@@ -114,6 +135,7 @@ namespace Umbraco.Core.Migrations.Upgrade
             // * Porting from version 7:
             //     Append the ported migration to the main chain, using a new guid (same as above).
             //     Create a new special chain from the {init-...} state to the main chain.
+            HandleMigrationMoves();
 
 
             // plan starts at 7.14.0 (anything before 7.14.0 is not supported)
@@ -181,14 +203,14 @@ namespace Umbraco.Core.Migrations.Upgrade
             // release-8.0.1
 
             // to 8.1.0...
+            To<AddPropertyTypeValidationMessageColumns>("{3D67D2C8-5E65-47D0-A9E1-DC2EE0779D6B}");
             To<ConvertTinyMceAndGridMediaUrlsToLocalLink>("{B69B6E8C-A769-4044-A27E-4A4E18D1645A}");
             To<RenameUserLoginDtoDateIndex>("{0372A42B-DECF-498D-B4D1-6379E907EB94}");
-            To<FixContentNuCascade>("{5B1E0D93-F5A3-449B-84BA-65366B84E2D4}");
+            To<FixContentNuCascade>("{E1E02EA0-0A77-4FAC-8D4A-9E4D460C0083}");
 
             // to 8.6.0...
             To<UpdateRelationTypeTable>("{4759A294-9860-46BC-99F9-B4C975CAE580}");
             To<AddNewRelationTypes>("{0BC866BC-0665-487A-9913-0290BD0169AD}");
-            To<AddPropertyTypeValidationMessageColumns>("{3D67D2C8-5E65-47D0-A9E1-DC2EE0779D6B}");
             To<MissingContentVersionsIndexes>("{EE288A91-531B-4995-8179-1D62D9AA3E2E}");
             To<AddMainDomLock>("{2AB29964-02A1-474D-BD6B-72148D2A53A2}");
 
