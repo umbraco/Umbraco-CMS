@@ -29,7 +29,7 @@ namespace Umbraco.Tests.Services
         {
             base.SetUp();
             ContentRepositoryBase.ThrowOnWarning = true;
-            _globalSettings = new GlobalSettingsBuilder().Build();
+            _globalSettings = new GlobalSettings();
         }
 
         public override void TearDown()

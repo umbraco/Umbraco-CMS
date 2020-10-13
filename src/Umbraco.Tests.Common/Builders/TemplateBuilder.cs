@@ -62,11 +62,11 @@ namespace Umbraco.Tests.Common.Builders
             var content = _content;
             var isMasterTemplate = _isMasterTemplate ?? false;
             var masterTemplateAlias = _masterTemplateAlias ?? string.Empty;
-            var masterTemplateId = _masterTemplateId ?? null;
+            var masterTemplateId = _masterTemplateId ?? new Lazy<int>(() => -1);
 
             var shortStringHelper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig());
 
-            return new Template(shortStringHelper, name, alias)
+            var template = new Template(shortStringHelper, name, alias)
             {
                 Id = id,
                 Key = key,
@@ -78,6 +78,16 @@ namespace Umbraco.Tests.Common.Builders
                 MasterTemplateAlias = masterTemplateAlias,
                 MasterTemplateId = masterTemplateId,
             };
+
+            return template;
+        }
+
+        public static Template CreateTextPageTemplate(string alias = "textPage")
+        {
+            return (Template)new TemplateBuilder()
+                .WithAlias(alias)
+                .WithName("Text page")
+                .Build();
         }
 
         int? IWithIdBuilder.Id

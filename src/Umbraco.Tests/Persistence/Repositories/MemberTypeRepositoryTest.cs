@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Linq;
 using Moq;
+using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Logging;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Scoping;
-using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
@@ -24,16 +24,16 @@ namespace Umbraco.Tests.Persistence.Repositories
         private MemberTypeRepository CreateRepository(IScopeProvider provider)
         {
             var templateRepository = Mock.Of<ITemplateRepository>();
-            var globalSettings = new GlobalSettingsBuilder().Build();
+            var globalSettings = new GlobalSettings();
             var commonRepository = new ContentTypeCommonRepository((IScopeAccessor)provider, templateRepository, AppCaches, ShortStringHelper);
-            var languageRepository = new LanguageRepository((IScopeAccessor)provider, AppCaches.Disabled, Mock.Of<ILogger>(), Microsoft.Extensions.Options.Options.Create(globalSettings));
-            return new MemberTypeRepository((IScopeAccessor) provider, AppCaches.Disabled, Mock.Of<ILogger>(), commonRepository, languageRepository, ShortStringHelper);
+            var languageRepository = new LanguageRepository((IScopeAccessor)provider, AppCaches.Disabled, Mock.Of<ILogger<LanguageRepository>>(), Microsoft.Extensions.Options.Options.Create(globalSettings));
+            return new MemberTypeRepository((IScopeAccessor) provider, AppCaches.Disabled, Mock.Of<ILogger<MemberTypeRepository>>(), commonRepository, languageRepository, ShortStringHelper);
         }
 
         [Test]
         public void Can_Persist_Member_Type()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository(provider);
@@ -59,7 +59,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Persist_Member_Type_Same_Property_Keys()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository(provider);
@@ -85,7 +85,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Cannot_Persist_Member_Type_Without_Alias()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository(provider);
@@ -101,7 +101,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Get_All_Member_Types()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository(provider);
@@ -126,7 +126,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Get_All_Member_Types_By_Guid_Ids()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository(provider);
@@ -151,7 +151,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Get_Member_Types_By_Guid_Id()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository(provider);
@@ -178,7 +178,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Get_All_Members_When_No_Properties_Assigned()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository(provider);
@@ -205,7 +205,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Get_Member_Type_By_Id()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository(provider);
@@ -221,7 +221,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Get_Member_Type_By_Guid_Id()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository(provider);
@@ -240,7 +240,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             var stubs = ConventionsHelper.GetStandardPropertyTypeStubs(ShortStringHelper);
 
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (provider.CreateScope())
             {
                 var repository = CreateRepository(provider);
@@ -285,7 +285,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             var stubs = ConventionsHelper.GetStandardPropertyTypeStubs(ShortStringHelper);
 
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (provider.CreateScope())
             {
                 var repository = CreateRepository(provider);
@@ -316,7 +316,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             var stubs = ConventionsHelper.GetStandardPropertyTypeStubs(ShortStringHelper);
 
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (provider.CreateScope())
             {
                 var repository = CreateRepository(provider);
@@ -350,7 +350,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Built_In_Member_Type_Properties_Are_Not_Reused_For_Different_Member_Types()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository(provider);
@@ -372,7 +372,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Delete_MemberType()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository(provider);

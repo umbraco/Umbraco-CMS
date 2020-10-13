@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
@@ -7,11 +6,12 @@ using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Common;
-using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Testing;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
@@ -39,7 +39,9 @@ namespace Umbraco.Tests.Integration
         {
             var httpContextAccessor = Mock.Of<IHttpContextAccessor>();
             var hostingEnvironment = Mock.Of<IHostingEnvironment>();
-            var globalSettings = new GlobalSettingsBuilder().Build();
+            var backofficeSecurityAccessor = Mock.Of<IBackofficeSecurityAccessor>();
+            Mock.Get(backofficeSecurityAccessor).Setup(x => x.BackofficeSecurity).Returns(Mock.Of<IBackofficeSecurity>());
+            var globalSettings = new GlobalSettings();
 
             var umbracoContextFactory = new UmbracoContextFactory(
                 _umbracoContextAccessor,
@@ -53,7 +55,7 @@ namespace Umbraco.Tests.Integration
                 httpContextAccessor,
                 Mock.Of<ICookieManager>(),
                 Mock.Of<IRequestAccessor>(),
-                Mock.Of<IWebSecurity>());
+                backofficeSecurityAccessor);
 
             var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext();
             var umbracoContext = umbracoContextReference.UmbracoContext;
@@ -70,10 +72,11 @@ namespace Umbraco.Tests.Integration
         [Test]
         public void Umbraco_Context_Not_Null()
         {
-            var globalSettings = new GlobalSettingsBuilder().Build();
+            var globalSettings = new GlobalSettings();
             var httpContextAccessor = Mock.Of<IHttpContextAccessor>();
             var hostingEnvironment = Mock.Of<IHostingEnvironment>();
-
+            var backofficeSecurityAccessor = Mock.Of<IBackofficeSecurityAccessor>();
+            Mock.Get(backofficeSecurityAccessor).Setup(x => x.BackofficeSecurity).Returns(Mock.Of<IBackofficeSecurity>());
             var umbracoContextFactory = new UmbracoContextFactory(
                 _umbracoContextAccessor,
                 Mock.Of<IPublishedSnapshotService>(),
@@ -86,7 +89,7 @@ namespace Umbraco.Tests.Integration
                 httpContextAccessor,
                 Mock.Of<ICookieManager>(),
                 Mock.Of<IRequestAccessor>(),
-                Mock.Of<IWebSecurity>());
+                backofficeSecurityAccessor);
 
             var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext();
             var umbCtx = umbracoContextReference.UmbracoContext;
@@ -105,11 +108,12 @@ namespace Umbraco.Tests.Integration
             publishedSnapshot.Setup(x => x.Members).Returns(Mock.Of<IPublishedMemberCache>());
             var content = new Mock<IPublishedContent>();
             content.Setup(x => x.Id).Returns(2);
-
+            var backofficeSecurityAccessor = Mock.Of<IBackofficeSecurityAccessor>();
+            Mock.Get(backofficeSecurityAccessor).Setup(x => x.BackofficeSecurity).Returns(Mock.Of<IBackofficeSecurity>());
             var publishedSnapshotService = new Mock<IPublishedSnapshotService>();
             var httpContextAccessor = Mock.Of<IHttpContextAccessor>();
             var hostingEnvironment = Mock.Of<IHostingEnvironment>();
-            var globalSettings = new GlobalSettingsBuilder().Build();
+            var globalSettings = new GlobalSettings();
 
             var umbracoContextFactory = new UmbracoContextFactory(
                 _umbracoContextAccessor,
@@ -123,7 +127,7 @@ namespace Umbraco.Tests.Integration
                 httpContextAccessor,
                 Mock.Of<ICookieManager>(),
                 Mock.Of<IRequestAccessor>(),
-                Mock.Of<IWebSecurity>());
+                backofficeSecurityAccessor);
 
             var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext();
             var umbracoContext = umbracoContextReference.UmbracoContext;
@@ -144,10 +148,11 @@ namespace Umbraco.Tests.Integration
         [Test]
         public void Mock_Current_Page()
         {
-            var globalSettings = new GlobalSettingsBuilder().Build();
+            var globalSettings = new GlobalSettings();
             var httpContextAccessor = Mock.Of<IHttpContextAccessor>();
             var hostingEnvironment = Mock.Of<IHostingEnvironment>();
-
+            var backofficeSecurityAccessor = Mock.Of<IBackofficeSecurityAccessor>();
+            Mock.Get(backofficeSecurityAccessor).Setup(x => x.BackofficeSecurity).Returns(Mock.Of<IBackofficeSecurity>());
             var umbracoContextFactory = new UmbracoContextFactory(
                 _umbracoContextAccessor,
                 Mock.Of<IPublishedSnapshotService>(),
@@ -160,7 +165,7 @@ namespace Umbraco.Tests.Integration
                 httpContextAccessor,
                 Mock.Of<ICookieManager>(),
                 Mock.Of<IRequestAccessor>(),
-                Mock.Of<IWebSecurity>());
+                backofficeSecurityAccessor);
 
             var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext();
             var umbracoContext = umbracoContextReference.UmbracoContext;
@@ -198,7 +203,7 @@ namespace Umbraco.Tests.Integration
             private readonly IPublishedContentQuery _publishedContentQuery;
 
             public TestSurfaceController(IUmbracoContextAccessor umbracoContextAccessor, IPublishedContentQuery publishedContentQuery, IPublishedUrlProvider publishedUrlProvider)
-                : base(umbracoContextAccessor, null, ServiceContext.CreatePartial(), AppCaches.Disabled, null, null, publishedUrlProvider)
+                : base(umbracoContextAccessor, null, ServiceContext.CreatePartial(), AppCaches.Disabled, null, publishedUrlProvider)
             {
                 _publishedContentQuery = publishedContentQuery;
             }

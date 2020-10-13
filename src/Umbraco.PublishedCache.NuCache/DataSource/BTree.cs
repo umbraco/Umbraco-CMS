@@ -45,11 +45,10 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             var blockSize = 4096;
 
             var appSetting = settings.BTreeBlockSize;
-            if (appSetting == null)
+            if (!appSetting.HasValue)
                 return blockSize;
 
-            if (!int.TryParse(appSetting, out blockSize))
-                throw new ConfigurationErrorsException($"Invalid block size value \"{appSetting}\": not a number.");
+            blockSize = appSetting.Value;
 
             var bit = 0;
             for (var i = blockSize; i != 1; i >>= 1)

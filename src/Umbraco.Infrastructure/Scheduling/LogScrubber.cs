@@ -7,6 +7,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Sync;
+using Microsoft.Extensions.Logging;
 
 namespace Umbraco.Web.Scheduling
 {
@@ -16,11 +17,12 @@ namespace Umbraco.Web.Scheduling
         private readonly IServerRegistrar _serverRegistrar;
         private readonly IAuditService _auditService;
         private readonly LoggingSettings _settings;
-        private readonly IProfilingLogger _logger;
+        private readonly IProfilingLogger _profilingLogger;
+        private readonly ILogger<LogScrubber> _logger;
         private readonly IScopeProvider _scopeProvider;
 
         public LogScrubber(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
-            IMainDom mainDom, IServerRegistrar serverRegistrar, IAuditService auditService, IOptions<LoggingSettings> settings, IScopeProvider scopeProvider, IProfilingLogger logger)
+            IMainDom mainDom, IServerRegistrar serverRegistrar, IAuditService auditService, IOptions<LoggingSettings> settings, IScopeProvider scopeProvider, IProfilingLogger profilingLogger , ILogger<LogScrubber> logger)
             : base(runner, delayMilliseconds, periodMilliseconds)
         {
             _mainDom = mainDom;
@@ -28,6 +30,7 @@ namespace Umbraco.Web.Scheduling
             _auditService = auditService;
             _settings = settings.Value;
             _scopeProvider = scopeProvider;
+            _profilingLogger = profilingLogger ;
             _logger = logger;
         }
 
@@ -42,7 +45,7 @@ namespace Umbraco.Web.Scheduling
             }
             catch (Exception ex)
             {
-                _logger.Error<LogScrubber>(ex, "Unable to locate a log scrubbing maximum age. Defaulting to 24 hours.");
+                _logger.LogError(ex, "Unable to locate a log scrubbing maximum age. Defaulting to 24 hours.");
             }
             return maximumAge;
 
@@ -59,23 +62,23 @@ namespace Umbraco.Web.Scheduling
             switch (_serverRegistrar.GetCurrentServerRole())
             {
                 case ServerRole.Replica:
-                    _logger.Debug<LogScrubber>("Does not run on replica servers.");
+                    _logger.LogDebug("Does not run on replica servers.");
                     return true; // DO repeat, server role can change
                 case ServerRole.Unknown:
-                    _logger.Debug<LogScrubber>("Does not run on servers with unknown role.");
+                    _logger.LogDebug("Does not run on servers with unknown role.");
                     return true; // DO repeat, server role can change
             }
 
             // ensure we do not run if not main domain, but do NOT lock it
             if (_mainDom.IsMainDom == false)
             {
-                _logger.Debug<LogScrubber>("Does not run if not MainDom.");
+                _logger.LogDebug("Does not run if not MainDom.");
                 return false; // do NOT repeat, going down
             }
 
             // Ensure we use an explicit scope since we are running on a background thread.
             using (var scope = _scopeProvider.CreateScope())
-            using (_logger.DebugDuration<LogScrubber>("Log scrubbing executing", "Log scrubbing complete"))
+            using (_profilingLogger.DebugDuration<LogScrubber>("Log scrubbing executing", "Log scrubbing complete"))
             {
                 _auditService.CleanLogs(GetLogScrubbingMaximumAge(_settings));
                 scope.Complete();

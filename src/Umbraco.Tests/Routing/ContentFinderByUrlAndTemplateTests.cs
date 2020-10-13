@@ -1,14 +1,10 @@
-﻿using Moq;
-using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
+﻿using NUnit.Framework;
+using Microsoft.Extensions.Logging;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Routing;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models;
 using Umbraco.Tests.Testing;
-using Current = Umbraco.Web.Composing.Current;
-using Umbraco.Tests.Common.Builders;
 
 namespace Umbraco.Tests.Routing
 {
@@ -31,17 +27,15 @@ namespace Umbraco.Tests.Routing
         [TestCase("/home/Sub1.aspx/blah")]
         public void Match_Document_By_Url_With_Template(string urlAsString)
         {
-            var globalSettings = new GlobalSettingsBuilder()
-                .WithHideTopLevelNodeFromPath(false)
-                .Build();
+            var globalSettings = new GlobalSettings { HideTopLevelNodeFromPath = false };
 
             var template1 = CreateTemplate("test");
             var template2 = CreateTemplate("blah");
             var umbracoContext = GetUmbracoContext(urlAsString, template1.Id, globalSettings: globalSettings);
             var publishedRouter = CreatePublishedRouter();
             var frequest = publishedRouter.CreateRequest(umbracoContext);
-            var webRoutingSettings = new WebRoutingSettingsBuilder().Build();
-            var lookup = new ContentFinderByUrlAndTemplate(Logger, ServiceContext.FileService, ServiceContext.ContentTypeService, Microsoft.Extensions.Options.Options.Create(webRoutingSettings));
+            var webRoutingSettings = new WebRoutingSettings();
+            var lookup = new ContentFinderByUrlAndTemplate(LoggerFactory.CreateLogger<ContentFinderByUrlAndTemplate>(), ServiceContext.FileService, ServiceContext.ContentTypeService, Microsoft.Extensions.Options.Options.Create(webRoutingSettings));
 
             var result = lookup.TryFindContent(frequest);
 

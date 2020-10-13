@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using NPoco;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -21,7 +21,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// <summary>
         /// Initializes a new instance of the <see cref="NPocoRepositoryBase{TId, TEntity}"/> class.
         /// </summary>
-        protected NPocoRepositoryBase(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger)
+        protected NPocoRepositoryBase(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<NPocoRepositoryBase<TId, TEntity>> logger)
             : base(scopeAccessor, cache, logger)
         { }
 

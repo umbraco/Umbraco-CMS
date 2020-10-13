@@ -10,6 +10,7 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Models;
@@ -23,20 +24,20 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IUpgradeService _upgradeService;
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly ICookieManager _cookieManager;
-        private readonly IWebSecurity _webSecurity;
+        private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly GlobalSettings _globalSettings;
 
         public UpdateCheckController(
             IUpgradeService upgradeService,
             IUmbracoVersion umbracoVersion,
             ICookieManager cookieManager,
-            IWebSecurity webSecurity,
+            IBackofficeSecurityAccessor backofficeSecurityAccessor,
             IOptions<GlobalSettings> globalSettings)
         {
             _upgradeService = upgradeService ?? throw new ArgumentNullException(nameof(upgradeService));
             _umbracoVersion = umbracoVersion ?? throw new ArgumentNullException(nameof(umbracoVersion));
             _cookieManager = cookieManager ?? throw new ArgumentNullException(nameof(cookieManager));
-            _webSecurity = webSecurity ?? throw new ArgumentNullException(nameof(webSecurity));
+            _backofficeSecurityAccessor = backofficeSecurityAccessor ?? throw new ArgumentNullException(nameof(backofficeSecurityAccessor));
             _globalSettings = globalSettings.Value ?? throw new ArgumentNullException(nameof(globalSettings));
         }
 
@@ -45,7 +46,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         {
             var updChkCookie = _cookieManager.GetCookieValue("UMB_UPDCHK");
             var updateCheckCookie = updChkCookie ?? string.Empty;
-            if (_globalSettings.VersionCheckPeriod > 0 && string.IsNullOrEmpty(updateCheckCookie) && _webSecurity.CurrentUser.IsAdmin())
+            if (_globalSettings.VersionCheckPeriod > 0 && string.IsNullOrEmpty(updateCheckCookie) && _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.IsAdmin())
             {
                 try
                 {

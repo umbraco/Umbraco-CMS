@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.Models;
@@ -9,7 +10,6 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
-using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;
 
@@ -25,12 +25,12 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
         public void SetUp()
         {
             CreateTestData();
-            _globalSettings = new GlobalSettingsBuilder().Build();
+            _globalSettings = new GlobalSettings();
         }
 
         private LanguageRepository CreateRepository(IScopeProvider provider)
         {
-            return new LanguageRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger, Microsoft.Extensions.Options.Options.Create(_globalSettings));
+            return new LanguageRepository((IScopeAccessor) provider, AppCaches.Disabled, LoggerFactory.CreateLogger<LanguageRepository>(), Microsoft.Extensions.Options.Options.Create(_globalSettings));
         }
 
         [Test]

@@ -24,14 +24,13 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
             composition.RegisterUnique<OutOfDateModelsStatus>();
             composition.RegisterUnique<ModelsGenerationError>();
 
-
+            composition.RegisterUnique<PureLiveModelFactory>();
             composition.RegisterUnique<IPublishedModelFactory>(factory =>
             {
-                var config = factory.GetInstance<IOptions<ModelsBuilderConfig>>().Value;
+                var config = factory.GetInstance<IOptions<ModelsBuilderSettings>>().Value;
                 if (config.ModelsMode == ModelsMode.PureLive)
                 {
-                    composition.RegisterUnique<IPublishedModelFactory, PureLiveModelFactory>();
-
+                    return factory.GetInstance<PureLiveModelFactory>();
                     // the following would add @using statement in every view so user's don't
                     // have to do it - however, then noone understands where the @using statement
                     // comes from, and it cannot be avoided / removed --- DISABLED

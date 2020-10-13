@@ -1,21 +1,26 @@
 ﻿using System;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Serialization;
-using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Core.Persistence.Mappers;
+using Umbraco.Tests.Common.Builders;
+using Umbraco.Tests.Common.Builders.Extensions;
 using MockedUser = Umbraco.Tests.TestHelpers.Entities.MockedUser;
 
 namespace Umbraco.Tests.Persistence.Repositories
@@ -29,19 +34,19 @@ namespace Umbraco.Tests.Persistence.Repositories
         private MediaRepository CreateMediaRepository(IScopeProvider provider, out IMediaTypeRepository mediaTypeRepository)
         {
             var accessor = (IScopeAccessor) provider;
-            var globalSettings = new GlobalSettingsBuilder().Build();
-            var templateRepository = new TemplateRepository(accessor, AppCaches.Disabled, Logger, TestObjects.GetFileSystemsMock(), IOHelper, ShortStringHelper);
+            var globalSettings = new GlobalSettings();
+            var templateRepository = new TemplateRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<TemplateRepository>(), TestObjects.GetFileSystemsMock(), IOHelper, ShortStringHelper);
             var commonRepository = new ContentTypeCommonRepository(accessor, templateRepository, AppCaches, ShortStringHelper);
-            var languageRepository = new LanguageRepository(accessor, AppCaches, Logger, Microsoft.Extensions.Options.Options.Create(globalSettings));
-            mediaTypeRepository = new MediaTypeRepository(accessor, AppCaches, Mock.Of<ILogger>(), commonRepository, languageRepository, ShortStringHelper);
-            var tagRepository = new TagRepository(accessor, AppCaches, Mock.Of<ILogger>());
-            var relationTypeRepository = new RelationTypeRepository(accessor, AppCaches.Disabled, Logger);
+            var languageRepository = new LanguageRepository(accessor, AppCaches, LoggerFactory.CreateLogger<LanguageRepository>(), Microsoft.Extensions.Options.Options.Create(globalSettings));
+            mediaTypeRepository = new MediaTypeRepository(accessor, AppCaches, Mock.Of<ILogger<MediaTypeRepository>>(), commonRepository, languageRepository, ShortStringHelper);
+            var tagRepository = new TagRepository(accessor, AppCaches, Mock.Of<ILogger<TagRepository>>());
+            var relationTypeRepository = new RelationTypeRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<RelationTypeRepository>());
             var entityRepository = new EntityRepository(accessor);
-            var relationRepository = new RelationRepository(accessor, Logger, relationTypeRepository, entityRepository);
+            var relationRepository = new RelationRepository(accessor, LoggerFactory.CreateLogger<RelationRepository>(), relationTypeRepository, entityRepository);
             var propertyEditors = new Lazy<PropertyEditorCollection>(() => new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>())));
             var mediaUrlGenerators = new MediaUrlGeneratorCollection(Enumerable.Empty<IMediaUrlGenerator>());
             var dataValueReferences = new DataValueReferenceFactoryCollection(Enumerable.Empty<IDataValueReferenceFactory>());
-            var repository = new MediaRepository(accessor, AppCaches, Mock.Of<ILogger>(), mediaTypeRepository, tagRepository, Mock.Of<ILanguageRepository>(), relationRepository, relationTypeRepository, propertyEditors, mediaUrlGenerators, dataValueReferences, DataTypeService);
+            var repository = new MediaRepository(accessor, AppCaches, Mock.Of<ILogger<MediaRepository>>(), LoggerFactory, mediaTypeRepository, tagRepository, Mock.Of<ILanguageRepository>(), relationRepository, relationTypeRepository, propertyEditors, mediaUrlGenerators, dataValueReferences, DataTypeService);
             return repository;
         }
 
@@ -54,33 +59,131 @@ namespace Umbraco.Tests.Persistence.Repositories
         private DocumentRepository CreateContentRepository(IScopeProvider provider, out IContentTypeRepository contentTypeRepository, out ITemplateRepository templateRepository)
         {
             var accessor = (IScopeAccessor) provider;
-            var globalSettings = new GlobalSettingsBuilder().Build();
-            templateRepository = new TemplateRepository(accessor, AppCaches, Logger, TestObjects.GetFileSystemsMock(), IOHelper, ShortStringHelper);
-            var tagRepository = new TagRepository(accessor, AppCaches, Logger);
+            var globalSettings = new GlobalSettings();
+            templateRepository = new TemplateRepository(accessor, AppCaches, LoggerFactory.CreateLogger<TemplateRepository>(), TestObjects.GetFileSystemsMock(), IOHelper, ShortStringHelper);
+            var tagRepository = new TagRepository(accessor, AppCaches, LoggerFactory.CreateLogger<TagRepository>());
             var commonRepository = new ContentTypeCommonRepository(accessor, templateRepository, AppCaches, ShortStringHelper);
-            var languageRepository = new LanguageRepository(accessor, AppCaches, Logger, Microsoft.Extensions.Options.Options.Create(globalSettings));
-            contentTypeRepository = new ContentTypeRepository(accessor, AppCaches, Logger, commonRepository, languageRepository, ShortStringHelper);
-            var relationTypeRepository = new RelationTypeRepository(accessor, AppCaches.Disabled, Logger);
+            var languageRepository = new LanguageRepository(accessor, AppCaches, LoggerFactory.CreateLogger<LanguageRepository>(), Microsoft.Extensions.Options.Options.Create(globalSettings));
+            contentTypeRepository = new ContentTypeRepository(accessor, AppCaches, LoggerFactory.CreateLogger<ContentTypeRepository>(), commonRepository, languageRepository, ShortStringHelper);
+            var relationTypeRepository = new RelationTypeRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<RelationTypeRepository>());
             var entityRepository = new EntityRepository(accessor);
-            var relationRepository = new RelationRepository(accessor, Logger, relationTypeRepository, entityRepository);
+            var relationRepository = new RelationRepository(accessor, LoggerFactory.CreateLogger<RelationRepository>(), relationTypeRepository, entityRepository);
             var propertyEditors = new Lazy<PropertyEditorCollection>(() => new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>())));
             var dataValueReferences = new DataValueReferenceFactoryCollection(Enumerable.Empty<IDataValueReferenceFactory>());
-            var repository = new DocumentRepository(accessor, AppCaches, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, relationRepository, relationTypeRepository, propertyEditors, dataValueReferences, DataTypeService);
+            var repository = new DocumentRepository(accessor, AppCaches, LoggerFactory.CreateLogger<DocumentRepository>(), LoggerFactory, contentTypeRepository, templateRepository, tagRepository, languageRepository, relationRepository, relationTypeRepository, propertyEditors, dataValueReferences, DataTypeService);
             return repository;
         }
 
         private UserRepository CreateRepository(IScopeProvider provider)
         {
             var accessor = (IScopeAccessor) provider;
-            var globalSettings = new GlobalSettingsBuilder().Build();
-            var repository = new UserRepository(accessor, AppCaches.Disabled, Logger, Mappers, Microsoft.Extensions.Options.Options.Create(globalSettings), Microsoft.Extensions.Options.Options.Create(new UserPasswordConfigurationSettings()), new JsonNetSerializer());
+            var globalSettings = new GlobalSettings();
+            var repository = new UserRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<UserRepository>(), Mappers, Microsoft.Extensions.Options.Options.Create(globalSettings), Microsoft.Extensions.Options.Options.Create(new UserPasswordConfigurationSettings()), new JsonNetSerializer());
             return repository;
         }
 
         private UserGroupRepository CreateUserGroupRepository(IScopeProvider provider)
         {
             var accessor = (IScopeAccessor) provider;
-            return new UserGroupRepository(accessor, AppCaches.Disabled, Logger, ShortStringHelper);
+            return new UserGroupRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<UserGroupRepository>(), LoggerFactory, ShortStringHelper);
+        }
+
+        [Test]
+        public void Validate_Login_Session()
+        {
+            // Arrange
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
+            var user = MockedUser.CreateUser();
+            using (var scope = provider.CreateScope(autoComplete: true))
+            {
+                var repository = CreateRepository(provider);
+                repository.Save(user);
+            }
+
+            using (var scope = provider.CreateScope(autoComplete: true))
+            {
+                var repository = CreateRepository(provider);
+                var sessionId = repository.CreateLoginSession(user.Id, "1.2.3.4");
+
+                // manually update this record to be in the past
+                scope.Database.Execute(SqlContext.Sql()
+                    .Update<UserLoginDto>(u => u.Set(x => x.LoggedOutUtc, DateTime.UtcNow.AddDays(-100)))
+                    .Where<UserLoginDto>(x => x.SessionId == sessionId));
+
+                var isValid = repository.ValidateLoginSession(user.Id, sessionId);
+                Assert.IsFalse(isValid);
+
+                // create a new one
+                sessionId = repository.CreateLoginSession(user.Id, "1.2.3.4");
+                isValid = repository.ValidateLoginSession(user.Id, sessionId);
+                Assert.IsTrue(isValid);
+            }
+        }
+
+        [Test]
+        public void Can_Perform_Add_On_UserRepository()
+        {
+            // Arrange
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
+            using (var scope = provider.CreateScope(autoComplete: true))
+            {
+                var repository = CreateRepository(provider);
+
+                var user = MockedUser.CreateUser();
+
+                // Act
+                repository.Save(user);
+
+
+                // Assert
+                Assert.That(user.HasIdentity, Is.True);
+            }
+        }
+
+        [Test]
+        public void Can_Perform_Multiple_Adds_On_UserRepository()
+        {
+            // Arrange
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
+            using (var scope = provider.CreateScope(autoComplete: true))
+            {
+                var repository = CreateRepository(provider);
+
+                var user1 = MockedUser.CreateUser("1");
+                var use2 = MockedUser.CreateUser("2");
+
+                // Act
+                repository.Save(user1);
+
+                repository.Save(use2);
+
+
+                // Assert
+                Assert.That(user1.HasIdentity, Is.True);
+                Assert.That(use2.HasIdentity, Is.True);
+            }
+        }
+
+        [Test]
+        public void Can_Verify_Fresh_Entity_Is_Not_Dirty()
+        {
+            // Arrange
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
+            using (var scope = provider.CreateScope(autoComplete: true))
+            {
+                var repository = CreateRepository(provider);
+
+                var user = MockedUser.CreateUser();
+                repository.Save(user);
+
+
+                // Act
+                var resolved = repository.Get((int)user.Id);
+                bool dirty = ((User)resolved).IsDirty();
+
+                // Assert
+                Assert.That(dirty, Is.False);
+            }
         }
 
         [Test]
@@ -90,8 +193,8 @@ namespace Umbraco.Tests.Persistence.Repositories
             var mt = MockedContentTypes.CreateSimpleMediaType("testmedia", "TestMedia");
 
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
+            using (var scope = provider.CreateScope(autoComplete: true))
             {
                 var userRepository = CreateRepository(provider);
                 var contentRepository = CreateContentRepository(provider, out var contentTypeRepo);
@@ -145,6 +248,272 @@ namespace Umbraco.Tests.Persistence.Repositories
             }
         }
 
+        [Test]
+        public void Can_Perform_Delete_On_UserRepository()
+        {
+            // Arrange
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
+            using (var scope = provider.CreateScope(autoComplete: true))
+            {
+                var repository = CreateRepository(provider);
+
+                var user = MockedUser.CreateUser();
+
+                // Act
+                repository.Save(user);
+
+                var id = user.Id;
+
+                var repository2 = new UserRepository((IScopeAccessor) provider, AppCaches.Disabled, LoggerFactory.CreateLogger<UserRepository>(),
+                    Mock.Of<IMapperCollection>(),
+                    Microsoft.Extensions.Options.Options.Create(new GlobalSettings()),
+                    Microsoft.Extensions.Options.Options.Create(new UserPasswordConfigurationSettings()),
+                    Mock.Of<IJsonSerializer>());
+
+                repository2.Delete(user);
+
+
+                var resolved = repository2.Get((int) id);
+
+                // Assert
+                Assert.That(resolved, Is.Null);
+            }
+        }
+
+        [Test]
+        public void Can_Perform_Get_On_UserRepository()
+        {
+            // Arrange
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
+            using (var scope = provider.CreateScope(autoComplete: true))
+            {
+                var repository = CreateRepository(provider);
+                var userGroupRepository = CreateUserGroupRepository(provider);
+
+                var user = CreateAndCommitUserWithGroup(repository, userGroupRepository);
+
+                // Act
+                var updatedItem = repository.Get(user.Id);
+
+                // FIXME: this test cannot work, user has 2 sections but the way it's created,
+                // they don't show, so the comparison with updatedItem fails - fix!
+
+                // Assert
+                AssertPropertyValues(updatedItem, user);
+            }
+        }
+
+        [Test]
+        public void Can_Perform_GetByQuery_On_UserRepository()
+        {
+            // Arrange
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
+            using (var scope = provider.CreateScope(autoComplete: true))
+            {
+                var repository = CreateRepository(provider);
+
+                CreateAndCommitMultipleUsers(repository);
+
+                // Act
+                var query = scope.SqlContext.Query<IUser>().Where(x => x.Username == "TestUser1");
+                var result = repository.Get(query);
+
+                // Assert
+                Assert.That(result.Count(), Is.GreaterThanOrEqualTo(1));
+            }
+        }
+
+        [Test]
+        public void Can_Perform_GetAll_By_Param_Ids_On_UserRepository()
+        {
+            // Arrange
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
+            using (var scope = provider.CreateScope(autoComplete: true))
+            {
+                var repository = CreateRepository(provider);
+
+                var users = CreateAndCommitMultipleUsers(repository);
+
+                // Act
+                var result = repository.GetMany((int) users[0].Id, (int) users[1].Id);
+
+                // Assert
+                Assert.That(result, Is.Not.Null);
+                Assert.That(result.Any(), Is.True);
+                Assert.That(result.Count(), Is.EqualTo(2));
+            }
+        }
+
+        [Test]
+        public void Can_Perform_GetAll_On_UserRepository()
+        {
+            // Arrange
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
+            using (var scope = provider.CreateScope(autoComplete: true))
+            {
+                var repository = CreateRepository(provider);
+
+                CreateAndCommitMultipleUsers(repository);
+
+                // Act
+                var result = repository.GetMany();
+
+                // Assert
+                Assert.That(result, Is.Not.Null);
+                Assert.That(result.Any(), Is.True);
+                Assert.That(result.Count(), Is.GreaterThanOrEqualTo(3));
+            }
+        }
+
+        [Test]
+        public void Can_Perform_Exists_On_UserRepository()
+        {
+            // Arrange
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
+            using (var scope = provider.CreateScope(autoComplete: true))
+            {
+                var repository = CreateRepository(provider);
+
+                var users = CreateAndCommitMultipleUsers(repository);
+
+                // Act
+                var exists = repository.Exists(users[0].Id);
+
+                // Assert
+                Assert.That(exists, Is.True);
+            }
+        }
+
+        [Test]
+        public void Can_Perform_Count_On_UserRepository()
+        {
+            // Arrange
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
+            using (var scope = provider.CreateScope(autoComplete: true))
+            {
+                var repository = CreateRepository(provider);
+
+                var users = CreateAndCommitMultipleUsers(repository);
+
+                // Act
+                var query = scope.SqlContext.Query<IUser>().Where(x => x.Username == "TestUser1" || x.Username == "TestUser2");
+                var result = repository.Count(query);
+
+                // Assert
+                Assert.AreEqual(2, result);
+            }
+        }
+
+        [Test]
+        public void Can_Get_Paged_Results_By_Query_And_Filter_And_Groups()
+        {
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
+            using (var scope = provider.CreateScope(autoComplete: true))
+            {
+                var repository = CreateRepository(provider);
+
+                var users = CreateAndCommitMultipleUsers(repository);
+                var query = provider.SqlContext.Query<IUser>().Where(x => x.Username == "TestUser1" || x.Username == "TestUser2");
+
+                try
+                {
+                    scope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
+                    scope.Database.AsUmbracoDatabase().EnableSqlCount = true;
+
+                    // Act
+                    var result = repository.GetPagedResultsByQuery(query, 0, 10, out var totalRecs, user => user.Id, Direction.Ascending,
+                            excludeUserGroups: new[] { Constants.Security.TranslatorGroupAlias },
+                            filter: provider.SqlContext.Query<IUser>().Where(x => x.Id > -1));
+
+                    // Assert
+                    Assert.AreEqual(2, totalRecs);
+                }
+                finally
+                {
+                    scope.Database.AsUmbracoDatabase().EnableSqlTrace = false;
+                    scope.Database.AsUmbracoDatabase().EnableSqlCount = false;
+                }
+            }
+
+        }
+
+        [Test]
+        public void Can_Get_Paged_Results_With_Filter_And_Groups()
+        {
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
+            using (var scope = provider.CreateScope(autoComplete: true))
+            {
+                var repository = CreateRepository(provider);
+
+                var users = CreateAndCommitMultipleUsers(repository);
+
+                try
+                {
+                    scope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
+                    scope.Database.AsUmbracoDatabase().EnableSqlCount = true;
+
+                    // Act
+                    var result = repository.GetPagedResultsByQuery(null, 0, 10, out var totalRecs, user => user.Id, Direction.Ascending,
+                        includeUserGroups: new[] { Constants.Security.AdminGroupAlias, Constants.Security.SensitiveDataGroupAlias },
+                        excludeUserGroups: new[] { Constants.Security.TranslatorGroupAlias },
+                        filter: provider.SqlContext.Query<IUser>().Where(x => x.Id == -1));
+
+                    // Assert
+                    Assert.AreEqual(1, totalRecs);
+                }
+                finally
+                {
+                    scope.Database.AsUmbracoDatabase().EnableSqlTrace = false;
+                    scope.Database.AsUmbracoDatabase().EnableSqlCount = false;
+                }
+            }
+        }
+
+        [Test]
+        public void Can_Invalidate_SecurityStamp_On_Username_Change()
+        {
+            // Arrange
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
+            using (var scope = provider.CreateScope(autoComplete: true))
+            {
+                var repository = CreateRepository(provider);
+                var userGroupRepository = CreateUserGroupRepository(provider);
+
+                var user = CreateAndCommitUserWithGroup(repository, userGroupRepository);
+                var originalSecurityStamp = user.SecurityStamp;
+
+                // Ensure when user generated a security stamp is present
+                Assert.That(user.SecurityStamp, Is.Not.Null);
+                Assert.That(user.SecurityStamp, Is.Not.Empty);
+
+                // Update username
+                user.Username = user.Username + "UPDATED";
+                repository.Save(user);
+
+                // Get the user
+                var updatedUser = repository.Get(user.Id);
+
+                // Ensure the Security Stamp is invalidated & no longer the same
+                Assert.AreNotEqual(originalSecurityStamp, updatedUser.SecurityStamp);
+            }
+        }
+
+        private void AssertPropertyValues(IUser updatedItem, IUser originalUser)
+        {
+            Assert.That(updatedItem.Id, Is.EqualTo(originalUser.Id));
+            Assert.That(updatedItem.Name, Is.EqualTo(originalUser.Name));
+            Assert.That(updatedItem.Language, Is.EqualTo(originalUser.Language));
+            Assert.That(updatedItem.IsApproved, Is.EqualTo(originalUser.IsApproved));
+            Assert.That(updatedItem.RawPasswordValue, Is.EqualTo(originalUser.RawPasswordValue));
+            Assert.That(updatedItem.IsLockedOut, Is.EqualTo(originalUser.IsLockedOut));
+            Assert.IsTrue(updatedItem.StartContentIds.UnsortedSequenceEqual(originalUser.StartContentIds));
+            Assert.IsTrue(updatedItem.StartMediaIds.UnsortedSequenceEqual(originalUser.StartMediaIds));
+            Assert.That(updatedItem.Email, Is.EqualTo(originalUser.Email));
+            Assert.That(updatedItem.Username, Is.EqualTo(originalUser.Username));
+            Assert.That(updatedItem.AllowedSections.Count(), Is.EqualTo(originalUser.AllowedSections.Count()));
+            foreach (var allowedSection in originalUser.AllowedSections)
+                Assert.IsTrue(updatedItem.AllowedSections.Contains(allowedSection));
+        }
 
         private static User CreateAndCommitUserWithGroup(IUserRepository repository, IUserGroupRepository userGroupRepository)
         {
@@ -158,6 +527,16 @@ namespace Umbraco.Tests.Persistence.Repositories
             user.AddGroup(group);
 
             return user;
+        }
+        private IUser[] CreateAndCommitMultipleUsers(IUserRepository repository)
+        {
+            var user1 = new UserBuilder().WithoutIdentity().WithSuffix("1").Build();
+            var user2 = new UserBuilder().WithoutIdentity().WithSuffix("2").Build();
+            var user3 = new UserBuilder().WithoutIdentity().WithSuffix("3").Build();
+            repository.Save(user1);
+            repository.Save(user2);
+            repository.Save(user3);
+            return new IUser[] { user1, user2, user3 };
         }
 
     }

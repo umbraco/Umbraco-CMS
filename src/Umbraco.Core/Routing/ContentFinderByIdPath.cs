@@ -1,4 +1,3 @@
-using Umbraco.Core.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
@@ -6,6 +5,7 @@ using Umbraco.Core.Models.PublishedContent;
 using System.Globalization;
 using Umbraco.Core.Configuration.Models;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
 
 namespace Umbraco.Web.Routing
 {
@@ -17,11 +17,11 @@ namespace Umbraco.Web.Routing
     /// </remarks>
     public class ContentFinderByIdPath : IContentFinder
     {
-        private readonly ILogger _logger;
+        private readonly ILogger<ContentFinderByIdPath> _logger;
         private readonly IRequestAccessor _requestAccessor;
         private readonly WebRoutingSettings _webRoutingSettings;
 
-        public ContentFinderByIdPath(IOptions<WebRoutingSettings> webRoutingSettings, ILogger logger, IRequestAccessor requestAccessor)
+        public ContentFinderByIdPath(IOptions<WebRoutingSettings> webRoutingSettings, ILogger<ContentFinderByIdPath> logger, IRequestAccessor requestAccessor)
         {
             _webRoutingSettings = webRoutingSettings.Value ?? throw new System.ArgumentNullException(nameof(webRoutingSettings));
             _logger = logger ?? throw new System.ArgumentNullException(nameof(logger));
@@ -53,7 +53,7 @@ namespace Umbraco.Web.Routing
 
                 if (nodeId > 0)
                 {
-                    _logger.Debug<ContentFinderByIdPath>("Id={NodeId}", nodeId);
+                    _logger.LogDebug("Id={NodeId}", nodeId);
                     node = frequest.UmbracoContext.Content.GetById(nodeId);
 
                     if (node != null)
@@ -69,7 +69,7 @@ namespace Umbraco.Web.Routing
                         }
 
                         frequest.PublishedContent = node;
-                        _logger.Debug<ContentFinderByIdPath>("Found node with id={PublishedContentId}", frequest.PublishedContent.Id);
+                        _logger.LogDebug("Found node with id={PublishedContentId}", frequest.PublishedContent.Id);
                     }
                     else
                     {
@@ -79,7 +79,7 @@ namespace Umbraco.Web.Routing
             }
 
             if (nodeId == -1)
-                _logger.Debug<ContentFinderByIdPath>("Not a node id");
+                _logger.LogDebug("Not a node id");
 
             return node != null;
         }

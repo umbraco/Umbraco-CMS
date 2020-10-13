@@ -12,6 +12,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
+using Umbraco.Core.Media;
 using Umbraco.Core.Strings;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.ActionsResults;
@@ -32,18 +33,20 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IShortStringHelper _shortStringHelper;
         private readonly ContentSettings _contentSettings;
         private readonly IIOHelper _ioHelper;
+        private readonly IImageUrlGenerator _imageUrlGenerator;
 
         public TinyMceController(
             IHostingEnvironment hostingEnvironment,
             IShortStringHelper shortStringHelper,
             IOptions<ContentSettings> contentSettings,
-            IIOHelper ioHelper
-        )
+            IIOHelper ioHelper,
+            IImageUrlGenerator imageUrlGenerator)
         {
             _hostingEnvironment = hostingEnvironment;
             _shortStringHelper = shortStringHelper;
             _contentSettings = contentSettings.Value;
             _ioHelper = ioHelper;
+            _imageUrlGenerator = imageUrlGenerator;
         }
 
         [HttpPost]
@@ -78,7 +81,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             var safeFileName = fileName.ToSafeFileName(_shortStringHelper);
             var ext = safeFileName.Substring(safeFileName.LastIndexOf('.') + 1).ToLower();
 
-            if (_contentSettings.IsFileAllowedForUpload(ext) == false || _contentSettings.Imaging.ImageFileTypes.Contains(ext) == false)
+            if (_contentSettings.IsFileAllowedForUpload(ext) == false || _imageUrlGenerator.SupportedImageFileTypes.Contains(ext) == false)
             {
                 // Throw some error - to say can't upload this IMG type
                 return new UmbracoProblemResult("This is not an image filetype extension that is approved", HttpStatusCode.BadRequest);

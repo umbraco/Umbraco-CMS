@@ -3,6 +3,8 @@ using System.Linq;
 using System.Web.Mvc;
 using System.Web.Routing;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -30,7 +32,6 @@ using Umbraco.Web.Runtime;
 using Umbraco.Web.WebApi;
 using ConnectionStrings = Umbraco.Core.Configuration.Models.ConnectionStrings;
 using Current = Umbraco.Web.Composing.Current;
-using ILogger = Umbraco.Core.Logging.ILogger;
 
 namespace Umbraco.Tests.Routing
 {
@@ -53,8 +54,8 @@ namespace Umbraco.Tests.Routing
 
         public class TestRuntime : CoreRuntime
         {
-            public TestRuntime(GlobalSettings globalSettings, ConnectionStrings connectionStrings, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)
-                : base(globalSettings, connectionStrings,umbracoVersion, ioHelper, Mock.Of<ILogger>(), Mock.Of<IProfiler>(), new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, TestHelper.DbProviderFactoryCreator, TestHelper.MainDom, TestHelper.GetTypeFinder(), AppCaches.NoCache)
+            public TestRuntime(GlobalSettings globalSettings, ConnectionStrings connectionStrings, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)
+                : base(globalSettings, connectionStrings,umbracoVersion, ioHelper,  NullLoggerFactory.Instance, Mock.Of<IProfiler>(), new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, TestHelper.DbProviderFactoryCreator, TestHelper.MainDom, TestHelper.GetTypeFinder(), AppCaches.NoCache)
             {
             }
 
@@ -73,7 +74,7 @@ namespace Umbraco.Tests.Routing
             var umbracoApiControllerTypes = new UmbracoApiControllerTypeCollection(Composition.TypeLoader.GetUmbracoApiControllers());
             Composition.RegisterUnique(umbracoApiControllerTypes);
 
-            var requestHandlerSettings = new RequestHandlerSettingsBuilder().Build();
+            var requestHandlerSettings = new RequestHandlerSettings();
             Composition.RegisterUnique<IShortStringHelper>(_ => new DefaultShortStringHelper(Microsoft.Extensions.Options.Options.Create(requestHandlerSettings)));
         }
 
@@ -110,7 +111,7 @@ namespace Umbraco.Tests.Routing
             frequest.TemplateModel = template;
 
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
-            var handler = new RenderRouteHandler(umbracoContext, new TestControllerFactory(umbracoContextAccessor, Mock.Of<ILogger>()), ShortStringHelper);
+            var handler = new RenderRouteHandler(umbracoContext, new TestControllerFactory(umbracoContextAccessor, Mock.Of<ILogger<TestControllerFactory>>()), ShortStringHelper);
 
             handler.GetHandlerForRoute(httpContext.Request.RequestContext, frequest);
             Assert.AreEqual("RenderMvc", routeData.Values["controller"].ToString());
@@ -151,14 +152,15 @@ namespace Umbraco.Tests.Routing
             var type = new AutoPublishedContentType(Guid.NewGuid(), 22, "CustomDocument", new PublishedPropertyType[] { });
             ContentTypesCache.GetPublishedContentTypeByAlias = alias => type;
 
-            var handler = new RenderRouteHandler(umbracoContext, new TestControllerFactory(umbracoContextAccessor, Mock.Of<ILogger>(), context =>
+            var handler = new RenderRouteHandler(umbracoContext, new TestControllerFactory(umbracoContextAccessor, Mock.Of<ILogger<TestControllerFactory>>(), context =>
                 {
 
                   return new CustomDocumentController(Factory.GetInstance<IOptions<GlobalSettings>>(),
                         umbracoContextAccessor,
                         Factory.GetInstance<ServiceContext>(),
                         Factory.GetInstance<AppCaches>(),
-                        Factory.GetInstance<IProfilingLogger>());
+                        Factory.GetInstance<IProfilingLogger>(),
+                        Factory.GetInstance<ILoggerFactory>());
                 }), ShortStringHelper);
 
             handler.GetHandlerForRoute(httpContext.Request.RequestContext, frequest);
@@ -195,8 +197,8 @@ namespace Umbraco.Tests.Routing
         /// </summary>
         public class CustomDocumentController : RenderMvcController
         {
-            public CustomDocumentController(IOptions<GlobalSettings> globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger)
-                : base(globalSettings, umbracoContextAccessor, services, appCaches, profilingLogger)
+            public CustomDocumentController(IOptions<GlobalSettings> globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger, ILoggerFactory loggerFactory)
+                : base(globalSettings, umbracoContextAccessor, services, appCaches, profilingLogger, loggerFactory)
             {
             }
 

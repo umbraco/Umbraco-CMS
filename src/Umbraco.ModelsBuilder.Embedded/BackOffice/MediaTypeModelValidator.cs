@@ -11,7 +11,7 @@ namespace Umbraco.ModelsBuilder.Embedded.BackOffice
     // ReSharper disable once UnusedMember.Global - This is typed scanned
     public class MediaTypeModelValidator : ContentTypeModelValidatorBase<MediaTypeSave, PropertyTypeBasic>
     {
-        public MediaTypeModelValidator(IOptions<ModelsBuilderConfig> config) : base(config)
+        public MediaTypeModelValidator(IOptions<ModelsBuilderSettings> config) : base(config)
         {
         }
     }

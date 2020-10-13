@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Events;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
@@ -14,9 +14,9 @@ namespace Umbraco.Core.Services.Implement
     {
         private readonly IMemberGroupRepository _memberGroupRepository;
 
-        public MemberGroupService(IScopeProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory,
+        public MemberGroupService(IScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory,
             IMemberGroupRepository memberGroupRepository)
-            : base(provider, logger, eventMessagesFactory)
+            : base(provider, loggerFactory, eventMessagesFactory)
         {
             _memberGroupRepository = memberGroupRepository;
             //Proxy events!

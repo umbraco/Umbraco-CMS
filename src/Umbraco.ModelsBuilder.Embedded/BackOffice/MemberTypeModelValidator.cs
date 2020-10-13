@@ -11,7 +11,7 @@ namespace Umbraco.ModelsBuilder.Embedded.BackOffice
     // ReSharper disable once UnusedMember.Global - This is typed scanned
     public class MemberTypeModelValidator : ContentTypeModelValidatorBase<MemberTypeSave, MemberPropertyTypeBasic>
     {
-        public MemberTypeModelValidator(IOptions<ModelsBuilderConfig> config) : base(config)
+        public MemberTypeModelValidator(IOptions<ModelsBuilderSettings> config) : base(config)
         {
         }
     }

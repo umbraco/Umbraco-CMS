@@ -1,5 +1,6 @@
 using System;
 using System.Globalization;
+using Umbraco.Core.Models;
 using Umbraco.Tests.Common.Builders.Interfaces;
 
 namespace Umbraco.Tests.Common.Builders.Extensions
@@ -73,6 +74,13 @@ namespace Umbraco.Tests.Common.Builders.Extensions
             where T : IWithParentIdBuilder
         {
             builder.ParentId = parentId;
+            return builder;
+        }
+
+        public static T WithParentContentType<T>(this T builder, IContentTypeComposition parent)
+            where T : IWithParentContentTypeBuilder
+        {
+            builder.Parent = parent;
             return builder;
         }
 
@@ -198,6 +206,13 @@ namespace Umbraco.Tests.Common.Builders.Extensions
             where T : IWithCultureInfoBuilder
         {
             builder.CultureInfo = CultureInfo.GetCultureInfo(name);
+            return builder;
+        }
+
+        public static T WithSupportsPublishing<T>(this T builder, bool supportsPublishing)
+            where T : IWithSupportsPublishing
+        {
+            builder.SupportsPublishing = supportsPublishing;
             return builder;
         }
     }

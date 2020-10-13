@@ -16,7 +16,7 @@ namespace Umbraco.Core.Configuration.Models
 
         public bool DisableRedirectUrlTracking { get; set; } = false;
 
-        public string UrlProviderMode { get; set; } = UrlMode.Auto.ToString();
+        public UrlMode UrlProviderMode { get; set; } = UrlMode.Auto;
 
         public string UmbracoApplicationUrl { get; set; }
     }

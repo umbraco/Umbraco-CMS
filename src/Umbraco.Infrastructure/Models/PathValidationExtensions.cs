@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-using Umbraco.Core.Logging;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Dtos;
 
@@ -78,7 +78,7 @@ namespace Umbraco.Core.Models
         /// <param name="getParent">A callback specified to retrieve the parent entity of the entity</param>
         /// <param name="update">A callback specified to update a fixed entity</param>
         public static void EnsureValidPath<T>(this T entity,
-            ILogger logger,
+            ILogger<T> logger,
             Func<T, T> getParent,
             Action<T> update)
             where T: IUmbracoEntity
@@ -88,7 +88,7 @@ namespace Umbraco.Core.Models
 
             if (entity.ValidatePath() == false)
             {
-                logger.Warn(typeof(PathValidationExtensions), "The content item {EntityId} has an invalid path: {EntityPath} with parentID: {EntityParentId}", entity.Id, entity.Path, entity.ParentId);
+                logger.LogWarning("The content item {EntityId} has an invalid path: {EntityPath} with parentID: {EntityParentId}", entity.Id, entity.Path, entity.ParentId);
                 if (entity.ParentId == -1)
                 {
                     entity.Path = string.Concat("-1,", entity.Id);

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Umbraco.Core.Configuration.Models.Validation;
 using Umbraco.Core.Macros;
 
 namespace Umbraco.Core.Configuration.Models
@@ -15,7 +16,7 @@ namespace Umbraco.Core.Configuration.Models
 
         public bool ResolveUrlsFromTextString { get; set; } = false;
 
-        public IEnumerable<ContentErrorPage> Error404Collection { get; set; } = Array.Empty<ContentErrorPage>();
+        public ContentErrorPage[] Error404Collection { get; set; } = Array.Empty<ContentErrorPage>();
 
         public string PreviewBadge { get; set; } = DefaultPreviewBadge;
 

@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Umbraco.Core.Logging;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Core.HealthCheck.Checks.LiveEnvironment
@@ -9,8 +9,8 @@ namespace Umbraco.Core.HealthCheck.Checks.LiveEnvironment
         Group = "Live Environment")]
     public class TraceCheck : AbstractSettingsCheck
     {
-        public TraceCheck(ILocalizedTextService textService, ILogger logger, IConfigurationService configurationService)
-        : base(textService, logger, configurationService)
+        public TraceCheck(ILocalizedTextService textService, ILoggerFactory loggerFactory, IConfigurationService configurationService)
+        : base(textService, loggerFactory, configurationService)
         { }
 
         public override string ItemPath => "/configuration/system.web/trace/@enabled";

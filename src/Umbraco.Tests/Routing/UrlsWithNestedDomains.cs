@@ -2,15 +2,16 @@
 using System.Linq;
 using Moq;
 using NUnit.Framework;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Web.Routing;
 using Umbraco.Core.Services;
+using Umbraco.Tests.Common;
 using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Web;
-using Umbraco.Tests.Common;
-using Umbraco.Tests.Common.Builders;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.Routing
 {
@@ -32,8 +33,8 @@ namespace Umbraco.Tests.Routing
         [Test]
         public void DoNotPolluteCache()
         {
-            var globalSettings = new GlobalSettingsBuilder().WithHideTopLevelNodeFromPath(false).Build();
-            var requestHandlerSettings = new RequestHandlerSettingsBuilder().WithAddTrailingSlash(true).Build();
+            var requestHandlerSettings = new RequestHandlerSettings { AddTrailingSlash = true };
+            var globalSettings = new GlobalSettings { HideTopLevelNodeFromPath = false };
 
             SetDomains1();
 
@@ -44,7 +45,7 @@ namespace Umbraco.Tests.Routing
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
             var urlProvider = new DefaultUrlProvider(
                 Microsoft.Extensions.Options.Options.Create(requestHandlerSettings),
-                Logger,
+                LoggerFactory.CreateLogger<DefaultUrlProvider>(),
                 Microsoft.Extensions.Options.Options.Create(globalSettings),
                 new SiteDomainHelper(), umbracoContextAccessor, UriUtility);
             var publishedUrlProvider = GetPublishedUrlProvider(umbracoContext, urlProvider);
@@ -65,7 +66,7 @@ namespace Umbraco.Tests.Routing
             Assert.IsTrue(frequest.HasDomain);
 
             // check that it's been routed
-            var lookup = new ContentFinderByUrl(Logger);
+            var lookup = new ContentFinderByUrl(LoggerFactory.CreateLogger<ContentFinderByUrl>());
             var result = lookup.TryFindContent(frequest);
             Assert.IsTrue(result);
             Assert.AreEqual(100111, frequest.PublishedContent.Id);
@@ -97,7 +98,7 @@ namespace Umbraco.Tests.Routing
 
         private IPublishedUrlProvider GetPublishedUrlProvider(IUmbracoContext umbracoContext, DefaultUrlProvider urlProvider)
         {
-            var webRoutingSettings = new WebRoutingSettingsBuilder().Build();
+            var webRoutingSettings = new WebRoutingSettings();
             return new UrlProvider(
                 new TestUmbracoContextAccessor(umbracoContext),
                 Microsoft.Extensions.Options.Options.Create(webRoutingSettings),

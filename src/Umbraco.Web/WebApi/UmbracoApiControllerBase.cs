@@ -118,7 +118,7 @@ namespace Umbraco.Web.WebApi
         /// <summary>
         /// Gets the web security helper.
         /// </summary>
-        public IWebSecurity Security => UmbracoContext.Security;
+        public IBackofficeSecurity Security => UmbracoContext.Security;
 
         /// <summary>
         /// Tries to get the current HttpContext.

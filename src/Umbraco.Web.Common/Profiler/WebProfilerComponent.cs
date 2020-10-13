@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Net;
@@ -17,7 +18,7 @@ namespace Umbraco.Web.Common.Profiler
         private readonly IUmbracoRequestLifetime _umbracoRequestLifetime;
         private readonly List<Action> _terminate = new List<Action>();
 
-        public WebProfilerComponent(IProfiler profiler, ILogger logger, IUmbracoRequestLifetime umbracoRequestLifetime,
+        public WebProfilerComponent(IProfiler profiler, ILogger<WebProfilerComponent> logger, IUmbracoRequestLifetime umbracoRequestLifetime,
             IUmbracoApplicationLifetime umbracoApplicationLifetime)
         {
             _umbracoRequestLifetime = umbracoRequestLifetime;
@@ -31,7 +32,7 @@ namespace Umbraco.Web.Common.Profiler
 
             // if VoidProfiler was registered, let it be known
             if (profiler is VoidProfiler)
-                logger.Info<WebProfilerComponent>(
+                logger.LogInformation(
                     "Profiler is VoidProfiler, not profiling (must run debug mode to profile).");
             _profile = false;
         }

@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.HealthCheck;
 using Umbraco.Core.HealthCheck.Checks;
+using Umbraco.Infrastructure.HealthCheck;
 
 namespace Umbraco.Web.HealthCheck.NotificationMethods
 {

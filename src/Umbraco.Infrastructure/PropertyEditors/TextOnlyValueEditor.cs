@@ -20,7 +20,6 @@ namespace Umbraco.Web.PropertyEditors
         /// A method used to format the database value to a value that can be used by the editor
         /// </summary>
         /// <param name="property"></param>
-        /// <param name="dataTypeService"></param>
         /// <param name="culture"></param>
         /// <param name="segment"></param>
         /// <returns></returns>

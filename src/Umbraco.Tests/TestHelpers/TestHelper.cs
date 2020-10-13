@@ -35,6 +35,7 @@ using Umbraco.Web.Routing;
 using File = System.IO.File;
 using Umbraco.Tests.Common.Builders;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Configuration.Models;
 
 namespace Umbraco.Tests.TestHelpers
@@ -63,7 +64,7 @@ namespace Umbraco.Tests.TestHelpers
             public override IBackOfficeInfo GetBackOfficeInfo()
                 => new AspNetBackOfficeInfo(
                     new GlobalSettings(),
-                    TestHelper.IOHelper, Mock.Of<ILogger>(), Options.Create(new WebRoutingSettings()));
+                    TestHelper.IOHelper, Mock.Of<ILogger<AspNetBackOfficeInfo>>(), Options.Create(new WebRoutingSettings()));
 
             public override IHostingEnvironment GetHostingEnvironment()
                 => new AspNetHostingEnvironment(Options.Create(new HostingSettings()));
@@ -104,7 +105,7 @@ namespace Umbraco.Tests.TestHelpers
         public static IMainDom MainDom => _testHelperInternal.MainDom;
         public static UriUtility UriUtility => _testHelperInternal.UriUtility;
 
-        public static IEmailSender EmailSender { get; } = new EmailSender(Options.Create(new GlobalSettingsBuilder().Build()));
+        public static IEmailSender EmailSender { get; } = new EmailSender(Options.Create(new GlobalSettings()));
 
 
         /// <summary>
@@ -302,25 +303,6 @@ namespace Umbraco.Tests.TestHelpers
                 }
             }
         }
-
-        // TODO: Move to MockedValueEditors.cs
-        public static DataValueEditor CreateDataValueEditor(string name)
-        {
-            var valueType = (ValueTypes.IsValue(name)) ? name : ValueTypes.String;
-
-            return new DataValueEditor(
-                Mock.Of<IDataTypeService>(),
-                Mock.Of<ILocalizationService>(),
-                Mock.Of<ILocalizedTextService>(),
-                Mock.Of<IShortStringHelper>(),
-                new DataEditorAttribute(name, name, name)
-                {
-                    ValueType = valueType
-                }
-
-            );
-        }
-
 
         public static IUmbracoVersion GetUmbracoVersion() => _testHelperInternal.GetUmbracoVersion();
 

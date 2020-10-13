@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Umbraco.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
@@ -159,7 +160,7 @@ namespace Umbraco.Core
             }
             catch (ArgumentException)
             {
-                Current.Logger.Debug(typeof(UriExtensions), "Failed to determine if request was client side (invalid chars in path \"{Path}\"?)", url.LocalPath);
+                Current.Logger.LogDebug("Failed to determine if request was client side (invalid chars in path \"{Path}\"?)", url.LocalPath);
                 return false;
             }
         }

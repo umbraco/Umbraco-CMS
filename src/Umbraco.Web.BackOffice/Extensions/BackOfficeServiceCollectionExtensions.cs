@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -44,6 +45,11 @@ namespace Umbraco.Extensions
             services.ConfigureOptions<ConfigureBackOfficeCookieOptions>();
         }
 
+        public static void AddUmbracoPreview(this IServiceCollection services)
+        {
+            services.AddSignalR();
+        }
+
         /// <summary>
         /// Adds the services required for using Umbraco back office Identity
         /// </summary>
@@ -57,7 +63,7 @@ namespace Umbraco.Extensions
             services.BuildUmbracoBackOfficeIdentity()
                 .AddDefaultTokenProviders()
                 .AddUserStore<BackOfficeUserStore>()
-                .AddUserManager<BackOfficeUserManager>()
+                .AddUserManager<IBackOfficeUserManager, BackOfficeUserManager>()
                 .AddSignInManager<BackOfficeSignInManager>()
                 .AddClaimsPrincipalFactory<BackOfficeClaimsPrincipalFactory<BackOfficeIdentityUser>>();
 
@@ -80,7 +86,7 @@ namespace Umbraco.Extensions
             services.TryAddScoped<IPasswordValidator<BackOfficeIdentityUser>, PasswordValidator<BackOfficeIdentityUser>>();
             services.TryAddScoped<IPasswordHasher<BackOfficeIdentityUser>>(
                 services => new BackOfficePasswordHasher(
-                    new LegacyPasswordSecurity(services.GetRequiredService<IOptions<UserPasswordConfigurationSettings>>().Value),
+                    new LegacyPasswordSecurity(),
                     services.GetRequiredService<IJsonSerializer>()));
             services.TryAddScoped<IUserConfirmation<BackOfficeIdentityUser>, DefaultUserConfirmation<BackOfficeIdentityUser>>();
             services.TryAddScoped<IUserClaimsPrincipalFactory<BackOfficeIdentityUser>, UserClaimsPrincipalFactory<BackOfficeIdentityUser>>();

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
@@ -23,8 +24,8 @@ namespace Umbraco.Web.Mvc
         {
         }
 
-        protected UmbracoAuthorizedController(IOptions<GlobalSettings> globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger)
-            : base(globalSettings, umbracoContextAccessor, services, appCaches, profilingLogger)
+        protected UmbracoAuthorizedController(IOptions<GlobalSettings> globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger, ILoggerFactory loggerFactory)
+            : base(globalSettings, umbracoContextAccessor, services, appCaches, profilingLogger, loggerFactory)
         {
         }
     }

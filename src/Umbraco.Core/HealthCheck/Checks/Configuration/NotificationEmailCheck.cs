@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Core.HealthCheck.Checks.Configuration
@@ -14,9 +14,9 @@ namespace Umbraco.Core.HealthCheck.Checks.Configuration
         private readonly ContentSettings _contentSettings;
         private const string DefaultFromEmail = "your@email.here";
 
-        public NotificationEmailCheck(ILocalizedTextService textService, ILogger logger, IConfigurationService configurationService,
+        public NotificationEmailCheck(ILocalizedTextService textService, ILoggerFactory loggerFactory, IConfigurationService configurationService,
             IOptions<ContentSettings> contentSettings)
-            : base(textService, logger, configurationService)
+            : base(textService, loggerFactory, configurationService)
         {
             _contentSettings = contentSettings.Value;
         }

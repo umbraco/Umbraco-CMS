@@ -10,7 +10,7 @@ using Umbraco.Web.WebApi;
 
 namespace Umbraco.Web.Trees
 {
-    [PluginController("UmbracoTrees")]
+    [PluginController(Constants.Web.Mvc.BackOfficeTreeArea)]
     [CoreTree]
     public abstract class MemberTypeAndGroupTreeControllerBase : TreeController
     {

@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -17,8 +20,6 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.Common;
-using Umbraco.Tests.Common.Builders;
-using Umbraco.Tests.Strings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing.Objects;
 using Umbraco.Web;
@@ -115,7 +116,7 @@ namespace Umbraco.Tests.PublishedContent
             Mock.Get(runtime).Setup(x => x.Level).Returns(RuntimeLevel.Run);
 
             // create data types, property types and content types
-            var dataType = new DataType(new VoidEditor("Editor", Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>())) { Id = 3 };
+            var dataType = new DataType(new VoidEditor("Editor", NullLoggerFactory.Instance, Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>())) { Id = 3 };
 
             var dataTypes = new[]
             {
@@ -179,8 +180,8 @@ namespace Umbraco.Tests.PublishedContent
 
             var typeFinder = TestHelper.GetTypeFinder();
 
-            var globalSettings = new GlobalSettingsBuilder().Build();
-            var nuCacheSettings = new NuCacheSettingsBuilder().Build();
+            var globalSettings = new GlobalSettings();
+            var nuCacheSettings = new NuCacheSettings();
 
             // at last, create the complete NuCache snapshot service!
             var options = new PublishedSnapshotServiceOptions { IgnoreLocalDb = true };
@@ -192,6 +193,7 @@ namespace Umbraco.Tests.PublishedContent
                 new TestPublishedSnapshotAccessor(),
                 _variationAccesor,
                 Mock.Of<IProfilingLogger>(),
+                NullLoggerFactory.Instance,
                 scopeProvider,
                 Mock.Of<IDocumentRepository>(),
                 Mock.Of<IMediaRepository>(),
@@ -203,7 +205,7 @@ namespace Umbraco.Tests.PublishedContent
                 publishedModelFactory,
                 new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider(TestHelper.ShortStringHelper) }),
                 TestHelper.GetHostingEnvironment(),
-                new MockShortStringHelper(),
+                Mock.Of<IShortStringHelper>(),
                 TestHelper.IOHelper,
                 Microsoft.Extensions.Options.Options.Create(nuCacheSettings));
 

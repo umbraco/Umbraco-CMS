@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Xml.XPath;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Models;
@@ -108,7 +108,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
                 else
                 {
                     // this is a property that does not correspond to anything, ignore and log
-                    Current.Logger.Warn<PublishedMediaCache>("Dropping property '{PropertyKey}' because it does not belong to the content type.", i.Key);
+                    Current.Logger.LogWarning("Dropping property '{PropertyKey}' because it does not belong to the content type.", i.Key);
                 }
             }
         }

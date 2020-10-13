@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.Serialization;
+using Microsoft.Extensions.Logging;
 using Umbraco.Composing;
-using Umbraco.Core.Logging;
+
 
 namespace Umbraco.Core.Models
 {
@@ -414,7 +415,7 @@ namespace Umbraco.Core.Models
         public virtual string ContentTypeAlias => ContentType.Alias;
 
         /// <summary>
-        /// Internal/Experimental - only used for mapping queries. 
+        /// Internal/Experimental - only used for mapping queries.
         /// </summary>
         /// <remarks>
         /// Adding these to have first level properties instead of the Properties collection.
@@ -423,7 +424,7 @@ namespace Umbraco.Core.Models
         [EditorBrowsable(EditorBrowsableState.Never)]
         public string LongStringPropertyValue { get; set; }
         /// <summary>
-        /// Internal/Experimental - only used for mapping queries. 
+        /// Internal/Experimental - only used for mapping queries.
         /// </summary>
         /// <remarks>
         /// Adding these to have first level properties instead of the Properties collection.
@@ -432,7 +433,7 @@ namespace Umbraco.Core.Models
         [EditorBrowsable(EditorBrowsableState.Never)]
         public string ShortStringPropertyValue { get; set; }
         /// <summary>
-        /// Internal/Experimental - only used for mapping queries. 
+        /// Internal/Experimental - only used for mapping queries.
         /// </summary>
         /// <remarks>
         /// Adding these to have first level properties instead of the Properties collection.
@@ -441,7 +442,7 @@ namespace Umbraco.Core.Models
         [EditorBrowsable(EditorBrowsableState.Never)]
         public int IntegerPropertyValue { get; set; }
         /// <summary>
-        /// Internal/Experimental - only used for mapping queries. 
+        /// Internal/Experimental - only used for mapping queries.
         /// </summary>
         /// <remarks>
         /// Adding these to have first level properties instead of the Properties collection.
@@ -450,7 +451,7 @@ namespace Umbraco.Core.Models
         [EditorBrowsable(EditorBrowsableState.Never)]
         public bool BoolPropertyValue { get; set; }
         /// <summary>
-        /// Internal/Experimental - only used for mapping queries. 
+        /// Internal/Experimental - only used for mapping queries.
         /// </summary>
         /// <remarks>
         /// Adding these to have first level properties instead of the Properties collection.
@@ -459,7 +460,7 @@ namespace Umbraco.Core.Models
         [EditorBrowsable(EditorBrowsableState.Never)]
         public DateTime DateTimePropertyValue { get; set; }
         /// <summary>
-        /// Internal/Experimental - only used for mapping queries. 
+        /// Internal/Experimental - only used for mapping queries.
         /// </summary>
         /// <remarks>
         /// Adding these to have first level properties instead of the Properties collection.
@@ -472,7 +473,7 @@ namespace Umbraco.Core.Models
         {
             void DoLog(string logPropertyAlias, string logPropertyName)
             {
-                Current.Logger.Warn<Member>("Trying to access the '{PropertyName}' property on '{MemberType}' " +
+                Current.Logger.LogWarning("Trying to access the '{PropertyName}' property on '{MemberType}' " +
                                             "but the {PropertyAlias} property does not exist on the member type so a default value is returned. " +
                                             "Ensure that you have a property type with alias:  {PropertyAlias} configured on your member type in order to use the '{PropertyName}' property on the model correctly.",
                                                 logPropertyName,
@@ -497,7 +498,7 @@ namespace Umbraco.Core.Models
         {
             void DoLog(string logPropertyAlias, string logPropertyName)
             {
-                Current.Logger.Warn<Member>("An attempt was made to set a value on the property '{PropertyName}' on type '{MemberType}' but the " +
+                Current.Logger.LogWarning("An attempt was made to set a value on the property '{PropertyName}' on type '{MemberType}' but the " +
                                             "property type {PropertyAlias} does not exist on the member type, ensure that this property type exists so that setting this property works correctly.",
                                                 logPropertyName,
                                                 typeof(Member),
@@ -524,6 +525,6 @@ namespace Umbraco.Core.Models
 
         /// <inheritdoc />
         [IgnoreDataMember]
-        public bool HasAdditionalData => _additionalData != null;        
+        public bool HasAdditionalData => _additionalData != null;
     }
 }

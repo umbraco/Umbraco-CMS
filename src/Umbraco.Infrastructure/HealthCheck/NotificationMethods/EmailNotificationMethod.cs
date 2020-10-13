@@ -8,6 +8,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.HealthCheck;
 using Umbraco.Core.Services;
+using Umbraco.Infrastructure.HealthCheck;
 
 namespace Umbraco.Web.HealthCheck.NotificationMethods
 {

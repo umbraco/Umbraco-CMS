@@ -26,7 +26,6 @@ namespace Umbraco.Core.Composing
         /// <param name="umbracoServiceProviderFactory"></param>
         /// <returns></returns>
         public static IHostBuilder UseUmbraco(this IHostBuilder builder, UmbracoServiceProviderFactory umbracoServiceProviderFactory)
-            => builder.UseServiceProviderFactory(umbracoServiceProviderFactory)
-                .UseSerilog();
+            => builder.UseServiceProviderFactory(umbracoServiceProviderFactory);
     }
 }

@@ -4,11 +4,11 @@ using System.Data.Common;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Events;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
@@ -26,15 +26,17 @@ namespace Umbraco.Core.Services.Implement
         private readonly IUserGroupRepository _userGroupRepository;
         private readonly GlobalSettings _globalSettings;
         private readonly bool _isUpgrading;
+        private readonly ILogger<UserService> _logger;
 
-        public UserService(IScopeProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory, IRuntimeState runtimeState,
+        public UserService(IScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory, IRuntimeState runtimeState,
             IUserRepository userRepository, IUserGroupRepository userGroupRepository, IOptions<GlobalSettings> globalSettings)
-            : base(provider, logger, eventMessagesFactory)
+            : base(provider, loggerFactory, eventMessagesFactory)
         {
             _userRepository = userRepository;
             _userGroupRepository = userGroupRepository;
             _globalSettings = globalSettings.Value;
             _isUpgrading = runtimeState.Level == RuntimeLevel.Install || runtimeState.Level == RuntimeLevel.Upgrade;
+            _logger = loggerFactory.CreateLogger<UserService>();
         }
 
         #region Implementation of IMembershipUserService
@@ -254,6 +256,13 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
+        // explicit implementation because we don't need it now but due to the way that the members membership provider is put together
+        // this method must exist in this service as an implementation (legacy)
+        void IMembershipMemberService<IUser>.SetLastLogin(string username, DateTime date)
+        {
+            throw new NotSupportedException("This method is not implemented or supported for users");
+        }
+
         /// <summary>
         /// Saves an <see cref="IUser"/>
         /// </summary>
@@ -293,7 +302,7 @@ namespace Umbraco.Core.Services.Implement
                     // if we are upgrading and an exception occurs, log and swallow it
                     if (_isUpgrading == false) throw;
 
-                    Logger.Warn<UserService>(ex, "An error occurred attempting to save a user instance during upgrade, normally this warning can be ignored");
+                    _logger.LogWarning(ex, "An error occurred attempting to save a user instance during upgrade, normally this warning can be ignored");
 
                     // we don't want the uow to rollback its scope!
                     scope.Complete();
@@ -941,7 +950,7 @@ namespace Umbraco.Core.Services.Implement
         {
             var nodeIds = path.GetIdsFromPathReversed();
 
-            if (nodeIds.Length == 0)
+            if (nodeIds.Length == 0 || user is null)
                 return EntityPermissionSet.Empty();
 
             //collect all permissions structures for all nodes for all groups belonging to the user

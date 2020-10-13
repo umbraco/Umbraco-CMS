@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Tests.Common.Builders.Interfaces;
+using Umbraco.Tests.Common.Builders.Extensions;
 
 namespace Umbraco.Tests.Common.Builders
 {
@@ -12,6 +14,7 @@ namespace Umbraco.Tests.Common.Builders
         {
         }
     }
+
     public class UserBuilder<TParent>
         : ChildBuilderBase<TParent, User>,
             IWithIdBuilder,
@@ -91,8 +94,6 @@ namespace Umbraco.Tests.Common.Builders
             return this;
         }
 
-
-
         public UserBuilder<TParent> WithSessionTimeout(int sessionTimeout)
         {
             _sessionTimeout = sessionTimeout;
@@ -122,11 +123,18 @@ namespace Umbraco.Tests.Common.Builders
             return this;
         }
 
+        public UserGroupBuilder<UserBuilder<TParent>> AddUserGroup()
+        {
+            var builder = new UserGroupBuilder<UserBuilder<TParent>>(this);
+            _userGroupBuilders.Add(builder);
+            return builder;
+        }
+
         public override User Build()
         {
             var id = _id ?? 0;
             var defaultLang = _defaultLang ?? "en";
-            var globalSettings = new GlobalSettingsBuilder().WithDefaultUiLanguage(defaultLang).Build();
+            var globalSettings = new GlobalSettings { DefaultUILanguage = defaultLang };
             var key = _key ?? Guid.NewGuid();
             var createDate = _createDate ?? DateTime.Now;
             var updateDate = _updateDate ?? DateTime.Now;
@@ -175,19 +183,41 @@ namespace Umbraco.Tests.Common.Builders
                 result.AddGroup(readOnlyUserGroup.ToReadOnlyGroup());
             }
 
-
             return result;
         }
 
-        public UserGroupBuilder<UserBuilder<TParent>> AddUserGroup()
+        public static IEnumerable<IUser> CreateMulipleUsers(int amount, Action<int, IUser> onCreating = null)
         {
-            var builder = new UserGroupBuilder<UserBuilder<TParent>>(this);
+            var list = new List<IUser>();
 
-            _userGroupBuilders.Add(builder);
+            for (var i = 0; i < amount; i++)
+            {
+                var name = "User No-" + i;
+                var user = new UserBuilder()
+                    .WithName(name)
+                    .WithEmail("test" + i + "@test.com")
+                    .WithLogin("test" + i, "test" + i)
+                    .Build();
 
-            return builder;
+                onCreating?.Invoke(i, user);
+
+                user.ResetDirtyProperties(false);
+
+                list.Add(user);
+            }
+
+            return list;
         }
 
+        public static User CreateUser(string suffix = "")
+        {
+            return new UserBuilder()
+                .WithIsApproved(true)
+                .WithName("TestUser" + suffix)
+                .WithLogin("TestUser" + suffix, "testing")
+                .WithEmail("test" + suffix + "@test.com")
+                .Build();
+        }
 
         int? IWithIdBuilder.Id
         {

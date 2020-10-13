@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using Umbraco.Core.Configuration.UmbracoSettings;
-
-namespace Umbraco.Core.Configuration.Models
+﻿namespace Umbraco.Core.Configuration.Models
 {
     public class ContentImagingSettings
     {
@@ -17,17 +14,8 @@ namespace Umbraco.Core.Configuration.Models
             }
         };
 
-        public IEnumerable<string> ImageFileTypes { get; set; } = new[] { "jpeg", "jpg", "gif", "bmp", "png", "tiff", "tif" };
+        public string[] ImageFileTypes { get; set; } = new[] { "jpeg", "jpg", "gif", "bmp", "png", "tiff", "tif" };
 
-        public IEnumerable<IImagingAutoFillUploadField> AutoFillImageProperties { get; set; } = DefaultImagingAutoFillUploadField;
-
-        private class ImagingAutoFillUploadField : IImagingAutoFillUploadField
-        {
-            public string Alias { get; set; }
-            public string WidthFieldAlias { get; set; }
-            public string HeightFieldAlias { get; set; }
-            public string LengthFieldAlias { get; set; }
-            public string ExtensionFieldAlias { get; set; }
-        }
+        public ImagingAutoFillUploadField[] AutoFillImageProperties { get; set; } = DefaultImagingAutoFillUploadField;
     }
 }

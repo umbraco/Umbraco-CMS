@@ -1,7 +1,7 @@
 ﻿using NUnit.Framework;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Tests.Common;
-using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.Routing;
 
@@ -15,7 +15,7 @@ namespace Umbraco.Tests.Routing
 
         public override void SetUp()
         {
-            _globalSettings = new GlobalSettingsBuilder().WithHideTopLevelNodeFromPath(HideTopLevelNodeFromPath).Build();
+            _globalSettings = new GlobalSettings { HideTopLevelNodeFromPath = HideTopLevelNodeFromPath };
             base.SetUp();
             PublishedSnapshotService = CreatePublishedSnapshotService(_globalSettings);
 
@@ -40,14 +40,13 @@ namespace Umbraco.Tests.Routing
         [TestCase(1172, "/test-page/")] // not hidden because not first root
         public void Get_Url_Hiding_Top_Level(int nodeId, string niceUrlMatch)
         {
-
-            var requestHandlerSettings = new RequestHandlerSettingsBuilder().WithAddTrailingSlash(true).Build();
+            var requestHandlerSettings = new RequestHandlerSettings { AddTrailingSlash = true };
 
             var umbracoContext = GetUmbracoContext("/test", 1111, globalSettings: _globalSettings, snapshotService:PublishedSnapshotService);
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
             var urlProvider = new DefaultUrlProvider(
                 Microsoft.Extensions.Options.Options.Create(requestHandlerSettings),
-                Logger,
+                LoggerFactory.CreateLogger<DefaultUrlProvider>(),
                 Microsoft.Extensions.Options.Options.Create(_globalSettings),
                 new SiteDomainHelper(), umbracoContextAccessor, UriUtility);
             var publishedUrlProvider = GetPublishedUrlProvider(umbracoContext, urlProvider);

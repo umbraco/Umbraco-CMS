@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.IO;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
-using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
@@ -24,7 +23,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Perform_Add_On_Repository()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (ScopeProvider.CreateScope())
             {
                 var repository = CreateRepository(provider);
@@ -44,7 +43,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Perform_Multiple_Adds_On_Repository()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (ScopeProvider.CreateScope())
             {
                 var repository = CreateRepository(provider);
@@ -74,7 +73,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Create_Tag_Relations()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (ScopeProvider.CreateScope())
             {
                 var contentRepository = CreateDocumentRepository(provider, out var contentTypeRepository);
@@ -104,7 +103,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Append_Tag_Relations()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (ScopeProvider.CreateScope())
             {
                 var contentRepository = CreateDocumentRepository(provider, out var contentTypeRepository);
@@ -143,7 +142,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Replace_Tag_Relations()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (ScopeProvider.CreateScope())
             {
                 var contentRepository = CreateDocumentRepository(provider, out var contentTypeRepository);
@@ -185,7 +184,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Merge_Tag_Relations()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (ScopeProvider.CreateScope())
             {
                 var contentRepository = CreateDocumentRepository(provider, out var contentTypeRepository);
@@ -225,7 +224,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Clear_Tag_Relations()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (ScopeProvider.CreateScope())
             {
                 var contentRepository = CreateDocumentRepository(provider, out var contentTypeRepository);
@@ -261,7 +260,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Remove_Specific_Tags_From_Property()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (ScopeProvider.CreateScope())
             {
                 var contentRepository = CreateDocumentRepository(provider, out var contentTypeRepository);
@@ -305,7 +304,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Get_Tags_For_Content_By_Id()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (ScopeProvider.CreateScope())
             {
                 var contentRepository = CreateDocumentRepository(provider, out var contentTypeRepository);
@@ -349,7 +348,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Get_Tags_For_Content_By_Key()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (ScopeProvider.CreateScope())
             {
                 var contentRepository = CreateDocumentRepository(provider, out var contentTypeRepository);
@@ -394,7 +393,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Get_All()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (ScopeProvider.CreateScope())
             {
                 var contentRepository = CreateDocumentRepository(provider, out var contentTypeRepository);
@@ -429,7 +428,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Get_All_With_Ids()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (ScopeProvider.CreateScope())
             {
                 var contentRepository = CreateDocumentRepository(provider, out var contentTypeRepository);
@@ -469,7 +468,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Get_Tags_For_Content_For_Group()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (ScopeProvider.CreateScope())
             {
                 var contentRepository = CreateDocumentRepository(provider, out var contentTypeRepository);
@@ -513,7 +512,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Get_Tags_For_Property_By_Id()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (ScopeProvider.CreateScope())
             {
                 var contentRepository = CreateDocumentRepository(provider, out var contentTypeRepository);
@@ -557,7 +556,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Get_Tags_For_Property_By_Key()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (ScopeProvider.CreateScope())
             {
                 var contentRepository = CreateDocumentRepository(provider, out var contentTypeRepository);
@@ -601,7 +600,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Get_Tags_For_Property_For_Group()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (ScopeProvider.CreateScope())
             {
                 var contentRepository = CreateDocumentRepository(provider, out var contentTypeRepository);
@@ -646,7 +645,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Get_Tags_For_Entity_Type()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (ScopeProvider.CreateScope())
             {
                 var contentRepository = CreateDocumentRepository(provider, out var contentTypeRepository);
@@ -703,7 +702,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Get_Tags_For_Entity_Type_For_Group()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (ScopeProvider.CreateScope())
             {
                 var contentRepository = CreateDocumentRepository(provider, out var contentTypeRepository);
@@ -755,7 +754,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Cascade_Deletes_Tag_Relations()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (var scope = ScopeProvider.CreateScope())
             {
                 var contentRepository = CreateDocumentRepository(provider, out var contentTypeRepository);
@@ -791,7 +790,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Get_Tagged_Entities_For_Tag_Group()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (ScopeProvider.CreateScope())
             {
                 var contentRepository = CreateDocumentRepository(provider, out var contentTypeRepository);
@@ -871,7 +870,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Get_Tagged_Entities_For_Tag()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (ScopeProvider.CreateScope())
             {
                 var contentRepository = CreateDocumentRepository(provider, out var contentTypeRepository);
@@ -950,43 +949,43 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private TagRepository CreateRepository(IScopeProvider provider)
         {
-            return new TagRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger);
+            return new TagRepository((IScopeAccessor) provider, AppCaches.Disabled, LoggerFactory.CreateLogger<TagRepository>());
         }
 
         private DocumentRepository CreateDocumentRepository(IScopeProvider provider, out ContentTypeRepository contentTypeRepository)
         {
             var accessor = (IScopeAccessor) provider;
-            var globalSettings = new GlobalSettingsBuilder().Build();
-            var templateRepository = new TemplateRepository(accessor, AppCaches.Disabled, Logger, TestObjects.GetFileSystemsMock(), IOHelper, ShortStringHelper);
-            var tagRepository = new TagRepository(accessor, AppCaches.Disabled, Logger);
+            var globalSettings = new GlobalSettings();
+            var templateRepository = new TemplateRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<TemplateRepository>(), TestObjects.GetFileSystemsMock(), IOHelper, ShortStringHelper);
+            var tagRepository = new TagRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<TagRepository>());
             var commonRepository = new ContentTypeCommonRepository(accessor, templateRepository, AppCaches.Disabled, ShortStringHelper);
-            var languageRepository = new LanguageRepository(accessor, AppCaches.Disabled, Logger, Microsoft.Extensions.Options.Options.Create(globalSettings));
-            contentTypeRepository = new ContentTypeRepository(accessor, AppCaches.Disabled, Logger, commonRepository, languageRepository, ShortStringHelper);
-            var relationTypeRepository = new RelationTypeRepository(accessor, AppCaches.Disabled, Logger);
+            var languageRepository = new LanguageRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<LanguageRepository>(), Microsoft.Extensions.Options.Options.Create(globalSettings));
+            contentTypeRepository = new ContentTypeRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<ContentTypeRepository>(), commonRepository, languageRepository, ShortStringHelper);
+            var relationTypeRepository = new RelationTypeRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<RelationTypeRepository>());
             var entityRepository = new EntityRepository(accessor);
-            var relationRepository = new RelationRepository(accessor, Logger, relationTypeRepository, entityRepository);
+            var relationRepository = new RelationRepository(accessor, LoggerFactory.CreateLogger<RelationRepository>(), relationTypeRepository, entityRepository);
             var propertyEditors = new Lazy<PropertyEditorCollection>(() => new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>())));
             var dataValueReferences = new DataValueReferenceFactoryCollection(Enumerable.Empty<IDataValueReferenceFactory>());
-            var repository = new DocumentRepository(accessor, AppCaches.Disabled, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, relationRepository, relationTypeRepository, propertyEditors, dataValueReferences, DataTypeService);
+            var repository = new DocumentRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<DocumentRepository>(), LoggerFactory, contentTypeRepository, templateRepository, tagRepository, languageRepository, relationRepository, relationTypeRepository, propertyEditors, dataValueReferences, DataTypeService);
             return repository;
         }
 
         private MediaRepository CreateMediaRepository(IScopeProvider provider, out MediaTypeRepository mediaTypeRepository)
         {
             var accessor = (IScopeAccessor) provider;
-            var globalSettings = new GlobalSettingsBuilder().Build();
-            var templateRepository = new TemplateRepository(accessor, AppCaches.Disabled, Logger, TestObjects.GetFileSystemsMock(), IOHelper, ShortStringHelper);
-            var tagRepository = new TagRepository(accessor, AppCaches.Disabled, Logger);
+            var globalSettings = new GlobalSettings();
+            var templateRepository = new TemplateRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<TemplateRepository>(), TestObjects.GetFileSystemsMock(), IOHelper, ShortStringHelper);
+            var tagRepository = new TagRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<TagRepository>());
             var commonRepository = new ContentTypeCommonRepository(accessor, templateRepository, AppCaches.Disabled, ShortStringHelper);
-            var languageRepository = new LanguageRepository(accessor, AppCaches.Disabled, Logger, Microsoft.Extensions.Options.Options.Create(globalSettings));
-            mediaTypeRepository = new MediaTypeRepository(accessor, AppCaches.Disabled, Logger, commonRepository, languageRepository, ShortStringHelper);
-            var relationTypeRepository = new RelationTypeRepository(accessor, AppCaches.Disabled, Logger);
+            var languageRepository = new LanguageRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<LanguageRepository>(), Microsoft.Extensions.Options.Options.Create(globalSettings));
+            mediaTypeRepository = new MediaTypeRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<MediaTypeRepository>(), commonRepository, languageRepository, ShortStringHelper);
+            var relationTypeRepository = new RelationTypeRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<RelationTypeRepository>());
             var entityRepository = new EntityRepository(accessor);
-            var relationRepository = new RelationRepository(accessor, Logger, relationTypeRepository, entityRepository);
+            var relationRepository = new RelationRepository(accessor, LoggerFactory.CreateLogger<RelationRepository>(), relationTypeRepository, entityRepository);
             var propertyEditors = new Lazy<PropertyEditorCollection>(() => new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>())));
             var mediaUrlGenerators = new MediaUrlGeneratorCollection(Enumerable.Empty<IMediaUrlGenerator>());
             var dataValueReferences = new DataValueReferenceFactoryCollection(Enumerable.Empty<IDataValueReferenceFactory>());
-            var repository = new MediaRepository(accessor, AppCaches.Disabled, Logger, mediaTypeRepository, tagRepository, Mock.Of<ILanguageRepository>(), relationRepository, relationTypeRepository, propertyEditors, mediaUrlGenerators, dataValueReferences, DataTypeService);
+            var repository = new MediaRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<MediaRepository>(), LoggerFactory, mediaTypeRepository, tagRepository, Mock.Of<ILanguageRepository>(), relationRepository, relationTypeRepository, propertyEditors, mediaUrlGenerators, dataValueReferences, DataTypeService);
             return repository;
         }
     }

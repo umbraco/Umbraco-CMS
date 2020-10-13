@@ -8,9 +8,9 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Common;
-using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Web.Routing;
+using Microsoft.Extensions.Logging;
 
 namespace Umbraco.Tests.Routing
 {
@@ -25,9 +25,9 @@ namespace Umbraco.Tests.Routing
         {
             base.SetUp();
 
-            _globalSettings = new GlobalSettingsBuilder().Build();
-            _webRoutingSettings = new WebRoutingSettingsBuilder().Build();
-            _requestHandlerSettings = new RequestHandlerSettingsBuilder().WithAddTrailingSlash(true).Build();
+            _globalSettings = new GlobalSettings();
+            _webRoutingSettings = new WebRoutingSettings();
+            _requestHandlerSettings = new RequestHandlerSettings { AddTrailingSlash = true };
         }
 
         private ILocalizedTextService GetTextService()
@@ -64,12 +64,12 @@ namespace Umbraco.Tests.Routing
 
             var umbContext = GetUmbracoContext("http://localhost:8000");
             var publishedRouter = CreatePublishedRouter(Factory,
-                contentFinders: new ContentFinderCollection(new[] { new ContentFinderByUrl(Logger) }));
+                contentFinders: new ContentFinderCollection(new[] { new ContentFinderByUrl(LoggerFactory.CreateLogger<ContentFinderByUrl>()) }));
             var urls = content.GetContentUrls(publishedRouter,
                 umbContext,
                 GetLangService("en-US", "fr-FR"), GetTextService(), ServiceContext.ContentService,
                 VariationContextAccessor,
-                Logger,
+                LoggerFactory.CreateLogger<IContent>(),
                 UriUtility,
                 PublishedUrlProvider).ToList();
 
@@ -91,7 +91,7 @@ namespace Umbraco.Tests.Routing
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbContext);
             var urlProvider = new DefaultUrlProvider(
                 Microsoft.Extensions.Options.Options.Create(_requestHandlerSettings),
-                Logger,
+                LoggerFactory.CreateLogger<DefaultUrlProvider>(),
                 Microsoft.Extensions.Options.Options.Create(_globalSettings),
                 new SiteDomainHelper(),
                 umbracoContextAccessor, UriUtility);
@@ -104,12 +104,12 @@ namespace Umbraco.Tests.Routing
             );
 
             var publishedRouter = CreatePublishedRouter(Factory,
-                contentFinders:new ContentFinderCollection(new[]{new ContentFinderByUrl(Logger) }));
+                contentFinders:new ContentFinderCollection(new[]{new ContentFinderByUrl(LoggerFactory.CreateLogger<ContentFinderByUrl>()) }));
             var urls = content.GetContentUrls(publishedRouter,
                 umbContext,
                 GetLangService("en-US", "fr-FR"), GetTextService(), ServiceContext.ContentService,
                 VariationContextAccessor,
-                Logger,
+                LoggerFactory.CreateLogger<IContent>(),
                 UriUtility,
                 publishedUrlProvider).ToList();
 
@@ -138,7 +138,7 @@ namespace Umbraco.Tests.Routing
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbContext);
             var urlProvider = new DefaultUrlProvider(
                 Microsoft.Extensions.Options.Options.Create(_requestHandlerSettings),
-                Logger,
+                LoggerFactory.CreateLogger<DefaultUrlProvider>(),
                 Microsoft.Extensions.Options.Options.Create(_globalSettings),
                 new SiteDomainHelper(), umbracoContextAccessor, UriUtility);
             var publishedUrlProvider = new UrlProvider(
@@ -150,12 +150,12 @@ namespace Umbraco.Tests.Routing
             );
 
             var publishedRouter = CreatePublishedRouter(Factory,
-                contentFinders: new ContentFinderCollection(new[] { new ContentFinderByUrl(Logger) }));
+                contentFinders: new ContentFinderCollection(new[] { new ContentFinderByUrl(LoggerFactory.CreateLogger<ContentFinderByUrl>()) }));
             var urls = child.GetContentUrls(publishedRouter,
                 umbContext,
                 GetLangService("en-US", "fr-FR"), GetTextService(), ServiceContext.ContentService,
                 VariationContextAccessor,
-                Logger,
+                LoggerFactory.CreateLogger<IContent>(),
                 UriUtility,
                 publishedUrlProvider
                 ).ToList();

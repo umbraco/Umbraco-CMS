@@ -8,6 +8,7 @@
 @using Umbraco.Core.Hosting
 @using Umbraco.Extensions
 @using Umbraco.Core.Logging
+@using Umbraco.Core.Services
 @using Umbraco.Web.BackOffice.Controllers
 @inject BackOfficeSignInManager signInManager
 @inject BackOfficeServerVariables backOfficeServerVariables
@@ -16,7 +17,7 @@
 @inject IOptions<GlobalSettings> globalSettings
 @inject IRuntimeMinifier runtimeMinifier
 @inject IProfilerHtml profilerHtml
-
+@inject IIconService IconService
 @{
     bool.TryParse(Context.Request.Query["umbDebug"], out bool isDebug);
     var backOfficePath = globalSettings.Value.GetBackOfficePath(hostingEnvironment);
@@ -94,14 +95,17 @@
     <umb-overlay ng-if="overlay.show"
                  model="overlay"
                  position="{{overlay.position}}"
+                 size="overlay.size"
                  view="overlay.view"
+                 name="overlay.name"
                  parent-scope="overlay.parentScope">
     </umb-overlay>
 
     <umb-editors ng-show="infiniteMode"></umb-editors>
 
-    <umb-login ng-if="login.show"
-               on-login="hideLoginScreen()">
+    <umb-login
+        ng-if="login.show"
+        on-login="hideLoginScreen()">
     </umb-login>
 
     @await Html.BareMinimumServerVariablesScriptAsync(backOfficeServerVariables)
@@ -109,8 +113,14 @@
     <script>
         document.angularReady = function(app) {
             @await Html.AngularValueExternalLoginInfoScriptAsync(signInManager, ViewData.GetExternalSignInError())
-            @Html.AngularValueResetPasswordCodeInfoScript(ViewData["PasswordResetCode"])
+            @Html.AngularValueResetPasswordCodeInfoScript(ViewData[ViewDataExtensions.TokenPasswordResetCode])
             @await Html.AngularValueTinyMceAssetsAsync(runtimeMinifier)
+
+            app.run(["iconHelper", function (iconHelper) {
+                @* We inject icons to the icon helper(service), since icons can only be loaded if user is authorized. By injecting these to the service they will not be requested as they will become cached. *@
+                iconHelper.defineIcon("icon-check", '@Html.Raw(IconService.GetIcon("icon-check")?.SvgString)');
+                iconHelper.defineIcon("icon-delete", '@Html.Raw(IconService.GetIcon("icon-delete")?.SvgString)');
+            }]);
             //required for the noscript trick
             document.getElementById("mainwrapper").style.display = "inherit";
         }

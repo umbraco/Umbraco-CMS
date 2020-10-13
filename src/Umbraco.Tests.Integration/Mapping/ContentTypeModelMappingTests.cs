@@ -8,8 +8,8 @@ using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
+using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Integration.Testing;
-using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.Models.ContentEditing;
 
@@ -22,16 +22,13 @@ namespace Umbraco.Tests.Models.Mapping
         private IDataTypeService _dataTypeService;
         private UmbracoMapper _sut;
         private IFileService _fileService;
-        private IEntityService _entityService;
-
 
         [SetUp]
-        public void Setup()
+        public void SetupTest()
         {
             _sut = Services.GetRequiredService<UmbracoMapper>();
             _dataTypeService = Services.GetRequiredService<IDataTypeService>();
             _fileService = Services.GetRequiredService<IFileService>();
-            _entityService = Services.GetRequiredService<IEntityService>();
         }
 
         [Test]
@@ -275,12 +272,12 @@ namespace Umbraco.Tests.Models.Mapping
         public void IMemberType_To_MemberTypeDisplay()
         {
             //Arrange
-            var memberType = MockedContentTypes.CreateSimpleMemberType();
+            var memberType = MemberTypeBuilder.CreateSimpleMemberType();
             var alias = memberType.PropertyTypes.Last().Alias;
             memberType.SetIsSensitiveProperty(alias, true);
             memberType.SetMemberCanEditProperty(alias, true);
             memberType.SetMemberCanViewProperty(alias, true);
-            MockedContentTypes.EnsureAllIds(memberType, 8888);
+            MemberTypeBuilder.EnsureAllIds(memberType, 8888);
 
             //Act
 
@@ -334,8 +331,8 @@ namespace Umbraco.Tests.Models.Mapping
         {
             //Arrange
 
-            var mediaType = MockedContentTypes.CreateImageMediaType();
-            MockedContentTypes.EnsureAllIds(mediaType, 8888);
+            var mediaType = MediaTypeBuilder.CreateImageMediaType();
+            MediaTypeBuilder.EnsureAllIds(mediaType, 8888);
 
             //Act
 
@@ -389,8 +386,8 @@ namespace Umbraco.Tests.Models.Mapping
             //
             // // setup the mocks to return the data we want to test against...
 
-            var contentType = MockedContentTypes.CreateTextPageContentType();
-            MockedContentTypes.EnsureAllIds(contentType, 8888);
+            var contentType = ContentTypeBuilder.CreateTextPageContentType();
+            ContentTypeBuilder.EnsureAllIds(contentType, 8888);
 
             //Act
 
@@ -667,7 +664,7 @@ namespace Umbraco.Tests.Models.Mapping
         public void IMediaTypeComposition_To_MediaTypeDisplay()
         {
             //Arrange
-            var ctMain = MockedContentTypes.CreateSimpleMediaType("parent", "Parent");
+            var ctMain = MediaTypeBuilder.CreateSimpleMediaType("parent", "Parent");
             //not assigned to tab
             ctMain.AddPropertyType(new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext)
             {
@@ -678,8 +675,8 @@ namespace Umbraco.Tests.Models.Mapping
                 SortOrder = 1,
                 DataTypeId = -88
             });
-            MockedContentTypes.EnsureAllIds(ctMain, 8888);
-            var ctChild1 = MockedContentTypes.CreateSimpleMediaType("child1", "Child 1", ctMain, true);
+            MediaTypeBuilder.EnsureAllIds(ctMain, 8888);
+            var ctChild1 = MediaTypeBuilder.CreateSimpleMediaType("child1", "Child 1", ctMain, true);
             ctChild1.AddPropertyType(new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext)
             {
                 Alias = "someProperty",
@@ -689,8 +686,8 @@ namespace Umbraco.Tests.Models.Mapping
                 SortOrder = 1,
                 DataTypeId = -88
             }, "Another tab");
-            MockedContentTypes.EnsureAllIds(ctChild1, 7777);
-            var contentType = MockedContentTypes.CreateSimpleMediaType("child2", "Child 2", ctChild1, true, "CustomGroup");
+            MediaTypeBuilder.EnsureAllIds(ctChild1, 7777);
+            var contentType = MediaTypeBuilder.CreateSimpleMediaType("child2", "Child 2", ctChild1, true, "CustomGroup");
             //not assigned to tab
             contentType.AddPropertyType(new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext)
             {
@@ -701,7 +698,7 @@ namespace Umbraco.Tests.Models.Mapping
                 SortOrder = 1,
                 DataTypeId = -88
             });
-            MockedContentTypes.EnsureAllIds(contentType, 6666);
+            MediaTypeBuilder.EnsureAllIds(contentType, 6666);
 
 
             //Act
@@ -745,23 +742,21 @@ namespace Umbraco.Tests.Models.Mapping
             {
                 Assert.AreEqual(contentType.AllowedContentTypes.ElementAt(i).Id.Value, result.AllowedContentTypes.ElementAt(i));
             }
-
         }
-
 
         [Test]
         public void IContentTypeComposition_To_ContentTypeDisplay()
         {
             //Arrange
 
-            var ctMain = MockedContentTypes.CreateSimpleContentType();
+            var ctMain = ContentTypeBuilder.CreateSimpleContentType();
             //not assigned to tab
             ctMain.AddPropertyType(new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext)
             {
                 Alias = "umbracoUrlName", Name = "Slug", Description = "", Mandatory = false, SortOrder = 1, DataTypeId = -88
             });
-            MockedContentTypes.EnsureAllIds(ctMain, 8888);
-            var ctChild1 = MockedContentTypes.CreateSimpleContentType("child1", "Child 1", ctMain, true);
+            ContentTypeBuilder.EnsureAllIds(ctMain, 8888);
+            var ctChild1 = ContentTypeBuilder.CreateSimpleContentType("child1", "Child 1", ctMain, true);
             ctChild1.AddPropertyType(new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext)
             {
                 Alias = "someProperty",
@@ -771,14 +766,14 @@ namespace Umbraco.Tests.Models.Mapping
                 SortOrder = 1,
                 DataTypeId = -88
             }, "Another tab");
-            MockedContentTypes.EnsureAllIds(ctChild1, 7777);
-            var contentType = MockedContentTypes.CreateSimpleContentType("child2", "Child 2", ctChild1, true, "CustomGroup");
+            ContentTypeBuilder.EnsureAllIds(ctChild1, 7777);
+            var contentType = ContentTypeBuilder.CreateSimpleContentType("child2", "Child 2", ctChild1, true, "CustomGroup");
             //not assigned to tab
             contentType.AddPropertyType(new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext)
             {
                 Alias = "umbracoUrlAlias", Name = "AltUrl", Description = "", Mandatory = false, SortOrder = 1, DataTypeId = -88
             });
-            MockedContentTypes.EnsureAllIds(contentType, 6666);
+            ContentTypeBuilder.EnsureAllIds(contentType, 6666);
 
 
             //Act

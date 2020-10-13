@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Core.HealthCheck.Checks.Configuration
@@ -15,15 +15,15 @@ namespace Umbraco.Core.HealthCheck.Checks.Configuration
     public class MacroErrorsCheck : AbstractSettingsCheck
     {
         private readonly ILocalizedTextService _textService;
-        private readonly ILogger _logger;
+        private readonly ILoggerFactory _loggerFactory;
         private readonly ContentSettings _contentSettings;
 
-        public MacroErrorsCheck(ILocalizedTextService textService, ILogger logger,
+        public MacroErrorsCheck(ILocalizedTextService textService, ILoggerFactory loggerFactory,
             IConfigurationService configurationService, IOptions<ContentSettings> contentSettings)
-            : base(textService, logger, configurationService)
+            : base(textService, loggerFactory, configurationService)
         {
             _textService = textService;
-            _logger = logger;
+            _loggerFactory = loggerFactory;
             _contentSettings = contentSettings != null
                 ? contentSettings.Value
                 : throw new ArgumentNullException(nameof(contentSettings));

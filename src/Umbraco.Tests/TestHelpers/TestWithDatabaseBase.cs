@@ -4,6 +4,8 @@ using System.Data.SqlServerCe;
 using System.Threading;
 using System.Web.Routing;
 using System.Xml;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -89,7 +91,7 @@ namespace Umbraco.Tests.TestHelpers
                     return TestObjects.GetDatabaseFactoryMock();
 
                 var lazyMappers = new Lazy<IMapperCollection>(f.GetInstance<IMapperCollection>);
-                var factory = new UmbracoDatabaseFactory(f.GetInstance<ILogger>(), GetDbConnectionString(), GetDbProviderName(), lazyMappers, TestHelper.DbProviderFactoryCreator);
+                var factory = new UmbracoDatabaseFactory(f.GetInstance<ILogger<UmbracoDatabaseFactory>>(), f.GetInstance<ILoggerFactory>(), GetDbConnectionString(), GetDbProviderName(), lazyMappers, TestHelper.DbProviderFactoryCreator);
                 factory.ResetForTests();
                 return factory;
             });
@@ -150,7 +152,7 @@ namespace Umbraco.Tests.TestHelpers
 
         protected virtual string GetDbConnectionString()
         {
-            return @"Datasource=|DataDirectory|UmbracoNPocoTests.sdf;Flush Interval=1;";
+            return @"DataSource=|DataDirectory|UmbracoNPocoTests.sdf;Flush Interval=1;";
         }
 
 
@@ -244,7 +246,7 @@ namespace Umbraco.Tests.TestHelpers
                 Factory.GetInstance<IMediaTypeService>(),
                 Factory.GetInstance<IMemberTypeService>(),
                 Factory.GetInstance<IPublishedContentTypeFactory>(),
-                Logger);
+                Factory.GetInstance<ILogger<PublishedContentTypeCache>>());
 
             // testing=true so XmlStore will not use the file nor the database
 
@@ -258,7 +260,7 @@ namespace Umbraco.Tests.TestHelpers
                 Factory.GetInstance<IUmbracoContextAccessor>(),
                 Factory.GetInstance<IDocumentRepository>(), Factory.GetInstance<IMediaRepository>(), Factory.GetInstance<IMemberRepository>(),
                 DefaultCultureAccessor,
-                Logger,
+                Factory.GetInstance<ILoggerFactory>(),
                 globalSettings ?? TestObjects.GetGlobalSettings(),
                 HostingEnvironment,
                 HostingLifetime,
@@ -299,7 +301,7 @@ namespace Umbraco.Tests.TestHelpers
             {
                 using (var scope = ScopeProvider.CreateScope())
                 {
-                    var schemaHelper = new DatabaseSchemaCreator(scope.Database, Logger, UmbracoVersion);
+                    var schemaHelper = new DatabaseSchemaCreator(scope.Database, LoggerFactory.CreateLogger<DatabaseSchemaCreator>(), LoggerFactory, UmbracoVersion);
                     //Create the umbraco database and its base data
                     schemaHelper.InitializeDatabaseSchema();
 
@@ -342,7 +344,7 @@ namespace Umbraco.Tests.TestHelpers
             }
             catch (Exception ex)
             {
-                Logger.Error<TestWithDatabaseBase>(ex, "Could not remove the old database file");
+                LoggerFactory.CreateLogger<TestWithDatabaseBase>().LogError(ex, "Could not remove the old database file");
 
                 // swallow this exception - that's because a sub class might require further teardown logic
                 onFail?.Invoke(ex);
@@ -372,8 +374,8 @@ namespace Umbraco.Tests.TestHelpers
             var umbracoContext = new UmbracoContext(
                 httpContextAccessor,
                 service,
-                Mock.Of<IWebSecurity>(),
-                globalSettings ?? new GlobalSettingsBuilder().Build(),
+                Mock.Of<IBackofficeSecurity>(),
+                globalSettings ?? new GlobalSettings(),
                 HostingEnvironment,
                 new TestVariationContextAccessor(),
                 UriUtility,

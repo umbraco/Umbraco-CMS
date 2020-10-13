@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Composing;
@@ -218,7 +219,7 @@ namespace Umbraco.Core.Models
                     }
                     catch (Exception ex)
                     {
-                        Current.Logger.Warn(typeof(PropertyTagsExtensions), ex, "Could not automatically convert stored json value to an enumerable string '{Json}'", value.ToString());
+                        Current.Logger.LogWarning(ex, "Could not automatically convert stored json value to an enumerable string '{Json}'", value.ToString());
                     }
                     break;
 

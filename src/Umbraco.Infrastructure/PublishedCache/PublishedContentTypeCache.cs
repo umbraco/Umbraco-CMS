@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
+using Microsoft.Extensions.Logging;
 
 namespace Umbraco.Web.PublishedCache
 {
@@ -23,11 +23,11 @@ namespace Umbraco.Web.PublishedCache
         private readonly IMediaTypeService _mediaTypeService;
         private readonly IMemberTypeService _memberTypeService;
         private readonly IPublishedContentTypeFactory _publishedContentTypeFactory;
-        private readonly ILogger _logger;
+        private readonly ILogger<PublishedContentTypeCache> _logger;
         private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
 
         // default ctor
-        public PublishedContentTypeCache(IContentTypeService contentTypeService, IMediaTypeService mediaTypeService, IMemberTypeService memberTypeService, IPublishedContentTypeFactory publishedContentTypeFactory, ILogger logger)
+        public PublishedContentTypeCache(IContentTypeService contentTypeService, IMediaTypeService mediaTypeService, IMemberTypeService memberTypeService, IPublishedContentTypeFactory publishedContentTypeFactory, ILogger<PublishedContentTypeCache> logger)
         {
             _contentTypeService = contentTypeService;
             _mediaTypeService = mediaTypeService;
@@ -37,7 +37,7 @@ namespace Umbraco.Web.PublishedCache
         }
 
         // for unit tests ONLY
-        internal PublishedContentTypeCache(ILogger logger, IPublishedContentTypeFactory publishedContentTypeFactory)
+        internal PublishedContentTypeCache(ILogger<PublishedContentTypeCache> logger, IPublishedContentTypeFactory publishedContentTypeFactory)
         {
             _logger = logger;
             _publishedContentTypeFactory = publishedContentTypeFactory;
@@ -50,7 +50,7 @@ namespace Umbraco.Web.PublishedCache
         /// </summary>
         public void ClearAll()
         {
-            _logger.Debug<PublishedContentTypeCache>("Clear all.");
+            _logger.LogDebug("Clear all.");
 
             try
             {
@@ -72,7 +72,7 @@ namespace Umbraco.Web.PublishedCache
         /// <param name="id">An identifier.</param>
         public void ClearContentType(int id)
         {
-            _logger.Debug<PublishedContentTypeCache>("Clear content type w/id {ContentTypeId}", id);
+            _logger.LogDebug("Clear content type w/id {ContentTypeId}", id);
 
             try
             {
@@ -107,7 +107,7 @@ namespace Umbraco.Web.PublishedCache
         /// <param name="id">A data type identifier.</param>
         public void ClearDataType(int id)
         {
-            _logger.Debug<PublishedContentTypeCache>("Clear data type w/id {DataTypeId}.", id);
+            _logger.LogDebug("Clear data type w/id {DataTypeId}.", id);
 
             // there is no recursion to handle here because a PublishedContentType contains *all* its
             // properties ie both its own properties and those that were inherited (it's based upon an

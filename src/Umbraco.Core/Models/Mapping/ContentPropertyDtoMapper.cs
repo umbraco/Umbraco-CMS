@@ -1,4 +1,4 @@
-﻿using Umbraco.Core.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
@@ -12,7 +12,7 @@ namespace Umbraco.Web.Models.Mapping
     /// </summary>
     internal class ContentPropertyDtoMapper : ContentPropertyBasicMapper<ContentPropertyDto>
     {
-        public ContentPropertyDtoMapper(IDataTypeService dataTypeService, IEntityService entityService, ILogger logger, PropertyEditorCollection propertyEditors)
+        public ContentPropertyDtoMapper(IDataTypeService dataTypeService, IEntityService entityService, ILogger<ContentPropertyDtoMapper> logger, PropertyEditorCollection propertyEditors)
             : base(dataTypeService, entityService, logger, propertyEditors)
         { }
 

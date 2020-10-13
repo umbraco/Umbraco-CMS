@@ -1,7 +1,7 @@
 ﻿using System;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
@@ -22,7 +22,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         public DocumentBlueprintRepository(
             IScopeAccessor scopeAccessor,
             AppCaches appCaches,
-            ILogger logger,
+            ILogger<DocumentBlueprintRepository> logger,
+            ILoggerFactory loggerFactory,
             IContentTypeRepository contentTypeRepository,
             ITemplateRepository templateRepository,
             ITagRepository tagRepository,
@@ -32,7 +33,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             Lazy<PropertyEditorCollection> propertyEditorCollection,
             IDataTypeService dataTypeService,
             DataValueReferenceFactoryCollection dataValueReferenceFactories)
-            : base(scopeAccessor, appCaches, logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, relationRepository, relationTypeRepository, propertyEditorCollection, dataValueReferenceFactories, dataTypeService)
+            : base(scopeAccessor, appCaches, logger, loggerFactory, contentTypeRepository, templateRepository, tagRepository, languageRepository, relationRepository, relationTypeRepository, propertyEditorCollection, dataValueReferenceFactories, dataTypeService)
         {
         }
 

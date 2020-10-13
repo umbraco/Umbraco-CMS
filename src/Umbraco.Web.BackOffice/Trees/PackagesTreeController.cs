@@ -11,7 +11,7 @@ namespace Umbraco.Web.Trees
 {
     [UmbracoTreeAuthorize(Constants.Trees.Packages)]
     [Tree(Constants.Applications.Packages, Constants.Trees.Packages, SortOrder = 0, IsSingleNodeTree = true)]
-    [PluginController("UmbracoTrees")]
+    [PluginController(Constants.Web.Mvc.BackOfficeTreeArea)]
     [CoreTree]
     public class PackagesTreeController : TreeController
     {

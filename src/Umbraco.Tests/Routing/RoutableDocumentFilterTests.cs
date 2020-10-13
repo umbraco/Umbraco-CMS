@@ -2,6 +2,7 @@
 using System.Web.Mvc;
 using System.Web.Routing;
 using NUnit.Framework;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
@@ -51,10 +52,7 @@ namespace Umbraco.Tests.Routing
         {
             //reset the app config, we only want to test routes not the hard coded paths
 
-            var globalSettings = new GlobalSettingsBuilder()
-                .WithReservedPaths(string.Empty)
-                .WithReservedUrls(String.Empty)
-                .Build();
+            var globalSettings = new GlobalSettings { ReservedPaths = string.Empty, ReservedUrls = string.Empty };
 
             var routableDocFilter = new RoutableDocumentFilter(globalSettings, IOHelper);
 

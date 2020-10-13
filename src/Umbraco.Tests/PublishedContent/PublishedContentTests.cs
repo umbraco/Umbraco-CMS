@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
@@ -46,24 +48,24 @@ namespace Umbraco.Tests.PublishedContent
             Composition.RegisterUnique<IPublishedContentTypeFactory, PublishedContentTypeFactory>();
             Composition.RegisterUnique<IPublishedValueFallback, PublishedValueFallback>();
 
-            var logger = Mock.Of<ILogger>();
+            var loggerFactory = NullLoggerFactory.Instance;
             var mediaService = Mock.Of<IMediaService>();
             var mediaFileService = Mock.Of<IMediaFileSystem>();
             var contentTypeBaseServiceProvider = Mock.Of<IContentTypeBaseServiceProvider>();
             var umbracoContextAccessor = Mock.Of<IUmbracoContextAccessor>();
             var publishedUrlProvider = Mock.Of<IPublishedUrlProvider>();
             var imageSourceParser = new HtmlImageSourceParser(publishedUrlProvider);
-            var pastedImages = new RichTextEditorPastedImages(umbracoContextAccessor, logger, IOHelper, mediaService, contentTypeBaseServiceProvider, mediaFileService, ShortStringHelper, publishedUrlProvider);
+            var pastedImages = new RichTextEditorPastedImages(umbracoContextAccessor, loggerFactory.CreateLogger<RichTextEditorPastedImages>(), IOHelper, mediaService, contentTypeBaseServiceProvider, mediaFileService, ShortStringHelper, publishedUrlProvider);
             var linkParser = new HtmlLocalLinkParser(umbracoContextAccessor, publishedUrlProvider);
             var localizationService = Mock.Of<ILocalizationService>();
 
             var dataTypeService = new TestObjects.TestDataTypeService(
-                new DataType(new VoidEditor(logger, Mock.Of<IDataTypeService>(), localizationService, LocalizedTextService, ShortStringHelper)) { Id = 1 },
-                new DataType(new TrueFalsePropertyEditor(logger, Mock.Of<IDataTypeService>(), localizationService, IOHelper, ShortStringHelper, LocalizedTextService)) { Id = 1001 },
-                new DataType(new RichTextPropertyEditor(logger,umbracoContextAccessor, Mock.Of<IDataTypeService>(),  localizationService, imageSourceParser, linkParser, pastedImages, ShortStringHelper, IOHelper, LocalizedTextService, Mock.Of<IImageUrlGenerator>())) { Id = 1002 },
-                new DataType(new IntegerPropertyEditor(logger, Mock.Of<IDataTypeService>(), localizationService, ShortStringHelper, LocalizedTextService)) { Id = 1003 },
-                new DataType(new TextboxPropertyEditor(logger, Mock.Of<IDataTypeService>(), localizationService, IOHelper, ShortStringHelper, LocalizedTextService)) { Id = 1004 },
-                new DataType(new MediaPickerPropertyEditor(logger, Mock.Of<IDataTypeService>(), localizationService, IOHelper, ShortStringHelper, LocalizedTextService)) { Id = 1005 });
+                new DataType(new VoidEditor(loggerFactory, Mock.Of<IDataTypeService>(), localizationService, LocalizedTextService, ShortStringHelper)) { Id = 1 },
+                new DataType(new TrueFalsePropertyEditor(loggerFactory, Mock.Of<IDataTypeService>(), localizationService, IOHelper, ShortStringHelper, LocalizedTextService)) { Id = 1001 },
+                new DataType(new RichTextPropertyEditor(loggerFactory,umbracoContextAccessor, Mock.Of<IDataTypeService>(),  localizationService, imageSourceParser, linkParser, pastedImages, ShortStringHelper, IOHelper, LocalizedTextService, Mock.Of<IImageUrlGenerator>())) { Id = 1002 },
+                new DataType(new IntegerPropertyEditor(loggerFactory, Mock.Of<IDataTypeService>(), localizationService, ShortStringHelper, LocalizedTextService)) { Id = 1003 },
+                new DataType(new TextboxPropertyEditor(loggerFactory, Mock.Of<IDataTypeService>(), localizationService, IOHelper, ShortStringHelper, LocalizedTextService)) { Id = 1004 },
+                new DataType(new MediaPickerPropertyEditor(loggerFactory, Mock.Of<IDataTypeService>(), localizationService, IOHelper, ShortStringHelper, LocalizedTextService)) { Id = 1005 });
             Composition.RegisterUnique<IDataTypeService>(f => dataTypeService);
         }
 
@@ -95,11 +97,11 @@ namespace Umbraco.Tests.PublishedContent
         }
 
 
-        protected override TypeLoader CreateTypeLoader(IIOHelper ioHelper, ITypeFinder typeFinder, IAppPolicyCache runtimeCache, IProfilingLogger logger, IHostingEnvironment hostingEnvironment)
+        protected override TypeLoader CreateTypeLoader(IIOHelper ioHelper, ITypeFinder typeFinder, IAppPolicyCache runtimeCache, ILogger<TypeLoader> logger, IProfilingLogger profilingLogger , IHostingEnvironment hostingEnvironment)
         {
-            var baseLoader = base.CreateTypeLoader(ioHelper, typeFinder, runtimeCache, logger, hostingEnvironment);
+            var baseLoader = base.CreateTypeLoader(ioHelper, typeFinder, runtimeCache, logger, profilingLogger , hostingEnvironment);
 
-            return new TypeLoader(typeFinder, runtimeCache, new DirectoryInfo(hostingEnvironment.LocalTempPath), logger, false,
+            return new TypeLoader(typeFinder, runtimeCache, new DirectoryInfo(hostingEnvironment.LocalTempPath), logger, profilingLogger , false,
                 // this is so the model factory looks into the test assembly
                 baseLoader.AssembliesToScan
                     .Union(new[] { typeof(PublishedContentTests).Assembly })

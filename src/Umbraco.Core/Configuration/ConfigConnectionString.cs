@@ -29,13 +29,16 @@ namespace Umbraco.Core.Configuration
                 ConnectionString = connectionString
             };
 
-            if (builder.TryGetValue("Data Source", out var ds) && ds is string dataSource)
+            if (
+                (builder.TryGetValue("Data Source", out var ds)
+                 || builder.TryGetValue("DataSource", out ds)) && ds is string dataSource)
             {
                 if (dataSource.EndsWith(".sdf"))
                 {
                     return Constants.DbProviderNames.SqlCe;
                 }
             }
+
 
             if (builder.TryGetValue("Server", out var s) && s is string server && !string.IsNullOrEmpty(server))
             {

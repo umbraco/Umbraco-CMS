@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 
@@ -10,7 +11,7 @@ namespace Umbraco.Core.HealthCheck.Checks
     {
         protected IConfigurationService ConfigurationService { get; }
         protected ILocalizedTextService TextService { get; }
-        protected ILogger Logger { get; }
+        protected ILoggerFactory LoggerFactory { get; }
 
         /// <summary>
         /// Gets key within the JSON to check, in the colon-delimited format
@@ -38,10 +39,10 @@ namespace Umbraco.Core.HealthCheck.Checks
         /// </summary>
         public abstract ValueComparisonType ValueComparisonType { get; }
 
-        protected AbstractSettingsCheck(ILocalizedTextService textService, ILogger logger, IConfigurationService configurationService)
+        protected AbstractSettingsCheck(ILocalizedTextService textService, ILoggerFactory loggerFactory, IConfigurationService configurationService)
         {
             TextService = textService;
-            Logger = logger;
+            LoggerFactory = loggerFactory;
             ConfigurationService = configurationService;
         }
 

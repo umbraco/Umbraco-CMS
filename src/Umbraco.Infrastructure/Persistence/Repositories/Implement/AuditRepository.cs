@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using NPoco;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Dtos;
@@ -14,7 +14,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 {
     internal class AuditRepository : NPocoRepositoryBase<int, IAuditItem>, IAuditRepository
     {
-        public AuditRepository(IScopeAccessor scopeAccessor, ILogger logger)
+        public AuditRepository(IScopeAccessor scopeAccessor, ILogger<AuditRepository> logger)
             : base(scopeAccessor, AppCaches.NoCache, logger)
         { }
 

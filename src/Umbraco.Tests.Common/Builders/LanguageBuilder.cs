@@ -57,7 +57,7 @@ namespace Umbraco.Tests.Common.Builders
         public override ILanguage Build()
         {
             var cultureInfo = _cultureInfo ?? CultureInfo.GetCultureInfo("en-US");
-            var globalSettings = new GlobalSettingsBuilder().WithDefaultUiLanguage(cultureInfo.Name).Build();
+            var globalSettings = new GlobalSettings { DefaultUILanguage = cultureInfo.Name };
             var key = _key ?? Guid.NewGuid();
             var createDate = _createDate ?? DateTime.Now;
             var updateDate = _updateDate ?? DateTime.Now;

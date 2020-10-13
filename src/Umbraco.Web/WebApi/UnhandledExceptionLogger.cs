@@ -1,6 +1,6 @@
 ﻿using System.Web.Http.ExceptionHandling;
 using Umbraco.Web.Composing;
-using Umbraco.Core.Logging;
+using Microsoft.Extensions.Logging;
 
 namespace Umbraco.Web.WebApi
 {
@@ -28,7 +28,7 @@ namespace Umbraco.Web.WebApi
                 var requestUrl = context.ExceptionContext?.ControllerContext?.Request?.RequestUri?.AbsoluteUri;
                 var controllerType = context.ExceptionContext?.ActionContext?.ControllerContext?.Controller?.GetType();
 
-                _logger.Error(controllerType, context.Exception, "Unhandled controller exception occurred for request '{RequestUrl}'", requestUrl);
+                _logger.LogError(context.Exception, "Unhandled controller exception occurred for request '{RequestUrl}'", requestUrl);
             }
         }
 

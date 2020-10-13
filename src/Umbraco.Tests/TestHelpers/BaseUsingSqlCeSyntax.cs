@@ -3,15 +3,15 @@ using System.IO;
 using Moq;
 using NPoco;
 using NUnit.Framework;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.Mappers;
-using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence;
 using Umbraco.Persistance.SqlCe;
-using Umbraco.Tests.Components;
 using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.TestHelpers
@@ -42,12 +42,14 @@ namespace Umbraco.Tests.TestHelpers
             var typeFinder = TestHelper.GetTypeFinder();
             var typeLoader = new TypeLoader(typeFinder, NoAppCache.Instance,
                 new DirectoryInfo(ioHelper.MapPath("~/App_Data/TEMP")),
+                Mock.Of<ILogger<TypeLoader>>(),
                 logger,
                 false);
 
-            var composition = new Composition(container, typeLoader, Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.IOHelper, AppCaches.NoCache);
+            var composition = new Composition(container, typeLoader, Mock.Of<IProfilingLogger>(), Mock.Of<IRuntimeState>(), TestHelper.IOHelper, AppCaches.NoCache);
 
             composition.RegisterUnique<ILogger>(_ => Mock.Of<ILogger>());
+            composition.RegisterUnique<ILoggerFactory>(_ => NullLoggerFactory.Instance);
             composition.RegisterUnique<IProfiler>(_ => Mock.Of<IProfiler>());
 
             composition.RegisterUnique(typeLoader);

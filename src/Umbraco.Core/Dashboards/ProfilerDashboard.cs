@@ -5,7 +5,7 @@ using Umbraco.Core.Dashboards;
 namespace Umbraco.Web.Dashboards
 {
     [Weight(60)]
-    public class ProfilerDashboardDashboard : IDashboard
+    public class ProfilerDashboard : IDashboard
     {
         public string Alias => "settingsProfiler";
 

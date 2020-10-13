@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Serialization;
@@ -17,9 +17,9 @@ namespace Umbraco.Core.Configuration.Grid
         private readonly IManifestParser _manifestParser;
 
         private readonly IJsonSerializer _jsonSerializer;
-        private readonly ILogger _logger;
+        private readonly ILogger<GridEditorsConfig> _logger;
 
-        public GridEditorsConfig(AppCaches appCaches, IHostingEnvironment hostingEnvironment, IManifestParser manifestParser,IJsonSerializer jsonSerializer, ILogger logger)
+        public GridEditorsConfig(AppCaches appCaches, IHostingEnvironment hostingEnvironment, IManifestParser manifestParser,IJsonSerializer jsonSerializer, ILogger<GridEditorsConfig> logger)
         {
             _appCaches = appCaches;
             _hostingEnvironment = hostingEnvironment;
@@ -47,7 +47,7 @@ namespace Umbraco.Core.Configuration.Grid
                         }
                         catch (Exception ex)
                         {
-                            _logger.Error<GridEditorsConfig>(ex, "Could not parse the contents of grid.editors.config.js into a JSON array '{Json}", sourceString);
+                            _logger.LogError(ex, "Could not parse the contents of grid.editors.config.js into a JSON array '{Json}", sourceString);
                         }
                     }
 

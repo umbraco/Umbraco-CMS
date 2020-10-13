@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text;
 using Umbraco.Core.Collections;
 using Umbraco.Core.Logging;
+using Microsoft.Extensions.Logging;
 
 namespace Umbraco.Core.Composing
 {
@@ -16,7 +17,8 @@ namespace Umbraco.Core.Composing
     public class Composers
     {
         private readonly Composition _composition;
-        private readonly IProfilingLogger _logger;
+        private readonly ILogger<Composers> _logger;
+        private readonly IProfilingLogger _profileLogger;
         private readonly IEnumerable<Type> _composerTypes;
         private readonly IEnumerable<Attribute> _enableDisableAttributes;
 
@@ -28,7 +30,8 @@ namespace Umbraco.Core.Composing
         /// <param name="composition">The composition.</param>
         /// <param name="composerTypes">The <see cref="IComposer" /> types.</param>
         /// <param name="enableDisableAttributes">The <see cref="EnableComposerAttribute" /> and/or <see cref="DisableComposerAttribute" /> attributes.</param>
-        /// <param name="logger">The profiling logger.</param>
+        /// <param name="logger">The logger.</param>
+        /// <param name="profileLogger">The profiling logger.</param>
         /// <exception cref="ArgumentNullException">composition
         /// or
         /// composerTypes
@@ -36,13 +39,13 @@ namespace Umbraco.Core.Composing
         /// enableDisableAttributes
         /// or
         /// logger</exception>
-
-        public Composers(Composition composition, IEnumerable<Type> composerTypes, IEnumerable<Attribute> enableDisableAttributes, IProfilingLogger logger)
+        public Composers(Composition composition, IEnumerable<Type> composerTypes, IEnumerable<Attribute> enableDisableAttributes, ILogger<Composers> logger, IProfilingLogger profileLogger)
         {
             _composition = composition ?? throw new ArgumentNullException(nameof(composition));
             _composerTypes = composerTypes ?? throw new ArgumentNullException(nameof(composerTypes));
             _enableDisableAttributes = enableDisableAttributes ?? throw new ArgumentNullException(nameof(enableDisableAttributes));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _profileLogger = profileLogger;
         }
 
         private class EnableInfo
@@ -61,19 +64,19 @@ namespace Umbraco.Core.Composing
 
             IEnumerable<Type> orderedComposerTypes;
 
-            using (_logger.DebugDuration<Composers>("Preparing composer types.", "Prepared composer types."))
+            using (_profileLogger.DebugDuration<Composers>("Preparing composer types.", "Prepared composer types."))
             {
                 orderedComposerTypes = PrepareComposerTypes();
             }
 
             var composers = InstantiateComposers(orderedComposerTypes);
 
-            using (_logger.DebugDuration<Composers>($"Composing composers. (log when >{LogThresholdMilliseconds}ms)", "Composed composers."))
+            using (_profileLogger.DebugDuration<Composers>($"Composing composers. (log when >{LogThresholdMilliseconds}ms)", "Composed composers."))
             {
                 foreach (var composer in composers)
                 {
                     var componentType = composer.GetType();
-                    using (_logger.DebugDuration<Composers>($"Composing {componentType.FullName}.", $"Composed {componentType.FullName}.", thresholdMilliseconds: LogThresholdMilliseconds))
+                    using (_profileLogger.DebugDuration<Composers>($"Composing {componentType.FullName}.", $"Composed {componentType.FullName}.", thresholdMilliseconds: LogThresholdMilliseconds))
                     {
                         composer.Compose(_composition);
                     }
@@ -92,7 +95,7 @@ namespace Umbraco.Core.Composing
 
             // bit verbose but should help for troubleshooting
             //var text = "Ordered Composers: " + Environment.NewLine + string.Join(Environment.NewLine, sortedComposerTypes) + Environment.NewLine;
-            _logger.Debug<Composers>("Ordered Composers: {SortedComposerTypes}", sortedComposerTypes);
+            _logger.LogDebug("Ordered Composers: {SortedComposerTypes}", sortedComposerTypes);
 
             return sortedComposerTypes;
         }
@@ -183,8 +186,8 @@ namespace Umbraco.Core.Composing
             catch (Exception e)
             {
                 // in case of an error, force-dump everything to log
-                _logger.Info<Composers>("Composer Report:\r\n{ComposerReport}", GetComposersReport(requirements));
-                _logger.Error<Composers>(e, "Failed to sort composers.");
+                _logger.LogInformation("Composer Report:\r\n{ComposerReport}", GetComposersReport(requirements));
+                _logger.LogError(e, "Failed to sort composers.");
                 throw;
             }
 
@@ -370,7 +373,7 @@ namespace Umbraco.Core.Composing
                 return (IComposer) ctor.Invoke(Array.Empty<object>());
             }
 
-            using (_logger.DebugDuration<Composers>("Instantiating composers.", "Instantiated composers."))
+            using (_profileLogger.DebugDuration<Composers>("Instantiating composers.", "Instantiated composers."))
             {
                 return types.Select(InstantiateComposer).ToArray();
             }

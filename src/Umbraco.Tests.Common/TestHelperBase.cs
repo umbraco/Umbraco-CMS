@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
@@ -36,14 +38,14 @@ namespace Umbraco.Tests.Common
         protected TestHelperBase(Assembly entryAssembly)
         {
             MainDom = new SimpleMainDom();
-            _typeFinder = new TypeFinder(Mock.Of<ILogger>(), new DefaultUmbracoAssemblyProvider(entryAssembly), new VaryingRuntimeHash());
+            _typeFinder = new TypeFinder(NullLoggerFactory.Instance.CreateLogger<TypeFinder>(), new DefaultUmbracoAssemblyProvider(entryAssembly), new VaryingRuntimeHash());
         }
 
         public ITypeFinder GetTypeFinder() => _typeFinder;
 
         public TypeLoader GetMockedTypeLoader()
         {
-            return new TypeLoader(Mock.Of<ITypeFinder>(), Mock.Of<IAppPolicyCache>(), new DirectoryInfo(IOHelper.MapPath("~/App_Data/TEMP")), Mock.Of<IProfilingLogger>());
+            return new TypeLoader(Mock.Of<ITypeFinder>(), Mock.Of<IAppPolicyCache>(), new DirectoryInfo(IOHelper.MapPath("~/App_Data/TEMP")), Mock.Of<ILogger<TypeLoader>>(), Mock.Of<IProfilingLogger>());
         }
 
        // public Configs GetConfigs() => GetConfigsFactory().Create();
@@ -120,7 +122,7 @@ namespace Umbraco.Tests.Common
 
         public IRegister GetRegister()
         {
-            return RegisterFactory.Create(new GlobalSettingsBuilder().Build());
+            return RegisterFactory.Create(new GlobalSettings());
         }
 
         public abstract IHostingEnvironment GetHostingEnvironment();
@@ -144,9 +146,7 @@ namespace Umbraco.Tests.Common
         {
             hostingEnv = hostingEnv ?? GetHostingEnvironment();
             return new LoggingConfiguration(
-                Path.Combine(hostingEnv.ApplicationPhysicalPath, "App_Data","Logs"),
-                Path.Combine(hostingEnv.ApplicationPhysicalPath, "config","serilog.config"),
-                Path.Combine(hostingEnv.ApplicationPhysicalPath, "config","serilog.user.config"));
+                Path.Combine(hostingEnv.ApplicationPhysicalPath, "umbraco","logs"));
         }
     }
 }

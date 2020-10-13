@@ -2,21 +2,19 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.Packaging;
 using Umbraco.Core.Packaging;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
-using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 using File = System.IO.File;
@@ -51,16 +49,16 @@ namespace Umbraco.Tests.Packaging
             new ConflictingPackageData(
                 ServiceContext.MacroService,
                 ServiceContext.FileService),
-                Microsoft.Extensions.Options.Options.Create(new GlobalSettingsBuilder().Build()));
+                Microsoft.Extensions.Options.Options.Create(new GlobalSettings()));
 
         private PackageDataInstallation PackageDataInstallation => new PackageDataInstallation(
-            Logger, ServiceContext.FileService, ServiceContext.MacroService, ServiceContext.LocalizationService,
+            NullLoggerFactory.Instance.CreateLogger<PackageDataInstallation>(), NullLoggerFactory.Instance, ServiceContext.FileService, ServiceContext.MacroService, ServiceContext.LocalizationService,
             ServiceContext.DataTypeService, ServiceContext.EntityService,
             ServiceContext.ContentTypeService, ServiceContext.ContentService,
             Factory.GetInstance<PropertyEditorCollection>(),
             Factory.GetInstance<IScopeProvider>(),
             Factory.GetInstance<IShortStringHelper>(),
-            Microsoft.Extensions.Options.Options.Create(new GlobalSettingsBuilder().Build()),
+            Microsoft.Extensions.Options.Options.Create(new GlobalSettings()),
             Factory.GetInstance<ILocalizedTextService>());
 
         private IPackageInstallation PackageInstallation => new PackageInstallation(
@@ -126,7 +124,7 @@ namespace Umbraco.Tests.Packaging
         public void Can_Read_Compiled_Package_Warnings()
         {
             //copy a file to the same path that the package will install so we can detect file conflicts
-            
+
             var filePath = Path.Combine(_testBaseFolder.FullName, "bin", "Auros.DocumentTypePicker.dll");
             Directory.CreateDirectory(Path.GetDirectoryName(filePath));
             File.WriteAllText(filePath, "test");

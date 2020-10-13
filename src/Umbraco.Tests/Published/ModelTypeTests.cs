@@ -8,38 +8,21 @@ namespace Umbraco.Tests.Published
     [TestFixture]
     public class ModelTypeTests
     {
-        [Test]
-        public void ModelTypeEqualityTests()
-        {
-            Assert.AreNotEqual(ModelType.For("alias1"), ModelType.For("alias1"));
 
-            Assert.IsTrue(ModelType.Equals(ModelType.For("alias1"), ModelType.For("alias1")));
-            Assert.IsFalse(ModelType.Equals(ModelType.For("alias1"), ModelType.For("alias2")));
-
-            Assert.IsTrue(ModelType.Equals(typeof(IEnumerable<>).MakeGenericType(ModelType.For("alias1")), typeof(IEnumerable<>).MakeGenericType(ModelType.For("alias1"))));
-            Assert.IsFalse(ModelType.Equals(typeof(IEnumerable<>).MakeGenericType(ModelType.For("alias1")), typeof(IEnumerable<>).MakeGenericType(ModelType.For("alias2"))));
-
-            Assert.IsTrue(ModelType.Equals(ModelType.For("alias1").MakeArrayType(), ModelType.For("alias1").MakeArrayType()));
-            Assert.IsFalse(ModelType.Equals(ModelType.For("alias1").MakeArrayType(), ModelType.For("alias2").MakeArrayType()));
-        }
-
+            //TODO these is not easy to move to the Unittest project due to underlysing NotImplementedException of Type.IsSZArray
         [Test]
         public void ModelTypeToStringTests()
         {
-            Assert.AreEqual("{alias1}", ModelType.For("alias1").ToString());
+            var modelType = ModelType.For("alias1");
+            var modelTypeArray = modelType.MakeArrayType();
+
+            Assert.AreEqual("{alias1}", modelType.ToString());
 
             // there's an "*" there because the arrays are not true SZArray - but that changes when we map
-            Assert.AreEqual("{alias1}[*]", ModelType.For("alias1").MakeArrayType().ToString());
-            Assert.AreEqual("System.Collections.Generic.IEnumerable`1[{alias1}[*]]", typeof(IEnumerable<>).MakeGenericType(ModelType.For("alias1").MakeArrayType()).ToString());
-        }
 
-        [Test]
-        public void TypeToStringTests()
-        {
-            var type = typeof(int);
-            Assert.AreEqual("System.Int32", type.ToString());
-            Assert.AreEqual("System.Int32[]", type.MakeArrayType().ToString());
-            Assert.AreEqual("System.Collections.Generic.IEnumerable`1[System.Int32[]]", typeof(IEnumerable<>).MakeGenericType(type.MakeArrayType()).ToString());
+            Assert.AreEqual("{alias1}[*]", modelTypeArray.ToString());
+            var enumArray = typeof(IEnumerable<>).MakeGenericType(modelTypeArray);
+            Assert.AreEqual("System.Collections.Generic.IEnumerable`1[{alias1}[*]]", enumArray.ToString());
         }
 
         [Test]
@@ -53,36 +36,8 @@ namespace Umbraco.Tests.Published
             // there's an "*" there because the arrays are not true SZArray - but that changes when we map
             Assert.AreEqual("{alias1}[*]", ModelType.For("alias1").MakeArrayType().FullName);
             // note the inner assembly qualified name
-            Assert.AreEqual("System.Collections.Generic.IEnumerable`1[[{alias1}[*], Umbraco.Core, Version=9.0.0.0, Culture=neutral, PublicKeyToken=null]]", typeof(IEnumerable<>).MakeGenericType(ModelType.For("alias1").MakeArrayType()).FullName);
+            Assert.AreEqual("System.Collections.Generic.IEnumerable`1[[{alias1}[*], Umbraco.Core, Version=0.5.0.0, Culture=neutral, PublicKeyToken=null]]", typeof(IEnumerable<>).MakeGenericType(ModelType.For("alias1").MakeArrayType()).FullName);
         }
 
-        [Test]
-        public void TypeFullNameTests()
-        {
-            var type = typeof(int);
-            Assert.AreEqual("System.Int32", type.FullName);
-            Assert.AreEqual("System.Int32[]", type.MakeArrayType().FullName);
-            // note the inner assembly qualified name
-            Assert.AreEqual("System.Collections.Generic.IEnumerable`1[[System.Int32[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]", typeof(IEnumerable<>).MakeGenericType(type.MakeArrayType()).FullName);
-        }
-
-        [Test]
-        public void ModelTypeMapTests()
-        {
-            var map = new Dictionary<string, Type>
-            {
-                { "alias1", typeof (PublishedSnapshotTestObjects.TestElementModel1) },
-                { "alias2", typeof (PublishedSnapshotTestObjects.TestElementModel2) },
-            };
-
-            Assert.AreEqual("Umbraco.Tests.Published.PublishedSnapshotTestObjects+TestElementModel1",
-                ModelType.Map(ModelType.For("alias1"), map).ToString());
-            Assert.AreEqual("Umbraco.Tests.Published.PublishedSnapshotTestObjects+TestElementModel1[]",
-                ModelType.Map(ModelType.For("alias1").MakeArrayType(), map).ToString());
-            Assert.AreEqual("System.Collections.Generic.IEnumerable`1[Umbraco.Tests.Published.PublishedSnapshotTestObjects+TestElementModel1]",
-                ModelType.Map(typeof(IEnumerable<>).MakeGenericType(ModelType.For("alias1")), map).ToString());
-            Assert.AreEqual("System.Collections.Generic.IEnumerable`1[Umbraco.Tests.Published.PublishedSnapshotTestObjects+TestElementModel1[]]",
-                ModelType.Map(typeof(IEnumerable<>).MakeGenericType(ModelType.For("alias1").MakeArrayType()), map).ToString());
-        }
     }
 }

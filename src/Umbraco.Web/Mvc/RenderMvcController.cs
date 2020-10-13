@@ -1,6 +1,7 @@
 using System;
 using System.Web.Mvc;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
@@ -21,16 +22,18 @@ namespace Umbraco.Web.Mvc
     public class RenderMvcController : UmbracoController, IRenderMvcController
     {
         private IPublishedRequest _publishedRequest;
+        private readonly ILogger<RenderMvcController> _logger;
 
         public RenderMvcController()
         {
             ActionInvoker = new RenderActionInvoker();
         }
 
-        public RenderMvcController(IOptions<GlobalSettings> globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger)
-            : base(globalSettings, umbracoContextAccessor, services, appCaches, profilingLogger)
+        public RenderMvcController(IOptions<GlobalSettings> globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger, ILoggerFactory loggerFactory)
+            : base(globalSettings, umbracoContextAccessor, services, appCaches, profilingLogger, loggerFactory)
         {
             ActionInvoker = new RenderActionInvoker();
+            _logger = loggerFactory.CreateLogger<RenderMvcController>();
         }
 
         /// <summary>
@@ -70,7 +73,7 @@ namespace Umbraco.Web.Mvc
             var result = ViewEngines.Engines.FindView(ControllerContext, template, null);
             if (result.View != null) return true;
 
-            Logger.Warn<RenderMvcController>("No physical template file was found for template {Template}", template);
+            _logger.LogWarning("No physical template file was found for template {Template}", template);
             return false;
         }
 

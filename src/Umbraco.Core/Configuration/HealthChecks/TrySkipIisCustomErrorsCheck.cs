@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Core.HealthCheck.Checks.Configuration
@@ -16,16 +16,15 @@ namespace Umbraco.Core.HealthCheck.Checks.Configuration
     public class TrySkipIisCustomErrorsCheck : AbstractSettingsCheck
     {
         private readonly ILocalizedTextService _textService;
-        private readonly ILogger _logger;
+        private readonly ILoggerFactory _loggerFactory;
         private readonly Version _iisVersion;
         private readonly GlobalSettings _globalSettings;
 
-        public TrySkipIisCustomErrorsCheck(ILocalizedTextService textService, IHostingEnvironment hostingEnvironment, ILogger logger, IConfigurationService configurationService, IOptions<GlobalSettings> globalSettings)
-            : base(textService, logger, configurationService)
+        public TrySkipIisCustomErrorsCheck(ILocalizedTextService textService, ILoggerFactory loggerFactory, IConfigurationService configurationService, IOptions<GlobalSettings> globalSettings)
+            : base(textService, loggerFactory, configurationService)
         {
             _textService = textService;
-            _logger = logger;
-            _iisVersion = hostingEnvironment.IISVersion;
+            _loggerFactory = loggerFactory;
             _globalSettings = globalSettings.Value;
         }
 

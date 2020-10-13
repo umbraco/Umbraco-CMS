@@ -95,7 +95,7 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
 
             var backofficeIdentity = (UmbracoBackOfficeIdentity) owinContext.Authentication.User.Identity;
 
-            var webSecurity = new Mock<IWebSecurity>();
+            var backofficeSecurity = new Mock<IBackofficeSecurity>();
 
             //mock CurrentUser
             var groups = new List<ReadOnlyUserGroup>();
@@ -116,13 +116,13 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
             mockUser.Setup(x => x.StartContentIds).Returns(backofficeIdentity.StartContentNodes);
             mockUser.Setup(x => x.StartMediaIds).Returns(backofficeIdentity.StartMediaNodes);
             mockUser.Setup(x => x.Username).Returns(backofficeIdentity.Username);
-            webSecurity.Setup(x => x.CurrentUser)
+            backofficeSecurity.Setup(x => x.CurrentUser)
                 .Returns(mockUser.Object);
 
             //mock Validate
-            webSecurity.Setup(x => x.ValidateCurrentUser())
+            backofficeSecurity.Setup(x => x.ValidateCurrentUser())
                 .Returns(() => true);
-            webSecurity.Setup(x => x.UserHasSectionAccess(It.IsAny<string>(), It.IsAny<IUser>()))
+            backofficeSecurity.Setup(x => x.UserHasSectionAccess(It.IsAny<string>(), It.IsAny<IUser>()))
                 .Returns(() => true);
 
             var publishedSnapshot = new Mock<IPublishedSnapshot>();
@@ -135,7 +135,7 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
             var httpContextAccessor = TestHelper.GetHttpContextAccessor(httpContext);
             var umbCtx = new UmbracoContext(httpContextAccessor,
                 publishedSnapshotService.Object,
-                webSecurity.Object,
+                backofficeSecurity.Object,
                 globalSettings,
                 TestHelper.GetHostingEnvironment(),
                 new TestVariationContextAccessor(),

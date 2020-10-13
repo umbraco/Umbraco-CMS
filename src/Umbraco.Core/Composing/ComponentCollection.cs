@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Composing
@@ -12,22 +13,24 @@ namespace Umbraco.Core.Composing
     {
         private const int LogThresholdMilliseconds = 100;
 
-        private readonly IProfilingLogger _logger;
+        private readonly IProfilingLogger _profilingLogger;
+        private readonly ILogger<ComponentCollection> _logger;
 
-        public ComponentCollection(IEnumerable<IComponent> items, IProfilingLogger logger)
+        public ComponentCollection(IEnumerable<IComponent> items, IProfilingLogger profilingLogger, ILogger<ComponentCollection> logger)
             : base(items)
         {
+            _profilingLogger = profilingLogger;
             _logger = logger;
         }
 
         public void Initialize()
         {
-            using (_logger.DebugDuration<ComponentCollection>($"Initializing. (log components when >{LogThresholdMilliseconds}ms)", "Initialized."))
+            using (_profilingLogger.DebugDuration<ComponentCollection>($"Initializing. (log components when >{LogThresholdMilliseconds}ms)", "Initialized."))
             {
                 foreach (var component in this)
                 {
                     var componentType = component.GetType();
-                    using (_logger.DebugDuration<ComponentCollection>($"Initializing {componentType.FullName}.", $"Initialized {componentType.FullName}.", thresholdMilliseconds: LogThresholdMilliseconds))
+                    using (_profilingLogger.DebugDuration<ComponentCollection>($"Initializing {componentType.FullName}.", $"Initialized {componentType.FullName}.", thresholdMilliseconds: LogThresholdMilliseconds))
                     {
                         component.Initialize();
                     }
@@ -37,12 +40,12 @@ namespace Umbraco.Core.Composing
 
         public void Terminate()
         {
-            using (_logger.DebugDuration<ComponentCollection>($"Terminating. (log components when >{LogThresholdMilliseconds}ms)", "Terminated."))
+            using (_profilingLogger.DebugDuration<ComponentCollection>($"Terminating. (log components when >{LogThresholdMilliseconds}ms)", "Terminated."))
             {
                 foreach (var component in this.Reverse()) // terminate components in reverse order
                 {
                     var componentType = component.GetType();
-                    using (_logger.DebugDuration<ComponentCollection>($"Terminating {componentType.FullName}.", $"Terminated {componentType.FullName}.", thresholdMilliseconds: LogThresholdMilliseconds))
+                    using (_profilingLogger.DebugDuration<ComponentCollection>($"Terminating {componentType.FullName}.", $"Terminated {componentType.FullName}.", thresholdMilliseconds: LogThresholdMilliseconds))
                     {
                         try
                         {
@@ -51,7 +54,7 @@ namespace Umbraco.Core.Composing
                         }
                         catch (Exception ex)
                         {
-                            _logger.Error<ComponentCollection>(ex, "Error while terminating component {ComponentType}.", componentType.FullName);
+                            _logger.LogError(ex, "Error while terminating component {ComponentType}.", componentType.FullName);
                         }
                     }
                 }

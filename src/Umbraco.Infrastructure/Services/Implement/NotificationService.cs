@@ -7,9 +7,9 @@ using System.Net.Mail;
 using System.Text;
 using System.Threading;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Membership;
@@ -28,11 +28,11 @@ namespace Umbraco.Core.Services.Implement
         private readonly GlobalSettings _globalSettings;
         private readonly ContentSettings _contentSettings;
         private readonly IEmailSender _emailSender;
-        private readonly ILogger _logger;
+        private readonly ILogger<NotificationService> _logger;
         private readonly IIOHelper _ioHelper;
 
         public NotificationService(IScopeProvider provider, IUserService userService, IContentService contentService, ILocalizationService localizationService,
-            ILogger logger, IIOHelper ioHelper, INotificationsRepository notificationsRepository, IOptions<GlobalSettings> globalSettings, IOptions<ContentSettings> contentSettings, IEmailSender emailSender)
+            ILogger<NotificationService> logger, IIOHelper ioHelper, INotificationsRepository notificationsRepository, IOptions<GlobalSettings> globalSettings, IOptions<ContentSettings> contentSettings, IEmailSender emailSender)
         {
             _notificationsRepository = notificationsRepository;
             _globalSettings = globalSettings.Value;
@@ -509,7 +509,7 @@ namespace Umbraco.Core.Services.Implement
         {
             ThreadPool.QueueUserWorkItem(state =>
             {
-                _logger.Debug<NotificationService>("Begin processing notifications.");
+                _logger.LogDebug("Begin processing notifications.");
                 while (true)
                 {
                     NotificationRequest request;
@@ -518,11 +518,11 @@ namespace Umbraco.Core.Services.Implement
                         try
                         {
                             _emailSender.SendAsync(request.Mail).GetAwaiter().GetResult();
-                            _logger.Debug<NotificationService>("Notification '{Action}' sent to {Username} ({Email})", request.Action, request.UserName, request.Email);
+                            _logger.LogDebug("Notification '{Action}' sent to {Username} ({Email})", request.Action, request.UserName, request.Email);
                         }
                         catch (Exception ex)
                         {
-                            _logger.Error<NotificationService>(ex, "An error occurred sending notification");
+                            _logger.LogError(ex, "An error occurred sending notification");
                         }
                         finally
                         {
@@ -537,7 +537,7 @@ namespace Umbraco.Core.Services.Implement
                     }
                 }
 
-                _logger.Debug<NotificationService>("Done processing notifications.");
+                _logger.LogDebug("Done processing notifications.");
             });
         }
 

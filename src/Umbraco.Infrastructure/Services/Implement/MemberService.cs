@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Events;
 using Umbraco.Core.Exceptions;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Querying;
@@ -28,9 +28,9 @@ namespace Umbraco.Core.Services.Implement
 
         #region Constructor
 
-        public MemberService(IScopeProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory, IMemberGroupService memberGroupService,
+        public MemberService(IScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory, IMemberGroupService memberGroupService,
             IMemberRepository memberRepository, IMemberTypeRepository memberTypeRepository, IMemberGroupRepository memberGroupRepository, IAuditRepository auditRepository)
-            : base(provider, logger, eventMessagesFactory)
+            : base(provider, loggerFactory, eventMessagesFactory)
         {
             _memberRepository = memberRepository;
             _memberTypeRepository = memberTypeRepository;
@@ -435,15 +435,10 @@ namespace Umbraco.Core.Services.Implement
         /// <returns><see cref="IMember"/></returns>
         public IMember GetByUsername(string username)
         {
-            // TODO: Somewhere in here, whether at this level or the repository level, we need to add
-            // a caching mechanism since this method is used by all the membership providers and could be
-            // called quite a bit when dealing with members.
-
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                scope.ReadLock(Constants.Locks.MemberTree);
-                var query = Query<IMember>().Where(x => x.Username.Equals(username));
-                return _memberRepository.Get(query).FirstOrDefault();
+                scope.ReadLock(Constants.Locks.MemberTree);                
+                return _memberRepository.GetByUsername(username);
             }
         }
 
@@ -793,12 +788,17 @@ namespace Umbraco.Core.Services.Implement
 
         #region Save
 
-        /// <summary>
-        /// Saves an <see cref="IMember"/>
-        /// </summary>
-        /// <param name="member"><see cref="IMember"/> to Save</param>
-        /// <param name="raiseEvents">Optional parameter to raise events.
-        /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
+        /// <inheritdoc />
+        public void SetLastLogin(string username, DateTime date)
+        {
+            using (var scope = ScopeProvider.CreateScope())
+            {   
+                _memberRepository.SetLastLogin(username, date);
+                scope.Complete();
+            }
+        }
+
+        /// <inheritdoc />
         public void Save(IMember member, bool raiseEvents = true)
         {
             //trimming username and email to make sure we have no trailing space
@@ -834,12 +834,7 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        /// <summary>
-        /// Saves a list of <see cref="IMember"/> objects
-        /// </summary>
-        /// <param name="members"><see cref="IEnumerable{IMember}"/> to save</param>
-        /// <param name="raiseEvents">Optional parameter to raise events.
-        /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
+        /// <inheritdoc />
         public void Save(IEnumerable<IMember> members, bool raiseEvents = true)
         {
             var membersA = members.ToArray();
@@ -986,7 +981,7 @@ namespace Umbraco.Core.Services.Implement
                 return result.Select(x => x.Id).Distinct();
             }
         }
-        
+
         public IEnumerable<IMember> GetMembersInRole(string roleName)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))

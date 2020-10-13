@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
@@ -22,7 +23,7 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
 
         private RelationTypeRepository CreateRepository(IScopeProvider provider)
         {
-            return new RelationTypeRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger);
+            return new RelationTypeRepository((IScopeAccessor) provider, AppCaches.Disabled, LoggerFactory.CreateLogger<RelationTypeRepository>());
         }
 
         [Test]
@@ -221,7 +222,7 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
             var provider = ScopeProvider;
             using (var scope = provider.CreateScope())
             {
-                var repository = new RelationTypeRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger);
+                var repository = new RelationTypeRepository((IScopeAccessor) provider, AppCaches.Disabled, LoggerFactory.CreateLogger<RelationTypeRepository>());
 
                 repository.Save(relateContent);//Id 2
                 repository.Save(relateContentType);//Id 3

@@ -7,8 +7,8 @@ using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
+using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Integration.Testing;
-using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Integration.Persistence.Repositories
@@ -31,25 +31,25 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
             var contentService = GetRequiredService<IContentService>();
             var contentTypeService = GetRequiredService<IContentTypeService>();
             var createdContent = new List<IContent>();
-            var contentType = MockedContentTypes.CreateBasicContentType("blah");
+            var contentType = ContentTypeBuilder.CreateBasicContentType("blah");
             contentTypeService.Save(contentType);
             for (var i = 0; i < 10; i++)
             {
-                var c1 = MockedContent.CreateBasicContent(contentType);
+                var c1 = ContentBuilder.CreateBasicContent(contentType);
                 contentService.Save(c1);
                 createdContent.Add(c1);
             }
 
             //Create media
-            
+
             var mediaService = GetRequiredService<IMediaService>();
             var mediaTypeService = GetRequiredService<IMediaTypeService>();
             var createdMedia = new List<IMedia>();
-            var imageType = MockedContentTypes.CreateImageMediaType("myImage");
+            var imageType = MediaTypeBuilder.CreateImageMediaType("myImage");
             mediaTypeService.Save(imageType);
             for (var i = 0; i < 10; i++)
             {
-                var c1 = MockedMedia.CreateMediaImage(imageType, -1);
+                var c1 = MediaBuilder.CreateMediaImage(imageType, -1);
                 mediaService.Save(c1);
                 createdMedia.Add(c1);
             }
@@ -58,12 +58,12 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
 
             var memberService = GetRequiredService<IMemberService>();
             var memberTypeService = GetRequiredService<IMemberTypeService>();
-            var memberType = MockedContentTypes.CreateSimpleMemberType("simple");
+            var memberType = MemberTypeBuilder.CreateSimpleMemberType("simple");
             memberTypeService.Save(memberType);
-            var createdMembers = MockedMember.CreateSimpleMember(memberType, 10).ToList();
+            var createdMembers = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10).ToList();
             memberService.Save(createdMembers);
 
-            
+
             var provider = ScopeProvider;
             using (provider.CreateScope())
             {
@@ -77,7 +77,7 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
                     .WhereIn(e => e.Id, ids);
 
                 var entities = repo.GetPagedResultsByQuery(query, objectTypes, 0, 20, out var totalRecords, null, null).ToList();
-                
+
                 Assert.AreEqual(20, entities.Count);
                 Assert.AreEqual(30, totalRecords);
 

@@ -10,7 +10,7 @@ namespace Umbraco.Core.Configuration
     {
         private static string _modelsDirectoryAbsolute = null;
 
-        public static string ModelsDirectoryAbsolute(this ModelsBuilderConfig modelsBuilderConfig, IHostingEnvironment hostingEnvironment)
+        public static string ModelsDirectoryAbsolute(this ModelsBuilderSettings modelsBuilderConfig, IHostingEnvironment hostingEnvironment)
         {
             if (_modelsDirectoryAbsolute is null)
             {

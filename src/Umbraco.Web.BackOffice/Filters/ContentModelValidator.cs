@@ -6,7 +6,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Umbraco.Core.Logging;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
@@ -22,14 +22,14 @@ namespace Umbraco.Web.BackOffice.Filters
     internal abstract class ContentModelValidator
     {
 
-        protected IWebSecurity WebSecurity { get; }
+        protected IBackofficeSecurity BackofficeSecurity { get; }
         public IPropertyValidationService PropertyValidationService { get; }
-        protected ILogger Logger { get; }
+        protected ILogger<ContentModelValidator> Logger { get; }
 
-        protected ContentModelValidator(ILogger logger, IWebSecurity webSecurity, IPropertyValidationService propertyValidationService)
+        protected ContentModelValidator(ILogger<ContentModelValidator> logger, IBackofficeSecurity backofficeSecurity, IPropertyValidationService propertyValidationService)
         {
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            WebSecurity = webSecurity ?? throw new ArgumentNullException(nameof(webSecurity));
+            BackofficeSecurity = backofficeSecurity ?? throw new ArgumentNullException(nameof(backofficeSecurity));
             PropertyValidationService = propertyValidationService ?? throw new ArgumentNullException(nameof(propertyValidationService));
         }
     }
@@ -52,11 +52,11 @@ namespace Umbraco.Web.BackOffice.Filters
         private readonly ILocalizedTextService _textService;
 
         protected ContentModelValidator(
-            ILogger logger,
-            IWebSecurity webSecurity,
+            ILogger<ContentModelValidator> logger,
+            IBackofficeSecurity backofficeSecurity,
             ILocalizedTextService textService,
             IPropertyValidationService propertyValidationService)
-            : base(logger, webSecurity, propertyValidationService)
+            : base(logger, backofficeSecurity, propertyValidationService)
         {
             _textService = textService ?? throw new ArgumentNullException(nameof(textService));
         }
@@ -144,7 +144,7 @@ namespace Umbraco.Web.BackOffice.Filters
                 {
                     var message = $"Could not find property editor \"{p.DataType.EditorAlias}\" for property with id {p.Id}.";
 
-                    Logger.Warn<ContentModelValidator>(message);
+                    Logger.LogWarning(message);
                     continue;
                 }
 

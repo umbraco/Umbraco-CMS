@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Core.HealthCheck.Checks.LiveEnvironment
@@ -13,8 +13,8 @@ namespace Umbraco.Core.HealthCheck.Checks.LiveEnvironment
     {
         private readonly HostingSettings _hostingSettings;
 
-        public CompilationDebugCheck(ILocalizedTextService textService, ILogger logger,IConfigurationService configurationService, IOptions<HostingSettings> hostingSettings)
-            : base(textService, logger, configurationService)
+        public CompilationDebugCheck(ILocalizedTextService textService, ILoggerFactory loggerFactory,IConfigurationService configurationService, IOptions<HostingSettings> hostingSettings)
+            : base(textService, loggerFactory, configurationService)
         {
             _hostingSettings = hostingSettings.Value;
         }

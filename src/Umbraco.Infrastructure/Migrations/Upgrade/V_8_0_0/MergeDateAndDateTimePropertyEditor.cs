@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.PropertyEditors;
@@ -40,7 +40,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error<DropDownPropertyEditorsMigration>(
+                    Logger.LogError(
                         ex,
                         "Invalid property editor configuration detected: \"{Configuration}\", cannot convert editor, values will be cleared",
                         dataType.Configuration);

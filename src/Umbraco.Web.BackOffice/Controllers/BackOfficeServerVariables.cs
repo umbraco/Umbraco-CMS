@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -11,11 +11,13 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
+using Umbraco.Core.Media;
 using Umbraco.Core.WebAssets;
 using Umbraco.Extensions;
 using Umbraco.Web.BackOffice.HealthCheck;
 using Umbraco.Web.BackOffice.Profiling;
 using Umbraco.Web.BackOffice.PropertyEditors;
+using Umbraco.Web.BackOffice.Routing;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Features;
@@ -42,6 +44,8 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly SecuritySettings _securitySettings;
         private readonly IRuntimeMinifier _runtimeMinifier;
         private readonly IAuthenticationSchemeProvider _authenticationSchemeProvider;
+        private readonly IImageUrlGenerator _imageUrlGenerator;
+        private readonly PreviewRoutes _previewRoutes;
 
         public BackOfficeServerVariables(
             LinkGenerator linkGenerator,
@@ -56,7 +60,9 @@ namespace Umbraco.Web.BackOffice.Controllers
             IOptions<RuntimeSettings> runtimeSettings,
             IOptions<SecuritySettings> securitySettings,
             IRuntimeMinifier runtimeMinifier,
-            IAuthenticationSchemeProvider authenticationSchemeProvider)
+            IAuthenticationSchemeProvider authenticationSchemeProvider,
+            IImageUrlGenerator imageUrlGenerator,
+            PreviewRoutes previewRoutes)
         {
             _linkGenerator = linkGenerator;
             _runtimeState = runtimeState;
@@ -71,6 +77,8 @@ namespace Umbraco.Web.BackOffice.Controllers
             _securitySettings = securitySettings.Value;
             _runtimeMinifier = runtimeMinifier;
             _authenticationSchemeProvider = authenticationSchemeProvider;
+            _imageUrlGenerator = imageUrlGenerator;
+            _previewRoutes = previewRoutes;
         }
 
         /// <summary>
@@ -82,7 +90,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             //this is the filter for the keys that we'll keep based on the full version of the server vars
             var keepOnlyKeys = new Dictionary<string, string[]>
             {
-                {"umbracoUrls", new[] {"authenticationApiBaseUrl", "serverVarsJs", "externalLoginsUrl", "currentUserApiBaseUrl"}},
+                {"umbracoUrls", new[] {"authenticationApiBaseUrl", "serverVarsJs", "externalLoginsUrl", "currentUserApiBaseUrl", "previewHubUrl"}},
                 {"umbracoSettings", new[] {"allowPasswordReset", "imageFileTypes", "maxFileSize", "loginBackgroundImage", "canSendRequiredEmail", "usernameIsEmail"}},
                 {"application", new[] {"applicationPath", "cacheBuster"}},
                 {"isDebuggingEnabled", new string[] { }},
@@ -354,6 +362,9 @@ namespace Umbraco.Web.BackOffice.Controllers
                             "elementTypeApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<ElementTypeController>(
                                 controller => controller.GetAll())
                         },
+                        {
+                            "previewHubUrl", _previewRoutes.GetPreviewHubRoute()
+                        },
                     }
                 },
                 {
@@ -364,7 +375,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                         {"appPluginsPath", _hostingEnvironment.ToAbsolute(Constants.SystemDirectories.AppPlugins).TrimEnd('/')},
                         {
                             "imageFileTypes",
-                            string.Join(",", _contentSettings.Imaging.ImageFileTypes)
+                            string.Join(",", _imageUrlGenerator.SupportedImageFileTypes)
                         },
                         {
                             "disallowedUploadFiles",

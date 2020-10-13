@@ -2,21 +2,18 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using Moq;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.IO;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
-using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.TestHelpers.Stubs;
@@ -44,18 +41,18 @@ namespace Umbraco.Tests.Services
         private DocumentRepository CreateDocumentRepository(IScopeProvider provider)
         {
             var accessor = (IScopeAccessor)provider;
-            var globalSettings = new GlobalSettingsBuilder().Build();
-            var tRepository = new TemplateRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger, TestObjects.GetFileSystemsMock(), IOHelper, ShortStringHelper);
-            var tagRepo = new TagRepository(accessor, AppCaches.Disabled, Logger);
+            var globalSettings = new GlobalSettings();
+            var tRepository = new TemplateRepository((IScopeAccessor) provider, AppCaches.Disabled, LoggerFactory.CreateLogger<TemplateRepository>(), TestObjects.GetFileSystemsMock(), IOHelper, ShortStringHelper);
+            var tagRepo = new TagRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<TagRepository>());
             var commonRepository = new ContentTypeCommonRepository(accessor, tRepository, AppCaches, ShortStringHelper);
-            var languageRepository = new LanguageRepository(accessor, AppCaches.Disabled, Logger, Microsoft.Extensions.Options.Options.Create(globalSettings));
-            var ctRepository = new ContentTypeRepository(accessor, AppCaches.Disabled, Logger, commonRepository, languageRepository, ShortStringHelper);
-            var relationTypeRepository = new RelationTypeRepository(accessor, AppCaches.Disabled, Logger);
+            var languageRepository = new LanguageRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<LanguageRepository>(), Microsoft.Extensions.Options.Options.Create(globalSettings));
+            var ctRepository = new ContentTypeRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<ContentTypeRepository>(), commonRepository, languageRepository, ShortStringHelper);
+            var relationTypeRepository = new RelationTypeRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<RelationTypeRepository>());
             var entityRepository = new EntityRepository(accessor);
-            var relationRepository = new RelationRepository(accessor, Logger, relationTypeRepository, entityRepository);
+            var relationRepository = new RelationRepository(accessor, LoggerFactory.CreateLogger<RelationRepository>(), relationTypeRepository, entityRepository);
             var propertyEditors = new Lazy<PropertyEditorCollection>(() => new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>())));
             var dataValueReferences = new DataValueReferenceFactoryCollection(Enumerable.Empty<IDataValueReferenceFactory>());
-            var repository = new DocumentRepository(accessor, AppCaches.Disabled, Logger, ctRepository, tRepository, tagRepo, languageRepository, relationRepository, relationTypeRepository, propertyEditors, dataValueReferences, DataTypeService);
+            var repository = new DocumentRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<DocumentRepository>(), LoggerFactory, ctRepository, tRepository, tagRepo, languageRepository, relationRepository, relationTypeRepository, propertyEditors, dataValueReferences, DataTypeService);
             return repository;
         }
 
@@ -67,9 +64,9 @@ namespace Umbraco.Tests.Services
 
         private static IProfilingLogger GetTestProfilingLogger()
         {
-            var logger = new DebugDiagnosticsLogger(new MessageTemplates());
+
             var profiler = new TestProfiler();
-            return new ProfilingLogger(logger, profiler);
+            return new ProfilingLogger(new NullLogger<ProfilingLogger>(), profiler);
         }
 
         [Test]
@@ -130,7 +127,7 @@ namespace Umbraco.Tests.Services
                     total.AddRange(ServiceContext.ContentService.GetPagedDescendants(content.Id, 0, int.MaxValue, out var _));
                 }
                 TestProfiler.Disable();
-                Current.Logger.Info<ContentServicePerformanceTest>("Returned {Total} items", total.Count);
+                Current.Logger.LogInformation("Returned {Total} items", total.Count);
             }
         }
 
@@ -180,7 +177,7 @@ namespace Umbraco.Tests.Services
             var pages = MockedContent.CreateTextpageContent(contentType, -1, 100);
             ServiceContext.ContentService.Save(pages, 0);
 
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateDocumentRepository(provider);
@@ -209,7 +206,7 @@ namespace Umbraco.Tests.Services
             var pages = MockedContent.CreateTextpageContent(contentType, -1, 1000);
             ServiceContext.ContentService.Save(pages, 0);
 
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateDocumentRepository(provider);
@@ -236,7 +233,7 @@ namespace Umbraco.Tests.Services
             var pages = MockedContent.CreateTextpageContent(contentType, -1, 100);
             ServiceContext.ContentService.Save(pages, 0);
 
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateDocumentRepository(provider);
@@ -266,7 +263,7 @@ namespace Umbraco.Tests.Services
             var pages = MockedContent.CreateTextpageContent(contentType, -1, 1000);
             ServiceContext.ContentService.Save(pages, 0);
 
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateDocumentRepository(provider);

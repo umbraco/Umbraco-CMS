@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
@@ -31,10 +32,10 @@ namespace Umbraco.Web.Common.Install
         private readonly InstallStatusTracker _installStatusTracker;
         private readonly IUmbracoApplicationLifetime _umbracoApplicationLifetime;
         private readonly InstallStepCollection _installSteps;
-        private readonly ILogger _logger;
+        private readonly ILogger<InstallApiController> _logger;
         private readonly IProfilingLogger _proflog;
 
-        public InstallApiController(DatabaseBuilder databaseBuilder, IProfilingLogger proflog,
+        public InstallApiController(DatabaseBuilder databaseBuilder, IProfilingLogger proflog, ILogger<InstallApiController> logger,
             InstallHelper installHelper, InstallStepCollection installSteps, InstallStatusTracker installStatusTracker,
             IUmbracoApplicationLifetime umbracoApplicationLifetime)
         {
@@ -44,7 +45,7 @@ namespace Umbraco.Web.Common.Install
             _installStatusTracker = installStatusTracker;
             _umbracoApplicationLifetime = umbracoApplicationLifetime;
             InstallHelper = installHelper;
-            _logger = _proflog;
+            _logger = logger;
         }
 
 
@@ -145,7 +146,7 @@ namespace Umbraco.Web.Common.Install
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error<InstallApiController>(ex, "An error occurred during installation step {Step}",
+                    _logger.LogError(ex, "An error occurred during installation step {Step}",
                         step.Name);
 
                     if (ex is TargetInvocationException && ex.InnerException != null)
@@ -258,7 +259,7 @@ namespace Umbraco.Web.Common.Install
             }
             catch (Exception ex)
             {
-                _logger.Error<InstallApiController>(ex, "Checking if step requires execution ({Step}) failed.",
+                _logger.LogError(ex, "Checking if step requires execution ({Step}) failed.",
                     step.Name);
                 throw;
             }
@@ -289,7 +290,7 @@ namespace Umbraco.Web.Common.Install
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error<InstallApiController>(ex, "Installation step {Step} failed.", step.Name);
+                    _logger.LogError(ex, "Installation step {Step} failed.", step.Name);
                     throw;
                 }
             }

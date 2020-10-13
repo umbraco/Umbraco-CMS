@@ -31,7 +31,7 @@ namespace Umbraco.Tests.Benchmarks
         {
             public Config()
             {
-                Add(new MemoryDiagnoser());
+                Add(MemoryDiagnoser.Default);
             }
         }
 

@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.IO;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.PostMigrations;
 using Umbraco.Core.Models;
 
@@ -51,7 +51,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                     }
                     catch (Exception ex)
                     {
-                        Logger.Error<DropDownPropertyEditorsMigration>(
+                        Logger.LogError(
                             ex, "Invalid configuration: \"{Configuration}\", cannot convert editor.",
                             dataType.Configuration);
 

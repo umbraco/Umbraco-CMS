@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Xml;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Events;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
@@ -44,9 +45,9 @@ namespace Umbraco.Tests.Scoping
 
         protected override void ComposeSettings()
         {
-            var contentSettings = new ContentSettingsBuilder().Build();
-            var globalSettings = new GlobalSettingsBuilder().Build();
-            var userPasswordConfigurationSettings = new UserPasswordConfigurationSettingsBuilder().Build();
+            var contentSettings = new ContentSettings();
+            var globalSettings = new GlobalSettings();
+            var userPasswordConfigurationSettings = new UserPasswordConfigurationSettings();
 
             Composition.Register(x => Microsoft.Extensions.Options.Options.Create(contentSettings));
             Composition.Register(x => Microsoft.Extensions.Options.Options.Create(globalSettings));
@@ -98,7 +99,7 @@ namespace Umbraco.Tests.Scoping
             var item = new Content("name", -1, contentType);
 
             // wire cache refresher
-            _distributedCacheBinder = new DistributedCacheBinder(new DistributedCache(Current.ServerMessenger, Current.CacheRefreshers), Mock.Of<IUmbracoContextFactory>(), Mock.Of<ILogger>());
+            _distributedCacheBinder = new DistributedCacheBinder(new DistributedCache(Current.ServerMessenger, Current.CacheRefreshers), Mock.Of<IUmbracoContextFactory>(), Mock.Of<ILogger<DistributedCacheBinder>>());
             _distributedCacheBinder.BindEvents(true);
 
             // check xml in context = "before"
@@ -211,7 +212,7 @@ namespace Umbraco.Tests.Scoping
             ServiceContext.ContentTypeService.Save(contentType);
 
             // wire cache refresher
-            _distributedCacheBinder = new DistributedCacheBinder(new DistributedCache(Current.ServerMessenger, Current.CacheRefreshers), Mock.Of<IUmbracoContextFactory>(), Mock.Of<ILogger>());
+            _distributedCacheBinder = new DistributedCacheBinder(new DistributedCache(Current.ServerMessenger, Current.CacheRefreshers), Mock.Of<IUmbracoContextFactory>(), Mock.Of<ILogger<DistributedCacheBinder>>());
             _distributedCacheBinder.BindEvents(true);
 
             // check xml in context = "before"

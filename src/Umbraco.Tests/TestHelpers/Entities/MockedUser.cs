@@ -1,8 +1,8 @@
-﻿using Moq;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using Moq;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Tests.Common.Builders;
 
 namespace Umbraco.Tests.TestHelpers.Entities
 {
@@ -24,7 +24,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
 
         internal static User CreateUser(string suffix = "")
         {
-            var globalSettings = new GlobalSettingsBuilder().Build();
+            var globalSettings = new GlobalSettings();
             var user = new User(globalSettings)
             {
                 Language = "en",
@@ -43,7 +43,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
         {
             var list = new List<IUser>();
 
-            var globalSettings = new GlobalSettingsBuilder().Build();
+            var globalSettings = new GlobalSettings();
             for (int i = 0; i < amount; i++)
             {
                 var name = "Member No-" + i;

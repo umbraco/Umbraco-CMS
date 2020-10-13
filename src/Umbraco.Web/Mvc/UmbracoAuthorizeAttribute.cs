@@ -3,6 +3,7 @@ using System.Web;
 using System.Web.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Security;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Security;
@@ -14,22 +15,22 @@ namespace Umbraco.Web.Mvc
     public sealed class UmbracoAuthorizeAttribute : AuthorizeAttribute
     {
         // see note in HttpInstallAuthorizeAttribute
-        private readonly IWebSecurity _webSecurity;
+        private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly IRuntimeState _runtimeState;
         private readonly string _redirectUrl;
 
         private IRuntimeState RuntimeState => _runtimeState ?? Current.RuntimeState;
 
-        private IWebSecurity WebSecurity => _webSecurity ?? Current.UmbracoContext.Security;
+        private IBackofficeSecurity BackofficeSecurity => _backofficeSecurityAccessor.BackofficeSecurity ?? Current.UmbracoContext.Security;
 
         /// <summary>
         /// THIS SHOULD BE ONLY USED FOR UNIT TESTS
         /// </summary>
-        /// <param name="webSecurity"></param>
+        /// <param name="backofficeSecurityAccessor"></param>
         /// <param name="runtimeState"></param>
-        public UmbracoAuthorizeAttribute(IWebSecurity webSecurity, IRuntimeState runtimeState)
+        public UmbracoAuthorizeAttribute(IBackofficeSecurityAccessor backofficeSecurityAccessor, IRuntimeState runtimeState)
         {
-            _webSecurity = webSecurity ?? throw new ArgumentNullException(nameof(webSecurity));
+            _backofficeSecurityAccessor = backofficeSecurityAccessor ?? throw new ArgumentNullException(nameof(backofficeSecurityAccessor));
             _runtimeState = runtimeState ?? throw new ArgumentNullException(nameof(runtimeState));
         }
 
@@ -75,7 +76,7 @@ namespace Umbraco.Web.Mvc
                 // otherwise we need to ensure that a user is logged in
                 return RuntimeState.Level == RuntimeLevel.Install
                     || RuntimeState.Level == RuntimeLevel.Upgrade
-                    || WebSecurity.ValidateCurrentUser();
+                    || BackofficeSecurity.ValidateCurrentUser();
             }
             catch (Exception)
             {

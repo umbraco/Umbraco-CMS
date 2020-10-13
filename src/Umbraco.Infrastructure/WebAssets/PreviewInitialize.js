@@ -8,7 +8,6 @@
     'js/umbraco.services.js',
     'js/umbraco.interceptors.js',
     'ServerVariables',
-    'lib/signalr/jquery.signalR.js',
-    'BackOffice/signalr/hubs',
+    'lib/signalr/signalr.min.js',
     'js/umbraco.preview.js'
 ]

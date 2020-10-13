@@ -5,8 +5,8 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Strings;
 using Umbraco.Web.Models.ContentEditing;
@@ -18,6 +18,7 @@ using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Security;
 using Umbraco.Core;
 using Umbraco.Core.Mapping;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -32,8 +33,8 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly ParameterEditorCollection _parameterEditorCollection;
         private readonly IMacroService _macroService;
         private readonly IShortStringHelper _shortStringHelper;
-        private readonly IWebSecurity _webSecurity;
-        private readonly ILogger _logger;
+        private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
+        private readonly ILogger<MacrosController> _logger;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly UmbracoMapper _umbracoMapper;
 
@@ -41,8 +42,8 @@ namespace Umbraco.Web.BackOffice.Controllers
             ParameterEditorCollection parameterEditorCollection,
             IMacroService macroService,
             IShortStringHelper shortStringHelper,
-            IWebSecurity webSecurity,
-            ILogger logger,
+            IBackofficeSecurityAccessor backofficeSecurityAccessor,
+            ILogger<MacrosController> logger,
             IHostingEnvironment hostingEnvironment,
             UmbracoMapper umbracoMapper
             )
@@ -50,7 +51,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _parameterEditorCollection = parameterEditorCollection ?? throw new ArgumentNullException(nameof(parameterEditorCollection));
             _macroService = macroService ?? throw new ArgumentNullException(nameof(macroService));
             _shortStringHelper = shortStringHelper ?? throw new ArgumentNullException(nameof(shortStringHelper));
-            _webSecurity = webSecurity ?? throw new ArgumentNullException(nameof(webSecurity));
+            _backofficeSecurityAccessor = backofficeSecurityAccessor ?? throw new ArgumentNullException(nameof(backofficeSecurityAccessor));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
             _umbracoMapper = umbracoMapper ?? throw new ArgumentNullException(nameof(umbracoMapper));
@@ -95,14 +96,14 @@ namespace Umbraco.Web.BackOffice.Controllers
                     MacroSource = string.Empty
                 };
 
-                _macroService.Save(macro, _webSecurity.CurrentUser.Id);
+                _macroService.Save(macro, _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.Id);
 
                 return macro.Id;
             }
             catch (Exception exception)
             {
                 const string errorMessage = "Error creating macro";
-                _logger.Error<MacrosController>(exception, errorMessage);
+                _logger.LogError(exception, errorMessage);
                 throw HttpResponseException.CreateNotificationValidationErrorResponse(errorMessage);
             }
         }
@@ -215,7 +216,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             try
             {
-                _macroService.Save(macro, _webSecurity.CurrentUser.Id);
+                _macroService.Save(macro, _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.Id);
 
                 macroDisplay.Notifications.Clear();
 
@@ -226,7 +227,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             catch (Exception exception)
             {
                 const string errorMessage = "Error creating macro";
-                _logger.Error<MacrosController>(exception, errorMessage);
+                _logger.LogError(exception, errorMessage);
                 throw HttpResponseException.CreateNotificationValidationErrorResponse(errorMessage);
             }
         }

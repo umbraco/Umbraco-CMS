@@ -11,6 +11,7 @@ using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Configuration.Models;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
 
 namespace Umbraco.Examine
 {
@@ -25,6 +26,7 @@ namespace Umbraco.Examine
         public UmbracoIndexesCreator(
             ITypeFinder typeFinder,
             IProfilingLogger profilingLogger,
+            ILoggerFactory loggerFactory,
             ILocalizationService languageService,
             IPublicAccessService publicAccessService,
             IMemberService memberService,
@@ -35,6 +37,7 @@ namespace Umbraco.Examine
             ILuceneDirectoryFactory directoryFactory) : base(typeFinder, hostingEnvironment, settings)
         {
             ProfilingLogger = profilingLogger ?? throw new System.ArgumentNullException(nameof(profilingLogger));
+            LoggerFactory = loggerFactory;
             LanguageService = languageService ?? throw new System.ArgumentNullException(nameof(languageService));
             PublicAccessService = publicAccessService ?? throw new System.ArgumentNullException(nameof(publicAccessService));
             MemberService = memberService ?? throw new System.ArgumentNullException(nameof(memberService));
@@ -45,6 +48,7 @@ namespace Umbraco.Examine
         }
 
         protected IProfilingLogger ProfilingLogger { get; }
+        protected ILoggerFactory LoggerFactory { get; }
         protected IHostingEnvironment HostingEnvironment { get; }
         protected IRuntimeState RuntimeState { get; }
         protected ILuceneDirectoryFactory DirectoryFactory { get; }
@@ -75,6 +79,8 @@ namespace Umbraco.Examine
                 new UmbracoFieldDefinitionCollection(),
                 new CultureInvariantWhitespaceAnalyzer(),
                 ProfilingLogger,
+                LoggerFactory.CreateLogger<UmbracoContentIndex>(),
+                LoggerFactory,
                 HostingEnvironment,
                 RuntimeState,
                 LanguageService,
@@ -91,6 +97,8 @@ namespace Umbraco.Examine
                 new UmbracoFieldDefinitionCollection(),
                 new StandardAnalyzer(Lucene.Net.Util.Version.LUCENE_30),
                 ProfilingLogger,
+                LoggerFactory.CreateLogger<UmbracoContentIndex>(),
+                LoggerFactory,
                 HostingEnvironment,
                 RuntimeState,
                 LanguageService,
@@ -106,6 +114,8 @@ namespace Umbraco.Examine
                 DirectoryFactory.CreateDirectory(Constants.UmbracoIndexes.MembersIndexPath),
                 new CultureInvariantWhitespaceAnalyzer(),
                 ProfilingLogger,
+                LoggerFactory.CreateLogger<UmbracoMemberIndex>(),
+                LoggerFactory,
                 HostingEnvironment,
                 RuntimeState,
                 UmbracoIndexConfig.GetMemberValueSetValidator()

@@ -5,11 +5,13 @@ using System.Web;
 using System.Web.Mvc;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
 using Microsoft.Owin.Security;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Web.Mvc;
 using Umbraco.Core.Services;
@@ -37,6 +39,8 @@ namespace Umbraco.Web.Editors
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly RuntimeSettings _runtimeSettings;
         private readonly SecuritySettings _securitySettings;
+        private readonly IIconService _iconService;
+        private readonly ILogger<BackOfficeController> _logger;
 
         public BackOfficeController(
             UmbracoFeatures features,
@@ -45,12 +49,14 @@ namespace Umbraco.Web.Editors
             ServiceContext services,
             AppCaches appCaches,
             IProfilingLogger profilingLogger,
+            ILoggerFactory loggerFactory,
             IUmbracoVersion umbracoVersion,
             IOptions<ContentSettings> contentSettings,
             IHostingEnvironment hostingEnvironment,
             IOptions<RuntimeSettings> settings,
-            IOptions<SecuritySettings> securitySettings)
-            : base(globalSettings, umbracoContextAccessor, services, appCaches, profilingLogger)
+            IOptions<SecuritySettings> securitySettings,
+            IIconService iconService)
+            : base(globalSettings, umbracoContextAccessor, services, appCaches, profilingLogger, loggerFactory)
 
         {
             _features = features;
@@ -59,6 +65,8 @@ namespace Umbraco.Web.Editors
             _hostingEnvironment = hostingEnvironment;
             _runtimeSettings = settings.Value;
             _securitySettings = securitySettings.Value;
+            _iconService = iconService;
+            _logger = loggerFactory.CreateLogger<BackOfficeController>();
         }
 
         protected BackOfficeSignInManager SignInManager => _signInManager ?? (_signInManager = OwinContext.GetBackOfficeSignInManager());
@@ -176,7 +184,7 @@ namespace Umbraco.Web.Editors
             var authType = OwinContext.Authentication.GetExternalAuthenticationTypes().FirstOrDefault(x => x.AuthenticationType == loginInfo.Login.LoginProvider);
             if (authType == null)
             {
-                Logger.Warn<BackOfficeController>("Could not find external authentication provider registered: {LoginProvider}", loginInfo.Login.LoginProvider);
+                _logger.LogWarning("Could not find external authentication provider registered: {LoginProvider}", loginInfo.Login.LoginProvider);
             }
             else
             {
@@ -199,7 +207,7 @@ namespace Umbraco.Web.Editors
                     shouldSignIn = autoLinkOptions.OnExternalLogin(user, loginInfo);
                     if (shouldSignIn == false)
                     {
-                        Logger.Warn<BackOfficeController>("The AutoLinkOptions of the external authentication provider '{LoginProvider}' have refused the login based on the OnExternalLogin method. Affected user id: '{UserId}'", loginInfo.Login.LoginProvider, user.Id);
+                        _logger.LogWarning("The AutoLinkOptions of the external authentication provider '{LoginProvider}' have refused the login based on the OnExternalLogin method. Affected user id: '{UserId}'", loginInfo.Login.LoginProvider, user.Id);
                     }
                 }
 

@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Data.Common;
 using System.Threading;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NPoco;
 using NPoco.FluentMappings;
 using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.FaultHandling;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -29,7 +29,8 @@ namespace Umbraco.Core.Persistence
         private readonly IDbProviderFactoryCreator _dbProviderFactoryCreator;
         private readonly GlobalSettings _globalSettings;
         private readonly Lazy<IMapperCollection> _mappers;
-        private readonly ILogger _logger;
+        private readonly ILogger<UmbracoDatabaseFactory> _logger;
+        private readonly ILoggerFactory _loggerFactory;
 
         private object _lock = new object();
 
@@ -69,8 +70,8 @@ namespace Umbraco.Core.Persistence
         /// Initializes a new instance of the <see cref="UmbracoDatabaseFactory"/>.
         /// </summary>
         /// <remarks>Used by core runtime.</remarks>
-        public UmbracoDatabaseFactory(ILogger logger, IOptions<GlobalSettings> globalSettings, IOptions<ConnectionStrings> connectionStrings, Lazy<IMapperCollection> mappers,IDbProviderFactoryCreator dbProviderFactoryCreator)
-            : this(logger, globalSettings.Value, connectionStrings.Value, mappers, dbProviderFactoryCreator)
+        public UmbracoDatabaseFactory(ILogger<UmbracoDatabaseFactory> logger, ILoggerFactory loggerFactory, IOptions<GlobalSettings> globalSettings, IOptions<ConnectionStrings> connectionStrings, Lazy<IMapperCollection> mappers,IDbProviderFactoryCreator dbProviderFactoryCreator)
+            : this(logger, loggerFactory, globalSettings.Value, connectionStrings.Value, mappers, dbProviderFactoryCreator)
         {
 
         }
@@ -79,19 +80,20 @@ namespace Umbraco.Core.Persistence
         /// Initializes a new instance of the <see cref="UmbracoDatabaseFactory"/>.
         /// </summary>
         /// <remarks>Used by the other ctor and in tests.</remarks>
-        public UmbracoDatabaseFactory(ILogger logger, GlobalSettings globalSettings, ConnectionStrings connectionStrings,  Lazy<IMapperCollection> mappers, IDbProviderFactoryCreator dbProviderFactoryCreator)
+        public UmbracoDatabaseFactory(ILogger<UmbracoDatabaseFactory> logger, ILoggerFactory loggerFactory, GlobalSettings globalSettings, ConnectionStrings connectionStrings,  Lazy<IMapperCollection> mappers, IDbProviderFactoryCreator dbProviderFactoryCreator)
         {
 
             _globalSettings = globalSettings;
             _mappers = mappers ?? throw new ArgumentNullException(nameof(mappers));
             _dbProviderFactoryCreator = dbProviderFactoryCreator  ?? throw new ArgumentNullException(nameof(dbProviderFactoryCreator));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _loggerFactory = loggerFactory;
 
             var settings = connectionStrings.UmbracoConnectionString;
 
             if (settings == null)
             {
-                logger.Debug<UmbracoDatabaseFactory>("Missing connection string, defer configuration.");
+                logger.LogDebug("Missing connection string, defer configuration.");
                 return; // not configured
             }
 
@@ -101,7 +103,7 @@ namespace Umbraco.Core.Persistence
             var providerName = settings.ProviderName;
             if (string.IsNullOrWhiteSpace(connectionString) || string.IsNullOrWhiteSpace(providerName))
             {
-                logger.Debug<UmbracoDatabaseFactory>("Empty connection string or provider name, defer configuration.");
+                logger.LogDebug("Empty connection string or provider name, defer configuration.");
                 return; // not configured
             }
 
@@ -112,15 +114,16 @@ namespace Umbraco.Core.Persistence
         /// Initializes a new instance of the <see cref="UmbracoDatabaseFactory"/>.
         /// </summary>
         /// <remarks>Used in tests.</remarks>
-        public UmbracoDatabaseFactory(ILogger logger, string connectionString, string providerName, Lazy<IMapperCollection> mappers, IDbProviderFactoryCreator dbProviderFactoryCreator)
+        public UmbracoDatabaseFactory(ILogger<UmbracoDatabaseFactory> logger, ILoggerFactory loggerFactory, string connectionString, string providerName, Lazy<IMapperCollection> mappers, IDbProviderFactoryCreator dbProviderFactoryCreator)
         {
             _mappers = mappers ?? throw new ArgumentNullException(nameof(mappers));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _loggerFactory = loggerFactory;
             _dbProviderFactoryCreator = dbProviderFactoryCreator ?? throw new ArgumentNullException(nameof(dbProviderFactoryCreator));
 
             if (string.IsNullOrWhiteSpace(connectionString) || string.IsNullOrWhiteSpace(providerName))
             {
-                logger.Debug<UmbracoDatabaseFactory>("Missing connection string or provider name, defer configuration.");
+                logger.LogDebug("Missing connection string or provider name, defer configuration.");
                 return; // not configured
             }
 
@@ -185,7 +188,7 @@ namespace Umbraco.Core.Persistence
                 // else leave unchanged
             }
 
-            _logger.Debug<UmbracoDatabaseFactory>("SqlServer {SqlServerVersion}, DatabaseType is {DatabaseType} ({Source}).",
+            _logger.LogDebug("SqlServer {SqlServerVersion}, DatabaseType is {DatabaseType} ({Source}).",
                 versionName, _databaseType, fromSettings ? "settings" : "detected");
         }
 
@@ -242,7 +245,7 @@ namespace Umbraco.Core.Persistence
 
         private SqlContext Initialize()
         {
-            _logger.Debug<UmbracoDatabaseFactory>("Initializing.");
+            _logger.LogDebug("Initializing.");
 
             if (ConnectionString.IsNullOrWhiteSpace()) throw new InvalidOperationException("The factory has not been configured with a proper connection string.");
             if (_providerName.IsNullOrWhiteSpace()) throw new InvalidOperationException("The factory has not been configured with a proper provider name.");
@@ -287,7 +290,7 @@ namespace Umbraco.Core.Persistence
             if (_npocoDatabaseFactory == null)
                 throw new NullReferenceException("The call to UmbracoDatabaseFactory.Config yielded a null UmbracoDatabaseFactory instance.");
 
-            _logger.Debug<UmbracoDatabaseFactory>("Initialized.");
+            _logger.LogDebug("Initialized.");
 
             return new SqlContext(_sqlSyntax, _databaseType, _pocoDataFactory, _mappers);
         }
@@ -309,7 +312,7 @@ namespace Umbraco.Core.Persistence
         // method used by NPoco's UmbracoDatabaseFactory to actually create the database instance
         private UmbracoDatabase CreateDatabaseInstance()
         {
-            return new UmbracoDatabase(ConnectionString, SqlContext, DbProviderFactory, _logger, _bulkSqlInsertProvider, _connectionRetryPolicy, _commandRetryPolicy);
+            return new UmbracoDatabase(ConnectionString, SqlContext, DbProviderFactory, _loggerFactory.CreateLogger<UmbracoDatabase>(), _bulkSqlInsertProvider, _connectionRetryPolicy, _commandRetryPolicy);
         }
 
         protected override void DisposeResources()

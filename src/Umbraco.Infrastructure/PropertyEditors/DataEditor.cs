@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.Serialization;
+using Microsoft.Extensions.Logging;
 using Umbraco.Composing;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 
@@ -27,9 +27,9 @@ namespace Umbraco.Core.PropertyEditors
         /// <summary>
         /// Initializes a new instance of the <see cref="DataEditor"/> class.
         /// </summary>
-        public DataEditor(ILogger logger, IDataTypeService dataTypeService, ILocalizationService localizationService, ILocalizedTextService localizedTextService, IShortStringHelper shortStringHelper, EditorType type = EditorType.PropertyValue)
+        public DataEditor(ILoggerFactory loggerFactory, IDataTypeService dataTypeService, ILocalizationService localizationService, ILocalizedTextService localizedTextService, IShortStringHelper shortStringHelper, EditorType type = EditorType.PropertyValue)
         {
-            Logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            LoggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
             DataTypeService = dataTypeService ?? throw new ArgumentNullException(nameof(dataTypeService));
             LocalizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
             LocalizedTextService = localizedTextService  ?? throw new ArgumentNullException(nameof(localizedTextService));
@@ -61,12 +61,8 @@ namespace Umbraco.Core.PropertyEditors
         protected IShortStringHelper ShortStringHelper { get; }
         protected ILocalizedTextService LocalizedTextService { get; }
         protected ILocalizationService LocalizationService { get; }
+        protected ILoggerFactory LoggerFactory { get; }
         protected IDataTypeService DataTypeService { get; }
-
-        /// <summary>
-        /// Gets a logger.
-        /// </summary>
-        protected ILogger Logger { get; }
 
         /// <inheritdoc />
         [DataMember(Name = "alias", IsRequired = true)]

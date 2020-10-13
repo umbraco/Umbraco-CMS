@@ -10,10 +10,10 @@ namespace Umbraco.ModelsBuilder.Embedded
 {
     public sealed class ModelsGenerationError
     {
-        private readonly ModelsBuilderConfig _config;
+        private readonly ModelsBuilderSettings _config;
         private readonly IHostingEnvironment _hostingEnvironment;
 
-        public ModelsGenerationError(IOptions<ModelsBuilderConfig> config, IHostingEnvironment hostingEnvironment)
+        public ModelsGenerationError(IOptions<ModelsBuilderSettings> config, IHostingEnvironment hostingEnvironment)
         {
             _config = config.Value;
             _hostingEnvironment = hostingEnvironment;

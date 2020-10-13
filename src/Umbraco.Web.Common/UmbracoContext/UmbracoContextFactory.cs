@@ -7,6 +7,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.Common.Security;
 using Umbraco.Web.PublishedCache;
@@ -30,7 +31,7 @@ namespace Umbraco.Web
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ICookieManager _cookieManager;
         private readonly IRequestAccessor _requestAccessor;
-        private readonly IWebSecurity _webSecurity;
+        private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly UriUtility _uriUtility;
 
         /// <summary>
@@ -48,7 +49,7 @@ namespace Umbraco.Web
             IHttpContextAccessor httpContextAccessor,
             ICookieManager cookieManager,
             IRequestAccessor requestAccessor,
-             IWebSecurity webSecurity)
+             IBackofficeSecurityAccessor backofficeSecurityAccessor)
         {
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
             _publishedSnapshotService = publishedSnapshotService ?? throw new ArgumentNullException(nameof(publishedSnapshotService));
@@ -61,7 +62,7 @@ namespace Umbraco.Web
             _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
             _cookieManager = cookieManager ?? throw new ArgumentNullException(nameof(cookieManager));
             _requestAccessor = requestAccessor ?? throw new ArgumentNullException(nameof(requestAccessor));
-            _webSecurity = webSecurity ?? throw new ArgumentNullException(nameof(webSecurity));
+            _backofficeSecurityAccessor = backofficeSecurityAccessor ?? throw new ArgumentNullException(nameof(backofficeSecurityAccessor));
         }
 
         private IUmbracoContext CreateUmbracoContext()
@@ -79,7 +80,7 @@ namespace Umbraco.Web
 
             return new UmbracoContext(
                 _publishedSnapshotService,
-                _webSecurity,
+                _backofficeSecurityAccessor.BackofficeSecurity,
                 _globalSettings,
                 _hostingEnvironment,
                 _variationContextAccessor,
@@ -94,7 +95,6 @@ namespace Umbraco.Web
             var currentUmbracoContext = _umbracoContextAccessor.UmbracoContext;
             if (currentUmbracoContext != null)
                 return new UmbracoContextReference(currentUmbracoContext, false, _umbracoContextAccessor);
-
 
             var umbracoContext = CreateUmbracoContext();
             _umbracoContextAccessor.UmbracoContext = umbracoContext;

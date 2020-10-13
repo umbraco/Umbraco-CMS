@@ -1,5 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 using System.Web;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
@@ -18,7 +19,7 @@ namespace Umbraco.Web
     /// </summary>
     public class UmbracoApplication : UmbracoApplicationBase
     {
-        protected override IRuntime GetRuntime(GlobalSettings globalSettings, ConnectionStrings connectionStrings, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)
+        protected override IRuntime GetRuntime(GlobalSettings globalSettings, ConnectionStrings connectionStrings, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, ILoggerFactory loggerFactory, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)
         {
             var dbProviderFactoryCreator = new UmbracoDbProviderFactoryCreator();
 
@@ -28,10 +29,10 @@ namespace Umbraco.Web
 
             var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
             var mainDomLock = appSettingMainDomLock == "SqlMainDomLock" || isWindows == false
-                ? (IMainDomLock)new SqlMainDomLock(logger, globalSettings, connectionStrings, dbProviderFactoryCreator, hostingEnvironment)
-                : new MainDomSemaphoreLock(logger, hostingEnvironment);
+                ? (IMainDomLock)new SqlMainDomLock(loggerFactory.CreateLogger<SqlMainDomLock>(), loggerFactory, globalSettings, connectionStrings, dbProviderFactoryCreator, hostingEnvironment)
+                : new MainDomSemaphoreLock(loggerFactory.CreateLogger<MainDomSemaphoreLock>(), hostingEnvironment);
 
-            var mainDom = new MainDom(logger, mainDomLock);
+            var mainDom = new MainDom(loggerFactory.CreateLogger<MainDom>(), mainDomLock);
 
             var requestCache = new HttpRequestAppCache(() => HttpContext.Current != null ? HttpContext.Current.Items : null);
             var appCaches = new AppCaches(
@@ -40,7 +41,7 @@ namespace Umbraco.Web
                 new IsolatedCaches(type => new DeepCloneAppCache(new ObjectCacheAppCache())));
 
             var umbracoBootPermissionChecker = new AspNetUmbracoBootPermissionChecker();
-            return new CoreRuntime(globalSettings, connectionStrings,umbracoVersion, ioHelper, logger, profiler, umbracoBootPermissionChecker, hostingEnvironment, backOfficeInfo, dbProviderFactoryCreator, mainDom,
+            return new CoreRuntime(globalSettings, connectionStrings,umbracoVersion, ioHelper, loggerFactory, profiler, umbracoBootPermissionChecker, hostingEnvironment, backOfficeInfo, dbProviderFactoryCreator, mainDom,
                 GetTypeFinder(hostingEnvironment, logger, profiler), appCaches);
         }
 

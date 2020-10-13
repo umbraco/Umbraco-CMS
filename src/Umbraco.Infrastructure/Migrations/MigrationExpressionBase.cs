@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using Microsoft.Extensions.Logging;
 using NPoco;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 
@@ -55,7 +55,7 @@ namespace Umbraco.Core.Migrations
 
             if (string.IsNullOrWhiteSpace(sql))
             {
-                Logger.Info(GetType(), "SQL [{ContextIndex}]: <empty>", Context.Index);
+                Logger.LogInformation("SQL [{ContextIndex}]: <empty>", Context.Index);
             }
             else
             {
@@ -96,11 +96,11 @@ namespace Umbraco.Core.Migrations
 
             if (sql == null)
             {
-                Logger.Info(GetType(), $"SQL [{Context.Index}]: <empty>");
+                Logger.LogInformation($"SQL [{Context.Index}]: <empty>");
             }
             else
             {
-                Logger.Info(GetType(), $"SQL [{Context.Index}]: {sql.ToText()}");
+                Logger.LogInformation($"SQL [{Context.Index}]: {sql.ToText()}");
                 Database.Execute(sql);
             }
 
@@ -116,7 +116,7 @@ namespace Umbraco.Core.Migrations
         private void ExecuteStatement(StringBuilder stmtBuilder)
         {
             var stmt = stmtBuilder.ToString();
-            Logger.Info(GetType(), "SQL [{ContextIndex}]: {Sql}", Context.Index, stmt);
+            Logger.LogInformation("SQL [{ContextIndex}]: {Sql}", Context.Index, stmt);
             Database.Execute(stmt);
             stmtBuilder.Clear();
         }

@@ -23,44 +23,45 @@
                   the latter would pick anything below 3.0.0 and that includes prereleases such as 3.0.0-alpha, and we do
                   not want this to happen as the alpha of the next major is, really, the next major already.
                 -->
-                <dependency id="Microsoft.Extensions.Configuration" version="[3.1.2,3.999999)" />
-                <dependency id="Microsoft.Extensions.Configuration.Binder" version="[3.1.2,3.999999)" />
-                <dependency id="Microsoft.Extensions.Configuration.Json" version="[3.1.2,3.999999)" />
+                <dependency id="Microsoft.Extensions.Configuration" version="[3.1.8,3.999999)" />
+                <dependency id="Microsoft.Extensions.Configuration.Binder" version="[3.1.8,3.999999)" />
+                <dependency id="Microsoft.Extensions.Configuration.Json" version="[3.1.8,3.999999)" />
                 <dependency id="System.Configuration.ConfigurationManager" version="[4.7.0,4.999999)" />
                 <dependency id="System.ComponentModel.Annotations" version="[4.7.0,4.999999)" />
-                <dependency id="System.Reflection.Emit.Lightweight" version="[4.3.0,4.999999)" />
-                <dependency id="System.Runtime.Caching" version="[4.6.0,4.999999)" />
-                <dependency id="HtmlAgilityPack" version="[1.8.14,1.999999)" />
-                <dependency id="LightInject" version="[6.3.2,6.999999)" />
+                <dependency id="System.Reflection.Emit.Lightweight" version="[4.7.0,4.999999)" />
+                <dependency id="System.Runtime.Caching" version="[4.7.0,4.999999)" />
+                <dependency id="HtmlAgilityPack" version="[1.11.24,1.999999)" />
+                <dependency id="LightInject" version="[6.3.4,6.999999)" />
                 <dependency id="LightInject.Annotation" version="[1.1.0,1.999999)" />
-                <dependency id="LightInject.Microsoft.DependencyInjection" version="[3.3.0,3.999999)" />
-                <dependency id="LightInject.Microsoft.Hosting" version="[1.2.0,1.999999)" />
-                <dependency id="MailKit" version="[2.6.0,2.999999)" />
+                <dependency id="LightInject.Microsoft.DependencyInjection" version="[3.3.1,3.999999)" />
+                <dependency id="LightInject.Microsoft.Hosting" version="[1.2.1,1.999999)" />
+                <dependency id="MailKit" version="[2.9.0,2.999999)" />
                 <dependency id="Markdown" version="[2.2.1,2.999999)" />
                 <dependency id="Microsoft.CSharp" version="[4.7.0,4.999999)" />
-                <dependency id="Microsoft.Extensions.DependencyInjection" version="[3.1.2,3.999999)" />
-                <dependency id="Microsoft.Extensions.Configuration.Abstractions" version="[3.1.2,3.999999)" />
-                <dependency id="Microsoft.Extensions.Identity.Stores" version="[3.1.2,3.999999)" />
-                <dependency id="MiniProfiler.Shared" version="[4.1.0,4.999999)" />
+                <dependency id="Microsoft.Extensions.DependencyInjection" version="[3.1.8,3.999999)" />
+                <dependency id="Microsoft.Extensions.Configuration.Abstractions" version="[3.1.8,3.999999)" />
+                <dependency id="Microsoft.Extensions.Identity.Stores" version="[3.1.8,3.999999)" />
+                <dependency id="MiniProfiler.Shared" version="[4.2.1,4.999999)" />
                 <dependency id="Newtonsoft.Json" version="[12.0.3,12.999999)" />
                 <dependency id="NPoco" version="[4.0.2,4.999999)" />
-                <dependency id="Serilog" version="[2.9.0,2.999999)" />
+                <dependency id="Serilog" version="[2.10.0,2.999999)" />
                 <dependency id="Serilog.Enrichers.Process" version="[2.0.1,2.999999)" />
                 <dependency id="Serilog.Enrichers.Thread" version="[3.1.0,3.999999)" />
-                <dependency id="Serilog.Filters.Expressions" version="[2.0.0,2.999999)" />
+                <dependency id="Serilog.Extensions.Hosting" version="[3.1.0,3.999999)" />
+                <dependency id="Serilog.Filters.Expressions" version="[2.1.0,2.999999)" />
                 <dependency id="Serilog.Formatting.Compact" version="[1.1.0,1.999999)" />
                 <dependency id="Serilog.Formatting.Compact.Reader" version="[1.0.3,1.999999)" />
                 <dependency id="Serilog.Settings.AppSettings" version="[2.2.2,2.999999)" />
                 <dependency id="Serilog.Sinks.Async" version="[1.4.0,1.999999)" />
                 <dependency id="Serilog.Sinks.File" version="[4.1.0,4.999999)" />
-                <dependency id="Serilog.Sinks.Map" version="[1.0.0,1.999999)" />
-                <dependency id="System.Data.SqlClient" version="[4.8.0,4.999999)" />
+                <dependency id="Serilog.Sinks.Map" version="[1.0.1,1.999999)" />
+                <dependency id="System.Data.SqlClient" version="[4.8.2,4.999999)" />
                 <dependency id="System.Drawing.Common" version="[4.7.0,4.999999)" />
                 <dependency id="System.IO.FileSystem.AccessControl" version="[4.7.0,4.999999)" />
-                <dependency id="System.Threading.Tasks.Dataflow" version="[4.9.0,4.999999)" />
+                <dependency id="System.Threading.Tasks.Dataflow" version="[4.11.1,4.999999)" />
                 <dependency id="Examine.Core" version="[2.0.0-alpha.20200128.15,2.999999)" />
                 <dependency id="CSharpTest.Net.Collections-NetStd2" version="[14.906.1403.1084,14.999999)" />
-                <dependency id="SecurityCodeScan" version="[3.4.0,3.999999)" />
+                <dependency id="SecurityCodeScan" version="[3.5.3,3.999999)" />
             </group>
 
         </dependencies>

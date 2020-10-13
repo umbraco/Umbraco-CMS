@@ -1,11 +1,12 @@
 ﻿using System;
 using Examine;
+using Microsoft.Extensions.Options;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Composing.CompositionExtensions;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Grid;
-using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Dashboards;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Events;
@@ -18,7 +19,6 @@ using Umbraco.Core.Migrations;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Migrations.PostMigrations;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Templates;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.Validators;
@@ -29,6 +29,7 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
+using Umbraco.Core.Templates;
 using Umbraco.Examine;
 using Umbraco.Infrastructure.Examine;
 using Umbraco.Infrastructure.Media;
@@ -41,6 +42,7 @@ using Umbraco.Web.Features;
 using Umbraco.Web.HealthCheck;
 using Umbraco.Web.HealthCheck.NotificationMethods;
 using Umbraco.Web.Install;
+using Umbraco.Web.Media;
 using Umbraco.Web.Media.EmbedProviders;
 using Umbraco.Web.Migrations.PostMigrations;
 using Umbraco.Web.Models.PublishedContent;
@@ -55,8 +57,8 @@ using Umbraco.Web.Templates;
 using Umbraco.Web.Trees;
 using IntegerValidator = Umbraco.Core.PropertyEditors.Validators.IntegerValidator;
 using TextStringValueConverter = Umbraco.Core.PropertyEditors.ValueConverters.TextStringValueConverter;
-using Umbraco.Core.Configuration.Models;
-using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
+using Umbraco.Core.Configuration.HealthChecks;
 using Umbraco.Core.HealthCheck;
 using Umbraco.Core.HealthCheck.Checks;
 
@@ -149,6 +151,7 @@ namespace Umbraco.Core.Runtime
                     factory.GetInstance<IScopeProvider>(),
                     factory.GetInstance<ISqlContext>(),
                     factory.GetInstance<IProfilingLogger>(),
+                    factory.GetInstance<ILogger<DatabaseServerMessenger>>(),
                     factory.GetInstance<IServerRegistrar>(),
                     true, new DatabaseServerMessengerOptions(),
                     factory.GetInstance<IHostingEnvironment>(),
@@ -206,12 +209,6 @@ namespace Umbraco.Core.Runtime
             composition.RegisterUnique<IConfigManipulator, JsonConfigManipulator>();
             composition.RegisterUnique<IConfigurationService, ConfigurationService>();
             
-            // register the http context and umbraco context accessors
-            // we *should* use the HttpContextUmbracoContextAccessor, however there are cases when
-            // we have no http context, eg when booting Umbraco or in background threads, so instead
-            // let's use an hybrid accessor that can fall back to a ThreadStatic context.
-            composition.RegisterUnique<IUmbracoContextAccessor, HybridUmbracoContextAccessor>();
-
             // register the umbraco context factory
             // composition.RegisterUnique<IUmbracoContextFactory, UmbracoContextFactory>();
             composition.RegisterUnique<IPublishedUrlProvider, UrlProvider>();
@@ -354,7 +351,6 @@ namespace Umbraco.Core.Runtime
                 return new PublishedContentQuery(umbCtx.UmbracoContext.PublishedSnapshot, factory.GetInstance<IVariationContextAccessor>(), factory.GetInstance<IExamineManager>());
             }, Lifetime.Request);
 
-
             composition.RegisterUnique<IPublishedUrlProvider, UrlProvider>();
 
             // register the http context and umbraco context accessors
@@ -373,6 +369,8 @@ namespace Umbraco.Core.Runtime
             // Register noop versions for examine to be overridden by examine
             composition.RegisterUnique<IUmbracoIndexesCreator, NoopUmbracoIndexesCreator>();
             composition.RegisterUnique<IBackOfficeExamineSearcher, NoopBackOfficeExamineSearcher>();
+
+            composition.RegisterUnique<UploadAutoFillProperties>();
         }
     }
 }

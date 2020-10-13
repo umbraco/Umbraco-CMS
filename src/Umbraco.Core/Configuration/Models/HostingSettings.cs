@@ -1,4 +1,6 @@
-﻿namespace Umbraco.Core.Configuration.Models
+﻿using System;
+
+namespace Umbraco.Core.Configuration.Models
 {
     public class HostingSettings
     {

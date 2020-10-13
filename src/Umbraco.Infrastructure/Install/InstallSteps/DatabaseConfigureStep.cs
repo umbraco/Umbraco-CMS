@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Web.Install.Models;
 using Umbraco.Core.Configuration.Models;
@@ -16,13 +16,14 @@ namespace Umbraco.Web.Install.InstallSteps
     public class DatabaseConfigureStep : InstallSetupStep<DatabaseModel>
     {
         private readonly DatabaseBuilder _databaseBuilder;
-        private readonly ILogger _logger;
+        private readonly ILogger<DatabaseConfigureStep> _logger;
         private readonly ConnectionStrings _connectionStrings;
 
-        public DatabaseConfigureStep(DatabaseBuilder databaseBuilder, IOptions<ConnectionStrings> connectionStrings)
+        public DatabaseConfigureStep(DatabaseBuilder databaseBuilder, IOptions<ConnectionStrings> connectionStrings, ILogger<DatabaseConfigureStep> logger)
         {
             _databaseBuilder = databaseBuilder;
             _connectionStrings = connectionStrings.Value ?? throw new ArgumentNullException(nameof(connectionStrings));
+            _logger = logger;
         }
 
         public override Task<InstallSetupResult> ExecuteAsync(DatabaseModel database)
@@ -120,7 +121,7 @@ namespace Umbraco.Web.Install.InstallSteps
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error<DatabaseConfigureStep>(ex, "An error occurred, reconfiguring...");
+                    _logger.LogError(ex, "An error occurred, reconfiguring...");
                     //something went wrong, could not connect so probably need to reconfigure
                     return true;
                 }

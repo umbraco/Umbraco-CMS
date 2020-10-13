@@ -1,21 +1,21 @@
 ﻿using System;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
+using Microsoft.Extensions.Logging;
+using Umbraco.Core.HealthCheck;
 using Umbraco.Core.Services;
 
-namespace Umbraco.Core.HealthCheck
+namespace Umbraco.Core.Configuration.HealthChecks
 {
     public class ConfigurationService : IConfigurationService
     {
         private readonly ILocalizedTextService _textService;
-        private readonly ILogger _logger;
+        private readonly ILogger<ConfigurationService> _logger;
         private readonly IConfigManipulator _configManipulator;
 
         /// <param name="textService"></param>
         /// <param name="logger"></param>
         /// <param name="configManipulator"></param>
         /// <returns></returns>
-        public ConfigurationService(ILocalizedTextService textService, ILogger logger, IConfigManipulator configManipulator)
+        public ConfigurationService(ILocalizedTextService textService, ILogger<ConfigurationService> logger, IConfigManipulator configManipulator)
         {
             if (textService == null) HandleNullParameter(nameof(textService));
             if (configManipulator == null) HandleNullParameter(nameof(configManipulator));
@@ -28,7 +28,7 @@ namespace Umbraco.Core.HealthCheck
 
         private void HandleNullParameter(string parameter)
         {
-            _logger.Error<ConfigurationService>("A required ConfigurationService parameter was null", parameter);
+            _logger.LogError("Error trying to get configuration value", parameter);
             throw new ArgumentNullException(parameter);
         }
 
@@ -59,7 +59,7 @@ namespace Umbraco.Core.HealthCheck
             }
             catch (Exception ex)
             {
-                _logger.Error<ConfigurationService>(ex, "Error trying to update configuration");
+               _logger.LogError(ex, "Error trying to update configuration");
                 return new ConfigurationServiceResult
                 {
                     Success = false,

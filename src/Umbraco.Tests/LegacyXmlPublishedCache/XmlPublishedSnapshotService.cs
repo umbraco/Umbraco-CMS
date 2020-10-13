@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.PublishedContent;
@@ -56,7 +56,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             IUmbracoContextAccessor umbracoContextAccessor,
             IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository,
             IDefaultCultureAccessor defaultCultureAccessor,
-            ILogger logger,
+            ILoggerFactory loggerFactory,
             GlobalSettings globalSettings,
             IHostingEnvironment hostingEnvironment,
             IApplicationShutdownRegistry hostingLifetime,
@@ -70,7 +70,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
                 publishedSnapshotAccessor, variationContextAccessor, umbracoContextAccessor,
                 documentRepository, mediaRepository, memberRepository,
                 defaultCultureAccessor,
-                logger, globalSettings, hostingEnvironment, hostingLifetime, shortStringHelper, siteDomainHelper, entitySerializer, null, mainDom, testing, enableRepositoryEvents)
+                loggerFactory, globalSettings, hostingEnvironment, hostingLifetime, shortStringHelper, siteDomainHelper, entitySerializer, null, mainDom, testing, enableRepositoryEvents)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
         }
@@ -84,7 +84,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             IUmbracoContextAccessor umbracoContextAccessor,
             IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository,
             IDefaultCultureAccessor defaultCultureAccessor,
-            ILogger logger,
+            ILoggerFactory loggerFactory,
             GlobalSettings globalSettings,
             IHostingEnvironment hostingEnvironment,
             IApplicationShutdownRegistry hostingLifetime,
@@ -99,7 +99,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             _routesCache = new RoutesCache();
             _publishedContentTypeFactory = publishedContentTypeFactory;
             _contentTypeCache = contentTypeCache
-                ?? new PublishedContentTypeCache(serviceContext.ContentTypeService, serviceContext.MediaTypeService, serviceContext.MemberTypeService, publishedContentTypeFactory, logger);
+                ?? new PublishedContentTypeCache(serviceContext.ContentTypeService, serviceContext.MediaTypeService, serviceContext.MemberTypeService, publishedContentTypeFactory, loggerFactory.CreateLogger<PublishedContentTypeCache>());
 
             _xmlStore = new XmlStore(serviceContext.ContentTypeService, serviceContext.ContentService, scopeProvider, _routesCache,
                 _contentTypeCache, publishedSnapshotAccessor, mainDom, testing, enableRepositoryEvents,

@@ -3,13 +3,13 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Umbraco.Composing;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Events;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
@@ -30,20 +30,22 @@ namespace Umbraco.Web.BackOffice.Controllers
     public abstract class ContentControllerBase : BackOfficeNotificationsController
     {
         protected ICultureDictionary CultureDictionary { get; }
-        protected ILogger Logger { get; }
+        protected ILoggerFactory LoggerFactory { get; }
         protected IShortStringHelper ShortStringHelper { get; }
         protected IEventMessagesFactory EventMessages { get; }
         protected ILocalizedTextService LocalizedTextService { get; }
+        private readonly ILogger<ContentControllerBase> _logger;
 
         protected ContentControllerBase(
             ICultureDictionary cultureDictionary,
-            ILogger logger,
+            ILoggerFactory loggerFactory,
             IShortStringHelper shortStringHelper,
             IEventMessagesFactory eventMessages,
             ILocalizedTextService localizedTextService)
         {
             CultureDictionary = cultureDictionary;
-            Logger = logger;
+            LoggerFactory = loggerFactory;
+            _logger = loggerFactory.CreateLogger<ContentControllerBase>();
             ShortStringHelper = shortStringHelper;
             EventMessages = eventMessages;
             LocalizedTextService = localizedTextService;
@@ -78,7 +80,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 // get the property editor
                 if (propertyDto.PropertyEditor == null)
                 {
-                    Logger.Warn<ContentControllerBase>("No property editor found for property {PropertyAlias}", propertyDto.Alias);
+                    _logger.LogWarning("No property editor found for property {PropertyAlias}", propertyDto.Alias);
                     continue;
                 }
 

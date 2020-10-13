@@ -9,10 +9,10 @@ namespace Umbraco.ModelsBuilder.Embedded
 {
     public sealed class OutOfDateModelsStatus
     {
-        private readonly ModelsBuilderConfig _config;
+        private readonly ModelsBuilderSettings _config;
         private readonly IHostingEnvironment _hostingEnvironment;
 
-        public OutOfDateModelsStatus(IOptions<ModelsBuilderConfig> config, IHostingEnvironment hostingEnvironment)
+        public OutOfDateModelsStatus(IOptions<ModelsBuilderSettings> config, IHostingEnvironment hostingEnvironment)
         {
             _config = config.Value;
             _hostingEnvironment = hostingEnvironment;

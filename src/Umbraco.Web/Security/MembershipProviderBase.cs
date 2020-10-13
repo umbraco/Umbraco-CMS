@@ -8,10 +8,10 @@ using System.Web;
 using System.Web.Hosting;
 using System.Web.Configuration;
 using System.Web.Security;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Web.Composing;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Security;
 
 namespace Umbraco.Web.Security
@@ -257,7 +257,7 @@ namespace Umbraco.Web.Security
             if ((PasswordFormat == MembershipPasswordFormat.Hashed) && EnablePasswordRetrieval)
             {
                 var ex = new ProviderException("Provider can not retrieve a hashed password");
-                Current.Logger.Error<MembershipProviderBase>(ex, "Cannot specify a Hashed password format with the enabledPasswordRetrieval option set to true");
+                Current.Logger.LogError(ex, "Cannot specify a Hashed password format with the enabledPasswordRetrieval option set to true");
                 throw ex;
             }
 

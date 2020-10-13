@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
         <TargetFramework>netcoreapp3.1</TargetFramework>
@@ -59,11 +59,11 @@
 
     <!-- We don't want to include the generated files, they will throw a lot of errors -->
     <ItemGroup>
-        <None Remove="Umbraco/Models/all.generated.cs"/>
-        <Compile Remove="Umbraco/Models/all.generated.cs"/>
-        <None Remove="Umbraco/Models/models.generated.cs"/>
+        <None Remove="Umbraco/Models/all.generated.cs" />
+        <Compile Remove="Umbraco/Models/all.generated.cs" />
+        <None Remove="Umbraco/Models/models.generated.cs" />
         <Compile Remove="Umbraco/Models/models.generated.cs" />
-        <Folder Remove="Umbraco/Models/Compiled"/>
+        <Folder Remove="Umbraco/Models/Compiled" />
         <None Remove="Umbraco/Models/Compiled/**" />
         <None Remove="Umbraco/Models/all.dll.path" />
         <None Remove="Umbraco/Models/models.hash" />
@@ -71,7 +71,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.3" />
+      <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.8" />
         <!-- TODO: remove the reference to System.Configuration.ConfigurationManager when Examine/lucene dont need it-->
         <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.7.0" />
     </ItemGroup>

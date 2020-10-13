@@ -16,6 +16,7 @@ namespace Umbraco.Extensions
                 .WithMiniProfiler()
                 .WithMvcAndRazor()
                 .WithWebServer()
+                .WithPreview()
                 .Build();
         }
 
@@ -24,5 +25,8 @@ namespace Umbraco.Extensions
 
         public static IUmbracoBuilder WithBackOfficeIdentity(this IUmbracoBuilder builder)
             => builder.AddWith(nameof(WithBackOfficeIdentity), () => builder.Services.AddUmbracoBackOfficeIdentity());
+
+        public static IUmbracoBuilder WithPreview(this IUmbracoBuilder builder)
+            => builder.AddWith(nameof(WithPreview), () => builder.Services.AddUmbracoPreview());
     }
 }

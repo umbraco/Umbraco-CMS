@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.Logging;
 using Umbraco.Net;
 
 namespace Umbraco.Core.Manifest
@@ -13,11 +13,11 @@ namespace Umbraco.Core.Manifest
         private static readonly object Locker = new object();
         private static volatile bool _isRestarting;
 
-        private readonly ILogger _logger;
+        private readonly ILogger<ManifestWatcher> _logger;
         private readonly IUmbracoApplicationLifetime _umbracoApplicationLifetime;
         private readonly List<FileSystemWatcher> _fws = new List<FileSystemWatcher>();
 
-        public ManifestWatcher(ILogger logger, IUmbracoApplicationLifetime umbracoApplicationLifetime)
+        public ManifestWatcher(ILogger<ManifestWatcher> logger, IUmbracoApplicationLifetime umbracoApplicationLifetime)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _umbracoApplicationLifetime = umbracoApplicationLifetime;
@@ -57,7 +57,7 @@ namespace Umbraco.Core.Manifest
                 if (_isRestarting) return;
 
                 _isRestarting = true;
-                _logger.Info<ManifestWatcher>("Manifest has changed, app pool is restarting ({Path})", e.FullPath);
+                _logger.LogInformation("Manifest has changed, app pool is restarting ({Path})", e.FullPath);
                 _umbracoApplicationLifetime.Restart();
                 Dispose(); // uh? if the app restarts then this should be disposed anyways?
             }

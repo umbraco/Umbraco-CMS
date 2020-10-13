@@ -9,6 +9,7 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.BackOffice;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Extensions;
 using Umbraco.Tests.Common.Builders;
@@ -138,7 +139,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.BackOffice
         [SetUp]
         public void Setup()
         {
-            var globalSettings = new GlobalSettingsBuilder().WithDefaultUiLanguage("test").Build();
+            var globalSettings = new GlobalSettings { DefaultUILanguage = "test" };
 
             _testUser = new BackOfficeIdentityUser(globalSettings, _testUserId, new List<IReadOnlyUserGroup>())
             {

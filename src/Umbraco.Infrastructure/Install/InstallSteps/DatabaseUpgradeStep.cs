@@ -2,11 +2,11 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Migrations.Upgrade;
 using Umbraco.Web.Install.Models;
@@ -20,14 +20,14 @@ namespace Umbraco.Web.Install.InstallSteps
     {
         private readonly DatabaseBuilder _databaseBuilder;
         private readonly IRuntimeState _runtime;
-        private readonly ILogger _logger;
+        private readonly ILogger<DatabaseUpgradeStep> _logger;
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly ConnectionStrings _connectionStrings;
 
         public DatabaseUpgradeStep(
             DatabaseBuilder databaseBuilder,
             IRuntimeState runtime,
-            ILogger logger,
+            ILogger<DatabaseUpgradeStep> logger,
             IUmbracoVersion umbracoVersion,
             IOptions<ConnectionStrings> connectionStrings)
         {
@@ -46,7 +46,7 @@ namespace Umbraco.Web.Install.InstallSteps
 
             if (upgrade)
             {
-                _logger.Info<DatabaseUpgradeStep>("Running 'Upgrade' service");
+                _logger.LogInformation("Running 'Upgrade' service");
 
                 var plan = new UmbracoPlan(_umbracoVersion);
                 plan.AddPostMigration<ClearCsrfCookies>(); // needed when running installer (back-office)

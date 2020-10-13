@@ -22,36 +22,37 @@ namespace Umbraco.Tests.Integration.TestServerTest
             Action<CoreRuntime, RuntimeEssentialsEventArgs> dbInstallEventHandler)
         {
             return builder.AddWith(nameof(global::Umbraco.Web.Common.Builder.UmbracoBuilderExtensions.WithCore),
-                () =>
-                {
-                    builder.Services.AddUmbracoCore(
-                        builder.WebHostEnvironment,
-                        container,
-                        typeof(UmbracoBuilderExtensions).Assembly,
-                        AppCaches.NoCache, // Disable caches in integration tests
-                        testHelper.GetLoggingConfiguration(),
-                        (globalSettings, connectionStrings, umbVersion, ioHelper, logger, profiler, hostingEnv,
-                            backOfficeInfo, typeFinder, appCaches, dbProviderFactoryCreator) =>
-                        {
-                            var runtime = UmbracoIntegrationTest.CreateTestRuntime(
-                                globalSettings,
-                                connectionStrings,
-                                umbVersion,
-                                ioHelper,
-                                logger,
-                                profiler,
-                                hostingEnv,
-                                backOfficeInfo,
-                                typeFinder,
-                                appCaches,
-                                dbProviderFactoryCreator,
-                                testHelper.MainDom, // SimpleMainDom
-                                dbInstallEventHandler); // DB Installation event handler
+                    () =>
+                    {
+                        builder.Services.AddUmbracoCore(
+                            builder.WebHostEnvironment,
+                            container,
+                            typeof(UmbracoBuilderExtensions).Assembly,
+                            AppCaches.NoCache, // Disable caches in integration tests
+                            testHelper.GetLoggingConfiguration(),
+                            builder.Config,
+                            // TODO: Yep that's extremely ugly
+                            (globalSettings, connectionStrings, umbVersion, ioHelper, loggerFactory, profiler, hostingEnv, backOfficeInfo, typeFinder, appCaches, dbProviderFactoryCreator) =>
+                            {
+                                var runtime = UmbracoIntegrationTest.CreateTestRuntime(
+                                    globalSettings,
+                                    connectionStrings,
+                                    umbVersion,
+                                    ioHelper,
+                                    loggerFactory,
+                                    profiler,
+                                    hostingEnv,
+                                    backOfficeInfo,
+                                    typeFinder,
+                                    appCaches,
+                                    dbProviderFactoryCreator,
+                                    testHelper.MainDom,         // SimpleMainDom
+                                    dbInstallEventHandler);     // DB Installation event handler
 
-                            return runtime;
-                        },
-                        out _);
-                });
+                                return runtime;
+                            },
+                            out _);
+                    });
         }
     }
 }

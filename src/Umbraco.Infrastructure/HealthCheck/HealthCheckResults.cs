@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using HeyRed.MarkdownSharp;
+using Microsoft.Extensions.Logging;
 using Umbraco.Composing;
 using Umbraco.Core.HealthCheck;
-using Umbraco.Core.HealthCheck.Checks;
-using Umbraco.Core.Logging;
 
-namespace Umbraco.Web.HealthCheck
+namespace Umbraco.Infrastructure.HealthCheck
 {
     public class HealthCheckResults
     {
@@ -28,7 +27,7 @@ namespace Umbraco.Web.HealthCheck
                     }
                     catch (Exception ex)
                     {
-                        Logger.Error<HealthCheckResults>(ex, "Error running scheduled health check: {HealthCheckName}", t.Name);
+                        Logger.LogError(ex, "Error running scheduled health check: {HealthCheckName}", t.Name);
                         var message = $"Health check failed with exception: {ex.Message}. See logs for details.";
                         return new List<HealthCheckStatus>
                         {
@@ -55,7 +54,7 @@ namespace Umbraco.Web.HealthCheck
 
         public void LogResults()
         {
-            Logger.Info<HealthCheckResults>("Scheduled health check results:");
+            Logger.LogInformation("Scheduled health check results:");
             foreach (var result in _results)
             {
                 var checkName = result.Key;
@@ -63,16 +62,16 @@ namespace Umbraco.Web.HealthCheck
                 var checkIsSuccess = result.Value.All(x => x.ResultType == StatusResultType.Success);
                 if (checkIsSuccess)
                 {
-                    Logger.Info<HealthCheckResults>("Checks for '{HealthCheckName}' all completed successfully.", checkName);
+                    Logger.LogInformation("Checks for '{HealthCheckName}' all completed successfully.", checkName);
                 }
                 else
                 {
-                    Logger.Warn<HealthCheckResults>("Checks for '{HealthCheckName}' completed with errors.", checkName);
+                    Logger.LogWarning("Checks for '{HealthCheckName}' completed with errors.", checkName);
                 }
 
                 foreach (var checkResult in checkResults)
                 {
-                    Logger.Info<HealthCheckResults>("Result for {HealthCheckName}: {HealthCheckResult}, Message: '{HealthCheckMessage}'", checkName, checkResult.ResultType, checkResult.Message);
+                    Logger.LogInformation("Result for {HealthCheckName}: {HealthCheckResult}, Message: '{HealthCheckMessage}'", checkName, checkResult.ResultType, checkResult.Message);
                 }
             }
         }
