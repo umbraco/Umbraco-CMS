@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -376,8 +377,8 @@ namespace Umbraco.Tests.Strings
         public void Utf8ToAsciiConverter()
         {
             const string str = "a\U00010F00z\uA74Ftéô";
-            var output = Core.Strings.Utf8ToAsciiConverter.ToAsciiString(str);
-            Assert.AreEqual("a?zooteo", output);
+            var output = Core.Strings.Utf8ToAsciiConverter.ToAsciiString(str.AsSpan());
+            Assert.AreEqual("a?zooteo", output.ToString());
         }
 
         [Test]
