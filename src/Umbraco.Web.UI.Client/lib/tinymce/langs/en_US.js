@@ -150,7 +150,7 @@ tinymce.addI18n('en_US',{
 "Insert link": "Insert link",
 "Insert\/edit link": "Insert\/edit link",
 "Text to display": "Text to display",
-"Url": "Url",
+"Url": "URL",
 "Target": "Target",
 "None": "None",
 "New window": "New window",
