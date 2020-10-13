@@ -235,9 +235,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                         },
                         RelationFactory.BuildDto);  // value = DTO
 
-                    // Use NPoco's own InsertBulk command which will automatically re-populate the new Ids on the entities, our own
-                    // BulkInsertRecords does not cater for this.
-                    Database.InsertBulk(entitiesAndDtos.Values);
+
+                    foreach (var dto in entitiesAndDtos.Values)
+                    {
+                        Database.Insert(dto);
+                    }
 
                     // All dtos now have IDs assigned
                     foreach (var de in entitiesAndDtos)
@@ -247,6 +249,33 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     }
 
                     PopulateObjectTypes(entitiesAndDtos.Keys.ToArray());
+                }
+            }
+        }
+
+        public void SaveBulk(IEnumerable<ReadOnlyRelation> relations)
+        {
+            foreach (var hasIdentityGroup in relations.GroupBy(r => r.HasIdentity))
+            {
+                if (hasIdentityGroup.Key)
+                {
+                    // Do updates, we can't really do a bulk update so this is still a 1 by 1 operation
+                    // however we can bulk populate the object types. It might be possible to bulk update
+                    // with SQL but would be pretty ugly and we're not really too worried about that for perf,
+                    // it's the bulk inserts we care about.
+                    foreach (var relation in hasIdentityGroup)
+                    {
+                        var dto = RelationFactory.BuildDto(relation);
+                        Database.Update(dto);
+                    }
+                }
+                else
+                {
+                    // Do bulk inserts
+                    var dtos = hasIdentityGroup.Select(RelationFactory.BuildDto);
+
+                    Database.InsertBulk(dtos);
+
                 }
             }
         }
