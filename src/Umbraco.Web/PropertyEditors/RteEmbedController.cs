@@ -29,8 +29,8 @@ namespace Umbraco.Web.PropertyEditors
 
             foreach (var provider in _embedCollection)
             {
-                //Url Scheme Regex is an array of possible regex patterns to match against the URL
-                foreach(var urlPattern in provider.UrlSchemeRegex)
+                // UrlSchemeRegex is an array of possible regex patterns to match against the URL
+                foreach (var urlPattern in provider.UrlSchemeRegex)
                 {
                     var regexPattern = new Regex(urlPattern, RegexOptions.IgnoreCase);
                     if (regexPattern.IsMatch(url))

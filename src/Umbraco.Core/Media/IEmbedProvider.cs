@@ -15,7 +15,7 @@ namespace Umbraco.Core.Media
         string[] UrlSchemeRegex { get; }
 
         /// <summary>
-        /// A collection of querystring request parameters to append to the API Url
+        /// A collection of querystring request parameters to append to the API URL
         /// </summary>
         /// <example>?key=value&key2=value2</example>
         Dictionary<string, string> RequestParams { get; }

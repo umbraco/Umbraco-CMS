@@ -134,6 +134,7 @@
     <Compile Include="Migrations\Upgrade\V_8_0_0\Models\ContentTypeDto80.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\Models\PropertyDataDto80.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\Models\PropertyTypeDto80.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_8_0\ExternalLoginTableUserData.cs" />
     <Compile Include="Models\Blocks\BlockEditorDataConverter.cs" />
     <Compile Include="Models\Blocks\BlockEditorData.cs" />
     <Compile Include="Models\Blocks\BlockItemData.cs" />
@@ -145,12 +146,16 @@
     <Compile Include="Models\ContentDataIntegrityReport.cs" />
     <Compile Include="Models\ContentDataIntegrityReportEntry.cs" />
     <Compile Include="Models\ContentDataIntegrityReportOptions.cs" />
+    <Compile Include="Models\Identity\ExternalLogin.cs" />
+    <Compile Include="Models\Identity\IExternalLogin.cs" />
+    <Compile Include="Models\IconModel.cs" />
     <Compile Include="Models\InstallLog.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentTypeExtensions.cs" />
     <Compile Include="Models\RelationTypeExtensions.cs" />
     <Compile Include="Persistence\Repositories\IInstallationRepository.cs" />
     <Compile Include="Persistence\Repositories\Implement\InstallationRepository.cs" />
     <Compile Include="PropertyEditors\ComplexPropertyEditorContentEventHandler.cs" />
+    <Compile Include="Services\IIconService.cs" />
     <Compile Include="Services\Implement\InstallationService.cs" />
     <Compile Include="Migrations\Upgrade\V_8_6_0\AddMainDomLock.cs" />
     <Compile Include="Models\Blocks\BlockListItem.cs" />
