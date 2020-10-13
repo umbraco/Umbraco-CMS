@@ -3,6 +3,7 @@ using Umbraco.Core.Models;
 using Umbraco.Tests.Common.Builders.Interfaces;
 using Umbraco.Tests.Common.Builders.Extensions;
 using Umbraco.Core;
+using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Common.Builders
 {
@@ -220,6 +221,31 @@ namespace Umbraco.Tests.Common.Builders
         {
             get => _parentId;
             set => _parentId = value;
+        }
+
+        public static IMedia CreateSimpleMedia(IMediaType contentType, string name, int parentId)
+        {
+            var media = new MediaBuilder()
+                .WithMediaType(contentType)
+                .WithName(name)
+                .WithParentId(parentId)
+                .WithCreatorId(0)
+                .Build();
+                ;
+
+            object obj =
+                new
+                {
+                    title = name + " Subpage",
+                    bodyText = "This is a subpage",
+                    author = "John Doe"
+                };
+
+            media.PropertyValues(obj);
+
+            media.ResetDirtyProperties(false);
+
+            return media;
         }
     }
 }
