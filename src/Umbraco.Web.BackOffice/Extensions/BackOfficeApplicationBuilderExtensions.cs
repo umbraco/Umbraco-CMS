@@ -47,7 +47,6 @@ namespace Umbraco.Extensions
             app.UseUmbracoRuntimeMinification();
 
             app.UseMiddleware<PreviewAuthenticationMiddleware>();
-            app.UseMiddleware<UnhandledExceptionLoggerMiddleware>();
 
             return app;
         }

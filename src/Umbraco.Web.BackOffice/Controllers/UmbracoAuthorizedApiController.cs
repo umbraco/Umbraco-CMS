@@ -1,4 +1,5 @@
-﻿using Umbraco.Web.BackOffice.Filters;
+﻿using Microsoft.AspNetCore.Mvc;
+using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Controllers;
 using Umbraco.Web.Common.Filters;
@@ -19,7 +20,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     [DisableBrowserCache]
     [UmbracoWebApiRequireHttps]
     [CheckIfUserTicketDataIsStale]
-    //[UnhandedExceptionLoggerConfiguration] //TODO reintroduce
+    [MiddlewareFilter(typeof(UnhandledExceptionLoggerFilter))]
     //[EnableDetailedErrors] //TODO reintroduce
     public abstract class UmbracoAuthorizedApiController : UmbracoApiController
     {

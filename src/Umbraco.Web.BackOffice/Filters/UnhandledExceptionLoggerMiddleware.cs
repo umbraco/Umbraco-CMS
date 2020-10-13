@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 
-namespace Umbraco.Web.BackOffice
+namespace Umbraco.Web.BackOffice.Filters
 {
     public class UnhandledExceptionLoggerMiddleware : IMiddleware
     {
