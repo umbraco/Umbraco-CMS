@@ -18,15 +18,12 @@ namespace Umbraco.Web.Common.Filters
 
         private class UmbracoUserTimeoutFilter : IActionFilter
         {
-
             public void OnActionExecuted(ActionExecutedContext context)
             {
                 //this can occur if an error has already occurred.
                 if (context.HttpContext.Response is null) return;
 
-                // Using the new way to GetRemainingAuthSeconds, which does not require you to get the ticket from the request
                 var remainingSeconds = context.HttpContext.User.GetRemainingAuthSeconds();
-
                 context.HttpContext.Response.Headers.Add("X-Umb-User-Seconds", remainingSeconds.ToString(CultureInfo.InvariantCulture));
             }
 

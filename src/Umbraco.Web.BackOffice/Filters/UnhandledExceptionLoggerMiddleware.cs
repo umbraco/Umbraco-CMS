@@ -7,6 +7,9 @@ using Umbraco.Core;
 
 namespace Umbraco.Web.BackOffice.Filters
 {
+    /// <summary>
+    /// Logs any unhandled exception.
+    /// </summary>
     public class UnhandledExceptionLoggerMiddleware : IMiddleware
     {
         private readonly ILogger<UnhandledExceptionLoggerMiddleware> _logger;
@@ -26,7 +29,7 @@ namespace Umbraco.Web.BackOffice.Filters
             }
             else
             {
-                // We call the next middleware, and catch any errors that occurs in the rest of the pipeline
+                // Call the next middleware, and catch any errors that occurs in the rest of the pipeline
                 try
                 {
                     await next(context);
@@ -34,7 +37,7 @@ namespace Umbraco.Web.BackOffice.Filters
                 catch (Exception e)
                 {
                     _logger.LogError(e, "Unhandled controller exception occurred for request '{RequestUrl}'", requestUri.AbsoluteUri);
-                    // throw the error again, just in case it gets handled (which is shouldn't)
+                    // Throw the error again, just in case it gets handled
                     throw;
                 }
             }
