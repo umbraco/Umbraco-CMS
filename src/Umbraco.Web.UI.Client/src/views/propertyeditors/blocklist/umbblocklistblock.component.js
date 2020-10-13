@@ -58,7 +58,7 @@
                     <style>
                     @import "{{$scope.stylesheet}}"
                     </style>
-                    <div ng-include="'${$scope.view}'"></div>
+                    <div ng-include="view"></div>
                 `;
                 $compile(shadowRoot)($scope);
             }
