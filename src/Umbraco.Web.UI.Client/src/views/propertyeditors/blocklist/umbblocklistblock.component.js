@@ -52,6 +52,7 @@
             $scope.view = assetsService.appendCacheBuster(model.view);
 
             if (model.stylesheet) {
+                $scope.stylesheet = assetsService.appendCacheBuster(model.stylesheet);
                 var shadowRoot = $element[0].attachShadow({ mode: 'open' });
                 shadowRoot.innerHTML = `
                     <style>
