@@ -21,7 +21,6 @@ namespace Umbraco.Web.BackOffice.Controllers
     [UmbracoWebApiRequireHttps]
     [CheckIfUserTicketDataIsStale]
     [MiddlewareFilter(typeof(UnhandledExceptionLoggerFilter))]
-    //[EnableDetailedErrors] //TODO reintroduce
     public abstract class UmbracoAuthorizedApiController : UmbracoApiController
     {
 
