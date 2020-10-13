@@ -134,6 +134,15 @@ namespace Umbraco.Core.Services
         IEnumerable<IRelation> GetByParentOrChildId(int id, string relationTypeAlias);
 
         /// <summary>
+        /// Gets a relation by the unique combination of parentId, childId and relationType.
+        /// </summary>
+        /// <param name="parentId">The id of the parent item.</param>
+        /// <param name="childId">The id of the child item.</param>
+        /// <param name="relationType">The RelationType.</param>
+        /// <returns>The relation or null</returns>
+        IRelation GetByParentAndChildId(int parentId, int childId, IRelationType relationType);
+
+        /// <summary>
         /// Gets a list of <see cref="IRelation"/> objects by the Name of the <see cref="IRelationType"/>
         /// </summary>
         /// <param name="relationTypeName">Name of the <see cref="IRelationType"/> to retrieve Relations for</param>
@@ -342,14 +351,7 @@ namespace Umbraco.Core.Services
         /// <param name="relationType"><see cref="IRelationType"/> to Delete Relations for</param>
         void DeleteRelationsOfType(IRelationType relationType);
 
-        /// <summary>
-        /// Gets a relation by the unique combination of parentId, childId and relationType.
-        /// </summary>
-        /// <param name="parentId">The id of the parent item.</param>
-        /// <param name="childId">The id of the child item.</param>
-        /// <param name="relationType">The RelationType.</param>
-        /// <returns>The relation or null</returns>
-        IRelation GetByParentChildAndType(int parentId, int childId, IRelationType relationType);
+        
 
     }
 }

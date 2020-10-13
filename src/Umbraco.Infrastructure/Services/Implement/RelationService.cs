@@ -173,6 +173,18 @@ namespace Umbraco.Core.Services.Implement
         }
 
         /// <inheritdoc />
+        public IRelation GetByParentAndChildId(int parentId, int childId, IRelationType relationType)
+        {
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                var query = Query<IRelation>().Where(x => x.ParentId == parentId &&
+                                                          x.ChildId == childId &&
+                                                          x.RelationTypeId == relationType.Id);
+                return _relationRepository.Get(query).FirstOrDefault();
+            }
+        }
+
+        /// <inheritdoc />
         public IEnumerable<IRelation> GetByRelationTypeName(string relationTypeName)
         {
             List<int> relationTypeIds;
@@ -540,18 +552,6 @@ namespace Umbraco.Core.Services.Implement
                 scope.Complete();
 
                 scope.Events.Dispatch(DeletedRelation, this, new DeleteEventArgs<IRelation>(relations, false));
-            }
-        }
-
-        /// <inheritdoc />
-        public IRelation GetByParentChildAndType(int parentId, int childId, IRelationType relationType)
-        {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                var query = Query<IRelation>().Where(x => x.ParentId == parentId &&
-                                                          x.ChildId == childId &&
-                                                          x.RelationTypeId == relationType.Id);
-                return _relationRepository.Get(query).FirstOrDefault();
             }
         }
 

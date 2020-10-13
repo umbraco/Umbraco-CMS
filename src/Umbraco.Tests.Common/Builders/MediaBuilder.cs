@@ -231,7 +231,6 @@ namespace Umbraco.Tests.Common.Builders
                 .WithParentId(parentId)
                 .WithCreatorId(0)
                 .Build();
-                ;
 
             object obj =
                 new
