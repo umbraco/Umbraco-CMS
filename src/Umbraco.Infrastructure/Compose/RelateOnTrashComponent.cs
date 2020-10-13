@@ -106,7 +106,7 @@ namespace Umbraco.Core.Compose
                     if (_entityService.Exists(originalParentId))
                     {
                         // Add a relation for the item being deleted, so that we can know the original parent for if we need to restore later
-                        var relation = _relationService.GetByParentChildAndType(originalParentId, item.Entity.Id, relationType) ??
+                        var relation = _relationService.GetByParentAndChildId(originalParentId, item.Entity.Id, relationType) ??
                                        new Relation(originalParentId, item.Entity.Id, relationType);
                         _relationService.Save(relation);
 
