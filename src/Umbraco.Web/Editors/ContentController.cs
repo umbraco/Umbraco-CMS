@@ -1978,7 +1978,7 @@ namespace Umbraco.Web.Editors
                 if (template == null)
                 {
                     //ModelState.AddModelError("Template", "No template exists with the specified alias: " + contentItem.TemplateAlias);
-                    Logger.Warn<ContentController>("No template exists with the specified alias: {TemplateAlias}", contentSave.TemplateAlias);
+                    Logger.Warn<ContentController, string>("No template exists with the specified alias: {TemplateAlias}", contentSave.TemplateAlias);
                 }
                 else if (template.Id != contentSave.PersistedContent.TemplateId)
                 {

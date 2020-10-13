@@ -107,7 +107,7 @@ namespace Umbraco.Web.Routing
                 }
                 catch (Exception ex)
                 {
-                    Current.Logger.Error<NotFoundHandlerHelper>(ex, "Could not parse xpath expression: {ContentXPath}", errorPage.ContentXPath);
+                    Current.Logger.Error<NotFoundHandlerHelper,string>(ex, "Could not parse xpath expression: {ContentXPath}", errorPage.ContentXPath);
                     return null;
                 }
             }

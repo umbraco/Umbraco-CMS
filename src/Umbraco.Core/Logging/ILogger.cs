@@ -52,34 +52,7 @@ namespace Umbraco.Core.Logging
         /// <param name="messageTemplate">A message template.</param>
         /// <param name="propertyValues">Property values.</param>
         void Fatal(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues);
-        /// <summary>
-        /// Logs a fatal message with an exception.
-        /// </summary>
-        /// <param name="reporting">The reporting type.</param>
-        /// <param name="exception">An exception.</param>
-        /// <param name="messageTemplate">A message template.</param>
-        /// <param name="propertyValue0">Property value 0</param>
-        /// <param name="propertyValue1">Property value 1</param>
-        /// <param name="propertyValue2">Property value 2</param>
-        void Fatal<T0, T1, T2>(Type reporting, Exception exception, string messageTemplate, T0 propertyValue0, T1 propertyValue1, T2 propertyValue2);
-        /// <summary>
-        /// Logs a fatal message with an exception.
-        /// </summary>
-        /// <param name="reporting">The reporting type.</param>
-        /// <param name="exception">An exception.</param>
-        /// <param name="messageTemplate">A message template.</param>
-        /// <param name="propertyValue0">Property value 0</param>
-        /// <param name="propertyValue1">Property value 1</param>
-        void Fatal<T0, T1>(Type reporting, Exception exception, string messageTemplate, T0 propertyValue0, T1 propertyValue1);
-        /// <summary>
-        /// Logs a fatal message with an exception.
-        /// </summary>
-        /// <param name="reporting">The reporting type.</param>
-        /// <param name="exception">An exception.</param>
-        /// <param name="messageTemplate">A message template.</param>
-        /// <param name="propertyValue0">Property value 0</param>
-        void Fatal<T0>(Type reporting, Exception exception, string messageTemplate, T0 propertyValue0);
-
+       
         /// <summary>
         /// Logs a fatal message.
         /// </summary>
@@ -119,34 +92,7 @@ namespace Umbraco.Core.Logging
         /// <param name="messageTemplate">A message template.</param>
         /// <param name="propertyValues">Property values.</param>
         void Error(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues);
-        /// <summary>
-        /// Logs an error message with an exception.
-        /// </summary>
-        /// <param name="reporting">The reporting type.</param>
-        /// <param name="exception">An exception.</param>
-        /// <param name="messageTemplate">A message template.</param>
-        /// <param name="propertyValue0">Property value 0</param>
-        /// <param name="propertyValue1">Property value 1</param>
-        /// <param name="propertyValue2">Property value 2</param>
-        void Error<T0, T1, T2>(Type reporting, Exception exception, string messageTemplate, T0 propertyValue0, T1 propertyValue1, T2 propertyValue2);
-        /// <summary>
-        /// Logs an error message with an exception.
-        /// </summary>
-        /// <param name="reporting">The reporting type.</param>
-        /// <param name="exception">An exception.</param>
-        /// <param name="messageTemplate">A message template.</param>
-        /// <param name="propertyValue0">Property value 0</param>
-        /// <param name="propertyValue1">Property value 1</param>
-        void Error<T0, T1>(Type reporting, Exception exception, string messageTemplate, T0 propertyValue0, T1 propertyValue1);
-        /// <summary>
-        /// Logs an error message with an exception.
-        /// </summary>
-        /// <param name="reporting">The reporting type.</param>
-        /// <param name="exception">An exception.</param>
-        /// <param name="messageTemplate">A message template.</param>
-        /// <param name="propertyValue0">Property value 0</param>
-        void Error<T0>(Type reporting, Exception exception, string messageTemplate, T0 propertyValue0);
-
+       
         /// <summary>
         /// Logs an error message.
         /// </summary>
@@ -186,40 +132,7 @@ namespace Umbraco.Core.Logging
         /// <param name="messageTemplate">A message template.</param>
         /// <param name="propertyValues">Property values.</param>
         void Warn(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues);
-        /// <summary>
-        /// Logs a warning message with an exception.
-        /// </summary>
-        /// <param name="reporting">The reporting type.</param>
-        /// <param name="exception">An exception.</param>
-        /// <param name="messageTemplate">A message template.</param>
-        /// <param name="propertyValue0">Property value 0</param>
-        /// <param name="propertyValue1">Property value 1</param>
-        /// <param name="propertyValue2">Property value 2</param>
-        void Warn<T0, T1, T2>(Type reporting, Exception exception, string messageTemplate, T0 propertyValue0, T1 propertyValue1, T2 propertyValue2);
-        /// <summary>
-        /// Logs a warning message with an exception.
-        /// </summary>
-        /// <param name="reporting">The reporting type.</param>
-        /// <param name="exception">An exception.</param>
-        /// <param name="messageTemplate">A message template.</param>
-        /// <param name="propertyValue0">Property value 0</param>
-        /// <param name="propertyValue1">Property value 1</param>
-        void Warn<T0, T1>(Type reporting, Exception exception, string messageTemplate, T0 propertyValue0, T1 propertyValue1);
-        /// <summary>
-        /// Logs a warning message with an exception.
-        /// </summary>
-        /// <param name="reporting">The reporting type.</param>
-        /// <param name="exception">An exception.</param>
-        /// <param name="messageTemplate">A message template.</param>
-        /// <param name="propertyValue0">Property value 0</param>
-        void Warn<T0>(Type reporting, Exception exception, string messageTemplate, T0 propertyValue0);
-        /// <summary>
-        /// Logs a warning message with an exception.
-        /// </summary>
-        /// <param name="reporting">The reporting type.</param>
-        /// <param name="message">A message template.</param>
-        /// <param name="propertyValue0">Property value 0</param>
-        void Warn<T0>(Type reporting, string message, T0 propertyValue0);
+       
 
         /// <summary>
         /// Logs an information message.
@@ -235,30 +148,7 @@ namespace Umbraco.Core.Logging
         /// <param name="messageTemplate">A message template.</param>
         /// <param name="propertyValues">Property values.</param>
         void Info(Type reporting, string messageTemplate, params object[] propertyValues);
-        /// <summary>
-        /// Logs a info message.
-        /// </summary>
-        /// <param name="reporting">The reporting type.</param>
-        /// <param name="messageTemplate">A message template.</param>
-        /// <param name="propertyValue0">Property value 0</param>
-        /// <param name="propertyValue1">Property value 1</param>
-        /// <param name="propertyValue2">Property value 2</param>
-        void Info<T0, T1, T2>(Type reporting, string messageTemplate, T0 propertyValue0, T1 propertyValue1, T2 propertyValue2);
-        /// <summary>
-        /// Logs a info message.
-        /// </summary>
-        /// <param name="reporting">The reporting type.</param>
-        /// <param name="messageTemplate">A message template.</param>
-        /// <param name="propertyValue0">Property value 0</param>
-        /// <param name="propertyValue1">Property value 1</param>
-        void Info<T0, T1>(Type reporting, string messageTemplate, T0 propertyValue0, T1 propertyValue1);
-        /// <summary>
-        /// Logs a info message.
-        /// </summary>
-        /// <param name="reporting">The reporting type.</param>
-        /// <param name="messageTemplate">A message template.</param>
-        /// <param name="propertyValue0">Property value 0</param>
-        void Info<T0>(Type reporting, string messageTemplate, T0 propertyValue0);
+       
 
         /// <summary>
         /// Logs a debugging message.
@@ -276,31 +166,6 @@ namespace Umbraco.Core.Logging
         void Debug(Type reporting, string messageTemplate, params object[] propertyValues);
 
         /// <summary>
-        /// Logs a debug message.
-        /// </summary>
-        /// <param name="reporting">The reporting type.</param>
-        /// <param name="messageTemplate">A message template.</param>
-        /// <param name="propertyValue0">Property value 0</param>
-        /// <param name="propertyValue1">Property value 1</param>
-        /// <param name="propertyValue2">Property value 2</param>
-        void Debug<T0, T1, T2>(Type reporting, string messageTemplate, T0 propertyValue0, T1 propertyValue1, T2 propertyValue2);
-        /// <summary>
-        /// Logs a debug message.
-        /// </summary>
-        /// <param name="reporting">The reporting type.</param>
-        /// <param name="messageTemplate">A message template.</param>
-        /// <param name="propertyValue0">Property value 0</param>
-        /// <param name="propertyValue1">Property value 1</param>
-        void Debug<T0, T1>(Type reporting, string messageTemplate, T0 propertyValue0, T1 propertyValue1);
-        /// <summary>
-        /// Logs a debug message.
-        /// </summary>
-        /// <param name="reporting">The reporting type.</param>
-        /// <param name="messageTemplate">A message template.</param>
-        /// <param name="propertyValue0">Property value 0</param>
-        void Debug<T0>(Type reporting, string messageTemplate, T0 propertyValue0);
-
-        /// <summary>
         /// Logs a verbose message.
         /// </summary>
         /// <param name="reporting">The reporting type.</param>
@@ -314,29 +179,6 @@ namespace Umbraco.Core.Logging
         /// <param name="messageTemplate">A message template.</param>
         /// <param name="propertyValues">Property values.</param>
         void Verbose(Type reporting, string messageTemplate, params object[] propertyValues);
-        /// <summary>
-        /// Logs a verbose message.
-        /// </summary>
-        /// <param name="reporting">The reporting type.</param>
-        /// <param name="messageTemplate">A message template.</param>
-        /// <param name="propertyValue0">Property value 0</param>
-        /// <param name="propertyValue1">Property value 1</param>
-        /// <param name="propertyValue2">Property value 2</param>
-        void Verbose<T0, T1, T2>(Type reporting, string messageTemplate, T0 propertyValue0, T1 propertyValue1, T2 propertyValue2);
-        /// <summary>
-        /// Logs a verbose message.
-        /// </summary>
-        /// <param name="reporting">The reporting type.</param>
-        /// <param name="messageTemplate">A message template.</param>
-        /// <param name="propertyValue0">Property value 0</param>
-        /// <param name="propertyValue1">Property value 1</param>
-        void Verbose<T0, T1>(Type reporting, string messageTemplate, T0 propertyValue0, T1 propertyValue1);
-        /// <summary>
-        /// Logs a verbose message.
-        /// </summary>
-        /// <param name="reporting">The reporting type.</param>
-        /// <param name="messageTemplate">A message template.</param>
-        /// <param name="propertyValue0">Property value 0</param>
-        void Verbose<T0>(Type reporting, string messageTemplate, T0 propertyValue0);
+        
     }
 }

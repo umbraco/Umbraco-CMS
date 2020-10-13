@@ -324,9 +324,9 @@ namespace Umbraco.Core.Migrations.Install
             }
 
             // save
-            logger.Info<DatabaseBuilder>("Saving connection string to {ConfigFile}.", fileSource);
+            logger.Info<DatabaseBuilder, string>("Saving connection string to {ConfigFile}.", fileSource);
             xml.Save(fileName, SaveOptions.DisableFormatting);
-            logger.Info<DatabaseBuilder>("Saved connection string to {ConfigFile}.", fileSource);
+            logger.Info<DatabaseBuilder, string>("Saved connection string to {ConfigFile}.", fileSource);
         }
 
         private static void AddOrUpdateAttribute(XElement element, string name, string value)
@@ -453,7 +453,7 @@ namespace Umbraco.Core.Migrations.Install
                     message = message + "<p>Installation completed!</p>";
 
                     //now that everything is done, we need to determine the version of SQL server that is executing
-                    _logger.Info<DatabaseBuilder>("Database configuration status: {DbConfigStatus}", message);
+                    _logger.Info<DatabaseBuilder, string>("Database configuration status: {DbConfigStatus}", message);
                     return new Result { Message = message, Success = true, Percentage = "100" };
                 }
 
@@ -502,7 +502,7 @@ namespace Umbraco.Core.Migrations.Install
 
                 //now that everything is done, we need to determine the version of SQL server that is executing
 
-                _logger.Info<DatabaseBuilder>("Database configuration status: {DbConfigStatus}", message);
+                _logger.Info<DatabaseBuilder, string>("Database configuration status: {DbConfigStatus}", message);
 
                 return new Result { Message = message, Success = true, Percentage = "100" };
             }
@@ -533,7 +533,7 @@ namespace Umbraco.Core.Migrations.Install
 
             if (_databaseSchemaValidationResult != null)
             {
-                _logger.Info<DatabaseBuilder>("The database schema validation produced the following summary: {DbSchemaSummary}", _databaseSchemaValidationResult.GetSummary());
+                _logger.Info<DatabaseBuilder, string>("The database schema validation produced the following summary: {DbSchemaSummary}", _databaseSchemaValidationResult.GetSummary());
             }
 
             return new Result

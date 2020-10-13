@@ -100,7 +100,7 @@ namespace Umbraco.Web.Editors
             catch (Exception ex)
             {
                 // IOException, PathTooLong, DirectoryNotFound, UnathorizedAccess
-                Logger.Error<TinyMceController>(ex, "Error when trying to move {CurrentFilePath} to {NewFilePath}", currentFile, newFilePath);
+                Logger.Error<TinyMceController, string, string>(ex, "Error when trying to move {CurrentFilePath} to {NewFilePath}", currentFile, newFilePath);
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, $"Error when trying to move {currentFile} to {newFilePath}", ex);
             }
 

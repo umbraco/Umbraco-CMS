@@ -44,7 +44,7 @@ namespace Umbraco.Web.Routing
                 if (node != null)
                 {
                     frequest.PublishedContent = node;
-                    Logger.Debug<ContentFinderByUrlAlias>("Path '{UriAbsolutePath}' is an alias for id={PublishedContentId}", frequest.Uri.AbsolutePath, frequest.PublishedContent.Id);
+                    Logger.Debug<ContentFinderByUrlAlias, string, int>("Path '{UriAbsolutePath}' is an alias for id={PublishedContentId}", frequest.Uri.AbsolutePath, frequest.PublishedContent.Id);
                 }
             }
 

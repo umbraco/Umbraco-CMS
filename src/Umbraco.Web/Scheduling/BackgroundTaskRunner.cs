@@ -239,7 +239,7 @@ namespace Umbraco.Web.Scheduling
                     throw new InvalidOperationException("The task runner has completed.");
 
                 // add task
-                _logger.Debug<BackgroundTaskRunner>("{LogPrefix} Task Added {TaskType}", _logPrefix , task.GetType().FullName);
+                _logger.Debug<BackgroundTaskRunner, string, string>("{LogPrefix} Task Added {TaskType}", _logPrefix , task.GetType().FullName);
                 _tasks.Post(task);
 
                 // start
@@ -259,12 +259,12 @@ namespace Umbraco.Web.Scheduling
             {
                 if (_completed)
                 {
-                    _logger.Debug<BackgroundTaskRunner>("{LogPrefix} Task cannot be added {TaskType}, the task runner has already shutdown", _logPrefix, task.GetType().FullName);
+                    _logger.Debug<BackgroundTaskRunner, string, string>("{LogPrefix} Task cannot be added {TaskType}, the task runner has already shutdown", _logPrefix, task.GetType().FullName);
                     return false;
                 }
 
                 // add task
-                _logger.Debug<BackgroundTaskRunner>("{LogPrefix} Task added {TaskType}", _logPrefix, task.GetType().FullName);
+                _logger.Debug<BackgroundTaskRunner, string, string>("{LogPrefix} Task added {TaskType}", _logPrefix, task.GetType().FullName);
                 _tasks.Post(task);
 
                 // start
@@ -321,7 +321,7 @@ namespace Umbraco.Web.Scheduling
             _shutdownToken = _shutdownTokenSource.Token;
             _runningTask = Task.Run(async () => await Pump().ConfigureAwait(false), _shutdownToken);
 
-            _logger.Debug<BackgroundTaskRunner>("{LogPrefix} Starting", _logPrefix);
+            _logger.Debug<BackgroundTaskRunner, string>("{LogPrefix} Starting", _logPrefix);
         }
 
         /// <summary>
@@ -342,7 +342,7 @@ namespace Umbraco.Web.Scheduling
             var hasTasks = TaskCount > 0;
 
             if (!force && hasTasks)
-                _logger.Info<BackgroundTaskRunner>("{LogPrefix} Waiting for tasks to complete", _logPrefix);
+                _logger.Info<BackgroundTaskRunner, string>("{LogPrefix} Waiting for tasks to complete", _logPrefix);
 
             // complete the queue
             // will stop waiting on the queue or on a latch
@@ -408,7 +408,7 @@ namespace Umbraco.Web.Scheduling
                         }
                         catch (Exception ex)
                         {
-                            _logger.Error<BackgroundTaskRunner>(ex, "{LogPrefix} Task runner exception", _logPrefix);
+                            _logger.Error<BackgroundTaskRunner, string>(ex, "{LogPrefix} Task runner exception", _logPrefix);
                         }
                     }
                 }
@@ -440,7 +440,7 @@ namespace Umbraco.Web.Scheduling
                     if (_shutdownToken.IsCancellationRequested == false && TaskCount > 0) continue;
 
                     // if we really have nothing to do, stop
-                    _logger.Debug<BackgroundTaskRunner>("{LogPrefix} Stopping", _logPrefix);
+                    _logger.Debug<BackgroundTaskRunner, string>("{LogPrefix} Stopping", _logPrefix);
 
                     if (_options.PreserveRunningTask == false)
                         _runningTask = null;
@@ -567,7 +567,7 @@ namespace Umbraco.Web.Scheduling
             catch (Exception ex)
             {
 
-                _logger.Error<BackgroundTaskRunner>(ex, "{LogPrefix} Task has failed", _logPrefix);
+                _logger.Error<BackgroundTaskRunner, string>(ex, "{LogPrefix} Task has failed", _logPrefix);
             }
         }
 
@@ -601,7 +601,7 @@ namespace Umbraco.Web.Scheduling
 
         private void OnEvent<TArgs>(TypedEventHandler<BackgroundTaskRunner<T>, TArgs> handler, string name, TArgs e)
         {
-            _logger.Debug<BackgroundTaskRunner>("{LogPrefix} OnEvent {EventName}", _logPrefix, name);
+            _logger.Debug<BackgroundTaskRunner, string, string>("{LogPrefix} OnEvent {EventName}", _logPrefix, name);
 
             if (handler == null) return;
 
@@ -611,7 +611,7 @@ namespace Umbraco.Web.Scheduling
             }
             catch (Exception ex)
             {
-                _logger.Error<BackgroundTaskRunner>(ex, "{LogPrefix} {Name} exception occurred", _logPrefix, name);
+                _logger.Error<BackgroundTaskRunner, string, string>(ex, "{LogPrefix} {Name} exception occurred", _logPrefix, name);
             }
         }
 
@@ -698,7 +698,7 @@ namespace Umbraco.Web.Scheduling
                 if (_terminating == false)
                 {
                     _terminating = true;
-                    _logger.Info<BackgroundTaskRunner>("{LogPrefix} Terminating {Immediate}", _logPrefix, immediate ? immediate.ToString() : string.Empty);
+                    _logger.Info<BackgroundTaskRunner, string, string>("{LogPrefix} Terminating {Immediate}", _logPrefix, immediate ? immediate.ToString() : string.Empty);
                     onTerminating = true;
                 }
             }
@@ -783,7 +783,7 @@ namespace Umbraco.Web.Scheduling
         /// </remarks>
         private void StopImmediate()
         {
-            _logger.Info<BackgroundTaskRunner>("{LogPrefix} Canceling tasks", _logPrefix);
+            _logger.Info<BackgroundTaskRunner, string>("{LogPrefix} Canceling tasks", _logPrefix);
             try
             {
                 Shutdown(true, true); // cancel all tasks, wait for the current one to end
@@ -817,7 +817,7 @@ namespace Umbraco.Web.Scheduling
                 terminatedSource = _terminatedSource;
             }
 
-            _logger.Info<BackgroundTaskRunner>("{LogPrefix} Tasks {TaskStatus}, terminated",
+            _logger.Info<BackgroundTaskRunner, string, string>("{LogPrefix} Tasks {TaskStatus}, terminated",
                 _logPrefix,
                 immediate ? "cancelled" : "completed");
 

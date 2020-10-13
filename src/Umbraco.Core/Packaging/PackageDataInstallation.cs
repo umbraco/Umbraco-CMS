@@ -532,7 +532,7 @@ namespace Umbraco.Core.Packaging
                         var tryCreateFolder = _contentTypeService.CreateContainer(-1, rootFolder);
                         if (tryCreateFolder == false)
                         {
-                            _logger.Error<PackagingService>(tryCreateFolder.Exception, "Could not create folder: {FolderName}", rootFolder);
+                            _logger.Error<PackagingService, string>(tryCreateFolder.Exception, "Could not create folder: {FolderName}", rootFolder);
                             throw tryCreateFolder.Exception;
                         }
                         var rootFolderId = tryCreateFolder.Result.Entity.Id;
@@ -566,7 +566,7 @@ namespace Umbraco.Core.Packaging
             var tryCreateFolder = _contentTypeService.CreateContainer(current.Id, folderName);
             if (tryCreateFolder == false)
             {
-                _logger.Error<PackagingService>(tryCreateFolder.Exception, "Could not create folder: {FolderName}", folderName);
+                _logger.Error<PackagingService, string>(tryCreateFolder.Exception, "Could not create folder: {FolderName}", folderName);
                 throw tryCreateFolder.Exception;
             }
             return _contentTypeService.GetContainer(tryCreateFolder.Result.Entity.Id);
@@ -679,7 +679,7 @@ namespace Umbraco.Core.Packaging
                     }
                     else
                     {
-                        _logger.Warn<PackagingService>("Packager: Error handling allowed templates. Template with alias '{TemplateAlias}' could not be found.", alias);
+                        _logger.Warn<PackagingService,string>("Packager: Error handling allowed templates. Template with alias '{TemplateAlias}' could not be found.", alias);
                     }
                 }
 
@@ -695,7 +695,7 @@ namespace Umbraco.Core.Packaging
                 }
                 else
                 {
-                    _logger.Warn<PackagingService>("Packager: Error handling default template. Default template with alias '{DefaultTemplateAlias}' could not be found.", defaultTemplateElement.Value);
+                    _logger.Warn<PackagingService,string>("Packager: Error handling default template. Default template with alias '{DefaultTemplateAlias}' could not be found.", defaultTemplateElement.Value);
                 }
             }
         }
@@ -767,7 +767,7 @@ namespace Umbraco.Core.Packaging
                 if (dataTypeDefinition == null)
                 {
                     // TODO: We should expose this to the UI during install!
-                    _logger.Warn<PackagingService>("Packager: Error handling creation of PropertyType '{PropertyType}'. Could not find DataTypeDefintion with unique id '{DataTypeDefinitionId}' nor one referencing the DataType with a property editor alias (or legacy control id) '{PropertyEditorAlias}'. Did the package creator forget to package up custom datatypes? This property will be converted to a label/readonly editor if one exists.",
+                    _logger.Warn<PackagingService, string, Guid, string>("Packager: Error handling creation of PropertyType '{PropertyType}'. Could not find DataTypeDefintion with unique id '{DataTypeDefinitionId}' nor one referencing the DataType with a property editor alias (or legacy control id) '{PropertyEditorAlias}'. Did the package creator forget to package up custom datatypes? This property will be converted to a label/readonly editor if one exists.",
                         property.Element("Name").Value, dataTypeDefinitionId, property.Element("Type").Value.Trim());
 
                     //convert to a label!
@@ -824,7 +824,7 @@ namespace Umbraco.Core.Packaging
                 var allowedChild = importedContentTypes.ContainsKey(alias) ? importedContentTypes[alias] : _contentTypeService.Get(alias);
                 if (allowedChild == null)
                 {
-                    _logger.Warn<PackagingService>(
+                    _logger.Warn<PackagingService, string, string>(
                         "Packager: Error handling DocumentType structure. DocumentType with alias '{DoctypeAlias}' could not be found and was not added to the structure for '{DoctypeStructureAlias}'.",
                         alias, contentType.Alias);
                     continue;
@@ -945,7 +945,7 @@ namespace Umbraco.Core.Packaging
                         var tryCreateFolder = _dataTypeService.CreateContainer(-1, rootFolder);
                         if (tryCreateFolder == false)
                         {
-                            _logger.Error<PackagingService>(tryCreateFolder.Exception, "Could not create folder: {FolderName}", rootFolder);
+                            _logger.Error<PackagingService, string>(tryCreateFolder.Exception, "Could not create folder: {FolderName}", rootFolder);
                             throw tryCreateFolder.Exception;
                         }
                         current = _dataTypeService.GetContainer(tryCreateFolder.Result.Entity.Id);
@@ -978,7 +978,7 @@ namespace Umbraco.Core.Packaging
             var tryCreateFolder = _dataTypeService.CreateContainer(current.Id, folderName);
             if (tryCreateFolder == false)
             {
-                _logger.Error<PackagingService>(tryCreateFolder.Exception, "Could not create folder: {FolderName}", folderName);
+                _logger.Error<PackagingService, string>(tryCreateFolder.Exception, "Could not create folder: {FolderName}", folderName);
                 throw tryCreateFolder.Exception;
             }
             return _dataTypeService.GetContainer(tryCreateFolder.Result.Entity.Id);
@@ -1283,7 +1283,7 @@ namespace Umbraco.Core.Packaging
                 else if (string.IsNullOrEmpty((string)elementCopy.Element("Master")) == false &&
                          templateElements.Any(x => (string)x.Element("Alias") == (string)elementCopy.Element("Master")) == false)
                 {
-                    _logger.Info<PackageDataInstallation>(
+                    _logger.Info<PackageDataInstallation, string, string>(
                         "Template '{TemplateAlias}' has an invalid Master '{TemplateMaster}', so the reference has been ignored.",
                         (string)elementCopy.Element("Alias"),
                         (string)elementCopy.Element("Master"));

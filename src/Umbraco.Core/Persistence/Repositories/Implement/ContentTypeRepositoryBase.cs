@@ -1197,7 +1197,7 @@ AND umbracoNode.id <> @id",
             {
                 var ex = new InvalidOperationException($"Property Type '{pt.Name}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.");
 
-                Logger.Error<ContentTypeRepositoryBase<TEntity>>("Property Type '{PropertyTypeName}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.",
+                Logger.Error<ContentTypeRepositoryBase<TEntity>, string>("Property Type '{PropertyTypeName}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.",
                     pt.Name);
 
                 throw ex;
@@ -1210,7 +1210,7 @@ AND umbracoNode.id <> @id",
             {
                 var ex = new InvalidOperationException($"{typeof(TEntity).Name} '{entity.Name}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.");
 
-                Logger.Error<ContentTypeRepositoryBase<TEntity>>("{EntityTypeName} '{EntityName}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.",
+                Logger.Error<ContentTypeRepositoryBase<TEntity>, string, string>("{EntityTypeName} '{EntityName}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.",
                     typeof(TEntity).Name,
                     entity.Name);
 
@@ -1242,7 +1242,7 @@ AND umbracoNode.id <> @id",
                 }
                 else
                 {
-                    Logger.Warn<ContentTypeRepositoryBase<TEntity>>("Could not assign a data type for the property type {PropertyTypeAlias} since no data type was found with a property editor {PropertyEditorAlias}", propertyType.Alias, propertyType.PropertyEditorAlias);
+                    Logger.Warn<ContentTypeRepositoryBase<TEntity>, string, string>("Could not assign a data type for the property type {PropertyTypeAlias} since no data type was found with a property editor {PropertyEditorAlias}", propertyType.Alias, propertyType.PropertyEditorAlias);
                 }
             }
         }
