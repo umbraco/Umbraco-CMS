@@ -353,9 +353,7 @@ angular.module('umbraco.services')
              * @param {string} url the original url without cache buster 
              * @returns {string} The url with the cache buster appended
              */
-            appendCacheBuster: function (url) {
-                return appendRnd(url);
-            }
+            appendCacheBuster: appendRnd
         };
 
         return service;
