@@ -82,7 +82,7 @@ namespace Umbraco.Web.Search
             string type;
             var indexName = Constants.UmbracoIndexes.InternalIndexName;
             var fields = _umbracoTreeSearcherFields.GetBackOfficeFields().ToList();
-            ISet<string> fieldsToLoad;
+            ISet<string> fieldsToLoad = null;
 
             // TODO: WE should try to allow passing in a lucene raw query, however we will still need to do some manual string
             // manipulation for things like start paths, member types, etc...
@@ -103,7 +103,10 @@ namespace Umbraco.Web.Search
                     indexName = Constants.UmbracoIndexes.MembersIndexName;
                     type = "member";
                     fields.AddRange(_umbracoTreeSearcherFields.GetBackOfficeMembersFields());
-                    fieldsToLoad = _umbracoTreeSearcherFields.GetBackOfficeMembersFieldsToLoad();
+                    if(_umbracoTreeSearcherFields is IUmbracoTreeSearcherFields2 umbracoTreeSearcherFieldMember)
+                    {
+                        fieldsToLoad = umbracoTreeSearcherFieldMember.GetBackOfficeMembersFieldsToLoad();
+                    }
                     if (searchFrom != null && searchFrom != Constants.Conventions.MemberTypes.AllMembersListId && searchFrom.Trim() != "-1")
                     {
                         sb.Append("+__NodeTypeAlias:");
@@ -114,14 +117,20 @@ namespace Umbraco.Web.Search
                 case UmbracoEntityTypes.Media:
                     type = "media";
                     fields.AddRange(_umbracoTreeSearcherFields.GetBackOfficeMediaFields());
-                    fieldsToLoad = _umbracoTreeSearcherFields.GetBackOfficeMediaFieldsToLoad();
+                    if (_umbracoTreeSearcherFields is IUmbracoTreeSearcherFields2 umbracoTreeSearcherFieldsMedia)
+                    {
+                        fieldsToLoad = umbracoTreeSearcherFieldsMedia.GetBackOfficeMediaFieldsToLoad();
+                    }
                     var allMediaStartNodes = _umbracoContext.Security.CurrentUser.CalculateMediaStartNodeIds(_entityService);
                     AppendPath(sb, UmbracoObjectTypes.Media, allMediaStartNodes, searchFrom, ignoreUserStartNodes, _entityService);
                     break;
                 case UmbracoEntityTypes.Document:
                     type = "content";
                     fields.AddRange(_umbracoTreeSearcherFields.GetBackOfficeDocumentFields());
-                    fieldsToLoad = _umbracoTreeSearcherFields.GetBackOfficeDocumentFieldsToLoad();
+                    if (_umbracoTreeSearcherFields is IUmbracoTreeSearcherFields2 umbracoTreeSearcherFieldsDocument)
+                    {
+                        fieldsToLoad = umbracoTreeSearcherFieldsDocument.GetBackOfficeDocumentFieldsToLoad();
+                    }
                     var allContentStartNodes = _umbracoContext.Security.CurrentUser.CalculateContentStartNodeIds(_entityService);
                     AppendPath(sb, UmbracoObjectTypes.Document, allContentStartNodes, searchFrom, ignoreUserStartNodes, _entityService);
                     break;
