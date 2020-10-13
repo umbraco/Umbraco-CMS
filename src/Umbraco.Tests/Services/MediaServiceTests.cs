@@ -40,12 +40,14 @@ namespace Umbraco.Tests.Services
             media = ServiceContext.MediaService.GetById(media.Id);
             media.SetValue("title", "another title of mine");          // Change a value
             media.SetValue("bodyText", null);                          // Clear a value
+            media.SetValue("author", "new author");                    // Add a value
             ServiceContext.MediaService.Save(media);
 
             // re-get
             media = ServiceContext.MediaService.GetById(media.Id);
             Assert.AreEqual("another title of mine", media.GetValue("title"));
             Assert.IsNull(media.GetValue("bodyText"));
+            Assert.AreEqual("new author", media.GetValue("author"));
         }
 
         /// <summary>

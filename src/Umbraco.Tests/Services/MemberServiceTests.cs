@@ -62,12 +62,14 @@ namespace Umbraco.Tests.Services
             member = ServiceContext.MemberService.GetById(member.Id);
             member.SetValue("title", "another title of mine");          // Change a value
             member.SetValue("bodyText", null);                          // Clear a value
+            member.SetValue("author", "new author");                    // Add a value
             ServiceContext.MemberService.Save(member);
 
             // re-get
             member = ServiceContext.MemberService.GetById(member.Id);
             Assert.AreEqual("another title of mine", member.GetValue("title"));
             Assert.IsNull(member.GetValue("bodyText"));
+            Assert.AreEqual("new author", member.GetValue("author"));
         }
 
         [Test]

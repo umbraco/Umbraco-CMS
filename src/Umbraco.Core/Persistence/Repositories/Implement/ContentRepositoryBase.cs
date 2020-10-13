@@ -919,6 +919,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 }
                 else
                 {
+                    // TODO: we can speed this up: Use BulkInsert and then do one SELECT to re-retrieve the property data inserted with assigned IDs.
+                    // This is a perfect thing to benchmark with Benchmark.NET to compare perf between Nuget releases.
                     Database.Insert(propertyDataDto);
                 }
 
