@@ -51,6 +51,7 @@
     <Compile Include="Config\QuickRunConfigAttribute.cs" />
     <Compile Include="Config\QuickRunWithMemoryDiagnoserConfigAttribute.cs" />
     <Compile Include="CtorInvokeBenchmarks.cs" />
+    <Compile Include="DefaultShortStringHelperBenchmark.cs" />
     <Compile Include="HexStringBenchmarks.cs" />
     <Compile Include="EnumeratorBenchmarks.cs" />
     <Compile Include="LinqCastBenchmarks.cs" />
