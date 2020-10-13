@@ -2144,36 +2144,41 @@ namespace Umbraco.Tests.Integration.Services
                 Key = new Guid("D7B84CC9-14AE-4D92-A042-023767AD3304")
             };
 
-            page.SetCultureName("fr1", "fr");
-            page.SetCultureName("da1", "da");
+            page.SetCultureName("fr1", langFr.IsoCode);
+            page.SetCultureName("da1", langDa.IsoCode);
+            Thread.Sleep(1);
             ContentService.Save(page);
             var versionId0 = page.VersionId;
 
-            page.SetValue(p1.Alias, "v1fr", "fr");
-            page.SetValue(p1.Alias, "v1da", "da");
+            page.SetValue(p1.Alias, "v1fr", langFr.IsoCode);
+            page.SetValue(p1.Alias, "v1da", langDa.IsoCode);
+            Thread.Sleep(1);
             ContentService.SaveAndPublish(page);
             var versionId1 = page.VersionId;
 
-            Thread.Sleep(250);
+            Thread.Sleep(10);
 
-            page.SetCultureName("fr2", "fr");
-            page.SetValue(p1.Alias, "v2fr", "fr");
-            ContentService.SaveAndPublish(page, "fr");
+            page.SetCultureName("fr2", langFr.IsoCode);
+            page.SetValue(p1.Alias, "v2fr", langFr.IsoCode);
+            Thread.Sleep(1);
+            ContentService.SaveAndPublish(page, langFr.IsoCode);
             var versionId2 = page.VersionId;
 
-            Thread.Sleep(250);
+            Thread.Sleep(10);
 
-            page.SetCultureName("da2", "da");
-            page.SetValue(p1.Alias, "v2da", "da");
-            ContentService.SaveAndPublish(page, "da");
+            page.SetCultureName("da2", langDa.IsoCode);
+            page.SetValue(p1.Alias, "v2da", langDa.IsoCode);
+            Thread.Sleep(1);
+            ContentService.SaveAndPublish(page, langDa.IsoCode);
             var versionId3 = page.VersionId;
 
-            Thread.Sleep(250);
+            Thread.Sleep(10);
 
-            page.SetCultureName("fr3", "fr");
-            page.SetCultureName("da3", "da");
-            page.SetValue(p1.Alias, "v3fr", "fr");
-            page.SetValue(p1.Alias, "v3da", "da");
+            page.SetCultureName("fr3", langFr.IsoCode);
+            page.SetCultureName("da3", langDa.IsoCode);
+            page.SetValue(p1.Alias, "v3fr", langFr.IsoCode);
+            page.SetValue(p1.Alias, "v3da", langDa.IsoCode);
+            Thread.Sleep(1);
             ContentService.SaveAndPublish(page);
             var versionId4 = page.VersionId;
 
@@ -2199,76 +2204,75 @@ namespace Umbraco.Tests.Integration.Services
             Assert.AreEqual(versionId0, versions[4].VersionId);
             Assert.AreEqual(versionId3, versions[4].PublishedVersionId);
 
-            Assert.AreEqual("fr3", versions[4].GetPublishName("fr"));
-            Assert.AreEqual("fr3", versions[3].GetPublishName("fr"));
-            Assert.AreEqual("fr3", versions[2].GetPublishName("fr"));
-            Assert.AreEqual("fr3", versions[1].GetPublishName("fr"));
-            Assert.AreEqual("fr3", versions[0].GetPublishName("fr"));
+            Assert.AreEqual("fr3", versions[4].GetPublishName(langFr.IsoCode));
+            Assert.AreEqual("fr3", versions[3].GetPublishName(langFr.IsoCode));
+            Assert.AreEqual("fr3", versions[2].GetPublishName(langFr.IsoCode));
+            Assert.AreEqual("fr3", versions[1].GetPublishName(langFr.IsoCode));
+            Assert.AreEqual("fr3", versions[0].GetPublishName(langFr.IsoCode));
 
-            Assert.AreEqual("fr1", versions[4].GetCultureName("fr"));
-            Assert.AreEqual("fr2", versions[3].GetCultureName("fr"));
-            Assert.AreEqual("fr2", versions[2].GetCultureName("fr"));
-            Assert.AreEqual("fr3", versions[1].GetCultureName("fr"));
-            Assert.AreEqual("fr3", versions[0].GetCultureName("fr"));
+            Assert.AreEqual("fr1", versions[4].GetCultureName(langFr.IsoCode));
+            Assert.AreEqual("fr2", versions[3].GetCultureName(langFr.IsoCode));
+            Assert.AreEqual("fr2", versions[2].GetCultureName(langFr.IsoCode));
+            Assert.AreEqual("fr3", versions[1].GetCultureName(langFr.IsoCode));
+            Assert.AreEqual("fr3", versions[0].GetCultureName(langFr.IsoCode));
 
-            Assert.AreEqual("da3", versions[4].GetPublishName("da"));
-            Assert.AreEqual("da3", versions[3].GetPublishName("da"));
-            Assert.AreEqual("da3", versions[2].GetPublishName("da"));
-            Assert.AreEqual("da3", versions[1].GetPublishName("da"));
-            Assert.AreEqual("da3", versions[0].GetPublishName("da"));
+            Assert.AreEqual("da3", versions[4].GetPublishName(langDa.IsoCode));
+            Assert.AreEqual("da3", versions[3].GetPublishName(langDa.IsoCode));
+            Assert.AreEqual("da3", versions[2].GetPublishName(langDa.IsoCode));
+            Assert.AreEqual("da3", versions[1].GetPublishName(langDa.IsoCode));
+            Assert.AreEqual("da3", versions[0].GetPublishName(langDa.IsoCode));
 
-            Assert.AreEqual("da1", versions[4].GetCultureName("da"));
-            Assert.AreEqual("da1", versions[3].GetCultureName("da"));
-            Assert.AreEqual("da2", versions[2].GetCultureName("da"));
-            Assert.AreEqual("da3", versions[1].GetCultureName("da"));
-            Assert.AreEqual("da3", versions[0].GetCultureName("da"));
+            Assert.AreEqual("da1", versions[4].GetCultureName(langDa.IsoCode));
+            Assert.AreEqual("da1", versions[3].GetCultureName(langDa.IsoCode));
+            Assert.AreEqual("da2", versions[2].GetCultureName(langDa.IsoCode));
+            Assert.AreEqual("da3", versions[1].GetCultureName(langDa.IsoCode));
+            Assert.AreEqual("da3", versions[0].GetCultureName(langDa.IsoCode));
 
             // all versions have the same publish infos
             for (var i = 0; i < 5; i++)
             {
                 Assert.AreEqual(versions[0].PublishDate, versions[i].PublishDate);
-                Assert.AreEqual(versions[0].GetPublishDate("fr"), versions[i].GetPublishDate("fr"));
-                Assert.AreEqual(versions[0].GetPublishDate("da"), versions[i].GetPublishDate("da"));
+                Assert.AreEqual(versions[0].GetPublishDate(langFr.IsoCode), versions[i].GetPublishDate(langFr.IsoCode));
+                Assert.AreEqual(versions[0].GetPublishDate(langDa.IsoCode), versions[i].GetPublishDate(langDa.IsoCode));
             }
 
             for (var i = 0; i < 5; i++)
             {
                 Console.Write("[{0}] ", i);
                 Console.WriteLine(versions[i].UpdateDate.ToString("O").Substring(11));
-                Console.WriteLine("    fr: {0}", versions[i].GetUpdateDate("fr")?.ToString("O").Substring(11));
-                Console.WriteLine("    da: {0}", versions[i].GetUpdateDate("da")?.ToString("O").Substring(11));
+                Console.WriteLine("    fr: {0}", versions[i].GetUpdateDate(langFr.IsoCode)?.ToString("O").Substring(11));
+                Console.WriteLine("    da: {0}", versions[i].GetUpdateDate(langDa.IsoCode)?.ToString("O").Substring(11));
             }
             Console.WriteLine("-");
 
             // for all previous versions, UpdateDate is the published date
 
-            Assert.AreEqual(versions[4].UpdateDate, versions[4].GetUpdateDate("fr"));
-            Assert.AreEqual(versions[4].UpdateDate, versions[4].GetUpdateDate("da"));
+            Assert.AreEqual(versions[4].UpdateDate, versions[4].GetUpdateDate(langFr.IsoCode));
+            Assert.AreEqual(versions[4].UpdateDate, versions[4].GetUpdateDate(langDa.IsoCode));
 
-            Assert.AreEqual(versions[3].UpdateDate, versions[3].GetUpdateDate("fr"));
-            Assert.AreEqual(versions[4].UpdateDate, versions[3].GetUpdateDate("da"));
+            Assert.AreEqual(versions[3].UpdateDate, versions[3].GetUpdateDate(langFr.IsoCode));
+            Assert.AreEqual(versions[4].UpdateDate, versions[3].GetUpdateDate(langDa.IsoCode));
 
-            Assert.AreEqual(versions[3].UpdateDate, versions[2].GetUpdateDate("fr"));
-            Assert.AreEqual(versions[2].UpdateDate, versions[2].GetUpdateDate("da"));
+            Assert.AreEqual(versions[3].UpdateDate, versions[2].GetUpdateDate(langFr.IsoCode));
+            Assert.AreEqual(versions[2].UpdateDate, versions[2].GetUpdateDate(langDa.IsoCode));
 
             // for the published version, UpdateDate is the published date
 
-            Assert.AreEqual(versions[1].UpdateDate, versions[1].GetUpdateDate("fr"));
-            Assert.AreEqual(versions[1].UpdateDate, versions[1].GetUpdateDate("da"));
+            Assert.AreEqual(versions[1].UpdateDate, versions[1].GetUpdateDate(langFr.IsoCode));
+            Assert.AreEqual(versions[1].UpdateDate, versions[1].GetUpdateDate(langDa.IsoCode));
             Assert.AreEqual(versions[1].PublishDate, versions[1].UpdateDate);
 
             // for the current version, things are different
             // UpdateDate is the date it was last saved
 
-            Assert.AreEqual(versions[0].UpdateDate, versions[0].GetUpdateDate("fr"));
-            Assert.AreEqual(versions[0].UpdateDate, versions[0].GetUpdateDate("da"));
+            Assert.AreEqual(versions[0].UpdateDate, versions[0].GetUpdateDate(langFr.IsoCode));
+            Assert.AreEqual(versions[0].UpdateDate, versions[0].GetUpdateDate(langDa.IsoCode));
 
             // so if we save again...
-
-            page.SetCultureName("fr4", "fr");
-            //page.SetCultureName("da4", "da");
-            page.SetValue(p1.Alias, "v4fr", "fr");
-            page.SetValue(p1.Alias, "v4da", "da");
+            page.SetCultureName("fr4", langFr.IsoCode);
+            //page.SetCultureName("da4", langDa.IsoCode);
+            page.SetValue(p1.Alias, "v4fr", langFr.IsoCode);
+            page.SetValue(p1.Alias, "v4da", langDa.IsoCode);
             ContentService.Save(page);
             var versionId5 = page.VersionId;
 
@@ -2282,8 +2286,8 @@ namespace Umbraco.Tests.Integration.Services
             {
                 Console.Write("[{0}] ", i);
                 Console.WriteLine(versions[i].UpdateDate.ToString("O").Substring(11));
-                Console.WriteLine("    fr: {0}", versions[i].GetUpdateDate("fr")?.ToString("O").Substring(11));
-                Console.WriteLine("    da: {0}", versions[i].GetUpdateDate("da")?.ToString("O").Substring(11));
+                Console.WriteLine("    fr: {0}", versions[i].GetUpdateDate(langFr.IsoCode)?.ToString("O").Substring(11));
+                Console.WriteLine("    da: {0}", versions[i].GetUpdateDate(langDa.IsoCode)?.ToString("O").Substring(11));
             }
             Console.WriteLine("-");
 
@@ -2292,32 +2296,32 @@ namespace Umbraco.Tests.Integration.Services
 
             for (var i = 0; i < 5; i++)
             {
-                Console.Write("[{0}] ", i);
-                Console.WriteLine(versionsSlim[i].UpdateDate.ToString("O").Substring(11));
-                Console.WriteLine("    fr: {0}", versionsSlim[i].GetUpdateDate("fr")?.ToString("O").Substring(11));
-                Console.WriteLine("    da: {0}", versionsSlim[i].GetUpdateDate("da")?.ToString("O").Substring(11));
+                Console.Write("[{0}]     ", i);
+                Console.WriteLine(versionsSlim[i].UpdateDate.Ticks);
+                Console.WriteLine("    fr: {0}", versionsSlim[i].GetUpdateDate(langFr.IsoCode)?.Ticks);
+                Console.WriteLine("    da: {0}", versionsSlim[i].GetUpdateDate(langDa.IsoCode)?.Ticks);
             }
             Console.WriteLine("-");
 
             // what we do in the controller to get rollback versions
-            var versionsSlimFr = versionsSlim.Where(x => x.UpdateDate == x.GetUpdateDate("fr")).ToArray();
-            Assert.AreEqual(3, versionsSlimFr.Length);
+            var versionsSlimFr = versionsSlim.Where(x => x.UpdateDate == x.GetUpdateDate(langFr.IsoCode)).ToArray();
+            Assert.AreEqual(4, versionsSlimFr.Length);
 
             // alas, at the moment we do *not* properly track 'dirty' for cultures, meaning
             // that we cannot synchronize dates the way we do with publish dates - and so this
             // would fail - the version UpdateDate is greater than the cultures'.
-            //Assert.AreEqual(versions[0].UpdateDate, versions[0].GetUpdateDate("fr"));
-            //Assert.AreEqual(versions[0].UpdateDate, versions[0].GetUpdateDate("da"));
+            Assert.AreEqual(versions[0].UpdateDate, versions[0].GetUpdateDate(langFr.IsoCode));
+            Assert.AreEqual(versions[0].UpdateDate, versions[0].GetUpdateDate(langDa.IsoCode));
 
             // now roll french back to its very first version
-            page.CopyFrom(versions[4], "fr"); // only the pure FR values
+            page.CopyFrom(versions[4], langFr.IsoCode); // only the pure FR values
             page.CopyFrom(versions[4], null); // so, must explicitly do the INVARIANT values too
-            page.SetCultureName(versions[4].GetPublishName("fr"), "fr");
+            page.SetCultureName(versions[4].GetPublishName(langFr.IsoCode), langFr.IsoCode);
             ContentService.Save(page);
 
             // and voila, rolled back!
-            Assert.AreEqual(versions[4].GetPublishName("fr"), page.GetCultureName("fr"));
-            Assert.AreEqual(versions[4].GetValue(p1.Alias, "fr"), page.GetValue(p1.Alias, "fr"));
+            Assert.AreEqual(versions[4].GetPublishName(langFr.IsoCode), page.GetCultureName(langFr.IsoCode));
+            Assert.AreEqual(versions[4].GetValue(p1.Alias, langFr.IsoCode), page.GetValue(p1.Alias, langFr.IsoCode));
 
             // note that rolling back invariant values means we also rolled back... DA... at least partially
             // bah?
