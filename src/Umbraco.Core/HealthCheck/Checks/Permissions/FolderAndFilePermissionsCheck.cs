@@ -17,14 +17,14 @@ namespace Umbraco.Core.HealthCheck.Checks.Permissions
     public class FolderAndFilePermissionsCheck : HealthCheck
     {
         private readonly ILocalizedTextService _textService;
-        private readonly GlobalSettings _globalSettings;
+        private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
         private readonly IFilePermissionHelper _filePermissionHelper;
         private readonly IIOHelper _ioHelper;
 
-        public FolderAndFilePermissionsCheck(ILocalizedTextService textService, IOptions<GlobalSettings> globalSettings, IFilePermissionHelper filePermissionHelper, IIOHelper ioHelper)
+        public FolderAndFilePermissionsCheck(ILocalizedTextService textService, IOptionsMonitor<GlobalSettings> globalSettings, IFilePermissionHelper filePermissionHelper, IIOHelper ioHelper)
         {
             _textService = textService;
-            _globalSettings = globalSettings.Value;
+            _globalSettings = globalSettings;
             _filePermissionHelper = filePermissionHelper;
             _ioHelper = ioHelper;
         }
@@ -60,10 +60,10 @@ namespace Umbraco.Core.HealthCheck.Checks.Permissions
                 { Constants.SystemDirectories.Preview, PermissionCheckRequirement.Required },
                 { Constants.SystemDirectories.AppPlugins, PermissionCheckRequirement.Required },
                 { Constants.SystemDirectories.Config, PermissionCheckRequirement.Optional },
-                { _globalSettings.UmbracoCssPath, PermissionCheckRequirement.Optional },
-                { _globalSettings.UmbracoMediaPath, PermissionCheckRequirement.Optional },
-                { _globalSettings.UmbracoScriptsPath, PermissionCheckRequirement.Optional },
-                { _globalSettings.UmbracoPath, PermissionCheckRequirement.Optional },
+                { _globalSettings.CurrentValue.UmbracoCssPath, PermissionCheckRequirement.Optional },
+                { _globalSettings.CurrentValue.UmbracoMediaPath, PermissionCheckRequirement.Optional },
+                { _globalSettings.CurrentValue.UmbracoScriptsPath, PermissionCheckRequirement.Optional },
+                { _globalSettings.CurrentValue.UmbracoPath, PermissionCheckRequirement.Optional },
                 { Constants.SystemDirectories.MvcViews, PermissionCheckRequirement.Optional }
             };
 

@@ -16,12 +16,12 @@ namespace Umbraco.Core.HealthCheck.Checks.Services
     public class SmtpCheck : HealthCheck
     {
         private readonly ILocalizedTextService _textService;
-        private readonly GlobalSettings _globalSettings;
+        private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
 
-        public SmtpCheck(ILocalizedTextService textService, IOptions<GlobalSettings> globalSettings)
+        public SmtpCheck(ILocalizedTextService textService, IOptionsMonitor<GlobalSettings> globalSettings)
         {
             _textService = textService;
-            _globalSettings = globalSettings.Value;
+            _globalSettings = globalSettings;
         }
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace Umbraco.Core.HealthCheck.Checks.Services
         {
             var success = false;
 
-            var smtpSettings = _globalSettings.Smtp;
+            var smtpSettings = _globalSettings.CurrentValue.Smtp;
 
             string message;
             if (smtpSettings == null)

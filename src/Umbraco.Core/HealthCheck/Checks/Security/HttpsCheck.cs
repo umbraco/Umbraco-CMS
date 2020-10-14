@@ -20,20 +20,20 @@ namespace Umbraco.Core.HealthCheck.Checks.Security
     public class HttpsCheck : HealthCheck
     {
         private readonly ILocalizedTextService _textService;
-        private readonly GlobalSettings _globalSettings;
+        private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
         private readonly IRequestAccessor _requestAccessor;
         private readonly ILogger<HttpsCheck> _logger;
         private const string FixHttpsSettingAction = "fixHttpsSetting";
         string itemPath => Constants.Configuration.ConfigGlobalUseHttps;
 
         public HttpsCheck(ILocalizedTextService textService,
-            IOptions<GlobalSettings> globalSettings,
+            IOptionsMonitor<GlobalSettings> globalSettings,
             IIOHelper ioHelper,
             IRequestAccessor requestAccessor,
             ILogger<HttpsCheck> logger)
         {
             _textService = textService;
-            _globalSettings = globalSettings.Value;
+            _globalSettings = globalSettings;
             _requestAccessor = requestAccessor;
             _logger = logger;
         }
@@ -152,7 +152,7 @@ namespace Umbraco.Core.HealthCheck.Checks.Security
 
         private HealthCheckStatus CheckHttpsConfigurationSetting()
         {
-            bool httpsSettingEnabled = _globalSettings.UseHttps;
+            bool httpsSettingEnabled = _globalSettings.CurrentValue.UseHttps;
             Uri uri = _requestAccessor.GetApplicationUrl();
             var actions = new List<HealthCheckAction>();
 
