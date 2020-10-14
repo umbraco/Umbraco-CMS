@@ -3,12 +3,12 @@
 * @name umbraco.directives.directive:umbControlGroup
 * @restrict E
 
-@param {string=} label The label for the control group field
-@param {string=} description The description for the control group field
-@param {boolean=} hideLabel Set to <code>true</code> to hide the label
-@param {string=} alias The alias of the field within the control group
-@param {string=} labelFor The alias of the field that the label is for, used for validation
-@param {boolean=} required Set to <code>true</code> to mark the field as required
+@param {string=} label The label for the control group field.
+@param {string=} description The description for the control group field.
+@param {boolean=} hideLabel Set to <code>true</code> to hide the label.
+@param {string=} alias The alias of the field within the control group.
+@param {string=} labelFor The alias of the field that the label is for, used for validation.
+@param {boolean=} required Set to <code>true</code> to mark the field as required.
 
 **/
 
