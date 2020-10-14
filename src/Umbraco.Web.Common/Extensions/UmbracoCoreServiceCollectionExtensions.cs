@@ -275,7 +275,7 @@ namespace Umbraco.Extensions
                 loggingConfiguration,
                 configuration, out var ioHelper, out var hostingEnvironment, out var backOfficeInfo, out var profiler);
 
-            var loggerFactory = serviceProvider.GetService<ILoggerFactory>();
+            var loggerFactory = services.BuildServiceProvider().GetService<ILoggerFactory>();
 
             var umbracoVersion = new UmbracoVersion();
             var typeFinder = CreateTypeFinder(loggerFactory, profiler, webHostEnvironment, entryAssembly, typeFinderSettings);

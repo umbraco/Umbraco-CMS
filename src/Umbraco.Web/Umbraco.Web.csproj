@@ -237,8 +237,6 @@
     <Compile Include="WebApi\Filters\FeatureAuthorizeAttribute.cs" />
     <Compile Include="WebApi\SessionHttpControllerRouteHandler.cs" />
     <Compile Include="WebApi\UmbracoApiControllerTypeCollectionBuilder.cs" />
-    <Compile Include="WebApi\UnhandedExceptionLoggerConfigurationAttribute.cs" />
-    <Compile Include="WebApi\UnhandledExceptionLogger.cs" />
     <Compile Include="Runtime\WebInitialComponent.cs" />
     <Compile Include="Mvc\ControllerContextExtensions.cs" />
     <Compile Include="Mvc\DisableBrowserCacheAttribute.cs" />
@@ -372,7 +370,6 @@
     <Compile Include="WebApi\UmbracoAuthorizeAttribute.cs" />
     <Compile Include="WebApi\UmbracoAuthorizedApiController.cs" />
     <Compile Include="WebApi\Filters\ValidationFilterAttribute.cs" />
-    <Compile Include="WebApi\Filters\UmbracoUserTimeoutFilterAttribute.cs" />
     <Compile Include="Mvc\ControllerExtensions.cs" />
     <Compile Include="TypeLoaderExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
