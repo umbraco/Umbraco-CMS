@@ -268,10 +268,7 @@
     <Compile Include="Mvc\PreRenderViewActionFilterAttribute.cs" />
     <Compile Include="Mvc\RedirectToUmbracoUrlResult.cs" />
     <Compile Include="Mvc\UmbracoVirtualNodeByIdRouteHandler.cs" />
-    <Compile Include="Mvc\JsonNetResult.cs" />
-    <Compile Include="Mvc\MinifyJavaScriptResultAttribute.cs" />
     <Compile Include="Mvc\EnsurePublishedContentRequestAttribute.cs" />
-    <Compile Include="Mvc\UmbracoViewPage.cs" />
     <Compile Include="Mvc\UmbracoVirtualNodeRouteHandler.cs" />
     <Compile Include="Security\AppBuilderExtensions.cs" />
     <Compile Include="Security\AuthenticationOptionsExtensions.cs" />
