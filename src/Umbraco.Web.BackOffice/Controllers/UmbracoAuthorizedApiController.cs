@@ -1,4 +1,5 @@
-﻿using Umbraco.Web.BackOffice.Filters;
+﻿using Microsoft.AspNetCore.Mvc;
+using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Controllers;
 using Umbraco.Web.Common.Filters;
@@ -14,13 +15,12 @@ namespace Umbraco.Web.BackOffice.Controllers
     /// before their timeout expires.
     /// </remarks>
     [IsBackOffice]
-    //[UmbracoUserTimeoutFilter] //TODO reintroduce
+    [UmbracoUserTimeoutFilter]
     [UmbracoAuthorize]
     [DisableBrowserCache]
     [UmbracoWebApiRequireHttps]
     [CheckIfUserTicketDataIsStale]
-    //[UnhandedExceptionLoggerConfiguration] //TODO reintroduce
-    //[EnableDetailedErrors] //TODO reintroduce
+    [MiddlewareFilter(typeof(UnhandledExceptionLoggerFilter))]
     public abstract class UmbracoAuthorizedApiController : UmbracoApiController
     {
 
