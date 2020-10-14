@@ -142,7 +142,8 @@ namespace Umbraco.Core.HealthCheck.Checks.Security
         private HealthCheckStatus SetHeaderInConfig()
         {
             var errorMessage = string.Empty;
-            var success = SaveHeaderToConfigFile(out errorMessage);
+            //TODO: edit to show fix suggestion instead of making fix
+            var success = true;
 
             if (success)
             {
@@ -158,60 +159,6 @@ namespace Umbraco.Core.HealthCheck.Checks.Security
                 {
                     ResultType = StatusResultType.Error
                 };
-        }
-
-        private bool SaveHeaderToConfigFile(out string errorMessage)
-        {
-            try
-            {
-                // There don't look to be any useful classes defined in https://msdn.microsoft.com/en-us/library/system.web.configuration(v=vs.110).aspx
-                // for working with the customHeaders section, so working with the XML directly.
-                //TODO: Custom headers for appsettings
-                //TODO: pass section in instead
-                //TODO: correct logic according to JSON structure
-                IConfigurationSection systemWebServerElement = null;
-                    //_configurationService.GetSection("system.webServer");
-                string httpProtocolElement = systemWebServerElement["httpProtocol"];
-                if (httpProtocolElement == null)
-                {
-                    //TODO: add httpProtocol to JSON
-                }
-
-                var customHeadersElement = systemWebServerElement["customHeaders"];
-                if (customHeadersElement == null)
-                {
-                    //TODO: customHeaders to JSON
-                }
-
-                //var removeHeaderElement = customHeadersElement.Elements("remove")
-                //    .SingleOrDefault(x => x.Attribute("name")?.Value.Equals(_value, StringComparison.InvariantCultureIgnoreCase) == true);
-                //if (removeHeaderElement == null)
-                //{
-                //    customHeadersElement.Add(
-                //        new XElement("remove",
-                //            new XAttribute("name", _header)));
-                //}
-
-                //var addHeaderElement = customHeadersElement.Elements("add")
-                //    .SingleOrDefault(x => x.Attribute("name")?.Value.Equals(_header, StringComparison.InvariantCultureIgnoreCase) == true);
-                //if (addHeaderElement == null)
-                //{
-                //    customHeadersElement.Add(
-                //        new XElement("add",
-                //            new XAttribute("name", _header),
-                //            new XAttribute("value", _value)));
-                //}
-
-                //TODO: save config
-
-                errorMessage = string.Empty;
-                return true;
-            }
-            catch (Exception ex)
-            {
-                errorMessage = ex.Message;
-                return false;
-            }
         }
     }
 }
