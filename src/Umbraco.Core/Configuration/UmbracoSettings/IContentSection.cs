@@ -32,5 +32,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         bool ShowDeprecatedPropertyEditors { get; }
 
         string LoginBackgroundImage { get; }
+
+        string LoginLogoImage { get; }
     }
 }

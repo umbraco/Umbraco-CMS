@@ -47,6 +47,7 @@
         vm.externalLoginInfo = externalLoginInfo;
         vm.resetPasswordCodeInfo = resetPasswordCodeInfo;
         vm.backgroundImage = Umbraco.Sys.ServerVariables.umbracoSettings.loginBackgroundImage;
+        vm.loginLogoImage = Umbraco.Sys.ServerVariables.umbracoSettings.loginLogoImage;
         vm.usernameIsEmail = Umbraco.Sys.ServerVariables.umbracoSettings.usernameIsEmail;
 
         vm.$onInit = onInit;
