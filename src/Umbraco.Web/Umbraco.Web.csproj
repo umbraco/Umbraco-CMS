@@ -148,7 +148,6 @@
     <Compile Include="Compose\AuditEventsComposer.cs" />
     <Compile Include="Compose\BackOfficeUserAuditEventsComponent.cs" />
     <Compile Include="Compose\BackOfficeUserAuditEventsComposer.cs" />
-    <Compile Include="Composing\LightInject\LightInjectContainer.cs" />
     <Compile Include="Editors\PasswordChanger.cs" />
     <Compile Include="HttpContextExtensions.cs" />
     <Compile Include="Macros\MacroRenderer.cs" />
@@ -208,7 +207,6 @@
     <Compile Include="Security\IdentityAuditEventArgs.cs" />
     <Compile Include="CompositionExtensions.cs" />
     <Compile Include="Composing\Current.cs" />
-    <Compile Include="Editors\BackOfficeServerVariables.cs" />
     <Compile Include="ImageProcessorLogger.cs" />
     <Compile Include="Mvc\ContainerControllerFactory.cs" />
     <Compile Include="OwinExtensions.cs" />
