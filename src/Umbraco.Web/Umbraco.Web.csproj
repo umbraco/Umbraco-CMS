@@ -292,7 +292,6 @@
     <Compile Include="Mvc\ViewDataDictionaryExtensions.cs" />
     <Compile Include="Models\RegisterModel.cs" />
     <Compile Include="Security\MembershipHelper.cs" />
-    <Compile Include="Editors\UmbracoAuthorizedJsonController.cs" />
     <Compile Include="HttpCookieExtensions.cs" />
     <Compile Include="FormDataCollectionExtensions.cs" />
     <Compile Include="Editors\BackOfficeController.cs" />
