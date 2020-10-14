@@ -36,8 +36,6 @@ namespace Umbraco.Tests.Services
             CreateTestData();
         }
 
-        protected override Action<IServiceCollection> CustomTestSetup => (services) => services.AddSingleton<IProfiler, TestProfiler>();
-
         [Test]
         public void Profiler()
         {
