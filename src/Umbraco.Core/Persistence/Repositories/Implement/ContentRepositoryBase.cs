@@ -363,9 +363,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (ordering.OrderBy.InvariantEquals("path"))
                 return GetAliasedField(SqlSyntax.GetFieldName<NodeDto>(x => x.Path), sql);
 
-            if (ordering.OrderBy.InvariantEquals("level"))
-                return GetAliasedField(SqlSyntax.GetFieldName<NodeDto>(x => x.Level), sql);
-
             // note: 'owner' is the user who created the item as a whole,
             //       we don't have an 'owner' per culture (should we?)
             if (ordering.OrderBy.InvariantEquals("owner"))

@@ -119,7 +119,7 @@ namespace Umbraco.Examine
                 //add the published filter
                 //note: We will filter for published variants in the validator
                 content = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out _, _publishedQuery,
-                    Ordering.By("Level", Direction.Ascending)).ToArray();
+                    Ordering.By("Path", Direction.Ascending)).ToArray();
                
                 if (content.Length > 0)
                 {
