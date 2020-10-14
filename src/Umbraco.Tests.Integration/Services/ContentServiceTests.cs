@@ -14,6 +14,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
@@ -33,8 +34,7 @@ namespace Umbraco.Tests.Integration.Services
     [Category("Slow")]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest,
         PublishedRepositoryEvents = true,
-        WithApplication = true,
-        Logger = UmbracoTestOptions.Logger.Console)]
+        WithApplication = true)]
     public class ContentServiceTests : UmbracoIntegrationTestWithContent
     {
         // TODO: Add test to verify there is only ONE newest document/content in {Constants.DatabaseSchema.Tables.Document} table after updating.
@@ -53,6 +53,7 @@ namespace Umbraco.Tests.Integration.Services
         private IDomainService DomainService => GetRequiredService<IDomainService>();
         private INotificationService NotificationService => GetRequiredService<INotificationService>();
         private PropertyEditorCollection PropertyEditorCollection => GetRequiredService<PropertyEditorCollection>();
+        private IDocumentRepository DocumentRepository => GetRequiredService<IDocumentRepository>();
 
         public override void Setup()
         {
@@ -2347,7 +2348,7 @@ namespace Umbraco.Tests.Integration.Services
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var repository = CreateRepository(ScopeProvider, out _);
+                var repository = DocumentRepository;
 
                 foreach (var content in list)
                 {
@@ -3199,26 +3200,6 @@ namespace Umbraco.Tests.Integration.Services
                 Debug.Print("Created: 'Hierarchy Simple Text Subpage {0}' - Depth: {1}", i, depth);
             }
             return list;
-        }
-
-        private DocumentRepository CreateRepository(IScopeProvider provider, out ContentTypeRepository contentTypeRepository)
-        {
-            var globalSettings = new GlobalSettings();
-            var accessor = (IScopeAccessor) provider;
-            var fileSystems = GetMockFileSystems();
-
-            var templateRepository = new TemplateRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<TemplateRepository>(), fileSystems, IOHelper, ShortStringHelper);
-            var tagRepository = new TagRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<TagRepository>());
-            var commonRepository = new ContentTypeCommonRepository(accessor, templateRepository, AppCaches, ShortStringHelper);
-            var languageRepository = new LanguageRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<LanguageRepository>(), Microsoft.Extensions.Options.Options.Create(globalSettings));
-            contentTypeRepository = new ContentTypeRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<ContentTypeRepository>(), commonRepository, languageRepository, ShortStringHelper);
-            var relationTypeRepository = new RelationTypeRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<RelationTypeRepository>());
-            var entityRepository = new EntityRepository(accessor);
-            var relationRepository = new RelationRepository(accessor, LoggerFactory.CreateLogger<RelationRepository>(), relationTypeRepository, entityRepository);
-            var propertyEditors = new Lazy<PropertyEditorCollection>(() => new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>())));
-            var dataValueReferences = new DataValueReferenceFactoryCollection(Enumerable.Empty<IDataValueReferenceFactory>());
-            var repository = new DocumentRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<DocumentRepository>(), LoggerFactory, contentTypeRepository, templateRepository, tagRepository, languageRepository, relationRepository, relationTypeRepository, propertyEditors, dataValueReferences, DataTypeService);
-            return repository;
         }
 
         private void CreateEnglishAndFrenchDocumentType(out Language langUk, out Language langFr, out ContentType contentType)

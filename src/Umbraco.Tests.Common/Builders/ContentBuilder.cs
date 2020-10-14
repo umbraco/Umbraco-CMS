@@ -233,6 +233,32 @@ namespace Umbraco.Tests.Common.Builders
             return content;
         }
 
+        public static IEnumerable<Content> CreateTextpageContent(IContentType contentType, int parentId, int amount)
+        {
+            var list = new List<Content>();
+
+            for (int i = 0; i < amount; i++)
+            {
+                var name = "Textpage No-" + i;
+                var content = new Content(name, parentId, contentType) { CreatorId = 0, WriterId = 0 };
+                object obj =
+                    new
+                    {
+                        title = name + " title",
+                        bodyText = string.Format("This is a textpage based on the {0} ContentType", contentType.Alias),
+                        keywords = "text,page,meta",
+                        description = "This is the meta description for a textpage"
+                    };
+
+                content.PropertyValues(obj);
+
+                content.ResetDirtyProperties(false);
+
+                list.Add(content);
+            }
+
+            return list;
+        }
         public static Content CreateTextpageContent(IContentType contentType, string name, int parentId)
         {
             return new ContentBuilder()
@@ -283,7 +309,7 @@ namespace Umbraco.Tests.Common.Builders
                 .WithParentId(parentId)
                 .WithContentType(contentType)
                 .Build();
-            
+
             content.SetValue("isTrue", true);
             content.SetValue("number", 42);
             content.SetValue("bodyText", "Lorem Ipsum Body Text Test");
