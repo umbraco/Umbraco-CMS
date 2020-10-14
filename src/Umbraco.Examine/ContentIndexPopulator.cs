@@ -120,34 +120,28 @@ namespace Umbraco.Examine
                 //note: We will filter for published variants in the validator
                 content = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out _, _publishedQuery,
                     Ordering.By("Path", Direction.Ascending)).ToArray();
-               
+
+                
                 if (content.Length > 0)
                 {
                     var indexableContent = new List<IContent>();
 
-                    // get the max level in this result set
-                    int maxLevel = content.Max(x => x.Level);
-
-                    // gets the first level pages, these are always published because _publishedQuery filter
-                    // and store the id in a hash set so we can track them
-                    var firstLevelContent = content.Where(x => x.Level == 1);
-                    
-                    foreach (var item in firstLevelContent)
+                    foreach (var item in content)
                     {
-                        publishedPages.Add(item.Id);
-                        indexableContent.Add(item);
-                    }
-
-                    // get content per level so we can filter the pages that don't have a published parent
-                    // this because the paged descendants method does not take unpublished ancestors into account
-                    for (var level = 2; level <= maxLevel; level++)
-                    {
-                        var levelContent = content.Where(x => x.Level == level && publishedPages.Contains(x.ParentId));
-
-                        foreach (var item in levelContent)
+                        if (item.Level == 1)
                         {
-                            publishedPages.Add(item.Id);
+                            // first level pages are always published so no need to filter them
                             indexableContent.Add(item);
+                            publishedPages.Add(item.Id);
+                        }
+                        else
+                        {
+                            if (publishedPages.Contains(item.ParentId))
+                            {
+                                // only index when parent is published
+                                publishedPages.Add(item.Id);
+                                indexableContent.Add(item);
+                            }
                         }
                     }
 
