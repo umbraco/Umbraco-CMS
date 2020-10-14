@@ -10,8 +10,8 @@ namespace Umbraco.Core.HealthCheck.Checks.Security
         Group = "Security")]
     public class ClickJackingCheck : BaseHttpHeaderCheck
     {
-        public ClickJackingCheck(IConfigurationService configurationService, IRequestAccessor requestAccessor, ILocalizedTextService textService)
-            : base(configurationService, requestAccessor, textService, "X-Frame-Options", "sameorigin", "clickJacking", true)
+        public ClickJackingCheck(IRequestAccessor requestAccessor, ILocalizedTextService textService)
+            : base(requestAccessor, textService, "X-Frame-Options", "sameorigin", "clickJacking", true)
         {
         }
     }

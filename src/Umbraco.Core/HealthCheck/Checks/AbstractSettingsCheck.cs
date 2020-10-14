@@ -9,7 +9,6 @@ namespace Umbraco.Core.HealthCheck.Checks
 {
     public abstract class AbstractSettingsCheck : HealthCheck
     {
-        protected IConfigurationService ConfigurationService { get; }
         protected ILocalizedTextService TextService { get; }
         protected ILoggerFactory LoggerFactory { get; }
 
@@ -39,11 +38,10 @@ namespace Umbraco.Core.HealthCheck.Checks
         /// </summary>
         public abstract ValueComparisonType ValueComparisonType { get; }
 
-        protected AbstractSettingsCheck(ILocalizedTextService textService, ILoggerFactory loggerFactory, IConfigurationService configurationService)
+        protected AbstractSettingsCheck(ILocalizedTextService textService, ILoggerFactory loggerFactory)
         {
             TextService = textService;
             LoggerFactory = loggerFactory;
-            ConfigurationService = configurationService;
         }
 
         /// <summary>
@@ -142,60 +140,22 @@ namespace Umbraco.Core.HealthCheck.Checks
         /// Rectifies this check.
         /// </summary>
         /// <returns></returns>
-        public virtual HealthCheckStatus Rectify()
+        public virtual HealthCheckStatus Rectify(HealthCheckAction action)
         {
             if (ValueComparisonType == ValueComparisonType.ShouldNotEqual)
             {
                 throw new InvalidOperationException(TextService.Localize("healthcheck/cannotRectifyShouldNotEqual"));
             }
 
+            //TODO: show message instead of actually fixing config
             string recommendedValue = Values.First(v => v.IsRecommended).Value;
-            return UpdateConfigurationValue(recommendedValue);
-        }
-
-        /// <summary>
-        /// Rectifies this check with a provided value.
-        /// </summary>
-        /// <param name="value">Value provided</param>
-        /// <returns></returns>
-        public virtual HealthCheckStatus Rectify(string value)
-        {
-            if (ValueComparisonType == ValueComparisonType.ShouldEqual)
-            {
-                throw new InvalidOperationException(
-                    TextService.Localize("healthcheck/cannotRectifyShouldEqualWithValue"));
-            }
-
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                throw new InvalidOperationException(TextService.Localize("healthcheck/valueToRectifyNotProvided"));
-            }
-
-            // Need to track provided value in order to correctly put together the rectify message
-            ProvidedValue = value;
-
-            return UpdateConfigurationValue(value);
-        }
-
-        private HealthCheckStatus UpdateConfigurationValue(string value)
-        {
-            ConfigurationServiceResult updateConfigFile = ConfigurationService.UpdateConfigFile(value, ItemPath);
-
-            if (updateConfigFile.Success == false)
-            {
-                var message = updateConfigFile.Result;
-                return new HealthCheckStatus(message) { ResultType = StatusResultType.Error };
-            }
-
             string resultMessage = string.Format(RectifySuccessMessage, ItemPath, Values);
             return new HealthCheckStatus(resultMessage) { ResultType = StatusResultType.Success };
         }
 
         public override HealthCheckStatus ExecuteAction(HealthCheckAction action)
         {
-            return string.IsNullOrEmpty(action.ProvidedValue)
-                ? Rectify()
-                : Rectify(action.ProvidedValue);
+            return Rectify(action);
         }
     }
 }

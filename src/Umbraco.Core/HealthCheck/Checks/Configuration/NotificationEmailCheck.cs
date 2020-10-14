@@ -14,9 +14,8 @@ namespace Umbraco.Core.HealthCheck.Checks.Configuration
         private readonly ContentSettings _contentSettings;
         private const string DefaultFromEmail = "your@email.here";
 
-        public NotificationEmailCheck(ILocalizedTextService textService, ILoggerFactory loggerFactory, IConfigurationService configurationService,
-            IOptions<ContentSettings> contentSettings)
-            : base(textService, loggerFactory, configurationService)
+        public NotificationEmailCheck(ILocalizedTextService textService, ILoggerFactory loggerFactory, IOptions<ContentSettings> contentSettings)
+            : base(textService, loggerFactory)
         {
             _contentSettings = contentSettings.Value;
         }

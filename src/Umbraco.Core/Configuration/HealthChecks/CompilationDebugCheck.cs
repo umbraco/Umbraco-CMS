@@ -2,21 +2,23 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.HealthCheck;
+using Umbraco.Core.HealthCheck.Checks;
 using Umbraco.Core.Services;
 
-namespace Umbraco.Core.HealthCheck.Checks.LiveEnvironment
+namespace Umbraco.Core.Configuration.HealthChecks
 {
     [HealthCheck("61214FF3-FC57-4B31-B5CF-1D095C977D6D", "Debug Compilation Mode",
         Description = "Leaving debug compilation mode enabled can severely slow down a website and take up more memory on the server.",
         Group = "Live Environment")]
     public class CompilationDebugCheck : AbstractSettingsCheck
     {
-        private readonly HostingSettings _hostingSettings;
+        private readonly IOptionsMonitor<HostingSettings> _hostingSettings;
 
-        public CompilationDebugCheck(ILocalizedTextService textService, ILoggerFactory loggerFactory,IConfigurationService configurationService, IOptions<HostingSettings> hostingSettings)
-            : base(textService, loggerFactory, configurationService)
+        public CompilationDebugCheck(ILocalizedTextService textService, ILoggerFactory loggerFactory, IOptionsMonitor<HostingSettings> hostingSettings)
+            : base(textService, loggerFactory)
         {
-            _hostingSettings = hostingSettings.Value;
+            _hostingSettings = hostingSettings;
         }
 
         public override string ItemPath => Constants.Configuration.ConfigHostingDebug;
@@ -32,7 +34,7 @@ namespace Umbraco.Core.HealthCheck.Checks.LiveEnvironment
             }
         };
 
-        public override string CurrentValue => _hostingSettings.Debug.ToString();
+        public override string CurrentValue => _hostingSettings.CurrentValue.Debug.ToString();
 
         public override string CheckSuccessMessage => TextService.Localize("healthcheck/compilationDebugCheckSuccessMessage");
 

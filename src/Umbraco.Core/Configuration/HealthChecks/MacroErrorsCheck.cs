@@ -16,17 +16,15 @@ namespace Umbraco.Core.HealthCheck.Checks.Configuration
     {
         private readonly ILocalizedTextService _textService;
         private readonly ILoggerFactory _loggerFactory;
-        private readonly ContentSettings _contentSettings;
+        private readonly IOptionsMonitor<ContentSettings> _contentSettings;
 
         public MacroErrorsCheck(ILocalizedTextService textService, ILoggerFactory loggerFactory,
-            IConfigurationService configurationService, IOptions<ContentSettings> contentSettings)
-            : base(textService, loggerFactory, configurationService)
+            IOptionsMonitor<ContentSettings> contentSettings)
+            : base(textService, loggerFactory)
         {
             _textService = textService;
             _loggerFactory = loggerFactory;
-            _contentSettings = contentSettings != null
-                ? contentSettings.Value
-                : throw new ArgumentNullException(nameof(contentSettings));
+            _contentSettings = contentSettings;
         }
 
         public override ValueComparisonType ValueComparisonType => ValueComparisonType.ShouldEqual;
@@ -59,7 +57,7 @@ namespace Umbraco.Core.HealthCheck.Checks.Configuration
             }
         }
 
-        public override string CurrentValue => _contentSettings.MacroErrors.ToString();
+        public override string CurrentValue => _contentSettings.CurrentValue.MacroErrors.ToString();
 
         /// <summary>
         /// Gets the message for when the check has succeeded.

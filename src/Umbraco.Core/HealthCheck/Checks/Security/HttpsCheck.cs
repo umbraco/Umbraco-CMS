@@ -22,8 +22,7 @@ namespace Umbraco.Core.HealthCheck.Checks.Security
         private readonly ILocalizedTextService _textService;
         private readonly GlobalSettings _globalSettings;
         private readonly IRequestAccessor _requestAccessor;
-        private readonly ILogger<ConfigurationService> _logger;
-        private readonly IConfigurationService _configurationService;
+        private readonly ILogger<HttpsCheck> _logger;
         private const string FixHttpsSettingAction = "fixHttpsSetting";
         string itemPath => Constants.Configuration.ConfigGlobalUseHttps;
 
@@ -31,14 +30,12 @@ namespace Umbraco.Core.HealthCheck.Checks.Security
             IOptions<GlobalSettings> globalSettings,
             IIOHelper ioHelper,
             IRequestAccessor requestAccessor,
-            ILogger<ConfigurationService> logger,
-            IConfigurationService configurationService)
+            ILogger<HttpsCheck> logger)
         {
             _textService = textService;
             _globalSettings = globalSettings.Value;
             _requestAccessor = requestAccessor;
             _logger = logger;
-            _configurationService = configurationService;
         }
 
         /// <summary>
@@ -191,19 +188,11 @@ namespace Umbraco.Core.HealthCheck.Checks.Security
 
         private HealthCheckStatus FixHttpsSetting()
         {
-            ConfigurationServiceResult updateConfigFile = _configurationService.UpdateConfigFile("true", itemPath);
+            //TODO: return message instead of actual fix
 
-            if (updateConfigFile.Success)
+            return new HealthCheckStatus(_textService.Localize("healthcheck/httpsCheckEnableHttpsSuccess"))
             {
-                return new HealthCheckStatus(_textService.Localize("healthcheck/httpsCheckEnableHttpsSuccess"))
-                {
-                    ResultType = StatusResultType.Success
-                };
-            }
-
-            return new HealthCheckStatus(_textService.Localize("healthcheck/httpsCheckEnableHttpsError", new[] { updateConfigFile.Result }))
-            {
-                ResultType = StatusResultType.Error
+                ResultType = StatusResultType.Success
             };
         }
     }

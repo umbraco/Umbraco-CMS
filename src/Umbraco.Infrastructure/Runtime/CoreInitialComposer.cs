@@ -207,7 +207,6 @@ namespace Umbraco.Core.Runtime
 
             // Config manipulator
             composition.RegisterUnique<IConfigManipulator, JsonConfigManipulator>();
-            composition.RegisterUnique<IConfigurationService, ConfigurationService>();
             
             // register the umbraco context factory
             // composition.RegisterUnique<IUmbracoContextFactory, UmbracoContextFactory>();

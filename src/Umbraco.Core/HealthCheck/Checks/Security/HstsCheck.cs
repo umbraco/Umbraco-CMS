@@ -15,8 +15,8 @@ namespace Umbraco.Core.HealthCheck.Checks.Security
         // and the blog post of Troy Hunt (https://www.troyhunt.com/understanding-http-strict-transport/)
         // If you want do to it perfectly, you have to submit it https://hstspreload.org/,
         // but then you should include subdomains and I wouldn't suggest to do that for Umbraco-sites.
-        public HstsCheck(IConfigurationService configurationService, IRequestAccessor requestAccessor, ILocalizedTextService textService)
-            : base(configurationService, requestAccessor, textService, "Strict-Transport-Security", "max-age=10886400", "hSTS", true)
+        public HstsCheck(IRequestAccessor requestAccessor, ILocalizedTextService textService)
+            : base(requestAccessor, textService, "Strict-Transport-Security", "max-age=10886400", "hSTS", true)
         {
         }
     }

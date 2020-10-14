@@ -20,11 +20,13 @@ namespace Umbraco.Core.HealthCheck.Checks.Configuration
         private readonly Version _iisVersion;
         private readonly GlobalSettings _globalSettings;
 
-        public TrySkipIisCustomErrorsCheck(ILocalizedTextService textService, ILoggerFactory loggerFactory, IConfigurationService configurationService, IOptions<GlobalSettings> globalSettings)
-            : base(textService, loggerFactory, configurationService)
+        public TrySkipIisCustomErrorsCheck(ILocalizedTextService textService, ILoggerFactory loggerFactory, IOptions<GlobalSettings> globalSettings)
+            : base(textService, loggerFactory)
         {
             _textService = textService;
             _loggerFactory = loggerFactory;
+            //TODO: detect if hosted in IIS, and then IIS version if we want to go this route
+            _iisVersion = new Version("7.5");
             _globalSettings = globalSettings.Value;
         }
 

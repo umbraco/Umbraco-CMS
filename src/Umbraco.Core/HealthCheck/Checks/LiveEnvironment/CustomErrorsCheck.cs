@@ -10,8 +10,8 @@ namespace Umbraco.Core.HealthCheck.Checks.LiveEnvironment
         Group = "Live Environment")]
     public class CustomErrorsCheck : AbstractSettingsCheck
     {
-        public CustomErrorsCheck(ILocalizedTextService textService, ILoggerFactory loggerFactory, IConfigurationService configurationService)
-            : base(textService, loggerFactory, configurationService)
+        public CustomErrorsCheck(ILocalizedTextService textService, ILoggerFactory loggerFactory)
+            : base(textService, loggerFactory)
         { }
 
         public override string ItemPath => Constants.Configuration.ConfigCustomErrorsMode;

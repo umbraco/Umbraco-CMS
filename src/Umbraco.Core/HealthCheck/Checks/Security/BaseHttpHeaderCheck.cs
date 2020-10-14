@@ -21,16 +21,13 @@ namespace Umbraco.Core.HealthCheck.Checks.Security
         private readonly string _localizedTextPrefix;
         private readonly bool _metaTagOptionAvailable;
         private readonly IRequestAccessor _requestAccessor;
-        private readonly IConfigurationService _configurationService;
 
         protected BaseHttpHeaderCheck(
-            IConfigurationService configurationService,
             IRequestAccessor requestAccessor,
             ILocalizedTextService textService,
             string header, string value, string localizedTextPrefix, bool metaTagOptionAvailable)
         {
             TextService = textService ?? throw new ArgumentNullException(nameof(textService));
-            _configurationService = configurationService;
             _requestAccessor = requestAccessor;
             _header = header;
             _value = value;
