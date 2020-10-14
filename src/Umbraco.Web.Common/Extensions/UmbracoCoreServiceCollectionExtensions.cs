@@ -241,6 +241,16 @@ namespace Umbraco.Extensions
             if (container is null) throw new ArgumentNullException(nameof(container));
             if (entryAssembly is null) throw new ArgumentNullException(nameof(entryAssembly));
 
+            // Add service session
+            // This can be overwritten by the user by adding their own call to AddSession
+            // since the last call of AddSession take precedence
+            services.AddSession(options =>
+            {
+                options.Cookie.Name = "UMB_SESSION";
+                options.Cookie.HttpOnly = true;
+                options.IdleTimeout = TimeSpan.FromSeconds(60);
+            });
+
             // Add supported databases
             services.AddUmbracoSqlCeSupport();
             services.AddUmbracoSqlServerSupport();
