@@ -47,6 +47,7 @@ namespace Umbraco.Tests.Common.Builders
         private string _validationRegExp;
         private string _validationRegExpMessage;
         private bool? _supportsPublishing;
+        private ContentVariation? _variations;
 
         public PropertyTypeBuilder(TParent parentBuilder) : base(parentBuilder)
         {
@@ -90,6 +91,12 @@ namespace Umbraco.Tests.Common.Builders
             return this;
         }
 
+        public PropertyTypeBuilder<TParent> WithVariations(ContentVariation variation)
+        {
+            _variations = variation;
+            return this;
+        }
+
         public override PropertyType Build()
         {
             var id = _id ?? 0;
@@ -109,6 +116,7 @@ namespace Umbraco.Tests.Common.Builders
             var validationRegExp = _validationRegExp ?? string.Empty;
             var validationRegExpMessage = _validationRegExpMessage ?? string.Empty;
             var supportsPublishing = _supportsPublishing ?? false;
+            var variations = _variations ?? ContentVariation.Nothing;
 
             var shortStringHelper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig());
 
@@ -129,6 +137,7 @@ namespace Umbraco.Tests.Common.Builders
                 ValidationRegExp = validationRegExp,
                 ValidationRegExpMessage = validationRegExpMessage,
                 SupportsPublishing = supportsPublishing,
+                Variations = variations,
             };
 
             return propertyType;

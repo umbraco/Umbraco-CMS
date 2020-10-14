@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Tests.Common.Builders;
+using Umbraco.Tests.Common.Builders.Extensions;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
 {
@@ -21,6 +22,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
         public void Can_Deep_Clone()
         {
             var item = _builder
+                .WithId(1)
                 .WithParentObjectType(Guid.NewGuid())
                 .WithChildObjectType(Guid.NewGuid())
                 .Build();

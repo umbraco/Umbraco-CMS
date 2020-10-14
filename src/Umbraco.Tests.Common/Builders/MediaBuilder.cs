@@ -20,7 +20,8 @@ namespace Umbraco.Tests.Common.Builders
             IWithTrashedBuilder,
             IWithLevelBuilder,
             IWithPathBuilder,
-            IWithSortOrderBuilder
+            IWithSortOrderBuilder,
+            IWithPropertyValues
     {
         private MediaTypeBuilder _mediaTypeBuilder;
         private GenericDictionaryBuilder<MediaBuilder, string, object> _propertyDataBuilder;
@@ -37,6 +38,9 @@ namespace Umbraco.Tests.Common.Builders
         private int? _sortOrder;
         private bool? _trashed;
         private IMediaType _mediaType;
+        private object _propertyValues;
+        private string _propertyValuesCulture;
+        private string _propertyValuesSegment;
 
         public MediaTypeBuilder AddMediaType()
         {
@@ -74,6 +78,9 @@ namespace Umbraco.Tests.Common.Builders
             var path = _path ?? $"-1,{id}";
             var sortOrder = _sortOrder ?? 0;
             var trashed = _trashed ?? false;
+            var propertyValues = _propertyValues ?? null;
+            var propertyValuesCulture = _propertyValuesCulture ?? null;
+            var propertyValuesSegment = _propertyValuesSegment ?? null;
 
             if (_mediaTypeBuilder is null && _mediaType is null)
             {
@@ -95,18 +102,40 @@ namespace Umbraco.Tests.Common.Builders
                 Trashed = trashed,
             };
 
-            if (_propertyDataBuilder != null)
+            if (_propertyDataBuilder != null || propertyValues != null)
             {
-                var propertyData = _propertyDataBuilder.Build();
-                foreach (var kvp in propertyData)
+                if (_propertyDataBuilder != null)
                 {
-                    media.SetValue(kvp.Key, kvp.Value);
+                    var propertyData = _propertyDataBuilder.Build();
+                    foreach (var keyValuePair in propertyData)
+                    {
+                        media.SetValue(keyValuePair.Key, keyValuePair.Value);
+                    }
+                }
+                else
+                {
+                    media.PropertyValues(propertyValues, propertyValuesCulture, propertyValuesSegment);
                 }
 
                 media.ResetDirtyProperties(false);
             }
 
             return media;
+        }
+
+        public static Media CreateSimpleMedia(IMediaType mediaType, string name, int parentId)
+        {
+            return new MediaBuilder()
+                .WithName(name)
+                .WithMediaType(mediaType)
+                .WithParentId(parentId)
+                .WithPropertyValues(new
+                    {
+                        title = name + " Subpage",
+                        bodyText = "This is a subpage",
+                        author = "John Doe"
+                    })
+                .Build();
         }
 
         public static Media CreateMediaImage(IMediaType mediaType, int parentId)
@@ -223,28 +252,22 @@ namespace Umbraco.Tests.Common.Builders
             set => _parentId = value;
         }
 
-        public static IMedia CreateSimpleMedia(IMediaType contentType, string name, int parentId)
+        object IWithPropertyValues.PropertyValues
         {
-            var media = new MediaBuilder()
-                .WithMediaType(contentType)
-                .WithName(name)
-                .WithParentId(parentId)
-                .WithCreatorId(0)
-                .Build();
+            get => _propertyValues;
+            set => _propertyValues = value;
+        }
 
-            object obj =
-                new
-                {
-                    title = name + " Subpage",
-                    bodyText = "This is a subpage",
-                    author = "John Doe"
-                };
+        string IWithPropertyValues.PropertyValuesCulture
+        {
+            get => _propertyValuesCulture;
+            set => _propertyValuesCulture = value;
+        }
 
-            media.PropertyValues(obj);
-
-            media.ResetDirtyProperties(false);
-
-            return media;
+        string IWithPropertyValues.PropertyValuesSegment
+        {
+            get => _propertyValuesSegment;
+            set => _propertyValuesSegment = value;
         }
     }
 }
