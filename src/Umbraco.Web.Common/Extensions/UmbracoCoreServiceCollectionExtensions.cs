@@ -248,7 +248,6 @@ namespace Umbraco.Extensions
             {
                 options.Cookie.Name = "UMB_SESSION";
                 options.Cookie.HttpOnly = true;
-                options.IdleTimeout = TimeSpan.FromSeconds(60);
             });
 
             // Add supported databases
