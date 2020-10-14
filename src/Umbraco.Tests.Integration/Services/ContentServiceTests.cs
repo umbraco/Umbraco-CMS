@@ -25,13 +25,12 @@ using Umbraco.Tests.Common.Builders.Extensions;
 using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;
 
-namespace Umbraco.Tests.Integration.Services
+namespace Umbraco.Tests.Services
 {
     /// <summary>
     /// Tests covering all methods in the ContentService class.
     /// </summary>
     [TestFixture]
-    [Category("Slow")]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest,
         PublishedRepositoryEvents = true,
         WithApplication = true)]

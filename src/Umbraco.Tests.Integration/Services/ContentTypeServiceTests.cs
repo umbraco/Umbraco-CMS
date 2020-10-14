@@ -16,8 +16,6 @@ using Umbraco.Tests.Testing;
 namespace Umbraco.Tests.Integration.Services
 {
     [TestFixture]
-    [Category("Slow")]
-    [Apartment(ApartmentState.STA)]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, PublishedRepositoryEvents = true)]
     public class ContentTypeServiceTests : UmbracoIntegrationTest
     {
