@@ -72,7 +72,7 @@ namespace Umbraco.Core.PropertyEditors.Validators
             if (string.IsNullOrWhiteSpace(format)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(format));
             if (value == null || !new Regex(format).IsMatch(value.ToString()))
             {
-                yield return new ValidationResult(_textService.Localize("validation", "invalidPattern"), new[] { "value" });
+                yield return new ValidationResult(_textService.Localize("validation", "invalidPattern"), Constants.StringArrays.ValueLower);
             }
         }
     }

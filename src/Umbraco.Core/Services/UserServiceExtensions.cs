@@ -57,7 +57,7 @@ namespace Umbraco.Core.Services
         /// <param name="entityIds"></param>
         public static void RemoveUserGroupPermissions(this IUserService userService, int groupId, params int[] entityIds)
         {
-            userService.ReplaceUserGroupPermissions(groupId, new char[] {}, entityIds);
+            userService.ReplaceUserGroupPermissions(groupId, Array.Empty<char>(), entityIds);
         }
 
         /// <summary>
