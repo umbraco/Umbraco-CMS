@@ -116,7 +116,7 @@ namespace Umbraco.Core
             /// <summary>
             /// Char array containing =
             /// </summary>
-            public static readonly char[] Equals = new char[] { '=' };
+            public static readonly char[] EqualsChar = new char[] { '=' };
 
             
         }

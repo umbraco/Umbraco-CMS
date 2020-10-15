@@ -42,7 +42,7 @@ namespace Umbraco.Web
                 var cookieCollection = cookiesHeaderValue.Split(Constants.CharArrays.Semicolon, StringSplitOptions.RemoveEmptyEntries);
                 foreach (var cookieNameValue in cookieCollection)
                 {
-                    var parts = cookieNameValue.Split(Constants.CharArrays.Equals, StringSplitOptions.RemoveEmptyEntries);
+                    var parts = cookieNameValue.Split(Constants.CharArrays.EqualsChar, StringSplitOptions.RemoveEmptyEntries);
                     if (parts.Length != 2) continue;
                     if (parts[0].Trim().Equals(cookieName, StringComparison.InvariantCultureIgnoreCase))
                         return parts[1].Trim();
