@@ -155,6 +155,9 @@
     <Compile Include="Macros\MemberUserKeyProvider.cs" />
     <Compile Include="Macros\PartialViewMacroController.cs" />
     <Compile Include="Macros\PartialViewMacroEngine.cs" />
+    <Compile Include="Mvc\IRenderController.cs" />
+    <Compile Include="Mvc\IRenderMvcController.cs" />
+    <Compile Include="Mvc\RenderMvcController.cs" />
     <Compile Include="Mvc\UmbracoViewPageOfTModel.cs" />
     <Compile Include="Security\IdentityFactoryMiddleware.cs" />
     <Compile Include="Security\BackofficeSecurity.cs" />
@@ -240,10 +243,7 @@
     <Compile Include="Runtime\WebInitialComponent.cs" />
     <Compile Include="Mvc\ControllerContextExtensions.cs" />
     <Compile Include="Mvc\DisableBrowserCacheAttribute.cs" />
-    <Compile Include="Mvc\EnsurePartialViewMacroViewContextFilterAttribute.cs" />
-    <Compile Include="Mvc\IRenderController.cs" />
     <Compile Include="Mvc\ModelBindingException.cs" />
-    <Compile Include="Mvc\RenderIndexActionSelectorAttribute.cs" />
     <Compile Include="Mvc\UmbracoRequireHttpsAttribute.cs" />
     <Compile Include="Mvc\ValidateMvcAngularAntiForgeryTokenAttribute.cs" />
     <Compile Include="OwinMiddlewareConfiguredEventArgs.cs" />
@@ -309,7 +309,6 @@
     <Compile Include="Mvc\MemberAuthorizeAttribute.cs" />
     <Compile Include="Mvc\BackOfficeArea.cs" />
     <Compile Include="Mvc\ControllerFactoryExtensions.cs" />
-    <Compile Include="Mvc\IRenderMvcController.cs" />
     <Compile Include="Mvc\SurfaceRouteHandler.cs" />
     <Compile Include="Controllers\UmbLoginController.cs" />
     <Compile Include="UrlHelperExtensions.cs" />
@@ -327,8 +326,6 @@
     <Compile Include="WebApi\UmbracoApiControllerBase.cs" />
     <Compile Include="Mvc\UmbracoAuthorizeAttribute.cs" />
     <Compile Include="Mvc\NotChildAction.cs" />
-    <Compile Include="Mvc\UmbracoAuthorizedController.cs" />
-    <Compile Include="Mvc\UmbracoController.cs" />
     <Compile Include="Mvc\UmbracoControllerFactory.cs" />
     <Compile Include="Mvc\UmbracoMvcHandler.cs" />
     <Compile Include="PublishedContentExtensions.cs" />
@@ -362,7 +359,6 @@
     <Compile Include="Mvc\RenderActionInvoker.cs" />
     <Compile Include="Mvc\RenderControllerFactory.cs" />
     <Compile Include="Mvc\ContentModelBinder.cs" />
-    <Compile Include="Mvc\RenderMvcController.cs" />
     <Compile Include="Mvc\RenderRouteHandler.cs" />
     <Compile Include="Mvc\RenderViewEngine.cs" />
     <Compile Include="Mvc\RouteDefinition.cs" />

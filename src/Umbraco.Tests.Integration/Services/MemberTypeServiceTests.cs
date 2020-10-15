@@ -5,6 +5,7 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
+using Umbraco.Core.Services.Implement;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;
@@ -17,22 +18,22 @@ namespace Umbraco.Tests.Integration.Services
     public class MemberTypeServiceTests : UmbracoIntegrationTest
     {
         private IMemberService MemberService => GetRequiredService<IMemberService>();
-        private IMemberTypeService MemberTypeService => GetRequiredService<IMemberTypeService>();
+        private IMemberTypeService IMemberTypeService => GetRequiredService<IMemberTypeService>();
 
         [SetUp]
         public void SetupTest()
         {
             // TODO: remove this once IPublishedSnapShotService has been implemented with nucache.
-            Umbraco.Core.Services.Implement.MemberTypeService.ClearScopeEvents();
+            MemberTypeService.ClearScopeEvents();
         }
 
         [Test]
         public void Member_Cannot_Edit_Property()
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            MemberTypeService.Save(memberType);
+            IMemberTypeService.Save(memberType);
             //re-get
-            memberType = MemberTypeService.Get(memberType.Id);
+            memberType = IMemberTypeService.Get(memberType.Id);
             foreach (var p in memberType.PropertyTypes)
             {
                 Assert.IsFalse(memberType.MemberCanEditProperty(p.Alias));
@@ -43,12 +44,12 @@ namespace Umbraco.Tests.Integration.Services
         public void Member_Can_Edit_Property()
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            MemberTypeService.Save(memberType);
+            IMemberTypeService.Save(memberType);
             var prop = memberType.PropertyTypes.First().Alias;
             memberType.SetMemberCanEditProperty(prop, true);
-            MemberTypeService.Save(memberType);
+            IMemberTypeService.Save(memberType);
             //re-get
-            memberType = MemberTypeService.Get(memberType.Id);
+            memberType = IMemberTypeService.Get(memberType.Id);
             foreach (var p in memberType.PropertyTypes.Where(x => x.Alias != prop))
             {
                 Assert.IsFalse(memberType.MemberCanEditProperty(p.Alias));
@@ -60,9 +61,9 @@ namespace Umbraco.Tests.Integration.Services
         public void Member_Cannot_View_Property()
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            MemberTypeService.Save(memberType);
+            IMemberTypeService.Save(memberType);
             //re-get
-            memberType = MemberTypeService.Get(memberType.Id);
+            memberType = IMemberTypeService.Get(memberType.Id);
             foreach (var p in memberType.PropertyTypes)
             {
                 Assert.IsFalse(memberType.MemberCanViewProperty(p.Alias));
@@ -73,12 +74,12 @@ namespace Umbraco.Tests.Integration.Services
         public void Member_Can_View_Property()
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            MemberTypeService.Save(memberType);
+            IMemberTypeService.Save(memberType);
             var prop = memberType.PropertyTypes.First().Alias;
             memberType.SetMemberCanViewProperty(prop, true);
-            MemberTypeService.Save(memberType);
+            IMemberTypeService.Save(memberType);
             //re-get
-            memberType = MemberTypeService.Get(memberType.Id);
+            memberType = IMemberTypeService.Get(memberType.Id);
             foreach (var p in memberType.PropertyTypes.Where(x => x.Alias != prop))
             {
                 Assert.IsFalse(memberType.MemberCanViewProperty(p.Alias));
@@ -90,7 +91,7 @@ namespace Umbraco.Tests.Integration.Services
         public void Deleting_PropertyType_Removes_The_Property_From_Member()
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            MemberTypeService.Save(memberType);
+            IMemberTypeService.Save(memberType);
             IMember member = MemberBuilder.CreateSimpleMember(memberType, "test", "test@test.com", "pass", "test");
             MemberService.Save(member);
             var initProps = member.Properties.Count;
@@ -98,7 +99,7 @@ namespace Umbraco.Tests.Integration.Services
             //remove a property (NOT ONE OF THE DEFAULTS)
             var standardProps = ConventionsHelper.GetStandardPropertyTypeStubs(ShortStringHelper);
             memberType.RemovePropertyType(memberType.PropertyTypes.First(x => standardProps.ContainsKey(x.Alias) == false).Alias);
-            MemberTypeService.Save(memberType);
+            IMemberTypeService.Save(memberType);
 
             //re-load it from the db
             member = MemberService.GetById(member.Id);
@@ -113,13 +114,13 @@ namespace Umbraco.Tests.Integration.Services
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType("memberTypeAlias", string.Empty);
 
             // Act & Assert
-            Assert.Throws<ArgumentException>(() => MemberTypeService.Save(memberType));
+            Assert.Throws<ArgumentException>(() => IMemberTypeService.Save(memberType));
         }
 
         [Test]
         public void Empty_Description_Is_Always_Null_After_Saving_Member_Type()
         {
-            var service = MemberTypeService;
+            var service = IMemberTypeService;
             var memberType = MemberTypeBuilder.CreateSimpleMemberType();
             memberType.Description = null;
             service.Save(memberType);

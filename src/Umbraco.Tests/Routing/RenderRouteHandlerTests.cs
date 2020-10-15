@@ -198,7 +198,7 @@ namespace Umbraco.Tests.Routing
         public class CustomDocumentController : RenderMvcController
         {
             public CustomDocumentController(IOptions<GlobalSettings> globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger, ILoggerFactory loggerFactory)
-                : base(globalSettings, umbracoContextAccessor, services, appCaches, profilingLogger, loggerFactory)
+
             {
             }
 
