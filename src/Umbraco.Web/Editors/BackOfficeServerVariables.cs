@@ -62,7 +62,7 @@ namespace Umbraco.Web.Editors
                 {"umbracoUrls", new[] {"authenticationApiBaseUrl", "serverVarsJs", "externalLoginsUrl", "currentUserApiBaseUrl", "iconApiBaseUrl"}},
                 {"umbracoSettings", new[] {"allowPasswordReset", "imageFileTypes", "maxFileSize", "loginBackgroundImage", "canSendRequiredEmail", "usernameIsEmail"}},
                 {"application", new[] {"applicationPath", "cacheBuster"}},
-                {"isDebuggingEnabled", new string[] { }},
+                {"isDebuggingEnabled", Array.Empty<string>()},
                 {"features", new [] {"disabledFeatures"}}
             };
             //now do the filtering...

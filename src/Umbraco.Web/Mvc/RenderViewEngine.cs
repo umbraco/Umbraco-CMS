@@ -66,14 +66,14 @@ namespace Umbraco.Web.Mvc
         {
             return ShouldFindView(controllerContext, false)
                 ? base.FindView(controllerContext, viewName, masterName, useCache)
-                : new ViewEngineResult(new string[] { });
+                : new ViewEngineResult(Array.Empty<string>());
         }
 
         public override ViewEngineResult FindPartialView(ControllerContext controllerContext, string partialViewName, bool useCache)
         {
             return ShouldFindView(controllerContext, true)
                 ? base.FindPartialView(controllerContext, partialViewName, useCache)
-                : new ViewEngineResult(new string[] { });
+                : new ViewEngineResult(Array.Empty<string>());
         }
 
         /// <summary>
