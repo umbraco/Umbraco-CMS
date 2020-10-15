@@ -196,7 +196,7 @@ namespace Umbraco.Web.Search
             if (surroundedByQuotes)
             {
                 //strip quotes, escape string, the replace again
-                query = query.Trim('\"', '\'');
+                query = query.Trim(Constants.CharArrays.DoubleQuoteSingleQuote);
 
                 query = Lucene.Net.QueryParsers.QueryParser.Escape(query);
 
@@ -230,7 +230,7 @@ namespace Umbraco.Web.Search
             }
             else
             {
-                var trimmed = query.Trim(new[] { '\"', '\'' });
+                var trimmed = query.Trim(Constants.CharArrays.DoubleQuoteSingleQuote);
 
                 //nothing to search
                 if (searchFrom.IsNullOrWhiteSpace() && trimmed.IsNullOrWhiteSpace())
@@ -243,7 +243,7 @@ namespace Umbraco.Web.Search
                 {
                     query = Lucene.Net.QueryParsers.QueryParser.Escape(query);
 
-                    var querywords = query.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                    var querywords = query.Split(Constants.CharArrays.Space, StringSplitOptions.RemoveEmptyEntries);
 
                     sb.Append("+(");
 

@@ -125,7 +125,7 @@ namespace Umbraco.Web.Trees
 
 
             //if the media item is in the recycle bin, we don't have a default menu and we need to show a limited menu
-            if (item.Path.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries).Contains(RecycleBinId.ToInvariantString()))
+            if (item.Path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries).Contains(RecycleBinId.ToInvariantString()))
             {
                 menu.Items.Add<ActionRestore>(Services.TextService, opensDialog: true);
                 menu.Items.Add<ActionMove>(Services.TextService, opensDialog: true);

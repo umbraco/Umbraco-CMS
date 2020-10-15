@@ -174,7 +174,7 @@ namespace Umbraco.Web.Editors
         {
             var foundContent = GetResultForId(id, type);
 
-            return foundContent.Path.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse);
+            return foundContent.Path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse);
         }
 
         /// <summary>
@@ -187,7 +187,7 @@ namespace Umbraco.Web.Editors
         {
             var foundContent = GetResultForKey(id, type);
 
-            return foundContent.Path.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse);
+            return foundContent.Path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse);
         }
 
         /// <summary>
@@ -1114,7 +1114,7 @@ namespace Umbraco.Web.Editors
         {
             if (postFilter.IsNullOrWhiteSpace()) return entities;
 
-            var postFilterConditions = postFilter.Split('&');
+            var postFilterConditions = postFilter.Split(Constants.CharArrays.Ampersand);
 
             foreach (var postFilterCondition in postFilterConditions)
             {
@@ -1131,9 +1131,7 @@ namespace Umbraco.Web.Editors
             return entities;
         }
 
-        private static QueryCondition BuildQueryCondition<T>(string postFilter)
-        {
-            var postFilterParts = postFilter.Split(new[]
+        private static readonly string[] _postFilterSplitStrings = new[]
             {
                 "=",
                 "==",
@@ -1143,7 +1141,10 @@ namespace Umbraco.Web.Editors
                 "<",
                 ">=",
                 "<="
-            }, 2, StringSplitOptions.RemoveEmptyEntries);
+            };
+        private static QueryCondition BuildQueryCondition<T>(string postFilter)
+        {
+            var postFilterParts = postFilter.Split(_postFilterSplitStrings, 2, StringSplitOptions.RemoveEmptyEntries);
 
             if (postFilterParts.Length != 2)
             {

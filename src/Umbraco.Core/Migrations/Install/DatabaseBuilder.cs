@@ -346,7 +346,7 @@ namespace Umbraco.Core.Migrations.Install
             var sqlCeDatabaseExists = false;
             if (dbIsSqlCe)
             {
-                var parts = databaseSettings.ConnectionString.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+                var parts = databaseSettings.ConnectionString.Split(Constants.CharArrays.Semicolon, StringSplitOptions.RemoveEmptyEntries);
                 var dataSourcePart = parts.FirstOrDefault(x => x.InvariantStartsWith("Data Source="));
                 if (dataSourcePart != null)
                 {

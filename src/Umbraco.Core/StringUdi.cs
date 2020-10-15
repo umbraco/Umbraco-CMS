@@ -33,7 +33,7 @@ namespace Umbraco.Core
         public StringUdi(Uri uriValue)
             : base(uriValue)
         {
-            Id = Uri.UnescapeDataString(uriValue.AbsolutePath.TrimStart('/'));
+            Id = Uri.UnescapeDataString(uriValue.AbsolutePath.TrimStart(Constants.CharArrays.ForwardSlash));
         }
 
         private static string EscapeUriString(string s)

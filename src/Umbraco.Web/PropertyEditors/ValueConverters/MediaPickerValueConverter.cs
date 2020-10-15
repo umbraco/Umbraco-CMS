@@ -57,7 +57,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             if (source == null) return null;
 
             var nodeIds = source.ToString()
-                .Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries)
+                .Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)
                 .Select(Udi.Parse)
                 .ToArray();
             return nodeIds;

@@ -176,7 +176,7 @@ namespace Umbraco.Core.Services.Implement
         /// <returns></returns>
         public IEnumerable<Notification> FilterUserNotificationsByPath(IEnumerable<Notification> userNotifications, string path)
         {
-            var pathParts = path.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries);
+            var pathParts = path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries);
             return userNotifications.Where(r => pathParts.InvariantContains(r.EntityId.ToString(CultureInfo.InvariantCulture))).ToList();
         }
 

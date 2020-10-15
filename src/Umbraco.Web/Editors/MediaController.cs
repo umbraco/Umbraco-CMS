@@ -694,7 +694,7 @@ namespace Umbraco.Web.Editors
             //get the files
             foreach (var file in result.FileData)
             {
-                var fileName = file.Headers.ContentDisposition.FileName.Trim(new[] { '\"' }).TrimEnd();
+                var fileName = file.Headers.ContentDisposition.FileName.Trim(Constants.CharArrays.DoubleQuote).TrimEnd();
                 var safeFileName = fileName.ToSafeFileName();
                 var ext = safeFileName.Substring(safeFileName.LastIndexOf('.') + 1).ToLower();
 

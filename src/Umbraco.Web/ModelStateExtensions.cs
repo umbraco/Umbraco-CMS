@@ -145,7 +145,7 @@ namespace Umbraco.Web
                 .Select(x =>
                 {
                     // Format "<culture>_<segment>"
-                    var cs = x.Split(new[] { '_' });
+                    var cs = x.Split(Constants.CharArrays.Underscore);
                     return (culture: cs[0], segment: cs[1]);
                 })
                 .Where(x => !x.culture.IsNullOrWhiteSpace())
