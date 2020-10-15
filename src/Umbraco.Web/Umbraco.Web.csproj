@@ -284,7 +284,6 @@
     <Compile Include="Models\RegisterModel.cs" />
     <Compile Include="Security\MembershipHelper.cs" />
     <Compile Include="HttpCookieExtensions.cs" />
-    <Compile Include="FormDataCollectionExtensions.cs" />
     <Compile Include="Editors\BackOfficeController.cs" />
     <Compile Include="Security\Providers\MembersMembershipProvider.cs" />
     <Compile Include="Security\Providers\MembersRoleProvider.cs" />
