@@ -15,6 +15,7 @@ namespace Umbraco.Examine
         {
         }
 
+        private static readonly object[] _negativeOneArray = new object[] { -1 };
         /// <inheritdoc />
         public override IEnumerable<ValueSet> GetValueSets(params IMember[] members)
         {
@@ -25,7 +26,7 @@ namespace Umbraco.Examine
                     {"icon", m.ContentType.Icon?.Yield() ?? Enumerable.Empty<string>()},
                     {"id", new object[] {m.Id}},
                     {UmbracoExamineIndex.NodeKeyFieldName, new object[] {m.Key}},
-                    {"parentID", new object[] {m.Level > 1 ? m.ParentId : -1}},
+                    {"parentID", m.Level > 1 ? new object[] { m.ParentId} :_negativeOneArray},
                     {"level", new object[] {m.Level}},
                     {"creatorID", new object[] {m.CreatorId}},
                     {"sortOrder", new object[] {m.SortOrder}},

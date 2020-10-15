@@ -21,6 +21,11 @@ namespace Umbraco.Examine
         private readonly UrlSegmentProviderCollection _urlSegmentProviders;
         private readonly IUserService _userService;
         private readonly IScopeProvider _scopeProvider;
+        private static readonly object[] _yArray = new object[] { "y" };
+        private static readonly object[] _nArray = new object[] { "n" };
+        private static readonly object[] _negativeOneArray = new object[] { -1 };
+        private static readonly object[] _zeroArray = new object[] { 0 };
+        private static readonly object[] _doubleQuestionMarkArray = new object[] { "??" };
 
         [Obsolete("Use the other ctor instead")]
         public ContentValueSetBuilder(PropertyEditorCollection propertyEditors,
@@ -46,24 +51,25 @@ namespace Umbraco.Examine
         /// <inheritdoc />
         public override IEnumerable<ValueSet> GetValueSets(params IContent[] content)
         {
-            Dictionary<int, IProfile> creatorIds;
-            Dictionary<int, IProfile> writerIds;
+            Dictionary<int, object[]> creatorIds;
+            Dictionary<int, object[]> writerIds;
 
             // We can lookup all of the creator/writer names at once which can save some
             // processing below instead of one by one.
             using (var scope = _scopeProvider.CreateScope())
             {
                 creatorIds = _userService.GetProfilesById(content.Select(x => x.CreatorId).ToArray())
-                    .ToDictionary(x => x.Id, x => x);
+                    .ToDictionary(x => x.Id, x => new object[] { x.Name });
                 writerIds = _userService.GetProfilesById(content.Select(x => x.WriterId).ToArray())
-                    .ToDictionary(x => x.Id, x => x);
+                    .ToDictionary(x => x.Id, x => new object[] { x.Name });
                 scope.Complete();
             }
 
             return GetValueSetsEnumerable(content, creatorIds, writerIds);
         }
 
-        private IEnumerable<ValueSet> GetValueSetsEnumerable(IContent[] content, Dictionary<int, IProfile> creatorIds, Dictionary<int, IProfile> writerIds)
+       
+        private IEnumerable<ValueSet> GetValueSetsEnumerable(IContent[] content, Dictionary<int, object[]> creatorIds, Dictionary<int, object[]> writerIds)
         {
             // TODO: There is a lot of boxing going on here and ultimately all values will be boxed by Lucene anyways
             // but I wonder if there's a way to reduce the boxing that we have to do or if it will matter in the end since
@@ -78,10 +84,10 @@ namespace Umbraco.Examine
                 var values = new Dictionary<string, IEnumerable<object>>
                 {
                     {"icon", c.ContentType.Icon?.Yield() ?? Enumerable.Empty<string>()},
-                    {UmbracoExamineIndex.PublishedFieldName, new object[] {c.Published ? "y" : "n"}},   //Always add invariant published value
+                    {UmbracoExamineIndex.PublishedFieldName, c.Published ? _yArray : _nArray},   //Always add invariant published value
                     {"id", new object[] {c.Id}},
                     {UmbracoExamineIndex.NodeKeyFieldName, new object[] {c.Key}},
-                    {"parentID", new object[] {c.Level > 1 ? c.ParentId : -1}},
+                    {"parentID",c.Level > 1 ?  new object[] {c.ParentId } : _negativeOneArray},
                     {"level", new object[] {c.Level}},
                     {"creatorID", new object[] {c.CreatorId}},
                     {"sortOrder", new object[] {c.SortOrder}},
@@ -93,16 +99,16 @@ namespace Umbraco.Examine
                     {"urlName", urlValue?.Yield() ?? Enumerable.Empty<string>()},                  //Always add invariant urlName
                     {"path", c.Path?.Yield() ?? Enumerable.Empty<string>()},
                     {"nodeType", c.ContentType.Id.ToString().Yield() ?? Enumerable.Empty<string>()},
-                    {"creatorName", (creatorIds.TryGetValue(c.CreatorId, out var creatorProfile) ? creatorProfile.Name : "??").Yield() },
-                    {"writerName", (writerIds.TryGetValue(c.WriterId, out var writerProfile) ? writerProfile.Name : "??").Yield() },
+                   {"creatorName", creatorIds.TryGetValue(c.CreatorId, out var creatorProfile) ? creatorProfile : _doubleQuestionMarkArray },
+                    {"writerName", writerIds.TryGetValue(c.WriterId, out var writerProfile) ? writerProfile : _doubleQuestionMarkArray },
                     {"writerID", new object[] {c.WriterId}},
-                    {"templateID", new object[] {c.TemplateId ?? 0}},
-                    {UmbracoContentIndex.VariesByCultureFieldName, new object[] {"n"}},
+                    {"templateID", c.TemplateId != null ? new object[] {c.TemplateId} : _zeroArray },
+                    {UmbracoContentIndex.VariesByCultureFieldName, _nArray},
                 };
 
                 if (isVariant)
                 {
-                    values[UmbracoContentIndex.VariesByCultureFieldName] = new object[] { "y" };
+                    values[UmbracoContentIndex.VariesByCultureFieldName] = _yArray;
 
                     foreach (var culture in c.AvailableCultures)
                     {
@@ -112,7 +118,7 @@ namespace Umbraco.Examine
                         values[$"nodeName_{lowerCulture}"] = (PublishedValuesOnly
                             ? c.GetPublishName(culture)?.Yield()
                             : c.GetCultureName(culture)?.Yield()) ?? Enumerable.Empty<string>();
-                        values[$"{UmbracoExamineIndex.PublishedFieldName}_{lowerCulture}"] = (c.IsCulturePublished(culture) ? "y" : "n").Yield<object>();
+                        values[$"{UmbracoExamineIndex.PublishedFieldName}_{lowerCulture}"] = c.IsCulturePublished(culture) ? _yArray : _nArray;
                         values[$"updateDate_{lowerCulture}"] = (PublishedValuesOnly
                             ? c.GetPublishDate(culture)
                             : c.GetUpdateDate(culture))?.Yield<object>() ?? Enumerable.Empty<object>();
