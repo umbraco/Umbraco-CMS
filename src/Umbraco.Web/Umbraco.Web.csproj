@@ -186,7 +186,6 @@
     <Compile Include="Security\BackOfficeUserManagerMarker.cs" />
     <Compile Include="WebAssets\CDF\ClientDependencyComponent.cs" />
     <Compile Include="WebAssets\CDF\ClientDependencyComposer.cs" />
-    <Compile Include="Security\ConfiguredPasswordValidator.cs" />
     <Compile Include="Security\MembershipProviderBase.cs" />
     <Compile Include="Security\MembershipProviderExtensions.cs" />
     <Compile Include="Security\OwinDataProtectorTokenProvider.cs" />
