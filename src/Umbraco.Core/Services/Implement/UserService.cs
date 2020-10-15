@@ -267,15 +267,17 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="entity"><see cref="IUser"/> to Save</param>
         /// <param name="raiseEvents">Optional parameter to raise events.
         /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
-        public void Save(IUser entity, bool raiseEvents = true)
+        public Attempt<OperationResult> Save(IUser entity, bool raiseEvents = true)
         {
+            var evtMsgs = EventMessagesFactory.Get();
+
             using (var scope = ScopeProvider.CreateScope())
             {
-                var saveEventArgs = new SaveEventArgs<IUser>(entity);
+                var saveEventArgs = new SaveEventArgs<IUser>(entity, evtMsgs);
                 if (raiseEvents && scope.Events.DispatchCancelable(SavingUser, this, saveEventArgs))
                 {
                     scope.Complete();
-                    return;
+                    return OperationResult.Attempt.Cancel(evtMsgs);
                 }
 
                 if (string.IsNullOrWhiteSpace(entity.Username))
@@ -318,6 +320,7 @@ namespace Umbraco.Core.Services.Implement
                     scope.Complete();
                 }
             }
+            return OperationResult.Attempt.Succeed(evtMsgs);
         }
 
         /// <summary>
@@ -326,17 +329,19 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="entities"><see cref="IEnumerable{IUser}"/> to save</param>
         /// <param name="raiseEvents">Optional parameter to raise events.
         /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
-        public void Save(IEnumerable<IUser> entities, bool raiseEvents = true)
+        public Attempt<OperationResult> Save(IEnumerable<IUser> entities, bool raiseEvents = true)
         {
             var entitiesA = entities.ToArray();
 
+            var evtMsgs = EventMessagesFactory.Get();
+
             using (var scope = ScopeProvider.CreateScope())
             {
-                var saveEventArgs = new SaveEventArgs<IUser>(entitiesA);
+                var saveEventArgs = new SaveEventArgs<IUser>(entitiesA, evtMsgs);
                 if (raiseEvents && scope.Events.DispatchCancelable(SavingUser, this, saveEventArgs))
                 {
                     scope.Complete();
-                    return;
+                    return OperationResult.Attempt.Cancel(evtMsgs);
                 }
 
                 foreach (var user in entitiesA)
@@ -371,6 +376,7 @@ namespace Umbraco.Core.Services.Implement
                 //commit the whole lot in one go
                 scope.Complete();
             }
+            return OperationResult.Attempt.Succeed(evtMsgs);
         }
 
         /// <summary>
@@ -843,8 +849,10 @@ namespace Umbraco.Core.Services.Implement
         /// </param>
         /// <param name="raiseEvents">Optional parameter to raise events.
         /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
-        public void Save(IUserGroup userGroup, int[] userIds = null, bool raiseEvents = true)
+        public Attempt<OperationResult> Save(IUserGroup userGroup, int[] userIds = null, bool raiseEvents = true)
         {
+            var evtMsgs = EventMessagesFactory.Get();
+
             using (var scope = ScopeProvider.CreateScope())
             {
                 // we need to figure out which users have been added / removed, for audit purposes
@@ -862,12 +870,12 @@ namespace Umbraco.Core.Services.Implement
                     removedUsers = groupIds.Except(userIds).Select(x => xGroupUsers[x]).Where(x => x.Id != 0).ToArray();
                 }
 
-                var saveEventArgs = new SaveEventArgs<UserGroupWithUsers>(new UserGroupWithUsers(userGroup, addedUsers, removedUsers));
+                var saveEventArgs = new SaveEventArgs<UserGroupWithUsers>(new UserGroupWithUsers(userGroup, addedUsers, removedUsers), evtMsgs);
 
                 if (raiseEvents && scope.Events.DispatchCancelable(SavingUserGroup, this, saveEventArgs))
                 {
                     scope.Complete();
-                    return;
+                    return OperationResult.Attempt.Cancel(evtMsgs);
                 }
 
                 _userGroupRepository.AddOrUpdateGroupWithUsers(userGroup, userIds);
@@ -880,6 +888,7 @@ namespace Umbraco.Core.Services.Implement
 
                 scope.Complete();
             }
+            return OperationResult.Attempt.Succeed(evtMsgs);
         }
 
         /// <summary>

@@ -812,19 +812,21 @@ namespace Umbraco.Core.Services.Implement
         }
 
         /// <inheritdoc />
-        public void Save(IMember member, bool raiseEvents = true)
+        public Attempt<OperationResult> Save(IMember member, bool raiseEvents = true)
         {
             //trimming username and email to make sure we have no trailing space
             member.Username = member.Username.Trim();
             member.Email = member.Email.Trim();
 
+            var evtMsgs = EventMessagesFactory.Get();
+
             using (var scope = ScopeProvider.CreateScope())
             {
-                var saveEventArgs = new SaveEventArgs<IMember>(member);
+                var saveEventArgs = new SaveEventArgs<IMember>(member, evtMsgs);
                 if (raiseEvents && scope.Events.DispatchCancelable(Saving, this, saveEventArgs))
                 {
                     scope.Complete();
-                    return;
+                    return OperationResult.Attempt.Cancel(evtMsgs);
                 }
 
                 if (string.IsNullOrWhiteSpace(member.Name))
@@ -845,20 +847,22 @@ namespace Umbraco.Core.Services.Implement
 
                 scope.Complete();
             }
+            return OperationResult.Attempt.Succeed(evtMsgs);
         }
 
         /// <inheritdoc />
-        public void Save(IEnumerable<IMember> members, bool raiseEvents = true)
+        public Attempt<OperationResult> Save(IEnumerable<IMember> members, bool raiseEvents = true)
         {
             var membersA = members.ToArray();
+            var evtMsgs = EventMessagesFactory.Get();
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var saveEventArgs = new SaveEventArgs<IMember>(membersA);
+                var saveEventArgs = new SaveEventArgs<IMember>(membersA, evtMsgs);
                 if (raiseEvents && scope.Events.DispatchCancelable(Saving, this, saveEventArgs))
                 {
                     scope.Complete();
-                    return;
+                    return OperationResult.Attempt.Cancel(evtMsgs);
                 }
 
                 scope.WriteLock(Constants.Locks.MemberTree);
@@ -881,6 +885,7 @@ namespace Umbraco.Core.Services.Implement
 
                 scope.Complete();
             }
+            return OperationResult.Attempt.Succeed(evtMsgs);
         }
 
         #endregion
