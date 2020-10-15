@@ -316,7 +316,7 @@
     <key alias="untouchedLanguagesForFirstTime">These languages haven't been created</key>
 
     <key alias="variantsWillBeSaved">All new variants will be saved.</key>
-    <key alias="variantsToPublish">Which variants you would like to publish?</key>
+    <key alias="variantsToPublish">Which variants would you like to publish?</key>
     <key alias="variantsToSave">Choose which variants to be saved.</key>
     <key alias="variantsToSendForApproval">Pick variants to send for approval.</key>
     <key alias="variantsToSchedule">Set scheduled publishing...</key>
@@ -2511,8 +2511,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="addCustomView">Add custom view</key>
     <key alias="addSettingsElementType">Add settings</key>
     <key alias="labelTemplatePlaceholder">Overwrite label template</key>
-    <key alias="confirmDeleteBlockMessage"><![CDATA[Are you sure you want to delete content of <strong>%0%</strong>.]]></key>
-    <key alias="confirmDeleteBlockTypeMessage"><![CDATA[Are you sure you want to delete block configuration of <strong>%0%</strong>.]]></key>
+    <key alias="confirmDeleteBlockMessage"><![CDATA[Are you sure you want to delete the content <strong>%0%</strong>?]]></key>
+    <key alias="confirmDeleteBlockTypeMessage"><![CDATA[Are you sure you want to delete the block configuration <strong>%0%</strong>?]]></key>
     <key alias="confirmDeleteBlockTypeNotice">The content of this block will still be present, editing of this content will no longer be available and will be shown as unsupported content.</key>
     <key alias="blockConfigurationOverlayTitle"><![CDATA[Configuration of '%0%']]></key>
     <key alias="thumbnail">Thumbnail</key>
