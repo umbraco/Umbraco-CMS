@@ -33,10 +33,10 @@
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
   </PropertyGroup>
-    <PropertyGroup>
-        <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-        <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
-    </PropertyGroup>
+  <PropertyGroup>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+  </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
@@ -151,6 +151,7 @@
     <Compile Include="Scoping\ScopeEventDispatcherTests.cs" />
     <Compile Include="Security\OwinDataProtectorTokenProviderTests.cs" />
     <Compile Include="Persistence\Repositories\UserRepositoryTest.cs" />
+    <Compile Include="Services\TestWithSomeContentBase.cs" />
     <Compile Include="TestHelpers\Entities\MockedContent.cs" />
     <Compile Include="TestHelpers\Entities\MockedContentTypes.cs" />
     <Compile Include="TestHelpers\Entities\MockedEntity.cs" />
@@ -168,16 +169,11 @@
     <Compile Include="Routing\RoutableDocumentFilterTests.cs" />
     <Compile Include="Runtimes\StandaloneTests.cs" />
     <Compile Include="Routing\GetContentUrlsTests.cs" />
-    <Compile Include="Services\ContentServiceTagsTests.cs" />
     <Compile Include="Services\ContentTypeServiceVariantsTests.cs" />
-    <Compile Include="Services\EntityXmlSerializerTests.cs" />
-    <Compile Include="Services\MemberGroupServiceTests.cs" />
-    <Compile Include="Services\MediaTypeServiceTests.cs" />
     <Compile Include="TestHelpers\RandomIdRamDirectory.cs" />
     <Compile Include="TestHelpers\Stubs\TestUserPasswordConfig.cs" />
     <Compile Include="Testing\Objects\TestDataSource.cs" />
     <Compile Include="Issues\U9560.cs" />
-    <Compile Include="Integration\ContentEventsTests.cs" />
     <Compile Include="Migrations\AdvancedMigrationTests.cs" />
     <Compile Include="Persistence\NPocoTests\NPocoFetchTests.cs" />
     <Compile Include="Persistence\NPocoTests\NPocoSqlTemplateTests.cs" />
@@ -264,8 +260,6 @@
     <Compile Include="PublishedContent\PublishedRouterTests.cs" />
     <Compile Include="PublishedContent\RootNodeTests.cs" />
     <Compile Include="Scheduling\BackgroundTaskRunnerTests.cs" />
-    <Compile Include="Services\MemberServiceTests.cs" />
-    <Compile Include="Services\MemberTypeServiceTests.cs" />
     <Compile Include="Packaging\PackageInstallationTest.cs" />
     <Compile Include="Services\PerformanceTests.cs" />
     <Compile Include="Cache\PublishedCache\PublishedMediaCacheTests.cs" />
@@ -320,10 +314,6 @@
     <Compile Include="Routing\DomainsAndCulturesTests.cs" />
     <Compile Include="Routing\SiteDomainHelperTests.cs" />
     <Compile Include="Routing\UrlsWithNestedDomains.cs" />
-    <Compile Include="Services\TestWithSomeContentBase.cs" />
-    <Compile Include="Services\ContentServicePerformanceTest.cs" />
-    <Compile Include="Services\ContentServiceTests.cs" />
-    <Compile Include="Services\ContentTypeServiceTests.cs" />
     <Compile Include="Packaging\PackageDataInstallationTests.cs" />
     <Compile Include="Services\Importing\ImportResources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -468,6 +458,9 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Integration" />
   </ItemGroup>
   <!-- get NuGet packages directory -->
   <PropertyGroup>

@@ -2,64 +2,44 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration.Models;
+using Umbraco.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Scoping;
-using Umbraco.Tests.TestHelpers;
-using Umbraco.Tests.TestHelpers.Entities;
+using Umbraco.Core.Services;
+using Umbraco.Tests.Common.Builders;
+using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Tests.Testing;
-using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.Services
 {
-    [TestFixture, NUnit.Framework.Ignore("fixme - ignored test")]
+    [TestFixture]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-    public class ContentServicePerformanceTest : TestWithDatabaseBase
+    public class ContentServicePerformanceTest : UmbracoIntegrationTest
     {
-        public override void SetUp()
+        protected DocumentRepository DocumentRepository => (DocumentRepository)GetRequiredService<IDocumentRepository>();
+        protected IFileService FileService => GetRequiredService<IFileService>();
+        protected IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
+        protected IContentService ContentService => GetRequiredService<IContentService>();
+
+        protected IContentType ContentType { get; set; }
+
+        [SetUp]
+        public void SetUpData()
         {
-            base.SetUp();
             CreateTestData();
-        }
-
-        protected override void Compose()
-        {
-            base.Compose();
-            Composition.Register<IProfiler, TestProfiler>();
-        }
-
-        private DocumentRepository CreateDocumentRepository(IScopeProvider provider)
-        {
-            var accessor = (IScopeAccessor)provider;
-            var globalSettings = new GlobalSettings();
-            var tRepository = new TemplateRepository((IScopeAccessor) provider, AppCaches.Disabled, LoggerFactory.CreateLogger<TemplateRepository>(), TestObjects.GetFileSystemsMock(), IOHelper, ShortStringHelper);
-            var tagRepo = new TagRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<TagRepository>());
-            var commonRepository = new ContentTypeCommonRepository(accessor, tRepository, AppCaches, ShortStringHelper);
-            var languageRepository = new LanguageRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<LanguageRepository>(), Microsoft.Extensions.Options.Options.Create(globalSettings));
-            var ctRepository = new ContentTypeRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<ContentTypeRepository>(), commonRepository, languageRepository, ShortStringHelper);
-            var relationTypeRepository = new RelationTypeRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<RelationTypeRepository>());
-            var entityRepository = new EntityRepository(accessor);
-            var relationRepository = new RelationRepository(accessor, LoggerFactory.CreateLogger<RelationRepository>(), relationTypeRepository, entityRepository);
-            var propertyEditors = new Lazy<PropertyEditorCollection>(() => new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>())));
-            var dataValueReferences = new DataValueReferenceFactoryCollection(Enumerable.Empty<IDataValueReferenceFactory>());
-            var repository = new DocumentRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<DocumentRepository>(), LoggerFactory, ctRepository, tRepository, tagRepo, languageRepository, relationRepository, relationTypeRepository, propertyEditors, dataValueReferences, DataTypeService);
-            return repository;
         }
 
         [Test]
         public void Profiler()
         {
-            Assert.IsInstanceOf<TestProfiler>(Current.Profiler);
+            Assert.IsInstanceOf<TestProfiler>(GetRequiredService<IProfiler>());
         }
 
         private static IProfilingLogger GetTestProfilingLogger()
@@ -84,10 +64,13 @@ namespace Umbraco.Tests.Services
             // ... NOPE, made even more nice changes, it is now...
             // 4452ms !!!!!!!
 
-            var contentType1 = MockedContentTypes.CreateTextPageContentType("test1", "test1");
-            var contentType2 = MockedContentTypes.CreateTextPageContentType("test2", "test2");
-            var contentType3 = MockedContentTypes.CreateTextPageContentType("test3", "test3");
-            ServiceContext.ContentTypeService.Save(new[] { contentType1, contentType2, contentType3 });
+            var template = TemplateBuilder.CreateTextPageTemplate();
+            FileService.SaveTemplate(template);
+
+            var contentType1 = ContentTypeBuilder.CreateTextPageContentType("test1", "test1", defaultTemplateId: template.Id);
+            var contentType2 = ContentTypeBuilder.CreateTextPageContentType("test2", "test2", defaultTemplateId: template.Id);
+            var contentType3 = ContentTypeBuilder.CreateTextPageContentType("test3", "test3", defaultTemplateId: template.Id);
+            ContentTypeService.Save(new[] { contentType1, contentType2, contentType3 });
             contentType1.AllowedContentTypes = new[]
             {
                 new ContentTypeSort(new Lazy<int>(() => contentType2.Id), 0, contentType2.Alias),
@@ -103,17 +86,17 @@ namespace Umbraco.Tests.Services
                 new ContentTypeSort(new Lazy<int>(() => contentType1.Id), 0, contentType1.Alias),
                 new ContentTypeSort(new Lazy<int>(() => contentType2.Id), 1, contentType2.Alias)
             };
-            ServiceContext.ContentTypeService.Save(new[] { contentType1, contentType2, contentType3 });
+            ContentTypeService.Save(new[] { contentType1, contentType2, contentType3 });
 
-            var roots = MockedContent.CreateTextpageContent(contentType1, -1, 10);
-            ServiceContext.ContentService.Save(roots);
+            var roots = ContentBuilder.CreateTextpageContent(contentType1, -1, 10);
+            ContentService.Save(roots);
             foreach (var root in roots)
             {
-                var item1 = MockedContent.CreateTextpageContent(contentType1, root.Id, 10);
-                var item2 = MockedContent.CreateTextpageContent(contentType2, root.Id, 10);
-                var item3 = MockedContent.CreateTextpageContent(contentType3, root.Id, 10);
+                var item1 = ContentBuilder.CreateTextpageContent(contentType1, root.Id, 10);
+                var item2 = ContentBuilder.CreateTextpageContent(contentType2, root.Id, 10);
+                var item3 = ContentBuilder.CreateTextpageContent(contentType3, root.Id, 10);
 
-                ServiceContext.ContentService.Save(item1.Concat(item2).Concat(item3));
+                ContentService.Save(item1.Concat(item2).Concat(item3));
             }
 
             var total = new List<IContent>();
@@ -121,10 +104,10 @@ namespace Umbraco.Tests.Services
             using (GetTestProfilingLogger().TraceDuration<ContentServicePerformanceTest>("Getting all content in site"))
             {
                 TestProfiler.Enable();
-                total.AddRange(ServiceContext.ContentService.GetRootContent());
+                total.AddRange(ContentService.GetRootContent());
                 foreach (var content in total.ToArray())
                 {
-                    total.AddRange(ServiceContext.ContentService.GetPagedDescendants(content.Id, 0, int.MaxValue, out var _));
+                    total.AddRange(ContentService.GetPagedDescendants(content.Id, 0, int.MaxValue, out var _));
                 }
                 TestProfiler.Disable();
                 Current.Logger.LogInformation("Returned {Total} items", total.Count);
@@ -135,12 +118,12 @@ namespace Umbraco.Tests.Services
         public void Creating_100_Items()
         {
             // Arrange
-            var contentType = ServiceContext.ContentTypeService.Get(NodeDto.NodeIdSeed);
-            var pages = MockedContent.CreateTextpageContent(contentType, -1, 100);
+            var contentType = ContentTypeService.Get(ContentType.Id);
+            var pages = ContentBuilder.CreateTextpageContent(contentType, -1, 100);
 
             // Act
             Stopwatch watch = Stopwatch.StartNew();
-            ServiceContext.ContentService.Save(pages, 0);
+            ContentService.Save(pages, 0);
             watch.Stop();
             var elapsed = watch.ElapsedMilliseconds;
 
@@ -154,12 +137,12 @@ namespace Umbraco.Tests.Services
         public void Creating_1000_Items()
         {
             // Arrange
-            var contentType = ServiceContext.ContentTypeService.Get(NodeDto.NodeIdSeed);
-            var pages = MockedContent.CreateTextpageContent(contentType, -1, 1000);
+            var contentType = ContentTypeService.Get(ContentType.Id);
+            var pages = ContentBuilder.CreateTextpageContent(contentType, -1, 1000);
 
             // Act
             Stopwatch watch = Stopwatch.StartNew();
-            ServiceContext.ContentService.Save(pages, 0);
+            ContentService.Save(pages, 0);
             watch.Stop();
             var elapsed = watch.ElapsedMilliseconds;
 
@@ -173,14 +156,14 @@ namespace Umbraco.Tests.Services
         public void Getting_100_Uncached_Items()
         {
             // Arrange
-            var contentType = ServiceContext.ContentTypeService.Get(NodeDto.NodeIdSeed);
-            var pages = MockedContent.CreateTextpageContent(contentType, -1, 100);
-            ServiceContext.ContentService.Save(pages, 0);
+            var contentType = ContentTypeService.Get(ContentType.Id);
+            var pages = ContentBuilder.CreateTextpageContent(contentType, -1, 100);
+            ContentService.Save(pages, 0);
 
-            var provider = TestObjects.GetScopeProvider(LoggerFactory);
+            var provider = ScopeProvider;
             using (var scope = provider.CreateScope())
             {
-                var repository = CreateDocumentRepository(provider);
+                var repository = DocumentRepository;
 
                 // Act
                 Stopwatch watch = Stopwatch.StartNew();
@@ -198,18 +181,17 @@ namespace Umbraco.Tests.Services
 
         }
 
-        [Test, NUnit.Framework.Ignore("fixme - ignored test")]
+        [Test]
         public void Getting_1000_Uncached_Items()
         {
             // Arrange
-            var contentType = ServiceContext.ContentTypeService.Get(NodeDto.NodeIdSeed);
-            var pages = MockedContent.CreateTextpageContent(contentType, -1, 1000);
-            ServiceContext.ContentService.Save(pages, 0);
+            var contentType = ContentTypeService.Get(ContentType.Id);
+            var pages = ContentBuilder.CreateTextpageContent(contentType, -1, 1000);
+            ContentService.Save(pages, 0);
 
-            var provider = TestObjects.GetScopeProvider(LoggerFactory);
-            using (var scope = provider.CreateScope())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                var repository = CreateDocumentRepository(provider);
+                var repository = DocumentRepository;
 
                 // Act
                 Stopwatch watch = Stopwatch.StartNew();
@@ -229,14 +211,13 @@ namespace Umbraco.Tests.Services
         public void Getting_100_Cached_Items()
         {
             // Arrange
-            var contentType = ServiceContext.ContentTypeService.Get(NodeDto.NodeIdSeed);
-            var pages = MockedContent.CreateTextpageContent(contentType, -1, 100);
-            ServiceContext.ContentService.Save(pages, 0);
+            var contentType = ContentTypeService.Get(ContentType.Id);
+            var pages = ContentBuilder.CreateTextpageContent(contentType, -1, 100);
+            ContentService.Save(pages, 0);
 
-            var provider = TestObjects.GetScopeProvider(LoggerFactory);
-            using (var scope = provider.CreateScope())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                var repository = CreateDocumentRepository(provider);
+                var repository = DocumentRepository;
 
                 // Act
                 var contents = repository.GetMany();
@@ -255,18 +236,17 @@ namespace Umbraco.Tests.Services
             }
         }
 
-        [Test, NUnit.Framework.Ignore("fixme - ignored test")]
+        [Test]
         public void Getting_1000_Cached_Items()
         {
             // Arrange
-            var contentType = ServiceContext.ContentTypeService.Get(NodeDto.NodeIdSeed);
-            var pages = MockedContent.CreateTextpageContent(contentType, -1, 1000);
-            ServiceContext.ContentService.Save(pages, 0);
+            var contentType = ContentTypeService.Get(ContentType.Id);
+            var pages = ContentBuilder.CreateTextpageContent(contentType, -1, 1000);
+            ContentService.Save(pages, 0);
 
-            var provider = TestObjects.GetScopeProvider(LoggerFactory);
-            using (var scope = provider.CreateScope())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                var repository = CreateDocumentRepository(provider);
+                var repository = DocumentRepository;
 
                 // Act
                 var contents = repository.GetMany();
@@ -293,9 +273,13 @@ namespace Umbraco.Tests.Services
 
         public void CreateTestData()
         {
-            //Create and Save ContentType "textpage" -> NodeDto.NodeIdSeed
-            ContentType contentType = MockedContentTypes.CreateTextPageContentType();
-            ServiceContext.ContentTypeService.Save(contentType);
+
+            var template = TemplateBuilder.CreateTextPageTemplate();
+            FileService.SaveTemplate(template);
+
+            //Create and Save ContentType "textpage" -> ContentType.Id
+            ContentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id);
+            ContentTypeService.Save(ContentType);
         }
     }
 }

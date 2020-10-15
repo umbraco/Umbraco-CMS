@@ -5,6 +5,7 @@ using Umbraco.Core.Models;
 using Umbraco.Tests.Common.Builders.Interfaces;
 using Umbraco.Tests.Common.Builders.Extensions;
 using Umbraco.Tests.Testing;
+using Umbraco.Core;
 
 namespace Umbraco.Tests.Common.Builders
 {
@@ -22,7 +23,8 @@ namespace Umbraco.Tests.Common.Builders
             IWithLevelBuilder,
             IWithPathBuilder,
             IWithSortOrderBuilder,
-            IWithCultureInfoBuilder
+            IWithCultureInfoBuilder,
+            IWithPropertyValues
     {
         private ContentTypeBuilder _contentTypeBuilder;
         private GenericDictionaryBuilder<ContentBuilder, string, object> _propertyDataBuilder;
@@ -85,14 +87,6 @@ namespace Umbraco.Tests.Common.Builders
             return this;
         }
 
-        public ContentBuilder WithPropertyValues(object propertyValues, string culture = null, string segment = null)
-        {
-            _propertyValues = propertyValues;
-            _propertyValuesCulture = culture;
-            _propertyValuesSegment = segment;
-            return this;
-        }
-
         public GenericDictionaryBuilder<ContentBuilder, string, object> AddPropertyData()
         {
             var builder = new GenericDictionaryBuilder<ContentBuilder, string, object>(this);
@@ -129,10 +123,7 @@ namespace Umbraco.Tests.Common.Builders
             Content content;
             if (parent != null)
             {
-                content = new Content(name, parent, contentType, culture)
-                {
-                    ParentId = parent.Id
-                };
+                content = new Content(name, parent, contentType, culture);
             }
             else
             {
@@ -242,6 +233,32 @@ namespace Umbraco.Tests.Common.Builders
             return content;
         }
 
+        public static IEnumerable<Content> CreateTextpageContent(IContentType contentType, int parentId, int amount)
+        {
+            var list = new List<Content>();
+
+            for (int i = 0; i < amount; i++)
+            {
+                var name = "Textpage No-" + i;
+                var content = new Content(name, parentId, contentType) { CreatorId = 0, WriterId = 0 };
+                object obj =
+                    new
+                    {
+                        title = name + " title",
+                        bodyText = string.Format("This is a textpage based on the {0} ContentType", contentType.Alias),
+                        keywords = "text,page,meta",
+                        description = "This is the meta description for a textpage"
+                    };
+
+                content.PropertyValues(obj);
+
+                content.ResetDirtyProperties(false);
+
+                list.Add(content);
+            }
+
+            return list;
+        }
         public static Content CreateTextpageContent(IContentType contentType, string name, int parentId)
         {
             return new ContentBuilder()
@@ -257,6 +274,63 @@ namespace Umbraco.Tests.Common.Builders
                         description = "This is the meta description for a textpage"
                     })
                 .Build();
+        }
+
+        public static IEnumerable<Content> CreateMultipleTextpageContent(IContentType contentType, int parentId, int amount)
+        {
+            var list = new List<Content>();
+
+            for (var i = 0; i < amount; i++)
+            {
+                var name = "Textpage No-" + i;
+                var content = new ContentBuilder()
+                    .WithName(name)
+                    .WithParentId(parentId)
+                    .WithContentType(contentType)
+                    .WithPropertyValues(new
+                        {
+                            title = name + " title",
+                            bodyText = $"This is a textpage based on the {contentType.Alias} ContentType",
+                            keywords = "text,page,meta",
+                            description = "This is the meta description for a textpage"
+                        })
+                    .Build();
+
+                list.Add(content);
+            }
+
+            return list;
+        }
+
+        public static Content CreateAllTypesContent(IContentType contentType, string name, int parentId)
+        {
+            var content = new ContentBuilder()
+                .WithName(name)
+                .WithParentId(parentId)
+                .WithContentType(contentType)
+                .Build();
+
+            content.SetValue("isTrue", true);
+            content.SetValue("number", 42);
+            content.SetValue("bodyText", "Lorem Ipsum Body Text Test");
+            content.SetValue("singleLineText", "Single Line Text Test");
+            content.SetValue("multilineText", "Multiple lines \n in one box");
+            content.SetValue("upload", "/media/1234/koala.jpg");
+            content.SetValue("label", "Non-editable label");
+            content.SetValue("dateTime", DateTime.Now.AddDays(-20));
+            content.SetValue("colorPicker", "black");
+            content.SetValue("ddlMultiple", "1234,1235");
+            content.SetValue("rbList", "random");
+            content.SetValue("date", DateTime.Now.AddDays(-10));
+            content.SetValue("ddl", "1234");
+            content.SetValue("chklist", "randomc");
+            content.SetValue("contentPicker", Udi.Create(Constants.UdiEntityType.Document, new Guid("74ECA1D4-934E-436A-A7C7-36CC16D4095C")).ToString());
+            content.SetValue("mediaPicker", Udi.Create(Constants.UdiEntityType.Media, new Guid("44CB39C8-01E5-45EB-9CF8-E70AAF2D1691")).ToString());
+            content.SetValue("memberPicker", Udi.Create(Constants.UdiEntityType.Member, new Guid("9A50A448-59C0-4D42-8F93-4F1D55B0F47D")).ToString());
+            content.SetValue("multiUrlPicker", "[{\"name\":\"https://test.com\",\"url\":\"https://test.com\"}]");
+            content.SetValue("tags", "this,is,tags");
+
+            return content;
         }
 
         int? IWithIdBuilder.Id
@@ -318,15 +392,35 @@ namespace Umbraco.Tests.Common.Builders
             get => _sortOrder;
             set => _sortOrder = value;
         }
+
         int? IWithParentIdBuilder.ParentId
         {
             get => _parentId;
             set => _parentId = value;
         }
+
         CultureInfo IWithCultureInfoBuilder.CultureInfo
         {
             get => _cultureInfo;
             set => _cultureInfo = value;
+        }
+
+        object IWithPropertyValues.PropertyValues
+        {
+            get => _propertyValues;
+            set => _propertyValues = value;
+        }
+
+        string IWithPropertyValues.PropertyValuesCulture
+        {
+            get => _propertyValuesCulture;
+            set => _propertyValuesCulture = value;
+        }
+
+        string IWithPropertyValues.PropertyValuesSegment
+        {
+            get => _propertyValuesSegment;
+            set => _propertyValuesSegment = value;
         }
     }
 }

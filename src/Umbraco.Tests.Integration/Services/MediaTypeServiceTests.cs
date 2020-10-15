@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using NUnit.Framework;
@@ -6,26 +7,41 @@ using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
-using Umbraco.Tests.TestHelpers.Entities;
+using Umbraco.Tests.Common.Builders;
+using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;
 
-namespace Umbraco.Tests.Services
+namespace Umbraco.Tests.Integration.Services
 {
     [TestFixture]
     [Apartment(ApartmentState.STA)]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, PublishedRepositoryEvents = true)]
-    public class MediaTypeServiceTests : TestWithSomeContentBase
+    public class MediaTypeServiceTests : UmbracoIntegrationTest
     {
+        private MediaService MediaService => (MediaService)GetRequiredService<IMediaService>();
+        private IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();
+
+        [Test]
+        public void Get_With_Missing_Guid()
+        {
+            // Arrange
+            //Act
+            var result = MediaTypeService.Get(Guid.NewGuid());
+
+            //Assert
+            Assert.IsNull(result);
+        }
+
         [Test]
         public void Empty_Description_Is_Always_Null_After_Saving_Media_Type()
         {
-            var mediaType = MockedContentTypes.CreateSimpleMediaType("mediaType", "Media Type");
+            var mediaType = MediaTypeBuilder.CreateSimpleMediaType("mediaType", "Media Type");
             mediaType.Description = null;
-            ServiceContext.MediaTypeService.Save(mediaType);
+            MediaTypeService.Save(mediaType);
 
-            var mediaType2 = MockedContentTypes.CreateSimpleMediaType("mediaType2", "Media Type 2");
+            var mediaType2 = MediaTypeBuilder.CreateSimpleMediaType("mediaType2", "Media Type 2");
             mediaType2.Description = string.Empty;
-            ServiceContext.MediaTypeService.Save(mediaType2);
+            MediaTypeService.Save(mediaType2);
 
             Assert.IsNull(mediaType.Description);
             Assert.IsNull(mediaType2.Description);
@@ -34,25 +50,25 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Deleting_Media_Type_With_Hierarchy_Of_Media_Items_Moves_Orphaned_Media_To_Recycle_Bin()
         {
-            IMediaType contentType1 = MockedContentTypes.CreateSimpleMediaType("test1", "Test1");
-            ServiceContext.MediaTypeService.Save(contentType1);
-            IMediaType contentType2 = MockedContentTypes.CreateSimpleMediaType("test2", "Test2");
-            ServiceContext.MediaTypeService.Save(contentType2);
-            IMediaType contentType3 = MockedContentTypes.CreateSimpleMediaType("test3", "Test3");
-            ServiceContext.MediaTypeService.Save(contentType3);
+            IMediaType contentType1 = MediaTypeBuilder.CreateSimpleMediaType("test1", "Test1");
+            MediaTypeService.Save(contentType1);
+            IMediaType contentType2 = MediaTypeBuilder.CreateSimpleMediaType("test2", "Test2");
+            MediaTypeService.Save(contentType2);
+            IMediaType contentType3 = MediaTypeBuilder.CreateSimpleMediaType("test3", "Test3");
+            MediaTypeService.Save(contentType3);
 
             var contentTypes = new[] { contentType1, contentType2, contentType3 };
             var parentId = -1;
 
             var ids = new List<int>();
 
-            for (int i = 0; i < 2; i++)
+            for (var i = 0; i < 2; i++)
             {
                 for (var index = 0; index < contentTypes.Length; index++)
                 {
                     var contentType = contentTypes[index];
-                    var contentItem = MockedMedia.CreateSimpleMedia(contentType, "MyName_" + index + "_" + i, parentId);
-                    ServiceContext.MediaService.Save(contentItem);
+                    var contentItem = MediaBuilder.CreateSimpleMedia(contentType, "MyName_" + index + "_" + i, parentId);
+                    MediaService.Save(contentItem);
                     parentId = contentItem.Id;
 
                     ids.Add(contentItem.Id);
@@ -60,9 +76,9 @@ namespace Umbraco.Tests.Services
             }
 
             //delete the first content type, all other content of different content types should be in the recycle bin
-            ServiceContext.MediaTypeService.Delete(contentTypes[0]);
+            MediaTypeService.Delete(contentTypes[0]);
 
-            var found = ServiceContext.MediaService.GetByIds(ids);
+            var found = MediaService.GetByIds(ids);
 
             Assert.AreEqual(4, found.Count());
             foreach (var content in found)
@@ -78,25 +94,25 @@ namespace Umbraco.Tests.Services
 
             try
             {
-                IMediaType contentType1 = MockedContentTypes.CreateSimpleMediaType("test1", "Test1");
-                ServiceContext.MediaTypeService.Save(contentType1);
-                IMediaType contentType2 = MockedContentTypes.CreateSimpleMediaType("test2", "Test2");
-                ServiceContext.MediaTypeService.Save(contentType2);
-                IMediaType contentType3 = MockedContentTypes.CreateSimpleMediaType("test3", "Test3");
-                ServiceContext.MediaTypeService.Save(contentType3);
+                IMediaType contentType1 = MediaTypeBuilder.CreateSimpleMediaType("test1", "Test1");
+                MediaTypeService.Save(contentType1);
+                IMediaType contentType2 = MediaTypeBuilder.CreateSimpleMediaType("test2", "Test2");
+                MediaTypeService.Save(contentType2);
+                IMediaType contentType3 = MediaTypeBuilder.CreateSimpleMediaType("test3", "Test3");
+                MediaTypeService.Save(contentType3);
 
                 var contentTypes = new[] { contentType1, contentType2, contentType3 };
                 var parentId = -1;
 
                 var ids = new List<int>();
 
-                for (int i = 0; i < 2; i++)
+                for (var i = 0; i < 2; i++)
                 {
                     for (var index = 0; index < contentTypes.Length; index++)
                     {
                         var contentType = contentTypes[index];
-                        var contentItem = MockedMedia.CreateSimpleMedia(contentType, "MyName_" + index + "_" + i, parentId);
-                        ServiceContext.MediaService.Save(contentItem);
+                        var contentItem = MediaBuilder.CreateSimpleMedia(contentType, "MyName_" + index + "_" + i, parentId);
+                        MediaService.Save(contentItem);
                         parentId = contentItem.Id;
 
                         ids.Add(contentItem.Id);
@@ -105,7 +121,7 @@ namespace Umbraco.Tests.Services
 
                 foreach (var contentType in contentTypes.Reverse())
                 {
-                    ServiceContext.MediaTypeService.Delete(contentType);
+                    MediaTypeService.Delete(contentType);
                 }
             }
             finally
@@ -119,7 +135,7 @@ namespace Umbraco.Tests.Services
             foreach (var item in e.MoveInfoCollection)
             {
                 //if this item doesn't exist then Fail!
-                var exists = ServiceContext.MediaService.GetById(item.Entity.Id);
+                var exists = MediaService.GetById(item.Entity.Id);
                 if (exists == null)
                     Assert.Fail("The item doesn't exist");
             }
@@ -129,13 +145,13 @@ namespace Umbraco.Tests.Services
         public void Can_Copy_MediaType_By_Performing_Clone()
         {
             // Arrange
-            var mediaType = MockedContentTypes.CreateImageMediaType("Image2") as IMediaType;
-            ServiceContext.MediaTypeService.Save(mediaType);
+            var mediaType = MediaTypeBuilder.CreateImageMediaType("Image2") as IMediaType;
+            MediaTypeService.Save(mediaType);
 
             // Act
             var sut = mediaType.DeepCloneWithResetIdentities("Image2_2");
             Assert.IsNotNull(sut);
-            ServiceContext.MediaTypeService.Save(sut);
+            MediaTypeService.Save(sut);
 
             // Assert
             Assert.That(sut.HasIdentity, Is.True);
@@ -154,12 +170,12 @@ namespace Umbraco.Tests.Services
         public void Can_Copy_MediaType_To_New_Parent_By_Performing_Clone()
         {
             // Arrange
-            var parentMediaType1 = MockedContentTypes.CreateSimpleMediaType("parent1", "Parent1");
-            ServiceContext.MediaTypeService.Save(parentMediaType1);
-            var parentMediaType2 = MockedContentTypes.CreateSimpleMediaType("parent2", "Parent2", null, true);
-            ServiceContext.MediaTypeService.Save(parentMediaType2);
-            var mediaType = MockedContentTypes.CreateImageMediaType("Image2") as IMediaType;
-            ServiceContext.MediaTypeService.Save(mediaType);
+            var parentMediaType1 = MediaTypeBuilder.CreateSimpleMediaType("parent1", "Parent1");
+            MediaTypeService.Save(parentMediaType1);
+            var parentMediaType2 = MediaTypeBuilder.CreateSimpleMediaType("parent2", "Parent2", null, true);
+            MediaTypeService.Save(parentMediaType2);
+            var mediaType = MediaTypeBuilder.CreateImageMediaType("Image2") as IMediaType;
+            MediaTypeService.Save(mediaType);
 
             // Act
             var clone = mediaType.DeepCloneWithResetIdentities("newcategory");
@@ -167,13 +183,13 @@ namespace Umbraco.Tests.Services
             clone.RemoveContentType("parent1");
             clone.AddContentType(parentMediaType2);
             clone.ParentId = parentMediaType2.Id;
-            ServiceContext.MediaTypeService.Save(clone);
+            MediaTypeService.Save(clone);
 
             // Assert
             Assert.That(clone.HasIdentity, Is.True);
 
-            var clonedMediaType = ServiceContext.MediaTypeService.Get(clone.Id);
-            var originalMediaType = ServiceContext.MediaTypeService.Get(mediaType.Id);
+            var clonedMediaType = MediaTypeService.Get(clone.Id);
+            var originalMediaType = MediaTypeService.Get(mediaType.Id);
 
             Assert.That(clonedMediaType.CompositionAliases().Any(x => x.Equals("parent2")), Is.True);
             Assert.That(clonedMediaType.CompositionAliases().Any(x => x.Equals("parent1")), Is.False);

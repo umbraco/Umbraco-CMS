@@ -19,6 +19,7 @@ using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Sync;
 using Umbraco.Core.WebAssets;
 using Umbraco.Examine;
+using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Web.Compose;
 using Umbraco.Web.PublishedCache.NuCache;
 using Umbraco.Web.Scheduling;
@@ -53,10 +54,11 @@ namespace Umbraco.Tests.Integration.Testing
 
             // replace this service so that it can lookup the correct file locations
             composition.RegisterUnique<ILocalizedTextService>(GetLocalizedTextService);
-            
+
             composition.RegisterUnique<IServerMessenger, NoopServerMessenger>();
-            
-            
+            composition.RegisterUnique<IProfiler, TestProfiler>();
+
+
         }
 
         /// <summary>
@@ -129,7 +131,7 @@ namespace Umbraco.Tests.Integration.Testing
 
             public void PerformRemove<T>(ICacheRefresher refresher, Func<T, int> getNumericId, params T[] instances)
             {
- 
+
             }
 
             public void PerformRemove(ICacheRefresher refresher, params int[] numericIds)

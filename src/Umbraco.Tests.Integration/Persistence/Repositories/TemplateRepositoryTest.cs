@@ -27,20 +27,11 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class TemplateRepositoryTest : UmbracoIntegrationTest
     {
-        private IFileSystems _fileSystems;
+        private IFileSystems FileSystems => GetRequiredService<IFileSystems>();
 
         private ITemplateRepository CreateRepository(IScopeProvider provider)
         {
-            return new TemplateRepository((IScopeAccessor) provider, AppCaches.Disabled, LoggerFactory.CreateLogger<TemplateRepository>(), _fileSystems, IOHelper, ShortStringHelper);
-        }
-
-        [SetUp]
-        public void SetUp()
-        {
-            var testHelper = new TestHelper();
-            _fileSystems = Mock.Of<IFileSystems>();
-            var viewsFileSystem = new PhysicalFileSystem(IOHelper, testHelper.GetHostingEnvironment(), LoggerFactory.CreateLogger<PhysicalFileSystem>(), Constants.SystemDirectories.MvcViews);
-            Mock.Get(_fileSystems).Setup(x => x.MvcViewsFileSystem).Returns(viewsFileSystem);
+            return new TemplateRepository((IScopeAccessor) provider, AppCaches.Disabled, LoggerFactory.CreateLogger<TemplateRepository>(), FileSystems, IOHelper, ShortStringHelper);
         }
 
         [Test]
@@ -75,7 +66,7 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
 
                 //Assert
                 Assert.That(repository.Get("test"), Is.Not.Null);
-                Assert.That(_fileSystems.MvcViewsFileSystem.FileExists("test.cshtml"), Is.True);
+                Assert.That(FileSystems.MvcViewsFileSystem.FileExists("test.cshtml"), Is.True);
             }
         }
 
@@ -98,7 +89,7 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
 
                 //Assert
                 Assert.That(repository.Get("test"), Is.Not.Null);
-                Assert.That(_fileSystems.MvcViewsFileSystem.FileExists("test.cshtml"), Is.True);
+                Assert.That(FileSystems.MvcViewsFileSystem.FileExists("test.cshtml"), Is.True);
                 Assert.AreEqual(
                     @"@usingUmbraco.Web.PublishedModels;@inheritsUmbraco.Web.Common.AspNetCore.UmbracoViewPage@{Layout=null;}".StripWhitespace(),
                     template.Content.StripWhitespace());
@@ -126,7 +117,7 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
 
                 //Assert
                 Assert.That(repository.Get("test2"), Is.Not.Null);
-                Assert.That(_fileSystems.MvcViewsFileSystem.FileExists("test2.cshtml"), Is.True);
+                Assert.That(FileSystems.MvcViewsFileSystem.FileExists("test2.cshtml"), Is.True);
                 Assert.AreEqual(
                     "@usingUmbraco.Web.PublishedModels;@inherits Umbraco.Web.Common.AspNetCore.UmbracoViewPage @{ Layout = \"test.cshtml\";}".StripWhitespace(),
                     template2.Content.StripWhitespace());
@@ -189,8 +180,8 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
 
                 //Assert
                 Assert.AreEqual("test11", template.Alias);
-                Assert.That(_fileSystems.MvcViewsFileSystem.FileExists("test11.cshtml"), Is.True);
-                Assert.That(_fileSystems.MvcViewsFileSystem.FileExists("test.cshtml"), Is.False);
+                Assert.That(FileSystems.MvcViewsFileSystem.FileExists("test11.cshtml"), Is.True);
+                Assert.That(FileSystems.MvcViewsFileSystem.FileExists("test.cshtml"), Is.False);
             }
         }
 
@@ -217,7 +208,7 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
                 var updated = repository.Get("test");
 
                 // Assert
-                Assert.That(_fileSystems.MvcViewsFileSystem.FileExists("test.cshtml"), Is.True);
+                Assert.That(FileSystems.MvcViewsFileSystem.FileExists("test.cshtml"), Is.True);
                 Assert.That(updated.Content, Is.EqualTo(ViewHelper.GetDefaultFileContent() + "<html></html>"));
             }
         }
@@ -240,12 +231,12 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
 
                 // Act
                 var templates = repository.Get("test");
-                Assert.That(_fileSystems.MvcViewsFileSystem.FileExists("test.cshtml"), Is.True);
+                Assert.That(FileSystems.MvcViewsFileSystem.FileExists("test.cshtml"), Is.True);
                 repository.Delete(templates);
 
                 // Assert
                 Assert.IsNull(repository.Get("test"));
-                Assert.That(_fileSystems.MvcViewsFileSystem.FileExists("test.cshtml"), Is.False);
+                Assert.That(FileSystems.MvcViewsFileSystem.FileExists("test.cshtml"), Is.False);
             }
         }
 
@@ -565,7 +556,6 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
         public void TearDown()
         {
             var testHelper = new TestHelper();
-            _fileSystems  = null;
 
             //Delete all files
             var fsViews = new PhysicalFileSystem(IOHelper, testHelper.GetHostingEnvironment(), LoggerFactory.CreateLogger<PhysicalFileSystem>(), Constants.SystemDirectories.MvcViews);

@@ -6,7 +6,7 @@ using Umbraco.Core.Services;
 using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;
 
-namespace Umbraco.Tests.Services
+namespace Umbraco.Tests.Integration.Services
 {
     /// <summary>
     /// Tests covering the DataTypeService with cache enabled

@@ -11,7 +11,7 @@ using Umbraco.Tests.Testing;
 
 // ReSharper disable CommentTypo
 // ReSharper disable StringLiteralTypo
-namespace Umbraco.Tests.Services
+namespace Umbraco.Tests.Integration.Services
 {
     [TestFixture]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, PublishedRepositoryEvents = true, WithApplication = true)]
