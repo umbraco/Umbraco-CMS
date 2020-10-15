@@ -9,13 +9,14 @@ namespace Umbraco.Web.PropertyEditors
     /// </summary>
     public class DateTimeConfigurationEditor : ConfigurationEditor<DateTimeConfiguration>
     {
+        private static readonly string[] _timeChars = new string[] { "H", "m", "s" };
         public override IDictionary<string, object> ToValueEditor(object configuration)
         {
             var d = base.ToValueEditor(configuration);
 
             var format = d["format"].ToString();
 
-            d["pickTime"] = format.ContainsAny(new string[] { "H", "m", "s" });
+            d["pickTime"] = format.ContainsAny(_timeChars);
 
             return d;
         }

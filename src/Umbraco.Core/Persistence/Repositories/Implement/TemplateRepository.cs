@@ -570,6 +570,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
         }
 
+        private static readonly string[] _validTemplateDirs = new[] { SystemDirectories.MvcViews };
+        private static readonly IEnumerable<string> _validTemplateFileExtensions = new[] { "cshtml", "vbhtml" };
+
         /// <summary>
         /// Validates a <see cref="ITemplate"/>
         /// </summary>
@@ -582,17 +585,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // are we using Path for something else?!
             var path = template.VirtualPath;
 
-            // get valid paths
-            var validDirs = new[] { SystemDirectories.MvcViews };
-
-            // get valid extensions
-            var validExts = new List<string>();
-            validExts.Add("cshtml");
-            validExts.Add("vbhtml");
-
             // validate path and extension
-            var validFile = IOHelper.VerifyEditPath(path, validDirs);
-            var validExtension = IOHelper.VerifyFileExtension(path, validExts);
+            var validFile = IOHelper.VerifyEditPath(path, _validTemplateDirs);
+            var validExtension = IOHelper.VerifyFileExtension(path, _validTemplateFileExtensions);
             return validFile && validExtension;
         }
 

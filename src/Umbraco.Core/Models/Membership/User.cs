@@ -24,8 +24,8 @@ namespace Umbraco.Core.Models.Membership
             _language = Current.Configs.Global().DefaultUILanguage; // TODO: inject
             _isApproved = true;
             _isLockedOut = false;
-            _startContentIds = new int[] { };
-            _startMediaIds = new int[] { };
+            _startContentIds = Array.Empty<int>();
+            _startMediaIds = Array.Empty<int>();
             //cannot be null
             _rawPasswordValue = "";
         }
@@ -52,8 +52,8 @@ namespace Umbraco.Core.Models.Membership
             _userGroups = new HashSet<IReadOnlyUserGroup>();
             _isApproved = true;
             _isLockedOut = false;
-            _startContentIds = new int[] { };
-            _startMediaIds = new int[] { };
+            _startContentIds = Array.Empty<int>();
+            _startMediaIds = Array.Empty<int>();
         }
 
         /// <summary>

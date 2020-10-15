@@ -19,7 +19,7 @@ namespace Umbraco.Core.PropertyEditors.Validators
                 var result = value.TryConvertTo<int>();
                 if (result.Success == false)
                 {
-                    yield return new ValidationResult("The value " + value + " is not a valid integer", new[] { "value" });
+                    yield return new ValidationResult("The value " + value + " is not a valid integer", Constants.StringArrays.ValueLower);
                 }
             }
         }

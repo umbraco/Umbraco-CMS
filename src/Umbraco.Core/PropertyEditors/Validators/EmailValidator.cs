@@ -21,7 +21,7 @@ namespace Umbraco.Core.PropertyEditors.Validators
             if (asString != string.Empty && emailVal.IsValid(asString) == false)
             {
                 // TODO: localize these!
-                yield return new ValidationResult("Email is invalid", new[] { "value" });
+                yield return new ValidationResult("Email is invalid", Constants.StringArrays.ValueLower);
             }
         }
     }
