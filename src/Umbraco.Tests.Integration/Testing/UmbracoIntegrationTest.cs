@@ -289,7 +289,6 @@ namespace Umbraco.Tests.Integration.Testing
 
         #region LocalDb
 
-
         private static readonly object _dbLocker = new object();
         private static LocalDbTestDatabase _dbInstance;
 

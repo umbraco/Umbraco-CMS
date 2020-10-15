@@ -464,6 +464,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             //insert the schedule
             PersistContentSchedule(entity, false);
 
+
             // persist the variations
             if (entity.ContentType.VariesByCulture())
             {
@@ -649,7 +650,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
                     // names also impact 'edited'
                     // ReSharper disable once UseDeconstruction
-                    foreach (var cultureInfo in entity.CultureInfos)
+                     foreach (var cultureInfo in entity.CultureInfos)
                         if (cultureInfo.Name != entity.GetPublishName(cultureInfo.Culture))
                         {
                             edited = true;

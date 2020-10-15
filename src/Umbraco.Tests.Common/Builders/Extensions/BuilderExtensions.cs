@@ -202,10 +202,10 @@ namespace Umbraco.Tests.Common.Builders.Extensions
             return builder;
         }
 
-        public static T WithCultureInfo<T>(this T builder, string name)
+        public static T WithCultureInfo<T>(this T builder, string cultureCode)
             where T : IWithCultureInfoBuilder
         {
-            builder.CultureInfo = CultureInfo.GetCultureInfo(name);
+            builder.CultureInfo = CultureInfo.GetCultureInfo(cultureCode);
             return builder;
         }
 
@@ -213,6 +213,15 @@ namespace Umbraco.Tests.Common.Builders.Extensions
             where T : IWithSupportsPublishing
         {
             builder.SupportsPublishing = supportsPublishing;
+            return builder;
+        }
+
+        public static T WithPropertyValues<T>(this T builder, object propertyValues, string culture = null, string segment = null)
+            where T : IWithPropertyValues
+        {
+            builder.PropertyValues = propertyValues;
+            builder.PropertyValuesCulture = culture;
+            builder.PropertyValuesSegment = segment;
             return builder;
         }
     }

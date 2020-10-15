@@ -17,6 +17,14 @@
     </ItemGroup>
 
     <ItemGroup>
+      <None Remove="Services\Importing\Dictionary-Package.xml" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="Services\Importing\Dictionary-Package.xml" />
+    </ItemGroup>
+
+    <ItemGroup>
         <PackageReference Include="Examine.Lucene" Version="2.0.0-alpha.20200128.15" />
         <PackageReference Include="LightInject.Microsoft.DependencyInjection" Version="3.3.3" />
         <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
@@ -57,6 +65,22 @@
 
     <ItemGroup>
       <Folder Include="Umbraco\logs" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="Services\Importing\ImportResources.Designer.cs">
+        <DependentUpon>ImportResources.resx</DependentUpon>
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+      </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Update="Services\Importing\ImportResources.resx">
+        <SubType>Designer</SubType>
+        <LastGenOutput>ImportResources.Designer.cs</LastGenOutput>
+        <Generator>ResXFileCodeGenerator</Generator>
+      </EmbeddedResource>
     </ItemGroup>
 
 </Project>

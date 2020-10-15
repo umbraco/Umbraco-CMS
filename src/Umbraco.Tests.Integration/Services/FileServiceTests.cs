@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using NUnit.Framework;
@@ -7,7 +6,7 @@ using Umbraco.Core.Services;
 using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;
 
-namespace Umbraco.Tests.Services
+namespace Umbraco.Tests.Integration.Services
 {
     [TestFixture]
     [Apartment(ApartmentState.STA)]
