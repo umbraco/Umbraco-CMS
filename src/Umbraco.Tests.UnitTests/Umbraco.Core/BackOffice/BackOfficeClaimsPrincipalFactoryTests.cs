@@ -9,8 +9,10 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.BackOffice;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Extensions;
+using Umbraco.Tests.Common.Builders;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.BackOffice
 {
@@ -137,10 +139,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.BackOffice
         [SetUp]
         public void Setup()
         {
-            var mockGlobalSettings = new Mock<IGlobalSettings>();
-            mockGlobalSettings.Setup(x => x.DefaultUILanguage).Returns("test");
+            var globalSettings = new GlobalSettings { DefaultUILanguage = "test" };
 
-            _testUser = new BackOfficeIdentityUser(mockGlobalSettings.Object, _testUserId, new List<IReadOnlyUserGroup>())
+            _testUser = new BackOfficeIdentityUser(globalSettings, _testUserId, new List<IReadOnlyUserGroup>())
             {
                 UserName = _testUserName,
                 Name = _testUserGivenName,

@@ -18,7 +18,7 @@ namespace Umbraco.Web.Trees
 {
     [UmbracoTreeAuthorize(Constants.Trees.MediaTypes)]
     [Tree(Constants.Applications.Settings, Constants.Trees.MediaTypes, SortOrder = 1, TreeGroup = Constants.Trees.Groups.Settings)]
-    [PluginController("UmbracoTrees")]
+    [PluginController(Constants.Web.Mvc.BackOfficeTreeArea)]
     [CoreTree]
     public class MediaTypeTreeController : TreeController, ISearchableTree
     {

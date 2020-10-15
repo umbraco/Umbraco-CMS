@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Security;
 using System.Text;
 using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.Logging;
+using Microsoft.Extensions.Logging;
 
 namespace Umbraco.Core.Composing
 {
@@ -14,7 +14,7 @@ namespace Umbraco.Core.Composing
     /// <inheritdoc cref="ITypeFinder"/>
     public class TypeFinder : ITypeFinder
     {
-        private readonly ILogger _logger;
+        private readonly ILogger<TypeFinder> _logger;
         private readonly IAssemblyProvider _assemblyProvider;
         private readonly IRuntimeHash _runtimeHash;
         private volatile HashSet<Assembly> _localFilteredAssemblyCache;
@@ -26,7 +26,7 @@ namespace Umbraco.Core.Composing
         // used for benchmark tests
         internal bool QueryWithReferencingAssemblies = true;
 
-        public TypeFinder(ILogger logger, IAssemblyProvider assemblyProvider, IRuntimeHash runtimeHash, ITypeFinderConfig typeFinderConfig = null)
+        public TypeFinder(ILogger<TypeFinder> logger, IAssemblyProvider assemblyProvider, IRuntimeHash runtimeHash, ITypeFinderConfig typeFinderConfig = null)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _assemblyProvider = assemblyProvider;
@@ -156,6 +156,7 @@ namespace Umbraco.Core.Composing
             "MiniProfiler.",
             "Owin,",
             "SQLite",
+            "ReSharperTestRunner32" // used by resharper testrunner
         };
 
         /// <summary>
@@ -296,7 +297,7 @@ namespace Umbraco.Core.Composing
                     }
                     catch (TypeLoadException ex)
                     {
-                        _logger.Error(typeof(TypeFinder), ex, "Could not query types on {Assembly} assembly, this is most likely due to this assembly not being compatible with the current Umbraco version", assembly);
+                        _logger.LogError(ex, "Could not query types on {Assembly} assembly, this is most likely due to this assembly not being compatible with the current Umbraco version", assembly);
                         continue;
                     }
 
@@ -371,7 +372,7 @@ namespace Umbraco.Core.Composing
                     }
                     catch (TypeLoadException ex)
                     {
-                        _logger.Error(typeof(TypeFinder), ex, "Could not query types on {Assembly} assembly, this is most likely due to this assembly not being compatible with the current Umbraco version", assembly);
+                        _logger.LogError(ex, "Could not query types on {Assembly} assembly, this is most likely due to this assembly not being compatible with the current Umbraco version", assembly);
                         continue;
                     }
 
@@ -441,7 +442,7 @@ namespace Umbraco.Core.Composing
                     if (_notifiedLoadExceptionAssemblies.Contains(a.FullName) == false)
                     {
                         _notifiedLoadExceptionAssemblies.Add(a.FullName);
-                        _logger.Warn(typeof (TypeFinder), ex, "Could not load all types from {TypeName}.", a.GetName().Name);
+                        _logger.LogWarning(ex, "Could not load all types from {TypeName}.", a.GetName().Name);
                     }
                 }
                 return rex.Types.WhereNotNull().ToArray();

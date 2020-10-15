@@ -11,7 +11,9 @@ using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
@@ -34,7 +36,7 @@ namespace Umbraco.Web.Common.Templates
         private readonly IPublishedRouter _publishedRouter;
         private readonly IFileService _fileService;
         private readonly ILocalizationService _languageService;
-        private readonly IWebRoutingSettings _webRoutingSettings;
+        private readonly WebRoutingSettings _webRoutingSettings;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ICompositeViewEngine _viewEngine;
@@ -43,7 +45,7 @@ namespace Umbraco.Web.Common.Templates
             IPublishedRouter publishedRouter,
             IFileService fileService,
             ILocalizationService textService,
-            IWebRoutingSettings webRoutingSettings,
+            IOptions<WebRoutingSettings> webRoutingSettings,
             IShortStringHelper shortStringHelper,
             IHttpContextAccessor httpContextAccessor,
             ICompositeViewEngine viewEngine)
@@ -52,7 +54,7 @@ namespace Umbraco.Web.Common.Templates
             _publishedRouter = publishedRouter ?? throw new ArgumentNullException(nameof(publishedRouter));
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
             _languageService = textService ?? throw new ArgumentNullException(nameof(textService));
-            _webRoutingSettings = webRoutingSettings ?? throw new ArgumentNullException(nameof(webRoutingSettings));
+            _webRoutingSettings = webRoutingSettings.Value ?? throw new ArgumentNullException(nameof(webRoutingSettings));
             _shortStringHelper = shortStringHelper ?? throw new ArgumentNullException(nameof(shortStringHelper));
             _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
             _viewEngine = viewEngine ?? throw new ArgumentNullException(nameof(viewEngine));

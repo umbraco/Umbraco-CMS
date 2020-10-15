@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Dictionary;
@@ -177,6 +178,9 @@ namespace Umbraco.Web.Composing
         public static ISectionService SectionService
             => Factory.GetInstance<ISectionService>();
 
+        public static IIconService IconService
+            => Factory.GetInstance<IIconService>();
+
         #endregion
 
         #region Web Constants
@@ -213,8 +217,6 @@ namespace Umbraco.Web.Composing
 
         public static TypeLoader TypeLoader => Factory.GetInstance<TypeLoader>();
 
-        public static Configs Configs => Factory.GetInstance<Configs>();
-
         public static UrlSegmentProviderCollection UrlSegmentProviders => Factory.GetInstance<UrlSegmentProviderCollection>();
 
         public static CacheRefresherCollection CacheRefreshers => Factory.GetInstance<CacheRefresherCollection>();
@@ -245,7 +247,9 @@ namespace Umbraco.Web.Composing
 
         public static IShortStringHelper ShortStringHelper => Factory.GetInstance<IShortStringHelper>();
 
-        public static ILogger Logger => Umbraco.Composing.Current.Logger;
+        public static ILogger<object> Logger => Factory.GetInstance<ILogger<object>>();
+
+        public static ILoggerFactory LoggerFactory => Factory.GetInstance<ILoggerFactory>();
 
         public static IProfiler Profiler => Factory.GetInstance<IProfiler>();
 

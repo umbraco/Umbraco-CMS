@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
@@ -14,9 +16,9 @@ using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
+using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Integration.Implementations;
 using Umbraco.Tests.Integration.Testing;
-using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Integration.Persistence.Repositories
@@ -25,20 +27,11 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class TemplateRepositoryTest : UmbracoIntegrationTest
     {
-        private IFileSystems _fileSystems;
+        private IFileSystems FileSystems => GetRequiredService<IFileSystems>();
 
         private ITemplateRepository CreateRepository(IScopeProvider provider)
         {
-            return new TemplateRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger, _fileSystems, IOHelper, ShortStringHelper);
-        }
-
-        [SetUp]
-        public void SetUp()
-        {
-            var testHelper = new TestHelper();  
-            _fileSystems = Mock.Of<IFileSystems>();
-            var viewsFileSystem = new PhysicalFileSystem(IOHelper, testHelper.GetHostingEnvironment(), Logger, Constants.SystemDirectories.MvcViews);
-            Mock.Get(_fileSystems).Setup(x => x.MvcViewsFileSystem).Returns(viewsFileSystem);
+            return new TemplateRepository((IScopeAccessor) provider, AppCaches.Disabled, LoggerFactory.CreateLogger<TemplateRepository>(), FileSystems, IOHelper, ShortStringHelper);
         }
 
         [Test]
@@ -73,7 +66,7 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
 
                 //Assert
                 Assert.That(repository.Get("test"), Is.Not.Null);
-                Assert.That(_fileSystems.MvcViewsFileSystem.FileExists("test.cshtml"), Is.True);
+                Assert.That(FileSystems.MvcViewsFileSystem.FileExists("test.cshtml"), Is.True);
             }
         }
 
@@ -96,9 +89,9 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
 
                 //Assert
                 Assert.That(repository.Get("test"), Is.Not.Null);
-                Assert.That(_fileSystems.MvcViewsFileSystem.FileExists("test.cshtml"), Is.True);
+                Assert.That(FileSystems.MvcViewsFileSystem.FileExists("test.cshtml"), Is.True);
                 Assert.AreEqual(
-                    @"@inherits Umbraco.Web.Common.AspNetCore.UmbracoViewPage @{ Layout = null;}".StripWhitespace(),
+                    @"@usingUmbraco.Web.PublishedModels;@inheritsUmbraco.Web.Common.AspNetCore.UmbracoViewPage@{Layout=null;}".StripWhitespace(),
                     template.Content.StripWhitespace());
             }
         }
@@ -124,9 +117,9 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
 
                 //Assert
                 Assert.That(repository.Get("test2"), Is.Not.Null);
-                Assert.That(_fileSystems.MvcViewsFileSystem.FileExists("test2.cshtml"), Is.True);
+                Assert.That(FileSystems.MvcViewsFileSystem.FileExists("test2.cshtml"), Is.True);
                 Assert.AreEqual(
-                    "@inherits Umbraco.Web.Common.AspNetCore.UmbracoViewPage @{ Layout = \"test.cshtml\";}".StripWhitespace(),
+                    "@usingUmbraco.Web.PublishedModels;@inherits Umbraco.Web.Common.AspNetCore.UmbracoViewPage @{ Layout = \"test.cshtml\";}".StripWhitespace(),
                     template2.Content.StripWhitespace());
             }
         }
@@ -187,8 +180,8 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
 
                 //Assert
                 Assert.AreEqual("test11", template.Alias);
-                Assert.That(_fileSystems.MvcViewsFileSystem.FileExists("test11.cshtml"), Is.True);
-                Assert.That(_fileSystems.MvcViewsFileSystem.FileExists("test.cshtml"), Is.False);
+                Assert.That(FileSystems.MvcViewsFileSystem.FileExists("test11.cshtml"), Is.True);
+                Assert.That(FileSystems.MvcViewsFileSystem.FileExists("test.cshtml"), Is.False);
             }
         }
 
@@ -215,7 +208,7 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
                 var updated = repository.Get("test");
 
                 // Assert
-                Assert.That(_fileSystems.MvcViewsFileSystem.FileExists("test.cshtml"), Is.True);
+                Assert.That(FileSystems.MvcViewsFileSystem.FileExists("test.cshtml"), Is.True);
                 Assert.That(updated.Content, Is.EqualTo(ViewHelper.GetDefaultFileContent() + "<html></html>"));
             }
         }
@@ -238,12 +231,12 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
 
                 // Act
                 var templates = repository.Get("test");
-                Assert.That(_fileSystems.MvcViewsFileSystem.FileExists("test.cshtml"), Is.True);
+                Assert.That(FileSystems.MvcViewsFileSystem.FileExists("test.cshtml"), Is.True);
                 repository.Delete(templates);
 
                 // Assert
                 Assert.IsNull(repository.Get("test"));
-                Assert.That(_fileSystems.MvcViewsFileSystem.FileExists("test.cshtml"), Is.False);
+                Assert.That(FileSystems.MvcViewsFileSystem.FileExists("test.cshtml"), Is.False);
             }
         }
 
@@ -259,39 +252,36 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
             using (provider.CreateScope())
             {
                 var templateRepository = CreateRepository(provider);
-
-                var tagRepository = new TagRepository(scopeAccessor, AppCaches.Disabled, Logger);
+                var globalSettings = new GlobalSettings();
+                var tagRepository = new TagRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<TagRepository>());
                 var commonRepository = new ContentTypeCommonRepository(scopeAccessor, templateRepository, AppCaches, ShortStringHelper);
-                var languageRepository = new LanguageRepository(scopeAccessor, AppCaches.Disabled, Logger, GlobalSettings);
-                var contentTypeRepository = new ContentTypeRepository(scopeAccessor, AppCaches.Disabled, Logger, commonRepository, languageRepository, ShortStringHelper);
-                var relationTypeRepository = new RelationTypeRepository(scopeAccessor, AppCaches.Disabled, Logger);
+                var languageRepository = new LanguageRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<LanguageRepository>(), Microsoft.Extensions.Options.Options.Create(globalSettings));
+                var contentTypeRepository = new ContentTypeRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<ContentTypeRepository>(), commonRepository, languageRepository, ShortStringHelper);
+                var relationTypeRepository = new RelationTypeRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<RelationTypeRepository>());
                 var entityRepository = new EntityRepository(scopeAccessor);
-                var relationRepository = new RelationRepository(scopeAccessor, Logger, relationTypeRepository, entityRepository);
+                var relationRepository = new RelationRepository(scopeAccessor, LoggerFactory.CreateLogger<RelationRepository>(), relationTypeRepository, entityRepository);
                 var propertyEditors = new Lazy<PropertyEditorCollection>(() => new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>())));
                 var dataValueReferences = new DataValueReferenceFactoryCollection(Enumerable.Empty<IDataValueReferenceFactory>());
-                var contentRepo = new DocumentRepository(scopeAccessor, AppCaches.Disabled, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, relationRepository, relationTypeRepository, propertyEditors, dataValueReferences, dataTypeService);
+                var contentRepo = new DocumentRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<DocumentRepository>(), LoggerFactory, contentTypeRepository, templateRepository, tagRepository, languageRepository, relationRepository, relationTypeRepository, propertyEditors, dataValueReferences, dataTypeService);
 
-                var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage2", "Textpage");
-                fileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
+                var template = TemplateBuilder.CreateTextPageTemplate();
+                fileService.SaveTemplate(template); // else, FK violation on contentType!
+
+                var contentType = ContentTypeBuilder.CreateSimpleContentType("umbTextpage2", "Textpage", defaultTemplateId: template.Id);
                 contentTypeRepository.Save(contentType);
-                var textpage = MockedContent.CreateSimpleContent(contentType);
-                contentRepo.Save(textpage);
 
-                var template = new Template(ShortStringHelper, "test", "test")
-                {
-                    Content = @"<%@ Master Language=""C#"" %>"
-                };
-                templateRepository.Save(template);
+                var textpage = ContentBuilder.CreateSimpleContent(contentType);
+                contentRepo.Save(textpage);
 
                 textpage.TemplateId = template.Id;
                 contentRepo.Save(textpage);
 
                 // Act
-                var templates = templateRepository.Get("test");
+                var templates = templateRepository.Get("textPage");
                 templateRepository.Delete(templates);
 
                 // Assert
-                Assert.IsNull(templateRepository.Get("test"));
+                Assert.IsNull(templateRepository.Get("textPage"));
             }
         }
 
@@ -566,10 +556,9 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
         public void TearDown()
         {
             var testHelper = new TestHelper();
-            _fileSystems  = null;
 
             //Delete all files
-            var fsViews = new PhysicalFileSystem(IOHelper, testHelper.GetHostingEnvironment(), Logger, Constants.SystemDirectories.MvcViews);
+            var fsViews = new PhysicalFileSystem(IOHelper, testHelper.GetHostingEnvironment(), LoggerFactory.CreateLogger<PhysicalFileSystem>(), Constants.SystemDirectories.MvcViews);
             var views = fsViews.GetFiles("", "*.cshtml");
             foreach (var file in views)
                 fsViews.DeleteFile(file);

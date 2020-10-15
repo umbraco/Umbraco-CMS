@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Web.Scheduling;
 
 namespace Umbraco.Tests.LegacyXmlPublishedCache
@@ -18,7 +18,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
     internal class XmlStoreFilePersister : LatchedBackgroundTaskBase
     {
         private readonly IBackgroundTaskRunner<XmlStoreFilePersister> _runner;
-        private readonly ILogger _logger;
+        private readonly ILogger<XmlStoreFilePersister> _logger;
         private readonly XmlStore _store;
         private readonly object _locko = new object();
         private bool _released;
@@ -39,12 +39,12 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         public override bool RunsOnShutdown => _timer != null;
 
         // initialize the first instance, which is inactive (not touched yet)
-        public XmlStoreFilePersister(IBackgroundTaskRunner<XmlStoreFilePersister> runner, XmlStore store, ILogger logger)
+        public XmlStoreFilePersister(IBackgroundTaskRunner<XmlStoreFilePersister> runner, XmlStore store, ILogger<XmlStoreFilePersister> logger)
             : this(runner, store, logger, false)
         { }
 
         // initialize further instances, which are active (touched)
-        private XmlStoreFilePersister(IBackgroundTaskRunner<XmlStoreFilePersister> runner, XmlStore store, ILogger logger, bool touched)
+        private XmlStoreFilePersister(IBackgroundTaskRunner<XmlStoreFilePersister> runner, XmlStore store, ILogger<XmlStoreFilePersister> logger, bool touched)
         {
             _runner = runner;
             _store = store;
@@ -61,7 +61,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
 
             if (touched == false) return;
 
-            _logger.Debug<XmlStoreFilePersister>("Created, save in {WaitMilliseconds}ms.", WaitMilliseconds);
+            _logger.LogDebug("Created, save in {WaitMilliseconds}ms.", WaitMilliseconds);
             _initialTouch = DateTime.Now;
             _timer = new Timer(_ => TimerRelease());
             _timer.Change(WaitMilliseconds, 0);
@@ -83,22 +83,22 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             {
                 if (_released) // our timer has triggered OR the runner is shutting down
                 {
-                    _logger.Debug<XmlStoreFilePersister>("Touched, was released...");
+                    _logger.LogDebug("Touched, was released...");
 
                     // release: has run or is running, too late, return a new task (adds itself to runner)
                     if (_runner == null)
                     {
-                        _logger.Debug<XmlStoreFilePersister>("Runner is down, run now.");
+                        _logger.LogDebug("Runner is down, run now.");
                         runNow = true;
                     }
                     else
                     {
-                        _logger.Debug<XmlStoreFilePersister>("Create new...");
+                        _logger.LogDebug("Create new...");
                         ret = new XmlStoreFilePersister(_runner, _store, _logger, true);
                         if (ret._runner == null)
                         {
                             // could not enlist with the runner, runner is completed, must run now
-                            _logger.Debug<XmlStoreFilePersister>("Runner is down, run now.");
+                            _logger.LogDebug("Runner is down, run now.");
                             runNow = true;
                         }
                     }
@@ -106,7 +106,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
 
                 else if (_timer == null) // we don't have a timer yet
                 {
-                    _logger.Debug<XmlStoreFilePersister>("Touched, was idle, start and save in {WaitMilliseconds}ms.", WaitMilliseconds);
+                    _logger.LogDebug("Touched, was idle, start and save in {WaitMilliseconds}ms.", WaitMilliseconds);
                     _initialTouch = DateTime.Now;
                     _timer = new Timer(_ => TimerRelease());
                     _timer.Change(WaitMilliseconds, 0);
@@ -119,12 +119,12 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
 
                     if (DateTime.Now - _initialTouch < TimeSpan.FromMilliseconds(MaxWaitMilliseconds))
                     {
-                        _logger.Debug<XmlStoreFilePersister>("Touched, was waiting, can delay, save in {WaitMilliseconds}ms.", WaitMilliseconds);
+                        _logger.LogDebug("Touched, was waiting, can delay, save in {WaitMilliseconds}ms.", WaitMilliseconds);
                         _timer.Change(WaitMilliseconds, 0);
                     }
                     else
                     {
-                        _logger.Debug<XmlStoreFilePersister>("Touched, was waiting, cannot delay.");
+                        _logger.LogDebug("Touched, was waiting, cannot delay.");
                     }
                 }
             }
@@ -135,7 +135,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
 
             if (runNow)
                 //Run();
-                _logger.Warn<XmlStoreFilePersister>("Cannot write now because we are going down, changes may be lost.");
+                _logger.LogWarning("Cannot write now because we are going down, changes may be lost.");
 
             return ret; // this, by default, unless we created a new one
         }
@@ -144,7 +144,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         {
             lock (_locko)
             {
-                _logger.Debug<XmlStoreFilePersister>("Timer: release.");
+                _logger.LogDebug("Timer: release.");
                 _released = true;
 
                 Release();
@@ -157,7 +157,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         {
             lock (_locko)
             {
-                _logger.Debug<XmlStoreFilePersister>("Run now (sync).");
+                _logger.LogDebug("Run now (sync).");
                 // not really needed but safer (it's only us invoking Run, but the method is public...)
                 _released = true;
             }

@@ -4,6 +4,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Hosting.Internal;
+using Microsoft.Extensions.Logging;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Routing
 {
@@ -16,6 +22,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Routing
             var services = new ServiceCollection();
             services.AddLogging();
             services.AddMvc();
+            services.AddSingleton<IHostApplicationLifetime>(x => new ApplicationLifetime(x.GetRequiredService<ILogger<ApplicationLifetime>>()));
+            services.AddSignalR();
             _serviceProvider = services.BuildServiceProvider();
         }
 
@@ -25,7 +33,10 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Routing
 
         public IApplicationBuilder CreateApplicationBuilder()
         {
-            return Mock.Of<IApplicationBuilder>();
+            var mock = new Mock<IApplicationBuilder>();
+            mock.Setup(x => x.Build()).Returns(httpContext => Task.CompletedTask);
+            return mock.Object;
         }
+        
     }
 }

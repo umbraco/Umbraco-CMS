@@ -1,10 +1,10 @@
 ﻿using System;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
-using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
@@ -20,11 +20,19 @@ namespace Umbraco.Web.PropertyEditors
     /// </summary>
     internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core vs web?
     {
-        private readonly ILogger _logger;
+        private readonly ILogger<ImageCropperPropertyValueEditor> _logger;
         private readonly IMediaFileSystem _mediaFileSystem;
-        private readonly IContentSettings _contentSettings;
+        private readonly ContentSettings _contentSettings;
 
-        public ImageCropperPropertyValueEditor(DataEditorAttribute attribute, ILogger logger, IMediaFileSystem mediaFileSystem, IDataTypeService dataTypeService, ILocalizationService localizationService, ILocalizedTextService localizedTextService, IShortStringHelper shortStringHelper, IContentSettings contentSettings)
+        public ImageCropperPropertyValueEditor(
+            DataEditorAttribute attribute,
+            ILogger<ImageCropperPropertyValueEditor> logger,
+            IMediaFileSystem mediaFileSystem,
+            IDataTypeService dataTypeService,
+            ILocalizationService localizationService,
+            ILocalizedTextService localizedTextService,
+            IShortStringHelper shortStringHelper,
+            ContentSettings contentSettings)
             : base(dataTypeService, localizationService, localizedTextService, shortStringHelper, attribute)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -82,7 +90,7 @@ namespace Umbraco.Web.PropertyEditors
             catch (Exception ex)
             {
                 // for some reason the value is invalid so continue as if there was no value there
-                _logger.Warn<ImageCropperPropertyValueEditor>(ex, "Could not parse current db value to a JObject.");
+                _logger.LogWarning(ex, "Could not parse current db value to a JObject.");
             }
             if (string.IsNullOrWhiteSpace(currentPath) == false)
                 currentPath = _mediaFileSystem.GetRelativePath(currentPath);

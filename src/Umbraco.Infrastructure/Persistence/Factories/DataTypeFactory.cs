@@ -1,5 +1,5 @@
 ﻿using System;
-using Umbraco.Core.Logging;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.PropertyEditors;
@@ -8,13 +8,13 @@ namespace Umbraco.Core.Persistence.Factories
 {
     internal static class DataTypeFactory
     {
-        public static IDataType BuildEntity(DataTypeDto dto, PropertyEditorCollection editors, ILogger logger)
+        public static IDataType BuildEntity(DataTypeDto dto, PropertyEditorCollection editors, ILogger<IDataType> logger)
         {
             // Check we have an editor for the data type.
             if (!editors.TryGet(dto.EditorAlias, out var editor))
             {
-                logger.Warn(typeof(DataType), "Could not find an editor with alias {EditorAlias}, treating as Label. " +
-                                              "The site may fail to boot and/or load data types and run.", dto.EditorAlias);
+                logger.LogWarning("Could not find an editor with alias {EditorAlias}, treating as Label. " +
+                                  "The site may fail to boot and/or load data types and run.", dto.EditorAlias);
 
                 // Create as special type, which downstream can be handled by converting to a LabelPropertyEditor to make clear
                 // the situation to the user.

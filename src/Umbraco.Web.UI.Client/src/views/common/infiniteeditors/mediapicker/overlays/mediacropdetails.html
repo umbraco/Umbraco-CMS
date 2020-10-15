@@ -26,7 +26,7 @@
 
             <div class="umb-control-group" ng-if="model.target">
 
-                <div ng-if="model.disableFocalPoint && model.target.thumbnail">
+                <div ng-if="vm.cropSet() === false">
                     <h5>
                         <localize key="general_preview">Preview</localize>
                     </h5>
@@ -34,7 +34,7 @@
                     <img ng-src="{{model.target.thumbnail}}" alt="{{model.target.name}}" />
                 </div>
 
-                <div ng-if="!model.disableFocalPoint">
+                <div ng-if="vm.cropSet()">
                     <h5>
                         <localize key="@general_cropSection">Crop section</localize>
                     </h5>

@@ -6,6 +6,7 @@ using Examine.LuceneEngine.Providers;
 using Lucene.Net.Analysis;
 using Lucene.Net.Analysis.Standard;
 using Lucene.Net.Store;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Umbraco.Core;
 using Umbraco.Core.Hosting;
@@ -55,7 +56,7 @@ namespace Umbraco.Tests.UmbracoExamine
 
         public static MediaIndexPopulator GetMediaIndexRebuilder(PropertyEditorCollection propertyEditors, IMediaService mediaService)
         {
-            var mediaValueSetBuilder = new MediaValueSetBuilder(propertyEditors, new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider(TestHelper.ShortStringHelper) }), GetMockUserService(), GetMockLogger(), TestHelper.ShortStringHelper, TestHelper.JsonSerializer);
+            var mediaValueSetBuilder = new MediaValueSetBuilder(propertyEditors, new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider(TestHelper.ShortStringHelper) }), GetMockUserService(), Mock.Of<ILogger<MediaValueSetBuilder>>(), TestHelper.ShortStringHelper, TestHelper.JsonSerializer);
             var mediaIndexDataSource = new MediaIndexPopulator(null, mediaService, mediaValueSetBuilder);
             return mediaIndexDataSource;
         }
@@ -156,7 +157,7 @@ namespace Umbraco.Tests.UmbracoExamine
             return mediaTypeServiceMock.Object;
         }
 
-        public static IProfilingLogger GetMockLogger()
+        public static IProfilingLogger GetMockProfilingLogger()
         {
             return new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>());
         }
@@ -185,6 +186,8 @@ namespace Umbraco.Tests.UmbracoExamine
                 new UmbracoFieldDefinitionCollection(),
                 analyzer,
                 profilingLogger,
+                Mock.Of<ILogger<UmbracoContentIndex>>(),
+                Mock.Of<ILoggerFactory>(),
                 hostingEnvironment,
                 runtimeState,
                 languageService,

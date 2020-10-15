@@ -91,18 +91,18 @@
     <PackageReference Include="Microsoft.AspNet.WebApi" Version="5.2.7" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="2.10.0" />
     <PackageReference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform" Version="2.0.1" />
-    <PackageReference Include="Microsoft.Owin.Host.SystemWeb" Version="4.0.1" />
-    <PackageReference Include="Microsoft.Owin.Security.Cookies" Version="4.0.1" />
-    <PackageReference Include="Microsoft.Owin.Security.OAuth" Version="4.0.1" />
+    <PackageReference Include="Microsoft.Owin.Host.SystemWeb" Version="4.1.1" />
+    <PackageReference Include="Microsoft.Owin.Security.Cookies" Version="4.1.1" />
+    <PackageReference Include="Microsoft.Owin.Security.OAuth" Version="4.1.1" />
     <PackageReference Include="Microsoft.SourceLink.GitHub">
       <Version>1.0.0</Version>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="MiniProfiler" Version="4.1.0" />
+    <PackageReference Include="MiniProfiler" Version="4.2.1" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="SecurityCodeScan">
-      <Version>3.4.0</Version>
+      <Version>3.5.3</Version>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
@@ -117,10 +117,6 @@
     <ProjectReference Include="..\Umbraco.Examine.Lucene\Umbraco.Examine.Lucene.csproj">
       <Project>{0fad7d2a-d7dd-45b1-91fd-488bb6cdacea}</Project>
       <Name>Umbraco.Examine.Lucene</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Umbraco.ModelsBuilder.Embedded\Umbraco.ModelsBuilder.Embedded.csproj">
-      <Project>{52ac0ba8-a60e-4e36-897b-e8b97a54ed1c}</Project>
-      <Name>Umbraco.ModelsBuilder.Embedded</Name>
     </ProjectReference>
     <ProjectReference Include="..\Umbraco.PublishedCache.NuCache\Umbraco.PublishedCache.NuCache.csproj">
       <Project>{f6de8da0-07cc-4ef2-8a59-2bc81dbb3830}</Project>

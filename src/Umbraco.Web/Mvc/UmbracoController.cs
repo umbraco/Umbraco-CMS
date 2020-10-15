@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Web;
 using System.Web.Mvc;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.Owin;
 using Umbraco.Core.Cache;
 using Umbraco.Web.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Security;
 
@@ -23,7 +26,7 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Gets or sets the Umbraco context.
         /// </summary>
-        public IGlobalSettings GlobalSettings { get; }
+        public IOptions<GlobalSettings> GlobalSettings { get; }
 
         /// <summary>
         /// Gets the Umbraco context.
@@ -45,15 +48,16 @@ namespace Umbraco.Web.Mvc
         /// </summary>
         public AppCaches AppCaches { get; }
 
-        /// <summary>
-        /// Gets or sets the logger.
-        /// </summary>
-        public ILogger Logger { get; }
 
         /// <summary>
         /// Gets or sets the profiling logger.
         /// </summary>
         public IProfilingLogger ProfilingLogger { get; set; }
+
+        /// <summary>
+        /// Gets the LoggerFactory
+        /// </summary>
+        public ILoggerFactory LoggerFactory { get; }
 
         protected IOwinContext OwinContext => Request.GetOwinContext();
 
@@ -65,27 +69,28 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Gets the web security helper.
         /// </summary>
-        public virtual IWebSecurity Security => UmbracoContext.Security;
+        public virtual IBackofficeSecurity Security => UmbracoContext.Security;
 
         protected UmbracoController()
             : this(
-                  Current.Factory.GetInstance<IGlobalSettings>(),
+                  Current.Factory.GetInstance<IOptions<GlobalSettings>>(),
                   Current.Factory.GetInstance<IUmbracoContextAccessor>(),
                   Current.Factory.GetInstance<ServiceContext>(),
                   Current.Factory.GetInstance<AppCaches>(),
-                  Current.Factory.GetInstance<IProfilingLogger>()
+                  Current.Factory.GetInstance<IProfilingLogger>(),
+                  Current.Factory.GetInstance<LoggerFactory>()
             )
         {
         }
 
-        protected UmbracoController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger)
+        protected UmbracoController(IOptions<GlobalSettings> globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger, ILoggerFactory loggerFactory)
         {
             GlobalSettings = globalSettings;
             UmbracoContextAccessor = umbracoContextAccessor;
             Services = services;
             AppCaches = appCaches;
-            Logger = profilingLogger;
             ProfilingLogger = profilingLogger;
+            LoggerFactory = loggerFactory;
         }
     }
 }

@@ -16,9 +16,9 @@ namespace Umbraco.Web
         DateTime ObjectCreated { get; }
 
         /// <summary>
-        /// Gets the WebSecurity class
+        /// Gets the BackofficeSecurity class
         /// </summary>
-        IWebSecurity Security { get; }
+        IBackofficeSecurity Security { get; }
 
         /// <summary>
         /// Gets the uri that is handled by ASP.NET after server-side rewriting took place.

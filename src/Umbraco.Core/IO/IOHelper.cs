@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Reflection;
 using System.IO;
 using System.Linq;
-using Umbraco.Core.Configuration;
+using System.Reflection;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Strings;
 
@@ -14,7 +13,7 @@ namespace Umbraco.Core.IO
     {
         private readonly IHostingEnvironment _hostingEnvironment;
 
-        public IOHelper(IHostingEnvironment hostingEnvironment, IGlobalSettings globalSettings)
+        public IOHelper(IHostingEnvironment hostingEnvironment)
         {
             _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
         }

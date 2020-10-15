@@ -1,5 +1,7 @@
 ﻿using System.Text.RegularExpressions;
-using Umbraco.Core.Configuration.UmbracoSettings;
+using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 
@@ -7,18 +9,20 @@ namespace Umbraco.Web.Templates
 {
     public sealed class HtmlUrlParser
     {
-        private readonly IContentSettings _contentSettings;
+        private readonly ContentSettings _contentSettings;
+        private readonly ILogger<HtmlUrlParser> _logger;
         private readonly IIOHelper _ioHelper;
-        private readonly IProfilingLogger _logger;
+        private readonly IProfilingLogger _profilingLogger;
 
         private static readonly Regex ResolveUrlPattern = new Regex("(=[\"\']?)(\\W?\\~(?:.(?![\"\']?\\s+(?:\\S+)=|[>\"\']))+.)[\"\']?",
             RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
 
-        public HtmlUrlParser(IContentSettings contentSettings, IProfilingLogger logger, IIOHelper ioHelper)
+        public HtmlUrlParser(IOptions<ContentSettings> contentSettings, ILogger<HtmlUrlParser> logger ,IProfilingLogger profilingLogger, IIOHelper ioHelper)
         {
-            _contentSettings = contentSettings;
-            _ioHelper = ioHelper;
+            _contentSettings = contentSettings.Value;
             _logger = logger;
+            _ioHelper = ioHelper;
+            _profilingLogger = profilingLogger;
         }
 
         /// <summary>
@@ -34,11 +38,11 @@ namespace Umbraco.Web.Templates
         {
             if (_contentSettings.ResolveUrlsFromTextString == false) return text;
 
-            using (var timer = _logger.DebugDuration(typeof(IOHelper), "ResolveUrlsFromTextString starting", "ResolveUrlsFromTextString complete"))
+            using (var timer = _profilingLogger.DebugDuration(typeof(IOHelper), "ResolveUrlsFromTextString starting", "ResolveUrlsFromTextString complete"))
             {
                 // find all relative urls (ie. urls that contain ~)
                 var tags = ResolveUrlPattern.Matches(text);
-                _logger.Debug(typeof(IOHelper), "After regex: {Duration} matched: {TagsCount}", timer.Stopwatch.ElapsedMilliseconds, tags.Count);
+                _logger.LogDebug("After regex: {Duration} matched: {TagsCount}", timer.Stopwatch.ElapsedMilliseconds, tags.Count);
                 foreach (Match tag in tags)
                 {
                     var url = "";

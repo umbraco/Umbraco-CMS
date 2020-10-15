@@ -1,5 +1,5 @@
-﻿using Umbraco.Core.Dictionary;
-using Umbraco.Core.Logging;
+﻿using Microsoft.Extensions.Logging;
+using Umbraco.Core.Dictionary;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
@@ -16,7 +16,7 @@ namespace Umbraco.Web.Models.Mapping
         private readonly ICultureDictionary _cultureDictionary;
         private readonly ILocalizedTextService _textService;
 
-        public ContentPropertyDisplayMapper(ICultureDictionary cultureDictionary, IDataTypeService dataTypeService, IEntityService entityService, ILocalizedTextService textService, ILogger logger, PropertyEditorCollection propertyEditors)
+        public ContentPropertyDisplayMapper(ICultureDictionary cultureDictionary, IDataTypeService dataTypeService, IEntityService entityService, ILocalizedTextService textService, ILogger<ContentPropertyDisplayMapper> logger, PropertyEditorCollection propertyEditors)
             : base(dataTypeService, entityService, logger, propertyEditors)
         {
             _cultureDictionary = cultureDictionary;

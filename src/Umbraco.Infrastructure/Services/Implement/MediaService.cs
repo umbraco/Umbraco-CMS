@@ -4,9 +4,9 @@ using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
@@ -32,10 +32,10 @@ namespace Umbraco.Core.Services.Implement
 
         #region Constructors
 
-        public MediaService(IScopeProvider provider, IMediaFileSystem mediaFileSystem, ILogger logger, IEventMessagesFactory eventMessagesFactory,
+        public MediaService(IScopeProvider provider, IMediaFileSystem mediaFileSystem, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory,
             IMediaRepository mediaRepository, IAuditRepository auditRepository, IMediaTypeRepository mediaTypeRepository,
             IEntityRepository entityRepository, IShortStringHelper shortStringHelper)
-            : base(provider, logger, eventMessagesFactory)
+            : base(provider, loggerFactory, eventMessagesFactory)
         {
             _mediaFileSystem = mediaFileSystem;
             _mediaRepository = mediaRepository;

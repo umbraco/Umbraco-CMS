@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using Microsoft.Extensions.Options;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Web.Routing;
 
@@ -8,13 +10,13 @@ namespace Umbraco.Web.AspNet
     public class AspNetRequestAccessor : IRequestAccessor
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IWebRoutingSettings _webRoutingSettings;
+        private readonly WebRoutingSettings _webRoutingSettings;
         private readonly ISet<string> _applicationUrls = new HashSet<string>();
         private Uri _currentApplicationUrl;
-        public AspNetRequestAccessor(IHttpContextAccessor httpContextAccessor, IWebRoutingSettings webRoutingSettings)
+        public AspNetRequestAccessor(IHttpContextAccessor httpContextAccessor, IOptions<WebRoutingSettings> webRoutingSettings)
         {
             _httpContextAccessor = httpContextAccessor;
-            _webRoutingSettings = webRoutingSettings;
+            _webRoutingSettings = webRoutingSettings.Value;
 
             UmbracoModule.EndRequest += OnEndRequest;
             UmbracoModule.RouteAttempt += OnRouteAttempt;

@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Web.HealthCheck.Checks.Config
@@ -12,8 +12,8 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         Group = "Configuration")]
     public class MacroErrorsCheck : AbstractConfigCheck
     {
-        public MacroErrorsCheck(ILocalizedTextService textService, IHostingEnvironment hostingEnvironment, ILogger logger)
-            : base(textService, hostingEnvironment, logger)
+        public MacroErrorsCheck(ILocalizedTextService textService, IHostingEnvironment hostingEnvironment, ILoggerFactory loggerFactory)
+            : base(textService, hostingEnvironment, loggerFactory)
         { }
 
         public override string FilePath => "~/Config/umbracoSettings.config";

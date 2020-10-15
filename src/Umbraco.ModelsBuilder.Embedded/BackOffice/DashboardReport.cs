@@ -1,18 +1,20 @@
 ﻿using System.Text;
+using Microsoft.Extensions.Options;
 using Umbraco.Configuration;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 
 namespace Umbraco.ModelsBuilder.Embedded.BackOffice
 {
     internal class DashboardReport
     {
-        private readonly IModelsBuilderConfig _config;
+        private readonly ModelsBuilderSettings _config;
         private readonly OutOfDateModelsStatus _outOfDateModels;
         private readonly ModelsGenerationError _mbErrors;
 
-        public DashboardReport(IModelsBuilderConfig config, OutOfDateModelsStatus outOfDateModels, ModelsGenerationError mbErrors)
+        public DashboardReport(IOptions<ModelsBuilderSettings> config, OutOfDateModelsStatus outOfDateModels, ModelsGenerationError mbErrors)
         {
-            _config = config;
+            _config = config.Value;
             _outOfDateModels = outOfDateModels;
             _mbErrors = mbErrors;
         }

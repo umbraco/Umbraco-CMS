@@ -40,7 +40,7 @@
                         <label class="control-label" for="server">Server</label>
                         <div class="controls">
                             <input type="text" id="server" name="server"
-                                   placeholder="{{ installer.current.model.dbType == 3 ? 'umbraco-database.database.windows.net' : '127.0.0.1\SQLEXPRESS'}}"
+                                   placeholder="{{ installer.current.model.dbType == 3 ? 'umbraco-database.database.windows.net' : '127.0.0.1\\SQLEXPRESS'}}"
                                    required ng-model="installer.current.model.server" />
                             <small class="inline-help">Enter server domain or IP</small>
                         </div>

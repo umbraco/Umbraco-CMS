@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
@@ -17,11 +17,11 @@ namespace Umbraco.Web.Models.Mapping
         where TDestination : ContentPropertyBasic, new()
     {
         private readonly IEntityService _entityService;
-        private readonly ILogger _logger;
+        private readonly ILogger<ContentPropertyBasicMapper<TDestination>> _logger;
         private readonly PropertyEditorCollection _propertyEditors;
         protected IDataTypeService DataTypeService { get; }
 
-        public ContentPropertyBasicMapper(IDataTypeService dataTypeService, IEntityService entityService, ILogger logger, PropertyEditorCollection propertyEditors)
+        public ContentPropertyBasicMapper(IDataTypeService dataTypeService, IEntityService entityService, ILogger<ContentPropertyBasicMapper<TDestination>> logger, PropertyEditorCollection propertyEditors)
         {
             _logger = logger;
             _propertyEditors = propertyEditors;
@@ -38,7 +38,7 @@ namespace Umbraco.Web.Models.Mapping
             var editor = _propertyEditors[property.PropertyType.PropertyEditorAlias];
             if (editor == null)
             {
-                _logger.Error<ContentPropertyBasicMapper<TDestination>>(
+                _logger.LogError(
                     new NullReferenceException("The property editor with alias " + property.PropertyType.PropertyEditorAlias + " does not exist"),
                     "No property editor '{PropertyEditorAlias}' found, converting to a Label",
                     property.PropertyType.PropertyEditorAlias);

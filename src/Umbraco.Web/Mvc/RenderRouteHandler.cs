@@ -4,9 +4,9 @@ using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
 using System.Web.SessionState;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Strings;
 using Umbraco.Web.Features;
 using Umbraco.Web.Models;
@@ -280,7 +280,7 @@ namespace Umbraco.Web.Mvc
                 }
                 else
                 {
-                    Current.Logger.Warn<RenderRouteHandler>("The current Document Type {ContentTypeAlias} matches a locally declared controller of type {ControllerName}. Custom Controllers for Umbraco routing must implement '{UmbracoRenderController}' and inherit from '{UmbracoControllerBase}'.",
+                    Current.Logger.LogWarning("The current Document Type {ContentTypeAlias} matches a locally declared controller of type {ControllerName}. Custom Controllers for Umbraco routing must implement '{UmbracoRenderController}' and inherit from '{UmbracoControllerBase}'.",
                         request.PublishedContent.ContentType.Alias,
                         controllerType.FullName,
                         typeof(IRenderController).FullName,

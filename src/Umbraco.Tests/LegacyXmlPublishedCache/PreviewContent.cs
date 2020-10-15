@@ -2,9 +2,9 @@
 using System.IO;
 using System.Linq;
 using System.Xml;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Composing;
 
@@ -41,7 +41,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
                 }
                 catch (Exception ex)
                 {
-                    Current.Logger.Error<PreviewContent>(ex, "Could not load preview set {PreviewSet} for user {UserId}.", _previewSet, _userId);
+                    Current.Logger.LogError(ex, "Could not load preview set {PreviewSet} for user {UserId}.", _previewSet, _userId);
 
                     ClearPreviewSet();
 
@@ -147,7 +147,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             }
             catch (Exception ex)
             {
-                Current.Logger.Error<PreviewContent>(ex, "Couldn't delete preview set {FileName} for user {UserId}", file.Name, userId);
+                Current.Logger.LogError(ex, "Couldn't delete preview set {FileName} for user {UserId}", file.Name, userId);
             }
         }
 

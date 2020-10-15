@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
 using Examine.LuceneEngine.Providers;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Lucene.Net.Store;
 using Umbraco.Core.IO;
 using System.Linq;
@@ -14,7 +14,7 @@ namespace Umbraco.Examine
     {
         private readonly IHostingEnvironment _hostingEnvironment;
 
-        public LuceneIndexDiagnostics(LuceneIndex index, ILogger logger, IHostingEnvironment hostingEnvironment)
+        public LuceneIndexDiagnostics(LuceneIndex index, ILogger<LuceneIndexDiagnostics> logger, IHostingEnvironment hostingEnvironment)
         {
             _hostingEnvironment = hostingEnvironment;
             Index = index;
@@ -22,7 +22,7 @@ namespace Umbraco.Examine
         }
 
         public LuceneIndex Index { get; }
-        public ILogger Logger { get; }
+        public ILogger<LuceneIndexDiagnostics> Logger { get; }
 
         public int DocumentCount
         {
@@ -34,7 +34,7 @@ namespace Umbraco.Examine
                 }
                 catch (AlreadyClosedException)
                 {
-                    Logger.Warn(typeof(UmbracoContentIndex), "Cannot get GetIndexDocumentCount, the writer is already closed");
+                    Logger.LogWarning("Cannot get GetIndexDocumentCount, the writer is already closed");
                     return 0;
                 }
             }
@@ -50,7 +50,7 @@ namespace Umbraco.Examine
                 }
                 catch (AlreadyClosedException)
                 {
-                    Logger.Warn(typeof(UmbracoContentIndex), "Cannot get GetIndexFieldCount, the writer is already closed");
+                    Logger.LogWarning("Cannot get GetIndexFieldCount, the writer is already closed");
                     return 0;
                 }
             }

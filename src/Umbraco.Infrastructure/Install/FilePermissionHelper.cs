@@ -8,6 +8,8 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Install;
 using Umbraco.Core.IO;
 using Umbraco.Web.PublishedCache;
+using Umbraco.Core.Configuration.Models;
+using Microsoft.Extensions.Options;
 
 namespace Umbraco.Web.Install
 {
@@ -19,13 +21,13 @@ namespace Umbraco.Web.Install
 
         // ensure Umbraco can write to these files (the directories must exist)
         private readonly string[] _permissionFiles = { };
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly IIOHelper _ioHelper;
         private readonly IPublishedSnapshotService _publishedSnapshotService;
 
-        public FilePermissionHelper(IGlobalSettings globalSettings, IIOHelper ioHelper, IPublishedSnapshotService publishedSnapshotService)
+        public FilePermissionHelper(IOptions<GlobalSettings> globalSettings, IIOHelper ioHelper, IPublishedSnapshotService publishedSnapshotService)
         {
-            _globalSettings = globalSettings;
+            _globalSettings = globalSettings.Value;
             _ioHelper = ioHelper;
             _publishedSnapshotService = publishedSnapshotService;
             _permissionDirs = new[] { _globalSettings.UmbracoCssPath, Constants.SystemDirectories.Config, Constants.SystemDirectories.Data, _globalSettings.UmbracoMediaPath, Constants.SystemDirectories.Preview };

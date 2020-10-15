@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
-using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.Logging;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
@@ -14,14 +15,14 @@ namespace Umbraco.Web.Models.Mapping
     public class DataTypeMapDefinition : IMapDefinition
     {
         private readonly PropertyEditorCollection _propertyEditors;
-        private readonly ILogger _logger;
-        private readonly IContentSettings _contentSettings;
+        private readonly ILogger<DataTypeMapDefinition> _logger;
+        private readonly ContentSettings _contentSettings;
 
-        public DataTypeMapDefinition(PropertyEditorCollection propertyEditors, ILogger logger, IContentSettings contentSettings)
+        public DataTypeMapDefinition(PropertyEditorCollection propertyEditors, ILogger<DataTypeMapDefinition> logger, IOptions<ContentSettings> contentSettings)
         {
             _propertyEditors = propertyEditors;
             _logger = logger;
-            _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
+            _contentSettings = contentSettings.Value ?? throw new ArgumentNullException(nameof(contentSettings));
         }
 
         private static readonly int[] SystemIds =
@@ -174,7 +175,7 @@ namespace Umbraco.Web.Models.Mapping
                 else
                 {
                     // weird - just leave the field without a value - but warn
-                    _logger.Warn<DataTypeMapDefinition>("Could not find a value for configuration field '{ConfigField}'", field.Key);
+                    _logger.LogWarning("Could not find a value for configuration field '{ConfigField}'", field.Key);
                 }
             }
         }

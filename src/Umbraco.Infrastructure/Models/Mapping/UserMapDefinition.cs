@@ -18,6 +18,8 @@ using Umbraco.Web.Actions;
 using Umbraco.Web.Services;
 using Umbraco.Core.Media;
 using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Core.Configuration.Models;
+using Microsoft.Extensions.Options;
 
 namespace Umbraco.Web.Models.Mapping
 {
@@ -29,13 +31,13 @@ namespace Umbraco.Web.Models.Mapping
         private readonly ILocalizedTextService _textService;
         private readonly ActionCollection _actions;
         private readonly AppCaches _appCaches;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly IMediaFileSystem _mediaFileSystem;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly IImageUrlGenerator _imageUrlGenerator;
 
         public UserMapDefinition(ILocalizedTextService textService, IUserService userService, IEntityService entityService, ISectionService sectionService,
-            AppCaches appCaches, ActionCollection actions, IGlobalSettings globalSettings, IMediaFileSystem mediaFileSystem, IShortStringHelper shortStringHelper,
+            AppCaches appCaches, ActionCollection actions, IOptions<GlobalSettings> globalSettings, IMediaFileSystem mediaFileSystem, IShortStringHelper shortStringHelper,
             IImageUrlGenerator imageUrlGenerator)
         {
             _sectionService = sectionService;
@@ -44,7 +46,7 @@ namespace Umbraco.Web.Models.Mapping
             _textService = textService;
             _actions = actions;
             _appCaches = appCaches;
-            _globalSettings = globalSettings;
+            _globalSettings = globalSettings.Value;
             _mediaFileSystem = mediaFileSystem;
             _shortStringHelper = shortStringHelper;
             _imageUrlGenerator = imageUrlGenerator;

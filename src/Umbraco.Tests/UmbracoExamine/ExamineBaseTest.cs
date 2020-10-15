@@ -1,13 +1,13 @@
 ﻿using System.IO;
+using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
-using Umbraco.Core;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Logging.Serilog;
 using Umbraco.Core.Strings;
-using Umbraco.Tests.Components;
 using Umbraco.Tests.TestHelpers;
+using NullLogger = Microsoft.Extensions.Logging.Abstractions.NullLogger;
 
 namespace Umbraco.Tests.UmbracoExamine
 {
@@ -17,9 +17,9 @@ namespace Umbraco.Tests.UmbracoExamine
         [OneTimeSetUp]
         public void InitializeFixture()
         {
-            
-            var logger = new SerilogLogger(new FileInfo(TestHelper.MapPathForTestFiles("~/unit-test.config")));
-            _profilingLogger = new ProfilingLogger(logger, new LogProfiler(logger));
+
+            // var logger = new SerilogLogger<object>(new FileInfo(TestHelper.MapPathForTestFiles("~/unit-test.config")));
+            _profilingLogger = new ProfilingLogger(NullLogger.Instance, new LogProfiler(NullLogger<LogProfiler>.Instance));
         }
 
         private IProfilingLogger _profilingLogger;
@@ -33,8 +33,8 @@ namespace Umbraco.Tests.UmbracoExamine
         protected override void Compose()
         {
             base.Compose();
-
-            Composition.RegisterUnique<IShortStringHelper>(_ => new DefaultShortStringHelper(SettingsForTests.GenerateMockRequestHandlerSettings()));
+            var requestHandlerSettings = new RequestHandlerSettings();
+            Composition.RegisterUnique<IShortStringHelper>(_ => new DefaultShortStringHelper(Microsoft.Extensions.Options.Options.Create(requestHandlerSettings)));
         }
     }
 }

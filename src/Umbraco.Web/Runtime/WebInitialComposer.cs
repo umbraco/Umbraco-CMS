@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Web.Security;
+﻿using System.Web.Security;
 using Microsoft.AspNet.SignalR;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
@@ -14,9 +13,6 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Security;
 using Umbraco.Web.Security.Providers;
-using Umbraco.Web.SignalR;
-using Umbraco.Web.Templates;
-using Umbraco.Web.Trees;
 
 namespace Umbraco.Web.Runtime
 {
@@ -75,9 +71,6 @@ namespace Umbraco.Web.Runtime
 
             // auto-register views
             composition.RegisterAuto(typeof(UmbracoViewPage<>));
-
-            // register preview SignalR hub
-            composition.RegisterUnique(_ => GlobalHost.ConnectionManager.GetHubContext<PreviewHub>());
         }
     }
 }

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Web.HealthCheck.Checks.Config
@@ -15,9 +15,9 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
     {
         private readonly Version _iisVersion;
 
-        public TrySkipIisCustomErrorsCheck(ILocalizedTextService textService, ILogger logger,
+        public TrySkipIisCustomErrorsCheck(ILocalizedTextService textService, ILoggerFactory loggerFactory,
             IHostingEnvironment hostingEnvironment)
-            : base(textService, hostingEnvironment, logger)
+            : base(textService, hostingEnvironment, loggerFactory)
         {
             _iisVersion = hostingEnvironment.IISVersion;
         }

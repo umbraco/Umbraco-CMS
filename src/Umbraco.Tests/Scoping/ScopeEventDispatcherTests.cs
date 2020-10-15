@@ -1,20 +1,22 @@
 ﻿using System;
 using System.Linq;
+using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Events;
-using Umbraco.Core.Models;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
+using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Scoping;
+using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
-using Umbraco.Core.Persistence.Mappers;
-using Umbraco.Core.Services;
-using Umbraco.Tests.Components;
 using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.Scoping
@@ -34,28 +36,22 @@ namespace Umbraco.Tests.Scoping
 
             var register = TestHelper.GetRegister();
 
-            var composition = new Composition(register, TestHelper.GetMockedTypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.GetConfigs(), TestHelper.IOHelper, AppCaches.NoCache);
+            var composition = new Composition(register, TestHelper.GetMockedTypeLoader(), Mock.Of<IProfilingLogger>(), Mock.Of<IRuntimeState>(), TestHelper.IOHelper, AppCaches.NoCache);
 
             _testObjects = new TestObjects(register);
 
-            composition.RegisterUnique(factory => new FileSystems(factory, factory.TryGetInstance<ILogger>(), TestHelper.IOHelper, SettingsForTests.GenerateMockGlobalSettings(), TestHelper.GetHostingEnvironment()));
+            var globalSettings = new GlobalSettings();
+            composition.RegisterUnique(factory => new FileSystems(factory, factory.TryGetInstance<ILogger<FileSystems>>(), factory.TryGetInstance<ILoggerFactory>(), TestHelper.IOHelper, Microsoft.Extensions.Options.Options.Create(globalSettings), TestHelper.GetHostingEnvironment()));
             composition.WithCollectionBuilder<MapperCollectionBuilder>();
-
-            composition.Configs.Add(() => SettingsForTests.DefaultGlobalSettings);
-            composition.Configs.Add(SettingsForTests.GenerateMockContentSettings);
 
             Current.Reset();
             Current.Factory = composition.CreateFactory();
-
-            SettingsForTests.Reset(); // ensure we have configuration
         }
 
         [TearDown]
         public void TearDown()
         {
             Current.Reset();
-
-            SettingsForTests.Reset();
         }
 
         [TestCase(false, true, true)]
@@ -74,7 +70,7 @@ namespace Umbraco.Tests.Scoping
             DoThing1 += (sender, args) => { counter1++; if (cancel) args.Cancel = true; };
             DoThing2 += (sender, args) => { counter2++; };
 
-            var scopeProvider = _testObjects.GetScopeProvider(Mock.Of<ILogger>());
+            var scopeProvider = _testObjects.GetScopeProvider(NullLoggerFactory.Instance);
             using (var scope = scopeProvider.CreateScope(eventDispatcher: passive ? new PassiveEventDispatcher() : null))
             {
                 var cancelled = scope.Events.DispatchCancelable(DoThing1, this, new SaveEventArgs<string>("test"));
@@ -103,7 +99,7 @@ namespace Umbraco.Tests.Scoping
             DoThing2 += OnDoThingFail;
             DoThing3 += OnDoThingFail;
 
-            var scopeProvider = _testObjects.GetScopeProvider(Mock.Of<ILogger>());
+            var scopeProvider = _testObjects.GetScopeProvider(NullLoggerFactory.Instance);
             using (var scope = scopeProvider.CreateScope(eventDispatcher: new PassiveEventDispatcher()))
             {
                 scope.Events.Dispatch(DoThing1, this, new SaveEventArgs<string>("test"));
@@ -145,7 +141,7 @@ namespace Umbraco.Tests.Scoping
             var content3 = MockedContent.CreateBasicContent(contentType);
             content3.Id = 789;
 
-            var scopeProvider = _testObjects.GetScopeProvider(Mock.Of<ILogger>());
+            var scopeProvider = _testObjects.GetScopeProvider(NullLoggerFactory.Instance);
             using (var scope = scopeProvider.CreateScope(eventDispatcher: new PassiveEventDispatcher()))
             {
 
@@ -184,7 +180,7 @@ namespace Umbraco.Tests.Scoping
             var contentService = Mock.Of<IContentService>();
             var content = Mock.Of<IContent>();
 
-            var scopeProvider = _testObjects.GetScopeProvider(Mock.Of<ILogger>());
+            var scopeProvider = _testObjects.GetScopeProvider(NullLoggerFactory.Instance);
             using (var scope = scopeProvider.CreateScope(eventDispatcher: new PassiveEventDispatcher()))
             {
                 scope.Events.Dispatch(Test_Unpublished, contentService, new PublishEventArgs<IContent>(new [] { content }), "Unpublished");
@@ -218,7 +214,7 @@ namespace Umbraco.Tests.Scoping
             content3.Id = 123;
             content3.UpdateDate = now.AddMinutes(3);
 
-            var scopeProvider = _testObjects.GetScopeProvider(Mock.Of<ILogger>());
+            var scopeProvider = _testObjects.GetScopeProvider(NullLoggerFactory.Instance);
             using (var scope = scopeProvider.CreateScope(eventDispatcher: new PassiveEventDispatcher()))
             {
                 scope.Events.Dispatch(DoSaveForContent, this, new SaveEventArgs<IContent>(content1));
@@ -258,7 +254,7 @@ namespace Umbraco.Tests.Scoping
             content3.Id = 123;
             content1.UpdateDate = now.AddMinutes(3);
 
-            var scopeProvider = _testObjects.GetScopeProvider(Mock.Of<ILogger>());
+            var scopeProvider = _testObjects.GetScopeProvider(NullLoggerFactory.Instance);
             using (var scope = scopeProvider.CreateScope(eventDispatcher: new PassiveEventDispatcher()))
             {
                 scope.Events.Dispatch(DoSaveForContent, this, new SaveEventArgs<IContent>(content1));
@@ -291,7 +287,7 @@ namespace Umbraco.Tests.Scoping
             content3.Id = 123;
             content3.UpdateDate = now.AddMinutes(3);
 
-            var scopeProvider = _testObjects.GetScopeProvider(Mock.Of<ILogger>());
+            var scopeProvider = _testObjects.GetScopeProvider(NullLoggerFactory.Instance);
             using (var scope = scopeProvider.CreateScope(eventDispatcher: new PassiveEventDispatcher()))
             {
                 scope.Events.Dispatch(DoSaveForContent, this, new SaveEventArgs<IContent>(content1));
@@ -315,7 +311,7 @@ namespace Umbraco.Tests.Scoping
             DoThing2 += OnDoThingFail;
             DoThing3 += OnDoThingFail;
 
-            var scopeProvider = _testObjects.GetScopeProvider(Mock.Of<ILogger>());
+            var scopeProvider = _testObjects.GetScopeProvider(NullLoggerFactory.Instance);
             using (var scope = scopeProvider.CreateScope(eventDispatcher: new PassiveEventDispatcher()))
             {
                 scope.Events.Dispatch(DoThing1, this, new SaveEventArgs<string>("test"));
@@ -341,7 +337,7 @@ namespace Umbraco.Tests.Scoping
             IScopeContext ambientContext = null;
             Guid value = Guid.Empty;
 
-            var scopeProvider = _testObjects.GetScopeProvider(Mock.Of<ILogger>()) as ScopeProvider;
+            var scopeProvider = _testObjects.GetScopeProvider(NullLoggerFactory.Instance) as ScopeProvider;
 
             DoThing1 += (sender, args) => { counter++; };
             DoThing2 += (sender, args) => { counter++; };

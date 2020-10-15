@@ -1,9 +1,9 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.BackOffice;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Extensions;
 using Umbraco.Web.Models;
@@ -13,9 +13,9 @@ namespace Umbraco.Web.BackOffice.Security
 {
     internal class PasswordChanger
     {
-        private readonly ILogger _logger;
+        private readonly ILogger<PasswordChanger> _logger;
 
-        public PasswordChanger(ILogger logger)
+        public PasswordChanger(ILogger<PasswordChanger> logger)
         {
             _logger = logger;
         }
@@ -32,7 +32,7 @@ namespace Umbraco.Web.BackOffice.Security
             IUser currentUser,
             IUser savingUser,
             ChangingPasswordModel passwordModel,
-            BackOfficeUserManager userMgr)
+            IBackOfficeUserManager userMgr)
         {
             if (passwordModel == null) throw new ArgumentNullException(nameof(passwordModel));
             if (userMgr == null) throw new ArgumentNullException(nameof(userMgr));
@@ -72,7 +72,7 @@ namespace Umbraco.Web.BackOffice.Security
                 if (resetResult.Succeeded == false)
                 {
                     var errors = resetResult.Errors.ToErrorMessage();
-                    _logger.Warn<PasswordChanger>("Could not reset user password {PasswordErrors}", errors);
+                    _logger.LogWarning("Could not reset user password {PasswordErrors}", errors);
                     return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult(errors, new[] { "value" }) });
                 }
 
@@ -92,7 +92,7 @@ namespace Umbraco.Web.BackOffice.Security
             {
                 //no, fail with error messages for "password"
                 var errors = changeResult.Errors.ToErrorMessage();
-                _logger.Warn<PasswordChanger>("Could not change user password {PasswordErrors}", errors);
+                _logger.LogWarning("Could not change user password {PasswordErrors}", errors);
                 return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult(errors, new[] { "password" }) });
             }
             return Attempt.Succeed(new PasswordChangedModel());

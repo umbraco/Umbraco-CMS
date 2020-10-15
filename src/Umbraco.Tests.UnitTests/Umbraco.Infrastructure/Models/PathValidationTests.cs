@@ -1,7 +1,7 @@
 ﻿using System;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core.Logging;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Tests.Common.Builders;
@@ -54,7 +54,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
                 .Build();
 
             //no id assigned
-            Assert.Throws<InvalidOperationException>(() => entity.EnsureValidPath(Mock.Of<ILogger>(), umbracoEntity => new EntitySlim(), umbracoEntity => { }));
+            Assert.Throws<InvalidOperationException>(() => entity.EnsureValidPath(Mock.Of<ILogger<EntitySlim>>(), umbracoEntity => new EntitySlim(), umbracoEntity => { }));
         }
 
         [Test]
@@ -66,7 +66,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
                 .Build();
 
             //no parent found
-            Assert.Throws<NullReferenceException>(() => entity.EnsureValidPath(Mock.Of<ILogger>(), umbracoEntity => null, umbracoEntity => { }));
+            Assert.Throws<NullReferenceException>(() => entity.EnsureValidPath(Mock.Of<ILogger<EntitySlim>>(), umbracoEntity => null, umbracoEntity => { }));
         }
 
         [Test]
@@ -76,7 +76,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
                 .WithId(1234)
                 .Build();
 
-            entity.EnsureValidPath(Mock.Of<ILogger>(), umbracoEntity => null, umbracoEntity => { });
+            entity.EnsureValidPath(Mock.Of<ILogger<EntitySlim>>(), umbracoEntity => null, umbracoEntity => { });
 
             //works because it's under the root
             Assert.AreEqual("-1,1234", entity.Path);
@@ -90,7 +90,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
                 .WithParentId(888)
                 .Build();
 
-            entity.EnsureValidPath(Mock.Of<ILogger>(), umbracoEntity => umbracoEntity.ParentId == 888 ? new EntitySlim { Id = 888, Path = "-1,888" } : null, umbracoEntity => { });
+            entity.EnsureValidPath(Mock.Of<ILogger<EntitySlim>>(), umbracoEntity => umbracoEntity.ParentId == 888 ? new EntitySlim { Id = 888, Path = "-1,888" } : null, umbracoEntity => { });
 
             //works because the parent was found
             Assert.AreEqual("-1,888,1234", entity.Path);
@@ -140,7 +140,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
             };
 
             //this will recursively fix all paths
-            entity.EnsureValidPath(Mock.Of<ILogger>(), getParent, umbracoEntity => { });
+            entity.EnsureValidPath(Mock.Of<ILogger<IUmbracoEntity>>(), getParent, umbracoEntity => { });
 
             Assert.AreEqual("-1,999", parentA.Path);
             Assert.AreEqual("-1,999,888", parentB.Path);

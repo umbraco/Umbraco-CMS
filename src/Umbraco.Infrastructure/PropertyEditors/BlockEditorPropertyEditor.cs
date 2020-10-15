@@ -3,8 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Blocks;
 using Umbraco.Core.Models.Editors;
@@ -29,14 +29,14 @@ namespace Umbraco.Web.PropertyEditors
         private readonly IContentTypeService _contentTypeService;
 
         public BlockEditorPropertyEditor(
-            ILogger logger,
+            ILoggerFactory loggerFactory,
             Lazy<PropertyEditorCollection> propertyEditors,
             IDataTypeService dataTypeService,
             IContentTypeService contentTypeService,
             ILocalizedTextService localizedTextService,
             ILocalizationService localizationService,
             IShortStringHelper shortStringHelper)
-            : base(logger, dataTypeService,localizationService,localizedTextService, shortStringHelper)
+            : base(loggerFactory, dataTypeService,localizationService,localizedTextService, shortStringHelper)
         {
             _localizedTextService = localizedTextService;
             _propertyEditors = propertyEditors;
@@ -49,16 +49,16 @@ namespace Umbraco.Web.PropertyEditors
 
         #region Value Editor
 
-        protected override IDataValueEditor CreateValueEditor() => new BlockEditorPropertyValueEditor(Attribute, PropertyEditors, _dataTypeService, _contentTypeService, _localizedTextService, Logger, LocalizationService,ShortStringHelper);
+        protected override IDataValueEditor CreateValueEditor() => new BlockEditorPropertyValueEditor(Attribute, PropertyEditors, _dataTypeService, _contentTypeService, _localizedTextService, LoggerFactory.CreateLogger<BlockEditorPropertyValueEditor>(), LocalizationService,ShortStringHelper);
 
         internal class BlockEditorPropertyValueEditor : DataValueEditor, IDataValueReference
         {
             private readonly PropertyEditorCollection _propertyEditors;
             private readonly IDataTypeService _dataTypeService;
-            private readonly ILogger _logger;
+            private readonly ILogger<BlockEditorPropertyValueEditor> _logger;
             private readonly BlockEditorValues _blockEditorValues;
 
-            public BlockEditorPropertyValueEditor(DataEditorAttribute attribute, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IContentTypeService contentTypeService, ILocalizedTextService textService, ILogger logger, ILocalizationService localizationService, IShortStringHelper shortStringHelper)
+            public BlockEditorPropertyValueEditor(DataEditorAttribute attribute, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IContentTypeService contentTypeService, ILocalizedTextService textService, ILogger<BlockEditorPropertyValueEditor> logger, ILocalizationService localizationService, IShortStringHelper shortStringHelper)
                 : base(dataTypeService, localizationService, textService, shortStringHelper, attribute)
             {
                 _propertyEditors = propertyEditors;
@@ -156,7 +156,7 @@ namespace Umbraco.Web.PropertyEditors
                         {
                             // deal with weird situations by ignoring them (no comment)
                             row.PropertyValues.Remove(prop.Key);
-                            _logger.Warn<BlockEditorPropertyValueEditor>(
+                            _logger.LogWarning(
                                 "ToEditor removed property value {PropertyKey} in row {RowId} for property type {PropertyTypeAlias}",
                                 prop.Key, row.Key, property.PropertyType.Alias);
                             continue;
@@ -405,7 +405,7 @@ namespace Umbraco.Web.PropertyEditors
                     if (!propertyTypes.TryGetValue(prop.Key, out var propType))
                     {
                         block.RawPropertyValues.Remove(prop.Key);
-                        _logger.Warn<BlockEditorValues>("The property {PropertyKey} for block {BlockKey} was removed because the property type {PropertyTypeAlias} was not found on {ContentTypeAlias}",
+                        _logger.LogWarning("The property {PropertyKey} for block {BlockKey} was removed because the property type {PropertyTypeAlias} was not found on {ContentTypeAlias}",
                             prop.Key, block.Key, prop.Key, contentType.Alias);
                     }
                     else

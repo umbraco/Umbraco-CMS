@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Dtos;
 
@@ -8,7 +9,7 @@ namespace Umbraco.Core.Persistence.Factories
 {
     internal static class UserFactory
     {
-        public static IUser BuildEntity(IGlobalSettings globalSettings, UserDto dto)
+        public static IUser BuildEntity(GlobalSettings globalSettings, UserDto dto)
         {
             var guidId = dto.Id.ToGuid();
 

@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
@@ -25,15 +27,15 @@ namespace Umbraco.Web.BackOffice.Controllers
     {
         private readonly ILocalizationService _localizationService;
         private readonly UmbracoMapper _umbracoMapper;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
 
         public LanguageController(ILocalizationService localizationService,
             UmbracoMapper umbracoMapper,
-            IGlobalSettings globalSettings)
+            IOptions<GlobalSettings> globalSettings)
         {
             _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
             _umbracoMapper = umbracoMapper ?? throw new ArgumentNullException(nameof(umbracoMapper));
-            _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
+            _globalSettings = globalSettings.Value ?? throw new ArgumentNullException(nameof(globalSettings));
         }
 
         /// <summary>

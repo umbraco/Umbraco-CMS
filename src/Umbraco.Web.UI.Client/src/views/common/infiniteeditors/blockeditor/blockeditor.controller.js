@@ -7,8 +7,8 @@ angular.module("umbraco")
             vm.tabs = [];
 
             localizationService.localizeMany([
-                vm.model.liveEditing ? "prompt_discardChanges" : "general_close",
-                vm.model.liveEditing ? "buttons_confirmActionConfirm" : "buttons_submitChanges"
+                vm.model.createFlow ? "general_cancel" : (vm.model.liveEditing ? "prompt_discardChanges" : "general_close"),
+                vm.model.createFlow ? "general_create" : (vm.model.liveEditing ? "buttons_confirmActionConfirm" : "buttons_submitChanges")
             ]).then(function (data) {
                 vm.closeLabel = data[0];
                 vm.submitLabel = data[1];
@@ -68,16 +68,16 @@ angular.module("umbraco")
                     // * It would have a 'commit' method to commit the removed errors - which we would call in the formHelper.submitForm when it's successful
                     // * It would have a 'rollback' method to reset the removed errors - which we would call here
 
-
-                    if (vm.blockForm.$dirty === true) {
-                        localizationService.localizeMany(["prompt_discardChanges", "blockEditor_blockHasChanges"]).then(function (localizations) {
+                    if (vm.model.createFlow === true || vm.blockForm.$dirty === true) {
+                        var labels = vm.model.createFlow === true ? ["blockEditor_confirmCancelBlockCreationHeadline", "blockEditor_confirmCancelBlockCreationMessage"] : ["prompt_discardChanges", "blockEditor_blockHasChanges"];
+                        localizationService.localizeMany(labels).then(function (localizations) {
                             const confirm = {
                                 title: localizations[0],
                                 view: "default",
                                 content: localizations[1],
                                 submitButtonLabelKey: "general_discard",
                                 submitButtonStyle: "danger",
-                                closeButtonLabelKey: "general_cancel",
+                                closeButtonLabelKey: "prompt_stay",
                                 submit: function () {
                                     overlayService.close();
                                     vm.model.close(vm.model);
@@ -88,11 +88,10 @@ angular.module("umbraco")
                             };
                             overlayService.open(confirm);
                         });
-
-                        return;
+                    } else {
+                        vm.model.close(vm.model);
                     }
-                    // TODO: check if content/settings has changed and ask user if they are sure.
-                    vm.model.close(vm.model);
+
                 }
             }
 

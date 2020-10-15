@@ -15,6 +15,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Tests.Common.Builders
             var builder = new LanguageBuilder();
 
             var expected = CultureInfo.GetCultureInfo("en-GB");
+
             // Act
             var language = builder
                 .WithCultureInfo(expected.Name)

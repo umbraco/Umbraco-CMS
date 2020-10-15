@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.Extensions.Logging;
 using Microsoft.Owin;
 using Microsoft.Owin.Security;
 using Umbraco.Core;
@@ -109,7 +110,7 @@ namespace Umbraco.Web.Security
                 }
                 catch (System.Exception ex)
                 {
-                    Current.Logger.Error(typeof (AuthenticationOptionsExtensions), ex, "Could not read AuthenticationOptions properties");
+                    Current.Logger.LogError(ex, "Could not read AuthenticationOptions properties");
                 }
             }
             else

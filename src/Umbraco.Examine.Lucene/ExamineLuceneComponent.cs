@@ -1,8 +1,8 @@
-﻿using Examine;
+﻿using Microsoft.Extensions.Logging;
+using Examine;
 using Examine.LuceneEngine.Directories;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Logging;
 
 namespace Umbraco.Examine
 {
@@ -12,14 +12,14 @@ namespace Umbraco.Examine
         private readonly IndexRebuilder _indexRebuilder;
         private readonly IExamineManager _examineManager;
         private readonly IMainDom _mainDom;
-        private readonly ILogger _logger;
+        private readonly ILoggerFactory _loggerFactory;
 
-        public ExamineLuceneComponent(IndexRebuilder indexRebuilder, IExamineManager examineManager, IMainDom mainDom, ILogger logger)
+        public ExamineLuceneComponent(IndexRebuilder indexRebuilder, IExamineManager examineManager, IMainDom mainDom, ILoggerFactory loggerFactory)
         {
             _indexRebuilder = indexRebuilder;
             _examineManager = examineManager;
             _mainDom = mainDom;
-            _logger = logger;
+            _loggerFactory = loggerFactory;
         }
 
         public void Initialize()
@@ -41,7 +41,7 @@ namespace Umbraco.Examine
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void IndexRebuilder_RebuildingIndexes(object sender, IndexRebuildingEventArgs e) => _examineManager.ConfigureIndexes(_mainDom, _logger);
+        private void IndexRebuilder_RebuildingIndexes(object sender, IndexRebuildingEventArgs e) => _examineManager.ConfigureIndexes(_mainDom, _loggerFactory.CreateLogger<IExamineManager>());
 
         public void Terminate()
         {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data.SqlClient;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
@@ -26,7 +27,7 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
 
         private ServerRegistrationRepository CreateRepository(IScopeProvider provider)
         {
-            return new ServerRegistrationRepository((IScopeAccessor) provider, Logger);
+            return new ServerRegistrationRepository((IScopeAccessor) provider, LoggerFactory.CreateLogger<ServerRegistrationRepository>());
         }
 
         [Test]
@@ -55,7 +56,7 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
 
                 var server = repository.Get(1);
                 server.ServerIdentity = "COMPUTER2";
-                
+
                 Assert.Throws<SqlException>(() => repository.Save(server));
             }
         }

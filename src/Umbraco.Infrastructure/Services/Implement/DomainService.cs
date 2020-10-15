@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Events;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Scoping;
@@ -11,9 +11,9 @@ namespace Umbraco.Core.Services.Implement
     {
         private readonly IDomainRepository _domainRepository;
 
-        public DomainService(IScopeProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory,
+        public DomainService(IScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory,
             IDomainRepository domainRepository)
-            : base(provider, logger, eventMessagesFactory)
+            : base(provider, loggerFactory, eventMessagesFactory)
         {
             _domainRepository = domainRepository;
         }

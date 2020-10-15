@@ -17,7 +17,7 @@ namespace Umbraco.Web.Trees
     /// </summary>
     [Tree(Core.Constants.Applications.Settings, Core.Constants.Trees.PartialViews, SortOrder = 7, TreeGroup = Core.Constants.Trees.Groups.Templating)]
     [UmbracoTreeAuthorize(Constants.Trees.PartialViews)]
-    [PluginController("UmbracoTrees")]
+    [PluginController(Constants.Web.Mvc.BackOfficeTreeArea)]
     [CoreTree]
     public class PartialViewsTreeController : FileSystemTreeController
     {

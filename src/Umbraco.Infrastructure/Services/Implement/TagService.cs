@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Events;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Scoping;
@@ -18,9 +18,9 @@ namespace Umbraco.Core.Services.Implement
     {
         private readonly ITagRepository _tagRepository;
 
-        public TagService(IScopeProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory,
+        public TagService(IScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory,
             ITagRepository tagRepository)
-            : base(provider, logger, eventMessagesFactory)
+            : base(provider, loggerFactory, eventMessagesFactory)
         {
             _tagRepository = tagRepository;
         }

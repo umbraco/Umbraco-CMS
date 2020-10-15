@@ -2,6 +2,7 @@
 using System.Text;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Hosting;
 
@@ -62,7 +63,7 @@ namespace Umbraco.Web
 
         // maps an internal umbraco uri to a public uri
         // ie with virtual directory, .aspx if required...
-        public Uri UriFromUmbraco(Uri uri, IGlobalSettings globalSettings, IRequestHandlerSettings requestConfig)
+        public Uri UriFromUmbraco(Uri uri, RequestHandlerSettings requestConfig)
         {
             var path = uri.GetSafeAbsolutePath();
 

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Runtime
 {
@@ -16,10 +16,10 @@ namespace Umbraco.Core.Runtime
         // event wait handle used to notify current main domain that it should
         // release the lock because a new domain wants to be the main domain
         private readonly EventWaitHandle _signal;
-        private readonly ILogger _logger;
+        private readonly ILogger<MainDomSemaphoreLock> _logger;
         private IDisposable _lockRelease;
 
-        public MainDomSemaphoreLock(ILogger logger, IHostingEnvironment hostingEnvironment)
+        public MainDomSemaphoreLock(ILogger<MainDomSemaphoreLock> logger, IHostingEnvironment hostingEnvironment)
         {
             var lockName = "UMBRACO-" + MainDom.GetMainDomId(hostingEnvironment) + "-MAINDOM-LCK";
             _systemLock = new SystemLock(lockName);
@@ -52,7 +52,7 @@ namespace Umbraco.Core.Runtime
             }
             catch (TimeoutException ex)
             {
-                _logger.Error<MainDomSemaphoreLock>(ex);
+                _logger.LogError(ex.Message);
                 return Task.FromResult(false);
             }
             finally

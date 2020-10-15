@@ -13,6 +13,7 @@ using Microsoft.Owin.Security;
 using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.BackOffice;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Extensions;
 using Umbraco.Web.Composing;
 using Constants = Umbraco.Core.Constants;
@@ -68,7 +69,7 @@ namespace Umbraco.Web.Security
                     if (ex is FormatException || ex is JsonReaderException)
                     {
                         // this will occur if the cookie data is invalid
-                       
+
                     }
                     else
                     {
@@ -104,7 +105,7 @@ namespace Umbraco.Web.Security
         /// <summary>
         /// This will return the current back office identity.
         /// </summary>
-        /// <param name="http"></param>      
+        /// <param name="http"></param>
         /// <returns>
         /// Returns the current back office identity if an admin is authenticated otherwise null
         /// </returns>
@@ -151,7 +152,7 @@ namespace Umbraco.Web.Security
         public static AuthenticationTicket GetUmbracoAuthTicket(this HttpContextBase http)
         {
             if (http == null) throw new ArgumentNullException(nameof(http));
-            return GetAuthTicket(http, Current.Configs.Security().AuthCookieName);
+            return GetAuthTicket(http, /*Current.Configs.Security() TODO*/new SecuritySettings().AuthCookieName);
         }
 
         internal static AuthenticationTicket GetUmbracoAuthTicket(this HttpContext http)
@@ -163,7 +164,7 @@ namespace Umbraco.Web.Security
         public static AuthenticationTicket GetUmbracoAuthTicket(this IOwinContext ctx)
         {
             if (ctx == null) throw new ArgumentNullException(nameof(ctx));
-            return GetAuthTicket(ctx, Current.Configs.Security().AuthCookieName);
+            return GetAuthTicket(ctx, /*Current.Configs.Security() TODO introduce injection instead of default value*/new SecuritySettings().AuthCookieName);
         }
 
         private static AuthenticationTicket GetAuthTicket(this IOwinContext owinCtx, string cookieName)
@@ -215,7 +216,7 @@ namespace Umbraco.Web.Security
             catch (Exception)
             {
                 // occurs when decryption fails
-                
+
                 return null;
             }
         }
@@ -236,6 +237,6 @@ namespace Umbraco.Web.Security
             return secureDataFormat.Unprotect(formsCookie);
         }
 
-        
+
     }
 }

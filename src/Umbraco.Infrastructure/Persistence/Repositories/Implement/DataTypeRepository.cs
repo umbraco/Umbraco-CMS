@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Events;
 using Umbraco.Core.Exceptions;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Dtos;
@@ -26,11 +26,13 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     internal class DataTypeRepository : NPocoRepositoryBase<int, IDataType>, IDataTypeRepository
     {
         private readonly Lazy<PropertyEditorCollection> _editors;
+        private readonly ILogger<IDataType> _dataTypeLogger;
 
-        public DataTypeRepository(IScopeAccessor scopeAccessor, AppCaches cache, Lazy<PropertyEditorCollection> editors, ILogger logger)
+        public DataTypeRepository(IScopeAccessor scopeAccessor, AppCaches cache, Lazy<PropertyEditorCollection> editors, ILogger<DataTypeRepository> logger, ILoggerFactory loggerFactory)
             : base(scopeAccessor, cache, logger)
         {
             _editors = editors;
+            _dataTypeLogger = loggerFactory.CreateLogger<IDataType>();
         }
 
         #region Overrides of RepositoryBase<int,DataTypeDefinition>
@@ -54,7 +56,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
 
             var dtos = Database.Fetch<DataTypeDto>(dataTypeSql);
-            return dtos.Select(x => DataTypeFactory.BuildEntity(x, _editors.Value, Logger)).ToArray();
+            return dtos.Select(x => DataTypeFactory.BuildEntity(x, _editors.Value, _dataTypeLogger)).ToArray();
         }
 
         protected override IEnumerable<IDataType> PerformGetByQuery(IQuery<IDataType> query)
@@ -65,7 +67,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             var dtos = Database.Fetch<DataTypeDto>(sql);
 
-            return dtos.Select(x => DataTypeFactory.BuildEntity(x, _editors.Value, Logger)).ToArray();
+            return dtos.Select(x => DataTypeFactory.BuildEntity(x, _editors.Value, _dataTypeLogger)).ToArray();
         }
 
         #endregion

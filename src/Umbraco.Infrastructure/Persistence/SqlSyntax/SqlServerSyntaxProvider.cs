@@ -4,6 +4,7 @@ using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
@@ -161,7 +162,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
                 }
                 catch (Exception e)
                 {
-                    logger.Error<UmbracoDatabaseFactory>(e, "Failed to detected SqlServer version.");
+                    logger.LogError(e, "Failed to detected SqlServer version.");
                     version = new ServerVersionInfo(); // all unknown
                 }
             }

@@ -1,7 +1,7 @@
 //used for the media picker dialog
 angular.module("umbraco")
     .controller("Umbraco.Editors.MediaPickerController",
-        function ($scope, $timeout, mediaResource, entityResource, userService, mediaHelper, mediaTypeHelper, eventsService, treeService, localStorageService, localizationService, editorService, umbSessionStorage) {
+        function ($scope, $timeout, mediaResource, entityResource, userService, mediaHelper, mediaTypeHelper, eventsService, treeService, localStorageService, localizationService, editorService, umbSessionStorage, notificationsService) {
 
             var vm = this;
 
@@ -166,8 +166,14 @@ angular.module("umbraco")
                 }
             }
 
-            function upload() {
-                $(".umb-file-dropzone .file-select").trigger("click");
+            function upload(v) {
+                var fileSelect = $(".umb-file-dropzone .file-select");
+                if (fileSelect.length === 0){
+                    localizationService.localize('media_uploadNotAllowed').then(function (message) { notificationsService.warning(message); });
+                }
+                else{
+                    fileSelect.trigger("click");
+                }
             }
 
             function dragLeave() {
@@ -223,15 +229,11 @@ angular.module("umbraco")
                                     return f.path.indexOf($scope.startNodeId) !== -1;
                                 });
                         });
-
-                    mediaTypeHelper.getAllowedImagetypes(folder.id)
-                        .then(function (types) {
-                            vm.acceptedMediatypes = types;
-                        });
                 } else {
                     $scope.path = [];
                 }
 
+                mediaTypeHelper.getAllowedImagetypes(folder.id).then(function (types) { vm.acceptedMediatypes = types; });
                 $scope.lockedFolder = (folder.id === -1 && $scope.model.startNodeIsVirtual) || hasFolderAccess(folder) === false;
                 $scope.currentFolder = folder;
 
@@ -286,7 +288,7 @@ angular.module("umbraco")
                     gotoFolder(item);
                 }
                 else {
-                    $scope.clickHandler(item, event, index);
+                    clickHandler(item, event, index);
                 }
             };
 

@@ -116,8 +116,7 @@ namespace Umbraco.Extensions
             sb.AppendLine();
             sb.AppendLine(@"var errors = [];");
 
-            var errors = val as IEnumerable<string>;
-            if (errors != null)
+            if (val is IEnumerable<string> errors)
             {
                 foreach (var error in errors)
                 {
@@ -125,13 +124,10 @@ namespace Umbraco.Extensions
                 }
             }
 
-            var resetCodeModel = val as ValidatePasswordResetCodeModel;
-
-
             sb.AppendLine(@"app.value(""resetPasswordCodeInfo"", {");
             sb.AppendLine(@"errors: errors,");
             sb.Append(@"resetCodeModel: ");
-            sb.AppendLine(JsonConvert.SerializeObject(resetCodeModel));
+            sb.AppendLine(val?.ToString() ?? "null");
             sb.AppendLine(@"});");
 
             return html.Raw(sb.ToString());

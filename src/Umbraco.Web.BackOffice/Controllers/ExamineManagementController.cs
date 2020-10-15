@@ -4,10 +4,10 @@ using System.Linq;
 using Examine;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Examine;
 using Umbraco.Extensions;
 using Umbraco.Web.Common.Attributes;
@@ -22,14 +22,14 @@ namespace Umbraco.Web.BackOffice.Controllers
     public class ExamineManagementController : UmbracoAuthorizedJsonController
     {
         private readonly IExamineManager _examineManager;
-        private readonly ILogger _logger;
+        private readonly ILogger<ExamineManagementController> _logger;
         private readonly IIOHelper _ioHelper;
         private readonly IIndexDiagnosticsFactory _indexDiagnosticsFactory;
         private readonly IAppPolicyCache _runtimeCache;
         private readonly IndexRebuilder _indexRebuilder;
 
 
-        public ExamineManagementController(IExamineManager examineManager, ILogger logger, IIOHelper ioHelper, IIndexDiagnosticsFactory indexDiagnosticsFactory,
+        public ExamineManagementController(IExamineManager examineManager, ILogger<ExamineManagementController> logger, IIOHelper ioHelper, IIndexDiagnosticsFactory indexDiagnosticsFactory,
             AppCaches appCaches,
             IndexRebuilder indexRebuilder)
         {
@@ -136,7 +136,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             if (!validate.IsSuccessStatusCode())
                 throw new HttpResponseException(validate);
 
-            _logger.Info<ExamineManagementController>("Rebuilding index '{IndexName}'", indexName);
+            _logger.LogInformation("Rebuilding index '{IndexName}'", indexName);
 
             //remove it in case there's a handler there already
             index.IndexOperationComplete -= Indexer_IndexOperationComplete;
@@ -162,7 +162,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             {
                 //ensure it's not listening
                 index.IndexOperationComplete -= Indexer_IndexOperationComplete;
-                _logger.Error<ExamineManagementController>(ex, "An error occurred rebuilding index");
+                _logger.LogError(ex, "An error occurred rebuilding index");
                 var response = new ConflictObjectResult("The index could not be rebuilt at this time, most likely there is another thread currently writing to the index. Error: {ex}");
 
                 HttpContext.SetReasonPhrase("Could Not Rebuild");
@@ -245,14 +245,12 @@ namespace Umbraco.Web.BackOffice.Controllers
         {
             var indexer = (IIndex)sender;
 
-            _logger.Debug<ExamineManagementController>("Logging operation completed for index {IndexName}", indexer.Name);
+            _logger.LogDebug("Logging operation completed for index {IndexName}", indexer.Name);
 
             //ensure it's not listening anymore
             indexer.IndexOperationComplete -= Indexer_IndexOperationComplete;
 
-            _logger
-                .Info<ExamineManagementController
-                >($"Rebuilding index '{indexer.Name}' done.");
+            _logger.LogInformation($"Rebuilding index '{indexer.Name}' done.");
 
             var cacheKey = "temp_indexing_op_" + indexer.Name;
             _runtimeCache.Clear(cacheKey);

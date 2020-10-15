@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 using Umbraco.Core;
 using Umbraco.Core.Media;
@@ -9,6 +10,8 @@ namespace Umbraco.Infrastructure.Media
 {
     public class ImageSharpImageUrlGenerator : IImageUrlGenerator
     {
+        public IEnumerable<string> SupportedImageFileTypes => new[] { "jpeg", "jpg", "gif", "bmp", "png" };
+
         public string GetImageUrl(ImageUrlGenerationOptions options)
         {
             if (options == null) return null;

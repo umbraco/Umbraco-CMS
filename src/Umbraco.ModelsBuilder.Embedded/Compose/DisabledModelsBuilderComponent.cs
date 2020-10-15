@@ -1,5 +1,4 @@
-﻿using Umbraco.Core;
-using Umbraco.Core.Composing;
+﻿using Umbraco.Core.Composing;
 using Umbraco.ModelsBuilder.Embedded.BackOffice;
 using Umbraco.Web.Features;
 

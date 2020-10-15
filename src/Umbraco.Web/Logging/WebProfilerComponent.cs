@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Web;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 
@@ -10,7 +12,7 @@ namespace Umbraco.Web.Logging
         private readonly WebProfiler _profiler;
         private readonly bool _profile;
 
-        public WebProfilerComponent(IProfiler profiler, ILogger logger)
+        public WebProfilerComponent(IProfiler profiler, ILogger<WebProfilerComponent> logger)
         {
             _profile = true;
 
@@ -21,7 +23,7 @@ namespace Umbraco.Web.Logging
 
             // if VoidProfiler was registered, let it be known
             if (profiler is VoidProfiler)
-                logger.Info<WebProfilerComponent>("Profiler is VoidProfiler, not profiling (must run debug mode to profile).");
+                logger.LogInformation("Profiler is VoidProfiler, not profiling (must run debug mode to profile).");
             _profile = false;
         }
 
@@ -35,15 +37,22 @@ namespace Umbraco.Web.Logging
         }
 
         public void Terminate()
-        { }
+        {
+            UmbracoApplicationBase.ApplicationInit -= InitializeApplication;
+        }
 
         private void InitializeApplication(object sender, EventArgs args)
         {
             if (!(sender is HttpApplication app)) return;
 
-            // for *each* application (this will run more than once)
-            app.BeginRequest += (s, a) => _profiler.UmbracoApplicationBeginRequest(s, a);
-            app.EndRequest += (s, a) => _profiler.UmbracoApplicationEndRequest(s, a);
+            // NOTE: We do not unbind these events ... because you just can't do that for HttpApplication events, they will
+            // be removed when the app dies.
+            app.BeginRequest += BeginRequest;
+            app.EndRequest += EndRequest;
         }
+
+        private void BeginRequest(object s, EventArgs a) => _profiler.UmbracoApplicationBeginRequest(s, a);
+
+        private void EndRequest(object s, EventArgs a) => _profiler.UmbracoApplicationEndRequest(s, a);
     }
 }

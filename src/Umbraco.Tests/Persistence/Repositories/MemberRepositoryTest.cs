@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
-using System.Xml.Linq;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NPoco;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.Logging;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
@@ -30,25 +29,26 @@ namespace Umbraco.Tests.Persistence.Repositories
         private MemberRepository CreateRepository(IScopeProvider provider, out MemberTypeRepository memberTypeRepository, out MemberGroupRepository memberGroupRepository)
         {
             var accessor = (IScopeAccessor) provider;
+            var globalSettings = new GlobalSettings();
             var templateRepository = Mock.Of<ITemplateRepository>();
             var commonRepository = new ContentTypeCommonRepository(accessor, templateRepository, AppCaches, ShortStringHelper);
-            var languageRepository = new LanguageRepository(accessor, AppCaches.Disabled, Logger, TestObjects.GetGlobalSettings());
-            memberTypeRepository = new MemberTypeRepository(accessor, AppCaches.Disabled, Logger, commonRepository, languageRepository, ShortStringHelper);
-            memberGroupRepository = new MemberGroupRepository(accessor, AppCaches.Disabled, Logger);
-            var tagRepo = new TagRepository(accessor, AppCaches.Disabled, Logger);
-            var relationTypeRepository = new RelationTypeRepository(accessor, AppCaches.Disabled, Logger);
+            var languageRepository = new LanguageRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<LanguageRepository>(), Microsoft.Extensions.Options.Options.Create(globalSettings));
+            memberTypeRepository = new MemberTypeRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<MemberTypeRepository>(), commonRepository, languageRepository, ShortStringHelper);
+            memberGroupRepository = new MemberGroupRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<MemberGroupRepository>());
+            var tagRepo = new TagRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<TagRepository>());
+            var relationTypeRepository = new RelationTypeRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<RelationTypeRepository>());
             var entityRepository = new EntityRepository(accessor);
-            var relationRepository = new RelationRepository(accessor, Logger, relationTypeRepository, entityRepository);
+            var relationRepository = new RelationRepository(accessor, LoggerFactory.CreateLogger<RelationRepository>(), relationTypeRepository, entityRepository);
             var propertyEditors = new Lazy<PropertyEditorCollection>(() => new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>())));
             var dataValueReferences = new DataValueReferenceFactoryCollection(Enumerable.Empty<IDataValueReferenceFactory>());
-            var repository = new MemberRepository(accessor, AppCaches.Disabled, Logger, memberTypeRepository, memberGroupRepository, tagRepo, Mock.Of<ILanguageRepository>(), relationRepository, relationTypeRepository,  PasswordHasher, propertyEditors, dataValueReferences, DataTypeService);
+            var repository = new MemberRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<MemberRepository>(), memberTypeRepository, memberGroupRepository, tagRepo, Mock.Of<ILanguageRepository>(), relationRepository, relationTypeRepository,  PasswordHasher, propertyEditors, dataValueReferences, DataTypeService);
             return repository;
         }
 
         [Test]
         public void GetMember()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (var scope = provider.CreateScope())
             {
                 MemberTypeRepository memberTypeRepository;
@@ -67,7 +67,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void GetMembers()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (var scope = provider.CreateScope())
             {
                 MemberTypeRepository memberTypeRepository;
@@ -90,7 +90,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void GetAllMembers()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (var scope = provider.CreateScope())
             {
                 MemberTypeRepository memberTypeRepository;
@@ -116,7 +116,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void QueryMember()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (var scope = provider.CreateScope())
             {
                 MemberTypeRepository memberTypeRepository;
@@ -139,7 +139,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void SaveMember()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (var scope = provider.CreateScope())
             {
                 MemberTypeRepository memberTypeRepository;
@@ -164,7 +164,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void MemberHasBuiltinProperties()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (var scope = provider.CreateScope())
             {
                 MemberTypeRepository memberTypeRepository;
@@ -196,7 +196,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void SavingPreservesPassword()
         {
             IMember sut;
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (var scope = provider.CreateScope())
             {
                 MemberTypeRepository memberTypeRepository;
@@ -226,7 +226,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void SavingUpdatesNameAndEmail()
         {
             IMember sut;
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (var scope = provider.CreateScope())
             {
                 MemberTypeRepository memberTypeRepository;
@@ -256,7 +256,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void QueryMember_WithSubQuery()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
 
             var query = provider.SqlContext.Query<IMember>().Where(x =>
                         ((Member) x).LongStringPropertyValue.Contains("1095") &&
@@ -276,7 +276,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private IMember CreateTestMember(IMemberType memberType = null, string name = null, string email = null, string password = null, string username = null, Guid? key = null)
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (var scope = provider.CreateScope())
             {
                 MemberTypeRepository memberTypeRepository;
@@ -300,7 +300,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private IMemberType CreateTestMemberType(string alias = null)
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (var scope = provider.CreateScope())
             {
                 MemberTypeRepository memberTypeRepository;
@@ -316,7 +316,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private Sql<ISqlContext> GetBaseQuery(bool isCount)
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             if (isCount)
             {
                 var sqlCount = provider.SqlContext.Sql()
@@ -356,7 +356,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private Sql<ISqlContext> GetSubquery()
         {
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             var sql = provider.SqlContext.Sql();
             sql.Select("umbracoNode.id")
                 .From<NodeDto>()

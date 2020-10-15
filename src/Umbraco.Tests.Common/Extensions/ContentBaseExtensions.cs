@@ -1,15 +1,10 @@
 ﻿using System;
-using System.Linq;
-using Umbraco.Core;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
-using Umbraco.Core.Services;
 
 namespace Umbraco.Tests.Testing
 {
     public static class ContentBaseExtensions
     {
-
         /// <summary>
         /// Set property values by alias with an anonymous object.
         /// </summary>

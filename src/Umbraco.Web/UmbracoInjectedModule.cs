@@ -1,18 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Web;
 using System.Web.Routing;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
-using Umbraco.Core.Security;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
+using Umbraco.Core.Security;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Routing;
-using Umbraco.Web.Security;
 
 namespace Umbraco.Web
 {
@@ -39,7 +37,7 @@ namespace Umbraco.Web
         private readonly IUmbracoContextFactory _umbracoContextFactory;
         private readonly RoutableDocumentFilter _routableDocumentLookup;
         private readonly IRequestCache _requestCache;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly UriUtility _uriUtility;
 
@@ -51,7 +49,7 @@ namespace Umbraco.Web
             RoutableDocumentFilter routableDocumentLookup,
             UriUtility uriUtility,
             IRequestCache requestCache,
-            IGlobalSettings globalSettings,
+            GlobalSettings globalSettings,
             IHostingEnvironment hostingEnvironment)
         {
             _runtime = runtime;
@@ -229,7 +227,7 @@ namespace Umbraco.Web
             if (context.Content.HasContent())
                 return true;
 
-            _logger.Warn<UmbracoModule>("Umbraco has no content");
+            _logger.LogWarning("Umbraco has no content");
 
             if (RouteTable.Routes[Constants.Web.NoContentRouteName] is Route route)
             {
@@ -297,7 +295,7 @@ namespace Umbraco.Web
         }
 
 
-        
+
         #endregion
 
         #region IHttpModule

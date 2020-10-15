@@ -1,29 +1,31 @@
+using System.Linq;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.Diagnostics;
 using Umbraco.Core.Hosting;
-using Umbraco.Net;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Runtime;
 using Umbraco.Core.Security;
+using Umbraco.Core.Services;
+using Umbraco.Extensions;
+using Umbraco.Net;
 using Umbraco.Web.Common.AspNetCore;
+using Umbraco.Web.Common.Controllers;
 using Umbraco.Web.Common.Formatters;
+using Umbraco.Web.Common.Install;
 using Umbraco.Web.Common.Lifetime;
 using Umbraco.Web.Common.Macros;
-using Umbraco.Web.Composing.CompositionExtensions;
-using Umbraco.Web.Macros;
-using Umbraco.Core.Diagnostics;
-using Umbraco.Core.Logging;
-using Umbraco.Web.Common.Profiler;
-using Umbraco.Web.Common.Install;
-using Umbraco.Extensions;
-using System.Linq;
-using Umbraco.Core.Configuration;
-using Umbraco.Web.Common.Controllers;
 using Umbraco.Web.Common.Middleware;
 using Umbraco.Web.Common.ModelBinding;
+using Umbraco.Web.Common.Profiler;
 using Umbraco.Web.Common.Routing;
-using Umbraco.Web.Common.Templates;
 using Umbraco.Web.Common.Security;
+using Umbraco.Web.Common.Templates;
+using Umbraco.Web.Composing.CompositionExtensions;
+using Umbraco.Web.Macros;
 using Umbraco.Web.Security;
 using Umbraco.Web.Templates;
 
@@ -37,7 +39,7 @@ namespace Umbraco.Web.Common.Runtime
     [ComposeAfter(typeof(CoreInitialComposer))]
     public class AspNetCoreComposer : ComponentComposer<AspNetCoreComponent>, IComposer
     {
-        public new void Compose(Composition composition)
+        public override void Compose(Composition composition)
         {
             base.Compose(composition);
 
@@ -74,7 +76,8 @@ namespace Umbraco.Web.Common.Runtime
 
             // register the umbraco context factory
             composition.RegisterUnique<IUmbracoContextFactory, UmbracoContextFactory>();
-            composition.RegisterUnique<IWebSecurity, WebSecurity>();
+            composition.RegisterUnique<IBackofficeSecurityFactory, BackofficeSecurityFactory>();
+            composition.RegisterUnique<IBackofficeSecurityAccessor, HybridBackofficeSecurityAccessor>();
 
             //register the install components
             //NOTE: i tried to not have these registered if we weren't installing or upgrading but post install when the site restarts
@@ -96,9 +99,7 @@ namespace Umbraco.Web.Common.Runtime
 
             composition.RegisterUnique<ITemplateRenderer, TemplateRenderer>();
             composition.RegisterUnique<IPublicAccessChecker, PublicAccessChecker>();
-            composition.RegisterUnique<LegacyPasswordSecurity>(factory => new LegacyPasswordSecurity(factory.GetInstance<IUserPasswordConfiguration>()));
-
-
+            composition.RegisterUnique(factory => new LegacyPasswordSecurity());
         }
     }
 }

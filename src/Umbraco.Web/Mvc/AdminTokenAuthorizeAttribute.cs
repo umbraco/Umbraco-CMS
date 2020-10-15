@@ -4,8 +4,8 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Mvc;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 
@@ -19,7 +19,7 @@ namespace Umbraco.Web.Mvc
         // see note in HttpInstallAuthorizeAttribute
         private readonly IUserService _userService;
         private readonly IRuntimeState _runtimeState;
-        private readonly ILogger _logger;
+        private readonly ILogger<object> _logger;
 
         private IUserService UserService => _userService ?? Current.Services.UserService;
 
@@ -119,7 +119,7 @@ namespace Umbraco.Web.Mvc
             }
             catch (Exception ex)
             {
-                Logger.Error<AdminTokenAuthorizeAttribute>(ex, "Failed to format passed in token value");
+                Logger.LogError(ex, "Failed to format passed in token value");
                 return false;
             }
         }

@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Configuration;
+﻿using Microsoft.Extensions.Options;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.ModelsBuilder.Embedded.BackOffice
@@ -10,7 +11,7 @@ namespace Umbraco.ModelsBuilder.Embedded.BackOffice
     // ReSharper disable once UnusedMember.Global - This is typed scanned
     public class MediaTypeModelValidator : ContentTypeModelValidatorBase<MediaTypeSave, PropertyTypeBasic>
     {
-        public MediaTypeModelValidator(IModelsBuilderConfig config) : base(config)
+        public MediaTypeModelValidator(IOptions<ModelsBuilderSettings> config) : base(config)
         {
         }
     }

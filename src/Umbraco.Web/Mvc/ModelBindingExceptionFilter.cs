@@ -3,8 +3,10 @@ using System.Configuration;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Web.Mvc;
+using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration;
 using Umbraco.Core;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Mvc
@@ -23,7 +25,7 @@ namespace Umbraco.Web.Mvc
 
         public void OnException(ExceptionContext filterContext)
         {
-            var settings = Current.Factory.GetInstance<IExceptionFilterSettings>();
+            var settings = Current.Factory.GetInstance<IOptions<ExceptionFilterSettings>>().Value;
             var disabled = settings?.Disabled ?? false;
             if (Current.PublishedModelFactory.IsLiveFactory()
                 && !disabled

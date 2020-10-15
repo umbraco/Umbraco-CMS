@@ -20,7 +20,7 @@ namespace Umbraco.Web.Trees
         // We are allowed to see the dictionary tree, if we are allowed to manage templates, such that se can use the
         // dictionary items in templates, even when we dont have authorization to manage the dictionary items
         )]
-    [PluginController("UmbracoTrees")]
+    [PluginController(Constants.Web.Mvc.BackOfficeTreeArea)]
     [CoreTree]
     [Tree(Constants.Applications.Translation, Constants.Trees.Dictionary, TreeGroup = Constants.Trees.Groups.Settings)]
     public class DictionaryTreeController : TreeController

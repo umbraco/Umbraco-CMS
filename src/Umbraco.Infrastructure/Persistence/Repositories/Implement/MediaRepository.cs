@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Exceptions;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Dtos;
@@ -31,7 +31,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         public MediaRepository(
             IScopeAccessor scopeAccessor,
             AppCaches cache,
-            ILogger logger,
+            ILogger<MediaRepository> logger,
+            ILoggerFactory loggerFactory,
             IMediaTypeRepository mediaTypeRepository,
             ITagRepository tagRepository,
             ILanguageRepository languageRepository,
@@ -46,7 +47,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             _mediaTypeRepository = mediaTypeRepository ?? throw new ArgumentNullException(nameof(mediaTypeRepository));
             _tagRepository = tagRepository ?? throw new ArgumentNullException(nameof(tagRepository));
             _mediaUrlGenerators = mediaUrlGenerators;
-            _mediaByGuidReadRepository = new MediaByGuidReadRepository(this, scopeAccessor, cache, logger);
+            _mediaByGuidReadRepository = new MediaByGuidReadRepository(this, scopeAccessor, cache, loggerFactory.CreateLogger<MediaByGuidReadRepository>());
         }
 
         protected override MediaRepository This => this;
@@ -417,7 +418,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             private readonly MediaRepository _outerRepo;
 
-            public MediaByGuidReadRepository(MediaRepository outerRepo, IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger)
+            public MediaByGuidReadRepository(MediaRepository outerRepo, IScopeAccessor scopeAccessor, AppCaches cache, ILogger<MediaByGuidReadRepository> logger)
                 : base(scopeAccessor, cache, logger)
             {
                 _outerRepo = outerRepo;

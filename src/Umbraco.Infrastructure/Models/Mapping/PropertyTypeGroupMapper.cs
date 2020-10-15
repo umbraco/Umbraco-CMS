@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
@@ -17,9 +17,9 @@ namespace Umbraco.Web.Models.Mapping
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly IDataTypeService _dataTypeService;
         private readonly IShortStringHelper _shortStringHelper;
-        private readonly ILogger _logger;
+        private readonly ILogger<PropertyTypeGroupMapper<TPropertyType>> _logger;
 
-        public PropertyTypeGroupMapper(PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IShortStringHelper shortStringHelper, ILogger logger)
+        public PropertyTypeGroupMapper(PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IShortStringHelper shortStringHelper, ILogger<PropertyTypeGroupMapper<TPropertyType>> logger)
         {
             _propertyEditors = propertyEditors;
             _dataTypeService = dataTypeService;
@@ -210,8 +210,7 @@ namespace Umbraco.Web.Models.Mapping
                 //fixme: Don't explode if we can't find this, log an error and change this to a label
                 if (propertyEditor == null)
                 {
-                    _logger.Error(GetType(),
-                        "No property editor could be resolved with the alias: {PropertyEditorAlias}, defaulting to label", p.PropertyEditorAlias);
+                    _logger.LogError("No property editor could be resolved with the alias: {PropertyEditorAlias}, defaulting to label", p.PropertyEditorAlias);
                     propertyEditorAlias = Constants.PropertyEditors.Aliases.Label;
                     propertyEditor = _propertyEditors[propertyEditorAlias];
                 }

@@ -13,7 +13,28 @@
 function clipboardService(notificationsService, eventsService, localStorageService, iconHelper) {
 
 
-    var clearPropertyResolvers = [];
+    const TYPES = {};
+    TYPES.ELEMENT_TYPE = "elementType";
+    TYPES.RAW = "raw";
+
+    var clearPropertyResolvers = {};
+    var pastePropertyResolvers = {};
+    var clipboardTypeResolvers = {};
+
+    clipboardTypeResolvers[TYPES.ELEMENT_TYPE] = function(data, propMethod) {
+        for (var t = 0; t < data.variants[0].tabs.length; t++) {
+            var tab = data.variants[0].tabs[t];
+            for (var p = 0; p < tab.properties.length; p++) {
+                var prop = tab.properties[p];
+                propMethod(prop, TYPES.ELEMENT_TYPE);
+            }
+        }
+    }
+    clipboardTypeResolvers[TYPES.RAW] = function(data, propMethod) {
+        for (var p = 0; p < data.length; p++) {
+            propMethod(data[p], TYPES.RAW);
+        }
+    }
 
 
     var STORAGE_KEY = "umbClipboardService";
@@ -57,28 +78,29 @@ function clipboardService(notificationsService, eventsService, localStorageServi
     }
 
 
-    function clearPropertyForStorage(prop) {
+    function resolvePropertyForStorage(prop, type) {
 
-        for (var i=0; i<clearPropertyResolvers.length; i++) {
-            clearPropertyResolvers[i](prop, clearPropertyForStorage);
+        type = type || "raw";
+        var resolvers = clearPropertyResolvers[type];
+
+        for (var i=0; i<resolvers.length; i++) {
+            resolvers[i](prop, resolvePropertyForStorage);
         }
 
     }
 
-    var prepareEntryForStorage = function(entryData, firstLevelClearupMethod) {
+    var prepareEntryForStorage = function(type, entryData, firstLevelClearupMethod) {
 
         var cloneData = Utilities.copy(entryData);
         if (firstLevelClearupMethod != undefined) {
             firstLevelClearupMethod(cloneData);
         }
 
-        // remove keys from sub-entries
-        for (var t = 0; t < cloneData.variants[0].tabs.length; t++) {
-            var tab = cloneData.variants[0].tabs[t];
-            for (var p = 0; p < tab.properties.length; p++) {
-                var prop = tab.properties[p];
-                clearPropertyForStorage(prop);
-            }
+        var typeResolver = clipboardTypeResolvers[type];
+        if(typeResolver) {
+            typeResolver(cloneData, resolvePropertyForStorage);
+        } else {
+            console.warn("Umbraco.service.clipboardService has no type resolver for '" + type + "'.");
         }
 
         return cloneData;
@@ -95,7 +117,51 @@ function clipboardService(notificationsService, eventsService, localStorageServi
     }
 
 
+
+
+    function resolvePropertyForPaste(prop, type) {
+
+        type = type || "raw";
+        var resolvers = pastePropertyResolvers[type];
+
+        for (var i=0; i<resolvers.length; i++) {
+            resolvers[i](prop, resolvePropertyForPaste);
+        }
+    }
+
+
+
     var service = {};
+
+    /**
+     * Default types to store in clipboard.
+     */
+    service.TYPES = TYPES;
+
+
+    /**
+    * @ngdoc method
+    * @name umbraco.services.clipboardService#parseContentForPaste
+    * @methodOf umbraco.services.clipboardService
+    *
+    * @param {object} function The content entry to be cloned and resolved.
+    *
+    * @description
+    * Executed registered property resolvers for inner properties, to be done on pasting a clipbaord content entry.
+    *
+    */
+    service.parseContentForPaste = function(pasteEntryData, type) {
+        var cloneData = Utilities.copy(pasteEntryData);
+
+        var typeResolver = clipboardTypeResolvers[type];
+        if(typeResolver) {
+            typeResolver(cloneData, resolvePropertyForPaste);
+        } else {
+            console.warn("Umbraco.service.clipboardService has no type resolver for '" + type + "'.");
+        }
+
+        return cloneData;
+    }
 
 
     /**
@@ -104,14 +170,15 @@ function clipboardService(notificationsService, eventsService, localStorageServi
     * @methodOf umbraco.services.clipboardService
     *
     * @param {string} function A method executed for every property and inner properties copied.
+    * @param {string} string A string representing the property type format for this resolver to execute for.
     *
     * @description
-    * Executed for all properties including inner properties when performing a copy action.
+    * Executed for all properties of given type when performing a copy action.
     *
     * @deprecated Incorrect spelling please use 'registerClearPropertyResolver'
     */
-    service.registrerClearPropertyResolver = function(resolver) {
-        this.registerClearPropertyResolver(resolver);
+    service.registrerClearPropertyResolver = function(resolver, type) {
+        this.registerClearPropertyResolver(resolver, type);
     };
 
     /**
@@ -119,28 +186,56 @@ function clipboardService(notificationsService, eventsService, localStorageServi
     * @name umbraco.services.clipboardService#registerClearPropertyResolver
     * @methodOf umbraco.services.clipboardService
     *
-    * @param {string} function A method executed for every property and inner properties copied.
+    * @param {method} function A method executed for every property and inner properties copied. Notice the method both needs to deal with retriving a property object {alias:..editor:..value:... ,...} and the raw property value as if the property is an inner property of a nested property.
+    * @param {string} string A string representing the property type format for this resolver to execute for.
     *
     * @description
-    * Executed for all properties including inner properties when performing a copy action.
+    * Executed for all properties of given type when performing a copy action.
     */
-    service.registerClearPropertyResolver = function(resolver) {
-        clearPropertyResolvers.push(resolver);
+    service.registerClearPropertyResolver = function(resolver, type) {
+        type = type || "raw";
+        if(!clearPropertyResolvers[type]) {
+            clearPropertyResolvers[type] = [];
+        }
+        clearPropertyResolvers[type].push(resolver);
+    };
+
+    /**
+    * @ngdoc method
+    * @name umbraco.services.clipboardService#registerPastePropertyResolver
+    * @methodOf umbraco.services.clipboardService
+    *
+    * @param {method} function A method executed for every property and inner properties copied. Notice the method both needs to deal with retriving a property object {alias:..editor:..value:... ,...} and the raw property value as if the property is an inner property of a nested property.
+    * @param {string} string A string representing the property type format for this resolver to execute for.
+    *
+    * @description
+    * Executed for all properties of given type when performing a paste action.
+    */
+    service.registerPastePropertyResolver = function(resolver, type) {
+        type = type || "raw";
+        if(!pastePropertyResolvers[type]) {
+            pastePropertyResolvers[type] = [];
+        }
+        pastePropertyResolvers[type].push(resolver);
     };
 
 
     /**
     * @ngdoc method
-    * @name umbraco.services.clipboardService#registrerPropertyClearingResolver
+    * @name umbraco.services.clipboardService#registrerTypeResolvers
     * @methodOf umbraco.services.clipboardService
     *
-    * @param {string} function A method executed for every property and inner properties copied.
+    * @param {method} function A method for to execute resolvers for each properties of the specific type.
+    * @param {string} string A string representing the content type format for this resolver to execute for.
     *
     * @description
-    * Executed for all properties including inner properties when performing a copy action.
+    * Executed for all properties including inner properties when performing a paste action.
     */
-   service.registrerClearPropertyResolver = function(resolver) {
-        clearPropertyResolvers.push(resolver);
+    service.registrerTypeResolvers = function(resolver, type) {
+        if(!clipboardTypeResolvers[type]) {
+            clipboardTypeResolvers[type] = [];
+        }
+        clipboardTypeResolvers[type].push(resolver);
     };
 
 
@@ -174,7 +269,7 @@ function clipboardService(notificationsService, eventsService, localStorageServi
             }
         );
 
-        var entry = {unique:uniqueKey, type:type, alias:alias, data:prepareEntryForStorage(data, firstLevelClearupMethod), label:displayLabel, icon:displayIcon, date:Date.now()};
+        var entry = {unique:uniqueKey, type:type, alias:alias, data:prepareEntryForStorage(type, data, firstLevelClearupMethod), label:displayLabel, icon:displayIcon, date:Date.now()};
         storage.entries.push(entry);
 
         if (saveStorage(storage) === true) {
@@ -204,10 +299,14 @@ function clipboardService(notificationsService, eventsService, localStorageServi
     */
     service.copyArray = function(type, aliases, datas, displayLabel, displayIcon, uniqueKey, firstLevelClearupMethod) {
 
+        if (type === "elementTypeArray") {
+            type = "elementType";
+        }
+
         var storage = retriveStorage();
 
         // Clean up each entry
-        var copiedDatas = datas.map(data => prepareEntryForStorage(data, firstLevelClearupMethod));
+        var copiedDatas = datas.map(data => prepareEntryForStorage(type, data, firstLevelClearupMethod));
 
         // remove previous copies of this entry:
         storage.entries = storage.entries.filter(

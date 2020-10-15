@@ -7,7 +7,5 @@
         /// The physical path where logs are stored
         /// </summary>
         string LogDirectory { get; }
-        string LogConfigurationFile { get; }
-        string UserLogConfigurationFile { get; }
     }
 }

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Models.PublishedContent;
 
@@ -13,17 +15,15 @@ namespace Umbraco.Web.Routing
     /// </summary>
     public class AliasUrlProvider : IUrlProvider
     {
-        private readonly IGlobalSettings _globalSettings;
-        private readonly IRequestHandlerSettings _requestConfig;
+        private readonly RequestHandlerSettings _requestConfig;
         private readonly ISiteDomainHelper _siteDomainHelper;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly UriUtility _uriUtility;
         private readonly IPublishedValueFallback _publishedValueFallback;
 
-        public AliasUrlProvider(IGlobalSettings globalSettings, IRequestHandlerSettings requestConfig, ISiteDomainHelper siteDomainHelper, UriUtility uriUtility, IPublishedValueFallback publishedValueFallback, IUmbracoContextAccessor umbracoContextAccessor)
+        public AliasUrlProvider(IOptions<RequestHandlerSettings> requestConfig, ISiteDomainHelper siteDomainHelper, UriUtility uriUtility, IPublishedValueFallback publishedValueFallback, IUmbracoContextAccessor umbracoContextAccessor)
         {
-            _globalSettings = globalSettings;
-            _requestConfig = requestConfig;
+            _requestConfig = requestConfig.Value;
             _siteDomainHelper = siteDomainHelper;
             _uriUtility = uriUtility;
             _publishedValueFallback = publishedValueFallback;
@@ -100,7 +100,7 @@ namespace Umbraco.Web.Routing
                 {
                     var path = "/" + alias;
                     var uri = new Uri(path, UriKind.Relative);
-                    yield return UrlInfo.Url(_uriUtility.UriFromUmbraco(uri, _globalSettings, _requestConfig).ToString());
+                    yield return UrlInfo.Url(_uriUtility.UriFromUmbraco(uri, _requestConfig).ToString());
                 }
             }
             else
@@ -127,7 +127,7 @@ namespace Umbraco.Web.Routing
                     {
                         var path = "/" + alias;
                         var uri = new Uri(CombinePaths(domainUri.Uri.GetLeftPart(UriPartial.Path), path));
-                        yield return UrlInfo.Url(_uriUtility.UriFromUmbraco(uri, _globalSettings, _requestConfig).ToString(), domainUri.Culture.Name);
+                        yield return UrlInfo.Url(_uriUtility.UriFromUmbraco(uri, _requestConfig).ToString(), domainUri.Culture.Name);
                     }
                 }
             }

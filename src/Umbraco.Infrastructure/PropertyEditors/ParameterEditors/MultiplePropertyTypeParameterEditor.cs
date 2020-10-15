@@ -1,4 +1,4 @@
-﻿using Umbraco.Core.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
@@ -12,12 +12,13 @@ namespace Umbraco.Web.PropertyEditors.ParameterEditors
         "entitypicker")]
     public class MultiplePropertyTypeParameterEditor : DataEditor
     {
-        public MultiplePropertyTypeParameterEditor(ILogger logger,
+        public MultiplePropertyTypeParameterEditor(
+            ILoggerFactory loggerFactory,
             IDataTypeService dataTypeService,
             ILocalizationService localizationService,
             ILocalizedTextService localizedTextService,
             IShortStringHelper shortStringHelper)
-            : base(logger, dataTypeService, localizationService, localizedTextService, shortStringHelper)
+            : base(loggerFactory, dataTypeService, localizationService, localizedTextService, shortStringHelper)
         {
             // configure
             DefaultConfiguration.Add("multiple", "1");

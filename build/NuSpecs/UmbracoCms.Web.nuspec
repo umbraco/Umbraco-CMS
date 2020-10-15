@@ -24,16 +24,16 @@
                   not want this to happen as the alpha of the next major is, really, the next major already.
                 -->
                 <dependency id="Umbraco.Cms.Core" version="[$version$]" />
-                <dependency id="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" version="[3.1.4,3.999999)" />
-                <dependency id="Serilog.AspNetCore" version="[3.2.0,3.999999)" />
-                <dependency id="Microsoft.AspNetCore.Mvc.NewtonsoftJson" version="[3.1.3,3.999999)" />
-                <dependency id="MiniProfiler.AspNetCore.Mvc" version="[4.1.0,4.999999)" />
+                <dependency id="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" version="[3.1.8,3.999999)" />
+                <dependency id="Serilog.AspNetCore" version="[3.4.0,3.999999)" />
+                <dependency id="Microsoft.AspNetCore.Mvc.NewtonsoftJson" version="[3.1.8,3.999999)" />
+                <dependency id="Microsoft.CodeAnalysis.CSharp" version="[3.7.0,3.999999)" />
+                <dependency id="MiniProfiler.AspNetCore.Mvc" version="[4.2.1,4.999999)" />
                 <dependency id="NETStandard.Library" version="[2.0.3,2.999999)" />
-                <dependency id="Serilog.AspNetCore" version="[3.2.0,3.999999)" />
                 <dependency id="Smidge" version="[3.1.1,3.999999)" />
                 <dependency id="Smidge.Nuglify" version="[2.0.0,2.999999)" />
-                <dependency id="SixLabors.ImageSharp.Web" version="[1.0.0-rc0003,1.999999)" />
-                <dependency id="HtmlSanitizer" version="[4.0.217,4.999999)" />
+                <dependency id="SixLabors.ImageSharp.Web" version="[1.0.0,1.999999)" />
+                <dependency id="HtmlSanitizer" version="[5.0.353,5.999999)" />
             </group>
 
         </dependencies>
@@ -43,18 +43,18 @@
         <file src="$BuildTmp$\bin\Umbraco.Web.BackOffice.dll" target="lib\netcoreapp3.1\Umbraco.Web.BackOffice.dll" />
         <file src="$BuildTmp$\bin\Umbraco.Web.Common.dll" target="lib\netcoreapp3.1\Umbraco.Web.Common.dll" />
         <file src="$BuildTmp$\bin\Umbraco.Web.Website.dll" target="lib\netcoreapp3.1\Umbraco.Web.Website.dll" />
-        <!--Umbraco.ModelsBuilder.Embedded-->
+        <file src="$BuildTmp$\bin\Umbraco.ModelsBuilder.Embedded.dll" target="lib\netcoreapp3.1\Umbraco.ModelsBuilder.Embedded.dll" />
 
         <!-- docs -->
         <file src="$BuildTmp$\bin\Umbraco.Web.BackOffice.xml" target="lib\netcoreapp3.1\Umbraco.Web.BackOffice.xml" />
         <file src="$BuildTmp$\bin\Umbraco.Web.Common.xml" target="lib\netcoreapp3.1\Umbraco.Web.Common.xml" />
         <file src="$BuildTmp$\bin\Umbraco.Web.Website.xml" target="lib\netcoreapp3.1\Umbraco.Web.Website.xml" />
-        <!--Umbraco.ModelsBuilder.Embedded-->
+        <file src="$BuildTmp$\bin\Umbraco.ModelsBuilder.Embedded.xml" target="lib\netcoreapp3.1\Umbraco.ModelsBuilder.Embedded.xml" />
 
         <!-- symbols -->
         <file src="$BuildTmp$\bin\Umbraco.Web.BackOffice.pdb" target="lib\netcoreapp3.1\Umbraco.Web.BackOffice.pdb" />
         <file src="$BuildTmp$\bin\Umbraco.Web.Common.pdb" target="lib\netcoreapp3.1\Umbraco.Web.Common.pdb" />
         <file src="$BuildTmp$\bin\Umbraco.Web.Website.pdb" target="lib\netcoreapp3.1\Umbraco.Web.Website.pdb" />
-        <!--Umbraco.ModelsBuilder.Embedded-->
+        <file src="$BuildTmp$\bin\Umbraco.ModelsBuilder.Embedded.pdb" target="lib\netcoreapp3.1\Umbraco.ModelsBuilder.Embedded.pdb" />
     </files>
 </package>

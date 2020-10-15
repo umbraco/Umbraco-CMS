@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Membership;
@@ -26,6 +26,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         private readonly ITemplateRepository _templateRepository;
         private readonly ITagRepository _tagRepository;
         private readonly AppCaches _appCaches;
+        private readonly ILoggerFactory _loggerFactory;
         private PermissionRepository<IContent> _permissionRepository;
         private readonly ContentByGuidReadRepository _contentByGuidReadRepository;
         private readonly IScopeAccessor _scopeAccessor;
@@ -36,6 +37,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// <param name="scopeAccessor"></param>
         /// <param name="appCaches"></param>
         /// <param name="logger"></param>
+        /// <param name="loggerFactory"></param>
         /// <param name="contentTypeRepository"></param>
         /// <param name="templateRepository"></param>
         /// <param name="tagRepository"></param>
@@ -46,7 +48,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         public DocumentRepository(
             IScopeAccessor scopeAccessor,
             AppCaches appCaches,
-            ILogger logger,
+            ILogger<DocumentRepository> logger,
+            ILoggerFactory loggerFactory,
             IContentTypeRepository contentTypeRepository,
             ITemplateRepository templateRepository,
             ITagRepository tagRepository,
@@ -62,8 +65,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             _templateRepository = templateRepository ?? throw new ArgumentNullException(nameof(templateRepository));
             _tagRepository = tagRepository ?? throw new ArgumentNullException(nameof(tagRepository));
             _appCaches = appCaches;
+            _loggerFactory = loggerFactory;
             _scopeAccessor = scopeAccessor;
-            _contentByGuidReadRepository = new ContentByGuidReadRepository(this, scopeAccessor, appCaches, logger);
+            _contentByGuidReadRepository = new ContentByGuidReadRepository(this, scopeAccessor, appCaches, loggerFactory.CreateLogger<ContentByGuidReadRepository>());
         }
 
         protected override DocumentRepository This => this;
@@ -75,7 +79,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         // note: is ok to 'new' the repo here as it's a sub-repo really
         private PermissionRepository<IContent> PermissionRepository => _permissionRepository
-            ?? (_permissionRepository = new PermissionRepository<IContent>(_scopeAccessor, _appCaches, Logger));
+            ?? (_permissionRepository = new PermissionRepository<IContent>(_scopeAccessor, _appCaches, _loggerFactory.CreateLogger<PermissionRepository<IContent>>()));
 
         #region Repository Base
 
@@ -460,6 +464,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             //insert the schedule
             PersistContentSchedule(entity, false);
 
+
             // persist the variations
             if (entity.ContentType.VariesByCulture())
             {
@@ -645,7 +650,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
                     // names also impact 'edited'
                     // ReSharper disable once UseDeconstruction
-                    foreach (var cultureInfo in entity.CultureInfos)
+                     foreach (var cultureInfo in entity.CultureInfos)
                         if (cultureInfo.Name != entity.GetPublishName(cultureInfo.Culture))
                         {
                             edited = true;
@@ -953,7 +958,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             private readonly DocumentRepository _outerRepo;
 
-            public ContentByGuidReadRepository(DocumentRepository outerRepo, IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger)
+            public ContentByGuidReadRepository(DocumentRepository outerRepo, IScopeAccessor scopeAccessor, AppCaches cache, ILogger<ContentByGuidReadRepository> logger)
                 : base(scopeAccessor, cache, logger)
             {
                 _outerRepo = outerRepo;

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Diagnostics;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NPoco;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations;
 using Umbraco.Core.Migrations.Expressions.Common.Expressions;
 using Umbraco.Core.Migrations.Expressions.Create.Index;
@@ -99,7 +99,7 @@ WHERE (([umbracoNode].[nodeObjectType] = @0))) x)".Replace(Environment.NewLine, 
         [Test]
         public void CreateIndexBuilder_SqlServer_NonClustered_CreatesNonClusteredIndex()
         {
-            var logger = Mock.Of<ILogger>();
+            var logger = Mock.Of<ILogger<MigrationContext>>();
             var sqlSyntax = new SqlServerSyntaxProvider();
             var db = new TestDatabase(DatabaseType.SqlServer2005, sqlSyntax);
             var context = new MigrationContext(db, logger);
@@ -120,7 +120,7 @@ WHERE (([umbracoNode].[nodeObjectType] = @0))) x)".Replace(Environment.NewLine, 
         [Test]
         public void CreateIndexBuilder_SqlServer_Unique_CreatesUniqueNonClusteredIndex()
         {
-            var logger = Mock.Of<ILogger>();
+            var logger = Mock.Of<ILogger<MigrationContext>>();
             var sqlSyntax = new SqlServerSyntaxProvider();
             var db = new TestDatabase(DatabaseType.SqlServer2005, sqlSyntax);
             var context = new MigrationContext(db, logger);
@@ -141,7 +141,7 @@ WHERE (([umbracoNode].[nodeObjectType] = @0))) x)".Replace(Environment.NewLine, 
         [Test]
         public void CreateIndexBuilder_SqlServer_Unique_CreatesUniqueNonClusteredIndex_Multi_Columnn()
         {
-            var logger = Mock.Of<ILogger>();
+            var logger = Mock.Of<ILogger<MigrationContext>>();
             var sqlSyntax = new SqlServerSyntaxProvider();
             var db = new TestDatabase(DatabaseType.SqlServer2005, sqlSyntax);
             var context = new MigrationContext(db, logger);
@@ -162,7 +162,7 @@ WHERE (([umbracoNode].[nodeObjectType] = @0))) x)".Replace(Environment.NewLine, 
         [Test]
         public void CreateIndexBuilder_SqlServer_Clustered_CreatesClusteredIndex()
         {
-            var logger = Mock.Of<ILogger>();
+            var logger = Mock.Of<ILogger<MigrationContext>>();
             var sqlSyntax = new SqlServerSyntaxProvider();
             var db = new TestDatabase(DatabaseType.SqlServer2005, sqlSyntax);
             var context = new MigrationContext(db, logger);

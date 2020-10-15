@@ -1,6 +1,6 @@
 using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Routing
@@ -15,10 +15,10 @@ namespace Umbraco.Web.Routing
     public class ContentFinderByRedirectUrl : IContentFinder
     {
         private readonly IRedirectUrlService _redirectUrlService;
-        private readonly ILogger _logger;
+        private readonly ILogger<ContentFinderByRedirectUrl> _logger;
         private readonly IPublishedUrlProvider _publishedUrlProvider;
 
-        public ContentFinderByRedirectUrl(IRedirectUrlService redirectUrlService, ILogger logger, IPublishedUrlProvider publishedUrlProvider)
+        public ContentFinderByRedirectUrl(IRedirectUrlService redirectUrlService, ILogger<ContentFinderByRedirectUrl> logger, IPublishedUrlProvider publishedUrlProvider)
         {
             _redirectUrlService = redirectUrlService;
             _logger = logger;
@@ -41,7 +41,7 @@ namespace Umbraco.Web.Routing
 
             if (redirectUrl == null)
             {
-                _logger.Debug<ContentFinderByRedirectUrl>("No match for route: {Route}", route);
+                _logger.LogDebug("No match for route: {Route}", route);
                 return false;
             }
 
@@ -49,14 +49,14 @@ namespace Umbraco.Web.Routing
             var url = content == null ? "#" : content.Url(_publishedUrlProvider, redirectUrl.Culture);
             if (url.StartsWith("#"))
             {
-                _logger.Debug<ContentFinderByRedirectUrl>("Route {Route} matches content {ContentId} which has no url.", route, redirectUrl.ContentId);
+                _logger.LogDebug("Route {Route} matches content {ContentId} which has no url.", route, redirectUrl.ContentId);
                 return false;
             }
 
             // Appending any querystring from the incoming request to the redirect url.
             url = string.IsNullOrEmpty(frequest.Uri.Query) ? url : url + frequest.Uri.Query;
 
-            _logger.Debug<ContentFinderByRedirectUrl>("Route {Route} matches content {ContentId} with url '{Url}', redirecting.", route, content.Id, url);
+            _logger.LogDebug("Route {Route} matches content {ContentId} with url '{Url}', redirecting.", route, content.Id, url);
             frequest.SetRedirectPermanent(url);
 
 
