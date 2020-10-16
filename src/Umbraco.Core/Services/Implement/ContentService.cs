@@ -2356,7 +2356,7 @@ namespace Umbraco.Core.Services.Implement
             if (raiseEvents)
             {
                 //raise cancelable sorting event
-                if (scope.Events.DispatchCancelable(Saving, this, saveEventArgs, nameof(Sorting)))
+                if (scope.Events.DispatchCancelable(Sorting, this, saveEventArgs, nameof(Sorting)))
                     return OperationResult.Cancel(evtMsgs);
 
                 //raise saving event (this one cannot be canceled)
