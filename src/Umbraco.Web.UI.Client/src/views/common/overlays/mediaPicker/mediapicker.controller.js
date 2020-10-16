@@ -17,6 +17,7 @@ angular.module("umbraco")
             $scope.cropSize = dialogOptions.cropSize;
             $scope.lastOpenedNode = localStorageService.get("umbLastOpenedMediaNodeId");
             $scope.lockedFolder = true;
+            $scope.showChilds = false;
 
             var userStartNodes = [];
 
@@ -66,6 +67,12 @@ angular.module("umbraco")
             function onInit() {
                 userService.getCurrentUser().then(function (userData) {
                     userStartNodes = userData.startMediaIds;
+
+                    if (userStartNodes && userStartNodes.length > 1) {
+                        // if there is more than one start node, this needs to be true, so all folders are shown in media picker
+                        // otherwise the media grid will filter them out
+                        $scope.showChilds = true;
+                    }
 
                     if ($scope.startNodeId !== -1) {
                         entityResource.getById($scope.startNodeId, "media")
