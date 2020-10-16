@@ -12,6 +12,9 @@ namespace Umbraco.Core.PropertyEditors
 
         public class Crop
         {
+            [JsonProperty("name")]
+            public string Name { get; set; }
+
             [JsonProperty("alias")]
             public string Alias { get; set; }
 

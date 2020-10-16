@@ -3,51 +3,57 @@
     <div class="control-group umb-cropsizes__add">
 
         <div class="umb-cropsizes__input-wrap">
+            <label for="addcropname"><localize key="general_name">Name</localize></label>
+            <input id="addcropname"
+                   name="newItem.name"
+                   type="text"
+                   ng-model="newItem.name"
+                   class="umb-cropsizes__input"
+                   val-highlight="{{hasError}}"
+                   localize="placeholder"
+                   placeholder="@general_name"
+                   focus-when="{{setFocus}}"
+                   ng-change="change()" />
+        </div>
+
+        <div class="umb-cropsizes__input-wrap">
             <label for="addcropalias"><localize key="general_alias">Alias</localize></label>
-            <input
-                id="addcropalias"
-                name="newItem.alias"
-                type="text"
-                ng-model="newItem.alias"
-                class="umb-cropsizes__input"
-                val-highlight="{{hasError}}"
-                localize="placeholder"
-                placeholder="@general_alias"
-                focus-when="{{setFocus}}"
-                ng-change="change()"
-            />
+            <input id="addcropalias"
+                   name="newItem.alias"
+                   type="text"
+                   ng-model="newItem.alias"
+                   class="umb-cropsizes__input"
+                   val-highlight="{{hasError}}"
+                   localize="placeholder"
+                   placeholder="@general_alias" />
         </div>
 
         <div class="umb-cropsizes__input-wrap umb-cropsizes__input-wrap--narrow">
             <label for="addcropwidth"><localize key="general_width">Width</localize></label>
-            <input
-                name="newItem.width"
-                type="number"
-                localize="placeholder"
-                placeholder="@general_width"
-                ng-model="newItem.width"
-                class="umb-cropsizes__input"
-                val-highlight="{{hasError}}"
-                id="addcropwidth"
-                min="0"
-                pattern="[0-9]*"
-            />
+            <input name="newItem.width"
+                   type="number"
+                   localize="placeholder"
+                   placeholder="@general_width"
+                   ng-model="newItem.width"
+                   class="umb-cropsizes__input"
+                   val-highlight="{{hasError}}"
+                   id="addcropwidth"
+                   min="0"
+                   pattern="[0-9]*" />
         </div>
 
         <div class="umb-cropsizes__input-wrap umb-cropsizes__input-wrap--narrow">
             <label for="addcropheight"><localize key="general_height">Height</localize></label>
-            <input
-                name="newItem.height"
-                type="number"
-                localize="placeholder"
-                placeholder="@general_height"
-                ng-model="newItem.height"
-                class="umb-cropsizes__input"
-                val-highlight="{{hasError}}"
-                id="addcropheight"
-                min="0"
-                pattern="[0-9]*"
-            />
+            <input name="newItem.height"
+                   type="number"
+                   localize="placeholder"
+                   placeholder="@general_height"
+                   ng-model="newItem.height"
+                   class="umb-cropsizes__input"
+                   val-highlight="{{hasError}}"
+                   id="addcropheight"
+                   min="0"
+                   pattern="[0-9]*" />
         </div>
 
         <div class="umb-cropsizes__controls">
@@ -62,7 +68,7 @@
         <div class="control-group umb-prevalues-multivalues__listitem" ng-repeat="item in model.value">
             <i class="icon icon-navigation handle"></i>
             <div class="umb-prevalues-multivalues__left">
-                <p><span>{{item.alias}}</span> <small>({{item.width}}px &times; {{item.height}}px)</small></p>
+                <p><span>Name: {{item.name}}</span> <span>Alias: {{item.alias}}</span> <small>({{item.width}}px &times; {{item.height}}px)</small></p>
             </div>
             <div class="umb-prevalues-multivalues__right">
                 <button type="button" class="umb-node-preview__action" ng-click="edit(item, $event)"><localize key="general_edit">Edit</localize></button>
