@@ -92,7 +92,7 @@ namespace Umbraco.Tests.Integration.Testing
         [SetUp]
         public virtual void Setup()
         {
-            TestContext.Progress.Write($"Start test {_testCount++}: ");
+            TestContext.Progress.Write($"Start test {_testCount++}: {TestContext.CurrentContext.Test.Name}");
             _stopWatch = new Stopwatch();
             _stopWatch.Start();
             var hostBuilder = CreateHostBuilder();
