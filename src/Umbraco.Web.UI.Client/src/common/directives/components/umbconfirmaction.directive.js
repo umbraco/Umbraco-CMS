@@ -5,6 +5,7 @@
 @scope
 
 @description
+<p><b>OBSOLETE!!! - Please use <umb-confirm-remove> instead :-)</b></p>
 <p>Use this directive to toggle a confirmation prompt for an action.
 The prompt consists of a checkmark and a cross to confirm or cancel the action.
 The prompt can be opened in four direction up, down, left or right.</p>
