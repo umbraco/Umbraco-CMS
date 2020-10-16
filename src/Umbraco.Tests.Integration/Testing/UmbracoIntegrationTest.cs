@@ -85,25 +85,22 @@ namespace Umbraco.Tests.Integration.Testing
             FirstTestInFixture = false;
             FirstTestInSession = false;
 
-            _stopWatch.Stop();
-            TestContext.Progress.WriteLine($"  Total: {_stopWatch.Elapsed}, Step1: {_stopWatchStep1}, Step1: {_stopWatchStep2}");
+            TestContext.Progress.Write($"  {TestContext.CurrentContext.Result.Outcome.Status}");
         }
 
         [SetUp]
         public virtual void Setup()
         {
             TestContext.Progress.Write($"Start test {_testCount++}: {TestContext.CurrentContext.Test.Name}");
-            _stopWatch = new Stopwatch();
-            _stopWatch.Start();
+
             var hostBuilder = CreateHostBuilder();
 
             var host = hostBuilder.Start();
-            _stopWatchStep1 = _stopWatch.Elapsed;
+
             Services = host.Services;
             var app = new ApplicationBuilder(host.Services);
 
-            Configure(app); //Takes around 200 ms
-            _stopWatchStep2 = _stopWatch.Elapsed;
+            Configure(app);
 
             OnFixtureTearDown(() => host.Dispose());
         }
@@ -500,9 +497,6 @@ namespace Umbraco.Tests.Integration.Testing
         protected static bool FirstTestInSession = true;
 
         protected bool FirstTestInFixture = true;
-        private Stopwatch _stopWatch;
         private static int _testCount = 1;
-        private TimeSpan _stopWatchStep1;
-        private TimeSpan _stopWatchStep2;
     }
 }
