@@ -268,8 +268,8 @@
                                     <!-- delete property -->
                                     <div ng-if="!property.locked" class="umb-group-builder__property-action">
                                         <umb-confirm-remove
-                                            ng-if="property.deletePrompt"
                                             show="property.deletePrompt"
+                                            css-class="flex justify-center"
                                             direction="left"
                                             on-delete="togglePrompt(property)"
                                             on-confirm="deleteProperty(tab, $index)"
