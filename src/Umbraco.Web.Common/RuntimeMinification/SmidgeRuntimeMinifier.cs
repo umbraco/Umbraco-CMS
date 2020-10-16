@@ -21,31 +21,39 @@ namespace Umbraco.Web.Common.RuntimeMinification
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ISmidgeConfig _smidgeConfig;
         private readonly IConfigManipulator _configManipulator;
-        private readonly PreProcessPipelineFactory _preProcessPipelineFactory;
         private readonly IBundleManager _bundles;
         private readonly SmidgeHelperAccessor _smidge;
 
-        private PreProcessPipeline _jsPipeline;
-        private PreProcessPipeline _cssPipeline;
+        // used only for minifying in MinifyAsync not for an actual pipeline
+        private Lazy<PreProcessPipeline> _jsMinPipeline;
+        private Lazy<PreProcessPipeline> _cssMinPipeline;
+
+        // default pipelines for processing js/css files for the back office
+        private Lazy<PreProcessPipeline> _jsPipeline;
+        private Lazy<PreProcessPipeline> _cssPipeline;
 
         public SmidgeRuntimeMinifier(
             IBundleManager bundles,
             SmidgeHelperAccessor smidge,
-            PreProcessPipelineFactory preProcessPipelineFactory,
             IHostingEnvironment hostingEnvironment,
             ISmidgeConfig smidgeConfig,
             IConfigManipulator configManipulator)
         {
             _bundles = bundles;
             _smidge = smidge;
-            _preProcessPipelineFactory = preProcessPipelineFactory;
             _hostingEnvironment = hostingEnvironment;
             _smidgeConfig = smidgeConfig;
             _configManipulator = configManipulator;
-        }
 
-        private PreProcessPipeline JsPipeline => _jsPipeline ??= _preProcessPipelineFactory.Create(typeof(JsMinifier));
-        private PreProcessPipeline CssPipeline => _cssPipeline ??= _preProcessPipelineFactory.Create(typeof(NuglifyCss));
+            _jsMinPipeline = new Lazy<PreProcessPipeline>(() => _bundles.PipelineFactory.Create(typeof(JsMinifier)));
+            _cssMinPipeline = new Lazy<PreProcessPipeline>(() => _bundles.PipelineFactory.Create(typeof(NuglifyCss)));
+
+            // replace the default JsMinifier with NuglifyJs and CssMinifier with NuglifyCss in the default pipelines
+            // for use with our bundles only (not modifying global options)
+            _jsPipeline = new Lazy<PreProcessPipeline>(() => bundles.PipelineFactory.DefaultJs().Replace<JsMinifier, SmidgeNuglifyJs>(_bundles.PipelineFactory));
+            _cssPipeline = new Lazy<PreProcessPipeline>(() => bundles.PipelineFactory.DefaultCss().Replace<CssMinifier, NuglifyCss>(_bundles.PipelineFactory));
+
+        }
 
         public string CacheBuster => _smidgeConfig.Version;
 
@@ -58,11 +66,10 @@ namespace Umbraco.Web.Common.RuntimeMinification
             if (_bundles.Exists(bundleName))
                 throw new InvalidOperationException($"The bundle name {bundleName} already exists");
 
-            var bundle = _bundles.Create(bundleName, WebFileType.Css, filePaths);
-
             // Here we could configure bundle options instead of using smidge's global defaults.
             // For example we can use our own custom cache buster for this bundle without having the global one
             // affect this or vice versa.
+            var bundle = _bundles.Create(bundleName, _cssPipeline.Value, WebFileType.Css, filePaths);
         }
 
         public async Task<string> RenderCssHereAsync(string bundleName) => (await _smidge.SmidgeHelper.CssHereAsync(bundleName, _hostingEnvironment.IsDebugMode)).ToString();
@@ -75,11 +82,10 @@ namespace Umbraco.Web.Common.RuntimeMinification
             if (_bundles.Exists(bundleName))
                 throw new InvalidOperationException($"The bundle name {bundleName} already exists");
 
-            var bundle = _bundles.Create(bundleName, WebFileType.Js, filePaths);
-
             // Here we could configure bundle options instead of using smidge's global defaults.
             // For example we can use our own custom cache buster for this bundle without having the global one
             // affect this or vice versa.
+            var bundle = _bundles.Create(bundleName, _jsPipeline.Value, WebFileType.Js, filePaths);
         }
 
         public async Task<string> RenderJsHereAsync(string bundleName) => (await _smidge.SmidgeHelper.JsHereAsync(bundleName, _hostingEnvironment.IsDebugMode)).ToString();
@@ -92,11 +98,11 @@ namespace Umbraco.Web.Common.RuntimeMinification
             switch (assetType)
             {
                 case AssetType.Javascript:
-                    return await JsPipeline
+                    return await _jsMinPipeline.Value
                         .ProcessAsync(
                             new FileProcessContext(fileContent, new JavaScriptFile(), BundleContext.CreateEmpty()));
                 case AssetType.Css:
-                    return await CssPipeline
+                    return await _cssMinPipeline.Value
                         .ProcessAsync(new FileProcessContext(fileContent, new CssFile(), BundleContext.CreateEmpty()));
                 default:
                     throw new NotSupportedException("Unexpected AssetType");

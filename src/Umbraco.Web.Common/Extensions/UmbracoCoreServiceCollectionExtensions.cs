@@ -295,13 +295,6 @@ namespace Umbraco.Extensions
 
             factory = coreRuntime.Configure(container);
 
-
-            services.Configure<HostingSettings>(hostingSettings =>
-            {
-                hostingSettings.Debug = false;
-            });
-
-
             return services;
         }
 
