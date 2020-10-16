@@ -10,15 +10,13 @@ The prompt can be opened in four direction up, down, left or right.</p>
 <h3>Markup example</h3>
 <pre>
     <div ng-controller="My.Controller as vm">
-        <div class="my-action" style="position:relative;">
-            <umb-confirm-action
-                show="vm.promptIsVisible"
-                direction="left"
-                on-delete="vm.showPrompt()"
-                on-confirm="vm.ConfirmRemove()"
-                on-cancel="vm.hidePrompt()">
-            </umb-confirm-action>
-        </div>
+        <umb-confirm-remove
+            show="vm.promptIsVisible"
+            direction="left"
+            on-delete="vm.showPrompt()"
+            on-confirm="vm.ConfirmRemove()"
+            on-cancel="vm.hidePrompt()">
+        </umb-confirm-remove>
     </div>
 </pre>
 <h3>Controller example</h3>
