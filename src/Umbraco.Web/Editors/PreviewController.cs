@@ -26,7 +26,6 @@ namespace Umbraco.Web.Editors
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly ILocalizationService _localizationService;
         private readonly IIconService _iconService;
-        private readonly IDomainService _domainService;
 
         [Obsolete("Use the constructor that injects IIconService.")]
         public PreviewController(
@@ -40,8 +39,7 @@ namespace Umbraco.Web.Editors
                 publishedSnapshotService,
                 umbracoContextAccessor,
                 localizationService,
-                Current.IconService,
-                Current.Services.DomainService)
+                Current.IconService)
         {
 
         }
@@ -52,8 +50,7 @@ namespace Umbraco.Web.Editors
             IPublishedSnapshotService publishedSnapshotService,
             IUmbracoContextAccessor umbracoContextAccessor,
             ILocalizationService localizationService,
-            IIconService iconService,
-            IDomainService domainService)
+            IIconService iconService)
         {
             _features = features;
             _globalSettings = globalSettings;
@@ -61,7 +58,6 @@ namespace Umbraco.Web.Editors
             _umbracoContextAccessor = umbracoContextAccessor;
             _localizationService = localizationService;
             _iconService = iconService;
-            _domainService = domainService;
         }
 
         [UmbracoAuthorize(redirectToUmbracoLogin: true)]
