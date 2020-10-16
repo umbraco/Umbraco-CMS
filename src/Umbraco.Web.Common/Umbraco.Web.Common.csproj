@@ -26,8 +26,8 @@
       <PackageReference Include="NETStandard.Library" Version="2.0.3" />
       <PackageReference Include="Serilog.AspNetCore" Version="3.4.0" />
       <PackageReference Include="SixLabors.ImageSharp.Web" Version="1.0.0" />
-      <PackageReference Include="Smidge" Version="3.2.0-build.239" />
-      <PackageReference Include="Smidge.Nuglify" Version="3.2.0-build.239" />
+      <PackageReference Include="Smidge" Version="3.2.0-build.244" />
+      <PackageReference Include="Smidge.Nuglify" Version="3.2.0-build.244" />
     </ItemGroup>
 
     <ItemGroup>

@@ -20,6 +20,7 @@ namespace Umbraco.Web.Common.RuntimeMinification
             // angular injection to handle minification correctly which requires declaring string named versions of all
             // dependencies injected (which is a pain). So we just turn this option off.
             nuglifyCodeSettings.LocalRenaming = NUglify.JavaScript.LocalRenaming.KeepAll;
+            nuglifyCodeSettings.PreserveFunctionNames = true;
 
             return new NuglifySettings(new NuglifyCodeSettings(nuglifyCodeSettings), defaultSettings.CssCodeSettings);
         }
