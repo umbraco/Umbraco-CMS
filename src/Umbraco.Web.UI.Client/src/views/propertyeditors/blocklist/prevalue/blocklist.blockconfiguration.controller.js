@@ -144,6 +144,7 @@
             const editor = {
                 create: true,
                 infiniteMode: true,
+                noTemplate: true,
                 isElement: true,
                 submit: function (model) {
                     loadElementTypes().then( function () {
