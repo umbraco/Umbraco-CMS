@@ -1,0 +1,29 @@
+<div class="umb_confirm-remove">
+    <button ng-if="onDelete" type="button" class="btn-reset" ng-click="clickButton($event)">
+        <i class="icon-trash" aria-hidden="true"></i>
+        <span class="sr-only">Delete</span>
+    </button>
+
+    <div class="umb_confirm-remove__overlay" ng-class="{
+        '-top': direction === 'top',
+        '-right': direction === 'right',
+        '-bottom': direction === 'bottom',
+        '-left': direction === 'left'}" on-outside-click="clickCancel()" ng-if="show">
+
+        <button type="button" class="umb_confirm-remove__overlay-action -confirm btn-reset" ng-click="clickConfirm()"
+            localize="title" title="@buttons_confirmActionConfirm">
+            <i class="icon-check" aria-hidden="true"></i>
+            <span class="sr-only">
+                <localize key="buttons_confirmActionConfirm">Confirm</localize>
+            </span>
+        </button>
+
+        <button type="button" class="umb_confirm-remove__overlay-action -cancel btn-reset" ng-click="clickCancel()"
+            localize="title" title="@buttons_confirmActionCancel">
+            <i class="icon-delete" aria-hidden="true"></i>
+            <span class="sr-only">
+                <localize key="buttons_confirmActionCancel">Cancel</localize>
+            </span>
+        </button>
+    </div>
+</div>

@@ -101,13 +101,14 @@
                     </ng-form>
 
                     <div class="umb-group-builder__group-remove" ng-if="!sortingMode && canRemoveGroup(tab)">
-                        <i class="icon-trash" ng-click="togglePrompt(tab)"></i>
-                        <umb-confirm-action
+                        <umb-confirm-remove
                             ng-if="tab.deletePrompt"
+                            show="tab.deletePrompt"
                             direction="left"
+                            on-delete="togglePrompt(tab)"
                             on-confirm="removeGroup($index)"
                             on-cancel="hidePrompt(tab)">
-                        </umb-confirm-action>
+                        </umb-confirm-remove>
                     </div>
 
                 </div>
@@ -266,15 +267,14 @@
 
                                     <!-- delete property -->
                                     <div ng-if="!property.locked" class="umb-group-builder__property-action">
-                                        <button aria-label="Delete property" class="btn-icon" ng-click="togglePrompt(property)">
-                                            <umb-icon icon="icon-trash" class="icon-trash"></umb-icon>
-                                        </button>
-                                        <umb-confirm-action
+                                        <umb-confirm-remove
                                             ng-if="property.deletePrompt"
+                                            show="property.deletePrompt"
                                             direction="left"
+                                            on-delete="togglePrompt(property)"
                                             on-confirm="deleteProperty(tab, $index)"
                                             on-cancel="hidePrompt(property)">
-                                        </umb-confirm-action>
+                                        </umb-confirm-remove>
                                     </div>
 
                                 </div>

@@ -10,18 +10,16 @@
 
           <div class="icon-wrapper">
               <i class="icon icon-navigation handle" aria-hidden="true" localize="title" title="@general_move"></i>
-  
+
               <div class="umb-multiple-textbox__confirm" ng-show="model.value.length > model.config.min">
-                  <button type="button" class="umb-multiple-textbox__confirm-action" ng-click="showPrompt($index, item)" localize="title" title="@content_removeTextBox">
-                      <i class="icon-trash" aria-hidden="true"></i>
-                  </button>
-  
-                  <umb-confirm-action
-                      ng-if="promptIsVisible === $index"
-                      direction="left"
-                      on-confirm="remove($index)"
-                      on-cancel="hidePrompt()">
-                  </umb-confirm-action>
+                    <umb-confirm-remove
+                        ng-if="promptIsVisible === $index"
+                        show="promptIsVisible === $index"
+                        direction="left"
+                        on-delete="showPrompt($index, item)"
+                        on-confirm="remove($index)"
+                        on-cancel="hidePrompt()">
+                    </umb-confirm-remove>
               </div>
           </div>
       </div>
