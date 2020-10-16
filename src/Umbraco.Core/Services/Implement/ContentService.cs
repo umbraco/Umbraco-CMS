@@ -2647,7 +2647,7 @@ namespace Umbraco.Core.Services.Implement
             var variesByCulture = content.ContentType.VariesByCulture();
 
             var impactsToPublish = culturesPublishing == null
-                ? CultureImpact.InvariantArray  //if it's null it's invariant
+                ? new[] { CultureImpact.Invariant } //if it's null it's invariant
                 : culturesPublishing.Select(x => CultureImpact.Explicit(x, allLangs.Any(lang => lang.IsoCode.InvariantEquals(x) && lang.IsMandatory))).ToArray();
 
             // publish the culture(s)

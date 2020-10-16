@@ -19,7 +19,7 @@ namespace Umbraco.Core.PropertyEditors.Validators
 
             var result = value.TryConvertTo<decimal>();
             if (result.Success == false)
-                yield return new ValidationResult("The value " + value + " is not a valid decimal", Constants.StringArrays.ValueLower);
+                yield return new ValidationResult("The value " + value + " is not a valid decimal", new[] { "value" });
         }
     }
 }

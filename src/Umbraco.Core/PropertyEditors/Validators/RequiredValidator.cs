@@ -35,7 +35,7 @@ namespace Umbraco.Core.PropertyEditors.Validators
         {
             if (value == null)
             {
-                yield return new ValidationResult(_textService.Localize("validation", "invalidNull"), Constants.StringArrays.ValueLower);
+                yield return new ValidationResult(_textService.Localize("validation", "invalidNull"), new[] { "value" });
                 yield break;
             }
 
@@ -43,7 +43,7 @@ namespace Umbraco.Core.PropertyEditors.Validators
             {
                 if (value.ToString().DetectIsEmptyJson())
                 {
-                    yield return new ValidationResult(_textService.Localize("validation", "invalidEmpty"), Constants.StringArrays.ValueLower);
+                    yield return new ValidationResult(_textService.Localize("validation", "invalidEmpty"), new[] { "value" });
                 }
 
                 yield break;
@@ -51,7 +51,7 @@ namespace Umbraco.Core.PropertyEditors.Validators
 
             if (value.ToString().IsNullOrWhiteSpace())
             {
-                yield return new ValidationResult(_textService.Localize("validation", "invalidEmpty"), Constants.StringArrays.ValueLower);
+                yield return new ValidationResult(_textService.Localize("validation", "invalidEmpty"), new[] { "value" });
             }
         }
     }

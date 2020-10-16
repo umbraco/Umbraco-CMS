@@ -195,7 +195,7 @@ namespace Umbraco.Core.Composing
             if (excludeFromResults == null)
                 excludeFromResults = new HashSet<Assembly>();
             if (exclusionFilter == null)
-                exclusionFilter = Array.Empty<string>();
+                exclusionFilter = new string[] { };
 
             return GetAllAssemblies()
                 .Where(x => excludeFromResults.Contains(x) == false

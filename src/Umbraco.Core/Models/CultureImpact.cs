@@ -64,12 +64,6 @@ namespace Umbraco.Core.Models
         /// </summary>
         public static CultureImpact Invariant { get; } = new CultureImpact(null);
 
-
-        /// <summary>
-        /// Gets the impact of the invariant culture as an array.
-        /// </summary>
-        public static CultureImpact[] InvariantArray { get; } = new[] { new CultureImpact(null) };
-
         /// <summary>
         /// Creates an impact instance representing the impact of a specific culture.
         /// </summary>

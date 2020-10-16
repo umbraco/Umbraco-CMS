@@ -175,7 +175,7 @@ namespace Umbraco.Core.Xml.XPath
         {
             public MacroRoot(IEnumerable<MacroParameter> parameters)
             {
-                Parameters = parameters == null ? Array.Empty<MacroParameter>() : parameters.ToArray();
+                Parameters = parameters == null ? new MacroParameter[] {} : parameters.ToArray();
             }
 
             public MacroParameter[] Parameters { get; private set; }

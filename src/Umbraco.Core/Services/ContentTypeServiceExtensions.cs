@@ -131,7 +131,7 @@ namespace Umbraco.Core.Services
 
         private static IContentTypeComposition[] GetAncestors(IContentTypeComposition ctype, IContentTypeComposition[] allContentTypes)
         {
-            if (ctype == null) return Array.Empty<IContentTypeComposition>();
+            if (ctype == null) return new IContentTypeComposition[] {};
             var ancestors = new List<IContentTypeComposition>();
             var parentId = ctype.ParentId;
             while (parentId > 0)

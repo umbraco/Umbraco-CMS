@@ -136,7 +136,6 @@ namespace Umbraco.Core
             return false;
         }
 
-        private static string[] toInclude = new[] { ".aspx", ".ashx", ".asmx", ".axd", ".svc" };
         /// <summary>
         /// This is a performance tweak to check if this not an ASP.Net server file
         /// .Net will pass these requests through to the module when in integrated mode.
@@ -150,6 +149,7 @@ namespace Umbraco.Core
             {
                 var ext = Path.GetExtension(url.LocalPath);
                 if (ext.IsNullOrWhiteSpace()) return false;
+                var toInclude = new[] {".aspx", ".ashx", ".asmx", ".axd", ".svc"};
                 return toInclude.Any(ext.InvariantEquals) == false;
             }
             catch (ArgumentException)

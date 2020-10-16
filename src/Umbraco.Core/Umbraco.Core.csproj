@@ -130,7 +130,6 @@
     <Compile Include="AssemblyExtensions.cs" />
     <Compile Include="Constants-CharArrays.cs" />
     <Compile Include="Constants-SqlTemplates.cs" />
-    <Compile Include="Constants-StringArrays.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\Models\ContentTypeDto80.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\Models\PropertyDataDto80.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\Models\PropertyTypeDto80.cs" />

@@ -184,7 +184,8 @@ namespace Umbraco.Core.Logging.Serilog
                     messageTemplate += "\r\nFailed to create a minidump";
 
                     //Log a new entry (as opposed to appending to same log entry)
-                    logger.Write(level, ex, "Failed to create a minidump ({ExType}: {ExMessage})", ex.GetType().FullName, ex.Message);
+                    logger.Write(level, ex, "Failed to create a minidump ({ExType}: {ExMessage})",
+                        new object[]{ ex.GetType().FullName, ex.Message });
                 }
             }
         }
