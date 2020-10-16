@@ -20,14 +20,13 @@ using Umbraco.Tests.Testing;
 using Umbraco.Web;
 using Umbraco.Web.Common.Builder;
 using Umbraco.Web.Common.Controllers;
-using Umbraco.Web.Editors;
 using Microsoft.Extensions.Hosting;
 using Umbraco.Web.BackOffice.Controllers;
 
 namespace Umbraco.Tests.Integration.TestServerTest
 {
     [TestFixture]
-    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Console, Boot = false)]
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Console, Boot = true)]
     public abstract class UmbracoTestServerTestBase : UmbracoIntegrationTest
     {
         [SetUp]
