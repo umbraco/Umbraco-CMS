@@ -792,14 +792,10 @@ namespace Umbraco.Web.Security
             ChangingPasswordModel passwordModel,
             MembershipProvider membershipProvider)
         {
-            var umbracoBaseProvider = membershipProvider as MembershipProviderBase;
-
             // YES! It is completely insane how many options you have to take into account based on the membership provider. yikes!
 
             if (passwordModel == null) throw new ArgumentNullException(nameof(passwordModel));
             if (membershipProvider == null) throw new ArgumentNullException(nameof(membershipProvider));
-            var userId = -1;
-
 
             //we're not resetting it so we need to try to change it.
 

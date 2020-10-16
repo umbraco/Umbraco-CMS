@@ -1,14 +1,8 @@
 ﻿using Microsoft.Extensions.Options;
-using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Strings;
-using Umbraco.Tests.Common.Builders;
-using Umbraco.Tests.TestHelpers;
-using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Strings
 {

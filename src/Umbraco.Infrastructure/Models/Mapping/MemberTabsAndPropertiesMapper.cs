@@ -10,11 +10,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Core.Dictionary;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Security;
-using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Models.Mapping
 {

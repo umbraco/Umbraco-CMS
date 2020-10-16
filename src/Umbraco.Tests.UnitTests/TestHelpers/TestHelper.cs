@@ -42,7 +42,6 @@ namespace Umbraco.Tests.TestHelpers
     public static class TestHelper
     {
         private static readonly TestHelperInternal _testHelperInternal = new TestHelperInternal();
-        private static IEmailSender _emailSender;
 
         private class TestHelperInternal : TestHelperBase
         {
