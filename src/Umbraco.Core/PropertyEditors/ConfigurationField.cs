@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.Serialization;
 
 namespace Umbraco.Core.PropertyEditors
@@ -12,8 +11,6 @@ namespace Umbraco.Core.PropertyEditors
     [DataContract]
     public class ConfigurationField
     {
-        private string _view;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="ConfigurationField"/> class.
         /// </summary>

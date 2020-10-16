@@ -11,7 +11,6 @@ using Umbraco.Core.Strings;
 using Umbraco.Web.Features;
 using Umbraco.Web.Models;
 using Umbraco.Web.Routing;
-using Umbraco.Core.Strings;
 using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web.Mvc

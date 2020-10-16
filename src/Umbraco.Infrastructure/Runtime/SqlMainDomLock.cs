@@ -24,7 +24,6 @@ namespace Umbraco.Core.Runtime
         private const string UpdatedSuffix = "_updated";
         private readonly ILogger<SqlMainDomLock> _logger;
         private readonly IHostingEnvironment _hostingEnvironment;
-        private IUmbracoDatabase _db;
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
         private SqlServerSyntaxProvider _sqlServerSyntax = new SqlServerSyntaxProvider();
         private bool _mainDomChanging = false;

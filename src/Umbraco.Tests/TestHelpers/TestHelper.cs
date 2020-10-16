@@ -13,7 +13,6 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Diagnostics;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
@@ -25,7 +24,6 @@ using Umbraco.Net;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Serialization;
-using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Persistance.SqlCe;
 using Umbraco.Tests.Common;
@@ -33,7 +31,6 @@ using Umbraco.Web;
 using Umbraco.Web.Hosting;
 using Umbraco.Web.Routing;
 using File = System.IO.File;
-using Umbraco.Tests.Common.Builders;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core.Configuration.Models;
@@ -46,7 +43,6 @@ namespace Umbraco.Tests.TestHelpers
     public static class TestHelper
     {
         private static readonly TestHelperInternal _testHelperInternal = new TestHelperInternal();
-        private static IEmailSender _emailSender;
 
         private class TestHelperInternal : TestHelperBase
         {

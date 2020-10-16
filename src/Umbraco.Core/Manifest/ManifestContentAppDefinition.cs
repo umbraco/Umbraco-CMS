@@ -27,7 +27,6 @@ namespace Umbraco.Core.Manifest
     [DataContract(Name = "appdef", Namespace = "")]
     public class ManifestContentAppDefinition
     {
-        private string _view;
 
         /// <summary>
         /// Gets or sets the name of the content app.
