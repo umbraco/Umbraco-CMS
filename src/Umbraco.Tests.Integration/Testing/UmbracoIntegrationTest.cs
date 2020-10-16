@@ -86,7 +86,7 @@ namespace Umbraco.Tests.Integration.Testing
             FirstTestInSession = false;
 
             _stopWatch.Stop();
-            TestContext.Progress.WriteLine($" {_stopWatch.Elapsed}");
+            TestContext.Progress.WriteLine($"  Total: {_stopWatch.Elapsed}, Step1: {_stopWatchStep1}, Step1: {_stopWatchStep2}");
         }
 
         [SetUp]
@@ -97,11 +97,13 @@ namespace Umbraco.Tests.Integration.Testing
             _stopWatch.Start();
             var hostBuilder = CreateHostBuilder();
 
-            var host = hostBuilder.StartAsync().GetAwaiter().GetResult();
+            var host = hostBuilder.Start();
+            _stopWatchStep1 = _stopWatch.Elapsed;
             Services = host.Services;
             var app = new ApplicationBuilder(host.Services);
-            Configure(app); //Takes around 200 ms
 
+            Configure(app); //Takes around 200 ms
+            _stopWatchStep2 = _stopWatch.Elapsed;
 
             OnFixtureTearDown(() => host.Dispose());
         }
@@ -500,5 +502,7 @@ namespace Umbraco.Tests.Integration.Testing
         protected bool FirstTestInFixture = true;
         private Stopwatch _stopWatch;
         private static int _testCount = 1;
+        private TimeSpan _stopWatchStep1;
+        private TimeSpan _stopWatchStep2;
     }
 }
