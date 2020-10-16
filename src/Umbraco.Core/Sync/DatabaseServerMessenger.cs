@@ -262,12 +262,9 @@ namespace Umbraco.Core.Sync
 
                     _lastPruned = _lastSync;
 
-                    switch (Current.RuntimeState.ServerRole)
+                    if (Current.RuntimeState.ServerRole.ShouldPrune())
                     {
-                        case ServerRole.Single:
-                        case ServerRole.Master:
-                            PruneOldInstructions(scope.Database);
-                            break;
+                        PruneOldInstructions(scope.Database);
                     }
 
                     scope.Complete();
