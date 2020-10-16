@@ -26,6 +26,7 @@ namespace Umbraco.Web.Editors
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly ILocalizationService _localizationService;
         private readonly IIconService _iconService;
+        private readonly IDomainService _domainService;
 
         [Obsolete("Use the constructor that injects IIconService.")]
         public PreviewController(
@@ -39,7 +40,8 @@ namespace Umbraco.Web.Editors
                 publishedSnapshotService,
                 umbracoContextAccessor,
                 localizationService,
-                Current.IconService)
+                Current.IconService,
+                Current.Services.DomainService)
         {
 
         }
@@ -50,7 +52,8 @@ namespace Umbraco.Web.Editors
             IPublishedSnapshotService publishedSnapshotService,
             IUmbracoContextAccessor umbracoContextAccessor,
             ILocalizationService localizationService,
-            IIconService iconService)
+            IIconService iconService,
+            IDomainService domainService)
         {
             _features = features;
             _globalSettings = globalSettings;
@@ -58,13 +61,22 @@ namespace Umbraco.Web.Editors
             _umbracoContextAccessor = umbracoContextAccessor;
             _localizationService = localizationService;
             _iconService = iconService;
+            _domainService = domainService;
         }
 
         [UmbracoAuthorize(redirectToUmbracoLogin: true)]
         [DisableBrowserCache]
-        public ActionResult Index()
+        public ActionResult Index(int? id = null)
         {
             var availableLanguages = _localizationService.GetAllLanguages();
+            if (id.HasValue)
+            {
+                var content = _umbracoContextAccessor.UmbracoContext.Content.GetById(true, id.Value);
+                if (content is null)
+                    return HttpNotFound();
+
+                availableLanguages = availableLanguages.Where(language => content.Cultures.ContainsKey(language.IsoCode));
+            }
 
             var model = new BackOfficePreviewModel(_features, _globalSettings, availableLanguages, _iconService);
 
@@ -79,7 +91,6 @@ namespace Umbraco.Web.Editors
 
             return View(_globalSettings.Path.EnsureEndsWith('/') + "Views/Preview/" + "Index.cshtml", model);
         }
-
         /// <summary>
         /// Returns the JavaScript file for preview
         /// </summary>
