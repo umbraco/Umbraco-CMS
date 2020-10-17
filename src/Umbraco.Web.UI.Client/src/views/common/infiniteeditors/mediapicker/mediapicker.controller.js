@@ -53,11 +53,11 @@ angular.module("umbraco")
             if ($scope.onlyImages) {
                 vm.acceptedFileTypes = mediaHelper.formatFileTypes(umbracoSettings.imageFileTypes);
             } else {
-                // Use whitelist of allowed file types if provided
+                // Use list of allowed file types if provided
                 if (allowedUploadFiles !== '') {
                     vm.acceptedFileTypes = allowedUploadFiles;
                 } else {
-                    // If no whitelist, we pass in a blacklist by adding ! to the file extensions, allowing everything EXCEPT for disallowedUploadFiles
+                    // If no allowed list, we pass in a disallowed list by adding ! to the file extensions, allowing everything EXCEPT for disallowedUploadFiles
                     vm.acceptedFileTypes = !mediaHelper.formatFileTypes(umbracoSettings.disallowedUploadFiles);
                 }
             }
