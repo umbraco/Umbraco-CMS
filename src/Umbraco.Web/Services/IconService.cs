@@ -2,7 +2,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Ganss.XSS;
+using Microsoft.CodeAnalysis.Operations;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
@@ -13,14 +15,16 @@ namespace Umbraco.Web.Services
     public class IconService : IIconService
     {
         private readonly IGlobalSettings _globalSettings;
+        private readonly IAppPolicyCache _cache;
 
-        public IconService(IGlobalSettings globalSettings)
+        public IconService(IGlobalSettings globalSettings, AppCaches appCaches)
         {
             _globalSettings = globalSettings;
+            _cache = appCaches.RuntimeCache;
         }
 
         /// <inheritdoc />
-        public IList<IconModel> GetAllIcons()
+        public IList<IconModel> GetAllIcons() => _cache.GetCacheItem<IList<IconModel>>("Umbraco.Web.Services.IconService::AllIconModels", () =>
         {
             var icons = new List<IconModel>();
             var iconNames = GetAllIconNames();
@@ -36,7 +40,7 @@ namespace Umbraco.Web.Services
             });
 
             return icons;
-        }
+        });
 
         /// <inheritdoc />
         public IconModel GetIcon(string iconName)
@@ -68,11 +72,7 @@ namespace Umbraco.Web.Services
             if (string.IsNullOrWhiteSpace(iconName))
                 return null;
 
-            var iconNames = GetAllIconNames();
-            var iconPath = iconNames.FirstOrDefault(x => x.Name.InvariantEquals($"{iconName}.svg"))?.FullName;
-            return iconPath == null
-                ? null
-                : CreateIconModel(iconName, iconPath);
+            return GetAllIcons().FirstOrDefault(i => i.Name == iconName);
         }
 
         /// <summary>
