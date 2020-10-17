@@ -46,6 +46,8 @@
             function getFocusableElements(targetElm) {
                 var elm = targetElm ? targetElm : target;
                 focusableElements = elm.querySelectorAll(focusableElementsSelector);
+
+                // Maybe don't set these here but wait doing it until the observer has run?
                 firstFocusableElement = focusableElements[0];
                 lastFocusableElement = focusableElements[focusableElements.length -1];
 
@@ -83,7 +85,7 @@
 
             function setElementFocus() {
                 var defaultFocusedElement = getAutoFocusElement(focusableElements);
-                var lastknownElement;
+                var lastKnownElement;
 
                 // If an inifite editor is being closed then we reset the focus to the element that triggered the the overlay
                 if(closingEditor){
@@ -95,13 +97,13 @@
                     // is closed taking us back to the first layer
                     // Otherwise set it to the last element in the lastKnownFocusedElements array
                     if(infiniteEditors.length === 1 && editorInfo !== null){
-                        lastknownElement = editorInfo;
+                        lastKnownElement = editorInfo;
 
                         // Clear the array
                         clearLastKnownFocusedElements();
                     }
                     else {
-                        lastknownElement = $rootScope.lastKnownFocusableElements[lastItemIndex];
+                        lastKnownElement = $rootScope.lastKnownFocusableElements[lastItemIndex];
 
                         // Remove the last item from the array so we always set the correct lastKnowFocus for each layer
                         $rootScope.lastKnownFocusableElements.splice(lastItemIndex, 1);
@@ -116,8 +118,8 @@
                 // 2nd - We check to see if a default focus has been set using the umb-auto-focus directive. If not we set focus on
                 // the first focusable element
                 // 3rd - Otherwise put the focus on the default focused element
-                if(lastknownElement){
-                    lastknownElement.focus();
+                if(lastKnownElement){
+                    lastKnownElement.focus();
                 }
                 else if(defaultFocusedElement === null ){
                     firstFocusableElement.focus();
@@ -135,6 +137,8 @@
                 // Options for the observer (which mutations to observe)
                 var config = { attributes: true, childList: true, subtree: true};
 
+                // Whenever the DOM changes ensure the list of focused elements is updated
+                // TODO: Maybe track the first call for this function ensuring first and last focusable elements are detected initially and then just disover focusable elements
                 function domChange() {
                     getFocusableElements();
                 }
@@ -170,9 +174,10 @@
 
                 $timeout(() => {
 
+                    // Fetch the DOM nodes we need
                     getDomNodes();
 
-                    // Only do the cleanup if we're in infinite editing mode
+                    // Cleanup event handlers if we're in infinite editing mode
                     if(infiniteEditors.length > 0){
                         cleanupEventHandlers();
                     }
@@ -202,7 +207,6 @@
                 });
             });
 
-            // Only used for resetting the focus lock on infinite editors whenever a layer is closed and there is still one open
             // If more than one editor is still open then re-initialize otherwise remove the event listener
             scope.$on('$destroy', function () {
                 // Make sure to disconnect the observer so we potentially don't end up with having many active ones
