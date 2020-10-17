@@ -210,7 +210,7 @@
     <key alias="recycleBinIsEmpty">Geri dönüşüm kutusu artık boş</key>
     <key alias="recycleBinWarning">Öğeleri geri dönüşüm kutusu silindiğinde, onlar sonsuza kadar gitmiş olacak</key>
     <key alias="regexSearchError"><![CDATA[<a target='_blank' href='http://regexlib.com'>regexlib.com</a>'s webcoder şu anda üzerinde hiçbir kontrole sahip bazı sorunları, yaşanıyor. Bu rahatsızlıktan dolayı çok üzgünüz.]]></key>
-    <key alias="regexSearchHelp">Bir düzenli ifade arama form alanına doğrulama ekleyin. Örnek: 'E-posta', zip code 'url'</key>
+    <key alias="regexSearchHelp">Bir düzenli ifade arama form alanına doğrulama ekleyin. Örnek: 'E-posta', 'zip code', 'URL'.</key>
     <key alias="removeMacro">Makro kaldır</key>
     <key alias="requiredField">Gerekli alan</key>
     <key alias="sitereindexed">Site yeniden indekslendi</key>
