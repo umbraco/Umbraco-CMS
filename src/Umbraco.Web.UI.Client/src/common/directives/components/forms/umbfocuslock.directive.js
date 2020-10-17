@@ -136,7 +136,6 @@
                 var config = { attributes: true, childList: true, subtree: true};
 
                 // Whenever the DOM changes ensure the list of focused elements is updated
-                // TODO: Maybe track the first call for this function ensuring first and last focusable elements are detected initially and then just disover focusable elements
                 function domChange() {
                     getFocusableElements();
                 }
