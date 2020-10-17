@@ -26,7 +26,7 @@
     <key alias="logout">Exit</key>
     <key alias="move">Move</key>
     <key alias="notify">Notifications</key>
-    <key alias="protect">Restrict access</key>
+    <key alias="protect">Restrict Public Access</key>
     <key alias="publish">Publish</key>
     <key alias="unpublish">Unpublish</key>
     <key alias="refreshNode">Reload</key>
