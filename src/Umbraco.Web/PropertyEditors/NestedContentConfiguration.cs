@@ -27,6 +27,9 @@ namespace Umbraco.Web.PropertyEditors
         [ConfigurationField("hideLabel", "Hide Label", "boolean", Description = "Hide the property label and let the item list span the full width of the editor window.")]
         public bool HideLabel { get; set; }
 
+        [ConfigurationField("maxPropertyWidth", "Property editor width", "textstring", Description = "optional css overwrite, example: 800px or 100%")]
+        public string MaxPropertyWidth { get; set; }
+
         public class ContentType
         {
             [JsonProperty("ncAlias")]

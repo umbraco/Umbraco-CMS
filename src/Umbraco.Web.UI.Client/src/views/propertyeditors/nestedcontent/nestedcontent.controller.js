@@ -93,6 +93,12 @@
         if (vm.maxItems === 0)
             vm.maxItems = 1000;
 
+        vm.listWrapperStyles = {};
+
+        if (model.config.maxPropertyWidth) {
+            vm.listWrapperStyles['max-width'] = model.config.maxPropertyWidth;
+        }
+
         vm.singleMode = vm.minItems === 1 && vm.maxItems === 1 && model.config.contentTypes.length === 1;;
         vm.showIcons = Object.toBoolean(model.config.showIcons);
         vm.wideMode = Object.toBoolean(model.config.hideLabel);

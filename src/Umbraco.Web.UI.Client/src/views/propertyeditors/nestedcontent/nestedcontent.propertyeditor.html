@@ -1,5 +1,5 @@
-﻿<div id="umb-nested-content--{{model.id}}" class="umb-nested-content" ng-class="{'umb-nested-content--narrow':!vm.wideMode, 'umb-nested-content--wide':vm.wideMode}">
 
+﻿<div id="umb-nested-content--{{model.id}}" class="umb-nested-content" ng-class="{'umb-nested-content--narrow':!vm.wideMode, 'umb-nested-content--wide':vm.wideMode}" ng-style="vm.listWrapperStyles">
     <umb-load-indicator class="mt2" ng-if="!vm.inited"></umb-load-indicator>
 
     <ng-form name="nestedContentForm" ng-show="vm.inited">
