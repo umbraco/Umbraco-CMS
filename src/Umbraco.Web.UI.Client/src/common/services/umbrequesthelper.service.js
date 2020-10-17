@@ -179,7 +179,7 @@ function umbRequestHelper($http, $q, notificationsService, eventsService, formHe
 
                     //show a ysod dialog
                     if (Umbraco.Sys.ServerVariables["isDebuggingEnabled"] === true) {
-                        const error = { errorMsg: 'An error occured', data: response.data };
+                        const error = { errorMsg: 'An error occurred', data: response.data };
                         // TODO: All YSOD handling should be done with an interceptor
                         overlayService.ysod(error);
                     }
@@ -294,7 +294,7 @@ function umbRequestHelper($http, $q, notificationsService, eventsService, formHe
                         }
                         else if (Umbraco.Sys.ServerVariables["isDebuggingEnabled"] === true) {
                             //show a ysod dialog
-                            const error = { errorMsg: 'An error occured', data: response.data };
+                            const error = { errorMsg: 'An error occurred', data: response.data };
                             // TODO: All YSOD handling should be done with an interceptor
                             overlayService.ysod(error);
                         }
