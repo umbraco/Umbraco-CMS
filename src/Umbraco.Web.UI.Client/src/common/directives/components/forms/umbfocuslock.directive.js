@@ -3,6 +3,7 @@
 
     function FocusLock($timeout, $rootScope, angularHelper) {
 
+        // If the umb-auto-focus directive is in use we respect that by leaving the default focus on it instead of choosing the first focusable element using this function
         function getAutoFocusElement (elements) {
             var elmentWithAutoFocus = null;
 
@@ -33,6 +34,8 @@
 
             // List of elements that can be focusable within the focus lock
             var focusableElementsSelector = '[role="button"], a[href]:not([disabled]):not(.ng-hide), button:not([disabled]):not(.ng-hide), textarea:not([disabled]):not(.ng-hide), input:not([disabled]):not(.ng-hide), select:not([disabled]):not(.ng-hide)';
+
+            // Grab the body element so we can add the tabbing class on it when needed
             var bodyElement = document.querySelector('body');
 
             function getDomNodes(){
@@ -49,7 +52,7 @@
                 return focusableElements;
             }
 
-            function handleKeydown() {
+            function handleKeydown(event) {
                 var isTabPressed = (event.key === 'Tab' || event.keyCode === 9);
 
                 if (!isTabPressed){
@@ -124,8 +127,7 @@
                 }
             }
 
-            function observeDomChanges(init) {
-                var targetToObserve = init ? document.querySelector('.umb-editors') : target;
+            function observeDomChanges() {
                 // Watch for DOM changes - so we can refresh the focusable elements if an element
                 // changes from being disabled to being enabled for instance
                 var observer = new MutationObserver(_.debounce(domChange, 200));
@@ -138,7 +140,7 @@
                 }
 
                 // Start observing the target node for configured mutations
-                observer.observe(targetToObserve, config);
+                observer.observe(target, config);
 
                 // Disconnect observer
                 if(disconnectObserver){
@@ -200,6 +202,7 @@
                 });
             });
 
+            // Only used for resetting the focus lock on infinite editors whenever a layer is closed and there is still one open
             // If more than one editor is still open then re-initialize otherwise remove the event listener
             scope.$on('$destroy', function () {
                 // Make sure to disconnect the observer so we potentially don't end up with having many active ones
@@ -237,3 +240,6 @@
     angular.module('umbraco.directives').directive('umbFocusLock', FocusLock);
 
 })();
+
+
+// TODO: Ensure the domObserver is NOT started when there is only one infinite overlay and it's being destroyed!
