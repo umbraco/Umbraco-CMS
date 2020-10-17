@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using Ganss.XSS;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
@@ -13,30 +14,16 @@ namespace Umbraco.Web.Services
     public class IconService : IIconService
     {
         private readonly IGlobalSettings _globalSettings;
+        private readonly IAppPolicyCache _cache;
 
-        public IconService(IGlobalSettings globalSettings)
+        public IconService(IGlobalSettings globalSettings, AppCaches appCaches)
         {
             _globalSettings = globalSettings;
+            _cache = appCaches.RuntimeCache;
         }
 
         /// <inheritdoc />
-        public IList<IconModel> GetAllIcons()
-        {
-            var icons = new List<IconModel>();
-            var iconNames = GetAllIconNames();
-
-            iconNames.OrderBy(f => f.Name).ToList().ForEach(iconInfo =>
-            {
-                var icon = GetIcon(iconInfo);
-
-                if (icon != null)
-                {
-                    icons.Add(icon);
-                }
-            });
-
-            return icons;
-        }
+        public IList<IconModel> GetAllIcons() => GetIconModels().ToList();
 
         /// <inheritdoc />
         public IconModel GetIcon(string iconName)
@@ -68,11 +55,7 @@ namespace Umbraco.Web.Services
             if (string.IsNullOrWhiteSpace(iconName))
                 return null;
 
-            var iconNames = GetAllIconNames();
-            var iconPath = iconNames.FirstOrDefault(x => x.Name.InvariantEquals($"{iconName}.svg"))?.FullName;
-            return iconPath == null
-                ? null
-                : CreateIconModel(iconName, iconPath);
+            return GetIconModels().FirstOrDefault(i => i.Name.InvariantEquals(iconName));
         }
 
         /// <summary>
@@ -130,5 +113,14 @@ namespace Umbraco.Web.Services
 
             return iconNames;
         }
+
+        private IconModel[] GetIconModels() => _cache.GetCacheItem(
+            "Umbraco.Web.Services.IconService::AllIconModels",
+            () => GetAllIconNames()
+                    .OrderBy(f => f.Name)
+                    .Select(GetIcon)
+                    .Where(i => i != null)
+                    .ToArray()
+        );
     }
 }
