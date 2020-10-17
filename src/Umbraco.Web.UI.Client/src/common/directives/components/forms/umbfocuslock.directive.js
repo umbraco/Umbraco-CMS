@@ -46,12 +46,6 @@
             function getFocusableElements(targetElm) {
                 var elm = targetElm ? targetElm : target;
                 focusableElements = elm.querySelectorAll(focusableElementsSelector);
-
-                // Maybe don't set these here but wait doing it until the observer has run?
-                firstFocusableElement = focusableElements[0];
-                lastFocusableElement = focusableElements[focusableElements.length -1];
-
-                return focusableElements;
             }
 
             function handleKeydown(event) {
@@ -86,6 +80,10 @@
             function setElementFocus() {
                 var defaultFocusedElement = getAutoFocusElement(focusableElements);
                 var lastKnownElement;
+
+                // Set first and last focusable elements
+                firstFocusableElement = focusableElements[0];
+                lastFocusableElement = focusableElements[focusableElements.length - 1];
 
                 // If an inifite editor is being closed then we reset the focus to the element that triggered the the overlay
                 if(closingEditor){
