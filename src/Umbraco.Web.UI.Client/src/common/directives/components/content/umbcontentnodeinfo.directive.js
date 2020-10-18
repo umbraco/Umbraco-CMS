@@ -315,7 +315,7 @@
 
             function updateCurrentUrls() {
                 // never show URLs for element types (if they happen to have been created in the content tree)
-                if (scope.node.isElement) {
+                if (scope.node.isElement || scope.node.urls === null) {
                     scope.currentUrls = null;
                     return;
                 }
