@@ -358,13 +358,13 @@ namespace Umbraco.Tests.Integration.Services
             var global = ContentTypeBuilder.CreateSimpleContentType("global", "Global", defaultTemplateId: template.Id);
             ContentTypeService.Save(global);
 
-            var components = ContentTypeBuilder.CreateSimpleContentType("components", "Components", global, true, defaultTemplateId: template.Id);
+            var components = ContentTypeBuilder.CreateSimpleContentType("components", "Components", global, randomizeAliases: true, defaultTemplateId: template.Id);
             ContentTypeService.Save(components);
 
-            var component = ContentTypeBuilder.CreateSimpleContentType("component", "Component", components, true, defaultTemplateId: template.Id);
+            var component = ContentTypeBuilder.CreateSimpleContentType("component", "Component", components, randomizeAliases: true, defaultTemplateId: template.Id);
             ContentTypeService.Save(component);
 
-            var category = ContentTypeBuilder.CreateSimpleContentType("category", "Category", global, true, defaultTemplateId: template.Id);
+            var category = ContentTypeBuilder.CreateSimpleContentType("category", "Category", global, randomizeAliases: true, defaultTemplateId: template.Id);
             ContentTypeService.Save(category);
 
             var success = category.AddContentType(component);
@@ -378,10 +378,10 @@ namespace Umbraco.Tests.Integration.Services
             var template = TemplateBuilder.CreateTextPageTemplate();
             FileService.SaveTemplate(template);
 
-            var contentType = ContentTypeBuilder.CreateSimpleContentType("page", "Page", null, true, defaultTemplateId: template.Id);
+            var contentType = ContentTypeBuilder.CreateSimpleContentType("page", "Page", null, randomizeAliases: true, defaultTemplateId: template.Id);
             ContentTypeService.Save(contentType);
 
-            var childContentType = ContentTypeBuilder.CreateSimpleContentType("childPage", "Child Page", contentType, true, "Child Content", defaultTemplateId: template.Id);
+            var childContentType = ContentTypeBuilder.CreateSimpleContentType("childPage", "Child Page", contentType, randomizeAliases: true, propertyGroupName: "Child Content", defaultTemplateId: template.Id);
             ContentTypeService.Save(childContentType);
             var content = ContentService.Create("Page 1", -1, childContentType.Alias);
             ContentService.Save(content);
@@ -593,10 +593,10 @@ namespace Umbraco.Tests.Integration.Services
 
             var parentContentType1 = ContentTypeBuilder.CreateSimpleContentType("parent1", "Parent1", defaultTemplateId: template.Id);
             ContentTypeService.Save(parentContentType1);
-            var parentContentType2 = ContentTypeBuilder.CreateSimpleContentType("parent2", "Parent2", null, true, defaultTemplateId: template.Id);
+            var parentContentType2 = ContentTypeBuilder.CreateSimpleContentType("parent2", "Parent2", null, randomizeAliases: true, defaultTemplateId: template.Id);
             ContentTypeService.Save(parentContentType2);
 
-            var simpleContentType = ContentTypeBuilder.CreateSimpleContentType("category", "Category", parentContentType1, true, defaultTemplateId: template.Id) as IContentType;
+            var simpleContentType = ContentTypeBuilder.CreateSimpleContentType("category", "Category", parentContentType1, randomizeAliases: true, defaultTemplateId: template.Id) as IContentType;
             ContentTypeService.Save(simpleContentType);
 
             // Act
@@ -690,10 +690,10 @@ namespace Umbraco.Tests.Integration.Services
 
             var parentContentType1 = ContentTypeBuilder.CreateSimpleContentType("parent1", "Parent1", defaultTemplateId: template.Id);
             ContentTypeService.Save(parentContentType1);
-            var parentContentType2 = ContentTypeBuilder.CreateSimpleContentType("parent2", "Parent2", null, true, defaultTemplateId: template.Id);
+            var parentContentType2 = ContentTypeBuilder.CreateSimpleContentType("parent2", "Parent2", null, randomizeAliases: true, defaultTemplateId: template.Id);
             ContentTypeService.Save(parentContentType2);
 
-            var simpleContentType = ContentTypeBuilder.CreateSimpleContentType("category", "Category", parentContentType1, true, defaultTemplateId: template.Id);
+            var simpleContentType = ContentTypeBuilder.CreateSimpleContentType("category", "Category", parentContentType1, randomizeAliases: true, defaultTemplateId: template.Id);
             ContentTypeService.Save(simpleContentType);
 
             // Act
@@ -733,7 +733,7 @@ namespace Umbraco.Tests.Integration.Services
 
             var parent = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: template.Id);
             ContentTypeService.Save(parent);
-            var child = ContentTypeBuilder.CreateSimpleContentType("simpleChildPage", "Simple Child Page", parent, true, defaultTemplateId: template.Id);
+            var child = ContentTypeBuilder.CreateSimpleContentType("simpleChildPage", "Simple Child Page", parent, randomizeAliases: true, defaultTemplateId: template.Id);
             ContentTypeService.Save(child);
             var composition = ContentTypeBuilder.CreateMetaContentType();
             ContentTypeService.Save(composition);
@@ -762,11 +762,11 @@ namespace Umbraco.Tests.Integration.Services
             var template = TemplateBuilder.CreateTextPageTemplate();
             FileService.SaveTemplate(template);
 
-            var basePage = ContentTypeBuilder.CreateSimpleContentType("basePage", "Base Page", null, true, defaultTemplateId: template.Id);
+            var basePage = ContentTypeBuilder.CreateSimpleContentType("basePage", "Base Page", null, randomizeAliases: true, defaultTemplateId: template.Id);
             ContentTypeService.Save(basePage);
             var contentPage = ContentTypeBuilder.CreateSimpleContentType("contentPage", "Content Page", basePage, defaultTemplateId: template.Id);
             ContentTypeService.Save(contentPage);
-            var advancedPage = ContentTypeBuilder.CreateSimpleContentType("advancedPage", "Advanced Page", contentPage, true, defaultTemplateId: template.Id);
+            var advancedPage = ContentTypeBuilder.CreateSimpleContentType("advancedPage", "Advanced Page", contentPage, randomizeAliases: true, defaultTemplateId: template.Id);
             ContentTypeService.Save(advancedPage);
 
             var metaComposition = ContentTypeBuilder.CreateMetaContentType();
@@ -1048,11 +1048,11 @@ namespace Umbraco.Tests.Integration.Services
             var template = TemplateBuilder.CreateTextPageTemplate();
             FileService.SaveTemplate(template);
 
-            var page = ContentTypeBuilder.CreateSimpleContentType("page", "Page", null, true, "Content", defaultTemplateId: template.Id);
+            var page = ContentTypeBuilder.CreateSimpleContentType("page", "Page", null, randomizeAliases: true, defaultTemplateId: template.Id);
             ContentTypeService.Save(page);
-            var contentPage = ContentTypeBuilder.CreateSimpleContentType("contentPage", "Content Page", page, true, "Content_", defaultTemplateId: template.Id);
+            var contentPage = ContentTypeBuilder.CreateSimpleContentType("contentPage", "Content Page", page, randomizeAliases: true, propertyGroupName: "Content_", defaultTemplateId: template.Id);
             ContentTypeService.Save(contentPage);
-            var advancedPage = ContentTypeBuilder.CreateSimpleContentType("advancedPage", "Advanced Page", contentPage, true, "Details", defaultTemplateId: template.Id);
+            var advancedPage = ContentTypeBuilder.CreateSimpleContentType("advancedPage", "Advanced Page", contentPage, randomizeAliases: true, propertyGroupName: "Details", defaultTemplateId: template.Id);
             ContentTypeService.Save(advancedPage);
 
             var contentMetaComposition = ContentTypeBuilder.CreateContentMetaContentType();
@@ -1157,11 +1157,11 @@ namespace Umbraco.Tests.Integration.Services
             // Arrange
             var template = TemplateBuilder.CreateTextPageTemplate();
             FileService.SaveTemplate(template);
-            var basePage = ContentTypeBuilder.CreateSimpleContentType("basePage", "Base Page", null, true, defaultTemplateId: template.Id);
+            var basePage = ContentTypeBuilder.CreateSimpleContentType("basePage", "Base Page", null, randomizeAliases: true, defaultTemplateId: template.Id);
             ContentTypeService.Save(basePage);
-            var contentPage = ContentTypeBuilder.CreateSimpleContentType("contentPage", "Content Page", basePage, true, defaultTemplateId: template.Id);
+            var contentPage = ContentTypeBuilder.CreateSimpleContentType("contentPage", "Content Page", basePage, randomizeAliases: true, defaultTemplateId: template.Id);
             ContentTypeService.Save(contentPage);
-            var advancedPage = ContentTypeBuilder.CreateSimpleContentType("advancedPage", "Advanced Page", contentPage, true, defaultTemplateId: template.Id);
+            var advancedPage = ContentTypeBuilder.CreateSimpleContentType("advancedPage", "Advanced Page", contentPage, randomizeAliases: true, defaultTemplateId: template.Id);
             ContentTypeService.Save(advancedPage);
 
             var metaComposition = ContentTypeBuilder.CreateMetaContentType();
@@ -1200,7 +1200,7 @@ namespace Umbraco.Tests.Integration.Services
             // create 'page' content type with a 'Content_' group
             var template = TemplateBuilder.CreateTextPageTemplate();
             FileService.SaveTemplate(template);
-            var page = ContentTypeBuilder.CreateSimpleContentType("page", "Page", null, false, "Content_", defaultTemplateId: template.Id);
+            var page = ContentTypeBuilder.CreateSimpleContentType("page", "Page", propertyGroupName: "Content_", defaultTemplateId: template.Id);
             Assert.AreEqual(1, page.PropertyGroups.Count);
             Assert.AreEqual("Content_", page.PropertyGroups.First().Name);
             Assert.AreEqual(3, page.PropertyTypes.Count());
@@ -1210,7 +1210,7 @@ namespace Umbraco.Tests.Integration.Services
             ContentTypeService.Save(page);
 
             // create 'contentPage' content type as a child of 'page'
-            var contentPage = ContentTypeBuilder.CreateSimpleContentType("contentPage", "Content Page", page, true, defaultTemplateId: template.Id);
+            var contentPage = ContentTypeBuilder.CreateSimpleContentType("contentPage", "Content Page", page, randomizeAliases: true, defaultTemplateId: template.Id);
             Assert.AreEqual(1, page.PropertyGroups.Count);
             Assert.AreEqual("Content_", page.PropertyGroups.First().Name);
             Assert.AreEqual(3, contentPage.PropertyTypes.Count());
@@ -1281,11 +1281,11 @@ namespace Umbraco.Tests.Integration.Services
             // Arrange
             var template = TemplateBuilder.CreateTextPageTemplate();
             FileService.SaveTemplate(template);
-            var page = ContentTypeBuilder.CreateSimpleContentType("page", "Page", null, true, "Content_", defaultTemplateId: template.Id);
+            var page = ContentTypeBuilder.CreateSimpleContentType("page", "Page", null, randomizeAliases: true, propertyGroupName: "Content_", defaultTemplateId: template.Id);
             ContentTypeService.Save(page);
-            var contentPage = ContentTypeBuilder.CreateSimpleContentType("contentPage", "Content Page", page, true, "Contentx", defaultTemplateId: template.Id);
+            var contentPage = ContentTypeBuilder.CreateSimpleContentType("contentPage", "Content Page", page, randomizeAliases: true, propertyGroupName: "Contentx", defaultTemplateId: template.Id);
             ContentTypeService.Save(contentPage);
-            var advancedPage = ContentTypeBuilder.CreateSimpleContentType("advancedPage", "Advanced Page", contentPage, true, "Contenty", defaultTemplateId: template.Id);
+            var advancedPage = ContentTypeBuilder.CreateSimpleContentType("advancedPage", "Advanced Page", contentPage, randomizeAliases: true, propertyGroupName: "Contenty", defaultTemplateId: template.Id);
             ContentTypeService.Save(advancedPage);
 
             var contentMetaComposition = ContentTypeBuilder.CreateContentMetaContentType();
@@ -1355,9 +1355,9 @@ namespace Umbraco.Tests.Integration.Services
             // Arrange
             var template = TemplateBuilder.CreateTextPageTemplate();
             FileService.SaveTemplate(template);
-            var page = ContentTypeBuilder.CreateSimpleContentType("page", "Page", null, true, "Content_", defaultTemplateId: template.Id);
+            var page = ContentTypeBuilder.CreateSimpleContentType("page", "Page", null, randomizeAliases: true, propertyGroupName: "Content_", defaultTemplateId: template.Id);
             ContentTypeService.Save(page);
-            var contentPage = ContentTypeBuilder.CreateSimpleContentType("contentPage", "Content Page", page, true, "Content", defaultTemplateId: template.Id);
+            var contentPage = ContentTypeBuilder.CreateSimpleContentType("contentPage", "Content Page", page, randomizeAliases: true, propertyGroupName: "Content", defaultTemplateId: template.Id);
             ContentTypeService.Save(contentPage);
 
             var contentMetaComposition = ContentTypeBuilder.CreateContentMetaContentType();
@@ -1589,11 +1589,11 @@ namespace Umbraco.Tests.Integration.Services
             typeA.PropertyTypes.First(x => x.Alias.InvariantEquals("title")).Variations = ContentVariation.Culture; // with a variant property
             ContentTypeService.Save(typeA);
 
-            var typeB = ContentTypeBuilder.CreateSimpleContentType("b", "B", typeA, true, defaultTemplateId: template.Id);
+            var typeB = ContentTypeBuilder.CreateSimpleContentType("b", "B", typeA, randomizeAliases: true, defaultTemplateId: template.Id);
             typeB.Variations = ContentVariation.Nothing; // make it invariant
             ContentTypeService.Save(typeB);
 
-            var typeC = ContentTypeBuilder.CreateSimpleContentType("c", "C", typeA, true, defaultTemplateId: template.Id);
+            var typeC = ContentTypeBuilder.CreateSimpleContentType("c", "C", typeA, randomizeAliases: true, defaultTemplateId: template.Id);
             typeC.Variations = ContentVariation.Culture; // make it variant
             ContentTypeService.Save(typeC);
 
@@ -1705,7 +1705,7 @@ namespace Umbraco.Tests.Integration.Services
             {
                 var contentType = ContentTypeBuilder.CreateSimpleContentType("childType" + i, "ChildType" + i,
                     //make the last entry in the list, this one's parent
-                    list.Last(), true, defaultTemplateId: template.Id);
+                    list.Last(), randomizeAliases: true, defaultTemplateId: template.Id);
 
                 list.Add(contentType);
             }
