@@ -287,7 +287,6 @@
     <Compile Include="PublishedContent\PublishedContentTests.cs" />
     <Compile Include="PublishedContent\PublishedMediaTests.cs" />
     <Compile Include="Web\Mvc\HtmlHelperExtensionMethodsTests.cs" />
-    <Compile Include="Models\ContentTests.cs" />
     <Compile Include="Persistence\SqlCeTableByTableTest.cs" />
     <Compile Include="Persistence\DatabaseContextTests.cs" />
     <Compile Include="Persistence\Mappers\ContentMapperTest.cs" />
@@ -460,7 +459,7 @@
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Integration" />
+    <Folder Include="Integration\" />
   </ItemGroup>
   <!-- get NuGet packages directory -->
   <PropertyGroup>
