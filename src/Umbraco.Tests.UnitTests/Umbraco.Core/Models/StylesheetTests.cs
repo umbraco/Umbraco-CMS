@@ -6,7 +6,7 @@ using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Tests.Common.Builders;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
+namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
 {
     [TestFixture]
     public class StylesheetTests

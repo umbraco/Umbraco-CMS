@@ -3,13 +3,12 @@ using System.Diagnostics;
 using System.Linq;
 using Newtonsoft.Json;
 using NUnit.Framework;
-using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Common.Builders.Extensions;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
+namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
 {
     [TestFixture]
     public class ContentTypeTests
