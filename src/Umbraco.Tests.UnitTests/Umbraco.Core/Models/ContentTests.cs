@@ -7,22 +7,17 @@ using System.Threading;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Newtonsoft.Json;
-using Umbraco.Core;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Composing.CompositionExtensions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
-using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
-using Umbraco.Core.Services.Implement;
-using Umbraco.Tests.TestHelpers.Entities;
-using Umbraco.Tests.TestHelpers.Stubs;
-using Umbraco.Tests.Testing;
-using Umbraco.Web.PropertyEditors;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Common.Builders.Extensions;
+using Umbraco.Tests.TestHelpers.Stubs;
+using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
 {
