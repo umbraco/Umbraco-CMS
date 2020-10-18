@@ -3,10 +3,10 @@ using Umbraco.Core.Models;
 using Umbraco.Infrastructure.Media;
 using Umbraco.Web.Models;
 
-namespace Umbraco.Tests.Models
+namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Media
 {
     [TestFixture]
-    public class ImageProcessorImageUrlGeneratorTest
+    public class ImageSharpImageUrlGeneratorTests
     {
         private const string MediaPath = "/media/1005/img_0671.jpg";
         private static readonly ImageUrlGenerationOptions.CropCoordinates Crop = new ImageUrlGenerationOptions.CropCoordinates(0.58729977382575338m, 0.055768992440203169m, 0m, 0.32457553600198386m);
