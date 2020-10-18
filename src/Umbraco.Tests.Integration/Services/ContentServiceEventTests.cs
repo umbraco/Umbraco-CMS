@@ -20,7 +20,7 @@ namespace Umbraco.Tests.Integration.Services
         Logger = UmbracoTestOptions.Logger.Console)]
     public class ContentServiceEventTests : UmbracoIntegrationTest
     {
-        private IContentTypeService IContentTypeService => GetRequiredService<IContentTypeService>();
+        private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
         private ContentService ContentService => (ContentService)GetRequiredService<IContentService>();
         private ILocalizationService LocalizationService => GetRequiredService<ILocalizationService>();
         private IFileService FileService => GetRequiredService<IFileService>();
@@ -34,7 +34,7 @@ namespace Umbraco.Tests.Integration.Services
             ContentRepositoryBase.ThrowOnWarning = true;
             _globalSettings = new GlobalSettings();
             // TODO: remove this once IPublishedSnapShotService has been implemented with nucache.
-            ContentTypeService.ClearScopeEvents();
+            Core.Services.Implement.ContentTypeService.ClearScopeEvents();
             CreateTestData();
         }
 
@@ -44,7 +44,7 @@ namespace Umbraco.Tests.Integration.Services
             FileService.SaveTemplate(template); // else, FK violation on contentType!
 
             _contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id);
-            IContentTypeService.Save(_contentType);
+            ContentTypeService.Save(_contentType);
         }
 
         public override void TearDown()
@@ -61,7 +61,7 @@ namespace Umbraco.Tests.Integration.Services
             _contentType.Variations = ContentVariation.Culture;
             foreach (var propertyType in _contentType.PropertyTypes)
                 propertyType.Variations = ContentVariation.Culture;
-            IContentTypeService.Save(_contentType);
+            ContentTypeService.Save(_contentType);
 
             IContent document = new Content("content", -1, _contentType);
             document.SetCultureName("hello", "en-US");
@@ -155,7 +155,7 @@ namespace Umbraco.Tests.Integration.Services
             _contentType.Variations = ContentVariation.Culture;
             foreach (var propertyType in _contentType.PropertyTypes)
                 propertyType.Variations = ContentVariation.Culture;
-            IContentTypeService.Save(_contentType);
+            ContentTypeService.Save(_contentType);
 
             IContent document = new Content("content", -1, _contentType);
             document.SetCultureName("hello", "en-US");
@@ -255,7 +255,7 @@ namespace Umbraco.Tests.Integration.Services
         {
             var titleProperty = _contentType.PropertyTypes.First(x => x.Alias == "title");
             titleProperty.Mandatory = true; // make this required!
-            IContentTypeService.Save(_contentType);
+            ContentTypeService.Save(_contentType);
 
             IContent document = new Content("content", -1, _contentType);
 
@@ -299,7 +299,7 @@ namespace Umbraco.Tests.Integration.Services
             _contentType.Variations = ContentVariation.Culture;
             foreach (var propertyType in _contentType.PropertyTypes)
                 propertyType.Variations = ContentVariation.Culture;
-            IContentTypeService.Save(_contentType);
+            ContentTypeService.Save(_contentType);
 
             var contentService = (ContentService)ContentService;
 

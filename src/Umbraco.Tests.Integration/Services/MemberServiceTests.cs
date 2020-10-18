@@ -13,7 +13,6 @@ using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
-using Umbraco.Core.Services.Implement;
 using Umbraco.Tests.Common;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Integration.Testing;
@@ -28,21 +27,21 @@ namespace Umbraco.Tests.Integration.Services
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, PublishedRepositoryEvents = true, WithApplication = true)]
     public class MemberServiceTests : UmbracoIntegrationTest
     {
-        private IMemberTypeService IMemberTypeService => GetRequiredService<IMemberTypeService>();
+        private IMemberTypeService MemberTypeService => GetRequiredService<IMemberTypeService>();
         private IMemberService MemberService => GetRequiredService<IMemberService>();
 
         [SetUp]
         public void SetupTest()
         {
             // TODO: remove this once IPublishedSnapShotService has been implemented with nucache.
-            MemberTypeService.ClearScopeEvents();
+            Core.Services.Implement.MemberTypeService.ClearScopeEvents();
         }
 
         [Test]
         public void Can_Update_Member_Property_Value()
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            IMemberTypeService.Save(memberType);
+            MemberTypeService.Save(memberType);
             IMember member = MemberBuilder.CreateSimpleMember(memberType, "hello", "helloworld@test123.com", "hello", "hello");
             member.SetValue("title", "title of mine");
             MemberService.Save(member);
@@ -60,7 +59,7 @@ namespace Umbraco.Tests.Integration.Services
         [Test]
         public void Can_Get_By_Username()
         {
-            var memberType = IMemberTypeService.Get("member");
+            var memberType = MemberTypeService.Get("member");
             IMember member = new Member("xname", "xemail", "xusername", "xrawpassword", memberType, true);
             MemberService.Save(member);
 
@@ -74,7 +73,7 @@ namespace Umbraco.Tests.Integration.Services
         public void Can_Set_Last_Login_Date()
         {
             var now = DateTime.Now;
-            var memberType = IMemberTypeService.Get("member");
+            var memberType = MemberTypeService.Get("member");
             IMember member = new Member("xname", "xemail", "xusername", "xrawpassword", memberType, true)
             {
                 LastLoginDate = now,
@@ -95,7 +94,7 @@ namespace Umbraco.Tests.Integration.Services
         [Test]
         public void Can_Create_Member_With_Properties()
         {
-            var memberType = IMemberTypeService.Get("member");
+            var memberType = MemberTypeService.Get("member");
             IMember member = new Member("xname", "xemail", "xusername", "xrawpassword", memberType, true);
             MemberService.Save(member);
 
@@ -146,7 +145,7 @@ namespace Umbraco.Tests.Integration.Services
         public void Can_Create_Member()
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            IMemberTypeService.Save(memberType);
+            MemberTypeService.Save(memberType);
             IMember member = MemberBuilder.CreateSimpleMember(memberType, "test", "test@test.com", "pass", "test");
             MemberService.Save(member);
 
@@ -160,7 +159,7 @@ namespace Umbraco.Tests.Integration.Services
         public void Can_Create_Member_With_Long_TLD_In_Email()
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            IMemberTypeService.Save(memberType);
+            MemberTypeService.Save(memberType);
             IMember member = MemberBuilder.CreateSimpleMember(memberType, "test", "test@test.marketing", "pass", "test");
             MemberService.Save(member);
 
@@ -219,7 +218,7 @@ namespace Umbraco.Tests.Integration.Services
         public void Can_Get_All_Roles_By_Member_Id()
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            IMemberTypeService.Save(memberType);
+            MemberTypeService.Save(memberType);
             IMember member = MemberBuilder.CreateSimpleMember(memberType, "test", "test@test.com", "pass", "test");
             MemberService.Save(member);
 
@@ -237,7 +236,7 @@ namespace Umbraco.Tests.Integration.Services
         public void Can_Get_All_Roles_Ids_By_Member_Id()
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            IMemberTypeService.Save(memberType);
+            MemberTypeService.Save(memberType);
             IMember member = MemberBuilder.CreateSimpleMember(memberType, "test", "test@test.com", "pass", "test");
             MemberService.Save(member);
 
@@ -255,7 +254,7 @@ namespace Umbraco.Tests.Integration.Services
         public void Can_Get_All_Roles_By_Member_Username()
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            IMemberTypeService.Save(memberType);
+            MemberTypeService.Save(memberType);
             IMember member = MemberBuilder.CreateSimpleMember(memberType, "test", "test@test.com", "pass", "test");
             MemberService.Save(member);
             //need to test with '@' symbol in the lookup
@@ -290,7 +289,7 @@ namespace Umbraco.Tests.Integration.Services
         public void Throws_When_Deleting_Assigned_Role()
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            IMemberTypeService.Save(memberType);
+            MemberTypeService.Save(memberType);
             IMember member = MemberBuilder.CreateSimpleMember(memberType, "test", "test@test.com", "pass", "test");
             MemberService.Save(member);
 
@@ -312,7 +311,7 @@ namespace Umbraco.Tests.Integration.Services
             }
 
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            IMemberTypeService.Save(memberType);
+            MemberTypeService.Save(memberType);
             var member1 = MemberBuilder.CreateSimpleMember(memberType, "test1", "test1@test.com", "pass", "test1");
             MemberService.Save(member1);
             var member2 = MemberBuilder.CreateSimpleMember(memberType, "test2", "test2@test.com", "pass", "test2");
@@ -333,7 +332,7 @@ namespace Umbraco.Tests.Integration.Services
         public void Cannot_Save_Member_With_Empty_Name()
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            IMemberTypeService.Save(memberType);
+            MemberTypeService.Save(memberType);
             IMember member = MemberBuilder.CreateSimpleMember(memberType, string.Empty, "test@test.com", "pass", "test");
 
             // Act & Assert
@@ -350,7 +349,7 @@ namespace Umbraco.Tests.Integration.Services
         public void Find_Members_In_Role(string roleName1, string usernameToMatch, StringPropertyMatchType matchType, int resultCount)
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            IMemberTypeService.Save(memberType);
+            MemberTypeService.Save(memberType);
             var member1 = MemberBuilder.CreateSimpleMember(memberType, "test1", "test1@test.com", "pass", "test1");
             MemberService.Save(member1);
             var member2 = MemberBuilder.CreateSimpleMember(memberType, "test2", "test2@test.com", "pass", "test2");
@@ -370,7 +369,7 @@ namespace Umbraco.Tests.Integration.Services
             MemberService.AddRole("MyTestRole1");
 
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            IMemberTypeService.Save(memberType);
+            MemberTypeService.Save(memberType);
             var member1 = MemberBuilder.CreateSimpleMember(memberType, "test1", "test1@test.com", "pass", "test1");
             MemberService.Save(member1);
             var member2 = MemberBuilder.CreateSimpleMember(memberType, "test2", "test2@test.com", "pass", "test2");
@@ -393,7 +392,7 @@ namespace Umbraco.Tests.Integration.Services
             MemberService.AddRole("MyTestRole1");
 
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            IMemberTypeService.Save(memberType);
+            MemberTypeService.Save(memberType);
             var member1 = MemberBuilder.CreateSimpleMember(memberType, "test1", "test1@test.com", "pass", "test1");
             MemberService.Save(member1);
             var member2 = MemberBuilder.CreateSimpleMember(memberType, "test2", "test2@test.com", "pass", "test2");
@@ -416,7 +415,7 @@ namespace Umbraco.Tests.Integration.Services
             MemberService.AddRole("MyTestRole1");
 
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            IMemberTypeService.Save(memberType);
+            MemberTypeService.Save(memberType);
             var member1 = MemberBuilder.CreateSimpleMember(memberType, "test1", "test1@test.com", "pass", "test1");
             MemberService.Save(member1);
             var member2 = MemberBuilder.CreateSimpleMember(memberType, "test2", "test2@test.com", "pass", "test2");
@@ -435,7 +434,7 @@ namespace Umbraco.Tests.Integration.Services
             MemberService.AddRole("MyTestRole1");
 
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            IMemberTypeService.Save(memberType);
+            MemberTypeService.Save(memberType);
             var member1 = MemberBuilder.CreateSimpleMember(memberType, "test1", "test1@test.com", "pass", "test1@test.com");
             MemberService.Save(member1);
             var member2 = MemberBuilder.CreateSimpleMember(memberType, "test2", "test2@test.com", "pass", "test2@test.com");
@@ -452,7 +451,7 @@ namespace Umbraco.Tests.Integration.Services
         public void Associate_Members_To_Roles_With_New_Role()
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            IMemberTypeService.Save(memberType);
+            MemberTypeService.Save(memberType);
             var member1 = MemberBuilder.CreateSimpleMember(memberType, "test1", "test1@test.com", "pass", "test1");
             MemberService.Save(member1);
             var member2 = MemberBuilder.CreateSimpleMember(memberType, "test2", "test2@test.com", "pass", "test2");
@@ -470,7 +469,7 @@ namespace Umbraco.Tests.Integration.Services
         public void Remove_Members_From_Roles_With_Member_Id()
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            IMemberTypeService.Save(memberType);
+            MemberTypeService.Save(memberType);
             var member1 = MemberBuilder.CreateSimpleMember(memberType, "test1", "test1@test.com", "pass", "test1");
             MemberService.Save(member1);
             var member2 = MemberBuilder.CreateSimpleMember(memberType, "test2", "test2@test.com", "pass", "test2");
@@ -491,7 +490,7 @@ namespace Umbraco.Tests.Integration.Services
         public void Remove_Members_From_Roles_With_Member_Username()
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            IMemberTypeService.Save(memberType);
+            MemberTypeService.Save(memberType);
             var member1 = MemberBuilder.CreateSimpleMember(memberType, "test1", "test1@test.com", "pass", "test1");
             MemberService.Save(member1);
             var member2 = MemberBuilder.CreateSimpleMember(memberType, "test2", "test2@test.com", "pass", "test2");
@@ -512,7 +511,7 @@ namespace Umbraco.Tests.Integration.Services
         public void Can_Delete_member()
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            IMemberTypeService.Save(memberType);
+            MemberTypeService.Save(memberType);
             IMember member = MemberBuilder.CreateSimpleMember(memberType, "test", "test@test.com", "pass", "test");
             MemberService.Save(member);
 
@@ -527,7 +526,7 @@ namespace Umbraco.Tests.Integration.Services
         public void Exists_By_Username()
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            IMemberTypeService.Save(memberType);
+            MemberTypeService.Save(memberType);
             IMember member = MemberBuilder.CreateSimpleMember(memberType, "test", "test@test.com", "pass", "test");
             MemberService.Save(member);
             IMember member2 = MemberBuilder.CreateSimpleMember(memberType, "test", "test2@test.com", "pass", "test2@test.com");
@@ -542,7 +541,7 @@ namespace Umbraco.Tests.Integration.Services
         public void Exists_By_Id()
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            IMemberTypeService.Save(memberType);
+            MemberTypeService.Save(memberType);
             IMember member = MemberBuilder.CreateSimpleMember(memberType, "test", "test@test.com", "pass", "test");
             MemberService.Save(member);
 
@@ -554,7 +553,7 @@ namespace Umbraco.Tests.Integration.Services
         public void Tracks_Dirty_Changes()
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            IMemberTypeService.Save(memberType);
+            MemberTypeService.Save(memberType);
             IMember member = MemberBuilder.CreateSimpleMember(memberType, "test", "test@test.com", "pass", "test");
             MemberService.Save(member);
 
@@ -578,7 +577,7 @@ namespace Umbraco.Tests.Integration.Services
         public void Get_By_Email()
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            IMemberTypeService.Save(memberType);
+            MemberTypeService.Save(memberType);
             IMember member = MemberBuilder.CreateSimpleMember(memberType, "test", "test@test.com", "pass", "test");
             MemberService.Save(member);
 
@@ -590,7 +589,7 @@ namespace Umbraco.Tests.Integration.Services
         public void Get_Member_Name()
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            IMemberTypeService.Save(memberType);
+            MemberTypeService.Save(memberType);
             IMember member = MemberBuilder.CreateSimpleMember(memberType, "Test Real Name", "test@test.com", "pass", "testUsername");
             MemberService.Save(member);
 
@@ -602,7 +601,7 @@ namespace Umbraco.Tests.Integration.Services
         public void Get_By_Username()
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            IMemberTypeService.Save(memberType);
+            MemberTypeService.Save(memberType);
             IMember member = MemberBuilder.CreateSimpleMember(memberType, "test", "test@test.com", "pass", "test");
             MemberService.Save(member);
 
@@ -614,7 +613,7 @@ namespace Umbraco.Tests.Integration.Services
         public void Get_By_Object_Id()
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            IMemberTypeService.Save(memberType);
+            MemberTypeService.Save(memberType);
             IMember member = MemberBuilder.CreateSimpleMember(memberType, "test", "test@test.com", "pass", "test");
             MemberService.Save(member);
 
@@ -626,7 +625,7 @@ namespace Umbraco.Tests.Integration.Services
         public void Get_All_Paged_Members()
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            IMemberTypeService.Save(memberType);
+            MemberTypeService.Save(memberType);
             var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
             MemberService.Save(members);
 
@@ -643,7 +642,7 @@ namespace Umbraco.Tests.Integration.Services
         public void Get_All_Paged_Members_With_Filter()
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            IMemberTypeService.Save(memberType);
+            MemberTypeService.Save(memberType);
             var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
             MemberService.Save(members);
 
@@ -666,7 +665,7 @@ namespace Umbraco.Tests.Integration.Services
         public void Find_By_Name_Starts_With()
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            IMemberTypeService.Save(memberType);
+            MemberTypeService.Save(memberType);
             var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
             MemberService.Save(members);
 
@@ -683,7 +682,7 @@ namespace Umbraco.Tests.Integration.Services
         public void Find_By_Email_Starts_With()
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            IMemberTypeService.Save(memberType);
+            MemberTypeService.Save(memberType);
             var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
             MemberService.Save(members);
             //don't find this
@@ -700,7 +699,7 @@ namespace Umbraco.Tests.Integration.Services
         public void Find_By_Email_Ends_With()
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            IMemberTypeService.Save(memberType);
+            MemberTypeService.Save(memberType);
             var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
             MemberService.Save(members);
             //include this
@@ -717,7 +716,7 @@ namespace Umbraco.Tests.Integration.Services
         public void Find_By_Email_Contains()
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            IMemberTypeService.Save(memberType);
+            MemberTypeService.Save(memberType);
             var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
             MemberService.Save(members);
             //include this
@@ -734,7 +733,7 @@ namespace Umbraco.Tests.Integration.Services
         public void Find_By_Email_Exact()
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            IMemberTypeService.Save(memberType);
+            MemberTypeService.Save(memberType);
             var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
             MemberService.Save(members);
             //include this
@@ -751,7 +750,7 @@ namespace Umbraco.Tests.Integration.Services
         public void Find_By_Login_Starts_With()
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            IMemberTypeService.Save(memberType);
+            MemberTypeService.Save(memberType);
             var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
             MemberService.Save(members);
             //don't find this
@@ -768,7 +767,7 @@ namespace Umbraco.Tests.Integration.Services
         public void Find_By_Login_Ends_With()
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            IMemberTypeService.Save(memberType);
+            MemberTypeService.Save(memberType);
             var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
             MemberService.Save(members);
             //include this
@@ -785,7 +784,7 @@ namespace Umbraco.Tests.Integration.Services
         public void Find_By_Login_Contains()
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            IMemberTypeService.Save(memberType);
+            MemberTypeService.Save(memberType);
             var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
             MemberService.Save(members);
             //include this
@@ -802,7 +801,7 @@ namespace Umbraco.Tests.Integration.Services
         public void Find_By_Login_Exact()
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            IMemberTypeService.Save(memberType);
+            MemberTypeService.Save(memberType);
             var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
             MemberService.Save(members);
             //include this
@@ -819,7 +818,7 @@ namespace Umbraco.Tests.Integration.Services
         public void Get_By_Property_String_Value_Exact()
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            IMemberTypeService.Save(memberType);
+            MemberTypeService.Save(memberType);
             var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
             MemberService.Save(members);
             var customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
@@ -835,7 +834,7 @@ namespace Umbraco.Tests.Integration.Services
         public void Get_By_Property_String_Value_Contains()
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            IMemberTypeService.Save(memberType);
+            MemberTypeService.Save(memberType);
             var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
             MemberService.Save(members);
             var customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
@@ -851,7 +850,7 @@ namespace Umbraco.Tests.Integration.Services
         public void Get_By_Property_String_Value_Starts_With()
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            IMemberTypeService.Save(memberType);
+            MemberTypeService.Save(memberType);
             var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
             MemberService.Save(members);
             var customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
@@ -867,7 +866,7 @@ namespace Umbraco.Tests.Integration.Services
         public void Get_By_Property_String_Value_Ends_With()
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            IMemberTypeService.Save(memberType);
+            MemberTypeService.Save(memberType);
             var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
             MemberService.Save(members);
             var customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
@@ -890,7 +889,7 @@ namespace Umbraco.Tests.Integration.Services
                     //NOTE: This is what really determines the db type - the above definition doesn't really do anything
                     DataTypeId = -51
                 }, "Content");
-            IMemberTypeService.Save(memberType);
+            MemberTypeService.Save(memberType);
             var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10, (i, member) => member.SetValue("number", i));
             MemberService.Save(members);
 
@@ -914,7 +913,7 @@ namespace Umbraco.Tests.Integration.Services
                 //NOTE: This is what really determines the db type - the above definition doesn't really do anything
                 DataTypeId = -51
             }, "Content");
-            IMemberTypeService.Save(memberType);
+            MemberTypeService.Save(memberType);
             var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10, (i, member) => member.SetValue("number", i));
             MemberService.Save(members);
 
@@ -938,7 +937,7 @@ namespace Umbraco.Tests.Integration.Services
                 //NOTE: This is what really determines the db type - the above definition doesn't really do anything
                 DataTypeId = -51
             }, "Content");
-            IMemberTypeService.Save(memberType);
+            MemberTypeService.Save(memberType);
             var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10, (i, member) => member.SetValue("number", i));
             MemberService.Save(members);
 
@@ -962,7 +961,7 @@ namespace Umbraco.Tests.Integration.Services
                 //NOTE: This is what really determines the db type - the above definition doesn't really do anything
                 DataTypeId = -51
             }, "Content");
-            IMemberTypeService.Save(memberType);
+            MemberTypeService.Save(memberType);
             var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10, (i, member) => member.SetValue("number", i));
             MemberService.Save(members);
 
@@ -986,7 +985,7 @@ namespace Umbraco.Tests.Integration.Services
                 //NOTE: This is what really determines the db type - the above definition doesn't really do anything
                 DataTypeId = -51
             }, "Content");
-            IMemberTypeService.Save(memberType);
+            MemberTypeService.Save(memberType);
             var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10, (i, member) => member.SetValue("number", i));
             MemberService.Save(members);
 
@@ -1010,7 +1009,7 @@ namespace Umbraco.Tests.Integration.Services
                 //NOTE: This is what really determines the db type - the above definition doesn't really do anything
                 DataTypeId = -36
             }, "Content");
-            IMemberTypeService.Save(memberType);
+            MemberTypeService.Save(memberType);
             var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10, (i, member) => member.SetValue("date", new DateTime(2013, 12, 20, 1, i, 0)));
             MemberService.Save(members);
 
@@ -1034,7 +1033,7 @@ namespace Umbraco.Tests.Integration.Services
                 //NOTE: This is what really determines the db type - the above definition doesn't really do anything
                 DataTypeId = -36
             }, "Content");
-            IMemberTypeService.Save(memberType);
+            MemberTypeService.Save(memberType);
             var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10, (i, member) => member.SetValue("date", new DateTime(2013, 12, 20, 1, i, 0)));
             MemberService.Save(members);
 
@@ -1058,7 +1057,7 @@ namespace Umbraco.Tests.Integration.Services
                 //NOTE: This is what really determines the db type - the above definition doesn't really do anything
                 DataTypeId = -36
             }, "Content");
-            IMemberTypeService.Save(memberType);
+            MemberTypeService.Save(memberType);
             var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10, (i, member) => member.SetValue("date", new DateTime(2013, 12, 20, 1, i, 0)));
             MemberService.Save(members);
 
@@ -1082,7 +1081,7 @@ namespace Umbraco.Tests.Integration.Services
                 //NOTE: This is what really determines the db type - the above definition doesn't really do anything
                 DataTypeId = -36
             }, "Content");
-            IMemberTypeService.Save(memberType);
+            MemberTypeService.Save(memberType);
             var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10, (i, member) => member.SetValue("date", new DateTime(2013, 12, 20, 1, i, 0)));
             MemberService.Save(members);
 
@@ -1106,7 +1105,7 @@ namespace Umbraco.Tests.Integration.Services
                 //NOTE: This is what really determines the db type - the above definition doesn't really do anything
                 DataTypeId = -36
             }, "Content");
-            IMemberTypeService.Save(memberType);
+            MemberTypeService.Save(memberType);
             var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10, (i, member) => member.SetValue("date", new DateTime(2013, 12, 20, 1, i, 0)));
             MemberService.Save(members);
 
@@ -1124,7 +1123,7 @@ namespace Umbraco.Tests.Integration.Services
         public void Count_All_Members()
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            IMemberTypeService.Save(memberType);
+            MemberTypeService.Save(memberType);
             var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
             MemberService.Save(members);
             var customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
@@ -1139,7 +1138,7 @@ namespace Umbraco.Tests.Integration.Services
         public void Count_All_Locked_Members()
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            IMemberTypeService.Save(memberType);
+            MemberTypeService.Save(memberType);
             var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10, (i, member) => member.IsLockedOut = i % 2 == 0);
             MemberService.Save(members);
 
@@ -1156,7 +1155,7 @@ namespace Umbraco.Tests.Integration.Services
         public void Count_All_Approved_Members()
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            IMemberTypeService.Save(memberType);
+            MemberTypeService.Save(memberType);
             var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10, (i, member) => member.IsApproved = i % 2 == 0);
             MemberService.Save(members);
 
@@ -1173,9 +1172,9 @@ namespace Umbraco.Tests.Integration.Services
         public void Setting_Property_On_Built_In_Member_Property_When_Property_Doesnt_Exist_On_Type_Is_Ok()
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            IMemberTypeService.Save(memberType);
+            MemberTypeService.Save(memberType);
             memberType.RemovePropertyType(Constants.Conventions.Member.Comments);
-            IMemberTypeService.Save(memberType);
+            MemberTypeService.Save(memberType);
             Assert.IsFalse(memberType.PropertyTypes.Any(x => x.Alias == Constants.Conventions.Member.Comments));
 
             var customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
@@ -1196,7 +1195,7 @@ namespace Umbraco.Tests.Integration.Services
         public void Setting_DateTime_Property_On_Built_In_Member_Property_Saves_To_Correct_Column()
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            IMemberTypeService.Save(memberType);
+            MemberTypeService.Save(memberType);
             var member = MemberBuilder.CreateSimpleMember(memberType, "test", "test@test.com", "test", "test");
             var date = DateTime.Now;
             member.LastLoginDate = DateTime.Now;
@@ -1234,7 +1233,7 @@ namespace Umbraco.Tests.Integration.Services
         public void New_Member_Approved_By_Default()
         {
             IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            IMemberTypeService.Save(memberType);
+            MemberTypeService.Save(memberType);
 
             var customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
             MemberService.Save(customMember);
