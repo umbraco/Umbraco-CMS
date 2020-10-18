@@ -70,6 +70,14 @@ function DocumentTypesCreateController($scope, $location, navigationService, con
         navigationService.hideMenu();
     };
 
+    $scope.createComposition = function () {
+        $location.search('create', null);
+        $location.search('notemplate', null);
+        $location.search('iscomposition', null);
+        $location.path("/settings/documenttypes/edit/" + node.id).search("create", "true").search("notemplate", "true").search("iscomposition", "true");
+        navigationService.hideMenu();
+    };
+
     $scope.createElement = function () {
         $location.search('create', null);
         $location.search('notemplate', null);
