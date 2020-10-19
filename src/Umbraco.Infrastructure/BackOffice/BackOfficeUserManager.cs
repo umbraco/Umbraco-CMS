@@ -376,9 +376,9 @@ namespace Umbraco.Core.BackOffice
             return new IdentityAuditEventArgs(auditEvent, ip, currentUserId, string.Empty, affectedUserId, affectedUsername);
         }
 
-        // TODO: Review where these are raised and see if they can be simplified and either done in the this usermanager or the signin manager, lastly we'll resort to the authenticaiton controller
+        // TODO: Review where these are raised and see if they can be simplified and either done in the this usermanager or the signin manager, lastly we'll resort to the authentication controller
         // In some cases it will be nicer/easier to not pass in IPrincipal
-        public void RaiseAccountLockedEvent(IPrincipal currentUser, int userId) => OnAccountLocked(CreateArgs(AuditEvent.AccountLocked, currentUser, userId, string.Empty));
+        public void RaiseAccountLockedEvent(BackOfficeIdentityUser currentUser, int userId) => OnAccountLocked(CreateArgs(AuditEvent.AccountLocked, currentUser, userId, string.Empty));
 
         public void RaiseAccountUnlockedEvent(IPrincipal currentUser, int userId) => OnAccountUnlocked(CreateArgs(AuditEvent.AccountUnlocked, currentUser, userId, string.Empty));
 

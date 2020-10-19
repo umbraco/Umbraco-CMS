@@ -1059,6 +1059,8 @@ To manage your website, simply open the Umbraco back office and start adding con
 			</body>
 		</html>
 	]]></key>
+    <key alias="mfaSecurityCodeSubject">Umbraco: Security Code</key>
+    <key alias="mfaSecurityCodeMessage">Your security code is: %0%</key>
   </area>
   <area alias="main">
     <key alias="dashboard">Dashboard</key>

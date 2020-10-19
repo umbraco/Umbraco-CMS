@@ -70,6 +70,7 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
 
             var subject = _textService.Localize("healthcheck/scheduledHealthCheckEmailSubject", new[] { host.ToString() });
 
+            // TODO: Why isn't this injected?
             var mailSender = new EmailSender(Options.Create(_globalSettings));
             using (var mailMessage = CreateMailMessage(subject, message))
             {

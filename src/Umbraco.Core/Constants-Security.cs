@@ -35,6 +35,7 @@
             public const string BackOfficeExternalCookieName = "UMB_EXTLOGIN";
             public const string BackOfficeTokenAuthenticationType = "UmbracoBackOfficeToken";
             public const string BackOfficeTwoFactorAuthenticationType = "UmbracoTwoFactorCookie";
+            public const string BackOfficeTwoFactorRememberMeAuthenticationType = "UmbracoTwoFactorRememberMeCookie";
 
             public const string EmptyPasswordPrefix = "___UIDEMPTYPWORD__";
             public const string ForceReAuthFlag = "umbraco-force-auth";

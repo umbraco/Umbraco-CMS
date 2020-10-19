@@ -30,9 +30,17 @@ using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Security;
 using Constants = Umbraco.Core.Constants;
+using Microsoft.AspNetCore.Identity;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
+    // See 
+    // for a bigger example of this type of controller implementation in netcore:
+    // https://github.com/dotnet/AspNetCore.Docs/blob/2efb4554f8f659be97ee7cd5dd6143b871b330a5/aspnetcore/migration/1x-to-2x/samples/AspNetCoreDotNetCore2App/AspNetCoreDotNetCore2App/Controllers/AccountController.cs
+    // https://github.com/dotnet/AspNetCore.Docs/blob/ad16f5e1da6c04fa4996ee67b513f2a90fa0d712/aspnetcore/common/samples/WebApplication1/Controllers/AccountController.cs
+    // with authenticator app
+    // https://github.com/dotnet/AspNetCore.Docs/blob/master/aspnetcore/security/authentication/identity/sample/src/ASPNETCore-IdentityDemoComplete/IdentityDemo/Controllers/AccountController.cs
+
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]  // TODO: Maybe this could be applied with our Application Model conventions
     //[ValidationFilter] // TODO: I don't actually think this is required with our custom Application Model conventions applied
     [AngularJsonOnlyConfiguration] // TODO: This could be applied with our Application Model conventions
@@ -51,6 +59,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IIpResolver _ipResolver;
         private readonly UserPasswordConfigurationSettings _passwordConfiguration;
         private readonly IEmailSender _emailSender;
+        private readonly ISmsSender _smsSender;
         private readonly Core.Hosting.IHostingEnvironment _hostingEnvironment;
         private readonly IRequestAccessor _requestAccessor;
         private readonly LinkGenerator _linkGenerator;
@@ -71,6 +80,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             IIpResolver ipResolver,
             IOptions<UserPasswordConfigurationSettings> passwordConfiguration,
             IEmailSender emailSender,
+            ISmsSender smsSender,
             Core.Hosting.IHostingEnvironment hostingEnvironment,
             IRequestAccessor requestAccessor,
             LinkGenerator linkGenerator)
@@ -87,6 +97,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _ipResolver = ipResolver;
             _passwordConfiguration = passwordConfiguration.Value;
             _emailSender = emailSender;
+            _smsSender = smsSender;
             _hostingEnvironment = hostingEnvironment;
             _requestAccessor = requestAccessor;
             _linkGenerator = linkGenerator;
@@ -139,6 +150,30 @@ namespace Umbraco.Web.BackOffice.Controllers
             var user = _userService.GetUserById(id);
 
             return _umbracoMapper.Map<UserDisplay>(user);
+        }
+
+        [UmbracoAuthorize]
+        [ValidateAngularAntiForgeryToken]
+        public async Task<ActionResult> PostUnLinkLogin(UnLinkLoginModel unlinkLoginModel)
+        {
+            var user = await _userManager.FindByIdAsync(User.Identity.GetUserId());
+            if (user == null) throw new InvalidOperationException("Could not find user");
+
+            var result = await _userManager.RemoveLoginAsync(
+                user,
+                unlinkLoginModel.LoginProvider,
+                unlinkLoginModel.ProviderKey);
+
+            if (result.Succeeded)
+            {
+                await _signInManager.SignInAsync(user, true);
+                return Ok();
+            }
+            else
+            {
+                AddModelErrors(result);
+                throw HttpResponseException.CreateValidationErrorResponse(ModelState);
+            }
         }
 
         [HttpGet]
@@ -313,7 +348,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                     var code = await _userManager.GeneratePasswordResetTokenAsync(identityUser);
                     var callbackUrl = ConstructCallbackUrl(identityUser.Id, code);
 
-                    var message = _textService.Localize("resetPasswordEmailCopyFormat",
+                    var message = _textService.Localize("login/resetPasswordEmailCopyFormat",
                         // Ensure the culture of the found user is used for the email!
                         UmbracoUserExtensions.GetUserCulture(identityUser.Culture, _textService, _globalSettings),
                         new[] { identityUser.UserName, callbackUrl });
@@ -337,6 +372,107 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
 
             return Ok();
+        }
+
+        /// <summary>
+        /// Used to retrieve the 2FA providers for code submission
+        /// </summary>
+        /// <returns></returns>
+        [SetAngularAntiForgeryTokens] 
+        public async Task<IEnumerable<string>> Get2FAProviders()
+        {
+            var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
+            if (user == null)
+            {
+                _logger.LogWarning("Get2FAProviders :: No verified user found, returning 404");
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            var userFactors = await _userManager.GetValidTwoFactorProvidersAsync(user);
+            return userFactors;
+        }
+
+        [SetAngularAntiForgeryTokens]
+        public async Task<IActionResult> PostSend2FACode([FromBody] string provider)
+        {
+            if (provider.IsNullOrWhiteSpace())
+                return NotFound();
+
+            var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
+            if (user == null)
+            {
+                _logger.LogWarning("PostSend2FACode :: No verified user found, returning 404");
+                return NotFound();
+            }
+
+            // Generate the token and send it
+            var code = await _userManager.GenerateTwoFactorTokenAsync(user, provider);
+            if (string.IsNullOrWhiteSpace(code))
+            {
+                _logger.LogWarning("PostSend2FACode :: Could not generate 2FA code");
+                return BadRequest("Invalid code");
+            }
+
+            var subject = _textService.Localize("login/mfaSecurityCodeSubject",
+                       // Ensure the culture of the found user is used for the email!
+                       UmbracoUserExtensions.GetUserCulture(user.Culture, _textService, _globalSettings));
+
+            var message = _textService.Localize("login/mfaSecurityCodeMessage",
+                // Ensure the culture of the found user is used for the email!
+                UmbracoUserExtensions.GetUserCulture(user.Culture, _textService, _globalSettings),
+                new[] { code });
+
+            if (provider == "Email")
+            {
+                var mailMessage = new MailMessage()
+                {
+                    Subject = subject,
+                    Body = message,
+                    IsBodyHtml = true,
+                    To = { user.Email }
+                };
+
+                await _emailSender.SendAsync(mailMessage);
+            }
+            else if (provider == "Phone")
+            {
+                await _smsSender.SendSmsAsync(await _userManager.GetPhoneNumberAsync(user), message);
+            }
+
+            return Ok();
+        }
+
+        [SetAngularAntiForgeryTokens]
+        public async Task<ActionResult<UserDetail>> PostVerify2FACode(Verify2FACodeModel model)
+        {
+            if (ModelState.IsValid == false)
+            {
+                throw HttpResponseException.CreateValidationErrorResponse(ModelState);
+            }
+
+            var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
+            if (user == null)
+            {
+                _logger.LogWarning("PostVerify2FACode :: No verified user found, returning 404");
+                return NotFound();
+            }
+
+            var result = await _signInManager.TwoFactorSignInAsync(model.Provider, model.Code, model.IsPersistent, model.RememberClient);
+            if (result.Succeeded)
+            {
+                return GetUserDetail(_userService.GetByUsername(user.UserName));
+            }
+
+            if (result.IsLockedOut)
+            {
+                throw HttpResponseException.CreateValidationErrorResponse("User is locked out");
+            }
+            if (result.IsNotAllowed)
+            {
+                throw HttpResponseException.CreateValidationErrorResponse("User is not allowed");
+            }            
+
+            throw HttpResponseException.CreateValidationErrorResponse("Invalid code");
         }
 
         /// <summary>
@@ -453,6 +589,14 @@ namespace Umbraco.Web.BackOffice.Controllers
             var applicationUri = _requestAccessor.GetApplicationUrl();
             var callbackUri = new Uri(applicationUri, action);
             return callbackUri.ToString();
+        }
+
+        private void AddModelErrors(IdentityResult result, string prefix = "")
+        {
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(prefix, error.Description);
+            }
         }
     }
 }
