@@ -29,6 +29,7 @@
 @param {boolean} showText Set to <code>true</code> to show the text. <code>false</code> by default
 @param {domElement} element Highlights a DOM-element (HTML-selector)
 @param {string} state Set the initial state of the component. To have it hidden use <code>hidden</code>
+@param {string} mode Set the mode, which decides how to style the component. "small" and "tab" are currently supported
 **/
 
 (function () {
@@ -82,7 +83,8 @@
             color: "@?",
             showText: "<?",
             element: "@?",
-            state: "@?"
+            state: "@?",
+            mode: "@?"
         }
     };
 

@@ -1018,6 +1018,37 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         }
 
         /// <inheritdoc />
+        public void ClearSchedule(DateTime date, ContentScheduleAction action)
+        {
+            var a = action.ToString();
+            var sql = Sql().Delete<ContentScheduleDto>().Where<ContentScheduleDto>(x => x.Date <= date && x.Action == a);
+            Database.Execute(sql);
+        }
+
+        private Sql GetSqlForHasScheduling(ContentScheduleAction action, DateTime date)
+        {
+            var template = SqlContext.Templates.Get("Umbraco.Core.DocumentRepository.GetSqlForHasScheduling", tsql => tsql
+                .SelectCount()
+                    .From<ContentScheduleDto>()
+                    .Where<ContentScheduleDto>(x => x.Action == SqlTemplate.Arg<string>("action") && x.Date <= SqlTemplate.Arg<DateTime>("date")));
+
+            var sql = template.Sql(action.ToString(), date);
+            return sql;
+        }
+
+        public bool HasContentForExpiration(DateTime date)
+        {
+            var sql = GetSqlForHasScheduling(ContentScheduleAction.Expire, date);
+            return Database.ExecuteScalar<int>(sql) > 0;
+        }
+
+        public bool HasContentForRelease(DateTime date)
+        {
+            var sql = GetSqlForHasScheduling(ContentScheduleAction.Release, date);
+            return Database.ExecuteScalar<int>(sql) > 0;
+        }
+
+        /// <inheritdoc />
         public IEnumerable<IContent> GetContentForRelease(DateTime date)
         {
             var action = ContentScheduleAction.Release.ToString();

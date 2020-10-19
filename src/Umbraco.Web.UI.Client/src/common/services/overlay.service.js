@@ -8,7 +8,7 @@
 (function () {
     "use strict";
 
-    function overlayService(eventsService, backdropService) {
+    function overlayService(eventsService, backdropService, focusLockService) {
 
         var currentOverlay = null;
 
@@ -43,12 +43,14 @@
             }
 
             overlay.show = true;
+            focusLockService.addInertAttribute();
             backdropService.open(backdropOptions);
             currentOverlay = overlay;
             eventsService.emit("appState.overlay", overlay);
         }
 
         function close() {
+            focusLockService.removeInertAttribute();
             backdropService.close();
             currentOverlay = null;
             eventsService.emit("appState.overlay", null);
@@ -76,7 +78,12 @@
                 case "delete":
                     if (!overlay.confirmMessageStyle) overlay.confirmMessageStyle = "danger";
                     if (!overlay.submitButtonStyle) overlay.submitButtonStyle = "danger";
-                    if (!overlay.submitButtonLabelKey) overlay.submitButtonLabelKey = "contentTypeEditor_yesDelete";
+                    if (!overlay.submitButtonLabelKey) overlay.submitButtonLabelKey = "actions_delete";
+                    break;
+
+                case "remove":
+                    if (!overlay.submitButtonStyle) overlay.submitButtonStyle = "primary";
+                    if (!overlay.submitButtonLabelKey) overlay.submitButtonLabelKey = "actions_remove";
                     break;
                 
                 default:
@@ -92,12 +99,18 @@
             confirm(overlay);
         }
 
+        function confirmRemove(overlay) {
+            overlay.confirmType = "remove";
+            confirm(overlay);
+        }
+
         var service = {
             open: open,
             close: close,
             ysod: ysod,
             confirm: confirm,
-            confirmDelete: confirmDelete
+            confirmDelete: confirmDelete,
+            confirmRemove: confirmRemove
         };
 
         return service;

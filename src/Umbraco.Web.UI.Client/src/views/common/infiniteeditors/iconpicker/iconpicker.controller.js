@@ -6,7 +6,7 @@
  * @description
  * The controller for the content type editor icon picker
  */
-function IconPickerController($scope, iconHelper, localizationService) {
+function IconPickerController($scope, localizationService, iconHelper) {
 
     var vm = this;
 
@@ -42,14 +42,29 @@ function IconPickerController($scope, iconHelper, localizationService) {
         vm.loading = true;
 
         setTitle();
-    
-        iconHelper.getIcons().then(function (icons) {
-            vm.icons = icons;
-            vm.loading = false;
-        });
+
+        iconHelper.getAllIcons()
+            .then(icons => {
+                vm.icons = icons;
+
+                // Get's legacy icons, removes duplicates then maps them to IconModel
+                iconHelper.getIcons()
+                    .then(icons => {
+                        if (icons && icons.length > 0) {
+                            let legacyIcons = icons
+                                .filter(icon => !vm.icons.find(x => x.name == icon))
+                                .map(icon => { return { name: icon, svgString: null }; });
+
+                            vm.icons = legacyIcons.concat(vm.icons);
+                        }
+
+                        vm.loading = false;
+                    });
+            });
 
         // set a default color if nothing is passed in
         vm.color = $scope.model.color ? findColor($scope.model.color) : vm.colors.find(x => x.default);
+
 
         // if an icon is passed in - preselect it
         vm.icon = $scope.model.icon ? $scope.model.icon : undefined;
@@ -87,7 +102,7 @@ function IconPickerController($scope, iconHelper, localizationService) {
     }
 
     function submit() {
-        if ($scope.model && $scope.model.submit) {            
+        if ($scope.model && $scope.model.submit) {
             $scope.model.submit($scope.model);
         }
     }

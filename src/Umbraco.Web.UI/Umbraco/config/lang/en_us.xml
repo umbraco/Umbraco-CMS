@@ -17,6 +17,7 @@
     <key alias="createGroup">Create group</key>
     <key alias="delete">Delete</key>
     <key alias="disable">Disable</key>
+    <key alias="editSettings">Edit settings</key>
     <key alias="emptyRecycleBin">Empty recycle bin</key>
     <key alias="enable">Enable</key>
     <key alias="exportDocumentType">Export Document Type</key>
@@ -31,6 +32,7 @@
     <key alias="unpublish">Unpublish</key>
     <key alias="refreshNode">Reload</key>
     <key alias="republish">Republish entire site</key>
+    <key alias="remove">Remove</key>
     <key alias="rename" version="7.3.0">Rename</key>
     <key alias="restore" version="7.3.0">Restore</key>
     <key alias="SetPermissionsForThePage">Set permissions for the page %0%</key>
@@ -155,6 +157,8 @@
     <key alias="confirmActionCancel">Cancel</key>
     <key alias="confirmActionConfirm">Confirm</key>
 	<key alias="morePublishingOptions">More publishing options</key>
+    <key alias="submitChanges">Submit</key>
+    <key alias="submitChangesAndClose">Submit and close</key>
   </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">Viewing for</key>
@@ -296,7 +300,7 @@
     <key alias="addTextBox">Add another text box</key>
     <key alias="removeTextBox">Remove this text box</key>
     <key alias="contentRoot">Content root</key>
-    <key alias="includeUnpublished">Include drafts and unpublished content items.</key>
+    <key alias="includeUnpublished">Include unpublished content items.</key>
     <key alias="isSensitiveValue">This value is hidden. If you need access to view this value please contact your website administrator.</key>
     <key alias="isSensitiveValue_short">This value is hidden.</key>
     <key alias="languagesToPublishForFirstTime">What languages would you like to publish? All languages with content are saved!</key>
@@ -350,6 +354,7 @@
     <key alias="createFolderFailed">Failed to create a folder under parent id %0%</key>
     <key alias="renameFolderFailed">Failed to rename the folder with id %0%</key>
     <key alias="dragAndDropYourFilesIntoTheArea">Drag and drop your file(s) into the area</key>
+    <key alias="uploadNotAllowed">Upload is not allowed in this location.</key>
   </area>
   <area alias="member">
     <key alias="createNewMember">Create a new member</key>
@@ -433,6 +438,9 @@
     <key alias="closeThisWindow">Close this window</key>
     <key alias="confirmdelete">Are you sure you want to delete</key>
     <key alias="confirmdisable">Are you sure you want to disable</key>
+    <key alias="confirmremove">Are you sure you want to remove</key>
+    <key alias="confirmremoveusageof"><![CDATA[Are you sure you want to remove the usage of <b>%0%</b>]]></key>
+    <key alias="confirmremovereferenceto"><![CDATA[Are you sure you want to remove the reference to <b>%0%</b>]]></key>
     <key alias="confirmlogout">Are you sure?</key>
     <key alias="confirmSure">Are you sure?</key>
     <key alias="cut">Cut</key>
@@ -512,6 +520,9 @@
     <key alias="selectEditorConfiguration">Select configuration</key>
     <key alias="selectSnippet">Select snippet</key>
     <key alias="variantdeletewarning">This will delete the node and all its languages. If you only want to delete one language, you should unpublish the node in that language instead.</key>
+    <key alias="propertyuserpickerremovewarning"><![CDATA[This will remove the user <b>%0%</b>.]]></key>
+    <key alias="userremovewarning"><![CDATA[This will remove the user <b>%0%</b> from the <b>%1%</b> group]]></key>
+    <key alias="yesRemove">Yes, remove</key>
   </area>
   <area alias="dictionary">
     <key alias="noItems">There are no dictionary items.</key>
@@ -638,6 +649,7 @@
     <key alias="tableColMergeLeft">Please place cursor at the left of the two cells you wish to merge</key>
     <key alias="tableSplitNotSplittable">You cannot split a cell that hasn't been merged.</key>
     <key alias="propertyHasErrors">This property is invalid</key>
+    <key alias="errorPropertyEditorNotSupportedInElementTypes">Property '%0%' uses editor '%1%' which is not supported in Element Types.</key>
   </area>
   <area alias="general">
     <key alias="options">Options</key>
@@ -666,6 +678,7 @@
     <key alias="continue">Continue</key>
     <key alias="copy">Copy</key>
     <key alias="create">Create</key>
+    <key alias="cropSection">Crop section</key>
     <key alias="database">Database</key>
     <key alias="date">Date</key>
     <key alias="default">Default</key>
@@ -675,6 +688,7 @@
     <key alias="design">Design</key>
     <key alias="dictionary">Dictionary</key>
     <key alias="dimensions">Dimensions</key>
+    <key alias="discard">Discard</key>
     <key alias="down">Down</key>
     <key alias="download">Download</key>
     <key alias="edit">Edit</key>
@@ -1607,10 +1621,12 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="gridLayouts">Grid Layouts</key>
     <key alias="gridLayoutsDetail">Layouts are the overall work area for the grid editor, usually you only need one or two different layouts</key>
     <key alias="addGridLayout">Add Grid Layout</key>
+    <key alias="editGridLayout">Edit Grid Layout</key>
     <key alias="addGridLayoutDetail">Adjust the layout by setting column widths and adding additional sections</key>
     <key alias="rowConfigurations">Row configurations</key>
     <key alias="rowConfigurationsDetail">Rows are predefined cells arranged horizontally</key>
     <key alias="addRowConfiguration">Add row configuration</key>
+    <key alias="editRowConfiguration">Edit row configuration</key>
     <key alias="addRowConfigurationDetail">Adjust the row by setting cell widths and adding additional cells</key>
     <key alias="columns">Columns</key>
     <key alias="columnsDetails">Total combined number of columns in the grid layout</key>
@@ -2299,8 +2315,12 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="labelUsedByMedia">Used in Media</key>
   </area>
   <area alias="logViewer">
+      <key alias="deleteSavedSearch">Delete Saved Search</key>
       <key alias="logLevels">Log Levels</key>
       <key alias="savedSearches">Saved Searches</key>
+      <key alias="saveSearch">Save Search</key>
+      <key alias="saveSearchDescription">Enter a friendly name for your search query</key>
+      <key alias="filterSearch">Filter Search</key>
       <key alias="totalItems">Total Items</key>
       <key alias="timestamp">Timestamp</key>
       <key alias="level">Level</key>
@@ -2330,9 +2350,11 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="labelForCopyAllEntries">Copy %0%</key>
     <key alias="labelForArrayOfItemsFrom">%0% from %1%</key>
     <key alias="labelForRemoveAllEntries">Remove all items</key>
+    <key alias="labelForClearClipboard">Clear clipboard</key>
   </area>
   <area alias="propertyActions">
     <key alias="tooltipForPropertyActionsMenu">Open Property Actions</key>
+    <key alias="tooltipForPropertyActionsMenuClose">Close Property Actions</key>
   </area>
   <area alias="nuCache">
     <key alias="wait">Wait</key>
@@ -2452,6 +2474,45 @@ To manage your website, simply open the Umbraco back office and start adding con
   <area alias="formsDashboard">
     <key alias="formsHeadline">Umbraco Forms</key>
     <key alias="formsDescription">Create forms using an intuitive drag and drop interface. From simple contact forms that sends e-mails to advanced questionaires that integrate with CRM systems. Your clients will love it!</key>
+  </area>
+  <area alias="blockEditor">
+    <key alias="headlineCreateBlock">Create new block</key>
+    <key alias="headlineAddSettingsElementType">Attach a settings section</key>
+    <key alias="headlineAddCustomView">Select view</key>
+    <key alias="headlineAddCustomStylesheet">Select stylesheet</key>
+    <key alias="headlineAddThumbnail">Choose thumbnail</key>
+    <key alias="labelcreateNewElementType">Create new</key>
+    <key alias="labelCustomStylesheet">Custom stylesheet</key>
+    <key alias="addCustomStylesheet">Add stylesheet</key>
+    <key alias="headlineEditorAppearance">Editor apperance</key>
+    <key alias="headlineDataModels">Data models</key>
+    <key alias="headlineCatalogueAppearance">Catalogue appearance</key>
+    <key alias="labelBackgroundColor">Background color</key>
+    <key alias="labelIconColor">Icon color</key>
+    <key alias="labelContentElementType">Content model</key>
+    <key alias="labelLabelTemplate">Label</key>
+    <key alias="labelCustomView">Custom view</key>
+    <key alias="labelSettingsElementType">Settings model</key>
+    <key alias="labelEditorSize">Overlay editor size</key>
+    <key alias="addCustomView">Add custom view</key>
+    <key alias="addSettingsElementType">Add settings</key>
+    <key alias="labelTemplatePlaceholder">Overwrite label template</key>
+    <key alias="confirmDeleteBlockMessage"><![CDATA[Are you sure you want to delete content of <strong>%0%</strong>.]]></key>
+    <key alias="confirmDeleteBlockTypeMessage"><![CDATA[Are you sure you want to delete block configuration of <strong>%0%</strong>.]]></key>
+    <key alias="confirmDeleteBlockTypeNotice">The content of this block will still be present, editing of this content will no longer be available and will be shown as unsupported content.</key>
+    <key alias="blockConfigurationOverlayTitle"><![CDATA[Configuration of '%0%']]></key>
+    <key alias="thumbnail">Thumbnail</key>
+    <key alias="addThumbnail">Add thumbnail</key>
+    <key alias="tabCreateEmpty">Create empty</key>
+    <key alias="tabClipboard">Clipboard</key>
+    <key alias="tabBlockSettings">Settings</key>
+    <key alias="headlineAdvanced">Advanced</key>
+    <key alias="forceHideContentEditor">Force hide content editor</key>
+    <key alias="blockHasChanges">You have made changes to this content. Are you sure you want to discard them?</key>
+    <key alias="confirmCancelBlockCreationHeadline">Discard creation?</key>
+    <key alias="confirmCancelBlockCreationMessage"><![CDATA[Are you sure you want to cancel the creation.]]></key>
+    <key alias="elementTypeDoesNotExistHeadline">Error!</key>
+    <key alias="elementTypeDoesNotExistDescription">The ElementType of this block does not exist anymore</key>
   </area>
   <area alias="contentTemplatesDashboard">
     <key alias="whatHeadline">What are Content Templates?</key>

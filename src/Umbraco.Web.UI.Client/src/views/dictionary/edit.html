@@ -22,8 +22,8 @@
                 <umb-box>
                     <umb-box-content>
                         <p ng-bind-html="vm.description"></p>
-                        <umb-property ng-repeat="translation in vm.content.translations" property="translation.property">
-                            <textarea ng-model="translation.translation" id="{{translation.isoCode}}" maxlength="1000"></textarea>
+                        <umb-property ng-repeat="translation in vm.content.translations | orderBy:'displayName'" property="translation.property">
+                            <textarea rows="2" class="autogrow" style="width: 100%;" ng-model="translation.translation" maxlength="1000"></textarea>
                         </umb-property>
                     </umb-box-content>
                 </umb-box>

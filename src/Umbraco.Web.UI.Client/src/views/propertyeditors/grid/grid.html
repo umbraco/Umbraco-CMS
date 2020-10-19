@@ -155,8 +155,8 @@
                                                       </div>
 
                                                       <div class="cell-tools" ng-if="(area === active || area === currentCellWithActiveChild) && !sortMode">
-                                                         <button type="button" aria-haspopup="true" class="btn-reset cell-tool" ng-click="editGridItemSettings(area, 'cell')">
-                                                            <i class="icon-settings" aria-hidden></i>
+                                                         <button type="button" aria-haspopup="true" class="btn-icon cell-tool" ng-click="editGridItemSettings(area, 'cell')">
+                                                            <i class="icon-settings" aria-hidden="true"></i>
                                                             <span class="sr-only">Open column settings</span>
                                                          </button>
                                                       </div>
@@ -201,7 +201,11 @@
                                                                       <div class="umb-tools" ng-if="control === active">
 
                                                                           <div class="umb-control-tool" ng-if="control.editor.config.settings">
-                                                                              <button class="umb-control-tool-icon icon-settings btn-reset" ng-click="editGridItemSettings(control, 'control')" type="button"></button>
+                                                                              <button type="button" class="umb-control-tool-icon icon-settings btn-icon" ng-click="editGridItemSettings(control, 'control')">
+                                                                                  <span class="sr-only">
+                                                                                      <localize key="general_edit">Edit</localize>
+                                                                                  </span>
+                                                                              </button>
                                                                           </div>
 
                                                                           <div class="umb-control-tool">
@@ -254,17 +258,15 @@
 
                     <div class="umb-add-row" ng-if="!sortMode">
 
-                       <button
-                          class="iconBox btn-reset"
-                          type="button"
-                          title="{{ section.$allowedLayouts.length == 1 ? section.$allowedLayouts[0].label || section.$allowedLayouts[0].name : '' }}"
-                          ng-click="section.$allowedLayouts.length == 1 ? addRow(section, section.$allowedLayouts[0]) : toggleAddRow()"
-                          ng-if="!showRowConfigurations">
-
-                          <i class="icon icon-add" ></i>
-                          <span class="sr-only">
-                            <localize key="visuallyHiddenTexts_addNewRow">Add new row</localize>
-                          </span>
+                       <button type="button"
+                               class="iconBox btn-reset"
+                               title="{{section.$allowedLayouts.length == 1 ? section.$allowedLayouts[0].label || section.$allowedLayouts[0].name : ''}}"
+                               ng-click="section.$allowedLayouts.length == 1 ? addRow(section, section.$allowedLayouts[0]) : toggleAddRow()"
+                               ng-if="!showRowConfigurations">
+                            <i class="icon icon-add" aria-hidden="true"></i>
+                            <span class="sr-only">
+                                <localize key="visuallyHiddenTexts_addNewRow">Add new row</localize>
+                            </span>
                         </button>
 
                     </div>

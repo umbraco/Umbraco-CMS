@@ -32,7 +32,7 @@ function DocumentTypesCreateController($scope, $location, navigationService, con
 
     $scope.createContainer = function () {
 
-        if (formHelper.submitForm({ scope: $scope, formCtrl: this.createFolderForm })) {
+        if (formHelper.submitForm({ scope: $scope, formCtrl: $scope.createFolderForm })) {
 
             contentTypeResource.createContainer(node.id, $scope.model.folderName).then(function (folderId) {
 
@@ -47,12 +47,13 @@ function DocumentTypesCreateController($scope, $location, navigationService, con
                     activate: true
                 });
 
-                formHelper.resetForm({ scope: $scope });
+                formHelper.resetForm({ scope: $scope, formCtrl: $scope.createFolderForm });
 
                 var section = appState.getSectionState("currentSection");
 
             }, function (err) {
 
+                formHelper.resetForm({ scope: $scope, formCtrl: $scope.createFolderForm, hasErrors: true });
                 $scope.error = err;
 
             });
@@ -83,9 +84,7 @@ function DocumentTypesCreateController($scope, $location, navigationService, con
                         $location.search('create', null);
                         $location.search('notemplate', null);
 
-                        formHelper.resetForm({
-                            scope: $scope
-                        });
+                        formHelper.resetForm({ scope: $scope, formCtrl: this.createDoctypeCollectionForm });
 
                         var section = appState.getSectionState("currentSection");
 
@@ -94,6 +93,7 @@ function DocumentTypesCreateController($scope, $location, navigationService, con
 
                     }, function (err) {
 
+                        formHelper.resetForm({ scope: $scope, formCtrl: this.createDoctypeCollectionForm, hasErrors: true });
                         $scope.error = err;
 
                         //show any notifications

@@ -138,6 +138,7 @@
 
 .umb-media-grid__item-overlay {
    display: flex;
+   align-items: center;
    width: 100%;
    opacity: 0;
    position: absolute;
@@ -216,4 +217,24 @@
     opacity: 1;
     text-decoration: none;
     box-shadow: 0 1px 2px rgba(0,0,0,.2);
+}
+
+/*for the listview*/
+
+.umb-media-grid__list-item.selected, .umb-media-grid__list-item.selected:hover, .umb-media-grid__list-item.selected:focus {
+    border: 2px solid #f5c1bc !important;
+}
+
+.umb-media-grid__list-view .umb-table-cell.umb-table__name {
+    flex: 1 1 25%;
+    max-width: none;
+    white-space: normal;
+}
+
+.umb-media-grid__list-view .umb-table-cell.umb-table__name .item-name {
+    white-space:normal;
+}
+.umb-media-grid__list-view .umb-table-cell.umb-table__name ins {
+    text-decoration: none;
+    margin-top: 3px;
 }

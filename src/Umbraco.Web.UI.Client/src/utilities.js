@@ -18,7 +18,7 @@
     /**
      * Facade to angular.copy
      */
-    const copy = val => angular.copy(val);
+    const copy = (src, dst) => angular.copy(src, dst);
 
     /**
      * Equivalent to angular.isArray

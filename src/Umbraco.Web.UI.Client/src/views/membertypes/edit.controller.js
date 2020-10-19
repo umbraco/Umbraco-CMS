@@ -10,7 +10,7 @@
     "use strict";
 
     function MemberTypesEditController($scope, $routeParams, $q,
-        memberTypeResource, dataTypeResource, editorState, iconHelper,
+        memberTypeResource, editorState, iconHelper,
         navigationService, contentEditingHelper, notificationsService, localizationService,
         overlayHelper, contentTypeHelper, angularHelper, eventsService) {
 
@@ -19,6 +19,7 @@
         var infiniteMode = $scope.model && $scope.model.infiniteMode;
         var memberTypeId = $routeParams.id;
         var create = $routeParams.create;
+        var memberTypeIcon = "";
 
         vm.save = save;
         vm.close = close;
@@ -259,6 +260,10 @@
                     var args = { memberType: vm.contentType };
                     eventsService.emit("editors.memberType.saved", args);
 
+                    if (memberTypeIcon !== vm.contentType.icon) {
+                        eventsService.emit("editors.tree.icon.changed", args);
+                    }
+
                     vm.page.saveButtonState = "success";
 
                     if(infiniteMode && $scope.model.submit) {
@@ -292,18 +297,6 @@
 
         function init(contentType) {
 
-            // set all tab to inactive
-            if (contentType.groups.length !== 0) {
-                angular.forEach(contentType.groups, function (group) {
-
-                    angular.forEach(group.properties, function (property) {
-                        // get data type details for each property
-                        getDataTypeDetails(property);
-                    });
-
-                });
-            }
-
             // convert legacy icons
             convertLegacyIcons(contentType);
 
@@ -311,6 +304,8 @@
             editorState.set(contentType);
 
             vm.contentType = contentType;
+
+            memberTypeIcon = contentType.icon;
         }
 
         function convertLegacyIcons(contentType) {
@@ -326,18 +321,6 @@
 
             // set icon back on contentType
             contentType.icon = contentTypeArray[0].icon;
-        }
-
-        function getDataTypeDetails(property) {
-
-            if (property.propertyState !== "init") {
-
-                dataTypeResource.getById(property.dataTypeId)
-					.then(function (dataType) {
-					    property.dataTypeIcon = dataType.icon;
-					    property.dataTypeName = dataType.name;
-					});
-            }
         }
 
         /** Syncs the content type  to it's tree node - this occurs on first load and after saving */

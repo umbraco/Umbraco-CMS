@@ -284,7 +284,7 @@ Opens an overlay to show a custom YSOD. </br>
                                 templateScope.model = scope.model;
                                 element.html(response.data);
                                 element.show();
-                                $compile(element.contents())(templateScope);
+                                $compile(element)(templateScope);
                             });
                     }
                 }
@@ -473,7 +473,7 @@ Opens an overlay to show a custom YSOD. </br>
 
             scope.submitForm = function (model) {
                 if (scope.model.submit) {
-                    if (formHelper.submitForm({ scope: scope, skipValidation: scope.model.skipFormValidation })) {
+                    if (formHelper.submitForm({ scope: scope, skipValidation: scope.model.skipFormValidation, keepServerValidation: true })) {
 
                         if (scope.model.confirmSubmit && scope.model.confirmSubmit.enable && !scope.directive.enableConfirmButton) {
                             //wrap in a when since we don't know if this is a promise or not

@@ -4,59 +4,65 @@
     function PublishDescendantsController($scope, localizationService) {
 
         var vm = this;
-
-        vm.includeUnpublished = false;
+        vm.includeUnpublished = $scope.model.includeUnpublished || false;
 
         vm.changeSelection = changeSelection;
         vm.toggleIncludeUnpublished = toggleIncludeUnpublished;
 
-
         function onInit() {
 
             vm.variants = $scope.model.variants;
-            vm.displayVariants = vm.variants.slice(0);// shallow copy, we dont want to share the array-object(because we will be performing a sort method) but each entry should be shared (because we need validation and notifications).
+            vm.displayVariants = vm.variants.slice(0); // shallow copy, we don't want to share the array-object (because we will be performing a sort method) but each entry should be shared (because we need validation and notifications).
             vm.labels = {};
 
+            // get localized texts for use in directives
             if (!$scope.model.title) {
-                localizationService.localize("buttons_publishDescendants").then(function (value) {
+                localizationService.localize("buttons_publishDescendants").then(value => {
                     $scope.model.title = value;
                 });
             }
+            if (!vm.labels.includeUnpublished) {
+                localizationService.localize("content_includeUnpublished").then(function (value) {
+                    vm.labels.includeUnpublished = value;
+                });
+            }
+            if (!vm.labels.includeUnpublished) {
+                localizationService.localize("content_includeUnpublished").then(value => {
+                    vm.labels.includeUnpublished = value;
+                });
+            }
 
-            _.each(vm.variants, function (variant) {
+            vm.variants.forEach(variant => {
                 variant.isMandatory = isMandatoryFilter(variant);
             });
 
             if (vm.variants.length > 1) {
 
-                vm.displayVariants.sort(function (a, b) {
+                vm.displayVariants.sort((a, b) => {
                     if (a.language && b.language) {
-                        if (a.language.name > b.language.name) {
+                        if (a.language.name < b.language.name) {
                             return -1;
                         }
-                        if (a.language.name < b.language.name) {
+                        if (a.language.name > b.language.name) {
                             return 1;
                         }
                     }
                     if (a.segment && b.segment) {
-                        if (a.segment > b.segment) {
+                        if (a.segment < b.segment) {
                             return -1;
                         }
-                        if (a.segment < b.segment) {
+                        if (a.segment > b.segment) {
                             return 1;
                         }
                     }
                     return 0;
                 });
 
-                var active = _.find(vm.variants, function (v) {
-                    return v.active;
-                });
+                var active = vm.variants.find(v => v.active);
 
                 if (active) {
                     //ensure that the current one is selected
-                    active.publish = true;
-                    active.save = true;
+                    active.publish = active.save = true;
                 }
 
                 $scope.model.disableSubmitButton = !canPublish();
@@ -67,24 +73,23 @@
                     "key": "content_publishDescendantsHelp",
                     "tokens": [vm.variants[0].name]
                 };
-            }
-            
+            }            
         }
 
         function toggleIncludeUnpublished() {
-            console.log("toggleIncludeUnpublished")
             vm.includeUnpublished = !vm.includeUnpublished;
+            // make sure this value is pushed back to the scope
+            $scope.model.includeUnpublished = vm.includeUnpublished;
         }
 
         /** Returns true if publishing is possible based on if there are un-published mandatory languages */
         function canPublish() {
             var selected = [];
-            for (var i = 0; i < vm.variants.length; i++) {
-                var variant = vm.variants[i];
+            vm.variants.forEach(variant => {
 
                 var published = !(variant.state === "NotCreated" || variant.state === "Draft");
 
-                if (variant.segment == null &&  variant.language && variant.language.isMandatory && !published && !variant.publish) {
+                if (variant.segment == null && variant.language && variant.language.isMandatory && !published && !variant.publish) {
                     //if a mandatory variant isn't published 
                     //and not flagged for saving
                     //then we cannot continue
@@ -96,7 +101,8 @@
                 if (variant.publish) {
                     selected.push(variant.publish);
                 }
-            }
+            });
+
             return selected.length > 0;
         }
 
@@ -115,11 +121,10 @@
         }
 
         //when this dialog is closed, reset all 'publish' flags
-        $scope.$on('$destroy', function () {
-            for (var i = 0; i < vm.variants.length; i++) {
-                vm.variants[i].publish = false;
-                vm.variants[i].save = false;
-            }
+        $scope.$on('$destroy', () => {
+            vm.variants.forEach(variant => {
+                variant.publish = variant.save = false;
+            });
         });
 
         onInit();

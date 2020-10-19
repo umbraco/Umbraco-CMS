@@ -5,7 +5,7 @@
         class="umb-editor-sub-view"
         ng-repeat="subView in subViews track by subView.alias"
         ng-class="'sub-view-' + subView.name"
-        val-sub-view>
+        val-sub-view="subView">
 
        <div class="umb-editor-sub-view__content"
             ng-show="subView.active === true" 

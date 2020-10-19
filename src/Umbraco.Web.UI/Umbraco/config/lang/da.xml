@@ -17,6 +17,7 @@
     <key alias="createGroup">Opret gruppe</key>
     <key alias="delete">Slet</key>
     <key alias="disable">Deaktivér</key>
+    <key alias="editSettings">Edit settings</key>
     <key alias="emptyRecycleBin">Tøm papirkurv</key>
     <key alias="enable">Aktivér</key>
     <key alias="exportDocumentType">Eksportér dokumenttype</key>
@@ -152,6 +153,8 @@
     <key alias="confirmActionCancel">Fortryd</key>
     <key alias="confirmActionConfirm">Bekræft</key>
 	<key alias="morePublishingOptions">Flere publiseringsmuligheder</key>
+    <key alias="submitChanges">Indsæt</key>
+    <key alias="submitChangesAndClose">Indsæt og luk</key>
   </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">For</key>
@@ -282,7 +285,7 @@
     <key alias="addTextBox">Tilføj en ny tekstboks</key>
     <key alias="removeTextBox">Fjern denne tekstboks</key>
     <key alias="contentRoot">Indholdsrod</key>
-    <key alias="includeUnpublished">Medtag udkast: udgiv også ikke-publicerede sider.</key>
+    <key alias="includeUnpublished">Inkluder ikke-udgivet indhold.</key>
     <key alias="isSensitiveValue">Denne værdi er skjult.Hvis du har brug for adgang til at se denne værdi, bedes du kontakte din web-administrator.</key>
     <key alias="isSensitiveValue_short">Denne værdi er skjult.</key>
     <key alias="languagesToPublishForFirstTime">Hvilke sprog vil du gerne udgive? Alle sprog med indhold gemmes!</key>
@@ -608,6 +611,7 @@
     <key alias="tableColMergeLeft">Du skal stå til venstre for de 2 celler du ønsker at samle!</key>
     <key alias="tableSplitNotSplittable">Du kan ikke opdele en celle, som ikke allerede er delt.</key>
     <key alias="propertyHasErrors">Denne egenskab er ugyldig</key>
+    <key alias="errorPropertyEditorNotSupportedInElementTypes">Feltet %0% bruger editor %1% som ikke er supporteret for ElementTyper.</key>
   </area>
   <area alias="general">
     <key alias="about">Om</key>
@@ -644,6 +648,7 @@
     <key alias="design">Design</key>
     <key alias="dictionary">Ordbog</key>
     <key alias="dimensions">Dimensioner</key>
+    <key alias="discard">Kassér</key>
     <key alias="down">Ned</key>
     <key alias="download">Hent</key>
     <key alias="edit">Rediger</key>
@@ -1780,8 +1785,10 @@ Mange hilsner fra Umbraco robotten
     <key alias="usedByProperties">Brugt af</key>
   </area>
   <area alias="logViewer">
+    <key alias="deleteSavedSearch">Slet gemte søgning</key>
     <key alias="logLevels">Log type</key>
-    <key alias="savedSearches">Gemte søgninger</key>
+    <key alias="saveSearch">Gem søgning</key>
+    <key alias="saveSearchDescription">Indtast et navn for din søgebetingelse</key>
     <key alias="totalItems">Samlet resultat</key>
     <key alias="timestamp">Dato</key>
     <key alias="level">Type</key>
@@ -1811,8 +1818,49 @@ Mange hilsner fra Umbraco robotten
     <key alias="labelForCopyAllEntries">Kopier %0%</key>
     <key alias="labelForArrayOfItemsFrom">%0% fra %1%</key>
     <key alias="labelForRemoveAllEntries">Fjern alle elementer</key>
+    <key alias="labelForClearClipboard">Ryd udklipsholder</key>
   </area>
   <area alias="propertyActions">
     <key alias="tooltipForPropertyActionsMenu">Åben egenskabshandlinger</key>
   </area>
+  <area alias="blockEditor">
+    <key alias="headlineCreateBlock">Opret ny blok</key>
+    <key alias="headlineAddSettingsElementType">Tilføj en indstillings afsnit</key>
+    <key alias="headlineAddCustomView">Tilføj visning</key>
+    <key alias="headlineAddCustomStylesheet">Tilføj stylesheet</key>
+    <key alias="headlineAddThumbnail">Vælg billede</key>
+    <key alias="labelcreateNewElementType">Opret ny</key>
+    <key alias="labelCustomStylesheet">Overskriv stylesheet</key>
+    <key alias="addCustomStylesheet">Tilføj stylesheet</key>
+    <key alias="headlineEditorAppearance">Redigerings udseende</key>
+    <key alias="headlineDataModels">Data modeller</key>
+    <key alias="headlineCatalogueAppearance">katalog udseende</key>
+    <key alias="labelBackgroundColor">Baggrunds farve</key>
+    <key alias="labelIconColor">Ikon farve</key>
+    <key alias="labelContentElementType">Indholds model</key>
+    <key alias="labelLabelTemplate">Label</key>
+    <key alias="labelCustomView">Speciel visning</key>
+    <key alias="labelSettingsElementType">Indstillings model</key>
+    <key alias="labelEditorSize">Rederings lagets størrelse</key>
+    <key alias="addCustomView">Tilføj speciel visning</key>
+    <key alias="addSettingsElementType">Tilføj instillinger</key>
+    <key alias="labelTemplatePlaceholder">Overskriv label form</key>
+    <key alias="confirmDeleteBlockMessage"><![CDATA[Er du sikker på at du vil slette dette indhold: <strong>%0%</strong>.]]></key>
+    <key alias="confirmDeleteBlockTypeMessage"><![CDATA[Er du sikker på at du vil slette denne blok konfiguration: <strong>%0%</strong>.]]></key>
+    <key alias="confirmDeleteBlockTypeNotice">Indholdet vil stadigt eksistere, men redigering af dette indhold vil ikke være muligt. Indholdet vil blive vist som ikke understøttet indhold.</key>
+    <key alias="blockConfigurationOverlayTitle"><![CDATA[Konfiguration af '%0%']]></key>
+    <key alias="thumbnail">Billede</key>
+    <key alias="addThumbnail">Tilføj billede</key>
+    <key alias="tabCreateEmpty">Opret ny</key>
+    <key alias="tabClipboard">Udklipsholder</key>
+    <key alias="tabBlockSettings">Indstillinger</key>
+    <key alias="headlineAdvanced">Avanceret</key>
+    <key alias="forceHideContentEditor">Skjuld indholds editoren</key>
+    <key alias="blockHasChanges">Du har lavet ændringer til dette indhold. Er du sikker på at du vil kassere dem?</key>
+    <key alias="confirmCancelBlockCreationHeadline">Annuller oprettelse?</key>
+    <key alias="confirmCancelBlockCreationMessage"><![CDATA[Er du sikker på at du vil annullere oprettelsen.]]></key>
+    <key alias="elementTypeDoesNotExistHeadline">Error!</key>
+    <key alias="elementTypeDoesNotExistDescription">The ElementType of this block does not exist anymore</key>
+  </area>
+
 </language>

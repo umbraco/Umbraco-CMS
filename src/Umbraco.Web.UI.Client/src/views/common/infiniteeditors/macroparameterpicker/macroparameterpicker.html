@@ -34,15 +34,18 @@
                             <h5>{{key}}</h5>
                             <ul class="umb-card-grid -four-in-row" ng-mouseleave="vm.hideDetailsOverlay()">
                                 <li ng-repeat="parameterEditor in value | orderBy:'name'"
-                                    data-element="editor-{{parameterEditor.name}}"
-                                    ng-mouseover="vm.showDetailsOverlay(parameterEditor)"
-                                    ng-click="vm.pickParameterEditor(parameterEditor)">
-                                    <a class="umb-card-grid-item" href="" title="{{parameterEditor.name}}">
+                                    data-element="editor-{{parameterEditor.name}}">
+                                    <button
+                                        type="button"
+                                        ng-mouseover="vm.showDetailsOverlay(parameterEditor)"
+                                        ng-click="vm.pickParameterEditor(parameterEditor)"
+                                        class="btn-reset umb-card-grid-item"
+                                        title="{{parameterEditor.name}}">
                                         <span>
-                                            <i class="{{parameterEditor.icon}}" ng-class="{'icon-autofill': parameterEditor.icon == null}"></i>
+                                            <i class="{{parameterEditor.icon}}" ng-class="{'icon-autofill': parameterEditor.icon == null}" aria-hidden="true"></i>
                                             {{parameterEditor.name}}
                                         </span>
-                                    </a>
+                                    </button>
                                 </li>
                             </ul>
                         </div>
@@ -55,15 +58,18 @@
                                 <div ng-if="result.parameterEditors.length > 0">
                                     <h5>{{result.group}}</h5>
                                     <ul class="umb-card-grid -four-in-row" ng-mouseleave="vm.hideDetailsOverlay()">
-                                        <li ng-repeat="parameterEditor in result.parameterEditors | orderBy:'name'"
-                                            ng-mouseover="vm.showDetailsOverlay(parameterEditor)"
-                                            ng-click="vm.pickParameterEditor(parameterEditor)">
+                                        <li ng-repeat="parameterEditor in result.parameterEditors | orderBy:'name'">
                                             <div ng-if="parameterEditor.loading" class="umb-card-grid-item__loading">
                                                 <div class="umb-button__progress"></div>
                                             </div>
-                                            <a class="umb-card-grid-item" href="" title="{{parameterEditor.name}}">
+                                            <button
+                                                type="button"
+                                                ng-mouseover="vm.showDetailsOverlay(parameterEditor)"
+                                                ng-click="vm.pickParameterEditor(parameterEditor)"
+                                                class="btn-reset umb-card-grid-item"
+                                                title="{{parameterEditor.name}}">
                                                 <span>
-                                                    <i class="{{parameterEditor.icon}}" ng-class="{'icon-autofill': parameterEditor.icon == null}"></i>
+                                                    <i class="{{parameterEditor.icon}}" ng-class="{'icon-autofill': parameterEditor.icon == null}" aria-hidden="true"></i>
                                                     {{parameterEditor.name}}
                                                 </span>
                                             </a>
@@ -74,7 +80,7 @@
                         </div>
 
                         <umb-empty-state position="center" ng-if="vm.filterResult.totalResults === 0">
-                            <localize key="general_searchNoResult"></localize>
+                            <localize key="general_searchNoResult">Sorry, we can not find what you are looking for.</localize>
                         </umb-empty-state>
                     </div>
 
