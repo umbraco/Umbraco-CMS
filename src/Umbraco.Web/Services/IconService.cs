@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -23,14 +24,20 @@ namespace Umbraco.Web.Services
         }
 
         /// <inheritdoc />
-        public IList<IconModel> GetAllIcons() => GetIconModels().ToList();
+        public IList<IconModel> GetAllIcons() => GetIconModels().Values.OrderBy(i => i.Name).ToList();
 
         /// <inheritdoc />
         public IconModel GetIcon(string iconName)
         {
-            return string.IsNullOrWhiteSpace(iconName)
-                ? null
-                : CreateIconModel(iconName.StripFileExtension());
+            if (iconName.IsNullOrWhiteSpace())
+            {
+                return null;
+            }
+
+            var allIconModels = GetIconModels();
+            return allIconModels.ContainsKey(iconName)
+                ? allIconModels[iconName]
+                : null;
         }
 
         /// <summary>
@@ -43,19 +50,6 @@ namespace Umbraco.Web.Services
             return fileInfo == null || string.IsNullOrWhiteSpace(fileInfo.Name)
                 ? null
                 : CreateIconModel(fileInfo.Name.StripFileExtension(), fileInfo.FullName);
-        }
-
-        /// <summary>
-        /// Gets an IconModel containing the icon name and SvgString
-        /// </summary>
-        /// <param name="iconName"></param>
-        /// <returns><see cref="IconModel"/></returns>
-        private IconModel CreateIconModel(string iconName)
-        {
-            if (string.IsNullOrWhiteSpace(iconName))
-                return null;
-
-            return GetIconModels().FirstOrDefault(i => i.Name.InvariantEquals(iconName));
         }
 
         /// <summary>
@@ -114,13 +108,13 @@ namespace Umbraco.Web.Services
             return iconNames;
         }
 
-        private IconModel[] GetIconModels() => _cache.GetCacheItem(
+        private Dictionary<string, IconModel> GetIconModels() => _cache.GetCacheItem(
             "Umbraco.Web.Services.IconService::AllIconModels",
             () => GetAllIconNames()
-                    .OrderBy(f => f.Name)
                     .Select(GetIcon)
                     .Where(i => i != null)
-                    .ToArray()
+                    .GroupBy(i => i.Name, StringComparer.OrdinalIgnoreCase)
+                    .ToDictionary(g => g.Key, g => g.First(), StringComparer.OrdinalIgnoreCase)
         );
     }
 }
