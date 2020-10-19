@@ -1,7 +1,6 @@
 using System;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Common.Filters;
@@ -27,7 +26,6 @@ namespace Umbraco.Web.Mvc
             _logger = logger;
             _compositeViewEngine = compositeViewEngine;
         }
-
 
         /// <summary>
         /// Gets the current content item.
@@ -76,7 +74,7 @@ namespace Umbraco.Web.Mvc
         {
             var template = ControllerContext.RouteData.Values["action"].ToString();
             if (EnsurePhsyicalViewExists(template) == false)
-                throw new Exception("No physical template file was found for template " + template);
+                throw new InvalidOperationException("No physical template file was found for template " + template);
             return View(template, model);
         }
 
