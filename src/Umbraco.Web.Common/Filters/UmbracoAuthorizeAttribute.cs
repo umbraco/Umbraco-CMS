@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace Umbraco.Web.BackOffice.Filters
+namespace Umbraco.Web.Common.Filters
 {
     /// <summary>
     /// Ensures authorization is successful for a back office user.

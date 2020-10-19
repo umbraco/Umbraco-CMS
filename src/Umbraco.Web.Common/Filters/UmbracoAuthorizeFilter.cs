@@ -7,7 +7,7 @@ using Umbraco.Extensions;
 using Umbraco.Web.Security;
 using IHostingEnvironment = Umbraco.Core.Hosting.IHostingEnvironment;
 
-namespace Umbraco.Web.BackOffice.Filters
+namespace Umbraco.Web.Common.Filters
 {
 
     /// <summary>
