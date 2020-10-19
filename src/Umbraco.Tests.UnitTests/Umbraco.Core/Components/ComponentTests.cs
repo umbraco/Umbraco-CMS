@@ -47,6 +47,7 @@ namespace Umbraco.Tests.Components
             var mediaFileSystem = Mock.Of<IMediaFileSystem>();
             var p = new ScopeProvider(f, fs, Options.Create(coreDebug), mediaFileSystem, loggerFactory.CreateLogger<ScopeProvider>(), loggerFactory, typeFinder, NoAppCache.Instance);
 
+            mock.Setup(x => x.GetService(typeof(ILogger<ComponentCollection>))).Returns(loggerFactory.CreateLogger<ComponentCollection>());
             mock.Setup(x => x.GetService(typeof (ILogger))).Returns(logger);
             mock.Setup(x => x.GetService(typeof(ILoggerFactory))).Returns(loggerFactory);
             mock.Setup(x => x.GetService(typeof (IProfilingLogger))).Returns(new ProfilingLogger(logger, Mock.Of<IProfiler>()));
