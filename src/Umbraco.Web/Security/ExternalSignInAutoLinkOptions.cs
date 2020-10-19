@@ -23,7 +23,7 @@ namespace Umbraco.Web.Security
         {
             _defaultUserGroups = defaultUserGroups ?? new[] { Constants.Security.EditorGroupAlias };
             _autoLinkExternalAccount = autoLinkExternalAccount;
-            _defaultCulture = defaultCulture ?? Current.Configs.Global().DefaultUILanguage;
+            _defaultCulture = defaultCulture ?? /*Current.Configs.Global().DefaultUILanguage TODO reintroduce config value*/ "en-US";
         }
 
         private readonly string[] _defaultUserGroups;

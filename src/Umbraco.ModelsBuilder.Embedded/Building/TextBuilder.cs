@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 
 namespace Umbraco.ModelsBuilder.Embedded.Building
 {
@@ -17,7 +18,7 @@ namespace Umbraco.ModelsBuilder.Embedded.Building
         /// and the result of code parsing.
         /// </summary>
         /// <param name="typeModels">The list of models to generate.</param>
-        public TextBuilder(IModelsBuilderConfig config, IList<TypeModel> typeModels)
+        public TextBuilder(ModelsBuilderSettings config, IList<TypeModel> typeModels)
             : base(config, typeModels)
         { }
 

@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Events;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.Models.Entities;
@@ -49,8 +49,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// </param>
         protected ContentRepositoryBase(
             IScopeAccessor scopeAccessor,
-            AppCaches cache
-            , ILogger logger,
+            AppCaches cache,
+            ILogger<NPocoRepositoryBase<TId, TEntity>> logger,
             ILanguageRepository languageRepository,
             IRelationRepository relationRepository,
             IRelationTypeRepository relationTypeRepository,
@@ -709,7 +709,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 {
                     if (ContentRepositoryBase.ThrowOnWarning)
                         throw new InvalidOperationException($"The query returned multiple property sets for content {temp.Id}, {temp.ContentType.Name}");
-                    Logger.Warn<ContentRepositoryBase<TId, TEntity, TRepository>>("The query returned multiple property sets for content {ContentId}, {ContentTypeName}", temp.Id, temp.ContentType.Name);
+                    Logger.LogWarning("The query returned multiple property sets for content {ContentId}, {ContentTypeName}", temp.Id, temp.ContentType.Name);
                 }
 
                 result[temp.VersionId] = new PropertyCollection(properties);

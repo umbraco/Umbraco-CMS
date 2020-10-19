@@ -34,6 +34,10 @@ using Umbraco.Web;
 using Umbraco.Web.Hosting;
 using Umbraco.Web.Routing;
 using File = System.IO.File;
+using Umbraco.Tests.Common.Builders;
+using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
+using Umbraco.Core.Configuration.Models;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -60,11 +64,11 @@ namespace Umbraco.Tests.TestHelpers
 
             public override IBackOfficeInfo GetBackOfficeInfo()
                 => new AspNetBackOfficeInfo(
-                    SettingsForTests.GenerateMockGlobalSettings(GetUmbracoVersion()),
-                    TestHelper.IOHelper, Mock.Of<ILogger>(), SettingsForTests.GenerateMockWebRoutingSettings());
+                    new GlobalSettings(),
+                    TestHelper.IOHelper, Mock.Of<ILogger<AspNetBackOfficeInfo>>(), Options.Create(new WebRoutingSettings()));
 
             public override IHostingEnvironment GetHostingEnvironment()
-                => new AspNetHostingEnvironment(SettingsForTests.DefaultHostingSettings);
+                => new AspNetHostingEnvironment(Options.Create(new HostingSettings()));
 
             public override IApplicationShutdownRegistry GetHostingEnvironmentLifetime()
                 => new AspNetApplicationShutdownRegistry();
@@ -77,11 +81,11 @@ namespace Umbraco.Tests.TestHelpers
 
         public static TypeLoader GetMockedTypeLoader() => _testHelperInternal.GetMockedTypeLoader();
 
-        public static Configs GetConfigs() => _testHelperInternal.GetConfigs();
+        //public static Configs GetConfigs() => _testHelperInternal.GetConfigs();
 
         public static IBackOfficeInfo GetBackOfficeInfo() => _testHelperInternal.GetBackOfficeInfo();
 
-        public static IConfigsFactory GetConfigsFactory() => _testHelperInternal.GetConfigsFactory();
+      //  public static IConfigsFactory GetConfigsFactory() => _testHelperInternal.GetConfigsFactory();
 
         /// <summary>
         /// Gets the working directory of the test project.
@@ -95,16 +99,14 @@ namespace Umbraco.Tests.TestHelpers
         public static IDbProviderFactoryCreator DbProviderFactoryCreator => _testHelperInternal.DbProviderFactoryCreator;
         public static IBulkSqlInsertProvider BulkSqlInsertProvider => _testHelperInternal.BulkSqlInsertProvider;
         public static IMarchal Marchal => _testHelperInternal.Marchal;
-        public static ICoreDebugSettings CoreDebugSettings => _testHelperInternal.CoreDebugSettings;
+        public static CoreDebugSettings CoreDebugSettings => _testHelperInternal.CoreDebugSettings;
 
 
         public static IIOHelper IOHelper => _testHelperInternal.IOHelper;
         public static IMainDom MainDom => _testHelperInternal.MainDom;
         public static UriUtility UriUtility => _testHelperInternal.UriUtility;
 
-        public static IWebRoutingSettings WebRoutingSettings => _testHelperInternal.WebRoutingSettings;
-
-        public static IEmailSender EmailSender { get; } = new EmailSender(SettingsForTests.GenerateMockGlobalSettings());
+        public static IEmailSender EmailSender { get; } = new EmailSender(Options.Create(new GlobalSettings()));
 
 
         /// <summary>
@@ -116,12 +118,12 @@ namespace Umbraco.Tests.TestHelpers
 
         public static void InitializeContentDirectories()
         {
-            CreateDirectories(new[] { Constants.SystemDirectories.MvcViews, SettingsForTests.GenerateMockGlobalSettings().UmbracoMediaPath, Constants.SystemDirectories.AppPlugins });
+            CreateDirectories(new[] { Constants.SystemDirectories.MvcViews, new GlobalSettings().UmbracoMediaPath, Constants.SystemDirectories.AppPlugins });
         }
 
         public static void CleanContentDirectories()
         {
-            CleanDirectories(new[] { Constants.SystemDirectories.MvcViews, SettingsForTests.GenerateMockGlobalSettings().UmbracoMediaPath });
+            CleanDirectories(new[] { Constants.SystemDirectories.MvcViews, new GlobalSettings().UmbracoMediaPath });
         }
 
         public static void CreateDirectories(string[] directories)
@@ -302,25 +304,6 @@ namespace Umbraco.Tests.TestHelpers
                 }
             }
         }
-
-        // TODO: Move to MockedValueEditors.cs
-        public static DataValueEditor CreateDataValueEditor(string name)
-        {
-            var valueType = (ValueTypes.IsValue(name)) ? name : ValueTypes.String;
-
-            return new DataValueEditor(
-                Mock.Of<IDataTypeService>(),
-                Mock.Of<ILocalizationService>(),
-                Mock.Of<ILocalizedTextService>(),
-                Mock.Of<IShortStringHelper>(),
-                new DataEditorAttribute(name, name, name)
-                {
-                    ValueType = valueType
-                }
-
-            );
-        }
-
 
         public static IUmbracoVersion GetUmbracoVersion() => _testHelperInternal.GetUmbracoVersion();
 

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Web;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Routing;
 
@@ -50,7 +50,7 @@ namespace Umbraco.Web
             var end = false;
             var response = context.Response;
 
-            logger.Debug<UmbracoModule>("Response status: Redirect={Redirect}, Is404={Is404}, StatusCode={ResponseStatusCode}",
+            logger.LogDebug("Response status: Redirect={Redirect}, Is404={Is404}, StatusCode={ResponseStatusCode}",
                 pcr.IsRedirect ? (pcr.IsRedirectPermanent ? "permanent" : "redirect") : "none",
                 pcr.Is404 ? "true" : "false",
                 pcr.ResponseStatusCode);
@@ -75,10 +75,10 @@ namespace Umbraco.Web
             else if (pcr.Is404)
             {
                 response.StatusCode = 404;
-                response.TrySkipIisCustomErrors = Current.Configs.WebRouting().TrySkipIisCustomErrors;
+                response.TrySkipIisCustomErrors = /*Current.Configs.WebRouting().TrySkipIisCustomErrors; TODO introduce from config*/ false;
 
                 if (response.TrySkipIisCustomErrors == false)
-                    logger.Warn<UmbracoModule>("Status code is 404 yet TrySkipIisCustomErrors is false - IIS will take over.");
+                    logger.LogWarning("Status code is 404 yet TrySkipIisCustomErrors is false - IIS will take over.");
             }
 
             if (pcr.ResponseStatusCode > 0)
@@ -97,7 +97,7 @@ namespace Umbraco.Web
             context.ApplicationInstance.CompleteRequest();
             // though some say that .CompleteRequest() does not properly shutdown the response
             // and the request will hang until the whole code has run... would need to test?
-            logger.Debug<UmbracoModule>("Response status: redirecting, complete request now.");
+            logger.LogDebug("Response status: redirecting, complete request now.");
 
             return end;
         }

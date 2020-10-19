@@ -12,7 +12,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         public void Can_Map_Id_Property()
         {
             // Act
-            string column = new PropertyTypeMapper(MockSqlContext(), CreateMaps()).Map("Id");
+            string column = new PropertyTypeMapper(MockSqlContext()).Map("Id");
 
             // Assert
             Assert.That(column, Is.EqualTo("[cmsPropertyType].[id]"));
@@ -22,7 +22,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         public void Can_Map_Alias_Property()
         {
             // Act
-            string column = new PropertyTypeMapper(MockSqlContext(), CreateMaps()).Map("Alias");
+            string column = new PropertyTypeMapper(MockSqlContext()).Map("Alias");
 
             // Assert
             Assert.That(column, Is.EqualTo("[cmsPropertyType].[Alias]"));
@@ -32,7 +32,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         public void Can_Map_DataTypeDefinitionId_Property()
         {
             // Act
-            string column = new PropertyTypeMapper(MockSqlContext(), CreateMaps()).Map("DataTypeId");
+            string column = new PropertyTypeMapper(MockSqlContext()).Map("DataTypeId");
 
             // Assert
             Assert.That(column, Is.EqualTo("[cmsPropertyType].[dataTypeId]"));
@@ -42,7 +42,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         public void Can_Map_SortOrder_Property()
         {
             // Act
-            string column = new PropertyTypeMapper(MockSqlContext(), CreateMaps()).Map("SortOrder");
+            string column = new PropertyTypeMapper(MockSqlContext()).Map("SortOrder");
 
             // Assert
             Assert.That(column, Is.EqualTo("[cmsPropertyType].[sortOrder]"));
@@ -52,7 +52,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         public void Can_Map_PropertyEditorAlias_Property()
         {
             // Act
-            string column = new PropertyTypeMapper(MockSqlContext(), CreateMaps()).Map("PropertyEditorAlias");
+            string column = new PropertyTypeMapper(MockSqlContext()).Map("PropertyEditorAlias");
 
             // Assert
             Assert.That(column, Is.EqualTo($"[{Constants.DatabaseSchema.Tables.DataType}].[propertyEditorAlias]"));
@@ -62,7 +62,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         public void Can_Map_DataTypeDatabaseType_Property()
         {
             // Act
-            string column = new PropertyTypeMapper(MockSqlContext(), CreateMaps()).Map("ValueStorageType");
+            string column = new PropertyTypeMapper(MockSqlContext()).Map("ValueStorageType");
 
             // Assert
             Assert.That(column, Is.EqualTo($"[{Constants.DatabaseSchema.Tables.DataType}].[dbType]"));

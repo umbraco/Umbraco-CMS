@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Linq;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Composing.CompositionExtensions;
 using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
@@ -26,14 +26,12 @@ namespace Umbraco.Tests.Models
         {
             base.Compose();
 
-            Composition.Register(_ => Mock.Of<ILogger>());
             Composition.ComposeFileSystems();
 
             Composition.Register(_ => Mock.Of<IDataTypeService>());
-            Composition.Register(_ => Mock.Of<IContentSettings>());
 
             // all this is required so we can validate properties...
-            var editor = new TextboxPropertyEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), IOHelper, ShortStringHelper, LocalizedTextService) { Alias = "test" };
+            var editor = new TextboxPropertyEditor(NullLoggerFactory.Instance, Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), IOHelper, ShortStringHelper, LocalizedTextService) { Alias = "test" };
             Composition.Register(_ => new DataEditorCollection(new[] { editor }));
             Composition.Register<PropertyEditorCollection>();
             var dataType = Mock.Of<IDataType>();

@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Upgrade.V_8_0_0.DataTypes;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
@@ -17,7 +17,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
     {
         private readonly PreValueMigratorCollection _preValueMigrators;
         private readonly PropertyEditorCollection _propertyEditors;
-        private readonly ILogger _logger;
+        private readonly ILogger<DataTypeMigration> _logger;
 
         private static readonly ISet<string> LegacyAliases = new HashSet<string>()
         {
@@ -31,7 +31,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
             Constants.PropertyEditors.Legacy.Aliases.MultiNodeTreePicker2,
         };
 
-        public DataTypeMigration(IMigrationContext context, PreValueMigratorCollection preValueMigrators, PropertyEditorCollection propertyEditors, ILogger logger)
+        public DataTypeMigration(IMigrationContext context, PreValueMigratorCollection preValueMigrators, PropertyEditorCollection propertyEditors, ILogger<DataTypeMigration> logger)
             : base(context)
         {
             _preValueMigrators = preValueMigrators;
@@ -94,7 +94,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                 {
                     if (!LegacyAliases.Contains(dataType.EditorAlias))
                     {
-                        _logger.Warn<DataTypeMigration>(
+                        _logger.LogWarning(
                             "Skipping validation of configuration for data type {NodeId} : {EditorAlias}."
                             + " Please ensure that the configuration is valid. The site may fail to start and / or load data types and run.",
                             dataType.NodeId, dataType.EditorAlias);
@@ -104,7 +104,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                 {
                     if (!LegacyAliases.Contains(newAlias))
                     {
-                        _logger.Warn<DataTypeMigration>("Skipping validation of configuration for data type {NodeId} : {NewEditorAlias} (was: {EditorAlias})"
+                        _logger.LogWarning("Skipping validation of configuration for data type {NodeId} : {NewEditorAlias} (was: {EditorAlias})"
                                                         + " because no property editor with that alias was found."
                                                         + " Please ensure that the configuration is valid. The site may fail to start and / or load data types and run.",
                             dataType.NodeId, newAlias, dataType.EditorAlias);
@@ -119,7 +119,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                     }
                     catch (Exception e)
                     {
-                        _logger.Warn<DataTypeMigration>(e, "Failed to validate configuration for data type {NodeId} : {NewEditorAlias} (was: {EditorAlias})."
+                        _logger.LogWarning(e, "Failed to validate configuration for data type {NodeId} : {NewEditorAlias} (was: {EditorAlias})."
                                                         + " Please fix the configuration and ensure it is valid. The site may fail to start and / or load data types and run.",
                                                         dataType.NodeId, newAlias, dataType.EditorAlias);
                     }

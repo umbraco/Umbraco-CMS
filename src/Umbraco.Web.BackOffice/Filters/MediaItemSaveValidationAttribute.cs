@@ -1,9 +1,10 @@
 ﻿using System;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.Models.ContentEditing;
@@ -26,21 +27,21 @@ namespace Umbraco.Web.BackOffice.Filters
             private readonly IPropertyValidationService _propertyValidationService;
 
 
-            private readonly ILogger _logger;
             private readonly IMediaService _mediaService;
             private readonly ILocalizedTextService _textService;
-            private readonly IWebSecurity _webSecurity;
+            private readonly ILoggerFactory _loggerFactory;
+            private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
 
             public MediaItemSaveValidationFilter(
-                ILogger logger,
-                IWebSecurity webSecurity,
+                ILoggerFactory loggerFactory,
+                IBackofficeSecurityAccessor backofficeSecurityAccessor,
                 ILocalizedTextService textService,
                 IMediaService mediaService,
                 IEntityService entityService,
                 IPropertyValidationService propertyValidationService)
             {
-                _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-                _webSecurity = webSecurity ?? throw new ArgumentNullException(nameof(webSecurity));
+                _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
+                _backofficeSecurityAccessor = backofficeSecurityAccessor ?? throw new ArgumentNullException(nameof(backofficeSecurityAccessor));
                 _textService = textService ?? throw new ArgumentNullException(nameof(textService));
                 _mediaService = mediaService ?? throw new ArgumentNullException(nameof(mediaService));
                 _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
@@ -50,7 +51,7 @@ namespace Umbraco.Web.BackOffice.Filters
             public void OnActionExecuting(ActionExecutingContext context)
             {
                 var model = (MediaItemSave) context.ActionArguments["contentItem"];
-                var contentItemValidator = new MediaSaveModelValidator(_logger, _webSecurity, _textService, _propertyValidationService);
+                var contentItemValidator = new MediaSaveModelValidator(_loggerFactory.CreateLogger<MediaSaveModelValidator>(), _backofficeSecurityAccessor.BackofficeSecurity, _textService, _propertyValidationService);
 
                 if (ValidateUserAccess(model, context))
                 {
@@ -101,7 +102,7 @@ namespace Umbraco.Web.BackOffice.Filters
 
                 if (MediaController.CheckPermissions(
                     actionContext.HttpContext.Items,
-                    _webSecurity.CurrentUser,
+                    _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser,
                     _mediaService, _entityService,
                     contentIdToCheck, contentToCheck) == false)
                 {

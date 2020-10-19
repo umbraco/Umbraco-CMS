@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
@@ -25,21 +26,21 @@ namespace Umbraco.Core
             // then we pre-resolve them which means that the instance re-resolved later is different... BUT if we register that
             // pre-resolved instance here again, then it will be the same instance re-resolved later, just like we are doing with
             // IDbProviderFactoryCreator.
-            ILogger logger, IProfiler profiler, IProfilingLogger profilingLogger,
+            ILogger logger, ILoggerFactory loggerFactory, IProfiler profiler, IProfilingLogger profilingLogger,
             IMainDom mainDom,
             AppCaches appCaches,
             IUmbracoDatabaseFactory databaseFactory,
             TypeLoader typeLoader,
             IRuntimeState state,
             ITypeFinder typeFinder,
-
             IIOHelper ioHelper,
             IUmbracoVersion umbracoVersion,
             IDbProviderFactoryCreator dbProviderFactoryCreator,
             IHostingEnvironment hostingEnvironment,
             IBackOfficeInfo backOfficeInfo)
-        {            
+        {
             composition.Services.AddUnique(logger);
+            composition.Services.AddUnique(loggerFactory);
             composition.Services.AddUnique(profiler);
             composition.Services.AddUnique(profilingLogger);
             composition.Services.AddUnique(mainDom);

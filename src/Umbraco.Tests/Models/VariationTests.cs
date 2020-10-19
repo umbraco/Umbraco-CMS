@@ -1,16 +1,16 @@
 ﻿using System;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Web.Composing;
-using ILogger = Umbraco.Core.Logging.ILogger;
 using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.Models
@@ -24,19 +24,12 @@ namespace Umbraco.Tests.Models
         [SetUp]
         public void SetUp()
         {
-            // annoying, but content type wants short string helper ;(
-            SettingsForTests.Reset();
-
             // well, this is also annoying, but...
             // validating a value is performed by its data editor,
             // based upon the configuration in the data type, so we
             // need to be able to retrieve them all...
 
             Current.Reset();
-
-            var configs = TestHelper.GetConfigs();
-            configs.Add(() => SettingsForTests.DefaultGlobalSettings);
-            configs.Add(SettingsForTests.GenerateMockContentSettings);
 
             _factory = Mock.Of<IServiceProvider>();
 
@@ -45,7 +38,7 @@ namespace Umbraco.Tests.Models
 
             var dataEditors = new DataEditorCollection(new IDataEditor[]
             {
-                new DataEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>()) { Alias = "editor", ExplicitValueEditor = TestHelper.CreateDataValueEditor("view") }
+                new DataEditor(NullLoggerFactory.Instance, Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>()) { Alias = "editor", ExplicitValueEditor = MockedValueEditors.CreateDataValueEditor("view") }
             });
             var propertyEditors = new PropertyEditorCollection(dataEditors);
 
@@ -66,7 +59,7 @@ namespace Umbraco.Tests.Models
                 .Setup(x => x.GetService(It.IsAny<Type>()))
                 .Returns<Type>(x =>
                 {
-                    if (x == typeof(Configs)) return configs;
+                    //if (x == typeof(Configs)) return configs;
                     if (x == typeof(PropertyEditorCollection)) return propertyEditors;
                     if (x == typeof(ServiceContext)) return serviceContext;
                     if (x == typeof(ILocalizedTextService)) return serviceContext.LocalizationService;

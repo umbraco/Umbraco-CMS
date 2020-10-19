@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Examine;
 using Examine.LuceneEngine.Providers;
 using Lucene.Net.Analysis;
@@ -8,7 +9,6 @@ using Lucene.Net.QueryParsers;
 using Lucene.Net.Search;
 using Umbraco.Core;
 using Version = Lucene.Net.Util.Version;
-using Umbraco.Core.Logging;
 using System.Threading;
 
 namespace Umbraco.Examine
@@ -29,7 +29,7 @@ namespace Umbraco.Examine
         /// <remarks>
         /// Configures and unlocks all Lucene based indexes registered with the <see cref="IExamineManager"/>.
         /// </remarks>
-        internal static void ConfigureIndexes(this IExamineManager examineManager, IMainDom mainDom, ILogger logger)
+        internal static void ConfigureIndexes(this IExamineManager examineManager, IMainDom mainDom, ILogger<IExamineManager> logger)
         {
             LazyInitializer.EnsureInitialized(
                 ref _configuredInit,
@@ -71,7 +71,7 @@ namespace Umbraco.Examine
         /// <remarks>
         /// This is not thread safe, use with care
         /// </remarks>
-        private static void ConfigureLuceneIndexes(this IExamineManager examineManager, ILogger logger, bool disableExamineIndexing)
+        private static void ConfigureLuceneIndexes(this IExamineManager examineManager, ILogger<IExamineManager> logger, bool disableExamineIndexing)
         {
             foreach (var luceneIndexer in examineManager.Indexes.OfType<LuceneIndex>())
             {
@@ -87,7 +87,7 @@ namespace Umbraco.Examine
                 var dir = luceneIndexer.GetLuceneDirectory();
                 if (IndexWriter.IsLocked(dir))
                 {
-                    logger.Info(typeof(ExamineExtensions), "Forcing index {IndexerName} to be unlocked since it was left in a locked state", luceneIndexer.Name);
+                    logger.LogDebug("Forcing index {IndexerName} to be unlocked since it was left in a locked state", luceneIndexer.Name);
                     IndexWriter.Unlock(dir);
                 }
             }

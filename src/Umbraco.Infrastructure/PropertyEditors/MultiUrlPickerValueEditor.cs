@@ -3,8 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.Models.Entities;
@@ -20,12 +20,12 @@ namespace Umbraco.Web.PropertyEditors
     public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
     {
         private readonly IEntityService _entityService;
-        private readonly ILogger _logger;
+        private readonly ILogger<MultiUrlPickerValueEditor> _logger;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly IPublishedUrlProvider _publishedUrlProvider;
         private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
 
-        public MultiUrlPickerValueEditor(IEntityService entityService, IPublishedSnapshotAccessor publishedSnapshotAccessor, ILogger logger, IDataTypeService dataTypeService, ILocalizationService localizationService, ILocalizedTextService localizedTextService, IShortStringHelper shortStringHelper, DataEditorAttribute attribute, IUmbracoContextAccessor umbracoContextAccessor, IPublishedUrlProvider publishedUrlProvider)
+        public MultiUrlPickerValueEditor(IEntityService entityService, IPublishedSnapshotAccessor publishedSnapshotAccessor, ILogger<MultiUrlPickerValueEditor> logger, IDataTypeService dataTypeService, ILocalizationService localizationService, ILocalizedTextService localizedTextService, IShortStringHelper shortStringHelper, DataEditorAttribute attribute, IUmbracoContextAccessor umbracoContextAccessor, IPublishedUrlProvider publishedUrlProvider)
             : base(dataTypeService, localizationService, localizedTextService, shortStringHelper, attribute)
         {
             _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
@@ -122,7 +122,7 @@ namespace Umbraco.Web.PropertyEditors
             }
             catch (Exception ex)
             {
-                _logger.Error<MultiUrlPickerValueEditor>("Error getting links", ex);
+                _logger.LogError("Error getting links", ex);
             }
 
             return base.ToEditor(property, culture, segment);
@@ -157,7 +157,7 @@ namespace Umbraco.Web.PropertyEditors
             }
             catch (Exception ex)
             {
-                _logger.Error<MultiUrlPickerValueEditor>("Error saving links", ex);
+                _logger.LogError("Error saving links", ex);
             }
 
             return base.FromEditor(editorValue, currentValue);

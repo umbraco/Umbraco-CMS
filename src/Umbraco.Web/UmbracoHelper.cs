@@ -11,6 +11,7 @@ using Umbraco.Core.Templates;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Xml;
 using Umbraco.Web.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace Umbraco.Web
 {
@@ -455,7 +456,7 @@ namespace Umbraco.Web
             }
             catch (Exception ex) when (ex is FormatException || ex is ArgumentException)
             {
-                Current.Logger.Warn(typeof(UmbracoHelper), "A value was detected in the ufprt parameter but Umbraco could not decrypt the string");
+                Current.Logger.LogWarning("A value was detected in the ufprt parameter but Umbraco could not decrypt the string");
                 parts = null;
                 return false;
             }

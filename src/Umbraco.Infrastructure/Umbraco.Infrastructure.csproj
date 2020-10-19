@@ -10,35 +10,35 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="HtmlAgilityPack" Version="1.8.14" />
-      <PackageReference Include="LightInject" Version="6.3.2" />
-      <PackageReference Include="MailKit" Version="2.6.0" />
+      <PackageReference Include="HtmlAgilityPack" Version="1.11.24" />
+      <PackageReference Include="MailKit" Version="2.9.0" />
       <PackageReference Include="Markdown" Version="2.2.1" />
       <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-      <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.7" />
-      <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="3.1.2" />
-      <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.2" />
-      <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="3.1.2" />
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.8" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="3.1.8" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.8" />
+      <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="3.1.8" />
       <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" />
-      <PackageReference Include="MiniProfiler.Shared" Version="4.1.0" />
+      <PackageReference Include="MiniProfiler.Shared" Version="4.2.1" />
       <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
       <PackageReference Include="NPoco" Version="4.0.2" />
-      <PackageReference Include="Serilog" Version="2.9.0" />
+      <PackageReference Include="Serilog" Version="2.10.0" />
       <PackageReference Include="Serilog.Enrichers.Process" Version="2.0.1" />
       <PackageReference Include="Serilog.Enrichers.Thread" Version="3.1.0" />
-      <PackageReference Include="Serilog.Extensions.Hosting" Version="3.0.0" />
-      <PackageReference Include="Serilog.Filters.Expressions" Version="2.0.0" />
+      <PackageReference Include="Serilog.Extensions.Hosting" Version="3.1.0" />
+      <PackageReference Include="Serilog.Filters.Expressions" Version="2.1.0" />
       <PackageReference Include="Serilog.Formatting.Compact" Version="1.1.0" />
       <PackageReference Include="Serilog.Formatting.Compact.Reader" Version="1.0.3" />
       <PackageReference Include="Serilog.Settings.AppSettings" Version="2.2.2" />
+      <PackageReference Include="Serilog.Settings.Configuration" Version="3.1.0" />
       <PackageReference Include="Serilog.Sinks.Async" Version="1.4.0" />
       <PackageReference Include="Serilog.Sinks.File" Version="4.1.0" />
-      <PackageReference Include="Serilog.Sinks.Map" Version="1.0.0" />
-      <PackageReference Include="System.Data.SqlClient" Version="4.8.0" />
+      <PackageReference Include="Serilog.Sinks.Map" Version="1.0.1" />
+      <PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
       <PackageReference Include="System.Drawing.Common" Version="4.7.0" />
       <PackageReference Include="System.IO.FileSystem.AccessControl" Version="4.7.0" />
-      <PackageReference Include="System.Threading.Tasks.Dataflow" Version="4.9.0" />
-       <PackageReference Include="Examine.Core" Version="2.0.0-alpha.20200128.15" />
+      <PackageReference Include="System.Threading.Tasks.Dataflow" Version="4.11.1" />
+      <PackageReference Include="Examine.Core" Version="2.0.0-alpha.20200128.15" />
     </ItemGroup>
 
     <ItemGroup>
@@ -86,6 +86,9 @@
         </AssemblyAttribute>
         <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
             <_Parameter1>Umbraco.Tests.UnitTests</_Parameter1>
+        </AssemblyAttribute>
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+            <_Parameter1>DynamicProxyGenAssembly2</_Parameter1>
         </AssemblyAttribute>
     </ItemGroup>
 

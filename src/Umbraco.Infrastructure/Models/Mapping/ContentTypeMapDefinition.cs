@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
@@ -13,6 +13,8 @@ using Umbraco.Core.Exceptions;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Strings;
+using Umbraco.Core.Configuration.Models;
+using Microsoft.Extensions.Options;
 
 namespace Umbraco.Web.Models.Mapping
 {
@@ -28,15 +30,15 @@ namespace Umbraco.Web.Models.Mapping
         private readonly IContentTypeService _contentTypeService;
         private readonly IMediaTypeService _mediaTypeService;
         private readonly IMemberTypeService _memberTypeService;
-        private readonly ILogger _logger;
+        private readonly ILoggerFactory _loggerFactory;
+        private readonly ILogger<ContentTypeMapDefinition> _logger;
         private readonly IShortStringHelper _shortStringHelper;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
-
 
         public ContentTypeMapDefinition(CommonMapper commonMapper, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IFileService fileService,
             IContentTypeService contentTypeService, IMediaTypeService mediaTypeService, IMemberTypeService memberTypeService,
-            ILogger logger, IShortStringHelper shortStringHelper, IGlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
+            ILoggerFactory loggerFactory, IShortStringHelper shortStringHelper, IOptions<GlobalSettings> globalSettings, IHostingEnvironment hostingEnvironment)
         {
             _commonMapper = commonMapper;
             _propertyEditors = propertyEditors;
@@ -45,9 +47,10 @@ namespace Umbraco.Web.Models.Mapping
             _contentTypeService = contentTypeService;
             _mediaTypeService = mediaTypeService;
             _memberTypeService = memberTypeService;
-            _logger = logger;
+            _loggerFactory = loggerFactory;
+            _logger = _loggerFactory.CreateLogger<ContentTypeMapDefinition>();
             _shortStringHelper = shortStringHelper;
-            _globalSettings = globalSettings;
+            _globalSettings = globalSettings.Value;
             _hostingEnvironment = hostingEnvironment;
         }
 
@@ -533,7 +536,7 @@ namespace Umbraco.Web.Models.Mapping
         {
             MapTypeToDisplayBase(source, target);
 
-            var groupsMapper = new PropertyTypeGroupMapper<TTargetPropertyType>(_propertyEditors, _dataTypeService, _shortStringHelper, _logger);
+            var groupsMapper = new PropertyTypeGroupMapper<TTargetPropertyType>(_propertyEditors, _dataTypeService, _shortStringHelper, _loggerFactory.CreateLogger<PropertyTypeGroupMapper<TTargetPropertyType>>());
             target.Groups = groupsMapper.Map(source);
         }
 

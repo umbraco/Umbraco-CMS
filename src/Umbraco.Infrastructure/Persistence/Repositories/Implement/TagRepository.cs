@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Dtos;
@@ -17,7 +17,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 {
     internal class TagRepository : NPocoRepositoryBase<int, ITag>, ITagRepository
     {
-        public TagRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger)
+        public TagRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<TagRepository> logger)
             : base(scopeAccessor, cache, logger)
         { }
 

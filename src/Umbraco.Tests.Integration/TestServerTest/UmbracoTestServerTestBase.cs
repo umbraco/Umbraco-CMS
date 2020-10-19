@@ -22,6 +22,7 @@ using Umbraco.Web.Common.Builder;
 using Umbraco.Web.Common.Controllers;
 using Umbraco.Web.Editors;
 using Microsoft.Extensions.Hosting;
+using Umbraco.Web.BackOffice.Controllers;
 
 namespace Umbraco.Tests.Integration.TestServerTest
 {
@@ -30,7 +31,7 @@ namespace Umbraco.Tests.Integration.TestServerTest
     public abstract class UmbracoTestServerTestBase : UmbracoIntegrationTest
     {
         [SetUp]
-        public override Task Setup()
+        public override void Setup()
         {
             InMemoryConfiguration["ConnectionStrings:" + Constants.System.UmbracoConnectionName] = null;
             InMemoryConfiguration["Umbraco:CMS:Hosting:Debug"] = "true";
@@ -54,8 +55,6 @@ namespace Umbraco.Tests.Integration.TestServerTest
             });
 
             LinkGenerator = Factory.Services.GetRequiredService<LinkGenerator>();
-
-            return Task.CompletedTask;
         }
 
         public override IHostBuilder CreateHostBuilder()
@@ -90,6 +89,7 @@ namespace Umbraco.Tests.Integration.TestServerTest
         {
             var url = LinkGenerator.GetUmbracoApiService<T>(methodSelector);
 
+            var backofficeSecurityFactory = GetRequiredService<IBackofficeSecurityFactory>();
             var umbracoContextFactory = GetRequiredService<IUmbracoContextFactory>();
             var httpContextAccessor = GetRequiredService<IHttpContextAccessor>();
 
@@ -104,6 +104,7 @@ namespace Umbraco.Tests.Integration.TestServerTest
                 }
             };
 
+            backofficeSecurityFactory.EnsureBackofficeSecurity();
             umbracoContextFactory.EnsureUmbracoContext();
 
             return url;
@@ -138,6 +139,7 @@ namespace Umbraco.Tests.Integration.TestServerTest
                 .WithRuntimeMinifier()
                 .WithBackOffice()
                 .WithBackOfficeIdentity()
+                .WithPreview()
                 //.WithMiniProfiler() // we don't want this running in tests
                 .WithMvcAndRazor(mvcBuilding: mvcBuilder =>
                 {

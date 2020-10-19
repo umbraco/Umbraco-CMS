@@ -4,17 +4,17 @@ using System.IO;
 using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Configuration
 {
     public class XmlConfigManipulator : IConfigManipulator
     {
         private readonly IIOHelper _ioHelper;
-        private readonly ILogger _logger;
+        private readonly ILogger<XmlConfigManipulator> _logger;
 
-        public XmlConfigManipulator(IIOHelper ioHelper, ILogger logger)
+        public XmlConfigManipulator(IIOHelper ioHelper, ILogger<XmlConfigManipulator> logger)
         {
             _ioHelper = ioHelper;
             _logger = logger;
@@ -101,9 +101,9 @@ namespace Umbraco.Core.Configuration
             }
 
             // save
-            _logger.Info<XmlConfigManipulator>("Saving connection string to {ConfigFile}.", fileSource);
+            _logger.LogInformation("Saving connection string to {ConfigFile}.", fileSource);
             xml.Save(fileName, SaveOptions.DisableFormatting);
-            _logger.Info<XmlConfigManipulator>("Saved connection string to {ConfigFile}.", fileSource);
+            _logger.LogInformation("Saved connection string to {ConfigFile}.", fileSource);
         }
 
         public void SaveConfigValue(string itemPath, object value)

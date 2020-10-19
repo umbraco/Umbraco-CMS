@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Exceptions;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Dtos;
@@ -19,7 +19,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// </summary>
     internal class MediaTypeRepository : ContentTypeRepositoryBase<IMediaType>, IMediaTypeRepository
     {
-        public MediaTypeRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger, IContentTypeCommonRepository commonRepository, ILanguageRepository languageRepository, IShortStringHelper shortStringHelper)
+        public MediaTypeRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<MediaTypeRepository> logger, IContentTypeCommonRepository commonRepository, ILanguageRepository languageRepository, IShortStringHelper shortStringHelper)
             : base(scopeAccessor, cache, logger, commonRepository, languageRepository, shortStringHelper)
         { }
 

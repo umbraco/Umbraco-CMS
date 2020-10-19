@@ -1,9 +1,11 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.IO.MediaPathSchemes;
-using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Composing.CompositionExtensions
 {
@@ -97,8 +99,8 @@ namespace Umbraco.Core.Composing.CompositionExtensions
             {
                 var ioHelper = factory.GetRequiredService<IIOHelper>();
                 var hostingEnvironment = factory.GetRequiredService<IHostingEnvironment>();
-                var logger = factory.GetRequiredService<ILogger>();
-                var globalSettings = factory.GetRequiredService<IGlobalSettings>();
+                var logger = factory.GetRequiredService<ILogger<PhysicalFileSystem>>();
+                var globalSettings = factory.GetRequiredService<IOptions<GlobalSettings>>().Value;
 
                 var rootPath = hostingEnvironment.MapPathWebRoot(globalSettings.UmbracoMediaPath);
                 var rootUrl = hostingEnvironment.ToAbsolute(globalSettings.UmbracoMediaPath);

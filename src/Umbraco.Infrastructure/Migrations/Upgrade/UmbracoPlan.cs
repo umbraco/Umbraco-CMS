@@ -2,6 +2,7 @@
 using Semver;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Migrations.Upgrade.Common;
 using Umbraco.Core.Migrations.Upgrade.V_8_0_0;
 using Umbraco.Core.Migrations.Upgrade.V_8_0_1;
@@ -16,17 +17,15 @@ namespace Umbraco.Core.Migrations.Upgrade
     public class UmbracoPlan : MigrationPlan
     {
         private readonly IUmbracoVersion _umbracoVersion;
-        private readonly IGlobalSettings _globalSettings;
         private const string InitPrefix = "{init-";
         private const string InitSuffix = "}";
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoPlan"/> class.
         /// </summary>
-        public UmbracoPlan(IUmbracoVersion umbracoVersion, IGlobalSettings globalSettings)
+        public UmbracoPlan(IUmbracoVersion umbracoVersion)
             : base(Constants.System.UmbracoUpgradePlanName)
         {
             _umbracoVersion = umbracoVersion;
-            _globalSettings = globalSettings;
             DefinePlan();
         }
 
@@ -191,7 +190,7 @@ namespace Umbraco.Core.Migrations.Upgrade
 
             // to 8.7.0...
             To<MissingDictionaryIndex>("{a78e3369-8ea3-40ec-ad3f-5f76929d2b20}");
-            
+
             //FINAL
         }
     }

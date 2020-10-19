@@ -3,9 +3,9 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Events;
-using Umbraco.Core.Logging;
 
 namespace Umbraco.Web.Cache
 {
@@ -17,12 +17,12 @@ namespace Umbraco.Web.Cache
         private static readonly ConcurrentDictionary<string, MethodInfo> FoundHandlers = new ConcurrentDictionary<string, MethodInfo>();
         private readonly DistributedCache _distributedCache;
         private readonly IUmbracoContextFactory _umbracoContextFactory;
-        private readonly ILogger _logger;
+        private readonly ILogger<DistributedCacheBinder> _logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DistributedCacheBinder"/> class.
         /// </summary>
-        public DistributedCacheBinder(DistributedCache distributedCache, IUmbracoContextFactory umbracoContextFactory, ILogger logger)
+        public DistributedCacheBinder(DistributedCache distributedCache, IUmbracoContextFactory umbracoContextFactory, ILogger<DistributedCacheBinder> logger)
         {
             _distributedCache = distributedCache;
             _logger = logger;
@@ -73,7 +73,7 @@ namespace Umbraco.Web.Cache
                     {
                         // TODO: should this be fatal (ie, an exception)?
                         var name = e.Sender.GetType().Name + "_" + e.EventName;
-                        _logger.Warn<DistributedCacheBinder>("Dropping event {EventName} because no corresponding handler was found.", name);
+                        _logger.LogWarning("Dropping event {EventName} because no corresponding handler was found.", name);
                         continue;
                     }
 

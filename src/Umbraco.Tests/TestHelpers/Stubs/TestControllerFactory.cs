@@ -5,10 +5,10 @@ using System.Reflection;
 using System.Web.Mvc;
 using System.Web.Routing;
 using System.Web.SessionState;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Logging;
 using Umbraco.Web;
 using Umbraco.Web.Composing;
 using Current = Umbraco.Web.Composing.Current;
@@ -21,16 +21,16 @@ namespace Umbraco.Tests.TestHelpers.Stubs
     internal class TestControllerFactory : IControllerFactory
     {
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
-        private readonly ILogger _logger;
+        private readonly ILogger<TestControllerFactory> _logger;
         private readonly Func<RequestContext, IController> _factory;
 
-        public TestControllerFactory(IUmbracoContextAccessor umbracoContextAccessor, ILogger logger)
+        public TestControllerFactory(IUmbracoContextAccessor umbracoContextAccessor, ILogger<TestControllerFactory> logger)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
             _logger = logger;
         }
 
-        public TestControllerFactory(IUmbracoContextAccessor umbracoContextAccessor, ILogger logger, Func<RequestContext, IController> factory)
+        public TestControllerFactory(IUmbracoContextAccessor umbracoContextAccessor, ILogger<TestControllerFactory> logger, Func<RequestContext, IController> factory)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
             _logger = logger;

@@ -11,7 +11,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         public void Can_Map_Id_Property()
         {
             // Act
-            string column = new RelationMapper(MockSqlContext(), CreateMaps()).Map("Id");
+            string column = new RelationMapper(MockSqlContext()).Map("Id");
 
             // Assert
             Assert.That(column, Is.EqualTo("[umbracoRelation].[id]"));
@@ -21,7 +21,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         public void Can_Map_ChildId_Property()
         {
             // Act
-            string column = new RelationMapper(MockSqlContext(), CreateMaps()).Map("ChildId");
+            string column = new RelationMapper(MockSqlContext()).Map("ChildId");
 
             // Assert
             Assert.That(column, Is.EqualTo("[umbracoRelation].[childId]"));
@@ -31,7 +31,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         public void Can_Map_Datetime_Property()
         {
             // Act
-            string column = new RelationMapper(MockSqlContext(), CreateMaps()).Map("CreateDate");
+            string column = new RelationMapper(MockSqlContext()).Map("CreateDate");
 
             // Assert
             Assert.That(column, Is.EqualTo("[umbracoRelation].[datetime]"));
@@ -41,7 +41,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         public void Can_Map_Comment_Property()
         {
             // Act
-            string column = new RelationMapper(MockSqlContext(), CreateMaps()).Map("Comment");
+            string column = new RelationMapper(MockSqlContext()).Map("Comment");
 
             // Assert
             Assert.That(column, Is.EqualTo("[umbracoRelation].[comment]"));
@@ -51,7 +51,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         public void Can_Map_RelationType_Property()
         {
             // Act
-            string column = new RelationMapper(MockSqlContext(), CreateMaps()).Map("RelationTypeId");
+            string column = new RelationMapper(MockSqlContext()).Map("RelationTypeId");
 
             // Assert
             Assert.That(column, Is.EqualTo("[umbracoRelation].[relType]"));

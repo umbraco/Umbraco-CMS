@@ -15,10 +15,10 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="HtmlSanitizer" Version="4.0.217" />
-      <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="3.1.7" />
+      <PackageReference Include="HtmlSanitizer" Version="5.0.343" />
+      <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="3.1.8" />
       <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-      <PackageReference Include="Serilog.AspNetCore" Version="3.2.0" />
+      <PackageReference Include="Serilog.AspNetCore" Version="3.4.0" />
     </ItemGroup>
 
     <ItemGroup>
@@ -31,7 +31,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Umbraco.Configuration\Umbraco.Configuration.csproj" />
         <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj" />
         <ProjectReference Include="..\Umbraco.Examine.Lucene\Umbraco.Examine.Lucene.csproj" Condition="'$(OS)' == 'Windows_NT'" />
         <ProjectReference Include="..\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj" />

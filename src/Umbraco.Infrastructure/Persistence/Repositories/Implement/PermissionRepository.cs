@@ -5,12 +5,12 @@ using System.Linq;
 using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Exceptions;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Scoping;
+using Microsoft.Extensions.Logging;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
@@ -25,7 +25,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     internal class PermissionRepository<TEntity> : NPocoRepositoryBase<int, ContentPermissionSet>
         where TEntity : class, IEntity
     {
-        public PermissionRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger)
+        public PermissionRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<PermissionRepository<TEntity>> logger)
             : base(scopeAccessor, cache, logger)
         { }
 

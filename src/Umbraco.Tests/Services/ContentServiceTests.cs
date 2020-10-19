@@ -3,25 +3,26 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Services;
-using Umbraco.Tests.TestHelpers.Entities;
-using Umbraco.Core.Events;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Repositories.Implement;
-using Umbraco.Core.Scoping;
-using Umbraco.Core.Services.Implement;
-using Umbraco.Tests.Testing;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
-using Umbraco.Core.Cache;
 using Umbraco.Core.PropertyEditors;
-using Umbraco.Tests.Common.TestHelpers.Entities;
+using Umbraco.Core.Scoping;
+using Umbraco.Core.Services;
+using Umbraco.Core.Services.Implement;
+using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.LegacyXmlPublishedCache;
+using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Web.Composing;
+using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Services
 {
@@ -41,10 +42,13 @@ namespace Umbraco.Tests.Services
         // TODO: Add test to verify there is only ONE newest document/content in {Constants.DatabaseSchema.Tables.Document} table after updating.
         // TODO: Add test to delete specific version (with and without deleting prior versions) and versions by date.
 
+        private GlobalSettings _globalSettings;
+
         public override void SetUp()
         {
             base.SetUp();
             ContentRepositoryBase.ThrowOnWarning = true;
+            _globalSettings = new GlobalSettings();
         }
 
         public override void TearDown()
@@ -174,8 +178,8 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Perform_Scheduled_Publishing()
         {
-            var langUk = new Language(TestObjects.GetGlobalSettings(), "en-GB") { IsDefault = true };
-            var langFr = new Language(TestObjects.GetGlobalSettings(), "fr-FR");
+            var langUk = new Language(_globalSettings, "en-GB") { IsDefault = true };
+            var langFr = new Language(_globalSettings, "fr-FR");
 
             ServiceContext.LocalizationService.Save(langFr);
             ServiceContext.LocalizationService.Save(langUk);
@@ -509,7 +513,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Can_Save_New_Content_With_Explicit_User()
         {
-            var user = new User(TestObjects.GetGlobalSettings())
+            var user = new User(_globalSettings)
                 {
                     Name = "Test",
                     Email = "test@test.com",
@@ -878,8 +882,8 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Unpublishing_Mandatory_Language_Unpublishes_Document()
         {
-            var langUk = new Language(TestObjects.GetGlobalSettings(), "en-GB") { IsDefault = true, IsMandatory = true };
-            var langFr = new Language(TestObjects.GetGlobalSettings(), "fr-FR");
+            var langUk = new Language(_globalSettings, "en-GB") { IsDefault = true, IsMandatory = true };
+            var langFr = new Language(_globalSettings, "fr-FR");
 
             ServiceContext.LocalizationService.Save(langFr);
             ServiceContext.LocalizationService.Save(langUk);
@@ -975,8 +979,8 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
 
-            var langGB = new Language(TestObjects.GetGlobalSettings(), "en-GB") { IsDefault = true };
-            var langFr = new Language(TestObjects.GetGlobalSettings(), "fr-FR");
+            var langGB = new Language(_globalSettings, "en-GB") { IsDefault = true };
+            var langFr = new Language(_globalSettings, "fr-FR");
 
             ServiceContext.LocalizationService.Save(langFr);
             ServiceContext.LocalizationService.Save(langGB);
@@ -1043,8 +1047,8 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
 
-            var langGB = new Language(TestObjects.GetGlobalSettings(), "en-GB") { IsDefault = true, IsMandatory = true };
-            var langFr = new Language(TestObjects.GetGlobalSettings(), "fr-FR");
+            var langGB = new Language(_globalSettings, "en-GB") { IsDefault = true, IsMandatory = true };
+            var langFr = new Language(_globalSettings, "fr-FR");
 
             ServiceContext.LocalizationService.Save(langFr);
             ServiceContext.LocalizationService.Save(langGB);
@@ -1222,8 +1226,8 @@ namespace Umbraco.Tests.Services
         {
             //TODO: This is using an internal API - we aren't exposing this publicly (at least for now) but we'll keep the test around
 
-            var langFr = new Language(TestObjects.GetGlobalSettings(), "fr");
-            var langDa = new Language(TestObjects.GetGlobalSettings(), "da");
+            var langFr = new Language(_globalSettings, "fr");
+            var langDa = new Language(_globalSettings, "da");
             ServiceContext.LocalizationService.Save(langFr);
             ServiceContext.LocalizationService.Save(langDa);
 
@@ -2158,8 +2162,8 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Can_Rollback_Version_On_Multilingual()
         {
-            var langFr = new Language(TestObjects.GetGlobalSettings(), "fr");
-            var langDa = new Language(TestObjects.GetGlobalSettings(), "da");
+            var langFr = new Language(_globalSettings, "fr");
+            var langDa = new Language(_globalSettings, "da");
             ServiceContext.LocalizationService.Save(langFr);
             ServiceContext.LocalizationService.Save(langDa);
 
@@ -2685,8 +2689,8 @@ namespace Umbraco.Tests.Services
         {
             var languageService = ServiceContext.LocalizationService;
 
-            var langUk = new Language(TestObjects.GetGlobalSettings(), "en-GB") { IsDefault = true };
-            var langFr = new Language(TestObjects.GetGlobalSettings(), "fr-FR");
+            var langUk = new Language(_globalSettings, "en-GB") { IsDefault = true };
+            var langFr = new Language(_globalSettings, "fr-FR");
 
             languageService.Save(langFr);
             languageService.Save(langUk);
@@ -2720,8 +2724,8 @@ namespace Umbraco.Tests.Services
         {
             var languageService = ServiceContext.LocalizationService;
 
-            var langUk = new Language(TestObjects.GetGlobalSettings(), "en-GB") { IsDefault = true };
-            var langFr = new Language(TestObjects.GetGlobalSettings(), "fr-FR");
+            var langUk = new Language(_globalSettings, "en-GB") { IsDefault = true };
+            var langFr = new Language(_globalSettings, "fr-FR");
 
             languageService.Save(langFr);
             languageService.Save(langUk);
@@ -2757,9 +2761,9 @@ namespace Umbraco.Tests.Services
         {
             var languageService = ServiceContext.LocalizationService;
 
-            var langUk = new Language(TestObjects.GetGlobalSettings(), "en-GB") { IsDefault = true };
-            var langFr = new Language(TestObjects.GetGlobalSettings(), "fr-FR");
-            var langDa = new Language(TestObjects.GetGlobalSettings(), "da-DK");
+            var langUk = new Language(_globalSettings, "en-GB") { IsDefault = true };
+            var langFr = new Language(_globalSettings, "fr-FR");
+            var langDa = new Language(_globalSettings, "da-DK");
 
             languageService.Save(langFr);
             languageService.Save(langUk);
@@ -2859,10 +2863,10 @@ namespace Umbraco.Tests.Services
             var languageService = ServiceContext.LocalizationService;
 
             //var langFr = new Language("fr-FR") { IsDefaultVariantLanguage = true };
-            var langXx = new Language(TestObjects.GetGlobalSettings(), "pt-PT") { IsDefault = true };
-            var langFr = new Language(TestObjects.GetGlobalSettings(), "fr-FR");
-            var langUk = new Language(TestObjects.GetGlobalSettings(), "en-GB");
-            var langDe = new Language(TestObjects.GetGlobalSettings(), "de-DE");
+            var langXx = new Language(_globalSettings, "pt-PT") { IsDefault = true };
+            var langFr = new Language(_globalSettings, "fr-FR");
+            var langUk = new Language(_globalSettings, "en-GB");
+            var langDe = new Language(_globalSettings, "de-DE");
 
             languageService.Save(langFr);
             languageService.Save(langUk);
@@ -3245,24 +3249,24 @@ namespace Umbraco.Tests.Services
         private DocumentRepository CreateRepository(IScopeProvider provider, out ContentTypeRepository contentTypeRepository)
         {
             var accessor = (IScopeAccessor) provider;
-            var templateRepository = new TemplateRepository(accessor, AppCaches.Disabled, Logger, TestObjects.GetFileSystemsMock(), IOHelper, ShortStringHelper);
-            var tagRepository = new TagRepository(accessor, AppCaches.Disabled, Logger);
+            var templateRepository = new TemplateRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<TemplateRepository>(), TestObjects.GetFileSystemsMock(), IOHelper, ShortStringHelper);
+            var tagRepository = new TagRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<TagRepository>());
             var commonRepository = new ContentTypeCommonRepository(accessor, templateRepository, AppCaches, ShortStringHelper);
-            var languageRepository = new LanguageRepository(accessor, AppCaches.Disabled, Logger, TestObjects.GetGlobalSettings());
-            contentTypeRepository = new ContentTypeRepository(accessor, AppCaches.Disabled, Logger, commonRepository, languageRepository, ShortStringHelper);
-            var relationTypeRepository = new RelationTypeRepository(accessor, AppCaches.Disabled, Logger);
+            var languageRepository = new LanguageRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<LanguageRepository>(), Microsoft.Extensions.Options.Options.Create(_globalSettings));
+            contentTypeRepository = new ContentTypeRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<ContentTypeRepository>(), commonRepository, languageRepository, ShortStringHelper);
+            var relationTypeRepository = new RelationTypeRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<RelationTypeRepository>());
             var entityRepository = new EntityRepository(accessor);
-            var relationRepository = new RelationRepository(accessor, Logger, relationTypeRepository, entityRepository);
+            var relationRepository = new RelationRepository(accessor, LoggerFactory.CreateLogger<RelationRepository>(), relationTypeRepository, entityRepository);
             var propertyEditors = new Lazy<PropertyEditorCollection>(() => new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>())));
             var dataValueReferences = new DataValueReferenceFactoryCollection(Enumerable.Empty<IDataValueReferenceFactory>());
-            var repository = new DocumentRepository(accessor, AppCaches.Disabled, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, relationRepository, relationTypeRepository, propertyEditors, dataValueReferences, DataTypeService);
+            var repository = new DocumentRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<DocumentRepository>(), LoggerFactory, contentTypeRepository, templateRepository, tagRepository, languageRepository, relationRepository, relationTypeRepository, propertyEditors, dataValueReferences, DataTypeService);
             return repository;
         }
 
         private void CreateEnglishAndFrenchDocumentType(out Language langUk, out Language langFr, out ContentType contentType)
         {
-            langUk = new Language(TestObjects.GetGlobalSettings(), "en-GB") { IsDefault = true };
-            langFr = new Language(TestObjects.GetGlobalSettings(), "fr-FR");
+            langUk = new Language(_globalSettings, "en-GB") { IsDefault = true };
+            langFr = new Language(_globalSettings, "fr-FR");
             ServiceContext.LocalizationService.Save(langFr);
             ServiceContext.LocalizationService.Save(langUk);
 

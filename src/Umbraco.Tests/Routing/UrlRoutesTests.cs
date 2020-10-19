@@ -4,7 +4,9 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models;
+using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
@@ -197,10 +199,9 @@ DetermineRouteById(id):
         [TestCase(2006, false, "/x/b/e")]
         public void GetRouteByIdNoHide(int id, bool hide, string expected)
         {
-            var globalSettings = Mock.Get(Factory.GetInstance<IGlobalSettings>()); //this will modify the IGlobalSettings instance stored in the container
-            globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(hide);
+            var globalSettings = new GlobalSettings { HideTopLevelNodeFromPath = hide };
 
-            var umbracoContext = GetUmbracoContext("/test", 0, globalSettings: globalSettings.Object);
+            var umbracoContext = GetUmbracoContext("/test", 0, globalSettings: globalSettings);
             var cache = umbracoContext.Content as PublishedContentCache;
             if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
 
@@ -221,10 +222,10 @@ DetermineRouteById(id):
         [TestCase(2006, true, "/b/e")] // risky!
         public void GetRouteByIdHide(int id, bool hide, string expected)
         {
-            var globalSettings = Mock.Get(Factory.GetInstance<IGlobalSettings>()); //this will modify the IGlobalSettings instance stored in the container
-            globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(hide);
+            var globalSettings = new GlobalSettings { HideTopLevelNodeFromPath = hide };
 
-            var umbracoContext = GetUmbracoContext("/test", 0, globalSettings: globalSettings.Object);
+            var snapshotService = CreatePublishedSnapshotService(globalSettings);
+            var umbracoContext = GetUmbracoContext("/test", 0, globalSettings: globalSettings, snapshotService: snapshotService);
             var cache = umbracoContext.Content as PublishedContentCache;
             if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
 
@@ -235,10 +236,10 @@ DetermineRouteById(id):
         [Test]
         public void GetRouteByIdCache()
         {
-            var globalSettings = Mock.Get(Factory.GetInstance<IGlobalSettings>()); //this will modify the IGlobalSettings instance stored in the container
-            globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(false);
+            var globalSettings = new GlobalSettings { HideTopLevelNodeFromPath = false };
 
-            var umbracoContext = GetUmbracoContext("/test", 0, globalSettings:globalSettings.Object);
+            var snapshotService = CreatePublishedSnapshotService(globalSettings);
+            var umbracoContext = GetUmbracoContext("/test", 0, globalSettings:globalSettings, snapshotService: snapshotService);
             var cache = umbracoContext.Content as PublishedContentCache;
             if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
 
@@ -266,10 +267,10 @@ DetermineRouteById(id):
         [TestCase("/x", false, 2000)]
         public void GetByRouteNoHide(string route, bool hide, int expected)
         {
-            var globalSettings = Mock.Get(Factory.GetInstance<IGlobalSettings>()); //this will modify the IGlobalSettings instance stored in the container
-            globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(hide);
+            var globalSettings = new GlobalSettings { HideTopLevelNodeFromPath = hide };
 
-            var umbracoContext = GetUmbracoContext("/test", 0, globalSettings:globalSettings.Object);
+            var snapshotService = CreatePublishedSnapshotService(globalSettings);
+            var umbracoContext = GetUmbracoContext("/test", 0, globalSettings:globalSettings, snapshotService: snapshotService);
             var cache = umbracoContext.Content as PublishedContentCache;
             if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
 
@@ -297,10 +298,10 @@ DetermineRouteById(id):
         [TestCase("/b/c", true, 1002)] // (hence the 2005 collision)
         public void GetByRouteHide(string route, bool hide, int expected)
         {
-            var globalSettings = Mock.Get(Factory.GetInstance<IGlobalSettings>()); //this will modify the IGlobalSettings instance stored in the container
-            globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(hide);
+            var globalSettings = new GlobalSettings { HideTopLevelNodeFromPath = hide };
 
-            var umbracoContext = GetUmbracoContext("/test", 0, globalSettings:globalSettings.Object);
+            var snapshotService = CreatePublishedSnapshotService(globalSettings);
+            var umbracoContext = GetUmbracoContext("/test", 0, globalSettings:globalSettings, snapshotService: snapshotService);
             var cache = umbracoContext.Content as PublishedContentCache;
             if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
 
@@ -320,10 +321,10 @@ DetermineRouteById(id):
         [Test]
         public void GetByRouteCache()
         {
-            var globalSettings = Mock.Get(Factory.GetInstance<IGlobalSettings>()); //this will modify the IGlobalSettings instance stored in the container
-            globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(false);
+            var globalSettings = new GlobalSettings { HideTopLevelNodeFromPath = false };
 
-            var umbracoContext = GetUmbracoContext("/test", 0, globalSettings:globalSettings.Object);
+            var snapshotService = CreatePublishedSnapshotService(globalSettings);
+            var umbracoContext = GetUmbracoContext("/test", 0, globalSettings:globalSettings, snapshotService:snapshotService);
             var cache = umbracoContext.Content as PublishedContentCache;
             if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
 

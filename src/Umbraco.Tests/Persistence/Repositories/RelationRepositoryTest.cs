@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Dtos;
@@ -32,9 +32,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         private RelationRepository CreateRepository(IScopeProvider provider, out RelationTypeRepository relationTypeRepository)
         {
             var accessor = (IScopeAccessor) provider;
-            relationTypeRepository = new RelationTypeRepository(accessor, AppCaches.Disabled, Mock.Of<ILogger>());
+            relationTypeRepository = new RelationTypeRepository(accessor, AppCaches.Disabled, Mock.Of<ILogger<RelationTypeRepository>>());
             var entityRepository = new EntityRepository(accessor);
-            var repository = new RelationRepository(accessor, Mock.Of<ILogger>(), relationTypeRepository, entityRepository);
+            var repository = new RelationRepository(accessor, Mock.Of<ILogger<RelationRepository>>(), relationTypeRepository, entityRepository);
             return repository;
         }
 
@@ -42,7 +42,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Add_On_RelationRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (var scope = provider.CreateScope())
             {
                 RelationTypeRepository repositoryType;
@@ -64,7 +64,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Update_On_RelationRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (var scope = provider.CreateScope())
             {
                 RelationTypeRepository repositoryType;
@@ -89,7 +89,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Delete_On_RelationRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (var scope = provider.CreateScope())
             {
                 RelationTypeRepository repositoryType;
@@ -111,7 +111,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Get_On_RelationRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (var scope = provider.CreateScope())
             {
                 RelationTypeRepository repositoryType;
@@ -133,7 +133,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetAll_On_RelationRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (var scope = provider.CreateScope())
             {
                 RelationTypeRepository repositoryType;
@@ -154,7 +154,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetAll_With_Params_On_RelationRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (var scope = provider.CreateScope())
             {
                 RelationTypeRepository repositoryType;
@@ -176,7 +176,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             CreateTestDataForPagingTests(out var createdContent, out var createdMembers, out var createdMedia);
 
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository(provider, out var relationTypeRepository);
@@ -214,7 +214,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Get_Paged_Parent_Child_Entities_With_Same_Entity_Relation()
         {
-            //Create a media item and create a relationship between itself (parent -> child)            
+            //Create a media item and create a relationship between itself (parent -> child)
             var imageType = MockedContentTypes.CreateImageMediaType("myImage");
             ServiceContext.MediaTypeService.Save(imageType);
             var media = MockedMedia.CreateMediaImage(imageType, -1);
@@ -222,7 +222,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var relType = ServiceContext.RelationService.GetRelationTypeByAlias(Constants.Conventions.RelationTypes.RelatedMediaAlias);
             ServiceContext.RelationService.Relate(media.Id, media.Id, relType);
 
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository(provider, out var relationTypeRepository);
@@ -244,7 +244,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             CreateTestDataForPagingTests(out var createdContent, out var createdMembers, out var createdMedia);
 
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository(provider, out var relationTypeRepository);
@@ -325,7 +325,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Exists_On_RelationRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (var scope = provider.CreateScope())
             {
                 RelationTypeRepository repositoryType;
@@ -345,7 +345,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Count_On_RelationRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (var scope = provider.CreateScope())
             {
                 RelationTypeRepository repositoryType;
@@ -364,7 +364,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetByQuery_On_RelationRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (var scope = provider.CreateScope())
             {
                 RelationTypeRepository repositoryType;
@@ -386,7 +386,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Delete_Content_And_Verify_Relation_Is_Removed()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (var scope = provider.CreateScope())
             {
                 RelationTypeRepository repositoryType;
@@ -414,7 +414,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void CreateTestData()
         {
             var relateContent = new RelationType(
-                "Relate Content on Copy", "relateContentOnCopy", true, 
+                "Relate Content on Copy", "relateContentOnCopy", true,
                 Constants.ObjectTypes.Document,
                 new Guid("C66BA18E-EAF3-4CFF-8A22-41B16D66A972"));
 
@@ -424,13 +424,13 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Constants.ObjectTypes.DocumentType,
                 new Guid("A2CB7800-F571-4787-9638-BC48539A0EFB"));
 
-            var provider = TestObjects.GetScopeProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(LoggerFactory);
             using (var scope = provider.CreateScope())
             {
                 var accessor = (IScopeAccessor)provider;
-                var relationTypeRepository = new RelationTypeRepository(accessor, AppCaches.Disabled, Mock.Of<ILogger>());
+                var relationTypeRepository = new RelationTypeRepository(accessor, AppCaches.Disabled, Mock.Of<ILogger<RelationTypeRepository>>());
                 var entityRepository = new EntityRepository(accessor);
-                var relationRepository = new RelationRepository(accessor, Mock.Of<ILogger>(), relationTypeRepository, entityRepository);
+                var relationRepository = new RelationRepository(accessor, Mock.Of<ILogger<RelationRepository>>(), relationTypeRepository, entityRepository);
 
                 relationTypeRepository.Save(relateContent);
                 relationTypeRepository.Save(relateContentType);

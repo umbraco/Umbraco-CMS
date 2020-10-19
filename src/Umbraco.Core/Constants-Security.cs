@@ -62,6 +62,7 @@
             public const string AspNetCoreV3PasswordHashAlgorithmName = "PBKDF2.ASPNETCORE.V3";
             public const string AspNetCoreV2PasswordHashAlgorithmName = "PBKDF2.ASPNETCORE.V2";
             public const string AspNetUmbraco8PasswordHashAlgorithmName = "HMACSHA256";
+            public const string AspNetUmbraco4PasswordHashAlgorithmName = "HMACSHA1";
         }
     }
 }

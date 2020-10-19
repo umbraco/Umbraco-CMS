@@ -1,6 +1,7 @@
 ﻿using System.Configuration;
 using System.IO;
 using Umbraco.Core.Hosting;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
 
 namespace Umbraco.Core.Configuration
@@ -9,9 +10,8 @@ namespace Umbraco.Core.Configuration
     {
         private static string _modelsDirectoryAbsolute = null;
 
-        public static string ModelsDirectoryAbsolute(this IModelsBuilderConfig modelsBuilderConfig, IHostingEnvironment hostingEnvironment)
+        public static string ModelsDirectoryAbsolute(this ModelsBuilderSettings modelsBuilderConfig, IHostingEnvironment hostingEnvironment)
         {
-
             if (_modelsDirectoryAbsolute is null)
             {
                 var modelsDirectory = modelsBuilderConfig.ModelsDirectory;

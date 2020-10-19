@@ -4,9 +4,10 @@ using System.Linq;
 using System.Xml.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
+using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Services.Importing;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.Composing;
@@ -18,6 +19,13 @@ namespace Umbraco.Tests.Services
     public class EntityXmlSerializerTests : TestWithSomeContentBase
     {
         private IEntityXmlSerializer Serializer => Factory.GetInstance<IEntityXmlSerializer>();
+        private GlobalSettings _globalSettings;
+
+        public override void SetUp()
+        {
+            base.SetUp();
+            _globalSettings = new GlobalSettings();
+        }
 
         [Test]
         public void Can_Export_Macro()
@@ -57,10 +65,10 @@ namespace Umbraco.Tests.Services
         public void Can_Export_Languages()
         {
             // Arrange
-            var languageNbNo = new Language(TestObjects.GetGlobalSettings(), "nb-NO") { CultureName = "Norwegian" };
+            var languageNbNo = new Language(_globalSettings, "nb-NO") { CultureName = "Norwegian" };
             ServiceContext.LocalizationService.Save(languageNbNo);
 
-            var languageEnGb = new Language(TestObjects.GetGlobalSettings(), "en-GB") { CultureName = "English (United Kingdom)" };
+            var languageEnGb = new Language(_globalSettings, "en-GB") { CultureName = "English (United Kingdom)" };
             ServiceContext.LocalizationService.Save(languageEnGb);
 
             var newPackageXml = XElement.Parse(ImportResources.Dictionary_Package);
@@ -75,10 +83,10 @@ namespace Umbraco.Tests.Services
 
         private void CreateDictionaryData()
         {
-            var languageNbNo = new Language(TestObjects.GetGlobalSettings(), "nb-NO") { CultureName = "nb-NO" };
+            var languageNbNo = new Language(_globalSettings, "nb-NO") { CultureName = "nb-NO" };
             ServiceContext.LocalizationService.Save(languageNbNo);
 
-            var languageEnGb = new Language(TestObjects.GetGlobalSettings(), "en-GB") { CultureName = "en-GB" };
+            var languageEnGb = new Language(_globalSettings, "en-GB") { CultureName = "en-GB" };
             ServiceContext.LocalizationService.Save(languageEnGb);
 
             var parentItem = new DictionaryItem("Parent");

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -15,7 +16,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         private readonly ConfigurationService _configurationService;
 
         protected ILocalizedTextService TextService { get; }
-        protected ILogger Logger { get; }
+        protected ILoggerFactory LoggerFactory { get; }
 
         /// <summary>
         /// Gets the config file path.
@@ -55,12 +56,12 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
             get { return false; }
         }
 
-        protected AbstractConfigCheck(ILocalizedTextService textService, IHostingEnvironment hostingEnvironment, ILogger logger)
+        protected AbstractConfigCheck(ILocalizedTextService textService, IHostingEnvironment hostingEnvironment, ILoggerFactory loggerFactory)
         {
             _hostingEnvironment = hostingEnvironment;
             TextService = textService;
-            Logger = logger;
-            _configurationService = new ConfigurationService(AbsoluteFilePath, XPath, textService, logger);
+            LoggerFactory = loggerFactory;
+            _configurationService = new ConfigurationService(AbsoluteFilePath, XPath, textService, loggerFactory.CreateLogger<ConfigurationService>());
         }
 
         /// <summary>

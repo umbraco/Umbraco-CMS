@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
+using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Querying;
@@ -14,7 +14,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 {
     internal class RedirectUrlRepository : NPocoRepositoryBase<Guid, IRedirectUrl>, IRedirectUrlRepository
     {
-        public RedirectUrlRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger)
+        public RedirectUrlRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<RedirectUrlRepository> logger)
             : base(scopeAccessor, cache, logger)
         { }
 

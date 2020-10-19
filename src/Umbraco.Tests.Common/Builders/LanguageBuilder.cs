@@ -1,7 +1,6 @@
 using System;
 using System.Globalization;
-using Moq;
-using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models;
 using Umbraco.Tests.Common.Builders.Interfaces;
 
@@ -58,6 +57,7 @@ namespace Umbraco.Tests.Common.Builders
         public override ILanguage Build()
         {
             var cultureInfo = _cultureInfo ?? CultureInfo.GetCultureInfo("en-US");
+            var globalSettings = new GlobalSettings { DefaultUILanguage = cultureInfo.Name };
             var key = _key ?? Guid.NewGuid();
             var createDate = _createDate ?? DateTime.Now;
             var updateDate = _updateDate ?? DateTime.Now;
@@ -66,7 +66,7 @@ namespace Umbraco.Tests.Common.Builders
             var isDefault = _isDefault ?? false;
             var isMandatory = _isMandatory ?? false;
 
-            return new Language(Mock.Of<IGlobalSettings>(), cultureInfo.Name)
+            return new Language(globalSettings, cultureInfo.Name)
             {
                 Id = _id ?? 0,
                 CultureName = cultureInfo.EnglishName,

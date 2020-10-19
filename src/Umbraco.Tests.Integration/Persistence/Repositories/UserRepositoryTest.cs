@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Linq;
+using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
@@ -25,14 +27,14 @@ namespace Umbraco.Tests.Persistence.Repositories
         private UserRepository CreateRepository(IScopeProvider provider)
         {
             var accessor = (IScopeAccessor) provider;
-            var repository = new UserRepository(accessor, AppCaches.Disabled, Logger, Mappers, GlobalSettings, Mock.Of<IUserPasswordConfiguration>(), new JsonNetSerializer());
+            var repository = new UserRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<UserRepository>(), Mappers, Options.Create(GlobalSettings), Options.Create(new UserPasswordConfigurationSettings()), new JsonNetSerializer());
             return repository;
         }
 
         private UserGroupRepository CreateUserGroupRepository(IScopeProvider provider)
         {
             var accessor = (IScopeAccessor) provider;
-            return new UserGroupRepository(accessor, AppCaches.Disabled, Logger, ShortStringHelper);
+            return new UserGroupRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<UserGroupRepository>(), LoggerFactory, ShortStringHelper);
         }
 
         [Test]
@@ -117,7 +119,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var id = user.Id;
 
-                var repository2 = new UserRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger, Mock.Of<IMapperCollection>(),GlobalSettings, Mock.Of<IUserPasswordConfiguration>(), new JsonNetSerializer());
+                var repository2 = new UserRepository((IScopeAccessor) provider, AppCaches.Disabled, LoggerFactory.CreateLogger<UserRepository>(), Mock.Of<IMapperCollection>(), Options.Create(GlobalSettings), Options.Create(new UserPasswordConfigurationSettings()), new JsonNetSerializer());
 
                 repository2.Delete(user);
 

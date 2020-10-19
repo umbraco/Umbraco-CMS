@@ -66,14 +66,14 @@
     <PackageReference Include="Examine.Core">
       <Version>2.0.0-alpha.20200128.15</Version>
     </PackageReference>
-    <PackageReference Include="HtmlAgilityPack" Version="1.8.14" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.24" />
     <PackageReference Include="HtmlSanitizer">
-      <Version>4.0.217</Version>
+      <Version>5.0.343</Version>
     </PackageReference>
     <PackageReference Include="ImageProcessor">
       <Version>2.7.0.100</Version>
     </PackageReference>
-    <PackageReference Include="LightInject" Version="6.3.2" />
+    <PackageReference Include="LightInject" Version="6.3.4" />
     <PackageReference Include="LightInject.Annotation" Version="1.1.0" />
     <PackageReference Include="LightInject.Mvc" Version="2.0.0" />
     <PackageReference Include="LightInject.Web">
@@ -83,11 +83,14 @@
     <PackageReference Include="Markdown" Version="2.2.1" />
     <PackageReference Include="Microsoft.AspNet.Identity.Core" Version="2.2.3" />
     <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.2.7" />
-    <PackageReference Include="Microsoft.AspNet.SignalR.Core" Version="2.4.0" />
+    <PackageReference Include="Microsoft.AspNet.SignalR.Core" Version="2.4.1" />
     <PackageReference Include="Microsoft.AspNet.WebApi" Version="5.2.7" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
-    <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="3.1.2" />
-    <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="3.1.2" />
+    <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="3.1.8" />
+    <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="3.1.8" />
+    <PackageReference Include="Microsoft.Owin.Host.SystemWeb" Version="4.1.1" />
+    <PackageReference Include="Microsoft.Owin.Security.Cookies" Version="4.1.1" />
+    <PackageReference Include="Microsoft.Owin.Security.OAuth" Version="4.1.1" />
     <PackageReference Include="Microsoft.Owin.Host.SystemWeb" Version="4.0.1" />
     <PackageReference Include="Microsoft.Owin.Security.Cookies" Version="4.0.1" />
     <PackageReference Include="Microsoft.Owin.Security.OAuth" Version="4.0.1" />
@@ -96,7 +99,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="MiniProfiler" Version="4.1.0" />
+    <PackageReference Include="MiniProfiler" Version="4.2.1" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="NPoco" Version="4.0.2" />
     <PackageReference Include="SecurityCodeScan">
@@ -104,16 +107,12 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="System.Threading.Tasks.Dataflow" Version="4.9.0" />
+    <PackageReference Include="System.Threading.Tasks.Dataflow" Version="4.11.1" />
     <PackageReference Include="Umbraco.Code">
       <Version>1.0.5</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Umbraco.Configuration\Umbraco.Configuration.csproj">
-      <Project>{fbe7c065-dac0-4025-a78b-63b24d3ab00b}</Project>
-      <Name>Umbraco.Configuration</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj">
       <Project>{29aa69d9-b597-4395-8d42-43b1263c240a}</Project>
       <Name>Umbraco.Core</Name>
@@ -149,9 +148,6 @@
     <Compile Include="Compose\AuditEventsComposer.cs" />
     <Compile Include="Compose\BackOfficeUserAuditEventsComponent.cs" />
     <Compile Include="Compose\BackOfficeUserAuditEventsComposer.cs" />
-    <Compile Include="Compose\BlockEditorComponent.cs" />
-    <Compile Include="Compose\BlockEditorComposer.cs" />
-    <Compile Include="Compose\NestedContentPropertyComponent.cs" />
     <Compile Include="Composing\ServiceProviderExtensions.cs" />
     <Compile Include="Editors\PasswordChanger.cs" />
     <Compile Include="HttpContextExtensions.cs" />
@@ -161,7 +157,7 @@
     <Compile Include="Macros\PartialViewMacroEngine.cs" />
     <Compile Include="Mvc\UmbracoViewPageOfTModel.cs" />
     <Compile Include="Security\IdentityFactoryMiddleware.cs" />
-    <Compile Include="Security\WebSecurity.cs" />
+    <Compile Include="Security\BackofficeSecurity.cs" />
     <Compile Include="WebApi\Filters\EnableOverrideAuthorizationAttribute.cs" />
     <Compile Include="WebApi\Filters\OverridableAuthorizationAttribute.cs" />
     <Compile Include="WebApi\Filters\UmbracoTreeAuthorizeAttribute.cs" />
@@ -176,10 +172,8 @@
     <Compile Include="Logging\WebProfilerComposer.cs" />
     <Compile Include="Logging\WebProfilerProvider.cs" />
     <Compile Include="Models\Membership\UmbracoMembershipMember.cs" />
-    <Compile Include="Models\IconModel.cs" />
     <Compile Include="Mvc\HttpUmbracoFormRouteStringException.cs" />
     <Compile Include="Mvc\ModelBindingExceptionFilter.cs" />
-    <Compile Include="Mvc\StatusCodeFilterAttribute.cs" />
     <Compile Include="Mvc\SurfaceControllerTypeCollectionBuilder.cs" />
     <Compile Include="Mvc\ValidateUmbracoFormRouteStringAttribute.cs" />
     <Compile Include="AspNet\AspNetBackOfficeInfo.cs" />
@@ -187,7 +181,6 @@
     <Compile Include="AspNet\AspNetHttpContextAccessor.cs" />
     <Compile Include="AspNet\AspNetIpResolver.cs" />
     <Compile Include="AspNet\AspNetPasswordHasher.cs" />
-    <Compile Include="Compose\NestedContentPropertyComposer.cs" />
     <Compile Include="RoutableDocumentFilter.cs" />
     <Compile Include="Runtime\AspNetUmbracoBootPermissionChecker.cs" />
     <Compile Include="Security\BackOfficeSignInManager.cs" />
@@ -201,7 +194,6 @@
     <Compile Include="Security\OwinDataProtectorTokenProvider.cs" />
     <Compile Include="Security\PublicAccessChecker.cs" />
     <Compile Include="Security\UmbracoMembershipProviderBase.cs" />
-    <Compile Include="Security\UserAwarePasswordHasher.cs" />
     <Compile Include="StringExtensions.cs" />
     <Compile Include="UmbracoContext.cs" />
     <Compile Include="UmbracoContextFactory.cs" />
@@ -221,7 +213,6 @@
     <Compile Include="Mvc\ContainerControllerFactory.cs" />
     <Compile Include="OwinExtensions.cs" />
     <Compile Include="Security\BackOfficeCookieAuthenticationProvider.cs" />
-    <Compile Include="SignalR\PreviewHubComposer.cs" />
     <Compile Include="WebAssets\CDF\ClientDependencyConfiguration.cs" />
     <Compile Include="UmbracoApplicationBase.cs" />
     <Compile Include="WebApi\Filters\HttpQueryStringModelBinder.cs" />
@@ -237,17 +228,12 @@
     <Compile Include="Mvc\FilteredControllerFactoryCollectionBuilder.cs" />
     <Compile Include="Mvc\SurfaceControllerTypeCollection.cs" />
     <Compile Include="PublishedElementExtensions.cs" />
-    <Compile Include="PublishedModels\DummyClassSoThatPublishedModelsNamespaceExists.cs" />
     <Compile Include="Security\AuthenticationExtensions.cs" />
     <Compile Include="Security\UmbracoSecureDataFormat.cs" />
     <Compile Include="Security\UmbracoAuthTicketDataProtector.cs" />
-    <Compile Include="SignalR\IPreviewHub.cs" />
-    <Compile Include="SignalR\PreviewHub.cs" />
-    <Compile Include="SignalR\PreviewHubComponent.cs" />
     <Compile Include="UmbracoModule.cs" />
     <Compile Include="WebApi\EnableDetailedErrorsAttribute.cs" />
     <Compile Include="WebApi\Filters\AppendUserModifiedHeaderAttribute.cs" />
-    <Compile Include="WebApi\Filters\CheckIfUserTicketDataIsStaleAttribute.cs" />
     <Compile Include="WebApi\Filters\FeatureAuthorizeAttribute.cs" />
     <Compile Include="WebApi\SessionHttpControllerRouteHandler.cs" />
     <Compile Include="WebApi\UmbracoApiControllerTypeCollectionBuilder.cs" />
@@ -301,9 +287,7 @@
     <Compile Include="WebApi\Filters\AngularAntiForgeryHelper.cs" />
     <Compile Include="WebApi\Filters\DisableBrowserCacheAttribute.cs" />
     <Compile Include="WebApi\Filters\FilterGrouping.cs" />
-    <Compile Include="WebApi\Filters\SetAngularAntiForgeryTokensAttribute.cs" />
     <Compile Include="WebApi\Filters\ValidateAngularAntiForgeryTokenAttribute.cs" />
-    <Compile Include="WebApi\HttpControllerContextExtensions.cs" />
     <Compile Include="Controllers\UmbRegisterController.cs" />
     <Compile Include="Models\ProfileModel.cs" />
     <Compile Include="Models\LoginStatusModel.cs" />
@@ -329,7 +313,6 @@
     <Compile Include="Mvc\ControllerFactoryExtensions.cs" />
     <Compile Include="Mvc\IRenderMvcController.cs" />
     <Compile Include="Mvc\SurfaceRouteHandler.cs" />
-    <Compile Include="CdfLogger.cs" />
     <Compile Include="Controllers\UmbLoginController.cs" />
     <Compile Include="UrlHelperExtensions.cs" />
     <Compile Include="UrlHelperRenderExtensions.cs" />
@@ -416,6 +399,8 @@
       <Link>Mvc\web.config</Link>
     </None>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Composing\LightInject\" />
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

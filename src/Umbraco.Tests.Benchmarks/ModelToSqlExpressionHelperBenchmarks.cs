@@ -29,7 +29,7 @@ namespace Umbraco.Tests.Benchmarks
 
         public ModelToSqlExpressionHelperBenchmarks()
         {
-            var contentMapper = new ContentMapper(MockSqlContext(), CreateMaps());
+            var contentMapper = new ContentMapper(MockSqlContext());
             _cachedExpression = new CachedExpression();
             var mapperCollection = new Mock<IMapperCollection>();
             mapperCollection.Setup(x => x[It.IsAny<Type>()]).Returns(contentMapper);

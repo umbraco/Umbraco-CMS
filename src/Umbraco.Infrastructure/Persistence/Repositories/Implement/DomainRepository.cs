@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Dtos;
@@ -17,7 +17,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
     internal class DomainRepository : NPocoRepositoryBase<int, IDomain>, IDomainRepository
     {
-        public DomainRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger)
+        public DomainRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<DomainRepository> logger)
             : base(scopeAccessor, cache, logger)
         { }
 

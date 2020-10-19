@@ -2,8 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 
 namespace Umbraco.Web.Common.Install
 {
@@ -24,7 +24,7 @@ namespace Umbraco.Web.Common.Install
                 var serviceProvider = authorizationFilterContext.HttpContext.RequestServices;
                 var runtimeState = serviceProvider.GetService<IRuntimeState>();
                 var umbracoContext = serviceProvider.GetService<IUmbracoContext>();
-                var logger = serviceProvider.GetService<ILogger>();
+                var logger = serviceProvider.GetService<ILogger<InstallAuthorizeFilter>>();
 
                 if (!IsAllowed(runtimeState, umbracoContext, logger))
                 {
@@ -33,7 +33,7 @@ namespace Umbraco.Web.Common.Install
 
             }
 
-            private static bool IsAllowed(IRuntimeState runtimeState, IUmbracoContext umbracoContext, ILogger logger)
+            private static bool IsAllowed(IRuntimeState runtimeState, IUmbracoContext umbracoContext, ILogger<InstallAuthorizeFilter> logger)
             {
                 try
                 {
@@ -45,7 +45,7 @@ namespace Umbraco.Web.Common.Install
                 }
                 catch (Exception ex)
                 {
-                    logger.Error<InstallAuthorizeAttribute>(ex, "An error occurred determining authorization");
+                    logger.LogError(ex, "An error occurred determining authorization");
                     return false;
                 }
             }

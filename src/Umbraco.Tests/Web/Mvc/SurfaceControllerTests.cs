@@ -2,13 +2,10 @@
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
-using System.Web.Security;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Dictionary;
-using Umbraco.Core.Logging;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Common;
@@ -17,8 +14,6 @@ using Umbraco.Tests.Testing;
 using Umbraco.Web;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
-using Umbraco.Web.Security;
-using Umbraco.Web.Security.Providers;
 using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.Web.Mvc
@@ -155,8 +150,8 @@ namespace Umbraco.Tests.Web.Mvc
 
             var content = Mock.Of<IPublishedContent>(publishedContent => publishedContent.Id == 12345);
 
-
-            var publishedRouter = BaseWebTest.CreatePublishedRouter(TestHelpers.SettingsForTests.GenerateMockWebRoutingSettings());
+            var webRoutingSettings = new WebRoutingSettings();
+            var publishedRouter = BaseWebTest.CreatePublishedRouter(webRoutingSettings);
             var frequest = publishedRouter.CreateRequest(umbracoContext, new Uri("http://localhost/test"));
             frequest.PublishedContent = content;
 
@@ -181,7 +176,7 @@ namespace Umbraco.Tests.Web.Mvc
             private readonly IPublishedContentQuery _publishedContentQuery;
 
             public TestSurfaceController(IUmbracoContextAccessor umbracoContextAccessor, IPublishedContentQuery publishedContentQuery)
-                : base(umbracoContextAccessor, null, ServiceContext.CreatePartial(), AppCaches.Disabled, null, null)
+                : base(umbracoContextAccessor, null, ServiceContext.CreatePartial(), AppCaches.Disabled, null)
             {
                 _publishedContentQuery = publishedContentQuery;
             }

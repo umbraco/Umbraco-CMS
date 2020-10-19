@@ -1,24 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Web.Composing;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
-using Umbraco.Tests.TestHelpers;
-using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Tests.PublishedContent
 {
-    class SolidPublishedSnapshot : IPublishedSnapshot
+    public class SolidPublishedSnapshot : IPublishedSnapshot
     {
         public readonly SolidPublishedContentCache InnerContentCache = new SolidPublishedContentCache();
         public readonly SolidPublishedContentCache InnerMediaCache = new SolidPublishedContentCache();
@@ -47,7 +44,7 @@ namespace Umbraco.Tests.PublishedContent
         { }
     }
 
-    class SolidPublishedContentCache : PublishedCacheBase, IPublishedContentCache, IPublishedMediaCache
+    public class SolidPublishedContentCache : PublishedCacheBase, IPublishedContentCache, IPublishedMediaCache
     {
         private readonly Dictionary<int, IPublishedContent> _content = new Dictionary<int, IPublishedContent>();
 
@@ -164,7 +161,7 @@ namespace Umbraco.Tests.PublishedContent
         }
     }
 
-    internal class SolidPublishedContent : IPublishedContent
+    public class SolidPublishedContent : IPublishedContent
     {
         #region Constructor
 
@@ -264,7 +261,7 @@ namespace Umbraco.Tests.PublishedContent
         #endregion
     }
 
-    internal class SolidPublishedProperty : IPublishedProperty
+    public class SolidPublishedProperty : IPublishedProperty
     {
         public IPublishedPropertyType PropertyType { get; set; }
         public string Alias { get; set; }
@@ -279,7 +276,7 @@ namespace Umbraco.Tests.PublishedContent
         public virtual bool HasValue(string culture = null, string segment = null) => SolidHasValue;
     }
 
-    internal class SolidPublishedPropertyWithLanguageVariants : SolidPublishedProperty
+    public class SolidPublishedPropertyWithLanguageVariants : SolidPublishedProperty
     {
         private readonly IDictionary<string, object> _solidSourceValues = new Dictionary<string, object>();
         private readonly IDictionary<string, object> _solidValues = new Dictionary<string, object>();
@@ -356,7 +353,7 @@ namespace Umbraco.Tests.PublishedContent
     }
 
     [PublishedModel("ContentType2")]
-    internal class ContentType2 : PublishedContentModel
+    public class ContentType2 : PublishedContentModel
     {
         #region Plumbing
 
@@ -366,11 +363,11 @@ namespace Umbraco.Tests.PublishedContent
 
         #endregion
 
-        public int Prop1 => this.Value<int>("prop1");
+        public int Prop1 => this.Value<int>(Mock.Of<IPublishedValueFallback>(), "prop1");
     }
 
     [PublishedModel("ContentType2Sub")]
-    internal class ContentType2Sub : ContentType2
+    public class ContentType2Sub : ContentType2
     {
         #region Plumbing
 
@@ -381,43 +378,46 @@ namespace Umbraco.Tests.PublishedContent
         #endregion
     }
 
-    internal class PublishedContentStrong1 : PublishedContentModel
+    public class PublishedContentStrong1 : PublishedContentModel
     {
         public PublishedContentStrong1(IPublishedContent content, IPublishedValueFallback fallback)
             : base(content)
         { }
 
-        public int StrongValue => this.Value<int>("strongValue");
+        public int StrongValue => this.Value<int>(Mock.Of<IPublishedValueFallback>(), "strongValue");
     }
 
-    internal class PublishedContentStrong1Sub : PublishedContentStrong1
+    public class PublishedContentStrong1Sub : PublishedContentStrong1
     {
         public PublishedContentStrong1Sub(IPublishedContent content, IPublishedValueFallback fallback)
             : base(content, fallback)
         { }
 
-        public int AnotherValue => this.Value<int>("anotherValue");
+        public int AnotherValue => this.Value<int>(Mock.Of<IPublishedValueFallback>(), "anotherValue");
     }
 
-    internal class PublishedContentStrong2 : PublishedContentModel
+    public class PublishedContentStrong2 : PublishedContentModel
     {
         public PublishedContentStrong2(IPublishedContent content, IPublishedValueFallback fallback)
             : base(content)
         { }
 
-        public int StrongValue => this.Value<int>("strongValue");
+        public int StrongValue => this.Value<int>(Mock.Of<IPublishedValueFallback>(), "strongValue");
     }
 
-    internal class AutoPublishedContentType : PublishedContentType
+    public class AutoPublishedContentType : PublishedContentType
     {
         private static readonly IPublishedPropertyType Default;
 
         static AutoPublishedContentType()
         {
-            var dataTypeService = new TestObjects.TestDataTypeService(
-                new DataType(new VoidEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(),  Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>())) { Id = 666 });
+            var dataTypeServiceMock = new Mock<IDataTypeService>();
+            var dataType = new DataType(new VoidEditor(NullLoggerFactory.Instance, dataTypeServiceMock.Object,
+                    Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>()))
+                { Id = 666 };
+            dataTypeServiceMock.Setup(x => x.GetAll()).Returns(dataType.Yield);
 
-            var factory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), new PropertyValueConverterCollection(Array.Empty<IPropertyValueConverter>()), dataTypeService);
+            var factory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), new PropertyValueConverterCollection(Array.Empty<IPropertyValueConverter>()), dataTypeServiceMock.Object);
             Default = factory.CreatePropertyType("*", 666);
         }
 

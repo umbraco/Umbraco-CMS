@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 
 namespace Umbraco.Extensions
@@ -24,7 +25,7 @@ namespace Umbraco.Extensions
             return request.Cookies.TryGetValue(Constants.Web.PreviewCookieName, out var cookieVal) && !cookieVal.IsNullOrWhiteSpace();
         }
 
-        public static bool IsBackOfficeRequest(this HttpRequest request, IGlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
+        public static bool IsBackOfficeRequest(this HttpRequest request, GlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
         {
             return new Uri(request.GetEncodedUrl(), UriKind.RelativeOrAbsolute).IsBackOfficeRequest(globalSettings, hostingEnvironment);
         }

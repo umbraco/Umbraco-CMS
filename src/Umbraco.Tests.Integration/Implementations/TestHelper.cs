@@ -1,25 +1,27 @@
-﻿
-using System;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Hosting;
-using Moq;
+﻿using System;
 using System.Data.Common;
 using System.IO;
 using System.Net;
 using System.Reflection;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Moq;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Diagnostics;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
-using Umbraco.Net;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Runtime;
+using Umbraco.Net;
 using Umbraco.Tests.Common;
 using Umbraco.Web.Common.AspNetCore;
 using IHostingEnvironment = Umbraco.Core.Hosting.IHostingEnvironment;
-using Microsoft.Extensions.FileProviders;
 
 namespace Umbraco.Tests.Integration.Implementations
 {
@@ -43,7 +45,7 @@ namespace Umbraco.Tests.Integration.Implementations
             var contentRoot = Assembly.GetExecutingAssembly().GetRootDirectorySafe();
             var hostEnvironment = new Mock<IWebHostEnvironment>();
             // this must be the assembly name for the WebApplicationFactory to work
-            hostEnvironment.Setup(x => x.ApplicationName).Returns(GetType().Assembly.GetName().Name); 
+            hostEnvironment.Setup(x => x.ApplicationName).Returns(GetType().Assembly.GetName().Name);
             hostEnvironment.Setup(x => x.ContentRootPath).Returns(() => contentRoot);
             hostEnvironment.Setup(x => x.ContentRootFileProvider).Returns(() => new PhysicalFileProvider(contentRoot));
             hostEnvironment.Setup(x => x.WebRootPath).Returns(() => WorkingDirectory);
@@ -54,8 +56,8 @@ namespace Umbraco.Tests.Integration.Implementations
             _hostEnvironment = hostEnvironment.Object;
 
             _hostingLifetime = new AspNetCoreApplicationShutdownRegistry(Mock.Of<IHostApplicationLifetime>());
-
-            Logger = new ProfilingLogger(new ConsoleLogger(new MessageTemplates()), Profiler);
+            ConsoleLoggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
+            ProfilingLogger = new ProfilingLogger(ConsoleLoggerFactory.CreateLogger("ProfilingLogger"), Profiler);
         }
 
 
@@ -91,7 +93,8 @@ namespace Umbraco.Tests.Integration.Implementations
         public AppCaches AppCaches { get; } = new AppCaches(NoAppCache.Instance, NoAppCache.Instance,
             new IsolatedCaches(type => NoAppCache.Instance));
 
-        public IProfilingLogger Logger { get; private set; }
+        public ILoggerFactory ConsoleLoggerFactory { get; private set; }
+        public IProfilingLogger ProfilingLogger { get; private set; }
 
         public IProfiler Profiler { get; } = new VoidProfiler();
 
@@ -109,15 +112,25 @@ namespace Umbraco.Tests.Integration.Implementations
         public override IBackOfficeInfo GetBackOfficeInfo()
         {
             if (_backOfficeInfo == null)
-                _backOfficeInfo =
-                    new AspNetCoreBackOfficeInfo(SettingsForTests.GetDefaultGlobalSettings(GetUmbracoVersion()));
+            {
+                var globalSettings = new GlobalSettings();
+                var mockedOptionsMonitorOfGlobalSettings = Mock.Of<IOptionsMonitor<GlobalSettings>>(x => x.CurrentValue == globalSettings);
+                _backOfficeInfo = new AspNetCoreBackOfficeInfo(mockedOptionsMonitorOfGlobalSettings);
+            }
+
             return _backOfficeInfo;
         }
 
         public override IHostingEnvironment GetHostingEnvironment()
             => _hostingEnvironment ??= new TestHostingEnvironment(
-                SettingsForTests.DefaultHostingSettings,
+                GetIOptionsMonitorOfHostingSettings(),
                 _hostEnvironment);
+
+        private IOptionsMonitor<HostingSettings> GetIOptionsMonitorOfHostingSettings()
+        {
+            var hostingSettings = new HostingSettings();
+            return Mock.Of<IOptionsMonitor<HostingSettings>>(x => x.CurrentValue == hostingSettings);
+        }
 
         public override IApplicationShutdownRegistry GetHostingEnvironmentLifetime() => _hostingLifetime;
 

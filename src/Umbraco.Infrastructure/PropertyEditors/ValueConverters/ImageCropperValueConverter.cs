@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Globalization;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Composing;
 
 namespace Umbraco.Core.PropertyEditors.ValueConverters
 {
@@ -14,6 +12,13 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
     [DefaultPropertyValueConverter(typeof(JsonValueConverter))]
     public class ImageCropperValueConverter : PropertyValueConverterBase
     {
+        private readonly ILogger<ImageCropperValueConverter> _logger;
+
+        public ImageCropperValueConverter(ILogger<ImageCropperValueConverter> logger)
+        {
+            _logger = logger;
+        }
+
         /// <inheritdoc />
         public override bool IsConverter(IPublishedPropertyType propertyType)
             => propertyType.EditorAlias.InvariantEquals(Constants.PropertyEditors.Aliases.ImageCropper);
@@ -44,7 +49,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             catch (Exception ex)
             {
                 // cannot deserialize, assume it may be a raw image url
-                Current.Logger.Error<ImageCropperValueConverter>(ex, "Could not deserialize string '{JsonString}' into an image cropper value.", sourceString);
+                _logger.LogError(ex, "Could not deserialize string '{JsonString}' into an image cropper value.", sourceString);
                 value = new ImageCropperValue { Src = sourceString };
             }
 

@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Threading;
 using Semver;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Exceptions;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Upgrade;
 using Umbraco.Core.Persistence;
 
@@ -14,10 +15,10 @@ namespace Umbraco.Core
     /// </summary>
     public class RuntimeState : IRuntimeState
     {
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly IUmbracoDatabaseFactory _databaseFactory;
-        private readonly ILogger _logger;
+        private readonly ILogger<RuntimeState> _logger;
 
         /// <summary>
         /// The initial <see cref="RuntimeState"/>
@@ -31,7 +32,7 @@ namespace Umbraco.Core
         /// <summary>
         /// Initializes a new instance of the <see cref="RuntimeState"/> class.
         /// </summary>
-        public RuntimeState(IGlobalSettings globalSettings, IUmbracoVersion umbracoVersion, IUmbracoDatabaseFactory databaseFactory, ILogger logger)
+        public RuntimeState(GlobalSettings globalSettings, IUmbracoVersion umbracoVersion, IUmbracoDatabaseFactory databaseFactory, ILogger<RuntimeState> logger)
         {
             _globalSettings = globalSettings;
             _umbracoVersion = umbracoVersion;
@@ -71,7 +72,7 @@ namespace Umbraco.Core
             {
                 // local version *does* match code version, but the database is not configured
                 // install - may happen with Deploy/Cloud/etc
-                _logger.Debug<RuntimeState>("Database is not configured, need to install Umbraco.");
+                _logger.LogDebug("Database is not configured, need to install Umbraco.");
                 Level = RuntimeLevel.Install;
                 Reason = RuntimeLevelReason.InstallNoDatabase;
                 return;
@@ -86,14 +87,14 @@ namespace Umbraco.Core
             {
                 connect = _databaseFactory.CanConnect;
                 if (connect || ++i == tries) break;
-                _logger.Debug<RuntimeState>("Could not immediately connect to database, trying again.");
+                _logger.LogDebug("Could not immediately connect to database, trying again.");
                 Thread.Sleep(1000);
             }
 
             if (connect == false)
             {
                 // cannot connect to configured database, this is bad, fail
-                _logger.Debug<RuntimeState>("Could not connect to database.");
+                _logger.LogDebug("Could not connect to database.");
 
                 if (_globalSettings.InstallMissingDatabase)
                 {
@@ -122,7 +123,7 @@ namespace Umbraco.Core
             catch (Exception e)
             {
                 // can connect to the database but cannot check the upgrade state... oops
-                _logger.Warn<RuntimeState>(e, "Could not check the upgrade state.");
+                _logger.LogWarning(e, "Could not check the upgrade state.");
 
                 if (_globalSettings.InstallEmptyDatabase)
                 {
@@ -154,14 +155,14 @@ namespace Umbraco.Core
 
             // although the files version matches the code version, the database version does not
             // which means the local files have been upgraded but not the database - need to upgrade
-            _logger.Debug<RuntimeState>("Has not reached the final upgrade step, need to upgrade Umbraco.");
+            _logger.LogDebug("Has not reached the final upgrade step, need to upgrade Umbraco.");
             Level = RuntimeLevel.Upgrade;
             Reason = RuntimeLevelReason.UpgradeMigrations;
         }
 
         private bool EnsureUmbracoUpgradeState(IUmbracoDatabaseFactory databaseFactory, ILogger logger)
         {
-            var upgrader = new Upgrader(new UmbracoPlan(_umbracoVersion, _globalSettings));
+            var upgrader = new Upgrader(new UmbracoPlan(_umbracoVersion));
             var stateValueKey = upgrader.StateValueKey;
 
             // no scope, no service - just directly accessing the database
@@ -171,7 +172,7 @@ namespace Umbraco.Core
                 FinalMigrationState = upgrader.Plan.FinalState;
             }
 
-            logger.Debug<RuntimeState>("Final upgrade state is {FinalMigrationState}, database contains {DatabaseState}", FinalMigrationState, CurrentMigrationState ?? "<null>");
+            logger.LogDebug("Final upgrade state is {FinalMigrationState}, database contains {DatabaseState}", FinalMigrationState, CurrentMigrationState ?? "<null>");
 
             return CurrentMigrationState == FinalMigrationState;
         }

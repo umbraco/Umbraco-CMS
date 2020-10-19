@@ -13,6 +13,7 @@ using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Directory = Lucene.Net.Store.Directory;
+using Microsoft.Extensions.Logging;
 
 namespace Umbraco.Examine
 {
@@ -22,6 +23,9 @@ namespace Umbraco.Examine
     /// </summary>
     public abstract class UmbracoExamineIndex : LuceneIndex, IUmbracoIndex, IIndexDiagnostics
     {
+        private readonly ILogger<UmbracoExamineIndex> _logger;
+        private readonly ILoggerFactory _loggerFactory;
+
         private readonly IRuntimeState _runtimeState;
         // note
         // wrapping all operations that end up calling base.SafelyProcessQueueItems in a safe call
@@ -29,7 +33,6 @@ namespace Umbraco.Examine
         // call context (and the database it can contain)! ideally we should be able to override
         // SafelyProcessQueueItems but that's not possible in the current version of Examine.
 
-        
 
         /// <summary>
         /// Create a new <see cref="UmbracoExamineIndex"/>
@@ -39,6 +42,8 @@ namespace Umbraco.Examine
         /// <param name="luceneDirectory"></param>
         /// <param name="defaultAnalyzer"></param>
         /// <param name="profilingLogger"></param>
+        /// <param name="logger"></param>
+        /// <param name="loggerFactory"></param>
         /// <param name="hostingEnvironment"></param>
         /// <param name="runtimeState"></param>
         /// <param name="validator"></param>
@@ -49,12 +54,16 @@ namespace Umbraco.Examine
             FieldDefinitionCollection fieldDefinitions,
             Analyzer defaultAnalyzer,
             IProfilingLogger profilingLogger,
+            ILogger<UmbracoExamineIndex> logger,
+            ILoggerFactory loggerFactory,
             IHostingEnvironment hostingEnvironment,
             IRuntimeState runtimeState,
             IValueSetValidator validator = null,
             IReadOnlyDictionary<string, IFieldValueTypeFactory> indexValueTypes = null)
             : base(name, luceneDirectory, fieldDefinitions, defaultAnalyzer, validator, indexValueTypes)
         {
+            _logger = logger;
+            _loggerFactory = loggerFactory;
             _runtimeState = runtimeState;
             ProfilingLogger = profilingLogger ?? throw new ArgumentNullException(nameof(profilingLogger));
 
@@ -62,7 +71,7 @@ namespace Umbraco.Examine
             if (luceneDirectory is FSDirectory fsDir)
                 LuceneIndexFolder = fsDir.Directory;
 
-            _diagnostics = new UmbracoExamineIndexDiagnostics(this, ProfilingLogger, hostingEnvironment);
+            _diagnostics = new UmbracoExamineIndexDiagnostics(this, _loggerFactory.CreateLogger<UmbracoExamineIndexDiagnostics>(), hostingEnvironment);
         }
 
         private readonly bool _configBased = false;
@@ -118,7 +127,7 @@ namespace Umbraco.Examine
         /// <param name="ex"></param>
         protected override void OnIndexingError(IndexingErrorEventArgs ex)
         {
-            ProfilingLogger.Error(GetType(), ex.InnerException, ex.Message);
+            _logger.LogError(ex.InnerException, ex.Message);
             base.OnIndexingError(ex);
         }
 
@@ -154,8 +163,7 @@ namespace Umbraco.Examine
         /// </summary>
         protected override void AddDocument(Document doc, ValueSet valueSet, IndexWriter writer)
         {
-            ProfilingLogger.Debug(GetType(),
-                "Write lucene doc id:{DocumentId}, category:{DocumentCategory}, type:{DocumentItemType}",
+            _logger.LogDebug("Write lucene doc id:{DocumentId}, category:{DocumentCategory}, type:{DocumentItemType}",
                 valueSet.Id,
                 valueSet.Category,
                 valueSet.ItemType);

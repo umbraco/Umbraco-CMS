@@ -1,7 +1,8 @@
 ﻿using System;
+using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Migrations.Upgrade;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
@@ -14,16 +15,14 @@ namespace Umbraco.Core.Migrations.Install
     internal class DatabaseDataCreator
     {
         private readonly IDatabase _database;
-        private readonly ILogger _logger;
+        private readonly ILogger<DatabaseDataCreator> _logger;
         private readonly IUmbracoVersion _umbracoVersion;
-        private readonly IGlobalSettings _globalSettings;
 
-        public DatabaseDataCreator(IDatabase database, ILogger logger, IUmbracoVersion umbracoVersion, IGlobalSettings globalSettings)
+        public DatabaseDataCreator(IDatabase database, ILogger<DatabaseDataCreator> logger, IUmbracoVersion umbracoVersion)
         {
             _database = database;
             _logger = logger;
             _umbracoVersion = umbracoVersion;
-            _globalSettings = globalSettings;
         }
 
         /// <summary>
@@ -33,7 +32,7 @@ namespace Umbraco.Core.Migrations.Install
         /// <param name="tableName">Name of the table to create base data for</param>
         public void InitializeBaseData(string tableName)
         {
-            _logger.Info<DatabaseDataCreator>("Creating data in {TableName}", tableName);
+            _logger.LogInformation("Creating data in {TableName}", tableName);
 
             if (tableName.Equals(Constants.DatabaseSchema.Tables.Node))
                 CreateNodeData();
@@ -77,7 +76,7 @@ namespace Umbraco.Core.Migrations.Install
             if (tableName.Equals(Constants.DatabaseSchema.Tables.KeyValue))
                 CreateKeyValueData();
 
-            _logger.Info<DatabaseDataCreator>("Done creating table {TableName} data.", tableName);
+            _logger.LogInformation("Done creating table {TableName} data.", tableName);
         }
 
         private void CreateNodeData()
@@ -340,7 +339,7 @@ namespace Umbraco.Core.Migrations.Install
         {
             // on install, initialize the umbraco migration plan with the final state
 
-            var upgrader = new Upgrader(new UmbracoPlan(_umbracoVersion, _globalSettings));
+            var upgrader = new Upgrader(new UmbracoPlan(_umbracoVersion));
             var stateValueKey = upgrader.StateValueKey;
             var finalState = upgrader.Plan.FinalState;
 

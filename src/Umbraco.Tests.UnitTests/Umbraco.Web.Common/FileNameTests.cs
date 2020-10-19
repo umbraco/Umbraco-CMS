@@ -5,9 +5,11 @@ using System.Threading.Tasks;
 using AutoFixture.NUnit3;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Tests.UnitTests.AutoFixture;
 using Umbraco.Web.BackOffice.Controllers;
@@ -53,10 +55,10 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common
         [Test]
         [AutoMoqData]
         public void PreviewViewExists(
-            [Frozen] IGlobalSettings globalSettings,
+            [Frozen] IOptions<GlobalSettings> globalSettings,
             PreviewController sut)
         {
-            Mock.Get(globalSettings).Setup(x => x.UmbracoPath).Returns("/");
+            globalSettings.Value.UmbracoPath = "/";
 
             var viewResult = sut.Index() as ViewResult;
             var fileName = GetViewName(viewResult);
@@ -69,12 +71,12 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common
         [Test]
         [AutoMoqData]
         public async Task BackOfficeDefaultExists(
-            [Frozen] IGlobalSettings globalSettings,
+            [Frozen] IOptions<GlobalSettings> globalSettings,
             [Frozen] IHostingEnvironment hostingEnvironment,
             [Frozen] ITempDataDictionary tempDataDictionary,
             BackOfficeController sut)
         {
-            Mock.Get(globalSettings).Setup(x => x.UmbracoPath).Returns("/");
+            globalSettings.Value.UmbracoPath = "/";
             Mock.Get(hostingEnvironment).Setup(x => x.ToAbsolute("/")).Returns("http://localhost/");
             Mock.Get(hostingEnvironment).SetupGet(x => x.ApplicationVirtualPath).Returns("/");
 

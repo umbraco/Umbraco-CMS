@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 
@@ -14,13 +16,13 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     internal class ScriptRepository : FileRepository<string, IScript>, IScriptRepository
     {
         private readonly IIOHelper _ioHelper;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
 
-        public ScriptRepository(IFileSystems fileSystems, IIOHelper ioHelper, IGlobalSettings globalSettings)
+        public ScriptRepository(IFileSystems fileSystems, IIOHelper ioHelper, IOptions<GlobalSettings> globalSettings)
             : base(fileSystems.ScriptsFileSystem)
         {
             _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
-            _globalSettings = globalSettings;
+            _globalSettings = globalSettings.Value;
         }
 
         #region Implementation of IRepository<string,Script>

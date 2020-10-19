@@ -7,13 +7,14 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Security;
 using Umbraco.Extensions;
 using Umbraco.Net;
 
 namespace Umbraco.Core.BackOffice
 {
-    public class BackOfficeUserManager : BackOfficeUserManager<BackOfficeIdentityUser>
+    public class BackOfficeUserManager : BackOfficeUserManager<BackOfficeIdentityUser>, IBackOfficeUserManager
     {
         public BackOfficeUserManager(
             IIpResolver ipResolver,
@@ -26,7 +27,7 @@ namespace Umbraco.Core.BackOffice
             BackOfficeIdentityErrorDescriber errors,
             IServiceProvider services,
             ILogger<UserManager<BackOfficeIdentityUser>> logger,
-            IUserPasswordConfiguration passwordConfiguration)
+            IOptions<UserPasswordConfigurationSettings> passwordConfiguration)
             : base(ipResolver, store, optionsAccessor, passwordHasher, userValidators, passwordValidators, keyNormalizer, errors, services, logger, passwordConfiguration)
         {
         }
@@ -48,11 +49,11 @@ namespace Umbraco.Core.BackOffice
             BackOfficeIdentityErrorDescriber errors,
             IServiceProvider services,
             ILogger<UserManager<T>> logger,
-            IUserPasswordConfiguration passwordConfiguration)
+            IOptions<UserPasswordConfigurationSettings> passwordConfiguration)
             : base(store, optionsAccessor, passwordHasher, userValidators, passwordValidators, keyNormalizer, errors, services, logger)
         {
             IpResolver = ipResolver ?? throw new ArgumentNullException(nameof(ipResolver));
-            PasswordConfiguration = passwordConfiguration ?? throw new ArgumentNullException(nameof(passwordConfiguration));
+            PasswordConfiguration = passwordConfiguration.Value ?? throw new ArgumentNullException(nameof(passwordConfiguration));
         }
 
         #region What we do not currently support

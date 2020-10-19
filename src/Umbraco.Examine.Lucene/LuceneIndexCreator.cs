@@ -4,11 +4,11 @@ using System.IO;
 using Examine;
 using Examine.LuceneEngine.Directories;
 using Lucene.Net.Store;
-using Umbraco.Core.Configuration;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
 
 namespace Umbraco.Examine
 {
@@ -20,13 +20,13 @@ namespace Umbraco.Examine
     {
         private readonly ITypeFinder _typeFinder;
         private readonly IHostingEnvironment _hostingEnvironment;
-        private readonly IIndexCreatorSettings _settings;
+        private readonly IndexCreatorSettings _settings;
 
-        protected LuceneIndexCreator(ITypeFinder typeFinder, IHostingEnvironment hostingEnvironment, IIndexCreatorSettings settings)
+        protected LuceneIndexCreator(ITypeFinder typeFinder, IHostingEnvironment hostingEnvironment, IOptions<IndexCreatorSettings> settings)
         {
             _typeFinder = typeFinder;
             _hostingEnvironment = hostingEnvironment;
-            _settings = settings;
+            _settings = settings.Value;
         }
 
         public abstract IEnumerable<IIndex> Create();        

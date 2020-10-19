@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -11,6 +12,7 @@ using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using Umbraco.Web.Composing;
 using Current = Umbraco.Web.Composing.Current;
+
 
 namespace Umbraco.Tests.Web
 {
@@ -37,6 +39,7 @@ namespace Umbraco.Tests.Web
                     typeFinder,
                     NoAppCache.Instance,
                     new DirectoryInfo(ioHelper.MapPath("~/App_Data/TEMP")),
+                    Mock.Of<ILogger<TypeLoader>>(),
                     new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>())
                     )
                 );

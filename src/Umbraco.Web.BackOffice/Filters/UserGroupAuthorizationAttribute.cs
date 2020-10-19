@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Umbraco.Core;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.Security;
@@ -34,7 +35,7 @@ namespace Umbraco.Web.BackOffice.Filters
             private readonly IContentService _contentService;
             private readonly IMediaService _mediaService;
             private readonly IEntityService _entityService;
-            private readonly IWebSecurity _webSecurity;
+            private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
 
             public UserGroupAuthorizationFilter(
                 IRequestAccessor requestAccessor,
@@ -42,7 +43,7 @@ namespace Umbraco.Web.BackOffice.Filters
                 IContentService contentService,
                 IMediaService mediaService,
                 IEntityService entityService,
-                IWebSecurity webSecurity,
+                IBackofficeSecurityAccessor backofficeSecurityAccessor,
                 string parameterName)
             {
                 _requestAccessor = requestAccessor;
@@ -50,7 +51,7 @@ namespace Umbraco.Web.BackOffice.Filters
                 _contentService = contentService;
                 _mediaService = mediaService;
                 _entityService = entityService;
-                _webSecurity = webSecurity;
+                _backofficeSecurityAccessor = backofficeSecurityAccessor;
                 _parameterName = parameterName;
             }
 
@@ -64,7 +65,7 @@ namespace Umbraco.Web.BackOffice.Filters
 
             private bool IsAuthorized(AuthorizationFilterContext actionContext)
             {
-                var currentUser = _webSecurity.CurrentUser;
+                var currentUser = _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser;
 
                 var queryString = actionContext.HttpContext.Request.Query;
 

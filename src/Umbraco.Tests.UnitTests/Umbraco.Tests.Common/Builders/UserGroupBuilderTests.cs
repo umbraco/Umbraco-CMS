@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Linq;
 using NUnit.Framework;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Common.Builders.Extensions;
@@ -41,7 +41,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Tests.Common.Builders
             Assert.AreEqual(testName, userGroup.Name);
             Assert.AreEqual(testUserCount, userGroup.UserCount);
             Assert.AreEqual(testIcon, userGroup.Icon);
-            Assert.AreEqual(testPermissions, string.Join(string.Empty, userGroup.Permissions));
+            Assert.AreEqual(testPermissions.Length, userGroup.Permissions.Count());
             Assert.AreEqual(testStartContentId, userGroup.StartContentId);
             Assert.AreEqual(testStartMediaId, userGroup.StartMediaId);
         }

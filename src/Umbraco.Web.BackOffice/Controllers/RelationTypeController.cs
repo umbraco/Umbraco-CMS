@@ -4,8 +4,8 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
@@ -25,13 +25,13 @@ namespace Umbraco.Web.BackOffice.Controllers
     [UmbracoTreeAuthorize(Constants.Trees.RelationTypes)]
     public class RelationTypeController : BackOfficeNotificationsController
     {
-        private readonly ILogger _logger;
+        private readonly ILogger<RelationTypeController> _logger;
         private readonly UmbracoMapper _umbracoMapper;
         private readonly IRelationService _relationService;
         private readonly IShortStringHelper _shortStringHelper;
 
         public RelationTypeController(
-            ILogger logger,
+            ILogger<RelationTypeController> logger,
             UmbracoMapper umbracoMapper,
             IRelationService relationService,
             IShortStringHelper shortStringHelper)
@@ -154,7 +154,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
             catch (Exception ex)
             {
-                _logger.Error(GetType(), ex, "Error creating relation type with {Name}", relationType.Name);
+                _logger.LogError(ex, "Error creating relation type with {Name}", relationType.Name);
                 throw HttpResponseException.CreateNotificationValidationErrorResponse("Error creating relation type.");
             }
         }
@@ -185,7 +185,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
             catch (Exception ex)
             {
-                _logger.Error(GetType(), ex, "Error saving relation type with {Id}", relationType.Id);
+                _logger.LogError(ex, "Error saving relation type with {Id}", relationType.Id);
                 throw HttpResponseException.CreateNotificationValidationErrorResponse("Something went wrong when saving the relation type");
             }
         }

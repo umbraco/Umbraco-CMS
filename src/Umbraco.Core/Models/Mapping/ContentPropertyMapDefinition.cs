@@ -1,5 +1,5 @@
-﻿using Umbraco.Core.Dictionary;
-using Umbraco.Core.Logging;
+﻿using Microsoft.Extensions.Logging;
+using Umbraco.Core.Dictionary;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
@@ -18,11 +18,11 @@ namespace Umbraco.Web.Models.Mapping
         private readonly ContentPropertyDtoMapper _contentPropertyDtoConverter;
         private readonly ContentPropertyDisplayMapper _contentPropertyDisplayMapper;
 
-        public ContentPropertyMapDefinition(ICultureDictionary cultureDictionary, IDataTypeService dataTypeService, IEntityService entityService, ILocalizedTextService textService, ILogger logger, PropertyEditorCollection propertyEditors)
+        public ContentPropertyMapDefinition(ICultureDictionary cultureDictionary, IDataTypeService dataTypeService, IEntityService entityService, ILocalizedTextService textService, ILoggerFactory loggerFactory, PropertyEditorCollection propertyEditors)
         {
-            _contentPropertyBasicConverter = new ContentPropertyBasicMapper<ContentPropertyBasic>(dataTypeService, entityService, logger, propertyEditors);
-            _contentPropertyDtoConverter = new ContentPropertyDtoMapper(dataTypeService, entityService, logger, propertyEditors);
-            _contentPropertyDisplayMapper = new ContentPropertyDisplayMapper(cultureDictionary, dataTypeService, entityService, textService, logger, propertyEditors);
+            _contentPropertyBasicConverter = new ContentPropertyBasicMapper<ContentPropertyBasic>(dataTypeService, entityService, loggerFactory.CreateLogger<ContentPropertyBasicMapper<ContentPropertyBasic>>(), propertyEditors);
+            _contentPropertyDtoConverter = new ContentPropertyDtoMapper(dataTypeService, entityService, loggerFactory.CreateLogger<ContentPropertyDtoMapper>(), propertyEditors);
+            _contentPropertyDisplayMapper = new ContentPropertyDisplayMapper(cultureDictionary, dataTypeService, entityService, textService, loggerFactory.CreateLogger<ContentPropertyDisplayMapper>(), propertyEditors);
         }
 
         public void DefineMaps(UmbracoMapper mapper)

@@ -8,6 +8,7 @@ using System.Reflection.Emit;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Configuration;
 using Umbraco.Core;
 using Umbraco.Core.Hosting;
@@ -15,6 +16,8 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.ModelsBuilder.Embedded.Building;
 using File = System.IO.File;
+using Umbraco.Core.Configuration.Models;
+using Microsoft.Extensions.Options;
 
 namespace Umbraco.ModelsBuilder.Embedded
 {
@@ -24,7 +27,8 @@ namespace Umbraco.ModelsBuilder.Embedded
         private readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim();
         private volatile bool _hasModels; // volatile 'cos reading outside lock
         private bool _pendingRebuild;
-        private readonly IProfilingLogger _logger;
+        private readonly IProfilingLogger _profilingLogger;
+        private readonly ILogger<PureLiveModelFactory> _logger;
         private readonly FileSystemWatcher _watcher;
         private int _ver, _skipver;
         private readonly int _debugLevel;
@@ -36,7 +40,7 @@ namespace Umbraco.ModelsBuilder.Embedded
         private static readonly Regex AssemblyVersionRegex = new Regex("AssemblyVersion\\(\"[0-9]+.[0-9]+.[0-9]+.[0-9]+\"\\)", RegexOptions.Compiled);
         private static readonly string[] OurFiles = { "models.hash", "models.generated.cs", "all.generated.cs", "all.dll.path", "models.err", "Compiled" };
 
-        private readonly IModelsBuilderConfig _config;
+        private readonly ModelsBuilderSettings _config;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IApplicationShutdownRegistry _hostingLifetime;
         private readonly ModelsGenerationError _errors;
@@ -44,15 +48,17 @@ namespace Umbraco.ModelsBuilder.Embedded
 
         public PureLiveModelFactory(
             Lazy<UmbracoServices> umbracoServices,
-            IProfilingLogger logger,
-            IModelsBuilderConfig config,
+            IProfilingLogger profilingLogger,
+            ILogger<PureLiveModelFactory> logger,
+            IOptions<ModelsBuilderSettings> config,
             IHostingEnvironment hostingEnvironment,
             IApplicationShutdownRegistry hostingLifetime,
             IPublishedValueFallback publishedValueFallback)
         {
             _umbracoServices = umbracoServices;
+            _profilingLogger = profilingLogger;
             _logger = logger;
-            _config = config;
+            _config = config.Value;
             _hostingEnvironment = hostingEnvironment;
             _hostingLifetime = hostingLifetime;
             _publishedValueFallback = publishedValueFallback;
@@ -212,7 +218,7 @@ namespace Umbraco.ModelsBuilder.Embedded
         // tells the factory that it should build a new generation of models
         private void ResetModels()
         {
-            _logger.Debug<PureLiveModelFactory>("Resetting models.");
+            _logger.LogDebug("Resetting models.");
 
             try
             {
@@ -254,7 +260,7 @@ namespace Umbraco.ModelsBuilder.Embedded
         internal Infos EnsureModels()
         {
             if (_debugLevel > 0)
-                _logger.Debug<PureLiveModelFactory>("Ensuring models.");
+                _logger.LogDebug("Ensuring models.");
 
             // don't use an upgradeable lock here because only 1 thread at a time could enter it
             try
@@ -286,7 +292,7 @@ namespace Umbraco.ModelsBuilder.Embedded
                 // either they haven't been loaded from the cache yet
                 // or they have been reseted and are pending a rebuild
 
-                using (_logger.DebugDuration<PureLiveModelFactory>("Get models.", "Got models."))
+                using (_profilingLogger.DebugDuration<PureLiveModelFactory>("Get models.", "Got models."))
                 {
                     try
                     {
@@ -305,8 +311,8 @@ namespace Umbraco.ModelsBuilder.Embedded
                     {
                         try
                         {
-                            _logger.Error<PureLiveModelFactory>("Failed to build models.", e);
-                            _logger.Warn<PureLiveModelFactory>("Running without models."); // be explicit
+                            _logger.LogError(e, "Failed to build models.");
+                            _logger.LogWarning("Running without models."); // be explicit
                             _errors.Report("Failed to build PureLive models.", e);
                         }
                         finally
@@ -372,13 +378,13 @@ namespace Umbraco.ModelsBuilder.Embedded
 
             if (!forceRebuild)
             {
-                _logger.Debug<PureLiveModelFactory>("Looking for cached models.");
+                _logger.LogDebug("Looking for cached models.");
                 if (File.Exists(modelsHashFile) && File.Exists(projFile))
                 {
                     var cachedHash = File.ReadAllText(modelsHashFile);
                     if (currentHash != cachedHash)
                     {
-                        _logger.Debug<PureLiveModelFactory>("Found obsolete cached models.");
+                        _logger.LogDebug("Found obsolete cached models.");
                         forceRebuild = true;
                     }
 
@@ -386,7 +392,7 @@ namespace Umbraco.ModelsBuilder.Embedded
                 }
                 else
                 {
-                    _logger.Debug<PureLiveModelFactory>("Could not find cached models.");
+                    _logger.LogDebug("Could not find cached models.");
                     forceRebuild = true;
                 }
             }
@@ -403,7 +409,7 @@ namespace Umbraco.ModelsBuilder.Embedded
                 {
                     var dllPath = File.ReadAllText(dllPathFile);
 
-                    _logger.Debug<PureLiveModelFactory>($"Cached models dll at {dllPath}.");
+                    _logger.LogDebug($"Cached models dll at {dllPath}.");
 
                     if (File.Exists(dllPath) && !File.Exists(dllPath + ".delete"))
                     {
@@ -418,18 +424,18 @@ namespace Umbraco.ModelsBuilder.Embedded
                             // with the "same but different" version of the assembly in memory
                             _skipver = assembly.GetName().Version.Revision;
 
-                            _logger.Debug<PureLiveModelFactory>("Loading cached models (dll).");
+                            _logger.LogDebug("Loading cached models (dll).");
                             return assembly;
                         }
 
-                        _logger.Debug<PureLiveModelFactory>("Cached models dll cannot be loaded (invalid assembly).");
+                        _logger.LogDebug("Cached models dll cannot be loaded (invalid assembly).");
                     }
                     else if (!File.Exists(dllPath))
-                        _logger.Debug<PureLiveModelFactory>("Cached models dll does not exist.");
+                        _logger.LogDebug("Cached models dll does not exist.");
                     else if (File.Exists(dllPath + ".delete"))
-                        _logger.Debug<PureLiveModelFactory>("Cached models dll is marked for deletion.");
+                        _logger.LogDebug("Cached models dll is marked for deletion.");
                     else
-                        _logger.Debug<PureLiveModelFactory>("Cached models dll cannot be loaded (why?).");
+                        _logger.LogDebug("Cached models dll cannot be loaded (why?).");
                 }
 
                 // must reset the version in the file else it would keep growing
@@ -458,12 +464,12 @@ namespace Umbraco.ModelsBuilder.Embedded
                     throw;
                 }
 
-                _logger.Debug<PureLiveModelFactory>("Loading cached models (source).");
+                _logger.LogDebug("Loading cached models (source).");
                 return assembly;
             }
 
             // need to rebuild
-            _logger.Debug<PureLiveModelFactory>("Rebuilding models.");
+            _logger.LogDebug("Rebuilding models.");
 
             // generate code, save
             var code = GenerateModelsCode(typeModels);
@@ -500,7 +506,7 @@ namespace Umbraco.ModelsBuilder.Embedded
                 throw;
             }
 
-            _logger.Debug<PureLiveModelFactory>("Done rebuilding.");
+            _logger.LogDebug("Done rebuilding.");
             return assembly;
         }
 
@@ -537,7 +543,7 @@ namespace Umbraco.ModelsBuilder.Embedded
 
         private void ClearOnFailingToCompile(string dllPathFile, string modelsHashFile, string projFile)
         {
-            _logger.Debug<PureLiveModelFactory>("Failed to compile.");
+            _logger.LogDebug("Failed to compile.");
 
             // the dll file reference still points to the previous dll, which is obsolete
             // now and will be deleted by ASP.NET eventually, so better clear that reference.
@@ -704,7 +710,7 @@ namespace Umbraco.ModelsBuilder.Embedded
 
             //if (_building && OurFiles.Contains(changed))
             //{
-            //    //_logger.Info<PureLiveModelFactory>("Ignoring files self-changes.");
+            //    //_logger.LogInformation<PureLiveModelFactory>("Ignoring files self-changes.");
             //    return;
             //}
 
@@ -712,7 +718,7 @@ namespace Umbraco.ModelsBuilder.Embedded
             if (OurFiles.Contains(changed))
                 return;
 
-            _logger.Info<PureLiveModelFactory>("Detected files changes.");
+            _logger.LogInformation("Detected files changes.");
 
             lock (SyncRoot) // don't reset while being locked
                 ResetModels();

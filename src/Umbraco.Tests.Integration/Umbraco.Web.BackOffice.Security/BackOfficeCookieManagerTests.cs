@@ -1,12 +1,11 @@
-﻿
-
+﻿using System;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Moq;
 using NUnit.Framework;
-using System;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Extensions;
 using Umbraco.Tests.Integration.Implementations;
@@ -25,7 +24,7 @@ namespace Umbraco.Tests.Security
             var testHelper = new TestHelper();
 
             var httpContextAccessor = testHelper.GetHttpContextAccessor();
-            var globalSettings = testHelper.SettingsForTests.GenerateMockGlobalSettings();
+            var globalSettings = new GlobalSettings();
             
             var runtime = Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Install);
             var mgr = new BackOfficeCookieManager(
@@ -50,8 +49,8 @@ namespace Umbraco.Tests.Security
             //hostingEnvironment.ToAbsolute(globalSettings.UmbracoPath);
 
             var httpContextAccessor = testHelper.GetHttpContextAccessor();
-            var globalSettings = testHelper.SettingsForTests.GenerateMockGlobalSettings();
-            
+            var globalSettings = new GlobalSettings();
+
             var runtime = Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Run);
             var mgr = new BackOfficeCookieManager(
                 Mock.Of<IUmbracoContextAccessor>(),
@@ -72,7 +71,7 @@ namespace Umbraco.Tests.Security
             var testHelper = new TestHelper();
 
             var httpContextAccessor = testHelper.GetHttpContextAccessor();
-            var globalSettings = testHelper.SettingsForTests.GenerateMockGlobalSettings();
+            var globalSettings = new GlobalSettings();
 
             var runtime = Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Run);
             
@@ -97,7 +96,7 @@ namespace Umbraco.Tests.Security
             var testHelper = new TestHelper();
 
             var httpContextAccessor = testHelper.GetHttpContextAccessor();
-            var globalSettings = testHelper.SettingsForTests.GenerateMockGlobalSettings();
+            var globalSettings = new GlobalSettings();
 
             var runtime = Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Run);
 
@@ -119,7 +118,7 @@ namespace Umbraco.Tests.Security
             var testHelper = new TestHelper();
 
             var httpContextAccessor = testHelper.GetHttpContextAccessor();
-            var globalSettings = testHelper.SettingsForTests.GenerateMockGlobalSettings();
+            var globalSettings = new GlobalSettings();
 
             var runtime = Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Run);
 

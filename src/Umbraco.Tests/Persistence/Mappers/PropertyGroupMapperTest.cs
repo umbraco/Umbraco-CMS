@@ -10,7 +10,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         public void Can_Map_Id_Property()
         {
             // Act
-            string column = new PropertyGroupMapper(MockSqlContext(), CreateMaps()).Map("Id");
+            string column = new PropertyGroupMapper(MockSqlContext()).Map("Id");
 
             // Assert
             Assert.That(column, Is.EqualTo("[cmsPropertyTypeGroup].[id]"));
@@ -20,7 +20,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         public void Can_Map_SortOrder_Property()
         {
             // Act
-            string column = new PropertyGroupMapper(MockSqlContext(), CreateMaps()).Map("SortOrder");
+            string column = new PropertyGroupMapper(MockSqlContext()).Map("SortOrder");
 
             // Assert
             Assert.That(column, Is.EqualTo("[cmsPropertyTypeGroup].[sortorder]"));
@@ -30,7 +30,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         public void Can_Map_Name_Property()
         {
             // Act
-            string column = new PropertyGroupMapper(MockSqlContext(), CreateMaps()).Map("Name");
+            string column = new PropertyGroupMapper(MockSqlContext()).Map("Name");
 
             // Assert
             Assert.That(column, Is.EqualTo("[cmsPropertyTypeGroup].[text]"));

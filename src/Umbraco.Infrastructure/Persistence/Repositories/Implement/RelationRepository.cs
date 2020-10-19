@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Dtos;
@@ -24,7 +24,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         private readonly IRelationTypeRepository _relationTypeRepository;
         private readonly IEntityRepository _entityRepository;
 
-        public RelationRepository(IScopeAccessor scopeAccessor, ILogger logger, IRelationTypeRepository relationTypeRepository, IEntityRepository entityRepository)
+        public RelationRepository(IScopeAccessor scopeAccessor, ILogger<RelationRepository> logger, IRelationTypeRepository relationTypeRepository, IEntityRepository entityRepository)
             : base(scopeAccessor, AppCaches.NoCache, logger)
         {
             _relationTypeRepository = relationTypeRepository;

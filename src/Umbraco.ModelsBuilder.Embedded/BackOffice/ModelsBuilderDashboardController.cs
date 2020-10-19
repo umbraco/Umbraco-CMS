@@ -1,8 +1,9 @@
 using System;
 using System.Runtime.Serialization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Umbraco.Configuration;
-using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Hosting;
 using Umbraco.ModelsBuilder.Embedded.Building;
@@ -22,17 +23,17 @@ namespace Umbraco.ModelsBuilder.Embedded.BackOffice
     [UmbracoApplicationAuthorize(Core.Constants.Applications.Settings)]
     public class ModelsBuilderDashboardController : UmbracoAuthorizedJsonController
     {
-        private readonly IModelsBuilderConfig _config;
+        private readonly ModelsBuilderSettings _config;
         private readonly ModelsGenerator _modelGenerator;
         private readonly OutOfDateModelsStatus _outOfDateModels;
         private readonly ModelsGenerationError _mbErrors;
         private readonly DashboardReport _dashboardReport;
         private readonly IHostingEnvironment _hostingEnvironment;
 
-        public ModelsBuilderDashboardController(IModelsBuilderConfig config, ModelsGenerator modelsGenerator, OutOfDateModelsStatus outOfDateModels, ModelsGenerationError mbErrors, IHostingEnvironment hostingEnvironment)
+        public ModelsBuilderDashboardController(IOptions<ModelsBuilderSettings> config, ModelsGenerator modelsGenerator, OutOfDateModelsStatus outOfDateModels, ModelsGenerationError mbErrors, IHostingEnvironment hostingEnvironment)
         {
             //_umbracoServices = umbracoServices;
-            _config = config;
+            _config = config.Value;
             _modelGenerator = modelsGenerator;
             _outOfDateModels = outOfDateModels;
             _mbErrors = mbErrors;

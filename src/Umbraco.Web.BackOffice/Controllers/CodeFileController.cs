@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Legacy;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
@@ -15,15 +14,13 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Strings.Css;
 using Umbraco.Extensions;
-using Umbraco.Web.Models.ContentEditing;
-using Stylesheet = Umbraco.Core.Models.Stylesheet;
-using StylesheetRule = Umbraco.Web.Models.ContentEditing.StylesheetRule;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.ActionsResults;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Exceptions;
-using Umbraco.Web.Editors;
-using Umbraco.Web.BackOffice.Trees;
+using Umbraco.Web.Models.ContentEditing;
+using Stylesheet = Umbraco.Core.Models.Stylesheet;
+using StylesheetRule = Umbraco.Web.Models.ContentEditing.StylesheetRule;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -41,7 +38,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly ILocalizedTextService _localizedTextService;
         private readonly UmbracoMapper _umbracoMapper;
         private readonly IShortStringHelper _shortStringHelper;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
 
         public CodeFileController(
             IIOHelper ioHelper,
@@ -51,9 +48,8 @@ namespace Umbraco.Web.BackOffice.Controllers
             ILocalizedTextService localizedTextService,
             UmbracoMapper umbracoMapper,
             IShortStringHelper shortStringHelper,
-            IGlobalSettings globalSettings)
+            IOptions<GlobalSettings> globalSettings)
         {
-
             _ioHelper = ioHelper;
             _fileSystems = fileSystems;
             _fileService = fileService;
@@ -61,7 +57,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _localizedTextService = localizedTextService;
             _umbracoMapper = umbracoMapper;
             _shortStringHelper = shortStringHelper;
-            _globalSettings = globalSettings;
+            _globalSettings = globalSettings.Value;
         }
 
         /// <summary>

@@ -2,15 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.Install;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence;
@@ -19,7 +18,6 @@ using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
-using Umbraco.Tests.Strings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
@@ -47,7 +45,7 @@ namespace Umbraco.Tests.Services
                 .Add(() => Composition.TypeLoader.GetCacheRefreshers());
         }
 
-        protected override IPublishedSnapshotService CreatePublishedSnapshotService()
+        protected override IPublishedSnapshotService CreatePublishedSnapshotService(GlobalSettings globalSettings = null)
         {
             var options = new PublishedSnapshotServiceOptions { IgnoreLocalDb = true };
             var publishedSnapshotAccessor = new UmbracoContextPublishedSnapshotAccessor(Umbraco.Web.Composing.Current.UmbracoContextAccessor);
@@ -61,7 +59,8 @@ namespace Umbraco.Tests.Services
             var hostingEnvironment = Mock.Of<IHostingEnvironment>();
 
             var typeFinder = TestHelper.GetTypeFinder();
-            var settings = Mock.Of<INuCacheSettings>();
+
+            var nuCacheSettings = new NuCacheSettings();
 
             return new PublishedSnapshotService(
                 options,
@@ -72,18 +71,19 @@ namespace Umbraco.Tests.Services
                 publishedSnapshotAccessor,
                 Mock.Of<IVariationContextAccessor>(),
                 ProfilingLogger,
+                NullLoggerFactory.Instance,
                 ScopeProvider,
                 documentRepository, mediaRepository, memberRepository,
                 DefaultCultureAccessor,
-                new DatabaseDataSource(Mock.Of<ILogger>()),
-                Factory.GetInstance<IGlobalSettings>(),
+                new DatabaseDataSource(Mock.Of<ILogger<DatabaseDataSource>>()),
+                Microsoft.Extensions.Options.Options.Create(globalSettings ?? new GlobalSettings()),
                 Factory.GetInstance<IEntityXmlSerializer>(),
                 Mock.Of<IPublishedModelFactory>(),
                 new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider(ShortStringHelper) }),
                 hostingEnvironment,
-                new MockShortStringHelper(),
+                Mock.Of<IShortStringHelper>(),
                 IOHelper,
-                settings);
+                Microsoft.Extensions.Options.Options.Create(nuCacheSettings));
         }
 
         public class LocalServerMessenger : ServerMessengerBase
@@ -312,7 +312,9 @@ namespace Umbraco.Tests.Services
             var nlContentName = "Content nl-NL";
             var nlCulture = "nl-NL";
 
-            ServiceContext.LocalizationService.Save(new Language(TestObjects.GetGlobalSettings(), nlCulture));
+            var globalSettings = new GlobalSettings();
+
+            ServiceContext.LocalizationService.Save(new Language(globalSettings, nlCulture));
 
             var includeCultureNames = contentType.Variations.HasFlag(ContentVariation.Culture);
 
@@ -668,9 +670,11 @@ namespace Umbraco.Tests.Services
             // can change it to variant and back
             // can then switch one property to variant
 
-            var languageEn = new Language(TestObjects.GetGlobalSettings(), "en") { IsDefault = true };
+            var globalSettings = new GlobalSettings();
+
+            var languageEn = new Language(globalSettings, "en") { IsDefault = true };
             ServiceContext.LocalizationService.Save(languageEn);
-            var languageFr = new Language(TestObjects.GetGlobalSettings(), "fr");
+            var languageFr = new Language(globalSettings, "fr");
             ServiceContext.LocalizationService.Save(languageFr);
 
             var contentType = CreateContentType(ContentVariation.Nothing);
@@ -1261,9 +1265,10 @@ namespace Umbraco.Tests.Services
 
         private void CreateFrenchAndEnglishLangs()
         {
-            var languageEn = new Language(TestObjects.GetGlobalSettings(), "en") { IsDefault = true };
+            var globalSettings = new GlobalSettings();
+            var languageEn = new Language(globalSettings, "en") { IsDefault = true };
             ServiceContext.LocalizationService.Save(languageEn);
-            var languageFr = new Language(TestObjects.GetGlobalSettings(), "fr");
+            var languageFr = new Language(globalSettings, "fr");
             ServiceContext.LocalizationService.Save(languageFr);
         }
 

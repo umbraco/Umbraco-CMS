@@ -1,18 +1,23 @@
 ﻿using Moq;
 using NUnit.Framework;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
+using Umbraco.Core.Sync;
 using Umbraco.Core.WebAssets;
 using Umbraco.Examine;
 using Umbraco.Web.Compose;
@@ -49,6 +54,10 @@ namespace Umbraco.Tests.Integration.Testing
 
             // replace this service so that it can lookup the correct file locations
             composition.Services.AddUnique(GetLocalizedTextService);
+            
+            composition.RegisterUnique<IServerMessenger, NoopServerMessenger>();
+            
+            
         }
 
         /// <summary>
@@ -58,8 +67,8 @@ namespace Umbraco.Tests.Integration.Testing
         /// <returns></returns>
         private ILocalizedTextService GetLocalizedTextService(IServiceProvider serviceProvider)
         {
-            var configs = serviceProvider.GetRequiredService<Configs>();
-            var logger = serviceProvider.GetRequiredService<ILogger>();
+            var globalSettings = serviceProvider.GetRequiredService<IOptions<GlobalSettings>>();
+            var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
             var appCaches = serviceProvider.GetRequiredService<AppCaches>();
 
             var localizedTextService = new LocalizedTextService(
@@ -72,15 +81,15 @@ namespace Umbraco.Tests.Integration.Testing
                         currFolder = currFolder.Parent;
                     }
                     var netcoreUI = currFolder.GetDirectories("Umbraco.Web.UI.NetCore", SearchOption.TopDirectoryOnly).First();
-                    var mainLangFolder = new DirectoryInfo(Path.Combine(netcoreUI.FullName, configs.Global().UmbracoPath.TrimStart("~/"), "config", "lang"));
+                    var mainLangFolder = new DirectoryInfo(Path.Combine(netcoreUI.FullName, globalSettings.Value.UmbracoPath.TrimStart("~/"), "config", "lang"));
 
                     return new LocalizedTextServiceFileSources(
-                        logger,
+                        loggerFactory.CreateLogger<LocalizedTextServiceFileSources>(),
                         appCaches,
                         mainLangFolder);
 
                 }),
-                logger);
+                loggerFactory.CreateLogger<LocalizedTextService>());
 
             return localizedTextService;
         }
@@ -88,14 +97,60 @@ namespace Umbraco.Tests.Integration.Testing
         // replace the default so there is no background index rebuilder
         private class TestBackgroundIndexRebuilder : BackgroundIndexRebuilder
         {
-            public TestBackgroundIndexRebuilder(IMainDom mainDom, IProfilingLogger logger, IApplicationShutdownRegistry hostingEnvironment, IndexRebuilder indexRebuilder)
-                : base(mainDom, logger, hostingEnvironment, indexRebuilder)
+            public TestBackgroundIndexRebuilder(IMainDom mainDom, IProfilingLogger profilingLogger , ILoggerFactory loggerFactory, IApplicationShutdownRegistry hostingEnvironment, IndexRebuilder indexRebuilder)
+                : base(mainDom, profilingLogger , loggerFactory, hostingEnvironment, indexRebuilder)
             {
             }
 
             public override void RebuildIndexes(bool onlyEmptyIndexes, int waitMilliseconds = 0)
             {
                 // noop
+            }
+        }
+
+        private class NoopServerMessenger : IServerMessenger
+        {
+            public NoopServerMessenger()
+            { }
+
+            public void PerformRefresh<TPayload>(ICacheRefresher refresher, TPayload[] payload)
+            {
+
+            }
+
+            public void PerformRefresh<T>(ICacheRefresher refresher, Func<T, int> getNumericId, params T[] instances)
+            {
+
+            }
+
+            public void PerformRefresh<T>(ICacheRefresher refresher, Func<T, Guid> getGuidId, params T[] instances)
+            {
+
+            }
+
+            public void PerformRemove<T>(ICacheRefresher refresher, Func<T, int> getNumericId, params T[] instances)
+            {
+ 
+            }
+
+            public void PerformRemove(ICacheRefresher refresher, params int[] numericIds)
+            {
+
+            }
+
+            public void PerformRefresh(ICacheRefresher refresher, params int[] numericIds)
+            {
+
+            }
+
+            public void PerformRefresh(ICacheRefresher refresher, params Guid[] guidIds)
+            {
+
+            }
+
+            public void PerformRefreshAll(ICacheRefresher refresher)
+            {
+
             }
         }
 

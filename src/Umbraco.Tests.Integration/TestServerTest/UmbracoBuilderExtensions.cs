@@ -1,5 +1,6 @@
 ﻿using System;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Runtime;
 using Umbraco.Extensions;
 using Umbraco.Tests.Integration.Implementations;
@@ -26,14 +27,16 @@ namespace Umbraco.Tests.Integration.TestServerTest
                             typeof(UmbracoBuilderExtensions).Assembly,
                             AppCaches.NoCache, // Disable caches in integration tests
                             testHelper.GetLoggingConfiguration(),
+                            builder.Config,
                             // TODO: Yep that's extremely ugly
-                            (configs, umbVersion, ioHelper, logger, profiler, hostingEnv, backOfficeInfo, typeFinder, appCaches, dbProviderFactoryCreator) =>
+                            (globalSettings, connectionStrings, umbVersion, ioHelper, loggerFactory, profiler, hostingEnv, backOfficeInfo, typeFinder, appCaches, dbProviderFactoryCreator) =>
                             {
                                 var runtime = UmbracoIntegrationTest.CreateTestRuntime(
-                                    configs,
+                                    globalSettings,
+                                    connectionStrings,
                                     umbVersion,
                                     ioHelper,
-                                    logger,
+                                    loggerFactory,
                                     profiler,
                                     hostingEnv,
                                     backOfficeInfo,

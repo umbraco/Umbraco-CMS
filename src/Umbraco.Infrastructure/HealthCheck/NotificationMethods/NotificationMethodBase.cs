@@ -2,13 +2,15 @@
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration.HealthChecks;
+using Umbraco.Core.Configuration.Models;
 
 namespace Umbraco.Web.HealthCheck.NotificationMethods
 {
     public abstract class NotificationMethodBase : IHealthCheckNotificationMethod
     {
-        protected NotificationMethodBase(IHealthChecksSettings healthCheckSettingsConfig)
+        protected NotificationMethodBase(IOptions<HealthChecksSettings> healthCheckSettings)
         {
             var type = GetType();
             var attribute = type.GetCustomAttribute<HealthCheckNotificationMethodAttribute>();
@@ -18,7 +20,7 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
                 return;
             }
 
-            var notificationMethods = healthCheckSettingsConfig.NotificationSettings.NotificationMethods;
+            var notificationMethods = healthCheckSettings.Value.NotificationSettings.NotificationMethods;
             if(!notificationMethods.TryGetValue(attribute.Alias, out var notificationMethod))
             {
                 Enabled = false;

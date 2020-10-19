@@ -2,12 +2,14 @@
 using System.IO;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Events;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Packaging;
 using Umbraco.Core.Routing;
 using Umbraco.Core.Services;
@@ -60,7 +62,7 @@ namespace Umbraco.Core.Composing.CompositionExtensions
             composition.Services.AddTransient<LocalizedTextServiceFileSources>(SourcesFactory);
             composition.Services.AddUnique<ILocalizedTextService>(factory => new LocalizedTextService(
                 factory.GetRequiredService<Lazy<LocalizedTextServiceFileSources>>(),
-                factory.GetRequiredService<ILogger>()));
+                factory.GetRequiredService<ILogger<LocalizedTextService>>()));
 
             composition.Services.AddUnique<IEntityXmlSerializer, EntityXmlSerializer>();
 
@@ -93,15 +95,15 @@ namespace Umbraco.Core.Composing.CompositionExtensions
                 serviceProvider.GetRequiredService<ILocalizationService>(),
                 serviceProvider.GetRequiredService<IHostingEnvironment>(),
                 serviceProvider.GetRequiredService<IEntityXmlSerializer>(),
-                serviceProvider.GetRequiredService<ILogger>(),
+                serviceProvider.GetRequiredService<ILoggerFactory>(),
                 serviceProvider.GetRequiredService<IUmbracoVersion>(),
-                serviceProvider.GetRequiredService<IGlobalSettings>(),
+                serviceProvider.GetRequiredService<IOptions<GlobalSettings>>(),
                 packageRepoFileName);
 
         private static LocalizedTextServiceFileSources SourcesFactory(IServiceProvider serviceProvider)
         {
             var hostingEnvironment = serviceProvider.GetRequiredService<IHostingEnvironment>();
-            var globalSettings = serviceProvider.GetRequiredService<IGlobalSettings>();
+            var globalSettings = serviceProvider.GetRequiredService<IOptions<GlobalSettings>>().Value;
             var mainLangFolder = new DirectoryInfo(hostingEnvironment.MapPathContentRoot(WebPath.Combine(globalSettings.UmbracoPath , "config","lang")));
             var appPlugins = new DirectoryInfo(hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.AppPlugins));
             var configLangFolder = new DirectoryInfo(hostingEnvironment.MapPathContentRoot(WebPath.Combine(Constants.SystemDirectories.Config  ,"lang")));
@@ -121,7 +123,7 @@ namespace Umbraco.Core.Composing.CompositionExtensions
                     .Select(x => new LocalizedTextServiceSupplementaryFileSource(x, true));
 
             return new LocalizedTextServiceFileSources(
-                serviceProvider.GetRequiredService<ILogger>(),
+                serviceProvider.GetRequiredService<ILogger<LocalizedTextServiceFileSources>>(),
                 serviceProvider.GetRequiredService<AppCaches>(),
                 mainLangFolder,
                 pluginLangFolders.Concat(userLangFolders));

@@ -2,12 +2,13 @@
 using CSharpTest.Net.Collections;
 using CSharpTest.Net.Serialization;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 
 namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 {
     internal class BTree
     {
-        public static BPlusTree<int, ContentNodeKit> GetTree(string filepath, bool exists, INuCacheSettings settings)
+        public static BPlusTree<int, ContentNodeKit> GetTree(string filepath, bool exists, NuCacheSettings settings)
         {
             var keySerializer = new PrimitiveSerializer();
             var valueSerializer = new ContentNodeKitSerializer();
@@ -21,7 +22,6 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 
                 // default is 4096, min 2^9 = 512, max 2^16 = 64K
                 FileBlockSize = GetBlockSize(settings),
-
 
                 //HACK: Forces FileOptions to be WriteThrough here: https://github.com/mamift/CSharpTest.Net.Collections/blob/9f93733b3af7ee0e2de353e822ff54d908209b0b/src/CSharpTest.Net.Collections/IO/TransactedCompoundFile.cs#L316-L327,
                 // as the reflection uses otherwise will failed in .NET Core as the "_handle" field in FileStream is renamed to "_fileHandle".
@@ -40,16 +40,15 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             return tree;
         }
 
-        private static int GetBlockSize(INuCacheSettings settings)
+        private static int GetBlockSize(NuCacheSettings settings)
         {
             var blockSize = 4096;
 
             var appSetting = settings.BTreeBlockSize;
-            if (appSetting == null)
+            if (!appSetting.HasValue)
                 return blockSize;
 
-            if (!int.TryParse(appSetting, out blockSize))
-                throw new ConfigurationErrorsException($"Invalid block size value \"{appSetting}\": not a number.");
+            blockSize = appSetting.Value;
 
             var bit = 0;
             for (var i = blockSize; i != 1; i >>= 1)

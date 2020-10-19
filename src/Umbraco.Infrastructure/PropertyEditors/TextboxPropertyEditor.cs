@@ -1,6 +1,6 @@
-﻿using Umbraco.Core;
+﻿using Microsoft.Extensions.Logging;
+using Umbraco.Core;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
@@ -27,8 +27,8 @@ namespace Umbraco.Web.PropertyEditors
         /// <summary>
         /// Initializes a new instance of the <see cref="TextboxPropertyEditor"/> class.
         /// </summary>
-        public TextboxPropertyEditor(ILogger logger, IDataTypeService dataTypeService, ILocalizationService localizationService, IIOHelper ioHelper, IShortStringHelper shortStringHelper, ILocalizedTextService localizedTextService)
-            : base(logger, dataTypeService, localizationService,localizedTextService, shortStringHelper)
+        public TextboxPropertyEditor(ILoggerFactory loggerFactory, IDataTypeService dataTypeService, ILocalizationService localizationService, IIOHelper ioHelper, IShortStringHelper shortStringHelper, ILocalizedTextService localizedTextService)
+            : base(loggerFactory, dataTypeService, localizationService,localizedTextService, shortStringHelper)
         {
             _dataTypeService = dataTypeService;
             _localizationService = localizationService;

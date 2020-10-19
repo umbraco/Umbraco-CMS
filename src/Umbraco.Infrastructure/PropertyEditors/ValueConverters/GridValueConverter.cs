@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.Grid;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Composing;
 
@@ -18,8 +18,8 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
     {
         private readonly IGridConfig _config;
 
-        public GridValueConverter(PropertyEditorCollection propertyEditors, IGridConfig config)
-            : base(propertyEditors)
+        public GridValueConverter(PropertyEditorCollection propertyEditors, IGridConfig config, ILogger<GridValueConverter> logger)
+            : base(propertyEditors, logger)
         {
             _config = config;
         }
@@ -92,7 +92,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
                 }
                 catch (Exception ex)
                 {
-                    Current.Logger.Error<GridValueConverter>(ex, "Could not parse the string '{JsonString}' to a json object", sourceString);
+                    Current.Logger.LogError(ex, "Could not parse the string '{JsonString}' to a json object", sourceString);
                 }
             }
 

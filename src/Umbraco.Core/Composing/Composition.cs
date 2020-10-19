@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 
@@ -30,13 +29,12 @@ namespace Umbraco.Core.Composing
         /// <param name="configs">Optional configs.</param>
         /// <param name="ioHelper">An IOHelper</param>
         /// <param name="appCaches"></param>
-        public Composition(IServiceCollection services, TypeLoader typeLoader, IProfilingLogger logger, IRuntimeState runtimeState, Configs configs, IIOHelper ioHelper, AppCaches appCaches)
+        public Composition(IServiceCollection services, TypeLoader typeLoader, IProfilingLogger logger, IRuntimeState runtimeState, IIOHelper ioHelper, AppCaches appCaches)
         {
             Services = services ?? throw new ArgumentNullException(nameof(services));
             TypeLoader = typeLoader ?? throw new ArgumentNullException(nameof(typeLoader));
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
             RuntimeState = runtimeState ?? throw new ArgumentNullException(nameof(runtimeState));
-            Configs = configs ?? throw new ArgumentNullException(nameof(configs));
             IOHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
             AppCaches = appCaches ?? throw new ArgumentNullException(nameof(appCaches));
         }
@@ -62,11 +60,6 @@ namespace Umbraco.Core.Composing
         /// </summary>
         public IRuntimeState RuntimeState { get; }
 
-        /// <summary>
-        /// Gets the configurations.
-        /// </summary>
-        public Configs Configs { get; }
-
         #endregion
 
         public IServiceCollection Services { get; }
@@ -79,8 +72,6 @@ namespace Umbraco.Core.Composing
             foreach (var builder in _builders.Values)
                 builder.RegisterWith(Services);
             _builders.Clear(); // no point keep them around
-
-            Configs.RegisterWith(Services);
         }
 
         #region Collection Builders

@@ -137,8 +137,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.ModelsBuilder.Embed
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Infrastructure", "Umbraco.Infrastructure\Umbraco.Infrastructure.csproj", "{3AE7BF57-966B-45A5-910A-954D7C554441}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Configuration", "Umbraco.Configuration\Umbraco.Configuration.csproj", "{FBE7C065-DAC0-4025-A78B-63B24D3AB00B}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Persistance.SqlCe", "Umbraco.Persistance.SqlCe\Umbraco.Persistance.SqlCe.csproj", "{33085570-9BF2-4065-A9B0-A29D920D13BA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.TestData", "Umbraco.TestData\Umbraco.TestData.csproj", "{FB5676ED-7A69-492C-B802-E7B24144C0FC}"
@@ -199,10 +197,6 @@ Global
 		{3AE7BF57-966B-45A5-910A-954D7C554441}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3AE7BF57-966B-45A5-910A-954D7C554441}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3AE7BF57-966B-45A5-910A-954D7C554441}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FBE7C065-DAC0-4025-A78B-63B24D3AB00B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FBE7C065-DAC0-4025-A78B-63B24D3AB00B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FBE7C065-DAC0-4025-A78B-63B24D3AB00B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FBE7C065-DAC0-4025-A78B-63B24D3AB00B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{33085570-9BF2-4065-A9B0-A29D920D13BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{33085570-9BF2-4065-A9B0-A29D920D13BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{33085570-9BF2-4065-A9B0-A29D920D13BA}.Release|Any CPU.ActiveCfg = Release|Any CPU

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -7,9 +8,10 @@ using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.BackOffice;
-using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Security;
 using Umbraco.Core.Serialization;
 using Umbraco.Net;
@@ -43,6 +45,11 @@ namespace Umbraco.Extensions
             services.ConfigureOptions<ConfigureBackOfficeCookieOptions>();
         }
 
+        public static void AddUmbracoPreview(this IServiceCollection services)
+        {
+            services.AddSignalR();
+        }
+
         /// <summary>
         /// Adds the services required for using Umbraco back office Identity
         /// </summary>
@@ -56,7 +63,7 @@ namespace Umbraco.Extensions
             services.BuildUmbracoBackOfficeIdentity()
                 .AddDefaultTokenProviders()
                 .AddUserStore<BackOfficeUserStore>()
-                .AddUserManager<BackOfficeUserManager>()
+                .AddUserManager<IBackOfficeUserManager, BackOfficeUserManager>()
                 .AddSignInManager<BackOfficeSignInManager>()
                 .AddClaimsPrincipalFactory<BackOfficeClaimsPrincipalFactory<BackOfficeIdentityUser>>();
 
@@ -79,7 +86,7 @@ namespace Umbraco.Extensions
             services.TryAddScoped<IPasswordValidator<BackOfficeIdentityUser>, PasswordValidator<BackOfficeIdentityUser>>();
             services.TryAddScoped<IPasswordHasher<BackOfficeIdentityUser>>(
                 services => new BackOfficePasswordHasher(
-                    new LegacyPasswordSecurity(services.GetRequiredService<IUserPasswordConfiguration>()),
+                    new LegacyPasswordSecurity(),
                     services.GetRequiredService<IJsonSerializer>()));
             services.TryAddScoped<IUserConfirmation<BackOfficeIdentityUser>, DefaultUserConfirmation<BackOfficeIdentityUser>>();
             services.TryAddScoped<IUserClaimsPrincipalFactory<BackOfficeIdentityUser>, UserClaimsPrincipalFactory<BackOfficeIdentityUser>>();

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core.Logging;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Scoping;
 using Type = System.Type;
 
@@ -285,30 +285,31 @@ namespace Umbraco.Core.Migrations
         /// <param name="fromState">The state to start execution at.</param>
         /// <param name="migrationBuilder">A migration builder.</param>
         /// <param name="logger">A logger.</param>
+        /// <param name="loggerFactory"></param>
         /// <returns>The final state.</returns>
         /// <remarks>The plan executes within the scope, which must then be completed.</remarks>
-        public string Execute(IScope scope, string fromState, IMigrationBuilder migrationBuilder, ILogger logger)
+        public string Execute(IScope scope, string fromState, IMigrationBuilder migrationBuilder, ILogger<MigrationPlan> logger, ILoggerFactory loggerFactory)
         {
             Validate();
 
             if (migrationBuilder == null) throw new ArgumentNullException(nameof(migrationBuilder));
             if (logger == null) throw new ArgumentNullException(nameof(logger));
 
-            logger.Info<MigrationPlan>("Starting '{MigrationName}'...", Name);
+            logger.LogInformation("Starting '{MigrationName}'...", Name);
 
             var origState = fromState ?? string.Empty;
 
-            logger.Info<MigrationPlan>("At {OrigState}", string.IsNullOrWhiteSpace(origState) ? "origin": origState);
+            logger.LogInformation("At {OrigState}", string.IsNullOrWhiteSpace(origState) ? "origin": origState);
 
             if (!_transitions.TryGetValue(origState, out var transition))
                 ThrowOnUnknownInitialState(origState);
 
-            var context = new MigrationContext(scope.Database, logger);
+            var context = new MigrationContext(scope.Database, loggerFactory.CreateLogger<MigrationContext>());
             context.PostMigrations.AddRange(_postMigrationTypes);
 
             while (transition != null)
             {
-                logger.Info<MigrationPlan>("Execute {MigrationType}", transition.MigrationType.Name);
+                logger.LogInformation("Execute {MigrationType}", transition.MigrationType.Name);
 
                 var migration = migrationBuilder.Build(transition.MigrationType, context);
                 migration.Migrate();
@@ -316,7 +317,7 @@ namespace Umbraco.Core.Migrations
                 var nextState = transition.TargetState;
                 origState = nextState;
 
-                logger.Info<MigrationPlan>("At {OrigState}", origState);
+                logger.LogInformation("At {OrigState}", origState);
 
                 // throw a raw exception here: this should never happen as the plan has
                 // been validated - this is just a paranoid safety test
@@ -333,12 +334,12 @@ namespace Umbraco.Core.Migrations
             // run post-migrations
             foreach (var postMigrationType in postMigrationTypes)
             {
-                logger.Info<MigrationPlan>($"PostMigration: {postMigrationType.FullName}.");
+                logger.LogInformation($"PostMigration: {postMigrationType.FullName}.");
                 var postMigration = migrationBuilder.Build(postMigrationType, context);
                 postMigration.Migrate();
             }
 
-            logger.Info<MigrationPlan>("Done (pending scope completion).");
+            logger.LogInformation("Done (pending scope completion).");
 
             // safety check - again, this should never happen as the plan has been validated,
             // and this is just a paranoid safety test

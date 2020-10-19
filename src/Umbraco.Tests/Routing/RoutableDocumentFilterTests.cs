@@ -1,9 +1,9 @@
-﻿using System.Web.Mvc;
+﻿using System;
+using System.Web.Mvc;
 using System.Web.Routing;
-using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
+using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using Umbraco.Web.Composing;
@@ -52,12 +52,10 @@ namespace Umbraco.Tests.Routing
         public void Is_Reserved_By_Route(string url, bool shouldMatch)
         {
             //reset the app config, we only want to test routes not the hard coded paths
-            // TODO: Why are we using and modifying the global IGlobalSettings and not just a custom one?
-            var globalSettingsMock = Mock.Get(Factory.GetInstance<IGlobalSettings>()); //this will modify the IGlobalSettings instance stored in the container
-            globalSettingsMock.Setup(x => x.ReservedPaths).Returns("");
-            globalSettingsMock.Setup(x => x.ReservedUrls).Returns("");
 
-            var routableDocFilter = new RoutableDocumentFilter(globalSettingsMock.Object, IOHelper);
+            var globalSettings = new GlobalSettings { ReservedPaths = string.Empty, ReservedUrls = string.Empty };
+
+            var routableDocFilter = new RoutableDocumentFilter(globalSettings, IOHelper);
 
             var routes = new RouteCollection();
 

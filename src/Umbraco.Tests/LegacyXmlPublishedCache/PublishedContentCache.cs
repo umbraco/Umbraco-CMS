@@ -7,6 +7,7 @@ using System.Xml.XPath;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Xml;
 using Umbraco.Tests.TestHelpers;
@@ -18,7 +19,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
     internal class PublishedContentCache : PublishedCacheBase, IPublishedContentCache
     {
         private readonly IAppCache _appCache;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly RoutesCache _routesCache;
         private readonly IVariationContextAccessor _variationContextAccessor;
         private readonly IDomainCache _domainCache;
@@ -33,7 +34,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             XmlStore xmlStore, // an XmlStore containing the master xml
             IDomainCache domainCache, // an IDomainCache implementation
             IAppCache appCache, // an IAppCache that should be at request-level
-            IGlobalSettings globalSettings,
+            GlobalSettings globalSettings,
             PublishedContentTypeCache contentTypeCache, // a PublishedContentType cache
             RoutesCache routesCache, // a RoutesCache
             IVariationContextAccessor variationContextAccessor,

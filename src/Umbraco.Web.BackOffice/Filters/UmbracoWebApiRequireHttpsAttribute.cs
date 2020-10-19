@@ -3,7 +3,8 @@ using System.Net;
 using System.Net.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Umbraco.Core.Configuration;
+using Microsoft.Extensions.Options;
+using Umbraco.Core.Configuration.Models;
 
 namespace Umbraco.Web.BackOffice.Filters
 {
@@ -27,11 +28,11 @@ namespace Umbraco.Web.BackOffice.Filters
 
     public  class UmbracoWebApiRequireHttpsFilter: IAuthorizationFilter
     {
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
 
-        public UmbracoWebApiRequireHttpsFilter(IGlobalSettings globalSettings)
+        public UmbracoWebApiRequireHttpsFilter(IOptions<GlobalSettings> globalSettings)
         {
-            _globalSettings = globalSettings;
+            _globalSettings = globalSettings.Value;
         }
 
         public void OnAuthorization(AuthorizationFilterContext context)

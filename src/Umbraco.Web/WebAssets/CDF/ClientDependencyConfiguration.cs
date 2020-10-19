@@ -6,11 +6,11 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Web;
 using System.Xml.Linq;
+using Microsoft.Extensions.Logging;
 using ClientDependency.Core.CompositeFiles.Providers;
 using ClientDependency.Core.Config;
 using Semver;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 
 namespace Umbraco.Web.WebAssets.CDF
 {
@@ -19,7 +19,7 @@ namespace Umbraco.Web.WebAssets.CDF
     /// </summary>
     public class ClientDependencyConfiguration
     {
-        private readonly ILogger _logger;
+        private readonly ILogger<ClientDependencyConfiguration> _logger;
         private readonly string _fileName;
 
         private string FileMapDefaultFolder
@@ -28,7 +28,7 @@ namespace Umbraco.Web.WebAssets.CDF
             set => XmlFileMapper.FileMapDefaultFolder = value;
         }
 
-        public ClientDependencyConfiguration(ILogger logger, IIOHelper ioHelper)
+        public ClientDependencyConfiguration(ILogger<ClientDependencyConfiguration> logger, IIOHelper ioHelper)
         {
             if (logger == null) throw new ArgumentNullException("logger");
             _logger = logger;
@@ -85,13 +85,13 @@ namespace Umbraco.Web.WebAssets.CDF
                     versionAttribute.SetValue(newVersion);
                     clientDependencyConfigXml.Save(_fileName, SaveOptions.DisableFormatting);
 
-                    _logger.Info<ClientDependencyConfiguration>("Updated version number from {OldVersion} to {NewVersion}", oldVersion, newVersion);
+                    _logger.LogInformation("Updated version number from {OldVersion} to {NewVersion}", oldVersion, newVersion);
                     return true;
                 }
             }
             catch (Exception ex)
             {
-                _logger.Error<ClientDependencyConfiguration>(ex, "Couldn't update ClientDependency version number");
+                _logger.LogError(ex, "Couldn't update ClientDependency version number");
             }
 
             return false;
@@ -124,7 +124,7 @@ namespace Umbraco.Web.WebAssets.CDF
             catch (Exception ex)
             {
                 //invalid path format or something... try/catch to be safe
-                _logger.Error<ClientDependencyConfiguration>(ex, "Could not get path from ClientDependency.config");
+                _logger.LogError(ex, "Could not get path from ClientDependency.config");
             }
 
             var success = true;
@@ -140,7 +140,7 @@ namespace Umbraco.Web.WebAssets.CDF
                 catch (Exception ex)
                 {
                     // Something could be locking the directory or the was another error, making sure we don't break the upgrade installer
-                    _logger.Error<ClientDependencyConfiguration>(ex, "Could not clear temp files");
+                    _logger.LogError(ex, "Could not clear temp files");
                     success = false;
                 }
             }

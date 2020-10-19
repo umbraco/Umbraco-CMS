@@ -3,7 +3,6 @@
  using System.Collections.Generic;
  using System.Linq;
  using Umbraco.Core.Services;
- using Umbraco.Core.Logging;
  using Umbraco.Web.Models.ContentEditing;
  using Umbraco.Tests.Testing;
  using Umbraco.Core.PropertyEditors;
@@ -12,12 +11,14 @@
  using System.ComponentModel.DataAnnotations;
  using Microsoft.AspNetCore.Mvc.ModelBinding;
  using Microsoft.Extensions.DependencyInjection;
+ using Microsoft.Extensions.Logging;
  using Newtonsoft.Json;
  using Newtonsoft.Json.Linq;
  using Umbraco.Core;
  using Umbraco.Core.IO;
  using Umbraco.Core.Mapping;
  using Umbraco.Core.Models;
+ using Umbraco.Core.Security;
  using Umbraco.Core.Strings;
  using Umbraco.Tests.Integration.Testing;
  using Umbraco.Tests.TestHelpers.Entities;
@@ -137,13 +138,15 @@
          [Test]
          public void Validating_ContentItemSave()
          {
-             var logger = Services.GetRequiredService<ILogger>();
-             var webSecurity = Services.GetRequiredService<IWebSecurity>();
+             var logger = Services.GetRequiredService<ILogger<ContentSaveModelValidator>>();
+             var backofficeSecurityFactory = Services.GetRequiredService<IBackofficeSecurityFactory>();
+             backofficeSecurityFactory.EnsureBackofficeSecurity();
+             var backofficeSecurityAccessor = Services.GetRequiredService<IBackofficeSecurityAccessor>();
              var localizedTextService = Services.GetRequiredService<ILocalizedTextService>();
              var propertyValidationService = Services.GetRequiredService<IPropertyValidationService>();
              var umbracoMapper = Services.GetRequiredService<UmbracoMapper>();
 
-             var validator = new ContentSaveModelValidator(logger, webSecurity, localizedTextService, propertyValidationService);
+             var validator = new ContentSaveModelValidator(logger, backofficeSecurityAccessor.BackofficeSecurity, localizedTextService, propertyValidationService);
 
              var content = MockedContent.CreateTextpageContent(_contentType, "test", -1);
 
@@ -273,9 +276,9 @@
          [DataEditor("complexTest", "test", "test")]
          public class ComplexTestEditor : NestedContentPropertyEditor
          {
-             public ComplexTestEditor(ILogger logger, Lazy<PropertyEditorCollection> propertyEditors, IDataTypeService dataTypeService, IContentTypeService contentTypeService, ILocalizationService localizationService,
+             public ComplexTestEditor(ILoggerFactory loggerFactory, Lazy<PropertyEditorCollection> propertyEditors, IDataTypeService dataTypeService, IContentTypeService contentTypeService, ILocalizationService localizationService,
                  IIOHelper ioHelper, ILocalizedTextService localizedTextService, IShortStringHelper shortStringHelper)
-                 : base(logger, propertyEditors, dataTypeService, localizationService, contentTypeService, ioHelper, shortStringHelper, localizedTextService)
+                 : base(loggerFactory, propertyEditors, dataTypeService, localizationService, contentTypeService, ioHelper, shortStringHelper, localizedTextService)
              {
              }
 
@@ -291,12 +294,12 @@
          [DataEditor("test", "test", "test")] // This alias aligns with the prop editor alias for all properties created from MockedContentTypes.CreateTextPageContentType
          public class TestEditor : DataEditor
          {
-             public TestEditor(ILogger logger,
+             public TestEditor(ILoggerFactory loggerFactory,
                  IDataTypeService dataTypeService,
                  ILocalizationService localizationService,
                  ILocalizedTextService localizedTextService,
                  IShortStringHelper shortStringHelper)
-                 : base(logger, dataTypeService, localizationService, localizedTextService, shortStringHelper)
+                 : base(loggerFactory, dataTypeService, localizationService, localizedTextService, shortStringHelper)
              {
 
              }

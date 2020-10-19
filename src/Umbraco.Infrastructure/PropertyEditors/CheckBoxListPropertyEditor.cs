@@ -1,6 +1,6 @@
-﻿using Umbraco.Core;
+﻿using Microsoft.Extensions.Logging;
+using Umbraco.Core;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
@@ -28,8 +28,8 @@ namespace Umbraco.Web.PropertyEditors
         /// <summary>
         /// The constructor will setup the property editor based on the attribute if one is found
         /// </summary>
-        public CheckBoxListPropertyEditor(ILogger logger, ILocalizedTextService textService, IDataTypeService dataTypeService, ILocalizationService localizationService, IShortStringHelper shortStringHelper, IIOHelper ioHelper, ILocalizedTextService localizedTextService)
-            : base(logger, dataTypeService, localizationService,localizedTextService, shortStringHelper)
+        public CheckBoxListPropertyEditor(ILoggerFactory loggerFactory, ILocalizedTextService textService, IDataTypeService dataTypeService, ILocalizationService localizationService, IShortStringHelper shortStringHelper, IIOHelper ioHelper, ILocalizedTextService localizedTextService)
+            : base(loggerFactory, dataTypeService, localizationService,localizedTextService, shortStringHelper)
         {
             _textService = textService;
             _dataTypeService = dataTypeService;
@@ -43,6 +43,6 @@ namespace Umbraco.Web.PropertyEditors
         protected override IConfigurationEditor CreateConfigurationEditor() => new ValueListConfigurationEditor(_textService, _ioHelper);
 
         /// <inheritdoc />
-        protected override IDataValueEditor CreateValueEditor() => new MultipleValueEditor(Logger, _dataTypeService, _localizationService, _localizedTextService, _shortStringHelper, Attribute);
+        protected override IDataValueEditor CreateValueEditor() => new MultipleValueEditor(LoggerFactory.CreateLogger<MultipleValueEditor>(), _dataTypeService, _localizationService, _localizedTextService, _shortStringHelper, Attribute);
     }
 }

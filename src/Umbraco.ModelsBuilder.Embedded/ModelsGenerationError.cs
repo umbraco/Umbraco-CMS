@@ -1,20 +1,21 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
+using Umbraco.Core.Configuration.Models;
 
 namespace Umbraco.ModelsBuilder.Embedded
 {
     public sealed class ModelsGenerationError
     {
-        private readonly IModelsBuilderConfig _config;
+        private readonly ModelsBuilderSettings _config;
         private readonly IHostingEnvironment _hostingEnvironment;
 
-        public ModelsGenerationError(IModelsBuilderConfig config, IHostingEnvironment hostingEnvironment)
+        public ModelsGenerationError(IOptions<ModelsBuilderSettings> config, IHostingEnvironment hostingEnvironment)
         {
-            _config = config;
+            _config = config.Value;
             _hostingEnvironment = hostingEnvironment;
         }
 

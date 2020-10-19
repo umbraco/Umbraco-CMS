@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
@@ -187,7 +188,7 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
 
         private IRedirectUrlRepository CreateRepository(IScopeProvider provider)
         {
-            return new RedirectUrlRepository((IScopeAccessor) provider, AppCaches, Logger);
+            return new RedirectUrlRepository((IScopeAccessor) provider, AppCaches, LoggerFactory.CreateLogger<RedirectUrlRepository>());
         }
 
         private IContent _textpage, _subpage, _otherpage, _trashed;

@@ -34,3 +34,8 @@ using System.Runtime.InteropServices;
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
+
+// Internals must be visible to DynamicProxyGenAssembly2
+// in order to mock loggers loggers with types from the assembly
+// I.E. Mock.Of<ILogger<TestControllerFactory>>()
+[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]

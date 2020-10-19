@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.PropertyEditors;
@@ -78,7 +78,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                     continue;
                 }
 
-                Logger.Warn(GetType(), "Could not find PropertyData {PropertyDataId} value '{PropertyValue}' in the datatype configuration: {Values}.",
+                Logger.LogWarning("Could not find PropertyData {PropertyDataId} value '{PropertyValue}' in the datatype configuration: {Values}.",
                     propData.Id, id, string.Join(", ", config.Items.Select(x => x.Id + ":" + x.Value)));
                 canConvert = false;
             }

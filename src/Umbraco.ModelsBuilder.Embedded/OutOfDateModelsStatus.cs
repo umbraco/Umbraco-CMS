@@ -1,19 +1,20 @@
 ﻿using System.IO;
+using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Web.Cache;
 
 namespace Umbraco.ModelsBuilder.Embedded
 {
     public sealed class OutOfDateModelsStatus
     {
-        private readonly IModelsBuilderConfig _config;
+        private readonly ModelsBuilderSettings _config;
         private readonly IHostingEnvironment _hostingEnvironment;
 
-        public OutOfDateModelsStatus(IModelsBuilderConfig config, IHostingEnvironment hostingEnvironment)
+        public OutOfDateModelsStatus(IOptions<ModelsBuilderSettings> config, IHostingEnvironment hostingEnvironment)
         {
-            _config = config;
+            _config = config.Value;
             _hostingEnvironment = hostingEnvironment;
         }
 

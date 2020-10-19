@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Web.Install.Models;
-using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
+using Microsoft.Extensions.Options;
 
 namespace Umbraco.Web.Install.InstallSteps
 {
@@ -15,13 +16,14 @@ namespace Umbraco.Web.Install.InstallSteps
     public class DatabaseConfigureStep : InstallSetupStep<DatabaseModel>
     {
         private readonly DatabaseBuilder _databaseBuilder;
-        private readonly ILogger _logger;
-        private readonly IConnectionStrings _connectionStrings;
+        private readonly ILogger<DatabaseConfigureStep> _logger;
+        private readonly ConnectionStrings _connectionStrings;
 
-        public DatabaseConfigureStep(DatabaseBuilder databaseBuilder, IConnectionStrings connectionStrings)
+        public DatabaseConfigureStep(DatabaseBuilder databaseBuilder, IOptions<ConnectionStrings> connectionStrings, ILogger<DatabaseConfigureStep> logger)
         {
             _databaseBuilder = databaseBuilder;
-            _connectionStrings = connectionStrings ?? throw new ArgumentNullException(nameof(connectionStrings));
+            _connectionStrings = connectionStrings.Value ?? throw new ArgumentNullException(nameof(connectionStrings));
+            _logger = logger;
         }
 
         public override Task<InstallSetupResult> ExecuteAsync(DatabaseModel database)
@@ -107,7 +109,7 @@ namespace Umbraco.Web.Install.InstallSteps
         private bool ShouldDisplayView()
         {
             //If the connection string is already present in web.config we don't need to show the settings page and we jump to installing/upgrading.
-            var databaseSettings = _connectionStrings[Constants.System.UmbracoConnectionName];
+            var databaseSettings = _connectionStrings.UmbracoConnectionString;
 
             if (databaseSettings.IsConnectionStringConfigured())
             {
@@ -119,7 +121,7 @@ namespace Umbraco.Web.Install.InstallSteps
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error<DatabaseConfigureStep>(ex, "An error occurred, reconfiguring...");
+                    _logger.LogError(ex, "An error occurred, reconfiguring...");
                     //something went wrong, could not connect so probably need to reconfigure
                     return true;
                 }
