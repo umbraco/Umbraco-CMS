@@ -35,6 +35,9 @@ namespace Umbraco.Extensions
             app.UseImageSharp();
             app.UseStaticFiles();
 
+            // Must be called after UseRouting and before UseEndpoints
+            app.UseSession();
+
             if (!app.UmbracoCanBoot()) return app;
 
             app.UseEndpoints(endpoints =>
