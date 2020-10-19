@@ -604,6 +604,7 @@ namespace Umbraco.Core.Packaging
             var defaultTemplateElement = infoElement.Element("DefaultTemplate");
 
             contentType.Name = infoElement.Element("Name").Value;
+            contentType.Key = new Guid(infoElement.Element("Key").Value);
             contentType.Icon = infoElement.Element("Icon").Value;
             contentType.Thumbnail = infoElement.Element("Thumbnail").Value;
             contentType.Description = infoElement.Element("Description").Value;
@@ -783,6 +784,7 @@ namespace Umbraco.Core.Packaging
                 var propertyType = new PropertyType(dataTypeDefinition, property.Element("Alias").Value)
                 {
                     Name = property.Element("Name").Value,
+                    Key = new Guid(property.Element("Key").Value),
                     Description = (string)property.Element("Description"),
                     Mandatory = property.Element("Mandatory") != null
                         ? property.Element("Mandatory").Value.ToLowerInvariant().Equals("true")
