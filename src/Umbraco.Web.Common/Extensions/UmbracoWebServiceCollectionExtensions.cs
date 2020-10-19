@@ -1,14 +1,10 @@
-﻿using System.Buffers;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.ObjectPool;
 using Microsoft.Extensions.Options;
 using SixLabors.ImageSharp.Memory;
 using SixLabors.ImageSharp.Web.Caching;
@@ -18,12 +14,8 @@ using SixLabors.ImageSharp.Web.Processors;
 using SixLabors.ImageSharp.Web.Providers;
 using Smidge;
 using Smidge.Nuglify;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Web.Common.ApplicationModels;
-using Umbraco.Web.Common.Middleware;
-using Umbraco.Web.Common.ModelBinding;
 
 namespace Umbraco.Extensions
 {
