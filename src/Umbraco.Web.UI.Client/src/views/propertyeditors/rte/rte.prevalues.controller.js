@@ -1,5 +1,5 @@
 angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
-    function ($scope, $timeout, $log, tinyMceService, stylesheetResource, assetsService) {
+    function ($scope, $timeout, $log, tinyMceService, stylesheetResource, assetsService, iconHelper) {
         var cfg = tinyMceService.defaultPrevalues();
 
         if($scope.model.value){
@@ -25,21 +25,31 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
 
         tinyMceService.configuration().then(function(config){
             $scope.tinyMceConfig = config;
-
-            // extend commands with properties for font-icon and if it is a custom command
-            $scope.tinyMceConfig.commands = _.map($scope.tinyMceConfig.commands, function (obj) {
-                var icon = getFontIcon(obj.alias);
-
-                var objCmd = Utilities.extend(obj, {
-                    fontIcon: icon.name,
-                    isCustom: icon.isCustom,
-                    selected: $scope.model.value.toolbar.indexOf(obj.alias) >= 0,
-                    icon: "mce-ico " + (icon.isCustom ? ' mce-i-custom ' : ' mce-i-') + icon.name
-                });
-
-                return objCmd;
+            iconHelper.getAllIcons().then(data => {
+                // extend commands with properties for font-icon and if it is a custom command
+                $scope.tinyMceConfig.commands = _.map($scope.tinyMceConfig.commands,
+                    function(obj) {
+                        var icon = getFontIcon(obj.alias);
+                        var svgName = "";
+                        var iconName = "";
+                        if (data.some(e => e.name === "icon-" + icon.name)) {
+                            iconName = "icon-" + icon.name;
+                        } else {
+                            iconName = "mce-ico " + (icon.isCustom ? " mce-i-custom " : " mce-i-") + icon.name;
+                        }
+                        var objCmd = Utilities.extend(obj,
+                            {
+                                fontIcon: icon.name,
+                                isCustom: icon.isCustom,
+                                selected: $scope.model.value.toolbar.indexOf(obj.alias) >= 0,
+                                icon: iconName
+                            });
+                        return objCmd;
+                    });
             });
         });
+
+        
 
         stylesheetResource.getAll().then(function(stylesheets){
             $scope.stylesheets = stylesheets;
@@ -81,6 +91,7 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
                 $scope.model.value.stylesheets.splice(index, 1);
             }
         };
+
 
         // map properties for specific commands
         function getFontIcon(alias) {

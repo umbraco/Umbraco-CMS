@@ -32,7 +32,7 @@
         </span>
     </span>
     <span class="umb-form-check__info" ng-transclude>
-        <i ng-if="vm.icon.length" class="{{vm.icon}}" aria-hidden="true"></i>
+        <umb-icon ng-if="vm.icon.length" icon="{{vm.icon}}" aria-hidden="true"></umb-icon>
         <span ng-if="vm.text.length" class="umb-form-check__text">{{vm.text}}</span>
     </span>
 </label>
