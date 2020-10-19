@@ -638,11 +638,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core
             public int Value1 => 42;
             public int Value2 { set { } }
             public int Value3 { get { return 42; } set { } }
-            private int ValueP1 => 42;
 
             public int Field1 = 33;
             private int Field2 = 66;
-
             public readonly int Field3 = 22;
         }
 
