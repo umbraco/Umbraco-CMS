@@ -50,7 +50,7 @@ namespace Umbraco.Tests.Testing
         /// </summary>
         /// <remarks>Default is to use the global tests plugin manager.</remarks>
         public UmbracoTestOptions.TypeLoader TypeLoader { get => _typeLoader.ValueOrDefault(UmbracoTestOptions.TypeLoader.Default); set => _typeLoader.Set(value); }
-        public bool Boot { get => _boot.ValueOrDefault(true); set => _boot.Set(value); }
+        public bool Boot { get => _boot.ValueOrDefault(false); set => _boot.Set(value); }
         private readonly Settable<bool> _boot = new Settable<bool>();
 
 

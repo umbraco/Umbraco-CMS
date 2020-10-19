@@ -19,7 +19,7 @@ namespace Umbraco.Web.Common.Filters
     /// <remarks>
     /// This is only enabled when running PureLive
     /// </remarks>
-    internal class ModelBindingExceptionFilter : ActionFilterAttribute, IExceptionFilter
+    public class ModelBindingExceptionFilter : ActionFilterAttribute, IExceptionFilter
     {
         private static readonly Regex _getPublishedModelsTypesRegex = new Regex("Umbraco.Web.PublishedModels.(\\w+)", RegexOptions.Compiled);
 

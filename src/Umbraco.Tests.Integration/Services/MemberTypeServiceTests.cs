@@ -23,7 +23,7 @@ namespace Umbraco.Tests.Integration.Services
         public void SetupTest()
         {
             // TODO: remove this once IPublishedSnapShotService has been implemented with nucache.
-            Umbraco.Core.Services.Implement.MemberTypeService.ClearScopeEvents();
+            Core.Services.Implement.MemberTypeService.ClearScopeEvents();
         }
 
         [Test]
