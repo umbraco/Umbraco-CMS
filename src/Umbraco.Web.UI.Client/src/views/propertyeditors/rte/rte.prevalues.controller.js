@@ -30,10 +30,11 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
                 $scope.tinyMceConfig.commands = _.map($scope.tinyMceConfig.commands,
                     function(obj) {
                         var icon = getFontIcon(obj.alias);
-                        var svgName = "";
                         var iconName = "";
-                        if (data.some(e => e.name === "icon-" + icon.name)) {
-                            iconName = "icon-" + icon.name;
+                        var svgName = "";
+                        var testName = icon.name.startsWith("icon-") ? icon.name : "icon-" + icon.name;
+                        if (data.some(e => e.name === testName)) {
+                            svgName = testName;
                         } else {
                             iconName = "mce-ico " + (icon.isCustom ? " mce-i-custom " : " mce-i-") + icon.name;
                         }
@@ -42,7 +43,8 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
                                 fontIcon: icon.name,
                                 isCustom: icon.isCustom,
                                 selected: $scope.model.value.toolbar.indexOf(obj.alias) >= 0,
-                                icon: iconName
+                                icon: iconName,
+                                svg: svgName
                             });
                         return objCmd;
                     });
