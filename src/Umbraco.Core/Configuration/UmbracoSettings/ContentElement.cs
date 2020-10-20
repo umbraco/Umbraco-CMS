@@ -41,7 +41,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         internal InnerTextConfigurationElement<string> LoginBackgroundImage => GetOptionalTextElement("loginBackgroundImage", string.Empty);
 
         [ConfigurationProperty("loginLogoImage")]
-        internal InnerTextConfigurationElement<string> LoginLogoImage => GetOptionalTextElement("loginLogoImage", string.Empty);
+        internal InnerTextConfigurationElement<string> LoginLogoImage => GetOptionalTextElement("loginLogoImage", "assets/img/application/umbraco_logo_white.svg");
 
         string IContentSection.NotificationEmailAddress => Notifications.NotificationEmailAddress;
 
