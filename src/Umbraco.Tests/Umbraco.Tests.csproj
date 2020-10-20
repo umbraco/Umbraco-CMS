@@ -289,7 +289,6 @@
     <Compile Include="Models\ContentTests.cs" />
     <Compile Include="Persistence\SqlCeTableByTableTest.cs" />
     <Compile Include="Persistence\DatabaseContextTests.cs" />
-    <Compile Include="Persistence\Mappers\ContentMapperTest.cs" />
     <Compile Include="Persistence\Mappers\ContentTypeMapperTest.cs" />
     <Compile Include="Persistence\Mappers\DataTypeMapperTest.cs" />
     <Compile Include="Persistence\Mappers\DictionaryMapperTest.cs" />
