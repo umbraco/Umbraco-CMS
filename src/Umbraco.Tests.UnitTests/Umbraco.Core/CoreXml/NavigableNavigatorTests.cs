@@ -10,7 +10,6 @@ using System.Xml.Xsl;
 using Umbraco.Core.Xml;
 using Umbraco.Core.Xml.XPath;
 using NUnit.Framework;
-using Umbraco.Tests.Common.TestHelpers;
 
 namespace Umbraco.Tests.CoreXml
 {

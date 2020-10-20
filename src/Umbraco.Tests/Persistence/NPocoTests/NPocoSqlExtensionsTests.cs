@@ -5,7 +5,6 @@ using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Tests.Common.TestHelpers;
 using static Umbraco.Core.Persistence.SqlExtensionsStatics;
 
 namespace Umbraco.Tests.Persistence.NPocoTests
