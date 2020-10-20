@@ -73,10 +73,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Umbraco\logs" />
-    </ItemGroup>
-
-    <ItemGroup>
       <Compile Update="Services\Importing\ImportResources.Designer.cs">
         <DependentUpon>ImportResources.resx</DependentUpon>
         <DesignTime>True</DesignTime>

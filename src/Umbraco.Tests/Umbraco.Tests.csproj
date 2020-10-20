@@ -139,8 +139,6 @@
     <Compile Include="Migrations\MigrationPlanTests.cs" />
     <Compile Include="Migrations\MigrationTests.cs" />
     <Compile Include="Models\ContentXmlTest.cs" />
-    <Compile Include="Models\ImageProcessorImageUrlGeneratorTest.cs" />
-    <Compile Include="Models\VariationTests.cs" />
     <Compile Include="PublishedContent\SolidPublishedSnapshot.cs" />
     <Compile Include="Published\ConvertersTests.cs" />
     <Compile Include="Published\ModelTypeTests.cs" />
@@ -202,7 +200,6 @@
     <Compile Include="Testing\TestDatabase.cs" />
     <Compile Include="Testing\TestingTests\NUnitTests.cs" />
     <Compile Include="Persistence\LocksTests.cs" />
-    <Compile Include="Persistence\BulkDataReaderTests.cs" />
     <Compile Include="Migrations\PostMigrationTests.cs" />
     <Compile Include="Persistence\NPocoTests\NPocoSqlExtensionsTests.cs" />
     <Compile Include="Persistence\UnitOfWorkTests.cs" />
