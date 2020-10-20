@@ -26,7 +26,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="LightInject.Microsoft.DependencyInjection" Version="3.3.0" />
       <None Remove="Services\Importing\Dictionary-Package.xml" />
     </ItemGroup>
 
