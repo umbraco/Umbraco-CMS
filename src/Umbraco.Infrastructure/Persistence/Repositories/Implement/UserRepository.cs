@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Dtos;
@@ -24,8 +26,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     internal class UserRepository : NPocoRepositoryBase<int, IUser>, IUserRepository
     {
         private readonly IMapperCollection _mapperCollection;
-        private readonly IGlobalSettings _globalSettings;
-        private readonly IUserPasswordConfiguration _passwordConfiguration;
+        private readonly GlobalSettings _globalSettings;
+        private readonly UserPasswordConfigurationSettings _passwordConfiguration;
         private readonly IJsonSerializer _jsonSerializer;
         private string _passwordConfigJson;
         private bool _passwordConfigInitialized;
@@ -40,12 +42,19 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// A dictionary specifying the configuration for user passwords. If this is null then no password configuration will be persisted or read.
         /// </param>
         /// <param name="globalSettings"></param>
-        public UserRepository(IScopeAccessor scopeAccessor, AppCaches appCaches, ILogger logger, IMapperCollection mapperCollection, IGlobalSettings globalSettings, IUserPasswordConfiguration passwordConfiguration, IJsonSerializer jsonSerializer)
+        public UserRepository(
+            IScopeAccessor scopeAccessor,
+            AppCaches appCaches,
+            ILogger<UserRepository> logger,
+            IMapperCollection mapperCollection,
+            IOptions<GlobalSettings> globalSettings,
+            IOptions<UserPasswordConfigurationSettings> passwordConfiguration,
+            IJsonSerializer jsonSerializer)
             : base(scopeAccessor, appCaches, logger)
         {
             _mapperCollection = mapperCollection ?? throw new ArgumentNullException(nameof(mapperCollection));
-            _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
-            _passwordConfiguration = passwordConfiguration ?? throw new ArgumentNullException(nameof(passwordConfiguration));
+            _globalSettings = globalSettings.Value ?? throw new ArgumentNullException(nameof(globalSettings));
+            _passwordConfiguration = passwordConfiguration.Value ?? throw new ArgumentNullException(nameof(passwordConfiguration));
             _jsonSerializer = jsonSerializer;
         }
 
@@ -159,10 +168,7 @@ ORDER BY colName";
         }
 
         public Guid CreateLoginSession(int userId, string requestingIpAddress, bool cleanStaleSessions = true)
-        {
-            // TODO: I know this doesn't follow the normal repository conventions which would require us to create a UserSessionRepository
-            //and also business logic models for these objects but that's just so overkill for what we are doing
-            //and now that everything is properly in a transaction (Scope) there doesn't seem to be much reason for using that anymore
+        {            
             var now = DateTime.UtcNow;
             var dto = new UserLoginDto
             {
@@ -192,13 +198,14 @@ ORDER BY colName";
             // that query is going to run a *lot*, make it a template
             var t = SqlContext.Templates.Get("Umbraco.Core.UserRepository.ValidateLoginSession", s => s
                 .Select<UserLoginDto>()
+                .SelectTop(1)
                 .From<UserLoginDto>()
                 .Where<UserLoginDto>(x => x.SessionId == SqlTemplate.Arg<Guid>("sessionId"))
                 .ForUpdate());
 
             var sql = t.Sql(sessionId);
 
-            var found = Database.Query<UserLoginDto>(sql).FirstOrDefault();
+            var found = Database.FirstOrDefault<UserLoginDto>(sql);
             if (found == null || found.UserId != userId || found.LoggedOutUtc.HasValue)
                 return false;
 
@@ -548,9 +555,9 @@ ORDER BY colName";
             {
                 userDto.EmailConfirmedDate = null;
                 userDto.SecurityStampToken = entity.SecurityStamp = Guid.NewGuid().ToString();
-                
+
                 changedCols.Add("emailConfirmedDate");
-                changedCols.Add("securityStampToken");  
+                changedCols.Add("securityStampToken");
             }
 
             //only update the changed cols
@@ -694,7 +701,13 @@ ORDER BY colName";
             else
                 sql.WhereNotIn<UserDto>(x => x.Id, inSql);
 
-            return ConvertFromDtos(Database.Fetch<UserDto>(sql));
+
+            var dtos = Database.Fetch<UserDto>(sql);
+
+            //adds missing bits like content and media start nodes
+            PerformGetReferencedDtos(dtos);
+
+            return ConvertFromDtos(dtos);
         }
 
         /// <summary>

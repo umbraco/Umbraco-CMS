@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.IO;
 using System.Linq;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
-using Umbraco.Composing;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 
@@ -16,12 +15,12 @@ namespace Umbraco.Web.PropertyEditors
     internal class UploadFileTypeValidator : IValueValidator
     {
         private readonly ILocalizedTextService _localizedTextService;
-        private readonly IContentSettings _contentSettings;
+        private readonly ContentSettings _contentSettings;
 
-        public UploadFileTypeValidator(ILocalizedTextService localizedTextService, IContentSettings contentSettings)
+        public UploadFileTypeValidator(ILocalizedTextService localizedTextService, IOptions<ContentSettings> contentSettings)
         {
             _localizedTextService = localizedTextService;
-            _contentSettings = contentSettings;
+            _contentSettings = contentSettings.Value;
         }
 
         public IEnumerable<ValidationResult> Validate(object value, string valueType, object dataTypeConfiguration)
@@ -55,7 +54,7 @@ namespace Umbraco.Web.PropertyEditors
             }
         }
 
-        internal static bool IsValidFileExtension(string fileName, IContentSettings contentSettings)
+        internal static bool IsValidFileExtension(string fileName, ContentSettings contentSettings)
         {
             if (fileName.IndexOf('.') <= 0) return false;
             var extension = fileName.GetFileExtension().TrimStart(".");

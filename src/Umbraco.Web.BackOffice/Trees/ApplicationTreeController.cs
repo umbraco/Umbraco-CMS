@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -7,10 +8,12 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Primitives;
 using Umbraco.Core;
 using Umbraco.Core.Services;
+using Umbraco.Extensions;
 using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.BackOffice.Trees;
 using Umbraco.Web.Common.Attributes;
@@ -27,25 +30,29 @@ namespace Umbraco.Web.Trees
     /// Used to return tree root nodes
     /// </summary>
     [AngularJsonOnlyConfiguration]
-    [PluginController("UmbracoTrees")]
+    [PluginController(Constants.Web.Mvc.BackOfficeTreeArea)]
     public class ApplicationTreeController : UmbracoAuthorizedApiController
     {
         private readonly ITreeService _treeService;
         private readonly ISectionService _sectionService;
         private readonly ILocalizedTextService _localizedTextService;
         private readonly IControllerFactory _controllerFactory;
+        private readonly IActionDescriptorCollectionProvider _actionDescriptorCollectionProvider;
+
 
         public ApplicationTreeController(
             ITreeService treeService,
             ISectionService sectionService,
             ILocalizedTextService localizedTextService,
-            IControllerFactory controllerFactory
+            IControllerFactory controllerFactory,
+            IActionDescriptorCollectionProvider actionDescriptorCollectionProvider
             )
               {
             _treeService = treeService;
             _sectionService = sectionService;
             _localizedTextService = localizedTextService;
             _controllerFactory = controllerFactory;
+            _actionDescriptorCollectionProvider = actionDescriptorCollectionProvider;
               }
 
         /// <summary>
@@ -250,67 +257,36 @@ namespace Umbraco.Web.Trees
         private async Task<object> GetApiControllerProxy(Type controllerType, string action, FormCollection querystring)
         {
             // note: this is all required in order to execute the auth-filters for the sub request, we
-            // need to "trick" web-api into thinking that it is actually executing the proxied controller.
+            // need to "trick" mvc into thinking that it is actually executing the proxied controller.
 
-
+            var controllerName = controllerType.Name.Substring(0, controllerType.Name.Length - 10); // remove controller part of name;
             // create proxy route data specifying the action & controller to execute
             var routeData = new RouteData(new RouteValueDictionary()
             {
                 ["action"] = action,
-                ["controller"] = controllerType.Name.Substring(0,controllerType.Name.Length-10) // remove controller part of name;
-
+                ["controller"] = controllerName
             });
+            if (!(querystring is null))
+            {
+                foreach (var (key,value) in querystring)
+                {
+                    routeData.Values[key] = value;
+                }
+            }
 
+            var actionDescriptor = _actionDescriptorCollectionProvider.ActionDescriptors.Items
+                .Cast<ControllerActionDescriptor>()
+                .First(x =>
+                    x.ControllerName.Equals(controllerName) &&
+                    x.ActionName == action);
 
-            var controllerContext = new ControllerContext(
-                new ActionContext(
-                    HttpContext,
-                    routeData,
-                    new ControllerActionDescriptor()
-                    {
-                        ControllerTypeInfo = controllerType.GetTypeInfo()
-                    }
-                ));
+            var actionContext = new ActionContext(HttpContext, routeData, actionDescriptor);
+            var proxyControllerContext = new ControllerContext(actionContext);
+            var controller = (TreeController) _controllerFactory.CreateController(proxyControllerContext);
 
-            var controller = (TreeController) _controllerFactory.CreateController(controllerContext);
-
-
-            //TODO Refactor trees or reimplement this hacks to check authentication.
-            //https://dev.azure.com/umbraco/D-Team%20Tracker/_workitems/edit/3694
-
-            // var context = ControllerContext;
-            //
-            // // get the controller
-            // var controller = (TreeController) DependencyResolver.Current.GetService(controllerType)
-            //                  ?? throw new Exception($"Failed to create controller of type {controllerType.FullName}.");
-            //
-            // // create the proxy URL for the controller action
-            // var proxyUrl = HttpContext.Request.RequestUri.GetLeftPart(UriPartial.Authority)
-            //           + HttpContext.Request.GetUrlHelper().GetUmbracoApiService(action, controllerType)
-            //           + "?" + querystring.ToQueryString();
-            //
-            //
-            //
-            // // create a proxy request
-            // var proxyRequest = new HttpRequestMessage(HttpMethod.Get, proxyUrl);
-            //
-            // // create a proxy controller context
-            // var proxyContext = new HttpControllerContext(context.Configuration, proxyRoute, proxyRequest)
-            // {
-            //     ControllerDescriptor = new HttpControllerDescriptor(context.ControllerDescriptor.Configuration, ControllerExtensions.GetControllerName(controllerType), controllerType),
-            //     RequestContext = context.RequestContext,
-            //     Controller = controller
-            // };
-            //
-            // // wire everything
-            // controller.ControllerContext = proxyContext;
-            // controller.Request = proxyContext.Request;
-            // controller.RequestContext.RouteData = proxyRoute;
-            //
-            // // auth
-            // var authResult = await controller.ControllerContext.InvokeAuthorizationFiltersForRequest();
-            // if (authResult != null)
-            //     throw new HttpResponseException(authResult);
+             var isAllowed = await controller.ControllerContext.InvokeAuthorizationFiltersForRequest(actionContext);
+             if (!isAllowed)
+                 throw new HttpResponseException(HttpStatusCode.Forbidden);
 
             return controller;
         }

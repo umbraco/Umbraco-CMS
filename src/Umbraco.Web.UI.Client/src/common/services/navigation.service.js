@@ -127,6 +127,13 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
         }
     }
 
+    function showBackdrop() {
+        var backDropOptions = {
+            'element': $('#leftcolumn')[0]
+        };
+        backdropService.open(backDropOptions);
+    }
+
     var service = {
 
         /**
@@ -169,7 +176,7 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
             //if the routing parameter keys are the same, we'll compare their values to see if any have changed and if so then the routing will be allowed.
             if (diff1.length === 0 && diff2.length === 0) {
                 var partsChanged = 0;
-                _.each(currRoutingKeys, function (k) {
+                currRoutingKeys.forEach(k => {
                     if (currUrlParams[k] != nextUrlParams[k]) {
                         partsChanged++;
                     }
@@ -206,7 +213,8 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
             var toRetain = _.union(retainedQueryStrings, toRetain);
             var currentSearch = $location.search();
             $location.search('');
-            _.each(toRetain, function (k) {
+
+            toRetain.forEach(k => {
                 if (currentSearch[k]) {
                     $location.search(k, currentSearch[k]);
                 }
@@ -240,7 +248,7 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
             var toRetain = Utilities.copy(nextRouteParams);
             var updated = false;
 
-            _.each(retainedQueryStrings, function (r) {
+            retainedQueryStrings.forEach(r => {
                 // if mculture is set to null in nextRouteParams, the value will be undefined and we will not retain any query string that has a value of "null"
                 if (currRouteParams[r] && nextRouteParams[r] !== undefined && !nextRouteParams[r]) {
                     toRetain[r] = currRouteParams[r];
@@ -319,7 +327,7 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
             appState.setGlobalState("showTray", false);
         },
 
-        /**     
+        /**
          * @ngdoc method
          * @name umbraco.services.navigationService#syncTree
          * @methodOf umbraco.services.navigationService
@@ -352,14 +360,14 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
             });
         },
 
-        /**     
+        /**
          * @ngdoc method
          * @name umbraco.services.navigationService#hasTree
          * @methodOf umbraco.services.navigationService
          *
          * @description
          * Checks if a tree with the given alias exists.
-         * 
+         *
          * @param {String} treeAlias the tree alias to check
          */
         hasTree: function (treeAlias) {
@@ -426,13 +434,9 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
         showMenu: function (args) {
             var self = this;
 
-            var backDropOptions = {
-                'element': $('#leftcolumn')[0]
-            };
-
             return treeService.getMenu({ treeNode: args.node })
                 .then(function (data) {
-                    backdropService.open(backDropOptions);
+                    showBackdrop();
                     //check for a default
                     //NOTE: event will be undefined when a call to hideDialog is made so it won't re-load the default again.
                     // but perhaps there's a better way to deal with with an additional parameter in the args ? it works though.
@@ -543,6 +547,7 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
                 }
             }
             else {
+                showBackdrop();
                 service.showDialog({
                     node: node,
                     action: action,
@@ -628,12 +633,12 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
         getTreeTemplateUrl: function (treeAlias, action) {
             var packageTreeFolder = treeService.getTreePackageFolder(treeAlias);
             if (packageTreeFolder) {
-                return Umbraco.Sys.ServerVariables.umbracoSettings.appPluginsPath +
+                return (Umbraco.Sys.ServerVariables.umbracoSettings.appPluginsPath +
                     "/" + packageTreeFolder +
-                    "/backoffice/" + treeAlias + "/" + action + ".html";
+                    "/backoffice/" + treeAlias + "/" + action + ".html").toLowerCase();
             }
             else {
-                return "views/" + treeAlias + "/" + action + ".html";
+                return ("views/" + treeAlias + "/" + action + ".html").toLowerCase();;
             }
         },
 

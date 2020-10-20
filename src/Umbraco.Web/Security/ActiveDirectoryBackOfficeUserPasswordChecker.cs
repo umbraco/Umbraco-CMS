@@ -1,22 +1,24 @@
 ﻿using System;
 using System.DirectoryServices.AccountManagement;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using Umbraco.Core.BackOffice;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 
 namespace Umbraco.Web.Security
 {
     // TODO: This relies on an assembly that is not .NET Standard (at least not at the time of implementation) :(
     public class ActiveDirectoryBackOfficeUserPasswordChecker : IBackOfficeUserPasswordChecker
     {
-        private readonly IActiveDirectorySettings _settings;
+        private readonly IOptions<ActiveDirectorySettings> _activeDirectorySettings;
 
-        public ActiveDirectoryBackOfficeUserPasswordChecker(IActiveDirectorySettings settings)
+        public ActiveDirectoryBackOfficeUserPasswordChecker(IOptions<ActiveDirectorySettings> activeDirectorySettings)
         {
-            _settings = settings;
+            _activeDirectorySettings = activeDirectorySettings;
         }
 
-        public virtual string ActiveDirectoryDomain => _settings.ActiveDirectoryDomain;
+        public virtual string ActiveDirectoryDomain => _activeDirectorySettings.Value.Domain;
 
         public Task<BackOfficeUserPasswordCheckerResult> CheckPasswordAsync(BackOfficeIdentityUser user, string password)
         {

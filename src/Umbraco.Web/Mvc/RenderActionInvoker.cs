@@ -13,8 +13,6 @@ namespace Umbraco.Web.Mvc
     /// </summary>
     public class RenderActionInvoker : AsyncControllerActionInvoker
     {
-
-
         /// <summary>
         /// Ensures that if an action for the Template name is not explicitly defined by a user, that the 'Index' action will execute
         /// </summary>

@@ -7,6 +7,7 @@ using Umbraco.Core;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Web.BackOffice.Filters;
@@ -36,7 +37,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IMediaTypeService _mediaTypeService;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly UmbracoMapper _umbracoMapper;
-        private readonly IWebSecurity _webSecurity;
+        private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
 
         public MediaTypeController(ICultureDictionary cultureDictionary,
             EditorValidatorCollection editorValidatorCollection,
@@ -48,7 +49,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             IShortStringHelper shortStringHelper,
             IEntityService entityService,
             IMediaService mediaService,
-            IWebSecurity webSecurity)
+            IBackofficeSecurityAccessor backofficeSecurityAccessor)
             : base(
             cultureDictionary,
             editorValidatorCollection,
@@ -64,13 +65,19 @@ namespace Umbraco.Web.BackOffice.Controllers
             _mediaService = mediaService ?? throw new ArgumentNullException(nameof(mediaService));
             _umbracoMapper = umbracoMapper ?? throw new ArgumentNullException(nameof(umbracoMapper));
             _contentTypeService = contentTypeService ?? throw new ArgumentNullException(nameof(contentTypeService));
-            _webSecurity = webSecurity ?? throw new ArgumentNullException(nameof(webSecurity));
+            _backofficeSecurityAccessor = backofficeSecurityAccessor ?? throw new ArgumentNullException(nameof(backofficeSecurityAccessor));
             _localizedTextService =
                 localizedTextService ?? throw new ArgumentNullException(nameof(localizedTextService));
         }
 
         public int GetCount() => _contentTypeService.Count();
 
+        /// <summary>
+        /// Gets the media type a given id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [DetermineAmbiguousActionByPassingParameters]
         [UmbracoTreeAuthorize(Constants.Trees.MediaTypes, Constants.Trees.Media)]
         public MediaTypeDisplay GetById(int id)
         {
@@ -81,6 +88,48 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
 
             var dto = _umbracoMapper.Map<IMediaType, MediaTypeDisplay>(ct);
+            return dto;
+        }
+
+        /// <summary>
+        /// Gets the media type a given guid
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [DetermineAmbiguousActionByPassingParameters]
+        [UmbracoTreeAuthorize(Constants.Trees.MediaTypes, Constants.Trees.Media)]
+        public MediaTypeDisplay GetById(Guid id)
+        {
+            var mediaType = _mediaTypeService.Get(id);
+            if (mediaType == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            var dto = _umbracoMapper.Map<IMediaType, MediaTypeDisplay>(mediaType);
+            return dto;
+        }
+
+        /// <summary>
+        /// Gets the media type a given udi
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [DetermineAmbiguousActionByPassingParameters]
+        [UmbracoTreeAuthorize(Constants.Trees.MediaTypes, Constants.Trees.Media)]
+        public MediaTypeDisplay GetById(Udi id)
+        {
+            var guidUdi = id as GuidUdi;
+            if (guidUdi == null)
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            var mediaType = _mediaTypeService.Get(guidUdi.Guid);
+            if (mediaType == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            var dto = _umbracoMapper.Map<IMediaType, MediaTypeDisplay>(mediaType);
             return dto;
         }
 
@@ -99,7 +148,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            _mediaTypeService.Delete(foundType, _webSecurity.CurrentUser.Id);
+            _mediaTypeService.Delete(foundType, _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.Id);
             return Ok();
         }
 
@@ -193,14 +242,14 @@ namespace Umbraco.Web.BackOffice.Controllers
         [HttpPost]
         public IActionResult DeleteContainer(int id)
         {
-            _mediaTypeService.DeleteContainer(id, _webSecurity.CurrentUser.Id);
+            _mediaTypeService.DeleteContainer(id, _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.Id);
 
             return Ok();
         }
 
         public IActionResult PostCreateContainer(int parentId, string name)
         {
-            var result = _mediaTypeService.CreateContainer(parentId, name, _webSecurity.CurrentUser.Id);
+            var result = _mediaTypeService.CreateContainer(parentId, name, _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.Id);
 
             return result
                 ? Ok(result.Result) //return the id
@@ -209,7 +258,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
         public IActionResult PostRenameContainer(int id, string name)
         {
-            var result = _mediaTypeService.RenameContainer(id, name, _webSecurity.CurrentUser.Id);
+            var result = _mediaTypeService.RenameContainer(id, name, _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.Id);
 
             return result
                 ? Ok(result.Result) //return the id

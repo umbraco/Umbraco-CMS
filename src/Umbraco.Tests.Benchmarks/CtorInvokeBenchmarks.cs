@@ -5,8 +5,8 @@ using System.Reflection.Emit;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
-using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
+using Perfolizer.Horology;
 using Umbraco.Core;
 
 namespace Umbraco.Tests.Benchmarks
@@ -26,7 +26,7 @@ namespace Umbraco.Tests.Benchmarks
         {
             public Config()
             {
-                Add(new MemoryDiagnoser());
+                Add(MemoryDiagnoser.Default);
                 //Add(ExecutionValidator.FailOnError);
 
                 //The 'quick and dirty' settings, so it runs a little quicker

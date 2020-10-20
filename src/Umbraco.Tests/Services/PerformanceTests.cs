@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
-using NPoco;
+using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Web.Composing;
@@ -11,7 +11,6 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Tests.TestHelpers;
@@ -58,9 +57,8 @@ namespace Umbraco.Tests.Services
 
         private static IProfilingLogger GetTestProfilingLogger()
         {
-            var logger = new DebugDiagnosticsLogger(new MessageTemplates());
             var profiler = new TestProfiler();
-            return new ProfilingLogger(logger, profiler);
+            return new ProfilingLogger(new NullLogger<ProfilingLogger>(), profiler);
         }
 
         [Test]

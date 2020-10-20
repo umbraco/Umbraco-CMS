@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Exceptions;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Dtos;
@@ -20,7 +20,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// </summary>
     internal class ContentTypeRepository : ContentTypeRepositoryBase<IContentType>, IContentTypeRepository
     {
-        public ContentTypeRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger, IContentTypeCommonRepository commonRepository, ILanguageRepository languageRepository, IShortStringHelper shortStringHelper)
+        public ContentTypeRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<ContentTypeRepository> logger, IContentTypeCommonRepository commonRepository, ILanguageRepository languageRepository, IShortStringHelper shortStringHelper)
             : base(scopeAccessor, cache, logger, commonRepository, languageRepository, shortStringHelper)
         { }
 
@@ -54,11 +54,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         protected override bool PerformExists(Guid id)
         => GetMany().FirstOrDefault(x => x.Key == id) != null;
 
-        protected override IEnumerable<IContentType> PerformGetAll(params int[] ids)
+        protected override IEnumerable<IContentType> GetAllWithFullCachePolicy()
         {
-            // the cache policy will always want everything
-            // even GetMany(ids) gets everything and filters afterwards
-            if (ids.Any()) throw new PanicException("There can be no ids specified");
             return CommonRepository.GetAllTypes().OfType<IContentType>();
         }
 
@@ -135,7 +132,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             if (objectTypes.Any())
             {
-                sql = sql.Where("umbracoNode.nodeObjectType IN (@objectTypes)", objectTypes);
+                sql = sql.Where("umbracoNode.nodeObjectType IN (@objectTypes)", new { objectTypes = objectTypes });
             }
 
             return Database.Fetch<string>(sql);
@@ -229,7 +226,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (string.IsNullOrWhiteSpace(entity.Alias))
             {
                 var ex = new Exception($"ContentType '{entity.Name}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.");
-                Logger.Error<ContentTypeRepository>("ContentType '{EntityName}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.", entity.Name);
+                Logger.LogError("ContentType '{EntityName}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.", entity.Name);
                 throw ex;
             }
 

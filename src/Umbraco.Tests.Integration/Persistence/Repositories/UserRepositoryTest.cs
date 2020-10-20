@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Linq;
+using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
@@ -25,14 +27,14 @@ namespace Umbraco.Tests.Persistence.Repositories
         private UserRepository CreateRepository(IScopeProvider provider)
         {
             var accessor = (IScopeAccessor) provider;
-            var repository = new UserRepository(accessor, AppCaches.Disabled, Logger, Mappers, GlobalSettings, Mock.Of<IUserPasswordConfiguration>(), new JsonNetSerializer());
+            var repository = new UserRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<UserRepository>(), Mappers, Options.Create(GlobalSettings), Options.Create(new UserPasswordConfigurationSettings()), new JsonNetSerializer());
             return repository;
         }
 
         private UserGroupRepository CreateUserGroupRepository(IScopeProvider provider)
         {
             var accessor = (IScopeAccessor) provider;
-            return new UserGroupRepository(accessor, AppCaches.Disabled, Logger, ShortStringHelper);
+            return new UserGroupRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<UserGroupRepository>(), LoggerFactory, ShortStringHelper);
         }
 
         [Test]
@@ -44,7 +46,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var repository = CreateRepository(provider);
 
-                var user = UserBuilder.Build();
+                var user = UserBuilderInstance.Build();
 
                 // Act
                 repository.Save(user);
@@ -64,8 +66,8 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var repository = CreateRepository(provider);
 
-                var user1 = UserBuilder.WithSuffix("1").Build();
-                var use2 = UserBuilder.WithSuffix("2").Build();
+                var user1 = UserBuilderInstance.WithSuffix("1").Build();
+                var use2 = UserBuilderInstance.WithSuffix("2").Build();
 
                 // Act
                 repository.Save(user1);
@@ -88,7 +90,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var repository = CreateRepository(provider);
 
-                var user = UserBuilder.WithoutIdentity().Build();
+                var user = UserBuilderInstance.WithoutIdentity().Build();
                 repository.Save(user);
 
 
@@ -110,14 +112,14 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var repository = CreateRepository(provider);
 
-                var user = UserBuilder.Build();
+                var user = UserBuilderInstance.Build();
 
                 // Act
                 repository.Save(user);
 
                 var id = user.Id;
 
-                var repository2 = new UserRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger, Mock.Of<IMapperCollection>(),GlobalSettings, Mock.Of<IUserPasswordConfiguration>(), new JsonNetSerializer());
+                var repository2 = new UserRepository((IScopeAccessor) provider, AppCaches.Disabled, LoggerFactory.CreateLogger<UserRepository>(), Mock.Of<IMapperCollection>(), Options.Create(GlobalSettings), Options.Create(new UserPasswordConfigurationSettings()), new JsonNetSerializer());
 
                 repository2.Delete(user);
 
@@ -366,22 +368,22 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private User CreateAndCommitUserWithGroup(IUserRepository repository, IUserGroupRepository userGroupRepository)
         {
-            var user = UserBuilder.WithoutIdentity().Build();
+            var user = UserBuilderInstance.WithoutIdentity().Build();
             repository.Save(user);
 
-            var group = UserGroupBuilder.Build();
+            var group = UserGroupBuilderInstance.Build();
             userGroupRepository.AddOrUpdateGroupWithUsers(@group, new[] { user.Id });
 
-            user.AddGroup(UserGroupBuilder.BuildReadOnly(group));
+            user.AddGroup(UserGroupBuilderInstance.BuildReadOnly(group));
 
             return user;
         }
 
         private IUser[] CreateAndCommitMultipleUsers(IUserRepository repository)
         {
-            var user1 = UserBuilder.WithoutIdentity().WithSuffix("1").Build();
-            var user2 = UserBuilder.WithoutIdentity().WithSuffix("2").Build();
-            var user3 = UserBuilder.WithoutIdentity().WithSuffix("3").Build();
+            var user1 = UserBuilderInstance.WithoutIdentity().WithSuffix("1").Build();
+            var user2 = UserBuilderInstance.WithoutIdentity().WithSuffix("2").Build();
+            var user3 = UserBuilderInstance.WithoutIdentity().WithSuffix("3").Build();
             repository.Save(user1);
             repository.Save(user2);
             repository.Save(user3);

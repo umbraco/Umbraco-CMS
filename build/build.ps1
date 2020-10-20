@@ -125,7 +125,23 @@
         $error.Clear()
 
         Write-Output "### gulp build for version $($this.Version.Release)" >> $log 2>&1
-        npx gulp build --buildversion=$this.Version.Release >> $log 2>&1
+        npm run build --buildversion=$this.Version.Release >> $log 2>&1
+		
+		# We can ignore this warning, we need to update to node 12 at some point - https://github.com/jsdom/jsdom/issues/2939
+		$indexes = [System.Collections.ArrayList]::new()
+		$index = 0;
+		$error | ForEach-Object {
+			# Find which of the errors is the ExperimentalWarning
+			if($_.ToString().Contains("ExperimentalWarning: The fs.promises API is experimental")) {
+				[void]$indexes.Add($index)
+			}
+			$index++
+		}
+		$indexes | ForEach-Object {
+			# Loop through the list of indexes and remove the errors that we expect and feel confident we can ignore
+			$error.Remove($error[$_])
+		}
+		
         if (-not $?) { throw "Failed to build" } # that one is expected to work
     } finally {
         Pop-Location
@@ -169,11 +185,11 @@
 
    # get files into WebApp\bin
     & dotnet publish "$src\Umbraco.Web.UI.NetCore\Umbraco.Web.UI.NetCore.csproj" `
-      --output "$($this.BuildTemp)\WebApp\bin\\" `
+      --configuration Release --output "$($this.BuildTemp)\WebApp\bin\\" `
       > $log
 
     & dotnet publish "$src\Umbraco.Persistance.SqlCe\Umbraco.Persistance.SqlCe.csproj" `
-      --output "$($this.BuildTemp)\SqlCe\" `
+      --configuration Release --output "$($this.BuildTemp)\SqlCe\" `
       > $log
 
     # remove extra files

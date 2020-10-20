@@ -442,9 +442,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
         getByIds: function (ids) {
 
             var idQuery = "";
-            _.each(ids, function (item) {
-                idQuery += "ids=" + item + "&";
-            });
+            ids.forEach(id => idQuery += `ids=${id}&`);
 
             return umbRequestHelper.resourcePromise(
                 $http.get(
@@ -455,9 +453,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                 'Failed to retrieve data for content with multiple ids')
                 .then(function (result) {
                     //each item needs to be re-formatted
-                    _.each(result, function (r) {
-                        umbDataFormatter.formatContentGetData(r)
-                    });
+                    result.forEach(r => umbDataFormatter.formatContentGetData(r));
                     return $q.when(result);
                 });
         },

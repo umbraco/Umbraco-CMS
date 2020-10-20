@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Linq;
 using System.Threading;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -13,6 +16,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.Common;
+using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.PublishedContent;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Web;
@@ -43,7 +47,7 @@ namespace Umbraco.Tests.TestHelpers
             // AutoPublishedContentTypes generates properties automatically
 
             var dataTypeService = new TestObjects.TestDataTypeService(
-                new DataType(new VoidEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(),Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>())) { Id = 1 });
+                new DataType(new VoidEditor(NullLoggerFactory.Instance, Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(),Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>())) { Id = 1 });
 
             var factory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), new PropertyValueConverterCollection(Array.Empty<IPropertyValueConverter>()), dataTypeService);
             var type = new AutoPublishedContentType(Guid.NewGuid(), 0, "anything", new PublishedPropertyType[] { });
@@ -91,17 +95,19 @@ namespace Umbraco.Tests.TestHelpers
 
         internal PublishedRouter CreatePublishedRouter(IFactory container = null, ContentFinderCollection contentFinders = null)
         {
-            return CreatePublishedRouter(SettingsForTests.GenerateMockWebRoutingSettings(), container ?? Factory, contentFinders);
+            var webRoutingSettings = new WebRoutingSettings();
+            return CreatePublishedRouter(webRoutingSettings, container ?? Factory, contentFinders);
         }
 
-        internal static PublishedRouter CreatePublishedRouter(IWebRoutingSettings webRoutingSettings, IFactory container = null, ContentFinderCollection contentFinders = null)
+        internal static PublishedRouter CreatePublishedRouter(WebRoutingSettings webRoutingSettings, IFactory container = null, ContentFinderCollection contentFinders = null)
         {
             return new PublishedRouter(
-                webRoutingSettings,
+                Microsoft.Extensions.Options.Options.Create(webRoutingSettings),
                 contentFinders ?? new ContentFinderCollection(Enumerable.Empty<IContentFinder>()),
                 new TestLastChanceFinder(),
                 new TestVariationContextAccessor(),
                 new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()),
+                Mock.Of<ILogger<PublishedRouter>>(),
                 Mock.Of<IPublishedUrlProvider>(),
                 Mock.Of<IRequestAccessor>(),
                 container?.GetInstance<IPublishedValueFallback>() ?? Current.Factory.GetInstance<IPublishedValueFallback>(),

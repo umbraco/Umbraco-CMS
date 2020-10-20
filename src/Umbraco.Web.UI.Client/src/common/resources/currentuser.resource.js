@@ -2,7 +2,7 @@
     * @ngdoc service
     * @name umbraco.resources.currentUserResource
     * @description Used for read/updates for the currently logged in user
-    * 
+    *
     *
     **/
 function currentUserResource($q, $http, umbRequestHelper, umbDataFormatter) {
@@ -35,10 +35,10 @@ function currentUserResource($q, $http, umbRequestHelper, umbDataFormatter) {
           *    .then(function() {
           *        alert('You are allowed to publish this item');
           *    });
-          * </pre> 
+          * </pre>
           *
           * @param {String} permission char representing the permission to check
-          * @param {Int} id id of content item to delete        
+          * @param {Int} id id of content item to delete
           * @returns {Promise} resourcePromise object.
           *
           */
@@ -50,6 +50,16 @@ function currentUserResource($q, $http, umbRequestHelper, umbDataFormatter) {
                         "HasPermission",
                         [{ permissionToCheck: permission }, { nodeId: id }])),
                 'Failed to check permission for item ' + id);
+        },
+
+        getCurrentUserLinkedLogins: function () {
+
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "currentUserApiBaseUrl",
+                        "GetCurrentUserLinkedLogins")),
+                'Server call failed for getting current users linked logins');
         },
 
         saveTourStatus: function (tourStatus) {
@@ -68,7 +78,7 @@ function currentUserResource($q, $http, umbRequestHelper, umbDataFormatter) {
         },
 
         getTours: function () {
-            
+
             return umbRequestHelper.resourcePromise(
                 $http.get(
                     umbRequestHelper.getApiUrl(
@@ -98,7 +108,7 @@ function currentUserResource($q, $http, umbRequestHelper, umbDataFormatter) {
          *
          * @description
          * Changes the current users password
-         * 
+         *
          * @returns {Promise} resourcePromise object containing the user array.
          *
          */
@@ -108,7 +118,7 @@ function currentUserResource($q, $http, umbRequestHelper, umbDataFormatter) {
             if (!changePasswordArgs) {
                 throw 'No password data to change';
             }
-            
+
             return umbRequestHelper.resourcePromise(
                 $http.post(
                     umbRequestHelper.getApiUrl(

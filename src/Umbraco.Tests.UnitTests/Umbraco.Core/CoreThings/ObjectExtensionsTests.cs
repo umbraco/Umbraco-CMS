@@ -6,7 +6,7 @@ using System.Threading;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.PropertyEditors;
-using Umbraco.Tests.Common.TestHelpers;
+using Umbraco.Tests.TestHelpers.Entities;
 
 namespace Umbraco.Tests.CoreThings
 {

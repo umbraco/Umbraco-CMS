@@ -1,20 +1,20 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Composing.CompositionExtensions;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
 using Umbraco.Core.IO.MediaPathSchemes;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
-using Umbraco.Tests.Components;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Core.Composing.CompositionExtensions;
-using Current = Umbraco.Web.Composing.Current;
 using FileSystems = Umbraco.Core.IO.FileSystems;
 
 namespace Umbraco.Tests.IO
@@ -30,28 +30,24 @@ namespace Umbraco.Tests.IO
         {
             _register = TestHelper.GetRegister();
 
-            var composition = new Composition(_register, TestHelper.GetMockedTypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.GetConfigs(), TestHelper.IOHelper, AppCaches.NoCache);
+            var composition = new Composition(_register, TestHelper.GetMockedTypeLoader(), Mock.Of<IProfilingLogger>(), Mock.Of<IRuntimeState>(), TestHelper.IOHelper, AppCaches.NoCache);
 
-            composition.Register(_ => Mock.Of<ILogger>());
             composition.Register(_ => Mock.Of<IDataTypeService>());
-            composition.Register(_ => Mock.Of<IContentSettings>());
+            composition.Register<ILoggerFactory>(NullLoggerFactory.Instance);
+            composition.Register(typeof(ILogger<>), typeof(Logger<>));
             composition.Register(_ => TestHelper.ShortStringHelper);
             composition.Register(_ => TestHelper.IOHelper);
             composition.RegisterUnique<IMediaPathScheme, UniqueMediaPathScheme>();
             composition.RegisterUnique(TestHelper.IOHelper);
             composition.RegisterUnique(TestHelper.GetHostingEnvironment());
 
-            composition.Configs.Add(() => SettingsForTests.DefaultGlobalSettings);
-            composition.Configs.Add(SettingsForTests.GenerateMockContentSettings);
+            var globalSettings = new GlobalSettings();
+            composition.Register(x => Microsoft.Extensions.Options.Options.Create(globalSettings));
+
 
             composition.ComposeFileSystems();
 
-            composition.Configs.Add(SettingsForTests.GenerateMockContentSettings);
-
             _factory = composition.CreateFactory();
-
-            Current.Reset();
-            Current.Factory = _factory;
 
             // make sure we start clean
             // because some tests will create corrupt or weird filesystems
@@ -64,7 +60,6 @@ namespace Umbraco.Tests.IO
             // stay clean (see note in Setup)
             FileSystems.Reset();
 
-            Current.Reset();
             _register.DisposeIfDisposable();
         }
 
@@ -119,7 +114,7 @@ namespace Umbraco.Tests.IO
             fs.DeleteMediaFiles(new[] { virtPath });
             Assert.IsFalse(File.Exists(physPath));
 
-            var scheme = Current.Factory.GetInstance<IMediaPathScheme>();
+            var scheme = _factory.GetInstance<IMediaPathScheme>();
             if (scheme is UniqueMediaPathScheme)
             {
                 // ~/media/1234 is *not* gone

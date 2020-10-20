@@ -1,11 +1,11 @@
 using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Umbraco.Extensions;
+using Umbraco.Web.Common.Builder;
 
 namespace Umbraco.Web.UI.NetCore
 {
@@ -17,8 +17,8 @@ namespace Umbraco.Web.UI.NetCore
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="webHostEnvironment"></param>
-        /// <param name="config"></param>
+        /// <param name="webHostEnvironment">The Web Host Environment</param>
+        /// <param name="config">The Configuration</param>
         /// <remarks>
         /// Only a few services are possible to be injected here https://github.com/dotnet/aspnetcore/issues/9337
         /// </remarks>
@@ -32,69 +32,20 @@ namespace Umbraco.Web.UI.NetCore
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            // TODO: We will need to decide on if we want to use the ServiceBasedControllerActivator to create our controllers
-            // or use the default IControllerActivator: DefaultControllerActivator (which doesn't directly use the container to resolve controllers)
-            // This will affect whether we need to explicitly register controllers in the container like we do today in v8.
-            // What we absolutely must do though is make sure we explicitly opt-in to using one or the other *always* for our controllers instead of
-            // relying on a global configuration set by a user since if a custom IControllerActivator is used for our own controllers we may not
-            // guarantee it will work. And then... is that even possible?
+            var umbracoBuilder = services.AddUmbraco(_env, _config);
+            umbracoBuilder.BuildWithAllBackOfficeComponents();
 
-            // TODO: we will need to simplify this and prob just have a one or 2 main method that devs call which call all other required methods,
-            // but for now we'll just be explicit with all of them
-            services.AddUmbracoConfiguration(_config);
-            services.AddUmbracoCore(_env, out var factory);
-            services.AddUmbracoWebComponents();
-            services.AddUmbracoRuntimeMinifier(_config);
-            services.AddUmbracoBackOffice();
-            services.AddUmbracoBackOfficeIdentity();
-            services.AddMiniProfiler(options =>
-            {
-                options.ShouldProfile = request => false; // WebProfiler determine and start profiling. We should not use the MiniProfilerMiddleware to also profile
-            });
-
-            //We need to have runtime compilation of views when using umbraco. We could consider having only this when a specific config is set.
-            //But as far as I can see, there are still precompiled views, even when this is activated, so maybe it is okay.
-            services.AddControllersWithViews().AddRazorRuntimeCompilation();
-
-
-            // If using Kestrel: https://stackoverflow.com/a/55196057
-            services.Configure<KestrelServerOptions>(options =>
-            {
-                options.AllowSynchronousIO = true;
-            });
-
-            services.Configure<IISServerOptions>(options =>
-            {
-                options.AllowSynchronousIO = true;
-            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app)
         {
-            //app.UseMiniProfiler();
             if (_env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseStatusCodePages();
-            app.UseRouting();
-
-            app.UseUmbracoCore();
-            app.UseUmbracoRouting();
-            app.UseRequestLocalization();
-            app.UseUmbracoRequestLogging();
-            app.UseUmbracoWebsite();
-            app.UseUmbracoBackOffice();
-            app.UseUmbracoInstaller();
-
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller}/{action=Index}/{id?}");
-            });
+            app.UseUmbraco();
         }
     }
 }

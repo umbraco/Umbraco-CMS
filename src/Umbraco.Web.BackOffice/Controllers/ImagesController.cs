@@ -2,7 +2,6 @@
 using System.IO;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Core;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Media;
 using Umbraco.Core.Models;
@@ -18,13 +17,13 @@ namespace Umbraco.Web.BackOffice.Controllers
     public class ImagesController : UmbracoAuthorizedApiController
     {
         private readonly IMediaFileSystem _mediaFileSystem;
-        private readonly IContentSettings _contentSettings;
         private readonly IImageUrlGenerator _imageUrlGenerator;
 
-        public ImagesController(IMediaFileSystem mediaFileSystem, IContentSettings contentSettings, IImageUrlGenerator imageUrlGenerator)
+        public ImagesController(
+            IMediaFileSystem mediaFileSystem,
+            IImageUrlGenerator imageUrlGenerator)
         {
             _mediaFileSystem = mediaFileSystem;
-            _contentSettings = contentSettings;
             _imageUrlGenerator = imageUrlGenerator;
         }
 
@@ -57,7 +56,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             var ext = Path.GetExtension(imagePath);
 
             // we need to check if it is an image by extension
-            if (_contentSettings.IsImageFile(ext) == false)
+            if (_imageUrlGenerator.IsSupportedImageFormat(ext) == false)
                 return NotFound();
 
             //redirect to ImageProcessor thumbnail with rnd generated from last modified time of original media file
@@ -65,7 +64,6 @@ namespace Umbraco.Web.BackOffice.Controllers
             try
             {
                 imageLastModified = _mediaFileSystem.GetLastModified(imagePath);
-
             }
             catch (Exception)
             {
@@ -76,7 +74,14 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
 
             var rnd = imageLastModified.HasValue ? $"&rnd={imageLastModified:yyyyMMddHHmmss}" : null;
-            var imageUrl = _imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(imagePath) { UpScale = false, Width = width, AnimationProcessMode = "first", ImageCropMode = ImageCropMode.Max, CacheBusterValue = rnd });
+            var imageUrl = _imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(imagePath)
+            {
+                UpScale = false,
+                Width = width,
+                AnimationProcessMode = "first",
+                ImageCropMode = ImageCropMode.Max,
+                CacheBusterValue = rnd
+            });
 
             return new RedirectResult(imageUrl, false);
         }
@@ -97,15 +102,22 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// If there is no media, image property or image file is found then this will return not found.
         /// </remarks>
         public string GetProcessedImageUrl(string imagePath,
-                                           int? width = null,
-                                           int? height = null,
-                                           int? focalPointLeft = null,
-                                           int? focalPointTop = null,
-                                           string animationProcessMode = "first",
-                                           ImageCropMode mode = ImageCropMode.Max,
-                                           bool upscale = false,
-                                           string cacheBusterValue = "")
-{
+            int? width = null,
+            int? height = null,
+            decimal? focalPointLeft = null,
+            decimal? focalPointTop = null,
+            string animationProcessMode = "first",
+            ImageCropMode mode = ImageCropMode.Max,
+            bool upscale = false,
+            string cacheBusterValue = "",
+            decimal? cropX1 = null,
+            decimal? cropX2 = null,
+            decimal? cropY1 = null,
+            decimal? cropY2 = null
+            )
+        {
+
+
             var options = new ImageUrlGenerationOptions(imagePath)
             {
                 AnimationProcessMode = animationProcessMode,
@@ -114,13 +126,35 @@ namespace Umbraco.Web.BackOffice.Controllers
                 ImageCropMode = mode,
                 UpScale = upscale,
                 Width = width,
+                Crop = (cropX1.HasValue && cropX2.HasValue && cropY1.HasValue && cropY2.HasValue) ? new ImageUrlGenerationOptions.CropCoordinates(cropX1.Value, cropY1.Value, cropX2.Value, cropY2.Value) : null,
+                FocalPoint = new ImageUrlGenerationOptions.FocalPointPosition(focalPointTop.GetValueOrDefault(0.5m), focalPointLeft.GetValueOrDefault(0.5m)),
             };
             if (focalPointLeft.HasValue && focalPointTop.HasValue)
             {
-                options.FocalPoint = new ImageUrlGenerationOptions.FocalPointPosition(focalPointTop.Value, focalPointLeft.Value);
+                options.FocalPoint =
+                    new ImageUrlGenerationOptions.FocalPointPosition(focalPointTop.Value, focalPointLeft.Value);
             }
 
             return _imageUrlGenerator.GetImageUrl(options);
+        }
+
+        public class FocalPointPositionModel
+        {
+            public decimal Left { get; set; }
+            public decimal Top { get; set; }
+        }
+
+        /// <summary>
+        /// The bounds of the crop within the original image, in whatever units the registered
+        /// IImageUrlGenerator uses, typically a percentage between 0 and 100.
+        /// </summary>
+        public class CropCoordinatesModel
+        {
+
+            public decimal X1 { get; set; }
+            public decimal Y1 { get; set; }
+            public decimal X2 { get; set;}
+            public decimal Y2 { get; set;}
         }
     }
 }

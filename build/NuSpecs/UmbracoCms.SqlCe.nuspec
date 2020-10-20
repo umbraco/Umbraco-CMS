@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <metadata minClientVersion="4.1.0">
-        <id>UmbracoCms.SqlCe</id>
+        <id>Umbraco.Cms.SqlCe</id>
         <version>9.0.0</version>
         <title>Umbraco Cms Sql Ce Add-on</title>
         <authors>Umbraco HQ</authors>
@@ -23,7 +23,7 @@
                   the latter would pick anything below 3.0.0 and that includes prereleases such as 3.0.0-alpha, and we do
                   not want this to happen as the alpha of the next major is, really, the next major already.
                 -->
-                <dependency id="UmbracoCms.Core" version="[$version$]" />
+                <dependency id="Umbraco.Cms.Core" version="[$version$]" />
                 <dependency id="Umbraco.SqlServerCE" version="[4.0.0.1,4.999999)" /> <!-- Hack it is only available in framework, but we need it on netstandard -->
             </group>
 

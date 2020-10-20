@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Umbraco.Core.Logging;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Persistence;
 
 namespace Umbraco.Core.Migrations
@@ -13,7 +13,7 @@ namespace Umbraco.Core.Migrations
         /// <summary>
         /// Gets the logger.
         /// </summary>
-        ILogger Logger { get; }
+        ILogger<IMigrationContext> Logger { get; }
 
         /// <summary>
         /// Gets the database instance.

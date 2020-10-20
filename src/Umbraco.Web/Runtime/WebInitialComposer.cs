@@ -1,4 +1,4 @@
-﻿using System.Linq;
+﻿using System.Web.Mvc;
 using System.Web.Security;
 using Microsoft.AspNet.SignalR;
 using Umbraco.Core;
@@ -14,9 +14,6 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Security;
 using Umbraco.Web.Security.Providers;
-using Umbraco.Web.SignalR;
-using Umbraco.Web.Templates;
-using Umbraco.Web.Trees;
 
 namespace Umbraco.Web.Runtime
 {
@@ -62,7 +59,7 @@ namespace Umbraco.Web.Runtime
             composition
                 // TODO: This will depend on if we use ServiceBasedControllerActivator - see notes in Startup.cs
                 .ComposeUmbracoControllers(GetType().Assembly)
-                .SetDefaultRenderMvcController<RenderMvcController>(); // default controller for template views
+                .SetDefaultRenderMvcController</*RenderMvcController*/ Controller>(); // default controller for template views
 
             //we need to eagerly scan controller types since they will need to be routed
             composition.WithCollectionBuilder<SurfaceControllerTypeCollectionBuilder>()
@@ -75,9 +72,6 @@ namespace Umbraco.Web.Runtime
 
             // auto-register views
             composition.RegisterAuto(typeof(UmbracoViewPage<>));
-
-            // register preview SignalR hub
-            composition.RegisterUnique(_ => GlobalHost.ConnectionManager.GetHubContext<PreviewHub>());
         }
     }
 }

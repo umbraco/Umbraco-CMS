@@ -5,6 +5,7 @@ using System.Linq;
 using Examine;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Scoping;
@@ -13,9 +14,13 @@ using Umbraco.Core.Services.Changes;
 using Umbraco.Core.Sync;
 using Umbraco.Web.Cache;
 using Umbraco.Examine;
+using Microsoft.Extensions.Logging;
+using Umbraco.Web.Scheduling;
 
 namespace Umbraco.Web.Search
 {
+
+
     public sealed class ExamineComponent : Umbraco.Core.Composing.IComponent
     {
         private readonly IExamineManager _examineManager;
@@ -24,13 +29,13 @@ namespace Umbraco.Web.Search
         private readonly IValueSetBuilder<IMedia> _mediaValueSetBuilder;
         private readonly IValueSetBuilder<IMember> _memberValueSetBuilder;
         private readonly BackgroundIndexRebuilder _backgroundIndexRebuilder;
-        private static object _isConfiguredLocker = new object();
         private readonly IScopeProvider _scopeProvider;
         private readonly ServiceContext _services;
         private readonly IMainDom _mainDom;
-        private readonly IProfilingLogger _logger;
+        private readonly IProfilingLogger _profilingLogger;
+        private readonly ILogger<ExamineComponent> _logger;
         private readonly IUmbracoIndexesCreator _indexCreator;
-
+        private readonly BackgroundTaskRunner<IBackgroundTask> _indexItemTaskRunner;
 
         // the default enlist priority is 100
         // enlist with a lower priority to ensure that anything "default" runs after us
@@ -39,13 +44,15 @@ namespace Umbraco.Web.Search
 
         public ExamineComponent(IMainDom mainDom,
             IExamineManager examineManager, IProfilingLogger profilingLogger,
+            ILoggerFactory loggerFactory,
             IScopeProvider scopeProvider, IUmbracoIndexesCreator indexCreator,
             ServiceContext services,
             IContentValueSetBuilder contentValueSetBuilder,
             IPublishedContentValueSetBuilder publishedContentValueSetBuilder,
             IValueSetBuilder<IMedia> mediaValueSetBuilder,
             IValueSetBuilder<IMember> memberValueSetBuilder,
-            BackgroundIndexRebuilder backgroundIndexRebuilder)
+            BackgroundIndexRebuilder backgroundIndexRebuilder,
+            IApplicationShutdownRegistry applicationShutdownRegistry)
         {
             _services = services;
             _scopeProvider = scopeProvider;
@@ -56,8 +63,10 @@ namespace Umbraco.Web.Search
             _memberValueSetBuilder = memberValueSetBuilder;
             _backgroundIndexRebuilder = backgroundIndexRebuilder;
             _mainDom = mainDom;
-            _logger = profilingLogger;
+            _profilingLogger = profilingLogger;
+            _logger = loggerFactory.CreateLogger<ExamineComponent>();
             _indexCreator = indexCreator;
+            _indexItemTaskRunner = new BackgroundTaskRunner<IBackgroundTask>(loggerFactory.CreateLogger<BackgroundTaskRunner<IBackgroundTask>>(), applicationShutdownRegistry);
         }
 
         public void Initialize()
@@ -65,7 +74,7 @@ namespace Umbraco.Web.Search
             //let's deal with shutting down Examine with MainDom
             var examineShutdownRegistered = _mainDom.Register(() =>
             {
-                using (_logger.TraceDuration<ExamineComponent>("Examine shutting down"))
+                using (_profilingLogger.TraceDuration<ExamineComponent>("Examine shutting down"))
                 {
                     _examineManager.Dispose();
                 }
@@ -73,7 +82,7 @@ namespace Umbraco.Web.Search
 
             if (!examineShutdownRegistered)
             {
-                _logger.Info<ExamineComponent>("Examine shutdown not registered, this AppDomain is not the MainDom, Examine will be disabled");
+                _logger.LogInformation("Examine shutdown not registered, this AppDomain is not the MainDom, Examine will be disabled");
 
                 //if we could not register the shutdown examine ourselves, it means we are not maindom! in this case all of examine should be disabled!
                 Suspendable.ExamineEvents.SuspendIndexers(_logger);
@@ -84,11 +93,11 @@ namespace Umbraco.Web.Search
             foreach(var index in _indexCreator.Create())
                 _examineManager.AddIndex(index);
 
-            _logger.Debug<ExamineComponent>("Examine shutdown registered with MainDom");
+            _logger.LogDebug("Examine shutdown registered with MainDom");
 
             var registeredIndexers = _examineManager.Indexes.OfType<IUmbracoIndex>().Count(x => x.EnableDefaultEventHandler);
 
-            _logger.Info<ExamineComponent>("Adding examine event handlers for {RegisteredIndexers} index providers.", registeredIndexers);
+            _logger.LogInformation("Adding examine event handlers for {RegisteredIndexers} index providers.", registeredIndexers);
 
             // don't bind event handlers if we're not suppose to listen
             if (registeredIndexers == 0)
@@ -104,7 +113,13 @@ namespace Umbraco.Web.Search
         }
 
         public void Terminate()
-        { }
+        {
+            ContentCacheRefresher.CacheUpdated -= ContentCacheRefresherUpdated;
+            ContentTypeCacheRefresher.CacheUpdated -= ContentTypeCacheRefresherUpdated;
+            MediaCacheRefresher.CacheUpdated -= MediaCacheRefresherUpdated;
+            MemberCacheRefresher.CacheUpdated -= MemberCacheRefresherUpdated;
+            LanguageCacheRefresher.CacheUpdated -= LanguageCacheRefresherUpdated;
+        }
 
         #region Cache refresher updated event handlers
 
@@ -557,12 +572,18 @@ namespace Umbraco.Web.Search
             }
         }
 
+        /// <summary>
+        /// An action that will execute at the end of the Scope being completed
+        /// </summary>
         private abstract class DeferedAction
         {
             public virtual void Execute()
             { }
         }
 
+        /// <summary>
+        /// Re-indexes an <see cref="IContent"/> item on a background thread
+        /// </summary>
         private class DeferedReIndexForContent : DeferedAction
         {
             private readonly ExamineComponent _examineComponent;
@@ -583,21 +604,32 @@ namespace Umbraco.Web.Search
 
             public static void Execute(ExamineComponent examineComponent, IContent content, bool isPublished)
             {
-                foreach (var index in examineComponent._examineManager.Indexes.OfType<IUmbracoIndex>()
-                    //filter the indexers
-                    .Where(x => isPublished || !x.PublishedValuesOnly)
-                    .Where(x => x.EnableDefaultEventHandler))
+                // perform the ValueSet lookup on a background thread
+                examineComponent._indexItemTaskRunner.Add(new SimpleTask(() =>
                 {
-                    //for content we have a different builder for published vs unpublished
-                    var builder = index.PublishedValuesOnly
-                        ? examineComponent._publishedContentValueSetBuilder
-                        : (IValueSetBuilder<IContent>)examineComponent._contentValueSetBuilder;
+                    // for content we have a different builder for published vs unpublished
+                    // we don't want to build more value sets than is needed so we'll lazily build 2 one for published one for non-published
+                    var builders = new Dictionary<bool, Lazy<List<ValueSet>>>
+                    {
+                        [true] = new Lazy<List<ValueSet>>(() => examineComponent._publishedContentValueSetBuilder.GetValueSets(content).ToList()),
+                        [false] = new Lazy<List<ValueSet>>(() => examineComponent._contentValueSetBuilder.GetValueSets(content).ToList())
+                    };
 
-                    index.IndexItems(builder.GetValueSets(content));
-                }
+                    foreach (var index in examineComponent._examineManager.Indexes.OfType<IUmbracoIndex>()
+                        //filter the indexers
+                        .Where(x => isPublished || !x.PublishedValuesOnly)
+                        .Where(x => x.EnableDefaultEventHandler))
+                    {
+                        var valueSet = builders[index.PublishedValuesOnly].Value;
+                        index.IndexItems(valueSet);
+                    }
+                }));
             }
         }
 
+        /// <summary>
+        /// Re-indexes an <see cref="IMedia"/> item on a background thread
+        /// </summary>
         private class DeferedReIndexForMedia : DeferedAction
         {
             private readonly ExamineComponent _examineComponent;
@@ -618,18 +650,25 @@ namespace Umbraco.Web.Search
 
             public static void Execute(ExamineComponent examineComponent, IMedia media, bool isPublished)
             {
-                var valueSet = examineComponent._mediaValueSetBuilder.GetValueSets(media).ToList();
-
-                foreach (var index in examineComponent._examineManager.Indexes.OfType<IUmbracoIndex>()
-                    //filter the indexers
-                    .Where(x => isPublished || !x.PublishedValuesOnly)
-                    .Where(x => x.EnableDefaultEventHandler))
+                // perform the ValueSet lookup on a background thread
+                examineComponent._indexItemTaskRunner.Add(new SimpleTask(() =>
                 {
-                    index.IndexItems(valueSet);
-                }
+                    var valueSet = examineComponent._mediaValueSetBuilder.GetValueSets(media).ToList();
+
+                    foreach (var index in examineComponent._examineManager.Indexes.OfType<IUmbracoIndex>()
+                        //filter the indexers
+                        .Where(x => isPublished || !x.PublishedValuesOnly)
+                        .Where(x => x.EnableDefaultEventHandler))
+                    {
+                        index.IndexItems(valueSet);
+                    }
+                }));
             }
         }
 
+        /// <summary>
+        /// Re-indexes an <see cref="IMember"/> item on a background thread
+        /// </summary>
         private class DeferedReIndexForMember : DeferedAction
         {
             private readonly ExamineComponent _examineComponent;
@@ -648,13 +687,17 @@ namespace Umbraco.Web.Search
 
             public static void Execute(ExamineComponent examineComponent, IMember member)
             {
-                var valueSet = examineComponent._memberValueSetBuilder.GetValueSets(member).ToList();
-                foreach (var index in examineComponent._examineManager.Indexes.OfType<IUmbracoIndex>()
-                    //filter the indexers
-                    .Where(x => x.EnableDefaultEventHandler))
+                // perform the ValueSet lookup on a background thread
+                examineComponent._indexItemTaskRunner.Add(new SimpleTask(() =>
                 {
-                    index.IndexItems(valueSet);
-                }
+                    var valueSet = examineComponent._memberValueSetBuilder.GetValueSets(member).ToList();
+                    foreach (var index in examineComponent._examineManager.Indexes.OfType<IUmbracoIndex>()
+                        //filter the indexers
+                        .Where(x => x.EnableDefaultEventHandler))
+                    {
+                        index.IndexItems(valueSet);
+                    }
+                }));
             }
         }
 

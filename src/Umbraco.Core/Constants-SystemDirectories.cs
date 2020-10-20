@@ -31,6 +31,8 @@
             public const string Packages = Data + "/packages";
 
             public const string Preview = Data + "/preview";
+
+            public const string LogFiles= "~/Logs";
         }
     }
 }

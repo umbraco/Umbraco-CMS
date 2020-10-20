@@ -123,10 +123,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
                         self.handleSaveError({
                             showNotifications: args.showNotifications,
                             softRedirect: args.softRedirect,
-                            err: err,
-                            rebindCallback: function () {
-                                rebindCallback.apply(self, [args.content, err.data]);
-                            }
+                            err: err
                         });
 
                         //update editor state to what is current
@@ -154,7 +151,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
             // first check if tab is already added
             var foundInfoTab = false;
 
-            angular.forEach(tabs, function (tab) {
+            tabs.forEach(function (tab) {
                 if (tab.id === infoTab.id && tab.alias === infoTab.alias) {
                     foundInfoTab = true;
                 }
@@ -373,7 +370,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
             //This is the ideal button order but depends on circumstance, we'll use this array to create the button list
             // Publish, SendToPublish, Save
             var actionOrder = ["U", "H", "A"];
-            var defaultActions;
+            var defaultAction = null; 
             var actions = [];
 
             //Create the first button (primary button)

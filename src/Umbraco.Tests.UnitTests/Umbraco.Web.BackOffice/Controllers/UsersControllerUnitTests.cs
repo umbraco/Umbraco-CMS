@@ -15,14 +15,14 @@ namespace Umbraco.Tests.Web.Controllers
     {
         [Test,AutoMoqData]
         public void PostUnlockUsers_When_User_Lockout_Update_Fails_Expect_Failure_Response(
-            [Frozen] IUserStore<BackOfficeIdentityUser> userStore,
+            [Frozen] IBackOfficeUserManager backOfficeUserManager,
             UsersController sut,
             BackOfficeIdentityUser user,
             int[] userIds,
             string expectedMessage)
         {
-            Mock.Get(userStore)
-                .Setup(x => x.FindByIdAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            Mock.Get(backOfficeUserManager)
+                .Setup(x => x.FindByIdAsync(It.IsAny<string>()))
                 .ReturnsAsync(user);
 
             Assert.ThrowsAsync<HttpResponseException>(() => sut.PostUnlockUsers(userIds));

@@ -34,8 +34,8 @@
         var modelObject;
 
         // Property actions:
-        var copyAllBlocksAction;
-        var deleteAllBlocksAction;
+        var copyAllBlocksAction = null;
+        var deleteAllBlocksAction = null;
 
         var inlineEditing = false;
         var liveEditing = true;
@@ -44,23 +44,23 @@
 
         vm.loading = true;
         vm.currentBlockInFocus = null;
-        vm.setBlockFocus = function(block) {
-            if(vm.currentBlockInFocus !== null) {
+        vm.setBlockFocus = function (block) {
+            if (vm.currentBlockInFocus !== null) {
                 vm.currentBlockInFocus.focus = false;
             }
             vm.currentBlockInFocus = block;
             block.focus = true;
-        }
+        };
+
         vm.supportCopy = clipboardService.isSupported();
 
         vm.layout = []; // The layout object specific to this Block Editor, will be a direct reference from Property Model.
         vm.availableBlockTypes = []; // Available block entries of this property editor.
+        vm.labels = {};
 
-        var labels = {};
-        vm.labels = labels;
         localizationService.localizeMany(["grid_addElement", "content_createEmpty"]).then(function (data) {
-            labels.grid_addElement = data[0];
-            labels.content_createEmpty = data[1];
+            vm.labels.grid_addElement = data[0];
+            vm.labels.content_createEmpty = data[1];
         });
 
         vm.$onInit = function() {
@@ -107,14 +107,15 @@
                 icon: "documents",
                 method: requestCopyAllBlocks,
                 isDisabled: true
-            }
+            };
+
             deleteAllBlocksAction = {
                 labelKey: 'clipboard_labelForRemoveAllEntries',
                 labelTokens: [],
                 icon: 'trash',
                 method: requestDeleteAllBlocks,
                 isDisabled: true
-            }
+            };
 
             var propertyActions = [
                 copyAllBlocksAction,
@@ -194,12 +195,14 @@
 
         function getDefaultViewForBlock(block) {
 
+            var defaultViewFolderPath = "views/propertyeditors/blocklist/blocklistentryeditors/";
+
             if (block.config.unsupported === true)
-                return "views/propertyeditors/blocklist/blocklistentryeditors/unsupportedblock/unsupportedblock.editor.html";
+                return defaultViewFolderPath + "unsupportedblock/unsupportedblock.editor.html";
 
             if (inlineEditing === true)
-                return "views/propertyeditors/blocklist/blocklistentryeditors/inlineblock/inlineblock.editor.html";
-            return "views/propertyeditors/blocklist/blocklistentryeditors/labelblock/labelblock.editor.html";
+                return defaultViewFolderPath + "inlineblock/inlineblock.editor.html";
+            return defaultViewFolderPath + "labelblock/labelblock.editor.html";
         }
 
         /**
@@ -233,13 +236,28 @@
             ensureCultureData(block.content);
             ensureCultureData(block.settings);
 
-            // TODO: Why is there a '/' prefixed? that means this will never work with virtual directories
-            block.view = (block.config.view ? "/" + block.config.view : getDefaultViewForBlock(block));
+            block.view = (block.config.view ? block.config.view : getDefaultViewForBlock(block));
             block.showValidation = block.config.view ? true : false;
 
             block.hideContentInOverlay = block.config.forceHideContentEditorInOverlay === true || inlineEditing === true;
             block.showSettings = block.config.settingsElementTypeKey != null;
             block.showCopy = vm.supportCopy && block.config.contentElementTypeKey != null;// if we have content, otherwise it doesn't make sense to copy.
+
+            block.setParentForm = function (parentForm) {
+                this._parentForm = parentForm;
+            }
+            block.activate = activateBlock.bind(null, block);
+            block.edit = function () {
+                var blockIndex = vm.layout.indexOf(this.layout);
+                editBlock(this, false, blockIndex, this._parentForm);
+            }
+            block.editSettings = function () {
+                var blockIndex = vm.layout.indexOf(this.layout);
+                editBlock(this, true, blockIndex, this._parentForm);
+            }
+            block.requestDelete = requestDeleteBlock.bind(null, block);
+            block.delete = deleteBlock.bind(null, block);
+            block.copy = copyBlock.bind(null, block);
 
             return block;
         }
@@ -276,9 +294,9 @@
 
         function deleteBlock(block) {
 
-            var layoutIndex = vm.layout.findIndex(entry => entry.contentUdi === block.content.udi);
+            var layoutIndex = vm.layout.findIndex(entry => entry.contentUdi === block.layout.contentUdi);
             if (layoutIndex === -1) {
-                throw new Error("Could not find layout entry of block with udi: "+block.content.udi)
+                throw new Error("Could not find layout entry of block with udi: "+block.layout.contentUdi)
             }
 
             setDirty();
@@ -308,7 +326,9 @@
             blockObject.active = true;
         }
 
-        function editBlock(blockObject, openSettings, blockIndex, parentForm) {
+        function editBlock(blockObject, openSettings, blockIndex, parentForm, options) {
+
+            options = options || {};
 
             // this must be set
             if (blockIndex === undefined) {
@@ -342,6 +362,7 @@
                 $parentForm: parentForm || vm.propertyForm, // pass in a $parentForm, this maintains the FormController hierarchy with the infinite editing view (if it contains a form)
                 hideContent: blockObject.hideContentInOverlay,
                 openSettings: openSettings === true,
+                createFlow: options.createFlow === true,
                 liveEditing: liveEditing,
                 title: blockObject.label,
                 view: "views/common/infiniteeditors/blockeditor/blockeditor.html",
@@ -356,15 +377,17 @@
                     blockObject.active = false;
                     editorService.close();
                 },
-                close: function() {
-
-                    if (liveEditing === true) {
-                        // revert values when closing in liveediting mode.
-                        blockObject.retrieveValuesFrom(blockContentClone, blockSettingsClone);
-                    }
-
-                    if (wasNotActiveBefore === true) {
-                        blockObject.active = false;
+                close: function(blockEditorModel) {
+                    if (blockEditorModel.createFlow) {
+                        deleteBlock(blockObject);
+                    } else {
+                        if (liveEditing === true) {
+                            // revert values when closing in liveediting mode.
+                            blockObject.retrieveValuesFrom(blockContentClone, blockSettingsClone);
+                        }
+                        if (wasNotActiveBefore === true) {
+                            blockObject.active = false;
+                        }
                     }
                     editorService.close();
                 }
@@ -404,7 +427,7 @@
                 size: (amountOfAvailableTypes > 8 ? "medium" : "small"),
                 filter: (amountOfAvailableTypes > 8),
                 clickPasteItem: function(item, mouseEvent) {
-                    if (item.type === "elementTypeArray") {
+                    if (Array.isArray(item.pasteData)) {
                         var indexIncrementor = 0;
                         item.pasteData.forEach(function (entry) {
                             if (requestPasteFromClipboard(createIndex + indexIncrementor, entry)) {
@@ -430,7 +453,7 @@
                             if (inlineEditing === true) {
                                 activateBlock(vm.layout[createIndex].$block);
                             } else if (inlineEditing === false && vm.layout[createIndex].$block.hideContentInOverlay !== true) {
-                                editBlock(vm.layout[createIndex].$block, false, createIndex, blockPickerModel.$parentForm);
+                                editBlock(vm.layout[createIndex].$block, false, createIndex, blockPickerModel.$parentForm, {createFlow: true});
                             }
                         }
                     }
@@ -446,40 +469,32 @@
             };
 
             blockPickerModel.clickClearClipboard = function ($event) {
-                clipboardService.clearEntriesOfType("elementType", vm.availableContentTypesAliases);
-                clipboardService.clearEntriesOfType("elementTypeArray", vm.availableContentTypesAliases);
+                clipboardService.clearEntriesOfType(clipboardService.TYPES.ELEMENT_TYPE, vm.availableContentTypesAliases);
             };
 
             blockPickerModel.clipboardItems = [];
 
-            var singleEntriesForPaste = clipboardService.retriveEntriesOfType("elementType", vm.availableContentTypesAliases);
-            singleEntriesForPaste.forEach(function (entry) {
-                blockPickerModel.clipboardItems.push(
-                    {
-                        type: "elementType",
-                        pasteData: entry.data,
-                        blockConfigModel: modelObject.getScaffoldFromAlias(entry.alias),
-                        elementTypeModel: {
-                            name: entry.label,
-                            icon: entry.icon
-                        }
+            var entriesForPaste = clipboardService.retriveEntriesOfType(clipboardService.TYPES.ELEMENT_TYPE, vm.availableContentTypesAliases);
+            entriesForPaste.forEach(function (entry) {
+                var pasteEntry = {
+                    type: clipboardService.TYPES.ELEMENT_TYPE,
+                    date: entry.date,
+                    pasteData: entry.data,
+                    elementTypeModel: {
+                        name: entry.label,
+                        icon: entry.icon
                     }
-                );
+                }
+                if(Array.isArray(pasteEntry.data) === false) {
+                    pasteEntry.blockConfigModel = modelObject.getScaffoldFromAlias(entry.alias);
+                } else {
+                    pasteEntry.blockConfigModel = {};
+                }
+                blockPickerModel.clipboardItems.push(pasteEntry);
             });
 
-            var arrayEntriesForPaste = clipboardService.retriveEntriesOfType("elementTypeArray", vm.availableContentTypesAliases);
-            arrayEntriesForPaste.forEach(function (entry) {
-                blockPickerModel.clipboardItems.push(
-                    {
-                        type: "elementTypeArray",
-                        pasteData: entry.data,
-                        blockConfigModel: {}, // no block configuration for paste items of elementTypeArray.
-                        elementTypeModel: {
-                            name: entry.label,
-                            icon: entry.icon
-                        }
-                    }
-                );
+            blockPickerModel.clipboardItems.sort( (a, b) => {
+                return b.date - a.date
             });
 
             // open block picker overlay
@@ -505,11 +520,11 @@
             }
 
             localizationService.localize("clipboard_labelForArrayOfItemsFrom", [vm.model.label, contentNodeName]).then(function(localizedLabel) {
-                clipboardService.copyArray("elementTypeArray", aliases, elementTypesToCopy, localizedLabel, "icon-thumbnail-list", vm.model.id);
+                clipboardService.copyArray(clipboardService.TYPES.ELEMENT_TYPE, aliases, elementTypesToCopy, localizedLabel, "icon-thumbnail-list", vm.model.id);
             });
         }
         function copyBlock(block) {
-            clipboardService.copy("elementType", block.content.contentTypeAlias, block.content, block.label);
+            clipboardService.copy(clipboardService.TYPES.ELEMENT_TYPE, block.content.contentTypeAlias, block.content, block.label);
         }
         function requestPasteFromClipboard(index, pasteEntry) {
 
@@ -588,6 +603,7 @@
 
         vm.sortableOptions = {
             axis: "y",
+            containment: "parent",
             cursor: "grabbing",
             handle: ".blockelement__draggable-element",
             cancel: "input,textarea,select,option",
@@ -604,30 +620,31 @@
         function onAmountOfBlocksChanged() {
 
             // enable/disable property actions
-            copyAllBlocksAction.isDisabled = vm.layout.length === 0;
-            deleteAllBlocksAction.isDisabled = vm.layout.length === 0;
+            if (copyAllBlocksAction) {
+                copyAllBlocksAction.isDisabled = vm.layout.length === 0;
+            }
+            if (deleteAllBlocksAction) {
+                deleteAllBlocksAction.isDisabled = vm.layout.length === 0;
+            }
 
             // validate limits:
-            if (vm.propertyForm) {
+            if (vm.propertyForm && vm.validationLimit) {
 
                 var isMinRequirementGood = vm.validationLimit.min === null || vm.layout.length >= vm.validationLimit.min;
                 vm.propertyForm.minCount.$setValidity("minCount", isMinRequirementGood);
 
                 var isMaxRequirementGood = vm.validationLimit.max === null || vm.layout.length <= vm.validationLimit.max;
                 vm.propertyForm.maxCount.$setValidity("maxCount", isMaxRequirementGood);
-
             }
         }
-        unsubscribe.push($scope.$watch(() => vm.layout.length, onAmountOfBlocksChanged));
 
+        unsubscribe.push($scope.$watch(() => vm.layout.length, onAmountOfBlocksChanged));
 
         $scope.$on("$destroy", function () {
             for (const subscription of unsubscribe) {
                 subscription();
             }
         });
-
-
     }
 
 })();

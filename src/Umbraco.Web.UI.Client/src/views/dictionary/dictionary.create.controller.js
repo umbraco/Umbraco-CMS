@@ -11,7 +11,6 @@ function DictionaryCreateController($scope, $location, dictionaryResource, navig
     var vm = this;
 
     vm.itemKey = "";
-
     vm.createItem = createItem;
 
     function createItem() {

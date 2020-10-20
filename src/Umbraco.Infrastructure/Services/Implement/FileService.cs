@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Events;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
@@ -29,17 +31,17 @@ namespace Umbraco.Core.Services.Implement
         private readonly IPartialViewMacroRepository _partialViewMacroRepository;
         private readonly IAuditRepository _auditRepository;
         private readonly IShortStringHelper _shortStringHelper;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
 
         private const string PartialViewHeader = "@inherits Umbraco.Web.Common.AspNetCore.UmbracoViewPage";
         private const string PartialViewMacroHeader = "@inherits Umbraco.Web.Common.Macros.PartialViewMacroPage";
 
-        public FileService(IScopeProvider uowProvider, ILogger logger, IEventMessagesFactory eventMessagesFactory,
+        public FileService(IScopeProvider uowProvider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory,
             IStylesheetRepository stylesheetRepository, IScriptRepository scriptRepository, ITemplateRepository templateRepository,
             IPartialViewRepository partialViewRepository, IPartialViewMacroRepository partialViewMacroRepository,
-            IAuditRepository auditRepository, IShortStringHelper shortStringHelper, IGlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
-            : base(uowProvider, logger, eventMessagesFactory)
+            IAuditRepository auditRepository, IShortStringHelper shortStringHelper, IOptions<GlobalSettings> globalSettings, IHostingEnvironment hostingEnvironment)
+            : base(uowProvider, loggerFactory, eventMessagesFactory)
         {
             _stylesheetRepository = stylesheetRepository;
             _scriptRepository = scriptRepository;
@@ -48,7 +50,7 @@ namespace Umbraco.Core.Services.Implement
             _partialViewMacroRepository = partialViewMacroRepository;
             _auditRepository = auditRepository;
             _shortStringHelper = shortStringHelper;
-            _globalSettings = globalSettings;
+            _globalSettings = globalSettings.Value;
             _hostingEnvironment = hostingEnvironment;
         }
 

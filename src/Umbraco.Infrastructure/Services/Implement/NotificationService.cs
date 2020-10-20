@@ -6,17 +6,15 @@ using System.Linq;
 using System.Net.Mail;
 using System.Text;
 using System.Threading;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.UmbracoSettings;
+using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Scoping;
-using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Services.Implement
 {
@@ -27,17 +25,19 @@ namespace Umbraco.Core.Services.Implement
         private readonly IContentService _contentService;
         private readonly ILocalizationService _localizationService;
         private readonly INotificationsRepository _notificationsRepository;
-        private readonly IGlobalSettings _globalSettings;
-        private readonly IContentSettings _contentSettings;
-        private readonly ILogger _logger;
+        private readonly GlobalSettings _globalSettings;
+        private readonly ContentSettings _contentSettings;
+        private readonly IEmailSender _emailSender;
+        private readonly ILogger<NotificationService> _logger;
         private readonly IIOHelper _ioHelper;
 
         public NotificationService(IScopeProvider provider, IUserService userService, IContentService contentService, ILocalizationService localizationService,
-            ILogger logger, IIOHelper ioHelper, INotificationsRepository notificationsRepository, IGlobalSettings globalSettings, IContentSettings contentSettings)
+            ILogger<NotificationService> logger, IIOHelper ioHelper, INotificationsRepository notificationsRepository, IOptions<GlobalSettings> globalSettings, IOptions<ContentSettings> contentSettings, IEmailSender emailSender)
         {
             _notificationsRepository = notificationsRepository;
-            _globalSettings = globalSettings;
-            _contentSettings = contentSettings;
+            _globalSettings = globalSettings.Value;
+            _contentSettings = contentSettings.Value;
+            _emailSender = emailSender;
             _uowProvider = provider ?? throw new ArgumentNullException(nameof(provider));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _contentService = contentService ?? throw new ArgumentNullException(nameof(contentService));
@@ -302,7 +302,7 @@ namespace Umbraco.Core.Services.Implement
 
             if (content.ContentType.VariesByNothing())
             {
-                if (!_contentSettings.DisableHtmlEmail)
+                if (!_contentSettings.Notifications.DisableHtmlEmail)
                 {
                     //create the HTML summary for invariant content
 
@@ -344,7 +344,7 @@ namespace Umbraco.Core.Services.Implement
             {
                 //it's variant, so detect what cultures have changed
 
-                if (!_contentSettings.DisableHtmlEmail)
+                if (!_contentSettings.Notifications.DisableHtmlEmail)
                 {
                     //Create the HTML based summary (ul of culture names)
 
@@ -405,14 +405,15 @@ namespace Umbraco.Core.Services.Implement
                 string.Concat(siteUri.Authority, _ioHelper.ResolveUrl(_globalSettings.UmbracoPath)),
                 summary.ToString());
 
+            var fromMail = _contentSettings.Notifications.Email ?? _globalSettings.Smtp.From;
             // create the mail message
-            var mail = new MailMessage(_contentSettings.NotificationEmailAddress, mailingUser.Email);
+            var mail = new MailMessage(fromMail, fromMail);
 
             // populate the message
 
 
             mail.Subject = createSubject((mailingUser, subjectVars));
-            if (_contentSettings.DisableHtmlEmail)
+            if (_contentSettings.Notifications.DisableHtmlEmail)
             {
                 mail.IsBodyHtml = false;
                 mail.Body = createBody((user: mailingUser, body: bodyVars, false));
@@ -508,50 +509,37 @@ namespace Umbraco.Core.Services.Implement
         {
             ThreadPool.QueueUserWorkItem(state =>
             {
-                var s = new SmtpClient();
-                try
+                _logger.LogDebug("Begin processing notifications.");
+                while (true)
                 {
-                    _logger.Debug<NotificationService>("Begin processing notifications.");
-                    while (true)
+                    NotificationRequest request;
+                    while (notificationRequests.TryTake(out request, 8 * 1000)) // stay on for 8s
                     {
-                        NotificationRequest request;
-                        while (notificationRequests.TryTake(out request, 8 * 1000)) // stay on for 8s
+                        try
                         {
-                            try
-                            {
-                                if (Sendmail != null) Sendmail(s, request.Mail, _logger); else s.Send(request.Mail);
-                                _logger.Debug<NotificationService>("Notification '{Action}' sent to {Username} ({Email})", request.Action, request.UserName, request.Email);
-                            }
-                            catch (Exception ex)
-                            {
-                                _logger.Error<NotificationService>(ex, "An error occurred sending notification");
-                                s.Dispose();
-                                s = new SmtpClient();
-                            }
-                            finally
-                            {
-                                request.Mail.Dispose();
-                            }
+                            _emailSender.SendAsync(request.Mail).GetAwaiter().GetResult();
+                            _logger.LogDebug("Notification '{Action}' sent to {Username} ({Email})", request.Action, request.UserName, request.Email);
                         }
-                        lock (Locker)
+                        catch (Exception ex)
                         {
-                            if (notificationRequests.Count > 0) continue; // last chance
-                            _running = false; // going down
-                            break;
+                            _logger.LogError(ex, "An error occurred sending notification");
+                        }
+                        finally
+                        {
+                            request.Mail.Dispose();
                         }
                     }
+                    lock (Locker)
+                    {
+                        if (notificationRequests.Count > 0) continue; // last chance
+                        _running = false; // going down
+                        break;
+                    }
                 }
-                finally
-                {
-                    s.Dispose();
-                }
-                _logger.Debug<NotificationService>("Done processing notifications.");
+
+                _logger.LogDebug("Done processing notifications.");
             });
         }
-
-        // for tests
-        internal static Action<SmtpClient, MailMessage, ILogger> Sendmail;
-            //= (_, msg, logger) => logger.Debug<NotificationService>("Email " + msg.To.ToString());
 
         #endregion
     }

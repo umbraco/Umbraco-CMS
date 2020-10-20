@@ -5,12 +5,12 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Web;
+using Microsoft.Extensions.Logging;
 using ClientDependency.Core;
 using ClientDependency.Core.CompositeFiles;
 using ClientDependency.Core.Config;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.WebAssets;
@@ -23,7 +23,8 @@ namespace Umbraco.Web.WebAssets.CDF
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IIOHelper _ioHelper;
-        private readonly ILogger _logger;
+        private readonly ILoggerFactory _loggerFactory;
+        private readonly ILogger<ClientDependencyRuntimeMinifier> _logger;
         private readonly IUmbracoVersion _umbracoVersion;
 
         public string CacheBuster => ClientDependencySettings.Instance.Version.ToString();
@@ -31,12 +32,13 @@ namespace Umbraco.Web.WebAssets.CDF
         public ClientDependencyRuntimeMinifier(
             IHttpContextAccessor httpContextAccessor,
             IIOHelper ioHelper,
-            ILogger logger,
+            ILoggerFactory loggerFactory,
             IUmbracoVersion umbracoVersion)
         {
             _httpContextAccessor = httpContextAccessor;
             _ioHelper = ioHelper;
-            _logger = logger;
+            _loggerFactory = loggerFactory;
+            _logger = _loggerFactory.CreateLogger<ClientDependencyRuntimeMinifier>();
             _umbracoVersion = umbracoVersion;
         }
 
@@ -107,7 +109,7 @@ namespace Umbraco.Web.WebAssets.CDF
         public void Reset()
         {
             // Update ClientDependency version
-            var clientDependencyConfig = new ClientDependencyConfiguration(_logger, _ioHelper);
+            var clientDependencyConfig = new ClientDependencyConfiguration(_loggerFactory.CreateLogger<ClientDependencyConfiguration>(), _ioHelper);
             var clientDependencyUpdated = clientDependencyConfig.UpdateVersionNumber(
                 _umbracoVersion.SemanticVersion, DateTime.UtcNow, "yyyyMMdd");
             // Delete ClientDependency temp directories to make sure we get fresh caches

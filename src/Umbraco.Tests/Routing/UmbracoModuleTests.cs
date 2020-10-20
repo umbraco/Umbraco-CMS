@@ -1,20 +1,13 @@
 ﻿using System;
-using System.IO;
 using System.Threading;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration.Models;
+using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
-using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Sync;
-using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Services;
-using Umbraco.Web.PublishedCache;
-using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.Routing
 {
@@ -31,8 +24,9 @@ namespace Umbraco.Tests.Routing
             // FIXME: be able to get the UmbracoModule from the container. any reason settings were from testobjects?
             //create the module
             var logger = Mock.Of<ILogger>();
-            var globalSettings = TestObjects.GetGlobalSettings();
-            var runtime = new RuntimeState(globalSettings, UmbracoVersion);
+
+            var globalSettings = new GlobalSettings { ReservedPaths = GlobalSettings.StaticReservedPaths + "~/umbraco" };
+            var runtime = Umbraco.Core.RuntimeState.Booting();
 
             _module = new UmbracoInjectedModule
             (

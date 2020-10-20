@@ -1,4 +1,4 @@
-using Umbraco.Core.Logging;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
 
@@ -12,11 +12,11 @@ namespace Umbraco.Web.Routing
     /// </remarks>
     public class ContentFinderByUrl : IContentFinder
     {
-        protected ILogger Logger { get; }
+        private readonly ILogger<ContentFinderByUrl> _logger;
 
-        public ContentFinderByUrl(ILogger logger)
+        public ContentFinderByUrl(ILogger<ContentFinderByUrl> logger)
         {
-            Logger = logger;
+            _logger = logger;
         }
 
         /// <summary>
@@ -46,17 +46,17 @@ namespace Umbraco.Web.Routing
         {
             if (docreq == null) throw new System.ArgumentNullException(nameof(docreq));
 
-            Logger.Debug<ContentFinderByUrl>("Test route {Route}", route);
+            _logger.LogDebug("Test route {Route}", route);
 
             var node = docreq.UmbracoContext.Content.GetByRoute(docreq.UmbracoContext.InPreviewMode, route, culture: docreq.Culture?.Name);
             if (node != null)
             {
                 docreq.PublishedContent = node;
-                Logger.Debug<ContentFinderByUrl>("Got content, id={NodeId}", node.Id);
+                _logger.LogDebug("Got content, id={NodeId}", node.Id);
             }
             else
             {
-                Logger.Debug<ContentFinderByUrl>("No match.");
+                _logger.LogDebug("No match.");
             }
 
             return node;

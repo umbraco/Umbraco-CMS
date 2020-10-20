@@ -1,7 +1,8 @@
 ﻿using System;
 using System.IO;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
-using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
@@ -16,13 +17,20 @@ namespace Umbraco.Web.PropertyEditors
     internal class FileUploadPropertyValueEditor : DataValueEditor
     {
         private readonly IMediaFileSystem _mediaFileSystem;
-        private readonly IContentSettings _contentSettings;
+        private readonly ContentSettings _contentSettings;
 
-        public FileUploadPropertyValueEditor(DataEditorAttribute attribute, IMediaFileSystem mediaFileSystem, IDataTypeService dataTypeService, ILocalizationService localizationService, ILocalizedTextService localizedTextService, IShortStringHelper shortStringHelper, IContentSettings contentSettings)
+        public FileUploadPropertyValueEditor(
+            DataEditorAttribute attribute,
+            IMediaFileSystem mediaFileSystem,
+            IDataTypeService dataTypeService,
+            ILocalizationService localizationService,
+            ILocalizedTextService localizedTextService,
+            IShortStringHelper shortStringHelper,
+            IOptions<ContentSettings> contentSettings)
             : base(dataTypeService, localizationService, localizedTextService, shortStringHelper, attribute)
         {
             _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
-            _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
+            _contentSettings = contentSettings.Value ?? throw new ArgumentNullException(nameof(contentSettings));
         }
 
         /// <summary>

@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Moq;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 
-namespace Umbraco.Tests.Common.TestHelpers
+namespace Umbraco.Tests.TestHelpers.Entities
 {
-    public static class MockedValueEditors
+    public class MockedValueEditors
     {
         public static DataValueEditor CreateDataValueEditor(string name)
         {

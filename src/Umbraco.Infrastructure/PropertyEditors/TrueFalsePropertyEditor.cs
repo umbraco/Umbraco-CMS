@@ -1,6 +1,6 @@
-﻿using Umbraco.Core;
+﻿using Microsoft.Extensions.Logging;
+using Umbraco.Core;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
@@ -13,7 +13,7 @@ namespace Umbraco.Web.PropertyEditors
     [DataEditor(
         Constants.PropertyEditors.Aliases.Boolean,
         EditorType.PropertyValue | EditorType.MacroParameter,
-        "Checkbox",
+        "Toggle",
         "boolean",
         ValueType = ValueTypes.Integer,
         Group = Constants.PropertyEditors.Groups.Common,
@@ -25,8 +25,8 @@ namespace Umbraco.Web.PropertyEditors
         /// <summary>
         /// Initializes a new instance of the <see cref="TrueFalsePropertyEditor"/> class.
         /// </summary>
-        public TrueFalsePropertyEditor(ILogger logger, IDataTypeService dataTypeService, ILocalizationService localizationService, IIOHelper ioHelper, IShortStringHelper shortStringHelper, ILocalizedTextService localizedTextService)
-            : base(logger, dataTypeService, localizationService, localizedTextService, shortStringHelper)
+        public TrueFalsePropertyEditor(ILoggerFactory loggerFactory, IDataTypeService dataTypeService, ILocalizationService localizationService, IIOHelper ioHelper, IShortStringHelper shortStringHelper, ILocalizedTextService localizedTextService)
+            : base(loggerFactory, dataTypeService, localizationService, localizedTextService, shortStringHelper)
         {
             _ioHelper = ioHelper;
         }

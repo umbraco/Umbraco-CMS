@@ -3,14 +3,15 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Net;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Extensions;
+
+using Umbraco.Net;
 
 namespace Umbraco.Core.Compose
 {
@@ -20,9 +21,9 @@ namespace Umbraco.Core.Compose
         private readonly IUserService _userService;
         private readonly IEntityService _entityService;
         private readonly IIpResolver _ipResolver;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
 
-        public AuditEventsComponent(IAuditService auditService, IUserService userService, IEntityService entityService, IIpResolver ipResolver, IGlobalSettings globalSettings)
+        public AuditEventsComponent(IAuditService auditService, IUserService userService, IEntityService entityService, IIpResolver ipResolver, GlobalSettings globalSettings)
         {
             _auditService = auditService;
             _userService = userService;
@@ -47,9 +48,21 @@ namespace Umbraco.Core.Compose
         }
 
         public void Terminate()
-        { }
+        {
+            UserService.SavedUserGroup -= OnSavedUserGroupWithUsers;
 
-        public static IUser UnknownUser(IGlobalSettings globalSettings) => new User(globalSettings) { Id = Constants.Security.UnknownUserId, Name = Constants.Security.UnknownUserName, Email = "" };
+            UserService.SavedUser -= OnSavedUser;
+            UserService.DeletedUser -= OnDeletedUser;
+            UserService.UserGroupPermissionsAssigned -= UserGroupPermissionAssigned;
+
+            MemberService.Saved -= OnSavedMember;
+            MemberService.Deleted -= OnDeletedMember;
+            MemberService.AssignedRoles -= OnAssignedRoles;
+            MemberService.RemovedRoles -= OnRemovedRoles;
+            MemberService.Exported -= OnMemberExported;
+        }
+
+        public static IUser UnknownUser(GlobalSettings globalSettings) => new User(globalSettings) { Id = Constants.Security.UnknownUserId, Name = Constants.Security.UnknownUserName, Email = "" };
 
         private IUser CurrentPerformingUser
         {

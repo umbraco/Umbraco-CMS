@@ -1,22 +1,21 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
-using Smidge;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Logging;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Runtime;
+using Umbraco.Extensions;
 using Umbraco.Tests.Common;
 using Umbraco.Tests.Integration.Extensions;
 using Umbraco.Tests.Integration.Implementations;
 using Umbraco.Tests.Integration.Testing;
-using Umbraco.Web.Common.AspNetCore;
-using Umbraco.Extensions;
 
 namespace Umbraco.Tests.Integration
 {
@@ -54,13 +53,16 @@ namespace Umbraco.Tests.Integration
 
             var testHelper = new TestHelper();
 
-            // Create the core runtime
-            var coreRuntime = new CoreRuntime(testHelper.GetConfigs(), testHelper.GetUmbracoVersion(),
-                testHelper.IOHelper, testHelper.Logger, testHelper.Profiler, testHelper.UmbracoBootPermissionChecker,
-                testHelper.GetHostingEnvironment(), testHelper.GetBackOfficeInfo(), testHelper.DbProviderFactoryCreator,
-                testHelper.MainDom, testHelper.GetTypeFinder(), NoAppCache.Instance);
+            var globalSettings = new GlobalSettings();
+            var connectionStrings = new ConnectionStrings();
 
-                // boot it!
+            // Create the core runtime
+            var coreRuntime = new CoreRuntime(globalSettings, connectionStrings, testHelper.GetUmbracoVersion(),
+                testHelper.IOHelper, testHelper.ConsoleLoggerFactory, testHelper.Profiler, testHelper.UmbracoBootPermissionChecker,
+                testHelper.GetHostingEnvironment(), testHelper.GetBackOfficeInfo(), testHelper.DbProviderFactoryCreator,
+                testHelper.MainDom, testHelper.GetTypeFinder(), AppCaches.NoCache);
+
+            // boot it!
             var factory = coreRuntime.Configure(umbracoContainer);
 
             Assert.IsTrue(coreRuntime.MainDom.IsMainDom);
@@ -70,6 +72,23 @@ namespace Umbraco.Tests.Integration
             Assert.IsFalse(MyComponent.IsInit);
             Assert.IsFalse(MyComponent.IsTerminated);
 
+            // TODO: found these registration were necessary here (as we haven't called the HostBuilder?), as dependencies for ComponentCollection
+            // are not resolved.  Need to check this if these explicit registrations are the best way to handle this.
+            var contentSettings = new ContentSettings();
+            var coreDebugSettings = new CoreDebugSettings();
+            var nuCacheSettings = new NuCacheSettings();
+            var requestHandlerSettings = new RequestHandlerSettings();
+            var userPasswordConfigurationSettings = new UserPasswordConfigurationSettings();
+            var webRoutingSettings = new WebRoutingSettings();
+
+            umbracoContainer.Register(x => Options.Create(globalSettings));
+            umbracoContainer.Register(x => Options.Create(contentSettings));
+            umbracoContainer.Register(x => Options.Create(coreDebugSettings));
+            umbracoContainer.Register(x => Options.Create(nuCacheSettings));
+            umbracoContainer.Register(x => Options.Create(requestHandlerSettings));
+            umbracoContainer.Register(x => Options.Create(userPasswordConfigurationSettings));
+            umbracoContainer.Register(x => Options.Create(webRoutingSettings));
+            umbracoContainer.Register(typeof(ILogger<>), typeof(Logger<>), Lifetime.Singleton);
             coreRuntime.Start();
 
             Assert.IsTrue(MyComponent.IsInit);
@@ -88,7 +107,7 @@ namespace Umbraco.Tests.Integration
         [Test]
         public async Task AddUmbracoCore()
         {
-            var umbracoContainer = UmbracoIntegrationTest.GetUmbracoContainer(out var serviceProviderFactory);
+            var umbracoContainer = UmbracoIntegrationTest.CreateUmbracoContainer(out var serviceProviderFactory);
             var testHelper = new TestHelper();
 
             var hostBuilder = new HostBuilder()
@@ -101,7 +120,7 @@ namespace Umbraco.Tests.Integration
 
                     // Add it!
                     services.AddUmbracoConfiguration(hostContext.Configuration);
-                    services.AddUmbracoCore(webHostEnvironment, umbracoContainer, GetType().Assembly, NoAppCache.Instance,  testHelper.GetLoggingConfiguration(), out _);
+                    services.AddUmbracoCore(webHostEnvironment, umbracoContainer, GetType().Assembly, AppCaches.NoCache, testHelper.GetLoggingConfiguration(), hostContext.Configuration,out _);
                 });
 
             var host = await hostBuilder.StartAsync();
@@ -128,7 +147,7 @@ namespace Umbraco.Tests.Integration
         [Test]
         public async Task UseUmbracoCore()
         {
-            var umbracoContainer = UmbracoIntegrationTest.GetUmbracoContainer(out var serviceProviderFactory);
+            var umbracoContainer = UmbracoIntegrationTest.CreateUmbracoContainer(out var serviceProviderFactory);
             var testHelper = new TestHelper();
 
             var hostBuilder = new HostBuilder()
@@ -141,7 +160,7 @@ namespace Umbraco.Tests.Integration
 
                     // Add it!
                     services.AddUmbracoConfiguration(hostContext.Configuration);
-                    services.AddUmbracoCore(webHostEnvironment, umbracoContainer, GetType().Assembly, NoAppCache.Instance, testHelper.GetLoggingConfiguration(), out _);
+                    services.AddUmbracoCore(webHostEnvironment, umbracoContainer, GetType().Assembly, AppCaches.NoCache, testHelper.GetLoggingConfiguration(),hostContext.Configuration, out _);
                 });
 
             var host = await hostBuilder.StartAsync();
@@ -187,9 +206,9 @@ namespace Umbraco.Tests.Integration
             public static bool IsInit { get; private set; }
             public static bool IsTerminated { get; private set; }
 
-            private readonly ILogger _logger;
+            private readonly ILogger<MyComponent> _logger;
 
-            public MyComponent(ILogger logger)
+            public MyComponent(ILogger<MyComponent> logger)
             {
                 _logger = logger;
             }

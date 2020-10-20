@@ -8,6 +8,7 @@ using System.Threading;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NPoco;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
@@ -47,7 +48,7 @@ namespace Umbraco.Core.Sync
         public DatabaseServerMessengerOptions Options { get; }
 
         public DatabaseServerMessenger(
-            IMainDom mainDom, IScopeProvider scopeProvider, ISqlContext sqlContext, IProfilingLogger proflog, IServerRegistrar serverRegistrar,
+            IMainDom mainDom, IScopeProvider scopeProvider, ISqlContext sqlContext, IProfilingLogger proflog, ILogger<DatabaseServerMessenger> logger, IServerRegistrar serverRegistrar,
             bool distributedEnabled, DatabaseServerMessengerOptions options,  IHostingEnvironment hostingEnvironment, CacheRefresherCollection cacheRefreshers)
             : base(distributedEnabled)
         {
@@ -58,14 +59,21 @@ namespace Umbraco.Core.Sync
             _serverRegistrar = serverRegistrar;
             _hostingEnvironment = hostingEnvironment;
             _cacheRefreshers = cacheRefreshers;
-            Logger = proflog;
+            Logger = logger;
             Options = options ?? throw new ArgumentNullException(nameof(options));
             _lastPruned = _lastSync = DateTime.UtcNow;
             _syncIdle = new ManualResetEvent(true);
             _distCacheFilePath = new Lazy<string>(() => GetDistCacheFilePath(hostingEnvironment));
+
+            // See notes on LocalIdentity
+            LocalIdentity = NetworkHelper.MachineName // eg DOMAIN\SERVER
+                + "/" + _hostingEnvironment.ApplicationId // eg /LM/S3SVC/11/ROOT
+                + " [P" + Process.GetCurrentProcess().Id // eg 1234
+                + "/D" + AppDomain.CurrentDomain.Id // eg 22
+                + "] " + Guid.NewGuid().ToString("N").ToUpper(); // make it truly unique
         }
 
-        protected ILogger Logger { get; }
+        protected ILogger<DatabaseServerMessenger> Logger { get; }
 
         protected IScopeProvider ScopeProvider { get; }
 
@@ -144,7 +152,7 @@ namespace Umbraco.Core.Sync
                     var idle =_syncIdle.WaitOne(5000);
                     if (idle == false)
                     {
-                        Logger.Warn<DatabaseServerMessenger>("The wait lock timed out, application is shutting down. The current instruction batch will be re-processed.");
+                        Logger.LogWarning("The wait lock timed out, application is shutting down. The current instruction batch will be re-processed.");
                     }
                 },
                 weight);
@@ -180,7 +188,7 @@ namespace Umbraco.Core.Sync
                 {
                     // we haven't synced - in this case we aren't going to sync the whole thing, we will assume this is a new
                     // server and it will need to rebuild it's own caches, eg Lucene or the xml cache file.
-                    Logger.Warn<DatabaseServerMessenger>("No last synced Id found, this generally means this is a new server/install."
+                    Logger.LogWarning("No last synced Id found, this generally means this is a new server/install."
                         + " The server will build its caches and indexes, and then adjust its last synced Id to the latest found in"
                         + " the database and maintain cache updates based on that Id.");
 
@@ -194,7 +202,7 @@ namespace Umbraco.Core.Sync
                     if (count > Options.MaxProcessingInstructionCount)
                     {
                         //too many instructions, proceed to cold boot
-                        Logger.Warn<DatabaseServerMessenger>(
+                        Logger.LogWarning(
                             "The instruction count ({InstructionCount}) exceeds the specified MaxProcessingInstructionCount ({MaxProcessingInstructionCount})."
                             + " The server will skip existing instructions, rebuild its caches and indexes entirely, adjust its last synced Id"
                             + " to the latest found in the database and maintain cache updates based on that Id.",
@@ -354,7 +362,7 @@ namespace Umbraco.Core.Sync
                 }
                 catch (JsonException ex)
                 {
-                    Logger.Error<DatabaseServerMessenger>(ex, "Failed to deserialize instructions ({DtoId}: '{DtoInstructions}').",
+                    Logger.LogError(ex, "Failed to deserialize instructions ({DtoId}: '{DtoInstructions}').",
                         dto.Id,
                         dto.Instructions);
 
@@ -370,7 +378,7 @@ namespace Umbraco.Core.Sync
                 //if they couldn't be all processed (i.e. we're shutting down) then exit
                 if (success == false)
                 {
-                    Logger.Info<DatabaseServerMessenger>("The current batch of instructions was not processed, app is shutting down");
+                    Logger.LogInformation("The current batch of instructions was not processed, app is shutting down");
                     break;
                 }
 
@@ -412,7 +420,7 @@ namespace Umbraco.Core.Sync
             //}
             catch (Exception ex)
             {
-                    Logger.Error<DatabaseServerMessenger>(
+                    Logger.LogError(
                         ex,
                         "DISTRIBUTED CACHE IS NOT UPDATED. Failed to execute instructions ({DtoId}: '{DtoInstructions}'). Instruction is being skipped/ignored",
                         dto.Id,
@@ -526,11 +534,7 @@ namespace Umbraco.Core.Sync
         /// <para>Practically, all we really need is the guid, the other infos are here for information
         /// and debugging purposes.</para>
         /// </remarks>
-        protected string LocalIdentity => NetworkHelper.MachineName // eg DOMAIN\SERVER
-            + "/" + _hostingEnvironment.ApplicationId // eg /LM/S3SVC/11/ROOT
-            + " [P" + Process.GetCurrentProcess().Id // eg 1234
-            + "/D" + AppDomain.CurrentDomain.Id // eg 22
-            + "] " + Guid.NewGuid().ToString("N").ToUpper(); // make it truly unique
+        protected string LocalIdentity { get; }
 
         private string GetDistCacheFilePath(IHostingEnvironment hostingEnvironment)
         {

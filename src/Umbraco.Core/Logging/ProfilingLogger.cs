@@ -1,4 +1,7 @@
 ﻿using System;
+using Microsoft.Extensions.Logging;
+using Umbraco.Core.Models;
+
 
 namespace Umbraco.Core.Logging
 {
@@ -43,89 +46,56 @@ namespace Umbraco.Core.Logging
 
         public DisposableTimer DebugDuration<T>(string startMessage)
         {
-            return Logger.IsEnabled<T>(LogLevel.Debug)
+            return Logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug)
                 ? DebugDuration<T>(startMessage, "Completed.")
                 : null;
         }
 
         public DisposableTimer DebugDuration<T>(string startMessage, string completeMessage, string failMessage = null, int thresholdMilliseconds = 0)
         {
-            return Logger.IsEnabled<T>(LogLevel.Debug)
+            return Logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug)
                 ? new DisposableTimer(Logger, LogLevel.Debug, Profiler, typeof(T), startMessage, completeMessage, failMessage, thresholdMilliseconds)
                 : null;
         }
 
         public DisposableTimer DebugDuration(Type loggerType, string startMessage, string completeMessage, string failMessage = null, int thresholdMilliseconds = 0)
         {
-            return Logger.IsEnabled(loggerType, LogLevel.Debug)
+            return Logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug)
                 ? new DisposableTimer(Logger, LogLevel.Debug, Profiler, loggerType, startMessage, completeMessage, failMessage, thresholdMilliseconds)
                 : null;
         }
 
         #region ILogger
 
-        public bool IsEnabled(Type reporting, LogLevel level)
-            => Logger.IsEnabled(reporting, level);
+        public bool IsEnabled(Microsoft.Extensions.Logging.LogLevel level)
+            => Logger.IsEnabled(level);
 
-        public void Fatal(Type reporting, Exception exception, string message)
-            => Logger.Fatal(reporting, exception, message);
+        public void LogCritical(Exception exception, string messageTemplate, params object[] propertyValues)
+            => Logger.LogCritical(exception, messageTemplate, propertyValues);
 
-        public void Fatal(Type reporting, Exception exception)
-            => Logger.Fatal(reporting, exception);
+        public void LogCritical(string messageTemplate, params object[] propertyValues)
+            => Logger.LogCritical(messageTemplate, propertyValues);
 
-        public void Fatal(Type reporting, string message)
-            => Logger.Fatal(reporting, message);
+        public void LogError(Exception exception, string messageTemplate, params object[] propertyValues)
+            => Logger.LogError(exception, messageTemplate, propertyValues);
 
-        public void Fatal(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues)
-            => Logger.Fatal(reporting, exception, messageTemplate, propertyValues);
+        public void LogError(string messageTemplate, params object[] propertyValues)
+            => Logger.LogError(messageTemplate, propertyValues);
 
-        public void Fatal(Type reporting, string messageTemplate, params object[] propertyValues)
-            => Logger.Fatal(reporting, messageTemplate, propertyValues);
+        public void LogWarning(string messageTemplate, params object[] propertyValues)
+            => Logger.LogWarning(messageTemplate, propertyValues);
 
-        public void Error(Type reporting, Exception exception, string message)
-            => Logger.Error(reporting, exception, message);
+        public void LogWarning(Exception exception, string messageTemplate, params object[] propertyValues)
+            => Logger.LogWarning(exception, messageTemplate, propertyValues);
 
-        public void Error(Type reporting, Exception exception)
-            => Logger.Error(reporting, exception);
+        public void LogInformation(string messageTemplate, params object[] propertyValues)
+            => Logger.LogInformation(messageTemplate, propertyValues);
 
-        public void Error(Type reporting, string message)
-            => Logger.Error(reporting, message);
+        public void LogDebug(string messageTemplate, params object[] propertyValues)
+            => Logger.LogDebug(messageTemplate, propertyValues);
 
-        public void Error(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues)
-            => Logger.Error(reporting, exception, messageTemplate, propertyValues);
-
-        public void Error(Type reporting, string messageTemplate, params object[] propertyValues)
-            => Logger.Error(reporting, messageTemplate, propertyValues);
-
-        public void Warn(Type reporting, string message)
-            => Logger.Warn(reporting, message);
-
-        public void Warn(Type reporting, string messageTemplate, params object[] propertyValues)
-            => Logger.Warn(reporting, messageTemplate, propertyValues);
-
-        public void Warn(Type reporting, Exception exception, string message)
-            => Logger.Warn(reporting, exception, message);
-
-        public void Warn(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues)
-            => Logger.Warn(reporting, exception, messageTemplate, propertyValues);
-
-        public void Info(Type reporting, string message)
-            => Logger.Info(reporting, message);
-
-        public void Info(Type reporting, string messageTemplate, params object[] propertyValues)
-            => Logger.Info(reporting, messageTemplate, propertyValues);
-
-        public void Debug(Type reporting, string message)
-            => Logger.Debug(reporting, message);
-
-        public void Debug(Type reporting, string messageTemplate, params object[] propertyValues)
-            => Logger.Debug(reporting, messageTemplate, propertyValues);
-
-        public void Verbose(Type reporting, string message)
-            => Logger.Verbose(reporting, message);
-
-        public void Verbose(Type reporting, string messageTemplate, params object[] propertyValues)
-            => Logger.Verbose(reporting, messageTemplate, propertyValues);
+        public void LogTrace(string messageTemplate, params object[] propertyValues)
+            => Logger.LogTrace(messageTemplate, propertyValues);
 
         #endregion
     }

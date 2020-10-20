@@ -2,17 +2,20 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
-using Umbraco.Core.Logging;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
+using Umbraco.Core.Configuration.Models;
+using Microsoft.Extensions.Options;
 
 namespace Umbraco.Core.IO
 {
     public class FileSystems : IFileSystems
     {
         private readonly IFactory _container;
-        private readonly ILogger _logger;
+        private readonly ILogger<FileSystems> _logger;
+        private readonly ILoggerFactory _loggerFactory;
         private readonly IIOHelper _ioHelper;
 
         private readonly ConcurrentDictionary<Type, Lazy<IFileSystem>> _filesystems = new ConcurrentDictionary<Type, Lazy<IFileSystem>>();
@@ -36,12 +39,13 @@ namespace Umbraco.Core.IO
         #region Constructor
 
         // DI wants a public ctor
-        public FileSystems(IFactory container, ILogger logger, IIOHelper ioHelper, IGlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
+        public FileSystems(IFactory container, ILogger<FileSystems> logger, ILoggerFactory loggerFactory, IIOHelper ioHelper, IOptions<GlobalSettings> globalSettings, IHostingEnvironment hostingEnvironment)
         {
             _container = container;
             _logger = logger;
+            _loggerFactory = loggerFactory;
             _ioHelper = ioHelper;
-            _globalSettings = globalSettings;
+            _globalSettings = globalSettings.Value;
             _hostingEnvironment = hostingEnvironment;
         }
 
@@ -126,17 +130,18 @@ namespace Umbraco.Core.IO
         // but it does not really matter what we return - here, null
         private object CreateWellKnownFileSystems()
         {
-            var macroPartialFileSystem = new PhysicalFileSystem(_ioHelper, _hostingEnvironment, _logger, Constants.SystemDirectories.MacroPartials);
-            var partialViewsFileSystem = new PhysicalFileSystem(_ioHelper, _hostingEnvironment, _logger, Constants.SystemDirectories.PartialViews);
-            var stylesheetsFileSystem = new PhysicalFileSystem(_ioHelper, _hostingEnvironment, _logger, _globalSettings.UmbracoCssPath);
-            var scriptsFileSystem = new PhysicalFileSystem(_ioHelper, _hostingEnvironment, _logger, _globalSettings.UmbracoScriptsPath);
-            var mvcViewsFileSystem = new PhysicalFileSystem(_ioHelper, _hostingEnvironment, _logger, Constants.SystemDirectories.MvcViews);
+            var logger = _loggerFactory.CreateLogger<PhysicalFileSystem>();
+            var macroPartialFileSystem = new PhysicalFileSystem(_ioHelper, _hostingEnvironment, logger, Constants.SystemDirectories.MacroPartials);
+            var partialViewsFileSystem = new PhysicalFileSystem(_ioHelper, _hostingEnvironment, logger, Constants.SystemDirectories.PartialViews);
+            var stylesheetsFileSystem = new PhysicalFileSystem(_ioHelper, _hostingEnvironment, logger, _globalSettings.UmbracoCssPath);
+            var scriptsFileSystem = new PhysicalFileSystem(_ioHelper, _hostingEnvironment, logger, _globalSettings.UmbracoScriptsPath);
+            var mvcViewsFileSystem = new PhysicalFileSystem(_ioHelper, _hostingEnvironment, logger, Constants.SystemDirectories.MvcViews);
 
-            _macroPartialFileSystem = new ShadowWrapper(macroPartialFileSystem, _ioHelper, _hostingEnvironment, _logger,"macro-partials", IsScoped);
-            _partialViewsFileSystem = new ShadowWrapper(partialViewsFileSystem, _ioHelper, _hostingEnvironment, _logger,"partials", IsScoped);
-            _stylesheetsFileSystem = new ShadowWrapper(stylesheetsFileSystem, _ioHelper, _hostingEnvironment,_logger,"css", IsScoped);
-            _scriptsFileSystem = new ShadowWrapper(scriptsFileSystem, _ioHelper, _hostingEnvironment,_logger,"scripts", IsScoped);
-            _mvcViewsFileSystem = new ShadowWrapper(mvcViewsFileSystem, _ioHelper, _hostingEnvironment,_logger,"views", IsScoped);
+            _macroPartialFileSystem = new ShadowWrapper(macroPartialFileSystem, _ioHelper, _hostingEnvironment, _loggerFactory, "macro-partials", IsScoped);
+            _partialViewsFileSystem = new ShadowWrapper(partialViewsFileSystem, _ioHelper, _hostingEnvironment, _loggerFactory, "partials", IsScoped);
+            _stylesheetsFileSystem = new ShadowWrapper(stylesheetsFileSystem, _ioHelper, _hostingEnvironment, _loggerFactory, "css", IsScoped);
+            _scriptsFileSystem = new ShadowWrapper(scriptsFileSystem, _ioHelper, _hostingEnvironment, _loggerFactory, "scripts", IsScoped);
+            _mvcViewsFileSystem = new ShadowWrapper(mvcViewsFileSystem, _ioHelper, _hostingEnvironment, _loggerFactory, "views", IsScoped);
 
             // TODO: do we need a lock here?
             _shadowWrappers.Add(_macroPartialFileSystem);
@@ -156,7 +161,7 @@ namespace Umbraco.Core.IO
 
         // internal for tests
         internal IReadOnlyDictionary<Type, string> Paths => _paths;
-        private IGlobalSettings _globalSettings;
+        private GlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
 
         /// <summary>
@@ -233,7 +238,7 @@ namespace Umbraco.Core.IO
 
                 _shadowCurrentId = id;
 
-                _logger.Debug<ShadowFileSystems>("Shadow '{ShadowId}'", _shadowCurrentId);
+                _logger.LogDebug("Shadow '{ShadowId}'", _shadowCurrentId);
 
                 foreach (var wrapper in _shadowWrappers)
                     wrapper.Shadow(_shadowCurrentId);
@@ -250,7 +255,7 @@ namespace Umbraco.Core.IO
                 if (id != _shadowCurrentId)
                     throw new InvalidOperationException("Not the current shadow.");
 
-                _logger.Debug<ShadowFileSystems>("UnShadow '{ShadowId}' {Status}", id, completed ? "complete" : "abort");
+                _logger.LogDebug("UnShadow '{ShadowId}' {Status}", id, completed ? "complete" : "abort");
 
                 var exceptions = new List<Exception>();
                 foreach (var wrapper in _shadowWrappers)
@@ -277,7 +282,7 @@ namespace Umbraco.Core.IO
         {
             lock (_shadowLocker)
             {
-                var wrapper = new ShadowWrapper(filesystem, _ioHelper, _hostingEnvironment, _logger, shadowPath, IsScoped);
+                var wrapper = new ShadowWrapper(filesystem, _ioHelper, _hostingEnvironment, _loggerFactory, shadowPath, IsScoped);
                 if (_shadowCurrentId != null)
                     wrapper.Shadow(_shadowCurrentId);
                 _shadowWrappers.Add(wrapper);

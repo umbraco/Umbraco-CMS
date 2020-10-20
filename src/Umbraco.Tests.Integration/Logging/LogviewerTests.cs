@@ -4,8 +4,8 @@ using Serilog;
 using System;
 using System.IO;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Logging.Viewer;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Integration.Implementations;
@@ -57,7 +57,7 @@ namespace Umbraco.Tests.Logging
             File.Copy(exampleLogfilePath, _newLogfilePath, true);
             File.Copy(exampleSearchfilePath, _newSearchfilePath, true);
 
-            var logger = Mock.Of<Core.Logging.ILogger>();
+            var logger = Mock.Of<ILogger<SerilogJsonLogViewer>>();
             var logViewerConfig = new LogViewerConfig(hostingEnv);
             _logViewer = new SerilogJsonLogViewer(logger, logViewerConfig, loggingConfiguration, Log.Logger);
         }

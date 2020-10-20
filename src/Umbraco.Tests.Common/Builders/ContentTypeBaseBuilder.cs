@@ -15,6 +15,7 @@ namespace Umbraco.Tests.Common.Builders
             IWithAliasBuilder,
             IWithNameBuilder,
             IWithParentIdBuilder,
+            IWithParentContentTypeBuilder,
             IWithPathBuilder,
             IWithLevelBuilder,
             IWithSortOrderBuilder,
@@ -32,6 +33,7 @@ namespace Umbraco.Tests.Common.Builders
         private string _alias;
         private string _name;
         private int? _parentId;
+        private IContentTypeComposition _parent;
         private int? _level;
         private string _path;
         private int? _sortOrder;
@@ -43,7 +45,6 @@ namespace Umbraco.Tests.Common.Builders
         private string _thumbnail;
         private bool? _trashed;
         private bool? _isContainer;
-        protected ContentVariation? ContentVariation { get; set; }
 
         protected IShortStringHelper ShortStringHelper => new DefaultShortStringHelper(new DefaultShortStringHelperConfig());
 
@@ -51,7 +52,7 @@ namespace Umbraco.Tests.Common.Builders
         {
         }
 
-        protected int GetId() => _id ?? 1;
+        protected int GetId() => _id ?? 0;
 
         protected Guid GetKey() => _key ?? Guid.NewGuid();
 
@@ -64,6 +65,8 @@ namespace Umbraco.Tests.Common.Builders
         protected string GetAlias() => _alias ?? GetName().ToCamelCase();
 
         protected int GetParentId() => _parentId ?? -1;
+
+        protected IContentTypeComposition GetParent() => _parent ?? null;
 
         protected int GetLevel() => _level ?? 0;
 
@@ -82,8 +85,6 @@ namespace Umbraco.Tests.Common.Builders
         protected bool GetTrashed() => _trashed ?? false;
 
         protected bool GetIsContainer() => _isContainer ?? false;
-        protected ContentVariation GetContentVariation() => ContentVariation ?? Core.Models.ContentVariation.Nothing;
-
 
         protected void BuildPropertyGroups(ContentTypeCompositionBase contentType, IEnumerable<PropertyGroup> propertyGroups)
         {
@@ -92,8 +93,6 @@ namespace Umbraco.Tests.Common.Builders
                 contentType.PropertyGroups.Add(propertyGroup);
             }
         }
-
-
 
         protected void BuildPropertyTypeIds(ContentTypeCompositionBase contentType, int? propertyTypeIdsIncrementingFrom)
         {
@@ -104,6 +103,23 @@ namespace Umbraco.Tests.Common.Builders
                 {
                     propertyType.Id = ++i;
                 }
+            }
+        }
+
+        public static void EnsureAllIds(ContentTypeCompositionBase contentType, int seedId)
+        {
+            // Ensure everything has IDs (it will have if builder is used to create the object, but still useful to reset
+            // and ensure there are no clashes).
+            contentType.Id = seedId;
+            var itemid = seedId + 1;
+            foreach (var propertyGroup in contentType.PropertyGroups)
+            {
+                propertyGroup.Id = itemid++;
+            }
+
+            foreach (var propertyType in contentType.PropertyTypes)
+            {
+                propertyType.Id = itemid++;
             }
         }
 
@@ -134,7 +150,21 @@ namespace Umbraco.Tests.Common.Builders
         int? IWithParentIdBuilder.ParentId
         {
             get => _parentId;
-            set => _parentId = value;
+            set
+            {
+                _parent = null;
+                _parentId = value;
+            }
+        }
+
+        IContentTypeComposition IWithParentContentTypeBuilder.Parent
+        {
+            get => _parent;
+            set
+            {
+                _parentId = null;
+                _parent = value;
+            }
         }
 
         int? IWithLevelBuilder.Level

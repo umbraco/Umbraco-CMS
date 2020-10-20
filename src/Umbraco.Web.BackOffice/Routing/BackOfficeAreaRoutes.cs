@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.Common.Controllers;
@@ -14,19 +16,19 @@ namespace Umbraco.Web.BackOffice.Routing
     /// </summary>
     public class BackOfficeAreaRoutes : IAreaRoutes
     {
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IRuntimeState _runtimeState;
         private readonly UmbracoApiControllerTypeCollection _apiControllers;
         private readonly string _umbracoPathSegment;
 
         public BackOfficeAreaRoutes(
-            IGlobalSettings globalSettings,
+            IOptions<GlobalSettings> globalSettings,
             IHostingEnvironment hostingEnvironment,
             IRuntimeState runtimeState,
             UmbracoApiControllerTypeCollection apiControllers)
         {
-            _globalSettings = globalSettings;
+            _globalSettings = globalSettings.Value;
             _hostingEnvironment = hostingEnvironment;
             _runtimeState = runtimeState;
             _apiControllers = apiControllers;
@@ -49,7 +51,6 @@ namespace Umbraco.Web.BackOffice.Routing
                     MapMinimalBackOffice(endpoints);
                     endpoints.MapUmbracoRoute<PreviewController>(_umbracoPathSegment, Constants.Web.Mvc.BackOfficeArea, null);
                     AutoRouteBackOfficeControllers(endpoints);
-
                     break;
                 case RuntimeLevel.BootFailed:
                 case RuntimeLevel.Unknown:

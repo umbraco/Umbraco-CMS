@@ -1,24 +1,5 @@
-﻿using System;
-using System.Globalization;
-using Moq;
-using Newtonsoft.Json;
-using NUnit.Framework;
-using Newtonsoft.Json.Linq;
-using Umbraco.Core;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
+﻿using NUnit.Framework;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.PropertyEditors.ValueConverters;
-using Umbraco.Core.Services;
-using Umbraco.Tests.Components;
-using Umbraco.Tests.TestHelpers;
-using Umbraco.Web;
-using Umbraco.Web.PropertyEditors;
-using System.Text;
 using Umbraco.Infrastructure.Media;
 using Umbraco.Web.Models;
 

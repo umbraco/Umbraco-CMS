@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Xml.Linq;
 using System.Xml.XPath;
-using Umbraco.Core.Logging;
+using Microsoft.Extensions.Logging;
 
 namespace Umbraco.Core.Services.Implement
 {
@@ -12,7 +12,7 @@ namespace Umbraco.Core.Services.Implement
 
     public class LocalizedTextService : ILocalizedTextService
     {
-        private readonly ILogger _logger;
+        private readonly ILogger<LocalizedTextService> _logger;
         private readonly Lazy<LocalizedTextServiceFileSources> _fileSources;
         private readonly IDictionary<CultureInfo, IDictionary<string, IDictionary<string, string>>> _dictionarySource;
         private readonly IDictionary<CultureInfo, Lazy<XDocument>> _xmlSource;
@@ -22,7 +22,7 @@ namespace Umbraco.Core.Services.Implement
         /// </summary>
         /// <param name="fileSources"></param>
         /// <param name="logger"></param>
-        public LocalizedTextService(Lazy<LocalizedTextServiceFileSources> fileSources, ILogger logger)
+        public LocalizedTextService(Lazy<LocalizedTextServiceFileSources> fileSources, ILogger<LocalizedTextService> logger)
         {
             if (logger == null) throw new ArgumentNullException("logger");
             _logger = logger;
@@ -35,7 +35,7 @@ namespace Umbraco.Core.Services.Implement
         /// </summary>
         /// <param name="source"></param>
         /// <param name="logger"></param>
-        public LocalizedTextService(IDictionary<CultureInfo, Lazy<XDocument>> source, ILogger logger)
+        public LocalizedTextService(IDictionary<CultureInfo, Lazy<XDocument>> source, ILogger<LocalizedTextService> logger)
         {
             if (source == null) throw new ArgumentNullException("source");
             if (logger == null) throw new ArgumentNullException("logger");
@@ -48,7 +48,7 @@ namespace Umbraco.Core.Services.Implement
         /// </summary>
         /// <param name="source"></param>
         /// <param name="logger"></param>
-        public LocalizedTextService(IDictionary<CultureInfo, IDictionary<string, IDictionary<string, string>>> source, ILogger logger)
+        public LocalizedTextService(IDictionary<CultureInfo, IDictionary<string, IDictionary<string, string>>> source, ILogger<LocalizedTextService> logger)
         {
             _dictionarySource = source ?? throw new ArgumentNullException(nameof(source));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -104,7 +104,7 @@ namespace Umbraco.Core.Services.Implement
             {
                 if (xmlSource.ContainsKey(culture) == false)
                 {
-                    _logger.Warn<LocalizedTextService>("The culture specified {Culture} was not found in any configured sources for this service", culture);
+                    _logger.LogWarning("The culture specified {Culture} was not found in any configured sources for this service", culture);
                     return result;
                 }
 
@@ -124,7 +124,7 @@ namespace Umbraco.Core.Services.Implement
             {
                 if (_dictionarySource.ContainsKey(culture) == false)
                 {
-                    _logger.Warn<LocalizedTextService>("The culture specified {Culture} was not found in any configured sources for this service", culture);
+                    _logger.LogWarning("The culture specified {Culture} was not found in any configured sources for this service", culture);
                     return result;
                 }
 
@@ -207,7 +207,7 @@ namespace Umbraco.Core.Services.Implement
         {
             if (_dictionarySource.ContainsKey(culture) == false)
             {
-                _logger.Warn<LocalizedTextService>("The culture specified {Culture} was not found in any configured sources for this service", culture);
+                _logger.LogWarning("The culture specified {Culture} was not found in any configured sources for this service", culture);
                 return "[" + key + "]";
             }
 
@@ -245,7 +245,7 @@ namespace Umbraco.Core.Services.Implement
         {
             if (xmlSource.ContainsKey(culture) == false)
             {
-                _logger.Warn<LocalizedTextService>("The culture specified {Culture} was not found in any configured sources for this service", culture);
+                _logger.LogWarning("The culture specified {Culture} was not found in any configured sources for this service", culture);
                 return "[" + key + "]";
             }
 

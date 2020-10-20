@@ -33,7 +33,8 @@ namespace Umbraco.Web.Models.ContentEditing
             if (UserGroups.Any() == false)
                 yield return new ValidationResult("A user must be assigned to at least one group", new[] { nameof(UserGroups) });
 
-            if (Current.Configs.Security().UsernameIsEmail == false && Username.IsNullOrWhiteSpace())
+            // TODO: this will need another way of retrieving this setting if and when Configs are removed from Current.
+            if (Current.SecuritySettings.UsernameIsEmail == false && Username.IsNullOrWhiteSpace())
                 yield return new ValidationResult("A username cannot be empty", new[] { nameof(Username) });
         }
     }

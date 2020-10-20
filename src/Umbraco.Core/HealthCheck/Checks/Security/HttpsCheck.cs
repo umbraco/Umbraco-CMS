@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Security.Cryptography.X509Certificates;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Services;
-using Umbraco.Core.Logging;
 using Umbraco.Web.HealthCheck.Checks.Config;
+using Umbraco.Core.Configuration.Models;
+using Microsoft.Extensions.Options;
 
 namespace Umbraco.Web.HealthCheck.Checks.Security
 {
@@ -19,20 +21,24 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
     public class HttpsCheck : HealthCheck
     {
         private readonly ILocalizedTextService _textService;
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly IIOHelper _ioHelper;
-        private readonly ILogger _logger;
         private readonly IRequestAccessor _requestAccessor;
+        private readonly ILogger<ConfigurationService> _logger;
 
         private const string FixHttpsSettingAction = "fixHttpsSetting";
 
-        public HttpsCheck(ILocalizedTextService textService, IGlobalSettings globalSettings, IIOHelper ioHelper, ILogger logger, IRequestAccessor requestAccessor)
+        public HttpsCheck(ILocalizedTextService textService,
+            IOptions<GlobalSettings> globalSettings,
+            IIOHelper ioHelper,
+            IRequestAccessor requestAccessor,
+            ILogger<ConfigurationService> logger)
         {
             _textService = textService;
-            _globalSettings = globalSettings;
+            _globalSettings = globalSettings.Value;
             _ioHelper = ioHelper;
-            _logger = logger;
             _requestAccessor = requestAccessor;
+            _logger = logger;
         }
 
         /// <summary>

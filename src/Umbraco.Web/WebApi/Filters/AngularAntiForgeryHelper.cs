@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Headers;
 using System.Web.Helpers;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.WebApi.Filters
@@ -44,7 +44,7 @@ namespace Umbraco.Web.WebApi.Filters
             }
             catch (Exception ex)
             {
-                Current.Logger.Error(typeof(AngularAntiForgeryHelper), ex, "Could not validate XSRF token");
+                Current.Logger.LogError(ex, "Could not validate XSRF token");
                 return false;
             }
             return true;

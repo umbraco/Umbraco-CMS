@@ -271,9 +271,15 @@
          * @param {any} app the active content app
          */
         function createButtons(content) {
+            
+            var isBlueprint = content.isBlueprint;
+
+            if ($scope.page.isNew && $location.path().search(/contentBlueprints/i) !== -1) {
+               isBlueprint = true;
+            }
 
             // for trashed and element type items, the save button is the primary action - otherwise it's a secondary action
-            $scope.page.saveButtonStyle = content.trashed || content.isElement || content.isBlueprint ? "primary" : "info";
+            $scope.page.saveButtonStyle = content.trashed || content.isElement || isBlueprint ? "primary" : "info";
             // only create the save/publish/preview buttons if the
             // content app is "Conent"
             if ($scope.activeApp && $scope.activeApp.alias !== "umbContent" && $scope.activeApp.alias !== "umbInfo" && $scope.activeApp.alias !== "umbListView") {

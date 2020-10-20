@@ -62,8 +62,8 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Umbraco.Web.UI.Client", "ht
 EndProject
 Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Umbraco.Tests.AcceptanceTest", "http://localhost:58896", "{9E4C8A12-FBE0-4673-8CE2-DF99D5D57817}"
 	ProjectSection(WebsiteProperties) = preProject
-        UseIISExpress = "true"
-        TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.5"
+								UseIISExpress = "true"
+								TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.5"
 		Debug.AspNetCompiler.VirtualPath = "/localhost_58896"
 		Debug.AspNetCompiler.PhysicalPath = "Umbraco.Tests.AcceptanceTest\"
 		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_58896\"
@@ -84,8 +84,8 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Umbraco.Tests.AcceptanceTes
 		Release.AspNetCompiler.ForceOverwrite = "true"
 		Release.AspNetCompiler.FixedNames = "false"
 		Release.AspNetCompiler.Debug = "False"
-        DefaultWebSiteLanguage = "Visual C#"
-        StartServerOnDebug = "false"
+								DefaultWebSiteLanguage = "Visual C#"
+								StartServerOnDebug = "false"
 		VWDPort = "58896"
 		VWDPort = "62926"
 		SlnRelativePath = "Umbraco.Tests.AcceptanceTest\"
@@ -107,10 +107,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{E3F9F378
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{5B03EF4E-E0AC-4905-861B-8C3EC1A0D458}"
-	ProjectSection(SolutionItems) = preProject
-		..\build\NuSpecs\build\UmbracoCms.props = ..\build\NuSpecs\build\UmbracoCms.props
-		..\build\NuSpecs\build\UmbracoCms.targets = ..\build\NuSpecs\build\UmbracoCms.targets
-	EndProjectSection
+ProjectSection(SolutionItems) = preProject
+	..\build\NuSpecs\build\Umbraco.Cms.props = ..\build\NuSpecs\build\Umbraco.Cms.props
+	..\build\NuSpecs\build\Umbraco.Cms.targets = ..\build\NuSpecs\build\Umbraco.Cms.targets
+EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DocTools", "DocTools", "{53594E5B-64A2-4545-8367-E3627D266AE8}"
 	ProjectSection(SolutionItems) = preProject
@@ -136,8 +136,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.ModelsBuilder.Embedded", "Umbraco.ModelsBuilder.Embedded\Umbraco.ModelsBuilder.Embedded.csproj", "{52AC0BA8-A60E-4E36-897B-E8B97A54ED1C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Infrastructure", "Umbraco.Infrastructure\Umbraco.Infrastructure.csproj", "{3AE7BF57-966B-45A5-910A-954D7C554441}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Configuration", "Umbraco.Configuration\Umbraco.Configuration.csproj", "{FBE7C065-DAC0-4025-A78B-63B24D3AB00B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Persistance.SqlCe", "Umbraco.Persistance.SqlCe\Umbraco.Persistance.SqlCe.csproj", "{33085570-9BF2-4065-A9B0-A29D920D13BA}"
 EndProject
@@ -199,10 +197,6 @@ Global
 		{3AE7BF57-966B-45A5-910A-954D7C554441}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3AE7BF57-966B-45A5-910A-954D7C554441}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3AE7BF57-966B-45A5-910A-954D7C554441}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FBE7C065-DAC0-4025-A78B-63B24D3AB00B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FBE7C065-DAC0-4025-A78B-63B24D3AB00B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FBE7C065-DAC0-4025-A78B-63B24D3AB00B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FBE7C065-DAC0-4025-A78B-63B24D3AB00B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{33085570-9BF2-4065-A9B0-A29D920D13BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{33085570-9BF2-4065-A9B0-A29D920D13BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{33085570-9BF2-4065-A9B0-A29D920D13BA}.Release|Any CPU.ActiveCfg = Release|Any CPU

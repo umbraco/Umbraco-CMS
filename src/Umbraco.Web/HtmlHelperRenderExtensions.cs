@@ -10,6 +10,7 @@ using System.Web.Mvc.Html;
 using System.Web.Routing;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Web.Mvc;
@@ -60,7 +61,7 @@ namespace Umbraco.Web
         /// <remarks>
         /// See: http://issues.umbraco.org/issue/U4-1614
         /// </remarks>
-        public static MvcHtmlString PreviewBadge(this HtmlHelper helper, IHttpContextAccessor httpContextAccessor, IGlobalSettings globalSettings, IIOHelper ioHelper, IContentSettings contentSettings)
+        public static MvcHtmlString PreviewBadge(this HtmlHelper helper, IHttpContextAccessor httpContextAccessor, GlobalSettings globalSettings, IIOHelper ioHelper, ContentSettings contentSettings)
         {
             if (Current.UmbracoContext.InPreviewMode)
             {
@@ -86,6 +87,12 @@ namespace Umbraco.Web
             Func<object, ViewDataDictionary, string> contextualKeyBuilder = null)
         {
             var cacheKey = new StringBuilder(partialViewName);
+             //let's always cache by the current culture to allow variants to have different cache results
+            var cultureName = System.Threading.Thread.CurrentThread.CurrentUICulture.Name;
+            if (!String.IsNullOrEmpty(cultureName))
+            {
+                cacheKey.AppendFormat("{0}-", cultureName);
+            }
             if (cacheByPage)
             {
                 if (Current.UmbracoContext == null)

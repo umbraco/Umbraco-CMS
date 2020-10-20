@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Events;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
@@ -43,7 +43,7 @@ namespace Umbraco.Web.Cache
             if (supportUnbinding)
                 _unbinders = new List<Action>();
 
-            _logger.Info<DistributedCacheBinderComponent>("Initializing Umbraco internal event handlers for cache refreshing.");
+            _logger.LogInformation("Initializing Umbraco internal event handlers for cache refreshing.");
 
             // bind to user and user group events
             Bind(() => UserService.SavedUserGroup += UserService_SavedUserGroup,

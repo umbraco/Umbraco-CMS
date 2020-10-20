@@ -1,17 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SqlServerCe;
-using System.Linq;
 using System.Threading;
 using System.Web.Routing;
 using System.Xml;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -33,6 +32,7 @@ using Umbraco.Persistance.SqlCe;
 using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Web.WebApi;
 using Umbraco.Tests.Common;
+using Umbraco.Tests.Common.Builders;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -91,7 +91,7 @@ namespace Umbraco.Tests.TestHelpers
                     return TestObjects.GetDatabaseFactoryMock();
 
                 var lazyMappers = new Lazy<IMapperCollection>(f.GetInstance<IMapperCollection>);
-                var factory = new UmbracoDatabaseFactory(f.GetInstance<ILogger>(), GetDbConnectionString(), GetDbProviderName(), lazyMappers, TestHelper.DbProviderFactoryCreator);
+                var factory = new UmbracoDatabaseFactory(f.GetInstance<ILogger<UmbracoDatabaseFactory>>(), f.GetInstance<ILoggerFactory>(), GetDbConnectionString(), GetDbProviderName(), lazyMappers, TestHelper.DbProviderFactoryCreator);
                 factory.ResetForTests();
                 return factory;
             });
@@ -152,7 +152,7 @@ namespace Umbraco.Tests.TestHelpers
 
         protected virtual string GetDbConnectionString()
         {
-            return @"Datasource=|DataDirectory|UmbracoNPocoTests.sdf;Flush Interval=1;";
+            return @"DataSource=|DataDirectory|UmbracoNPocoTests.sdf;Flush Interval=1;";
         }
 
 
@@ -237,16 +237,16 @@ namespace Umbraco.Tests.TestHelpers
             }
         }
 
-        protected virtual IPublishedSnapshotService CreatePublishedSnapshotService()
+        protected virtual IPublishedSnapshotService CreatePublishedSnapshotService(GlobalSettings globalSettings = null)
         {
             var cache = NoAppCache.Instance;
 
-            ContentTypesCache = new PublishedContentTypeCache(
+            ContentTypesCache ??= new PublishedContentTypeCache(
                 Factory.GetInstance<IContentTypeService>(),
                 Factory.GetInstance<IMediaTypeService>(),
                 Factory.GetInstance<IMemberTypeService>(),
                 Factory.GetInstance<IPublishedContentTypeFactory>(),
-                Logger);
+                Factory.GetInstance<ILogger<PublishedContentTypeCache>>());
 
             // testing=true so XmlStore will not use the file nor the database
 
@@ -260,8 +260,8 @@ namespace Umbraco.Tests.TestHelpers
                 Factory.GetInstance<IUmbracoContextAccessor>(),
                 Factory.GetInstance<IDocumentRepository>(), Factory.GetInstance<IMediaRepository>(), Factory.GetInstance<IMemberRepository>(),
                 DefaultCultureAccessor,
-                Logger,
-                Factory.GetInstance<IGlobalSettings>(),
+                Factory.GetInstance<ILoggerFactory>(),
+                globalSettings ?? TestObjects.GetGlobalSettings(),
                 HostingEnvironment,
                 HostingLifetime,
                 ShortStringHelper,
@@ -301,7 +301,7 @@ namespace Umbraco.Tests.TestHelpers
             {
                 using (var scope = ScopeProvider.CreateScope())
                 {
-                    var schemaHelper = new DatabaseSchemaCreator(scope.Database, Logger, UmbracoVersion, TestObjects.GetGlobalSettings());
+                    var schemaHelper = new DatabaseSchemaCreator(scope.Database, LoggerFactory.CreateLogger<DatabaseSchemaCreator>(), LoggerFactory, UmbracoVersion);
                     //Create the umbraco database and its base data
                     schemaHelper.InitializeDatabaseSchema();
 
@@ -344,14 +344,14 @@ namespace Umbraco.Tests.TestHelpers
             }
             catch (Exception ex)
             {
-                Logger.Error<TestWithDatabaseBase>(ex, "Could not remove the old database file");
+                LoggerFactory.CreateLogger<TestWithDatabaseBase>().LogError(ex, "Could not remove the old database file");
 
                 // swallow this exception - that's because a sub class might require further teardown logic
                 onFail?.Invoke(ex);
             }
         }
 
-        protected IUmbracoContext GetUmbracoContext(string url, int templateId = 1234, RouteData routeData = null, bool setSingleton = false,  IGlobalSettings globalSettings = null, IPublishedSnapshotService snapshotService = null)
+        protected IUmbracoContext GetUmbracoContext(string url, int templateId = 1234, RouteData routeData = null, bool setSingleton = false, GlobalSettings globalSettings = null, IPublishedSnapshotService snapshotService = null)
         {
             // ensure we have a PublishedCachesService
             var service = snapshotService ?? PublishedSnapshotService as XmlPublishedSnapshotService;
@@ -374,8 +374,8 @@ namespace Umbraco.Tests.TestHelpers
             var umbracoContext = new UmbracoContext(
                 httpContextAccessor,
                 service,
-                Mock.Of<IWebSecurity>(),
-                globalSettings ?? Factory.GetInstance<IGlobalSettings>(),
+                Mock.Of<IBackofficeSecurity>(),
+                globalSettings ?? new GlobalSettings(),
                 HostingEnvironment,
                 new TestVariationContextAccessor(),
                 UriUtility,

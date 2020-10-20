@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Events;
 using Umbraco.Core.Exceptions;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Factories;
@@ -29,7 +29,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     {
         private readonly IShortStringHelper _shortStringHelper;
 
-        protected ContentTypeRepositoryBase(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger, IContentTypeCommonRepository commonRepository, ILanguageRepository languageRepository, IShortStringHelper shortStringHelper)
+        protected ContentTypeRepositoryBase(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<ContentTypeRepositoryBase<TEntity>> logger, IContentTypeCommonRepository commonRepository, ILanguageRepository languageRepository, IShortStringHelper shortStringHelper)
             : base(scopeAccessor, cache, logger)
         {
             _shortStringHelper = shortStringHelper;
@@ -89,6 +89,24 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             return moveInfo;
         }
+
+        protected override IEnumerable<TEntity> PerformGetAll(params int[] ids)
+        {
+            var result = GetAllWithFullCachePolicy();
+
+            // By default the cache policy will always want everything
+            // even GetMany(ids) gets everything and filters afterwards,
+            // however if we are using No Cache, we must still be able to support
+            // collections of Ids, so this is to work around that:
+            if (ids.Any())
+            {
+                return result.Where(x => ids.Contains(x.Id));
+            }
+
+            return result;
+        }
+
+        protected abstract IEnumerable<TEntity> GetAllWithFullCachePolicy();
 
         protected virtual PropertyType CreatePropertyType(string propertyEditorAlias, ValueStorageType storageType, string propertyTypeAlias)
         {
@@ -1185,7 +1203,7 @@ AND umbracoNode.id <> @id",
         {
             // first clear dependencies
             Database.Delete<TagRelationshipDto>("WHERE propertyTypeId = @Id", new { Id = propertyTypeId });
-            Database.Delete<PropertyDataDto>("WHERE propertytypeid = @Id", new { Id = propertyTypeId });
+            Database.Delete<PropertyDataDto>("WHERE propertyTypeId = @Id", new { Id = propertyTypeId });
 
             // then delete the property type
             Database.Delete<PropertyTypeDto>("WHERE contentTypeId = @Id AND id = @PropertyTypeId",
@@ -1198,7 +1216,7 @@ AND umbracoNode.id <> @id",
             {
                 var ex = new InvalidOperationException($"Property Type '{pt.Name}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.");
 
-                Logger.Error<ContentTypeRepositoryBase<TEntity>>("Property Type '{PropertyTypeName}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.",
+                Logger.LogError("Property Type '{PropertyTypeName}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.",
                     pt.Name);
 
                 throw ex;
@@ -1211,7 +1229,7 @@ AND umbracoNode.id <> @id",
             {
                 var ex = new InvalidOperationException($"{typeof(TEntity).Name} '{entity.Name}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.");
 
-                Logger.Error<ContentTypeRepositoryBase<TEntity>>("{EntityTypeName} '{EntityName}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.",
+                Logger.LogError("{EntityTypeName} '{EntityName}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.",
                     typeof(TEntity).Name,
                     entity.Name);
 
@@ -1243,7 +1261,7 @@ AND umbracoNode.id <> @id",
                 }
                 else
                 {
-                    Logger.Warn<ContentTypeRepositoryBase<TEntity>>("Could not assign a data type for the property type {PropertyTypeAlias} since no data type was found with a property editor {PropertyEditorAlias}", propertyType.Alias, propertyType.PropertyEditorAlias);
+                    Logger.LogWarning("Could not assign a data type for the property type {PropertyTypeAlias} since no data type was found with a property editor {PropertyEditorAlias}", propertyType.Alias, propertyType.PropertyEditorAlias);
                 }
             }
         }

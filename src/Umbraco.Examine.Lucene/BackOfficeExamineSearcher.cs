@@ -113,6 +113,9 @@ namespace Umbraco.Examine
 
             var allLangs = _languageService.GetAllLanguages().Select(x => x.IsoCode.ToLowerInvariant()).ToList();
 
+            // the chars [*-_] in the query will mess everything up so let's remove those
+            query = Regex.Replace(query, "[\\*\\-_]", "");
+
             //check if text is surrounded by single or double quotes, if so, then exact match
             var surroundedByQuotes = Regex.IsMatch(query, "^\".*?\"$")
                                      || Regex.IsMatch(query, "^\'.*?\'$");

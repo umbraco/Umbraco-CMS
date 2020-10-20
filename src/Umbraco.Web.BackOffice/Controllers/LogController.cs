@@ -8,6 +8,7 @@ using Umbraco.Core.Mapping;
 using Umbraco.Core.Media;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.Attributes;
@@ -26,7 +27,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IImageUrlGenerator _imageUrlGenerator;
         private readonly IAuditService _auditService;
         private readonly UmbracoMapper _umbracoMapper;
-        private readonly IWebSecurity _webSecurity;
+        private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly IUserService _userService;
         private readonly AppCaches _appCaches;
         private readonly ISqlContext _sqlContext;
@@ -36,7 +37,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             IImageUrlGenerator imageUrlGenerator,
             IAuditService auditService,
             UmbracoMapper umbracoMapper,
-            IWebSecurity webSecurity,
+            IBackofficeSecurityAccessor backofficeSecurityAccessor,
             IUserService userService,
             AppCaches appCaches,
             ISqlContext sqlContext)
@@ -45,7 +46,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _imageUrlGenerator = imageUrlGenerator ?? throw new ArgumentNullException(nameof(imageUrlGenerator));
             _auditService = auditService ?? throw new ArgumentNullException(nameof(auditService));
             _umbracoMapper = umbracoMapper ?? throw new ArgumentNullException(nameof(umbracoMapper));
-            _webSecurity = webSecurity ?? throw new ArgumentNullException(nameof(webSecurity));
+            _backofficeSecurityAccessor = backofficeSecurityAccessor ?? throw new ArgumentNullException(nameof(backofficeSecurityAccessor));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _appCaches = appCaches ?? throw new ArgumentNullException(nameof(appCaches));
             _sqlContext = sqlContext ?? throw new ArgumentNullException(nameof(sqlContext));
@@ -89,13 +90,20 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             long totalRecords;
             var dateQuery = sinceDate.HasValue ? _sqlContext.Query<IAuditItem>().Where(x => x.CreateDate >= sinceDate) : null;
-            var userId = _webSecurity.GetUserId().ResultOr(0);
+            var userId = _backofficeSecurityAccessor.BackofficeSecurity.GetUserId().ResultOr(0);
             var result = _auditService.GetPagedItemsByUser(userId, pageNumber - 1, pageSize, out totalRecords, orderDirection, customFilter:dateQuery);
             var mapped = _umbracoMapper.MapEnumerable<IAuditItem, AuditLog>(result);
             return new PagedResult<AuditLog>(totalRecords, pageNumber, pageSize)
             {
                 Items = MapAvatarsAndNames(mapped)
             };
+        }
+
+        public IEnumerable<AuditLog> GetLog(AuditType logType, DateTime? sinceDate = null)
+        {
+            var result = _auditService.GetLogs(Enum<AuditType>.Parse(logType.ToString()), sinceDate);
+            var mapped = _umbracoMapper.MapEnumerable<IAuditItem, AuditLog>(result);
+            return mapped;
         }
 
         private IEnumerable<AuditLog> MapAvatarsAndNames(IEnumerable<AuditLog> items)

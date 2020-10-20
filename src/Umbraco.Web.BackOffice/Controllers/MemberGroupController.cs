@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Core;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
@@ -37,6 +38,12 @@ namespace Umbraco.Web.BackOffice.Controllers
                 localizedTextService ?? throw new ArgumentNullException(nameof(localizedTextService));
         }
 
+        /// <summary>
+        /// Gets the member group json for the member group id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [DetermineAmbiguousActionByPassingParameters]
         public MemberGroupDisplay GetById(int id)
         {
             var memberGroup = _memberGroupService.GetById(id);
@@ -47,6 +54,45 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             var dto = _umbracoMapper.Map<IMemberGroup, MemberGroupDisplay>(memberGroup);
             return dto;
+        }
+
+
+        /// <summary>
+        /// Gets the member group json for the member group guid
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [DetermineAmbiguousActionByPassingParameters]
+        public MemberGroupDisplay GetById(Guid id)
+        {
+            var memberGroup = _memberGroupService.GetById(id);
+            if (memberGroup == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            return _umbracoMapper.Map<IMemberGroup, MemberGroupDisplay>(memberGroup);
+        }
+
+        /// <summary>
+        /// Gets the member group json for the member group udi
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [DetermineAmbiguousActionByPassingParameters]
+        public MemberGroupDisplay GetById(Udi id)
+        {
+            var guidUdi = id as GuidUdi;
+            if (guidUdi == null)
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            var memberGroup = _memberGroupService.GetById(guidUdi.Guid);
+            if (memberGroup == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            return _umbracoMapper.Map<IMemberGroup, MemberGroupDisplay>(memberGroup);
         }
 
         public IEnumerable<MemberGroupDisplay> GetByIds([FromQuery]int[] ids)

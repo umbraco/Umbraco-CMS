@@ -4,8 +4,8 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
@@ -15,7 +15,6 @@ using Umbraco.Core.Mapping;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Exceptions;
-using Umbraco.Web.Editors;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -26,13 +25,13 @@ namespace Umbraco.Web.BackOffice.Controllers
     [UmbracoTreeAuthorize(Constants.Trees.RelationTypes)]
     public class RelationTypeController : BackOfficeNotificationsController
     {
-        private readonly ILogger _logger;
+        private readonly ILogger<RelationTypeController> _logger;
         private readonly UmbracoMapper _umbracoMapper;
         private readonly IRelationService _relationService;
         private readonly IShortStringHelper _shortStringHelper;
 
         public RelationTypeController(
-            ILogger logger,
+            ILogger<RelationTypeController> logger,
             UmbracoMapper umbracoMapper,
             IRelationService relationService,
             IShortStringHelper shortStringHelper)
@@ -43,12 +42,12 @@ namespace Umbraco.Web.BackOffice.Controllers
             _shortStringHelper = shortStringHelper ?? throw new ArgumentNullException(nameof(shortStringHelper));
         }
 
-
         /// <summary>
-        /// Gets a relation type by ID.
+        /// Gets a relation type by id
         /// </summary>
         /// <param name="id">The relation type ID.</param>
         /// <returns>Returns the <see cref="RelationTypeDisplay"/>.</returns>
+        [DetermineAmbiguousActionByPassingParameters]
         public RelationTypeDisplay GetById(int id)
         {
             var relationType = _relationService.GetRelationTypeById(id);
@@ -61,6 +60,41 @@ namespace Umbraco.Web.BackOffice.Controllers
             var display = _umbracoMapper.Map<IRelationType, RelationTypeDisplay>(relationType);
 
             return display;
+        }
+        /// <summary>
+        /// Gets a relation type by guid
+        /// </summary>
+        /// <param name="id">The relation type ID.</param>
+        /// <returns>Returns the <see cref="RelationTypeDisplay"/>.</returns>
+        [DetermineAmbiguousActionByPassingParameters]
+        public RelationTypeDisplay GetById(Guid id)
+        {
+            var relationType = _relationService.GetRelationTypeById(id);
+            if (relationType == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+            return _umbracoMapper.Map<IRelationType, RelationTypeDisplay>(relationType);
+        }
+
+        /// <summary>
+        /// Gets a relation type by udi
+        /// </summary>
+        /// <param name="id">The relation type ID.</param>
+        /// <returns>Returns the <see cref="RelationTypeDisplay"/>.</returns>
+        [DetermineAmbiguousActionByPassingParameters]
+        public RelationTypeDisplay GetById(Udi id)
+        {
+            var guidUdi = id as GuidUdi;
+            if (guidUdi == null)
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            var relationType = _relationService.GetRelationTypeById(guidUdi.Guid);
+            if (relationType == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+            return _umbracoMapper.Map<IRelationType, RelationTypeDisplay>(relationType);
         }
 
         public PagedResult<RelationDisplay> GetPagedResults(int id, int pageNumber = 1, int pageSize = 100)
@@ -120,7 +154,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
             catch (Exception ex)
             {
-                _logger.Error(GetType(), ex, "Error creating relation type with {Name}", relationType.Name);
+                _logger.LogError(ex, "Error creating relation type with {Name}", relationType.Name);
                 throw HttpResponseException.CreateNotificationValidationErrorResponse("Error creating relation type.");
             }
         }
@@ -151,7 +185,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
             catch (Exception ex)
             {
-                _logger.Error(GetType(), ex, "Error saving relation type with {Id}", relationType.Id);
+                _logger.LogError(ex, "Error saving relation type with {Id}", relationType.Id);
                 throw HttpResponseException.CreateNotificationValidationErrorResponse("Something went wrong when saving the relation type");
             }
         }

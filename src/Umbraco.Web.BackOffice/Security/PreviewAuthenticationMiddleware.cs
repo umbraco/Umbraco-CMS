@@ -6,6 +6,7 @@ using System;
 using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Extensions;
 
@@ -16,14 +17,14 @@ namespace Umbraco.Web.BackOffice.Security
     /// </summary>
     public class PreviewAuthenticationMiddleware : IMiddleware
     {
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
 
         public PreviewAuthenticationMiddleware(
-            IGlobalSettings globalSettings,
+            IOptions<GlobalSettings> globalSettings,
             IHostingEnvironment hostingEnvironment)
         {
-            _globalSettings = globalSettings;
+            _globalSettings = globalSettings.Value;
             _hostingEnvironment = hostingEnvironment;
         }
 

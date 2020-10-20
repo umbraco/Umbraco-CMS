@@ -23,7 +23,7 @@ namespace Umbraco.Web.Trees
     /// </remarks>
     [UmbracoApplicationAuthorize(Constants.Applications.Content)]
     [Tree(Constants.Applications.Settings, Constants.Trees.ContentBlueprints, SortOrder = 12, TreeGroup = Constants.Trees.Groups.Settings)]
-    [PluginController("UmbracoTrees")]
+    [PluginController(Constants.Web.Mvc.BackOfficeTreeArea)]
     [CoreTree]
     public class ContentBlueprintTreeController : TreeController
     {

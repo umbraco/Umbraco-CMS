@@ -4,7 +4,7 @@
  * @description
  * This Resource perfomrs actions to common authentication tasks for the Umbraco backoffice user
  *
- * @requires $q 
+ * @requires $q
  * @requires $http
  * @requires umbRequestHelper
  * @requires angularHelper
@@ -62,7 +62,7 @@ function authResource($q, $http, umbRequestHelper, angularHelper) {
      *    .then(function(data) {
      *        //Do stuff for login...
      *    });
-     * </pre> 
+     * </pre>
      * @param {string} login Username of backoffice user
      * @param {string} password Password of backoffice user
      * @returns {Promise} resourcePromise object
@@ -91,9 +91,9 @@ function authResource($q, $http, umbRequestHelper, angularHelper) {
      * There are not parameters for this since when the user has clicked on their invite email they will be partially
      * logged in (but they will not be approved) so we need to use this method to verify the non approved logged in user's details.
      * Using the getCurrentUser will not work since that only works for approved users
-     * @returns {} 
+     * @returns {}
      */
-    getCurrentInvitedUser: function () {      
+    getCurrentInvitedUser: function () {
       return umbRequestHelper.resourcePromise(
         $http.get(
           umbRequestHelper.getApiUrl(
@@ -117,7 +117,7 @@ function authResource($q, $http, umbRequestHelper, angularHelper) {
      *    .then(function(data) {
      *        //Do stuff for password reset request...
      *    });
-     * </pre> 
+     * </pre>
      * @param {string} email Email address of backoffice user
      * @returns {Promise} resourcePromise object
      *
@@ -164,7 +164,7 @@ function authResource($q, $http, umbRequestHelper, angularHelper) {
      *    .then(function(data) {
      *        //Allow reset of password
      *    });
-     * </pre> 
+     * </pre>
      * @param {integer} userId User Id
      * @param {string} resetCode Password reset code
      * @returns {Promise} resourcePromise object
@@ -195,14 +195,14 @@ function authResource($q, $http, umbRequestHelper, angularHelper) {
           }),
         'Password reset code validation failed for userId ' + userId + ', code' + resetCode);
     },
-    
+
     /**
      * @ngdoc method
      * @name umbraco.resources.currentUserResource#getPasswordConfig
      * @methodOf umbraco.resources.currentUserResource
      *
      * @description
-     * Gets the configuration of the user membership provider which is used to configure the change password form         
+     * Gets the configuration of the user membership provider which is used to configure the change password form
      */
       getPasswordConfig: function (userId) {
           return umbRequestHelper.resourcePromise(
@@ -227,7 +227,7 @@ function authResource($q, $http, umbRequestHelper, angularHelper) {
      *    .then(function(data) {
      *        //Password set
      *    });
-     * </pre> 
+     * </pre>
      * @param {integer} userId User Id
      * @param {string} password New password
      * @param {string} confirmPassword Confirmation of new password
@@ -346,15 +346,6 @@ function authResource($q, $http, umbRequestHelper, angularHelper) {
         'Server call failed for getting current user');
     },
 
-    getCurrentUserLinkedLogins: function () {
-
-      return umbRequestHelper.resourcePromise(
-        $http.get(
-          umbRequestHelper.getApiUrl(
-            "authenticationApiBaseUrl",
-            "GetCurrentUserLinkedLogins")),
-        'Server call failed for getting current users linked logins');
-    },
 
     /**
      * @ngdoc method

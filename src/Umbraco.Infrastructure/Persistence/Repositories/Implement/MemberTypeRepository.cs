@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Exceptions;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Dtos;
@@ -22,7 +22,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     {
         private readonly IShortStringHelper _shortStringHelper;
 
-        public MemberTypeRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger, IContentTypeCommonRepository commonRepository, ILanguageRepository languageRepository, IShortStringHelper shortStringHelper)
+        public MemberTypeRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<MemberTypeRepository> logger, IContentTypeCommonRepository commonRepository, ILanguageRepository languageRepository, IShortStringHelper shortStringHelper)
             : base(scopeAccessor, cache, logger, commonRepository, languageRepository, shortStringHelper)
         {
             _shortStringHelper = shortStringHelper;
@@ -59,11 +59,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         protected override IMemberType PerformGet(string alias)
             => GetMany().FirstOrDefault(x => x.Alias.InvariantEquals(alias));
 
-        protected override IEnumerable<IMemberType> PerformGetAll(params int[] ids)
+        protected override IEnumerable<IMemberType> GetAllWithFullCachePolicy()
         {
-            // the cache policy will always want everything
-            // even GetMany(ids) gets everything and filters afterwards
-            if (ids.Any()) throw new PanicException("There can be no ids specified");
             return CommonRepository.GetAllTypes().OfType<IMemberType>();
         }
 

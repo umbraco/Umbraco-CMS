@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Legacy;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Events;
-using Umbraco.Core.Install;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
@@ -20,7 +20,6 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.Common;
-using Umbraco.Tests.Strings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing.Objects;
 using Umbraco.Web;
@@ -52,12 +51,6 @@ namespace Umbraco.Tests.PublishedContent
 
             var factory = Mock.Of<IFactory>();
             Current.Factory = factory;
-
-            var configs = TestHelper.GetConfigs();
-            Mock.Get(factory).Setup(x => x.GetInstance(typeof(Configs))).Returns(configs);
-            var globalSettings = new GlobalSettings();
-            configs.Add(TestHelpers.SettingsForTests.GenerateMockContentSettings);
-            configs.Add<IGlobalSettings>(() => globalSettings);
 
             var publishedModelFactory = new NoopPublishedModelFactory();
             Mock.Get(factory).Setup(x => x.GetInstance(typeof(IPublishedModelFactory))).Returns(publishedModelFactory);
@@ -123,7 +116,7 @@ namespace Umbraco.Tests.PublishedContent
             Mock.Get(runtime).Setup(x => x.Level).Returns(RuntimeLevel.Run);
 
             // create data types, property types and content types
-            var dataType = new DataType(new VoidEditor("Editor", Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>())) { Id = 3 };
+            var dataType = new DataType(new VoidEditor("Editor", NullLoggerFactory.Instance, Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>())) { Id = 3 };
 
             var dataTypes = new[]
             {
@@ -186,7 +179,9 @@ namespace Umbraco.Tests.PublishedContent
             _variationAccesor = new TestVariationContextAccessor();
 
             var typeFinder = TestHelper.GetTypeFinder();
-            var settings = Mock.Of<INuCacheSettings>();
+
+            var globalSettings = new GlobalSettings();
+            var nuCacheSettings = new NuCacheSettings();
 
             // at last, create the complete NuCache snapshot service!
             var options = new PublishedSnapshotServiceOptions { IgnoreLocalDb = true };
@@ -198,20 +193,21 @@ namespace Umbraco.Tests.PublishedContent
                 new TestPublishedSnapshotAccessor(),
                 _variationAccesor,
                 Mock.Of<IProfilingLogger>(),
+                NullLoggerFactory.Instance,
                 scopeProvider,
                 Mock.Of<IDocumentRepository>(),
                 Mock.Of<IMediaRepository>(),
                 Mock.Of<IMemberRepository>(),
                 new TestDefaultCultureAccessor(),
                 dataSource,
-                globalSettings,
+                Microsoft.Extensions.Options.Options.Create(globalSettings),
                 Mock.Of<IEntityXmlSerializer>(),
                 publishedModelFactory,
                 new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider(TestHelper.ShortStringHelper) }),
                 TestHelper.GetHostingEnvironment(),
-                new MockShortStringHelper(),
+                Mock.Of<IShortStringHelper>(),
                 TestHelper.IOHelper,
-                settings);
+                Microsoft.Extensions.Options.Options.Create(nuCacheSettings));
 
             // invariant is the current default
             _variationAccesor.VariationContext = new VariationContext();

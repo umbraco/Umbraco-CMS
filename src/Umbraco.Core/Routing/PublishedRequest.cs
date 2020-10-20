@@ -5,6 +5,8 @@ using System.Threading;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Configuration.Models;
+using Microsoft.Extensions.Options;
 
 namespace Umbraco.Web.Routing
 {
@@ -16,7 +18,7 @@ namespace Umbraco.Web.Routing
     public class PublishedRequest : IPublishedRequest
     {
         private readonly IPublishedRouter _publishedRouter;
-        private readonly IWebRoutingSettings _webRoutingSettings;
+        private readonly WebRoutingSettings _webRoutingSettings;
 
         private bool _readonly; // after prepared
         private bool _readonlyUri; // after preparing
@@ -33,11 +35,11 @@ namespace Umbraco.Web.Routing
         /// <param name="publishedRouter">The published router.</param>
         /// <param name="umbracoContext">The Umbraco context.</param>
         /// <param name="uri">The request <c>Uri</c>.</param>
-        public PublishedRequest(IPublishedRouter publishedRouter, IUmbracoContext umbracoContext, IWebRoutingSettings webRoutingSettings, Uri uri = null)
+        public PublishedRequest(IPublishedRouter publishedRouter, IUmbracoContext umbracoContext, IOptions<WebRoutingSettings> webRoutingSettings, Uri uri = null)
         {
             UmbracoContext = umbracoContext ?? throw new ArgumentNullException(nameof(umbracoContext));
             _publishedRouter = publishedRouter ?? throw new ArgumentNullException(nameof(publishedRouter));
-            _webRoutingSettings = webRoutingSettings;
+            _webRoutingSettings = webRoutingSettings.Value;
             Uri = uri ?? umbracoContext.CleanedUmbracoUrl;
         }
 

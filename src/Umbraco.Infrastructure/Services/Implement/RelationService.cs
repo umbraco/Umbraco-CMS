@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Events;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Repositories;
@@ -15,13 +15,15 @@ namespace Umbraco.Core.Services.Implement
         private readonly IEntityService _entityService;
         private readonly IRelationRepository _relationRepository;
         private readonly IRelationTypeRepository _relationTypeRepository;
+        private readonly IAuditRepository _auditRepository;
 
-        public RelationService(IScopeProvider uowProvider, ILogger logger, IEventMessagesFactory eventMessagesFactory, IEntityService entityService,
-            IRelationRepository relationRepository, IRelationTypeRepository relationTypeRepository)
-            : base(uowProvider, logger, eventMessagesFactory)
+        public RelationService(IScopeProvider uowProvider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory, IEntityService entityService,
+            IRelationRepository relationRepository, IRelationTypeRepository relationTypeRepository, IAuditRepository auditRepository)
+            : base(uowProvider, loggerFactory, eventMessagesFactory)
         {
             _relationRepository = relationRepository;
             _relationTypeRepository = relationTypeRepository;
+            _auditRepository = auditRepository;
             _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
         }
 
@@ -171,6 +173,18 @@ namespace Umbraco.Core.Services.Implement
         }
 
         /// <inheritdoc />
+        public IRelation GetByParentAndChildId(int parentId, int childId, IRelationType relationType)
+        {
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                var query = Query<IRelation>().Where(x => x.ParentId == parentId &&
+                                                          x.ChildId == childId &&
+                                                          x.RelationTypeId == relationType.Id);
+                return _relationRepository.Get(query).FirstOrDefault();
+            }
+        }
+
+        /// <inheritdoc />
         public IEnumerable<IRelation> GetByRelationTypeName(string relationTypeName)
         {
             List<int> relationTypeIds;
@@ -191,7 +205,7 @@ namespace Umbraco.Core.Services.Implement
         public IEnumerable<IRelation> GetByRelationTypeAlias(string relationTypeAlias)
         {
             var relationType = GetRelationType(relationTypeAlias);
-            
+
             return relationType == null
                 ? Enumerable.Empty<IRelation>()
                 : GetRelationsByListOfTypeIds(new[] { relationType.Id });
@@ -294,7 +308,7 @@ namespace Umbraco.Core.Services.Implement
         /// <inheritdoc />
         public IEnumerable<Tuple<IUmbracoEntity, IUmbracoEntity>> GetEntitiesFromRelations(IEnumerable<IRelation> relations)
         {
-            //TODO: Argh! N+1 
+            //TODO: Argh! N+1
 
             foreach (var relation in relations)
             {
@@ -476,6 +490,7 @@ namespace Umbraco.Core.Services.Implement
                 }
 
                 _relationTypeRepository.Save(relationType);
+                Audit(AuditType.Save, Constants.Security.SuperUserId, relationType.Id, $"Saved relation type: {relationType.Name}");
                 scope.Complete();
                 saveEventArgs.CanCancel = false;
                 scope.Events.Dispatch(SavedRelationType, this, saveEventArgs);
@@ -564,6 +579,11 @@ namespace Umbraco.Core.Services.Implement
                 }
             }
             return relations;
+        }
+
+        private void Audit(AuditType type, int userId, int objectId, string message = null)
+        {
+            _auditRepository.Save(new AuditItem(objectId, type, userId, ObjectTypes.GetName(UmbracoObjectTypes.RelationType), message));
         }
         #endregion
 

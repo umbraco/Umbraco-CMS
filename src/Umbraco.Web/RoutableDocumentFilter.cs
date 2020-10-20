@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Collections.Concurrent;
 using Umbraco.Core.Collections;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
 using Umbraco.Web.Composing;
 
@@ -22,14 +23,14 @@ namespace Umbraco.Web
     /// </remarks>
     public sealed class RoutableDocumentFilter
     {
-        public RoutableDocumentFilter(IGlobalSettings globalSettings, IIOHelper ioHelper)
+        public RoutableDocumentFilter(GlobalSettings globalSettings, IIOHelper ioHelper)
         {
             _globalSettings = globalSettings;
             _ioHelper = ioHelper;
         }
 
         private static readonly ConcurrentDictionary<string, bool> RouteChecks = new ConcurrentDictionary<string, bool>();
-        private readonly IGlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly IIOHelper _ioHelper;
         private object _locker = new object();
         private bool _isInit = false;
@@ -80,7 +81,7 @@ namespace Umbraco.Web
             //NOTE: No need to warn, plus if we do we should log the document, as this message doesn't really tell us anything :)
             //if (!maybeDoc)
             //{
-            //    Logger.Warn<UmbracoModule>("Not a document");
+            //    Logger.LogWarning<UmbracoModule>("Not a document");
             //}
             return maybeDoc;
         }

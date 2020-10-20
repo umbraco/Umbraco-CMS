@@ -6,6 +6,7 @@ using System;
 using System.Reflection;
 using Umbraco.Core.Composing.LightInject;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 
 namespace Umbraco.Core.Composing
 {
@@ -20,7 +21,7 @@ namespace Umbraco.Core.Composing
         // cannot use typeof().AssemblyQualifiedName on the web container - we don't reference it
         // a normal Umbraco site should run on the web container, but an app may run on the core one
         private const string CoreLightInjectContainerTypeName = "Umbraco.Core.Composing.LightInject.LightInjectContainer,Umbraco.Core";
-        private const string WebLightInjectContainerTypeName = "Umbraco.Web.Composing.LightInject.LightInjectContainer,Umbraco.Web";
+        private const string WebLightInjectContainerTypeName = "Umbraco.Core.Composing.LightInject.LightInjectContainer,Umbraco.Infrastructure";
 
         /// <summary>
         /// Creates a new instance of the configured container.
@@ -29,7 +30,7 @@ namespace Umbraco.Core.Composing
         /// To override the default LightInjectContainer, add an appSetting named 'Umbraco.Core.RegisterType' with
         /// a fully qualified type name to a class with a static method "Create" returning an IRegister.
         /// </remarks>
-        public static IRegister Create(IGlobalSettings globalSettings)
+        public static IRegister Create(GlobalSettings globalSettings)
         {
             Type type;
 

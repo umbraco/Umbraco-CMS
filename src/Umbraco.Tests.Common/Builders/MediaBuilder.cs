@@ -1,6 +1,9 @@
 using System;
 using Umbraco.Core.Models;
 using Umbraco.Tests.Common.Builders.Interfaces;
+using Umbraco.Tests.Common.Builders.Extensions;
+using Umbraco.Core;
+using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Common.Builders
 {
@@ -17,7 +20,8 @@ namespace Umbraco.Tests.Common.Builders
             IWithTrashedBuilder,
             IWithLevelBuilder,
             IWithPathBuilder,
-            IWithSortOrderBuilder
+            IWithSortOrderBuilder,
+            IWithPropertyValues
     {
         private MediaTypeBuilder _mediaTypeBuilder;
         private GenericDictionaryBuilder<MediaBuilder, string, object> _propertyDataBuilder;
@@ -33,36 +37,59 @@ namespace Umbraco.Tests.Common.Builders
         private string _path;
         private int? _sortOrder;
         private bool? _trashed;
+        private IMediaType _mediaType;
+        private object _propertyValues;
+        private string _propertyValuesCulture;
+        private string _propertyValuesSegment;
 
         public MediaTypeBuilder AddMediaType()
         {
+            _mediaType = null;
             var builder = new MediaTypeBuilder(this);
             _mediaTypeBuilder = builder;
             return builder;
         }
 
+        public MediaBuilder WithMediaType(IMediaType mediaType)
+        {
+            _mediaTypeBuilder = null;
+            _mediaType = mediaType;
+
+            return this;
+        }
+
+        public GenericDictionaryBuilder<MediaBuilder, string, object> AddPropertyData()
+        {
+            var builder = new GenericDictionaryBuilder<MediaBuilder, string, object>(this);
+            _propertyDataBuilder = builder;
+            return builder;
+        }
+
         public override Media Build()
         {
-            var id = _id ?? 1;
+            var id = _id ?? 0;
             var key = _key ?? Guid.NewGuid();
             var parentId = _parentId ?? -1;
             var createDate = _createDate ?? DateTime.Now;
             var updateDate = _updateDate ?? DateTime.Now;
             var name = _name ?? Guid.NewGuid().ToString();
-            var creatorId = _creatorId ?? 1;
+            var creatorId = _creatorId ?? 0;
             var level = _level ?? 1;
             var path = _path ?? $"-1,{id}";
             var sortOrder = _sortOrder ?? 0;
             var trashed = _trashed ?? false;
+            var propertyValues = _propertyValues ?? null;
+            var propertyValuesCulture = _propertyValuesCulture ?? null;
+            var propertyValuesSegment = _propertyValuesSegment ?? null;
 
-            if (_mediaTypeBuilder == null)
+            if (_mediaTypeBuilder is null && _mediaType is null)
             {
-                throw new InvalidOperationException("A member cannot be constructed without providing a member type. Use AddMediaType().");
+                throw new InvalidOperationException("A media item cannot be constructed without providing a media type. Use AddMediaType() or WithMediaType().");
             }
 
-            var memberType = _mediaTypeBuilder.Build();
+            var mediaType = _mediaType ?? _mediaTypeBuilder.Build();
 
-            var member = new Media(name, parentId, memberType)
+            var media = new Media(name, parentId, mediaType)
             {
                 Id = id,
                 Key = key,
@@ -75,18 +102,89 @@ namespace Umbraco.Tests.Common.Builders
                 Trashed = trashed,
             };
 
-            if (_propertyDataBuilder != null)
+            if (_propertyDataBuilder != null || propertyValues != null)
             {
-                var propertyData = _propertyDataBuilder.Build();
-                foreach (var kvp in propertyData)
+                if (_propertyDataBuilder != null)
                 {
-                    member.SetValue(kvp.Key, kvp.Value);
+                    var propertyData = _propertyDataBuilder.Build();
+                    foreach (var keyValuePair in propertyData)
+                    {
+                        media.SetValue(keyValuePair.Key, keyValuePair.Value);
+                    }
+                }
+                else
+                {
+                    media.PropertyValues(propertyValues, propertyValuesCulture, propertyValuesSegment);
                 }
 
-                member.ResetDirtyProperties(false);
+                media.ResetDirtyProperties(false);
             }
 
-            return member;
+            return media;
+        }
+
+        public static Media CreateSimpleMedia(IMediaType mediaType, string name, int parentId)
+        {
+            return new MediaBuilder()
+                .WithName(name)
+                .WithMediaType(mediaType)
+                .WithParentId(parentId)
+                .WithPropertyValues(new
+                    {
+                        title = name + " Subpage",
+                        bodyText = "This is a subpage",
+                        author = "John Doe"
+                    })
+                .Build();
+        }
+
+        public static Media CreateMediaImage(IMediaType mediaType, int parentId)
+        {
+            return CreateMediaImage(mediaType, parentId, "/media/test-image.png");
+        }
+
+        public static Media CreateMediaImageWithCrop(IMediaType mediaType, int parentId)
+        {
+            return CreateMediaImage(mediaType, parentId, "{src: '/media/test-image.png', crops: []}");
+        }
+
+        private static Media CreateMediaImage(IMediaType mediaType, int parentId, string fileValue)
+        {
+            return new MediaBuilder()
+                .WithMediaType(mediaType)
+                .WithName("Test Image")
+                .WithParentId(parentId)
+                .AddPropertyData()
+                    .WithKeyValue(Constants.Conventions.Media.File, fileValue)
+                    .WithKeyValue(Constants.Conventions.Media.Width, "200")
+                    .WithKeyValue(Constants.Conventions.Media.Height, "200")
+                    .WithKeyValue(Constants.Conventions.Media.Bytes, "100")
+                    .WithKeyValue(Constants.Conventions.Media.Extension, "png")
+                    .Done()
+                .Build();
+        }
+
+        public static Media CreateMediaFolder(IMediaType mediaType, int parentId)
+        {
+            return new MediaBuilder()
+                .WithMediaType(mediaType)
+                .WithName("Test Folder")
+                .WithParentId(parentId)
+                .Build();
+        }
+
+        public static Media CreateMediaFile(IMediaType mediaType, int parentId)
+        {
+            return new MediaBuilder()
+                .WithMediaType(mediaType)
+                .WithName("Test File")
+                .WithParentId(parentId)
+                .AddPropertyData()
+                    .WithKeyValue(Constants.Conventions.Media.File, "/media/test-file.txt")
+                    .WithKeyValue(Constants.Conventions.Media.Bytes, "100")
+                    .WithKeyValue(Constants.Conventions.Media.Extension, "png")
+                    .Done()
+                .Build();
         }
 
         int? IWithIdBuilder.Id
@@ -152,6 +250,24 @@ namespace Umbraco.Tests.Common.Builders
         {
             get => _parentId;
             set => _parentId = value;
+        }
+
+        object IWithPropertyValues.PropertyValues
+        {
+            get => _propertyValues;
+            set => _propertyValues = value;
+        }
+
+        string IWithPropertyValues.PropertyValuesCulture
+        {
+            get => _propertyValuesCulture;
+            set => _propertyValuesCulture = value;
+        }
+
+        string IWithPropertyValues.PropertyValuesSegment
+        {
+            get => _propertyValuesSegment;
+            set => _propertyValuesSegment = value;
         }
     }
 }

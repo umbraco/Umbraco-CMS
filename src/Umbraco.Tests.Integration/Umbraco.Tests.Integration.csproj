@@ -11,6 +11,9 @@
       <Compile Remove="TEMP\**" />
       <EmbeddedResource Remove="TEMP\**" />
       <None Remove="TEMP\**" />
+      <Compile Remove="Views\**" />
+      <EmbeddedResource Remove="Views\**" />
+      <None Remove="Views\**" />
     </ItemGroup>
 
     <ItemGroup>
@@ -24,16 +27,28 @@
 
     <ItemGroup>
         <PackageReference Include="LightInject.Microsoft.DependencyInjection" Version="3.3.0" />
+      <None Remove="Services\Importing\Dictionary-Package.xml" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="Services\Importing\Dictionary-Package.xml" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Examine.Lucene" Version="2.0.0-alpha.20200128.15" />
+        <PackageReference Include="LightInject.Microsoft.DependencyInjection" Version="3.3.3" />
         <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="3.1.4" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="3.1.8" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.1" />
+        <PackageReference Include="Moq" Version="4.14.6" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.6.1" />
-        <PackageReference Include="Moq" Version="4.13.1" />
         <PackageReference Include="nunit" Version="3.12.0" />
-        <PackageReference Include="NUnit3TestAdapter" Version="3.16.1">
+        <PackageReference Include="NUnit3TestAdapter" Version="3.17.0">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="System.Data.SqlClient" Version="4.8.1" />
+        <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
+        <PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
     </ItemGroup>
 
     <ItemGroup>
@@ -56,6 +71,26 @@
       <None Update="Umbraco.Configuration\Configurations\web.config">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Umbraco\logs" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="Services\Importing\ImportResources.Designer.cs">
+        <DependentUpon>ImportResources.resx</DependentUpon>
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+      </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Update="Services\Importing\ImportResources.resx">
+        <SubType>Designer</SubType>
+        <LastGenOutput>ImportResources.Designer.cs</LastGenOutput>
+        <Generator>ResXFileCodeGenerator</Generator>
+      </EmbeddedResource>
     </ItemGroup>
 
 </Project>

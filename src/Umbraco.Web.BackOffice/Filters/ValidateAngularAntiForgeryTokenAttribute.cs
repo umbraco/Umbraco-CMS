@@ -6,8 +6,8 @@ using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Extensions;
 using Umbraco.Web.BackOffice.Security;
 
@@ -29,11 +29,11 @@ namespace Umbraco.Web.BackOffice.Filters
 
         private class ValidateAngularAntiForgeryTokenFilter : IAsyncActionFilter
         {
-            private readonly ILogger _logger;
+            private readonly ILogger<ValidateAngularAntiForgeryTokenFilter> _logger;
             private readonly IBackOfficeAntiforgery _antiforgery;
             private readonly ICookieManager _cookieManager;
 
-            public ValidateAngularAntiForgeryTokenFilter(ILogger logger, IBackOfficeAntiforgery antiforgery, ICookieManager cookieManager)
+            public ValidateAngularAntiForgeryTokenFilter(ILogger<ValidateAngularAntiForgeryTokenFilter> logger, IBackOfficeAntiforgery antiforgery, ICookieManager cookieManager)
             {
                 _logger = logger;
                 _antiforgery = antiforgery;
@@ -104,7 +104,7 @@ namespace Umbraco.Web.BackOffice.Filters
                 }
                 catch (AntiforgeryValidationException ex)
                 {
-                    _logger.Error<ValidateAntiForgeryTokenAttribute>(ex, "Could not validate XSRF token");
+                    _logger.LogError(ex, "Could not validate XSRF token");
                     return false;
                 }
             }

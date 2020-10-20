@@ -20,7 +20,7 @@ namespace Umbraco.Web.Common.Security
 
     public class BackOfficeSignInManager : SignInManager<BackOfficeIdentityUser>
     {
-        private readonly BackOfficeUserManager _userManager;
+        private readonly IBackOfficeUserManager _userManager;
 
         public BackOfficeSignInManager(
             BackOfficeUserManager userManager,
@@ -45,7 +45,7 @@ namespace Umbraco.Web.Common.Security
         {
             // override to handle logging/events
             var result = await base.PasswordSignInAsync(user, password, isPersistent, lockoutOnFailure);
-            return HandlePasswordSignIn(user, user.UserName, result);
+            return await HandlePasswordSignIn(user, user.UserName, result);
         }
 
         public override async Task<SignInResult> PasswordSignInAsync(string userName, string password, bool isPersistent, bool lockoutOnFailure)
@@ -53,7 +53,7 @@ namespace Umbraco.Web.Common.Security
             // override to handle logging/events
             var user = await UserManager.FindByNameAsync(userName);
             if (user == null)
-                return HandlePasswordSignIn(null, userName, SignInResult.Failed);
+                return await HandlePasswordSignIn(null, userName, SignInResult.Failed);
             return await PasswordSignInAsync(user, password, isPersistent, lockoutOnFailure);
         }
 
@@ -62,7 +62,7 @@ namespace Umbraco.Web.Common.Security
             // override to handle logging/events
             var result = await base.TwoFactorSignInAsync(provider, code, isPersistent, rememberClient);
             var user = await GetTwoFactorAuthenticationUserAsync(); // will never be null if the above succeeds
-            return HandlePasswordSignIn(user, user?.UserName, result);
+            return await HandlePasswordSignIn(user, user?.UserName, result);
         }
 
         public override bool IsSignedIn(ClaimsPrincipal principal)
@@ -125,13 +125,20 @@ namespace Umbraco.Web.Common.Security
             //await Context.SignOutAsync(IdentityConstants.TwoFactorUserIdScheme);
         }
 
-        private SignInResult HandlePasswordSignIn(BackOfficeIdentityUser user, string username, SignInResult result)
+        private async Task<SignInResult> HandlePasswordSignIn(BackOfficeIdentityUser user, string username, SignInResult result)
         {
             if (username.IsNullOrWhiteSpace())
                 username = "UNKNOWN"; // could happen in 2fa or something else weird
 
             if (result.Succeeded)
             {
+                //track the last login date
+                user.LastLoginDateUtc = DateTime.UtcNow;
+                if (user.AccessFailedCount > 0)
+                    //we have successfully logged in, reset the AccessFailedCount
+                    user.AccessFailedCount = 0;
+                await _userManager.UpdateAsync(user);
+
                 Logger.LogInformation("User: {UserName} logged in from IP address {IpAddress}", username, Context.Connection.RemoteIpAddress);
                 if (user != null)
                     _userManager.RaiseLoginSuccessEvent(user, user.Id);

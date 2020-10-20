@@ -20,7 +20,16 @@ angular.module("umbraco")
             $scope.setImage = function () {
                 var startNodeId = $scope.model.config && $scope.model.config.startNodeId ? $scope.model.config.startNodeId : undefined;
                 var startNodeIsVirtual = startNodeId ? $scope.model.config.startNodeIsVirtual : undefined;
-
+            var value = $scope.control.value;
+            var target = value
+                ? {
+                    udi: value.udi,
+                    url: value.image,
+                    image: value.image,
+                    focalPoint: value.focalPoint,
+                    coordinates: value.coordinates
+                }
+                : null;
                 var mediaPicker = {
                     startNodeId: startNodeId,
                     startNodeIsVirtual: startNodeIsVirtual,
@@ -29,11 +38,13 @@ angular.module("umbraco")
                     disableFolderSelect: true,
                     onlyImages: true,
                     dataTypeKey: $scope.model.dataTypeKey,
+                currentTarget: target,
                     submit: function (model) {
                         var selectedImage = model.selection[0];
 
                         $scope.control.value = {
                             focalPoint: selectedImage.focalPoint,
+                        coordinates: selectedImage.coordinates,
                             id: selectedImage.id,
                             udi: selectedImage.udi,
                             image: selectedImage.image,
@@ -69,25 +80,46 @@ angular.module("umbraco")
                     }
                     else {
                         if ($scope.control.editor.config && $scope.control.editor.config.size) {
+                            if ($scope.control.value.coordinates) {
+                                // New way, crop by percent must come before width/height.
+                                imageOptions.crop = $scope.control.value.coordinates;
+                                imageOptions.mode = "percentage"
+                            } else {
+                                // Here in order not to break existing content where focalPoint were used.
+                                // For some reason width/height have to come first when mode=crop.
+                                  if ($scope.control.value.focalPoint) {
+                                        imageOptions.focalPoint = {
+                                            left: $scope.control.value.focalPoint.left,
+                                            top: $scope.control.value.focalPoint.top
+                                        }
+                                        imageOptions.mode = "crop";
+                                    } else {
+                                    // Prevent black padding and no crop when focal point not set / changed from default
+                                    imageOptions.focalPoint = {
+                                       left: 0.5,
+                                       top: 0.5
+                                   }
+                                   imageOptions.mode = "crop";
+                                }
+                            }
                             imageOptions.animationprocessmode = "first";
                             imageOptions.height = $scope.control.editor.config.size.height;
                             imageOptions.width = $scope.control.editor.config.size.width;
                         }
 
-                        if ($scope.control.value.focalPoint) {
-                            imageOptions.focalPoint = {
-                                left: $scope.control.value.focalPoint.left,
-                                top: $scope.control.value.focalPoint.top
-                            }
-                            imageOptions.mode = "crop";
-                        }
+                    // set default size if no crop present (moved from the view)
+                    if (url.indexOf('?') == -1)
+                    {
+                     imageOptions.width = 800;
+                     imageOptions.upscale = false;
+                     imageOptions.animationprocessmode = false;
                     }
-
-                    mediaHelper.getProcessedImageUrl($scope.control.value.image, imageOptions)
-                        .then(function (url) {
-                            $scope.thumbnailUrl = url;
-                        });
                 }
-            };
+                mediaHelper.getProcessedImageUrl($scope.control.value.image, imageOptions)
+                    .then(function (url) {
+                        $scope.thumbnailUrl = url;
+                    });
+            }
+        };
 
-        });
+    });

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
@@ -55,15 +56,53 @@ namespace Umbraco.Web.BackOffice.Controllers
         }
 
         /// <summary>
-        /// Gets the content json for the content id
+        /// Gets the template json for the template id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
+        [DetermineAmbiguousActionByPassingParameters]
         public TemplateDisplay GetById(int id)
         {
             var template = _fileService.GetTemplate(id);
             if (template == null)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            return _umbracoMapper.Map<ITemplate, TemplateDisplay>(template);
+        }
+
+
+        /// <summary>
+        /// Gets the template json for the template guid
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [DetermineAmbiguousActionByPassingParameters]
+        public TemplateDisplay GetById(Guid id)
+        {
+            var template = _fileService.GetTemplate(id);
+            if (template == null)
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            return _umbracoMapper.Map<ITemplate, TemplateDisplay>(template);
+        }
+
+        /// <summary>
+        /// Gets the template json for the template udi
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [DetermineAmbiguousActionByPassingParameters]
+        public TemplateDisplay GetById(Udi id)
+        {
+            var guidUdi = id as GuidUdi;
+            if (guidUdi == null)
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            var template = _fileService.GetTemplate(guidUdi.Guid);
+            if (template == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
 
             return _umbracoMapper.Map<ITemplate, TemplateDisplay>(template);
         }

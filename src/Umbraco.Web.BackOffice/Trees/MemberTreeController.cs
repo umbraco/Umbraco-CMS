@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Extensions;
 using Umbraco.Web.Actions;
@@ -28,7 +29,7 @@ namespace Umbraco.Web.Trees
         Constants.Applications.Media,
         Constants.Applications.Members)]
     [Tree(Constants.Applications.Members, Constants.Trees.Members, SortOrder = 0)]
-    [PluginController("UmbracoTrees")]
+    [PluginController(Constants.Web.Mvc.BackOfficeTreeArea)]
     [CoreTree]
     [SearchableTree("searchResultFormatter", "configureMemberResult")]
     public class MemberTreeController : TreeController, ISearchableTree, ITreeNodeController
@@ -37,7 +38,7 @@ namespace Umbraco.Web.Trees
         private readonly IMenuItemCollectionFactory _menuItemCollectionFactory;
         private readonly IMemberService _memberService;
         private readonly IMemberTypeService _memberTypeService;
-        private readonly IWebSecurity _webSecurity;
+        private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
 
         public MemberTreeController(
             ILocalizedTextService localizedTextService,
@@ -46,14 +47,14 @@ namespace Umbraco.Web.Trees
             IMenuItemCollectionFactory menuItemCollectionFactory,
             IMemberService memberService,
             IMemberTypeService memberTypeService,
-            IWebSecurity webSecurity)
+            IBackofficeSecurityAccessor backofficeSecurityAccessor)
             : base(localizedTextService, umbracoApiControllerTypeCollection)
         {
             _treeSearcher = treeSearcher;
             _menuItemCollectionFactory = menuItemCollectionFactory;
             _memberService = memberService;
             _memberTypeService = memberTypeService;
-            _webSecurity = webSecurity;
+            _backofficeSecurityAccessor = backofficeSecurityAccessor;
         }
 
         /// <summary>
@@ -145,7 +146,7 @@ namespace Umbraco.Web.Trees
             //add delete option for all members
             menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true);
 
-            if (_webSecurity.CurrentUser.HasAccessToSensitiveData())
+            if (_backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.HasAccessToSensitiveData())
             {
                 menu.Items.Add(new ExportMember(LocalizedTextService));
             }

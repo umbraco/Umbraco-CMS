@@ -1,10 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Linq;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
-using System.Linq;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Extensions;
 using Umbraco.Web.BackOffice.Controllers;
@@ -56,6 +57,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Routing
             Assert.AreEqual(1, endpoints.DataSources.Count);
             var route = endpoints.DataSources.First();
             Assert.AreEqual(4, route.Endpoints.Count);
+            
             AssertMinimalBackOfficeRoutes(route);
 
             var endpoint3 = (RouteEndpoint)route.Endpoints[2];
@@ -94,8 +96,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Routing
 
         private BackOfficeAreaRoutes GetBackOfficeAreaRoutes(RuntimeLevel level)
         {
+            var globalSettings = new GlobalSettings();
             var routes = new BackOfficeAreaRoutes(
-                Mock.Of<IGlobalSettings>(x => x.UmbracoPath == "~/umbraco"),
+                Options.Create(globalSettings),
                 Mock.Of<IHostingEnvironment>(x => x.ToAbsolute(It.IsAny<string>()) == "/umbraco" && x.ApplicationVirtualPath == string.Empty),
                 Mock.Of<IRuntimeState>(x => x.Level == level),
                 new UmbracoApiControllerTypeCollection(new[] { typeof(Testing1Controller) }));

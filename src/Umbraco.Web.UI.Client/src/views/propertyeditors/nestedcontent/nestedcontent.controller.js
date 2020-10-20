@@ -22,18 +22,18 @@
 
                     // Loop through all inner properties:
                     for (var k in obj) {
-                        propClearingMethod(obj[k]);
+                        propClearingMethod(obj[k], clipboardService.TYPES.RAW);
                     }
                 }
             }
         }
-        
-        clipboardService.registrerClearPropertyResolver(clearNestedContentPropertiesForStorage)
+
+        clipboardService.registerClearPropertyResolver(clearNestedContentPropertiesForStorage, clipboardService.TYPES.ELEMENT_TYPE)
 
 
         function clearInnerNestedContentPropertiesForStorage(prop, propClearingMethod) {
 
-            // if we got an array, and it has a entry with ncContentTypeAlias this meants that we are dealing with a NestedContent property inside a NestedContent property.
+            // if we got an array, and it has a entry with ncContentTypeAlias this meants that we are dealing with a NestedContent property data.
             if ((Array.isArray(prop) && prop.length > 0 && prop[0].ncContentTypeAlias !== undefined)) {
 
                 for (var i = 0; i < prop.length; i++) {
@@ -44,13 +44,13 @@
 
                     // Loop through all inner properties:
                     for (var k in obj) {
-                        propClearingMethod(obj[k]);
+                        propClearingMethod(obj[k], clipboardService.TYPES.RAW);
                     }
                 }
             }
         }
-        
-        clipboardService.registrerClearPropertyResolver(clearInnerNestedContentPropertiesForStorage)
+
+        clipboardService.registerClearPropertyResolver(clearInnerNestedContentPropertiesForStorage, clipboardService.TYPES.RAW)
     }]);
 
     angular
@@ -98,6 +98,8 @@
         vm.wideMode = Object.toBoolean(model.config.hideLabel);
         vm.hasContentTypes = model.config.contentTypes.length > 0;
 
+        var cultureChanged = eventsService.on('editors.content.cultureChanged', (name, args) => updateModel());
+
         var labels = {};
         vm.labels = labels;
         localizationService.localizeMany(["grid_addElement", "content_createEmpty", "actions_copy"]).then(function (data) {
@@ -128,7 +130,7 @@
             }
 
             localizationService.localize("clipboard_labelForArrayOfItemsFrom", [model.label, nodeName]).then(function (data) {
-                clipboardService.copyArray("elementTypeArray", aliases, vm.nodes, data, "icon-thumbnail-list", model.id, clearNodeForCopy);
+                clipboardService.copyArray(clipboardService.TYPES.ELEMENT_TYPE, aliases, vm.nodes, data, "icon-thumbnail-list", model.id, clearNodeForCopy);
             });
         }
 
@@ -165,10 +167,7 @@
             icon: 'trash',
             method: removeAllEntries,
             isDisabled: true
-        }
-
-
-
+        };
         // helper to force the current form into the dirty state
         function setDirty() {
             if ($scope.$parent.$parent.propertyForm) {
@@ -187,45 +186,14 @@
         };
 
         vm.openNodeTypePicker = function ($event) {
-            if (vm.overlayMenu || vm.nodes.length >= vm.maxItems) {
+            
+            if (vm.nodes.length >= vm.maxItems) {
                 return;
             }
 
-            vm.overlayMenu = {
-                show: false,
-                style: {},
-                filter: vm.scaffolds.length > 12 ? true : false,
-                orderBy: "$index",
-                view: "itempicker",
-                event: $event,
-                clickPasteItem: function (item) {
-                    if (item.type === "elementTypeArray") {
-                        _.each(item.data, function (entry) {
-                            pasteFromClipboard(entry);
-                        });
-                    } else {
-                        pasteFromClipboard(item.data);
-                    }
-                    vm.overlayMenu.show = false;
-                    vm.overlayMenu = null;
-                },
-                submit: function (model) {
-                    if (model && model.selectedItem) {
-                        addNode(model.selectedItem.alias);
-                    }
-                    vm.overlayMenu.show = false;
-                    vm.overlayMenu = null;
-                },
-                close: function () {
-                    vm.overlayMenu.show = false;
-                    vm.overlayMenu = null;
-                }
-            };
-
-            // this could be used for future limiting on node types
-            vm.overlayMenu.availableItems = [];
+            var availableItems = [];
             _.each(vm.scaffolds, function (scaffold) {
-                vm.overlayMenu.availableItems.push({
+                availableItems.push({
                     alias: scaffold.contentTypeAlias,
                     name: scaffold.contentTypeName,
                     icon: iconHelper.convertFromLegacyIcon(scaffold.icon),
@@ -233,54 +201,78 @@
                 });
             });
 
-            if (vm.overlayMenu.availableItems.length === 0) {
-                return;
-            }
+            const dialog = {
+                view: "itempicker",
+                orderBy: "$index",
+                view: "itempicker",
+                event: $event,
+                filter: availableItems.length > 12,
+                size: availableItems.length > 6 ? "medium" : "small",
+                availableItems: availableItems,
+                clickPasteItem: function (item) {
+                    if (Array.isArray(item.data)) {
+                        _.each(item.data, function (entry) {
+                            pasteFromClipboard(entry);
+                        });
+                    } else {
+                        pasteFromClipboard(item.data);
+                    }
 
-            vm.overlayMenu.size = vm.overlayMenu.availableItems.length > 6 ? "medium" : "small";
+                    overlayService.close();
+                },
+                submit: function (model) {
+                    if (model && model.selectedItem) {
+                        addNode(model.selectedItem.alias);
+                    }
 
-            vm.overlayMenu.pasteItems = [];
-
-            var singleEntriesForPaste = clipboardService.retriveEntriesOfType("elementType", contentTypeAliases);
-            _.each(singleEntriesForPaste, function (entry) {
-                vm.overlayMenu.pasteItems.push({
-                    type: "elementType",
-                    name: entry.label,
-                    data: entry.data,
-                    icon: entry.icon
-                });
-            });
-
-            var arrayEntriesForPaste = clipboardService.retriveEntriesOfType("elementTypeArray", contentTypeAliases);
-            _.each(arrayEntriesForPaste, function (entry) {
-                vm.overlayMenu.pasteItems.push({
-                    type: "elementTypeArray",
-                    name: entry.label,
-                    data: entry.data,
-                    icon: entry.icon
-                });
-            });
-
-            vm.overlayMenu.title = labels.grid_addElement;
-            vm.overlayMenu.hideHeader = vm.overlayMenu.pasteItems.length > 0;
-
-            vm.overlayMenu.clickClearPaste = function ($event) {
-                $event.stopPropagation();
-                $event.preventDefault();
-                clipboardService.clearEntriesOfType("elementType", contentTypeAliases);
-                clipboardService.clearEntriesOfType("elementTypeArray", contentTypeAliases);
-                vm.overlayMenu.pasteItems = [];// This dialog is not connected via the clipboardService events, so we need to update manually.
-                vm.overlayMenu.hideHeader = false;
+                    overlayService.close();
+                },
+                close: function () {
+                    overlayService.close();
+                }
             };
 
-            if (vm.overlayMenu.availableItems.length === 1 && vm.overlayMenu.pasteItems.length === 0) {
-                // only one scaffold type - no need to display the picker
-                addNode(vm.scaffolds[0].contentTypeAlias);
-                vm.overlayMenu = null;
+            if (dialog.availableItems.length === 0) {
                 return;
             }
 
-            vm.overlayMenu.show = true;
+            dialog.pasteItems = [];
+
+            var entriesForPaste = clipboardService.retriveEntriesOfType(clipboardService.TYPES.ELEMENT_TYPE, contentTypeAliases);
+            _.each(entriesForPaste, function (entry) {
+                dialog.pasteItems.push({
+                    date: entry.date,
+                    name: entry.label,
+                    data: entry.data,
+                    icon: entry.icon
+                });
+            });
+
+            dialog.pasteItems.sort( (a, b) => {
+                return b.date - a.date
+            });
+
+            dialog.title = dialog.pasteItems.length > 0 ? labels.grid_addElement : labels.content_createEmpty;
+            dialog.hideHeader = dialog.pasteItems.length > 0;
+
+            dialog.clickClearPaste = function ($event) {
+                $event.stopPropagation();
+                $event.preventDefault();
+                clipboardService.clearEntriesOfType(clipboardService.TYPES.ELEMENT_TYPE, contentTypeAliases);
+                dialog.pasteItems = [];// This dialog is not connected via the clipboardService events, so we need to update manually.
+                dialog.hideHeader = false;
+            };
+
+            if (dialog.availableItems.length === 1 && dialog.pasteItems.length === 0) {
+                // only one scaffold type - no need to display the picker
+                addNode(vm.scaffolds[0].contentTypeAlias);
+
+                dialog.close();
+
+                return;
+            }
+
+            overlayService.open(dialog);
         };
 
         vm.editNode = function (idx) {
@@ -295,7 +287,7 @@
             return (vm.nodes.length > vm.minItems)
                 ? true
                 : model.config.contentTypes.length > 1;
-        }
+        };
 
         function deleteNode(idx) {
             var removed = vm.nodes.splice(idx, 1);
@@ -310,6 +302,7 @@
             updateModel();
             validate();
         };
+
         vm.requestDeleteNode = function (idx) {
             if (!vm.canDeleteNode(idx)) {
                 return;
@@ -397,10 +390,11 @@
 
             var scaffold = getScaffold(model.value[idx].ncContentTypeAlias);
             return scaffold && scaffold.icon ? iconHelper.convertFromLegacyIcon(scaffold.icon) : "icon-folder";
-        }
+        };
 
         vm.sortableOptions = {
             axis: "y",
+            containment: "parent",
             cursor: "move",
             handle: '.umb-nested-content__header-bar',
             distance: 10,
@@ -457,7 +451,7 @@
 
             syncCurrentNode();
 
-            clipboardService.copy("elementType", node.contentTypeAlias, node, null, null, null, clearNodeForCopy);
+            clipboardService.copy(clipboardService.TYPES.ELEMENT_TYPE, node.contentTypeAlias, node, null, null, null, clearNodeForCopy);
             $event.stopPropagation();
         }
 
@@ -467,6 +461,8 @@
             if (newNode === undefined) {
                 return;
             }
+
+            newNode = clipboardService.parseContentForPaste(newNode, clipboardService.TYPES.ELEMENT_TYPE);
 
             // generate a new key.
             newNode.key = String.CreateGuid();
@@ -479,7 +475,7 @@
         }
 
         function checkAbilityToPasteContent() {
-            vm.showPaste = clipboardService.hasEntriesOfType("elementType", contentTypeAliases) || clipboardService.hasEntriesOfType("elementTypeArray", contentTypeAliases);
+            vm.showPaste = clipboardService.hasEntriesOfType(clipboardService.TYPES.ELEMENT_TYPE, contentTypeAliases);
         }
 
         eventsService.on("clipboardService.storageUpdate", checkAbilityToPasteContent);
@@ -507,8 +503,7 @@
                     if (tab) {
                         scaffold.variants[0].tabs.push(tab);
 
-                        angular.forEach(tab.properties,
-                            function (property) {
+                        tab.properties.forEach(function (property) {
                                 if (_.find(notSupported, function (x) { return x === property.editor; })) {
                                     property.notSupported = true;
                                     // TODO: Not supported message to be replaced with 'content_nestedContentEditorNotSupported' dictionary key. Currently not possible due to async/timing quirk.
@@ -713,6 +708,7 @@
 
         $scope.$on("$destroy", function () {
             unsubscribe();
+            cultureChanged();
             watcher();
         });
 

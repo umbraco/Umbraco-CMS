@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Composing;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
@@ -149,7 +150,7 @@ namespace Umbraco.Core
         }
 
         public static bool IsAllowedTemplate(this IPublishedContent content, IContentTypeService contentTypeService,
-            IWebRoutingSettings webRoutingSettings, int templateId)
+            WebRoutingSettings webRoutingSettings, int templateId)
         {
             return content.IsAllowedTemplate(contentTypeService,
                 webRoutingSettings.DisableAlternativeTemplates,

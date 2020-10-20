@@ -2,11 +2,12 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Umbraco.Core;
-using Umbraco.Core.Configuration.HealthChecks;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Sync;
 using Umbraco.Web.HealthCheck;
+using Microsoft.Extensions.Logging;
 
 namespace Umbraco.Web.Scheduling
 {
@@ -16,8 +17,9 @@ namespace Umbraco.Web.Scheduling
         private readonly HealthCheckCollection _healthChecks;
         private readonly HealthCheckNotificationMethodCollection _notifications;
         private readonly IScopeProvider _scopeProvider;
-        private readonly IProfilingLogger _logger;
-        private readonly IHealthChecksSettings _healthChecksSettingsConfig;
+        private readonly IProfilingLogger _profilingLogger;
+        private readonly ILogger<HealthCheckNotifier> _logger;
+        private readonly HealthChecksSettings _healthChecksSettings;
         private readonly IServerRegistrar _serverRegistrar;
         private readonly IRuntimeState _runtimeState;
 
@@ -28,8 +30,9 @@ namespace Umbraco.Web.Scheduling
             HealthCheckCollection healthChecks,
             HealthCheckNotificationMethodCollection notifications,
             IMainDom mainDom,
-            IProfilingLogger logger,
-            IHealthChecksSettings healthChecksSettingsConfig,
+            IProfilingLogger profilingLogger ,
+            ILogger<HealthCheckNotifier> logger,
+            HealthChecksSettings healthChecksSettings,
             IServerRegistrar serverRegistrar,
             IRuntimeState runtimeState,
             IScopeProvider scopeProvider)
@@ -40,8 +43,9 @@ namespace Umbraco.Web.Scheduling
             _mainDom = mainDom;
             _scopeProvider = scopeProvider;
             _runtimeState = runtimeState;
+            _profilingLogger = profilingLogger ;
             _logger = logger;
-            _healthChecksSettingsConfig = healthChecksSettingsConfig;
+            _healthChecksSettings = healthChecksSettings;
             _serverRegistrar = serverRegistrar;
             _runtimeState = runtimeState;
         }
@@ -54,17 +58,17 @@ namespace Umbraco.Web.Scheduling
             switch (_serverRegistrar.GetCurrentServerRole())
             {
                 case ServerRole.Replica:
-                    _logger.Debug<HealthCheckNotifier>("Does not run on replica servers.");
+                    _logger.LogDebug("Does not run on replica servers.");
                     return true; // DO repeat, server role can change
                 case ServerRole.Unknown:
-                    _logger.Debug<HealthCheckNotifier>("Does not run on servers with unknown role.");
+                    _logger.LogDebug("Does not run on servers with unknown role.");
                     return true; // DO repeat, server role can change
             }
 
             // ensure we do not run if not main domain, but do NOT lock it
             if (_mainDom.IsMainDom == false)
             {
-                _logger.Debug<HealthCheckNotifier>("Does not run if not MainDom.");
+                _logger.LogDebug("Does not run if not MainDom.");
                 return false; // do NOT repeat, going down
             }
 
@@ -72,9 +76,9 @@ namespace Umbraco.Web.Scheduling
             // checks can be making service/database calls so we want to ensure the CallContext/Ambient scope
             // isn't used since that can be problematic.
             using (var scope = _scopeProvider.CreateScope())
-            using (_logger.DebugDuration<HealthCheckNotifier>("Health checks executing", "Health checks complete"))
+            using (_profilingLogger.DebugDuration<HealthCheckNotifier>("Health checks executing", "Health checks complete"))
             {
-                var healthCheckConfig = _healthChecksSettingsConfig;
+                var healthCheckConfig = _healthChecksSettings;
 
                 // Don't notify for any checks that are disabled, nor for any disabled
                 // just for notifications

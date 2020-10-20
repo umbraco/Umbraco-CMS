@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Exceptions;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Dtos;
@@ -19,7 +19,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// </summary>
     internal class MediaTypeRepository : ContentTypeRepositoryBase<IMediaType>, IMediaTypeRepository
     {
-        public MediaTypeRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger, IContentTypeCommonRepository commonRepository, ILanguageRepository languageRepository, IShortStringHelper shortStringHelper)
+        public MediaTypeRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<MediaTypeRepository> logger, IContentTypeCommonRepository commonRepository, ILanguageRepository languageRepository, IShortStringHelper shortStringHelper)
             : base(scopeAccessor, cache, logger, commonRepository, languageRepository, shortStringHelper)
         { }
 
@@ -48,11 +48,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         protected override IMediaType PerformGet(string alias)
             => GetMany().FirstOrDefault(x => x.Alias.InvariantEquals(alias));
 
-        protected override IEnumerable<IMediaType> PerformGetAll(params int[] ids)
+        protected override IEnumerable<IMediaType> GetAllWithFullCachePolicy()
         {
-            // the cache policy will always want everything
-            // even GetMany(ids) gets everything and filters afterwards
-            if (ids.Any()) throw new PanicException("There can be no ids specified");
             return CommonRepository.GetAllTypes().OfType<IMediaType>();
         }
 

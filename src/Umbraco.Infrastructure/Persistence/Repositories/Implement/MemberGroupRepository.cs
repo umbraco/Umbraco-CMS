@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Events;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Dtos;
@@ -16,7 +16,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 {
     internal class MemberGroupRepository : NPocoRepositoryBase<int, IMemberGroup>, IMemberGroupRepository
     {
-        public MemberGroupRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger)
+        public MemberGroupRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<MemberGroupRepository> logger)
             : base(scopeAccessor, cache, logger)
         { }
 
@@ -69,7 +69,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override string GetBaseWhereClause()
         {
-            return "umbracoNode.id = @id";
+            return $"{Constants.DatabaseSchema.Tables.Node}.id = @id";
         }
 
         protected override IEnumerable<string> GetDeleteClauses()
@@ -113,6 +113,16 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             Database.Update(dto);
 
             entity.ResetDirtyProperties();
+        }
+
+        public IMemberGroup Get(Guid uniqueId)
+        {
+            var sql = GetBaseQuery(false);
+            sql.Where("umbracoNode.uniqueId = @uniqueId", new { uniqueId });
+
+            var dto = Database.Fetch<NodeDto>(SqlSyntax.SelectTop(sql, 1)).FirstOrDefault();
+
+            return dto == null ? null : MemberGroupFactory.BuildEntity(dto);
         }
 
         public IMemberGroup GetByName(string name)

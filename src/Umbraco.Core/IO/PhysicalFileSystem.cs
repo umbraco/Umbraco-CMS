@@ -2,18 +2,18 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Composing;
 using System.Threading;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.IO
 {
     public class PhysicalFileSystem : IFileSystem
     {
         private readonly IIOHelper _ioHelper;
-        private readonly ILogger _logger;
+        private readonly ILogger<PhysicalFileSystem> _logger;
 
         // the rooted, filesystem path, using directory separator chars, NOT ending with a separator
         // eg "c:" or "c:\path\to\site" or "\\server\path"
@@ -30,7 +30,7 @@ namespace Umbraco.Core.IO
 
         // virtualRoot should be "~/path/to/root" eg "~/Views"
         // the "~/" is mandatory.
-        public PhysicalFileSystem(IIOHelper ioHelper, IHostingEnvironment hostingEnvironment, ILogger logger, string virtualRoot)
+        public PhysicalFileSystem(IIOHelper ioHelper, IHostingEnvironment hostingEnvironment, ILogger<PhysicalFileSystem> logger, string virtualRoot)
         {
             _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
             if (hostingEnvironment == null) throw new ArgumentNullException(nameof(hostingEnvironment));
@@ -45,7 +45,7 @@ namespace Umbraco.Core.IO
             _rootUrl = EnsureUrlSeparatorChar(hostingEnvironment.ToAbsolute(virtualRoot)).TrimEnd('/');
         }
 
-        public PhysicalFileSystem(IIOHelper ioHelper,IHostingEnvironment hostingEnvironment, ILogger logger, string rootPath, string rootUrl)
+        public PhysicalFileSystem(IIOHelper ioHelper,IHostingEnvironment hostingEnvironment, ILogger<PhysicalFileSystem> logger, string rootPath, string rootUrl)
         {
             _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -87,11 +87,11 @@ namespace Umbraco.Core.IO
             }
             catch (UnauthorizedAccessException ex)
             {
-                _logger.Error<PhysicalFileSystem>(ex, "Not authorized to get directories for '{Path}'", fullPath);
+                _logger.LogError(ex, "Not authorized to get directories for '{Path}'", fullPath);
             }
             catch (DirectoryNotFoundException ex)
             {
-                _logger.Error<PhysicalFileSystem>(ex, "Directory not found for '{Path}'", fullPath);
+                _logger.LogError(ex, "Directory not found for '{Path}'", fullPath);
             }
 
             return Enumerable.Empty<string>();
@@ -123,7 +123,7 @@ namespace Umbraco.Core.IO
             }
             catch (DirectoryNotFoundException ex)
             {
-                _logger.Error<PhysicalFileSystem>(ex, "Directory not found for '{Path}'", fullPath);
+                _logger.LogError(ex, "Directory not found for '{Path}'", fullPath);
             }
         }
 
@@ -203,11 +203,11 @@ namespace Umbraco.Core.IO
             }
             catch (UnauthorizedAccessException ex)
             {
-                _logger.Error<PhysicalFileSystem>(ex, "Not authorized to get directories for '{Path}'", fullPath);
+                _logger.LogError(ex, "Not authorized to get directories for '{Path}'", fullPath);
             }
             catch (DirectoryNotFoundException ex)
             {
-                _logger.Error<PhysicalFileSystem>(ex, "Directory not found for '{FullPath}'", fullPath);
+                _logger.LogError(ex, "Directory not found for '{FullPath}'", fullPath);
             }
 
             return Enumerable.Empty<string>();
@@ -240,7 +240,7 @@ namespace Umbraco.Core.IO
             }
             catch (FileNotFoundException ex)
             {
-                _logger.Error<PhysicalFileSystem>(ex.InnerException, "DeleteFile failed with FileNotFoundException for '{Path}'", fullPath);
+                _logger.LogError(ex.InnerException, "DeleteFile failed with FileNotFoundException for '{Path}'", fullPath);
             }
         }
 

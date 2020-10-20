@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core.Events;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
@@ -18,9 +17,9 @@ namespace Umbraco.Core.Services.Implement
         private readonly IAuditRepository _auditRepository;
         private readonly IAuditEntryRepository _auditEntryRepository;
 
-        public AuditService(IScopeProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory,
+        public AuditService(IScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory,
             IAuditRepository auditRepository, IAuditEntryRepository auditEntryRepository)
-            : base(provider, logger, eventMessagesFactory)
+            : base(provider, loggerFactory, eventMessagesFactory)
         {
             _auditRepository = auditRepository;
             _auditEntryRepository = auditEntryRepository;

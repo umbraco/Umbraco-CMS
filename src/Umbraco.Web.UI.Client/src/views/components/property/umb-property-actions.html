@@ -1,0 +1,20 @@
+<div class="umb-property-actions" ng-class="{ '-open': vm.isOpen }" ng-if="vm.actions.length > 0">
+
+    <umb-button-ellipsis
+        css-class="umb-outline umb-property-actions__toggle"
+        action="vm.toggle()"
+        mode="small"
+        text="{{vm.isOpen ? vm.labels.closeText : vm.labels.openText}}">
+    </umb-button-ellipsis>
+
+    <div class="umb-property-actions__menu" role="menu" ng-if="vm.isOpen" on-outside-click="vm.close()" on-close="vm.close()" deep-blur="vm.close()">
+        <ul class="umb-contextmenu">
+            <li ng-repeat="action in vm.actions" role="menuitem" class="umb-contextmenu-item" ng-class="{'-opens-dialog': action.opensDialog}">
+                <button type="button" class="btn-reset umb-outline" ng-click="vm.executeAction(action)" ng-disabled="action.isDisabled === true">
+                    <i class="icon icon-{{action.icon}}" aria-hidden="true"></i>
+                    <span class="menu-label"><localize key="{{::action.labelKey}}" tokens="action.labelTokens"></localize></span>
+                </button>
+            </li>
+        </ul>
+    </div>
+</div>

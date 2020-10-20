@@ -3,15 +3,16 @@ using System.Collections.Specialized;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Umbraco.Core;
+using Umbraco.Core.BackOffice;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Services;
-using Umbraco.Web.Install.Models;
-using Umbraco.Core.BackOffice;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Extensions;
+using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install.InstallSteps
 {
@@ -29,21 +30,26 @@ namespace Umbraco.Web.Install.InstallSteps
         private readonly IUserService _userService;
         private readonly DatabaseBuilder _databaseBuilder;
         private static HttpClient _httpClient;
-        private readonly IGlobalSettings _globalSettings;
-        private readonly IUserPasswordConfiguration _passwordConfiguration;
-        private readonly ISecuritySettings _securitySettings;
-        private readonly IConnectionStrings _connectionStrings;
+        private readonly UserPasswordConfigurationSettings _passwordConfiguration;
+        private readonly SecuritySettings _securitySettings;
+        private readonly ConnectionStrings _connectionStrings;
         private readonly ICookieManager _cookieManager;
-        private readonly BackOfficeUserManager _userManager;
+        private readonly IBackOfficeUserManager _userManager;
 
-        public NewInstallStep(IUserService userService, DatabaseBuilder databaseBuilder, IGlobalSettings globalSettings, IUserPasswordConfiguration passwordConfiguration, ISecuritySettings securitySettings, IConnectionStrings connectionStrings, ICookieManager cookieManager, BackOfficeUserManager userManager)
+        public NewInstallStep(
+            IUserService userService,
+            DatabaseBuilder databaseBuilder,
+            IOptions<UserPasswordConfigurationSettings> passwordConfiguration,
+            IOptions<SecuritySettings> securitySettings,
+            IOptions<ConnectionStrings> connectionStrings,
+            ICookieManager cookieManager,
+            IBackOfficeUserManager userManager)
         {
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _databaseBuilder = databaseBuilder ?? throw new ArgumentNullException(nameof(databaseBuilder));
-            _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
-            _passwordConfiguration = passwordConfiguration ?? throw new ArgumentNullException(nameof(passwordConfiguration));
-            _securitySettings = securitySettings ?? throw new ArgumentNullException(nameof(securitySettings));
-            _connectionStrings = connectionStrings ?? throw new ArgumentNullException(nameof(connectionStrings));
+            _passwordConfiguration = passwordConfiguration.Value ?? throw new ArgumentNullException(nameof(passwordConfiguration));
+            _securitySettings = securitySettings.Value ?? throw new ArgumentNullException(nameof(securitySettings));
+            _connectionStrings = connectionStrings.Value ?? throw new ArgumentNullException(nameof(connectionStrings));
             _cookieManager = cookieManager;
             _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
         }
@@ -126,7 +132,7 @@ namespace Umbraco.Web.Install.InstallSteps
         public override bool RequiresExecution(UserModel model)
         {
             //now we have to check if this is really a new install, the db might be configured and might contain data
-            var databaseSettings = _connectionStrings[Constants.System.UmbracoConnectionName];
+            var databaseSettings = _connectionStrings.UmbracoConnectionString;
             if (databaseSettings.IsConnectionStringConfigured() && _databaseBuilder.IsDatabaseConfigured)
                 return _databaseBuilder.HasSomeNonDefaultUser() == false;
 

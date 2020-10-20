@@ -27,7 +27,8 @@ namespace Umbraco.Tests.Common.Builders
             IWithCreateDateBuilder,
             IWithUpdateDateBuilder,
             IWithSortOrderBuilder,
-            IWithDescriptionBuilder where TParent : IBuildPropertyTypes
+            IWithDescriptionBuilder,
+            IWithSupportsPublishing where TParent : IBuildPropertyTypes
     {
         private int? _id;
         private Guid? _key;
@@ -45,6 +46,8 @@ namespace Umbraco.Tests.Common.Builders
         private string _mandatoryMessage;
         private string _validationRegExp;
         private string _validationRegExpMessage;
+        private bool? _supportsPublishing;
+        private ContentVariation? _variations;
 
         public PropertyTypeBuilder(TParent parentBuilder) : base(parentBuilder)
         {
@@ -88,6 +91,12 @@ namespace Umbraco.Tests.Common.Builders
             return this;
         }
 
+        public PropertyTypeBuilder<TParent> WithVariations(ContentVariation variation)
+        {
+            _variations = variation;
+            return this;
+        }
+
         public override PropertyType Build()
         {
             var id = _id ?? 0;
@@ -106,10 +115,12 @@ namespace Umbraco.Tests.Common.Builders
             var mandatoryMessage = _mandatoryMessage ?? string.Empty;
             var validationRegExp = _validationRegExp ?? string.Empty;
             var validationRegExpMessage = _validationRegExpMessage ?? string.Empty;
+            var supportsPublishing = _supportsPublishing ?? false;
+            var variations = _variations ?? ContentVariation.Nothing;
 
             var shortStringHelper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig());
 
-            return new PropertyType(shortStringHelper, propertyEditorAlias, valueStorageType)
+            var propertyType = new PropertyType(shortStringHelper, propertyEditorAlias, valueStorageType)
             {
                 Id = id,
                 Key = key,
@@ -125,7 +136,11 @@ namespace Umbraco.Tests.Common.Builders
                 MandatoryMessage = mandatoryMessage,
                 ValidationRegExp = validationRegExp,
                 ValidationRegExpMessage = validationRegExpMessage,
+                SupportsPublishing = supportsPublishing,
+                Variations = variations,
             };
+
+            return propertyType;
         }
         
         int? IWithIdBuilder.Id
@@ -174,6 +189,12 @@ namespace Umbraco.Tests.Common.Builders
         {
             get => _description;
             set => _description = value;
+        }
+
+        bool? IWithSupportsPublishing.SupportsPublishing
+        {
+            get => _supportsPublishing;
+            set => _supportsPublishing = value;
         }
     }
 }

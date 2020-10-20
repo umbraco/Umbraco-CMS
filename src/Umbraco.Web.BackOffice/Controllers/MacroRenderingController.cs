@@ -24,11 +24,6 @@ namespace Umbraco.Web.BackOffice.Controllers
     /// <summary>
     /// API controller to deal with Macro data
     /// </summary>
-    /// <remarks>
-    /// Note that this implements IRequiresSessionState which will enable HttpContext.Session - generally speaking we don't normally
-    /// enable this for webapi controllers, however since this controller is used to render macro content and macros can access
-    /// Session, we don't want it to throw null reference exceptions.
-    /// </remarks>
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     public class MacroRenderingController : UmbracoAuthorizedJsonController
     {

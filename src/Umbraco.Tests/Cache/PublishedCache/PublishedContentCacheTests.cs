@@ -5,9 +5,11 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Common;
+using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
@@ -58,7 +60,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
 
             _httpContextFactory = new FakeHttpContextFactory("~/Home");
 
-            var globalSettings = Factory.GetInstance<IGlobalSettings>();
+            var globalSettings = new GlobalSettings();
             var umbracoContextAccessor = Factory.GetInstance<IUmbracoContextAccessor>();
 
             _xml = new XmlDocument();
@@ -79,7 +81,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
             _umbracoContext = new UmbracoContext(
                 httpContextAccessor,
                 publishedSnapshotService.Object,
-                Mock.Of<IWebSecurity>(),
+                Mock.Of<IBackofficeSecurity>(),
                 globalSettings,
                 HostingEnvironment,
                 new TestVariationContextAccessor(),

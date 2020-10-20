@@ -48,6 +48,14 @@ namespace Umbraco.Web.Models.ContentEditing
         [ReadOnly(true)]
         public Guid DataTypeKey { get; set; }
 
+        [DataMember(Name = "dataTypeName")]
+        [ReadOnly(true)]
+        public string DataTypeName { get; set; }
+
+        [DataMember(Name = "dataTypeIcon")]
+        [ReadOnly(true)]
+        public string DataTypeIcon { get; set; }
+
         //SD: Is this really needed ?
         [DataMember(Name = "groupId")]
         public int GroupId { get; set; }

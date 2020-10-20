@@ -1,18 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NPoco;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations;
 using Umbraco.Core.Migrations.Upgrade;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Persistance.SqlCe;
+using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 
@@ -24,7 +25,7 @@ namespace Umbraco.Tests.Migrations
         [Test]
         public void CanExecute()
         {
-            var logger = Mock.Of<ILogger>();
+            var loggerFactory = NullLoggerFactory.Instance;
 
             var database = new TestDatabase();
             var scope = Mock.Of<IScope>();
@@ -66,7 +67,7 @@ namespace Umbraco.Tests.Migrations
                 var sourceState = kvs.GetValue("Umbraco.Tests.MigrationPlan") ?? string.Empty;
 
                 // execute plan
-                state = plan.Execute(s, sourceState, migrationBuilder, logger);
+                state = plan.Execute(s, sourceState, migrationBuilder, loggerFactory.CreateLogger<MigrationPlan>(), loggerFactory);
 
                 // save new state
                 kvs.SetValue("Umbraco.Tests.MigrationPlan", sourceState, state);
@@ -139,7 +140,7 @@ namespace Umbraco.Tests.Migrations
         [Test]
         public void ValidateUmbracoPlan()
         {
-            var plan = new UmbracoPlan(TestHelper.GetUmbracoVersion(), SettingsForTests.GenerateMockGlobalSettings());
+            var plan = new UmbracoPlan(TestHelper.GetUmbracoVersion());
             plan.Validate();
             Console.WriteLine(plan.FinalState);
             Assert.IsFalse(plan.FinalState.IsNullOrWhiteSpace());

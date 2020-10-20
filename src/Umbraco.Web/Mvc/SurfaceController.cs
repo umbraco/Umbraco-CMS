@@ -22,8 +22,8 @@ namespace Umbraco.Web.Mvc
         protected SurfaceController()
         { }
 
-        protected SurfaceController(IUmbracoContextAccessor umbracoContextAccessor, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, AppCaches appCaches, ILogger logger, IProfilingLogger profilingLogger)
-            : base(umbracoContextAccessor, databaseFactory, services, appCaches, logger, profilingLogger)
+        protected SurfaceController(IUmbracoContextAccessor umbracoContextAccessor, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger)
+            : base(umbracoContextAccessor, databaseFactory, services, appCaches,profilingLogger)
         { }
 
         /// <summary>
@@ -56,6 +56,38 @@ namespace Umbraco.Web.Mvc
         protected RedirectToUmbracoPageResult RedirectToUmbracoPage(int pageId, string queryString)
         {
             return new RedirectToUmbracoPageResult(pageId, queryString,  Current.PublishedUrlProvider);
+        }
+
+        /// <summary>
+        /// Redirects to the Umbraco page with the given id
+        /// </summary>
+        /// <param name="pageId"></param>
+        /// <returns></returns>
+        protected RedirectToUmbracoPageResult RedirectToUmbracoPage(Guid key)
+        {
+            return new RedirectToUmbracoPageResult(key);
+        }
+
+        /// <summary>
+        /// Redirects to the Umbraco page with the given id and passes provided querystring
+        /// </summary>
+        /// <param name="pageId"></param>
+        /// <param name="queryStringValues"></param>
+        /// <returns></returns>
+        protected RedirectToUmbracoPageResult RedirectToUmbracoPage(Guid key, NameValueCollection queryStringValues)
+        {
+            return new RedirectToUmbracoPageResult(key, queryStringValues);
+        }
+
+        /// <summary>
+        /// Redirects to the Umbraco page with the given id and passes provided querystring
+        /// </summary>
+        /// <param name="pageId"></param>
+        /// <param name="queryString"></param>
+        /// <returns></returns>
+        protected RedirectToUmbracoPageResult RedirectToUmbracoPage(Guid key, string queryString)
+        {
+            return new RedirectToUmbracoPageResult(key, queryString);
         }
 
         /// <summary>

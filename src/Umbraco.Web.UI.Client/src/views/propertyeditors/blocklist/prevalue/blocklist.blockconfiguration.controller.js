@@ -50,7 +50,7 @@
         unsubscribe.push(eventsService.on("editors.documentType.saved", updateUsedElementTypes));
 
         vm.requestRemoveBlockByIndex = function (index) {
-            localizationService.localizeMany(["general_delete", "blockEditor_confirmDeleteBlockMessage", "blockEditor_confirmDeleteBlockNotice"]).then(function (data) {
+            localizationService.localizeMany(["general_delete", "blockEditor_confirmDeleteBlockTypeMessage", "blockEditor_confirmDeleteBlockTypeNotice"]).then(function (data) {
                 var contentElementType = vm.getElementTypeByKey($scope.model.value[index].contentElementTypeKey);
                 overlayService.confirmDelete({
                     title: data[0],

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Persistence.Dtos;
@@ -15,7 +15,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 {
     internal class ExternalLoginRepository : NPocoRepositoryBase<int, IIdentityUserLogin>, IExternalLoginRepository
     {
-        public ExternalLoginRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger)
+        public ExternalLoginRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<ExternalLoginRepository> logger)
             : base(scopeAccessor, cache, logger)
         { }
 
