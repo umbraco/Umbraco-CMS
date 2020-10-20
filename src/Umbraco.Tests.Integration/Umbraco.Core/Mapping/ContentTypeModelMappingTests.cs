@@ -756,7 +756,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
                 Alias = "umbracoUrlName", Name = "Slug", Description = "", Mandatory = false, SortOrder = 1, DataTypeId = -88
             });
             ContentTypeBuilder.EnsureAllIds(ctMain, 8888);
-            var ctChild1 = ContentTypeBuilder.CreateSimpleContentType("child1", "Child 1", ctMain, true);
+            var ctChild1 = ContentTypeBuilder.CreateSimpleContentType("child1", "Child 1", ctMain, randomizeAliases: true);
             ctChild1.AddPropertyType(new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext)
             {
                 Alias = "someProperty",
@@ -767,7 +767,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
                 DataTypeId = -88
             }, "Another tab");
             ContentTypeBuilder.EnsureAllIds(ctChild1, 7777);
-            var contentType = ContentTypeBuilder.CreateSimpleContentType("child2", "Child 2", ctChild1, true, "CustomGroup");
+            var contentType = ContentTypeBuilder.CreateSimpleContentType("child2", "Child 2", ctChild1, randomizeAliases: true, propertyGroupName: "CustomGroup");
             //not assigned to tab
             contentType.AddPropertyType(new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext)
             {

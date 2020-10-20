@@ -3,69 +3,21 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
+using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
+using Umbraco.Tests.Common.Builders;
+using Umbraco.Tests.Common.Builders.Extensions;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Tests.TestHelpers.Entities;
-using Current = Umbraco.Web.Composing.Current;
+using Umbraco.Web.PropertyEditors;
 
-namespace Umbraco.Tests.Models
+namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
 {
     [TestFixture]
     public class VariationTests
     {
-        private IFactory _factory;
-        private IShortStringHelper ShortStringHelper { get; } = TestHelper.ShortStringHelper;
-
-        [SetUp]
-        public void SetUp()
-        {
-            // well, this is also annoying, but...
-            // validating a value is performed by its data editor,
-            // based upon the configuration in the data type, so we
-            // need to be able to retrieve them all...
-
-            Current.Reset();
-
-            _factory = Mock.Of<IFactory>();
-
-            var dataTypeService = Mock.Of<IDataTypeService>();
-            var localizationService = Mock.Of<ILocalizationService>();
-
-            var dataEditors = new DataEditorCollection(new IDataEditor[]
-            {
-                new DataEditor(NullLoggerFactory.Instance, Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>()) { Alias = "editor", ExplicitValueEditor = MockedValueEditors.CreateDataValueEditor("view") }
-            });
-            var propertyEditors = new PropertyEditorCollection(dataEditors);
-
-            var dataType = Mock.Of<IDataType>();
-            Mock.Get(dataType)
-                .Setup(x => x.Configuration)
-                .Returns(null);
-
-            Mock.Get(dataTypeService)
-                .Setup(x => x.GetDataType(It.IsAny<int>()))
-                .Returns<int>(x => dataType);
-
-            var serviceContext = ServiceContext.CreatePartial(
-                dataTypeService: dataTypeService,
-                localizedTextService: Mock.Of<ILocalizedTextService>());
-
-            Mock.Get(_factory)
-                .Setup(x => x.GetInstance(It.IsAny<Type>()))
-                .Returns<Type>(x =>
-                {
-                    //if (x == typeof(Configs)) return configs;
-                    if (x == typeof(PropertyEditorCollection)) return propertyEditors;
-                    if (x == typeof(ServiceContext)) return serviceContext;
-                    if (x == typeof(ILocalizedTextService)) return serviceContext.LocalizationService;
-                    throw new NotSupportedException(x.FullName);
-                });
-        }
-
         [Test]
         public void ValidateVariationTests()
         {
@@ -292,8 +244,10 @@ namespace Umbraco.Tests.Models
         [Test]
         public void ContentNames()
         {
-            var contentType = new ContentType(ShortStringHelper, -1) { Alias = "contentType" };
-            var content = new Content("content", -1, contentType) { Id = 1, VersionId = 1 };
+            var contentType = new ContentTypeBuilder()
+                .WithAlias("contentType")
+                .Build();
+            var content = CreateContent(contentType);
 
             const string langFr = "fr-FR";
             const string langUk = "en-UK";
@@ -305,7 +259,7 @@ namespace Umbraco.Tests.Models
             contentType.Variations = ContentVariation.Culture;
 
             // recreate content to re-capture content type variations
-            content = new Content("content", -1, contentType) { Id = 1, VersionId = 1 };
+            content = CreateContent(contentType);
 
             // invariant name works
             content.Name = "name";
@@ -333,11 +287,15 @@ namespace Umbraco.Tests.Models
         {
             const string langFr = "fr-FR";
 
-            var propertyType = new PropertyType(ShortStringHelper, "editor", ValueStorageType.Nvarchar) { Alias = "prop" };
-            var contentType = new ContentType(ShortStringHelper, -1) { Alias = "contentType" };
+            var propertyType = new PropertyTypeBuilder()
+                .WithAlias("prop")
+                .Build();
+            var contentType = new ContentTypeBuilder()
+                .WithAlias("contentType")
+                .Build();
             contentType.AddPropertyType(propertyType);
 
-            var content = new Content("content", -1, contentType) { Id = 1, VersionId = 1 };
+            var content = CreateContent(contentType);
 
             // can set value
             // and get edited value, published is null
@@ -419,7 +377,8 @@ namespace Umbraco.Tests.Models
             Assert.IsNull(content.GetValue("prop"));
             Assert.IsNull(content.GetValue("prop", published: true));
 
-            var other = new Content("other", -1, contentType) { Id = 2, VersionId = 1 };
+            var other = CreateContent(contentType, 2, "other");
+
             Assert.Throws<NotSupportedException>(() => other.SetValue("prop", "o")); // don't even try
             other.SetValue("prop", "o1", langFr);
 
@@ -441,26 +400,32 @@ namespace Umbraco.Tests.Models
         [Test]
         public void ContentPublishValuesWithMixedPropertyTypeVariations()
         {
-            var propertyValidationService = new PropertyValidationService(
-                _factory.GetInstance<PropertyEditorCollection>(),
-                _factory.GetInstance<ServiceContext>().DataTypeService,
-                _factory.GetInstance<ServiceContext>().TextService);
+            var propertyValidationService = GetPropertyValidationService();
             const string langFr = "fr-FR";
 
             // content type varies by Culture
             // prop1 varies by Culture
             // prop2 is invariant
 
-            var contentType = new ContentType(ShortStringHelper, -1) { Alias = "contentType" };
+            var contentType = new ContentTypeBuilder()
+                .WithAlias("contentType")
+                .Build();
             contentType.Variations |= ContentVariation.Culture;
 
-            var variantPropType = new PropertyType(ShortStringHelper, "editor", ValueStorageType.Nvarchar) { Alias = "prop1", Variations = ContentVariation.Culture, Mandatory = true };
-            var invariantPropType = new PropertyType(ShortStringHelper, "editor", ValueStorageType.Nvarchar) { Alias = "prop2", Variations = ContentVariation.Nothing, Mandatory = true};
-
+            var variantPropType = new PropertyTypeBuilder()
+                .WithAlias("prop1")
+                .WithVariations(ContentVariation.Culture)
+                .WithMandatory(true)
+                .Build();
+            var invariantPropType = new PropertyTypeBuilder()
+                .WithAlias("prop2")
+                .WithVariations(ContentVariation.Nothing)
+                .WithMandatory(true)
+                .Build();
             contentType.AddPropertyType(variantPropType);
             contentType.AddPropertyType(invariantPropType);
 
-            var content = new Content("content", -1, contentType) { Id = 1, VersionId = 1 };
+            var content = CreateContent(contentType);
 
             content.SetCultureName("hello", langFr);
 
@@ -490,11 +455,15 @@ namespace Umbraco.Tests.Models
             const string langUk = "en-UK";
             const string langEs = "es-ES";
 
-            var propertyType = new PropertyType(ShortStringHelper, "editor", ValueStorageType.Nvarchar) { Alias = "prop" };
-            var contentType = new ContentType(ShortStringHelper, -1) { Alias = "contentType" };
+            var propertyType = new PropertyTypeBuilder()
+                .WithAlias("prop")
+                .Build();
+            var contentType = new ContentTypeBuilder()
+                .WithAlias("contentType")
+                .Build();
             contentType.AddPropertyType(propertyType);
 
-            var content = new Content("content", -1, contentType) { Id = 1, VersionId = 1 };
+            var content = CreateContent(contentType);
 
             // change - now we vary by culture
             contentType.Variations |= ContentVariation.Culture;
@@ -545,12 +514,16 @@ namespace Umbraco.Tests.Models
         [Test]
         public void IsDirtyTests()
         {
-            var propertyType = new PropertyType(ShortStringHelper, "editor", ValueStorageType.Nvarchar) { Alias = "prop" };
+            var propertyType = new PropertyTypeBuilder()
+                .WithAlias("prop")
+                .Build();
             var prop = new Property(propertyType);
-            var contentType = new ContentType(ShortStringHelper, -1) { Alias = "contentType" };
+            var contentType = new ContentTypeBuilder()
+                .WithAlias("contentType")
+                .Build();
             contentType.AddPropertyType(propertyType);
 
-            var content = new Content("content", -1, contentType) { Id = 1, VersionId = 1 };
+            var content = CreateContent(contentType);
 
             prop.SetValue("a");
             Assert.AreEqual("a", prop.GetValue());
@@ -570,17 +543,17 @@ namespace Umbraco.Tests.Models
         [Test]
         public void ValidationTests()
         {
-            var propertyType = new PropertyType(ShortStringHelper, "editor", ValueStorageType.Nvarchar) { Alias = "prop", SupportsPublishing = true };
+            var propertyType = new PropertyTypeBuilder()
+                .WithAlias("prop")
+                .WithSupportsPublishing(true)
+                .Build();
+
             var prop = new Property(propertyType);
 
             prop.SetValue("a");
             Assert.AreEqual("a", prop.GetValue());
             Assert.IsNull(prop.GetValue(published: true));
-            var propertyValidationService = new PropertyValidationService(
-                _factory.GetInstance<PropertyEditorCollection>(),
-                _factory.GetInstance<ServiceContext>().DataTypeService,
-                _factory.GetInstance<ServiceContext>().TextService
-                );
+            var propertyValidationService = GetPropertyValidationService();
 
             Assert.IsTrue(propertyValidationService.IsPropertyValid(prop));
 
@@ -592,6 +565,44 @@ namespace Umbraco.Tests.Models
 
             // can publish, even though invalid
             prop.PublishValues();
+        }
+
+        private static Content CreateContent(IContentType contentType, int id = 1, string name = "content")
+        {
+            return new ContentBuilder()
+                .WithId(id)
+                .WithVersionId(1)
+                .WithName(name)
+                .WithContentType(contentType)
+                .Build();
+        }
+
+        private static PropertyValidationService GetPropertyValidationService()
+        {
+            var ioHelper = Mock.Of<IIOHelper>();
+            var dataTypeService = Mock.Of<IDataTypeService>();
+            var localizedTextService = Mock.Of<ILocalizedTextService>();
+            var localizationService = Mock.Of<ILocalizationService>();
+            var shortStringHelper = Mock.Of<IShortStringHelper>();
+
+            var textBoxEditor = new TextboxPropertyEditor(
+                NullLoggerFactory.Instance,
+                dataTypeService,
+                localizationService,
+                ioHelper,
+                shortStringHelper,
+                localizedTextService
+            );
+
+            var mockDataTypeService = new Mock<IDataTypeService>();
+            Mock.Get(dataTypeService).Setup(x => x.GetDataType(It.Is<int>(y => y == Constants.DataTypes.Textbox)))
+                .Returns(new DataType(textBoxEditor));
+
+            var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(new[] { textBoxEditor }));
+            return new PropertyValidationService(
+                propertyEditorCollection,
+                dataTypeService,
+                localizedTextService);
         }
     }
 }

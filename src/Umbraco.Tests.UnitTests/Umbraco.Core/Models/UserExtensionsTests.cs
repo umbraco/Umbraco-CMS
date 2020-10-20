@@ -8,7 +8,7 @@ using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Common.Builders;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
+namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
 {
     [TestFixture]
     public class UserExtensionsTests
