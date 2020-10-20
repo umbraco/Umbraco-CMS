@@ -141,7 +141,6 @@
     <Compile Include="Models\ContentXmlTest.cs" />
     <Compile Include="Models\ImageProcessorImageUrlGeneratorTest.cs" />
     <Compile Include="Models\VariationTests.cs" />
-    <Compile Include="Persistence\Mappers\MapperTestBase.cs" />
     <Compile Include="PublishedContent\SolidPublishedSnapshot.cs" />
     <Compile Include="Published\ConvertersTests.cs" />
     <Compile Include="Published\ModelTypeTests.cs" />
@@ -438,9 +437,6 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Integration\" />
   </ItemGroup>
   <!-- get NuGet packages directory -->
   <PropertyGroup>
