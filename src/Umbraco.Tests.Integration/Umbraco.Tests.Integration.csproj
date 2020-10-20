@@ -26,11 +26,11 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Remove="Services\Importing\Dictionary-Package.xml" />
+      <None Remove="Umbraco.Infrastructure\Services\Importing\Dictionary-Package.xml" />
     </ItemGroup>
 
     <ItemGroup>
-      <Content Include="Services\Importing\Dictionary-Package.xml" />
+      <Content Include="Umbraco.Infrastructure\Services\Importing\Dictionary-Package.xml" />
     </ItemGroup>
 
     <ItemGroup>
@@ -77,7 +77,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Compile Update="Services\Importing\ImportResources.Designer.cs">
+      <Compile Update="Umbraco.Infrastructure\Services\Importing\ImportResources.Designer.cs">
         <DependentUpon>ImportResources.resx</DependentUpon>
         <DesignTime>True</DesignTime>
         <AutoGen>True</AutoGen>
@@ -85,7 +85,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <EmbeddedResource Update="Services\Importing\ImportResources.resx">
+      <EmbeddedResource Update="Umbraco.Infrastructure\Services\Importing\ImportResources.resx">
         <SubType>Designer</SubType>
         <LastGenOutput>ImportResources.Designer.cs</LastGenOutput>
         <Generator>ResXFileCodeGenerator</Generator>
