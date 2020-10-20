@@ -17,7 +17,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Remove="Umbraco.Infrastructure\Services\Importing\Dictionary-Package.xml" />
       <Content Include="Logging\logviewer.searches.config.js">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
@@ -27,7 +26,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Remove="Services\Importing\Dictionary-Package.xml" />
+      <None Remove="Umbraco.Infrastructure\Services\Importing\Dictionary-Package.xml" />
     </ItemGroup>
 
     <ItemGroup>
