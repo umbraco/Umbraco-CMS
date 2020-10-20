@@ -20,7 +20,7 @@ using Umbraco.Core.IO;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Integration.Testing;
 
-namespace Umbraco.Tests.Umbraco.Infrastructure.Persistence.Repositories
+namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositories
 {
     [TestFixture]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]

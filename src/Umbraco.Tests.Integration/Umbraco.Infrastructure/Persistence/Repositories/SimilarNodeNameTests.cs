@@ -2,7 +2,7 @@
 using NUnit.Framework;
 using Umbraco.Core.Persistence.Repositories.Implement;
 
-namespace Umbraco.Tests.Umbraco.Infrastructure.Persistence.Repositories
+namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositories
 {
     [TestFixture]
     public class SimilarNodeNameTests

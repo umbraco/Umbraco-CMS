@@ -24,7 +24,7 @@ using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.Models.ContentEditing;
 
-namespace Umbraco.Tests.Umbraco.Infrastructure.Persistence.Repositories
+namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositories
 {
     [TestFixture]
     [UmbracoTest(Mapper = true, Database = UmbracoTestOptions.Database.NewSchemaPerTest)]

@@ -9,7 +9,7 @@ using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;
 
-namespace Umbraco.Tests.Umbraco.Infrastructure.Persistence.Repositories
+namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositories
 {
     [TestFixture]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
@@ -17,7 +17,7 @@ namespace Umbraco.Tests.Umbraco.Infrastructure.Persistence.Repositories
     {
         private UserGroupRepository CreateRepository(IScopeProvider provider)
         {
-            return new UserGroupRepository((IScopeAccessor) provider, Core.Cache.AppCaches.Disabled, LoggerFactory.CreateLogger<UserGroupRepository>(), LoggerFactory, ShortStringHelper);
+            return new UserGroupRepository((IScopeAccessor) provider, global::Umbraco.Core.Cache.AppCaches.Disabled, LoggerFactory.CreateLogger<UserGroupRepository>(), LoggerFactory, ShortStringHelper);
         }
 
         [Test]
@@ -128,7 +128,7 @@ namespace Umbraco.Tests.Umbraco.Infrastructure.Persistence.Repositories
 
                 var id = userGroup.Id;
 
-                var repository2 = new UserGroupRepository((IScopeAccessor) provider, Core.Cache.AppCaches.Disabled, LoggerFactory.CreateLogger<UserGroupRepository>(), LoggerFactory, ShortStringHelper);
+                var repository2 = new UserGroupRepository((IScopeAccessor) provider, global::Umbraco.Core.Cache.AppCaches.Disabled, LoggerFactory.CreateLogger<UserGroupRepository>(), LoggerFactory, ShortStringHelper);
                 repository2.Delete(userGroup);
                 scope.Complete();
 
