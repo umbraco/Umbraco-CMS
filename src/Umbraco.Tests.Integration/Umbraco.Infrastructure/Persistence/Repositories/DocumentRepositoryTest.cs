@@ -5,20 +5,18 @@ using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
-using Umbraco.Tests.Testing;
-using Umbraco.Web.PropertyEditors;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.IO;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Integration.Testing;
+using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositories
 {
@@ -36,14 +34,15 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
         private IFileService FileService => GetRequiredService<IFileService>();
         private IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
-        private ILocalizedTextService LocalizedTextService => GetRequiredService<ILocalizedTextService>();
-        private ILocalizationService LocalizationService => GetRequiredService<ILocalizationService>();
         private IFileSystems FileSystems => GetRequiredService<IFileSystems>();
 
         [SetUp]
         public void SetUpData()
         {
             CreateTestData();
+
+            // TODO: remove this once IPublishedSnapShotService has been implemented with nucache.
+            global::Umbraco.Core.Services.Implement.ContentTypeService.ClearScopeEvents();
 
             ContentRepositoryBase.ThrowOnWarning = true;
         }
