@@ -686,15 +686,28 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
             }
 
             if (e.nameExp) {
-                var newValue = e.nameExp({ value });
-                if (newValue && (newValue = $.trim(newValue))) {
-                    value = newValue;
-                }
+                value = resolveExpression(e, result, value, alias);
             }
 
             // set what we've got on the result
             result[alias] = value;
         });
+    }
+
+    // an ugly hack to resolve $stateful filters such as ncNodeName
+    // e.nameExp doesn't allow an expression to return a promise so the best thing
+    // i can think of doing is to hold my nose and poll e.nameExp until we get a value
+    function resolveExpression(e, result, expression, alias) {
+        var newValue = e.nameExp({ value: expression });
+        if (newValue === 'Loading...') {
+            $timeout(function () {
+                resolveExpression(e, result, expression, alias);
+            }, 1000);
+        }
+        if (newValue && (newValue = $.trim(newValue))) {
+            result[alias] = newValue;
+        }
+        return newValue;
     }
 
     function isDate(val) {
