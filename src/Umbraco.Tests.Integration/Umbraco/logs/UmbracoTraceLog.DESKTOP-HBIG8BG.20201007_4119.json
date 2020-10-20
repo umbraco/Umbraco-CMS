@@ -1,1 +1,0 @@
-{"@t":"2020-10-07T08:32:38.1888337Z","@mt":"{StartMessage} [Timing {TimingId}]","StartMessage":"Examine shutting down","TimingId":"f8a5ef0","SourceContext":"Umbraco.Web.Search.ExamineComponent","ProcessId":44024,"ProcessName":"testhost.x86","ThreadId":13,"AppDomainId":1,"AppDomainAppId":"1","MachineName":"DESKTOP-HBIG8BG","Log4NetLevel":"INFO "}
