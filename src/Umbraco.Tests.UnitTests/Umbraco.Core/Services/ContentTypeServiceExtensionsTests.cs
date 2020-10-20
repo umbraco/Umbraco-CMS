@@ -6,6 +6,7 @@ using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
+using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.TestHelpers.Entities;
 
 namespace Umbraco.Tests.Services
@@ -28,13 +29,13 @@ namespace Umbraco.Tests.Services
                 ct.PropertyGroups.Add(pg);
             };
 
-            var ct1 = MockedContentTypes.CreateBasicContentType("ct1", "CT1", null);
-            var ct2 = MockedContentTypes.CreateBasicContentType("ct2", "CT2", null);
+            var ct1 = ContentTypeBuilder.CreateBasicContentType("ct1", "CT1", null);
+            var ct2 = ContentTypeBuilder.CreateBasicContentType("ct2", "CT2", null);
             addPropType("title", ct2);
-            var ct3 = MockedContentTypes.CreateBasicContentType("ct3", "CT3", null);
+            var ct3 = ContentTypeBuilder.CreateBasicContentType("ct3", "CT3", null);
             addPropType("title", ct3);
-            var ct4 = MockedContentTypes.CreateBasicContentType("ct4", "CT4", null);
-            var ct5 = MockedContentTypes.CreateBasicContentType("ct5", "CT5", null);
+            var ct4 = ContentTypeBuilder.CreateBasicContentType("ct4", "CT4", null);
+            var ct5 = ContentTypeBuilder.CreateBasicContentType("ct5", "CT5", null);
             addPropType("blah", ct5);
             ct1.Id = 1;
             ct2.Id = 2;
@@ -68,12 +69,12 @@ namespace Umbraco.Tests.Services
                 ct.PropertyGroups.Add(pg);
             };
 
-            var ct1 = MockedContentTypes.CreateBasicContentType("ct1", "CT1", null);
-            var ct2 = MockedContentTypes.CreateBasicContentType("ct2", "CT2", null);
+            var ct1 = ContentTypeBuilder.CreateBasicContentType("ct1", "CT1", null);
+            var ct2 = ContentTypeBuilder.CreateBasicContentType("ct2", "CT2", null);
             addPropType(ct2);
-            var ct3 = MockedContentTypes.CreateBasicContentType("ct3", "CT3", null);
+            var ct3 = ContentTypeBuilder.CreateBasicContentType("ct3", "CT3", null);
             addPropType(ct3);
-            var ct4 = MockedContentTypes.CreateBasicContentType("ct4", "CT4", null);
+            var ct4 = ContentTypeBuilder.CreateBasicContentType("ct4", "CT4", null);
             ct1.Id = 1;
             ct2.Id = 2;
             ct3.Id = 3;
@@ -105,12 +106,12 @@ namespace Umbraco.Tests.Services
                 ct.PropertyGroups.Add(pg);
             };
 
-            var ct1 = MockedContentTypes.CreateBasicContentType("ct1", "CT1", null);
-            var ct2 = MockedContentTypes.CreateBasicContentType("ct2", "CT2", null);
+            var ct1 = ContentTypeBuilder.CreateBasicContentType("ct1", "CT1", null);
+            var ct2 = ContentTypeBuilder.CreateBasicContentType("ct2", "CT2", null);
             addPropType(ct2);
-            var ct3 = MockedContentTypes.CreateBasicContentType("ct3", "CT3", null);
+            var ct3 = ContentTypeBuilder.CreateBasicContentType("ct3", "CT3", null);
             addPropType(ct3);
-            var ct4 = MockedContentTypes.CreateBasicContentType("ct4", "CT4", null);
+            var ct4 = ContentTypeBuilder.CreateBasicContentType("ct4", "CT4", null);
             ct1.Id = 1;
             ct2.Id = 2;
             ct3.Id = 3;
@@ -131,9 +132,9 @@ namespace Umbraco.Tests.Services
         [Test]
         public void GetAvailableCompositeContentTypes_Not_Itself()
         {
-            var ct1 = MockedContentTypes.CreateBasicContentType("ct1", "CT1", null);
-            var ct2 = MockedContentTypes.CreateBasicContentType("ct2", "CT2", null);
-            var ct3 = MockedContentTypes.CreateBasicContentType("ct3", "CT3", null);
+            var ct1 = ContentTypeBuilder.CreateBasicContentType("ct1", "CT1", null);
+            var ct2 = ContentTypeBuilder.CreateBasicContentType("ct2", "CT2", null);
+            var ct3 = ContentTypeBuilder.CreateBasicContentType("ct3", "CT3", null);
             ct1.Id = 1;
             ct2.Id = 2;
             ct3.Id = 3;
@@ -154,11 +155,11 @@ namespace Umbraco.Tests.Services
         [Test]
         public void GetAvailableCompositeContentTypes_No_Results_If_Already_A_Composition_By_Parent()
         {
-            var ct1 = MockedContentTypes.CreateBasicContentType("ct1", "CT1");
-            var ct2 = MockedContentTypes.CreateBasicContentType("ct2", "CT2", ct1);
-            var ct3 = MockedContentTypes.CreateBasicContentType("ct3", "CT3");
+            var ct1 = ContentTypeBuilder.CreateBasicContentType("ct1", "CT1");
             ct1.Id = 1;
+            var ct2 = ContentTypeBuilder.CreateBasicContentType("ct2", "CT2", ct1);
             ct2.Id = 2;
+            var ct3 = ContentTypeBuilder.CreateBasicContentType("ct3", "CT3");
             ct3.Id = 3;
 
             var service = new Mock<IContentTypeService>();
@@ -174,9 +175,9 @@ namespace Umbraco.Tests.Services
         [Test]
         public void GetAvailableCompositeContentTypes_No_Results_If_Already_A_Composition()
         {
-            var ct1 = MockedContentTypes.CreateBasicContentType("ct1", "CT1");
-            var ct2 = MockedContentTypes.CreateBasicContentType("ct2", "CT2");
-            var ct3 = MockedContentTypes.CreateBasicContentType("ct3", "CT3");
+            var ct1 = ContentTypeBuilder.CreateBasicContentType("ct1", "CT1");
+            var ct2 = ContentTypeBuilder.CreateBasicContentType("ct2", "CT2");
+            var ct3 = ContentTypeBuilder.CreateBasicContentType("ct3", "CT3");
             ct1.Id = 1;
             ct2.Id = 2;
             ct3.Id = 3;
@@ -195,9 +196,9 @@ namespace Umbraco.Tests.Services
         [Test]
         public void GetAvailableCompositeContentTypes_Do_Not_Include_Other_Composed_Types()
         {
-            var ct1 = MockedContentTypes.CreateBasicContentType("ct1", "CT1");
-            var ct2 = MockedContentTypes.CreateBasicContentType("ct2", "CT2");
-            var ct3 = MockedContentTypes.CreateBasicContentType("ct3", "CT3");
+            var ct1 = ContentTypeBuilder.CreateBasicContentType("ct1", "CT1");
+            var ct2 = ContentTypeBuilder.CreateBasicContentType("ct2", "CT2");
+            var ct3 = ContentTypeBuilder.CreateBasicContentType("ct3", "CT3");
             ct1.Id = 1;
             ct2.Id = 2;
             ct3.Id = 3;
@@ -218,9 +219,9 @@ namespace Umbraco.Tests.Services
         [Test]
         public void GetAvailableCompositeContentTypes_Include_Direct_Composed_Types()
         {
-            var ct1 = MockedContentTypes.CreateBasicContentType("ct1", "CT1");
-            var ct2 = MockedContentTypes.CreateBasicContentType("ct2", "CT2");
-            var ct3 = MockedContentTypes.CreateBasicContentType("ct3", "CT3");
+            var ct1 = ContentTypeBuilder.CreateBasicContentType("ct1", "CT1");
+            var ct2 = ContentTypeBuilder.CreateBasicContentType("ct2", "CT2");
+            var ct3 = ContentTypeBuilder.CreateBasicContentType("ct3", "CT3");
             ct1.Id = 1;
             ct2.Id = 2;
             ct3.Id = 3;
@@ -242,10 +243,10 @@ namespace Umbraco.Tests.Services
         [Test]
         public void GetAvailableCompositeContentTypes_Include_Indirect_Composed_Types()
         {
-            var ct1 = MockedContentTypes.CreateBasicContentType("ct1", "CT1");
-            var ct2 = MockedContentTypes.CreateBasicContentType("ct2", "CT2");
-            var ct3 = MockedContentTypes.CreateBasicContentType("ct3", "CT3");
-            var ct4 = MockedContentTypes.CreateBasicContentType("ct4", "CT4");
+            var ct1 = ContentTypeBuilder.CreateBasicContentType("ct1", "CT1");
+            var ct2 = ContentTypeBuilder.CreateBasicContentType("ct2", "CT2");
+            var ct3 = ContentTypeBuilder.CreateBasicContentType("ct3", "CT3");
+            var ct4 = ContentTypeBuilder.CreateBasicContentType("ct4", "CT4");
             ct1.Id = 1;
             ct2.Id = 2;
             ct3.Id = 3;

@@ -20,6 +20,7 @@ using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Sync;
 using Umbraco.Core.WebAssets;
 using Umbraco.Examine;
+using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Web.Compose;
 using Umbraco.Web.PublishedCache.NuCache;
 using Umbraco.Web.Scheduling;
@@ -44,20 +45,21 @@ namespace Umbraco.Tests.Integration.Testing
             composition.Components().Remove<SchedulerComponent>();
             composition.Components().Remove<DatabaseServerRegistrarAndMessengerComponent>();
             composition.RegisterUnique<BackgroundIndexRebuilder, TestBackgroundIndexRebuilder>();
-            composition.Services.AddUnique(factory => Mock.Of<IRuntimeMinifier>());
+            composition.Services.AddSingleton<IRuntimeMinifier>(factory => Mock.Of<IRuntimeMinifier>());
 
             // we don't want persisted nucache files in tests
-            composition.Services.AddTransient(factory => new PublishedSnapshotServiceOptions { IgnoreLocalDb = true });
+            composition.Services.AddScoped(factory => new PublishedSnapshotServiceOptions { IgnoreLocalDb = true });
 
             // ensure all lucene indexes are using RAM directory (no file system)
             composition.RegisterUnique<ILuceneDirectoryFactory, LuceneRAMDirectoryFactory>();
 
             // replace this service so that it can lookup the correct file locations
-            composition.Services.AddUnique(GetLocalizedTextService);
-            
+            composition.Services.AddSingleton<ILocalizedTextService>(GetLocalizedTextService);
+
             composition.RegisterUnique<IServerMessenger, NoopServerMessenger>();
-            
-            
+            composition.RegisterUnique<IProfiler, TestProfiler>();
+
+
         }
 
         /// <summary>
@@ -65,11 +67,11 @@ namespace Umbraco.Tests.Integration.Testing
         /// we don't need to copy files
         /// </summary>
         /// <returns></returns>
-        private ILocalizedTextService GetLocalizedTextService(IServiceProvider serviceProvider)
+        private ILocalizedTextService GetLocalizedTextService(IServiceProvider factory)
         {
-            var globalSettings = serviceProvider.GetRequiredService<IOptions<GlobalSettings>>();
-            var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
-            var appCaches = serviceProvider.GetRequiredService<AppCaches>();
+            var globalSettings = factory.GetRequiredService<IOptions<GlobalSettings>>();
+            var loggerFactory = factory.GetRequiredService<ILoggerFactory>();
+            var appCaches = factory.GetRequiredService<AppCaches>();
 
             var localizedTextService = new LocalizedTextService(
                 new Lazy<LocalizedTextServiceFileSources>(() =>
@@ -130,7 +132,7 @@ namespace Umbraco.Tests.Integration.Testing
 
             public void PerformRemove<T>(ICacheRefresher refresher, Func<T, int> getNumericId, params T[] instances)
             {
- 
+
             }
 
             public void PerformRemove(ICacheRefresher refresher, params int[] numericIds)

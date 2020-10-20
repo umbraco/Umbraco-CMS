@@ -57,7 +57,7 @@ namespace Umbraco.Tests.Common.Builders
             var name = _name ?? Guid.NewGuid().ToString();
             var parentObjectType = _parentObjectType ?? null;
             var childObjectType = _childObjectType ?? null;
-            var id = _id ?? 1;
+            var id = _id ?? 0;
             var key = _key ?? Guid.NewGuid();
             var isBidirectional = _isBidirectional ?? false;
             var createDate = _createDate ?? DateTime.Now;

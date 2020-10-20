@@ -88,7 +88,7 @@
     <PackageReference Include="HtmlAgilityPack">
       <Version>1.11.24</Version>
     </PackageReference>
-    <PackageReference Include="LightInject" Version="6.3.4" />
+    <PackageReference Include="LightInject" Version="6.3.5" />
     <PackageReference Include="LightInject.Annotation" Version="1.1.0" />
     <PackageReference Include="Lucene.Net.Contrib" Version="3.0.3" />
     <PackageReference Include="Microsoft.AspNet.Identity.Core" Version="2.2.3" />
@@ -117,7 +117,7 @@
     <PackageReference Include="Microsoft.Owin.Testing" Version="4.1.1" />
     <PackageReference Include="Microsoft.Web.Infrastructure" Version="1.0.0.0" />
     <PackageReference Include="MiniProfiler" Version="4.2.1" />
-    <PackageReference Include="Moq" Version="4.14.5" />
+    <PackageReference Include="Moq" Version="4.14.6" />
     <PackageReference Include="NPoco" Version="4.0.2" />
     <PackageReference Include="NUnit" Version="3.12.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.17.0" />
@@ -142,25 +142,29 @@
     <Compile Include="IO\ShadowFileSystemTests.cs" />
     <Compile Include="LegacyXmlPublishedCache\ContentXmlDto.cs" />
     <Compile Include="LegacyXmlPublishedCache\PreviewXmlDto.cs" />
-    <Compile Include="Logging\LogviewerTests.cs" />
     <Compile Include="Migrations\MigrationPlanTests.cs" />
     <Compile Include="Migrations\MigrationTests.cs" />
     <Compile Include="Models\ContentXmlTest.cs" />
-    <Compile Include="Models\ImageProcessorImageUrlGeneratorTest.cs" />
-    <Compile Include="Models\VariationTests.cs" />
     <Compile Include="Persistence\Mappers\MapperTestBase.cs" />
-    <Compile Include="Persistence\Repositories\DocumentRepositoryTest.cs" />
     <Compile Include="PublishedContent\SolidPublishedSnapshot.cs" />
     <Compile Include="Published\ConvertersTests.cs" />
     <Compile Include="Published\ModelTypeTests.cs" />
+    <Compile Include="Publishing\PublishingStrategyTests.cs" />
     <Compile Include="Routing\BaseUrlProviderTest.cs" />
     <Compile Include="Routing\UrlProviderWithHideTopLevelNodeFromPathTests.cs" />
     <Compile Include="Scoping\ScopeEventDispatcherTests.cs" />
     <Compile Include="Security\OwinDataProtectorTokenProviderTests.cs" />
     <Compile Include="Persistence\Repositories\UserRepositoryTest.cs" />
+    <Compile Include="Services\ContentTypeServiceVariantsTests.cs" />
+    <Compile Include="Services\TestWithSomeContentBase.cs" />
+    <Compile Include="TestHelpers\Entities\MockedContent.cs" />
+    <Compile Include="TestHelpers\Entities\MockedContentTypes.cs" />
     <Compile Include="TestHelpers\Entities\MockedEntity.cs" />
+    <Compile Include="TestHelpers\Entities\MockedMedia.cs" />
+    <Compile Include="TestHelpers\Entities\MockedMember.cs" />
     <Compile Include="TestHelpers\Entities\MockedPropertyTypes.cs" />
     <Compile Include="TestHelpers\Entities\MockedUser.cs" />
+    <Compile Include="TestHelpers\Entities\MockedUserGroup.cs" />
     <Compile Include="UmbracoExamine\ExamineExtensions.cs" />
     <Compile Include="PublishedContent\NuCacheChildrenTests.cs" />
     <Compile Include="PublishedContent\PublishedContentLanguageVariantTests.cs" />
@@ -170,16 +174,10 @@
     <Compile Include="Routing\RoutableDocumentFilterTests.cs" />
     <Compile Include="Runtimes\StandaloneTests.cs" />
     <Compile Include="Routing\GetContentUrlsTests.cs" />
-    <Compile Include="Services\ContentServiceTagsTests.cs" />
-    <Compile Include="Services\ContentTypeServiceVariantsTests.cs" />
-    <Compile Include="Services\EntityXmlSerializerTests.cs" />
-    <Compile Include="Services\MemberGroupServiceTests.cs" />
-    <Compile Include="Services\MediaTypeServiceTests.cs" />
     <Compile Include="TestHelpers\RandomIdRamDirectory.cs" />
     <Compile Include="TestHelpers\Stubs\TestUserPasswordConfig.cs" />
     <Compile Include="Testing\Objects\TestDataSource.cs" />
     <Compile Include="Issues\U9560.cs" />
-    <Compile Include="Integration\ContentEventsTests.cs" />
     <Compile Include="Migrations\AdvancedMigrationTests.cs" />
     <Compile Include="Persistence\NPocoTests\NPocoFetchTests.cs" />
     <Compile Include="Persistence\NPocoTests\NPocoSqlTemplateTests.cs" />
@@ -227,7 +225,6 @@
     <Compile Include="Web\Controllers\BackOfficeControllerUnitTests.cs" />
     <Compile Include="Web\HttpCookieExtensionsTests.cs" />
     <Compile Include="Web\Mvc\HtmlStringUtilitiesTests.cs" />
-    <Compile Include="Web\Mvc\RenderIndexActionSelectorAttributeTests.cs" />
     <Compile Include="Persistence\NPocoTests\PetaPocoCachesTest.cs" />
     <Compile Include="Persistence\Repositories\DomainRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\PartialViewRepositoryTests.cs" />
@@ -266,11 +263,8 @@
     <Compile Include="PublishedContent\PublishedRouterTests.cs" />
     <Compile Include="PublishedContent\RootNodeTests.cs" />
     <Compile Include="Scheduling\BackgroundTaskRunnerTests.cs" />
-    <Compile Include="Services\MemberServiceTests.cs" />
-    <Compile Include="Services\MemberTypeServiceTests.cs" />
     <Compile Include="Packaging\PackageInstallationTest.cs" />
     <Compile Include="Services\PerformanceTests.cs" />
-    <Compile Include="Services\RelationServiceTests.cs" />
     <Compile Include="Cache\PublishedCache\PublishedMediaCacheTests.cs" />
     <Compile Include="Migrations\AlterMigrationTests.cs" />
     <Compile Include="Migrations\SqlScripts\SqlResources.Designer.cs">
@@ -296,7 +290,6 @@
     <Compile Include="PublishedContent\PublishedContentTests.cs" />
     <Compile Include="PublishedContent\PublishedMediaTests.cs" />
     <Compile Include="Web\Mvc\HtmlHelperExtensionMethodsTests.cs" />
-    <Compile Include="Models\ContentTests.cs" />
     <Compile Include="Persistence\SqlCeTableByTableTest.cs" />
     <Compile Include="Persistence\DatabaseContextTests.cs" />
     <Compile Include="Persistence\Mappers\ContentMapperTest.cs" />
@@ -312,24 +305,16 @@
     <Compile Include="Persistence\Mappers\RelationTypeMapperTest.cs" />
     <Compile Include="Persistence\NPocoTests\NPocoSqlTests.cs" />
     <Compile Include="Persistence\Querying\QueryBuilderTests.cs" />
-    <Compile Include="Persistence\Repositories\ContentTypeRepositoryTest.cs" />
-    <Compile Include="Persistence\Repositories\DataTypeDefinitionRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\MediaRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\MediaTypeRepositoryTest.cs" />
-    <Compile Include="Persistence\Repositories\RelationRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\ScriptRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\StylesheetRepositoryTest.cs" />
     <Compile Include="PublishedContent\PublishedContentMoreTests.cs" />
-    <Compile Include="Publishing\PublishingStrategyTests.cs" />
     <Compile Include="Cache\PublishedCache\PublishedContentCacheTests.cs" />
     <Compile Include="Routing\ContentFinderByAliasWithDomainsTests.cs" />
     <Compile Include="Routing\DomainsAndCulturesTests.cs" />
     <Compile Include="Routing\SiteDomainHelperTests.cs" />
     <Compile Include="Routing\UrlsWithNestedDomains.cs" />
-    <Compile Include="Services\TestWithSomeContentBase.cs" />
-    <Compile Include="Services\ContentServicePerformanceTest.cs" />
-    <Compile Include="Services\ContentServiceTests.cs" />
-    <Compile Include="Services\ContentTypeServiceTests.cs" />
     <Compile Include="Packaging\PackageDataInstallationTests.cs" />
     <Compile Include="Services\Importing\ImportResources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -444,12 +429,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Logging\logviewer.searches.config.js">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Logging\UmbracoTraceLog.UNITTEST.20181112.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="Migrations\SqlScripts\MySqlTotal-480.sql" />
     <Content Include="Migrations\SqlScripts\SqlCe-SchemaAndData-4110.sql" />
     <Content Include="Migrations\SqlScripts\SqlCeTotal-480.sql" />
@@ -480,6 +459,7 @@
     <Folder Include="Configurations\" />
     <Folder Include="CoreThings\" />
     <Folder Include="CoreXml\" />
+    <Folder Include="Integration\" />
   </ItemGroup>
   <!-- get NuGet packages directory -->
   <PropertyGroup>

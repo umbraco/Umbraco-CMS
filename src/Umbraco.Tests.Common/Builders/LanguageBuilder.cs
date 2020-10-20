@@ -24,6 +24,7 @@ namespace Umbraco.Tests.Common.Builders
     {
         private DateTime? _createDate;
         private CultureInfo _cultureInfo;
+        private string _cultureName;
         private DateTime? _deleteDate;
         private int? _fallbackLanguageId;
         private int? _id;
@@ -34,6 +35,12 @@ namespace Umbraco.Tests.Common.Builders
 
         public LanguageBuilder(TParent parentBuilder) : base(parentBuilder)
         {
+        }
+
+        public LanguageBuilder<TParent> WithCultureName(string cultureName)
+        {
+            _cultureName = cultureName;
+            return this;
         }
 
         public LanguageBuilder<TParent> WithIsDefault(bool isDefault)
@@ -57,6 +64,7 @@ namespace Umbraco.Tests.Common.Builders
         public override ILanguage Build()
         {
             var cultureInfo = _cultureInfo ?? CultureInfo.GetCultureInfo("en-US");
+            var cultureName = _cultureName ?? cultureInfo.EnglishName;
             var globalSettings = new GlobalSettings { DefaultUILanguage = cultureInfo.Name };
             var key = _key ?? Guid.NewGuid();
             var createDate = _createDate ?? DateTime.Now;
@@ -69,7 +77,7 @@ namespace Umbraco.Tests.Common.Builders
             return new Language(globalSettings, cultureInfo.Name)
             {
                 Id = _id ?? 0,
-                CultureName = cultureInfo.EnglishName,
+                CultureName = cultureName,
                 IsoCode = cultureInfo.Name,
                 Key = key,
                 CreateDate = createDate,

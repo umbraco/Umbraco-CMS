@@ -6,6 +6,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using Umbraco.Extensions;
+using Umbraco.Web.Common.Filters;
+using Umbraco.Web.Common.ModelBinders;
 
 namespace Umbraco.Web.Common.Builder
 {
@@ -38,11 +40,19 @@ namespace Umbraco.Web.Common.Builder
         public static IUmbracoBuilder WithMvcAndRazor(this IUmbracoBuilder builder, Action<MvcOptions> mvcOptions = null, Action<IMvcBuilder> mvcBuilding = null)
             => builder.AddWith(nameof(WithMvcAndRazor), () =>
             {
+
+
                 // TODO: We need to figure out if we can work around this because calling AddControllersWithViews modifies the global app and order is very important
                 // this will directly affect developers who need to call that themselves.
                 //We need to have runtime compilation of views when using umbraco. We could consider having only this when a specific config is set.
                 //But as far as I can see, there are still precompiled views, even when this is activated, so maybe it is okay.
-                var mvcBuilder = builder.Services.AddControllersWithViews(mvcOptions).AddRazorRuntimeCompilation();
+                var mvcBuilder = builder.Services.AddControllersWithViews(options =>
+                {
+                    options.ModelBinderProviders.Insert(0, new ContentModelBinderProvider());
+
+                    options.Filters.Insert(0, new EnsurePartialViewMacroViewContextFilterAttribute());
+                    mvcOptions?.Invoke(options);
+                }).AddRazorRuntimeCompilation();
                 mvcBuilding?.Invoke(mvcBuilder);
             });
 

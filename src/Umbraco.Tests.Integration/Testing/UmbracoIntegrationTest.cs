@@ -83,7 +83,8 @@ namespace Umbraco.Tests.Integration.Testing
             var host = hostBuilder.StartAsync().GetAwaiter().GetResult();
             Services = host.Services;
             var app = new ApplicationBuilder(host.Services);
-            Configure(app);
+            Configure(app); //Takes around 200 ms
+
 
             OnFixtureTearDown(() => host.Dispose());
         }
@@ -261,21 +262,19 @@ namespace Umbraco.Tests.Integration.Testing
 
         public virtual void Configure(IApplicationBuilder app)
         {
-            Services.GetRequiredService<IBackofficeSecurityFactory>().EnsureBackofficeSecurity();
-            Services.GetRequiredService<IUmbracoContextFactory>().EnsureUmbracoContext();
-
-            // get the currently set options
+            //get the currently set options
             var testOptions = TestOptionAttributeBase.GetTestOptions<UmbracoTestAttribute>();
             if (testOptions.Boot)
             {
-                app.UseUmbracoCore();
+                Services.GetRequiredService<IBackofficeSecurityFactory>().EnsureBackofficeSecurity();
+                Services.GetRequiredService<IUmbracoContextFactory>().EnsureUmbracoContext();
+                app.UseUmbracoCore(); // Takes 200 ms
             }
         }
 
         #endregion
 
         #region LocalDb
-
 
         private static readonly object _dbLocker = new object();
         private static LocalDbTestDatabase _dbInstance;
@@ -467,8 +466,8 @@ namespace Umbraco.Tests.Integration.Testing
 
         #region Builders
 
-        protected UserBuilder UserBuilder = new UserBuilder();
-        protected UserGroupBuilder UserGroupBuilder = new UserGroupBuilder();
+        protected UserBuilder UserBuilderInstance = new UserBuilder();
+        protected UserGroupBuilder UserGroupBuilderInstance = new UserGroupBuilder();
 
         #endregion
 

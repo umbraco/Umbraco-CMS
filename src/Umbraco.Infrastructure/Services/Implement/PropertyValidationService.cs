@@ -21,7 +21,6 @@ namespace Umbraco.Core.Services
             _textService = textService;
         }
 
-
         public IEnumerable<ValidationResult> ValidatePropertyValue(
            IPropertyType propertyType,
            object postedValue)

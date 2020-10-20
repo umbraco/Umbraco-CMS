@@ -33,7 +33,7 @@
                 <dependency id="Smidge" version="[3.1.1,3.999999)" />
                 <dependency id="Smidge.Nuglify" version="[2.0.0,2.999999)" />
                 <dependency id="SixLabors.ImageSharp.Web" version="[1.0.0,1.999999)" />
-                <dependency id="HtmlSanitizer" version="[5.0.343,5.999999)" />
+                <dependency id="HtmlSanitizer" version="[5.0.353,5.999999)" />
             </group>
 
         </dependencies>

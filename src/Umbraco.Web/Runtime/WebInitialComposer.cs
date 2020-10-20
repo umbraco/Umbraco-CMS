@@ -1,4 +1,5 @@
-﻿using System.Web.Security;
+﻿using System.Web.Mvc;
+using System.Web.Security;
 using Microsoft.AspNet.SignalR;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core;
@@ -59,7 +60,7 @@ namespace Umbraco.Web.Runtime
             composition
                 // TODO: This will depend on if we use ServiceBasedControllerActivator - see notes in Startup.cs
                 .ComposeUmbracoControllers(GetType().Assembly)
-                .SetDefaultRenderMvcController<RenderMvcController>(); // default controller for template views
+                .SetDefaultRenderMvcController</*RenderMvcController*/ Controller>(); // default controller for template views
 
             //we need to eagerly scan controller types since they will need to be routed
             composition.WithCollectionBuilder<SurfaceControllerTypeCollectionBuilder>()

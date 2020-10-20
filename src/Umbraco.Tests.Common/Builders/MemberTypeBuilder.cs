@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
@@ -132,6 +131,40 @@ namespace Umbraco.Tests.Common.Builders
             memberType.ResetDirtyProperties(false);
 
             return memberType;
+        }
+
+        public static MemberType CreateSimpleMemberType(string alias = null, string name = null)
+        {
+            var builder = new MemberTypeBuilder();
+            var memberType = builder
+                .WithAlias(alias)
+                .WithName(name)
+                .AddPropertyGroup()
+                    .WithName("Content")
+                    .WithSortOrder(1)
+                    .AddPropertyType()
+                        .WithAlias("title")
+                        .WithName("Title")
+                        .WithSortOrder(1)
+                        .Done()
+                    .AddPropertyType()
+                        .WithAlias("bodyText")
+                        .WithName("Body text")
+                        .WithSortOrder(2)
+                        .WithDataTypeId(-87)
+                        .Done()
+                    .AddPropertyType()
+                        .WithAlias("author")
+                        .WithName("Author")
+                        .WithSortOrder(3)
+                        .Done()
+                    .Done()
+                .Build();
+  
+            // Ensure that nothing is marked as dirty
+            memberType.ResetDirtyProperties(false);
+
+            return (MemberType)memberType;
         }
 
         int? IWithPropertyTypeIdsIncrementingFrom.PropertyTypeIdsIncrementingFrom

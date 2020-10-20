@@ -8,6 +8,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Services;
 using Umbraco.Extensions;
 using Umbraco.Web.BackOffice.Controllers;
+using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.BackOffice.Routing;
 using Umbraco.Web.BackOffice.Security;
 using Umbraco.Web.BackOffice.Services;
@@ -49,6 +50,7 @@ namespace Umbraco.Web.BackOffice.Runtime
                     "~/"));
 
             composition.RegisterUnique<IIconService, IconService>();
+            composition.RegisterUnique<UnhandledExceptionLoggerMiddleware>();
         }
     }
 }

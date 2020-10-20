@@ -14,7 +14,7 @@ namespace Umbraco.Tests.Benchmarks.Config
         /// </summary>
         public QuickRunWithMemoryDiagnoserConfigAttribute()
         {
-            Config.Add(new MemoryDiagnoser());
+            Config.Add(MemoryDiagnoser.Default);
         }
     }
 }

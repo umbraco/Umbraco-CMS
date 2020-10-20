@@ -217,6 +217,15 @@ namespace Umbraco.Extensions
             if (services is null) throw new ArgumentNullException(nameof(services));
             if (entryAssembly is null) throw new ArgumentNullException(nameof(entryAssembly));
 
+            // Add service session
+            // This can be overwritten by the user by adding their own call to AddSession
+            // since the last call of AddSession take precedence
+            services.AddSession(options =>
+            {
+                options.Cookie.Name = "UMB_SESSION";
+                options.Cookie.HttpOnly = true;
+            });
+
             // Add supported databases
             services.AddUmbracoSqlCeSupport();
             services.AddUmbracoSqlServerSupport();
@@ -251,7 +260,7 @@ namespace Umbraco.Extensions
                 loggingConfiguration,
                 configuration, out var ioHelper, out var hostingEnvironment, out var backOfficeInfo, out var profiler);
 
-            var loggerFactory = serviceProvider.GetService<ILoggerFactory>();
+            var loggerFactory = services.BuildServiceProvider().GetService<ILoggerFactory>();
 
             var umbracoVersion = new UmbracoVersion();
             var typeFinder = CreateTypeFinder(loggerFactory, profiler, webHostEnvironment, entryAssembly, typeFinderSettings);
@@ -270,13 +279,6 @@ namespace Umbraco.Extensions
                 dbProviderFactoryCreator);
 
             coreRuntime.Configure(services);
-
-
-            services.Configure<HostingSettings>(hostingSettings =>
-            {
-                hostingSettings.Debug = false;
-            });
-
 
             return services;
         }

@@ -25,7 +25,8 @@ namespace Umbraco.Tests.Common.Builders
             IWithCreateDateBuilder,
             IWithUpdateDateBuilder,
             IWithNameBuilder,
-            IWithSortOrderBuilder where TParent: IBuildPropertyGroups
+            IWithSortOrderBuilder,
+            IWithSupportsPublishing where TParent: IBuildPropertyGroups
     {
         private readonly List<PropertyTypeBuilder<PropertyGroupBuilder<TParent>>> _propertyTypeBuilders = new List<PropertyTypeBuilder<PropertyGroupBuilder<TParent>>>();
 
@@ -35,9 +36,17 @@ namespace Umbraco.Tests.Common.Builders
         private DateTime? _updateDate;
         private string _name;
         private int? _sortOrder;
+        private bool? _supportsPublishing;
+        private PropertyTypeCollection _propertyTypeCollection;
 
         public PropertyGroupBuilder(TParent parentBuilder) : base(parentBuilder)
         {
+        }
+
+        public PropertyGroupBuilder<TParent> WithPropertyTypeCollection(PropertyTypeCollection propertyTypeCollection)
+        {
+            _propertyTypeCollection = propertyTypeCollection;
+            return this;
         }
 
         public PropertyTypeBuilder<PropertyGroupBuilder<TParent>> AddPropertyType()
@@ -49,20 +58,29 @@ namespace Umbraco.Tests.Common.Builders
 
         public override PropertyGroup Build()
         {
-            var id = _id ?? 1;
+            var id = _id ?? 0;
             var key = _key ?? Guid.NewGuid();
             var createDate = _createDate ?? DateTime.Now;
             var updateDate = _updateDate ?? DateTime.Now;
             var name = _name ?? Guid.NewGuid().ToString();
             var sortOrder = _sortOrder ?? 0;
+            var supportsPublishing = _supportsPublishing ?? false;
 
-            var properties = new PropertyTypeCollection(false);
-            foreach (var propertyType in _propertyTypeBuilders.Select(x => x.Build()))
+            PropertyTypeCollection propertyTypeCollection;
+            if (_propertyTypeCollection != null)
             {
-                properties.Add(propertyType);
+                propertyTypeCollection = _propertyTypeCollection;
+            }
+            else
+            {
+                propertyTypeCollection = new PropertyTypeCollection(supportsPublishing);
+                foreach (var propertyType in _propertyTypeBuilders.Select(x => x.Build()))
+                {
+                    propertyTypeCollection.Add(propertyType);
+                }
             }
 
-            return new PropertyGroup(properties)
+            return new PropertyGroup(propertyTypeCollection)
             {
                 Id = id,
                 Key = key,
@@ -107,6 +125,12 @@ namespace Umbraco.Tests.Common.Builders
         {
             get => _sortOrder;
             set => _sortOrder = value;
+        }
+
+        bool? IWithSupportsPublishing.SupportsPublishing
+        {
+            get => _supportsPublishing;
+            set => _supportsPublishing = value;
         }
     }
 }

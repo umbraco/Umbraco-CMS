@@ -45,5 +45,22 @@ namespace Umbraco.Core.Persistence.Factories
             return dto;
         }
 
+        public static RelationDto BuildDto(ReadOnlyRelation entity)
+        {
+            var dto = new RelationDto
+            {
+                ChildId = entity.ChildId,
+                Comment = string.IsNullOrEmpty(entity.Comment) ? string.Empty : entity.Comment,
+                Datetime = entity.CreateDate,
+                ParentId = entity.ParentId,
+                RelationType = entity.RelationTypeId
+            };
+
+            if (entity.HasIdentity)
+                dto.Id = entity.Id;
+
+            return dto;
+        }
+
     }
 }
