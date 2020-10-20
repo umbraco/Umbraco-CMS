@@ -519,8 +519,8 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var repository = ContentTypeRepository;
                 var ctMain = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId:0);
-                var ctChild1 = ContentTypeBuilder.CreateSimpleContentType("child1", "Child 1", ctMain, true, defaultTemplateId:0);
-                var ctChild2 = ContentTypeBuilder.CreateSimpleContentType("child2", "Child 2", ctChild1, true, defaultTemplateId:0);
+                var ctChild1 = ContentTypeBuilder.CreateSimpleContentType("child1", "Child 1", ctMain, randomizeAliases: true, defaultTemplateId: 0);
+                var ctChild2 = ContentTypeBuilder.CreateSimpleContentType("child2", "Child 2", ctChild1, randomizeAliases: true, defaultTemplateId: 0);
 
                 repository.Save(ctMain);
                 repository.Save(ctChild1);

@@ -20,6 +20,7 @@ namespace Umbraco.Tests.Common.Builders
         private int? _propertyTypeIdsIncrementingFrom;
         private int? _defaultTemplateId;
         private ContentVariation? _contentVariation;
+        private PropertyTypeCollection _propertyTypeCollection;
 
         public ContentTypeBuilder() : base(null)
         {
@@ -38,6 +39,12 @@ namespace Umbraco.Tests.Common.Builders
         public ContentTypeBuilder WithContentVariation(ContentVariation contentVariation)
         {
             _contentVariation = contentVariation;
+            return this;
+        }
+
+        public ContentTypeBuilder WithPropertyTypeCollection(PropertyTypeCollection propertyTypeCollection)
+        {
+            _propertyTypeCollection = propertyTypeCollection;
             return this;
         }
 
@@ -104,9 +111,21 @@ namespace Umbraco.Tests.Common.Builders
 
             contentType.Variations = contentVariation;
 
-            contentType.NoGroupPropertyTypes =  _noGroupPropertyTypeBuilders.Select(x => x.Build());
-            BuildPropertyGroups(contentType, _propertyGroupBuilders.Select(x => x.Build()));
-            BuildPropertyTypeIds(contentType, _propertyTypeIdsIncrementingFrom);
+            if (_propertyTypeCollection != null)
+            {
+                var propertyGroup = new PropertyGroupBuilder()
+                    .WithName("Content")
+                    .WithSortOrder(1)
+                    .WithPropertyTypeCollection(_propertyTypeCollection)
+                    .Build();
+                contentType.PropertyGroups.Add(propertyGroup);
+            }
+            else
+            {
+                contentType.NoGroupPropertyTypes = _noGroupPropertyTypeBuilders.Select(x => x.Build());
+                BuildPropertyGroups(contentType, _propertyGroupBuilders.Select(x => x.Build()));
+                BuildPropertyTypeIds(contentType, _propertyTypeIdsIncrementingFrom);
+            }
 
             contentType.AllowedContentTypes = _allowedContentTypeBuilders.Select(x => x.Build());
 
@@ -134,7 +153,7 @@ namespace Umbraco.Tests.Common.Builders
 
         public static ContentType CreateSimpleContentType2(string alias, string name, IContentType parent = null, bool randomizeAliases = false, string propertyGroupName = "Content")
         {
-            var builder = CreateSimpleContentTypeHelper(alias, name, parent, randomizeAliases, propertyGroupName);
+            var builder = CreateSimpleContentTypeHelper(alias, name, parent, randomizeAliases: randomizeAliases, propertyGroupName: propertyGroupName);
 
             builder.AddPropertyType()
                 .WithAlias(RandomAlias("gen", randomizeAliases))
@@ -146,54 +165,70 @@ namespace Umbraco.Tests.Common.Builders
                 .Done();
 
             return (ContentType)builder.Build();
-        }public static ContentType CreateSimpleContentType(string alias = null, string name = null, IContentType parent = null, bool randomizeAliases = false, string propertyGroupName = "Content", bool mandatoryProperties = false, int defaultTemplateId = 0)
-        {
-            return (ContentType)CreateSimpleContentTypeHelper(alias, name, parent, randomizeAliases, propertyGroupName, mandatoryProperties, defaultTemplateId).Build();
         }
 
-        public static ContentTypeBuilder CreateSimpleContentTypeHelper(string alias = null, string name = null, IContentType parent = null, bool randomizeAliases = false, string propertyGroupName = "Content", bool mandatoryProperties = false, int defaultTemplateId = 0)
+        public static ContentType CreateSimpleContentType(string alias = null, string name = null, IContentType parent = null, PropertyTypeCollection propertyTypeCollection = null, bool randomizeAliases = false, string propertyGroupName = "Content", bool mandatoryProperties = false, int defaultTemplateId = 0)
         {
-            return new ContentTypeBuilder()
+            return (ContentType)CreateSimpleContentTypeHelper(alias, name, parent, propertyTypeCollection, randomizeAliases, propertyGroupName, mandatoryProperties, defaultTemplateId).Build();
+        }
+
+        public static ContentTypeBuilder CreateSimpleContentTypeHelper(string alias = null, string name = null, IContentType parent = null, PropertyTypeCollection propertyTypeCollection = null,  bool randomizeAliases = false, string propertyGroupName = "Content", bool mandatoryProperties = false, int defaultTemplateId = 0)
+        {
+            var builder = new ContentTypeBuilder()
                 .WithAlias(alias ?? "simple")
                 .WithName(name ?? "Simple Page")
-                .WithParentContentType(parent)
-                .AddPropertyGroup()
-                    .WithName(propertyGroupName)
-                    .WithSortOrder(1)
-                    .WithSupportsPublishing(true)
-                    .AddPropertyType()
-                        .WithAlias(RandomAlias("title", randomizeAliases))
-                        .WithName("Title")
+                .WithParentContentType(parent);
+
+            if (propertyTypeCollection != null)
+            {
+                builder = builder
+                    .WithPropertyTypeCollection(propertyTypeCollection);
+            }
+            else
+            {
+                builder = builder
+                    .AddPropertyGroup()
+                        .WithName(propertyGroupName)
                         .WithSortOrder(1)
-                        .WithMandatory(mandatoryProperties)
-                        .Done()
-                    .AddPropertyType()
-                        .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TinyMce)
-                        .WithValueStorageType(ValueStorageType.Ntext)
-                        .WithAlias(RandomAlias("bodyText", randomizeAliases))
-                        .WithName("Body text")
-                        .WithSortOrder(2)
-                        .WithDataTypeId(Constants.DataTypes.RichtextEditor)
-                        .WithMandatory(mandatoryProperties)
-                        .Done()
-                    .AddPropertyType()
-                        .WithAlias(RandomAlias("author", randomizeAliases))
-                        .WithName("Author")
-                        .WithSortOrder(3)
-                        .WithMandatory(mandatoryProperties)
-                        .Done()
+                        .WithSupportsPublishing(true)
+                        .AddPropertyType()
+                            .WithAlias(RandomAlias("title", randomizeAliases))
+                            .WithName("Title")
+                            .WithSortOrder(1)
+                            .WithMandatory(mandatoryProperties)
+                            .Done()
+                        .AddPropertyType()
+                            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TinyMce)
+                            .WithValueStorageType(ValueStorageType.Ntext)
+                            .WithAlias(RandomAlias("bodyText", randomizeAliases))
+                            .WithName("Body text")
+                            .WithSortOrder(2)
+                            .WithDataTypeId(Constants.DataTypes.RichtextEditor)
+                            .WithMandatory(mandatoryProperties)
+                            .Done()
+                        .AddPropertyType()
+                            .WithAlias(RandomAlias("author", randomizeAliases))
+                            .WithName("Author")
+                            .WithSortOrder(3)
+                            .WithMandatory(mandatoryProperties)
+                            .Done()
+                        .Done();
+            }
+
+            builder = builder
+                .AddAllowedTemplate()
+                    .WithId(defaultTemplateId)
+                    .WithAlias("textPage")
+                    .WithName("Textpage")
                     .Done()
-                    .AddAllowedTemplate()
-                        .WithId(defaultTemplateId)
-                        .WithAlias("textPage")
-                        .WithName("Textpage")
-                        .Done()
-                    .WithDefaultTemplateId(defaultTemplateId);
+                .WithDefaultTemplateId(defaultTemplateId);
+
+            return builder;
         }
 
         public static ContentType CreateSimpleTagsContentType(string alias, string name, IContentType parent = null, bool randomizeAliases = false, string propertyGroupName = "Content", int defaultTemplateId = 1)
         {
-            var contentType = CreateSimpleContentType(alias, name, parent, randomizeAliases, propertyGroupName, defaultTemplateId: defaultTemplateId);
+            var contentType = CreateSimpleContentType(alias, name, parent, randomizeAliases: randomizeAliases, propertyGroupName: propertyGroupName, defaultTemplateId: defaultTemplateId);
 
             var propertyType = new PropertyTypeBuilder()
                 .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.Tags)
@@ -215,7 +250,6 @@ namespace Umbraco.Tests.Common.Builders
                 .WithAlias(alias)
                 .WithName(name)
                 .AddPropertyGroup()
-                    .WithId(1)
                     .WithName("Content")
                     .WithSortOrder(1)
                     .WithSupportsPublishing(true)
@@ -234,7 +268,6 @@ namespace Umbraco.Tests.Common.Builders
                         .Done()
                     .Done()
                 .AddPropertyGroup()
-                    .WithId(2)
                     .WithName("Meta")
                     .WithSortOrder(2)
                     .WithSupportsPublishing(true)
