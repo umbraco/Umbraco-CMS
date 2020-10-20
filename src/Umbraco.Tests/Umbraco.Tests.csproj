@@ -141,7 +141,6 @@
     <Compile Include="Models\ContentXmlTest.cs" />
     <Compile Include="Models\ImageProcessorImageUrlGeneratorTest.cs" />
     <Compile Include="Models\VariationTests.cs" />
-    <Compile Include="Persistence\Mappers\MapperTestBase.cs" />
     <Compile Include="PublishedContent\SolidPublishedSnapshot.cs" />
     <Compile Include="Published\ConvertersTests.cs" />
     <Compile Include="Published\ModelTypeTests.cs" />
@@ -289,16 +288,6 @@
     <Compile Include="Models\ContentTests.cs" />
     <Compile Include="Persistence\SqlCeTableByTableTest.cs" />
     <Compile Include="Persistence\DatabaseContextTests.cs" />
-    <Compile Include="Persistence\Mappers\ContentTypeMapperTest.cs" />
-    <Compile Include="Persistence\Mappers\DataTypeMapperTest.cs" />
-    <Compile Include="Persistence\Mappers\DictionaryMapperTest.cs" />
-    <Compile Include="Persistence\Mappers\DictionaryTranslationMapperTest.cs" />
-    <Compile Include="Persistence\Mappers\LanguageMapperTest.cs" />
-    <Compile Include="Persistence\Mappers\MediaMapperTest.cs" />
-    <Compile Include="Persistence\Mappers\PropertyGroupMapperTest.cs" />
-    <Compile Include="Persistence\Mappers\PropertyTypeMapperTest.cs" />
-    <Compile Include="Persistence\Mappers\RelationMapperTest.cs" />
-    <Compile Include="Persistence\Mappers\RelationTypeMapperTest.cs" />
     <Compile Include="Persistence\NPocoTests\NPocoSqlTests.cs" />
     <Compile Include="Persistence\Querying\QueryBuilderTests.cs" />
     <Compile Include="Persistence\Repositories\MediaRepositoryTest.cs" />
