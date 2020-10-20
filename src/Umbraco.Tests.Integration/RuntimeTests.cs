@@ -68,8 +68,7 @@ namespace Umbraco.Tests.Integration
             Assert.IsFalse(MyComponent.IsInit);
             Assert.IsFalse(MyComponent.IsTerminated);
 
-            var serviceProvider = services.BuildServiceProvider();
-            coreRuntime.Start(serviceProvider);
+    
             // TODO: found these registration were necessary here (as we haven't called the HostBuilder?), as dependencies for ComponentCollection
             // are not resolved.  Need to check this if these explicit registrations are the best way to handle this.
             var contentSettings = new ContentSettings();
@@ -87,6 +86,9 @@ namespace Umbraco.Tests.Integration
             services.AddTransient(x => Options.Create(userPasswordConfigurationSettings));
             services.AddTransient(x => Options.Create(webRoutingSettings));
             services.AddSingleton(typeof(ILogger<>), typeof(Logger<>));
+
+            var serviceProvider = services.BuildServiceProvider();
+            coreRuntime.Start(serviceProvider);
 
             Assert.IsTrue(MyComponent.IsInit);
             Assert.IsFalse(MyComponent.IsTerminated);
