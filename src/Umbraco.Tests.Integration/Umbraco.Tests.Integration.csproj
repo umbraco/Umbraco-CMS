@@ -17,6 +17,15 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Content Include="Logging\logviewer.searches.config.js">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Logging\UmbracoTraceLog.UNITTEST.20181112.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
+
+    <ItemGroup>
       <None Remove="Umbraco.Infrastructure\Services\Importing\Dictionary-Package.xml" />
     </ItemGroup>
 
