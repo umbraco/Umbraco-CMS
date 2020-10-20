@@ -239,7 +239,6 @@
     <Compile Include="Models\Collections\OrderItem.cs" />
     <Compile Include="Models\Collections\SimpleOrder.cs" />
     <Compile Include="Web\Mvc\SurfaceControllerTests.cs" />
-    <Compile Include="Web\Mvc\UmbracoViewPageTests.cs" />
     <Compile Include="Runtimes\CoreRuntimeTests.cs" />
     <Compile Include="Runtimes\WebRuntimeComponentTests.cs" />
     <Compile Include="Cache\ObjectAppCacheTests.cs" />
