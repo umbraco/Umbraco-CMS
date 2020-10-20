@@ -1,4 +1,4 @@
-﻿using Moq;
+using Moq;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
