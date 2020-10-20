@@ -7,6 +7,7 @@ namespace Umbraco.Core.Configuration.Models
     /// </summary>
     public class ModelsBuilderSettings 
     {
+        // TODO: This should not go into App_Data - that folder isn't really a real thing anymore
         public static string DefaultModelsDirectory => "~/App_Data/Models";
 
         /// <summary>

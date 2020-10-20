@@ -370,7 +370,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
             //This is the ideal button order but depends on circumstance, we'll use this array to create the button list
             // Publish, SendToPublish, Save
             var actionOrder = ["U", "H", "A"];
-            var defaultActions;
+            var defaultAction = null; 
             var actions = [];
 
             //Create the first button (primary button)
