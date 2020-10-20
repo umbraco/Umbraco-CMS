@@ -34,7 +34,7 @@ namespace Umbraco.Tests.Integration.Services
             ContentRepositoryBase.ThrowOnWarning = true;
             _globalSettings = new GlobalSettings();
             // TODO: remove this once IPublishedSnapShotService has been implemented with nucache.
-            Umbraco.Core.Services.Implement.ContentTypeService.ClearScopeEvents();
+            Core.Services.Implement.ContentTypeService.ClearScopeEvents();
             CreateTestData();
         }
 

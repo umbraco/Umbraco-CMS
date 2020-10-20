@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Umbraco.Web.Common.Constants;
 using Umbraco.Web.Common.Controllers;
+using Umbraco.Web.Mvc;
 
 namespace Umbraco.Web.Common.Filters
 {
@@ -28,7 +29,7 @@ namespace Umbraco.Web.Common.Filters
     /// </remarks>
     public class EnsurePartialViewMacroViewContextFilterAttribute : ActionFilterAttribute
     {
-        
+
         /// <summary>
         /// Ensures the custom ViewContext datatoken is set before the RenderController action is invoked,
         /// this ensures that any calls to GetPropertyValue with regards to RTE or Grid editors can still
@@ -40,7 +41,7 @@ namespace Umbraco.Web.Common.Filters
             if (!(context.Controller is Controller controller)) return;
 
             //ignore anything that is not IRenderController
-            if (!(controller is RenderController)) return;
+            if (!(controller is IRenderController)) return;
 
             SetViewContext(context, controller);
         }
