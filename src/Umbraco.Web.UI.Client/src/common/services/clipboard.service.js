@@ -15,6 +15,7 @@ function clipboardService(notificationsService, eventsService, localStorageServi
 
     const TYPES = {};
     TYPES.ELEMENT_TYPE = "elementType";
+    TYPES.BLOCK = "block";
     TYPES.RAW = "raw";
 
     var clearPropertyResolvers = {};
@@ -28,6 +29,14 @@ function clipboardService(notificationsService, eventsService, localStorageServi
                 var prop = tab.properties[p];
                 propMethod(prop, TYPES.ELEMENT_TYPE);
             }
+        }
+    }
+    clipboardTypeResolvers[TYPES.BLOCK] = function(data, propMethod) {
+        if (data.data != null) {
+            clipboardTypeResolvers[TYPES.RAW](data.data, propMethod);
+        }
+        if (data.settingsData != null) {
+            clipboardTypeResolvers[TYPES.RAW](data.settingsData, propMethod);
         }
     }
     clipboardTypeResolvers[TYPES.RAW] = function(data, propMethod) {

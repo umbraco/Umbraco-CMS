@@ -493,6 +493,25 @@
                 blockPickerModel.clipboardItems.push(pasteEntry);
             });
 
+            var entriesForPaste = clipboardService.retriveEntriesOfType(clipboardService.TYPES.BLOCK, vm.availableContentTypesAliases);
+            entriesForPaste.forEach(function (entry) {
+                var pasteEntry = {
+                    type: clipboardService.TYPES.BLOCK,
+                    date: entry.date,
+                    pasteData: entry.data,
+                    elementTypeModel: {
+                        name: entry.label,
+                        icon: entry.icon
+                    }
+                }
+                if(Array.isArray(pasteEntry.data) === false) {
+                    pasteEntry.blockConfigModel = modelObject.getScaffoldFromAlias(entry.alias);
+                } else {
+                    pasteEntry.blockConfigModel = {};
+                }
+                blockPickerModel.clipboardItems.push(pasteEntry);
+            });
+
             blockPickerModel.clipboardItems.sort( (a, b) => {
                 return b.date - a.date
             });
@@ -504,7 +523,12 @@
 
         var requestCopyAllBlocks = function() {
 
-            var elementTypesToCopy = vm.layout.filter(entry => entry.$block.config.unsupported !== true).map(entry => entry.$block.content);
+            var elementTypesToCopy = vm.layout.filter(entry => entry.$block.config.unsupported !== true).map(
+                (entry) => {
+                    // No need to clone the data as its begin handled by the clipboardService.
+                    return {"data": entry.$block.data, "settingsData":entry.$block.settingsData}
+                }
+            );
 
             // list aliases
             var aliases = elementTypesToCopy.map(content => content.contentTypeAlias);
@@ -515,16 +539,21 @@
             var contentNodeName = "";
             if(vm.umbVariantContent) {
                 contentNodeName = vm.umbVariantContent.editor.content.name;
+                contentNodeIcon = vm.umbVariantContent.editor.content.icon;
             } else if (vm.umbElementEditorContent) {
-                contentNodeName = vm.umbElementEditorContent.model.documentType.name
+                contentNodeName = vm.umbElementEditorContent.model.documentType.name;
+                contentNodeIcon = vm.umbElementEditorContent.model.documentType.icon;
             }
 
+            console.log("contentNodeIcon", contentNodeIcon)
+
             localizationService.localize("clipboard_labelForArrayOfItemsFrom", [vm.model.label, contentNodeName]).then(function(localizedLabel) {
-                clipboardService.copyArray(clipboardService.TYPES.ELEMENT_TYPE, aliases, elementTypesToCopy, localizedLabel, "icon-thumbnail-list", vm.model.id);
+                clipboardService.copyArray(clipboardService.TYPES.BLOCK, aliases, elementTypesToCopy, localizedLabel, contentNodeIcon || "icon-thumbnail-list", vm.model.id);
             });
         }
         function copyBlock(block) {
-            clipboardService.copy(clipboardService.TYPES.ELEMENT_TYPE, block.content.contentTypeAlias, block.content, block.label);
+            console.log(block)
+            clipboardService.copy(clipboardService.TYPES.BLOCK, block.content.contentTypeAlias, {"data": block.data, "settingsData":block.settingsData}, block.label, block.content.icon, block.content.udi);
         }
         function requestPasteFromClipboard(index, pasteEntry) {
 

@@ -58,6 +58,7 @@
             }
         }
         function replaceElementTypeBlockListUDIsResolver(obj, propClearingMethod) {
+            // we could filter for specific Property Editor Aliases, but as the Block Editor structure can be used by many Property Editor we do not in this code know a good way to detect that this is a Block Editor and will therefor leave it to the value structure to determin this.
             replaceRawBlockListUDIsResolver(obj.value, propClearingMethod);
         }
 
