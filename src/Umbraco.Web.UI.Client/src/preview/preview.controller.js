@@ -363,7 +363,7 @@ var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.servi
             localStorage.setItem('UmbPreviewSessionAmount', amountOfPreviewSessions);
 
             if(amountOfPreviewSessions <= 0) {
-                // We are good to secretly end preview mode.
+                // We are good to end preview mode.
                 navigator.sendBeacon("../preview/end");
             }
         }

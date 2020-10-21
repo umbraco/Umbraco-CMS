@@ -126,7 +126,8 @@ namespace Umbraco.Web.Editors
             service.ExitPreview(previewToken);
 
             System.Web.HttpContext.Current.ExpireCookie(Constants.Web.PreviewCookieName);
-            // Expire Client-side cookie that determins wether the user has accepted to be in Preview Mode when visiting the website.
+
+            // Expire Client-side cookie that determines whether the user has accepted to be in Preview Mode when visiting the website.
             System.Web.HttpContext.Current.ExpireCookie(Constants.Web.AcceptPreviewCookieName);
 
             if (Uri.IsWellFormedUriString(redir, UriKind.Relative)
