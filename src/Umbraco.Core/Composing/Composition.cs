@@ -64,10 +64,7 @@ namespace Umbraco.Core.Composing
         #endregion
 
         #region IRegister
-
-        /// <inheritdoc />
-        public object Concrete => _register.Concrete;
-
+        
         /// <inheritdoc />
         public void Register(Type serviceType, Lifetime lifetime = Lifetime.Transient)
             => _register.Register(serviceType, lifetime);

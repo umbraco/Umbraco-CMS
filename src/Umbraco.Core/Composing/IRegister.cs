@@ -8,11 +8,6 @@ namespace Umbraco.Core.Composing
     public interface IRegister
     {
         /// <summary>
-        /// Gets the concrete container.
-        /// </summary>
-        object Concrete { get; }
-
-        /// <summary>
         /// Registers a service as its own implementation.
         /// </summary>
         void Register(Type serviceType, Lifetime lifetime = Lifetime.Transient);
