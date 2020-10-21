@@ -7,6 +7,7 @@ using Umbraco.Web.Editors;
 namespace Umbraco.Web.Mvc
 {
     // TODO: This has been ported to netcore, can be removed
+    // Has preview been migrated?
     internal class BackOfficeArea : AreaRegistration
     {
         private readonly GlobalSettings _globalSettings;
@@ -35,18 +36,6 @@ namespace Umbraco.Web.Mvc
                 new {controller = "Preview", action = "Index", editor = UrlParameter.Optional},
                 new[] { "Umbraco.Web.Editors" });
 
-            context.MapRoute(
-                "Umbraco_back_office",
-                AreaName + "/{action}/{id}",
-                new {controller = "BackOffice", action = "Default", id = UrlParameter.Optional},
-                //limit the action/id to only allow characters - this is so this route doesn't hog all other
-                // routes like: /umbraco/channels/word.aspx, etc...
-                new
-                    {
-                        action = @"[a-zA-Z]*",
-                        id = @"[a-zA-Z]*"
-                    },
-                new[] {typeof (BackOfficeController).Namespace});
         }
 
         public override string AreaName => _globalSettings.GetUmbracoMvcArea(_hostingEnvironment);

@@ -40,7 +40,7 @@ namespace Umbraco.Core.BackOffice
         /// <param name="email">This is allowed to be null (but would need to be filled in if trying to persist this instance)</param>
         /// <param name="culture"></param>
         /// <returns></returns>
-        public static BackOfficeIdentityUser CreateNew(GlobalSettings globalSettings, string username, string email, string culture)
+        public static BackOfficeIdentityUser CreateNew(GlobalSettings globalSettings, string username, string email, string culture, string name = null)
         {
             if (string.IsNullOrWhiteSpace(username)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(username));
             if (string.IsNullOrWhiteSpace(culture)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(culture));
@@ -54,6 +54,7 @@ namespace Umbraco.Core.BackOffice
             user._id = int.MinValue;
             user._hasIdentity = false;
             user._culture = culture;
+            user._name = name;
             user.EnableChangeTracking();
             return user;
         }

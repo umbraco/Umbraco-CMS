@@ -35,7 +35,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     public class MemberTypeController : ContentTypeControllerBase<IMemberType>
     {
         private readonly IMemberTypeService _memberTypeService;
-        private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
+        private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly UmbracoMapper _umbracoMapper;
         private readonly ILocalizedTextService _localizedTextService;
@@ -48,7 +48,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             IMemberTypeService memberTypeService,
             UmbracoMapper umbracoMapper,
             ILocalizedTextService localizedTextService,
-            IBackofficeSecurityAccessor backofficeSecurityAccessor,
+            IBackOfficeSecurityAccessor backofficeSecurityAccessor,
             IShortStringHelper shortStringHelper)
             : base(cultureDictionary,
                 editorValidatorCollection,
@@ -143,7 +143,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            _memberTypeService.Delete(foundType, _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.Id);
+            _memberTypeService.Delete(foundType, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
             return Ok();
         }
 
@@ -203,7 +203,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             var ctId = Convert.ToInt32(contentTypeSave.Id);
             var ct = ctId > 0 ? _memberTypeService.Get(ctId) : null;
 
-            if (_backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.HasAccessToSensitiveData() == false)
+            if (_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.HasAccessToSensitiveData() == false)
             {
                 //We need to validate if any properties on the contentTypeSave have had their IsSensitiveValue changed,
                 //and if so, we need to check if the current user has access to sensitive values. If not, we have to return an error

@@ -9,33 +9,33 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Common.Security
 {
-    public class BackofficeSecurityFactory: IBackofficeSecurityFactory
+    public class BackOfficeSecurityFactory: IBackOfficeSecurityFactory
     {
-        private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
+        private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
         private readonly IUserService _userService;
         private readonly IOptions<GlobalSettings> _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public BackofficeSecurityFactory(
-            IBackofficeSecurityAccessor backofficeSecurityAccessor,
+        public BackOfficeSecurityFactory(
+            IBackOfficeSecurityAccessor backofficeSecurityAccessor,
             IUserService userService,
             IOptions<GlobalSettings> globalSettings,
             IHostingEnvironment hostingEnvironment,
             IHttpContextAccessor httpContextAccessor)
         {
-            _backofficeSecurityAccessor = backofficeSecurityAccessor;
+            _backOfficeSecurityAccessor = backofficeSecurityAccessor;
             _userService = userService;
             _globalSettings = globalSettings;
             _hostingEnvironment = hostingEnvironment;
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public void EnsureBackofficeSecurity()
+        public void EnsureBackOfficeSecurity()
         {
-            if (_backofficeSecurityAccessor.BackofficeSecurity is null)
+            if (_backOfficeSecurityAccessor.BackOfficeSecurity is null)
             {
-                _backofficeSecurityAccessor.BackofficeSecurity = new BackofficeSecurity(_userService, _globalSettings, _hostingEnvironment, _httpContextAccessor);
+                _backOfficeSecurityAccessor.BackOfficeSecurity = new BackofficeSecurity(_userService, _globalSettings, _hostingEnvironment, _httpContextAccessor);
             }
 
         }

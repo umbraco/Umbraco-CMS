@@ -18,7 +18,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets the BackofficeSecurity class
         /// </summary>
-        IBackofficeSecurity Security { get; }
+        IBackOfficeSecurity Security { get; }
 
         /// <summary>
         /// Gets the uri that is handled by ASP.NET after server-side rewriting took place.

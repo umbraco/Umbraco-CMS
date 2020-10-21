@@ -1,9 +1,10 @@
-﻿using System;
-using Umbraco.Core;
+﻿using Microsoft.AspNetCore.Identity;
+using System;
 using Umbraco.Core.BackOffice;
-using Umbraco.Web.Composing;
+using Umbraco.Core.Configuration.Models;
+using SecurityConstants = Umbraco.Core.Constants.Security;
 
-namespace Umbraco.Web.Security
+namespace Umbraco.Web.Common.Security
 {
     /// <summary>
     /// Options used to configure auto-linking external OAuth providers
@@ -21,12 +22,10 @@ namespace Umbraco.Web.Security
             string[] defaultUserGroups = null,
             string defaultCulture = null)
         {
-            _defaultUserGroups = defaultUserGroups ?? new[] { Constants.Security.EditorGroupAlias };
-            _autoLinkExternalAccount = autoLinkExternalAccount;
-            _defaultCulture = defaultCulture ?? /*Current.Configs.Global().DefaultUILanguage TODO reintroduce config value*/ "en-US";
+            DefaultUserGroups = defaultUserGroups ?? new[] { SecurityConstants.EditorGroupAlias };
+            AutoLinkExternalAccount = autoLinkExternalAccount;
+            _defaultCulture = defaultCulture;
         }
-
-        private readonly string[] _defaultUserGroups;
 
         /// <summary>
         /// A callback executed during account auto-linking and before the user is persisted
@@ -39,39 +38,22 @@ namespace Umbraco.Web.Security
         /// </summary>
         public Func<BackOfficeIdentityUser, ExternalLoginInfo, bool> OnExternalLogin { get; set; }
 
+        /// <summary>
+        /// Flag indicating if logging in with the external provider should auto-link/create a local user
+        /// </summary>
+        public bool AutoLinkExternalAccount { get; }
 
         /// <summary>
-        /// The default User group aliases to use for auto-linking users
+        /// The default user groups to assign to the created local user linked
         /// </summary>
-        /// <param name="umbracoContext"></param>
-        /// <param name="loginInfo"></param>
-        /// <returns></returns>
-        public string[] GetDefaultUserGroups(IUmbracoContext umbracoContext, ExternalLoginInfo loginInfo)
-        {
-            return _defaultUserGroups;
-        }
-
-        private readonly bool _autoLinkExternalAccount;
-
-        /// <summary>
-        /// For private external auth providers such as Active Directory, which when set to true will automatically
-        /// create a local user if the external provider login was successful.
-        ///
-        /// For public auth providers this should always be false!!!
-        /// </summary>
-        public bool ShouldAutoLinkExternalAccount(IUmbracoContext umbracoContext, ExternalLoginInfo loginInfo)
-        {
-            return _autoLinkExternalAccount;
-        }
+        public string[] DefaultUserGroups { get; }
 
         private readonly string _defaultCulture;
 
         /// <summary>
         /// The default Culture to use for auto-linking users
         /// </summary>
-        public string GetDefaultCulture(IUmbracoContext umbracoContext, ExternalLoginInfo loginInfo)
-        {
-            return _defaultCulture;
-        }
+        // TODO: Should we use IDefaultCultureAccessor here intead?
+        public string GetUserAutoLinkCulture(GlobalSettings globalSettings) => _defaultCulture ?? globalSettings.DefaultUILanguage;
     }
 }

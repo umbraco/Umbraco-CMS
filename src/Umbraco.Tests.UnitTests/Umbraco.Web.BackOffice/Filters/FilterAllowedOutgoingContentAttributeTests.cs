@@ -30,7 +30,7 @@ namespace Umbraco.Tests.Web.Controllers
                 ActionBrowse.ActionLetter,
                 Mock.Of<IUserService>(),
                 Mock.Of<IEntityService>(),
-                Mock.Of<IBackofficeSecurityAccessor>() );
+                Mock.Of<IBackOfficeSecurityAccessor>() );
 
             var result = att.GetValueFromResponse(new ObjectResult(expected));
 
@@ -48,7 +48,7 @@ namespace Umbraco.Tests.Web.Controllers
                 ActionBrowse.ActionLetter,
                 Mock.Of<IUserService>(),
                 Mock.Of<IEntityService>(),
-                Mock.Of<IBackofficeSecurityAccessor>() );
+                Mock.Of<IBackOfficeSecurityAccessor>() );
 
             var result = att.GetValueFromResponse(new ObjectResult(container));
 
@@ -66,7 +66,7 @@ namespace Umbraco.Tests.Web.Controllers
                 ActionBrowse.ActionLetter,
                 Mock.Of<IUserService>(),
                 Mock.Of<IEntityService>(),
-                Mock.Of<IBackofficeSecurityAccessor>() );
+                Mock.Of<IBackOfficeSecurityAccessor>() );
 
             var actual = att.GetValueFromResponse(new ObjectResult(container));
 
@@ -91,7 +91,7 @@ namespace Umbraco.Tests.Web.Controllers
                 ActionBrowse.ActionLetter,
                 userService,
                 entityService,
-                Mock.Of<IBackofficeSecurityAccessor>() );
+                Mock.Of<IBackOfficeSecurityAccessor>() );
 
             var path = "";
             for (var i = 0; i < 10; i++)
@@ -139,7 +139,7 @@ namespace Umbraco.Tests.Web.Controllers
                 ActionBrowse.ActionLetter,
                 userService,
                 Mock.Of<IEntityService>(),
-                Mock.Of<IBackofficeSecurityAccessor>() );
+                Mock.Of<IBackOfficeSecurityAccessor>() );
             att.FilterBasedOnPermissions(list, user);
 
             Assert.AreEqual(3, list.Count);

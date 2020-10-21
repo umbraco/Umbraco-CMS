@@ -45,7 +45,7 @@ namespace Umbraco.Web.Trees
         private readonly ActionCollection _actions;
         private readonly GlobalSettings _globalSettings;
         private readonly IMenuItemCollectionFactory _menuItemCollectionFactory;
-        private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
+        private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly IContentService _contentService;
         private readonly IEntityService _entityService;
         private readonly IPublicAccessService _publicAccessService;
@@ -57,7 +57,7 @@ namespace Umbraco.Web.Trees
             UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
             IMenuItemCollectionFactory menuItemCollectionFactory,
             IEntityService entityService,
-            IBackofficeSecurityAccessor backofficeSecurityAccessor,
+            IBackOfficeSecurityAccessor backofficeSecurityAccessor,
             ILogger<ContentTreeController> logger,
             ActionCollection actionCollection,
             IUserService userService,
@@ -89,7 +89,7 @@ namespace Umbraco.Web.Trees
         private int[] _userStartNodes;
 
         protected override int[] UserStartNodes
-            => _userStartNodes ?? (_userStartNodes = _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.CalculateContentStartNodeIds(_entityService));
+            => _userStartNodes ?? (_userStartNodes = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.CalculateContentStartNodeIds(_entityService));
 
 
 
@@ -167,7 +167,7 @@ namespace Umbraco.Web.Trees
                 menu.DefaultMenuAlias = ActionNew.ActionAlias;
 
                 // we need to get the default permissions as you can't set permissions on the very root node
-                var permission = _userService.GetPermissions(_backofficeSecurityAccessor.BackofficeSecurity.CurrentUser, Constants.System.Root).First();
+                var permission = _userService.GetPermissions(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser, Constants.System.Root).First();
                 var nodeActions = _actions.FromEntityPermission(permission)
                     .Select(x => new MenuItem(x));
 
@@ -203,7 +203,7 @@ namespace Umbraco.Web.Trees
             }
 
             //if the user has no path access for this node, all they can do is refresh
-            if (!_backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.HasContentPathAccess(item, _entityService))
+            if (!_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.HasContentPathAccess(item, _entityService))
             {
                 var menu = _menuItemCollectionFactory.Create();
                 menu.Items.Add(new RefreshNode(LocalizedTextService, true));

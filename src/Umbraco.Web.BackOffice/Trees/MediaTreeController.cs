@@ -40,14 +40,14 @@ namespace Umbraco.Web.Trees
         private readonly UmbracoTreeSearcher _treeSearcher;
         private readonly IMediaService _mediaService;
         private readonly IEntityService _entityService;
-        private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
+        private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
 
         public MediaTreeController(
             ILocalizedTextService localizedTextService,
             UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
             IMenuItemCollectionFactory menuItemCollectionFactory,
             IEntityService entityService,
-            IBackofficeSecurityAccessor backofficeSecurityAccessor,
+            IBackOfficeSecurityAccessor backofficeSecurityAccessor,
             ILogger<MediaTreeController> logger,
             ActionCollection actionCollection,
             IUserService userService,
@@ -68,7 +68,7 @@ namespace Umbraco.Web.Trees
 
         private int[] _userStartNodes;
         protected override int[] UserStartNodes
-            => _userStartNodes ?? (_userStartNodes = _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.CalculateMediaStartNodeIds(_entityService));
+            => _userStartNodes ?? (_userStartNodes = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.CalculateMediaStartNodeIds(_entityService));
 
         /// <summary>
         /// Creates a tree node for a content item based on an UmbracoEntity
@@ -135,7 +135,7 @@ namespace Umbraco.Web.Trees
             }
 
             //if the user has no path access for this node, all they can do is refresh
-            if (!_backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.HasMediaPathAccess(item, _entityService))
+            if (!_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.HasMediaPathAccess(item, _entityService))
             {
                 menu.Items.Add(new RefreshNode(LocalizedTextService, true));
                 return menu;

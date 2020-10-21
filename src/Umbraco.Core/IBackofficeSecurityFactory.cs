@@ -3,13 +3,13 @@
 namespace Umbraco.Core
 {
     /// <summary>
-    /// Creates and manages <see cref="IBackofficeSecurity"/> instances.
+    /// Creates and manages <see cref="IBackOfficeSecurity"/> instances.
     /// </summary>
-    public interface IBackofficeSecurityFactory
+    public interface IBackOfficeSecurityFactory
     {
         /// <summary>
-        /// Ensures that a current <see cref="IBackofficeSecurity"/> exists.
+        /// Ensures that a current <see cref="IBackOfficeSecurity"/> exists.
         /// </summary>
-        void EnsureBackofficeSecurity();
+        void EnsureBackOfficeSecurity();
     }
 }

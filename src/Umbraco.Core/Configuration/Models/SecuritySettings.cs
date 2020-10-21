@@ -4,7 +4,7 @@
     {
         public bool KeepUserLoggedIn { get; set; } = false;
 
-        public bool HideDisabledUsersInBackoffice { get; set; } = false;
+        public bool HideDisabledUsersInBackOffice { get; set; } = false;
 
         public bool AllowPasswordReset { get; set; } = true;
 

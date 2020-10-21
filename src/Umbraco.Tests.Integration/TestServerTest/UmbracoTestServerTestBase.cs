@@ -89,7 +89,7 @@ namespace Umbraco.Tests.Integration.TestServerTest
         {
             var url = LinkGenerator.GetUmbracoApiService<T>(methodSelector);
 
-            var backofficeSecurityFactory = GetRequiredService<IBackofficeSecurityFactory>();
+            var backofficeSecurityFactory = GetRequiredService<IBackOfficeSecurityFactory>();
             var umbracoContextFactory = GetRequiredService<IUmbracoContextFactory>();
             var httpContextAccessor = GetRequiredService<IHttpContextAccessor>();
 
@@ -104,7 +104,7 @@ namespace Umbraco.Tests.Integration.TestServerTest
                 }
             };
 
-            backofficeSecurityFactory.EnsureBackofficeSecurity();
+            backofficeSecurityFactory.EnsureBackOfficeSecurity();
             umbracoContextFactory.EnsureUmbracoContext();
 
             return url;

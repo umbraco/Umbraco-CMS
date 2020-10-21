@@ -43,7 +43,7 @@ namespace Umbraco.Web.BackOffice.Filters
                     throw new InvalidOperationException($"No argument found for the current action with the name: {_userIdParameter}");
                 }
 
-                var backofficeSecurity = context.HttpContext.RequestServices.GetService<IBackofficeSecurity>();
+                var backofficeSecurity = context.HttpContext.RequestServices.GetService<IBackOfficeSecurity>();
                 var user = backofficeSecurity.CurrentUser;
                 if (user == null)
                 {

@@ -41,7 +41,7 @@ namespace Umbraco.Web.WebApi.Filters
         {
             private readonly int? _nodeId;
             private readonly string _paramName;
-            private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
+            private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
             private readonly IEntityService _entityService;
             private readonly IMediaService _mediaService;
 
@@ -49,7 +49,7 @@ namespace Umbraco.Web.WebApi.Filters
             /// This constructor will only be able to test the start node access
             /// </summary>
             public EnsureUserPermissionForMediaFilter(
-                IBackofficeSecurityAccessor backofficeSecurityAccessor,
+                IBackOfficeSecurityAccessor backofficeSecurityAccessor,
                 IEntityService entityService,
                 IMediaService mediaService,
                 int nodeId)
@@ -59,7 +59,7 @@ namespace Umbraco.Web.WebApi.Filters
             }
 
             public EnsureUserPermissionForMediaFilter(
-                IBackofficeSecurityAccessor backofficeSecurityAccessor,
+                IBackOfficeSecurityAccessor backofficeSecurityAccessor,
                 IEntityService entityService,
                 IMediaService mediaService,
                 string paramName)
@@ -71,7 +71,7 @@ namespace Umbraco.Web.WebApi.Filters
             }
 
             private EnsureUserPermissionForMediaFilter(
-                IBackofficeSecurityAccessor backofficeSecurityAccessor,
+                IBackOfficeSecurityAccessor backofficeSecurityAccessor,
                 IEntityService entityService,
                 IMediaService mediaService,
                 int? nodeId, string paramName)
@@ -118,7 +118,7 @@ namespace Umbraco.Web.WebApi.Filters
 
             public void OnActionExecuting(ActionExecutingContext context)
             {
-                if (_backofficeSecurityAccessor.BackofficeSecurity.CurrentUser == null)
+                if (_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser == null)
                 {
                     throw new HttpResponseException(System.Net.HttpStatusCode.Unauthorized);
                 }
@@ -159,7 +159,7 @@ namespace Umbraco.Web.WebApi.Filters
 
                 if (MediaController.CheckPermissions(
                     context.HttpContext.Items,
-                    _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser,
+                    _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser,
                     _mediaService,
                     _entityService,
                     nodeId))

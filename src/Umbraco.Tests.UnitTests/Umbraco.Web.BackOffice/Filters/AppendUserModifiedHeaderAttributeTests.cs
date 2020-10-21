@@ -91,7 +91,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Filters
                 .SetupGet(x => x.Id)
                 .Returns(100);
 
-            var backofficeSecurityMock = new Mock<IBackofficeSecurity>();
+            var backofficeSecurityMock = new Mock<IBackOfficeSecurity>();
             backofficeSecurityMock
                 .SetupGet(x => x.CurrentUser)
                 .Returns(currentUserMock.Object);
@@ -99,7 +99,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Filters
 
             var serviceProviderMock = new Mock<IServiceProvider>();
             serviceProviderMock
-                .Setup(x => x.GetService(typeof(IBackofficeSecurity)))
+                .Setup(x => x.GetService(typeof(IBackOfficeSecurity)))
                 .Returns(backofficeSecurityMock.Object);
 
             httpContext.RequestServices = serviceProviderMock.Object;

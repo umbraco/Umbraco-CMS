@@ -14,6 +14,9 @@ namespace Umbraco.Core.BackOffice
     public interface  IBackOfficeUserManager<TUser>: IDisposable
         where TUser : BackOfficeIdentityUser
     {
+        Task<IdentityResult> DeleteAsync(TUser user);
+
+        Task<TUser> FindByLoginAsync(string loginProvider, string providerKey);
 
         /// <summary>
         /// Finds and returns a user, if any, who has the specified <paramref name="userId"/>.

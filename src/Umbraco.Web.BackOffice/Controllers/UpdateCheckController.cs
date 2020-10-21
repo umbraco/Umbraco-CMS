@@ -24,14 +24,14 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IUpgradeService _upgradeService;
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly ICookieManager _cookieManager;
-        private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
+        private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly GlobalSettings _globalSettings;
 
         public UpdateCheckController(
             IUpgradeService upgradeService,
             IUmbracoVersion umbracoVersion,
             ICookieManager cookieManager,
-            IBackofficeSecurityAccessor backofficeSecurityAccessor,
+            IBackOfficeSecurityAccessor backofficeSecurityAccessor,
             IOptions<GlobalSettings> globalSettings)
         {
             _upgradeService = upgradeService ?? throw new ArgumentNullException(nameof(upgradeService));
@@ -46,7 +46,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         {
             var updChkCookie = _cookieManager.GetCookieValue("UMB_UPDCHK");
             var updateCheckCookie = updChkCookie ?? string.Empty;
-            if (_globalSettings.VersionCheckPeriod > 0 && string.IsNullOrEmpty(updateCheckCookie) && _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.IsAdmin())
+            if (_globalSettings.VersionCheckPeriod > 0 && string.IsNullOrEmpty(updateCheckCookie) && _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.IsAdmin())
             {
                 try
                 {

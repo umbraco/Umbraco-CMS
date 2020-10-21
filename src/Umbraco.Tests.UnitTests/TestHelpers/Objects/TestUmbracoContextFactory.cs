@@ -38,8 +38,8 @@ namespace Umbraco.Tests.UnitTests.TestHelpers.Objects
             snapshotService.Setup(x => x.CreatePublishedSnapshot(It.IsAny<string>())).Returns(snapshot.Object);
 
             var hostingEnvironment = Mock.Of<IHostingEnvironment>();
-            var backofficeSecurityAccessorMock = new Mock<IBackofficeSecurityAccessor>();
-            backofficeSecurityAccessorMock.Setup(x => x.BackofficeSecurity).Returns(Mock.Of<IBackofficeSecurity>());
+            var backofficeSecurityAccessorMock = new Mock<IBackOfficeSecurityAccessor>();
+            backofficeSecurityAccessorMock.Setup(x => x.BackOfficeSecurity).Returns(Mock.Of<IBackOfficeSecurity>());
             
             
             var umbracoContextFactory = new UmbracoContextFactory(

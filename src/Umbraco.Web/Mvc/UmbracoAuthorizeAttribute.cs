@@ -15,22 +15,22 @@ namespace Umbraco.Web.Mvc
     public sealed class UmbracoAuthorizeAttribute : AuthorizeAttribute
     {
         // see note in HttpInstallAuthorizeAttribute
-        private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
+        private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
         private readonly IRuntimeState _runtimeState;
         private readonly string _redirectUrl;
 
         private IRuntimeState RuntimeState => _runtimeState ?? Current.RuntimeState;
 
-        private IBackofficeSecurity BackofficeSecurity => _backofficeSecurityAccessor.BackofficeSecurity ?? Current.UmbracoContext.Security;
+        private IBackOfficeSecurity BackOfficeSecurity => _backOfficeSecurityAccessor.BackOfficeSecurity ?? Current.UmbracoContext.Security;
 
         /// <summary>
         /// THIS SHOULD BE ONLY USED FOR UNIT TESTS
         /// </summary>
         /// <param name="backofficeSecurityAccessor"></param>
         /// <param name="runtimeState"></param>
-        public UmbracoAuthorizeAttribute(IBackofficeSecurityAccessor backofficeSecurityAccessor, IRuntimeState runtimeState)
+        public UmbracoAuthorizeAttribute(IBackOfficeSecurityAccessor backofficeSecurityAccessor, IRuntimeState runtimeState)
         {
-            _backofficeSecurityAccessor = backofficeSecurityAccessor ?? throw new ArgumentNullException(nameof(backofficeSecurityAccessor));
+            _backOfficeSecurityAccessor = backofficeSecurityAccessor ?? throw new ArgumentNullException(nameof(backofficeSecurityAccessor));
             _runtimeState = runtimeState ?? throw new ArgumentNullException(nameof(runtimeState));
         }
 
@@ -76,7 +76,7 @@ namespace Umbraco.Web.Mvc
                 // otherwise we need to ensure that a user is logged in
                 return RuntimeState.Level == RuntimeLevel.Install
                     || RuntimeState.Level == RuntimeLevel.Upgrade
-                    || BackofficeSecurity.ValidateCurrentUser();
+                    || BackOfficeSecurity.ValidateCurrentUser();
             }
             catch (Exception)
             {

@@ -25,7 +25,7 @@ namespace Umbraco.Web.Trees
     public abstract class ContentTreeControllerBase : TreeController, ITreeNodeController
     {
         private readonly IEntityService _entityService;
-        private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
+        private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly ILogger<ContentTreeControllerBase> _logger;
         private readonly ActionCollection _actionCollection;
         private readonly IUserService _userService;
@@ -38,7 +38,7 @@ namespace Umbraco.Web.Trees
             UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
             IMenuItemCollectionFactory menuItemCollectionFactory,
             IEntityService entityService,
-            IBackofficeSecurityAccessor backofficeSecurityAccessor,
+            IBackOfficeSecurityAccessor backofficeSecurityAccessor,
             ILogger<ContentTreeControllerBase> logger,
             ActionCollection actionCollection,
             IUserService userService,
@@ -147,12 +147,12 @@ namespace Umbraco.Web.Trees
             switch (RecycleBinId)
             {
                 case Constants.System.RecycleBinMedia:
-                    startNodeIds = _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.CalculateMediaStartNodeIds(_entityService);
-                    startNodePaths = _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.GetMediaStartNodePaths(_entityService);
+                    startNodeIds = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.CalculateMediaStartNodeIds(_entityService);
+                    startNodePaths = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.GetMediaStartNodePaths(_entityService);
                     break;
                 case Constants.System.RecycleBinContent:
-                    startNodeIds = _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.CalculateContentStartNodeIds(_entityService);
-                    startNodePaths = _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.GetContentStartNodePaths(_entityService);
+                    startNodeIds = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.CalculateContentStartNodeIds(_entityService);
+                    startNodePaths = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.GetContentStartNodePaths(_entityService);
                     break;
                 default:
                     throw new NotSupportedException("Path access is only determined on content or media");
@@ -196,7 +196,7 @@ namespace Umbraco.Web.Trees
                 // TODO: in the future we could return a validation statement so we can have some UI to notify the user they don't have access
                 if (ignoreUserStartNodes == false && HasPathAccess(id, queryStrings) == false)
                 {
-                    _logger.LogWarning("User {Username} does not have access to node with id {Id}", _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.Username, id);
+                    _logger.LogWarning("User {Username} does not have access to node with id {Id}", _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Username, id);
                     return nodes;
                 }
 
@@ -312,8 +312,8 @@ namespace Umbraco.Web.Trees
         {
             if (entity == null) return false;
             return RecycleBinId == Constants.System.RecycleBinContent
-                ? _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.HasContentPathAccess(entity, _entityService)
-                : _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.HasMediaPathAccess(entity, _entityService);
+                ? _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.HasContentPathAccess(entity, _entityService)
+                : _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.HasMediaPathAccess(entity, _entityService);
         }
 
         /// <summary>
@@ -441,7 +441,7 @@ namespace Umbraco.Web.Trees
                 var deleteAction = _actionCollection.FirstOrDefault(y => y.Letter == ActionDelete.ActionLetter);
                 if (deleteAction != null)
                 {
-                    var perms = _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.GetPermissions(Constants.System.RecycleBinContentString, _userService);
+                    var perms = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.GetPermissions(Constants.System.RecycleBinContentString, _userService);
                     deleteAllowed = perms.FirstOrDefault(x => x.Contains(deleteAction.Letter)) != null;
                 }
 
@@ -492,7 +492,7 @@ namespace Umbraco.Web.Trees
 
         internal IEnumerable<MenuItem> GetAllowedUserMenuItemsForNode(IUmbracoEntity dd)
         {
-            var permissionsForPath = _userService.GetPermissionsForPath(_backofficeSecurityAccessor.BackofficeSecurity.CurrentUser, dd.Path).GetAllPermissions();
+            var permissionsForPath = _userService.GetPermissionsForPath(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser, dd.Path).GetAllPermissions();
             return _actionCollection.GetByLetters(permissionsForPath).Select(x => new MenuItem(x));
         }
 

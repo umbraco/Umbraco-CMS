@@ -64,7 +64,7 @@ namespace Umbraco.Web.Security
             AffectedUser = affectedUser;
 
             PerformingUser = performingUser == -1
-                ? GetCurrentRequestBackofficeUserId()
+                ? GetCurrentRequestBackOfficeUserId()
                 : performingUser;
         }
 
@@ -97,7 +97,7 @@ namespace Umbraco.Web.Security
             Comment = comment;
 
             PerformingUser = performingUser == -1
-                ? GetCurrentRequestBackofficeUserId()
+                ? GetCurrentRequestBackOfficeUserId()
                 : performingUser;
         }
 
@@ -105,7 +105,7 @@ namespace Umbraco.Web.Security
         /// Returns the current logged in backoffice user's Id logging if there is one
         /// </summary>
         /// <returns></returns>
-        protected int GetCurrentRequestBackofficeUserId()
+        protected int GetCurrentRequestBackOfficeUserId()
         {
             var userId = -1;
             var backOfficeIdentity = Thread.CurrentPrincipal.GetUmbracoIdentity();

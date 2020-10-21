@@ -23,7 +23,7 @@ namespace Umbraco.Web.Common.Security
         // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs
         private const string LoginProviderKey = "LoginProvider";
         // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs
-        private const string XsrfKey = "XsrfId";
+        private const string XsrfKey = "XsrfId"; // TODO: See BackOfficeController.XsrfKey
 
         private BackOfficeUserManager _userManager;
 
@@ -264,7 +264,7 @@ namespace Umbraco.Web.Common.Security
             // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs#L422
             // to replace the auth scheme
 
-            var auth = await Context.AuthenticateAsync(Constants.Security.BackOfficeAuthenticationType);
+            var auth = await Context.AuthenticateAsync(Constants.Security.BackOfficeExternalAuthenticationType);
             var items = auth?.Properties?.Items;
             if (auth?.Principal == null || items == null || !items.ContainsKey(LoginProviderKey))
             {

@@ -26,7 +26,7 @@ namespace Umbraco.Web.BackOffice.Filters
 
         public MemberSaveModelValidator(
             ILogger<MemberSaveModelValidator> logger,
-            IBackofficeSecurity backofficeSecurity,
+            IBackOfficeSecurity backofficeSecurity,
             ILocalizedTextService textService,
             IMemberTypeService memberTypeService,
             IMemberService memberService,
@@ -96,7 +96,7 @@ namespace Umbraco.Web.BackOffice.Filters
 
             //if the user doesn't have access to sensitive values, then we need to validate the incoming properties to check
             //if a sensitive value is being submitted.
-            if (BackofficeSecurity.CurrentUser.HasAccessToSensitiveData() == false)
+            if (BackOfficeSecurity.CurrentUser.HasAccessToSensitiveData() == false)
             {
                 var contentType = _memberTypeService.Get(model.PersistedContent.ContentTypeId);
                 var sensitiveProperties = contentType

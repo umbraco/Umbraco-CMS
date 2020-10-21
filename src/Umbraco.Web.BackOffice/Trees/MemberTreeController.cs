@@ -38,7 +38,7 @@ namespace Umbraco.Web.Trees
         private readonly IMenuItemCollectionFactory _menuItemCollectionFactory;
         private readonly IMemberService _memberService;
         private readonly IMemberTypeService _memberTypeService;
-        private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
+        private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
 
         public MemberTreeController(
             ILocalizedTextService localizedTextService,
@@ -47,7 +47,7 @@ namespace Umbraco.Web.Trees
             IMenuItemCollectionFactory menuItemCollectionFactory,
             IMemberService memberService,
             IMemberTypeService memberTypeService,
-            IBackofficeSecurityAccessor backofficeSecurityAccessor)
+            IBackOfficeSecurityAccessor backofficeSecurityAccessor)
             : base(localizedTextService, umbracoApiControllerTypeCollection)
         {
             _treeSearcher = treeSearcher;
@@ -146,7 +146,7 @@ namespace Umbraco.Web.Trees
             //add delete option for all members
             menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true);
 
-            if (_backofficeSecurityAccessor.BackofficeSecurity.CurrentUser.HasAccessToSensitiveData())
+            if (_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.HasAccessToSensitiveData())
             {
                 menu.Items.Add(new ExportMember(LocalizedTextService));
             }

@@ -274,7 +274,7 @@ namespace Umbraco.Tests.Integration.Testing
 
         public virtual void Configure(IApplicationBuilder app)
         {
-            Services.GetRequiredService<IBackofficeSecurityFactory>().EnsureBackofficeSecurity();
+            Services.GetRequiredService<IBackOfficeSecurityFactory>().EnsureBackOfficeSecurity();
             Services.GetRequiredService<IUmbracoContextFactory>().EnsureUmbracoContext();
 
             // get the currently set options

@@ -14,7 +14,7 @@ using Umbraco.Web.Security;
 namespace Umbraco.Web.Common.Security
 {
 
-    public class BackofficeSecurity : IBackofficeSecurity
+    public class BackofficeSecurity : IBackOfficeSecurity
     {
         private readonly IUserService _userService;
         private readonly GlobalSettings _globalSettings;

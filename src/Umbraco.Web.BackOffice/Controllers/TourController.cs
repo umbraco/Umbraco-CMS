@@ -22,14 +22,14 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly TourFilterCollection _filters;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly TourSettings _tourSettings;
-        private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;
+        private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly IContentTypeService _contentTypeService;
 
         public TourController(
             TourFilterCollection filters,
             IHostingEnvironment hostingEnvironment,
             IOptions<TourSettings> tourSettings,
-            IBackofficeSecurityAccessor backofficeSecurityAccessor,
+            IBackOfficeSecurityAccessor backofficeSecurityAccessor,
             IContentTypeService contentTypeService)
         {
             _filters = filters;
@@ -47,7 +47,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             if (_tourSettings.EnableTours == false)
                 return result;
 
-            var user = _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser;
+            var user = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
             if (user == null)
                 return result;
 
@@ -189,7 +189,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 var backOfficeTours = tours.Where(x =>
                     aliasFilters.Count == 0 || aliasFilters.All(filter => filter.IsMatch(x.Alias)) == false);
 
-                var user = _backofficeSecurityAccessor.BackofficeSecurity.CurrentUser;
+                var user = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
 
                 var localizedTours = backOfficeTours.Where(x =>
                     string.IsNullOrWhiteSpace(x.Culture) || x.Culture.Equals(user.Language,

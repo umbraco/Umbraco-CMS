@@ -31,7 +31,7 @@ namespace Umbraco.Web
         // warn: does *not* manage setting any IUmbracoContextAccessor
         internal UmbracoContext(
             IPublishedSnapshotService publishedSnapshotService,
-            IBackofficeSecurity backofficeSecurity,
+            IBackOfficeSecurity backofficeSecurity,
             GlobalSettings globalSettings,
             IHostingEnvironment hostingEnvironment,
             IVariationContextAccessor variationContextAccessor,
@@ -80,7 +80,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets the BackofficeSecurity class
         /// </summary>
-        public IBackofficeSecurity Security { get; }
+        public IBackOfficeSecurity Security { get; }
 
         /// <summary>
         /// Gets the uri that is handled by ASP.NET after server-side rewriting took place.

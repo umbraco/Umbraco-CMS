@@ -23,6 +23,7 @@ namespace Umbraco.Web.PublishedCache
         /// <inheritdoc />
         public string DefaultCulture => _runtimeLevel == RuntimeLevel.Run
             ? _localizationService.GetDefaultLanguageIsoCode() ?? "" // fast
+            // TODO: Shouldn't this come from GlobalSettings.DefaultUILanguage?
             : "en-US"; // default for install and upgrade, when the service is n/a
     }
 }

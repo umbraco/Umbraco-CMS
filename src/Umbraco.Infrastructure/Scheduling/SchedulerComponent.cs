@@ -42,7 +42,7 @@ namespace Umbraco.Web.Scheduling
         private readonly HealthChecksSettings _healthChecksSettings;
         private readonly IServerMessenger _serverMessenger;
         private readonly IRequestAccessor _requestAccessor;
-        private readonly IBackofficeSecurityFactory _backofficeSecurityFactory;
+        private readonly IBackOfficeSecurityFactory _backofficeSecurityFactory;
         private readonly LoggingSettings _loggingSettings;
         private readonly KeepAliveSettings _keepAliveSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
@@ -65,7 +65,7 @@ namespace Umbraco.Web.Scheduling
             IServerMessenger serverMessenger, IRequestAccessor requestAccessor,
             IOptions<LoggingSettings> loggingSettings, IOptions<KeepAliveSettings> keepAliveSettings,
             IHostingEnvironment hostingEnvironment,
-            IBackofficeSecurityFactory backofficeSecurityFactory)
+            IBackOfficeSecurityFactory backofficeSecurityFactory)
         {
             _runtime = runtime;
             _mainDom = mainDom;

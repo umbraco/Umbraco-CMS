@@ -374,7 +374,7 @@ namespace Umbraco.Tests.TestHelpers
             var umbracoContext = new UmbracoContext(
                 httpContextAccessor,
                 service,
-                Mock.Of<IBackofficeSecurity>(),
+                Mock.Of<IBackOfficeSecurity>(),
                 globalSettings ?? new GlobalSettings(),
                 HostingEnvironment,
                 new TestVariationContextAccessor(),
