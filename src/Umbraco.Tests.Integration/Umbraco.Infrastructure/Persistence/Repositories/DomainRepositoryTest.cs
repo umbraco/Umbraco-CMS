@@ -3,6 +3,7 @@ using System.Data;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
@@ -12,7 +13,7 @@ using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;
 
-namespace Umbraco.Tests.Integration.Persistence.Repositories
+namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositories
 {
     [TestFixture]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
@@ -25,7 +26,7 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
         private DomainRepository CreateRepository(IScopeProvider provider)
         {
             var accessor = (IScopeAccessor) provider;
-            var domainRepository = new DomainRepository(accessor, Core.Cache.AppCaches.Disabled, LoggerFactory.CreateLogger<DomainRepository>());
+            var domainRepository = new DomainRepository(accessor, AppCaches.NoCache, LoggerFactory.CreateLogger<DomainRepository>());
             return domainRepository;
         }
 
