@@ -1538,6 +1538,53 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void Can_Update_Content_Property_Values()
+        {
+            IContentType contentType = MockedContentTypes.CreateSimpleContentType();
+            ServiceContext.ContentTypeService.Save(contentType);
+            IContent content = MockedContent.CreateSimpleContent(contentType, "hello");
+            content.SetValue("title", "title of mine");
+            content.SetValue("bodyText", "hello world");
+            ServiceContext.ContentService.SaveAndPublish(content);
+
+            // re-get
+            content = ServiceContext.ContentService.GetById(content.Id);
+            content.SetValue("title", "another title of mine");          // Change a value
+            content.SetValue("bodyText", null);                          // Clear a value
+            content.SetValue("author", "new author");                    // Add a value
+            ServiceContext.ContentService.SaveAndPublish(content);
+
+            // re-get
+            content = ServiceContext.ContentService.GetById(content.Id);
+            Assert.AreEqual("another title of mine", content.GetValue("title"));
+            Assert.IsNull(content.GetValue("bodyText"));
+            Assert.AreEqual("new author", content.GetValue("author"));
+
+            content.SetValue("title", "new title");
+            content.SetValue("bodyText", "new body text");
+            content.SetValue("author", "new author text");
+            ServiceContext.ContentService.Save(content);                // new non-published version
+
+            // re-get
+            content = ServiceContext.ContentService.GetById(content.Id);
+            content.SetValue("title", null);                            // Clear a value
+            content.SetValue("bodyText", null);                         // Clear a value
+            ServiceContext.ContentService.Save(content);                // saving non-published version
+
+            // re-get
+            content = ServiceContext.ContentService.GetById(content.Id);
+            Assert.IsNull(content.GetValue("title"));                   // Test clearing the value worked with the non-published version
+            Assert.IsNull(content.GetValue("bodyText"));
+            Assert.AreEqual("new author text", content.GetValue("author"));
+
+            // make sure that the published version remained the same
+            var publishedContent = ServiceContext.ContentService.GetVersion(content.PublishedVersionId);
+            Assert.AreEqual("another title of mine", publishedContent.GetValue("title"));
+            Assert.IsNull(publishedContent.GetValue("bodyText"));
+            Assert.AreEqual("new author", publishedContent.GetValue("author"));
+        }
+
+        [Test]
         public void Can_Bulk_Save_Content()
         {
             // Arrange
