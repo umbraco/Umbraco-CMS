@@ -312,7 +312,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>ImportResources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Services\ThreadSafetyServiceTest.cs" />
     <Compile Include="Web\Controllers\PluginControllerAreaTests.cs" />
     <Compile Include="Cache\DistributedCache\DistributedCacheTests.cs" />
     <Compile Include="TestHelpers\TestWithDatabaseBase.cs" />
