@@ -146,7 +146,6 @@ var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.servi
         function windowVisibilityHandler(e) {
 
             var amountOfPreviewSessions = localStorage.getItem('UmbPreviewSessionAmount');
-            console.log("windowVisibilityHandler", amountOfPreviewSessions)
 
             // When tab is visible again:
             if(document.hidden === false) {
@@ -206,6 +205,14 @@ var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.servi
                 hasPreviewDialog = true;
 
                 // Ask to re-enter preview mode?
+
+                const localizeVarsFallback = {
+                    "returnToPreviewHeadline": "Preview content?",
+                    "returnToPreviewDescription":"You have ended preview mode, do you want to continue previewing this content?",
+                    "returnToPreviewButton":"Preview"
+                };
+                const umbLocalizedVars = Object.assign(localizeVarsFallback, $window.umbLocalizedVars);
+
 
                 // This modal is also used in websitepreview.js
                 var modelStyles = `
@@ -301,14 +308,14 @@ var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.servi
 
                 var modal = document.createElement("div");
                 modal.className = "umbraco-preview-dialog__modal";
-                modal.innerHTML = `<div class="umbraco-preview-dialog__headline">${$window.umbLocalizedVars.returnToPreviewHeadline}</div>
-                    <div class="umbraco-preview-dialog__question">${$window.umbLocalizedVars.returnToPreviewDescription}</div>`;
+                modal.innerHTML = `<div class="umbraco-preview-dialog__headline">${umbLocalizedVars.returnToPreviewHeadline}</div>
+                    <div class="umbraco-preview-dialog__question">${umbLocalizedVars.returnToPreviewDescription}</div>`;
                 con.appendChild(modal);
 
                 var continueButton = document.createElement("button");
                 continueButton.type = "button";
                 continueButton.className = "umbraco-preview-dialog__continue";
-                continueButton.innerHTML = $window.umbLocalizedVars.returnToPreviewButton;
+                continueButton.innerHTML = umbLocalizedVars.returnToPreviewButton;
                 continueButton.addEventListener("click", () => {
                     bodyEl.removeChild(fragment);
                     reenterPreviewMode();
@@ -346,7 +353,6 @@ var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.servi
         var amountOfPreviewSessions = Math.max(localStorage.getItem('UmbPreviewSessionAmount') || 0, 0);
             amountOfPreviewSessions++;
             localStorage.setItem('UmbPreviewSessionAmount', amountOfPreviewSessions);
-            console.log("UmbPreviewSessionAmount", amountOfPreviewSessions)
         }
         function resetPreviewSessions() {
             localStorage.setItem('UmbPreviewSessionAmount', 0);
@@ -355,7 +361,6 @@ var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.servi
             var amountOfPreviewSessions = localStorage.getItem('UmbPreviewSessionAmount') || 0;
             amountOfPreviewSessions--;
             localStorage.setItem('UmbPreviewSessionAmount', amountOfPreviewSessions);
-            console.log("ENDDDD", amountOfPreviewSessions)
 
             if(amountOfPreviewSessions <= 0) {
                 // We are good to secretly end preview mode.
