@@ -1,17 +1,17 @@
 ﻿using NUnit.Framework;
 using Umbraco.Core.Persistence.Mappers;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Persistence.Mappers
 {
     [TestFixture]
-    public class ContentTypeMapperTest : MapperTestBase
+    public class ContentTypeMapperTest
     {
         [Test]
         public void Can_Map_Id_Property()
         {
-
             // Act
-            string column = new ContentTypeMapper(MockSqlContext(), CreateMaps()).Map("Id");
+            string column = new ContentTypeMapper(TestHelper.GetMockSqlContext(), TestHelper.CreateMaps()).Map("Id");
 
             // Assert
             Assert.That(column, Is.EqualTo("[umbracoNode].[id]"));
@@ -22,7 +22,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         {
 
             // Act
-            string column = new ContentTypeMapper(MockSqlContext(), CreateMaps()).Map("Name");
+            string column = new ContentTypeMapper(TestHelper.GetMockSqlContext(), TestHelper.CreateMaps()).Map("Name");
 
             // Assert
             Assert.That(column, Is.EqualTo("[umbracoNode].[text]"));
@@ -33,7 +33,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         {
 
             // Act
-            string column = new ContentTypeMapper(MockSqlContext(), CreateMaps()).Map("Thumbnail");
+            string column = new ContentTypeMapper(TestHelper.GetMockSqlContext(), TestHelper.CreateMaps()).Map("Thumbnail");
 
             // Assert
             Assert.That(column, Is.EqualTo("[cmsContentType].[thumbnail]"));
@@ -44,7 +44,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         {
 
             // Act
-            string column = new ContentTypeMapper(MockSqlContext(), CreateMaps()).Map("Description");
+            string column = new ContentTypeMapper(TestHelper.GetMockSqlContext(), TestHelper.CreateMaps()).Map("Description");
 
             // Assert
             Assert.That(column, Is.EqualTo("[cmsContentType].[description]"));

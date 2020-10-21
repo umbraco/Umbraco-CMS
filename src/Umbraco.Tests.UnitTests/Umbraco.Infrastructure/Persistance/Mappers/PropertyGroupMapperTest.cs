@@ -1,16 +1,17 @@
 ﻿using NUnit.Framework;
 using Umbraco.Core.Persistence.Mappers;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Persistence.Mappers
 {
     [TestFixture]
-    public class PropertyGroupMapperTest : MapperTestBase
+    public class PropertyGroupMapperTest
     {
         [Test]
         public void Can_Map_Id_Property()
         {
             // Act
-            string column = new PropertyGroupMapper(MockSqlContext(), CreateMaps()).Map("Id");
+            string column = new PropertyGroupMapper(TestHelper.GetMockSqlContext(), TestHelper.CreateMaps()).Map("Id");
 
             // Assert
             Assert.That(column, Is.EqualTo("[cmsPropertyTypeGroup].[id]"));
@@ -20,7 +21,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         public void Can_Map_SortOrder_Property()
         {
             // Act
-            string column = new PropertyGroupMapper(MockSqlContext(), CreateMaps()).Map("SortOrder");
+            string column = new PropertyGroupMapper(TestHelper.GetMockSqlContext(), TestHelper.CreateMaps()).Map("SortOrder");
 
             // Assert
             Assert.That(column, Is.EqualTo("[cmsPropertyTypeGroup].[sortorder]"));
@@ -30,7 +31,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         public void Can_Map_Name_Property()
         {
             // Act
-            string column = new PropertyGroupMapper(MockSqlContext(), CreateMaps()).Map("Name");
+            string column = new PropertyGroupMapper(TestHelper.GetMockSqlContext(), TestHelper.CreateMaps()).Map("Name");
 
             // Assert
             Assert.That(column, Is.EqualTo("[cmsPropertyTypeGroup].[text]"));

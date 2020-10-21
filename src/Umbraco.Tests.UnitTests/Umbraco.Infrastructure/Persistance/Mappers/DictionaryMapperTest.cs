@@ -1,17 +1,17 @@
 ﻿using NUnit.Framework;
 using Umbraco.Core.Persistence.Mappers;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Persistence.Mappers
 {
     [TestFixture]
-    public class DictionaryMapperTest : MapperTestBase
+    public class DictionaryMapperTest
     {
         [Test]
         public void Can_Map_Id_Property()
         {
-
             // Act
-            string column = new DictionaryMapper(MockSqlContext(), CreateMaps()).Map("Id");
+            string column = new DictionaryMapper(TestHelper.GetMockSqlContext(), TestHelper.CreateMaps()).Map("Id");
 
             // Assert
             Assert.That(column, Is.EqualTo("[cmsDictionary].[pk]"));
@@ -22,7 +22,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         {
 
             // Act
-            string column = new DictionaryMapper(MockSqlContext(), CreateMaps()).Map("Key");
+            string column = new DictionaryMapper(TestHelper.GetMockSqlContext(), TestHelper.CreateMaps()).Map("Key");
 
             // Assert
             Assert.That(column, Is.EqualTo("[cmsDictionary].[id]"));
@@ -33,7 +33,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         {
 
             // Act
-            string column = new DictionaryMapper(MockSqlContext(), CreateMaps()).Map("ItemKey");
+            string column = new DictionaryMapper(TestHelper.GetMockSqlContext(), TestHelper.CreateMaps()).Map("ItemKey");
 
             // Assert
             Assert.That(column, Is.EqualTo("[cmsDictionary].[key]"));

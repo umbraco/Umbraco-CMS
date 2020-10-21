@@ -1,16 +1,17 @@
 ﻿using NUnit.Framework;
 using Umbraco.Core.Persistence.Mappers;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Persistence.Mappers
 {
     [TestFixture]
-    public class RelationTypeMapperTest : MapperTestBase
+    public class RelationTypeMapperTest
     {
         [Test]
         public void Can_Map_Id_Property()
         {
             // Act
-            string column = new RelationTypeMapper(MockSqlContext(), CreateMaps()).Map("Id");
+            string column = new RelationTypeMapper(TestHelper.GetMockSqlContext(), TestHelper.CreateMaps()).Map("Id");
 
             // Assert
             Assert.That(column, Is.EqualTo("[umbracoRelationType].[id]"));
@@ -20,7 +21,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         public void Can_Map_Alias_Property()
         {
             // Act
-            string column = new RelationTypeMapper(MockSqlContext(), CreateMaps()).Map("Alias");
+            string column = new RelationTypeMapper(TestHelper.GetMockSqlContext(), TestHelper.CreateMaps()).Map("Alias");
 
             // Assert
             Assert.That(column, Is.EqualTo("[umbracoRelationType].[alias]"));
@@ -31,7 +32,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         {
 
             // Act
-            string column = new RelationTypeMapper(MockSqlContext(), CreateMaps()).Map("ChildObjectType");
+            string column = new RelationTypeMapper(TestHelper.GetMockSqlContext(), TestHelper.CreateMaps()).Map("ChildObjectType");
 
             // Assert
             Assert.That(column, Is.EqualTo("[umbracoRelationType].[childObjectType]"));
@@ -42,7 +43,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         {
 
             // Act
-            string column = new RelationTypeMapper(MockSqlContext(), CreateMaps()).Map("IsBidirectional");
+            string column = new RelationTypeMapper(TestHelper.GetMockSqlContext(), TestHelper.CreateMaps()).Map("IsBidirectional");
 
             // Assert
             Assert.That(column, Is.EqualTo("[umbracoRelationType].[dual]"));

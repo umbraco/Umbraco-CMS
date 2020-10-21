@@ -1,17 +1,18 @@
 ﻿using NUnit.Framework;
 using Umbraco.Core.Persistence.Mappers;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Persistence.Mappers
 {
     [TestFixture]
-    public class LanguageMapperTest : MapperTestBase
+    public class LanguageMapperTest
     {
         [Test]
         public void Can_Map_Id_Property()
         {
 
             // Act
-            string column = new LanguageMapper(MockSqlContext(), CreateMaps()).Map("Id");
+            string column = new LanguageMapper(TestHelper.GetMockSqlContext(), TestHelper.CreateMaps()).Map("Id");
 
             // Assert
             Assert.That(column, Is.EqualTo("[umbracoLanguage].[id]"));
@@ -22,7 +23,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         {
 
             // Act
-            string column = new LanguageMapper(MockSqlContext(), CreateMaps()).Map("IsoCode");
+            string column = new LanguageMapper(TestHelper.GetMockSqlContext(), TestHelper.CreateMaps()).Map("IsoCode");
 
             // Assert
             Assert.That(column, Is.EqualTo("[umbracoLanguage].[languageISOCode]"));
@@ -32,7 +33,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         public void Can_Map_CultureName_Property()
         {
             // Act
-            string column = new LanguageMapper(MockSqlContext(), CreateMaps()).Map("CultureName");
+            string column = new LanguageMapper(TestHelper.GetMockSqlContext(), TestHelper.CreateMaps()).Map("CultureName");
 
             // Assert
             Assert.That(column, Is.EqualTo("[umbracoLanguage].[languageCultureName]"));
