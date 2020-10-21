@@ -2,31 +2,39 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
 using Umbraco.Core.Services;
 
-namespace Umbraco.Web.HealthCheck.Checks.Config
+namespace Umbraco.Core.HealthCheck.Checks.Configuration
 {
+    [Obsolete("This is not currently in the appsettings.JSON and so can either be removed, or rewritten in .NET Core fashion")]
     [HealthCheck("046A066C-4FB2-4937-B931-069964E16C66", "Try Skip IIS Custom Errors",
         Description = "Starting with IIS 7.5, this must be set to true for Umbraco 404 pages to show. Otherwise, IIS will takeover and render its built-in error page.",
         Group = "Configuration")]
-    public class TrySkipIisCustomErrorsCheck : AbstractConfigCheck
+    public class TrySkipIisCustomErrorsCheck : AbstractSettingsCheck
     {
+        private readonly ILocalizedTextService _textService;
+        private readonly ILoggerFactory _loggerFactory;
         private readonly Version _iisVersion;
+        private readonly GlobalSettings _globalSettings;
 
-        public TrySkipIisCustomErrorsCheck(ILocalizedTextService textService, ILoggerFactory loggerFactory,
-            IHostingEnvironment hostingEnvironment)
-            : base(textService, hostingEnvironment, loggerFactory)
+        public TrySkipIisCustomErrorsCheck(ILocalizedTextService textService, ILoggerFactory loggerFactory, IOptions<GlobalSettings> globalSettings)
+            : base(textService, loggerFactory)
         {
-            _iisVersion = hostingEnvironment.IISVersion;
+            _textService = textService;
+            _loggerFactory = loggerFactory;
+            //TODO: detect if hosted in IIS, and then IIS version if we want to go this route
+            _iisVersion = new Version("7.5");
+            _globalSettings = globalSettings.Value;
         }
 
-        public override string FilePath => "~/Config/umbracoSettings.config";
-
-        public override string XPath => "/settings/web.routing/@trySkipIisCustomErrors";
+        public override string ItemPath => "TBC";
 
         public override ValueComparisonType ValueComparisonType => ValueComparisonType.ShouldEqual;
+
+        public override string CurrentValue => null;
 
         public override IEnumerable<AcceptableConfiguration> Values
         {
@@ -36,7 +44,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
                 var recommendedValue = _iisVersion >= new Version("7.5")
                     ? bool.TrueString.ToLower()
                     : bool.FalseString.ToLower();
-                return new List<AcceptableConfiguration> { new AcceptableConfiguration { IsRecommended =  true, Value = recommendedValue } };
+                return new List<AcceptableConfiguration> { new AcceptableConfiguration { IsRecommended = true, Value = recommendedValue } };
             }
         }
 
@@ -44,7 +52,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         {
             get
             {
-                return TextService.Localize("healthcheck/trySkipIisCustomErrorsCheckSuccessMessage",
+                return _textService.Localize("healthcheck/trySkipIisCustomErrorsCheckSuccessMessage",
                     new[] { Values.First(v => v.IsRecommended).Value, _iisVersion.ToString() });
             }
         }
@@ -53,7 +61,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         {
             get
             {
-                return TextService.Localize("healthcheck/trySkipIisCustomErrorsCheckErrorMessage",
+                return _textService.Localize("healthcheck/trySkipIisCustomErrorsCheckErrorMessage",
                     new[] { CurrentValue, Values.First(v => v.IsRecommended).Value, _iisVersion.ToString() });
             }
         }
@@ -62,8 +70,10 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         {
             get
             {
-                return TextService.Localize("healthcheck/trySkipIisCustomErrorsCheckRectifySuccessMessage",
-                    new[] { Values.First(v => v.IsRecommended).Value, _iisVersion.ToString() });
+                return _textService.Localize("healthcheck/trySkipIisCustomErrorsCheckRectifySuccessMessage",
+                new[] { "Not implemented" });
+
+                //new[] { Values.First(v => v.IsRecommended).Value, _iisVersion.ToString() });
             }
         }
     }

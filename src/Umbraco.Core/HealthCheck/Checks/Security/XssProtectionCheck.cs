@@ -1,8 +1,7 @@
-﻿using Umbraco.Core;
-using Umbraco.Core.IO;
-using Umbraco.Core.Services;
+﻿using Umbraco.Core.Services;
+using Umbraco.Web;
 
-namespace Umbraco.Web.HealthCheck.Checks.Security
+namespace Umbraco.Core.HealthCheck.Checks.Security
 {
     [HealthCheck(
         "F4D2B02E-28C5-4999-8463-05759FA15C3A",
@@ -16,8 +15,8 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
         // and the blog post of Troy Hunt (https://www.troyhunt.com/understanding-http-strict-transport/)
         // If you want do to it perfectly, you have to submit it https://hstspreload.appspot.com/,
         // but then you should include subdomains and I wouldn't suggest to do that for Umbraco-sites.
-        public XssProtectionCheck(IRequestAccessor requestAccessor,ILocalizedTextService textService, IIOHelper ioHelper)
-            : base(requestAccessor, textService, "X-XSS-Protection", "1; mode=block", "xssProtection", true, ioHelper)
+        public XssProtectionCheck(IRequestAccessor requestAccessor,ILocalizedTextService textService)
+            : base(requestAccessor, textService, "X-XSS-Protection", "1; mode=block", "xssProtection", true)
         {
         }
     }

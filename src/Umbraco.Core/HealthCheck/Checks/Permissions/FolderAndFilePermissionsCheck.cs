@@ -2,27 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Options;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Install;
 using Umbraco.Core.IO;
 using Umbraco.Core.Services;
 
-namespace Umbraco.Web.HealthCheck.Checks.Permissions
+namespace Umbraco.Core.HealthCheck.Checks.Permissions
 {
-    internal enum PermissionCheckRequirement
-    {
-        Required,
-        Optional
-    }
-
-    internal enum PermissionCheckFor
-    {
-        Folder,
-        File
-    }
-
     [HealthCheck(
         "53DBA282-4A79-4B67-B958-B29EC40FCC23",
         "Folder & File Permissions",
@@ -31,14 +17,14 @@ namespace Umbraco.Web.HealthCheck.Checks.Permissions
     public class FolderAndFilePermissionsCheck : HealthCheck
     {
         private readonly ILocalizedTextService _textService;
-        private readonly GlobalSettings _globalSettings;
+        private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
         private readonly IFilePermissionHelper _filePermissionHelper;
         private readonly IIOHelper _ioHelper;
 
-        public FolderAndFilePermissionsCheck(ILocalizedTextService textService, IOptions<GlobalSettings> globalSettings, IFilePermissionHelper filePermissionHelper, IIOHelper ioHelper)
+        public FolderAndFilePermissionsCheck(ILocalizedTextService textService, IOptionsMonitor<GlobalSettings> globalSettings, IFilePermissionHelper filePermissionHelper, IIOHelper ioHelper)
         {
             _textService = textService;
-            _globalSettings = globalSettings.Value;
+            _globalSettings = globalSettings;
             _filePermissionHelper = filePermissionHelper;
             _ioHelper = ioHelper;
         }
@@ -74,10 +60,10 @@ namespace Umbraco.Web.HealthCheck.Checks.Permissions
                 { Constants.SystemDirectories.Preview, PermissionCheckRequirement.Required },
                 { Constants.SystemDirectories.AppPlugins, PermissionCheckRequirement.Required },
                 { Constants.SystemDirectories.Config, PermissionCheckRequirement.Optional },
-                { _globalSettings.UmbracoCssPath, PermissionCheckRequirement.Optional },
-                { _globalSettings.UmbracoMediaPath, PermissionCheckRequirement.Optional },
-                { _globalSettings.UmbracoScriptsPath, PermissionCheckRequirement.Optional },
-                { _globalSettings.UmbracoPath, PermissionCheckRequirement.Optional },
+                { _globalSettings.CurrentValue.UmbracoCssPath, PermissionCheckRequirement.Optional },
+                { _globalSettings.CurrentValue.UmbracoMediaPath, PermissionCheckRequirement.Optional },
+                { _globalSettings.CurrentValue.UmbracoScriptsPath, PermissionCheckRequirement.Optional },
+                { _globalSettings.CurrentValue.UmbracoPath, PermissionCheckRequirement.Optional },
                 { Constants.SystemDirectories.MvcViews, PermissionCheckRequirement.Optional }
             };
 
@@ -97,7 +83,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Permissions
 
             //now check the special folders
             var requiredPathCheckResult2 = _filePermissionHelper.EnsureDirectories(
-                GetPathsToCheck(pathsToCheckWithRestarts, PermissionCheckRequirement.Required), out var requiredFailedPaths2, writeCausesRestart:true);
+                GetPathsToCheck(pathsToCheckWithRestarts, PermissionCheckRequirement.Required), out var requiredFailedPaths2, writeCausesRestart: true);
             var optionalPathCheckResult2 = _filePermissionHelper.EnsureDirectories(
                 GetPathsToCheck(pathsToCheckWithRestarts, PermissionCheckRequirement.Optional), out var optionalFailedPaths2, writeCausesRestart: true);
 
@@ -139,9 +125,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Permissions
                 .ToArray();
         }
 
-        private HealthCheckStatus GetStatus(bool requiredPathCheckResult, IEnumerable<string> requiredFailedPaths,
-            bool optionalPathCheckResult, IEnumerable<string> optionalFailedPaths,
-            PermissionCheckFor checkingFor)
+        private HealthCheckStatus GetStatus(bool requiredPathCheckResult, IEnumerable<string> requiredFailedPaths, bool optionalPathCheckResult, IEnumerable<string> optionalFailedPaths, PermissionCheckFor checkingFor)
         {
             // Return error if any required paths fail the check, or warning if any optional ones do
             var resultType = StatusResultType.Success;
@@ -164,12 +148,11 @@ namespace Umbraco.Web.HealthCheck.Checks.Permissions
             }
 
             var actions = new List<HealthCheckAction>();
-            return
-                new HealthCheckStatus(message)
-                {
-                    ResultType = resultType,
-                    Actions = actions
-                };
+            return new HealthCheckStatus(message)
+            {
+                ResultType = resultType,
+                Actions = actions
+            };
         }
 
         private string GetMessageForPathCheckFailure(string messageKey, IEnumerable<string> failedPaths)

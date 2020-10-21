@@ -10,6 +10,7 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.HealthCheck;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Templates;

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core.Configuration.HealthChecks;
+using Umbraco.Core.HealthCheck;
+using Umbraco.Core.HealthCheck.Checks;
 
 namespace Umbraco.Core.Configuration.Models
 {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-namespace Umbraco.Web.HealthCheck
+namespace Umbraco.Core.HealthCheck
 {
     [DataContract(Name = "healthCheckAction", Namespace = "")]
     public class HealthCheckAction

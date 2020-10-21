@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Web.HealthCheck.Checks.Config
+﻿namespace Umbraco.Core.HealthCheck
 {
     public class AcceptableConfiguration
     {
