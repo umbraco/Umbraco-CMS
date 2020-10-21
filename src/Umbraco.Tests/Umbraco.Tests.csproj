@@ -219,7 +219,6 @@
     <Compile Include="Web\Mvc\HtmlStringUtilitiesTests.cs" />
     <Compile Include="Persistence\NPocoTests\PetaPocoCachesTest.cs" />
     <Compile Include="Persistence\Repositories\PartialViewRepositoryTests.cs" />
-    <Compile Include="Persistence\Repositories\PublicAccessRepositoryTest.cs" />
     <Compile Include="Routing\RoutesCacheTests.cs" />
     <Compile Include="Routing\UrlRoutingTestBase.cs" />
     <Compile Include="Web\Mvc\RenderNoContentControllerTests.cs" />
