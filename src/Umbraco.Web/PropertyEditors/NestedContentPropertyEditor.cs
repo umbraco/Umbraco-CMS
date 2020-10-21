@@ -363,7 +363,10 @@ namespace Umbraco.Web.PropertyEditors
             {
                 if (propertyValue == null || string.IsNullOrWhiteSpace(propertyValue.ToString()))
                     return new List<NestedContentRowValue>();
-
+                
+                 if (!propertyValue.ToString().DetectIsJson())
+                    return new List<NestedContentRowValue>();
+                    
                 var rowValues = JsonConvert.DeserializeObject<List<NestedContentRowValue>>(propertyValue.ToString());
 
                 // There was a note here about checking if the result had zero items and if so it would return null, so we'll continue to do that
