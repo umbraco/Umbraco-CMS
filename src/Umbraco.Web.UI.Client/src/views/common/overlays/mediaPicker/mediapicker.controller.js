@@ -94,7 +94,7 @@ angular.module("umbraco")
                     var id = $scope.target.udi ? $scope.target.udi : $scope.target.id
                     var altText = $scope.target.altText;
                     if (id) {
-                        entityResource.getById(id, "Media")
+                        mediaResource.getById(id)
                             .then(function (node) {
                                 $scope.target = node;
                                 if (ensureWithinStartNode(node)) {
