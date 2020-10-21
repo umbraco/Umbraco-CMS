@@ -101,11 +101,7 @@ namespace Umbraco.Web.Editors
         [UmbracoAuthorize]
         public ActionResult Frame(int id, string culture)
         {
-            var user = _umbracoContextAccessor.UmbracoContext.Security.CurrentUser;
-
-            var previewToken = _publishedSnapshotService.EnterPreview(user, id);
-
-            Response.Cookies.Set(new HttpCookie(Constants.Web.PreviewCookieName, previewToken));
+            EnterPreview(id);
 
             // use a numeric url because content may not be in cache and so .Url would fail
             var query = culture.IsNullOrWhiteSpace() ? string.Empty : $"?culture={culture}";
@@ -113,7 +109,16 @@ namespace Umbraco.Web.Editors
 
             return null;
         }
+        public ActionResult EnterPreview(int id)
+        {
+            var user = _umbracoContextAccessor.UmbracoContext.Security.CurrentUser;
 
+            var previewToken = _publishedSnapshotService.EnterPreview(user, id);
+
+            Response.Cookies.Set(new HttpCookie(Constants.Web.PreviewCookieName, previewToken));
+
+            return null;
+        }
         public ActionResult End(string redir = null)
         {
             var previewToken = Request.GetPreviewCookieValue();
@@ -121,6 +126,9 @@ namespace Umbraco.Web.Editors
             service.ExitPreview(previewToken);
 
             System.Web.HttpContext.Current.ExpireCookie(Constants.Web.PreviewCookieName);
+
+            // Expire Client-side cookie that determines whether the user has accepted to be in Preview Mode when visiting the website.
+            System.Web.HttpContext.Current.ExpireCookie(Constants.Web.AcceptPreviewCookieName);
 
             if (Uri.IsWellFormedUriString(redir, UriKind.Relative)
                 && redir.StartsWith("//") == false
