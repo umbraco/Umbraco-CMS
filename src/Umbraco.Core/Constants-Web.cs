@@ -18,7 +18,8 @@
             /// </summary>
             public const string PreviewCookieName = "UMB_PREVIEW";
             /// <summary>
-            /// Client-side cookie that determins wether the user has accepted to be in Preview Mode when visiting the website.
+
+            /// Client-side cookie that determines whether the user has accepted to be in Preview Mode when visiting the website.
             /// </summary>
             public const string AcceptPreviewCookieName = "UMB-WEBSITE-PREVIEW-ACCEPT";
 
