@@ -160,6 +160,21 @@ namespace Umbraco.Tests.Integration.Persistence.Repositories
         }
 
 
+        [TestCase("Test (0)", "Test (0) (1)")]
+        [TestCase("Test (-1)", "Test (-1) (1)")]
+        [TestCase("Test (1) (-1)", "Test (1) (-1) (1)")]
+        public void NonPositive_Suffix_Is_Ignored(string suffix, string expected)
+        {
+            var names = new[]
+            {
+                new SimilarNodeName { Id = 6, Name = suffix }
+            };
+            var res = SimilarNodeName.GetUniqueName(names, 0, suffix);
+
+            Assert.AreEqual(expected, res);
+        }
+
+
 
         /* Original Tests - Can be deleted, as new tests cover all cases */
 
