@@ -280,27 +280,54 @@ SELECT nodeId FROM {PreTables.ContentVersion} cv INNER JOIN {Constants.DatabaseS
             }
 
             // set 'edited' to true whenever a 'non-published' property data is != a published one
-            // cannot compare NTEXT values in TSQL
-            // cannot cast NTEXT to NVARCHAR(MAX) in SQLCE
-            // ... bah ...
-            var temp = Database.Fetch<dynamic>($@"SELECT n.id,
-v1.intValue intValue1, v1.decimalValue decimalValue1, v1.dateValue dateValue1, v1.varcharValue varcharValue1, v1.textValue textValue1,
-v2.intValue intValue2, v2.decimalValue decimalValue2, v2.dateValue dateValue2, v2.varcharValue varcharValue2, v2.textValue textValue2
-FROM {Constants.DatabaseSchema.Tables.Node} n
-JOIN {PreTables.ContentVersion} cv1 ON n.id=cv1.nodeId AND cv1.{SqlSyntax.GetQuotedColumnName("current")}=1
-JOIN {Constants.DatabaseSchema.Tables.PropertyData} v1 ON cv1.id=v1.versionId
-JOIN {PreTables.ContentVersion} cv2 ON n.id=cv2.nodeId
-JOIN {Constants.DatabaseSchema.Tables.DocumentVersion} dv ON cv2.id=dv.id AND dv.published=1
-JOIN {Constants.DatabaseSchema.Tables.PropertyData} v2 ON cv2.id=v2.versionId
-WHERE v1.propertyTypeId=v2.propertyTypeId
-AND (v1.languageId=v2.languageId OR (v1.languageId IS NULL AND v2.languageId IS NULL))
-AND (v1.segment=v2.segment OR (v1.segment IS NULL AND v2.segment IS NULL))");
+            if (Database.DatabaseType.IsSqlCe())
+            {
+                // cannot compare NTEXT values in TSQL
+                // cannot cast NTEXT to NVARCHAR(MAX) in SQLCE
+                // ... bah ...
+                var temp = Database.Fetch<dynamic>(
+                        $@" SELECT n.id,
+                            v1.intValue intValue1, v1.decimalValue decimalValue1, v1.dateValue dateValue1, v1.varcharValue varcharValue1, v1.textValue textValue1,
+                            v2.intValue intValue2, v2.decimalValue decimalValue2, v2.dateValue dateValue2, v2.varcharValue varcharValue2, v2.textValue textValue2
+                            FROM {Constants.DatabaseSchema.Tables.Node} n
+                            JOIN {PreTables.ContentVersion} cv1 ON n.id=cv1.nodeId AND cv1.{SqlSyntax.GetQuotedColumnName("current")}=1
+                            JOIN {Constants.DatabaseSchema.Tables.PropertyData} v1 ON cv1.id=v1.versionId
+                            JOIN {PreTables.ContentVersion} cv2 ON n.id=cv2.nodeId
+                            JOIN {Constants.DatabaseSchema.Tables.DocumentVersion} dv ON cv2.id=dv.id AND dv.published=1
+                            JOIN {Constants.DatabaseSchema.Tables.PropertyData} v2 ON cv2.id=v2.versionId
+                            WHERE v1.propertyTypeId=v2.propertyTypeId
+                            AND (v1.languageId=v2.languageId OR (v1.languageId IS NULL AND v2.languageId IS NULL))
+                            AND (v1.segment=v2.segment OR (v1.segment IS NULL AND v2.segment IS NULL))");
 
-            var updatedIds = new HashSet<int>();
-            foreach (var t in temp)
-                if (t.intValue1 != t.intValue2 || t.decimalValue1 != t.decimalValue2 || t.dateValue1 != t.dateValue2 || t.varcharValue1 != t.varcharValue2 || t.textValue1 != t.textValue2)
-                    if (updatedIds.Add((int)t.id))
-                        Database.Execute($"UPDATE {SqlSyntax.GetQuotedTableName(PreTables.Document)} SET edited=1 WHERE nodeId=@nodeId", new { nodeId = t.id });
+                var updatedIds = new HashSet<int>();
+                foreach (var t in temp)
+                    if (t.intValue1 != t.intValue2 || t.decimalValue1 != t.decimalValue2 || t.dateValue1 != t.dateValue2 || t.varcharValue1 != t.varcharValue2 || t.textValue1 != t.textValue2)
+                        if (updatedIds.Add((int)t.id))
+                            Database.Execute($"UPDATE {SqlSyntax.GetQuotedTableName(PreTables.Document)} SET edited=1 WHERE nodeId=@nodeId", new { nodeId = t.id });
+            }
+            else
+            {
+
+                Database.Execute(
+                           $@"UPDATE {SqlSyntax.GetQuotedTableName(PreTables.Document)}
+                            SET edited=1
+                            WHERE nodeId IN (SELECT n.id
+                            FROM {Constants.DatabaseSchema.Tables.Node} n
+                            JOIN {PreTables.ContentVersion} cv1 ON n.id=cv1.nodeId AND cv1.{SqlSyntax.GetQuotedColumnName("current")}=1
+                            JOIN {Constants.DatabaseSchema.Tables.PropertyData} v1 ON cv1.id=v1.versionId
+                            JOIN {PreTables.ContentVersion} cv2 ON n.id=cv2.nodeId
+                            JOIN {Constants.DatabaseSchema.Tables.DocumentVersion} dv ON cv2.id=dv.id AND dv.published=1
+                            JOIN {Constants.DatabaseSchema.Tables.PropertyData} v2 ON cv2.id=v2.versionId
+                            WHERE v1.propertyTypeId=v2.propertyTypeId
+                            AND (v1.languageId=v2.languageId OR (v1.languageId IS NULL AND v2.languageId IS NULL))
+                            AND (v1.segment=v2.segment OR (v1.segment IS NULL AND v2.segment IS NULL))
+                            AND (
+                                (v1.intValue != v2.intValue)
+                                OR (v1.decimalValue != v2.decimalValue)
+                                OR (v1.dateValue != v2.dateValue)
+                                OR (v1.varcharValue != v2.varcharValue)
+                                OR (CAST(v1.textValue AS NVARCHAR(MAX)) != CAST(v2.textValue AS NVARCHAR(MAX)))))");
+            }
 
             // drop more columns
             Delete.Column("versionId").FromTable(PreTables.ContentVersion).Do();
