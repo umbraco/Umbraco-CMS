@@ -200,7 +200,6 @@
     <Compile Include="Persistence\LocksTests.cs" />
     <Compile Include="Migrations\PostMigrationTests.cs" />
     <Compile Include="Persistence\NPocoTests\NPocoSqlExtensionsTests.cs" />
-    <Compile Include="Persistence\UnitOfWorkTests.cs" />
     <Compile Include="Testing\UmbracoTestBase.cs" />
     <Compile Include="TestHelpers\TestObjects-Mocks.cs" />
     <Compile Include="TestHelpers\TestObjects.cs" />
