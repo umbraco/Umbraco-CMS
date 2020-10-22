@@ -34,7 +34,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
-    // See 
+    // See
     // for a bigger example of this type of controller implementation in netcore:
     // https://github.com/dotnet/AspNetCore.Docs/blob/2efb4554f8f659be97ee7cd5dd6143b871b330a5/aspnetcore/migration/1x-to-2x/samples/AspNetCoreDotNetCore2App/AspNetCoreDotNetCore2App/Controllers/AccountController.cs
     // https://github.com/dotnet/AspNetCore.Docs/blob/ad16f5e1da6c04fa4996ee67b513f2a90fa0d712/aspnetcore/common/samples/WebApplication1/Controllers/AccountController.cs
@@ -378,18 +378,18 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// Used to retrieve the 2FA providers for code submission
         /// </summary>
         /// <returns></returns>
-        [SetAngularAntiForgeryTokens] 
-        public async Task<IEnumerable<string>> Get2FAProviders()
+        [SetAngularAntiForgeryTokens]
+        public async Task<ActionResult<IEnumerable<string>>> Get2FAProviders()
         {
             var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
             if (user == null)
             {
                 _logger.LogWarning("Get2FAProviders :: No verified user found, returning 404");
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return NotFound();
             }
 
             var userFactors = await _userManager.GetValidTwoFactorProvidersAsync(user);
-            return userFactors;
+            return new ObjectResult(userFactors);
         }
 
         [SetAngularAntiForgeryTokens]
@@ -470,7 +470,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             if (result.IsNotAllowed)
             {
                 throw HttpResponseException.CreateValidationErrorResponse("User is not allowed");
-            }            
+            }
 
             throw HttpResponseException.CreateValidationErrorResponse("Invalid code");
         }

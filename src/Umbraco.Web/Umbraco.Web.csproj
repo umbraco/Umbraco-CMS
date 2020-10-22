@@ -291,7 +291,6 @@
     <Compile Include="Mvc\AreaRegistrationExtensions.cs" />
     <Compile Include="Mvc\QueryStringFilterAttribute.cs" />
     <Compile Include="Mvc\MemberAuthorizeAttribute.cs" />
-    <Compile Include="Mvc\BackOfficeArea.cs" />
     <Compile Include="Mvc\ControllerFactoryExtensions.cs" />
     <Compile Include="Mvc\SurfaceRouteHandler.cs" />
     <Compile Include="Controllers\UmbLoginController.cs" />

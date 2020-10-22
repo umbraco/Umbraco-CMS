@@ -256,7 +256,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         {
             if (redirectUrl == null)
             {
-                redirectUrl = Url.Action("Default", "BackOffice");
+                redirectUrl = Url.Action(nameof(Default), this.GetControllerName());
             }
 
             var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
@@ -273,7 +273,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         public ActionResult LinkLogin(string provider)
         {
             // Request a redirect to the external login provider to link a login for the current user
-            var redirectUrl = Url.Action("ExternalLinkLoginCallback", "BackOffice");
+            var redirectUrl = Url.Action(nameof(ExternalLinkLoginCallback), this.GetControllerName());
             var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl, User.Identity.GetUserId());
             return Challenge(properties, provider);
         }
@@ -289,13 +289,13 @@ namespace Umbraco.Web.BackOffice.Controllers
                 {
                     //Add a flag and redirect for it to be displayed
                     TempData[ViewDataExtensions.TokenPasswordResetCode] =  _jsonSerializer.Serialize(new ValidatePasswordResetCodeModel { UserId = userId, ResetCode = resetCode });
-                    return RedirectToLocal(Url.Action("Default", "BackOffice"));
+                    return RedirectToLocal(Url.Action(nameof(Default), this.GetControllerName()));
                 }
             }
 
             //Add error and redirect for it to be displayed
             TempData[ViewDataExtensions.TokenPasswordResetCode] = new[] { _textService.Localize("login/resetCodeExpired") };
-            return RedirectToLocal(Url.Action("Default", "BackOffice"));
+            return RedirectToLocal(Url.Action(nameof(Default), this.GetControllerName()));
         }
 
         /// <summary>
@@ -311,7 +311,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             {
                 //Add error and redirect for it to be displayed
                 TempData[ViewDataExtensions.TokenExternalSignInError] = new[] { "An error occurred, could not get external login info" };
-                return RedirectToLocal(Url.Action("Default", "BackOffice"));
+                return RedirectToLocal(Url.Action(nameof(Default), this.GetControllerName()));
             }
 
             var user = await _userManager.FindByIdAsync(User.Identity.GetUserId());
@@ -319,7 +319,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             {
                 // ... this should really not happen
                 TempData[ViewDataExtensions.TokenExternalSignInError] = new[] { "Local user does not exist" };
-                return RedirectToLocal(Url.Action("Default", "BackOffice"));
+                return RedirectToLocal(Url.Action(nameof(Default), this.GetControllerName()));
             }
 
             var result2 = await _userManager.AddLoginAsync(user, loginInfo);
@@ -330,12 +330,12 @@ namespace Umbraco.Web.BackOffice.Controllers
                 // what this is for but we'll need to peek under the code here to figure out exactly what goes on.
                 //await _signInManager.UpdateExternalAuthenticationTokensAsync(loginInfo);
 
-                return RedirectToLocal(Url.Action("Default", "BackOffice"));
+                return RedirectToLocal(Url.Action(nameof(Default), this.GetControllerName()));
             }
 
             //Add errors and redirect for it to be displayed
             TempData[ViewDataExtensions.TokenExternalSignInError] = result2.Errors;
-            return RedirectToLocal(Url.Action("Default", "BackOffice"));
+            return RedirectToLocal(Url.Action(nameof(Default), this.GetControllerName()));
         }
 
         /// <summary>
