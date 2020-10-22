@@ -281,9 +281,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             Database.Insert(mediaVersionDto);
 
             // persist the property data
-            var propertyDataDtos = PropertyFactory.BuildDtos(entity.ContentType.Variations, entity.VersionId, 0, entity.Properties, LanguageRepository, out _, out _);
-            foreach (var propertyDataDto in propertyDataDtos)
-                Database.Insert(propertyDataDto);
+            InsertPropertyValues(entity, 0, out _, out _);
 
             // set tags
             SetEntityTags(entity, _tagRepository);
@@ -346,11 +344,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 Database.Update(mediaVersionDto);
 
                 // replace the property data
-                var deletePropertyDataSql = SqlContext.Sql().Delete<PropertyDataDto>().Where<PropertyDataDto>(x => x.VersionId == entity.VersionId);
-                Database.Execute(deletePropertyDataSql);
-                var propertyDataDtos = PropertyFactory.BuildDtos(entity.ContentType.Variations, entity.VersionId, 0, entity.Properties, LanguageRepository, out _, out _);
-                foreach (var propertyDataDto in propertyDataDtos)
-                    Database.Insert(propertyDataDto);
+                ReplacePropertyValues(entity, entity.VersionId, 0, out _, out _);
 
                 SetEntityTags(entity, _tagRepository);
 
