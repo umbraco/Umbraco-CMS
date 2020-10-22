@@ -527,7 +527,7 @@
             var elementTypesToCopy = vm.layout.filter(entry => entry.$block.config.unsupported !== true).map(
                 (entry) => {
                     // No need to clone the data as its begin handled by the clipboardService.
-                    return {"layout": block.layout, "data": entry.$block.data, "settingsData":entry.$block.settingsData}
+                    return {"layout": entry.$block.layout, "data": entry.$block.data, "settingsData":entry.$block.settingsData}
                 }
             );
 
@@ -537,16 +537,21 @@
             // remove dublicates
             aliases = aliases.filter((item, index) => aliases.indexOf(item) === index);
 
-            var contentNodeName = "";
+            var contentNodeName = "?";
+            var contentNodeIcon = null;
             if(vm.umbVariantContent) {
                 contentNodeName = vm.umbVariantContent.editor.content.name;
-                contentNodeIcon = vm.umbVariantContent.editor.content.icon;
+                if(vm.umbVariantContentEditors) {
+                    contentNodeIcon = vm.umbVariantContentEditors.content.icon.split(" ")[0];
+                }
             } else if (vm.umbElementEditorContent) {
                 contentNodeName = vm.umbElementEditorContent.model.documentType.name;
-                contentNodeIcon = vm.umbElementEditorContent.model.documentType.icon;
+                contentNodeIcon = vm.umbElementEditorContent.model.documentType.icon.split(" ")[0];
+                console.log(vm.umbElementEditorContent.model.documentType)
             }
 
-            console.log("contentNodeIcon", contentNodeIcon)
+
+            console.log("check that we get the right contentNodeIcon", contentNodeIcon)
 
             localizationService.localize("clipboard_labelForArrayOfItemsFrom", [vm.model.label, contentNodeName]).then(function(localizedLabel) {
                 clipboardService.copyArray(clipboardService.TYPES.BLOCK, aliases, elementTypesToCopy, localizedLabel, contentNodeIcon || "icon-thumbnail-list", vm.model.id);
@@ -566,6 +571,7 @@
                 layoutEntry = modelObject.createFromElementType(pasteEntry);
             } else if (pasteType === clipboardService.TYPES.BLOCK) {
                 layoutEntry = modelObject.createFromBlockData(pasteEntry);
+                console.log("pasteEntry", pasteEntry)
             } else {
                 // Not a supported paste type.
                 return false;

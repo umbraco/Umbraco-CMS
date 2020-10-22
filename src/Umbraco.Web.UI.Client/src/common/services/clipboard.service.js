@@ -10,7 +10,7 @@
  * The service has a set way for defining a data-set by a entryType and alias, which later will be used to retrive the posible entries for a paste scenario.
  *
  */
-function clipboardService(notificationsService, eventsService, localStorageService, iconHelper) {
+function clipboardService($window, notificationsService, eventsService, localStorageService, iconHelper) {
 
 
     const TYPES = {};
@@ -22,21 +22,35 @@ function clipboardService(notificationsService, eventsService, localStorageServi
     var pastePropertyResolvers = {};
     var clipboardTypeResolvers = {};
 
-    clipboardTypeResolvers[TYPES.ELEMENT_TYPE] = function(data, propMethod) {
-        for (var t = 0; t < data.variants[0].tabs.length; t++) {
-            var tab = data.variants[0].tabs[t];
+    clipboardTypeResolvers[TYPES.ELEMENT_TYPE] = function(element, propMethod) {
+        for (var t = 0; t < element.variants[0].tabs.length; t++) {
+            var tab = element.variants[0].tabs[t];
             for (var p = 0; p < tab.properties.length; p++) {
                 var prop = tab.properties[p];
                 propMethod(prop, TYPES.ELEMENT_TYPE);
             }
         }
     }
-    clipboardTypeResolvers[TYPES.BLOCK] = function(data, propMethod) {
-        if (data.data != null) {
-            clipboardTypeResolvers[TYPES.RAW](data.data, propMethod);
+    clipboardTypeResolvers[TYPES.BLOCK] = function (block, propMethod) {
+
+        propMethod(block, TYPES.BLOCK);
+
+        if(block.data) {
+            Object.keys(block.data).forEach( key => {
+                if(key === 'udi' || key === 'contentTypeKey') {
+                    return;
+                }
+                propMethod(block.data[key], TYPES.RAW);
+            });
         }
-        if (data.settingsData != null) {
-            clipboardTypeResolvers[TYPES.RAW](data.settingsData, propMethod);
+
+        if(block.settingsData) {
+            Object.keys(block.settingsData).forEach( key => {
+                if(key === 'udi' || key === 'contentTypeKey') {
+                    return;
+                }
+                propMethod(block.settingsData[key], TYPES.RAW);
+            });
         }
     }
     clipboardTypeResolvers[TYPES.RAW] = function(data, propMethod) {
@@ -44,7 +58,6 @@ function clipboardService(notificationsService, eventsService, localStorageServi
             propMethod(data[p], TYPES.RAW);
         }
     }
-
 
     var STORAGE_KEY = "umbClipboardService";
 
@@ -73,10 +86,13 @@ function clipboardService(notificationsService, eventsService, localStorageServi
         var storageString = JSON.stringify(storage);
 
         try {
+            // Check that we can parse the JSON:
             var storageJSON = JSON.parse(storageString);
+
+            // Store the string:
             localStorageService.set(STORAGE_KEY, storageString);
 
-            eventsService.emit("clipboardService.storageUpdate");
+            //eventsService.emit("clipboardService.storageUpdate");
 
             return true;
         } catch(e) {
@@ -91,11 +107,11 @@ function clipboardService(notificationsService, eventsService, localStorageServi
 
         type = type || "raw";
         var resolvers = clearPropertyResolvers[type];
-
-        for (var i=0; i<resolvers.length; i++) {
-            resolvers[i](prop, resolvePropertyForStorage);
+        if (resolvers) {
+            for (var i=0; i<resolvers.length; i++) {
+                resolvers[i](prop, resolvePropertyForStorage);
+            }
         }
-
     }
 
     var prepareEntryForStorage = function(type, entryData, firstLevelClearupMethod) {
@@ -132,9 +148,10 @@ function clipboardService(notificationsService, eventsService, localStorageServi
 
         type = type || "raw";
         var resolvers = pastePropertyResolvers[type];
-
-        for (var i=0; i<resolvers.length; i++) {
-            resolvers[i](prop, resolvePropertyForPaste);
+        if (resolvers) {
+            for (var i=0; i<resolvers.length; i++) {
+                resolvers[i](prop, resolvePropertyForPaste);
+            }
         }
     }
 
@@ -163,7 +180,7 @@ function clipboardService(notificationsService, eventsService, localStorageServi
         var cloneData = Utilities.copy(pasteEntryData);
 
         var typeResolver = clipboardTypeResolvers[type];
-        if(typeResolver) {
+        if (typeResolver) {
             typeResolver(cloneData, resolvePropertyForPaste);
         } else {
             console.warn("Umbraco.service.clipboardService has no type resolver for '" + type + "'.");
@@ -434,6 +451,17 @@ function clipboardService(notificationsService, eventsService, localStorageServi
 
         saveStorage(storage);
     };
+
+
+
+
+
+    $window.addEventListener("storage", localStorageChanged);
+    function localStorageChanged() {
+        console.log("clipboardService.storageUpdate");
+        // TODO: Check if its the right value that was changed...
+        eventsService.emit("clipboardService.storageUpdate");
+    }
 
 
 
