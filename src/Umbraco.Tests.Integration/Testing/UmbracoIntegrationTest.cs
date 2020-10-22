@@ -448,7 +448,7 @@ namespace Umbraco.Tests.Integration.Testing
 
         public TestHelper TestHelper = new TestHelper();
 
-        protected string TestDBConnectionString { get; private set; }
+        protected virtual string TestDBConnectionString { get; private set; }
 
         protected virtual Action<IServiceCollection> CustomTestSetup => services => { };
 

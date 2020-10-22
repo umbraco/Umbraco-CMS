@@ -9,6 +9,8 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
+using Umbraco.Tests.Common.Builders;
+using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
@@ -30,20 +32,20 @@ namespace Umbraco.Tests.Services
     [TestFixture]
     [Apartment(ApartmentState.STA)]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-    public class ThreadSafetyServiceTest : TestWithDatabaseBase
+    public class ThreadSafetyServiceTest : UmbracoIntegrationTest
     {
-        public override void SetUp()
+        private IContentService ContentService => GetRequiredService<IContentService>();
+        private IMediaService MediaService => GetRequiredService<IMediaService>();
+        private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
+
+        [SetUp]
+        public void SetUp()
         {
-            base.SetUp();
             CreateTestData();
         }
 
-        // not sure this is doing anything really
-        protected override string GetDbConnectionString()
-        {
-            // need a longer timeout for tests?
-            return base.GetDbConnectionString() + "default lock timeout=60000;";
-        }
+        protected override string TestDBConnectionString => base.TestDBConnectionString +  "default lock timeout=60000;";
+
 
         private const int MaxThreadCount = 20;
 
@@ -99,7 +101,7 @@ namespace Umbraco.Tests.Services
                 Assert.Ignore("Do not run on VSTS.");
 
             // the ServiceContext in that each repository in a service (i.e. ContentService) is a singleton
-            var contentService = (ContentService)ServiceContext.ContentService;
+            var contentService = (ContentService)ContentService;
 
             var threads = new List<Thread>();
             var exceptions = new List<Exception>();
@@ -167,7 +169,7 @@ namespace Umbraco.Tests.Services
             if (Environment.GetEnvironmentVariable("UMBRACO_TMP") != null)
                 Assert.Ignore("Do not run on VSTS.");
             // mimick the ServiceContext in that each repository in a service (i.e. ContentService) is a singleton
-            var mediaService = (MediaService)ServiceContext.MediaService;
+            var mediaService = (MediaService)MediaService;
 
             var threads = new List<Thread>();
             var exceptions = new List<Exception>();
@@ -228,9 +230,9 @@ namespace Umbraco.Tests.Services
         public void CreateTestData()
         {
             // Create and Save ContentType "umbTextpage" -> 1045
-            var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage", "Textpage");
+            var contentType = ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage");
             contentType.Key = new Guid("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522");
-            ServiceContext.ContentTypeService.Save(contentType);
+            ContentTypeService.Save(contentType);
         }
     }
 }

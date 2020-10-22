@@ -1,25 +1,26 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
+using Microsoft.Extensions.Options;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Services;
 
-namespace Umbraco.Web.HealthCheck.Checks.Config
+namespace Umbraco.Core.HealthCheck.Checks.Configuration
 {
     [HealthCheck("3E2F7B14-4B41-452B-9A30-E67FBC8E1206", "Notification Email Settings",
         Description = "If notifications are used, the 'from' email address should be specified and changed from the default value.",
         Group = "Configuration")]
-    public class NotificationEmailCheck : AbstractConfigCheck
+    public class NotificationEmailCheck : AbstractSettingsCheck
     {
+        private readonly IOptionsMonitor<ContentSettings> _contentSettings;
         private const string DefaultFromEmail = "your@email.here";
 
-        public NotificationEmailCheck(ILocalizedTextService textService, IHostingEnvironment hostingEnvironment, ILoggerFactory loggerFactory)
-            : base(textService, hostingEnvironment, loggerFactory)
-        { }
+        public NotificationEmailCheck(ILocalizedTextService textService, ILoggerFactory loggerFactory, IOptionsMonitor<ContentSettings> contentSettings)
+            : base(textService, loggerFactory)
+        {
+            _contentSettings = contentSettings;
+        }
 
-        public override string FilePath => "~/Config/umbracoSettings.config";
-
-        public override string XPath => "/settings/content/notifications/email";
+        public override string ItemPath => Constants.Configuration.ConfigContentNotificationsEmail;
 
         public override ValueComparisonType ValueComparisonType => ValueComparisonType.ShouldNotEqual;
 
@@ -28,8 +29,11 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
             new AcceptableConfiguration { IsRecommended = false, Value = DefaultFromEmail }
         };
 
-        public override string CheckSuccessMessage => TextService.Localize("healthcheck/notificationEmailsCheckSuccessMessage", new [] { CurrentValue } );
+        public override string CurrentValue => _contentSettings.CurrentValue.Notifications.Email;
+
+        public override string CheckSuccessMessage => TextService.Localize("healthcheck/notificationEmailsCheckSuccessMessage", new[] { CurrentValue });
 
         public override string CheckErrorMessage => TextService.Localize("healthcheck/notificationEmailsCheckErrorMessage", new[] { DefaultFromEmail });
+       
     }
 }

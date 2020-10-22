@@ -1,6 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using Umbraco.Core.Composing;
+using Umbraco.Infrastructure.HealthCheck;
 
 namespace Umbraco.Web.HealthCheck.NotificationMethods
 {

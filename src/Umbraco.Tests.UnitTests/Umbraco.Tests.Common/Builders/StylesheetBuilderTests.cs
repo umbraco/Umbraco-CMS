@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using NUnit.Framework;
 using Umbraco.Core.Routing;
 using Umbraco.Tests.Common.Builders;
@@ -24,7 +25,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Tests.Common.Builders
                 .Build();
 
             // Assert
-            Assert.AreEqual("\\css\\styles.css", stylesheet.Path);
+            Assert.AreEqual(Path.DirectorySeparatorChar + Path.Combine("css", "styles.css"), stylesheet.Path);
             Assert.AreEqual(testContent, stylesheet.Content);
         }
     }

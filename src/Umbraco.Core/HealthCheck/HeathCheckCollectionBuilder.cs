@@ -1,6 +1,6 @@
 ﻿using Umbraco.Core.Composing;
 
-namespace Umbraco.Web.HealthCheck
+namespace Umbraco.Core.HealthCheck
 {
     public class HealthCheckCollectionBuilder : LazyCollectionBuilderBase<HealthCheckCollectionBuilder, HealthCheckCollection, HealthCheck>
     {

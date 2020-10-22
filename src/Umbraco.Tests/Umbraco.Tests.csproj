@@ -148,7 +148,6 @@
     <Compile Include="Scoping\ScopeEventDispatcherTests.cs" />
     <Compile Include="Security\OwinDataProtectorTokenProviderTests.cs" />
     <Compile Include="Persistence\Repositories\UserRepositoryTest.cs" />
-    <Compile Include="Services\ContentTypeServiceVariantsTests.cs" />
     <Compile Include="Services\TestWithSomeContentBase.cs" />
     <Compile Include="TestHelpers\Entities\MockedContent.cs" />
     <Compile Include="TestHelpers\Entities\MockedContentTypes.cs" />
@@ -232,9 +231,7 @@
     <Compile Include="Models\Collections\Item.cs" />
     <Compile Include="Models\Collections\OrderItem.cs" />
     <Compile Include="Models\Collections\SimpleOrder.cs" />
-    <Compile Include="Web\Mvc\RenderModelBinderTests.cs" />
     <Compile Include="Web\Mvc\SurfaceControllerTests.cs" />
-    <Compile Include="Web\Mvc\UmbracoViewPageTests.cs" />
     <Compile Include="Runtimes\CoreRuntimeTests.cs" />
     <Compile Include="Runtimes\WebRuntimeComponentTests.cs" />
     <Compile Include="Cache\ObjectAppCacheTests.cs" />
@@ -295,7 +292,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>ImportResources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Services\ThreadSafetyServiceTest.cs" />
     <Compile Include="Web\Controllers\PluginControllerAreaTests.cs" />
     <Compile Include="Cache\DistributedCache\DistributedCacheTests.cs" />
     <Compile Include="TestHelpers\TestWithDatabaseBase.cs" />

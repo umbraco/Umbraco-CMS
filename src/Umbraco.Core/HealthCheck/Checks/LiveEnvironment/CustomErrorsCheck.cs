@@ -1,24 +1,20 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
 using Umbraco.Core.Services;
 
-namespace Umbraco.Web.HealthCheck.Checks.Config
+namespace Umbraco.Core.HealthCheck.Checks.LiveEnvironment
 {
     [HealthCheck("4090C0A1-2C52-4124-92DD-F028FD066A64", "Custom Errors",
         Description = "Leaving custom errors off will display a complete stack trace to your visitors if an exception occurs.",
         Group = "Live Environment")]
-    public class CustomErrorsCheck : AbstractConfigCheck
+    public class CustomErrorsCheck : AbstractSettingsCheck
     {
-        public CustomErrorsCheck(ILocalizedTextService textService, IHostingEnvironment hostingEnvironment, ILoggerFactory loggerFactory)
-            : base(textService, hostingEnvironment, loggerFactory)
+        public CustomErrorsCheck(ILocalizedTextService textService, ILoggerFactory loggerFactory)
+            : base(textService, loggerFactory)
         { }
 
-        public override string FilePath => "~/Web.config";
-
-        public override string XPath => "/configuration/system.web/customErrors/@mode";
+        public override string ItemPath => Constants.Configuration.ConfigCustomErrorsMode;
 
         public override ValueComparisonType ValueComparisonType => ValueComparisonType.ShouldEqual;
 
@@ -27,6 +23,8 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
             new AcceptableConfiguration { IsRecommended = true, Value = "RemoteOnly" },
             new AcceptableConfiguration { IsRecommended = false, Value = "On" }
         };
+
+        public override string CurrentValue { get; }
 
         public override string CheckSuccessMessage
         {

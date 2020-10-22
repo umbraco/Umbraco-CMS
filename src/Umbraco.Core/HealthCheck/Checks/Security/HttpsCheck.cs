@@ -3,15 +3,14 @@ using System.Collections.Generic;
 using System.Net;
 using System.Security.Cryptography.X509Certificates;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.IO;
 using Umbraco.Core.Services;
-using Umbraco.Web.HealthCheck.Checks.Config;
 using Umbraco.Core.Configuration.Models;
 using Microsoft.Extensions.Options;
+using Umbraco.Core.Configuration.HealthChecks;
+using Umbraco.Core.IO;
+using Umbraco.Web;
 
-namespace Umbraco.Web.HealthCheck.Checks.Security
+namespace Umbraco.Core.HealthCheck.Checks.Security
 {
     [HealthCheck(
         "EB66BB3B-1BCD-4314-9531-9DA2C1D6D9A7",
@@ -21,22 +20,20 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
     public class HttpsCheck : HealthCheck
     {
         private readonly ILocalizedTextService _textService;
-        private readonly GlobalSettings _globalSettings;
-        private readonly IIOHelper _ioHelper;
+        private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
         private readonly IRequestAccessor _requestAccessor;
-        private readonly ILogger<ConfigurationService> _logger;
-
+        private readonly ILogger<HttpsCheck> _logger;
         private const string FixHttpsSettingAction = "fixHttpsSetting";
+        string itemPath => Constants.Configuration.ConfigGlobalUseHttps;
 
         public HttpsCheck(ILocalizedTextService textService,
-            IOptions<GlobalSettings> globalSettings,
+            IOptionsMonitor<GlobalSettings> globalSettings,
             IIOHelper ioHelper,
             IRequestAccessor requestAccessor,
-            ILogger<ConfigurationService> logger)
+            ILogger<HttpsCheck> logger)
         {
             _textService = textService;
-            _globalSettings = globalSettings.Value;
-            _ioHelper = ioHelper;
+            _globalSettings = globalSettings;
             _requestAccessor = requestAccessor;
             _logger = logger;
         }
@@ -75,7 +72,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
             // Attempt to access the site over HTTPS to see if it HTTPS is supported
             // and a valid certificate has been configured
             var url = _requestAccessor.GetApplicationUrl().ToString().Replace("http:", "https:");
-            var request = (HttpWebRequest) WebRequest.Create(url);
+            var request = (HttpWebRequest)WebRequest.Create(url);
             request.Method = "HEAD";
 
             try
@@ -119,8 +116,8 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
                 if (exception != null)
                 {
                     message = exception.Status == WebExceptionStatus.TrustFailure
-                        ? _textService.Localize("healthcheck/httpsCheckInvalidCertificate", new [] { exception.Message })
-                        : _textService.Localize("healthcheck/healthCheckInvalidUrl", new [] { url, exception.Message });
+                        ? _textService.Localize("healthcheck/httpsCheckInvalidCertificate", new[] { exception.Message })
+                        : _textService.Localize("healthcheck/healthCheckInvalidUrl", new[] { url, exception.Message });
                 }
                 else
                 {
@@ -132,33 +129,31 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
 
             var actions = new List<HealthCheckAction>();
 
-            return
-                new HealthCheckStatus(message)
-                {
-                    ResultType = result,
-                    Actions = actions
-                };
+            return new HealthCheckStatus(message)
+            {
+                ResultType = result,
+                Actions = actions
+            };
         }
 
         private HealthCheckStatus CheckIfCurrentSchemeIsHttps()
         {
-            var uri =  _requestAccessor.GetApplicationUrl();
+            var uri = _requestAccessor.GetApplicationUrl();
             var success = uri.Scheme == "https";
 
             var actions = new List<HealthCheckAction>();
 
-            return
-                new HealthCheckStatus(_textService.Localize("healthcheck/httpsCheckIsCurrentSchemeHttps", new[] { success ? string.Empty : "not" }))
-                {
-                    ResultType = success ? StatusResultType.Success : StatusResultType.Error,
-                    Actions = actions
-                };
+            return new HealthCheckStatus(_textService.Localize("healthcheck/httpsCheckIsCurrentSchemeHttps", new[] { success ? string.Empty : "not" }))
+            {
+                ResultType = success ? StatusResultType.Success : StatusResultType.Error,
+                Actions = actions
+            };
         }
 
         private HealthCheckStatus CheckHttpsConfigurationSetting()
         {
-            var httpsSettingEnabled = _globalSettings.UseHttps;
-            var uri =  _requestAccessor.GetApplicationUrl();
+            bool httpsSettingEnabled = _globalSettings.CurrentValue.UseHttps;
+            Uri uri = _requestAccessor.GetApplicationUrl();
             var actions = new List<HealthCheckAction>();
 
             string resultMessage;
@@ -171,46 +166,34 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
             else
             {
                 if (httpsSettingEnabled == false)
+                {
                     actions.Add(new HealthCheckAction(FixHttpsSettingAction, Id)
                     {
                         Name = _textService.Localize("healthcheck/httpsCheckEnableHttpsButton"),
                         Description = _textService.Localize("healthcheck/httpsCheckEnableHttpsDescription")
                     });
+                }
 
                 resultMessage = _textService.Localize("healthcheck/httpsCheckConfigurationCheckResult",
-                    new[] {httpsSettingEnabled.ToString(), httpsSettingEnabled ? string.Empty : "not"});
-                resultType = httpsSettingEnabled ? StatusResultType.Success: StatusResultType.Error;
+                    new[] { httpsSettingEnabled.ToString(), httpsSettingEnabled ? string.Empty : "not" });
+                resultType = httpsSettingEnabled ? StatusResultType.Success : StatusResultType.Error;
             }
 
-            return
-                new HealthCheckStatus(resultMessage)
-                {
-                    ResultType = resultType,
-                    Actions = actions
-                };
+            return new HealthCheckStatus(resultMessage)
+            {
+                ResultType = resultType,
+                Actions = actions
+            };
         }
 
         private HealthCheckStatus FixHttpsSetting()
         {
-            var configFile = _ioHelper.MapPath("~/Web.config");
-            const string xPath = "/configuration/appSettings/add[@key='Umbraco.Core.UseHttps']/@value";
-            var configurationService = new ConfigurationService(configFile, xPath, _textService, _logger);
-            var updateConfigFile = configurationService.UpdateConfigFile("true");
+            //TODO: return message instead of actual fix
 
-            if (updateConfigFile.Success)
+            return new HealthCheckStatus(_textService.Localize("healthcheck/httpsCheckEnableHttpsSuccess"))
             {
-                return
-                    new HealthCheckStatus(_textService.Localize("healthcheck/httpsCheckEnableHttpsSuccess"))
-                    {
-                        ResultType = StatusResultType.Success
-                    };
-            }
-
-            return
-                new HealthCheckStatus(_textService.Localize("healthcheck/httpsCheckEnableHttpsError", new [] { updateConfigFile.Result }))
-                {
-                    ResultType = StatusResultType.Error
-                };
+                ResultType = StatusResultType.Success
+            };
         }
     }
 }

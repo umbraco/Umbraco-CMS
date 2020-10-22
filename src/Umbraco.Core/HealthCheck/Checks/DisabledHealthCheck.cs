@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Umbraco.Core.Configuration.HealthChecks
+namespace Umbraco.Core.HealthCheck.Checks
 {
     public class DisabledHealthCheck
     {
