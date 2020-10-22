@@ -30,18 +30,14 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
                 $scope.tinyMceConfig.commands = _.map($scope.tinyMceConfig.commands,
                     function(obj) {
                         var fontIcon = getFontIcon(obj.alias);
-                        var isCustom = fontIcon.isCustom;
-
                         var iconName = fontIcon.name.startsWith("icon-") ? fontIcon.name : "icon-" + fontIcon.name;
 
                         var icon = data.some(e => e.name === iconName)
                             ? iconName
-                            : "mce-ico " + (isCustom ? "mce-i-custom " : "mce-i-") + fontIcon.name;
+                            : "mce-ico " + (fontIcon.isCustom ? "mce-i-custom " : "mce-i-") + fontIcon.name;
 
                         var objCmd = Utilities.extend(obj,
                             {
-                                fontIcon: icon.name,
-                                isCustom: icon.isCustom,
                                 selected: $scope.model.value.toolbar.indexOf(obj.alias) >= 0,
                                 icon: icon
                             });
