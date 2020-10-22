@@ -69,7 +69,9 @@ The prompt can be opened in four direction up, down, left or right.</p>
 
   function ConfirmAction() {
 
-    function link(scope, el, attr, ctrl) {
+    function link(scope) {
+
+        scope.useShow = scope.onDelete !== undefined;
 
         scope.clickButton = function (event) {
             if(scope.onDelete) {

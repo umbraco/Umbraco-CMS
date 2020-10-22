@@ -10,7 +10,7 @@
         '-right': direction === 'right',
         '-bottom': direction === 'bottom',
         '-left': direction === 'left'}"
-        on-outside-click="clickCancel()" ng-if="show !== false">
+        on-outside-click="clickCancel()" ng-if="useShow !== true || show === true">
 
         <button type="button" class="umb_confirm-action__overlay-action -confirm btn-reset" ng-click="clickConfirm()" localize="title" title="@buttons_confirmActionConfirm">
             <i class="icon-check" aria-hidden="true"></i>

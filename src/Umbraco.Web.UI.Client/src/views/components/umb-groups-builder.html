@@ -270,9 +270,8 @@
                                             <umb-icon icon="icon-trash" class="icon-trash"></umb-icon>
                                         </button>
                                         <umb-confirm-action
-                                            show="property.deletePrompt"
+                                            ng-if="property.deletePrompt"
                                             direction="left"
-                                            on-delete="togglePrompt(property)"
                                             on-confirm="deleteProperty(tab, $index)"
                                             on-cancel="hidePrompt(property)">
                                         </umb-confirm-action>
