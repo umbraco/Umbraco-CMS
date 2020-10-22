@@ -35,6 +35,9 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.ChangePasswordCont
       }
       if (!$scope.model.config || $scope.model.config.minPasswordLength === undefined) {
         $scope.model.config.minPasswordLength = 0;
+        }
+      if (!$scope.model.config || $scope.model.config.minNonAlphaNumericChars === undefined) {
+          $scope.model.config.minNonAlphaNumericChars = 0;
       }
 
       //set the model defaults
