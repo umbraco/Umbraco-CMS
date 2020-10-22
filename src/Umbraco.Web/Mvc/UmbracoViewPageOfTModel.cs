@@ -143,59 +143,7 @@ namespace Umbraco.Web.Mvc
             if (ViewContext.RouteData.DataTokens.ContainsKey(Constants.DataTokenCurrentViewContext) == false)
                 ViewContext.RouteData.DataTokens.Add(Constants.DataTokenCurrentViewContext, ViewContext);
         }
-
-        // maps model
-        protected override void SetViewData(ViewDataDictionary viewData)
-        {
-            // capture the model before we tinker with the viewData
-            var viewDataModel = viewData.Model;
-
-            // map the view data (may change its type, may set model to null)
-            viewData = MapViewDataDictionary(viewData, typeof (TModel));
-
-            // bind the model
-            viewData.Model = ContentModelBinder.BindModel(viewDataModel, typeof (TModel));
-
-            // set the view data
-            base.SetViewData(viewData);
-        }
-
-        // viewData is the ViewDataDictionary (maybe <TModel>) that we have
-        // modelType is the type of the model that we need to bind to
-        //
-        // figure out whether viewData can accept modelType else replace it
-        //
-        private static ViewDataDictionary MapViewDataDictionary(ViewDataDictionary viewData, Type modelType)
-        {
-            var viewDataType = viewData.GetType();
-
-            // if viewData is not generic then it is a simple ViewDataDictionary instance and its
-            // Model property is of type 'object' and will accept anything, so it is safe to use
-            // viewData
-            if (viewDataType.IsGenericType == false)
-                return viewData;
-
-            // ensure it is the proper generic type
-            var def = viewDataType.GetGenericTypeDefinition();
-            if (def != typeof(ViewDataDictionary<>))
-                throw new Exception("Could not map viewData of type \"" + viewDataType.FullName + "\".");
-
-            // get the viewData model type and compare with the actual view model type:
-            // viewData is ViewDataDictionary<viewDataModelType> and we will want to assign an
-            // object of type modelType to the Model property of type viewDataModelType, we
-            // need to check whether that is possible
-            var viewDataModelType = viewDataType.GenericTypeArguments[0];
-
-            if (viewDataModelType.IsAssignableFrom(modelType))
-                return viewData;
-
-            // if not possible then we need to create a new ViewDataDictionary
-            var nViewDataType = typeof(ViewDataDictionary<>).MakeGenericType(modelType);
-            var tViewData = new ViewDataDictionary(viewData) { Model = null }; // temp view data to copy values
-            var nViewData = (ViewDataDictionary)Activator.CreateInstance(nViewDataType, tViewData);
-            return nViewData;
-        }
-
+        
         /// <summary>
         /// This will detect the end /body tag and insert the preview badge if in preview mode
         /// </summary>

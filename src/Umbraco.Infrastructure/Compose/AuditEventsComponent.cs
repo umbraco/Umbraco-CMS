@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Text;
 using System.Threading;
+using Microsoft.Extensions.Options;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Events;
@@ -23,13 +24,13 @@ namespace Umbraco.Core.Compose
         private readonly IIpResolver _ipResolver;
         private readonly GlobalSettings _globalSettings;
 
-        public AuditEventsComponent(IAuditService auditService, IUserService userService, IEntityService entityService, IIpResolver ipResolver, GlobalSettings globalSettings)
+        public AuditEventsComponent(IAuditService auditService, IUserService userService, IEntityService entityService, IIpResolver ipResolver, IOptions<GlobalSettings> globalSettings)
         {
             _auditService = auditService;
             _userService = userService;
             _entityService = entityService;
             _ipResolver = ipResolver;
-            _globalSettings = globalSettings;
+            _globalSettings = globalSettings.Value;
         }
 
         public void Initialize()
