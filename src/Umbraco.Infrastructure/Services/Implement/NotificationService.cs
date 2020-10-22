@@ -3,7 +3,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Net.Mail;
 using System.Text;
 using System.Threading;
 using Microsoft.Extensions.Options;
@@ -179,7 +178,7 @@ namespace Umbraco.Core.Services.Implement
         /// <returns></returns>
         public IEnumerable<Notification> FilterUserNotificationsByPath(IEnumerable<Notification> userNotifications, string path)
         {
-            var pathParts = path.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries);
+            var pathParts = path.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
             return userNotifications.Where(r => pathParts.InvariantContains(r.EntityId.ToString(CultureInfo.InvariantCulture))).ToList();
         }
 
@@ -406,22 +405,19 @@ namespace Umbraco.Core.Services.Implement
                 summary.ToString());
 
             var fromMail = _contentSettings.Notifications.Email ?? _globalSettings.Smtp.From;
-            // create the mail message
-            var mail = new MailMessage(fromMail, fromMail);
 
-            // populate the message
+            var subject = createSubject((mailingUser, subjectVars));
+            var body = "";
+            var isBodyHtml = false;
 
-
-            mail.Subject = createSubject((mailingUser, subjectVars));
             if (_contentSettings.Notifications.DisableHtmlEmail)
             {
-                mail.IsBodyHtml = false;
-                mail.Body = createBody((user: mailingUser, body: bodyVars, false));
+                body = createBody((user: mailingUser, body: bodyVars, false));
             }
             else
             {
-                mail.IsBodyHtml = true;
-                mail.Body =
+                isBodyHtml = true;
+                body =
                     string.Concat(@"<html><head>
 </head>
 <body style='font-family: Trebuchet MS, arial, sans-serif; font-color: black;'>
@@ -430,13 +426,16 @@ namespace Umbraco.Core.Services.Implement
 
             // nh, issue 30724. Due to hardcoded http strings in resource files, we need to check for https replacements here
             // adding the server name to make sure we don't replace external links
-            if (_globalSettings.UseHttps && string.IsNullOrEmpty(mail.Body) == false)
+            if (_globalSettings.UseHttps && string.IsNullOrEmpty(body) == false)
             {
-                string serverName = siteUri.Host;
-                mail.Body = mail.Body.Replace(
-                    string.Format("http://{0}", serverName),
-                    string.Format("https://{0}", serverName));
+                var serverName = siteUri.Host;
+                body = body.Replace(
+                    $"http://{serverName}",
+                    $"https://{serverName}");
             }
+
+            // create the mail message
+            var mail = new EmailMessage(fromMail, mailingUser.Email, subject, body) {IsBodyHtml = isBodyHtml};
 
             return new NotificationRequest(mail, actionName, mailingUser.Name, mailingUser.Email);
         }
@@ -488,7 +487,7 @@ namespace Umbraco.Core.Services.Implement
 
         private class NotificationRequest
         {
-            public NotificationRequest(MailMessage mail, string action, string userName, string email)
+            public NotificationRequest(EmailMessage mail, string action, string userName, string email)
             {
                 Mail = mail;
                 Action = action;
@@ -496,13 +495,13 @@ namespace Umbraco.Core.Services.Implement
                 Email = email;
             }
 
-            public MailMessage Mail { get; private set; }
+            public EmailMessage Mail { get; }
 
-            public string Action { get; private set; }
+            public string Action { get; }
 
-            public string UserName { get; private set; }
+            public string UserName { get; }
 
-            public string Email { get; private set; }
+            public string Email { get; }
         }
 
         private void Process(BlockingCollection<NotificationRequest> notificationRequests)
@@ -523,10 +522,6 @@ namespace Umbraco.Core.Services.Implement
                         catch (Exception ex)
                         {
                             _logger.LogError(ex, "An error occurred sending notification");
-                        }
-                        finally
-                        {
-                            request.Mail.Dispose();
                         }
                     }
                     lock (Locker)

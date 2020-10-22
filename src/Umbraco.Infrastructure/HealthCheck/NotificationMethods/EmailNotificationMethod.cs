@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Net.Mail;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.HealthCheck;
+using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Infrastructure.HealthCheck;
 
@@ -72,20 +71,18 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
             var subject = _textService.Localize("healthcheck/scheduledHealthCheckEmailSubject", new[] { host.ToString() });
 
             var mailSender = new EmailSender(Options.Create(_globalSettings));
-            using (var mailMessage = CreateMailMessage(subject, message))
-            {
-                await mailSender.SendAsync(mailMessage);
-            }
+            var mailMessage = CreateMailMessage(subject, message);
+            await mailSender.SendAsync(mailMessage);
         }
 
-        private MailMessage CreateMailMessage(string subject, string message)
+        private EmailMessage CreateMailMessage(string subject, string message)
         {
             var to = _contentSettings.Notifications.Email;
 
             if (string.IsNullOrWhiteSpace(subject))
                 subject = "Umbraco Health Check Status";
 
-            return new MailMessage(to, RecipientEmail, subject, message)
+            return new EmailMessage(to, RecipientEmail, subject, message)
             {
                 IsBodyHtml = message.IsNullOrWhiteSpace() == false && message.Contains("<") && message.Contains("</")
             };
