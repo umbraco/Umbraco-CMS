@@ -95,10 +95,10 @@
                                    </div>
 
                                     <div class="cell-tools-remove row-tool">
-                                        <button class="icon-trash btn-reset" ng-click="togglePrompt(row)" type="button"></button>
                                         <umb-confirm-action
-                                            ng-if="row.deletePrompt"
+                                            show="row.deletePrompt"
                                             direction="left"
+                                            on-delete="togglePrompt(row)"
                                             on-confirm="removeRow(section, $index)"
                                             on-cancel="hidePrompt(row)">
                                         </umb-confirm-action>
@@ -209,9 +209,9 @@
                                                                           </div>
 
                                                                           <div class="umb-control-tool">
-                                                                              <button class="umb-control-tool-icon icon-trash btn-reset" ng-click="togglePrompt(control)" type="button"></button>
-                                                                              <umb-confirm-action ng-if="control.deletePrompt"
+                                                                              <umb-confirm-action show="control.deletePrompt"
                                                                                                   direction="left"
+                                                                                                  on-delete="togglePrompt(control)"
                                                                                                   on-confirm="removeControl(area, $index)"
                                                                                                   on-cancel="hidePrompt(control)">
                                                                               </umb-confirm-action>
