@@ -1,37 +1,36 @@
-﻿using System.Linq;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
-using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Persistence.Repositories.Implement;
-using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 using System;
+using Umbraco.Core.Hosting;
+using Umbraco.Tests.Integration.Testing;
 
-namespace Umbraco.Tests.Persistence.Repositories
+namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositories
 {
     [TestFixture]
-    [UmbracoTest(WithApplication = true, Database = UmbracoTestOptions.Database.NewEmptyPerFixture)]
-    public class PartialViewRepositoryTests : TestWithDatabaseBase
+    [UmbracoTest(Database = UmbracoTestOptions.Database.None)]
+    public class PartialViewRepositoryTests : UmbracoIntegrationTest
     {
+        private IHostingEnvironment HostingEnvironment => GetRequiredService<IHostingEnvironment>();
         private IFileSystem _fileSystem;
 
-        public override void SetUp()
+        [SetUp]
+        public void SetUp()
         {
-            base.SetUp();
-
             _fileSystem = new PhysicalFileSystem(IOHelper, HostingEnvironment, LoggerFactory.CreateLogger<PhysicalFileSystem>(), Constants.SystemDirectories.MvcViews + "/Partials/");
         }
 
-        protected override void Compose()
+        [TearDown]
+        public void TearDownFiles()
         {
-            base.Compose();
-
-            Composition.RegisterUnique(f => new DataEditorCollection(Enumerable.Empty<DataEditor>()));
+            //Delete all files
+            Purge((PhysicalFileSystem)_fileSystem, "");
+            _fileSystem = null;
         }
 
         [Test]
@@ -42,7 +41,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var fileSystems = Mock.Of<IFileSystems>();
             Mock.Get(fileSystems).Setup(x => x.PartialViewsFileSystem).Returns(_fileSystem);
 
-            var provider = TestObjects.GetScopeProvider(LoggerFactory);
+            var provider = ScopeProvider;
             using (var scope = provider.CreateScope())
             {
                 var repository = new PartialViewRepository(fileSystems, IOHelper);
@@ -101,15 +100,6 @@ namespace Umbraco.Tests.Persistence.Repositories
             }
         }
 
-        [TearDown]
-        public override void TearDown()
-        {
-            base.TearDown();
-
-            //Delete all files
-            Purge((PhysicalFileSystem)_fileSystem, "");
-            _fileSystem = null;
-        }
 
         private void Purge(PhysicalFileSystem fs, string path)
         {

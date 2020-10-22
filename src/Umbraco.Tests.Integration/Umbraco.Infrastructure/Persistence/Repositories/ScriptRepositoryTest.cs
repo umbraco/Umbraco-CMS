@@ -5,33 +5,29 @@ using System.Text;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Tests.Common.Builders;
-using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;
 
-namespace Umbraco.Tests.Persistence.Repositories
+namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositories
 {
     [TestFixture]
-    [UmbracoTest(WithApplication = true, Database = UmbracoTestOptions.Database.NewEmptyPerFixture)]
-    public class ScriptRepositoryTest : TestWithDatabaseBase
+    [UmbracoTest(Database = UmbracoTestOptions.Database.None)]
+    public class ScriptRepositoryTest : UmbracoIntegrationTest
     {
+        private IHostingEnvironment HostingEnvironment => GetRequiredService<IHostingEnvironment>();
+
         private IFileSystems _fileSystems;
         private IFileSystem _fileSystem;
 
-        public override void SetUp()
+        [SetUp]
+        public void SetUpFileSystem()
         {
-            base.SetUp();
-
             _fileSystems = Mock.Of<IFileSystems>();
             _fileSystem = new PhysicalFileSystem(IOHelper, HostingEnvironment, LoggerFactory.CreateLogger<PhysicalFileSystem>(), new GlobalSettings().UmbracoScriptsPath);
             Mock.Get(_fileSystems).Setup(x => x.ScriptsFileSystem).Returns(_fileSystem);
@@ -41,24 +37,25 @@ namespace Umbraco.Tests.Persistence.Repositories
             }
         }
 
+        [TearDown]
+        public void TearDownFileSystem()
+        {
+            //Delete all files
+            Purge(_fileSystems.ScriptsFileSystem, "");
+            _fileSystems = null;
+        }
+
         private IScriptRepository CreateRepository()
         {
             var globalSettings = new GlobalSettings();
             return new ScriptRepository(_fileSystems, IOHelper, Microsoft.Extensions.Options.Options.Create(globalSettings));
         }
 
-        protected override void Compose()
-        {
-            base.Compose();
-
-            Composition.RegisterUnique(f => new DataEditorCollection(Enumerable.Empty<DataEditor>()));
-        }
-
         [Test]
         public void Can_Instantiate_Repository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(LoggerFactory);
+            var provider = ScopeProvider;
             using (var scope = ScopeProvider.CreateScope())
             {
                 // Act
@@ -73,7 +70,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Add_On_ScriptRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(LoggerFactory);
+            var provider = ScopeProvider;
             using (var scope = ScopeProvider.CreateScope())
             {
                 var repository = CreateRepository();
@@ -92,7 +89,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Update_On_ScriptRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(LoggerFactory);
+            var provider = ScopeProvider;
             using (var scope = ScopeProvider.CreateScope())
             {
                 var repository = CreateRepository();
@@ -118,7 +115,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Delete_On_ScriptRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(LoggerFactory);
+            var provider = ScopeProvider;
             using (var scope = ScopeProvider.CreateScope())
             {
                 var repository = CreateRepository();
@@ -138,7 +135,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Get_On_ScriptRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(LoggerFactory);
+            var provider = ScopeProvider;
             using (var scope = ScopeProvider.CreateScope())
             {
                 var repository = CreateRepository();
@@ -157,7 +154,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetAll_On_ScriptRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(LoggerFactory);
+            var provider = ScopeProvider;
             using (var scope = ScopeProvider.CreateScope())
             {
                 var repository = CreateRepository();
@@ -185,7 +182,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetAll_With_Params_On_ScriptRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(LoggerFactory);
+            var provider = ScopeProvider;
             using (var scope = ScopeProvider.CreateScope())
             {
                 var repository = CreateRepository();
@@ -213,7 +210,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Exists_On_ScriptRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(LoggerFactory);
+            var provider = ScopeProvider;
             using (var scope = ScopeProvider.CreateScope())
             {
                 var repository = CreateRepository();
@@ -232,7 +229,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             const string content = "/// <reference name=\"MicrosoftAjax.js\"/>";
 
             // Arrange
-            var provider = TestObjects.GetScopeProvider(LoggerFactory);
+            var provider = ScopeProvider;
             using (var scope = ScopeProvider.CreateScope())
             {
                 var repository = CreateRepository();
@@ -265,7 +262,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // unless noted otherwise, no changes / 7.2.8
 
-            var provider = TestObjects.GetScopeProvider(LoggerFactory);
+            var provider = ScopeProvider;
             using (var scope = ScopeProvider.CreateScope())
             {
                 var repository = CreateRepository();
@@ -333,16 +330,6 @@ namespace Umbraco.Tests.Persistence.Repositories
                     script = repository.Get("../packages.config"); // outside the filesystem, exists
                 });
             }
-        }
-
-        [TearDown]
-        public override void TearDown()
-        {
-            base.TearDown();
-
-            //Delete all files
-            Purge(_fileSystems.ScriptsFileSystem, "");
-            _fileSystems = null;
         }
 
         private void Purge(IFileSystem fs, string path)
