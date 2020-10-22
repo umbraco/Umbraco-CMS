@@ -9,10 +9,10 @@ using Umbraco.Core.Persistence.Querying;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 
-namespace Umbraco.Tests.Persistence.NPocoTests
+namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Persistence.NPocoTests
 {
     [TestFixture]
-    public class NPocoSqlTests : BaseUsingSqlCeSyntax
+    public class NPocoSqlTests : BaseUsingSqlSyntax
     {
         [Test]
         public void Where_Clause_With_Starts_With_Additional_Parameters()

@@ -5,13 +5,12 @@ using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Tests.Testing;
 using static Umbraco.Core.Persistence.SqlExtensionsStatics;
 
-namespace Umbraco.Tests.Persistence.NPocoTests
+namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Persistence.NPocoTests
 {
     [TestFixture]
-    public class NPocoSqlExtensionsTests : BaseUsingSqlCeSyntax
+    public class NPocoSqlExtensionsTests : BaseUsingSqlSyntax
     {
         [Test]
         public void WhereTest()
