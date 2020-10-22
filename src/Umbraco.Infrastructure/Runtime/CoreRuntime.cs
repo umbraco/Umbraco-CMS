@@ -15,6 +15,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
+using Umbraco.Infrastructure.Composing;
 
 namespace Umbraco.Core.Runtime
 {
@@ -361,6 +362,10 @@ namespace Umbraco.Core.Runtime
             _components?.Terminate();
         }
 
+        public void ReplaceFactory(IServiceProvider serviceProvider)
+        {
+            _factory = ServiceProviderFactoryAdapter.Wrap(serviceProvider);
+        }
 
         #region Getters
 
