@@ -6,22 +6,14 @@ using Umbraco.Core;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Querying;
-using Umbraco.Tests.Integration.Testing;
+using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 
-namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.NPocoTests
+namespace Umbraco.Tests.Persistence.NPocoTests
 {
     [TestFixture]
-    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-    public class NPocoSqlTests : UmbracoIntegrationTest
+    public class NPocoSqlTests : BaseUsingSqlCeSyntax
     {
-        private ISqlContext SqlContext => GetRequiredService<ISqlContext>();
-
-        private Sql<ISqlContext> Sql()
-        {
-            return NPoco.Sql.BuilderFor(SqlContext);
-        }
-
         [Test]
         public void Where_Clause_With_Starts_With_Additional_Parameters()
         {

@@ -4,7 +4,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Tests.TestHelpers;
 
-namespace Umbraco.Tests.Persistence.Mappers
+namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Mappers
 {
     [TestFixture]
     public class ContentMapperTest

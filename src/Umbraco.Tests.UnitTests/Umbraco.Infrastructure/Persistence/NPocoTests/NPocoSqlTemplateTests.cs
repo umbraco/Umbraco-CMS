@@ -5,9 +5,9 @@ using NUnit.Framework;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core;
-using Umbraco.Persistance.SqlCe;
+using Umbraco.Core.Persistence.SqlSyntax;
 
-namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.NPocoTests
+namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Persistence.NPocoTests
 {
     [TestFixture]
     public class NPocoSqlTemplateTests
@@ -15,7 +15,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.NPocoTest
         [Test]
         public void SqlTemplates()
         {
-            var sqlContext = new SqlContext(new SqlCeSyntaxProvider(), DatabaseType.SQLCe, Mock.Of<IPocoDataFactory>());
+            var sqlContext = new SqlContext(new SqlServerSyntaxProvider(), DatabaseType.SqlServer2012, Mock.Of<IPocoDataFactory>());
             var sqlTemplates = new SqlTemplates(sqlContext);
 
             // this can be used for queries that we know we'll use a *lot* and
@@ -38,13 +38,13 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.NPocoTest
             var mappers = new NPoco.MapperCollection { new PocoMapper() };
             var factory = new FluentPocoDataFactory((type, iPocoDataFactory) => new PocoDataBuilder(type, mappers).Init());
 
-            var sqlContext = new SqlContext(new SqlCeSyntaxProvider(), DatabaseType.SQLCe, factory);
+            var sqlContext = new SqlContext(new SqlServerSyntaxProvider(), DatabaseType.SQLCe, factory);
             var sqlTemplates = new SqlTemplates(sqlContext);
 
             const string sqlBase = "SELECT [zbThing1].[id] AS [Id], [zbThing1].[name] AS [Name] FROM [zbThing1] WHERE ";
 
-            var template = sqlTemplates.Get("sql1", s => s.Select<NPocoFetchTests.Thing1Dto>().From<NPocoFetchTests.Thing1Dto>()
-                .Where<NPocoFetchTests.Thing1Dto>(x => x.Name == SqlTemplate.Arg<string>("value")));
+            var template = sqlTemplates.Get("sql1", s => s.Select<Thing1Dto>().From<Thing1Dto>()
+                .Where<Thing1Dto>(x => x.Name == SqlTemplate.Arg<string>("value")));
 
             var sql = template.Sql("foo");
             Assert.AreEqual(sqlBase + "(([zbThing1].[name] = @0))", sql.SQL.NoCrLf());
@@ -56,8 +56,8 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.NPocoTest
             Assert.AreEqual(1, sql.Arguments.Length);
             Assert.AreEqual(123, sql.Arguments[0]);
 
-            template = sqlTemplates.Get("sql2", s => s.Select<NPocoFetchTests.Thing1Dto>().From<NPocoFetchTests.Thing1Dto>()
-                .Where<NPocoFetchTests.Thing1Dto>(x => x.Name == SqlTemplate.Arg<string>("value")));
+            template = sqlTemplates.Get("sql2", s => s.Select<Thing1Dto>().From<Thing1Dto>()
+                .Where<Thing1Dto>(x => x.Name == SqlTemplate.Arg<string>("value")));
 
             sql = template.Sql(new { value = "foo" });
             Assert.AreEqual(sqlBase + "(([zbThing1].[name] = @0))", sql.SQL.NoCrLf());
@@ -74,8 +74,8 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.NPocoTest
 
             var i = 666;
 
-            template = sqlTemplates.Get("sql3", s => s.Select<NPocoFetchTests.Thing1Dto>().From<NPocoFetchTests.Thing1Dto>()
-                .Where<NPocoFetchTests.Thing1Dto>(x => x.Id == i));
+            template = sqlTemplates.Get("sql3", s => s.Select<Thing1Dto>().From<Thing1Dto>()
+                .Where<Thing1Dto>(x => x.Id == i));
 
             sql = template.Sql("foo");
             Assert.AreEqual(sqlBase + "(([zbThing1].[id] = @0))", sql.SQL.NoCrLf());
@@ -90,8 +90,8 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.NPocoTest
             // but we cannot name them, because the arg name is the value of "i"
             // so we have to explicitely create the argument
 
-            template = sqlTemplates.Get("sql4", s => s.Select<NPocoFetchTests.Thing1Dto>().From<NPocoFetchTests.Thing1Dto>()
-                .Where<NPocoFetchTests.Thing1Dto>(x => x.Id == SqlTemplate.Arg<int>("i")));
+            template = sqlTemplates.Get("sql4", s => s.Select<Thing1Dto>().From<Thing1Dto>()
+                .Where<Thing1Dto>(x => x.Id == SqlTemplate.Arg<int>("i")));
 
             sql = template.Sql("foo");
             Assert.AreEqual(sqlBase + "(([zbThing1].[id] = @0))", sql.SQL.NoCrLf());
@@ -120,17 +120,17 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.NPocoTest
 
             // now with more arguments
 
-            template = sqlTemplates.Get("sql4a", s => s.Select<NPocoFetchTests.Thing1Dto>().From<NPocoFetchTests.Thing1Dto>()
-                .Where<NPocoFetchTests.Thing1Dto>(x => x.Id == SqlTemplate.Arg<int>("i") && x.Name == SqlTemplate.Arg<string>("name")));
+            template = sqlTemplates.Get("sql4a", s => s.Select<Thing1Dto>().From<Thing1Dto>()
+                .Where<Thing1Dto>(x => x.Id == SqlTemplate.Arg<int>("i") && x.Name == SqlTemplate.Arg<string>("name")));
             sql = template.Sql(0, 1);
             Assert.AreEqual(sqlBase + "((([zbThing1].[id] = @0) AND ([zbThing1].[name] = @1)))", sql.SQL.NoCrLf());
             Assert.AreEqual(2, sql.Arguments.Length);
             Assert.AreEqual(0, sql.Arguments[0]);
             Assert.AreEqual(1, sql.Arguments[1]);
 
-            template = sqlTemplates.Get("sql4b", s => s.Select<NPocoFetchTests.Thing1Dto>().From<NPocoFetchTests.Thing1Dto>()
-                .Where<NPocoFetchTests.Thing1Dto>(x => x.Id == SqlTemplate.Arg<int>("i"))
-                .Where<NPocoFetchTests.Thing1Dto>(x => x.Name == SqlTemplate.Arg<string>("name")));
+            template = sqlTemplates.Get("sql4b", s => s.Select<Thing1Dto>().From<Thing1Dto>()
+                .Where<Thing1Dto>(x => x.Id == SqlTemplate.Arg<int>("i"))
+                .Where<Thing1Dto>(x => x.Name == SqlTemplate.Arg<string>("name")));
             sql = template.Sql(0, 1);
             Assert.AreEqual(sqlBase + "(([zbThing1].[id] = @0)) AND (([zbThing1].[name] = @1))", sql.SQL.NoCrLf());
             Assert.AreEqual(2, sql.Arguments.Length);
@@ -139,8 +139,8 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.NPocoTest
 
             // works, magic
 
-            template = sqlTemplates.Get("sql5", s => s.Select<NPocoFetchTests.Thing1Dto>().From<NPocoFetchTests.Thing1Dto>()
-                .WhereIn<NPocoFetchTests.Thing1Dto>(x => x.Id, SqlTemplate.ArgIn<int>("i")));
+            template = sqlTemplates.Get("sql5", s => s.Select<Thing1Dto>().From<Thing1Dto>()
+                .WhereIn<Thing1Dto>(x => x.Id, SqlTemplate.ArgIn<int>("i")));
 
             sql = template.Sql("foo");
             Assert.AreEqual(sqlBase + "([zbThing1].[id] IN (@0))", sql.SQL.NoCrLf());
@@ -154,9 +154,9 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.NPocoTest
             Assert.AreEqual(2, sql.Arguments[1]);
             Assert.AreEqual(3, sql.Arguments[2]);
 
-            template = sqlTemplates.Get("sql5a", s => s.Select<NPocoFetchTests.Thing1Dto>().From<NPocoFetchTests.Thing1Dto>()
-                .WhereIn<NPocoFetchTests.Thing1Dto>(x => x.Id, SqlTemplate.ArgIn<int>("i"))
-                .Where<NPocoFetchTests.Thing1Dto>(x => x.Name == SqlTemplate.Arg<string>("name")));
+            template = sqlTemplates.Get("sql5a", s => s.Select<Thing1Dto>().From<Thing1Dto>()
+                .WhereIn<Thing1Dto>(x => x.Id, SqlTemplate.ArgIn<int>("i"))
+                .Where<Thing1Dto>(x => x.Name == SqlTemplate.Arg<string>("name")));
 
             sql = template.Sql("foo", "bar");
             Assert.AreEqual(sqlBase + "([zbThing1].[id] IN (@0)) AND (([zbThing1].[name] = @1))", sql.SQL.NoCrLf());
@@ -178,7 +178,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.NPocoTest
 
             // more fun...
 
-            template = sqlTemplates.Get("sql6", s => s.Select<NPocoFetchTests.Thing1Dto>().From<NPocoFetchTests.Thing1Dto>()
+            template = sqlTemplates.Get("sql6", s => s.Select<Thing1Dto>().From<Thing1Dto>()
                 // do NOT do this, this is NOT a visited expression
                 //.Append(" AND whatever=@0", SqlTemplate.Arg<string>("j"))
 
@@ -199,6 +199,18 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.NPocoTest
             Assert.AreEqual(2, sql.Arguments[1]);
             Assert.AreEqual(3, sql.Arguments[2]);
             Assert.AreEqual("oops", sql.Arguments[3]);
+        }
+
+        [TableName("zbThing1")]
+        [PrimaryKey("id", AutoIncrement = false)]
+        [ExplicitColumns]
+        public class Thing1Dto
+        {
+            [Column("id")]
+            public int Id { get; set; }
+
+            [Column("name")]
+            public string Name { get; set; }
         }
     }
 }
