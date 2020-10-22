@@ -98,9 +98,13 @@ namespace Umbraco.Examine
 
                 if (content.Length > 0)
                 {
+                    var valueSets = _contentValueSetBuilder.GetValueSets(content).ToList();
+
                     // ReSharper disable once PossibleMultipleEnumeration
                     foreach (var index in indexes)
-                        index.IndexItems(_contentValueSetBuilder.GetValueSets(content));
+                    {
+                        index.IndexItems(valueSets);
+                    }
                 }
 
                 pageIndex++;
@@ -145,9 +149,11 @@ namespace Umbraco.Examine
                         }
                     }
 
+                    var valueSets = _contentValueSetBuilder.GetValueSets(indexableContent.ToArray()).ToList();
+
                     // ReSharper disable once PossibleMultipleEnumeration
                     foreach (var index in indexes)
-                        index.IndexItems(_contentValueSetBuilder.GetValueSets(indexableContent.ToArray()));
+                        index.IndexItems(valueSets);
                 }
 
                 pageIndex++;
