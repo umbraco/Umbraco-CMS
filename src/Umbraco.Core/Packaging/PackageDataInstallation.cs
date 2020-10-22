@@ -604,7 +604,8 @@ namespace Umbraco.Core.Packaging
             var defaultTemplateElement = infoElement.Element("DefaultTemplate");
 
             contentType.Name = infoElement.Element("Name").Value;
-            contentType.Key = new Guid(infoElement.Element("Key").Value);
+            if (infoElement.Element("Key") != null)
+                contentType.Key = new Guid(infoElement.Element("Key").Value);
             contentType.Icon = infoElement.Element("Icon").Value;
             contentType.Thumbnail = infoElement.Element("Thumbnail").Value;
             contentType.Description = infoElement.Element("Description").Value;
@@ -784,7 +785,6 @@ namespace Umbraco.Core.Packaging
                 var propertyType = new PropertyType(dataTypeDefinition, property.Element("Alias").Value)
                 {
                     Name = property.Element("Name").Value,
-                    Key = new Guid(property.Element("Key").Value),
                     Description = (string)property.Element("Description"),
                     Mandatory = property.Element("Mandatory") != null
                         ? property.Element("Mandatory").Value.ToLowerInvariant().Equals("true")
@@ -802,6 +802,8 @@ namespace Umbraco.Core.Packaging
                         ? (ContentVariation)Enum.Parse(typeof(ContentVariation), property.Element("Variations").Value)
                         : ContentVariation.Nothing
                 };
+                if (property.Element("Key") != null)
+                    propertyType.Key = new Guid(property.Element("Key").Value);
 
                 var tab = (string)property.Element("Tab");
                 if (string.IsNullOrEmpty(tab))
