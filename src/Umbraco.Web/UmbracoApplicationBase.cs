@@ -80,10 +80,7 @@ namespace Umbraco.Web
                 return new VoidProfiler();
             }
 
-            var webProfiler = new WebProfiler();
-            webProfiler.Start();
-
-            return webProfiler;
+            return new VoidProfiler();
         }
 
         protected UmbracoApplicationBase(ILogger<UmbracoApplicationBase> logger, ILoggerFactory loggerFactory, SecuritySettings securitySettings, GlobalSettings globalSettings, ConnectionStrings connectionStrings, IIOHelper ioHelper, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)

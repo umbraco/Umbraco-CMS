@@ -4,9 +4,9 @@ namespace Umbraco.Extensions
 {
     public static class UmbracoBuilderExtensions
     {
-        public static void BuildWithAllBackOfficeComponents(this IUmbracoBuilder builder)
+        public static IUmbracoBuilder WithAllBackOfficeComponents(this IUmbracoBuilder builder)
         {
-            builder
+            return builder
                 .WithConfiguration()
                 .WithCore()
                 .WithWebComponents()
@@ -16,8 +16,7 @@ namespace Umbraco.Extensions
                 .WithMiniProfiler()
                 .WithMvcAndRazor()
                 .WithWebServer()
-                .WithPreview()
-                .Build();
+                .WithPreview();
         }
 
         public static IUmbracoBuilder WithBackOffice(this IUmbracoBuilder builder)
