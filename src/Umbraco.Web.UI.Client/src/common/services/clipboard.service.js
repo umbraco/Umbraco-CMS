@@ -92,7 +92,7 @@ function clipboardService($window, notificationsService, eventsService, localSto
             // Store the string:
             localStorageService.set(STORAGE_KEY, storageString);
 
-            //eventsService.emit("clipboardService.storageUpdate");
+            eventsService.emit("clipboardService.storageUpdate");
 
             return true;
         } catch(e) {
@@ -454,12 +454,9 @@ function clipboardService($window, notificationsService, eventsService, localSto
 
 
 
-
-
+    // Fires if LocalStorage was changed from another tab than this one.
     $window.addEventListener("storage", localStorageChanged);
     function localStorageChanged() {
-        console.log("clipboardService.storageUpdate");
-        // TODO: Check if its the right value that was changed...
         eventsService.emit("clipboardService.storageUpdate");
     }
 
