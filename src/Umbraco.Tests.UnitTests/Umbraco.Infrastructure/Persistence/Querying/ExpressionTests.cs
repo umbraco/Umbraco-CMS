@@ -2,9 +2,7 @@
 using System.Diagnostics;
 using System.Linq.Expressions;
 using Moq;
-using NPoco;
 using NUnit.Framework;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence;
@@ -17,12 +15,11 @@ using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
-using Umbraco.Persistance.SqlCe;
 
-namespace Umbraco.Tests.Persistence.Querying
+namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Querying
 {
     [TestFixture]
-    public class ExpressionTests : BaseUsingSqlCeSyntax
+    public class ExpressionTests : BaseUsingSqlSyntax
     {
         [Test]
         public void Equals_Claus_With_Two_Entity_Values()
@@ -154,7 +151,7 @@ namespace Umbraco.Tests.Persistence.Querying
         [Test]
         public void Equals_Method_For_Value_Gets_Escaped()
         {
-            var sqlSyntax = new SqlCeSyntaxProvider();
+            var sqlSyntax = new SqlServerSyntaxProvider();
             Expression<Func<IUser, bool>> predicate = user => user.Username.Equals("hello@world.com");
             var modelToSqlExpressionHelper = new ModelToSqlExpressionVisitor<IUser>(SqlContext.SqlSyntax, Mappers);
             var result = modelToSqlExpressionHelper.Visit(predicate);

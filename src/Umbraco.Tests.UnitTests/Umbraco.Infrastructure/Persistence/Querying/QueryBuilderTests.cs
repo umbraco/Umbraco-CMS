@@ -7,10 +7,10 @@ using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Tests.TestHelpers;
 
-namespace Umbraco.Tests.Persistence.Querying
+namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Querying
 {
     [TestFixture]
-    public class QueryBuilderTests : BaseUsingSqlCeSyntax
+    public class QueryBuilderTests : BaseUsingSqlSyntax
     {
         [Test]
         public void Can_Build_StartsWith_Query_For_IContent()

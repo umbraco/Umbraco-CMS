@@ -255,11 +255,6 @@
     <Compile Include="Models\Collections\PropertyCollectionTests.cs" />
     <Compile Include="Models\MediaXmlTest.cs" />
     <Compile Include="Persistence\FaultHandling\ConnectionRetryTest.cs" />
-    <Compile Include="Persistence\Querying\ContentTypeRepositorySqlClausesTest.cs" />
-    <Compile Include="Persistence\Querying\DataTypeDefinitionRepositorySqlClausesTest.cs" />
-    <Compile Include="Persistence\Querying\ExpressionTests.cs" />
-    <Compile Include="Persistence\Querying\MediaRepositorySqlClausesTest.cs" />
-    <Compile Include="Persistence\Querying\MediaTypeRepositorySqlClausesTest.cs" />
     <Compile Include="Persistence\SchemaValidationTest.cs" />
     <Compile Include="Persistence\SyntaxProvider\SqlCeSyntaxProviderTests.cs" />
     <Compile Include="PublishedContent\PublishedContentDataTableTests.cs" />
@@ -269,7 +264,6 @@
     <Compile Include="Web\Mvc\HtmlHelperExtensionMethodsTests.cs" />
     <Compile Include="Persistence\SqlCeTableByTableTest.cs" />
     <Compile Include="Persistence\DatabaseContextTests.cs" />
-    <Compile Include="Persistence\Querying\QueryBuilderTests.cs" />
     <Compile Include="PublishedContent\PublishedContentMoreTests.cs" />
     <Compile Include="Cache\PublishedCache\PublishedContentCacheTests.cs" />
     <Compile Include="Routing\ContentFinderByAliasWithDomainsTests.cs" />

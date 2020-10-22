@@ -1,17 +1,15 @@
 ﻿using System;
 using System.Diagnostics;
-using NPoco;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Tests.TestHelpers;
 
-namespace Umbraco.Tests.Persistence.Querying
+namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Querying
 {
     [TestFixture]
-    public class ContentTypeRepositorySqlClausesTest : BaseUsingSqlCeSyntax
+    public class ContentTypeRepositorySqlClausesTest : BaseUsingSqlSyntax
     {
         [Test]
         public void Can_Verify_Base_Clause()

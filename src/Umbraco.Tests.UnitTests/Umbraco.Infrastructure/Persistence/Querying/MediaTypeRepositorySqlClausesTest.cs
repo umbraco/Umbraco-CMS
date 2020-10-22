@@ -7,10 +7,10 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Tests.TestHelpers;
 
-namespace Umbraco.Tests.Persistence.Querying
+namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Querying
 {
     [TestFixture]
-    public class MediaTypeRepositorySqlClausesTest : BaseUsingSqlCeSyntax
+    public class MediaTypeRepositorySqlClausesTest : BaseUsingSqlSyntax
     {
         [Test]
         public void Can_Verify_Base_Clause()
