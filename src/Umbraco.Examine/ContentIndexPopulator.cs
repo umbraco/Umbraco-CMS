@@ -4,6 +4,7 @@ using System.Linq;
 using Examine;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Blocks;
 using Umbraco.Core.Services;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
@@ -76,31 +77,89 @@ namespace Umbraco.Examine
             {
                 contentParentId = _parentId.Value;
             }
+
+            if (_publishedValuesOnly)
+            {
+                IndexPublishedContent(contentParentId, pageIndex, pageSize, indexes);
+            }
+            else
+            {
+                IndexAllContent(contentParentId, pageIndex, pageSize, indexes);
+            }
+        }
+
+        protected void IndexAllContent(int contentParentId, int pageIndex, int pageSize, IReadOnlyList<IIndex> indexes)
+        {
             IContent[] content;
 
             do
             {
-                if (!_publishedValuesOnly)
-                {
-                    content = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out _).ToArray();
-                }
-                else
-                {
-                    //add the published filter
-                    //note: We will filter for published variants in the validator
-                    content = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out _,
-                        _publishedQuery, Ordering.By("Path", Direction.Ascending)).ToArray();
-                }
+                content = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out _).ToArray();
 
                 if (content.Length > 0)
                 {
+                    var valueSets = _contentValueSetBuilder.GetValueSets(content).ToList();
+
                     // ReSharper disable once PossibleMultipleEnumeration
                     foreach (var index in indexes)
-                        index.IndexItems(_contentValueSetBuilder.GetValueSets(content));
+                    {
+                        index.IndexItems(valueSets);
+                    }
+                }
+
+                pageIndex++;
+            } while (content.Length == pageSize);
+        }
+
+        protected void IndexPublishedContent(int contentParentId, int pageIndex, int pageSize,
+            IReadOnlyList<IIndex> indexes)
+        {
+            IContent[] content;
+
+            var publishedPages = new HashSet<int>();
+
+            do
+            {
+                //add the published filter
+                //note: We will filter for published variants in the validator
+                content = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out _, _publishedQuery,
+                    Ordering.By("Path", Direction.Ascending)).ToArray();
+
+                
+                if (content.Length > 0)
+                {
+                    var indexableContent = new List<IContent>();
+
+                    foreach (var item in content)
+                    {
+                        if (item.Level == 1)
+                        {
+                            // first level pages are always published so no need to filter them
+                            indexableContent.Add(item);
+                            publishedPages.Add(item.Id);
+                        }
+                        else
+                        {
+                            if (publishedPages.Contains(item.ParentId))
+                            {
+                                // only index when parent is published
+                                publishedPages.Add(item.Id);
+                                indexableContent.Add(item);
+                            }
+                        }
+                    }
+
+                    var valueSets = _contentValueSetBuilder.GetValueSets(indexableContent.ToArray()).ToList();
+
+                    // ReSharper disable once PossibleMultipleEnumeration
+                    foreach (var index in indexes)
+                        index.IndexItems(valueSets);
                 }
 
                 pageIndex++;
             } while (content.Length == pageSize);
         }
     }
+
+
 }
