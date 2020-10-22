@@ -68,18 +68,18 @@
 
                                 <!-- Save Search & Clear Search icon buttons -->
                                 <button type="button" class="btn-reset save-search" ng-show="vm.checkForSavedSearch()" ng-click="vm.addToSavedSearches()">
-                                    <umb-icon icon="icon-rate" class="icon-rate"></umb-icon>
+                                    <umb-icon icon="icon-rate"></umb-icon>
                                     <localize class="sr-only" key="logViewer_saveSearch">Save Search</localize>
                                 </button>
                                 <button type="button" class="btn-reset filter-search" ng-show="vm.logOptions.filterExpression" ng-click="vm.resetSearch()">
-                                    <umb-icon icon="icon-wrong" class="icon-wrong"></umb-icon>
+                                    <umb-icon icon="icon-wrong"></umb-icon>
                                     <localize class="sr-only" key="logViewer_filterSearch">Filter Search</localize>
                                 </button>
 
                                 <!-- Saved Searches -->
                                 <button type="button" class="umb-variant-switcher__toggle" ng-click="vm.dropdownOpen = !vm.dropdownOpen">
                                     <localize key="logViewer_savedSearches">Saved Searches</localize>
-                                    <umb-icon icon="{{vm.dropdownOpen ? 'icon-navigation-up' : 'icon-navigation-down'}}" class="umb-variant-switcher__expand {{vm.dropdownOpen ? 'icon-navigation-up' : 'icon-navigation-down'}}"></umb-icon>
+                                    <umb-icon icon="{{vm.dropdownOpen ? 'icon-navigation-up' : 'icon-navigation-down'}}" class="umb-variant-switcher__expand"></umb-icon>
                                 </button>
 
                                 <!-- Saved Searches Dropdown -->
@@ -90,7 +90,7 @@
                                             <span>{{search.query}}</span>
                                         </button>
                                         <button type="button" class="btn-reset" style="width: auto;" ng-click="vm.deleteSavedSearch(search)" localize="title" title="@logViewer_deleteThisSearch">
-                                            <umb-icon icon="icon-trash" class="icon-trash text-error"></umb-icon>
+                                            <umb-icon icon="icon-trash" class="text-error"></umb-icon>
                                         </button>
                                     </umb-dropdown-item>
                                 </umb-dropdown>
@@ -133,7 +133,7 @@
                             <tr>
                                 <th ng-click="vm.toggleOrderBy()">
                                     <localize key="logViewer_timestamp">Timestamp</localize>
-                                    <umb-icon icon="{{vm.logOptions.orderDirection === 'Descending' ? 'icon-navigation-down' : 'icon-navigation-up'}}" class="icon-navigation-down" ng-class="{'icon-navigation-down': vm.logOptions.orderDirection === 'Descending', 'icon-navigation-up': vm.logOptions.orderDirection !== 'Descending'}">&nbsp;</umb-icon>
+                                    <umb-icon icon="{{vm.logOptions.orderDirection === 'Descending' ? 'icon-navigation-down' : 'icon-navigation-up'}}">&nbsp;</umb-icon>
                                 </th>
                                 <th><localize key="logViewer_level">Level</localize></th>
                                 <th><localize key="logViewer_machine">Machine</localize></th>
@@ -187,7 +187,7 @@
                                                     aria-haspopup="true"
                                                     aria-expanded="{{log.searchDropdownOpen === undefined ? false : log.searchDropdownOpen}}"
                                                     ng-click="log.searchDropdownOpen = !log.searchDropdownOpen">
-                                                <umb-icon icon="icon-search" class="icon-search"></umb-icon>
+                                                <umb-icon icon="icon-search"></umb-icon>
                                                 <localize key="general_search">Search</localize>
                                                 <span class="caret" aria-hidden="true"></span>
                                             </button>
