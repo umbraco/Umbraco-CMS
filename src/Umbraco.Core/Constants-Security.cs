@@ -55,6 +55,8 @@
             public const string SessionIdClaimType = "http://umbraco.org/2015/02/identity/claims/backoffice/sessionid";
             public const string TicketExpiresClaimType = "http://umbraco.org/2020/06/identity/claims/backoffice/ticketexpires";
 
+            public const string BackOfficeExternalLoginOptionsProperty = "UmbracoBackOfficeExternalLoginOptions";
+
             /// <summary>
             /// The claim type for the ASP.NET Identity security stamp
             /// </summary>

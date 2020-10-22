@@ -15,6 +15,7 @@ using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
 {
+
     /// <summary>
     /// Tests covering the EntityService
     /// </summary>

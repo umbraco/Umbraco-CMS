@@ -112,7 +112,7 @@
 
     <script>
         document.angularReady = function(app) {
-            @await Html.AngularValueExternalLoginInfoScriptAsync(signInManager, ViewData.GetExternalSignInError())
+            @await Html.AngularValueExternalLoginInfoScriptAsync(signInManager, ViewData.GetExternalSignInProviderErrors())
             @Html.AngularValueResetPasswordCodeInfoScript(ViewData[ViewDataExtensions.TokenPasswordResetCode])
             @await Html.AngularValueTinyMceAssetsAsync(runtimeMinifier)
 

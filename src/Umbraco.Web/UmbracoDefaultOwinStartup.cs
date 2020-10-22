@@ -8,7 +8,6 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
 using Umbraco.Core.Mapping;
 using Umbraco.Net;
 using Umbraco.Core.Services;
@@ -76,6 +75,9 @@ namespace Umbraco.Web
             // Configure OWIN for authentication.
             ConfigureUmbracoAuthentication(app);
 
+            // must come after all authentication
+            app.UseUmbracoBackOfficeExternalLoginErrors();
+
             app
                 .UseSignalR(GlobalSettings, HostingEnvironment)
                 .FinalizeMiddlewareConfiguration();
@@ -91,6 +93,7 @@ namespace Umbraco.Web
             // Front-end OWIN cookie configuration must be declared after this code.
             app
                 .UseUmbracoBackOfficeExternalCookieAuthentication(UmbracoContextAccessor, RuntimeState, GlobalSettings, HostingEnvironment, RequestCache, PipelineStage.Authenticate);
+                // TODO: this would be considered a breaking change but this must come after all authentication so should be moved within ConfigureMiddleware
         }
 
         public static event EventHandler<OwinMiddlewareConfiguredEventArgs> MiddlewareConfigured;

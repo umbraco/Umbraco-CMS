@@ -1850,7 +1850,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="administrators">Administrator</key>
     <key alias="categoryField">Category field</key>
     <key alias="createDate">User created</key>
-    <key alias="changePassword">Change Your Password</key>
+    <key alias="changePassword">Change your password</key>
     <key alias="changePhoto">Change photo</key>
     <key alias="newPassword">New password</key>
     <key alias="noLockouts">hasn't been locked out</key>
@@ -2496,6 +2496,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="blockHasChanges">You have made changes to this content. Are you sure you want to discard them?</key>
     <key alias="confirmCancelBlockCreationHeadline">Discard creation?</key>
     <key alias="confirmCancelBlockCreationMessage"><![CDATA[Are you sure you want to cancel the creation.]]></key>
+    <key alias="elementTypeDoesNotExistHeadline">Error!</key>
+    <key alias="elementTypeDoesNotExistDescription">The ElementType of this block does not exist anymore</key>
   </area>
   <area alias="contentTemplatesDashboard">
     <key alias="whatHeadline">What are Content Templates?</key>

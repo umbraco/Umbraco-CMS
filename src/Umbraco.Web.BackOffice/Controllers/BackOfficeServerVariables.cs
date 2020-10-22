@@ -1,4 +1,4 @@
-﻿﻿using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -22,6 +22,7 @@ using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Features;
 using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Web.Security;
 using Umbraco.Web.Trees;
 
 namespace Umbraco.Web.BackOffice.Controllers

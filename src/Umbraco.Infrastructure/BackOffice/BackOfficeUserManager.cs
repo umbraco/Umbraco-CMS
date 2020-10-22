@@ -391,6 +391,12 @@ namespace Umbraco.Core.BackOffice
         public void RaiseInvalidLoginAttemptEvent(IPrincipal currentUser, string username) => OnLoginFailed(CreateArgs(AuditEvent.LoginFailed, currentUser, Constants.Security.SuperUserId, username));
 
         public void RaiseLoginRequiresVerificationEvent(IPrincipal currentUser, int userId) => OnLoginRequiresVerification(CreateArgs(AuditEvent.LoginRequiresVerification, currentUser, userId, string.Empty));
+        internal SignOutAuditEventArgs RaiseLogoutSuccessEvent(int userId)
+        {
+            var args = new SignOutAuditEventArgs(AuditEvent.LogoutSuccess, IpResolver.GetCurrentRequestIpAddress(), affectedUser: userId);
+            OnLogoutSuccess(args);
+            return args;
+        }
 
         public void RaiseLoginSuccessEvent(BackOfficeIdentityUser currentUser, int userId) => OnLoginSuccess(CreateArgs(AuditEvent.LoginSucces, currentUser, userId, string.Empty));
 
@@ -400,6 +406,10 @@ namespace Umbraco.Core.BackOffice
 
         public void RaiseResetAccessFailedCountEvent(IPrincipal currentUser, int userId) => OnResetAccessFailedCount(CreateArgs(AuditEvent.ResetAccessFailedCount, currentUser, userId, string.Empty));
 
+        internal void RaiseSendingUserInvite(UserInviteEventArgs args) => OnSendingUserInvite(args);
+        internal bool HasSendingUserInviteEventHandler => SendingUserInvite != null;
+
+        // TODO: Not sure why these are not strongly typed events?? They should be in netcore!
         public static event EventHandler AccountLocked;
         public static event EventHandler AccountUnlocked;
         public static event EventHandler ForgotPasswordRequested;
@@ -412,8 +422,13 @@ namespace Umbraco.Core.BackOffice
         public static event EventHandler PasswordReset;
         public static event EventHandler ResetAccessFailedCount;
 
+        /// <summary>
+        /// Raised when a user is invited
+        /// </summary>
+        public static event EventHandler SendingUserInvite; // this event really has nothing to do with the user manager but was the most convenient place to put it
         protected virtual void OnAccountLocked(IdentityAuditEventArgs e) => AccountLocked?.Invoke(this, e);
 
+        protected virtual void OnSendingUserInvite(UserInviteEventArgs e) => SendingUserInvite?.Invoke(this, e);
         protected virtual void OnAccountUnlocked(IdentityAuditEventArgs e) => AccountUnlocked?.Invoke(this, e);
 
         protected virtual void OnForgotPasswordRequested(IdentityAuditEventArgs e) => ForgotPasswordRequested?.Invoke(this, e);

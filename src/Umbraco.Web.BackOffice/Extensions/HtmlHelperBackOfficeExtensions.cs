@@ -18,6 +18,7 @@ using Umbraco.Web.Features;
 using Umbraco.Web.Models;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebAssets;
+using Umbraco.Core;
 
 namespace Umbraco.Extensions
 {
@@ -63,6 +64,7 @@ namespace Umbraco.Extensions
         /// <param name="signInManager"></param>
         /// <returns></returns>
         public static async Task<IHtmlContent> AngularValueExternalLoginInfoScriptAsync(this IHtmlHelper html,
+            BackOfficeExternalLoginProviderErrors externalLoginErrors,
             BackOfficeSignInManager signInManager,
             IEnumerable<string> externalLoginErrors)
         {
@@ -89,19 +91,27 @@ namespace Umbraco.Extensions
 
             if (externalLoginErrors != null)
             {
-                foreach (var error in externalLoginErrors)
+                foreach (var error in externalLoginErrors.Errors)
                 {
-                    sb.AppendFormat(@"errors.push(""{0}"");", error).AppendLine();
+                    sb.AppendFormat(@"errors.push(""{0}"");", error.ToSingleLine()).AppendLine();
                 }
             }
 
             sb.AppendLine(@"app.value(""externalLoginInfo"", {");
+            if (externalLoginErrors?.AuthenticationType != null)
+                sb.AppendLine($@"errorProvider: '{externalLoginErrors.AuthenticationType}',");
             sb.AppendLine(@"errors: errors,");
             sb.Append(@"providers: ");
             sb.AppendLine(JsonConvert.SerializeObject(loginProviders));
             sb.AppendLine(@"});");
 
             return html.Raw(sb.ToString());
+        }
+
+        [Obsolete("Use the other overload instead")]
+        public static IHtmlString AngularValueExternalLoginInfoScript(this HtmlHelper html, IEnumerable<string> externalLoginErrors)
+        {
+            return html.AngularValueExternalLoginInfoScript(new BackOfficeExternalLoginProviderErrors(string.Empty, externalLoginErrors));
         }
 
         /// <summary>

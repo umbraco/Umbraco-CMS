@@ -75,6 +75,23 @@ namespace Umbraco.Web.Security
             return app;
         }
 
+            app.UseStageMarker(stage);
+            return app;
+        }
+
+        /// <summary>
+        /// Enable the back office to detect and handle errors registered with external login providers
+        /// </summary>
+        /// <param name="app"></param>
+        /// <param name="stage"></param>
+        /// <returns></returns>
+        public static IAppBuilder UseUmbracoBackOfficeExternalLoginErrors(this IAppBuilder app, PipelineStage stage = PipelineStage.Authorize)
+        {
+            app.Use(typeof(BackOfficeExternalLoginProviderErrorMiddlware));
+            app.UseStageMarker(stage);
+            return app;
+        }
+
         public static void SanitizeThreadCulture(this IAppBuilder app)
         {
             Thread.CurrentThread.SanitizeThreadCulture();

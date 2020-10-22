@@ -1861,6 +1861,8 @@ Mange hilsner fra Umbraco robotten
     <key alias="blockHasChanges">Du har lavet ændringer til dette indhold. Er du sikker på at du vil kassere dem?</key>
     <key alias="confirmCancelBlockCreationHeadline">Annuller oprettelse?</key>
     <key alias="confirmCancelBlockCreationMessage"><![CDATA[Er du sikker på at du vil annullere oprettelsen.]]></key>
+    <key alias="elementTypeDoesNotExistHeadline">Error!</key>
+    <key alias="elementTypeDoesNotExistDescription">The ElementType of this block does not exist anymore</key>
   </area>
 
 </language>

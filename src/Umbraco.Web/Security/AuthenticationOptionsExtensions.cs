@@ -13,55 +13,61 @@ namespace Umbraco.Web.Security
     public static class AuthenticationOptionsExtensions
     {
         // TODO: Migrate this!
+        // these are used for backwards compat
+        private const string ExternalSignInAutoLinkOptionsProperty = "ExternalSignInAutoLinkOptions";
+        private const string ChallengeResultCallbackProperty = "ChallengeResultCallback";
 
-        ///// <summary>
-        ///// When trying to implement an Azure AD B2C provider or other OAuth provider that requires a customized Challenge Result in order to work then
-        ///// this must be used.
-        ///// </summary>
-        ///// <param name="authOptions"></param>
-        ///// <param name="authProperties"></param>
-        ///// <remarks>
-        ///// See: http://issues.umbraco.org/issue/U4-7353
-        ///// </remarks>
-        //public static void SetSignInChallengeResultCallback(
-        //    this AuthenticationOptions authOptions,
-        //    Func<IOwinContext, AuthenticationProperties> authProperties)
-        //{
-        //    authOptions.Description.Properties["ChallengeResultCallback"] = authProperties;
-        //}
+        /// <summary>
+        /// Used to specify all back office external login options
+        /// </summary>
+        /// <param name="authOptions"></param>
+        /// <param name="externalLoginProviderOptions"></param>
+        public static void SetBackOfficeExternalLoginProviderOptions(this AuthenticationOptions authOptions,
+            BackOfficeExternalLoginProviderOptions externalLoginProviderOptions)
+        {
+            authOptions.Description.Properties[Constants.Security.BackOfficeExternalLoginOptionsProperty] = externalLoginProviderOptions;
 
-        //public static AuthenticationProperties GetSignInChallengeResult(this AuthenticationDescription authenticationDescription, IOwinContext ctx)
-        //{
-        //    if (authenticationDescription.Properties.ContainsKey("ChallengeResultCallback") == false) return null;
-        //    var cb = authenticationDescription.Properties["ChallengeResultCallback"] as Func<IOwinContext, AuthenticationProperties>;
-        //    if (cb == null) return null;
-        //    return cb(ctx);
-        //}
+            // for backwards compat, we need to add these:
+            if (externalLoginProviderOptions.AutoLinkOptions != null)
+                authOptions.Description.Properties[ExternalSignInAutoLinkOptionsProperty] = externalLoginProviderOptions.AutoLinkOptions;
+            if (externalLoginProviderOptions.OnChallenge != null)
+                authOptions.Description.Properties[ChallengeResultCallbackProperty] = externalLoginProviderOptions.OnChallenge;
+        }
 
-        ///// <summary>
-        ///// Used during the External authentication process to assign external sign-in options
-        ///// that are used by the Umbraco authentication process.
-        ///// </summary>
-        ///// <param name="authOptions"></param>
-        ///// <param name="options"></param>
-        //public static void SetExternalSignInAutoLinkOptions(
-        //    this AuthenticationOptions authOptions,
-        //    ExternalSignInAutoLinkOptions options)
-        //{
-        //    authOptions.Description.Properties["ExternalSignInAutoLinkOptions"] = options;
-        //}
+        [Obsolete("Use SetBackOfficeExternalLoginProviderOptions instead")]
+        public static void SetSignInChallengeResultCallback(
+            this AuthenticationOptions authOptions,
+            Func<IOwinContext, AuthenticationProperties> authProperties)
+        {
+            authOptions.Description.Properties[ChallengeResultCallbackProperty] = authProperties;
+        }
 
-        ///// <summary>
-        ///// Used during the External authentication process to retrieve external sign-in options
-        ///// that have been set with SetExternalAuthenticationOptions
-        ///// </summary>
-        ///// <param name="authenticationDescription"></param>
-        //public static ExternalSignInAutoLinkOptions GetExternalAuthenticationOptions(this AuthenticationDescription authenticationDescription)
-        //{
-        //    if (authenticationDescription.Properties.ContainsKey("ExternalSignInAutoLinkOptions") == false) return null;
-        //    var options = authenticationDescription.Properties["ExternalSignInAutoLinkOptions"] as ExternalSignInAutoLinkOptions;
-        //    return options;
-        //}
+        public static AuthenticationProperties GetSignInChallengeResult(this AuthenticationDescription authenticationDescription, IOwinContext ctx)
+        {
+            if (authenticationDescription.Properties.ContainsKey(ChallengeResultCallbackProperty) == false) return null;
+            var cb = authenticationDescription.Properties[ChallengeResultCallbackProperty] as Func<IOwinContext, AuthenticationProperties>;
+            if (cb == null) return null;
+            return cb(ctx);
+        }
+
+        [Obsolete("Use SetBackOfficeExternalLoginProviderOptions instead")]
+        public static void SetExternalSignInAutoLinkOptions(
+            this AuthenticationOptions authOptions,
+            ExternalSignInAutoLinkOptions options)
+        {
+            authOptions.Description.Properties[ExternalSignInAutoLinkOptionsProperty] = options;
+        }
+
+        [Obsolete("Use GetExternalSignInAutoLinkOptions instead")]
+        public static ExternalSignInAutoLinkOptions GetExternalAuthenticationOptions(this AuthenticationDescription authenticationDescription)
+            => authenticationDescription.GetExternalSignInAutoLinkOptions();
+
+        public static ExternalSignInAutoLinkOptions GetExternalSignInAutoLinkOptions(this AuthenticationDescription authenticationDescription)
+        {
+            if (authenticationDescription.Properties.ContainsKey(ExternalSignInAutoLinkOptionsProperty) == false) return null;
+            var options = authenticationDescription.Properties[ExternalSignInAutoLinkOptionsProperty] as ExternalSignInAutoLinkOptions;
+            return options;
+        }
 
         ///// <summary>
         ///// Configures the properties of the authentication description instance for use with Umbraco back office
@@ -92,7 +98,7 @@ namespace Umbraco.Web.Security
         //    options.Description.Properties["SocialIcon"] = icon;
 
         //    //flag for use in back office
-        //    options.Description.Properties["UmbracoBackOffice"] = true;
+        //    options.Description.Properties[Constants.Security.BackOfficeAuthenticationType] = true;
 
         //    if (callbackPath.IsNullOrWhiteSpace())
         //    {
