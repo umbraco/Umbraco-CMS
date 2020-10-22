@@ -1,109 +1,61 @@
 ﻿using System;
-using System.IO;
-using System.Xml;
 using Microsoft.Extensions.Logging;
+using Umbraco.Core.HealthCheck;
 using Umbraco.Core.Services;
 
-namespace Umbraco.Web.HealthCheck.Checks.Config
+namespace Umbraco.Core.Configuration.HealthChecks
 {
-    // TODO: Add config transform for when config with specified XPath is not found
-
-    public class ConfigurationService
+    public class ConfigurationService : IConfigurationService
     {
-        private readonly string _configFilePath;
-        private readonly string _xPath;
         private readonly ILocalizedTextService _textService;
         private readonly ILogger<ConfigurationService> _logger;
+        private readonly IConfigManipulator _configManipulator;
 
-        /// <param name="configFilePath">The absolute file location of the configuration file</param>
-        /// <param name="xPath">The XPath to select the value</param>
         /// <param name="textService"></param>
         /// <param name="logger"></param>
+        /// <param name="configManipulator"></param>
         /// <returns></returns>
-        public ConfigurationService(string configFilePath, string xPath, ILocalizedTextService textService, ILogger<ConfigurationService> logger)
+        public ConfigurationService(ILocalizedTextService textService, ILogger<ConfigurationService> logger, IConfigManipulator configManipulator)
         {
-            _configFilePath = configFilePath;
-            _xPath = xPath;
+            if (textService == null) HandleNullParameter(nameof(textService));
+            if (configManipulator == null) HandleNullParameter(nameof(configManipulator));
+            if (logger == null) HandleNullParameter(nameof(logger));
+
+            _configManipulator = configManipulator;
             _textService = textService;
             _logger = logger;
         }
 
-        /// <summary>
-        /// Gets a value from a given configuration file with the given XPath
-        /// </summary>
-        public ConfigurationServiceResult GetConfigurationValue()
+        private void HandleNullParameter(string parameter)
         {
-            try
-            {
-                if (File.Exists(_configFilePath) == false)
-                    return new ConfigurationServiceResult
-                    {
-                        Success = false,
-                        Result = _textService.Localize("healthcheck/configurationServiceFileNotFound", new[] { _configFilePath })
-                    };
-
-                var xmlDocument = new XmlDocument();
-                xmlDocument.Load(_configFilePath);
-
-                var xmlNode = xmlDocument.SelectSingleNode(_xPath);
-                if (xmlNode == null)
-                    return new ConfigurationServiceResult
-                    {
-                        Success = false,
-                        Result = _textService.Localize("healthcheck/configurationServiceNodeNotFound", new[] { _xPath, _configFilePath })
-                    };
-
-                return new ConfigurationServiceResult
-                {
-                    Success = true,
-                    Result = string.Format(xmlNode.Value ?? xmlNode.InnerText)
-                };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error trying to get configuration value");
-                return new ConfigurationServiceResult
-                {
-                    Success = false,
-                    Result = _textService.Localize("healthcheck/configurationServiceError", new[] { ex.Message })
-                };
-            }
+            _logger.LogError("Error trying to get configuration value", parameter);
+            throw new ArgumentNullException(parameter);
         }
 
         /// <summary>
-        /// Updates a value in a given configuration file with the given XPath
+        /// Updates a value in a given configuration file with the given path
         /// </summary>
         /// <param name="value"></param>
+        /// <param name="itemPath"></param>
         /// <returns></returns>
-        public ConfigurationServiceResult UpdateConfigFile(string value)
+        public ConfigurationServiceResult UpdateConfigFile(string value, string itemPath)
         {
             try
             {
-                if (File.Exists(_configFilePath) == false)
+                if (itemPath == null)
+                {
                     return new ConfigurationServiceResult
                     {
                         Success = false,
-                        Result = _textService.Localize("healthcheck/configurationServiceFileNotFound", new[] { _configFilePath })
+                        Result = _textService.Localize("healthcheck/configurationServiceNodeNotFound", new[] { itemPath, value })
                     };
+                }
 
-                var xmlDocument = new XmlDocument { PreserveWhitespace = true };
-                xmlDocument.Load(_configFilePath);
-
-                var node = xmlDocument.SelectSingleNode(_xPath);
-                if (node == null)
-                    return new ConfigurationServiceResult
-                    {
-                        Success = false,
-                        Result = _textService.Localize("healthcheck/configurationServiceNodeNotFound", new[] { _xPath, _configFilePath })
-                    };
-
-                if (node.NodeType == XmlNodeType.Element)
-                    node.InnerText = value;
-                else
-                    node.Value = value;
-
-                xmlDocument.Save(_configFilePath);
-                return new ConfigurationServiceResult { Success = true };
+                _configManipulator.SaveConfigValue(itemPath, value);
+                return new ConfigurationServiceResult
+                {
+                    Success = true
+                };
             }
             catch (Exception ex)
             {

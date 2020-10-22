@@ -10,6 +10,7 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.HealthCheck;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Templates;
@@ -166,9 +167,6 @@ namespace Umbraco.Web.Composing
         internal static SurfaceControllerTypeCollection SurfaceControllerTypes
             => Factory.GetInstance<SurfaceControllerTypeCollection>();
 
-        public static FilteredControllerFactoryCollection FilteredControllerFactories
-            => Factory.GetInstance<FilteredControllerFactoryCollection>();
-
         internal static IPublishedSnapshotService PublishedSnapshotService
             => Factory.GetInstance<IPublishedSnapshotService>();
 
@@ -215,37 +213,11 @@ namespace Umbraco.Web.Composing
 
         public static IRuntimeState RuntimeState => Factory.GetInstance<IRuntimeState>();
 
-        public static TypeLoader TypeLoader => Factory.GetInstance<TypeLoader>();
-
-        public static UrlSegmentProviderCollection UrlSegmentProviders => Factory.GetInstance<UrlSegmentProviderCollection>();
-
         public static CacheRefresherCollection CacheRefreshers => Factory.GetInstance<CacheRefresherCollection>();
-
-        public static DataEditorCollection DataEditors => Factory.GetInstance<DataEditorCollection>();
-
-        public static DataValueReferenceFactoryCollection DataValueReferenceFactories => Factory.GetInstance<DataValueReferenceFactoryCollection>();
-
-        public static PropertyEditorCollection PropertyEditors => Factory.GetInstance<PropertyEditorCollection>();
-
-        public static ParameterEditorCollection ParameterEditors => Factory.GetInstance<ParameterEditorCollection>();
-
-        internal static ManifestValueValidatorCollection ManifestValidators => Factory.GetInstance<ManifestValueValidatorCollection>();
-
-        internal static IPackageActionRunner PackageActionRunner => Factory.GetInstance<IPackageActionRunner>();
-
-        internal static PackageActionCollection PackageActions => Factory.GetInstance<PackageActionCollection>();
-
-        internal static PropertyValueConverterCollection PropertyValueConverters => Factory.GetInstance<PropertyValueConverterCollection>();
 
         internal static IPublishedModelFactory PublishedModelFactory => Factory.GetInstance<IPublishedModelFactory>();
 
         public static IServerMessenger ServerMessenger => Factory.GetInstance<IServerMessenger>();
-
-        public static IServerRegistrar ServerRegistrar => Factory.GetInstance<IServerRegistrar>();
-
-        public static ICultureDictionaryFactory CultureDictionaryFactory => Factory.GetInstance<ICultureDictionaryFactory>();
-
-        public static IShortStringHelper ShortStringHelper => Factory.GetInstance<IShortStringHelper>();
 
         public static ILogger<object> Logger => Factory.GetInstance<ILogger<object>>();
 
@@ -262,10 +234,6 @@ namespace Umbraco.Web.Composing
         public static ServiceContext Services => Factory.GetInstance<ServiceContext>();
 
         public static IScopeProvider ScopeProvider => Factory.GetInstance<IScopeProvider>();
-
-        public static IFileSystems FileSystems => Factory.GetInstance<IFileSystems>();
-
-        public static ISqlContext SqlContext => Factory.GetInstance<ISqlContext>();
 
         public static IPublishedContentTypeFactory PublishedContentTypeFactory => Factory.GetInstance<IPublishedContentTypeFactory>();
 

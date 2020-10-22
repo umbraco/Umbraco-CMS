@@ -14,7 +14,7 @@ namespace Umbraco.Tests.Packaging
 
         private static FileInfo GetTestPackagePath(string packageName)
         {
-            const string testPackagesDirName = "Umbraco.Core\\Packaging\\Packages";
+            var testPackagesDirName = Path.Combine("Umbraco.Core","Packaging","Packages");
             var testDir = TestContext.CurrentContext.TestDirectory.Split("bin")[0];
             var path = Path.Combine(testDir, testPackagesDirName, packageName);
             return new FileInfo(path);

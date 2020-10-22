@@ -30,6 +30,7 @@ namespace Umbraco.Tests.Common.Builders
         private GenericDictionaryBuilder<ContentBuilder, string, object> _propertyDataBuilder;
 
         private int? _id;
+        private int? _versionId;
         private Guid? _key;
         private DateTime? _createDate;
         private DateTime? _updateDate;
@@ -48,12 +49,10 @@ namespace Umbraco.Tests.Common.Builders
         private string _propertyValuesCulture;
         private string _propertyValuesSegment;
 
-        public ContentTypeBuilder AddContentType()
+        public ContentBuilder WithVersionId(int versionId)
         {
-            _contentType = null;
-            var builder = new ContentTypeBuilder(this);
-            _contentTypeBuilder = builder;
-            return builder;
+            _versionId = versionId;
+            return this;
         }
 
         public ContentBuilder WithParent(IContent parent)
@@ -87,6 +86,14 @@ namespace Umbraco.Tests.Common.Builders
             return this;
         }
 
+        public ContentTypeBuilder AddContentType()
+        {
+            _contentType = null;
+            var builder = new ContentTypeBuilder(this);
+            _contentTypeBuilder = builder;
+            return builder;
+        }
+
         public GenericDictionaryBuilder<ContentBuilder, string, object> AddPropertyData()
         {
             var builder = new GenericDictionaryBuilder<ContentBuilder, string, object>(this);
@@ -97,6 +104,7 @@ namespace Umbraco.Tests.Common.Builders
         public override Content Build()
         {
             var id = _id ?? 0;
+            var versionId = _versionId ?? 0;
             var key = _key ?? Guid.NewGuid();
             var parentId = _parentId ?? -1;
             var parent = _parent ?? null;
@@ -131,6 +139,7 @@ namespace Umbraco.Tests.Common.Builders
             }
 
             content.Id = id;
+            content.VersionId = versionId;
             content.Key = key;
             content.CreateDate = createDate;
             content.UpdateDate = updateDate;

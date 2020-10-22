@@ -27,7 +27,7 @@ namespace Umbraco.Web.Common.ModelBinders
             // No need for type checks to ensure we have the appropriate binder, as in .NET Core this is handled in the provider,
             // in this case ContentModelBinderProvider.
 
-            // Being defensice though.... if for any reason the model is not either IContentModel or IPublishedContent,
+            // Being defensive though.... if for any reason the model is not either IContentModel or IPublishedContent,
             // then we return since those are the only types this binder is dealing with.
             if (source is IContentModel == false && source is IPublishedContent == false)
             {
@@ -36,7 +36,7 @@ namespace Umbraco.Web.Common.ModelBinders
 
             BindModelAsync(bindingContext, source, bindingContext.ModelType);
             return Task.CompletedTask;
-        }        
+        }
 
         // source is the model that we have
         // modelType is the type of the model that we need to bind to
@@ -56,8 +56,9 @@ namespace Umbraco.Web.Common.ModelBinders
 
             // If types already match, return
             var sourceType = source.GetType();
-            if (sourceType.Inherits(modelType)) // includes ==
+            if (sourceType.   Inherits(modelType)) // includes ==
             {
+                bindingContext.Result = ModelBindingResult.Success(source);
                 return Task.CompletedTask;
             }
 

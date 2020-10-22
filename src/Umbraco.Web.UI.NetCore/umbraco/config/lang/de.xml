@@ -2101,7 +2101,6 @@
     <key alias="trySkipIisCustomErrorsCheckSuccessMessage">"trySkipIisCustomErrors" ist auf '%0%' gestellt und Sie verwenden IIS-Version '%1%'.</key>
     <key alias="trySkipIisCustomErrorsCheckErrorMessage">"trySkipIisCustomErrors" ist aktuell auf '%0%' gestellt. Für Ihre IIS-Version (%2%) wird empfohlen, diese auf '%1%' zu stellen.</key>
     <key alias="trySkipIisCustomErrorsCheckRectifySuccessMessage">"trySkipIisCustomErrors" wurde erfolgreich auf '%0%' gestellt.</key>
-    <key alias="configurationServiceFileNotFound">Folgende Datei ist nicht vorhanden: '%0%'.</key>
     <key alias="configurationServiceNodeNotFound"><![CDATA[<strong>'%0%'</strong> wurde nicht in der Konfigurationsdatei <strong>'%1%'</strong> gefunden.]]></key>
     <key alias="configurationServiceError">Es trat ein Fehler auf, für eine vollständige Fehlermeldung suchen Sie in den Logs nach: %0%</key>
     <key alias="databaseSchemaValidationCheckDatabaseOk">Datenbank - Das Datenbank-Schema ist korrekt für diese Umbraco-Version</key>
@@ -2130,6 +2129,10 @@
     <key alias="traceModeCheckErrorMessage">Trace-Modus ist gegenwertig eingeschaltet. Es ist empfehlenswert diesen vor Live-Gang abzuschalten.</key>
     <key alias="traceModeCheckRectifySuccessMessage">Trace-Modus wurde erfolgreich abgeschaltet.</key>
     <key alias="folderPermissionsCheckMessage">Alle Ordner haben die korrekten Zugriffsrechte.</key>
+    <!-- The following keys get these tokens passed in:
+	    0: Path to the file not found
+  	-->
+    <key alias="fileNotFound">Folgende Datei ist nicht vorhanden: '%0%'.</key>
     <key alias="requiredFolderPermissionFailed"><![CDATA[Für folgende Ordner werden 'Ändern'-Berechtigungen benötigen, es konnte jedoch nicht auf sie zugegriffen werden: <strong>%0%</strong>.]]></key>
     <key alias="optionalFolderPermissionFailed"><![CDATA[Für folgende Ordner werden 'Ändern'-Berechtigungen benötigen, damit bestimmte Umbraco-Operationen funktionieren, es konnte jedoch nicht auf sie zugegriffen werden: <strong>%0%</strong>. Falls nicht in diese geschrieben wird, brauchen Sie nichts zu unternehmen.]]></key>
     <key alias="filePermissionsCheckMessage">Alle Dateien haben die korrekten Zugriffsrechte.</key>

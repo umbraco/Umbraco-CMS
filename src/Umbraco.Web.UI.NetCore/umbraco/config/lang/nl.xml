@@ -1326,7 +1326,6 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="trySkipIisCustomErrorsCheckErrorMessage">Try Skip IIS Custom foutmeldingen is ingesteld op '%0%'. Het wordt voor de gebruikte IIS versie (%2%) aangeraden deze in te stellen op '%1%'.</key>
     <key alias="trySkipIisCustomErrorsCheckRectifySuccessMessage">Try Skip IIS Custom foutmeldingen ingesteld op '%0%'.</key>
     <!-- The following keys get predefined tokens passed in that are not all the same, like above -->
-    <key alias="configurationServiceFileNotFound">Het volgende bestand bestaat niet: '%0%'.</key>
     <key alias="configurationServiceNodeNotFound"><![CDATA[<strong>'%0%'</strong> kon niet gevonden worden in configuratie bestand <strong>'%1%'</strong>.]]></key>
     <key alias="configurationServiceError">Er is een fout opgetreden. Bekijk de log file voor de volledige fout: %0%.</key>
     <key alias="httpsCheckValidCertificate">Het cerficaat van de website is ongeldig.</key>
@@ -1357,6 +1356,10 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="requiredFolderPermissionFailed"><![CDATA[De volgende bestanden moeten wijzig-rechten krijgen om Umbraco goed te laten werken: <strong>%0%</strong>.]]></key>
     <key alias="optionalFolderPermissionFailed"><![CDATA[Aangeraden wordt de volgende bestanden wijzig-rechten te geven om Umbraco goed te laten werken: <strong>%0%</strong>. Als deze niet in gebruik zijn voor deze omgeving hoeft er geen actie te worden ondernomen.]]></key>
     <key alias="filePermissionsCheckMessage">All files have the correct permissions set.</key>
+    <!-- The following keys get these tokens passed in:
+	    0: Path to the file not found
+  	-->
+    <key alias="fileNotFound">Het volgende bestand bestaat niet: '%0%'.</key>
     <!-- The following keys get these tokens passed in:
 	    0: Comma delimitted list of failed folder paths
   	-->

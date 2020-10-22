@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using NUnit.Framework;
-using Umbraco.Core.Configuration.HealthChecks;
+using Umbraco.Core.HealthCheck;
+using Umbraco.Core.HealthCheck.Checks;
+using Umbraco.Infrastructure.HealthCheck;
 using Umbraco.Web.HealthCheck;
 
 namespace Umbraco.Tests.Web.HealthChecks
@@ -135,7 +137,7 @@ namespace Umbraco.Tests.Web.HealthChecks
             var results = new HealthCheckResults(checks);
 
             var resultAsMarkdown = results.ResultsAsMarkDown(HealthCheckNotificationVerbosity.Summary);
-            Assert.IsTrue(resultAsMarkdown.IndexOf("Result: 'Success'\r\n") > -1);
+            Assert.IsTrue(resultAsMarkdown.IndexOf("Result: 'Success'" + Environment.NewLine) > -1);
         }
 
         [Test]
@@ -149,8 +151,8 @@ namespace Umbraco.Tests.Web.HealthChecks
             var results = new HealthCheckResults(checks);
 
             var resultAsMarkdown = results.ResultsAsMarkDown(HealthCheckNotificationVerbosity.Detailed);
-            Assert.IsFalse(resultAsMarkdown.IndexOf("Result: 'Success'\r\n") > -1);
-            Assert.IsTrue(resultAsMarkdown.IndexOf("Result: 'Success', Message: 'First check was successful'\r\n") > -1);
+            Assert.IsFalse(resultAsMarkdown.IndexOf("Result: 'Success'" + Environment.NewLine) > -1);
+            Assert.IsTrue(resultAsMarkdown.IndexOf("Result: 'Success', Message: 'First check was successful'" + Environment.NewLine) > -1);
         }
     }
 }

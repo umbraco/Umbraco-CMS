@@ -45,17 +45,18 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.ModelBinders
         }
 
         [Test]
-        public void Does_Not_Bind_Model_When_Source_Type_Matches_Model_Type()
+        public void BindModel_Returns_If_Same_Type()
         {
             // Arrange
-            var bindingContext = CreateBindingContext(typeof(ContentModel), source: new ContentModel(CreatePublishedContent()));
+            var content = new ContentModel(CreatePublishedContent());
+            var bindingContext = CreateBindingContext(typeof(ContentModel), source: content);
             var binder = new ContentModelBinder();
 
             // Act
             binder.BindModelAsync(bindingContext);
 
             // Assert
-            Assert.False(bindingContext.Result.IsModelSet);
+            Assert.AreSame(content, bindingContext.Result.Model);
         }
 
         [Test]

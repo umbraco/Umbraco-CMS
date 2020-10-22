@@ -6,6 +6,7 @@ using Umbraco.Core.Models;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Testing;
 
@@ -15,13 +16,6 @@ namespace Umbraco.Tests.Publishing
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class PublishingStrategyTests : TestWithDatabaseBase
     {
-        public override void SetUp()
-        {
-            base.SetUp();
-
-            //LegacyUmbracoSettings.SettingsFilePath = Current.IOHelper.MapPath(SystemDirectories.Config + Path.DirectorySeparatorChar, false);
-        }
-
         private IContent _homePage;
 
         [NUnit.Framework.Ignore("fixme - ignored test")]

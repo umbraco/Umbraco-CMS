@@ -48,7 +48,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common
             var viewResult = await sut.Index() as ViewResult;
             var fileName = GetViewName(viewResult, Path.DirectorySeparatorChar.ToString());
 
-            var views = GetUiFiles(new[] { "Umbraco", "UmbracoInstall" });
+            var views = GetUiFiles(new[] { "umbraco", "UmbracoInstall" });
             Assert.True(views.Contains(fileName), $"Expected {fileName} to exist, but it didn't");
         }
 
@@ -63,7 +63,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common
             var viewResult = sut.Index() as ViewResult;
             var fileName = GetViewName(viewResult);
 
-            var views = GetUiFiles(new[] { "Umbraco", "UmbracoBackOffice" });
+            var views = GetUiFiles(new[] { "umbraco", "UmbracoBackOffice" });
 
             Assert.True(views.Contains(fileName), $"Expected {fileName} to exist, but it didn't");
         }
@@ -85,7 +85,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common
 
             var viewResult = await sut.Default() as ViewResult;
             var fileName = GetViewName(viewResult);
-            var views = GetUiFiles(new[] { "Umbraco", "UmbracoBackOffice" });
+            var views = GetUiFiles(new[] { "umbraco", "UmbracoBackOffice" });
 
             Assert.True(views.Contains(fileName), $"Expected {fileName} to exist, but it didn't");
         }
@@ -94,7 +94,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common
         [Test]
         public void LanguageFilesAreLowercase()
         {
-            var files = GetUiFiles(new[] { "Umbraco", "config", "lang" });
+            var files = GetUiFiles(new[] { "umbraco", "config", "lang" });
             foreach (var fileName in files)
             {
                 Assert.AreEqual(fileName.ToLower(), fileName,

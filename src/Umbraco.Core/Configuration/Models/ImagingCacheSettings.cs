@@ -12,6 +12,6 @@ namespace Umbraco.Core.Configuration.Models
 
         public uint CachedNameLength { get; set; } = 8;
 
-        public string CacheFolder { get; set; } = Path.Combine("..", "Umbraco", "MediaCache");
+        public string CacheFolder { get; set; } = Path.Combine("..", "umbraco", "mediacache");
     }
 }

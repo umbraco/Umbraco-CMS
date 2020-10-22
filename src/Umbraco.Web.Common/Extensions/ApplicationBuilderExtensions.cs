@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog.Context;
 using Smidge;
+using Smidge.Nuglify;
 using StackExchange.Profiling;
 using Umbraco.Core;
 using Umbraco.Core.Hosting;
@@ -110,6 +111,7 @@ namespace Umbraco.Extensions
             if (!app.UmbracoCanBoot()) return app;
 
             app.UseSmidge();
+            app.UseSmidgeNuglify();
 
             return app;
         }

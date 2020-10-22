@@ -23,9 +23,9 @@ namespace Umbraco.Web.WebApi
     [IsBackOffice]
     // [UmbracoUserTimeoutFilter] has been migrated to netcore
     [UmbracoAuthorize]
-    [DisableBrowserCache]
-   // [UmbracoWebApiRequireHttps]
-   // [CheckIfUserTicketDataIsStale]
+    // [DisableBrowserCache] has been migrated to netcore
+    // [UmbracoWebApiRequireHttps]
+    // [CheckIfUserTicketDataIsStale]
     // [UnhandedExceptionLoggerConfiguration]
     [EnableDetailedErrors]
     public abstract class UmbracoAuthorizedApiController : UmbracoApiController
