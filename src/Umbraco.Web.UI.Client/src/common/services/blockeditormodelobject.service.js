@@ -783,11 +783,7 @@
              */
             createFromBlockData: function (blockData) {
 
-                console.log("createFromBlockData", blockData);
-
                 blockData = clipboardService.parseContentForPaste(blockData, clipboardService.TYPES.BLOCK);
-
-                console.log("createFromBlockData", blockData);
 
                 // As the blockData is a cloned object we can use its layout part for our layout entry.
                 var layoutEntry = blockData.layout;

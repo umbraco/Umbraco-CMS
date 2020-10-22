@@ -486,10 +486,11 @@
                         icon: entry.icon
                     }
                 }
-                if(Array.isArray(pasteEntry.data) === false) {
-                    pasteEntry.blockConfigModel = modelObject.getScaffoldFromAlias(entry.alias);
-                } else {
-                    pasteEntry.blockConfigModel = {};
+                if(Array.isArray(entry.data) === false) {
+                    var scaffold = modelObject.getScaffoldFromAlias(entry.alias);
+                    if(scaffold) {
+                        pasteEntry.blockConfigModel = modelObject.getBlockConfiguration(scaffold.contentTypeKey);
+                    }
                 }
                 blockPickerModel.clipboardItems.push(pasteEntry);
             });
@@ -505,10 +506,8 @@
                         icon: entry.icon
                     }
                 }
-                if(Array.isArray(pasteEntry.data) === false) {
-                    pasteEntry.blockConfigModel = modelObject.getScaffoldFromAlias(entry.alias);
-                } else {
-                    pasteEntry.blockConfigModel = {};
+                if(Array.isArray(entry.data) === false) {
+                    pasteEntry.blockConfigModel = modelObject.getBlockConfiguration(entry.data.data.contentTypeKey);
                 }
                 blockPickerModel.clipboardItems.push(pasteEntry);
             });
@@ -524,17 +523,19 @@
 
         var requestCopyAllBlocks = function() {
 
+            var aliases = [];
+
             var elementTypesToCopy = vm.layout.filter(entry => entry.$block.config.unsupported !== true).map(
                 (entry) => {
+
+                    aliases.push(entry.$block.content.contentTypeAlias);
+
                     // No need to clone the data as its begin handled by the clipboardService.
                     return {"layout": entry.$block.layout, "data": entry.$block.data, "settingsData":entry.$block.settingsData}
                 }
             );
 
-            // list aliases
-            var aliases = elementTypesToCopy.map(content => content.contentTypeAlias);
-
-            // remove dublicates
+            // remove dublicate aliases
             aliases = aliases.filter((item, index) => aliases.indexOf(item) === index);
 
             var contentNodeName = "?";
@@ -543,15 +544,13 @@
                 contentNodeName = vm.umbVariantContent.editor.content.name;
                 if(vm.umbVariantContentEditors) {
                     contentNodeIcon = vm.umbVariantContentEditors.content.icon.split(" ")[0];
+                } else if (vm.umbElementEditorContent) {
+                    contentNodeIcon = vm.umbElementEditorContent.model.documentType.icon.split(" ")[0];
                 }
             } else if (vm.umbElementEditorContent) {
                 contentNodeName = vm.umbElementEditorContent.model.documentType.name;
                 contentNodeIcon = vm.umbElementEditorContent.model.documentType.icon.split(" ")[0];
-                console.log(vm.umbElementEditorContent.model.documentType)
             }
-
-
-            console.log("check that we get the right contentNodeIcon", contentNodeIcon)
 
             localizationService.localize("clipboard_labelForArrayOfItemsFrom", [vm.model.label, contentNodeName]).then(function(localizedLabel) {
                 clipboardService.copyArray(clipboardService.TYPES.BLOCK, aliases, elementTypesToCopy, localizedLabel, contentNodeIcon || "icon-thumbnail-list", vm.model.id);
@@ -571,7 +570,6 @@
                 layoutEntry = modelObject.createFromElementType(pasteEntry);
             } else if (pasteType === clipboardService.TYPES.BLOCK) {
                 layoutEntry = modelObject.createFromBlockData(pasteEntry);
-                console.log("pasteEntry", pasteEntry)
             } else {
                 // Not a supported paste type.
                 return false;
