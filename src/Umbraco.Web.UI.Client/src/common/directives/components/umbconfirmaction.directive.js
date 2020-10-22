@@ -97,7 +97,7 @@ The prompt can be opened in four direction up, down, left or right.</p>
       templateUrl: 'views/components/umb-confirm-action.html',
       scope: {
         direction: "@",
-        show: "<?",
+        show: "<",
         onDelete: "&?",
         onConfirm: "&",
         onCancel: "&"
