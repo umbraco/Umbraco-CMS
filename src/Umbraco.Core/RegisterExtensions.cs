@@ -14,13 +14,6 @@ namespace Umbraco.Core
             => register.Register(typeof(TService), typeof(TImplementing), lifetime);
 
         /// <summary>
-        /// Registers a service with an implementation type, for a target.
-        /// </summary>
-        public static void RegisterFor<TService, TImplementing, TTarget>(this IRegister register, Lifetime lifetime = Lifetime.Transient)
-            where TService : class
-            => register.RegisterFor<TService, TTarget>(typeof(TImplementing), lifetime);
-
-        /// <summary>
         /// Registers a service as its own implementation.
         /// </summary>
         public static void Register<TService>(this IRegister register, Lifetime lifetime = Lifetime.Transient)
