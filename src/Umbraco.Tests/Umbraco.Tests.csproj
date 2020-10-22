@@ -276,7 +276,6 @@
     <Compile Include="Persistence\DatabaseContextTests.cs" />
     <Compile Include="Persistence\NPocoTests\NPocoSqlTests.cs" />
     <Compile Include="Persistence\Querying\QueryBuilderTests.cs" />
-    <Compile Include="Persistence\Repositories\StylesheetRepositoryTest.cs" />
     <Compile Include="PublishedContent\PublishedContentMoreTests.cs" />
     <Compile Include="Cache\PublishedCache\PublishedContentCacheTests.cs" />
     <Compile Include="Routing\ContentFinderByAliasWithDomainsTests.cs" />

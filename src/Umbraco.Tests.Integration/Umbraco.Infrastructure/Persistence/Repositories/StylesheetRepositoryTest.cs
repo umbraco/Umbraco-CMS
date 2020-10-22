@@ -6,42 +6,47 @@ using System.Text;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
-using Umbraco.Tests.Common.Builders;
-using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Integration.Implementations;
+using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;
 
-namespace Umbraco.Tests.Persistence.Repositories
+namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositories
 {
     [TestFixture]
-    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
-    public class StylesheetRepositoryTest : TestWithDatabaseBase
+    [UmbracoTest(Database = UmbracoTestOptions.Database.None)]
+    public class StylesheetRepositoryTest : UmbracoIntegrationTest
     {
         private IFileSystems _fileSystems;
         private IFileSystem _fileSystem;
+        private readonly TestHelper _testHelper = new TestHelper();
 
-        public override void SetUp()
+        [SetUp]
+        public void SetUpFileSystem()
         {
-            base.SetUp();
-
             _fileSystems = Mock.Of<IFileSystems>();
-            _fileSystem = new PhysicalFileSystem(IOHelper, HostingEnvironment, LoggerFactory.CreateLogger<PhysicalFileSystem>(), new GlobalSettings().UmbracoCssPath);
+            _fileSystem = new PhysicalFileSystem(_testHelper.IOHelper, _testHelper.GetHostingEnvironment(), LoggerFactory.CreateLogger<PhysicalFileSystem>(), new GlobalSettings().UmbracoCssPath);
             Mock.Get(_fileSystems).Setup(x => x.StylesheetsFileSystem).Returns(_fileSystem);
             var stream = CreateStream("body {background:#EE7600; color:#FFF;}");
             _fileSystem.AddFile("styles.css", stream);
         }
 
+        [TearDown]
+        public void TearDownFileSystem()
+        {
+            //Delete all files
+            Purge((PhysicalFileSystem) _fileSystem, "");
+            _fileSystem = null;
+        }
+
         private IStylesheetRepository CreateRepository()
         {
             var globalSettings = new GlobalSettings();
-            return new StylesheetRepository(_fileSystems, IOHelper, Microsoft.Extensions.Options.Options.Create(globalSettings));
+            return new StylesheetRepository(_fileSystems, _testHelper.IOHelper, Microsoft.Extensions.Options.Options.Create(globalSettings));
         }
 
         [Test]
@@ -315,16 +320,6 @@ namespace Umbraco.Tests.Persistence.Repositories
                 stylesheet = repository.Get("../packages.config"); // outside the filesystem, exists
                 Assert.IsNull(stylesheet);
             }
-        }
-
-        [TearDown]
-        public override void TearDown()
-        {
-            base.TearDown();
-
-            //Delete all files
-            Purge((PhysicalFileSystem) _fileSystem, "");
-            _fileSystem = null;
         }
 
         private void Purge(PhysicalFileSystem fs, string path)
