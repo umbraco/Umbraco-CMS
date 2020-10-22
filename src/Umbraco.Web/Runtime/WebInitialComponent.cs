@@ -66,7 +66,7 @@ namespace Umbraco.Web.Runtime
 
         private static void ConfigureGlobalFilters()
         {
-            GlobalFilters.Filters.Add(new EnsurePartialViewMacroViewContextFilterAttribute());
+            //GlobalFilters.Filters.Add(new EnsurePartialViewMacroViewContextFilterAttribute());
         }
 
         // internal for tests

@@ -5,9 +5,10 @@ namespace Umbraco.Core.Configuration.Models
     /// <summary>
     ///     Represents the models builder configuration.
     /// </summary>
-    public class ModelsBuilderSettings 
+    public class ModelsBuilderSettings
     {
-        public static string DefaultModelsDirectory => "~/App_Data/Models";
+        // TODO: This should not go into App_Data - that folder isn't really a real thing anymore
+        public static string DefaultModelsDirectory => "~/umbraco/models";
 
         /// <summary>
         ///     Gets a value indicating whether the whole models experience is enabled.

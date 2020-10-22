@@ -26,6 +26,7 @@ using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Filters;
 using Umbraco.Web.Common.Security;
 using Umbraco.Web.Models;
+using Umbraco.Web.Mvc;
 using Umbraco.Web.WebAssets;
 using Constants = Umbraco.Core.Constants;
 using Microsoft.AspNetCore.Identity;
@@ -34,9 +35,8 @@ using System.Security.Claims;
 namespace Umbraco.Web.BackOffice.Controllers
 {
     //[UmbracoRequireHttps] //TODO Reintroduce
-    [DisableBrowserCache]
     [PluginController(Constants.Web.Mvc.BackOfficeArea)]
-    public class BackOfficeController : Controller
+    public class BackOfficeController : UmbracoController
     {
         private readonly IBackOfficeUserManager _userManager;
         private readonly IRuntimeMinifier _runtimeMinifier;
