@@ -4,14 +4,23 @@ using NUnit.Framework;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Integration.Testing;
+using Umbraco.Tests.Testing;
 using static Umbraco.Core.Persistence.SqlExtensionsStatics;
 
-namespace Umbraco.Tests.Persistence.NPocoTests
+namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.NPocoTests
 {
     [TestFixture]
-    public class NPocoSqlExtensionsTests : BaseUsingSqlCeSyntax
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
+    public class NPocoSqlExtensionsTests : UmbracoIntegrationTest
     {
+        private ISqlContext SqlContext => GetRequiredService<ISqlContext>();
+
+        private Sql<ISqlContext> Sql()
+        {
+            return NPoco.Sql.BuilderFor(SqlContext);
+        }
+
         [Test]
         public void WhereTest()
         {

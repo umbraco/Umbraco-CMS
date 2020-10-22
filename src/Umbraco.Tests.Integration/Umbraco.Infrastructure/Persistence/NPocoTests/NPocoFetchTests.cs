@@ -4,19 +4,18 @@ using System.Linq;
 using NPoco;
 using NUnit.Framework;
 using Umbraco.Core.Persistence;
-using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;
 
-namespace Umbraco.Tests.Persistence.NPocoTests
+namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.NPocoTests
 {
     [TestFixture]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, WithApplication = true)]
-    public class NPocoFetchTests : TestWithDatabaseBase
+    public class NPocoFetchTests : UmbracoIntegrationTest
     {
-        protected override void Initialize()
+        [SetUp]
+        protected void SeedDatabase()
         {
-            base.Initialize();
-
             using (var scope = ScopeProvider.CreateScope())
             {
                 InsertData(scope.Database);

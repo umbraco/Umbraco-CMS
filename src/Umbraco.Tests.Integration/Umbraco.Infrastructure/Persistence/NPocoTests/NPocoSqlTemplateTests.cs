@@ -4,11 +4,10 @@ using NPoco;
 using NUnit.Framework;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
-using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core;
 using Umbraco.Persistance.SqlCe;
 
-namespace Umbraco.Tests.Persistence.NPocoTests
+namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.NPocoTests
 {
     [TestFixture]
     public class NPocoSqlTemplateTests

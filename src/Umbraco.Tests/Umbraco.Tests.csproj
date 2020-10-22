@@ -170,8 +170,6 @@
     <Compile Include="Testing\Objects\TestDataSource.cs" />
     <Compile Include="Issues\U9560.cs" />
     <Compile Include="Migrations\AdvancedMigrationTests.cs" />
-    <Compile Include="Persistence\NPocoTests\NPocoFetchTests.cs" />
-    <Compile Include="Persistence\NPocoTests\NPocoSqlTemplateTests.cs" />
     <Compile Include="Routing\ContentFinderByUrlAndTemplateTests.cs" />
     <Compile Include="Routing\ContentFinderByUrlTests.cs" />
     <Compile Include="Routing\ContentFinderByUrlWithDomainsTests.cs" />
@@ -199,7 +197,6 @@
     <Compile Include="Testing\TestingTests\NUnitTests.cs" />
     <Compile Include="Persistence\LocksTests.cs" />
     <Compile Include="Migrations\PostMigrationTests.cs" />
-    <Compile Include="Persistence\NPocoTests\NPocoSqlExtensionsTests.cs" />
     <Compile Include="Testing\UmbracoTestBase.cs" />
     <Compile Include="TestHelpers\TestObjects-Mocks.cs" />
     <Compile Include="TestHelpers\TestObjects.cs" />
@@ -238,7 +235,6 @@
     <Compile Include="Models\ContentExtensionsTests.cs" />
     <Compile Include="Web\Mvc\MergeParentContextViewDataAttributeTests.cs" />
     <Compile Include="Web\Mvc\ViewDataDictionaryExtensionTests.cs" />
-    <Compile Include="Persistence\NPocoTests\NPocoBulkInsertTests.cs" />
     <Compile Include="Persistence\Querying\ContentTypeSqlMappingTests.cs" />
     <Compile Include="PublishedContent\PublishedContentExtensionTests.cs" />
     <Compile Include="PublishedContent\PublishedRouterTests.cs" />
@@ -273,7 +269,6 @@
     <Compile Include="Web\Mvc\HtmlHelperExtensionMethodsTests.cs" />
     <Compile Include="Persistence\SqlCeTableByTableTest.cs" />
     <Compile Include="Persistence\DatabaseContextTests.cs" />
-    <Compile Include="Persistence\NPocoTests\NPocoSqlTests.cs" />
     <Compile Include="Persistence\Querying\QueryBuilderTests.cs" />
     <Compile Include="PublishedContent\PublishedContentMoreTests.cs" />
     <Compile Include="Cache\PublishedCache\PublishedContentCacheTests.cs" />

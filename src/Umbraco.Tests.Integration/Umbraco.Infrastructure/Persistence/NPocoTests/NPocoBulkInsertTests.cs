@@ -6,35 +6,43 @@ using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Tests.Integration.Implementations;
+using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 
-namespace Umbraco.Tests.Persistence.NPocoTests
+namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.NPocoTests
 {
     // FIXME: npoco - is this still appropriate?
     //
     [TestFixture]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-    public class NPocoBulkInsertTests : TestWithDatabaseBase
+    public class NPocoBulkInsertTests : UmbracoIntegrationTest
     {
+        private TestHelper _testHelper = new TestHelper();
+        private IProfilingLogger ProfilingLogger => _testHelper.ProfilingLogger;
 
-
-        [NUnit.Framework.Ignore("Ignored because you need to configure your own SQL Server to test thsi with")]
+        [NUnit.Framework.Ignore("Ignored because you need to configure your own SQL Server to test this with")]
         [Test]
         public void Can_Bulk_Insert_Native_Sql_Server_Bulk_Inserts()
         {
             // create the db
             // prob not what we want, this is not a real database, but hey, the test is ignored anyways
             // we'll fix this when we have proper testing infrastructure
-            var dbSqlServer = TestObjects.GetUmbracoSqlServerDatabase(new NullLogger<UmbracoDatabase>());
+            // var dbSqlServer = TestObjects.GetUmbracoSqlServerDatabase(new NullLogger<UmbracoDatabase>());
+            var provider = ScopeProvider;
+            using (var scope = ScopeProvider.CreateScope())
+            {
+                // Still no what we want, but look above.
+                var dbSqlServer = scope.Database;
+                //drop the table
+                dbSqlServer.Execute("DROP TABLE [umbracoServer]");
 
-            //drop the table
-            dbSqlServer.Execute("DROP TABLE [umbracoServer]");
-
-            //re-create it
-            dbSqlServer.Execute(@"CREATE TABLE [umbracoServer](
+                //re-create it
+                dbSqlServer.Execute(@"CREATE TABLE [umbracoServer](
     [id] [int] IDENTITY(1,1) NOT NULL,
     [address] [nvarchar](500) NOT NULL,
     [computerName] [nvarchar](255) NOT NULL,
@@ -47,27 +55,28 @@ namespace Umbraco.Tests.Persistence.NPocoTests
     [id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 )");
-            var data = new List<ServerRegistrationDto>();
-            for (var i = 0; i < 1000; i++)
-            {
-                data.Add(new ServerRegistrationDto
+                var data = new List<ServerRegistrationDto>();
+                for (var i = 0; i < 1000; i++)
                 {
-                    ServerAddress = "address" + i,
-                    ServerIdentity = "computer" + i,
-                    DateRegistered = DateTime.Now,
-                    IsActive = true,
-                    DateAccessed = DateTime.Now
-                });
-            }
+                    data.Add(new ServerRegistrationDto
+                    {
+                        ServerAddress = "address" + i,
+                        ServerIdentity = "computer" + i,
+                        DateRegistered = DateTime.Now,
+                        IsActive = true,
+                        DateAccessed = DateTime.Now
+                    });
+                }
 
-            using (var tr = dbSqlServer.GetTransaction())
-            {
-                dbSqlServer.BulkInsertRecords(data);
-                tr.Complete();
-            }
+                using (var tr = dbSqlServer.GetTransaction())
+                {
+                    dbSqlServer.BulkInsertRecords(data);
+                    tr.Complete();
+                }
 
-            // Assert
-            Assert.That(dbSqlServer.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoServer"), Is.EqualTo(1000));
+                // Assert
+                Assert.That(dbSqlServer.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoServer"), Is.EqualTo(1000));
+            }
         }
 
         [Test]
