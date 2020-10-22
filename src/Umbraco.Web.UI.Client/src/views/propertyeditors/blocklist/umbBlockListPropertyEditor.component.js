@@ -430,12 +430,12 @@
                     if (Array.isArray(item.pasteData)) {
                         var indexIncrementor = 0;
                         item.pasteData.forEach(function (entry) {
-                            if (requestPasteFromClipboard(createIndex + indexIncrementor, entry)) {
+                            if (requestPasteFromClipboard(createIndex + indexIncrementor, entry, item.type)) {
                                 indexIncrementor++;
                             }
                         });
                     } else {
-                        requestPasteFromClipboard(createIndex, item.pasteData);
+                        requestPasteFromClipboard(createIndex, item.pasteData, item.type);
                     }
                     if(!(mouseEvent.ctrlKey || mouseEvent.metaKey)) {
                         blockPickerModel.close();
@@ -470,6 +470,7 @@
 
             blockPickerModel.clickClearClipboard = function ($event) {
                 clipboardService.clearEntriesOfType(clipboardService.TYPES.ELEMENT_TYPE, vm.availableContentTypesAliases);
+                clipboardService.clearEntriesOfType(clipboardService.TYPES.BLOCK, vm.availableContentTypesAliases);
             };
 
             blockPickerModel.clipboardItems = [];
@@ -526,7 +527,7 @@
             var elementTypesToCopy = vm.layout.filter(entry => entry.$block.config.unsupported !== true).map(
                 (entry) => {
                     // No need to clone the data as its begin handled by the clipboardService.
-                    return {"data": entry.$block.data, "settingsData":entry.$block.settingsData}
+                    return {"layout": block.layout, "data": entry.$block.data, "settingsData":entry.$block.settingsData}
                 }
             );
 
@@ -552,23 +553,33 @@
             });
         }
         function copyBlock(block) {
-            console.log(block)
-            clipboardService.copy(clipboardService.TYPES.BLOCK, block.content.contentTypeAlias, {"data": block.data, "settingsData":block.settingsData}, block.label, block.content.icon, block.content.udi);
+            clipboardService.copy(clipboardService.TYPES.BLOCK, block.content.contentTypeAlias, {"layout": block.layout, "data": block.data, "settingsData":block.settingsData}, block.label, block.content.icon, block.content.udi);
         }
-        function requestPasteFromClipboard(index, pasteEntry) {
+        function requestPasteFromClipboard(index, pasteEntry, pasteType) {
 
             if (pasteEntry === undefined) {
                 return false;
             }
 
-            var layoutEntry = modelObject.createFromElementType(pasteEntry);
+            var layoutEntry;
+            if (pasteType === clipboardService.TYPES.ELEMENT_TYPE) {
+                layoutEntry = modelObject.createFromElementType(pasteEntry);
+            } else if (pasteType === clipboardService.TYPES.BLOCK) {
+                layoutEntry = modelObject.createFromBlockData(pasteEntry);
+            } else {
+                // Not a supported paste type.
+                return false;
+            }
+
             if (layoutEntry === null) {
+                // Pasting did not go well.
                 return false;
             }
 
             // make block model
             var blockObject = getBlockObject(layoutEntry);
             if (blockObject === null) {
+                // Initalization of the Block Object didnt go well, therefor we will fail the paste action.
                 return false;
             }
 
@@ -583,6 +594,7 @@
             return true;
 
         }
+
         function requestDeleteBlock(block) {
             localizationService.localizeMany(["general_delete", "blockEditor_confirmDeleteBlockMessage", "contentTypeEditor_yesDelete"]).then(function (data) {
                 const overlay = {

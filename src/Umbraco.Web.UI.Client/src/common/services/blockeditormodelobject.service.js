@@ -774,6 +774,37 @@
                 return layoutEntry;
 
             },
+            /**
+             * @ngdoc method
+             * @name createFromRawData
+             * @methodOf umbraco.services.blockEditorModelObject
+             * @description Insert data from raw models
+             * @return {Object | null} Layout entry object, to be inserted at a decired location in the layout object. Or ´null´ if the given ElementType isnt supported by the block configuration.
+             */
+            createFromBlockData: function (blockData) {
+
+                blockData = clipboardService.parseContentForPaste(blockData, clipboardService.TYPES.BLOCK);
+
+                // As the blockData is a cloned object we can use its layout part for our layout entry.
+                var layoutEntry = blockData.layout;
+                if (layoutEntry === null) {
+                    return null;
+                }
+
+                if (blockData.data) {
+                    this.value.contentData.push(blockData.data);
+                } else {
+                    // We do not have data, this cannot be succesful paste.
+                    return null;
+                }
+
+                if (blockData.settingsData) {
+                    this.value.settingsData.push(blockData.settingsData);
+                }
+
+                return layoutEntry;
+
+            },
 
             /**
              * @ngdoc method

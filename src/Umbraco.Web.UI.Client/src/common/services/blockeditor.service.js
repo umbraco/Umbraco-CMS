@@ -57,15 +57,15 @@
                 }
             }
         }
-        function replaceElementTypeBlockListUDIsResolver(obj, propClearingMethod) {
+        function elementTypeBlockResolver(obj, propPasteResolverMethod) {
             // we could filter for specific Property Editor Aliases, but as the Block Editor structure can be used by many Property Editor we do not in this code know a good way to detect that this is a Block Editor and will therefor leave it to the value structure to determin this.
-            replaceRawBlockListUDIsResolver(obj.value, propClearingMethod);
+            rawBlockResolver(obj.value, propPasteResolverMethod);
         }
 
-        clipboardService.registerPastePropertyResolver(replaceElementTypeBlockListUDIsResolver, clipboardService.TYPES.ELEMENT_TYPE);
+        clipboardService.registerPastePropertyResolver(elementTypeBlockResolver, clipboardService.TYPES.ELEMENT_TYPE);
 
 
-        function replaceRawBlockListUDIsResolver(value, propClearingMethod) {
+        function rawBlockResolver(value, propPasteResolverMethod) {
             if (value != null && typeof value === "object") {
 
                 // we got an object, and it has these three props then we are most likely dealing with a Block Editor.
@@ -73,19 +73,19 @@
 
                     replaceUdisOfObject(value.layout, value);
 
-                    // replace UDIs for inner properties of this Block Editors content data.
+                    // run resolvers for inner properties of this Blocks content data.
                     if(value.contentData.length > 0) {
                         value.contentData.forEach((item) => {
                             for (var k in item) {
-                                propClearingMethod(item[k], clipboardService.TYPES.RAW);
+                                propPasteResolverMethod(item[k], clipboardService.TYPES.RAW);
                             }
                         });
                     }
-                    // replace UDIs for inner properties of this Block Editors settings data.
+                    // run resolvers for inner properties of this Blocks settings data.
                     if(value.settingsData.length > 0) {
                         value.settingsData.forEach((item) => {
                             for (var k in item) {
-                                propClearingMethod(item[k], clipboardService.TYPES.RAW);
+                                propPasteResolverMethod(item[k], clipboardService.TYPES.RAW);
                             }
                         });
                     }
@@ -94,7 +94,32 @@
             }
         }
 
-        clipboardService.registerPastePropertyResolver(replaceRawBlockListUDIsResolver, clipboardService.TYPES.RAW);
+        clipboardService.registerPastePropertyResolver(rawBlockResolver, clipboardService.TYPES.RAW);
+
+
+        function blockResolver(block, propPasteResolverMethod) {
+
+            if(block.data) {
+
+                // Make new UDI for content-element
+                block.data.udi = block.layout.contentUdi = udiService.create("element");
+
+                // run resolvers for inner properties of this Blocks content data.
+                propPasteResolverMethod(block.data, clipboardService.TYPES.RAW);
+            }
+
+            if(block.settingsData) {
+
+                // Make new UDI for settings-element
+                block.settingsData.udi = block.layout.settingsUdi = udiService.create("element");
+
+                // run resolvers for inner properties of this Blocks settings data.
+                propPasteResolverMethod(block.settingsData, clipboardService.TYPES.RAW);
+            }
+
+        }
+
+        clipboardService.registerPastePropertyResolver(blockResolver, clipboardService.TYPES.BLOCK);
 
     }]);
 
