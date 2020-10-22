@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Examine;
-using Umbraco.Core;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Blocks;
 using Umbraco.Core.Services;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
@@ -125,7 +123,7 @@ namespace Umbraco.Examine
                 content = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out _, _publishedQuery,
                     Ordering.By("Path", Direction.Ascending)).ToArray();
 
-                
+
                 if (content.Length > 0)
                 {
                     var indexableContent = new List<IContent>();
