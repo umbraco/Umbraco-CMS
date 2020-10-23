@@ -73,7 +73,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Compile Update="Services\Importing\ImportResources.Designer.cs" />
+      <Folder Include="Umbraco\logs" />
     </ItemGroup>
 
     <ItemGroup>
