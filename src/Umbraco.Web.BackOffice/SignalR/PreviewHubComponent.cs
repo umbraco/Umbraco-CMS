@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Configuration;
 using Microsoft.AspNetCore.SignalR;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;

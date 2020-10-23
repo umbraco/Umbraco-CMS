@@ -1,8 +1,7 @@
 ﻿using Umbraco.Core;
 using Umbraco.Core.Composing;
-using Umbraco.Web.BackOffice.SignalR;
 
-namespace Umbraco.Web.SignalR
+namespace Umbraco.Web.BackOffice.SignalR
 {
     [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
     public class PreviewHubComposer : ComponentComposer<PreviewHubComponent>, ICoreComposer
