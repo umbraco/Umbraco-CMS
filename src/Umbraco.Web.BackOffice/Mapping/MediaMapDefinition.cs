@@ -9,7 +9,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Mapping;
-using Umbraco.Web.Trees;
+using Umbraco.Web.BackOffice.Trees;
 
 namespace Umbraco.Web.BackOffice.Mapping
 {

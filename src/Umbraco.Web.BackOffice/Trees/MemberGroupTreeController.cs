@@ -4,12 +4,12 @@ using Microsoft.AspNetCore.Http;
 using Umbraco.Core;
 using Umbraco.Core.Services;
 using Umbraco.Web.BackOffice.Filters;
-using Umbraco.Web.BackOffice.Trees;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Models.Trees;
+using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
 
-namespace Umbraco.Web.Trees
+namespace Umbraco.Web.BackOffice.Trees
 {
     [UmbracoTreeAuthorize(Constants.Trees.MemberGroups)]
     [Tree(Constants.Applications.Members, Constants.Trees.MemberGroups, SortOrder = 1)]

@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Web.Common.ModelBinders;
 
-namespace Umbraco.Web.Trees
+namespace Umbraco.Web.BackOffice.Trees
 {
     /// <summary>
     /// Represents an TreeNodeController
