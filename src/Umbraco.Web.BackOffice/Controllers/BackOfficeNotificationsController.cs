@@ -1,5 +1,4 @@
 ﻿using Umbraco.Web.BackOffice.Filters;
-using Umbraco.Web.WebApi.Filters;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {

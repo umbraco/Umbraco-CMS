@@ -13,7 +13,7 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Security;
 
 
-namespace Umbraco.Web.WebApi.Filters
+namespace Umbraco.Web.BackOffice.Filters
 {
     /// <summary>
     /// This inspects the result of the action that returns a collection of content and removes
