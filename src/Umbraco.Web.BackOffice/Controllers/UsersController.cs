@@ -542,10 +542,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 UmbracoUserExtensions.GetUserCulture(to.Language, _localizedTextService, _globalSettings),
                 new[] { userDisplay.Name, from, message, inviteUri.ToString(), fromEmail });
 
-            var mailMessage = new EmailMessage(fromEmail, to.Email, emailSubject, emailBody)
-            {
-                IsBodyHtml = true
-            };
+            var mailMessage = new EmailMessage(fromEmail, to.Email, emailSubject, emailBody, true);
 
             await _emailSender.SendAsync(mailMessage);
         }

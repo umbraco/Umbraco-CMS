@@ -82,10 +82,8 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
             if (string.IsNullOrWhiteSpace(subject))
                 subject = "Umbraco Health Check Status";
 
-            return new EmailMessage(to, RecipientEmail, subject, message)
-            {
-                IsBodyHtml = message.IsNullOrWhiteSpace() == false && message.Contains("<") && message.Contains("</")
-            };
+            var isBodyHtml = message.IsNullOrWhiteSpace() == false && message.Contains("<") && message.Contains("</");
+            return new EmailMessage(to, RecipientEmail, subject, message, isBodyHtml);
         }
     }
 }

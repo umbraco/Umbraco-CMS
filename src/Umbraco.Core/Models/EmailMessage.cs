@@ -8,19 +8,28 @@ namespace Umbraco.Core.Models
         public string To { get; }
         public string Subject { get; }
         public string Body { get; }
-        public bool IsBodyHtml { get; set; } = false;
+        public bool IsBodyHtml { get; }
 
-        public EmailMessage(string from, string to, string subject, string body)
+        public EmailMessage(string from, string to, string subject, string body, bool isBodyHtml)
         {
-            if (string.IsNullOrEmpty(from)) throw new ArgumentException("Value cannot be null or empty.", nameof(from));
-            if (string.IsNullOrEmpty(to)) throw new ArgumentException("Value cannot be null or empty.", nameof(to));
-            if (string.IsNullOrEmpty(subject)) throw new ArgumentException("Value cannot be null or empty.", nameof(subject));
-            if (string.IsNullOrEmpty(body)) throw new ArgumentException("Value cannot be null or empty.", nameof(body));
+            if (from == null) throw new ArgumentNullException(nameof(from));
+            if (from.Length == 0) throw new ArgumentException("Value cannot be empty.", nameof(from));
+
+            if (to == null) throw new ArgumentNullException(nameof(to));
+            if (to.Length == 0) throw new ArgumentException("Value cannot be empty.", nameof(to));
+
+            if (subject == null) throw new ArgumentNullException(nameof(subject));
+            if (subject.Length == 0) throw new ArgumentException("Value cannot be empty.", nameof(subject));
+
+            if (body == null) throw new ArgumentNullException(nameof(body));
+            if (body.Length == 0) throw new ArgumentException("Value cannot be empty.", nameof(body));
 
             From = from;
             To = to;
             Subject = subject;
             Body = body;
+
+            IsBodyHtml = isBodyHtml;
         }
     }
 }

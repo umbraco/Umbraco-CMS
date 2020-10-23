@@ -435,7 +435,7 @@ namespace Umbraco.Core.Services.Implement
             }
 
             // create the mail message
-            var mail = new EmailMessage(fromMail, mailingUser.Email, subject, body) {IsBodyHtml = isBodyHtml};
+            var mail = new EmailMessage(fromMail, mailingUser.Email, subject, body, isBodyHtml);
 
             return new NotificationRequest(mail, actionName, mailingUser.Name, mailingUser.Email);
         }

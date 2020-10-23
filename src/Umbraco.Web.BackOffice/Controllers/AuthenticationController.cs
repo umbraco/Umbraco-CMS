@@ -322,10 +322,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                         // Ensure the culture of the found user is used for the email!
                         UmbracoUserExtensions.GetUserCulture(identityUser.Culture, _textService, _globalSettings));
 
-                    var mailMessage = new EmailMessage(from, user.Email, subject, message)
-                    {
-                        IsBodyHtml = true
-                    };
+                    var mailMessage = new EmailMessage(from, user.Email, subject, message, true);
 
                     await _emailSender.SendAsync(mailMessage);
 
