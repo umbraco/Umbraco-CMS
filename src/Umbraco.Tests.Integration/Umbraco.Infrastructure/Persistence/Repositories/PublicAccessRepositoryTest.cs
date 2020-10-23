@@ -133,13 +133,10 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
                 Assert.IsTrue(found[0].HasIdentity);
                 Assert.AreNotEqual(default(DateTime), found[0].CreateDate);
                 Assert.AreNotEqual(default(DateTime), found[0].UpdateDate);
-                Assert.AreEqual(2, found[0].Rules.Count());
-                Assert.AreEqual("test", found[0].Rules.First().RuleValue);
-                Assert.AreEqual("RoleName", found[0].Rules.First().RuleType);
+                CollectionAssert.AreEquivalent(found[0].Rules, entry.Rules);
                 Assert.AreNotEqual(default(DateTime), found[0].Rules.First().CreateDate);
                 Assert.AreNotEqual(default(DateTime), found[0].Rules.First().UpdateDate);
                 Assert.IsTrue(found[0].Rules.First().HasIdentity);
-                Assert.AreEqual("test2", found[0].Rules.Skip(1).First().RuleValue);
             }
         }
 

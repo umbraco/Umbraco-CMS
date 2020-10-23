@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
@@ -23,13 +24,15 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
     {
         private IFileSystems _fileSystems;
         private IFileSystem _fileSystem;
-        private readonly TestHelper _testHelper = new TestHelper();
+
+        private IIOHelper IOHelper => GetRequiredService<IIOHelper>();
+        private IHostingEnvironment HostingEnvironment => GetRequiredService<IHostingEnvironment>();
 
         [SetUp]
         public void SetUpFileSystem()
         {
             _fileSystems = Mock.Of<IFileSystems>();
-            _fileSystem = new PhysicalFileSystem(_testHelper.IOHelper, _testHelper.GetHostingEnvironment(), LoggerFactory.CreateLogger<PhysicalFileSystem>(), new GlobalSettings().UmbracoCssPath);
+            _fileSystem = new PhysicalFileSystem(IOHelper, HostingEnvironment, LoggerFactory.CreateLogger<PhysicalFileSystem>(), new GlobalSettings().UmbracoCssPath);
             Mock.Get(_fileSystems).Setup(x => x.StylesheetsFileSystem).Returns(_fileSystem);
             var stream = CreateStream("body {background:#EE7600; color:#FFF;}");
             _fileSystem.AddFile("styles.css", stream);
@@ -46,7 +49,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
         private IStylesheetRepository CreateRepository()
         {
             var globalSettings = new GlobalSettings();
-            return new StylesheetRepository(_fileSystems, _testHelper.IOHelper, Microsoft.Extensions.Options.Options.Create(globalSettings));
+            return new StylesheetRepository(_fileSystems, IOHelper, Microsoft.Extensions.Options.Options.Create(globalSettings));
         }
 
         [Test]
