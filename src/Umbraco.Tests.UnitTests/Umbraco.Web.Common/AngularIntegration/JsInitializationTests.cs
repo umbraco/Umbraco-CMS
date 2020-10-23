@@ -2,7 +2,7 @@
 using Umbraco.Core;
 using Umbraco.Web.WebAssets;
 
-namespace Umbraco.Tests.Web.AngularIntegration
+namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.AngularIntegration
 {
     [TestFixture]
     public class JsInitializationTests

@@ -6,7 +6,7 @@ using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Tests.TestHelpers;
 
-namespace Umbraco.Tests.Composing
+namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
 {
     [TestFixture]
     public class ContainerConformingTests

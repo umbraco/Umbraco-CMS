@@ -6,7 +6,7 @@ using Umbraco.Core.HealthCheck.Checks;
 using Umbraco.Infrastructure.HealthCheck;
 using Umbraco.Web.HealthCheck;
 
-namespace Umbraco.Tests.Web.HealthChecks
+namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HealthChecks
 {
     [TestFixture]
     public class HealthCheckResultsTests

@@ -3,7 +3,7 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Strings.Css;
 
-namespace Umbraco.Tests.Strings
+namespace Umbraco.Tests.UnitTests.Umbraco.Core.ShortStringHelper
 {
     [TestFixture]
     public class StylesheetHelperTests

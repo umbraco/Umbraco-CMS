@@ -9,7 +9,7 @@ using Umbraco.Core.Strings;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.TestHelpers.Entities;
 
-namespace Umbraco.Tests.Services
+namespace Umbraco.Tests.UnitTests.Umbraco.Core.Services
 {
     [TestFixture]
     public class ContentTypeServiceExtensionsTests

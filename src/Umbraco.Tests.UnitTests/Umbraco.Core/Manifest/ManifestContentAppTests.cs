@@ -10,7 +10,7 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Composing;
 
-namespace Umbraco.Tests.Manifest
+namespace Umbraco.Tests.UnitTests.Umbraco.Core.Manifest
 {
     [TestFixture]
     public class ManifestContentAppTests
