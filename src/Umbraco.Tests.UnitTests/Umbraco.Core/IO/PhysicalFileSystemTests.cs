@@ -8,8 +8,7 @@ using NUnit.Framework;
 using Umbraco.Core.IO;
 using Umbraco.Tests.TestHelpers;
 
-
-namespace Umbraco.Tests.IO
+namespace Umbraco.Tests.UnitTests.Umbraco.Core.IO
 {
     [TestFixture]
     [Apartment(ApartmentState.STA)]
@@ -36,6 +35,7 @@ namespace Umbraco.Tests.IO
             {
                 File.Delete(f);
             }
+
             Directory.Delete(path, true);
         }
 
@@ -67,8 +67,8 @@ namespace Umbraco.Tests.IO
 
             Assert.Throws<PathTooLongException>(() =>
             {
-                using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
-                    _fileSystem.AddFile(path + "f3.txt", ms);
+                using var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo"));
+                _fileSystem.AddFile(path + "f3.txt", ms);
             });
         }
 
