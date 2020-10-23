@@ -791,7 +791,15 @@
                     return null;
                 }
 
+                var blockConfiguration;
+
                 if (blockData.data) {
+                    // Ensure that we support the alias:
+                    blockConfiguration = this.getBlockConfiguration(blockData.data.contentTypeKey);
+                    if(blockConfiguration === null) {
+                        return null;
+                    }
+
                     this.value.contentData.push(blockData.data);
                 } else {
                     // We do not have data, this cannot be succesful paste.
@@ -799,7 +807,19 @@
                 }
 
                 if (blockData.settingsData) {
-                    this.value.settingsData.push(blockData.settingsData);
+                    // Ensure that we support the alias:
+                    if(blockConfiguration.settingsElementTypeKey) {
+                        // If we have settings for this Block Configuration, we need to check that they align, if we dont we do not want to fail.
+                        if(blockConfiguration.settingsElementTypeKey === blockData.settingsData.contentTypeKey) {
+                            this.value.settingsData.push(blockData.settingsData);
+                        } else {
+                            // Settings ElementType does not align, so we will fail.
+                            return null;
+                        }
+                    } else {
+                        // We do not have settings currently, so lets get rid of the settings part and move on with the paste.
+                        delete layoutEntry.settingUdi;
+                    }
                 }
 
                 return layoutEntry;

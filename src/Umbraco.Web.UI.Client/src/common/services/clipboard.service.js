@@ -52,6 +52,18 @@ function clipboardService($window, notificationsService, eventsService, localSto
                 propMethod(block.settingsData[key], TYPES.RAW);
             });
         }
+
+        /*
+        // Concept for supporting Block that contains other Blocks.
+        // Missing clearifications:
+        // How do we ensure that the inner blocks of a block is supported in the new scenario. Not that likely but still relevant, so conciderations should be made.
+        if(block.references) {
+            // A Block clipboard entry can contain other Block Clipboard Entries, here we will make sure to resolve those identical to the main entry.
+            for (var r = 0; r < block.references.length; r++) {
+                clipboardTypeResolvers[TYPES.BLOCK](block.references[r], propMethod);
+            }
+        }
+        */
     }
     clipboardTypeResolvers[TYPES.RAW] = function(data, propMethod) {
         for (var p = 0; p < data.length; p++) {
@@ -453,12 +465,12 @@ function clipboardService($window, notificationsService, eventsService, localSto
     };
 
 
+    var emitClipboardStorageUpdate = _.debounce(function(e) {
+        eventsService.emit("clipboardService.storageUpdate");
+    }, 1000);
 
     // Fires if LocalStorage was changed from another tab than this one.
-    $window.addEventListener("storage", localStorageChanged);
-    function localStorageChanged() {
-        eventsService.emit("clipboardService.storageUpdate");
-    }
+    $window.addEventListener("storage", emitClipboardStorageUpdate);
 
 
 
