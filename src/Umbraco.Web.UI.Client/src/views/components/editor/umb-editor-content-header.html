@@ -91,7 +91,8 @@
 
         <div ng-if="splitViewOpen">
             <button type="button" class="btn-reset umb-editor-header__close-split-view" ng-click="closeSplitView()">
-                <umb-icon icon="icon-delete" class="icon-delete"></umb-icon>
+                <umb-icon icon="icon-delete" class="icon-delete" aria-hidden="true"></umb-icon>
+                <span class="sr-only"><localize key="general_closewindow">Close Window</localize></span>
             </button>
         </div>
 
