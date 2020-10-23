@@ -252,10 +252,10 @@ function umbRequestHelper($http, $q, notificationsService, eventsService, formHe
                         //each item has a property alias and the file object, we'll ensure that the alias is suffixed to the key
                         // so we know which property it belongs to on the server side
                         var file = args.files[f];
-                        var fileKey = "file_" + file.alias + "_" + (file.culture ? file.culture : "") + "_" + (file.segment ? file.segment : "");
+                        var fileKey = "file_" + (file.alias || '').replace(/_/g, '\\_') + "_" + (file.culture ? file.culture.replace(/_/g, '\\_') : "") + "_" + (file.segment ? file.segment.replace(/_/g, '\\_') : "");
 
                         if (Utilities.isArray(file.metaData) && file.metaData.length > 0) {
-                            fileKey += ("_" + file.metaData.join("_"));
+                            fileKey += ("_" + _.map(file.metaData, x => ('' + x).replace(/_/g, '\\_')).join("_"));
                         }
                         formData.append(fileKey, file.file);
                     }
