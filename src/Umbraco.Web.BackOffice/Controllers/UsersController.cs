@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Net.Mail;
 using System.Runtime.Serialization;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
@@ -543,13 +542,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 UmbracoUserExtensions.GetUserCulture(to.Language, _localizedTextService, _globalSettings),
                 new[] { userDisplay.Name, from, message, inviteUri.ToString(), fromEmail });
 
-            var mailMessage = new MailMessage()
-            {
-                Subject = emailSubject,
-                Body = emailBody,
-                IsBodyHtml = true,
-                To = { to.Email}
-            };
+            var mailMessage = new EmailMessage(fromEmail, to.Email, emailSubject, emailBody, true);
 
             await _emailSender.SendAsync(mailMessage);
         }
