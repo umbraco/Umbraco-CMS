@@ -221,9 +221,6 @@
     <Compile Include="Migrations\Stubs\FourElevenMigration.cs" />
     <Compile Include="Migrations\Stubs\SixZeroMigration2.cs" />
     <Compile Include="Testing\TestingTests\MockTests.cs" />
-    <Compile Include="Models\Collections\Item.cs" />
-    <Compile Include="Models\Collections\OrderItem.cs" />
-    <Compile Include="Models\Collections\SimpleOrder.cs" />
     <Compile Include="Web\Mvc\SurfaceControllerTests.cs" />
     <Compile Include="Runtimes\CoreRuntimeTests.cs" />
     <Compile Include="Runtimes\WebRuntimeComponentTests.cs" />
@@ -249,7 +246,6 @@
     <Compile Include="Migrations\Stubs\AlterUserTableMigrationStub.cs" />
     <Compile Include="Migrations\Stubs\Dummy.cs" />
     <Compile Include="Migrations\Stubs\SixZeroMigration1.cs" />
-    <Compile Include="Models\Collections\PropertyCollectionTests.cs" />
     <Compile Include="Models\MediaXmlTest.cs" />
     <Compile Include="Persistence\FaultHandling\ConnectionRetryTest.cs" />
     <Compile Include="Persistence\SchemaValidationTest.cs" />
