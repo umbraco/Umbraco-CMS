@@ -1,12 +1,13 @@
-﻿namespace Umbraco.Web.Security
+﻿namespace Umbraco.Core.BackOffice
 {
+
     /// <summary>
     /// Event args used when signing out
     /// </summary>
     public class SignOutAuditEventArgs : IdentityAuditEventArgs
     {
         public SignOutAuditEventArgs(AuditEvent action, string ipAddress, string comment = null, int performingUser = -1, int affectedUser = -1)
-            : base(action, ipAddress, comment, performingUser, affectedUser)
+            : base(action, ipAddress, performingUser, comment, affectedUser, null)
         {
         }
 

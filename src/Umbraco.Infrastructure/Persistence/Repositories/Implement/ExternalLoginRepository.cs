@@ -77,11 +77,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             Database.InsertBulk(toInsert.Select(i => ExternalLoginFactory.BuildDto(userId, i)));
         }
 
-        public void SaveUserLogins(int memberId, IEnumerable<IUserLoginInfo> logins)
-        {
-            Save(memberId, logins.Select(x => new ExternalLogin(x.LoginProvider, x.ProviderKey)));
-        }
-
         protected override IIdentityUserLogin PerformGet(int id)
         {
             var sql = GetBaseQuery(false);

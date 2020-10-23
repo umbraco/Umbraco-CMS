@@ -115,8 +115,9 @@ namespace Umbraco.Web.BackOffice.Services
 
         private IEnumerable<FileInfo> GetAllIconNames()
         {
+            // TODO: See comment: https://github.com/umbraco/Umbraco-CMS/pull/8884/files#r510564185
             // add icons from plugins
-            var appPlugins = new DirectoryInfo(_hostingEnvironment.MapPath(Constants.SystemDirectories.AppPlugins));
+            var appPlugins = new DirectoryInfo(_hostingEnvironment.MapPathWebRoot(Constants.SystemDirectories.AppPlugins));
             var pluginIcons = appPlugins.Exists == false
                 ? new List<FileInfo>()
                 : appPlugins.GetDirectories()
@@ -125,7 +126,7 @@ namespace Umbraco.Web.BackOffice.Services
                     .SelectMany(x => x.GetFiles("*.svg", SearchOption.TopDirectoryOnly));
 
             // add icons from IconsPath if not already added from plugins
-            var directory = new DirectoryInfo(_hostingEnvironment.MapPath($"{_globalSettings.IconsPath}/"));
+            var directory = new DirectoryInfo(_hostingEnvironment.MapPathWebRoot($"{_globalSettings.Value.IconsPath}/"));
             var iconNames = directory.GetFiles("*.svg")
                 .Where(x => pluginIcons.Any(i => i.Name == x.Name) == false);
 

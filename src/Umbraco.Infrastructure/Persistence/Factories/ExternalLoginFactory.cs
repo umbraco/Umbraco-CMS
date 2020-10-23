@@ -6,7 +6,7 @@ namespace Umbraco.Core.Persistence.Factories
 {
     internal static class ExternalLoginFactory
     {
-        public static IIdentityUserLoginExtended BuildEntity(ExternalLoginDto dto)
+        public static IIdentityUserLogin BuildEntity(ExternalLoginDto dto)
         {
             var entity = new IdentityUserLogin(dto.Id, dto.LoginProvider, dto.ProviderKey, dto.UserId, dto.CreateDate)
             {
@@ -20,7 +20,6 @@ namespace Umbraco.Core.Persistence.Factories
 
         public static ExternalLoginDto BuildDto(IIdentityUserLogin entity)
         {
-            var asExtended = entity as IIdentityUserLoginExtended;
             var dto = new ExternalLoginDto
             {
                 Id = entity.Id,
@@ -28,7 +27,7 @@ namespace Umbraco.Core.Persistence.Factories
                 LoginProvider = entity.LoginProvider,
                 ProviderKey = entity.ProviderKey,
                 UserId = entity.UserId,
-                UserData = asExtended?.UserData
+                UserData = entity.UserData
             };
 
             return dto;

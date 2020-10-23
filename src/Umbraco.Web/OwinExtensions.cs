@@ -9,21 +9,6 @@ namespace Umbraco.Web
 {
     public static class OwinExtensions
     {
-        /// <summary>
-        /// Used by external login providers to set any errors that occur during the OAuth negotiation
-        /// </summary>
-        /// <param name="owinContext"></param>
-        /// <param name="errors"></param>
-        public static void SetExternalLoginProviderErrors(this IOwinContext owinContext, BackOfficeExternalLoginProviderErrors errors)
-            => owinContext.Set(errors);
-
-        /// <summary>
-        /// Retrieve any errors set by external login providers during OAuth negotiation
-        /// </summary>
-        /// <param name="owinContext"></param>
-        /// <returns></returns>
-        internal static BackOfficeExternalLoginProviderErrors GetExternalLoginProviderErrors(this IOwinContext owinContext)
-            => owinContext.Get<BackOfficeExternalLoginProviderErrors>();
 
         /// <summary>
         /// Gets the <see cref="ISecureDataFormat{AuthenticationTicket}"/> for the Umbraco back office cookie
@@ -67,16 +52,6 @@ namespace Umbraco.Web
             return ctx == null ? Attempt<HttpContextBase>.Fail() : Attempt.Succeed(ctx);
         }
 
-        /// <summary>
-        /// Gets the back office sign in manager out of OWIN
-        /// </summary>
-        /// <param name="owinContext"></param>
-        /// <returns></returns>
-        public static BackOfficeSignInManager GetBackOfficeSignInManager(this IOwinContext owinContext)
-        {
-            return owinContext.Get<BackOfficeSignInManager>()
-                ?? throw new NullReferenceException($"Could not resolve an instance of {typeof (BackOfficeSignInManager)} from the {typeof(IOwinContext)}.");
-        }
 
         /// <summary>
         /// Gets the back office user manager out of OWIN

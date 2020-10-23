@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using Microsoft.Owin;
+using Microsoft.Owin.Extensions;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.DataProtection;
@@ -20,6 +21,8 @@ namespace Umbraco.Web.Security
     /// </summary>
     public static class AppBuilderExtensions
     {
+
+        // TODO: Migrate this!
 
         /// <summary>
         /// Ensures that the cookie middleware for validating external logins is assigned to the pipeline with the correct
@@ -72,22 +75,6 @@ namespace Umbraco.Web.Security
                 CookieDomain = new SecuritySettings().AuthCookieDomain // TODO inject settings
             }, stage);
 
-            return app;
-        }
-
-            app.UseStageMarker(stage);
-            return app;
-        }
-
-        /// <summary>
-        /// Enable the back office to detect and handle errors registered with external login providers
-        /// </summary>
-        /// <param name="app"></param>
-        /// <param name="stage"></param>
-        /// <returns></returns>
-        public static IAppBuilder UseUmbracoBackOfficeExternalLoginErrors(this IAppBuilder app, PipelineStage stage = PipelineStage.Authorize)
-        {
-            app.Use(typeof(BackOfficeExternalLoginProviderErrorMiddlware));
             app.UseStageMarker(stage);
             return app;
         }
@@ -97,41 +84,5 @@ namespace Umbraco.Web.Security
             Thread.CurrentThread.SanitizeThreadCulture();
         }
 
-        public static IAppBuilder CreatePerOwinContext<T>(this IAppBuilder app, Func<T> createCallback)
-            where T : class, IDisposable
-        {
-            return CreatePerOwinContext<T>(app, (options, context) => createCallback());
-        }
-
-        public static IAppBuilder CreatePerOwinContext<T>(this IAppBuilder app,
-            Func<IdentityFactoryOptions<T>, IOwinContext, T> createCallback) where T : class, IDisposable
-        {
-            if (app == null)
-            {
-                throw new ArgumentNullException(nameof(app));
-            }
-            return app.CreatePerOwinContext(createCallback, (options, instance) => instance.Dispose());
-        }
-
-        public static IAppBuilder CreatePerOwinContext<T>(this IAppBuilder app,
-            Func<IdentityFactoryOptions<T>, IOwinContext, T> createCallback,
-            Action<IdentityFactoryOptions<T>, T> disposeCallback) where T : class, IDisposable
-        {
-            if (app == null) throw new ArgumentNullException(nameof(app));
-            if (createCallback == null) throw new ArgumentNullException(nameof(createCallback));
-            if (disposeCallback == null) throw new ArgumentNullException(nameof(disposeCallback));
-
-            app.Use(typeof(IdentityFactoryMiddleware<T, IdentityFactoryOptions<T>>),
-                new IdentityFactoryOptions<T>
-                {
-                    DataProtectionProvider = app.GetDataProtectionProvider(),
-                    Provider = new IdentityFactoryProvider<T>
-                    {
-                        OnCreate = createCallback,
-                        OnDispose = disposeCallback
-                    }
-                });
-            return app;
-        }
     }
 }

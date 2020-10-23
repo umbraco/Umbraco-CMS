@@ -1,10 +1,7 @@
-﻿using Microsoft.Owin;
-using Microsoft.Owin.Security;
-using System;
-using System.Collections;
+﻿using System;
 using System.Runtime.Serialization;
 
-namespace Umbraco.Web.Security
+namespace Umbraco.Web.Common.Security
 {
 
     /// <summary>
@@ -13,18 +10,8 @@ namespace Umbraco.Web.Security
     public class BackOfficeExternalLoginProviderOptions
     {
         /// <summary>
-        /// When specified this will be called to retrieve the <see cref="AuthenticationProperties"/> used during the authentication Challenge response.
-        /// </summary>
-        /// <remarks>
-        /// This will generally not be needed since OpenIdConnect.RedirectToIdentityProvider options should be used instead
-        /// </remarks>
-        [IgnoreDataMember]
-        public Func<IOwinContext, AuthenticationProperties> OnChallenge { get; set; }
-
-        /// <summary>
         /// Options used to control how users can be auto-linked/created/updated based on the external login provider
         /// </summary>
-        [IgnoreDataMember] // we are ignoring this one from serialization for backwards compat since these options are manually incuded in the response separately
         public ExternalSignInAutoLinkOptions AutoLinkOptions { get; set; } = new ExternalSignInAutoLinkOptions();
 
         /// <summary>

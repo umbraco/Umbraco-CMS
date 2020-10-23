@@ -19,6 +19,7 @@ using Umbraco.Web.Models;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebAssets;
 using Umbraco.Core;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Extensions
 {
@@ -61,27 +62,20 @@ namespace Umbraco.Extensions
         /// Used to render the script that will pass in the angular "externalLoginInfo" service/value on page load
         /// </summary>
         /// <param name="html"></param>
-        /// <param name="signInManager"></param>
+        /// <param name="externalLogins"></param>
         /// <returns></returns>
-        public static async Task<IHtmlContent> AngularValueExternalLoginInfoScriptAsync(this IHtmlHelper html,
-            BackOfficeExternalLoginProviderErrors externalLoginErrors,
-            BackOfficeSignInManager signInManager,
-            IEnumerable<string> externalLoginErrors)
+        public static Task<IHtmlContent> AngularValueExternalLoginInfoScriptAsync(this IHtmlHelper html,
+            IBackOfficeExternalLoginProviders externalLogins,
+            BackOfficeExternalLoginProviderErrors externalLoginErrors)
         {
-            var providers = await signInManager.GetExternalAuthenticationSchemesAsync();
+            var providers = externalLogins.GetBackOfficeProviders();
 
             var loginProviders = providers
-                // TODO: We need to filter only back office enabled schemes.
-                // Before we used to have a property bag to check, now we don't so need to investigate the easiest/best
-                // way to do this. We have the type so maybe we check for a marker interface, but maybe there's another way,
-                // just need to investigate.
-                //.Where(p => p.Properties.ContainsKey("UmbracoBackOffice"))
                 .Select(p => new
                 {
-                    authType = p.Name,
-                    caption = p.DisplayName,
-                    // TODO: See above, if we need this property bag in the vars then we'll need to figure something out
-                    //properties = p.Properties
+                    authType = p.AuthenticationType,
+                    caption = p.Name,
+                    properties = p.Properties
                 })
                 .ToArray();
 
@@ -105,13 +99,7 @@ namespace Umbraco.Extensions
             sb.AppendLine(JsonConvert.SerializeObject(loginProviders));
             sb.AppendLine(@"});");
 
-            return html.Raw(sb.ToString());
-        }
-
-        [Obsolete("Use the other overload instead")]
-        public static IHtmlString AngularValueExternalLoginInfoScript(this HtmlHelper html, IEnumerable<string> externalLoginErrors)
-        {
-            return html.AngularValueExternalLoginInfoScript(new BackOfficeExternalLoginProviderErrors(string.Empty, externalLoginErrors));
+            return Task.FromResult(html.Raw(sb.ToString()));
         }
 
         /// <summary>

@@ -31,6 +31,7 @@ using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Security;
 using Constants = Umbraco.Core.Constants;
 using Microsoft.AspNetCore.Identity;
+using Umbraco.Web.Editors.Filters;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -63,6 +64,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly Core.Hosting.IHostingEnvironment _hostingEnvironment;
         private readonly IRequestAccessor _requestAccessor;
         private readonly LinkGenerator _linkGenerator;
+        private readonly IBackOfficeExternalLoginProviders _externalAuthenticationOptions;
 
         // TODO: We need to import the logic from Umbraco.Web.Editors.AuthenticationController
         // TODO: We need to review all _userManager.Raise calls since many/most should be on the usermanager or signinmanager, very few should be here
@@ -83,7 +85,8 @@ namespace Umbraco.Web.BackOffice.Controllers
             ISmsSender smsSender,
             Core.Hosting.IHostingEnvironment hostingEnvironment,
             IRequestAccessor requestAccessor,
-            LinkGenerator linkGenerator)
+            LinkGenerator linkGenerator,
+            IBackOfficeExternalLoginProviders externalAuthenticationOptions)
         {
             _backofficeSecurityAccessor = backofficeSecurityAccessor;
             _userManager = backOfficeUserManager;
@@ -101,6 +104,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _hostingEnvironment = hostingEnvironment;
             _requestAccessor = requestAccessor;
             _linkGenerator = linkGenerator;
+            _externalAuthenticationOptions = externalAuthenticationOptions;
         }
 
         /// <summary>
@@ -123,6 +127,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// This will also update the security stamp for the user so it can only be used once
         /// </remarks>
         [ValidateAngularAntiForgeryToken]
+        [DenyLocalLoginAuthorization]
         public async Task<ActionResult<UserDisplay>> PostVerifyInvite([FromQuery] int id, [FromQuery] string token)
         {
             if (string.IsNullOrWhiteSpace(token))
@@ -154,10 +159,28 @@ namespace Umbraco.Web.BackOffice.Controllers
 
         [UmbracoAuthorize]
         [ValidateAngularAntiForgeryToken]
-        public async Task<ActionResult> PostUnLinkLogin(UnLinkLoginModel unlinkLoginModel)
+        public async Task<IActionResult> PostUnLinkLogin(UnLinkLoginModel unlinkLoginModel)
         {
             var user = await _userManager.FindByIdAsync(User.Identity.GetUserId());
             if (user == null) throw new InvalidOperationException("Could not find user");
+
+            ExternalSignInAutoLinkOptions autoLinkOptions = null;
+            var authType = (await _signInManager.GetExternalAuthenticationSchemesAsync())
+               .FirstOrDefault(x => x.Name == unlinkLoginModel.LoginProvider);
+
+            if (authType == null)
+            {
+                _logger.LogWarning("Could not find external authentication provider registered: {LoginProvider}", unlinkLoginModel.LoginProvider);
+            }
+            else
+            {
+                autoLinkOptions = _externalAuthenticationOptions.Get(authType.Name);
+                if (!autoLinkOptions.AllowManualLinking)
+                {
+                    // If AllowManualLinking is disabled for this provider we cannot unlink
+                    return BadRequest();
+                }
+            }
 
             var result = await _userManager.RemoveLoginAsync(
                 user,
@@ -243,6 +266,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </remarks>
         [UmbracoAuthorize(redirectToUmbracoLogin: false, requireApproval: false)]
         [SetAngularAntiForgeryTokens]
+        [DenyLocalLoginAuthorization]
         public ActionResult<UserDetail> GetCurrentInvitedUser()
         {
             var user = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
@@ -266,6 +290,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <returns></returns>
         [SetAngularAntiForgeryTokens]
+        [DenyLocalLoginAuthorization]
         public async Task<UserDetail> PostLogin(LoginModel loginModel)
         {
             // Sign the user in with username/password, this also gives a chance for developers to
@@ -332,6 +357,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <returns></returns>
         [SetAngularAntiForgeryTokens]
+        [DenyLocalLoginAuthorization]
         public async Task<IActionResult> PostRequestPasswordReset(RequestPasswordResetModel model)
         {
             // If this feature is switched off in configuration the UI will be amended to not make the request to reset password available.
@@ -546,11 +572,19 @@ namespace Umbraco.Web.BackOffice.Controllers
         [ValidateAngularAntiForgeryToken]
         public IActionResult PostLogout()
         {
-            HttpContext.SignOutAsync(Core.Constants.Security.BackOfficeAuthenticationType);
+            HttpContext.SignOutAsync(Constants.Security.BackOfficeAuthenticationType);
 
             _logger.LogInformation("User {UserName} from IP address {RemoteIpAddress} has logged out", User.Identity == null ? "UNKNOWN" : User.Identity.Name, HttpContext.Connection.RemoteIpAddress);
 
-            _userManager.RaiseLogoutSuccessEvent(User, int.Parse(User.Identity.GetUserId()));
+            var userId = int.Parse(User.Identity.GetUserId());
+            var args = _userManager.RaiseLogoutSuccessEvent(User, userId);
+            if (!args.SignOutRedirectUrl.IsNullOrWhiteSpace())
+            {
+                return new ObjectResult(new
+                {
+                    signOutRedirectUrl = args.SignOutRedirectUrl
+                });
+            }
 
             return Ok();
         }

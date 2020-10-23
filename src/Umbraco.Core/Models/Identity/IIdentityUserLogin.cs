@@ -2,15 +2,6 @@
 
 namespace Umbraco.Core.Models.Identity
 {
-    // TODO: Merge these in v8! This is here purely for backward compat
-
-    public interface IIdentityUserLoginExtended : IIdentityUserLogin
-    {
-        /// <summary>
-        /// Used to store any arbitrary data for the user and external provider - like user tokens returned from the provider
-        /// </summary>
-        string UserData { get; set; }
-    }
 
     public interface IIdentityUserLogin : IEntity, IRememberBeingDirty
     {
@@ -28,5 +19,10 @@ namespace Umbraco.Core.Models.Identity
         /// User Id for the user who owns this login
         /// </summary>
         int UserId { get; set; }
+
+        /// <summary>
+        /// Used to store any arbitrary data for the user and external provider - like user tokens returned from the provider
+        /// </summary>
+        string UserData { get; set; }
     }
 }

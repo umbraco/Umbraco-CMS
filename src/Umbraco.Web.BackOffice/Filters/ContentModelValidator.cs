@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -12,7 +11,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Extensions;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Security;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Web.BackOffice.Filters
 {

@@ -16,9 +16,6 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         IEnumerable<IIdentityUserLogin> GetAll(int userId);
 
-        [Obsolete("Use the overload specifying loginProvider and providerKey instead")]
-        IEnumerable<IIdentityUserLogin> Find(IUserLoginInfo login);
-
         /// <summary>
         /// Returns all logins matching the login info - generally there should only be one but in some cases
         /// there might be more than one depending on if an administrator has been editing/removing members
@@ -27,9 +24,6 @@ namespace Umbraco.Core.Services
         /// <param name="providerKey"></param>
         /// <returns></returns>
         IEnumerable<IIdentityUserLogin> Find(string loginProvider, string providerKey);
-
-        [Obsolete("Use the Save method instead")]
-        void SaveUserLogins(int userId, IEnumerable<IUserLoginInfo> logins);
 
         /// <summary>
         /// Saves the external logins associated with the user
@@ -47,7 +41,7 @@ namespace Umbraco.Core.Services
         /// Save a single external login record
         /// </summary>
         /// <param name="login"></param>
-        void Save(IIdentityUserLoginExtended login);
+        void Save(IIdentityUserLogin login);
 
         /// <summary>
         /// Deletes all user logins - normally used when a member is deleted

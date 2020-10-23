@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Security;
 
 namespace Umbraco.Web.BackOffice.Filters
 {

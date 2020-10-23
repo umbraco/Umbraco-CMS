@@ -4,6 +4,7 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Security;
 using Umbraco.Web.Composing;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;

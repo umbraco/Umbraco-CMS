@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core;
+using Umbraco.Core.Security;
 using Umbraco.Web.Security;
 
 namespace Umbraco.Web.BackOffice.Filters

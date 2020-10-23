@@ -2,8 +2,8 @@ using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using SixLabors.ImageSharp.Web.DependencyInjection;
+using Umbraco.Web.BackOffice.Middleware;
 using Umbraco.Web.BackOffice.Routing;
-using Umbraco.Web.BackOffice.Security;
 
 namespace Umbraco.Extensions
 {
@@ -49,6 +49,7 @@ namespace Umbraco.Extensions
             app.UseUmbracoRuntimeMinification();
 
             app.UseMiddleware<PreviewAuthenticationMiddleware>();
+            app.UseMiddleware<BackOfficeExternalLoginProviderErrorMiddlware>();
 
             return app;
         }

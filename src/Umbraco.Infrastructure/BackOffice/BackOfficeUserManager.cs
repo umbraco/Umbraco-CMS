@@ -8,9 +8,11 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
 using Umbraco.Extensions;
 using Umbraco.Net;
+using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Core.BackOffice
 {
@@ -362,10 +364,15 @@ namespace Umbraco.Core.BackOffice
             return result;
         }
 
-        private IdentityAuditEventArgs CreateArgs(AuditEvent auditEvent, IPrincipal currentUser, int affectedUserId, string affectedUsername)
+        private int GetCurrentUserId(IPrincipal currentUser)
         {
             var umbIdentity = currentUser?.GetUmbracoIdentity();
             var currentUserId = umbIdentity?.GetUserId<int?>() ?? Constants.Security.SuperUserId;
+            return currentUserId;
+        }
+        private IdentityAuditEventArgs CreateArgs(AuditEvent auditEvent, IPrincipal currentUser, int affectedUserId, string affectedUsername)
+        {
+            var currentUserId = GetCurrentUserId(currentUser);
             var ip = IpResolver.GetCurrentRequestIpAddress();
             return new IdentityAuditEventArgs(auditEvent, ip, currentUserId, string.Empty, affectedUserId, affectedUsername);
         }
@@ -391,44 +398,53 @@ namespace Umbraco.Core.BackOffice
         public void RaiseInvalidLoginAttemptEvent(IPrincipal currentUser, string username) => OnLoginFailed(CreateArgs(AuditEvent.LoginFailed, currentUser, Constants.Security.SuperUserId, username));
 
         public void RaiseLoginRequiresVerificationEvent(IPrincipal currentUser, int userId) => OnLoginRequiresVerification(CreateArgs(AuditEvent.LoginRequiresVerification, currentUser, userId, string.Empty));
-        internal SignOutAuditEventArgs RaiseLogoutSuccessEvent(int userId)
-        {
-            var args = new SignOutAuditEventArgs(AuditEvent.LogoutSuccess, IpResolver.GetCurrentRequestIpAddress(), affectedUser: userId);
-            OnLogoutSuccess(args);
-            return args;
-        }
 
         public void RaiseLoginSuccessEvent(BackOfficeIdentityUser currentUser, int userId) => OnLoginSuccess(CreateArgs(AuditEvent.LoginSucces, currentUser, userId, string.Empty));
 
-        public void RaiseLogoutSuccessEvent(IPrincipal currentUser, int userId) => OnLogoutSuccess(CreateArgs(AuditEvent.LogoutSuccess, currentUser, userId, string.Empty));
-
+        public SignOutAuditEventArgs RaiseLogoutSuccessEvent(IPrincipal currentUser, int userId)
+        {
+            var currentUserId = GetCurrentUserId(currentUser);
+            var args = new SignOutAuditEventArgs(AuditEvent.LogoutSuccess, IpResolver.GetCurrentRequestIpAddress(), performingUser: currentUserId, affectedUser: userId);
+            OnLogoutSuccess(args);
+            return args;
+        }
+        
         public void RaisePasswordChangedEvent(IPrincipal currentUser, int userId) => OnPasswordChanged(CreateArgs(AuditEvent.LogoutSuccess, currentUser, userId, string.Empty));
 
         public void RaiseResetAccessFailedCountEvent(IPrincipal currentUser, int userId) => OnResetAccessFailedCount(CreateArgs(AuditEvent.ResetAccessFailedCount, currentUser, userId, string.Empty));
 
-        internal void RaiseSendingUserInvite(UserInviteEventArgs args) => OnSendingUserInvite(args);
-        internal bool HasSendingUserInviteEventHandler => SendingUserInvite != null;
+        public UserInviteEventArgs RaiseSendingUserInvite(IPrincipal currentUser, UserInvite invite, IUser createdUser)
+        {
+            var currentUserId = GetCurrentUserId(currentUser);
+            var ip = IpResolver.GetCurrentRequestIpAddress();
+            var args = new UserInviteEventArgs(ip, currentUserId, invite, createdUser);
+            OnSendingUserInvite(args);
+            return args;
+        }
 
-        // TODO: Not sure why these are not strongly typed events?? They should be in netcore!
-        public static event EventHandler AccountLocked;
-        public static event EventHandler AccountUnlocked;
-        public static event EventHandler ForgotPasswordRequested;
-        public static event EventHandler ForgotPasswordChangedSuccess;
-        public static event EventHandler LoginFailed;
-        public static event EventHandler LoginRequiresVerification;
-        public static event EventHandler LoginSuccess;
-        public static event EventHandler LogoutSuccess;
-        public static event EventHandler PasswordChanged;
-        public static event EventHandler PasswordReset;
-        public static event EventHandler ResetAccessFailedCount;
+        public bool HasSendingUserInviteEventHandler => SendingUserInvite != null;
+
+        public static event EventHandler<IdentityAuditEventArgs> AccountLocked;
+        public static event EventHandler<IdentityAuditEventArgs> AccountUnlocked;
+        public static event EventHandler<IdentityAuditEventArgs> ForgotPasswordRequested;
+        public static event EventHandler<IdentityAuditEventArgs> ForgotPasswordChangedSuccess;
+        public static event EventHandler<IdentityAuditEventArgs> LoginFailed;
+        public static event EventHandler<IdentityAuditEventArgs> LoginRequiresVerification;
+        public static event EventHandler<IdentityAuditEventArgs> LoginSuccess;
+        public static event EventHandler<SignOutAuditEventArgs> LogoutSuccess;
+        public static event EventHandler<IdentityAuditEventArgs> PasswordChanged;
+        public static event EventHandler<IdentityAuditEventArgs> PasswordReset;
+        public static event EventHandler<IdentityAuditEventArgs> ResetAccessFailedCount;
 
         /// <summary>
         /// Raised when a user is invited
         /// </summary>
-        public static event EventHandler SendingUserInvite; // this event really has nothing to do with the user manager but was the most convenient place to put it
+        public static event EventHandler<UserInviteEventArgs> SendingUserInvite; // this event really has nothing to do with the user manager but was the most convenient place to put it
+
         protected virtual void OnAccountLocked(IdentityAuditEventArgs e) => AccountLocked?.Invoke(this, e);
 
         protected virtual void OnSendingUserInvite(UserInviteEventArgs e) => SendingUserInvite?.Invoke(this, e);
+
         protected virtual void OnAccountUnlocked(IdentityAuditEventArgs e) => AccountUnlocked?.Invoke(this, e);
 
         protected virtual void OnForgotPasswordRequested(IdentityAuditEventArgs e) => ForgotPasswordRequested?.Invoke(this, e);
@@ -441,7 +457,7 @@ namespace Umbraco.Core.BackOffice
 
         protected virtual void OnLoginSuccess(IdentityAuditEventArgs e) => LoginSuccess?.Invoke(this, e);
 
-        protected virtual void OnLogoutSuccess(IdentityAuditEventArgs e) => LogoutSuccess?.Invoke(this, e);
+        protected virtual void OnLogoutSuccess(SignOutAuditEventArgs e) => LogoutSuccess?.Invoke(this, e);
 
         protected virtual void OnPasswordChanged(IdentityAuditEventArgs e) => PasswordChanged?.Invoke(this, e);
 

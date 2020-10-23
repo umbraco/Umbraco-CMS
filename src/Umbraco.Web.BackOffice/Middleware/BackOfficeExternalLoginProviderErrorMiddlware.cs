@@ -1,31 +1,27 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using System.Web.Mvc;
-using Microsoft.Owin;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Extensions;
 using Newtonsoft.Json;
 using Umbraco.Core;
+using Umbraco.Extensions;
 
-namespace Umbraco.Web.Security
+namespace Umbraco.Web.BackOffice.Middleware
 {
     /// <summary>
     /// Used to handle errors registered by external login providers
     /// </summary>
     /// <remarks>
-    /// When an external login provider registers an error with <see cref="OwinExtensions.SetExternalLoginProviderErrors"/> during the OAuth process,
+    /// When an external login provider registers an error with <see cref="HttpContextExtensions.SetExternalLoginProviderErrors"/> during the OAuth process,
     /// this middleware will detect that, store the errors into cookie data and redirect to the back office login so we can read the errors back out.
     /// </remarks>
-    internal class BackOfficeExternalLoginProviderErrorMiddlware : OwinMiddleware
+    public class BackOfficeExternalLoginProviderErrorMiddlware : IMiddleware
     {
-        public BackOfficeExternalLoginProviderErrorMiddlware(OwinMiddleware next) : base(next)
-        {
-        }
-
-        public override async Task Invoke(IOwinContext context)
+        public async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
             var shortCircuit = false;
-            if (!context.Request.Uri.IsClientSideRequest())
+            if (!context.Request.IsClientSideRequest())
             {
                 // check if we have any errors registered
                 var errors = context.GetExternalLoginProviderErrors();
@@ -39,16 +35,16 @@ namespace Umbraco.Web.Security
                     {
                         Expires = DateTime.Now.AddMinutes(5),
                         HttpOnly = true,
-                        Secure = context.Request.IsSecure
+                        Secure = context.Request.IsHttps
                     });
 
-                    context.Response.Redirect(context.Request.Uri.ToString());
+                    context.Response.Redirect(context.Request.GetEncodedUrl());
                 }
             }
 
-            if (Next != null && !shortCircuit)
+            if (next != null && !shortCircuit)
             {
-                await Next.Invoke(context);
+                await next(context);
             }
         }
     }

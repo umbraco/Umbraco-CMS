@@ -1,12 +1,12 @@
 ﻿using Umbraco.Core.Models.Membership;
 using Umbraco.Web.Models.ContentEditing;
 
-namespace Umbraco.Web.Security
+namespace Umbraco.Core.BackOffice
 {
     public class UserInviteEventArgs : IdentityAuditEventArgs
     {
         public UserInviteEventArgs(string ipAddress, int performingUser, UserInvite invitedUser, IUser localUser, string comment = null)
-            : base(AuditEvent.SendingUserInvite, ipAddress, comment, performingUser)
+            : base(AuditEvent.SendingUserInvite, ipAddress,  performingUser, comment, localUser.Id, localUser.Name)
         {
             InvitedUser = invitedUser ?? throw new System.ArgumentNullException(nameof(invitedUser));
             User = localUser;

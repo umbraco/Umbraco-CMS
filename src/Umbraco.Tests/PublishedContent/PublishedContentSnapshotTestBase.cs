@@ -9,8 +9,6 @@ using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
-using Umbraco.Web.Routing;
-using Umbraco.Web.Security;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Hosting;
@@ -21,9 +19,9 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Tests.Testing.Objects.Accessors;
 using Current = Umbraco.Web.Composing.Current;
 using Umbraco.Tests.Common;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Tests.PublishedContent
 {

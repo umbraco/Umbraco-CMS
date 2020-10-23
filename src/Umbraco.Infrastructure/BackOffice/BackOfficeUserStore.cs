@@ -144,7 +144,7 @@ namespace Umbraco.Core.BackOffice
                     user.Logins.Select(x => new ExternalLogin(
                         x.LoginProvider,
                         x.ProviderKey,
-                        (x is IIdentityUserLoginExtended extended) ? extended.UserData : null)));
+                        x.UserData)));
             }
 
             return Task.FromResult(IdentityResult.Success);
@@ -188,7 +188,7 @@ namespace Umbraco.Core.BackOffice
                         user.Logins.Select(x => new ExternalLogin(
                             x.LoginProvider,
                             x.ProviderKey,
-                            (x is IIdentityUserLoginExtended extended) ? extended.UserData : null)));
+                            x.UserData)));
                 }
             }
 

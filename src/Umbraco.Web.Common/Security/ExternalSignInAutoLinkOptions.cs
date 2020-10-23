@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System;
+using System.Runtime.Serialization;
 using Umbraco.Core.BackOffice;
 using Umbraco.Core.Configuration.Models;
 using SecurityConstants = Umbraco.Core.Constants.Security;

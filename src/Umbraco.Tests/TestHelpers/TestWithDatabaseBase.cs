@@ -5,7 +5,6 @@ using System.Threading;
 using System.Web.Routing;
 using System.Xml;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -18,7 +17,6 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
-using Umbraco.Web.Security;
 using Umbraco.Web.Routing;
 using File = System.IO.File;
 using Umbraco.Web.Composing;
@@ -32,7 +30,7 @@ using Umbraco.Persistance.SqlCe;
 using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Web.WebApi;
 using Umbraco.Tests.Common;
-using Umbraco.Tests.Common.Builders;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Tests.TestHelpers
 {

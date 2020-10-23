@@ -10,7 +10,6 @@
 @using Umbraco.Core.Logging
 @using Umbraco.Core.Services
 @using Umbraco.Web.BackOffice.Controllers
-@inject BackOfficeSignInManager signInManager
 @inject BackOfficeServerVariables backOfficeServerVariables
 @inject IUmbracoVersion umbracoVersion
 @inject IHostingEnvironment hostingEnvironment
@@ -18,6 +17,7 @@
 @inject IRuntimeMinifier runtimeMinifier
 @inject IProfilerHtml profilerHtml
 @inject IIconService IconService
+@inject IBackOfficeExternalLoginProviders externalLogins
 @{
     bool.TryParse(Context.Request.Query["umbDebug"], out bool isDebug);
     var backOfficePath = globalSettings.Value.GetBackOfficePath(hostingEnvironment);
@@ -103,16 +103,15 @@
 
     <umb-editors ng-show="infiniteMode"></umb-editors>
 
-    <umb-login
-        ng-if="login.show"
-        on-login="hideLoginScreen()">
+    <umb-login ng-if="login.show"
+               on-login="hideLoginScreen()">
     </umb-login>
 
     @await Html.BareMinimumServerVariablesScriptAsync(backOfficeServerVariables)
 
     <script>
         document.angularReady = function(app) {
-            @await Html.AngularValueExternalLoginInfoScriptAsync(signInManager, ViewData.GetExternalSignInProviderErrors())
+            @await Html.AngularValueExternalLoginInfoScriptAsync(externalLogins, ViewData.GetExternalSignInProviderErrors())
             @Html.AngularValueResetPasswordCodeInfoScript(ViewData[ViewDataExtensions.TokenPasswordResetCode])
             @await Html.AngularValueTinyMceAssetsAsync(runtimeMinifier)
 

@@ -8,9 +8,8 @@ using Microsoft.AspNetCore.Routing;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Web;
+using Umbraco.Core.Security;
 using Umbraco.Web.BackOffice.Filters;
-using Umbraco.Web.Security;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Filters
 {

@@ -75,9 +75,6 @@ namespace Umbraco.Web
             // Configure OWIN for authentication.
             ConfigureUmbracoAuthentication(app);
 
-            // must come after all authentication
-            app.UseUmbracoBackOfficeExternalLoginErrors();
-
             app
                 .UseSignalR(GlobalSettings, HostingEnvironment)
                 .FinalizeMiddlewareConfiguration();

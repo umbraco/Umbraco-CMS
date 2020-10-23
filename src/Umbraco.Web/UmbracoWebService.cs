@@ -3,9 +3,9 @@ using System.Web.Services;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
-using Umbraco.Web.Security;
 
 namespace Umbraco.Web
 {

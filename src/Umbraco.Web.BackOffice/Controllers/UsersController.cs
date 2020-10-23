@@ -38,13 +38,12 @@ using Umbraco.Web.Common.ActionResults;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Editors;
-using Umbraco.Web.Models;
-using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Security;
-using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
 using IUser = Umbraco.Core.Models.Membership.IUser;
 using Task = System.Threading.Tasks.Task;
+using Umbraco.Net;
+using Umbraco.Web.Common.ActionsResults;
+using Umbraco.Web.Common.Security;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
@@ -72,9 +71,11 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IMediaService _mediaService;
         private readonly IContentService _contentService;
         private readonly GlobalSettings _globalSettings;
-        private readonly IBackOfficeUserManager _backOfficeUserManager;
+        private readonly IBackOfficeUserManager _userManager;
         private readonly ILoggerFactory _loggerFactory;
         private readonly LinkGenerator _linkGenerator;
+        private readonly IBackOfficeExternalLoginProviders _externalLogins;
+        private readonly ILogger<UsersController> _logger;
 
         public UsersController(
             IMediaFileSystem mediaFileSystem,
@@ -97,7 +98,8 @@ namespace Umbraco.Web.BackOffice.Controllers
             IOptions<GlobalSettings> globalSettings,
             IBackOfficeUserManager backOfficeUserManager,
             ILoggerFactory loggerFactory,
-            LinkGenerator linkGenerator)
+            LinkGenerator linkGenerator,
+            IBackOfficeExternalLoginProviders externalLogins)
         {
             _mediaFileSystem = mediaFileSystem;
             _contentSettings = contentSettings.Value;
@@ -117,9 +119,11 @@ namespace Umbraco.Web.BackOffice.Controllers
             _mediaService = mediaService;
             _contentService = contentService;
             _globalSettings = globalSettings.Value;
-            _backOfficeUserManager = backOfficeUserManager;
+            _userManager = backOfficeUserManager;
             _loggerFactory = loggerFactory;
             _linkGenerator = linkGenerator;
+            _externalLogins = externalLogins;
+            _logger = _loggerFactory.CreateLogger<UsersController>();
         }
 
         /// <summary>
@@ -137,12 +141,12 @@ namespace Umbraco.Web.BackOffice.Controllers
 
         [AppendUserModifiedHeader("id")]
         [AdminUsersAuthorize]
-        public async Task<IActionResult> PostSetAvatar(int id, IList<IFormFile> files)
+        public IActionResult PostSetAvatar(int id, IList<IFormFile> files)
         {
-            return await PostSetAvatarInternal(files, _userService, _appCaches.RuntimeCache, _mediaFileSystem, _shortStringHelper, _contentSettings, _hostingEnvironment, _imageUrlGenerator, id);
+            return PostSetAvatarInternal(files, _userService, _appCaches.RuntimeCache, _mediaFileSystem, _shortStringHelper, _contentSettings, _hostingEnvironment, _imageUrlGenerator, id);
         }
 
-        internal static async Task<IActionResult> PostSetAvatarInternal(IList<IFormFile> files, IUserService userService, IAppCache cache, IMediaFileSystem mediaFileSystem, IShortStringHelper shortStringHelper, ContentSettings contentSettings, IHostingEnvironment hostingEnvironment, IImageUrlGenerator imageUrlGenerator, int id)
+        internal static IActionResult PostSetAvatarInternal(IList<IFormFile> files, IUserService userService, IAppCache cache, IMediaFileSystem mediaFileSystem, IShortStringHelper shortStringHelper, ContentSettings contentSettings, IHostingEnvironment hostingEnvironment, IImageUrlGenerator imageUrlGenerator, int id)
         {
             if (files is null)
             {
@@ -375,16 +379,16 @@ namespace Umbraco.Web.BackOffice.Controllers
             var identityUser = BackOfficeIdentityUser.CreateNew(_globalSettings, userSave.Username, userSave.Email, _globalSettings.DefaultUILanguage);
             identityUser.Name = userSave.Name;
 
-            var created = await _backOfficeUserManager.CreateAsync(identityUser);
+            var created = await _userManager.CreateAsync(identityUser);
             if (created.Succeeded == false)
             {
                 throw HttpResponseException.CreateNotificationValidationErrorResponse(created.Errors.ToErrorMessage());
             }
 
             string resetPassword;
-            var password = _backOfficeUserManager.GeneratePassword();
+            var password = _userManager.GeneratePassword();
 
-            var result = await _backOfficeUserManager.AddPasswordAsync(identityUser, password);
+            var result = await _userManager.AddPasswordAsync(identityUser, password);
             if (result.Succeeded == false)
             {
                 throw HttpResponseException.CreateNotificationValidationErrorResponse(created.Errors.ToErrorMessage());
@@ -416,7 +420,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <remarks>
         /// This will email the user an invite and generate a token that will be validated in the email
         /// </remarks>
-        public async Task<UserDisplay> PostInviteUser(UserInvite userSave)
+        public async Task<ActionResult<UserDisplay>> PostInviteUser(UserInvite userSave)
         {
             if (userSave == null) throw new ArgumentNullException("userSave");
 
@@ -425,7 +429,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             if (ModelState.IsValid == false)
             {
-                throw new HttpResponseException(HttpStatusCode.BadRequest, ModelState);
+                return new ValidationErrorResult(ModelState);
             }
 
             IUser user;
@@ -441,12 +445,9 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
             user = CheckUniqueEmail(userSave.Email, u => u.LastLoginDate != default || u.EmailConfirmedDate.HasValue);
 
-            var userMgr = TryGetOwinContext().Result.GetBackOfficeUserManager();
-
-            if (!EmailSender.CanSendRequiredEmail(GlobalSettings) && !userMgr.HasSendingUserInviteEventHandler)
+            if (!EmailSender.CanSendRequiredEmail(_globalSettings) && !_userManager.HasSendingUserInviteEventHandler)
             {
-                throw new HttpResponseException(
-                    Request.CreateNotificationValidationErrorResponse("No Email server is configured"));
+                return new ValidationErrorResult("No Email server is configured");
             }
 
             //Perform authorization here to see if the current user can actually save this user with the info being requested
@@ -454,7 +455,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             var canSaveUser = authHelper.IsAuthorized(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser, user, null, null, userSave.UserGroups);
             if (canSaveUser == false)
             {
-                throw new HttpResponseException(HttpStatusCode.Unauthorized, canSaveUser.Result);
+                return new ValidationErrorResult(canSaveUser.Result, StatusCodes.Status401Unauthorized);
             }
 
             if (user == null)
@@ -464,10 +465,10 @@ namespace Umbraco.Web.BackOffice.Controllers
                 var identityUser = BackOfficeIdentityUser.CreateNew(_globalSettings, userSave.Username, userSave.Email, _globalSettings.DefaultUILanguage);
                 identityUser.Name = userSave.Name;
 
-                var created = await _backOfficeUserManager.CreateAsync(identityUser);
+                var created = await _userManager.CreateAsync(identityUser);
                 if (created.Succeeded == false)
                 {
-                    throw HttpResponseException.CreateNotificationValidationErrorResponse(created.Errors.ToErrorMessage());
+                    return ValidationErrorResult.CreateNotificationValidationErrorResult(created.Errors.ToErrorMessage());
                 }
 
                 //now re-look the user back up
@@ -484,21 +485,16 @@ namespace Umbraco.Web.BackOffice.Controllers
             _userService.Save(user);
             var display = _umbracoMapper.Map<UserDisplay>(user);
 
-            var inviteArgs = new UserInviteEventArgs(
-                Request.TryGetHttpContext().Result.GetCurrentRequestIpAddress(),
-                performingUser: Security.GetUserId().Result,
-                userSave,
-                user);
+            UserInviteEventArgs inviteArgs;
 
             try
             {
-                userMgr.RaiseSendingUserInvite(inviteArgs);
+                inviteArgs = _userManager.RaiseSendingUserInvite(User, userSave, user);
             }
             catch (Exception ex)
             {
-                Logger.Error<UsersController>(ex, "An error occured in a custom event handler while inviting the user");
-                throw new HttpResponseException(
-                    Request.CreateNotificationValidationErrorResponse($"An error occured inviting the user (check logs for more info): {ex.Message}"));
+                _logger.LogError(ex, "An error occured in a custom event handler while inviting the user");
+                return ValidationErrorResult.CreateNotificationValidationErrorResult($"An error occured inviting the user (check logs for more info): {ex.Message}");
             }
 
             // If the event is handled then no need to send the email
@@ -553,8 +549,8 @@ namespace Umbraco.Web.BackOffice.Controllers
 
         private async Task SendUserInviteEmailAsync(UserBasic userDisplay, string from, string fromEmail, IUser to, string message)
         {
-            var user = await _backOfficeUserManager.FindByIdAsync(((int) userDisplay.Id).ToString());
-            var token = await _backOfficeUserManager.GenerateEmailConfirmationTokenAsync(user);
+            var user = await _userManager.FindByIdAsync(((int) userDisplay.Id).ToString());
+            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
 
             var inviteToken = string.Format("{0}{1}{2}",
                 (int)userDisplay.Id,
@@ -625,8 +621,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             var hasErrors = false;
 
             // we need to check if there's any Deny Local login providers present, if so we need to ensure that the user's email address cannot be changed
-            var owinContext = Request.TryGetOwinContext().Result;
-            var hasDenyLocalLogin = owinContext.Authentication.HasDenyLocalLogin();
+            var hasDenyLocalLogin = _externalLogins.HasDenyLocalLogin();
             if (hasDenyLocalLogin)
             {
                 userSave.Email = found.Email; // it cannot change, this would only happen if people are mucking around with the request
@@ -706,8 +701,9 @@ namespace Umbraco.Web.BackOffice.Controllers
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
+            // TODO: Why don't we inject this? Then we can just inject a logger
             var passwordChanger = new PasswordChanger(_loggerFactory.CreateLogger<PasswordChanger>());
-            var passwordChangeResult = await passwordChanger.ChangePasswordWithIdentityAsync(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser, found, changingPasswordModel, _backOfficeUserManager);
+            var passwordChangeResult = await passwordChanger.ChangePasswordWithIdentityAsync(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser, found, changingPasswordModel, _userManager);
 
             if (passwordChangeResult.Success)
             {
@@ -792,14 +788,14 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             foreach (var u in userIds)
             {
-                var user = await _backOfficeUserManager.FindByIdAsync(u.ToString());
+                var user = await _userManager.FindByIdAsync(u.ToString());
                 if (user == null)
                 {
                     notFound.Add(u);
                     continue;
                 }
 
-                var unlockResult = await _backOfficeUserManager.SetLockoutEndDateAsync(user, DateTimeOffset.Now);
+                var unlockResult = await _userManager.SetLockoutEndDateAsync(user, DateTimeOffset.Now);
                 if (unlockResult.Succeeded == false)
                 {
                     throw HttpResponseException.CreateValidationErrorResponse(

@@ -1,8 +1,8 @@
 using System;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Security;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
-using Umbraco.Web.Security;
 
 namespace Umbraco.Web
 {

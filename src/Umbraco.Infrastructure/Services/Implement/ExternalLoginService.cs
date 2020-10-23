@@ -30,12 +30,6 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        [Obsolete("Use the overload specifying loginProvider and providerKey instead")]
-        public IEnumerable<IIdentityUserLogin> Find(IUserLoginInfo login)
-        {
-            return Find(login.LoginProvider, login.ProviderKey);
-        }
-
         /// <inheritdoc />
         public IEnumerable<IIdentityUserLogin> Find(string loginProvider, string providerKey)
         {
@@ -45,12 +39,6 @@ namespace Umbraco.Core.Services.Implement
                     .Where(x => x.ProviderKey == providerKey && x.LoginProvider == loginProvider))
                     .ToList();
             }
-        }
-
-        [Obsolete("Use the Save method instead")]
-        public void SaveUserLogins(int userId, IEnumerable<IUserLoginInfo> logins)
-        {
-            Save(userId, logins.Select(x => new ExternalLogin(x.LoginProvider, x.ProviderKey)));
         }
 
         /// <inheritdoc />
@@ -64,7 +52,7 @@ namespace Umbraco.Core.Services.Implement
         }
 
         /// <inheritdoc />
-        public void Save(IIdentityUserLoginExtended login)
+        public void Save(IIdentityUserLogin login)
         {
             using (var scope = ScopeProvider.CreateScope())
             {
