@@ -3,9 +3,10 @@ using Umbraco.Core;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Web.Models.Mapping;
 using Umbraco.Web.Trees;
 
-namespace Umbraco.Web.Models.Mapping
+namespace Umbraco.Web.BackOffice.Mapping
 {
     /// <summary>
     /// Declares model mappings for members.

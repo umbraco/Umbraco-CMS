@@ -7,7 +7,7 @@ using Umbraco.Extensions;
 using Umbraco.Web.Common.Controllers;
 using Umbraco.Web.Trees;
 
-namespace Umbraco.Web.Models.Mapping
+namespace Umbraco.Web.BackOffice.Mapping
 {
     public class CommonTreeNodeMapper
     {
