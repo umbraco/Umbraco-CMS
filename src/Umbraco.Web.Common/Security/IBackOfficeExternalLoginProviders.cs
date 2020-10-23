@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Umbraco.Web.Common.Security
@@ -21,6 +22,30 @@ namespace Umbraco.Web.Common.Security
         string GetAutoLoginProvider();
 
         bool HasDenyLocalLogin();
+    }
+
+    // TODO: This class is just a placeholder for later
+    public class NopBackOfficeExternalLoginProviders : IBackOfficeExternalLoginProviders
+    {
+        public ExternalSignInAutoLinkOptions Get(string authenticationType)
+        {
+            return null;
+        }
+
+        public string GetAutoLoginProvider()
+        {
+            return null;
+        }
+
+        public IEnumerable<BackOfficeExternalLoginProvider> GetBackOfficeProviders()
+        {
+            return Enumerable.Empty<BackOfficeExternalLoginProvider>();
+        }
+
+        public bool HasDenyLocalLogin()
+        {
+            return false;
+        }
     }
 
     // TODO: we'll need to register these somehow

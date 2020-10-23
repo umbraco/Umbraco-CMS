@@ -31,6 +31,7 @@ namespace Umbraco.Web.BackOffice.Runtime
             composition.Register<BackOfficeSecurityStampValidator>(Lifetime.Request);
 
             composition.RegisterUnique<PreviewAuthenticationMiddleware>();
+            composition.RegisterUnique<BackOfficeExternalLoginProviderErrorMiddleware>();
             composition.RegisterUnique<IBackOfficeAntiforgery, BackOfficeAntiforgery>();
 
             // register back office trees

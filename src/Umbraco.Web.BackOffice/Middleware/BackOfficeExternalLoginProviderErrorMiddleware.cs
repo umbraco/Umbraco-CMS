@@ -16,7 +16,7 @@ namespace Umbraco.Web.BackOffice.Middleware
     /// When an external login provider registers an error with <see cref="HttpContextExtensions.SetExternalLoginProviderErrors"/> during the OAuth process,
     /// this middleware will detect that, store the errors into cookie data and redirect to the back office login so we can read the errors back out.
     /// </remarks>
-    public class BackOfficeExternalLoginProviderErrorMiddlware : IMiddleware
+    public class BackOfficeExternalLoginProviderErrorMiddleware : IMiddleware
     {
         public async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {

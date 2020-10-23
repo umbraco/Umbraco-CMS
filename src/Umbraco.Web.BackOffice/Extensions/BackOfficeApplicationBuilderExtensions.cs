@@ -49,7 +49,7 @@ namespace Umbraco.Extensions
             app.UseUmbracoRuntimeMinification();
 
             app.UseMiddleware<PreviewAuthenticationMiddleware>();
-            app.UseMiddleware<BackOfficeExternalLoginProviderErrorMiddlware>();
+            app.UseMiddleware<BackOfficeExternalLoginProviderErrorMiddleware>();
 
             return app;
         }
