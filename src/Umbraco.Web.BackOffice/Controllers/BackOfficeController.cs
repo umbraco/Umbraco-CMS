@@ -31,6 +31,7 @@ using Umbraco.Web.WebAssets;
 using Constants = Umbraco.Core.Constants;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
 using Umbraco.Web.Security;
 
 namespace Umbraco.Web.BackOffice.Controllers
@@ -52,6 +53,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly ILogger<BackOfficeController> _logger;
         private readonly IJsonSerializer _jsonSerializer;
         private readonly IBackOfficeExternalLoginProviders _externalLogins;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public BackOfficeController(
             IBackOfficeUserManager userManager,
@@ -66,7 +68,8 @@ namespace Umbraco.Web.BackOffice.Controllers
             IBackOfficeSecurityAccessor backofficeSecurityAccessor,
             ILogger<BackOfficeController> logger,
             IJsonSerializer jsonSerializer,
-            IBackOfficeExternalLoginProviders externalLogins)
+            IBackOfficeExternalLoginProviders externalLogins,
+            IHttpContextAccessor httpContextAccessor)
         {
             _userManager = userManager;
             _runtimeMinifier = runtimeMinifier;
@@ -81,6 +84,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _logger = logger;
             _jsonSerializer = jsonSerializer;
             _externalLogins = externalLogins;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         [HttpGet]
@@ -365,7 +369,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             ViewData.SetUmbracoPath(_globalSettings.GetUmbracoMvcArea(_hostingEnvironment));
 
             //check if there is the TempData or cookies with the any token name specified, if so, assign to view bag and render the view
-            if (ViewData.FromBase64CookieData<BackOfficeExternalLoginProviderErrors>(HttpContext, ViewDataExtensions.TokenExternalSignInError, _jsonSerializer) ||
+            if (ViewData.FromBase64CookieData<BackOfficeExternalLoginProviderErrors>(_httpContextAccessor.HttpContext, ViewDataExtensions.TokenExternalSignInError, _jsonSerializer) ||
                 ViewData.FromTempData(TempData, ViewDataExtensions.TokenExternalSignInError) ||
                 ViewData.FromTempData(TempData, ViewDataExtensions.TokenPasswordResetCode))
                 return defaultResponse();
