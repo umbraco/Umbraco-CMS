@@ -16,7 +16,6 @@ namespace Umbraco.Web.HeaderApps
                 Alias = "openBackofficeSearch",
                 Weight = -200,
                 Icon = "icon-search",
-                Hotkey = "ctrl+space",
                 View = "views/header/apps/search/search.html"
             });
         }

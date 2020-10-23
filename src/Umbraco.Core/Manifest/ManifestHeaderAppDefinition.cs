@@ -6,16 +6,27 @@ namespace Umbraco.Core.Manifest
 {
     // headerApps: [
     //   {
+    //     Format for default header app:
     //     name: 'App Name',        // required
     //     alias: 'appAlias',       // required
     //     weight: 0,               // optional, default is 0, use values between -99 and +99
     //     icon: 'icon.app',        // required
-    //     view: 'path/view.htm',   // required if you are not using the action value
-    //     action: ''               // required if you have not created your own view
+    //     action: '',              // required. Use javascript: before to perform a javascript action
+    //     hotkey: 'ctrl+a',        // optional
     //     show: [                  // optional, default is always show
     //       '+role/admin'          // show for admin users. Role based permissions will override others.
     //     ]
     //   },
+    //   {
+    //     Format for custom header app:
+    //     name: 'App Name',        // required
+    //     alias: 'appAlias',       // required
+    //     weight: 0,               // optional, default is 0, use values between -99 and +99
+    //     view: 'path/view.htm',   // required
+    //     show: [                  // optional, default is always show
+    //       '+role/admin'          // show for admin users. Role based permissions will override others.
+    //     ]
+    //   }
     //   ...
     // ]
 
@@ -45,6 +56,9 @@ namespace Umbraco.Core.Manifest
 
         [DataMember(Name = "action")]
         public string Action { get; set; }
+
+        [DataMember(Name = "hotkey")]
+        public string Hotkey { get; set; }
 
         [DataMember(Name = "show")]
         public string[] Show { get; set; } = Array.Empty<string>();

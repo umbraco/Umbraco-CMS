@@ -29,11 +29,10 @@ namespace Umbraco.Core.Manifest
 
             if (_app is null)
             {
-                _app = !string.IsNullOrWhiteSpace(_definition.View) ? new HeaderApp { View = _definition.View } : new DefaultHeaderApp { Action = _definition.Action };
+                _app = !string.IsNullOrWhiteSpace(_definition.View) ? new HeaderApp { View = _definition.View } : new DefaultHeaderApp { Action = _definition.Action, Hotkey = _definition.Hotkey };
                 _app.Alias = _definition.Alias;
                 _app.Name = _definition.Name;
                 _app.Icon = _definition.Icon;
-                _app.View = _definition.View;
                 _app.Weight = _definition.Weight;
             }
 

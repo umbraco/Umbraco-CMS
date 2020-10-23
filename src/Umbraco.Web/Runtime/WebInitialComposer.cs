@@ -246,6 +246,7 @@ namespace Umbraco.Web.Runtime
                 .Append<ContentTypePermissionsContentAppFactory>()
                 .Append<ContentTypeTemplatesContentAppFactory>();
 
+            // register known content apps
             composition.HeaderApps()
                 .Append<HelpHeaderAppFactory>()
                 .Append<SearchHeaderAppFactory>();

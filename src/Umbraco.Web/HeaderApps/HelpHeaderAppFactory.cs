@@ -16,7 +16,6 @@ namespace Umbraco.Web.HeaderApps
                 Alias = "openCloseBackofficeHelp",
                 Weight = -100,
                 Icon = "icon-help-alt",
-                Hotkey = "ctrl+shift+h",
                 View = "views/header/apps/help/help.html"
             });
         }
