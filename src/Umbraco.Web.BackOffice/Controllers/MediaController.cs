@@ -33,7 +33,7 @@ using Umbraco.Core.Strings;
 using Umbraco.Extensions;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.BackOffice.ModelBinders;
-using Umbraco.Web.Common.ActionResults;
+using Umbraco.Web.BackOffice.ActionResults;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.ContentApps;

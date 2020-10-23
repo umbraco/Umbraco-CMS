@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Umbraco.Web.Common.ActionResults
+namespace Umbraco.Web.BackOffice.ActionResults
 {
     public class UmbracoErrorResult : ObjectResult
     {
