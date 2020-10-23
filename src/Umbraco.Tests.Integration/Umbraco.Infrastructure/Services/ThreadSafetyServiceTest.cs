@@ -15,7 +15,7 @@ using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
 
-namespace Umbraco.Tests.Services
+namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
 {
     // these tests tend to fail from time to time esp. on VSTS
     //
