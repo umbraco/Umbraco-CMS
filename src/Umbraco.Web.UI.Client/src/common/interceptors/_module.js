@@ -5,7 +5,7 @@ angular.module('umbraco.interceptors', [])
         $httpProvider.defaults.xsrfCookieName = 'UMB-XSRF-TOKEN';
 
         $httpProvider.interceptors.push('securityInterceptor');
-        $httpProvider.interceptors.push('requiredHeadersInterceptor');
+
         $httpProvider.interceptors.push('requiredHeadersInterceptor');
         $httpProvider.interceptors.push('doNotPostDollarVariablesOnPostRequestInterceptor');
         $httpProvider.interceptors.push('cultureRequestInterceptor');
