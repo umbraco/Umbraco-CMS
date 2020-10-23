@@ -32,6 +32,7 @@ using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
+    [DisableBrowserCache] //TODO Reintroduce
     //[UmbracoRequireHttps] //TODO Reintroduce
     [PluginController(Constants.Web.Mvc.BackOfficeArea)]
     public class BackOfficeController : UmbracoController

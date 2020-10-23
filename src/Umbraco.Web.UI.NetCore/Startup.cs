@@ -33,7 +33,10 @@ namespace Umbraco.Web.UI.NetCore
         public void ConfigureServices(IServiceCollection services)
         {
             var umbracoBuilder = services.AddUmbraco(_env, _config);
-            umbracoBuilder.BuildWithAllBackOfficeComponents();
+            umbracoBuilder
+                .WithAllBackOfficeComponents()
+                .WithAllWebsiteComponents()
+                .Build();
 
         }
 

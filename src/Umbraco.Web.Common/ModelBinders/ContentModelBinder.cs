@@ -56,7 +56,7 @@ namespace Umbraco.Web.Common.ModelBinders
 
             // If types already match, return
             var sourceType = source.GetType();
-            if (sourceType.Inherits(modelType)) // includes ==
+            if (sourceType.   Inherits(modelType)) // includes ==
             {
                 bindingContext.Result = ModelBindingResult.Success(source);
                 return Task.CompletedTask;

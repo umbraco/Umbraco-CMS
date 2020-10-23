@@ -1,118 +1,225 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
+using static Umbraco.Core.Persistence.Repositories.Implement.SimilarNodeName;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
     internal class SimilarNodeName
     {
-        private int _numPos = -2;
-
         public int Id { get; set; }
         public string Name { get; set; }
 
-        // cached - reused
-        public int NumPos
-        {
-            get
-            {
-                if (_numPos != -2) return _numPos;
-
-                var name = Name;
-
-                // cater nodes with no name.
-                if (string.IsNullOrWhiteSpace(name))
-                    return _numPos;
-
-                if (name[name.Length - 1] != ')')
-                    return _numPos = -1;
-
-                var pos = name.LastIndexOf('(');
-                if (pos < 2 || pos == name.Length - 2) // < 2 and not < 0, because we want at least "x ("
-                    return _numPos = -1;
-
-                return _numPos = pos;
-            }
-        }
-
-        // not cached - used only once
-        public int NumVal
-        {
-            get
-            {
-                if (NumPos < 0)
-                    throw new InvalidOperationException();
-                int num;
-                if (int.TryParse(Name.Substring(NumPos + 1, Name.Length - 2 - NumPos), out num))
-                    return num;
-                return 0;
-            }
-        }
-
-        // compare without allocating, nor parsing integers
-        internal class Comparer : IComparer<SimilarNodeName>
-        {
-            public int Compare(SimilarNodeName x, SimilarNodeName y)
-            {
-                if (x == null) throw new ArgumentNullException("x");
-                if (y == null) throw new ArgumentNullException("y");
-
-                var xpos = x.NumPos;
-                var ypos = y.NumPos;
-
-                var xname = x.Name;
-                var yname = y.Name;
-
-                if (xpos < 0 || ypos < 0 || xpos != ypos)
-                    return string.Compare(xname, yname, StringComparison.Ordinal);
-
-                // compare the part before (number)
-                var n = string.Compare(xname, 0, yname, 0, xpos, StringComparison.Ordinal);
-                if (n != 0)
-                    return n;
-
-                // compare (number) lengths
-                var diff = xname.Length - yname.Length;
-                if (diff != 0) return diff < 0 ? -1 : +1;
-
-                // actually compare (number)
-                var i = xpos;
-                while (i < xname.Length - 1)
-                {
-                    if (xname[i] != yname[i])
-                        return xname[i] < yname[i] ? -1 : +1;
-                    i++;
-                }
-                return 0;
-            }
-        }
-
-        // gets a unique name
         public static string GetUniqueName(IEnumerable<SimilarNodeName> names, int nodeId, string nodeName)
         {
-            var uniqueNumber = 1;
-            var uniqueing = false;
-            foreach (var name in names.OrderBy(x => x, new Comparer()))
-            {
-                // ignore self
-                if (nodeId != 0 && name.Id == nodeId) continue;
+            var items = names
+                    .Where(x => x.Id != nodeId) // ignore same node
+                    .Select(x => x.Name);
 
-                if (uniqueing)
+            var uniqueName = GetUniqueName(items, nodeName);
+
+            return uniqueName;
+        }
+
+        public static string GetUniqueName(IEnumerable<string> names, string name)
+        {
+            var model = new StructuredName(name);
+            var items = names
+                    .Where(x => x.InvariantStartsWith(model.Text)) // ignore non-matching names
+                    .Select(x => new StructuredName(x));
+
+            // name is empty, and there are no other names with suffixes, so just return " (1)"
+            if (model.IsEmptyName() && !items.Any())
+            {
+                model.Suffix = StructuredName.INITIAL_SUFFIX;
+
+                return model.FullName;
+            }
+
+            // name is empty, and there are other names with suffixes
+            if (model.IsEmptyName() && items.SuffixedNameExists())
+            {
+                var emptyNameSuffix = GetSuffixNumber(items);
+
+                if (emptyNameSuffix > 0)
                 {
-                    if (name.NumPos > 0 && name.Name.InvariantStartsWith(nodeName) && name.NumVal == uniqueNumber)
-                        uniqueNumber++;
-                    else
-                        break;
-                }
-                else if (name.Name.InvariantEquals(nodeName))
-                {
-                    uniqueing = true;
+                    model.Suffix = (uint?)emptyNameSuffix;
+
+                    return model.FullName;
                 }
             }
 
-            return uniqueing || string.IsNullOrWhiteSpace(nodeName)
-                ? string.Concat(nodeName, " (", uniqueNumber.ToString(), ")")
-                : nodeName;
+            //  no suffix - name without suffix does NOT exist, AND name with suffix does NOT exist
+            if (!model.Suffix.HasValue && !items.SimpleNameExists(model.Text) && !items.SuffixedNameExists())
+            {
+                model.Suffix = StructuredName.NO_SUFFIX;
+
+                return model.FullName;
+            }
+
+            // no suffix - name without suffix exists, however name with suffix does NOT exist
+            if (!model.Suffix.HasValue && items.SimpleNameExists(model.Text) && !items.SuffixedNameExists())
+            {
+                var firstSuffix = GetFirstSuffix(items);
+                model.Suffix = (uint?)firstSuffix;
+
+                return model.FullName;
+            }
+
+            // no suffix - name without suffix exists, AND name with suffix does exist
+            if (!model.Suffix.HasValue && items.SimpleNameExists(model.Text) && items.SuffixedNameExists())
+            {
+                var nextSuffix = GetSuffixNumber(items);
+                model.Suffix = (uint?)nextSuffix;
+
+                return model.FullName;
+            }
+
+            // no suffix - name without suffix does NOT exist, however name with suffix exists
+            if (!model.Suffix.HasValue && !items.SimpleNameExists(model.Text) && items.SuffixedNameExists())
+            {
+                var nextSuffix = GetSuffixNumber(items);
+                model.Suffix = (uint?)nextSuffix;
+
+                return model.FullName;
+            }
+
+            // has suffix - name without suffix exists
+            if (model.Suffix.HasValue && items.SimpleNameExists(model.Text))
+            {
+                var nextSuffix = GetSuffixNumber(items);
+                model.Suffix = (uint?)nextSuffix;
+
+                return model.FullName;
+            }
+
+            // has suffix - name without suffix does NOT exist
+            // a case where the user added the suffix, so add a secondary suffix
+            if (model.Suffix.HasValue && !items.SimpleNameExists(model.Text))
+            {
+                model.Text = model.FullName;
+                model.Suffix = StructuredName.NO_SUFFIX;
+
+                // filter items based on full name with suffix
+                items = items.Where(x => x.Text.InvariantStartsWith(model.FullName));
+                var secondarySuffix = GetFirstSuffix(items);
+                model.Suffix = (uint?)secondarySuffix;
+
+                return model.FullName;
+            }
+
+            // has suffix - name without suffix also exists, therefore we simply increment
+            if (model.Suffix.HasValue && items.SimpleNameExists(model.Text))
+            {
+                var nextSuffix = GetSuffixNumber(items);
+                model.Suffix = (uint?)nextSuffix;
+
+                return model.FullName;
+            }
+
+            return name;
+        }
+
+        private static int GetFirstSuffix(IEnumerable<StructuredName> items)
+        {
+            const int suffixStart = 1;
+
+            if (!items.Any(x => x.Suffix == suffixStart))
+            {
+                // none of the suffixes are the same as suffixStart, so we can use suffixStart!
+                return suffixStart;
+            }
+
+            return GetSuffixNumber(items);
+        }
+
+        private static int GetSuffixNumber(IEnumerable<StructuredName> items)
+        {
+            int current = 1;
+            foreach (var item in items.OrderBy(x => x.Suffix))
+            {
+                if (item.Suffix == current)
+                {
+                    current++;
+                }
+                else if (item.Suffix > current)
+                {
+                    // do nothing - we found our number!
+                    // eg. when suffixes are 1 & 3, then this method is required to generate 2
+                    break;
+                }
+            }
+
+            return current;
+        }
+
+        internal class StructuredName
+        {
+            const string SPACE_CHARACTER = " ";
+            const string SUFFIXED_PATTERN = @"(.*) \(([1-9]\d*)\)$";
+            internal const uint INITIAL_SUFFIX = 1;
+            internal static readonly uint? NO_SUFFIX = default;
+
+            internal string Text { get; set; }
+            internal uint ? Suffix { get; set; }
+            public string FullName
+            {
+                get
+                {
+                    string text = (Text == SPACE_CHARACTER) ? Text.Trim() : Text;
+
+                    return Suffix > 0 ? $"{text} ({Suffix})" : text;
+                }
+            }
+
+            internal StructuredName(string name)
+            {
+                if (string.IsNullOrWhiteSpace(name))
+                {
+                    Text = SPACE_CHARACTER;
+
+                    return;
+                }
+
+                var rg = new Regex(SUFFIXED_PATTERN);
+                var matches = rg.Matches(name);
+                if (matches.Count > 0)
+                {
+                    var match = matches[0];
+                    Text = match.Groups[1].Value;
+                    int number = int.TryParse(match.Groups[2].Value, out number) ? number : 0;
+                    Suffix = (uint?)(number);
+
+                    return;
+                }
+                else
+                {
+                    Text = name;
+                }
+            }    
+
+            internal bool IsEmptyName()
+            {
+                return string.IsNullOrWhiteSpace(Text);
+            }
+        }
+    }
+
+    internal static class ListExtensions
+    {
+        internal static bool Contains(this IEnumerable<StructuredName> items, StructuredName model)
+        {
+            return items.Any(x => x.FullName.InvariantEquals(model.FullName));
+        }
+
+        internal static bool SimpleNameExists(this IEnumerable<StructuredName> items, string name)
+        {
+            return items.Any(x => x.FullName.InvariantEquals(name));
+        }
+
+        internal static bool SuffixedNameExists(this IEnumerable<StructuredName> items)
+        {
+            return items.Any(x => x.Suffix.HasValue);
         }
     }
 }

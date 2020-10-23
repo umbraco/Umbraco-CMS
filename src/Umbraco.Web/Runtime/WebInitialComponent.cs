@@ -89,16 +89,13 @@ namespace Umbraco.Web.Runtime
             MvcHandler.DisableMvcResponseHeader = true;
 
             // set master controller factory
-            var controllerFactory = new MasterControllerFactory(() => Current.FilteredControllerFactories);
-            ControllerBuilder.Current.SetControllerFactory(controllerFactory);
+            // var controllerFactory = new MasterControllerFactory(() => Current.FilteredControllerFactories);
+            // ControllerBuilder.Current.SetControllerFactory(controllerFactory);
 
             // set the render & plugin view engines
             ViewEngines.Engines.Add(new RenderViewEngine(_hostingEnvironment));
             ViewEngines.Engines.Add(new PluginViewEngine());
-
-            //set model binder
-            ModelBinderProviders.BinderProviders.Add(ContentModelBinder.Instance); // is a provider
-
+            
             ////add the profiling action filter
             //GlobalFilters.Filters.Add(new ProfilingActionFilter());
 

@@ -58,17 +58,13 @@ namespace Umbraco.Web.Runtime
 
             composition
                 // TODO: This will depend on if we use ServiceBasedControllerActivator - see notes in Startup.cs
-                .ComposeUmbracoControllers(GetType().Assembly)
+                //.ComposeUmbracoControllers(GetType().Assembly)
                 .SetDefaultRenderMvcController</*RenderMvcController*/ Controller>(); // default controller for template views
 
             //we need to eagerly scan controller types since they will need to be routed
             composition.WithCollectionBuilder<SurfaceControllerTypeCollectionBuilder>()
                 .Add(composition.TypeLoader.GetSurfaceControllers());
 
-            // add all known factories, devs can then modify this list on application
-            // startup either by binding to events or in their own global.asax
-            composition.FilteredControllerFactory()
-                .Append<RenderControllerFactory>();
 
             // auto-register views
             composition.RegisterAuto(typeof(UmbracoViewPage<>));

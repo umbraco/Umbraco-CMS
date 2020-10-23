@@ -20,8 +20,10 @@ namespace Umbraco.Web.Mvc
         /// </remarks>
         internal static Type GetControllerTypeInternal(this IControllerFactory factory, RequestContext requestContext, string controllerName)
         {
-            if (factory is MasterControllerFactory controllerFactory)
-                return controllerFactory.GetControllerTypeInternal(requestContext, controllerName);
+
+            //TODO Reintroduce for netcore
+            // if (factory is MasterControllerFactory controllerFactory)
+            //     return controllerFactory.GetControllerTypeInternal(requestContext, controllerName);
 
             //we have no choice but to instantiate the controller
             var instance = factory.CreateController(requestContext, controllerName);
