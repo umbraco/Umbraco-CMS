@@ -27,29 +27,8 @@ namespace Umbraco.Core.Composing
         /// Registers a service with an implementing instance.
         /// </summary>
         void Register(Type serviceType, object instance);
-        
-        /// <summary>
-        /// Registers a base type for auto-registration.
-        /// </summary>
-        /// <remarks>
-        /// <para>Auto-registration means that anytime the container is asked to create an instance
-        /// of a type deriving from <paramref name="serviceBaseType"/>, it will first register that
-        /// type automatically.</para>
-        /// <para>This can be used for instance for views or controllers. Then, one just needs to
-        /// register a common base class or interface, and the container knows how to create instances.</para>
-        /// </remarks>
-        void RegisterAuto(Type serviceBaseType);
 
         #region Control
-
-        /// <summary>
-        /// Configures the container for web support.
-        /// </summary>
-        /// <remarks>
-        /// <para>Enables support for MVC, WebAPI, but *not* per-request scope. This is used early in the boot
-        /// process, where anything "scoped" should not be linked to a web request.</para>
-        /// </remarks>
-        void ConfigureForWeb();  // TODO: Unsure if we need this anymore
 
         /// <summary>
         /// Creates the factory.

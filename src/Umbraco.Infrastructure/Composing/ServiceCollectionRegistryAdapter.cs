@@ -75,16 +75,6 @@ namespace Umbraco.Infrastructure.Composing
             _services.AddSingleton(serviceType, instance);
         }
 
-        public void RegisterAuto(Type serviceBaseType)
-        {
-            // TODO: MSDI - Remove or something
-        }
-
-        public void ConfigureForWeb()
-        {
-            // TODO: MSDI - Remove
-        }
-
         public IFactory CreateFactory()
         {
             return ServiceProviderFactoryAdapter.Wrap(_services.BuildServiceProvider());

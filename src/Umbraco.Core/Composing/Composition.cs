@@ -82,13 +82,6 @@ namespace Umbraco.Core.Composing
         public void Register(Type serviceType, object instance)
             => _register.Register(serviceType, instance);
 
-        /// <inheritdoc />
-        public void RegisterAuto(Type serviceBaseType)
-            => _register.RegisterAuto(serviceBaseType);
-
-        /// <inheritdoc />
-        public void ConfigureForWeb()
-            => _register.ConfigureForWeb();
 
         /// <inheritdoc />
         public IFactory CreateFactory()

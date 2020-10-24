@@ -26,12 +26,5 @@ namespace Umbraco.Core
         public static void Register<TService>(this IRegister register, TService instance)
             where TService : class
             => register.Register(typeof(TService), instance);
-
-        /// <summary>
-        /// Registers a base type for auto-registration.
-        /// </summary>
-        public static void RegisterAuto<TServiceBase>(this IRegister register)
-            where TServiceBase : class
-            => register.RegisterAuto(typeof(TServiceBase));
     }
 }
