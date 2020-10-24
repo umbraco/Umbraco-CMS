@@ -10,7 +10,6 @@ namespace Umbraco.Web.Logging
     {
         private readonly WebProfiler _profiler;
         private readonly bool _profile;
-        private readonly List<Action> _terminate = new List<Action>();
 
         public WebProfilerComponent(IProfiler profiler, ILogger logger)
         {
@@ -39,21 +38,20 @@ namespace Umbraco.Web.Logging
         public void Terminate()
         {
             UmbracoApplicationBase.ApplicationInit -= InitializeApplication;
-            foreach (var t in _terminate) t();
         }
 
         private void InitializeApplication(object sender, EventArgs args)
         {
             if (!(sender is HttpApplication app)) return;
 
-            // for *each* application (this will run more than once)
-            void beginRequest(object s, EventArgs a) => _profiler.UmbracoApplicationBeginRequest(s, a);
-            app.BeginRequest += beginRequest;
-            _terminate.Add(() => app.BeginRequest -= beginRequest);
-
-            void endRequest(object s, EventArgs a) => _profiler.UmbracoApplicationEndRequest(s, a);
-            app.EndRequest += endRequest;
-            _terminate.Add(() => app.EndRequest -= endRequest);
+            // NOTE: We do not unbind these events ... because you just can't do that for HttpApplication events, they will
+            // be removed when the app dies.
+            app.BeginRequest += BeginRequest;
+            app.EndRequest += EndRequest;
         }
+
+        private void BeginRequest(object s, EventArgs a) => _profiler.UmbracoApplicationBeginRequest(s, a);
+
+        private void EndRequest(object s, EventArgs a) => _profiler.UmbracoApplicationEndRequest(s, a);
     }
 }

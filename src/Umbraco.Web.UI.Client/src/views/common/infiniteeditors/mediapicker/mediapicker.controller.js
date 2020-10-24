@@ -17,6 +17,7 @@ angular.module("umbraco")
             vm.changeSearch = changeSearch;
             vm.submitFolder = submitFolder;
             vm.enterSubmitFolder = enterSubmitFolder;
+            vm.focalPointChanged = focalPointChanged;
             vm.changePagination = changePagination;
 
             vm.clickHandler = clickHandler;
@@ -241,7 +242,7 @@ angular.module("umbraco")
 
                 return getChildren(folder.id);
             }
-            
+
             function toggleListView() {
                 vm.showMediaList = !vm.showMediaList;
             }
@@ -370,7 +371,7 @@ angular.module("umbraco")
             }
 
             function openDetailsDialog() {
-                
+
                 const dialog = {
                     view: "views/common/infiniteeditors/mediapicker/overlays/mediacropdetails.html",
                     size: "small",
@@ -378,7 +379,7 @@ angular.module("umbraco")
                     target: $scope.target,
                     disableFocalPoint: $scope.disableFocalPoint,
                     submit: function (model) {
-                        
+
                         $scope.model.selection.push($scope.target);
                         $scope.model.submit($scope.model);
 
@@ -544,6 +545,19 @@ angular.module("umbraco")
                         folderImage.selected = true;
                     }
                 }
+            }
+
+            /**
+             * Called when the umbImageGravity component updates the focal point value
+             * @param {any} left
+             * @param {any} top
+             */
+            function focalPointChanged(left, top) {
+                // update the model focalpoint value
+                $scope.target.focalPoint = {
+                    left: left,
+                    top: top
+                };
             }
 
             function submit() {
