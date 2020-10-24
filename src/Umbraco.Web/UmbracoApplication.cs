@@ -34,7 +34,10 @@ namespace Umbraco.Web
 
             var mainDom = new MainDom(loggerFactory.CreateLogger<MainDom>(), mainDomLock);
 
-            var requestCache = new HttpRequestAppCache(() => HttpContext.Current != null ? HttpContext.Current.Items : null);
+            // Commented out as part of .NET Core transition as the HttpRequestAppCache constructor has changed to
+            // to match the change in the type of the HTTP context Items collection.
+            //// var requestCache = new HttpRequestAppCache(() => HttpContext.Current != null ? HttpContext.Current.Items : null);
+            IRequestCache requestCache = null;
             var appCaches = new AppCaches(
                 new DeepCloneAppCache(new ObjectCacheAppCache()),
                 requestCache,

@@ -41,7 +41,7 @@ namespace Umbraco.Core.Cache
         public virtual IEnumerable<object> SearchByKey(string keyStartsWith)
         {
             var plen = CacheItemPrefix.Length + 1;
-            IEnumerable<DictionaryEntry> entries;
+            IEnumerable<KeyValuePair<object, object>> entries;
             try
             {
                 EnterReadLock();
@@ -65,7 +65,7 @@ namespace Umbraco.Core.Cache
             const string prefix = CacheItemPrefix + "-";
             var compiled = new Regex(regex, RegexOptions.Compiled);
             var plen = prefix.Length;
-            IEnumerable<DictionaryEntry> entries;
+            IEnumerable<KeyValuePair<object, object>> entries;
             try
             {
                 EnterReadLock();
@@ -249,7 +249,7 @@ namespace Umbraco.Core.Cache
         // manipulate the underlying cache entries
         // these *must* be called from within the appropriate locks
         // and use the full prefixed cache keys
-        protected abstract IEnumerable<DictionaryEntry> GetDictionaryEntries();
+        protected abstract IEnumerable<KeyValuePair<object, object>> GetDictionaryEntries();
         protected abstract void RemoveEntry(string key);
         protected abstract object GetEntry(string key);
 

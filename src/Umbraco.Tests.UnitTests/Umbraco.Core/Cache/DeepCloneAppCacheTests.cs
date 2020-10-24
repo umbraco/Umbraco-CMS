@@ -1,22 +1,14 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
-using System.Web;
-using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Collections;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Tests.Common;
-using Umbraco.Tests.TestHelpers;
-using Umbraco.Web.Cache;
 
-namespace Umbraco.Tests.Cache
+namespace Umbraco.Tests.UnitTests.Umbraco.Core.Cache
 {
     [TestFixture]
     public class DeepCloneAppCacheTests : RuntimeAppCacheTests
@@ -41,12 +33,14 @@ namespace Umbraco.Tests.Cache
         [Test]
         public void Clones_List()
         {
-            var original = new DeepCloneableList<TestClone>(ListCloneBehavior.Always);
-            original.Add(new TestClone());
-            original.Add(new TestClone());
-            original.Add(new TestClone());
+            var original = new DeepCloneableList<TestClone>(ListCloneBehavior.Always)
+            {
+                new TestClone(),
+                new TestClone(),
+                new TestClone()
+            };
 
-            var val = _provider.GetCacheItem<DeepCloneableList<TestClone>>("test", () => original);
+            var val = _provider.GetCacheItem("test", () => original);
 
             Assert.AreEqual(original.Count, val.Count);
             foreach (var item in val)
@@ -64,7 +58,7 @@ namespace Umbraco.Tests.Cache
             };
             Assert.IsTrue(original.IsDirty());
 
-            var val = _provider.GetCacheItem<TestClass>("test", () => original);
+            var val = _provider.GetCacheItem("test", () => original);
 
             Assert.AreNotEqual(original.CloneId, val.CloneId);
             Assert.IsFalse(val.IsDirty());

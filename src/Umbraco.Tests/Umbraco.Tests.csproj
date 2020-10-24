@@ -200,7 +200,6 @@
     <Compile Include="UmbracoExamine\RandomIdRamDirectory.cs" />
     <Compile Include="Web\AngularIntegration\AngularAntiForgeryTests.cs" />
     <Compile Include="Migrations\Stubs\DropForeignKeyMigrationStub.cs" />
-    <Compile Include="Cache\DeepCloneAppCacheTests.cs" />
     <Compile Include="Cache\DefaultCachePolicyTests.cs" />
     <Compile Include="Cache\FullDataSetCachePolicyTests.cs" />
     <Compile Include="Cache\SingleItemsOnlyCachePolicyTests.cs" />
@@ -222,10 +221,6 @@
     <Compile Include="Web\Mvc\SurfaceControllerTests.cs" />
     <Compile Include="Runtimes\CoreRuntimeTests.cs" />
     <Compile Include="Runtimes\WebRuntimeComponentTests.cs" />
-    <Compile Include="Cache\ObjectAppCacheTests.cs" />
-    <Compile Include="Cache\AppCacheTests.cs" />
-    <Compile Include="Cache\HttpRequestAppCacheTests.cs" />
-    <Compile Include="Cache\RuntimeAppCacheTests.cs" />
     <Compile Include="Web\Mvc\MergeParentContextViewDataAttributeTests.cs" />
     <Compile Include="Web\Mvc\ViewDataDictionaryExtensionTests.cs" />
     <Compile Include="Persistence\Querying\ContentTypeSqlMappingTests.cs" />

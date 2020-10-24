@@ -1,9 +1,8 @@
 ﻿using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Cache;
-using Umbraco.Tests.TestHelpers;
 
-namespace Umbraco.Tests.Cache
+namespace Umbraco.Tests.UnitTests.Umbraco.Core.Cache
 {
     [TestFixture]
     public class ObjectAppCacheTests : RuntimeAppCacheTests

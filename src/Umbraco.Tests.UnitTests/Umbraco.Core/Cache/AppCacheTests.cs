@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Linq;
-using System.Web.UI;
 using NUnit.Framework;
 using Umbraco.Core.Cache;
 
-namespace Umbraco.Tests.Cache
+namespace Umbraco.Tests.UnitTests.Umbraco.Core.Cache
 {
     public abstract class AppCacheTests
     {
         internal abstract IAppCache AppCache { get; }
+
         protected abstract int GetTotalItemCount { get; }
 
         [SetUp]
@@ -66,10 +66,10 @@ namespace Umbraco.Tests.Cache
             try
             {
                 result = AppCache.Get("Blah", () =>
-                {
-                    counter++;
-                    throw new Exception("Do not cache this");
-                });
+                    {
+                        counter++;
+                        throw new Exception("Do not cache this");
+                    });
             }
             catch (Exception){}
 
@@ -85,16 +85,16 @@ namespace Umbraco.Tests.Cache
             object result;
 
             result = AppCache.Get("Blah", () =>
-            {
-                counter++;
-                return "";
-            });
+                {
+                    counter++;
+                    return "";
+                });
 
             result = AppCache.Get("Blah", () =>
-            {
-                counter++;
-                return "";
-            });
+                {
+                    counter++;
+                    return "";
+                });
 
             Assert.AreEqual(1, counter);
 
@@ -255,6 +255,10 @@ namespace Umbraco.Tests.Cache
 
         //just used for these tests
         private class MacroCacheContent
+        {
+        }
+
+        private class LiteralControl
         {
         }
     }

@@ -3,7 +3,7 @@ using System.Threading;
 using NUnit.Framework;
 using Umbraco.Core.Cache;
 
-namespace Umbraco.Tests.Cache
+namespace Umbraco.Tests.UnitTests.Umbraco.Core.Cache
 {
     public abstract class RuntimeAppCacheTests : AppCacheTests
     {
