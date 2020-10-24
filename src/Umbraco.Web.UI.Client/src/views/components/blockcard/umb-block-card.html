@@ -7,6 +7,7 @@
     <div class="__info" ng-if="vm.elementTypeModel !== null">
         <div class="__name" ng-bind="vm.elementTypeModel.name"></div>
         <div class="__subname" ng-if="vm.elementTypeModel.description" ng-bind="vm.elementTypeModel.description"></div>
+        <div class="__subname" ng-if="!vm.elementTypeModel.description">({{vm.elementTypeModel.alias}})</div>
     </div>
     <div class="__info --error" ng-if="vm.elementTypeModel === null">
         <div class="__name"><localize key="blockEditor_elementTypeDoesNotExistHeadline">Other</localize></div>
