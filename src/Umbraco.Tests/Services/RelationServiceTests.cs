@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Web.WebSockets;
+using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
@@ -189,6 +191,57 @@ namespace Umbraco.Tests.Services
             ServiceContext.RelationService.Save(newRelations);
             Assert.IsTrue(newRelations.All(x => x.UpdateDate == newDate));
         }
+
+        [Test]
+        public void Return_List_Of_Parent_Entities_When_Getting_By_Multiple_Child_Ids()
+        {
+            // Create content
+            var createdContent = new List<IContent>();
+            var contentType = MockedContentTypes.CreateBasicContentType("blah");
+            ServiceContext.ContentTypeService.Save(contentType);
+            for (int i = 0; i < 10; i++)
+            {
+                var c1 = MockedContent.CreateBasicContent(contentType);
+                ServiceContext.ContentService.Save(c1);
+                createdContent.Add(c1);
+            }
+
+            //Create media
+            var createdMedia = new List<IMedia>();
+            var imageType = MockedContentTypes.CreateImageMediaType("myImage");
+            ServiceContext.MediaTypeService.Save(imageType);
+            for (int i = 0; i < 10; i++)
+            {
+                var c1 = MockedMedia.CreateMediaImage(imageType, -1);
+                ServiceContext.MediaService.Save(c1);
+                createdMedia.Add(c1);
+            }
+
+            var relType = ServiceContext.RelationService.GetRelationTypeByAlias(Constants.Conventions.RelationTypes.RelatedMediaAlias);
+
+            // Relate content to media
+            foreach (var content in createdContent)
+                foreach (var media in createdMedia)
+                    ServiceContext.RelationService.Relate(content.Id, media.Id, relType);
+
+            var mediaItemIds = createdMedia.Select(x => x.Id).ToArray();
+
+            var paged = ServiceContext.RelationService.GetPagedParentEntitiesByChildIds(mediaItemIds, 0, 6,
+                out var totalRecs, new[] {Constants.Conventions.RelationTypes.RelatedMediaAlias}).ToList();
+
+            Assert.AreEqual(10, totalRecs);
+            Assert.AreEqual(6, paged.Count);
+
+            //next page
+            paged.AddRange(ServiceContext.RelationService.GetPagedParentEntitiesByChildIds(mediaItemIds, 1, 6,
+                out totalRecs, new[] { Constants.Conventions.RelationTypes.RelatedMediaAlias }));
+
+            Assert.AreEqual(10, totalRecs);
+            Assert.AreEqual(10, paged.Count);
+
+            Assert.IsTrue(createdContent.Select(x => x.Id).ContainsAll(paged.Select(x => x.Id)));
+        }
+
 
         private IRelation CreateAndSaveRelation(string name, string alias)
         {
