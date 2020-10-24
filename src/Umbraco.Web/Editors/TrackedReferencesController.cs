@@ -62,11 +62,8 @@ namespace Umbraco.Web.Editors
         [HttpGet]
         public bool HasReferencesInDescendants(int id, string entityType)
         {
-            //this.Services.EntityService.GetChildren()
-            //var childCount = this.Services.ContentService.CountChildren(id);
             var currentEntity = this.Services.EntityService.Get(id);
-
-
+            
             if (currentEntity != null)
             {
                 var currentObjectType = ObjectTypes.GetUmbracoObjectType(currentEntity.NodeObjectType);
@@ -82,7 +79,6 @@ namespace Umbraco.Web.Editors
                 var currentPage = 0;
 
                 IEntitySlim[] entities;
-
 
                 do
                 {
@@ -104,8 +100,7 @@ namespace Umbraco.Web.Editors
 
                 } while (entities.Length == pageSize);
             }
-
-
+            
             return false;
         }
     }
