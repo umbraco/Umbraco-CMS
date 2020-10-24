@@ -78,12 +78,12 @@ namespace Umbraco.Web.Editors
                 var pageSize = 1000;
                 var currentPage = 0;
 
-                IEntitySlim[] entities;
+                var entities = new List<IEntitySlim>();
 
                 do
                 {
                     entities = this.Services.EntityService.GetPagedDescendants(id, currentObjectType, currentPage, pageSize, out _)
-                        .ToArray();
+                        .ToList();
 
                     var ids = entities.Select(x => x.Id).ToArray();
 
@@ -98,7 +98,7 @@ namespace Umbraco.Web.Editors
 
                     currentPage++;
 
-                } while (entities.Length == pageSize);
+                } while (entities.Count == pageSize);
             }
             
             return false;
