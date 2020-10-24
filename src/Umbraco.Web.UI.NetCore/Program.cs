@@ -21,6 +21,7 @@ namespace Umbraco.Web.UI.NetCore
                     x.ClearProviders();
                 })
                 .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); })
+                .UseDefaultServiceProvider(options => options.ValidateOnBuild = false)
                 .UseUmbraco();
     }
 }
