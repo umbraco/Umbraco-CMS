@@ -54,7 +54,7 @@ namespace Umbraco.Web.Routing
 
                     if (node != null)
                     {
-                        string culture = null;
+                        string culture;
                         //if we have a node, check if we have a culture in the query string
                         if (frequest.UmbracoContext.HttpContext.Request.QueryString.ContainsKey("culture"))
                         {
