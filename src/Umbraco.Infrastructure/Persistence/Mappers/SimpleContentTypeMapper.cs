@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Infrastructure.Persistence.Mappers;
 
 namespace Umbraco.Core.Persistence.Mappers
 {
@@ -16,7 +17,7 @@ namespace Umbraco.Core.Persistence.Mappers
     [MapperFor(typeof(SimpleContentType))]
     public sealed class SimpleContentTypeMapper : BaseMapper
     {
-        public SimpleContentTypeMapper(Lazy<ISqlContext> sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
+        public SimpleContentTypeMapper(Lazy<ISqlContext> sqlContext, MapperConfigurationStore maps)
             : base(sqlContext, maps)
         { }
 

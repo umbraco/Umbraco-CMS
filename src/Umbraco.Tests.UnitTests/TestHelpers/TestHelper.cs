@@ -35,6 +35,7 @@ using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Web.Common.AspNetCore;
 using IHostingEnvironment = Umbraco.Core.Hosting.IHostingEnvironment;
+using Umbraco.Infrastructure.Persistence.Mappers;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -88,8 +89,8 @@ namespace Umbraco.Tests.TestHelpers
             return new Lazy<ISqlContext>(() => sqlContext);
         }
 
-        public static ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> CreateMaps()
-            => new ConcurrentDictionary<Type, ConcurrentDictionary<string, string>>();
+        public static MapperConfigurationStore CreateMaps()
+            => new MapperConfigurationStore();
 
         //public static Configs GetConfigs() => _testHelperInternal.GetConfigs();
 

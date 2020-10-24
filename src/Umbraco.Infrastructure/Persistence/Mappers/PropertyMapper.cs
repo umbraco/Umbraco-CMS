@@ -2,13 +2,14 @@
 using System.Collections.Concurrent;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Infrastructure.Persistence.Mappers;
 
 namespace Umbraco.Core.Persistence.Mappers
 {
     [MapperFor(typeof(Property))]
     public sealed class PropertyMapper : BaseMapper
     {
-        public PropertyMapper(Lazy<ISqlContext> sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
+        public PropertyMapper(Lazy<ISqlContext> sqlContext, MapperConfigurationStore maps)
             : base(sqlContext, maps)
         { }
 

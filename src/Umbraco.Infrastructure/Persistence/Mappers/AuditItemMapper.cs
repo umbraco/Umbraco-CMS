@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Infrastructure.Persistence.Mappers;
 
 namespace Umbraco.Core.Persistence.Mappers
 {
@@ -9,7 +10,7 @@ namespace Umbraco.Core.Persistence.Mappers
     [MapperFor(typeof(IAuditItem))]
     public sealed class AuditItemMapper : BaseMapper
     {
-        public AuditItemMapper(Lazy<ISqlContext> sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
+        public AuditItemMapper(Lazy<ISqlContext> sqlContext, MapperConfigurationStore maps)
             : base(sqlContext, maps)
         { }
 
