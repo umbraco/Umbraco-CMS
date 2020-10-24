@@ -21,11 +21,6 @@ namespace Umbraco.Infrastructure.Composing
             return _serviceProvider.GetRequiredService(type);
         }
 
-        public TService GetInstanceFor<TService, TTarget>()
-        {
-            throw new NotImplementedException("MSDI");
-        }
-
         public object TryGetInstance(Type type)
         {
             return _serviceProvider.GetService(type);
@@ -41,14 +36,10 @@ namespace Umbraco.Infrastructure.Composing
             return _serviceProvider.GetServices<TService>();
         }
 
-        public void Release(object instance) { }
-
         public IDisposable BeginScope()
         {
             return _serviceProvider.CreateScope();
         }
-
-        public void EnablePerWebRequestScope() { }
 
         public static IFactory Wrap(IServiceProvider serviceProvider)
         {

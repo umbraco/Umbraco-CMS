@@ -64,9 +64,6 @@ namespace Umbraco.Core.Composing.CompositionExtensions
                 );
             });
 
-            // register the supporting filesystems provider
-            composition.Register(factory => new SupportingFileSystems(factory), Lifetime.Singleton);
-            
             return composition;
         }
     }
