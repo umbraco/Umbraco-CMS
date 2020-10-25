@@ -90,10 +90,9 @@ namespace Umbraco.Extensions
                     services.GetRequiredService<IJsonSerializer>()));
             services.TryAddScoped<IUserConfirmation<BackOfficeIdentityUser>, DefaultUserConfirmation<BackOfficeIdentityUser>>();
             services.TryAddScoped<IUserClaimsPrincipalFactory<BackOfficeIdentityUser>, UserClaimsPrincipalFactory<BackOfficeIdentityUser>>();
-            services.TryAddScoped<UserManager<BackOfficeIdentityUser>,BackOfficeUserManager<BackOfficeIdentityUser>>();
+            services.TryAddScoped<UserManager<BackOfficeIdentityUser>>();
 
             // CUSTOM:
-          
             services.TryAddScoped<BackOfficeLookupNormalizer>();
             services.TryAddScoped<BackOfficeIdentityErrorDescriber>();
 
