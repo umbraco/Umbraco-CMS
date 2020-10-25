@@ -270,51 +270,7 @@ namespace Umbraco.Tests.TestHelpers
                 AssertAreEqual(property, expectedListEx[i], actualListEx[i], sorter, dateDeltaMilliseconds);
         }
 
-        public static void DeleteDirectory(string path)
-        {
-            Try(() =>
-            {
-                if (Directory.Exists(path) == false) return;
-                foreach (var file in Directory.EnumerateFiles(path, "*", SearchOption.AllDirectories))
-                    File.Delete(file);
-            });
 
-            Try(() =>
-            {
-                if (Directory.Exists(path) == false) return;
-                Directory.Delete(path, true);
-            });
-        }
-
-        public static void TryAssert(Action action, int maxTries = 5, int waitMilliseconds = 200)
-        {
-            Try<AssertionException>(action, maxTries, waitMilliseconds);
-        }
-
-        public static void Try(Action action, int maxTries = 5, int waitMilliseconds = 200)
-        {
-            Try<Exception>(action, maxTries, waitMilliseconds);
-        }
-
-        public static void Try<T>(Action action, int maxTries = 5, int waitMilliseconds = 200)
-            where T : Exception
-        {
-            var tries = 0;
-            while (true)
-            {
-                try
-                {
-                    action();
-                    break;
-                }
-                catch (T)
-                {
-                    if (tries++ > maxTries)
-                        throw;
-                    Thread.Sleep(waitMilliseconds);
-                }
-            }
-        }
 
         public static IUmbracoVersion GetUmbracoVersion() => _testHelperInternal.GetUmbracoVersion();
 

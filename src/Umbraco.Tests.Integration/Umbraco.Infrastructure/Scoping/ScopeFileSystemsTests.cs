@@ -5,46 +5,48 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Web.Composing;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
-using Umbraco.Tests.TestHelpers;
+using Umbraco.Core.Scoping;
 using Umbraco.Tests.Testing;
-using Umbraco.Core.Composing.CompositionExtensions;
+using Umbraco.Tests.Integration.Testing;
 using FileSystems = Umbraco.Core.IO.FileSystems;
 
 namespace Umbraco.Tests.Scoping
 {
     [TestFixture]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewEmptyPerTest)]
-    public class ScopeFileSystemsTests : TestWithDatabaseBase
+    public class ScopeFileSystemsTests : UmbracoIntegrationTest
     {
-        public override void SetUp()
-        {
-            base.SetUp();
+        private IMediaFileSystem MediaFileSystem => GetRequiredService<IMediaFileSystem>();
+        private IHostingEnvironment HostingEnvironment => GetRequiredService<IHostingEnvironment>();
 
+        [SetUp]
+        public void SetUp()
+        {
             SafeCallContext.Clear();
             ClearFiles(IOHelper);
         }
 
-        protected override void ComposeApplication(bool withApplication)
+        // protected override void ComposeApplication(bool withApplication)
+        // {
+        //     base.ComposeApplication(withApplication);
+        //
+        //     if (!withApplication) return;
+        //
+        //     // re-register with actual media fs
+        //     Composition.ComposeFileSystems();
+        // }
+
+        [TearDown]
+        public void Teardown()
         {
-            base.ComposeApplication(withApplication);
-
-            if (!withApplication) return;
-
-            // re-register with actual media fs
-            Composition.ComposeFileSystems();
-        }
-
-        public override void TearDown()
-        {
-            base.TearDown();
             SafeCallContext.Clear();
             FileSystems.ResetShadowId();
             ClearFiles(IOHelper);
         }
 
-        private static void ClearFiles(IIOHelper ioHelper)
+        private void ClearFiles(IIOHelper ioHelper)
         {
             TestHelper.DeleteDirectory(ioHelper.MapPath("media"));
             TestHelper.DeleteDirectory(ioHelper.MapPath("FileSysTests"));
@@ -57,7 +59,7 @@ namespace Umbraco.Tests.Scoping
         public void CreateMediaTest(bool complete)
         {
             var physMediaFileSystem = new PhysicalFileSystem(IOHelper, HostingEnvironment, Mock.Of<ILogger<PhysicalFileSystem>>(), IOHelper.MapPath("media"), "ignore");
-            var mediaFileSystem = Current.MediaFileSystem;
+            var mediaFileSystem = MediaFileSystem;
 
             Assert.IsFalse(physMediaFileSystem.FileExists("f1.txt"));
 
@@ -76,12 +78,12 @@ namespace Umbraco.Tests.Scoping
 
             if (complete)
             {
-                Assert.IsTrue(Current.MediaFileSystem.FileExists("f1.txt"));
+                Assert.IsTrue(MediaFileSystem.FileExists("f1.txt"));
                 Assert.IsTrue(physMediaFileSystem.FileExists("f1.txt"));
             }
             else
             {
-                Assert.IsFalse(Current.MediaFileSystem.FileExists("f1.txt"));
+                Assert.IsFalse(MediaFileSystem.FileExists("f1.txt"));
                 Assert.IsFalse(physMediaFileSystem.FileExists("f1.txt"));
             }
         }
@@ -91,7 +93,7 @@ namespace Umbraco.Tests.Scoping
         public void MultiThread()
         {
             var physMediaFileSystem = new PhysicalFileSystem(IOHelper, HostingEnvironment, Mock.Of<ILogger<PhysicalFileSystem>>(),IOHelper.MapPath("media"), "ignore");
-            var mediaFileSystem = Current.MediaFileSystem;
+            var mediaFileSystem = MediaFileSystem;
 
             var scopeProvider = ScopeProvider;
             using (var scope = scopeProvider.CreateScope(scopeFileSystems: true))
@@ -143,7 +145,7 @@ namespace Umbraco.Tests.Scoping
         [Test]
         public void SingleShadowEvenDetached()
         {
-            var scopeProvider = ScopeProvider;
+            var scopeProvider = (ScopeProvider)ScopeProvider;
             using (var scope = scopeProvider.CreateScope(scopeFileSystems: true))
             {
                 using (new SafeCallContext()) // not nesting!
