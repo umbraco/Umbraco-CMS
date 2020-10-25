@@ -75,7 +75,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
 
         private static VersionName MapProductVersion(string productVersion)
         {
-            var firstPart = string.IsNullOrWhiteSpace(productVersion) ? "??" : productVersion.Split('.')[0];
+            var firstPart = string.IsNullOrWhiteSpace(productVersion) ? "??" : productVersion.Split(Constants.CharArrays.Period)[0];
             switch (firstPart)
             {
                 case "??":

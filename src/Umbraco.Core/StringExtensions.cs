@@ -315,7 +315,7 @@ namespace Umbraco.Core
             if (value == null)
                 return null;
 
-            string[] parts = value.Split('\n');
+            string[] parts = value.Split(Constants.CharArrays.LineFeed);
 
             StringBuilder decryptedValue = new StringBuilder();
 

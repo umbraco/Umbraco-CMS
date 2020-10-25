@@ -46,7 +46,7 @@ namespace Umbraco.Core
 
             // we want to preserve the / and the unreserved
             // so...
-            return string.Join("/", s.Split('/').Select(Uri.EscapeDataString));
+            return string.Join("/", s.Split(Constants.CharArrays.ForwardSlash).Select(Uri.EscapeDataString));
         }
 
         /// <summary>

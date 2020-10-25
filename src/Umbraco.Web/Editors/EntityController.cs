@@ -315,7 +315,7 @@ namespace Umbraco.Web.Editors
                 getPath: nodeid =>
                 {
                     var ent = Services.EntityService.Get(nodeid);
-                    return ent.Path.Split(',').Reverse();
+                    return ent.Path.Split(Constants.CharArrays.Comma).Reverse();
                 },
                 publishedContentExists: i => Umbraco.Content(i) != null);
         }
@@ -802,7 +802,7 @@ namespace Umbraco.Web.Editors
             {
                 // TODO: Need to check for Object types that support hierarchic here, some might not.
 
-                var ids = Services.EntityService.Get(id).Path.Split(',').Select(int.Parse).Distinct().ToArray();
+                var ids = Services.EntityService.Get(id).Path.Split(Constants.CharArrays.Comma).Select(int.Parse).Distinct().ToArray();
 
                 var ignoreUserStartNodes = IsDataTypeIgnoringUserStartNodes(queryStrings?.GetValue<Guid?>("dataTypeId"));
                 if (ignoreUserStartNodes == false)

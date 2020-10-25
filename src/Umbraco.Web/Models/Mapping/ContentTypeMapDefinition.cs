@@ -558,7 +558,7 @@ namespace Umbraco.Web.Models.Mapping
                 return Enumerable.Empty<string>();
 
             var aliases = new List<string>();
-            var ancestorIds = parent.Path.Split(',').Select(int.Parse);
+            var ancestorIds = parent.Path.Split(Constants.CharArrays.Comma).Select(int.Parse);
             // loop through all content types and return ordered aliases of ancestors
             var allContentTypes = _contentTypeService.GetAll().ToArray();
             foreach (var ancestorId in ancestorIds)

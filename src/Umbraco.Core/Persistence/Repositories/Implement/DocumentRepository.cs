@@ -900,7 +900,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (content.ParentId == -1)
                 return content.Published;
 
-            var ids = content.Path.Split(',').Skip(1).Select(int.Parse);
+            var ids = content.Path.Split(Constants.CharArrays.Comma).Skip(1).Select(int.Parse);
 
             var sql = SqlContext.Sql()
                 .SelectCount<NodeDto>(x => x.NodeId)

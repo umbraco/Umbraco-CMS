@@ -49,6 +49,12 @@ namespace Umbraco.Core
             /// </summary>
             public static readonly char[] LineFeedCarriageReturn = new char[] { '\n', '\r' };
 
+
+            /// <summary>
+            /// Char array containing \n
+            /// </summary>
+            public static readonly char[] LineFeed = new char[] { '\n' };
+
             /// <summary>
             /// Char array containing only ,
             /// </summary>
@@ -118,7 +124,15 @@ namespace Umbraco.Core
             /// </summary>
             public static readonly char[] EqualsChar = new char[] { '=' };
 
-            
+            /// <summary>
+            /// Char array containing >
+            /// </summary>
+            public static readonly char[] GreaterThan = new char[] { '>' };
+
+            /// <summary>
+            /// Char array containing |
+            /// </summary>
+            public static readonly char[] VerticalTab = new char[] { '|' };
         }
     }
 }

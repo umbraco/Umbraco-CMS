@@ -645,7 +645,7 @@ namespace Umbraco.Web.Editors
             if (result.FormData.ContainsKey("path"))
             {
 
-                var folders = result.FormData["path"].Split('/');
+                var folders = result.FormData["path"].Split(Constants.CharArrays.ForwardSlash);
 
                 for (int i = 0; i < folders.Length - 1; i++)
                 {

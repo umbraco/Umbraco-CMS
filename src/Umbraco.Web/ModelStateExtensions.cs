@@ -107,7 +107,7 @@ namespace Umbraco.Web
             //Add any variant specific errors here
             var variantErrors = modelState.Keys
                 .Where(key => key.StartsWith("_Properties.")) //only choose _Properties errors
-                .Select(x => x.Split('.')) //split into parts
+                .Select(x => x.Split(Constants.CharArrays.Period)) //split into parts
                 .Where(x => x.Length >= 4 && !x[2].IsNullOrWhiteSpace() && !x[3].IsNullOrWhiteSpace())
                 .Select(x => (culture: x[2], segment: x[3]))
                 //if the culture is marked "invariant" than return the default language, this is because we can only edit invariant properties on the default language
