@@ -54,14 +54,10 @@ namespace Umbraco.Core.Composing.CompositionExtensions
 
                 var rootPath = hostingEnvironment.MapPathWebRoot(globalSettings.UmbracoMediaPath);
                 var rootUrl = hostingEnvironment.ToAbsolute(globalSettings.UmbracoMediaPath);
-                var defaultInnerFileSystem = new PhysicalFileSystem(ioHelper, hostingEnvironment, logger, rootPath, rootUrl);
+                var inner = new PhysicalFileSystem(ioHelper, hostingEnvironment, logger, rootPath, rootUrl);
 
-                return new MediaFileSystem(
-                    defaultInnerFileSystem,
-                    factory.GetInstance<IMediaPathScheme>(),
-                    factory.GetInstance<ILogger<MediaFileSystem>>(),
-                    factory.GetInstance<IShortStringHelper>()
-                );
+                var fileSystems = factory.GetInstance<IO.FileSystems>();
+                return fileSystems.GetFileSystem<MediaFileSystem>(inner);
             });
 
             return composition;
