@@ -14,6 +14,7 @@ using Umbraco.Core.BackOffice;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Security;
 using Umbraco.Core.Serialization;
+using Umbraco.Infrastructure.BackOffice;
 using Umbraco.Net;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.BackOffice.Security;
@@ -72,7 +73,7 @@ namespace Umbraco.Extensions
             services.ConfigureOptions<ConfigureBackOfficeSecurityStampValidatorOptions>();
         }
 
-        private static IdentityBuilder BuildUmbracoBackOfficeIdentity(this IServiceCollection services)
+        private static BackOfficeIdentityBuilder BuildUmbracoBackOfficeIdentity(this IServiceCollection services)
         {
             // Borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Extensions.Core/src/IdentityServiceCollectionExtensions.cs#L33
             // The reason we need our own is because the Identity system doesn't cater easily for multiple identity systems and particularly being
@@ -96,7 +97,7 @@ namespace Umbraco.Extensions
             services.TryAddScoped<BackOfficeLookupNormalizer>();
             services.TryAddScoped<BackOfficeIdentityErrorDescriber>();
 
-            return new IdentityBuilder(typeof(BackOfficeIdentityUser), services);
+            return new BackOfficeIdentityBuilder(services);
         }
     }
 }
