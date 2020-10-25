@@ -21,6 +21,9 @@ namespace Umbraco.Web.UI.NetCore
                     x.ClearProviders();
                 })
                 .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); })
+                // TODO: MSDI - this should probably be on one day, more so when we can reduce the number
+                // of times we build a ServiceProvider from services collection
+                // right now it's just painful.
                 .UseDefaultServiceProvider(options => options.ValidateOnBuild = false)
                 .UseUmbraco();
     }
