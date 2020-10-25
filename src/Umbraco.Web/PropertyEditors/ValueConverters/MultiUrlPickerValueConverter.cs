@@ -6,11 +6,13 @@ using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Web.Models;
 using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
 {
+    [DefaultPropertyValueConverter(typeof(JsonValueConverter))]
     public class MultiUrlPickerValueConverter : PropertyValueConverterBase
     {
         private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
