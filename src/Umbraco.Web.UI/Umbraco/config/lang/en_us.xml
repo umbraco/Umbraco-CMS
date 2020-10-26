@@ -2317,7 +2317,7 @@ To manage your website, simply open the Umbraco back office and start adding con
       <key alias="labelUsedInMediaDescendants">One or more of this item's descendants is being used in a media item</key>
       <key alias="labelUsedInContentDescendants">One or more of this item's descendants is being used in a content item</key>
       <key alias="labelUsedInMemberDescendants">One or more of this item's descendants is being used in a member</key>
-      <key alias="deleteWarning">The current item or one or more of this item's descendants is being used. Deleting this item can lead to broken links on your website.</key>   tem's descendants is being used in a content item</key>
+      <key alias="deleteWarning">The current item or one or more of this item's descendants is being used. Deleting this item can lead to broken links on your website.</key>
   </area>
   <area alias="logViewer">
       <key alias="deleteSavedSearch">Delete Saved Search</key>
