@@ -294,6 +294,17 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
+        public IEnumerable<IUmbracoEntity> GetPagedParentEntitiesByChildIds(int[] ids, long pageIndex, int pageSize, out long totalChildren,
+            string[] relationTypes, params UmbracoObjectTypes[] entityTypes)
+        {
+            var relationTypeIds = this.GetRelationTypeIdsFromAliases(relationTypes);
+
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                return _relationRepository.GetPagedParentEntitiesByChildIds(ids, pageIndex, pageSize, out totalChildren, relationTypeIds, entityTypes.Select(x => x.GetGuid()).ToArray());
+            }
+        }
+
         /// <inheritdoc />
         public IEnumerable<IUmbracoEntity> GetPagedChildEntitiesByParentId(int id, long pageIndex, int pageSize, out long totalChildren, params UmbracoObjectTypes[] entityTypes)
         {
