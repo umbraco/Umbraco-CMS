@@ -79,7 +79,7 @@ namespace Umbraco.Tests.Integration
                 testHelper.GetHostingEnvironment(), testHelper.GetBackOfficeInfo(), testHelper.DbProviderFactoryCreator,
                 testHelper.MainDom, testHelper.GetTypeFinder(), AppCaches.NoCache);
 
-            coreRuntime.Configure(umbracoContainer);
+            coreRuntime.Configure(umbracoContainer.Services);
 
             Assert.IsTrue(coreRuntime.MainDom.IsMainDom);
             Assert.IsNull(coreRuntime.State.BootFailedException);

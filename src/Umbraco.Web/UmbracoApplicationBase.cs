@@ -7,6 +7,7 @@ using System.Web;
 using System.Web.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Serilog;
@@ -21,6 +22,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Logging.Serilog;
 using Umbraco.Core.Logging.Serilog.Enrichers;
+using Umbraco.Infrastructure.Composing;
 using Umbraco.Net;
 using Umbraco.Web.Hosting;
 using Umbraco.Web.Logging;
@@ -145,7 +147,7 @@ namespace Umbraco.Web
         /// </summary>
         protected virtual IRegister GetRegister(GlobalSettings globalSettings)
         {
-            return RegisterFactory.Create(globalSettings);
+            return ServiceCollectionRegistryAdapter.Wrap(new ServiceCollection());
         }
 
         // events - in the order they trigger
@@ -193,7 +195,7 @@ namespace Umbraco.Web
                 Umbraco.Composing.Current.Profiler,
                 Umbraco.Composing.Current.HostingEnvironment,
                 Umbraco.Composing.Current.BackOfficeInfo);
-            _factory = Current.Factory = _runtime.Configure(register);
+            //_factory = Current.Factory = _runtime.Configure(register);
 
             // now we can add our request based logging enrichers (globally, which is what we were doing in netframework before)
             LogContext.Push(new HttpSessionIdEnricher(_factory.GetInstance<ISessionIdResolver>()));

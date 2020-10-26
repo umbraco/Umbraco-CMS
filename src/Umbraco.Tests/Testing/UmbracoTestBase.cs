@@ -42,6 +42,7 @@ using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Strings;
+using Umbraco.Infrastructure.Composing;
 using Umbraco.Net;
 using Umbraco.Tests.Common;
 using Umbraco.Tests.TestHelpers;
@@ -204,11 +205,16 @@ namespace Umbraco.Tests.Testing
             var register = TestHelper.GetRegister();
 
 
-
-            Composition = new Composition(register, typeLoader, proflogger, MockRuntimeState(RuntimeLevel.Run), TestHelper.IOHelper, AppCaches.NoCache);
+            Composition = new Composition(
+                (register as ServiceCollectionRegistryAdapter).Services,
+                typeLoader,
+                proflogger,
+                MockRuntimeState(RuntimeLevel.Run),
+                TestHelper.IOHelper,
+                AppCaches.NoCache
+            );
 
             //TestHelper.GetConfigs().RegisterWith(register);
-
             Composition.RegisterUnique(typeof(ILoggerFactory), loggerFactory);
             Composition.Register(typeof(ILogger<>), typeof(Logger<>));
             Composition.Register(typeof(ILogger), msLogger);

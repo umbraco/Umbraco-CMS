@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Core.Cache;
@@ -113,9 +114,9 @@ namespace Umbraco.Core.Runtime
         public IMainDom MainDom { get; }
 
         /// <inheritdoc/>
-        public virtual IFactory Configure(IRegister register)
+        public virtual IFactory Configure(IServiceCollection services)
         {
-            if (register is null) throw new ArgumentNullException(nameof(register));
+            if (services is null) throw new ArgumentNullException(nameof(services));
 
 
             // create and register the essential services
@@ -149,7 +150,7 @@ namespace Umbraco.Core.Runtime
 
                 // application environment
                 ConfigureUnhandledException();
-                _factory = Configure(register, timer);
+                _factory = Configure(services, timer);
 
                 return _factory;
             }
@@ -158,9 +159,9 @@ namespace Umbraco.Core.Runtime
         /// <summary>
         /// Configure the runtime within a timer.
         /// </summary>
-        private IFactory Configure(IRegister register, DisposableTimer timer)
+        private IFactory Configure(IServiceCollection services, DisposableTimer timer)
         {
-            if (register is null) throw new ArgumentNullException(nameof(register));
+            if (services is null) throw new ArgumentNullException(nameof(services));
             if (timer is null) throw new ArgumentNullException(nameof(timer));
 
             Composition composition = null;
@@ -181,7 +182,7 @@ namespace Umbraco.Core.Runtime
                 _state = new RuntimeState(_globalSettings, UmbracoVersion, databaseFactory, RuntimeLoggerFactory.CreateLogger<RuntimeState>());
 
                 // create the composition
-                composition = new Composition(register, typeLoader, ProfilingLogger, _state, IOHelper, AppCaches);
+                composition = new Composition(services, typeLoader, ProfilingLogger, _state, IOHelper, AppCaches);
 
                 composition.RegisterEssentials(Logger, RuntimeLoggerFactory, Profiler, ProfilingLogger, MainDom, AppCaches, databaseFactory, typeLoader, _state, TypeFinder, IOHelper, UmbracoVersion, DbProviderFactoryCreator, HostingEnvironment, BackOfficeInfo);
 

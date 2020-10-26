@@ -14,6 +14,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.IO.MediaPathSchemes;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
+using Umbraco.Infrastructure.Composing;
 using Umbraco.Tests.TestHelpers;
 using FileSystems = Umbraco.Core.IO.FileSystems;
 
@@ -30,7 +31,14 @@ namespace Umbraco.Tests.IO
         {
             _register = TestHelper.GetRegister();
 
-            var composition = new Composition(_register, TestHelper.GetMockedTypeLoader(), Mock.Of<IProfilingLogger>(), Mock.Of<IRuntimeState>(), TestHelper.IOHelper, AppCaches.NoCache);
+            var composition = new Composition(
+                (_register as ServiceCollectionRegistryAdapter).Services,
+                TestHelper.GetMockedTypeLoader(),
+                Mock.Of<IProfilingLogger>(),
+                Mock.Of<IRuntimeState>(),
+                TestHelper.IOHelper,
+                AppCaches.NoCache
+            );
 
             composition.Register(_ => Mock.Of<IDataTypeService>());
             composition.Register<ILoggerFactory>(NullLoggerFactory.Instance);

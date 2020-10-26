@@ -27,7 +27,7 @@ namespace Umbraco.Tests.TestHelpers
         [SetUp]
         public virtual void Setup()
         {
-            var container = TestHelper.GetRegister();
+            var container = TestHelper.GetServiceCollection();
             var typeLoader = TestHelper.GetMockedTypeLoader();
 
             var composition = new Composition(container, typeLoader, Mock.Of<IProfilingLogger>(), Mock.Of<IRuntimeState>(), TestHelper.IOHelper, AppCaches.NoCache);

@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Composing;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 
 namespace Umbraco.Core
@@ -11,9 +12,7 @@ namespace Umbraco.Core
         /// <summary>
         /// Boots the runtime.
         /// </summary>
-        /// <param name="register">The application register.</param>
-        /// <returns>The application factory.</returns>
-        IFactory Configure(IRegister register);
+        IFactory Configure(IServiceCollection services);
 
         /// <summary>
         /// Gets the runtime state.

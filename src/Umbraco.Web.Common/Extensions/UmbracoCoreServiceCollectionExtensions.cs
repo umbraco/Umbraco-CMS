@@ -306,7 +306,7 @@ namespace Umbraco.Extensions
                 appCaches,
                 dbProviderFactoryCreator);
 
-            factory = coreRuntime.Configure(container);
+            factory = coreRuntime.Configure(services);
 
             return services;
         }

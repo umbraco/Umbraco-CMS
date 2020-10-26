@@ -23,26 +23,6 @@ namespace Umbraco.Core.Composing
         private readonly Dictionary<string, Action<IRegister>> _uniques = new Dictionary<string, Action<IRegister>>();
         private IRegister _register => ServiceCollectionRegistryAdapter.Wrap(Services);
 
-
-        [Obsolete("Please use ctor that takes IServiceCollection instead")]
-        public Composition(IRegister register, TypeLoader typeLoader, IProfilingLogger logger, IRuntimeState runtimeState, IIOHelper ioHelper, AppCaches appCaches)
-        {
-            TypeLoader = typeLoader ?? throw new ArgumentNullException(nameof(typeLoader));
-            Logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            RuntimeState = runtimeState ?? throw new ArgumentNullException(nameof(runtimeState));
-            IOHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
-            AppCaches = appCaches ?? throw new ArgumentNullException(nameof(appCaches));
-
-            if (register is ServiceCollectionRegistryAdapter wrapper)
-            {
-                Services = wrapper.Services;
-            }
-            else
-            {
-                throw new ArgumentException("NO THANK YOU");
-            }
-        }
-
         public Composition(IServiceCollection services, TypeLoader typeLoader, IProfilingLogger logger, IRuntimeState runtimeState, IIOHelper ioHelper, AppCaches appCaches)
         {
             Services = services ?? throw new ArgumentNullException(nameof(services));

@@ -19,7 +19,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
         [Test]
         public void PackageActionCollectionBuilderWorks()
         {
-            var container = TestHelper.GetRegister();
+            var container = TestHelper.GetServiceCollection();
 
             var composition = new Composition(container, TestHelper.GetMockedTypeLoader(), Mock.Of<IProfilingLogger>(), Mock.Of<IRuntimeState>(), TestHelper.IOHelper, AppCaches.NoCache);
 

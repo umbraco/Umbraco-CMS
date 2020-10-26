@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -14,9 +15,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
     [TestFixture]
     public class LazyCollectionBuilderTests
     {
-        private IRegister CreateRegister()
+        private IServiceCollection CreateRegister()
         {
-            return TestHelper.GetRegister();
+            return TestHelper.GetServiceCollection();
         }
 
         // note
