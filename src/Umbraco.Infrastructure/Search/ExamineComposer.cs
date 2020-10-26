@@ -1,4 +1,5 @@
-﻿using Umbraco.Core;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
@@ -22,12 +23,12 @@ namespace Umbraco.Web.Search
 
             // populators are not a collection: one cannot remove ours, and can only add more
             // the container can inject IEnumerable<IIndexPopulator> and get them all
-            composition.Register<MemberIndexPopulator>(Lifetime.Singleton);
-            composition.Register<ContentIndexPopulator>(Lifetime.Singleton);
-            composition.Register<PublishedContentIndexPopulator>(Lifetime.Singleton);
-            composition.Register<MediaIndexPopulator>(Lifetime.Singleton);
+            composition.Services.AddSingleton<MemberIndexPopulator>();
+            composition.Services.AddSingleton<ContentIndexPopulator>();
+            composition.Services.AddSingleton<PublishedContentIndexPopulator>();
+            composition.Services.AddSingleton<MediaIndexPopulator>();
 
-            composition.Register<IndexRebuilder>(Lifetime.Singleton);
+            composition.Services.AddSingleton<IndexRebuilder>();
             composition.RegisterUnique<IUmbracoIndexConfig, UmbracoIndexConfig>();
             composition.RegisterUnique<IIndexDiagnosticsFactory, IndexDiagnosticsFactory>();
             composition.RegisterUnique<IPublishedContentValueSetBuilder>(factory =>

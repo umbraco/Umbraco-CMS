@@ -4,6 +4,7 @@ using System.Data.SqlServerCe;
 using System.Threading;
 using System.Web.Routing;
 using System.Xml;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -74,7 +75,7 @@ namespace Umbraco.Tests.TestHelpers
         {
             base.Compose();
 
-            Composition.Register<ISqlSyntaxProvider, SqlCeSyntaxProvider>();
+            Composition.Services.AddTransient<ISqlSyntaxProvider, SqlCeSyntaxProvider>();
             Composition.Register(factory => PublishedSnapshotService);
             Composition.Register(factory => DefaultCultureAccessor);
 

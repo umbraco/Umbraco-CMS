@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Linq;
 using System.Web;
 using System.Web.Security;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
@@ -66,7 +67,7 @@ namespace Umbraco.Tests.Testing.TestingTests
             Composition.Register(_ => Mock.Of<IMemberTypeService>());
             Composition.Register(_ => Mock.Of<IUserService>());
             Composition.Register(_ => AppCaches.Disabled);
-            Composition.Register<ServiceContext>();
+            Composition.Services.AddTransient<ServiceContext>();
 
             // ReSharper disable once UnusedVariable
             var helper = new UmbracoHelper(Mock.Of<IPublishedContent>(),

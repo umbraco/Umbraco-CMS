@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.BackOffice;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Core.BackOffice;
 using Umbraco.Core.Mapping;
 using Umbraco.Web.Models.Mapping;
 
@@ -36,8 +37,8 @@ namespace Umbraco.Core.Composing.CompositionExtensions
                 .Add<IdentityMapDefinition>()
                ;
 
-            composition.Register<CommonMapper>();
-            composition.Register<MemberTabsAndPropertiesMapper>();
+            composition.Services.AddTransient<CommonMapper>();
+            composition.Services.AddTransient<MemberTabsAndPropertiesMapper>();
 
             return composition;
         }

@@ -9,6 +9,7 @@ using System.Web.Routing;
 using System.Web.Security;
 using System.Xml.Linq;
 using Examine;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -362,7 +363,7 @@ namespace Umbraco.Tests.Testing
             runtimeStateMock.Setup(x => x.Level).Returns(RuntimeLevel.Run);
             Composition.RegisterUnique(f => runtimeStateMock.Object);
             Composition.Register(_ => Mock.Of<IImageUrlGenerator>());
-            Composition.Register<UploadAutoFillProperties>();
+            Composition.Services.AddTransient<UploadAutoFillProperties>();
 
             // ah...
             Composition.WithCollectionBuilder<ActionCollectionBuilder>();

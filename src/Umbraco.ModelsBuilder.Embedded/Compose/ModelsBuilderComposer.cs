@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Reflection;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core.Configuration;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
@@ -18,7 +19,7 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
         public void Compose(Composition composition)
         {
             composition.Components().Append<ModelsBuilderComponent>();
-            composition.Register<UmbracoServices>(Lifetime.Singleton);
+            composition.Services.AddSingleton<UmbracoServices>();
             composition.RegisterUnique<ModelsGenerator>();
             composition.RegisterUnique<LiveModelsProvider>();
             composition.RegisterUnique<OutOfDateModelsStatus>();

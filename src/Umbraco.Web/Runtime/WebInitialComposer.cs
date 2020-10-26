@@ -1,6 +1,7 @@
 ﻿using System.Web.Mvc;
 using System.Web.Security;
 using Microsoft.AspNet.SignalR;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Dictionary;
@@ -26,13 +27,13 @@ namespace Umbraco.Web.Runtime
         {
             base.Compose(composition);
 
-            composition.Register<UmbracoInjectedModule>();
+            composition.Services.AddTransient<UmbracoInjectedModule>();
 
 
             // register membership stuff
             composition.Register(factory => MembershipProviderExtensions.GetMembersMembershipProvider());
             composition.Register(factory => Roles.Enabled ? Roles.Provider : new MembersRoleProvider(factory.GetInstance<IMemberService>()));
-            composition.Register<MembershipHelper>(Lifetime.Request);
+            composition.Services.AddScoped<MembershipHelper>();
             composition.Register<IPublishedMemberCache>(factory => factory.GetInstance<IUmbracoContext>().PublishedSnapshot.Members);
             composition.RegisterUnique<IMemberUserKeyProvider, MemberUserKeyProvider>();
             composition.RegisterUnique<IPublicAccessChecker, PublicAccessChecker>();

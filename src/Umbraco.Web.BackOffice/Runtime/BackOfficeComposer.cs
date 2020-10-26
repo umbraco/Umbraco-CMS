@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
@@ -26,8 +27,8 @@ namespace Umbraco.Web.BackOffice.Runtime
             composition.RegisterUnique<BackOfficeAreaRoutes>();
             composition.RegisterUnique<PreviewRoutes>();
             composition.RegisterUnique<BackOfficeServerVariables>();
-            composition.Register<BackOfficeSessionIdValidator>(Lifetime.Request);
-            composition.Register<BackOfficeSecurityStampValidator>(Lifetime.Request);
+            composition.Services.AddScoped<BackOfficeSessionIdValidator>();
+            composition.Services.AddScoped<BackOfficeSecurityStampValidator>();
 
             composition.RegisterUnique<PreviewAuthenticationMiddleware>();
             composition.RegisterUnique<IBackOfficeAntiforgery, BackOfficeAntiforgery>();

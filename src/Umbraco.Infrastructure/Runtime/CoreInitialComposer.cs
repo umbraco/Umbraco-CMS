@@ -1,5 +1,6 @@
 ﻿using System;
 using Examine;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
@@ -95,7 +96,7 @@ namespace Umbraco.Core.Runtime
 
             // register database builder
             // *not* a singleton, don't want to keep it around
-            composition.Register<DatabaseBuilder>();
+            composition.Services.AddTransient<DatabaseBuilder>();
 
             // register manifest parser, will be injected in collection builders where needed
             composition.RegisterUnique<IManifestParser, ManifestParser>();
@@ -318,7 +319,7 @@ namespace Umbraco.Core.Runtime
                 .Append<ContentFinderByUrlAlias>()
                 .Append<ContentFinderByRedirectUrl>();
 
-            composition.Register<UmbracoTreeSearcher>(Lifetime.Request);
+            composition.Services.AddScoped<UmbracoTreeSearcher>();
 
             composition.SearchableTrees()
                 .Add(() => composition.TypeLoader.GetTypes<ISearchableTree>());
@@ -336,7 +337,7 @@ namespace Umbraco.Core.Runtime
             composition.RegisterUnique(f => new DistributedCache(f.GetInstance<IServerMessenger>(), f.GetInstance<CacheRefresherCollection>()));
 
 
-            composition.Register<ITagQuery, TagQuery>(Lifetime.Request);
+            composition.Services.AddScoped<ITagQuery, TagQuery>();
 
             composition.RegisterUnique<HtmlLocalLinkParser>();
             composition.RegisterUnique<HtmlUrlParser>();
@@ -361,7 +362,7 @@ namespace Umbraco.Core.Runtime
             // register accessors for cultures
             composition.RegisterUnique<IDefaultCultureAccessor, DefaultCultureAccessor>();
 
-            composition.Register<IFilePermissionHelper, FilePermissionHelper>(Lifetime.Singleton);
+            composition.Services.AddSingleton<IFilePermissionHelper, FilePermissionHelper>();
 
             composition.RegisterUnique<IUmbracoComponentRenderer, UmbracoComponentRenderer>();
 

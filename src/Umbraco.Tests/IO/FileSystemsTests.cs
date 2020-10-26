@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -41,7 +42,7 @@ namespace Umbraco.Tests.IO
             );
 
             composition.Register(_ => Mock.Of<IDataTypeService>());
-            composition.Register<ILoggerFactory>(NullLoggerFactory.Instance);
+            composition.Services.AddTransient<ILoggerFactory, NullLoggerFactory>();
             composition.Register(typeof(ILogger<>), typeof(Logger<>));
             composition.Register(_ => TestHelper.ShortStringHelper);
             composition.Register(_ => TestHelper.IOHelper);

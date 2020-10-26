@@ -17,7 +17,7 @@ namespace Umbraco.Core.Composing
     /// avoid accessing the container. This is because everything needs to be properly registered and with
     /// the proper lifecycle. These methods will take care of it. Directly registering into the container
     /// may cause issues.</remarks>
-    public class Composition : IRegister
+    public class Composition
     {
         private readonly Dictionary<Type, ICollectionBuilder> _builders = new Dictionary<Type, ICollectionBuilder>();
         private readonly Dictionary<string, Action<IRegister>> _uniques = new Dictionary<string, Action<IRegister>>();
