@@ -22,7 +22,6 @@ namespace Umbraco.Tests.Scoping
     {
         private IMediaFileSystem MediaFileSystem => GetRequiredService<IMediaFileSystem>();
         private IHostingEnvironment HostingEnvironment => GetRequiredService<IHostingEnvironment>();
-        private GlobalSettings GlobalSettings => GetRequiredService<IOptions<GlobalSettings>>().Value;
 
         [SetUp]
         public void SetUp()
@@ -45,10 +44,9 @@ namespace Umbraco.Tests.Scoping
             TestHelper.DeleteDirectory(ioHelper.MapPath("FileSysTests"));
             TestHelper.DeleteDirectory(ioHelper.MapPath(Constants.SystemDirectories.TempData.EnsureEndsWith('/') + "ShadowFs"));
         }
-
-        [TestCase(true)]
-        [TestCase(false)]
-        public void CreateMediaTest(bool complete)
+        
+        [Test]
+        public void test_MediaFileSystem_does_not_write_to_physical_file_system_when_scoped_if_scope_does_not_complete()
         {
             var rootPath = HostingEnvironment.MapPathWebRoot(GlobalSettings.UmbracoMediaPath);
             var rootUrl = HostingEnvironment.ToAbsolute(GlobalSettings.UmbracoMediaPath);
@@ -57,29 +55,48 @@ namespace Umbraco.Tests.Scoping
 
             Assert.IsFalse(physMediaFileSystem.FileExists("f1.txt"));
 
-            var scopeProvider = ScopeProvider;
-            using (var scope = scopeProvider.CreateScope(scopeFileSystems: true))
+            using (ScopeProvider.CreateScope(scopeFileSystems: true))
             {
                 using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
                     mediaFileSystem.AddFile("f1.txt", ms);
                 Assert.IsTrue(mediaFileSystem.FileExists("f1.txt"));
                 Assert.IsFalse(physMediaFileSystem.FileExists("f1.txt"));
-                if (complete)
-                    scope.Complete();
+     
                 Assert.IsTrue(mediaFileSystem.FileExists("f1.txt"));
                 Assert.IsFalse(physMediaFileSystem.FileExists("f1.txt"));
             }
 
-            if (complete)
+            // After scope is disposed ensure shadow wrapper didn't commit to physical
+            Assert.IsFalse(MediaFileSystem.FileExists("f1.txt"));
+            Assert.IsFalse(physMediaFileSystem.FileExists("f1.txt"));
+        }
+
+        [Test]
+        public void test_MediaFileSystem_writes_to_physical_file_system_when_scoped_and_scope_is_completed()
+        {
+            var rootPath = HostingEnvironment.MapPathWebRoot(GlobalSettings.UmbracoMediaPath);
+            var rootUrl = HostingEnvironment.ToAbsolute(GlobalSettings.UmbracoMediaPath);
+            var physMediaFileSystem = new PhysicalFileSystem(IOHelper, HostingEnvironment, Mock.Of<ILogger<PhysicalFileSystem>>(), rootPath, rootUrl);
+            var mediaFileSystem = MediaFileSystem;
+
+            Assert.IsFalse(physMediaFileSystem.FileExists("f1.txt"));
+
+            using (var scope = ScopeProvider.CreateScope(scopeFileSystems: true))
             {
-                Assert.IsTrue(MediaFileSystem.FileExists("f1.txt"));
-                Assert.IsTrue(physMediaFileSystem.FileExists("f1.txt"));
-            }
-            else
-            {
-                Assert.IsFalse(MediaFileSystem.FileExists("f1.txt"));
+                using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
+                    mediaFileSystem.AddFile("f1.txt", ms);
+                Assert.IsTrue(mediaFileSystem.FileExists("f1.txt"));
+                Assert.IsFalse(physMediaFileSystem.FileExists("f1.txt"));
+
+                scope.Complete();
+
+                Assert.IsTrue(mediaFileSystem.FileExists("f1.txt"));
                 Assert.IsFalse(physMediaFileSystem.FileExists("f1.txt"));
             }
+
+            // After scope is disposed ensure shadow wrapper writes to physical file system
+            Assert.IsTrue(MediaFileSystem.FileExists("f1.txt"));
+            Assert.IsTrue(physMediaFileSystem.FileExists("f1.txt"));
         }
 
         [Test]
