@@ -82,9 +82,6 @@ namespace Umbraco.Core.Composing
         /// <inheritdoc />
         public IFactory CreateFactory()
         {
-            foreach (var onCreating in OnCreatingFactory.Values)
-                onCreating();
-
             foreach (var builder in _builders.Values)
                 builder.RegisterWith(_register);
             _builders.Clear(); // no point keep them around
@@ -92,10 +89,6 @@ namespace Umbraco.Core.Composing
             return _register.CreateFactory();
         }
 
-        /// <summary>
-        /// Gets a dictionary of action to execute when creating the factory.
-        /// </summary>
-        public Dictionary<string, Action> OnCreatingFactory { get; } = new Dictionary<string, Action>();
 
         #endregion
 

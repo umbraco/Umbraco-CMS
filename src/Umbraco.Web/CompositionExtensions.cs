@@ -111,12 +111,7 @@ namespace Umbraco.Web
         /// <remarks>The controller type is registered to the container by the composition.</remarks>
         public static void SetDefaultRenderMvcController(this Composition composition, Type controllerType)
         {
-            composition.OnCreatingFactory["Umbraco.Core.DefaultRenderMvcController"] = () =>
-            {
-                // no need to register: all IRenderMvcController are registered
-                //composition.Register(controllerType, Lifetime.Request);
-                Current.DefaultRenderMvcControllerType = controllerType;
-            };
+           // NOOP
         }
 
         #endregion
