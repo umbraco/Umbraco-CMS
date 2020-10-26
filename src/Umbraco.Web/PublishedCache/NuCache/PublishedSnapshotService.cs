@@ -173,7 +173,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
             // if both local databases exist then Get will open them, else new databases will be created
             _localContentDb = _transactableDictionaryFactory.Get(ContentCacheEntityType.Document);
-            _localMediaDb = _transactableDictionaryFactory.Get(ContentCacheEntityType.Document);
+            _localMediaDb = _transactableDictionaryFactory.Get(ContentCacheEntityType.Media);
 
             _logger.Info<PublishedSnapshotService>("Registered with MainDom, localContentDbExists? {LocalContentDbExists}, localMediaDbExists? {LocalMediaDbExists}", _localContentDb.IsPopulated(), _localMediaDb.IsPopulated());
         }
