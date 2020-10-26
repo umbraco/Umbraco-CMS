@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Cache;
-using Umbraco.Web.Composing;
 using Umbraco.Core.Sync;
 
-namespace Umbraco.Tests.Cache.DistributedCache
+namespace Umbraco.Tests.UnitTests.Umbraco.Core.Cache.DistributedCache
 {
     /// <summary>
     /// Ensures that calls to DistributedCache methods carry through to the IServerMessenger correctly
@@ -14,7 +13,7 @@ namespace Umbraco.Tests.Cache.DistributedCache
     [TestFixture]
     public class DistributedCacheTests
     {
-        private Umbraco.Web.Cache.DistributedCache _distributedCache;
+        private global::Umbraco.Web.Cache.DistributedCache _distributedCache;
 
         private IServerRegistrar ServerRegistrar { get; set; }
         private TestServerMessenger ServerMessenger { get; set; }
@@ -30,13 +29,7 @@ namespace Umbraco.Tests.Cache.DistributedCache
                 new TestCacheRefresher()
             });
 
-            _distributedCache = new Umbraco.Web.Cache.DistributedCache(ServerMessenger, cacheRefresherCollection);
-        }
-
-        [TearDown]
-        public void Teardown()
-        {
-            Current.Reset();
+            _distributedCache = new global::Umbraco.Web.Cache.DistributedCache(ServerMessenger, cacheRefresherCollection);
         }
 
         [Test]
@@ -46,6 +39,7 @@ namespace Umbraco.Tests.Cache.DistributedCache
             {
                 _distributedCache.Refresh(Guid.Parse("E0F452CB-DCB2-4E84-B5A5-4F01744C5C73"), i);
             }
+
             Assert.AreEqual(10, ServerMessenger.IntIdsRefreshed.Count);
         }
 
@@ -59,6 +53,7 @@ namespace Umbraco.Tests.Cache.DistributedCache
                     x => x.Id,
                     new TestObjectWithId{Id = i});
             }
+
             Assert.AreEqual(10, ServerMessenger.IntIdsRefreshed.Count);
         }
 
@@ -69,6 +64,7 @@ namespace Umbraco.Tests.Cache.DistributedCache
             {
                 _distributedCache.Refresh(Guid.Parse("E0F452CB-DCB2-4E84-B5A5-4F01744C5C73"), Guid.NewGuid());
             }
+
             Assert.AreEqual(11, ServerMessenger.GuidIdsRefreshed.Count);
         }
 
@@ -79,6 +75,7 @@ namespace Umbraco.Tests.Cache.DistributedCache
             {
                 _distributedCache.Remove(Guid.Parse("E0F452CB-DCB2-4E84-B5A5-4F01744C5C73"), i);
             }
+
             Assert.AreEqual(12, ServerMessenger.IntIdsRemoved.Count);
         }
 
@@ -89,10 +86,11 @@ namespace Umbraco.Tests.Cache.DistributedCache
             {
                 _distributedCache.RefreshAll(Guid.Parse("E0F452CB-DCB2-4E84-B5A5-4F01744C5C73"));
             }
+
             Assert.AreEqual(13, ServerMessenger.CountOfFullRefreshes);
         }
 
-        #region internal test classes
+        #region Internal test classes
 
         internal class TestObjectWithId
         {
@@ -107,17 +105,13 @@ namespace Umbraco.Tests.Cache.DistributedCache
 
             public string Name => "Test Cache Refresher";
 
-            public void RefreshAll()
-            { }
+            public void RefreshAll() { }
 
-            public void Refresh(int id)
-            { }
+            public void Refresh(int id) { }
 
-            public void Remove(int id)
-            { }
+            public void Remove(int id) { }
 
-            public void Refresh(Guid id)
-            { }
+            public void Refresh(Guid id) { }
         }
 
         internal class TestServerMessenger : IServerMessenger
@@ -192,7 +186,6 @@ namespace Umbraco.Tests.Cache.DistributedCache
             {
                 throw new NotImplementedException();
             }
-
         }
 
         public class TestServerAddress : IServerAddress
@@ -201,6 +194,7 @@ namespace Umbraco.Tests.Cache.DistributedCache
             {
                 ServerAddress = address;
             }
+
             public string ServerAddress { get; private set; }
         }
 

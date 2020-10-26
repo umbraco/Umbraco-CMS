@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -7,7 +6,7 @@ using System.Threading;
 using NUnit.Framework;
 using Umbraco.Core.IO;
 
-namespace Umbraco.Tests.IO
+namespace Umbraco.Tests.UnitTests.Umbraco.Core.IO
 {
     [TestFixture]
     [Apartment(ApartmentState.STA)]
@@ -179,7 +178,7 @@ namespace Umbraco.Tests.IO
 
         protected Stream CreateStream(string contents = null)
         {
-            if(string.IsNullOrEmpty(contents))
+            if (string.IsNullOrEmpty(contents))
                 contents = "test";
 
             var bytes = Encoding.UTF8.GetBytes(contents);

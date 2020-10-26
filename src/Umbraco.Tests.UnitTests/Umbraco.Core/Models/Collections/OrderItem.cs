@@ -1,7 +1,7 @@
 ﻿using System;
 
-namespace Umbraco.Tests.Models.Collections
-{
+namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models.Collections
+{ 
     public class OrderItem : Item
     {
         public readonly int PartNumber;
@@ -13,10 +13,10 @@ namespace Umbraco.Tests.Models.Collections
         public OrderItem(int partNumber, string description,
             int quantity, double unitPrice)
         {
-            this.PartNumber = partNumber;
-            this.Description = description;
-            this.Quantity = quantity;
-            this.UnitPrice = unitPrice;
+            PartNumber = partNumber;
+            Description = description;
+            Quantity = quantity;
+            UnitPrice = unitPrice;
         }
 
         public int Quantity
@@ -33,7 +33,7 @@ namespace Umbraco.Tests.Models.Collections
 
         public override string ToString()
         {
-            return String.Format(
+            return string.Format(
                 "{0,9} {1,6} {2,-12} at {3,8:#,###.00} = {4,10:###,###.00}",
                 PartNumber, _quantity, Description, UnitPrice,
                 UnitPrice * _quantity);

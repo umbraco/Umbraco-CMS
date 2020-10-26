@@ -3,22 +3,22 @@ using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Tests.TestHelpers.Entities;
-using Umbraco.Tests.Testing;
 
-namespace Umbraco.Tests.Models.Collections
+namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models.Collections
 {
     [TestFixture]
-    public class PropertyCollectionTests : UmbracoTestBase
+    public class PropertyCollectionTests
     {
         [Test]
         public void Property_Adds_Case_Insensitive_Compare()
         {
-            var collection = new PropertyCollection();
-
-            collection.Add(new Property(new PropertyType(TestHelper.ShortStringHelper, "propEditor", ValueStorageType.Nvarchar, "test")));
-            collection.Add(new Property(new PropertyType(TestHelper.ShortStringHelper, "propEditor", ValueStorageType.Nvarchar, "Test")));
+            var collection = new PropertyCollection
+            {
+                new Property(new PropertyType(TestHelper.ShortStringHelper, "propEditor", ValueStorageType.Nvarchar, "test")),
+                new Property(new PropertyType(TestHelper.ShortStringHelper, "propEditor", ValueStorageType.Nvarchar, "Test"))
+            };
 
             Assert.AreEqual(1, collection.Count);
         }
@@ -26,9 +26,10 @@ namespace Umbraco.Tests.Models.Collections
         [Test]
         public void Property_Contains_Case_Insensitive_Compare()
         {
-            var collection = new PropertyCollection();
-
-            collection.Add(new Property(new PropertyType(TestHelper.ShortStringHelper, "propEditor", ValueStorageType.Nvarchar, "test")));
+            var collection = new PropertyCollection
+            {
+                new Property(new PropertyType(TestHelper.ShortStringHelper, "propEditor", ValueStorageType.Nvarchar, "test"))
+            };
 
             Assert.IsTrue(collection.Contains("Test"));
         }
@@ -79,7 +80,7 @@ namespace Umbraco.Tests.Models.Collections
         [Test]
         public void PropertyGroups_Collection_FirstOrDefault_Returns_Null()
         {
-            var contentType = MockedContentTypes.CreateTextPageContentType();
+            var contentType = ContentTypeBuilder.CreateTextPageContentType();
 
             Assert.That(contentType.PropertyGroups, Is.Not.Null);
             Assert.That(contentType.PropertyGroups.FirstOrDefault(x => x.Name.InvariantEquals("Content")) == null, Is.False);

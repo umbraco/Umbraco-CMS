@@ -2,9 +2,8 @@
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
-using Umbraco.Core;
 
-namespace Umbraco.Tests.Models.Collections
+namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models.Collections
 {
     public class SimpleOrder : KeyedCollection<int, OrderItem>, INotifyCollectionChanged
     {
@@ -73,10 +72,7 @@ namespace Umbraco.Tests.Models.Collections
 
         protected virtual void OnCollectionChanged(NotifyCollectionChangedEventArgs args)
         {
-            if (CollectionChanged != null)
-            {
-                CollectionChanged(this, args);
-            }
+            CollectionChanged?.Invoke(this, args);
         }
     }
 }
