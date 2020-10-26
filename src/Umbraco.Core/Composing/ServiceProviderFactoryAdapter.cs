@@ -5,7 +5,7 @@ using Umbraco.Core.Composing;
 
 namespace Umbraco.Infrastructure.Composing
 {
-    internal class ServiceProviderFactoryAdapter : IFactory
+    public class ServiceProviderFactoryAdapter : IFactory
     {
         private readonly IServiceProvider _serviceProvider;
 
