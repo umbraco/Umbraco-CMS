@@ -13,7 +13,7 @@ using Umbraco.Tests.UnitTests.TestHelpers.Objects;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Templates;
 
-namespace Umbraco.Tests.Templates
+namespace Umbraco.Tests.UnitTests.Umbraco.Core.Templates
 {
     [TestFixture]
     public class HtmlImageSourceParserTests

@@ -6,7 +6,7 @@ using System.Data.Common;
 using NUnit.Framework;
 using Umbraco.Core.Persistence;
 
-namespace Umbraco.Tests.Persistence
+namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Persistence
 {
     /// <summary>
     ///  Unit tests for <see cref="BulkDataReader"/>.

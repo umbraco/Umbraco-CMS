@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Umbraco.Web.Models.ContentEditing;
 
-namespace Umbraco.Web.Common.ActionResults
+namespace Umbraco.Web.BackOffice.ActionResults
 {
     public class UmbracoNotificationSuccessResponse : OkObjectResult
     {

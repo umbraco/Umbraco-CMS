@@ -2,15 +2,14 @@
 using Umbraco.Core.IO;
 using Umbraco.Core.Services;
 using Umbraco.Web.BackOffice.Filters;
-using Umbraco.Web.BackOffice.Trees;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
-using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
 
-namespace Umbraco.Web.Trees
+namespace Umbraco.Web.BackOffice.Trees
 {
     /// <summary>
     /// Tree for displaying partial views in the settings app

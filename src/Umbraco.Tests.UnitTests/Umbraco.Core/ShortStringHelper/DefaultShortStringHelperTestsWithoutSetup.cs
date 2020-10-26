@@ -6,8 +6,9 @@ using NUnit.Framework;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Strings;
+using CoreStrings = Umbraco.Core.Strings;
 
-namespace Umbraco.Tests.Strings
+namespace Umbraco.Tests.UnitTests.Umbraco.Core.ShortStringHelper
 {
     [TestFixture]
     public class DefaultShortStringHelperTestsWithoutSetup
@@ -300,7 +301,7 @@ namespace Umbraco.Tests.Strings
         public void Utf8ToAsciiConverter()
         {
             const string str = "a\U00010F00z\uA74Ftéô";
-            var output = Core.Strings.Utf8ToAsciiConverter.ToAsciiString(str);
+            var output = CoreStrings.Utf8ToAsciiConverter.ToAsciiString(str);
             Assert.AreEqual("a?zooteo", output);
         }
 

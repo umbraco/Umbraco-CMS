@@ -10,7 +10,7 @@ using Umbraco.Tests.Common.Builders.Extensions;
 using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.Common.Exceptions;
 
-namespace Umbraco.Tests.Web.Controllers
+namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
 {
     [TestFixture]
     public class MediaControllerUnitTests

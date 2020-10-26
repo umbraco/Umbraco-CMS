@@ -10,7 +10,7 @@ using Umbraco.Core.Logging.Viewer;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Integration.Implementations;
 
-namespace Umbraco.Tests.Logging
+namespace Umbraco.Tests.Integration.Logging
 {
     [TestFixture]
     public class LogviewerTests

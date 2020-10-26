@@ -8,9 +8,10 @@ using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Trees;
+using Umbraco.Web.Models.Mapping;
+using Umbraco.Web.BackOffice.Trees;
 
-namespace Umbraco.Web.Models.Mapping
+namespace Umbraco.Web.BackOffice.Mapping
 {
     /// <summary>
     /// Declares model mappings for media.

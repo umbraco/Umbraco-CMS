@@ -11,7 +11,7 @@ using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.PropertyEditors;
 
-namespace Umbraco.Tests.PropertyEditors
+namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
 {
     [TestFixture]
     public class EnsureUniqueValuesValidatorTest

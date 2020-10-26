@@ -10,9 +10,10 @@ using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Search;
+using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
 
-namespace Umbraco.Web.Trees
+namespace Umbraco.Web.BackOffice.Trees
 {
     [CoreTree]
     [UmbracoTreeAuthorize(Constants.Trees.MemberTypes)]

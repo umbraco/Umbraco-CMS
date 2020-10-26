@@ -9,10 +9,9 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.PackageActions;
-using Umbraco.Tests.Components;
 using Umbraco.Tests.TestHelpers;
 
-namespace Umbraco.Tests.Composing
+namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
 {
     [TestFixture]
     public class PackageActionCollectionTests : ComposingTestBase

@@ -9,7 +9,7 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Tests.TestHelpers;
 
-namespace Umbraco.Tests.Composing
+namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
 {
     public abstract class ComposingTestBase
     {
@@ -26,7 +26,7 @@ namespace Umbraco.Tests.Composing
             var ioHelper = TestHelper.IOHelper;
             TypeLoader = new TypeLoader(typeFinder, NoAppCache.Instance, new DirectoryInfo(ioHelper.MapPath("~/App_Data/TEMP")), Mock.Of<ILogger<TypeLoader>>(), ProfilingLogger, false, AssembliesToScan);
         }
-        
+
         protected virtual IEnumerable<Assembly> AssembliesToScan
             => new[]
             {

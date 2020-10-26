@@ -10,7 +10,7 @@ using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Web.BackOffice.Filters;
-using Umbraco.Web.Common.ActionResults;
+using Umbraco.Web.BackOffice.ActionResults;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Models.ContentEditing;

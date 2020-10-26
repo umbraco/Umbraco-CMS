@@ -2,7 +2,7 @@
 using NUnit.Framework;
 using Umbraco.Core.Events;
 
-namespace Umbraco.Tests.Scoping
+namespace Umbraco.Tests.UnitTests.Umbraco.Core.Scoping
 {
     [TestFixture]
     public class EventNameExtractorTests

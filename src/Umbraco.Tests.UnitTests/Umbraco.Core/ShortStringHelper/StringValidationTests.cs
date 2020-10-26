@@ -3,7 +3,7 @@ using NUnit.Framework;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 
-namespace Umbraco.Tests.Strings
+namespace Umbraco.Tests.UnitTests.Umbraco.Core.ShortStringHelper
 {
     [TestFixture]
     public class StringValidationTests
