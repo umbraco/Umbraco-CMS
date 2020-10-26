@@ -329,7 +329,7 @@ namespace Umbraco.Core.IO
 
             // nothing prevents us to reach the file, security-wise, yet it is outside
             // this filesystem's root - throw
-            throw new UnauthorizedAccessException("File '" + opath + "' is outside this filesystem's root.");
+            throw new UnauthorizedAccessException($"File original: [{opath}] full: [{path}] is outside this filesystem's root.");
         }
 
         /// <summary>
