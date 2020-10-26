@@ -6,7 +6,7 @@ using Umbraco.Core.Models;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.TestHelpers;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.Modelsl.Collections
+namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models.Collections
 {
     [TestFixture]
     public class PropertyCollectionTests
