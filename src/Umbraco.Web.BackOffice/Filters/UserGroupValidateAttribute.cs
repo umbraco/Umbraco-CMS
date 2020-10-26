@@ -6,7 +6,7 @@ using Umbraco.Core;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
-using Umbraco.Web.Common.ActionResults;
+using Umbraco.Web.BackOffice.ActionResults;
 using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Models.ContentEditing;
 

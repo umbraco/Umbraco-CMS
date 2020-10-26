@@ -12,6 +12,7 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Runtime;
 using Umbraco.Extensions;
+using Umbraco.Infrastructure.Composing;
 using Umbraco.Tests.Common;
 using Umbraco.Tests.Integration.Extensions;
 using Umbraco.Tests.Integration.Implementations;
@@ -43,10 +44,8 @@ namespace Umbraco.Tests.Integration
         [Test]
         public void Boot_Core_Runtime()
         {
-            // LightInject / Umbraco
-            var container = UmbracoServiceProviderFactory.CreateServiceContainer();
-            var serviceProviderFactory = new UmbracoServiceProviderFactory(container, false);
-            var umbracoContainer = serviceProviderFactory.GetContainer();
+            // TODO: MSDI - cleanup after initial merge.
+            var umbracoContainer = new ServiceCollectionRegistryAdapter(new ServiceCollection());
 
             // Special case since we are not using the Generic Host, we need to manually add an AspNetCore service to the container
             umbracoContainer.Register(x => Mock.Of<IHostApplicationLifetime>());
@@ -55,22 +54,6 @@ namespace Umbraco.Tests.Integration
 
             var globalSettings = new GlobalSettings();
             var connectionStrings = new ConnectionStrings();
-
-            // Create the core runtime
-            var coreRuntime = new CoreRuntime(globalSettings, connectionStrings, testHelper.GetUmbracoVersion(),
-                testHelper.IOHelper, testHelper.ConsoleLoggerFactory, testHelper.Profiler, testHelper.UmbracoBootPermissionChecker,
-                testHelper.GetHostingEnvironment(), testHelper.GetBackOfficeInfo(), testHelper.DbProviderFactoryCreator,
-                testHelper.MainDom, testHelper.GetTypeFinder(), AppCaches.NoCache);
-
-            // boot it!
-            var factory = coreRuntime.Configure(umbracoContainer);
-
-            Assert.IsTrue(coreRuntime.MainDom.IsMainDom);
-            Assert.IsNull(coreRuntime.State.BootFailedException);
-            Assert.AreEqual(RuntimeLevel.Install, coreRuntime.State.Level);
-            Assert.IsTrue(MyComposer.IsComposed);
-            Assert.IsFalse(MyComponent.IsInit);
-            Assert.IsFalse(MyComponent.IsTerminated);
 
             // TODO: found these registration were necessary here (as we haven't called the HostBuilder?), as dependencies for ComponentCollection
             // are not resolved.  Need to check this if these explicit registrations are the best way to handle this.
@@ -89,12 +72,27 @@ namespace Umbraco.Tests.Integration
             umbracoContainer.Register(x => Options.Create(userPasswordConfigurationSettings));
             umbracoContainer.Register(x => Options.Create(webRoutingSettings));
             umbracoContainer.Register(typeof(ILogger<>), typeof(Logger<>), Lifetime.Singleton);
+
+            // Create the core runtime
+            var coreRuntime = new CoreRuntime(globalSettings, connectionStrings, testHelper.GetUmbracoVersion(),
+                testHelper.IOHelper, testHelper.ConsoleLoggerFactory, testHelper.Profiler, testHelper.UmbracoBootPermissionChecker,
+                testHelper.GetHostingEnvironment(), testHelper.GetBackOfficeInfo(), testHelper.DbProviderFactoryCreator,
+                testHelper.MainDom, testHelper.GetTypeFinder(), AppCaches.NoCache);
+
+            coreRuntime.Configure(umbracoContainer);
+
+            Assert.IsTrue(coreRuntime.MainDom.IsMainDom);
+            Assert.IsNull(coreRuntime.State.BootFailedException);
+            Assert.AreEqual(RuntimeLevel.Install, coreRuntime.State.Level);
+            Assert.IsTrue(MyComposer.IsComposed);
+            Assert.IsFalse(MyComponent.IsInit);
+            Assert.IsFalse(MyComponent.IsTerminated);
+
+
             coreRuntime.Start();
 
             Assert.IsTrue(MyComponent.IsInit);
             Assert.IsFalse(MyComponent.IsTerminated);
-
-            Assertions.AssertContainer(umbracoContainer.Container, reportOnly: true); // TODO Change that to false eventually when we clean up the container
 
             coreRuntime.Terminate();
 
@@ -107,11 +105,10 @@ namespace Umbraco.Tests.Integration
         [Test]
         public async Task AddUmbracoCore()
         {
-            var umbracoContainer = UmbracoIntegrationTest.CreateUmbracoContainer(out var serviceProviderFactory);
             var testHelper = new TestHelper();
 
             var hostBuilder = new HostBuilder()
-                .UseUmbraco(serviceProviderFactory)
+                .UseUmbraco()
                 .ConfigureServices((hostContext, services) =>
                 {
                     var webHostEnvironment = testHelper.GetWebHostEnvironment();
@@ -120,7 +117,10 @@ namespace Umbraco.Tests.Integration
 
                     // Add it!
                     services.AddUmbracoConfiguration(hostContext.Configuration);
-                    services.AddUmbracoCore(webHostEnvironment, umbracoContainer, GetType().Assembly, AppCaches.NoCache, testHelper.GetLoggingConfiguration(), hostContext.Configuration,out _);
+
+                    // TODO: MSDI - cleanup after initial merge.
+                    var register = new ServiceCollectionRegistryAdapter(services);
+                    services.AddUmbracoCore(webHostEnvironment, register, GetType().Assembly, AppCaches.NoCache, testHelper.GetLoggingConfiguration(), hostContext.Configuration,out _);
                 });
 
             var host = await hostBuilder.StartAsync();
@@ -147,11 +147,10 @@ namespace Umbraco.Tests.Integration
         [Test]
         public async Task UseUmbracoCore()
         {
-            var umbracoContainer = UmbracoIntegrationTest.CreateUmbracoContainer(out var serviceProviderFactory);
             var testHelper = new TestHelper();
 
             var hostBuilder = new HostBuilder()
-                .UseUmbraco(serviceProviderFactory)
+                .UseUmbraco()
                 .ConfigureServices((hostContext, services) =>
                 {
                     var webHostEnvironment = testHelper.GetWebHostEnvironment();
@@ -160,7 +159,9 @@ namespace Umbraco.Tests.Integration
 
                     // Add it!
                     services.AddUmbracoConfiguration(hostContext.Configuration);
-                    services.AddUmbracoCore(webHostEnvironment, umbracoContainer, GetType().Assembly, AppCaches.NoCache, testHelper.GetLoggingConfiguration(),hostContext.Configuration, out _);
+                    // TODO: MSDI - cleanup after initial merge.
+                    var register = new ServiceCollectionRegistryAdapter(services);
+                    services.AddUmbracoCore(webHostEnvironment, register, GetType().Assembly, AppCaches.NoCache, testHelper.GetLoggingConfiguration(),hostContext.Configuration, out _);
                 });
 
             var host = await hostBuilder.StartAsync();

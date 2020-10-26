@@ -9,11 +9,13 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Serialization;
+using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Common.Builders.Extensions;
 using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;
@@ -24,6 +26,11 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, WithApplication = true, Logger = UmbracoTestOptions.Logger.Console)]
     public class UserRepositoryTest : UmbracoIntegrationTest
     {
+        private IDocumentRepository DocumentRepository => GetRequiredService<IDocumentRepository>();
+        private IContentTypeRepository ContentTypeRepository => GetRequiredService<IContentTypeRepository>();
+        private IMediaTypeRepository MediaTypeRepository => GetRequiredService<IMediaTypeRepository>();
+        private IMediaRepository MediaRepository => GetRequiredService<IMediaRepository>();
+
         private UserRepository CreateRepository(IScopeProvider provider)
         {
             var accessor = (IScopeAccessor) provider;
@@ -346,6 +353,98 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
 
                 // Ensure the Security Stamp is invalidated & no longer the same
                 Assert.AreNotEqual(originalSecurityStamp, updatedUser.SecurityStamp);
+            }
+        }
+
+        [Test]
+        public void Validate_Login_Session()
+        {
+            // Arrange
+            var provider = ScopeProvider;
+            var user = UserBuilder.CreateUser();
+            using (var scope = provider.CreateScope(autoComplete: true))
+            {
+                var repository = CreateRepository(provider);
+                repository.Save(user);
+            }
+
+            using (var scope = provider.CreateScope(autoComplete: true))
+            {
+                var repository = CreateRepository(provider);
+                var sessionId = repository.CreateLoginSession(user.Id, "1.2.3.4");
+
+                // manually update this record to be in the past
+                scope.Database.Execute(scope.SqlContext.Sql()
+                    .Update<UserLoginDto>(u => u.Set(x => x.LoggedOutUtc, DateTime.UtcNow.AddDays(-100)))
+                    .Where<UserLoginDto>(x => x.SessionId == sessionId));
+
+                var isValid = repository.ValidateLoginSession(user.Id, sessionId);
+                Assert.IsFalse(isValid);
+
+                // create a new one
+                sessionId = repository.CreateLoginSession(user.Id, "1.2.3.4");
+                isValid = repository.ValidateLoginSession(user.Id, sessionId);
+                Assert.IsTrue(isValid);
+            }
+        }
+
+        [Test]
+        public void Can_Perform_Update_On_UserRepository()
+        {
+            var ct = ContentTypeBuilder.CreateBasicContentType("test");
+            var mt = MediaTypeBuilder.CreateSimpleMediaType("testmedia", "TestMedia");
+
+            // Arrange
+            var provider = ScopeProvider;
+            using (var scope = provider.CreateScope(autoComplete: true))
+            {
+                var userRepository = CreateRepository(provider);
+                var userGroupRepository = CreateUserGroupRepository(provider);
+
+                ContentTypeRepository.Save(ct);
+                MediaTypeRepository.Save(mt);
+
+                var content = ContentBuilder.CreateBasicContent(ct);
+                var media = MediaBuilder.CreateSimpleMedia(mt, "asdf", -1);
+
+                DocumentRepository.Save(content);
+                MediaRepository.Save(media);
+
+                var user = CreateAndCommitUserWithGroup(userRepository, userGroupRepository);
+
+                // Act
+                var resolved = (User) userRepository.Get(user.Id);
+
+                resolved.Name = "New Name";
+                //the db column is not used, default permissions are taken from the user type's permissions, this is a getter only
+                //resolved.DefaultPermissions = "ZYX";
+                resolved.Language = "fr";
+                resolved.IsApproved = false;
+                resolved.RawPasswordValue = "new";
+                resolved.IsLockedOut = true;
+                resolved.StartContentIds = new[] { content.Id };
+                resolved.StartMediaIds = new[] { media.Id };
+                resolved.Email = "new@new.com";
+                resolved.Username = "newName";
+
+                userRepository.Save(resolved);
+
+                var updatedItem = (User) userRepository.Get(user.Id);
+
+                // Assert
+                Assert.That(updatedItem.Id, Is.EqualTo(resolved.Id));
+                Assert.That(updatedItem.Name, Is.EqualTo(resolved.Name));
+                Assert.That(updatedItem.Language, Is.EqualTo(resolved.Language));
+                Assert.That(updatedItem.IsApproved, Is.EqualTo(resolved.IsApproved));
+                Assert.That(updatedItem.RawPasswordValue, Is.EqualTo(resolved.RawPasswordValue));
+                Assert.That(updatedItem.IsLockedOut, Is.EqualTo(resolved.IsLockedOut));
+                Assert.IsTrue(updatedItem.StartContentIds.UnsortedSequenceEqual(resolved.StartContentIds));
+                Assert.IsTrue(updatedItem.StartMediaIds.UnsortedSequenceEqual(resolved.StartMediaIds));
+                Assert.That(updatedItem.Email, Is.EqualTo(resolved.Email));
+                Assert.That(updatedItem.Username, Is.EqualTo(resolved.Username));
+                Assert.That(updatedItem.AllowedSections.Count(), Is.EqualTo(resolved.AllowedSections.Count()));
+                foreach (var allowedSection in resolved.AllowedSections)
+                    Assert.IsTrue(updatedItem.AllowedSections.Contains(allowedSection));
             }
         }
 

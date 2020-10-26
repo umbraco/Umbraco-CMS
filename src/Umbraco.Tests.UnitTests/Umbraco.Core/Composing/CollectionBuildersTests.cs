@@ -7,10 +7,9 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
-using Umbraco.Tests.Components;
 using Umbraco.Tests.TestHelpers;
 
-namespace Umbraco.Tests.Composing
+namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
 {
     [TestFixture]
     public class CollectionBuildersTests
@@ -28,7 +27,7 @@ namespace Umbraco.Tests.Composing
             // factoryMock.Setup(x => x.GetInstance(typeof(Resolved3))).Returns(new Resolved3());
             // factoryMock.Setup(x => x.GetInstance(typeof(Resolved4))).Returns(new Resolved4());
 
-            
+
             var register = TestHelper.GetRegister();
             _composition = new Composition(register, TestHelper.GetMockedTypeLoader(), Mock.Of<IProfilingLogger>(), Mock.Of<IRuntimeState>(), TestHelper.IOHelper, AppCaches.NoCache);
         }

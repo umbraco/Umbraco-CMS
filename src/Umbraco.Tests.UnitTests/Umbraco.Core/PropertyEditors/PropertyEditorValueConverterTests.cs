@@ -13,7 +13,7 @@ using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.PropertyEditors.ValueConverters;
 
-namespace Umbraco.Tests.PropertyEditors
+namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
 {
     [TestFixture]
     public class PropertyEditorValueConverterTests

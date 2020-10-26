@@ -7,8 +7,9 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Umbraco.Core;
 using Umbraco.Extensions;
+using Umbraco.Web.PropertyEditors.Validation;
 
-namespace Umbraco.Web.PropertyEditors.Validation
+namespace Umbraco.Web.BackOffice.PropertyEditors.Validation
 {
     /// <summary>
     /// Custom json converter for <see cref="ValidationResult"/> and <see cref="ContentPropertyValidationResult"/>

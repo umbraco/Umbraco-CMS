@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
+using System.Threading;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.FileProviders;
@@ -28,6 +29,7 @@ using Umbraco.Core.Runtime;
 using Umbraco.Net;
 using Umbraco.Tests.Common;
 using Umbraco.Web.Common.AspNetCore;
+using File = System.IO.File;
 using IHostingEnvironment = Umbraco.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Tests.Integration.Implementations
@@ -163,7 +165,7 @@ namespace Umbraco.Tests.Integration.Implementations
 
         public void AssertPropertyValuesAreEqual(object actual, object expected, string dateTimeFormat = null, Func<IEnumerable, IEnumerable> sorter = null, string[] ignoreProperties = null)
         {
-            const int dateDeltaMilliseconds = 500; // .5s
+            const int dateDeltaMilliseconds = 1000; // 1s
 
             var properties = expected.GetType().GetProperties();
             foreach (var property in properties)
@@ -173,7 +175,7 @@ namespace Umbraco.Tests.Integration.Implementations
                 if (att != null && att.State == EditorBrowsableState.Never)
                     continue;
 
-                // ignore explicitely ignored properties
+                // ignore explicitly ignored properties
                 if (ignoreProperties != null && ignoreProperties.Contains(property.Name))
                     continue;
 
@@ -209,7 +211,7 @@ namespace Umbraco.Tests.Integration.Implementations
                 AssertAreEqual(property, expectedListEx[i], actualListEx[i], sorter, dateDeltaMilliseconds);
         }
 
-          private static void AssertAreEqual(PropertyInfo property, object expected, object actual, Func<IEnumerable, IEnumerable> sorter = null, int dateDeltaMilliseconds = 0)
+        private static void AssertAreEqual(PropertyInfo property, object expected, object actual, Func<IEnumerable, IEnumerable> sorter = null, int dateDeltaMilliseconds = 0)
         {
             if (!(expected is string) && expected is IEnumerable)
             {
@@ -238,8 +240,27 @@ namespace Umbraco.Tests.Integration.Implementations
                     Assert.Fail($"{property.DeclaringType.Name}.{property.Name}: Expected {expectedPropertyValues.Length} but got {actualPropertyValues.Length}.");
                 for (var i = 0; i < expectedPropertyValues.Length; i++)
                 {
-                    Assert.AreEqual(expectedPropertyValues[i].EditedValue, actualPropertyValues[i].EditedValue, $"{property.DeclaringType.Name}.{property.Name}: Expected draft value \"{expectedPropertyValues[i].EditedValue}\" but got \"{actualPropertyValues[i].EditedValue}\".");
-                    Assert.AreEqual(expectedPropertyValues[i].PublishedValue, actualPropertyValues[i].PublishedValue, $"{property.DeclaringType.Name}.{property.Name}: Expected published value \"{expectedPropertyValues[i].EditedValue}\" but got \"{actualPropertyValues[i].EditedValue}\".");
+                    // This is not pretty, but since a property value can be a datetime we can't just always compare them as is.
+                    // This is made worse by the fact that PublishedValue is not always set, meaning we can't lump it all into the same if block
+                    if (expectedPropertyValues[i].EditedValue is DateTime expectedEditDateTime)
+                    {
+                        var actualEditDateTime = (DateTime) actualPropertyValues[i].EditedValue;
+                        AssertDateTime(expectedEditDateTime, actualEditDateTime, $"{property.DeclaringType.Name}.{property.Name}: Expected draft value \"{expectedPropertyValues[i].EditedValue}\" but got \"{actualPropertyValues[i].EditedValue}\".", dateDeltaMilliseconds);
+                    }
+                    else
+                    {
+                        Assert.AreEqual(expectedPropertyValues[i].EditedValue, actualPropertyValues[i].EditedValue, $"{property.DeclaringType.Name}.{property.Name}: Expected draft value \"{expectedPropertyValues[i].EditedValue}\" but got \"{actualPropertyValues[i].EditedValue}\".");
+                    }
+
+                    if (expectedPropertyValues[i].PublishedValue is DateTime expectedPublishDateTime)
+                    {
+                        var actualPublishedDateTime = (DateTime) actualPropertyValues[i].PublishedValue;
+                        AssertDateTime(expectedPublishDateTime, actualPublishedDateTime, $"{property.DeclaringType.Name}.{property.Name}: Expected published value \"{expectedPropertyValues[i].PublishedValue}\" but got \"{actualPropertyValues[i].PublishedValue}\".", dateDeltaMilliseconds);
+                    }
+                    else
+                    {
+                        Assert.AreEqual(expectedPropertyValues[i].PublishedValue, actualPropertyValues[i].PublishedValue, $"{property.DeclaringType.Name}.{property.Name}: Expected published value \"{expectedPropertyValues[i].PublishedValue}\" but got \"{actualPropertyValues[i].PublishedValue}\".");
+                    }
                 }
             }
             else if (expected is IDataEditor expectedEditor)
@@ -254,6 +275,59 @@ namespace Umbraco.Tests.Integration.Implementations
                 // directly compare values
                 Assert.AreEqual(expected, actual, "Property {0}.{1} does not match. Expected: {2} but was: {3}", property.DeclaringType.Name, property.Name,
                     expected?.ToString() ?? "<null>", actual?.ToString() ?? "<null>");
+            }
+        }
+
+        private static void AssertDateTime(DateTime expected, DateTime actual, string failureMessage,
+            int dateDeltaMiliseconds = 0)
+        {
+            var delta = (actual - expected).TotalMilliseconds;
+            Assert.IsTrue(Math.Abs(delta) <= dateDeltaMiliseconds, failureMessage);
+        }
+
+        public void DeleteDirectory(string path)
+        {
+            Try(() =>
+            {
+                if (Directory.Exists(path) == false) return;
+                foreach (var file in Directory.EnumerateFiles(path, "*", SearchOption.AllDirectories))
+                    File.Delete(file);
+            });
+
+            Try(() =>
+            {
+                if (Directory.Exists(path) == false) return;
+                Directory.Delete(path, true);
+            });
+        }
+
+        public static void TryAssert(Action action, int maxTries = 5, int waitMilliseconds = 200)
+        {
+            Try<AssertionException>(action, maxTries, waitMilliseconds);
+        }
+
+        public static void Try(Action action, int maxTries = 5, int waitMilliseconds = 200)
+        {
+            Try<Exception>(action, maxTries, waitMilliseconds);
+        }
+
+        public static void Try<T>(Action action, int maxTries = 5, int waitMilliseconds = 200)
+            where T : Exception
+        {
+            var tries = 0;
+            while (true)
+            {
+                try
+                {
+                    action();
+                    break;
+                }
+                catch (T)
+                {
+                    if (tries++ > maxTries)
+                        throw;
+                    Thread.Sleep(waitMilliseconds);
+                }
             }
         }
     }

@@ -13,7 +13,7 @@ using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.PropertyEditors.ValueConverters;
 using Umbraco.Web.PublishedCache;
 
-namespace Umbraco.Tests.PropertyEditors
+namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
 {
     [TestFixture]
     public class BlockListPropertyValueConverterTests

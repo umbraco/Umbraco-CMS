@@ -43,7 +43,7 @@ namespace Umbraco.Web.BackOffice.Runtime
 
             composition.ComposeWebMappingProfiles();
 
-            composition.RegisterUniqueFor<IFileSystem, FilesTreeController>(factory =>
+            composition.RegisterUnique<IPhysicalFileSystem>(factory =>
                 new PhysicalFileSystem(
                     factory.GetInstance<IIOHelper>(),
                     factory.GetInstance<IHostingEnvironment>(),
@@ -52,6 +52,8 @@ namespace Umbraco.Web.BackOffice.Runtime
 
             composition.RegisterUnique<IIconService, IconService>();
             composition.RegisterUnique<UnhandledExceptionLoggerMiddleware>();
+
+            composition.ComposeUmbracoBackOfficeControllers();
         }
     }
 }

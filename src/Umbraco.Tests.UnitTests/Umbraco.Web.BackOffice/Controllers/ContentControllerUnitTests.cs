@@ -8,7 +8,7 @@ using Umbraco.Core.Services;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Common.Builders.Extensions;
 
-namespace Umbraco.Tests.Web.Controllers
+namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
 {
     [TestFixture]
     public class ContentControllerUnitTests

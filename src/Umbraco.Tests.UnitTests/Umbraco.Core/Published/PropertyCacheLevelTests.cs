@@ -13,7 +13,7 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Web.PublishedCache;
 
-namespace Umbraco.Tests.Published
+namespace Umbraco.Tests.UnitTests.Umbraco.Core.Published
 {
     [TestFixture]
     public class PropertyCacheLevelTests

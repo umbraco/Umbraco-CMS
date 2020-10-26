@@ -1,5 +1,5 @@
-﻿using System.Net.Mail;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Core
 {
@@ -8,7 +8,6 @@ namespace Umbraco.Core
     /// </summary>
     public interface IEmailSender
     {
-        // TODO: This would be better if MailMessage was our own abstraction!
-        Task SendAsync(MailMessage message);
+        Task SendAsync(EmailMessage message);
     }
 }

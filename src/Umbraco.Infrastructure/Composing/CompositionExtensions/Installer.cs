@@ -12,19 +12,19 @@ namespace Umbraco.Web.Composing.CompositionExtensions
         {
             // register the installer steps
 
-            composition.Register<NewInstallStep>(Lifetime.Scope);
-            composition.Register<UpgradeStep>(Lifetime.Scope);
-            composition.Register<FilePermissionsStep>(Lifetime.Scope);
-            composition.Register<DatabaseConfigureStep>(Lifetime.Scope);
-            composition.Register<DatabaseInstallStep>(Lifetime.Scope);
-            composition.Register<DatabaseUpgradeStep>(Lifetime.Scope);
+            composition.Register<InstallSetupStep,NewInstallStep>(Lifetime.Scope);
+            composition.Register<InstallSetupStep,UpgradeStep>(Lifetime.Scope);
+            composition.Register<InstallSetupStep,FilePermissionsStep>(Lifetime.Scope);
+            composition.Register<InstallSetupStep,DatabaseConfigureStep>(Lifetime.Scope);
+            composition.Register<InstallSetupStep,DatabaseInstallStep>(Lifetime.Scope);
+            composition.Register<InstallSetupStep,DatabaseUpgradeStep>(Lifetime.Scope);
 
             // TODO: Add these back once we have a compatible Starter kit
-            // composition.Register<StarterKitDownloadStep>(Lifetime.Scope);
-            // composition.Register<StarterKitInstallStep>(Lifetime.Scope);
-            // composition.Register<StarterKitCleanupStep>(Lifetime.Scope);
+            // composition.Register<InstallSetupStep,StarterKitDownloadStep>(Lifetime.Scope);
+            // composition.Register<InstallSetupStep,StarterKitInstallStep>(Lifetime.Scope);
+            // composition.Register<InstallSetupStep,StarterKitCleanupStep>(Lifetime.Scope);
 
-            composition.Register<CompleteInstallStep>(Lifetime.Scope);
+            composition.Register<InstallSetupStep,CompleteInstallStep>(Lifetime.Scope);
 
             composition.Register<InstallStepCollection>();
             composition.RegisterUnique<InstallHelper>();

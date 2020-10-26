@@ -10,7 +10,7 @@ using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Security;
 
-namespace Umbraco.Web.WebApi.Filters
+namespace Umbraco.Web.BackOffice.Filters
 {
     /// <summary>
     /// Auth filter to check if the current user has access to the content item

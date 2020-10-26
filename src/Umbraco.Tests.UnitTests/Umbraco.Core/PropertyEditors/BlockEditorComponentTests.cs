@@ -6,7 +6,7 @@ using System.Linq;
 using Umbraco.Core;
 using Umbraco.Web.Compose;
 
-namespace Umbraco.Tests.PropertyEditors
+namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
 {
     [TestFixture]
     public class BlockEditorComponentTests

@@ -115,13 +115,13 @@ namespace Umbraco.Core.Cache
 
         #region Entries
 
-        protected override IEnumerable<DictionaryEntry> GetDictionaryEntries()
+        protected override IEnumerable<KeyValuePair<object, object>> GetDictionaryEntries()
         {
             const string prefix = CacheItemPrefix + "-";
 
-            if (!TryGetContextItems(out var items)) return Enumerable.Empty<DictionaryEntry>();
+            if (!TryGetContextItems(out var items)) return Enumerable.Empty<KeyValuePair<object, object>>();
 
-            return items.Cast<DictionaryEntry>()
+            return items.Cast<KeyValuePair<object, object>>()
                 .Where(x => x.Key is string s && s.StartsWith(prefix));
         }
 

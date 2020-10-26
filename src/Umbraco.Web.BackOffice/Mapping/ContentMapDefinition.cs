@@ -10,10 +10,11 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Web.Models.Mapping;
 using Umbraco.Web.Routing;
-using Umbraco.Web.Trees;
+using Umbraco.Web.BackOffice.Trees;
 
-namespace Umbraco.Web.Models.Mapping
+namespace Umbraco.Web.BackOffice.Mapping
 {
     /// <summary>
     /// Declares how model mappings for content

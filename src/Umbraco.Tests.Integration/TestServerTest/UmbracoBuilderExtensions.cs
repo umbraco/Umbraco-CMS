@@ -4,6 +4,7 @@ using Umbraco.Core.Composing.LightInject;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Runtime;
 using Umbraco.Extensions;
+using Umbraco.Infrastructure.Composing;
 using Umbraco.Tests.Integration.Implementations;
 using Umbraco.Tests.Integration.Testing;
 using Umbraco.Web.Common.Builder;
@@ -18,15 +19,16 @@ namespace Umbraco.Tests.Integration.TestServerTest
         /// <param name="builder"></param>
         /// <returns></returns>
         public static IUmbracoBuilder WithTestCore(this IUmbracoBuilder builder, TestHelper testHelper,
-            LightInjectContainer container,
             Action<CoreRuntime, RuntimeEssentialsEventArgs> dbInstallEventHandler)
         {
             return builder.AddWith(nameof(global::Umbraco.Web.Common.Builder.UmbracoBuilderExtensions.WithCore),
                     () =>
                     {
+                        // TODO: MSDI - cleanup after initial merge.
+                        var register = new ServiceCollectionRegistryAdapter(builder.Services);
                         builder.Services.AddUmbracoCore(
                             builder.WebHostEnvironment,
-                            container,
+                            register,
                             typeof(UmbracoBuilderExtensions).Assembly,
                             AppCaches.NoCache, // Disable caches in integration tests
                             testHelper.GetLoggingConfiguration(),

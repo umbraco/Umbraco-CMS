@@ -1,13 +1,12 @@
 ﻿using System;
-using System.Linq;
 using System.Net.Mail;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using MimeKit;
 using MimeKit.Text;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Events;
+using Umbraco.Core.Models;
 using SmtpClient = MailKit.Net.Smtp.SmtpClient;
 
 namespace Umbraco.Core
@@ -41,7 +40,7 @@ namespace Umbraco.Core
         /// Sends the message non-async
         /// </summary>
         /// <param name="message"></param>
-        public void Send(MailMessage message)
+        public void Send(EmailMessage message)
         {
             if (_smtpConfigured.Value == false && _enableEvents)
             {
@@ -71,7 +70,7 @@ namespace Umbraco.Core
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        public async Task SendAsync(MailMessage message)
+        public async Task SendAsync(EmailMessage message)
         {
             if (_smtpConfigured.Value == false && _enableEvents)
             {
@@ -131,9 +130,9 @@ namespace Umbraco.Core
             if (handler != null) handler(null, e);
         }
 
-        private MimeMessage ConstructEmailMessage(MailMessage mailMessage)
+        private MimeMessage ConstructEmailMessage(EmailMessage mailMessage)
         {
-            var fromEmail = mailMessage.From?.Address;
+            var fromEmail = mailMessage.From;
             if(string.IsNullOrEmpty(fromEmail))
                 fromEmail = _globalSettings.Smtp.From;
 
@@ -143,7 +142,7 @@ namespace Umbraco.Core
                 From = { new MailboxAddress(fromEmail)},
                 Body = new TextPart(mailMessage.IsBodyHtml ? TextFormat.Html : TextFormat.Plain) { Text = mailMessage.Body }
             };
-            messageToSend.To.AddRange(mailMessage.To.Select(x=>new MailboxAddress(x.Address)));
+            messageToSend.To.Add(new MailboxAddress(mailMessage.To));
 
             return messageToSend;
         }

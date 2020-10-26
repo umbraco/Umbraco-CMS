@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
@@ -20,10 +19,8 @@ using Umbraco.Web.BackOffice.PropertyEditors;
 using Umbraco.Web.BackOffice.Routing;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Security;
-using Umbraco.Web.Editors;
 using Umbraco.Web.Features;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Security;
 using Umbraco.Web.Trees;
 
 namespace Umbraco.Web.BackOffice.Controllers

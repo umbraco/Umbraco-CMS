@@ -5,7 +5,7 @@ using NUnit.Framework;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Packaging;
 
-namespace Umbraco.Tests.Packaging
+namespace Umbraco.Tests.UnitTests.Umbraco.Core.Packaging
 {
     [TestFixture]
     public class PackageExtractionTests

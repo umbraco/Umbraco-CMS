@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Net.Mail;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Authentication;
@@ -371,6 +370,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 var user = _userService.GetByEmail(model.Email);
                 if (user != null)
                 {
+                    var from = _globalSettings.Smtp.From;
                     var code = await _userManager.GeneratePasswordResetTokenAsync(identityUser);
                     var callbackUrl = ConstructCallbackUrl(identityUser.Id, code);
 
@@ -383,13 +383,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                         // Ensure the culture of the found user is used for the email!
                         UmbracoUserExtensions.GetUserCulture(identityUser.Culture, _textService, _globalSettings));
 
-                    var mailMessage = new MailMessage()
-                    {
-                        Subject = subject,
-                        Body = message,
-                        IsBodyHtml = true,
-                        To = { user.Email }
-                    };
+                    var mailMessage = new EmailMessage(from, user.Email, subject, message, true);
 
                     await _emailSender.SendAsync(mailMessage);
 
@@ -431,6 +425,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 return NotFound();
             }
 
+            var from = _globalSettings.Smtp.From;
             // Generate the token and send it
             var code = await _userManager.GenerateTwoFactorTokenAsync(user, provider);
             if (string.IsNullOrWhiteSpace(code))
@@ -450,13 +445,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             if (provider == "Email")
             {
-                var mailMessage = new MailMessage()
-                {
-                    Subject = subject,
-                    Body = message,
-                    IsBodyHtml = true,
-                    To = { user.Email }
-                };
+                var mailMessage = new EmailMessage(from, user.Email, subject, message, true);
 
                 await _emailSender.SendAsync(mailMessage);
             }

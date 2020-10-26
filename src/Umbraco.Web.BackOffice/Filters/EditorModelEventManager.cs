@@ -2,9 +2,10 @@
 using Microsoft.AspNetCore.Mvc.Filters;
 using Umbraco.Core.Dashboards;
 using Umbraco.Core.Events;
+using Umbraco.Web.Editors;
 using Umbraco.Web.Models.ContentEditing;
 
-namespace Umbraco.Web.Editors
+namespace Umbraco.Web.BackOffice.Filters
 {
     /// <summary>
     /// Used to emit events for editor models in the back office

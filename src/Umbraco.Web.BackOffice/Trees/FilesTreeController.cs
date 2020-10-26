@@ -3,10 +3,10 @@ using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
-using Umbraco.Web.BackOffice.Trees;
+using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
 
-namespace Umbraco.Web.Trees
+namespace Umbraco.Web.BackOffice.Trees
 {
     [Tree(Constants.Applications.Settings, "files", TreeTitle = "Files", TreeUse = TreeUse.Dialog)]
     [CoreTree]
@@ -20,7 +20,7 @@ namespace Umbraco.Web.Trees
             ILocalizedTextService localizedTextService,
             UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
             IMenuItemCollectionFactory menuItemCollectionFactory,
-            IFileSystem fileSystem)
+            IPhysicalFileSystem fileSystem)
             : base(localizedTextService, umbracoApiControllerTypeCollection, menuItemCollectionFactory)
         {
             FileSystem = fileSystem;

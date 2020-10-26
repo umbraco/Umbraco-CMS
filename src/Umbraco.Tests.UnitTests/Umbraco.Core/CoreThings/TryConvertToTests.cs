@@ -7,7 +7,7 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.Testing;
 
-namespace Umbraco.Tests.CoreThings
+namespace Umbraco.Tests.UnitTests.Umbraco.Core.CoreThings
 {
     [TestFixture]
     public class TryConvertToTests

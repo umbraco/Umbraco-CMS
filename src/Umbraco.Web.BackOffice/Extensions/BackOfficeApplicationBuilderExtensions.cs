@@ -1,7 +1,13 @@
 using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using SixLabors.ImageSharp.Web.DependencyInjection;
+using Umbraco.Composing;
+using Umbraco.Core;
+using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.IO;
 using Umbraco.Web.BackOffice.Middleware;
 using Umbraco.Web.BackOffice.Routing;
 
@@ -22,6 +28,18 @@ namespace Umbraco.Extensions
             app.UseUmbracoBackOffice();
             app.UseUmbracoPreview();
             app.UseUmbracoInstaller();
+
+
+            // TODO: remove current class, it's on its last legs.
+            Current.Initialize(
+                app.ApplicationServices.GetService<ILogger<object>>(),
+                app.ApplicationServices.GetService<IOptions<SecuritySettings>>().Value,
+                app.ApplicationServices.GetService<IOptions<GlobalSettings>>().Value,
+                app.ApplicationServices.GetService<IIOHelper>(),
+                app.ApplicationServices.GetService<Umbraco.Core.Hosting.IHostingEnvironment>(),
+                app.ApplicationServices.GetService<IBackOfficeInfo>(),
+                app.ApplicationServices.GetService<Umbraco.Core.Logging.IProfiler>()
+            );
 
             return app;
         }
