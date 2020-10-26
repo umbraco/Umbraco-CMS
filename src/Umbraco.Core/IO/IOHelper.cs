@@ -122,7 +122,7 @@ namespace Umbraco.Core.IO
 
             var mappedRoot = MapPath(_hostingEnvironment.ApplicationVirtualPath);
             if (filePath.StartsWith(mappedRoot) == false)
-                filePath = MapPath(filePath);
+                filePath = _hostingEnvironment.MapPathContentRoot(filePath);
 
             // yes we can (see above)
             //// don't trust what we get, it may contain relative segments
@@ -132,7 +132,7 @@ namespace Umbraco.Core.IO
             {
                 var validDir = dir;
                 if (validDir.StartsWith(mappedRoot) == false)
-                    validDir = MapPath(validDir);
+                    validDir = _hostingEnvironment.MapPathContentRoot(validDir);
 
                 if (PathStartsWith(filePath, validDir, Path.DirectorySeparatorChar))
                     return true;

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -31,6 +32,7 @@ using Umbraco.Web.Routing;
 using File = System.IO.File;
 using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Web.Common.AspNetCore;
 using IHostingEnvironment = Umbraco.Core.Hosting.IHostingEnvironment;
 
@@ -77,6 +79,17 @@ namespace Umbraco.Tests.TestHelpers
         public static ITypeFinder GetTypeFinder() => _testHelperInternal.GetTypeFinder();
 
         public static TypeLoader GetMockedTypeLoader() => _testHelperInternal.GetMockedTypeLoader();
+
+        public static Lazy<ISqlContext> GetMockSqlContext()
+        {
+            var sqlContext = Mock.Of<ISqlContext>();
+            var syntax = new SqlServerSyntaxProvider();
+            Mock.Get(sqlContext).Setup(x => x.SqlSyntax).Returns(syntax);
+            return new Lazy<ISqlContext>(() => sqlContext);
+        }
+
+        public static ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> CreateMaps()
+            => new ConcurrentDictionary<Type, ConcurrentDictionary<string, string>>();
 
         //public static Configs GetConfigs() => _testHelperInternal.GetConfigs();
 
