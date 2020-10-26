@@ -14,7 +14,7 @@ using Umbraco.Core.Strings;
 using Umbraco.Tests.Common.PublishedContent;
 using Umbraco.Web.PublishedCache;
 
-namespace Umbraco.Tests.Published
+namespace Umbraco.Tests.UnitTests.Umbraco.Core.Published
 {
     [TestFixture]
     public class ConvertersTests

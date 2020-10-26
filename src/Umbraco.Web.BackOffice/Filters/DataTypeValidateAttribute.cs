@@ -13,7 +13,7 @@ using Umbraco.Web.Common.ActionsResults;
 using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Models.ContentEditing;
 
-namespace Umbraco.Web.Editors
+namespace Umbraco.Web.BackOffice.Filters
 {
     /// <summary>
     /// An attribute/filter that wires up the persisted entity of the DataTypeSave model and validates the whole request

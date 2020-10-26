@@ -6,7 +6,7 @@ using NUnit.Framework;
 using Umbraco.Core.Services;
 using Umbraco.Extensions;
 
-namespace Umbraco.Tests.Web.Validation
+namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Extensions
 {
     [TestFixture]
     public class ModelStateExtensionsTests

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Umbraco.Core.Composing;
 
-namespace Umbraco.Tests.Composing
+namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
 {
     /// <summary>
     /// Used for PluginTypeResolverTests

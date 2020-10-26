@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Net.Mail;
 using System.Runtime.Serialization;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
@@ -29,12 +28,11 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.WebApi.Filters;
 using Umbraco.Extensions;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.BackOffice.ModelBinders;
 using Umbraco.Web.BackOffice.Security;
-using Umbraco.Web.Common.ActionResults;
+using Umbraco.Web.BackOffice.ActionResults;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Editors;
@@ -543,13 +541,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 UmbracoUserExtensions.GetUserCulture(to.Language, _localizedTextService, _globalSettings),
                 new[] { userDisplay.Name, from, message, inviteUri.ToString(), fromEmail });
 
-            var mailMessage = new MailMessage()
-            {
-                Subject = emailSubject,
-                Body = emailBody,
-                IsBodyHtml = true,
-                To = { to.Email}
-            };
+            var mailMessage = new EmailMessage(fromEmail, to.Email, emailSubject, emailBody, true);
 
             await _emailSender.SendAsync(mailMessage);
         }

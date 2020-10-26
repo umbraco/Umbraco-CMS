@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -31,8 +32,10 @@ using Umbraco.Web.Routing;
 using File = System.IO.File;
 using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Web.Common.AspNetCore;
 using IHostingEnvironment = Umbraco.Core.Hosting.IHostingEnvironment;
+using Umbraco.Infrastructure.Persistence.Mappers;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -77,6 +80,17 @@ namespace Umbraco.Tests.TestHelpers
         public static ITypeFinder GetTypeFinder() => _testHelperInternal.GetTypeFinder();
 
         public static TypeLoader GetMockedTypeLoader() => _testHelperInternal.GetMockedTypeLoader();
+
+        public static Lazy<ISqlContext> GetMockSqlContext()
+        {
+            var sqlContext = Mock.Of<ISqlContext>();
+            var syntax = new SqlServerSyntaxProvider();
+            Mock.Get(sqlContext).Setup(x => x.SqlSyntax).Returns(syntax);
+            return new Lazy<ISqlContext>(() => sqlContext);
+        }
+
+        public static MapperConfigurationStore CreateMaps()
+            => new MapperConfigurationStore();
 
         //public static Configs GetConfigs() => _testHelperInternal.GetConfigs();
 
@@ -256,51 +270,7 @@ namespace Umbraco.Tests.TestHelpers
                 AssertAreEqual(property, expectedListEx[i], actualListEx[i], sorter, dateDeltaMilliseconds);
         }
 
-        public static void DeleteDirectory(string path)
-        {
-            Try(() =>
-            {
-                if (Directory.Exists(path) == false) return;
-                foreach (var file in Directory.EnumerateFiles(path, "*", SearchOption.AllDirectories))
-                    File.Delete(file);
-            });
 
-            Try(() =>
-            {
-                if (Directory.Exists(path) == false) return;
-                Directory.Delete(path, true);
-            });
-        }
-
-        public static void TryAssert(Action action, int maxTries = 5, int waitMilliseconds = 200)
-        {
-            Try<AssertionException>(action, maxTries, waitMilliseconds);
-        }
-
-        public static void Try(Action action, int maxTries = 5, int waitMilliseconds = 200)
-        {
-            Try<Exception>(action, maxTries, waitMilliseconds);
-        }
-
-        public static void Try<T>(Action action, int maxTries = 5, int waitMilliseconds = 200)
-            where T : Exception
-        {
-            var tries = 0;
-            while (true)
-            {
-                try
-                {
-                    action();
-                    break;
-                }
-                catch (T)
-                {
-                    if (tries++ > maxTries)
-                        throw;
-                    Thread.Sleep(waitMilliseconds);
-                }
-            }
-        }
 
         public static IUmbracoVersion GetUmbracoVersion() => _testHelperInternal.GetUmbracoVersion();
 

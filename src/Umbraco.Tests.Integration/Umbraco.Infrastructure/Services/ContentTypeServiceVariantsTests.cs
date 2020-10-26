@@ -15,7 +15,7 @@ using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.PublishedCache;
 
-namespace Umbraco.Tests.Services
+namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
 {
     [TestFixture]
     [Apartment(ApartmentState.STA)]

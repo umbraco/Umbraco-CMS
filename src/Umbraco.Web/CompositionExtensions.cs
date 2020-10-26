@@ -28,20 +28,7 @@ namespace Umbraco.Web
     /// </summary>
     public static class WebCompositionExtensions
     {
-        #region Collection Builders
 
-
-        /// <summary>
-        /// Gets the filtered controller factories collection builder.
-        /// </summary>
-        /// <param name="composition">The composition.</param>
-        /// <returns></returns>
-        public static FilteredControllerFactoryCollectionBuilder FilteredControllerFactory(this Composition composition)
-            => composition.WithCollectionBuilder<FilteredControllerFactoryCollectionBuilder>();
-
-
-
-        #endregion
 
         #region Uniques
 

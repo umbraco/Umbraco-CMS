@@ -189,3 +189,9 @@ cypress.env.json
 /src/Umbraco.Web.UI.NetCore/App_Data/TEMP/*
 /src/Umbraco.Web.UI.NetCore/App_Data/Smidge/Cache/*
 /src/Umbraco.Web.UI.NetCore/umbraco/logs
+
+src/Umbraco.Tests.Integration/umbraco/logs/
+
+src/Umbraco.Tests.Integration/Views/
+
+src/Umbraco.Tests/TEMP/

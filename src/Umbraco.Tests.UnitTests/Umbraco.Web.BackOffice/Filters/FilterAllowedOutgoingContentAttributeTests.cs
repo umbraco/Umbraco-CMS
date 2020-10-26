@@ -15,7 +15,7 @@ using Umbraco.Web.Actions;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.Models.ContentEditing;
 
-namespace Umbraco.Tests.Web.Controllers
+namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Filters
 {
     [TestFixture]
     public class FilterAllowedOutgoingContentAttributeTests

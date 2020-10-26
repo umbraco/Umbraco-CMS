@@ -9,7 +9,7 @@ using Umbraco.Core.Models;
 using System;
 using System.Linq;
 
-namespace Umbraco.Tests.UmbracoExamine
+namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Examine
 {
     [TestFixture]
     public class UmbracoContentValueSetValidatorTests
@@ -20,7 +20,7 @@ namespace Umbraco.Tests.UmbracoExamine
             var validator = new ContentValueSetValidator(false, true, Mock.Of<IPublicAccessService>());
 
             var result = validator.Validate(ValueSet.FromObject("555", IndexTypes.Content, new { hello = "world", path = "-1,555" }));
-            Assert.AreEqual(ValueSetValidationResult.Valid, result);            
+            Assert.AreEqual(ValueSetValidationResult.Valid, result);
 
             result = validator.Validate(ValueSet.FromObject("777", IndexTypes.Media, new { hello = "world", path = "-1,555" }));
             Assert.AreEqual(ValueSetValidationResult.Valid, result);

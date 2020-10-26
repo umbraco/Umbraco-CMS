@@ -19,8 +19,9 @@ using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 using Umbraco.Web.Website;
 using Umbraco.Web.Website.Controllers;
+using CoreConstants = Umbraco.Core.Constants;
 
-namespace Umbraco.Tests.Integration
+namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Controllers
 {
     [TestFixture]
     [UmbracoTest(WithApplication = true)]
@@ -183,7 +184,7 @@ namespace Umbraco.Tests.Integration
             };
 
             var routeData = new RouteData();
-            routeData.DataTokens.Add(Core.Constants.Web.UmbracoRouteDefinitionDataToken, routeDefinition);
+            routeData.DataTokens.Add(CoreConstants.Web.UmbracoRouteDefinitionDataToken, routeDefinition);
 
             var ctrl = new TestSurfaceController(umbracoContextAccessor, Mock.Of<IPublishedContentQuery>(), Mock.Of<IPublishedUrlProvider>());
             ctrl.ControllerContext = new ControllerContext()

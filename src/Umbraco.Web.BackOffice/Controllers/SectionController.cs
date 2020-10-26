@@ -8,12 +8,12 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.BackOffice.Controllers;
+using Umbraco.Web.BackOffice.Trees;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Security;
 using Umbraco.Web.Services;
-using Umbraco.Web.Trees;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {

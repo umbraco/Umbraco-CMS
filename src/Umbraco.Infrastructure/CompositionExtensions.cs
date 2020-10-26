@@ -283,22 +283,6 @@ namespace Umbraco.Core
         }
 
         /// <summary>
-        /// Sets the underlying media filesystem.
-        /// </summary>
-        /// <param name="composition">A composition.</param>
-        /// <param name="filesystemFactory">A filesystem factory.</param>
-        public static void SetMediaFileSystem(this Composition composition, Func<IFactory, IFileSystem> filesystemFactory)
-            => composition.RegisterUniqueFor<IFileSystem, IMediaFileSystem>(filesystemFactory);
-
-        /// <summary>
-        /// Sets the underlying media filesystem.
-        /// </summary>
-        /// <param name="composition">A composition.</param>
-        /// <param name="filesystemFactory">A filesystem factory.</param>
-        public static void SetMediaFileSystem(this Composition composition, Func<IFileSystem> filesystemFactory)
-            => composition.RegisterUniqueFor<IFileSystem, IMediaFileSystem>(_ => filesystemFactory());
-
-        /// <summary>
         /// Sets the log viewer.
         /// </summary>
         /// <typeparam name="T">The type of the log viewer.</typeparam>

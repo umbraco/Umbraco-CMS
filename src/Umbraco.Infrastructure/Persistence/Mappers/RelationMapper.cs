@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Infrastructure.Persistence.Mappers;
 
 namespace Umbraco.Core.Persistence.Mappers
 {
@@ -13,7 +14,7 @@ namespace Umbraco.Core.Persistence.Mappers
     [MapperFor(typeof(Relation))]
     public sealed class RelationMapper : BaseMapper
     {
-        public RelationMapper(Lazy<ISqlContext> sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
+        public RelationMapper(Lazy<ISqlContext> sqlContext, MapperConfigurationStore maps)
             : base(sqlContext, maps)
         { }
 

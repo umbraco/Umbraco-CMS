@@ -6,7 +6,7 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Web.Models.ContentEditing;
 
-namespace Umbraco.Tests.Web.AngularIntegration
+namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.AngularIntegration
 {
     [TestFixture]
     public class ContentModelSerializationTests

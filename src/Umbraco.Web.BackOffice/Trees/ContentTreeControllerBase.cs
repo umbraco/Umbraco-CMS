@@ -14,13 +14,13 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Web.Actions;
 using Umbraco.Core.Security;
 using Umbraco.Extensions;
-using Umbraco.Web.BackOffice.Trees;
 using Umbraco.Web.Common.Exceptions;
 using Umbraco.Web.Common.ModelBinders;
 using Umbraco.Web.Security;
+using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
 
-namespace Umbraco.Web.Trees
+namespace Umbraco.Web.BackOffice.Trees
 {
     public abstract class ContentTreeControllerBase : TreeController, ITreeNodeController
     {

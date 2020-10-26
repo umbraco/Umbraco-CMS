@@ -9,7 +9,7 @@ using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.UnitTests.AutoFixture;
 using Umbraco.Web.Common.AspNetCore;
 
-namespace Umbraco.Tests.IO
+namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website
 {
     [TestFixture]
     public class AspNetCoreHostingEnvironmentTests

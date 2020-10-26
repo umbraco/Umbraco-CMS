@@ -6,7 +6,7 @@ using Umbraco.Core.Security;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Security;
 
-namespace Umbraco.Web.WebApi.Filters
+namespace Umbraco.Web.BackOffice.Filters
 {
     /// <summary>
     /// Used to emit outgoing editor model events

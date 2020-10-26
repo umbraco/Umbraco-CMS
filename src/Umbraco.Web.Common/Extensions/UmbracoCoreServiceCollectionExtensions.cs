@@ -26,6 +26,7 @@ using Umbraco.Core.Logging.Serilog;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Runtime;
+using Umbraco.Infrastructure.Composing;
 using Umbraco.Web.Common.AspNetCore;
 using Umbraco.Web.Common.Profiler;
 using ConnectionStrings = Umbraco.Core.Configuration.Models.ConnectionStrings;
@@ -181,10 +182,6 @@ namespace Umbraco.Extensions
         /// <returns></returns>
         public static IServiceCollection AddUmbracoCore(this IServiceCollection services, IWebHostEnvironment webHostEnvironment, IConfiguration configuration, out IFactory factory)
         {
-            if (!UmbracoServiceProviderFactory.IsActive)
-                throw new InvalidOperationException("Ensure to add UseUmbraco() in your Program.cs after ConfigureWebHostDefaults to enable Umbraco's service provider factory");
-
-            var umbContainer = UmbracoServiceProviderFactory.UmbracoContainer;
 
             var loggingConfig = new LoggingConfiguration(
                 Path.Combine(webHostEnvironment.ContentRootPath, "umbraco", "logs"));
@@ -199,8 +196,15 @@ namespace Umbraco.Extensions
                 requestCache,
                 new IsolatedCaches(type => new DeepCloneAppCache(new ObjectCacheAppCache())));
 
+            /* TODO: MSDI - Post initial merge we can clean up a lot.
+             * Change the method signatures lower down
+             * Or even just remove IRegister / IFactory interfaces entirely.
+             * If we try to do it immediately, merging becomes a nightmare.
+             */
+            var register = new ServiceCollectionRegistryAdapter(services);
+
             services.AddUmbracoCore(webHostEnvironment,
-                umbContainer,
+                register,
                 Assembly.GetEntryAssembly(),
                 appCaches,
                 loggingConfig,

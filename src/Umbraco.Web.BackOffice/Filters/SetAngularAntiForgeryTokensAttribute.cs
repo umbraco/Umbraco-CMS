@@ -7,7 +7,7 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Web.BackOffice.Security;
 
-namespace Umbraco.Extensions
+namespace Umbraco.Web.BackOffice.Filters
 {
     /// <summary>
     /// An attribute/filter to set the csrf cookie token based on angular conventions
