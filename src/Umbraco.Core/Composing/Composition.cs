@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Infrastructure.Composing;
+
+using NoFactory = Umbraco.Infrastructure.Composing.ServiceProviderFactoryAdapter;
 
 namespace Umbraco.Core.Composing
 {
@@ -20,7 +23,6 @@ namespace Umbraco.Core.Composing
     public class Composition
     {
         private readonly Dictionary<Type, ICollectionBuilder> _builders = new Dictionary<Type, ICollectionBuilder>();
-        private readonly Dictionary<string, Action<IRegister>> _uniques = new Dictionary<string, Action<IRegister>>();
         private IRegister _register => ServiceCollectionRegistryAdapter.Wrap(Services);
 
         public Composition(IServiceCollection services, TypeLoader typeLoader, IProfilingLogger logger, IRuntimeState runtimeState, IIOHelper ioHelper, AppCaches appCaches)
@@ -83,10 +85,6 @@ namespace Umbraco.Core.Composing
             foreach (var onCreating in OnCreatingFactory.Values)
                 onCreating();
 
-            foreach (var unique in _uniques.Values)
-                unique(_register);
-            _uniques.Clear(); // no point keep them around
-
             foreach (var builder in _builders.Values)
                 builder.RegisterWith(_register);
             _builders.Clear(); // no point keep them around
@@ -102,32 +100,13 @@ namespace Umbraco.Core.Composing
         #endregion
 
         #region Unique
-
-        private string GetUniqueName<TService>()
-            => GetUniqueName(typeof(TService));
-
-        private string GetUniqueName(Type serviceType)
-            => serviceType.FullName;
-
-        private string GetUniqueName<TService, TTarget>()
-            => GetUniqueName(typeof(TService), typeof(TTarget));
-
-        private string GetUniqueName(Type serviceType, Type targetType)
-            => serviceType.FullName + "::" + targetType.FullName;
-
-        /// <summary>
-        /// Registers a unique service as its own implementation.
-        /// </summary>
-        /// <remarks>Unique services have one single implementation, and a Singleton lifetime.</remarks>
-        public void RegisterUnique(Type serviceType)
-            => _uniques[GetUniqueName(serviceType)] = register => register.Register(serviceType, Lifetime.Singleton);
-
+        
         /// <summary>
         /// Registers a unique service with an implementation type.
         /// </summary>
         /// <remarks>Unique services have one single implementation, and a Singleton lifetime.</remarks>
         public void RegisterUnique(Type serviceType, Type implementingType)
-            => _uniques[GetUniqueName(serviceType)] = register => register.Register(serviceType, implementingType, Lifetime.Singleton);
+            => Services.Replace(ServiceDescriptor.Singleton(serviceType, implementingType));
 
         /// <summary>
         /// Registers a unique service with an implementation factory.
@@ -135,14 +114,14 @@ namespace Umbraco.Core.Composing
         /// <remarks>Unique services have one single implementation, and a Singleton lifetime.</remarks>
         public void RegisterUnique<TService>(Func<IFactory, TService> factory)
             where TService : class
-            => _uniques[GetUniqueName<TService>()] = register => register.Register<TService>(factory, Lifetime.Singleton);
+            => Services.Replace(ServiceDescriptor.Singleton(sp => factory(NoFactory.Wrap(sp))));
 
         /// <summary>
         /// Registers a unique service with an implementing instance.
         /// </summary>
         /// <remarks>Unique services have one single implementation, and a Singleton lifetime.</remarks>
         public void RegisterUnique(Type serviceType, object instance)
-            => _uniques[GetUniqueName(serviceType)] = register => register.Register(serviceType, instance);
+            => Services.Replace(ServiceDescriptor.Singleton(serviceType, instance));
 
         #endregion
 
