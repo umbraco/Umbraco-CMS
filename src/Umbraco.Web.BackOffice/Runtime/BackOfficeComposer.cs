@@ -41,7 +41,7 @@ namespace Umbraco.Web.BackOffice.Runtime
 
             composition.ComposeWebMappingProfiles();
 
-            composition.RegisterUniqueFor<IFileSystem, FilesTreeController>(factory =>
+            composition.RegisterUnique<IPhysicalFileSystem>(factory =>
                 new PhysicalFileSystem(
                     factory.GetInstance<IIOHelper>(),
                     factory.GetInstance<IHostingEnvironment>(),

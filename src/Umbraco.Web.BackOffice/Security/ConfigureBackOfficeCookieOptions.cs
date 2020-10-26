@@ -27,6 +27,7 @@ namespace Umbraco.Web.BackOffice.Security
     /// </summary>
     public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAuthenticationOptions>
     {
+        private readonly IServiceProvider _serviceProvider;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly SecuritySettings _securitySettings;
         private readonly GlobalSettings _globalSettings;
@@ -37,10 +38,10 @@ namespace Umbraco.Web.BackOffice.Security
         private readonly IUserService _userService;
         private readonly IIpResolver _ipResolver;
         private readonly ISystemClock _systemClock;
-        private readonly BackOfficeSessionIdValidator _sessionIdValidator;
         private readonly LinkGenerator _linkGenerator;
 
         public ConfigureBackOfficeCookieOptions(
+            IServiceProvider serviceProvider,
             IUmbracoContextAccessor umbracoContextAccessor,
             IOptions<SecuritySettings> securitySettings,
             IOptions<GlobalSettings> globalSettings,
@@ -51,9 +52,9 @@ namespace Umbraco.Web.BackOffice.Security
             IUserService userService,
             IIpResolver ipResolver,
             ISystemClock systemClock,
-            BackOfficeSessionIdValidator sessionIdValidator,
             LinkGenerator linkGenerator)
         {
+            _serviceProvider = serviceProvider;
             _umbracoContextAccessor = umbracoContextAccessor;
             _securitySettings = securitySettings.Value;
             _globalSettings = globalSettings.Value;
@@ -64,7 +65,6 @@ namespace Umbraco.Web.BackOffice.Security
             _userService = userService;
             _ipResolver = ipResolver;
             _systemClock = systemClock;
-            _sessionIdValidator = sessionIdValidator;
             _linkGenerator = linkGenerator;
         }
 
@@ -226,7 +226,10 @@ namespace Umbraco.Web.BackOffice.Security
         private async Task EnsureValidSessionId(CookieValidatePrincipalContext context)
         {
             if (_runtimeState.Level == RuntimeLevel.Run)
-                await _sessionIdValidator.ValidateSessionAsync(TimeSpan.FromMinutes(1), context);
+            {
+                var validator = _serviceProvider.GetRequiredService<BackOfficeSessionIdValidator>();
+                await validator.ValidateSessionAsync(TimeSpan.FromMinutes(1), context);
+            }
         }
 
         /// <summary>

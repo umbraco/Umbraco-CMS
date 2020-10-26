@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
+using System.Threading;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.FileProviders;
@@ -28,6 +29,7 @@ using Umbraco.Core.Runtime;
 using Umbraco.Net;
 using Umbraco.Tests.Common;
 using Umbraco.Web.Common.AspNetCore;
+using File = System.IO.File;
 using IHostingEnvironment = Umbraco.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Tests.Integration.Implementations
@@ -281,6 +283,52 @@ namespace Umbraco.Tests.Integration.Implementations
         {
             var delta = (actual - expected).TotalMilliseconds;
             Assert.IsTrue(Math.Abs(delta) <= dateDeltaMiliseconds, failureMessage);
+        }
+
+        public void DeleteDirectory(string path)
+        {
+            Try(() =>
+            {
+                if (Directory.Exists(path) == false) return;
+                foreach (var file in Directory.EnumerateFiles(path, "*", SearchOption.AllDirectories))
+                    File.Delete(file);
+            });
+
+            Try(() =>
+            {
+                if (Directory.Exists(path) == false) return;
+                Directory.Delete(path, true);
+            });
+        }
+
+        public static void TryAssert(Action action, int maxTries = 5, int waitMilliseconds = 200)
+        {
+            Try<AssertionException>(action, maxTries, waitMilliseconds);
+        }
+
+        public static void Try(Action action, int maxTries = 5, int waitMilliseconds = 200)
+        {
+            Try<Exception>(action, maxTries, waitMilliseconds);
+        }
+
+        public static void Try<T>(Action action, int maxTries = 5, int waitMilliseconds = 200)
+            where T : Exception
+        {
+            var tries = 0;
+            while (true)
+            {
+                try
+                {
+                    action();
+                    break;
+                }
+                catch (T)
+                {
+                    if (tries++ > maxTries)
+                        throw;
+                    Thread.Sleep(waitMilliseconds);
+                }
+            }
         }
     }
 }
