@@ -17,6 +17,7 @@ using Umbraco.Web.BackOffice.HealthCheck;
 using Umbraco.Web.BackOffice.Profiling;
 using Umbraco.Web.BackOffice.PropertyEditors;
 using Umbraco.Web.BackOffice.Routing;
+using Umbraco.Web.BackOffice.Trees;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Security;
 using Umbraco.Web.Features;
