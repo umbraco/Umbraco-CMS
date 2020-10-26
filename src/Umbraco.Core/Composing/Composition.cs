@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Infrastructure.Composing;
 
 namespace Umbraco.Core.Composing
 {
@@ -19,21 +21,31 @@ namespace Umbraco.Core.Composing
     {
         private readonly Dictionary<Type, ICollectionBuilder> _builders = new Dictionary<Type, ICollectionBuilder>();
         private readonly Dictionary<string, Action<IRegister>> _uniques = new Dictionary<string, Action<IRegister>>();
-        private readonly IRegister _register;
+        private IRegister _register => ServiceCollectionRegistryAdapter.Wrap(Services);
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Composition"/> class.
-        /// </summary>
-        /// <param name="register">A register.</param>
-        /// <param name="typeLoader">A type loader.</param>
-        /// <param name="logger">A logger.</param>
-        /// <param name="runtimeState">The runtime state.</param>
-        /// <param name="configs">Optional configs.</param>
-        /// <param name="ioHelper">An IOHelper</param>
-        /// <param name="appCaches"></param>
+
+        [Obsolete("Please use ctor that takes IServiceCollection instead")]
         public Composition(IRegister register, TypeLoader typeLoader, IProfilingLogger logger, IRuntimeState runtimeState, IIOHelper ioHelper, AppCaches appCaches)
         {
-            _register = register ?? throw new ArgumentNullException(nameof(register));
+            TypeLoader = typeLoader ?? throw new ArgumentNullException(nameof(typeLoader));
+            Logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            RuntimeState = runtimeState ?? throw new ArgumentNullException(nameof(runtimeState));
+            IOHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
+            AppCaches = appCaches ?? throw new ArgumentNullException(nameof(appCaches));
+
+            if (register is ServiceCollectionRegistryAdapter wrapper)
+            {
+                Services = wrapper.Services;
+            }
+            else
+            {
+                throw new ArgumentException("NO THANK YOU");
+            }
+        }
+
+        public Composition(IServiceCollection services, TypeLoader typeLoader, IProfilingLogger logger, IRuntimeState runtimeState, IIOHelper ioHelper, AppCaches appCaches)
+        {
+            Services = services ?? throw new ArgumentNullException(nameof(services));
             TypeLoader = typeLoader ?? throw new ArgumentNullException(nameof(typeLoader));
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
             RuntimeState = runtimeState ?? throw new ArgumentNullException(nameof(runtimeState));
@@ -50,6 +62,8 @@ namespace Umbraco.Core.Composing
 
         public IIOHelper IOHelper { get; }
         public AppCaches AppCaches { get; }
+
+        public IServiceCollection Services { get; }
 
         /// <summary>
         /// Gets the type loader.

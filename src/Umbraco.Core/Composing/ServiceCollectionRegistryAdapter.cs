@@ -6,12 +6,12 @@ namespace Umbraco.Infrastructure.Composing
 {
     public class ServiceCollectionRegistryAdapter : IRegister
     {
-        private readonly IServiceCollection _services;
+        public IServiceCollection Services { get; }
 
         public ServiceCollectionRegistryAdapter(IServiceCollection services)
         {
-            _services = services ?? throw new ArgumentNullException(nameof(services));
-            _services.AddTransient(typeof(Lazy<>), typeof(LazyResolve<>));
+            Services = services ?? throw new ArgumentNullException(nameof(services));
+            Services.AddTransient(typeof(Lazy<>), typeof(LazyResolve<>));
         }
 
         public void Register(Type serviceType, Lifetime lifetime = Lifetime.Transient)
@@ -20,13 +20,13 @@ namespace Umbraco.Infrastructure.Composing
             {
                 case Lifetime.Request:
                 case Lifetime.Scope:
-                    _services.AddScoped(serviceType);
+                    Services.AddScoped(serviceType);
                     break;
                 case Lifetime.Transient:
-                    _services.AddTransient(serviceType);
+                    Services.AddTransient(serviceType);
                     break;
                 case Lifetime.Singleton:
-                    _services.AddSingleton(serviceType);
+                    Services.AddSingleton(serviceType);
                     break;
                 default:
                     throw new NotImplementedException($"Unhandled Lifetime: {lifetime}");
@@ -39,13 +39,13 @@ namespace Umbraco.Infrastructure.Composing
             {
                 case Lifetime.Request:
                 case Lifetime.Scope:
-                    _services.AddScoped(serviceType, implementingType);
+                    Services.AddScoped(serviceType, implementingType);
                     break;
                 case Lifetime.Transient:
-                    _services.AddTransient(serviceType, implementingType);
+                    Services.AddTransient(serviceType, implementingType);
                     break;
                 case Lifetime.Singleton:
-                    _services.AddSingleton(serviceType, implementingType);
+                    Services.AddSingleton(serviceType, implementingType);
                     break;
                 default:
                     throw new NotImplementedException($"Unhandled Lifetime: {lifetime}");
@@ -58,13 +58,13 @@ namespace Umbraco.Infrastructure.Composing
             {
                 case Lifetime.Request:
                 case Lifetime.Scope:
-                    _services.AddScoped(sp => factory(ServiceProviderFactoryAdapter.Wrap(sp)));
+                    Services.AddScoped(sp => factory(ServiceProviderFactoryAdapter.Wrap(sp)));
                     break;
                 case Lifetime.Transient:
-                    _services.AddTransient(sp => factory(ServiceProviderFactoryAdapter.Wrap(sp)));
+                    Services.AddTransient(sp => factory(ServiceProviderFactoryAdapter.Wrap(sp)));
                     break;
                 case Lifetime.Singleton:
-                    _services.AddSingleton(sp => factory(ServiceProviderFactoryAdapter.Wrap(sp)));
+                    Services.AddSingleton(sp => factory(ServiceProviderFactoryAdapter.Wrap(sp)));
                     break;
                 default:
                     throw new NotImplementedException($"Unhandled Lifetime: {lifetime}");
@@ -72,12 +72,17 @@ namespace Umbraco.Infrastructure.Composing
         }
         public void Register(Type serviceType, object instance)
         {
-            _services.AddSingleton(serviceType, instance);
+            Services.AddSingleton(serviceType, instance);
         }
 
         public IFactory CreateFactory()
         {
-            return ServiceProviderFactoryAdapter.Wrap(_services.BuildServiceProvider());
+            return ServiceProviderFactoryAdapter.Wrap(Services.BuildServiceProvider());
+        }
+
+        public static IRegister Wrap(IServiceCollection services)
+        {
+            return new ServiceCollectionRegistryAdapter(services);
         }
     }
 
