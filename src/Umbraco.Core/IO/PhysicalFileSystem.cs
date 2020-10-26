@@ -57,7 +57,6 @@ namespace Umbraco.Core.IO
             if (string.IsNullOrEmpty(rootUrl)) throw new ArgumentException("Value can't be empty.", nameof(rootUrl));
             if (rootPath.StartsWith("~/")) throw new ArgumentException("Value can't be a virtual path and start with '~/'.", nameof(rootPath));
 
-
             // rootPath should be... rooted, as in, it's a root path!
             if (Path.IsPathRooted(rootPath) == false)
             {
@@ -65,6 +64,9 @@ namespace Umbraco.Core.IO
                 var localRoot = hostingEnvironment.MapPathContentRoot("~");
                 rootPath = Path.Combine(localRoot, rootPath);
             }
+
+            // clean up root path
+            rootPath = Path.GetFullPath(rootPath);
 
             _rootPath = EnsureDirectorySeparatorChar(rootPath).TrimEnd(Path.DirectorySeparatorChar);
             _rootPathFwd = EnsureUrlSeparatorChar(_rootPath);
