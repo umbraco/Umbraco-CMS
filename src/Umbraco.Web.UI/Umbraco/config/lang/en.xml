@@ -2293,10 +2293,10 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="labelUsedByMembers">Used in Members</key>
     <key alias="labelUsedByMedia">Used in Media</key>
       <key alias="labelUsedInMediaDescendants">One or more of this item's descendants is being used in a media item</key>
-      <      <key alias="labelUsedInContentDescendants">One or more of this item's descendants is being used in a content item</key>
+      <key alias="labelUsedInContentDescendants">One or more of this item's descendants is being used in a content item</key>
       <key alias="labelUsedInMemberDescendants">One or more of this item's descendants is being used in a member</key>
-	  <key alias="deleteWarning"currenor one or more of tU's descgnihsilbupnendants is being used. Deleting this item can lead to broken links on your website.leting this item can lead to broken links on your website.</key>
-	  <key alias="unpublishWarning">The item or one of the underlying items is being used. Unpublishing it can cause issues.</key> 	
+      <key alias="deleteWarning">The current item or one or more of this item's descendants is being used. Deleting this item can lead to broken links on your website.</key>
+      <key alias="unpublishWarning">The current item or one or more of this item's descendants is being used. Unpublishing this item can lead to broken links on your website.</key>
   </area>
   <area alias="logViewer">
       <key alias="deleteSavedSearch">Delete Saved Search</key>
@@ -2494,8 +2494,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="addCustomView">Add custom view</key>
     <key alias="addSettingsElementType">Add settings</key>
     <key alias="labelTemplatePlaceholder">Overwrite label template</key>
-    <key alias="confirmDeleteBlockMessage"><![CDATA[Are you sure you want to delete content of <strong>%0%</strong>.]]></key>
-    <key alias="confirmDeleteBlockTypeMessage"><![CDATA[Are you sure you want to delete block configuration of <strong>%0%</strong>.]]></key>
+    <key alias="confirmDeleteBlockMessage"><![CDATA[Are you sure you want to delete the content <strong>%0%</strong>?]]></key>
+    <key alias="confirmDeleteBlockTypeMessage"><![CDATA[Are you sure you want to delete the block configuration <strong>%0%</strong>?]]></key>
     <key alias="confirmDeleteBlockTypeNotice">The content of this block will still be present, editing of this content will no longer be available and will be shown as unsupported content.</key>
     <key alias="blockConfigurationOverlayTitle"><![CDATA[Configuration of '%0%']]></key>
     <key alias="thumbnail">Thumbnail</key>
