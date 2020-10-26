@@ -50,7 +50,7 @@ namespace Umbraco.Tests.Scoping
         {
             var rootPath = HostingEnvironment.MapPathWebRoot(GlobalSettings.UmbracoMediaPath);
             var rootUrl = HostingEnvironment.ToAbsolute(GlobalSettings.UmbracoMediaPath);
-            var physMediaFileSystem = new PhysicalFileSystem(IOHelper, HostingEnvironment, Mock.Of<ILogger<PhysicalFileSystem>>(), rootPath, rootUrl);
+            var physMediaFileSystem = new PhysicalFileSystem(IOHelper, HostingEnvironment, GetRequiredService<ILogger<PhysicalFileSystem>>(), rootPath, rootUrl);
             var mediaFileSystem = MediaFileSystem;
 
             Assert.IsFalse(physMediaFileSystem.FileExists("f1.txt"));
@@ -76,7 +76,7 @@ namespace Umbraco.Tests.Scoping
         {
             var rootPath = HostingEnvironment.MapPathWebRoot(GlobalSettings.UmbracoMediaPath);
             var rootUrl = HostingEnvironment.ToAbsolute(GlobalSettings.UmbracoMediaPath);
-            var physMediaFileSystem = new PhysicalFileSystem(IOHelper, HostingEnvironment, Mock.Of<ILogger<PhysicalFileSystem>>(), rootPath, rootUrl);
+            var physMediaFileSystem = new PhysicalFileSystem(IOHelper, HostingEnvironment, GetRequiredService<ILogger<PhysicalFileSystem>>(), rootPath, rootUrl);
             var mediaFileSystem = MediaFileSystem;
 
             Assert.IsFalse(physMediaFileSystem.FileExists("f1.txt"));
@@ -104,7 +104,7 @@ namespace Umbraco.Tests.Scoping
         {
             var rootPath = HostingEnvironment.MapPathWebRoot(GlobalSettings.UmbracoMediaPath);
             var rootUrl = HostingEnvironment.ToAbsolute(GlobalSettings.UmbracoMediaPath);
-            var physMediaFileSystem = new PhysicalFileSystem(IOHelper, HostingEnvironment, Mock.Of<ILogger<PhysicalFileSystem>>(), rootPath, rootUrl);
+            var physMediaFileSystem = new PhysicalFileSystem(IOHelper, HostingEnvironment, GetRequiredService<ILogger<PhysicalFileSystem>>(), rootPath, rootUrl);
             var mediaFileSystem = MediaFileSystem;
 
             var scopeProvider = ScopeProvider;
