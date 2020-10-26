@@ -2,16 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Core;
-using Umbraco.Core.Configuration.HealthChecks;
-using Umbraco.Web.BackOffice.Filters;
-using Umbraco.Web.HealthCheck;
-using Umbraco.Web.Common.Attributes;
-using Umbraco.Core.Configuration.Models;
 using Microsoft.Extensions.Options;
+using Umbraco.Core;
+using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.HealthCheck;
+using Umbraco.Web.BackOffice.Controllers;
+using Umbraco.Web.BackOffice.Filters;
+using Umbraco.Web.Common.Attributes;
 using Microsoft.Extensions.Logging;
 
-namespace Umbraco.Web.BackOffice.Controllers
+namespace Umbraco.Web.BackOffice.HealthCheck
 {
     /// <summary>
     /// The API controller used to display the health check info and execute any actions
@@ -85,7 +85,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             return check.ExecuteAction(action);
         }
 
-        private HealthCheck.HealthCheck GetCheckById(Guid id)
+        private Core.HealthCheck.HealthCheck GetCheckById(Guid id)
         {
             var check = _checks
                 .Where(x => _disabledCheckIds.Contains(x.Id) == false)

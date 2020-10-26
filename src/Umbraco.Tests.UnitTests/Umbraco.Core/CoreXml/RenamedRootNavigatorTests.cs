@@ -1,9 +1,10 @@
-﻿using System.Xml;
+﻿using System.Runtime.InteropServices;
+using System.Xml;
 using System.Xml.XPath;
 using NUnit.Framework;
 using Umbraco.Core.Xml.XPath;
 
-namespace Umbraco.Tests.CoreXml
+namespace Umbraco.Tests.UnitTests.Umbraco.Core.CoreXml
 {
     [TestFixture]
     public class RenamedRootNavigatorTests
@@ -18,10 +19,10 @@ namespace Umbraco.Tests.CoreXml
 </root>");
             var nav = doc.CreateNavigator();
             var xml = nav.OuterXml;
-            Assert.AreEqual(@"<root foo=""bar"">
+            Assert.AreEqual(EnsureNativeLineEndings(@"<root foo=""bar"">
   <a></a>
   <b x=""1""></b>
-</root>".CrLf(), xml);
+</root>"), xml);
         }
 
         [Test]
@@ -34,10 +35,10 @@ namespace Umbraco.Tests.CoreXml
 </xx:root>");
             var nav = doc.CreateNavigator();
             var xml = nav.OuterXml;
-            Assert.AreEqual(@"<xx:root foo=""bar"" xmlns:xx=""uri"">
+            Assert.AreEqual(EnsureNativeLineEndings(@"<xx:root foo=""bar"" xmlns:xx=""uri"">
   <a></a>
   <b x=""1""></b>
-</xx:root>".CrLf(), xml);
+</xx:root>"), xml);
         }
 
         [Test]
@@ -50,10 +51,16 @@ namespace Umbraco.Tests.CoreXml
 </root>");
             var nav = new RenamedRootNavigator(doc.CreateNavigator(), "test");
             var xml = nav.OuterXml;
-            Assert.AreEqual(@"<test foo=""bar"">
+            Assert.AreEqual(EnsureNativeLineEndings(@"<test foo=""bar"">
   <a></a>
   <b x=""1""></b>
-</test>".CrLf(), xml);
+</test>"), xml);
+        }
+
+        private string EnsureNativeLineEndings(string text)
+        {
+            var useCrLf = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+            return useCrLf ? text.CrLf() : text.Lf();
         }
 
         [Test]
@@ -66,10 +73,10 @@ namespace Umbraco.Tests.CoreXml
 </xx:root>");
             var nav = new RenamedRootNavigator(doc.CreateNavigator(), "test");
             var xml = nav.OuterXml;
-            Assert.AreEqual(@"<xx:test foo=""bar"" xmlns:xx=""uri"">
+            Assert.AreEqual(EnsureNativeLineEndings(@"<xx:test foo=""bar"" xmlns:xx=""uri"">
   <a></a>
   <b x=""1""></b>
-</xx:test>".CrLf(), xml);
+</xx:test>"), xml);
         }
 
         [Test]

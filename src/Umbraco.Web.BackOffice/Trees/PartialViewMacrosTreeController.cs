@@ -2,12 +2,12 @@
 using Umbraco.Core.IO;
 using Umbraco.Core.Services;
 using Umbraco.Web.BackOffice.Filters;
-using Umbraco.Web.BackOffice.Trees;
 using Umbraco.Web.Common.Attributes;
+using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
 using Constants = Umbraco.Core.Constants;
 
-namespace Umbraco.Web.Trees
+namespace Umbraco.Web.BackOffice.Trees
 {
     /// <summary>
     /// Tree for displaying partial view macros in the developer app

@@ -10,7 +10,8 @@ using Umbraco.Core.Hosting;
 
 namespace Umbraco.Core.IO
 {
-    public class PhysicalFileSystem : IFileSystem
+    public interface IPhysicalFileSystem : IFileSystem {}
+    public class PhysicalFileSystem : IPhysicalFileSystem
     {
         private readonly IIOHelper _ioHelper;
         private readonly ILogger<PhysicalFileSystem> _logger;
@@ -56,7 +57,6 @@ namespace Umbraco.Core.IO
             if (string.IsNullOrEmpty(rootUrl)) throw new ArgumentException("Value can't be empty.", nameof(rootUrl));
             if (rootPath.StartsWith("~/")) throw new ArgumentException("Value can't be a virtual path and start with '~/'.", nameof(rootPath));
 
-
             // rootPath should be... rooted, as in, it's a root path!
             if (Path.IsPathRooted(rootPath) == false)
             {
@@ -64,6 +64,9 @@ namespace Umbraco.Core.IO
                 var localRoot = hostingEnvironment.MapPathContentRoot("~");
                 rootPath = Path.Combine(localRoot, rootPath);
             }
+
+            // clean up root path
+            rootPath = Path.GetFullPath(rootPath);
 
             _rootPath = EnsureDirectorySeparatorChar(rootPath).TrimEnd(Path.DirectorySeparatorChar);
             _rootPathFwd = EnsureUrlSeparatorChar(_rootPath);
@@ -328,7 +331,7 @@ namespace Umbraco.Core.IO
 
             // nothing prevents us to reach the file, security-wise, yet it is outside
             // this filesystem's root - throw
-            throw new UnauthorizedAccessException("File '" + opath + "' is outside this filesystem's root.");
+            throw new UnauthorizedAccessException($"File original: [{opath}] full: [{path}] is outside this filesystem's root.");
         }
 
         /// <summary>

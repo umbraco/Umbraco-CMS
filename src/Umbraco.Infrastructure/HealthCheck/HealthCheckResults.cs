@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using HeyRed.MarkdownSharp;
-using Umbraco.Composing;
-using Umbraco.Core.Configuration.HealthChecks;
 using Microsoft.Extensions.Logging;
+using Umbraco.Composing;
+using Umbraco.Core.HealthCheck;
 
-namespace Umbraco.Web.HealthCheck
+namespace Umbraco.Infrastructure.HealthCheck
 {
     public class HealthCheckResults
     {
@@ -16,7 +16,7 @@ namespace Umbraco.Web.HealthCheck
 
         private ILogger Logger => Current.Logger; // TODO: inject
 
-        public HealthCheckResults(IEnumerable<HealthCheck> checks)
+        public HealthCheckResults(IEnumerable<Core.HealthCheck.HealthCheck> checks)
         {
             _results = checks.ToDictionary(
                 t => t.Name,

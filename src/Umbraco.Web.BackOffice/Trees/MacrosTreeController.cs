@@ -4,12 +4,12 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Actions;
 using Umbraco.Web.BackOffice.Filters;
-using Umbraco.Web.BackOffice.Trees;
 using Umbraco.Web.Common.Attributes;
+using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
 using Constants = Umbraco.Core.Constants;
 
-namespace Umbraco.Web.Trees
+namespace Umbraco.Web.BackOffice.Trees
 {
     [UmbracoTreeAuthorize(Constants.Trees.Macros)]
     [Tree(Constants.Applications.Settings, Constants.Trees.Macros, TreeTitle = "Macros", SortOrder = 4, TreeGroup = Constants.Trees.Groups.Settings)]

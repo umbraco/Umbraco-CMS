@@ -32,7 +32,6 @@ using Umbraco.Web.Common.Filters;
 using Umbraco.Web.ContentApps;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Security;
-using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.BackOffice.Controllers

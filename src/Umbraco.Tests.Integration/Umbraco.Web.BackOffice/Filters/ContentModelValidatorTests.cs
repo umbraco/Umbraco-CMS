@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.DependencyInjection;
- using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
@@ -25,7 +25,7 @@ using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.PropertyEditors;
 using DataType = Umbraco.Core.Models.DataType;
 
-namespace Umbraco.Tests.Web.Validation
+namespace Umbraco.Tests.Integration.Umbraco.Web.Backoffice.Filters
 {
     [TestFixture]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Mapper = true, WithApplication = true, Logger = UmbracoTestOptions.Logger.Console)]

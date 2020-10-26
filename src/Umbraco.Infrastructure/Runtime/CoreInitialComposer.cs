@@ -58,7 +58,9 @@ using Umbraco.Web.Trees;
 using IntegerValidator = Umbraco.Core.PropertyEditors.Validators.IntegerValidator;
 using TextStringValueConverter = Umbraco.Core.PropertyEditors.ValueConverters.TextStringValueConverter;
 using Microsoft.Extensions.Logging;
-
+using Umbraco.Core.Configuration.HealthChecks;
+using Umbraco.Core.HealthCheck;
+using Umbraco.Core.HealthCheck.Checks;
 
 namespace Umbraco.Core.Runtime
 {
@@ -205,7 +207,7 @@ namespace Umbraco.Core.Runtime
 
             // Config manipulator
             composition.RegisterUnique<IConfigManipulator, JsonConfigManipulator>();
-
+            
             // register the umbraco context factory
             // composition.RegisterUnique<IUmbracoContextFactory, UmbracoContextFactory>();
             composition.RegisterUnique<IPublishedUrlProvider, UrlProvider>();
@@ -298,7 +300,7 @@ namespace Umbraco.Core.Runtime
 
             // register *all* checks, except those marked [HideFromTypeFinder] of course
             composition.HealthChecks()
-                .Add(() => composition.TypeLoader.GetTypes<HealthCheck>());
+                .Add(() => composition.TypeLoader.GetTypes<HealthCheck.HealthCheck>());
 
 
             composition.WithCollectionBuilder<HealthCheckNotificationMethodCollectionBuilder>()

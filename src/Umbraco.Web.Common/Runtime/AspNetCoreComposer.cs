@@ -72,7 +72,6 @@ namespace Umbraco.Web.Common.Runtime
             composition.RegisterUnique<IMacroRenderer, MacroRenderer>();
             composition.RegisterUnique<IMemberUserKeyProvider, MemberUserKeyProvider>();
 
-            composition.RegisterUnique<AngularJsonMediaTypeFormatter>();
 
             // register the umbraco context factory
             composition.RegisterUnique<IUmbracoContextFactory, UmbracoContextFactory>();

@@ -694,7 +694,6 @@
     <key alias="trySkipIisCustomErrorsCheckErrorMessage">Параметр 'Try Skip IIS Custom Errors' сейчас установлен в '%0%'. Рекомендуется установить в '%1%' для Вашего текущего IIS версии (%2%).</key>
     <key alias="trySkipIisCustomErrorsCheckRectifySuccessMessage">Параметр 'Try Skip IIS Custom Errors' успешно установлен в '%0%'.</key>
     <!-- The following keys get predefined tokens passed in that are not all the same, like above -->
-    <key alias="configurationServiceFileNotFound">Файл не существует: '%0%'.</key>
     <key alias="configurationServiceNodeNotFound"><![CDATA[Не найден параметр <strong>'%0%'</strong> в файле конфигурации <strong>'%1%'</strong>.]]></key>
     <key alias="configurationServiceError">Обнаружена ошибка, для получения полной информации обратитесь к журналу: %0%.</key>
     <key alias="healthCheckInvalidUrl">Ошибка проверки адреса URL %0% - '%1%'</key>
@@ -725,6 +724,10 @@
     <key alias="requiredFolderPermissionFailed"><![CDATA[Не получен доступ для установки корректных параметров безопасности к следующим папкам: <strong>%0%</strong>.]]></key>
     <key alias="optionalFolderPermissionFailed"><![CDATA[Невозможно получить доступ для установки корректных параметров безопасности с целью корректного функционирования Umbraco к следующим папкам: <strong>%0%</strong>. Если в них не разрешена запись, не нужно предпринимать никаких действий.]]></key>
     <key alias="filePermissionsCheckMessage">Все файлы имеют корректно установленные параметры безопасности.</key>
+    <!-- The following keys get these tokens passed in:
+	    0: Path to the file not found
+  	-->
+    <key alias="fileNotFound">Файл не существует: '%0%'.</key>
     <!-- The following keys get these tokens passed in:
 	    0: Comma delimitted list of failed folder paths
   	-->

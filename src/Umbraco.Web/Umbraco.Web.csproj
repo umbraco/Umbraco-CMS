@@ -144,16 +144,11 @@
     <Compile Include="AspNet\FrameworkMarchal.cs" />
     <Compile Include="AspNet\AspNetUmbracoApplicationLifetime.cs" />
     <Compile Include="BlockListTemplateExtensions.cs" />
-    <Compile Include="Compose\AuditEventsComponent.cs" />
-    <Compile Include="Compose\AuditEventsComposer.cs" />
     <Compile Include="Compose\BackOfficeUserAuditEventsComponent.cs" />
     <Compile Include="Compose\BackOfficeUserAuditEventsComposer.cs" />
     <Compile Include="Editors\PasswordChanger.cs" />
     <Compile Include="HttpContextExtensions.cs" />
-    <Compile Include="Macros\MacroRenderer.cs" />
     <Compile Include="Macros\MemberUserKeyProvider.cs" />
-    <Compile Include="Macros\PartialViewMacroController.cs" />
-    <Compile Include="Macros\PartialViewMacroEngine.cs" />
     <Compile Include="Mvc\IRenderController.cs" />
     <Compile Include="Mvc\IRenderMvcController.cs" />
     <Compile Include="Mvc\RenderMvcController.cs" />
@@ -168,13 +163,8 @@
     <Compile Include="HttpContextAccessorExtensions.cs" />
     <Compile Include="Logging\OwinLogger.cs" />
     <Compile Include="Logging\OwinLoggerFactory.cs" />
-    <Compile Include="Logging\WebProfiler.cs" />
-    <Compile Include="Logging\WebProfilerComponent.cs" />
-    <Compile Include="Logging\WebProfilerComposer.cs" />
-    <Compile Include="Logging\WebProfilerProvider.cs" />
     <Compile Include="Models\Membership\UmbracoMembershipMember.cs" />
     <Compile Include="Mvc\HttpUmbracoFormRouteStringException.cs" />
-    <Compile Include="Mvc\ModelBindingExceptionFilter.cs" />
     <Compile Include="Mvc\SurfaceControllerTypeCollectionBuilder.cs" />
     <Compile Include="Mvc\ValidateUmbracoFormRouteStringAttribute.cs" />
     <Compile Include="AspNet\AspNetBackOfficeInfo.cs" />
@@ -209,7 +199,6 @@
     <Compile Include="CompositionExtensions.cs" />
     <Compile Include="Composing\Current.cs" />
     <Compile Include="ImageProcessorLogger.cs" />
-    <Compile Include="Mvc\ContainerControllerFactory.cs" />
     <Compile Include="OwinExtensions.cs" />
     <Compile Include="Security\BackOfficeCookieAuthenticationProvider.cs" />
     <Compile Include="WebAssets\CDF\ClientDependencyConfiguration.cs" />
@@ -220,10 +209,7 @@
     <Compile Include="WebApi\ParameterSwapControllerActionSelector.cs" />
     <Compile Include="HttpContextUmbracoContextAccessor.cs" />
     <Compile Include="IHttpContextAccessor.cs" />
-    <Compile Include="Composing\CompositionExtensions\Controllers.cs" />
     <Compile Include="Composing\ModuleInjector.cs" />
-    <Compile Include="Mvc\FilteredControllerFactoryCollection.cs" />
-    <Compile Include="Mvc\FilteredControllerFactoryCollectionBuilder.cs" />
     <Compile Include="Mvc\SurfaceControllerTypeCollection.cs" />
     <Compile Include="PublishedElementExtensions.cs" />
     <Compile Include="Security\AuthenticationExtensions.cs" />
@@ -237,7 +223,6 @@
     <Compile Include="Runtime\WebInitialComponent.cs" />
     <Compile Include="Mvc\ControllerContextExtensions.cs" />
     <Compile Include="Mvc\DisableBrowserCacheAttribute.cs" />
-    <Compile Include="Mvc\ModelBindingException.cs" />
     <Compile Include="Mvc\UmbracoRequireHttpsAttribute.cs" />
     <Compile Include="Mvc\ValidateMvcAngularAntiForgeryTokenAttribute.cs" />
     <Compile Include="OwinMiddlewareConfiguredEventArgs.cs" />
@@ -261,7 +246,6 @@
     <Compile Include="Mvc\ActionExecutedEventArgs.cs" />
     <Compile Include="Mvc\AdminTokenAuthorizeAttribute.cs" />
     <Compile Include="Mvc\NotFoundHandler.cs" />
-    <Compile Include="Mvc\PreRenderViewActionFilterAttribute.cs" />
     <Compile Include="Mvc\RedirectToUmbracoUrlResult.cs" />
     <Compile Include="Mvc\UmbracoVirtualNodeByIdRouteHandler.cs" />
     <Compile Include="Mvc\EnsurePublishedContentRequestAttribute.cs" />
@@ -336,11 +320,8 @@
     <Compile Include="Mvc\ViewDataContainerExtensions.cs" />
     <Compile Include="Routing\PublishedContentNotFoundHandler.cs" />
     <Compile Include="Mvc\Constants.cs" />
-    <Compile Include="Mvc\IFilteredControllerFactory.cs" />
-    <Compile Include="Mvc\MasterControllerFactory.cs" />
     <Compile Include="Mvc\RenderActionInvoker.cs" />
     <Compile Include="Mvc\RenderControllerFactory.cs" />
-    <Compile Include="Mvc\ContentModelBinder.cs" />
     <Compile Include="Mvc\RenderRouteHandler.cs" />
     <Compile Include="Mvc\RenderViewEngine.cs" />
     <Compile Include="Mvc\RouteDefinition.cs" />

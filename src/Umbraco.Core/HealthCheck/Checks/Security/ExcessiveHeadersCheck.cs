@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using Umbraco.Core;
 using Umbraco.Core.Services;
+using Umbraco.Web;
 
-namespace Umbraco.Web.HealthCheck.Checks.Security
+namespace Umbraco.Core.HealthCheck.Checks.Security
 {
     [HealthCheck(
         "92ABBAA2-0586-4089-8AE2-9A843439D577",

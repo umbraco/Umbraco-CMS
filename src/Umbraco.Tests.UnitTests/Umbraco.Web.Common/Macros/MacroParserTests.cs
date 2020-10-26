@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using Umbraco.Web.Macros;
 
-namespace Umbraco.Tests.Macros
+namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Macros
 {
     [TestFixture]
     public class MacroParserTests
@@ -323,7 +323,7 @@ test"">
 <!-- <?UMBRACO_MACRO macroAlias=""Map"" test1=""value1"" test2=""value2
 test"" /> -->
 <ins>Macro alias: <strong>Map</strong></ins></div>
-<p>asdfasdf</p>".Replace(Environment.NewLine, string.Empty), result.Replace(Environment.NewLine, string.Empty));
+<p>asdfasdf</p>".NoCrLf(), result.NoCrLf());
         }
 
         [Test]

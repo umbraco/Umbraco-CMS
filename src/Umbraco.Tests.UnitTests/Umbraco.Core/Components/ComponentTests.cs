@@ -19,7 +19,7 @@ using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
 
-namespace Umbraco.Tests.Components
+namespace Umbraco.Tests.UnitTests.Umbraco.Core.Components
 {
     [TestFixture]
     public class ComponentTests
@@ -176,7 +176,7 @@ namespace Umbraco.Tests.Components
             }
             catch (Exception e)
             {
-                Assert.AreEqual("Broken composer dependency: Umbraco.Tests.Components.ComponentTests+Composer2 -> Umbraco.Tests.Components.ComponentTests+Composer4.", e.Message);
+                Assert.AreEqual("Broken composer dependency: Umbraco.Tests.UnitTests.Umbraco.Core.Components.ComponentTests+Composer2 -> Umbraco.Tests.UnitTests.Umbraco.Core.Components.ComponentTests+Composer4.", e.Message);
             }
         }
 

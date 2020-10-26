@@ -53,9 +53,9 @@ namespace Umbraco.Tests.Benchmarks
             for (var i = 0; i < 100; i++)
             {
                 var sql = Sql.BuilderFor(SqlContext)
-                    .Select<NPocoFetchTests.Thing1Dto>()
-                    .From<NPocoFetchTests.Thing1Dto>()
-                    .Where<NPocoFetchTests.Thing1Dto>(x => x.Name == "yada");
+                    .Select<Thing1Dto>()
+                    .From<Thing1Dto>()
+                    .Where<Thing1Dto>(x => x.Name == "yada");
 
                 var sqlString = sql.SQL; // force-build the SQL
             }
@@ -69,14 +69,26 @@ namespace Umbraco.Tests.Benchmarks
             for (var i = 0; i < 100; i++)
             {
                 var template = SqlTemplates.Get("test", s => s
-                    .Select<NPocoFetchTests.Thing1Dto>()
-                    .From<NPocoFetchTests.Thing1Dto>()
-                    .Where<NPocoFetchTests.Thing1Dto>(x => x.Name == SqlTemplate.Arg<string>("name")));
+                    .Select<Thing1Dto>()
+                    .From<Thing1Dto>()
+                    .Where<Thing1Dto>(x => x.Name == SqlTemplate.Arg<string>("name")));
 
                 var sql = template.Sql(new { name = "yada" });
 
                 var sqlString = sql.SQL; // force-build the SQL
             }
+        }
+
+        [TableName("zbThing1")]
+        [PrimaryKey("id", AutoIncrement = false)]
+        [ExplicitColumns]
+        public class Thing1Dto
+        {
+            [Column("id")]
+            public int Id { get; set; }
+
+            [Column("name")]
+            public string Name { get; set; }
         }
 
     }

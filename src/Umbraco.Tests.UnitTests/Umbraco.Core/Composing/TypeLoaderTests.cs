@@ -15,7 +15,7 @@ using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using Umbraco.Web.PropertyEditors;
 
-namespace Umbraco.Tests.Composing
+namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
 {
     [TestFixture]
     public class TypeLoaderTests

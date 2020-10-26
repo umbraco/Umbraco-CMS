@@ -9,7 +9,7 @@ using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Strings;
 
-namespace Umbraco.Tests.Strings
+namespace Umbraco.Tests.UnitTests.Umbraco.Core.ShortStringHelper
 {
     [TestFixture]
     public class StringExtensionsTests

@@ -19,7 +19,7 @@ using Umbraco.Core.Serialization;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
 
-namespace Umbraco.Tests.Manifest
+namespace Umbraco.Tests.UnitTests.Umbraco.Core.Manifest
 {
     [TestFixture]
     public class ManifestParserTests

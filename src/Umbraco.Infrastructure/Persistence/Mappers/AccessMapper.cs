@@ -2,13 +2,14 @@
 using System.Collections.Concurrent;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Infrastructure.Persistence.Mappers;
 
 namespace Umbraco.Core.Persistence.Mappers
 {
     [MapperFor(typeof(PublicAccessEntry))]
     public sealed class AccessMapper : BaseMapper
     {
-        public AccessMapper(Lazy<ISqlContext> sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
+        public AccessMapper(Lazy<ISqlContext> sqlContext, MapperConfigurationStore maps)
             : base(sqlContext, maps)
         { }
 

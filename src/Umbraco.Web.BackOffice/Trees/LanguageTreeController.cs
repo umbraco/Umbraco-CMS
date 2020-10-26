@@ -1,13 +1,13 @@
 using Microsoft.AspNetCore.Http;
 using Umbraco.Core.Services;
 using Umbraco.Web.BackOffice.Filters;
-using Umbraco.Web.BackOffice.Trees;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Models.Trees;
+using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
 using Constants = Umbraco.Core.Constants;
 
-namespace Umbraco.Web.Trees
+namespace Umbraco.Web.BackOffice.Trees
 {
     [UmbracoTreeAuthorize(Constants.Trees.Languages)]
     [Tree(Constants.Applications.Settings, Constants.Trees.Languages, SortOrder = 11, TreeGroup = Constants.Trees.Groups.Settings)]

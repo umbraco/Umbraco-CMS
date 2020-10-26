@@ -1,10 +1,10 @@
 ﻿using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Services;
-using Umbraco.Web.BackOffice.Trees;
+using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
 
-namespace Umbraco.Web.Trees
+namespace Umbraco.Web.BackOffice.Trees
 {
     [CoreTree]
     [Tree(Constants.Applications.Settings, Constants.Trees.Stylesheets, TreeTitle = "Stylesheets", SortOrder = 9, TreeGroup = Constants.Trees.Groups.Templating)]

@@ -35,6 +35,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Serilog;
 using Umbraco.Core.Logging.Serilog;
+using Umbraco.Infrastructure.Composing;
 using ConnectionStrings = Umbraco.Core.Configuration.Models.ConnectionStrings;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
@@ -51,14 +52,6 @@ namespace Umbraco.Tests.Integration.Testing
     [NonParallelizable]
     public abstract class UmbracoIntegrationTest
     {
-        public static LightInjectContainer CreateUmbracoContainer(out UmbracoServiceProviderFactory serviceProviderFactory)
-        {
-            var container = UmbracoServiceProviderFactory.CreateServiceContainer();
-            serviceProviderFactory = new UmbracoServiceProviderFactory(container, false);
-            var umbracoContainer = serviceProviderFactory.GetContainer();
-            return umbracoContainer;
-        }
-
         private List<Action> _testTeardown = null;
         private List<Action> _fixtureTeardown = new List<Action>();
 
@@ -134,16 +127,13 @@ namespace Umbraco.Tests.Integration.Testing
         /// <returns></returns>
         public virtual IHostBuilder CreateHostBuilder()
         {
-            UmbracoContainer = CreateUmbracoContainer(out var serviceProviderFactory);
-            _serviceProviderFactory = serviceProviderFactory;
-
             var hostBuilder = Host.CreateDefaultBuilder()
                 // IMPORTANT: We Cannot use UseStartup, there's all sorts of threads about this with testing. Although this can work
                 // if you want to setup your tests this way, it is a bit annoying to do that as the WebApplicationFactory will
                 // create separate Host instances. So instead of UseStartup, we just call ConfigureServices/Configure ourselves,
                 // and in the case of the UmbracoTestServerTestBase it will use the ConfigureWebHost to Configure the IApplicationBuilder directly.
                 //.ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup(GetType()); })
-                .UseUmbraco(_serviceProviderFactory)
+                .UseUmbraco()
                 .ConfigureAppConfiguration((context, configBuilder) =>
                 {
                     context.HostingEnvironment = TestHelper.GetWebHostEnvironment();
@@ -258,9 +248,11 @@ namespace Umbraco.Tests.Integration.Testing
 
             // Add it!
             services.AddUmbracoConfiguration(Configuration);
+            // TODO: MSDI - cleanup after initial merge.
+            var register = new ServiceCollectionRegistryAdapter(services);
             services.AddUmbracoCore(
                 webHostEnvironment,
-                UmbracoContainer,
+                register,
                 GetType().Assembly,
                 AppCaches.NoCache, // Disable caches for integration tests
                 TestHelper.GetLoggingConfiguration(),
@@ -443,10 +435,7 @@ namespace Umbraco.Tests.Integration.Testing
         #endregion
 
         #region Common services
-
-        protected LightInjectContainer UmbracoContainer { get; private set; }
-        private UmbracoServiceProviderFactory _serviceProviderFactory;
-
+        
         protected virtual T GetRequiredService<T>() => Services.GetRequiredService<T>();
 
         public Dictionary<string, string> InMemoryConfiguration { get; } = new Dictionary<string, string>();
@@ -455,7 +444,7 @@ namespace Umbraco.Tests.Integration.Testing
 
         public TestHelper TestHelper = new TestHelper();
 
-        protected string TestDBConnectionString { get; private set; }
+        protected virtual string TestDBConnectionString { get; private set; }
 
         protected virtual Action<IServiceCollection> CustomTestSetup => services => { };
 

@@ -1170,7 +1170,6 @@
     <key alias="trySkipIisCustomErrorsCheckErrorMessage">嘗試略過IIS自訂錯誤目前設為 %0%，然而在您使用的IIS版本為 %2% 時，建議設定是 %1%。</key>
     <key alias="trySkipIisCustomErrorsCheckRectifySuccessMessage">嘗試略過IIS自訂錯誤已成功設為 %0%。</key>
     <!-- The following keys get predefined tokens passed in that are not all the same, like above -->
-    <key alias="configurationServiceFileNotFound">檔案不存在：%0%。</key>
     <key alias="configurationServiceNodeNotFound"><![CDATA[於設定檔<strong>'%1%'</strong>中無法找到<strong>'%0%'</strong>。]]></key>
     <key alias="configurationServiceError">有錯誤產生，請參閱下列錯誤的紀錄：%0%。</key>
     <key alias="httpsCheckInvalidCertificate">憑證驗證錯誤：%0%</key>
@@ -1200,6 +1199,10 @@
     <key alias="requiredFolderPermissionFailed"><![CDATA[以下資料夾必須擁有修改權限，但無法連接：<strong>%0%</strong>。]]></key>
     <key alias="optionalFolderPermissionFailed"><![CDATA[以下資料夾必須擁有修改權限好讓系統可以正常運作，但無法連接：<strong>%0%</strong>。如果無須寫入，不需採取行動。]]></key>
     <key alias="filePermissionsCheckMessage">所有檔案已有正確權限設定。</key>
+    <!-- The following keys get these tokens passed in:
+	    0: Path to the file not found
+  	-->
+    <key alias="fileNotFound">檔案不存在：%0%。</key>
     <!-- The following keys get these tokens passed in:
 	    0: Comma delimitted list of failed folder paths
   	-->

@@ -13,10 +13,10 @@ using Umbraco.Web;
 using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.BackOffice.Security;
 
-namespace Umbraco.Tests.Security
+namespace Umbraco.Tests.Integration.Umbraco.Web.Backoffice.Security
 {
     [TestFixture]
-    public class BackOfficeCookieManagerTests 
+    public class BackOfficeCookieManagerTests
     {
         [Test]
         public void ShouldAuthenticateRequest_When_Not_Configured()
@@ -25,7 +25,7 @@ namespace Umbraco.Tests.Security
 
             var httpContextAccessor = testHelper.GetHttpContextAccessor();
             var globalSettings = new GlobalSettings();
-            
+
             var runtime = Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Install);
             var mgr = new BackOfficeCookieManager(
                 Mock.Of<IUmbracoContextAccessor>(),
@@ -74,7 +74,7 @@ namespace Umbraco.Tests.Security
             var globalSettings = new GlobalSettings();
 
             var runtime = Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Run);
-            
+
             var mgr = new BackOfficeCookieManager(
                 Mock.Of<IUmbracoContextAccessor>(),
                 runtime,

@@ -20,8 +20,8 @@ using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.WebAssets;
 using Umbraco.Extensions;
+using Umbraco.Web.BackOffice.ActionResults;
 using Umbraco.Web.BackOffice.Filters;
-using Umbraco.Web.Common.ActionResults;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Filters;
 using Umbraco.Web.Common.Security;
@@ -32,6 +32,7 @@ using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.BackOffice.Controllers
 {
+    [DisableBrowserCache] //TODO Reintroduce
     //[UmbracoRequireHttps] //TODO Reintroduce
     [PluginController(Constants.Web.Mvc.BackOfficeArea)]
     public class BackOfficeController : UmbracoController
