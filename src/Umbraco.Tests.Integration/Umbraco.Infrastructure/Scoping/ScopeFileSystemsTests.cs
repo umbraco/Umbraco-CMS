@@ -2,9 +2,11 @@
 using System.IO;
 using System.Text;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Scoping;
@@ -20,6 +22,7 @@ namespace Umbraco.Tests.Scoping
     {
         private IMediaFileSystem MediaFileSystem => GetRequiredService<IMediaFileSystem>();
         private IHostingEnvironment HostingEnvironment => GetRequiredService<IHostingEnvironment>();
+        private GlobalSettings GlobalSettings => GetRequiredService<IOptions<GlobalSettings>>().Value;
 
         [SetUp]
         public void SetUp()
@@ -27,16 +30,6 @@ namespace Umbraco.Tests.Scoping
             SafeCallContext.Clear();
             ClearFiles(IOHelper);
         }
-
-        // protected override void ComposeApplication(bool withApplication)
-        // {
-        //     base.ComposeApplication(withApplication);
-        //
-        //     if (!withApplication) return;
-        //
-        //     // re-register with actual media fs
-        //     Composition.ComposeFileSystems();
-        // }
 
         [TearDown]
         public void Teardown()
@@ -57,7 +50,9 @@ namespace Umbraco.Tests.Scoping
         [TestCase(false)]
         public void CreateMediaTest(bool complete)
         {
-            var physMediaFileSystem = new PhysicalFileSystem(IOHelper, HostingEnvironment, Mock.Of<ILogger<PhysicalFileSystem>>(), IOHelper.MapPath("media"), "ignore");
+            var rootPath = HostingEnvironment.MapPathWebRoot(GlobalSettings.UmbracoMediaPath);
+            var rootUrl = HostingEnvironment.ToAbsolute(GlobalSettings.UmbracoMediaPath);
+            var physMediaFileSystem = new PhysicalFileSystem(IOHelper, HostingEnvironment, Mock.Of<ILogger<PhysicalFileSystem>>(), rootPath, rootUrl);
             var mediaFileSystem = MediaFileSystem;
 
             Assert.IsFalse(physMediaFileSystem.FileExists("f1.txt"));
@@ -88,10 +83,11 @@ namespace Umbraco.Tests.Scoping
         }
 
         [Test]
-        [Explicit("Broken legacy test")]
         public void MultiThread()
         {
-            var physMediaFileSystem = new PhysicalFileSystem(IOHelper, HostingEnvironment, Mock.Of<ILogger<PhysicalFileSystem>>(),IOHelper.MapPath("media"), "ignore");
+            var rootPath = HostingEnvironment.MapPathWebRoot(GlobalSettings.UmbracoMediaPath);
+            var rootUrl = HostingEnvironment.ToAbsolute(GlobalSettings.UmbracoMediaPath);
+            var physMediaFileSystem = new PhysicalFileSystem(IOHelper, HostingEnvironment, Mock.Of<ILogger<PhysicalFileSystem>>(), rootPath, rootUrl);
             var mediaFileSystem = MediaFileSystem;
 
             var scopeProvider = ScopeProvider;
