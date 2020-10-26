@@ -88,8 +88,7 @@ namespace Umbraco.Tests.Integration
             Assert.IsFalse(MyComponent.IsInit);
             Assert.IsFalse(MyComponent.IsTerminated);
 
-
-            coreRuntime.Start();
+            coreRuntime.Start(umbracoContainer.Services.BuildServiceProvider());
 
             Assert.IsTrue(MyComponent.IsInit);
             Assert.IsFalse(MyComponent.IsTerminated);
@@ -120,7 +119,7 @@ namespace Umbraco.Tests.Integration
 
                     // TODO: MSDI - cleanup after initial merge.
                     var register = new ServiceCollectionRegistryAdapter(services);
-                    services.AddUmbracoCore(webHostEnvironment, register, GetType().Assembly, AppCaches.NoCache, testHelper.GetLoggingConfiguration(), hostContext.Configuration,out _);
+                    services.AddUmbracoCore(webHostEnvironment, register, GetType().Assembly, AppCaches.NoCache, testHelper.GetLoggingConfiguration(), hostContext.Configuration);
                 });
 
             var host = await hostBuilder.StartAsync();
@@ -161,7 +160,7 @@ namespace Umbraco.Tests.Integration
                     services.AddUmbracoConfiguration(hostContext.Configuration);
                     // TODO: MSDI - cleanup after initial merge.
                     var register = new ServiceCollectionRegistryAdapter(services);
-                    services.AddUmbracoCore(webHostEnvironment, register, GetType().Assembly, AppCaches.NoCache, testHelper.GetLoggingConfiguration(),hostContext.Configuration, out _);
+                    services.AddUmbracoCore(webHostEnvironment, register, GetType().Assembly, AppCaches.NoCache, testHelper.GetLoggingConfiguration(),hostContext.Configuration);
                 });
 
             var host = await hostBuilder.StartAsync();

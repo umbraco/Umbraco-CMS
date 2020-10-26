@@ -18,6 +18,7 @@ using Umbraco.Core.Strings;
 using Umbraco.Infrastructure.Composing;
 using Umbraco.Tests.PublishedContent;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Tests.Published

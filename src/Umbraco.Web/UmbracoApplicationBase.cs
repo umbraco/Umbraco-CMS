@@ -202,7 +202,7 @@ namespace Umbraco.Web
             LogContext.Push(new HttpRequestNumberEnricher(_factory.GetInstance<IRequestCache>()));
             LogContext.Push(new HttpRequestIdEnricher(_factory.GetInstance<IRequestCache>()));
 
-            _runtime.Start();
+            _runtime.Start(null);
         }
 
         // called by ASP.NET (auto event wireup) once per app domain

@@ -116,9 +116,8 @@ namespace Umbraco.Extensions
             Assembly entryAssembly,
             AppCaches appCaches,
             ILoggingConfiguration loggingConfiguration,
-            IConfiguration configuration,
-            out IFactory factory)
-            => services.AddUmbracoCore(webHostEnvironment, umbContainer, entryAssembly, appCaches, loggingConfiguration, configuration, GetCoreRuntime, out factory);
+            IConfiguration configuration)
+            => services.AddUmbracoCore(webHostEnvironment, umbContainer, entryAssembly, appCaches, loggingConfiguration, configuration, GetCoreRuntime);
 
         /// <summary>
         /// Adds the Umbraco Configuration requirements
@@ -166,21 +165,9 @@ namespace Umbraco.Extensions
         /// <param name="services"></param>
         /// <param name="webHostEnvironment"></param>
         /// <param name="configuration"></param>
-        /// <returns></returns>
-        public static IServiceCollection AddUmbracoCore(this IServiceCollection services, IWebHostEnvironment webHostEnvironment, IConfiguration configuration)
-        {
-            return services.AddUmbracoCore(webHostEnvironment, configuration, out _);
-        }
-
-        /// <summary>
-        /// Adds the Umbraco Back Core requirements
-        /// </summary>
-        /// <param name="services"></param>
-        /// <param name="webHostEnvironment"></param>
-        /// <param name="configuration"></param>
         /// <param name="factory"></param>
         /// <returns></returns>
-        public static IServiceCollection AddUmbracoCore(this IServiceCollection services, IWebHostEnvironment webHostEnvironment, IConfiguration configuration, out IFactory factory)
+        public static IServiceCollection AddUmbracoCore(this IServiceCollection services, IWebHostEnvironment webHostEnvironment, IConfiguration configuration)
         {
 
             var loggingConfig = new LoggingConfiguration(
@@ -209,8 +196,7 @@ namespace Umbraco.Extensions
                 appCaches,
                 loggingConfig,
                 configuration,
-                GetCoreRuntime,
-                out factory);
+                GetCoreRuntime);
 
             return services;
         }
@@ -237,8 +223,7 @@ namespace Umbraco.Extensions
             ILoggingConfiguration loggingConfiguration,
             IConfiguration configuration,
             //TODO: Yep that's extremely ugly
-            Func<GlobalSettings, ConnectionStrings, IUmbracoVersion, IIOHelper, ILoggerFactory, IProfiler, IHostingEnvironment, IBackOfficeInfo, ITypeFinder, AppCaches, IDbProviderFactoryCreator, IRuntime> getRuntime,
-            out IFactory factory)
+            Func<GlobalSettings, ConnectionStrings, IUmbracoVersion, IIOHelper, ILoggerFactory, IProfiler, IHostingEnvironment, IBackOfficeInfo, ITypeFinder, AppCaches, IDbProviderFactoryCreator, IRuntime> getRuntime)
         {
             if (services is null) throw new ArgumentNullException(nameof(services));
             var container = umbContainer;
@@ -306,7 +291,7 @@ namespace Umbraco.Extensions
                 appCaches,
                 dbProviderFactoryCreator);
 
-            factory = coreRuntime.Configure(services);
+            coreRuntime.Configure(services);
 
             return services;
         }

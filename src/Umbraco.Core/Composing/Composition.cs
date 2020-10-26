@@ -80,15 +80,12 @@ namespace Umbraco.Core.Composing
 
 
         /// <inheritdoc />
-        public IFactory CreateFactory()
+        public void RegisterBuilders()
         {
             foreach (var builder in _builders.Values)
                 builder.RegisterWith(_register);
             _builders.Clear(); // no point keep them around
-
-            return _register.CreateFactory();
         }
-
 
         #endregion
 
@@ -139,5 +136,13 @@ namespace Umbraco.Core.Composing
         }
 
         #endregion
+    }
+
+    public static class CompositionExtensins
+    {
+        //public static IFactory CreateFactory(this Composition composition)
+        //{
+        //    return NoFactory.Wrap(composition.Services.BuildServiceProvider());
+        //}
     }
 }

@@ -17,6 +17,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 using Umbraco.Infrastructure.Composing;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Web;
 using FileSystems = Umbraco.Core.IO.FileSystems;
 
 namespace Umbraco.Tests.IO

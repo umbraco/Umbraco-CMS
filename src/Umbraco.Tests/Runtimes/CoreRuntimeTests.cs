@@ -89,7 +89,7 @@ namespace Umbraco.Tests.Runtimes
                 return mock.Object;
             }
 
-            public override IFactory Configure(IServiceCollection services)
+            public override void Configure(IServiceCollection services)
             {
                 var container = ServiceCollectionRegistryAdapter.Wrap(services);
                 container.Register<IApplicationShutdownRegistry, AspNetApplicationShutdownRegistry>(Lifetime.Singleton);
@@ -97,8 +97,7 @@ namespace Umbraco.Tests.Runtimes
                 container.Register(typeof(ILogger<>), typeof(Logger<>), Lifetime.Singleton);
 
 
-                var factory = base.Configure(services);
-                return factory;
+                base.Configure(services);
             }
 
             // runs with only one single component

@@ -1,6 +1,8 @@
 ﻿using System;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
+using Umbraco.Infrastructure.Composing;
 using Umbraco.Web.Actions;
 using Umbraco.Web.ContentApps;
 using Umbraco.Web.Dashboards;
@@ -28,7 +30,11 @@ namespace Umbraco.Web
     /// </summary>
     public static class WebCompositionExtensions
     {
-
+        public static IFactory CreateFactory(this Composition composition)
+        {
+            composition.RegisterBuilders();
+            return ServiceProviderFactoryAdapter.Wrap(composition.Services.BuildServiceProvider());
+        }
 
         #region Uniques
 

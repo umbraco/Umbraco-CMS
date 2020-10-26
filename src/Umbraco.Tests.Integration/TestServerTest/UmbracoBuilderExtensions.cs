@@ -52,8 +52,7 @@ namespace Umbraco.Tests.Integration.TestServerTest
                                     dbInstallEventHandler);     // DB Installation event handler
 
                                 return runtime;
-                            },
-                            out _);
+                            });
                     });
         }
     }

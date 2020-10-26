@@ -9,6 +9,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Tests.UnitTests.TestHelpers;
 
 namespace Umbraco.Tests.TestHelpers
 {

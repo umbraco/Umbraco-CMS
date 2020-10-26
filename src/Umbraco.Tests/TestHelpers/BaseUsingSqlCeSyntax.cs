@@ -13,6 +13,7 @@ using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence;
 using Umbraco.Infrastructure.Composing;
 using Umbraco.Persistance.SqlCe;
+using Umbraco.Web;
 using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.TestHelpers

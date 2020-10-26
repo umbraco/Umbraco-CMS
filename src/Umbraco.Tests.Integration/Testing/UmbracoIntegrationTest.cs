@@ -250,8 +250,7 @@ namespace Umbraco.Tests.Integration.Testing
                 AppCaches.NoCache, // Disable caches for integration tests
                 TestHelper.GetLoggingConfiguration(),
                 Configuration,
-                CreateTestRuntime,
-                out _);
+                CreateTestRuntime);
 
             services.AddSignalR();
 
