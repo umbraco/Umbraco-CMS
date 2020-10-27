@@ -73,34 +73,34 @@ namespace Umbraco.Tests.IO
             _register.DisposeIfDisposable();
         }
 
-        private FileSystems FileSystems => _factory.GetInstance<FileSystems>();
+        private FileSystems FileSystems => _factory.GetRequiredService<FileSystems>();
 
         [Test]
         public void Can_Get_MediaFileSystem()
         {
-            var fileSystem = _factory.GetInstance<IMediaFileSystem>();
+            var fileSystem = _factory.GetRequiredService<IMediaFileSystem>();
             Assert.NotNull(fileSystem);
         }
 
         [Test]
         public void Can_Get_IMediaFileSystem()
         {
-            var fileSystem = _factory.GetInstance<IMediaFileSystem>();
+            var fileSystem = _factory.GetRequiredService<IMediaFileSystem>();
             Assert.NotNull(fileSystem);
         }
 
         [Test]
         public void IMediaFileSystem_Is_Singleton()
         {
-            var fileSystem1 = _factory.GetInstance<IMediaFileSystem>();
-            var fileSystem2 = _factory.GetInstance<IMediaFileSystem>();
+            var fileSystem1 = _factory.GetRequiredService<IMediaFileSystem>();
+            var fileSystem2 = _factory.GetRequiredService<IMediaFileSystem>();
             Assert.AreSame(fileSystem1, fileSystem2);
         }
 
         [Test]
         public void Can_Unwrap_MediaFileSystem()
         {
-            var fileSystem = _factory.GetInstance<IMediaFileSystem>();
+            var fileSystem = _factory.GetRequiredService<IMediaFileSystem>();
             var unwrapped = fileSystem.Unwrap();
             Assert.IsNotNull(unwrapped);
             var physical = unwrapped as PhysicalFileSystem;
@@ -110,13 +110,13 @@ namespace Umbraco.Tests.IO
         [Test]
         public void Can_Delete_MediaFiles()
         {
-            var fs = _factory.GetInstance<IMediaFileSystem>();
+            var fs = _factory.GetRequiredService<IMediaFileSystem>();
             var ms = new MemoryStream(Encoding.UTF8.GetBytes("test"));
             var virtPath = fs.GetMediaPath("file.txt", Guid.NewGuid(), Guid.NewGuid());
             fs.AddFile(virtPath, ms);
 
             // ~/media/1234/file.txt exists
-            var ioHelper = _factory.GetInstance<IIOHelper>();
+            var ioHelper = _factory.GetRequiredService<IIOHelper>();
             var physPath = ioHelper.MapPath(Path.Combine("media", virtPath));
             Assert.IsTrue(File.Exists(physPath));
 
@@ -124,7 +124,7 @@ namespace Umbraco.Tests.IO
             fs.DeleteMediaFiles(new[] { virtPath });
             Assert.IsFalse(File.Exists(physPath));
 
-            var scheme = _factory.GetInstance<IMediaPathScheme>();
+            var scheme = _factory.GetRequiredService<IMediaPathScheme>();
             if (scheme is UniqueMediaPathScheme)
             {
                 // ~/media/1234 is *not* gone

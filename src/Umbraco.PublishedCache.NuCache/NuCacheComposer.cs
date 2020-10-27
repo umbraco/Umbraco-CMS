@@ -27,8 +27,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // mapping lookups if we are using nucache.
             composition.RegisterUnique<IIdKeyMap>(factory =>
             {
-                var idkSvc = new IdKeyMap(factory.GetInstance<IScopeProvider>());
-                var publishedSnapshotService = factory.GetInstance<IPublishedSnapshotService>() as PublishedSnapshotService;
+                var idkSvc = new IdKeyMap(factory.GetRequiredService<IScopeProvider>());
+                var publishedSnapshotService = factory.GetRequiredService<IPublishedSnapshotService>() as PublishedSnapshotService;
                 if (publishedSnapshotService != null)
                 {
                     idkSvc.SetMapper(UmbracoObjectTypes.Document, id => publishedSnapshotService.GetDocumentUid(id), uid => publishedSnapshotService.GetDocumentId(uid));

@@ -30,7 +30,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
 
             var factory = composition.CreateFactory();
 
-            var actions = factory.GetInstance<PackageActionCollection>();
+            var actions = factory.GetRequiredService<PackageActionCollection>();
             Assert.AreEqual(2, actions.Count());
 
             // order is unspecified, but both must be there

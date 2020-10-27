@@ -51,7 +51,7 @@ namespace Umbraco.Tests.Models
             var urlName = media.GetUrlSegment(ShortStringHelper, new[] { new DefaultUrlSegmentProvider(ShortStringHelper) });
 
             // Act
-            XElement element = media.ToXml(Factory.GetInstance<IEntityXmlSerializer>());
+            XElement element = media.ToXml(Factory.GetRequiredService<IEntityXmlSerializer>());
 
             // Assert
             Assert.That(element, Is.Not.Null);

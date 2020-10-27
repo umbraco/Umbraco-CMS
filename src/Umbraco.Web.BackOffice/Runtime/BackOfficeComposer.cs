@@ -44,9 +44,9 @@ namespace Umbraco.Web.BackOffice.Runtime
 
             composition.RegisterUnique<IPhysicalFileSystem>(factory =>
                 new PhysicalFileSystem(
-                    factory.GetInstance<IIOHelper>(),
-                    factory.GetInstance<IHostingEnvironment>(),
-                    factory.GetInstance<ILogger<PhysicalFileSystem>>(),
+                    factory.GetRequiredService<IIOHelper>(),
+                    factory.GetRequiredService<IHostingEnvironment>(),
+                    factory.GetRequiredService<ILogger<PhysicalFileSystem>>(),
                     "~/"));
 
             composition.RegisterUnique<IIconService, IconService>();

@@ -110,11 +110,11 @@ namespace Umbraco.Tests.TestHelpers
                 Mock.Of<ILogger<PublishedRouter>>(),
                 Mock.Of<IPublishedUrlProvider>(),
                 Mock.Of<IRequestAccessor>(),
-                container?.GetInstance<IPublishedValueFallback>() ?? Current.Factory.GetInstance<IPublishedValueFallback>(),
-                container?.GetInstance<IPublicAccessChecker>()?? Current.Factory.GetInstance<IPublicAccessChecker>(),
-                container?.GetInstance<IFileService>()?? Current.Factory.GetInstance<IFileService>(),
-                container?.GetInstance<IContentTypeService>() ?? Current.Factory.GetInstance<IContentTypeService>(),
-                container?.GetInstance<IPublicAccessService>() ?? Current.Factory.GetInstance<IPublicAccessService>()
+                container?.GetRequiredService<IPublishedValueFallback>() ?? Current.Factory.GetRequiredService<IPublishedValueFallback>(),
+                container?.GetRequiredService<IPublicAccessChecker>()?? Current.Factory.GetRequiredService<IPublicAccessChecker>(),
+                container?.GetRequiredService<IFileService>()?? Current.Factory.GetRequiredService<IFileService>(),
+                container?.GetRequiredService<IContentTypeService>() ?? Current.Factory.GetRequiredService<IContentTypeService>(),
+                container?.GetRequiredService<IPublicAccessService>() ?? Current.Factory.GetRequiredService<IPublicAccessService>()
             );
         }
     }

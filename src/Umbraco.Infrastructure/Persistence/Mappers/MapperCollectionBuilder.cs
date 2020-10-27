@@ -20,7 +20,7 @@ namespace Umbraco.Core.Persistence.Mappers
             // - service IMapperCollection, returns MappersCollectionBuilder's collection
 
             register.Register<MapperConfigurationStore>(Lifetime.Singleton);
-            register.Register<IMapperCollection>(factory => factory.GetInstance<MapperCollection>());
+            register.Register<IMapperCollection>(factory => factory.GetRequiredService<MapperCollection>());
         }
 
         public MapperCollectionBuilder AddCoreMappers()

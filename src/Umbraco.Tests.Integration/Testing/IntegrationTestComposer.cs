@@ -68,9 +68,9 @@ namespace Umbraco.Tests.Integration.Testing
         /// <returns></returns>
         private ILocalizedTextService GetLocalizedTextService(IFactory factory)
         {
-            var globalSettings = factory.GetInstance<IOptions<GlobalSettings>>();
-            var loggerFactory = factory.GetInstance<ILoggerFactory>();
-            var appCaches = factory.GetInstance<AppCaches>();
+            var globalSettings = factory.GetRequiredService<IOptions<GlobalSettings>>();
+            var loggerFactory = factory.GetRequiredService<ILoggerFactory>();
+            var appCaches = factory.GetRequiredService<AppCaches>();
 
             var localizedTextService = new LocalizedTextService(
                 new Lazy<LocalizedTextServiceFileSources>(() =>

@@ -32,9 +32,9 @@ namespace Umbraco.Web.Runtime
 
             // register membership stuff
             composition.Register(factory => MembershipProviderExtensions.GetMembersMembershipProvider());
-            composition.Register(factory => Roles.Enabled ? Roles.Provider : new MembersRoleProvider(factory.GetInstance<IMemberService>()));
+            composition.Register(factory => Roles.Enabled ? Roles.Provider : new MembersRoleProvider(factory.GetRequiredService<IMemberService>()));
             composition.Services.AddScoped<MembershipHelper>();
-            composition.Register<IPublishedMemberCache>(factory => factory.GetInstance<IUmbracoContext>().PublishedSnapshot.Members);
+            composition.Register<IPublishedMemberCache>(factory => factory.GetRequiredService<IUmbracoContext>().PublishedSnapshot.Members);
             composition.RegisterUnique<IMemberUserKeyProvider, MemberUserKeyProvider>();
             composition.RegisterUnique<IPublicAccessChecker, PublicAccessChecker>();
 
@@ -45,9 +45,9 @@ namespace Umbraco.Web.Runtime
             if (composition.RuntimeState.Level == RuntimeLevel.Run)
                 composition.Register<UmbracoHelper>(factory =>
                 {
-                    var umbCtx = factory.GetInstance<IUmbracoContext>();
-                    return new UmbracoHelper(umbCtx.IsFrontEndUmbracoRequest ? umbCtx.PublishedRequest?.PublishedContent : null, factory.GetInstance<ICultureDictionaryFactory>(),
-                        factory.GetInstance<IUmbracoComponentRenderer>(), factory.GetInstance<IPublishedContentQuery>());
+                    var umbCtx = factory.GetRequiredService<IUmbracoContext>();
+                    return new UmbracoHelper(umbCtx.IsFrontEndUmbracoRequest ? umbCtx.PublishedRequest?.PublishedContent : null, factory.GetRequiredService<ICultureDictionaryFactory>(),
+                        factory.GetRequiredService<IUmbracoComponentRenderer>(), factory.GetRequiredService<IPublishedContentQuery>());
                 });
             else
                 composition.Register(_ => new UmbracoHelper());

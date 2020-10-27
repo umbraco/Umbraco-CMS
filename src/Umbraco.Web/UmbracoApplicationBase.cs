@@ -198,9 +198,9 @@ namespace Umbraco.Web
             //_factory = Current.Factory = _runtime.Configure(register);
 
             // now we can add our request based logging enrichers (globally, which is what we were doing in netframework before)
-            LogContext.Push(new HttpSessionIdEnricher(_factory.GetInstance<ISessionIdResolver>()));
-            LogContext.Push(new HttpRequestNumberEnricher(_factory.GetInstance<IRequestCache>()));
-            LogContext.Push(new HttpRequestIdEnricher(_factory.GetInstance<IRequestCache>()));
+            LogContext.Push(new HttpSessionIdEnricher(_factory.GetRequiredService<ISessionIdResolver>()));
+            LogContext.Push(new HttpRequestNumberEnricher(_factory.GetRequiredService<IRequestCache>()));
+            LogContext.Push(new HttpRequestIdEnricher(_factory.GetRequiredService<IRequestCache>()));
 
             _runtime.Start(null);
         }

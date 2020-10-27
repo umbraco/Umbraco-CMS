@@ -72,9 +72,9 @@ namespace Umbraco.Web.Mvc
         protected IUmbracoContext UmbracoContext => _umbracoContextAccessor?.UmbracoContext ?? Current.UmbracoContext;
 
         // TODO: try lazy property injection?
-        private IPublishedRouter PublishedRouter => Current.Factory.GetInstance<IPublishedRouter>();
+        private IPublishedRouter PublishedRouter => Current.Factory.GetRequiredService<IPublishedRouter>();
 
-        private IPublishedContentQuery PublishedContentQuery => _publishedContentQuery ?? (_publishedContentQuery = Current.Factory.GetInstance<IPublishedContentQuery>());
+        private IPublishedContentQuery PublishedContentQuery => _publishedContentQuery ?? (_publishedContentQuery = Current.Factory.GetRequiredService<IPublishedContentQuery>());
 
         public override void OnActionExecuted(ActionExecutedContext filterContext)
         {

@@ -71,13 +71,13 @@ namespace Umbraco.Tests.TestHelpers
         private Lazy<T> GetLazyService<T>(IFactory container, Func<IFactory, T> ctor)
             where T : class
         {
-            return new Lazy<T>(() => container?.TryGetInstance<T>() ?? ctor(container));
+            return new Lazy<T>(() => container?.GetService<T>() ?? ctor(container));
         }
 
         private T GetRepo<T>(IFactory container)
             where T : class, IRepository
         {
-            return container?.TryGetInstance<T>() ?? Mock.Of<T>();
+            return container?.GetService<T>() ?? Mock.Of<T>();
         }
 
         public IScopeProvider GetScopeProvider(ILoggerFactory loggerFactory, ITypeFinder typeFinder = null, FileSystems fileSystems = null, IUmbracoDatabaseFactory databaseFactory = null)
@@ -92,7 +92,7 @@ namespace Umbraco.Tests.TestHelpers
                 // var mappersBuilder = new MapperCollectionBuilder(Current.Container); // FIXME:
                 // mappersBuilder.AddCore();
                 // var mappers = mappersBuilder.CreateCollection();
-                var mappers = Current.Factory.GetInstance<IMapperCollection>();
+                var mappers = Current.Factory.GetRequiredService<IMapperCollection>();
                 databaseFactory = new UmbracoDatabaseFactory(
                     loggerFactory.CreateLogger<UmbracoDatabaseFactory>(),
                     loggerFactory,

@@ -73,7 +73,7 @@ namespace Umbraco.Tests.Scoping
             var runtimeStateMock = new Mock<IRuntimeState>();
             runtimeStateMock.Setup(x => x.Level).Returns(() => RuntimeLevel.Run);
 
-            var contentTypeFactory = Factory.GetInstance<IPublishedContentTypeFactory>();
+            var contentTypeFactory = Factory.GetRequiredService<IPublishedContentTypeFactory>();
             var documentRepository = Mock.Of<IDocumentRepository>();
             var mediaRepository = Mock.Of<IMediaRepository>();
             var memberRepository = Mock.Of<IMemberRepository>();
@@ -98,7 +98,7 @@ namespace Umbraco.Tests.Scoping
                 DefaultCultureAccessor,
                 new DatabaseDataSource(Mock.Of<ILogger<DatabaseDataSource>>()),
                 Microsoft.Extensions.Options.Options.Create(globalSettings ?? new GlobalSettings()),
-                Factory.GetInstance<IEntityXmlSerializer>(),
+                Factory.GetRequiredService<IEntityXmlSerializer>(),
                 new NoopPublishedModelFactory(),
                 new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider(ShortStringHelper) }),
                 hostingEnvironment,

@@ -33,19 +33,19 @@ namespace Umbraco.Web.Search
             composition.RegisterUnique<IIndexDiagnosticsFactory, IndexDiagnosticsFactory>();
             composition.RegisterUnique<IPublishedContentValueSetBuilder>(factory =>
                 new ContentValueSetBuilder(
-                    factory.GetInstance<PropertyEditorCollection>(),
-                    factory.GetInstance<UrlSegmentProviderCollection>(),
-                    factory.GetInstance<IUserService>(),
-                    factory.GetInstance<IShortStringHelper>(),
-                    factory.GetInstance<IScopeProvider>(),
+                    factory.GetRequiredService<PropertyEditorCollection>(),
+                    factory.GetRequiredService<UrlSegmentProviderCollection>(),
+                    factory.GetRequiredService<IUserService>(),
+                    factory.GetRequiredService<IShortStringHelper>(),
+                    factory.GetRequiredService<IScopeProvider>(),
                     true));
             composition.RegisterUnique<IContentValueSetBuilder>(factory =>
                 new ContentValueSetBuilder(
-                    factory.GetInstance<PropertyEditorCollection>(),
-                    factory.GetInstance<UrlSegmentProviderCollection>(),
-                    factory.GetInstance<IUserService>(),
-                    factory.GetInstance<IShortStringHelper>(),
-                    factory.GetInstance<IScopeProvider>(),
+                    factory.GetRequiredService<PropertyEditorCollection>(),
+                    factory.GetRequiredService<UrlSegmentProviderCollection>(),
+                    factory.GetRequiredService<IUserService>(),
+                    factory.GetRequiredService<IShortStringHelper>(),
+                    factory.GetRequiredService<IScopeProvider>(),
                     false));
             composition.RegisterUnique<IValueSetBuilder<IMedia>, MediaValueSetBuilder>();
             composition.RegisterUnique<IValueSetBuilder<IMember>, MemberValueSetBuilder>();

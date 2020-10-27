@@ -358,10 +358,10 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
 
             using (factory.BeginScope())
             {
-                var col1 = factory.GetInstance<TestCollection>();
+                var col1 = factory.GetRequiredService<TestCollection>();
                 AssertCollection(col1, typeof(Resolved1), typeof(Resolved2));
 
-                var col2 = factory.GetInstance<TestCollection>();
+                var col2 = factory.GetRequiredService<TestCollection>();
                 AssertCollection(col2, typeof(Resolved1), typeof(Resolved2));
 
                 AssertSameCollection(factory, col1, col2);
@@ -382,10 +382,10 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
 
             var factory = _composition.CreateFactory();
 
-            var col1 = factory.GetInstance<TestCollection>();
+            var col1 = factory.GetRequiredService<TestCollection>();
             AssertCollection(col1, typeof(Resolved1), typeof(Resolved2));
 
-            var col2 = factory.GetInstance<TestCollection>();
+            var col2 = factory.GetRequiredService<TestCollection>();
             AssertCollection(col1, typeof(Resolved1), typeof(Resolved2));
 
             AssertNotSameCollection(col1, col2);

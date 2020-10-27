@@ -66,11 +66,11 @@ namespace Umbraco.Web.Mvc
 
         protected PluginController()
             : this(
-                  Current.Factory.GetInstance<IUmbracoContextAccessor>(),
-                  Current.Factory.GetInstance<IUmbracoDatabaseFactory>(),
-                  Current.Factory.GetInstance<ServiceContext>(),
-                  Current.Factory.GetInstance<AppCaches>(),
-                  Current.Factory.GetInstance<IProfilingLogger>()
+                  Current.Factory.GetRequiredService<IUmbracoContextAccessor>(),
+                  Current.Factory.GetRequiredService<IUmbracoDatabaseFactory>(),
+                  Current.Factory.GetRequiredService<ServiceContext>(),
+                  Current.Factory.GetRequiredService<AppCaches>(),
+                  Current.Factory.GetRequiredService<IProfilingLogger>()
             )
         {
         }

@@ -36,8 +36,8 @@ namespace Umbraco.Core
             where TService2 : class
         {
             composition.RegisterUnique<TImplementing>();
-            composition.RegisterUnique<TService1>(factory => factory.GetInstance<TImplementing>());
-            composition.RegisterUnique<TService2>(factory => factory.GetInstance<TImplementing>());
+            composition.RegisterUnique<TService1>(factory => factory.GetRequiredService<TImplementing>());
+            composition.RegisterUnique<TService2>(factory => factory.GetRequiredService<TImplementing>());
         }
     }
 }

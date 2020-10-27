@@ -43,7 +43,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             base.Initialize();
 
-            var converters = Factory.GetInstance<PropertyValueConverterCollection>();
+            var converters = Factory.GetRequiredService<PropertyValueConverterCollection>();
             var umbracoContextAccessor = Mock.Of<IUmbracoContextAccessor>();
             var publishedUrlProvider = Mock.Of<IPublishedUrlProvider>();
             var loggerFactory = NullLoggerFactory.Instance;

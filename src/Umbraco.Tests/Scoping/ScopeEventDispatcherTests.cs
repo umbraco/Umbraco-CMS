@@ -43,7 +43,7 @@ namespace Umbraco.Tests.Scoping
             _testObjects = new TestObjects(wrapper);
 
             var globalSettings = new GlobalSettings();
-            composition.RegisterUnique(factory => new FileSystems(factory, factory.TryGetInstance<ILogger<FileSystems>>(), factory.TryGetInstance<ILoggerFactory>(), TestHelper.IOHelper, Microsoft.Extensions.Options.Options.Create(globalSettings), TestHelper.GetHostingEnvironment()));
+            composition.RegisterUnique(factory => new FileSystems(factory, factory.GetService<ILogger<FileSystems>>(), factory.GetService<ILoggerFactory>(), TestHelper.IOHelper, Microsoft.Extensions.Options.Options.Create(globalSettings), TestHelper.GetHostingEnvironment()));
             composition.WithCollectionBuilder<MapperCollectionBuilder>();
 
             Current.Reset();

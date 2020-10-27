@@ -66,7 +66,7 @@ namespace Umbraco.Tests.Published
             register.Register(f => publishedSnapshotAccessorMock.Object);
 
             var registerFactory = composition.CreateFactory();
-            var converters = registerFactory.GetInstance<PropertyValueConverterCollection>();
+            var converters = registerFactory.GetRequiredService<PropertyValueConverterCollection>();
 
             var dataTypeServiceMock = new Mock<IDataTypeService>();
             var dataType1 = new DataType(new VoidEditor(NullLoggerFactory.Instance, dataTypeServiceMock.Object,
@@ -103,7 +103,7 @@ namespace Umbraco.Tests.Published
                 Properties = new[] { new SolidPublishedProperty { Alias = "prop2", SolidHasValue = true, SolidValue = "1003" } }
             };
 
-            var publishedModelFactory = registerFactory.GetInstance<IPublishedModelFactory>();
+            var publishedModelFactory = registerFactory.GetRequiredService<IPublishedModelFactory>();
             cacheContent[cnt1.Id] = cnt1.CreateModel(publishedModelFactory);
             cacheContent[cnt2.Id] = cnt2.CreateModel(publishedModelFactory);
 

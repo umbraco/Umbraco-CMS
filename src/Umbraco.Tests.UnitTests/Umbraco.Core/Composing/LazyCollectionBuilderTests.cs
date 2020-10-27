@@ -39,13 +39,13 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
 
             var factory = composition.CreateFactory();
 
-            var values = factory.GetInstance<TestCollection>();
+            var values = factory.GetRequiredService<TestCollection>();
 
             Assert.AreEqual(3, values.Count());
             Assert.IsTrue(values.Select(x => x.GetType())
                 .ContainsAll(new[] { typeof(TransientObject1), typeof(TransientObject2), typeof(TransientObject3) }));
 
-            var other = factory.GetInstance<TestCollection>();
+            var other = factory.GetRequiredService<TestCollection>();
             Assert.AreNotSame(values, other); // transient
             var o1 = other.FirstOrDefault(x => x is TransientObject1);
             Assert.IsFalse(values.Contains(o1)); // transient
@@ -64,13 +64,13 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
 
             var factory = composition.CreateFactory();
 
-            var values = factory.GetInstance<TestCollection>();
+            var values = factory.GetRequiredService<TestCollection>();
 
             Assert.AreEqual(3, values.Count());
             Assert.IsTrue(values.Select(x => x.GetType())
                 .ContainsAll(new[] { typeof(TransientObject1), typeof(TransientObject2), typeof(TransientObject3) }));
 
-            var other = factory.GetInstance<TestCollection>();
+            var other = factory.GetRequiredService<TestCollection>();
             Assert.AreNotSame(values, other); // transient
             var o1 = other.FirstOrDefault(x => x is TransientObject1);
             Assert.IsFalse(values.Contains(o1)); // transient
@@ -90,13 +90,13 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
 
             var factory = composition.CreateFactory();
 
-            var values = factory.GetInstance<TestCollection>();
+            var values = factory.GetRequiredService<TestCollection>();
 
             Assert.AreEqual(3, values.Count());
             Assert.IsTrue(values.Select(x => x.GetType())
                 .ContainsAll(new[] { typeof(TransientObject1), typeof(TransientObject2), typeof(TransientObject3) }));
 
-            var other = factory.GetInstance<TestCollection>();
+            var other = factory.GetRequiredService<TestCollection>();
             Assert.AreNotSame(values, other); // transient
             var o1 = other.FirstOrDefault(x => x is TransientObject1);
             Assert.IsFalse(values.Contains(o1)); // transient
@@ -137,7 +137,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
 
             var factory = composition.CreateFactory();
 
-            var values = factory.GetInstance<TestCollection>();
+            var values = factory.GetRequiredService<TestCollection>();
 
             Assert.AreEqual(2, values.Count());
             Assert.IsFalse(values.Select(x => x.GetType())
@@ -145,7 +145,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
             Assert.IsTrue(values.Select(x => x.GetType())
                 .ContainsAll(new[] { typeof(TransientObject1), typeof(TransientObject2) }));
 
-            var other = factory.GetInstance<TestCollection>();
+            var other = factory.GetRequiredService<TestCollection>();
             Assert.AreNotSame(values, other); // transient
             var o1 = other.FirstOrDefault(x => x is TransientObject1);
             Assert.IsFalse(values.Contains(o1)); // transient

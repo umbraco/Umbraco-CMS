@@ -44,7 +44,7 @@ namespace Umbraco.Tests.PublishedContent
             _publishedSnapshotAccessorMock = new Mock<IPublishedSnapshotAccessor>();
             Composition.RegisterUnique<IPublishedSnapshotAccessor>(_publishedSnapshotAccessorMock.Object);
 
-            Composition.RegisterUnique<IPublishedModelFactory>(f => new PublishedModelFactory(f.GetInstance<TypeLoader>().GetTypes<PublishedContentModel>(), f.GetInstance<IPublishedValueFallback>()));
+            Composition.RegisterUnique<IPublishedModelFactory>(f => new PublishedModelFactory(f.GetRequiredService<TypeLoader>().GetTypes<PublishedContentModel>(), f.GetRequiredService<IPublishedValueFallback>()));
             Composition.RegisterUnique<IPublishedContentTypeFactory, PublishedContentTypeFactory>();
             Composition.RegisterUnique<IPublishedValueFallback, PublishedValueFallback>();
 
@@ -73,7 +73,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             base.Initialize();
 
-            var factory = Factory.GetInstance<IPublishedContentTypeFactory>() as PublishedContentTypeFactory;
+            var factory = Factory.GetRequiredService<IPublishedContentTypeFactory>() as PublishedContentTypeFactory;
 
             // need to specify a custom callback for unit tests
             // AutoPublishedContentTypes generates properties automatically
@@ -904,7 +904,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void FragmentProperty()
         {
-            var factory = Factory.GetInstance<IPublishedContentTypeFactory>() as PublishedContentTypeFactory;
+            var factory = Factory.GetRequiredService<IPublishedContentTypeFactory>() as PublishedContentTypeFactory;
 
             IEnumerable<IPublishedPropertyType> CreatePropertyTypes(IPublishedContentType contentType)
             {
@@ -928,7 +928,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void Fragment2()
         {
-            var factory = Factory.GetInstance<IPublishedContentTypeFactory>() as PublishedContentTypeFactory;
+            var factory = Factory.GetRequiredService<IPublishedContentTypeFactory>() as PublishedContentTypeFactory;
 
             IEnumerable<IPublishedPropertyType> CreatePropertyTypes(IPublishedContentType contentType)
             {

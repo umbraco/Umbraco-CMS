@@ -18,7 +18,7 @@ namespace Umbraco.Core
         /// <param name="factory">The factory.</param>
         /// <returns>An instance of the specified type.</returns>
         /// <remarks>Throws an exception if the factory failed to get an instance of the specified type.</remarks>
-        public static T GetInstance<T>(this IFactory factory)
+        public static T GetRequiredService<T>(this IFactory factory)
             where T : class
             => (T)factory.GetRequiredService(typeof(T));
 
@@ -30,7 +30,7 @@ namespace Umbraco.Core
         /// <remarks>Returns null if the factory does not know how to get an instance
         /// of the specified type. Throws an exception if the factory does know how
         /// to get an instance of the specified type, but failed to do so.</remarks>
-        public static T TryGetInstance<T>(this IFactory factory)
+        public static T GetService<T>(this IFactory factory)
             where T : class
             => (T)factory.GetService(typeof(T));
 

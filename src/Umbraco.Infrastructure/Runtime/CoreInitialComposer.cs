@@ -87,8 +87,8 @@ namespace Umbraco.Core.Runtime
 
             // register the scope provider
             composition.RegisterUnique<ScopeProvider>(); // implements both IScopeProvider and IScopeAccessor
-            composition.RegisterUnique<IScopeProvider>(f => f.GetInstance<ScopeProvider>());
-            composition.RegisterUnique<IScopeAccessor>(f => f.GetInstance<ScopeProvider>());
+            composition.RegisterUnique<IScopeProvider>(f => f.GetRequiredService<ScopeProvider>());
+            composition.RegisterUnique<IScopeAccessor>(f => f.GetRequiredService<ScopeProvider>());
 
             composition.RegisterUnique<IJsonSerializer, JsonNetSerializer>();
             composition.RegisterUnique<IMenuItemCollectionFactory, MenuItemCollectionFactory>();
@@ -131,15 +131,15 @@ namespace Umbraco.Core.Runtime
             // register a server registrar, by default it's the db registrar
             composition.RegisterUnique<IServerRegistrar>(f =>
             {
-                var globalSettings = f.GetInstance<IOptions<GlobalSettings>>().Value;
+                var globalSettings = f.GetRequiredService<IOptions<GlobalSettings>>().Value;
 
                 // TODO:  we still register the full IServerMessenger because
                 // even on 1 single server we can have 2 concurrent app domains
                 var singleServer = globalSettings.DisableElectionForSingleServer;
                 return singleServer
-                    ? (IServerRegistrar) new SingleServerRegistrar(f.GetInstance<IRequestAccessor>())
+                    ? (IServerRegistrar) new SingleServerRegistrar(f.GetRequiredService<IRequestAccessor>())
                     : new DatabaseServerRegistrar(
-                        new Lazy<IServerRegistrationService>(f.GetInstance<IServerRegistrationService>),
+                        new Lazy<IServerRegistrationService>(f.GetRequiredService<IServerRegistrationService>),
                         new DatabaseServerRegistrarOptions());
             });
 
@@ -148,15 +148,15 @@ namespace Umbraco.Core.Runtime
             // project
             composition.RegisterUnique<IServerMessenger>(factory
                 => new DatabaseServerMessenger(
-                    factory.GetInstance<IMainDom>(),
-                    factory.GetInstance<IScopeProvider>(),
-                    factory.GetInstance<ISqlContext>(),
-                    factory.GetInstance<IProfilingLogger>(),
-                    factory.GetInstance<ILogger<DatabaseServerMessenger>>(),
-                    factory.GetInstance<IServerRegistrar>(),
+                    factory.GetRequiredService<IMainDom>(),
+                    factory.GetRequiredService<IScopeProvider>(),
+                    factory.GetRequiredService<ISqlContext>(),
+                    factory.GetRequiredService<IProfilingLogger>(),
+                    factory.GetRequiredService<ILogger<DatabaseServerMessenger>>(),
+                    factory.GetRequiredService<IServerRegistrar>(),
                     true, new DatabaseServerMessengerOptions(),
-                    factory.GetInstance<IHostingEnvironment>(),
-                    factory.GetInstance<CacheRefresherCollection>()
+                    factory.GetRequiredService<IHostingEnvironment>(),
+                    factory.GetRequiredService<CacheRefresherCollection>()
                 ));
 
             composition.CacheRefreshers()
@@ -171,7 +171,7 @@ namespace Umbraco.Core.Runtime
             composition.RegisterUnique<IPublishedContentTypeFactory, PublishedContentTypeFactory>();
 
             composition.RegisterUnique<IShortStringHelper>(factory
-                => new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(factory.GetInstance<IOptions<RequestHandlerSettings>>().Value)));
+                => new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(factory.GetRequiredService<IOptions<RequestHandlerSettings>>().Value)));
 
             composition.UrlSegmentProviders()
                 .Append<DefaultUrlSegmentProvider>();
@@ -185,7 +185,7 @@ namespace Umbraco.Core.Runtime
             composition.RegisterUnique<IPublishedSnapshotRebuilder, PublishedSnapshotRebuilder>();
 
             composition.SetCultureDictionaryFactory<DefaultCultureDictionaryFactory>();
-            composition.Register(f => f.GetInstance<ICultureDictionaryFactory>().CreateDictionary(), Lifetime.Singleton);
+            composition.Register(f => f.GetRequiredService<ICultureDictionaryFactory>().CreateDictionary(), Lifetime.Singleton);
             composition.RegisterUnique<UriUtility>();
 
             // register the published snapshot accessor - the "current" published snapshot is in the umbraco context
@@ -334,7 +334,7 @@ namespace Umbraco.Core.Runtime
             composition.RegisterUnique<IExamineManager, ExamineManager>();
 
             // register distributed cache
-            composition.RegisterUnique(f => new DistributedCache(f.GetInstance<IServerMessenger>(), f.GetInstance<CacheRefresherCollection>()));
+            composition.RegisterUnique(f => new DistributedCache(f.GetRequiredService<IServerMessenger>(), f.GetRequiredService<CacheRefresherCollection>()));
 
 
             composition.Services.AddScoped<ITagQuery, TagQuery>();
@@ -347,8 +347,8 @@ namespace Umbraco.Core.Runtime
             composition.RegisterUnique<IUmbracoTreeSearcherFields, UmbracoTreeSearcherFields>();
             composition.Register<IPublishedContentQuery>(factory =>
             {
-                var umbCtx = factory.GetInstance<IUmbracoContextAccessor>();
-                return new PublishedContentQuery(umbCtx.UmbracoContext.PublishedSnapshot, factory.GetInstance<IVariationContextAccessor>(), factory.GetInstance<IExamineManager>());
+                var umbCtx = factory.GetRequiredService<IUmbracoContextAccessor>();
+                return new PublishedContentQuery(umbCtx.UmbracoContext.PublishedSnapshot, factory.GetRequiredService<IVariationContextAccessor>(), factory.GetRequiredService<IExamineManager>());
             }, Lifetime.Request);
 
             composition.RegisterUnique<IPublishedUrlProvider, UrlProvider>();

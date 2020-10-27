@@ -46,14 +46,14 @@ namespace Umbraco.Core
             composition.RegisterUnique(appCaches);
             composition.RegisterUnique(appCaches.RequestCache);
             composition.RegisterUnique(databaseFactory);
-            composition.RegisterUnique(factory => factory.GetInstance<IUmbracoDatabaseFactory>().SqlContext);
+            composition.RegisterUnique(factory => factory.GetRequiredService<IUmbracoDatabaseFactory>().SqlContext);
             composition.RegisterUnique(typeLoader);
             composition.RegisterUnique(state);
             composition.RegisterUnique(typeFinder);
             composition.RegisterUnique(ioHelper);
             composition.RegisterUnique(umbracoVersion);
             composition.RegisterUnique(dbProviderFactoryCreator);
-            composition.RegisterUnique(factory => factory.GetInstance<IUmbracoDatabaseFactory>().BulkSqlInsertProvider);
+            composition.RegisterUnique(factory => factory.GetRequiredService<IUmbracoDatabaseFactory>().BulkSqlInsertProvider);
             composition.RegisterUnique(hostingEnvironment);
             composition.RegisterUnique(backOfficeInfo);
         }
