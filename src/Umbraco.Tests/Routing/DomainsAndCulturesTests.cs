@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using Microsoft.Extensions.DependencyInjection;
+using NUnit.Framework;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Web.Routing;
@@ -14,7 +15,7 @@ namespace Umbraco.Tests.Routing
         {
             base.Compose();
 
-            Composition.Register<ISiteDomainHelper, SiteDomainHelper>();
+            Composition.Services.AddTransient<ISiteDomainHelper, SiteDomainHelper>();
         }
 
         private void SetDomains1()

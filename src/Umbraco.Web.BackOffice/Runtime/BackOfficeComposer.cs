@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
@@ -26,8 +27,8 @@ namespace Umbraco.Web.BackOffice.Runtime
             composition.RegisterUnique<BackOfficeAreaRoutes>();
             composition.RegisterUnique<PreviewRoutes>();
             composition.RegisterUnique<BackOfficeServerVariables>();
-            composition.Register<BackOfficeSessionIdValidator>(Lifetime.Request);
-            composition.Register<BackOfficeSecurityStampValidator>(Lifetime.Request);
+            composition.Services.AddScoped<BackOfficeSessionIdValidator>();
+            composition.Services.AddScoped<BackOfficeSecurityStampValidator>();
 
             composition.RegisterUnique<PreviewAuthenticationMiddleware>();
             composition.RegisterUnique<IBackOfficeAntiforgery, BackOfficeAntiforgery>();
@@ -43,9 +44,9 @@ namespace Umbraco.Web.BackOffice.Runtime
 
             composition.RegisterUnique<IPhysicalFileSystem>(factory =>
                 new PhysicalFileSystem(
-                    factory.GetInstance<IIOHelper>(),
-                    factory.GetInstance<IHostingEnvironment>(),
-                    factory.GetInstance<ILogger<PhysicalFileSystem>>(),
+                    factory.GetRequiredService<IIOHelper>(),
+                    factory.GetRequiredService<IHostingEnvironment>(),
+                    factory.GetRequiredService<ILogger<PhysicalFileSystem>>(),
                     "~/"));
 
             composition.RegisterUnique<IIconService, IconService>();

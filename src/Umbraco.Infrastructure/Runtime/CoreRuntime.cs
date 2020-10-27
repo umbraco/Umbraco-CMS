@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Core.Cache;
@@ -27,12 +28,13 @@ namespace Umbraco.Core.Runtime
     public class CoreRuntime : IRuntime
     {
         private ComponentCollection _components;
-        private IFactory _factory;
         // runtime state, this instance will get replaced again once the essential services are available to run the check
         private RuntimeState _state = RuntimeState.Booting();
         private readonly IUmbracoBootPermissionChecker _umbracoBootPermissionChecker;
         private readonly GlobalSettings _globalSettings;
         private readonly ConnectionStrings _connectionStrings;
+
+        private IServiceProvider _serviceProvider;
 
         public CoreRuntime(
             GlobalSettings globalSettings,
@@ -113,9 +115,9 @@ namespace Umbraco.Core.Runtime
         public IMainDom MainDom { get; }
 
         /// <inheritdoc/>
-        public virtual IFactory Configure(IRegister register)
+        public virtual void Configure(IServiceCollection services)
         {
-            if (register is null) throw new ArgumentNullException(nameof(register));
+            if (services is null) throw new ArgumentNullException(nameof(services));
 
 
             // create and register the essential services
@@ -149,22 +151,19 @@ namespace Umbraco.Core.Runtime
 
                 // application environment
                 ConfigureUnhandledException();
-                _factory = Configure(register, timer);
-
-                return _factory;
+                Configure(services, timer);
             }
         }
 
         /// <summary>
         /// Configure the runtime within a timer.
         /// </summary>
-        private IFactory Configure(IRegister register, DisposableTimer timer)
+        private void Configure(IServiceCollection services, DisposableTimer timer)
         {
-            if (register is null) throw new ArgumentNullException(nameof(register));
+            if (services is null) throw new ArgumentNullException(nameof(services));
             if (timer is null) throw new ArgumentNullException(nameof(timer));
 
             Composition composition = null;
-            IFactory factory = null;
 
             try
             {
@@ -181,7 +180,7 @@ namespace Umbraco.Core.Runtime
                 _state = new RuntimeState(_globalSettings, UmbracoVersion, databaseFactory, RuntimeLoggerFactory.CreateLogger<RuntimeState>());
 
                 // create the composition
-                composition = new Composition(register, typeLoader, ProfilingLogger, _state, IOHelper, AppCaches);
+                composition = new Composition(services, typeLoader, ProfilingLogger, _state, IOHelper, AppCaches);
 
                 composition.RegisterEssentials(Logger, RuntimeLoggerFactory, Profiler, ProfilingLogger, MainDom, AppCaches, databaseFactory, typeLoader, _state, TypeFinder, IOHelper, UmbracoVersion, DbProviderFactoryCreator, HostingEnvironment, BackOfficeInfo);
 
@@ -202,8 +201,9 @@ namespace Umbraco.Core.Runtime
                     RunComposers(typeLoader, composition);
                 }
 
-                 // create the factory
-                 factory = composition.CreateFactory();
+                composition.RegisterBuilders();
+                // TODO: We "should" be able to avoid this
+                _serviceProvider = composition.Services.BuildServiceProvider();
             }
             catch (Exception e)
             {
@@ -220,14 +220,15 @@ namespace Umbraco.Core.Runtime
                 // if something goes wrong above, we may end up with no factory
                 // meaning nothing can get the runtime state, etc - so let's try
                 // to make sure we have a factory
-                if (factory == null)
+         
+                try
                 {
-                    try
-                    {
-                        factory = composition?.CreateFactory();
-                    }
-                    catch { /* yea */ }
+                    composition?.RegisterBuilders();
+                    // TODO: We "should" be able to avoid this
+                    _serviceProvider = composition?.Services.BuildServiceProvider();
                 }
+                catch { /* yea */ }
+           
 
                 Debugger.Break();
 
@@ -237,27 +238,30 @@ namespace Umbraco.Core.Runtime
                 // understand this and will nullify themselves, while UmbracoModule will
                 // throw a BootFailedException for every requests.
             }
-
-            return factory;
         }
 
-        public void Start()
+        public void Start(IServiceProvider serviceProvider)
         {
+            // Capture for CreateDatabaseFactory
+            // TODO: MSDI - Split core runtime into configure vs startup classes
+            // TODO: MSDI - Fix CreateDatabaseFactory
+            _serviceProvider = serviceProvider;
+
             if (_state.Level <= RuntimeLevel.BootFailed)
                 throw new InvalidOperationException($"Cannot start the runtime if the runtime level is less than or equal to {RuntimeLevel.BootFailed}");
 
             // throws if not full-trust
             _umbracoBootPermissionChecker.ThrowIfNotPermissions();
 
-            var hostingEnvironmentLifetime = _factory.TryGetInstance<IApplicationShutdownRegistry>();
+            var hostingEnvironmentLifetime = serviceProvider.GetService<IApplicationShutdownRegistry>();
             if (hostingEnvironmentLifetime == null)
                 throw new InvalidOperationException($"An instance of {typeof(IApplicationShutdownRegistry)} could not be resolved from the container, ensure that one if registered in your runtime before calling {nameof(IRuntime)}.{nameof(Start)}");
 
             // acquire the main domain - if this fails then anything that should be registered with MainDom will not operate
-            AcquireMainDom(MainDom, _factory.GetInstance<IApplicationShutdownRegistry>());
+            AcquireMainDom(MainDom, serviceProvider.GetService<IApplicationShutdownRegistry>());
 
             // create & initialize the components
-            _components = _factory.GetInstance<ComponentCollection>();
+            _components = serviceProvider.GetService<ComponentCollection>();
             _components.Initialize();
         }
 
@@ -356,11 +360,6 @@ namespace Umbraco.Core.Runtime
             _components?.Terminate();
         }
 
-        public void ReplaceFactory(IServiceProvider serviceProvider)
-        {
-            _factory = ServiceProviderFactoryAdapter.Wrap(serviceProvider);
-        }
-
         #region Getters
 
         // getters can be implemented by runtimes inheriting from CoreRuntime
@@ -387,7 +386,20 @@ namespace Umbraco.Core.Runtime
         /// </summary>
         /// <remarks>This is strictly internal, for tests only.</remarks>
         protected internal virtual IUmbracoDatabaseFactory CreateDatabaseFactory()
-            => new UmbracoDatabaseFactory(RuntimeLoggerFactory.CreateLogger<UmbracoDatabaseFactory>(), RuntimeLoggerFactory, Options.Create(_globalSettings), Options.Create(_connectionStrings), new Lazy<IMapperCollection>(() => _factory.GetInstance<IMapperCollection>()), DbProviderFactoryCreator);
+            => new UmbracoDatabaseFactory(
+                RuntimeLoggerFactory.CreateLogger<UmbracoDatabaseFactory>(),
+                RuntimeLoggerFactory,
+                Options.Create(_globalSettings),
+                Options.Create(_connectionStrings),
+                new Lazy<IMapperCollection>(() =>
+                {
+                    if (_serviceProvider == null)
+                    {
+                        throw new ApplicationException("_serviceProvider should have been captured from CoreRuntime.Start (or built during configure)");
+                    }
+                    return _serviceProvider.GetRequiredService<IMapperCollection>();
+                }),
+                DbProviderFactoryCreator);
 
 
         #endregion

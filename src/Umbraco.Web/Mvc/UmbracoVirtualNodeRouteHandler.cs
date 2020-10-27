@@ -12,7 +12,7 @@ namespace Umbraco.Web.Mvc
     public abstract class UmbracoVirtualNodeRouteHandler : IRouteHandler
     {
         // TODO: try lazy property injection?
-        private IPublishedRouter PublishedRouter => Current.Factory.GetInstance<IPublishedRouter>();
+        private IPublishedRouter PublishedRouter => Current.Factory.GetRequiredService<IPublishedRouter>();
 
         /// <summary>
         /// Returns the UmbracoContext for this route handler

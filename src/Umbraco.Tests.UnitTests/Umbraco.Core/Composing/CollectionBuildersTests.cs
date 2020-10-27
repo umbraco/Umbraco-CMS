@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
+using Umbraco.Infrastructure.Composing;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.UnitTests.TestHelpers;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
 {
@@ -28,7 +31,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
             // factoryMock.Setup(x => x.GetInstance(typeof(Resolved4))).Returns(new Resolved4());
 
 
-            var register = TestHelper.GetRegister();
+            var register = TestHelper.GetServiceCollection();
             _composition = new Composition(register, TestHelper.GetMockedTypeLoader(), Mock.Of<IProfilingLogger>(), Mock.Of<IRuntimeState>(), TestHelper.IOHelper, AppCaches.NoCache);
         }
 
@@ -355,10 +358,10 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
 
             using (factory.BeginScope())
             {
-                var col1 = factory.GetInstance<TestCollection>();
+                var col1 = factory.GetRequiredService<TestCollection>();
                 AssertCollection(col1, typeof(Resolved1), typeof(Resolved2));
 
-                var col2 = factory.GetInstance<TestCollection>();
+                var col2 = factory.GetRequiredService<TestCollection>();
                 AssertCollection(col2, typeof(Resolved1), typeof(Resolved2));
 
                 AssertSameCollection(factory, col1, col2);
@@ -379,10 +382,10 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
 
             var factory = _composition.CreateFactory();
 
-            var col1 = factory.GetInstance<TestCollection>();
+            var col1 = factory.GetRequiredService<TestCollection>();
             AssertCollection(col1, typeof(Resolved1), typeof(Resolved2));
 
-            var col2 = factory.GetInstance<TestCollection>();
+            var col2 = factory.GetRequiredService<TestCollection>();
             AssertCollection(col1, typeof(Resolved1), typeof(Resolved2));
 
             AssertNotSameCollection(col1, col2);
@@ -414,23 +417,23 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
 
             TestCollection col1A, col1B;
 
-            var factory = _composition.CreateFactory();
+            var wrapper = (ServiceProviderFactoryAdapter)_composition.CreateFactory();
 
-            using (factory.BeginScope())
+            using (var scope = wrapper.ServiceProvider.CreateScope())
             {
-                col1A = factory.GetInstance<TestCollection>();
-                col1B = factory.GetInstance<TestCollection>();
+                col1A = scope.ServiceProvider.GetRequiredService<TestCollection>();
+                col1B = scope.ServiceProvider.GetRequiredService<TestCollection>();
 
                 AssertCollection(col1A, typeof(Resolved1), typeof(Resolved2));
                 AssertCollection(col1B, typeof(Resolved1), typeof(Resolved2));
-                AssertSameCollection(factory, col1A, col1B);
+                AssertSameCollection(wrapper, col1A, col1B);
             }
 
             TestCollection col2;
 
-            using (factory.BeginScope())
+            using (var scope = wrapper.ServiceProvider.CreateScope())
             {
-                col2 = factory.GetInstance<TestCollection>();
+                col2 = scope.ServiceProvider.GetRequiredService<TestCollection>();
             }
 
             AssertCollection(col2, typeof(Resolved1), typeof(Resolved2));
@@ -475,8 +478,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
             {
                 Assert.AreSame(col1A[i], col2A[i]);
 
-                var itemA = factory.GetInstance(col1A[i].GetType());
-                var itemB = factory.GetInstance(col2A[i].GetType());
+                var itemA = factory.GetRequiredService(col1A[i].GetType());
+                var itemB = factory.GetRequiredService(col2A[i].GetType());
 
                 Assert.AreSame(itemA, itemB);
             }

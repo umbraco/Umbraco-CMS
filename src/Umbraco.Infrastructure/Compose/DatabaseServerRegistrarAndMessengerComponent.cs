@@ -46,7 +46,7 @@ namespace Umbraco.Web.Compose
                     //rebuild the xml cache file if the server is not synced
                     () =>
                     {
-                        var publishedSnapshotService = factory.GetInstance<IPublishedSnapshotService>();
+                        var publishedSnapshotService = factory.GetRequiredService<IPublishedSnapshotService>();
 
                         // rebuild the published snapshot caches entirely, if the server is not synced
                         // this is equivalent to DistributedCache RefreshAll... but local only
@@ -62,7 +62,7 @@ namespace Umbraco.Web.Compose
                     // indexes then they can adjust this logic themselves.
                     () =>
                     {
-                        var indexRebuilder = factory.GetInstance<BackgroundIndexRebuilder>();
+                        var indexRebuilder = factory.GetRequiredService<BackgroundIndexRebuilder>();
                         indexRebuilder.RebuildIndexes(false, 5000);
                     }
                 }

@@ -11,7 +11,9 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence;
+using Umbraco.Infrastructure.Composing;
 using Umbraco.Persistance.SqlCe;
+using Umbraco.Web;
 using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.TestHelpers
@@ -35,7 +37,7 @@ namespace Umbraco.Tests.TestHelpers
         {
             Current.Reset();
 
-            var container = TestHelper.GetRegister();
+            var wrapper = (ServiceCollectionRegistryAdapter) TestHelper.GetRegister();
 
             var ioHelper = TestHelper.IOHelper;
             var logger = new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>());
@@ -46,7 +48,7 @@ namespace Umbraco.Tests.TestHelpers
                 logger,
                 false);
 
-            var composition = new Composition(container, typeLoader, Mock.Of<IProfilingLogger>(), Mock.Of<IRuntimeState>(), TestHelper.IOHelper, AppCaches.NoCache);
+            var composition = new Composition(wrapper.Services, typeLoader, Mock.Of<IProfilingLogger>(), Mock.Of<IRuntimeState>(), TestHelper.IOHelper, AppCaches.NoCache);
 
             composition.RegisterUnique<ILogger>(_ => Mock.Of<ILogger>());
             composition.RegisterUnique<ILoggerFactory>(_ => NullLoggerFactory.Instance);
@@ -64,8 +66,8 @@ namespace Umbraco.Tests.TestHelpers
             var pocoMappers = new NPoco.MapperCollection { new PocoMapper() };
             var pocoDataFactory = new FluentPocoDataFactory((type, iPocoDataFactory) => new PocoDataBuilder(type, pocoMappers).Init());
             var sqlSyntax = new SqlCeSyntaxProvider();
-            SqlContext = new SqlContext(sqlSyntax, DatabaseType.SQLCe, pocoDataFactory, new Lazy<IMapperCollection>(() => factory.GetInstance<IMapperCollection>()));
-            Mappers = factory.GetInstance<IMapperCollection>();
+            SqlContext = new SqlContext(sqlSyntax, DatabaseType.SQLCe, pocoDataFactory, new Lazy<IMapperCollection>(() => factory.GetRequiredService<IMapperCollection>()));
+            Mappers = factory.GetRequiredService<IMapperCollection>();
 
             SetUp();
         }

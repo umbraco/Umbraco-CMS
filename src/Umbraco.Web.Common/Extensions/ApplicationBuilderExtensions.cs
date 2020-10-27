@@ -42,10 +42,6 @@ namespace Umbraco.Extensions
             if (!app.UmbracoCanBoot()) return app;
 
             var runtime = app.ApplicationServices.GetRequiredService<IRuntime>();
-            if (runtime is CoreRuntime coreRuntime)
-            {
-                coreRuntime.ReplaceFactory(app.ApplicationServices);
-            }
 
             // Register a listener for application shutdown in order to terminate the runtime
             var hostLifetime = app.ApplicationServices.GetRequiredService<IApplicationShutdownRegistry>();
@@ -57,7 +53,7 @@ namespace Umbraco.Extensions
             LogContext.Push(threadAbortEnricher); // NOTE: We are not in a using clause because we are not removing it, it is on the global context
             
             // Start the runtime!
-            runtime.Start();
+            runtime.Start(app.ApplicationServices);
 
             return app;
         }

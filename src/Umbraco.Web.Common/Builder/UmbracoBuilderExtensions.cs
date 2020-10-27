@@ -28,7 +28,7 @@ namespace Umbraco.Web.Common.Builder
             => builder.AddWith(nameof(WithConfiguration), () => builder.Services.AddUmbracoConfiguration(builder.Config));
 
         public static IUmbracoBuilder WithCore(this IUmbracoBuilder builder)
-            => builder.AddWith(nameof(WithCore), () => builder.Services.AddUmbracoCore(builder.WebHostEnvironment, builder.Config, out _));
+            => builder.AddWith(nameof(WithCore), () => builder.Services.AddUmbracoCore(builder.WebHostEnvironment, builder.Config));
 
         public static IUmbracoBuilder WithMiniProfiler(this IUmbracoBuilder builder)
             => builder.AddWith(nameof(WithMiniProfiler), () =>

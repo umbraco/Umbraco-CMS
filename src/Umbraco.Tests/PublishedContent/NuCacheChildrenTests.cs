@@ -61,7 +61,7 @@ namespace Umbraco.Tests.PublishedContent
 
             var hostingEnvironment = Mock.Of<IHostingEnvironment>();
 
-            Mock.Get(factory).Setup(x => x.GetInstance(typeof(IPublishedModelFactory))).Returns(PublishedModelFactory);
+            Mock.Get(factory).Setup(x => x.GetRequiredService(typeof(IPublishedModelFactory))).Returns(PublishedModelFactory);
 
             var runtime = Mock.Of<IRuntimeState>();
             Mock.Get(runtime).Setup(x => x.Level).Returns(RuntimeLevel.Run);
@@ -172,7 +172,7 @@ namespace Umbraco.Tests.PublishedContent
             // invariant is the current default
             _variationAccesor.VariationContext = new VariationContext();
 
-            Mock.Get(factory).Setup(x => x.GetInstance(typeof(IVariationContextAccessor))).Returns(_variationAccesor);
+            Mock.Get(factory).Setup(x => x.GetRequiredService(typeof(IVariationContextAccessor))).Returns(_variationAccesor);
         }
 
         private IEnumerable<ContentNodeKit> GetNestedVariantKits()

@@ -1,4 +1,5 @@
-﻿using Smidge.FileProcessors;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Smidge.FileProcessors;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Runtime;
@@ -17,7 +18,7 @@ namespace Umbraco.Web.Common.RuntimeMinification
 
             composition.RegisterUnique<IRuntimeMinifier, SmidgeRuntimeMinifier>();
             composition.RegisterUnique<SmidgeHelperAccessor>();
-            composition.Register<IPreProcessor, SmidgeNuglifyJs>();
+            composition.Services.AddTransient<IPreProcessor, SmidgeNuglifyJs>();
         }
     }
 }

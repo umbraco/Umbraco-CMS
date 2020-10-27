@@ -155,12 +155,12 @@ namespace Umbraco.Tests.Routing
             var handler = new RenderRouteHandler(umbracoContext, new TestControllerFactory(umbracoContextAccessor, Mock.Of<ILogger<TestControllerFactory>>(), context =>
                 {
 
-                  return new CustomDocumentController(Factory.GetInstance<IOptions<GlobalSettings>>(),
+                  return new CustomDocumentController(Factory.GetRequiredService<IOptions<GlobalSettings>>(),
                         umbracoContextAccessor,
-                        Factory.GetInstance<ServiceContext>(),
-                        Factory.GetInstance<AppCaches>(),
-                        Factory.GetInstance<IProfilingLogger>(),
-                        Factory.GetInstance<ILoggerFactory>());
+                        Factory.GetRequiredService<ServiceContext>(),
+                        Factory.GetRequiredService<AppCaches>(),
+                        Factory.GetRequiredService<IProfilingLogger>(),
+                        Factory.GetRequiredService<ILoggerFactory>());
                 }), ShortStringHelper);
 
             handler.GetHandlerForRoute(httpContext.Request.RequestContext, frequest);

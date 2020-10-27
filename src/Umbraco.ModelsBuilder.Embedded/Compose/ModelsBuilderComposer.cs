@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Reflection;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core.Configuration;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
@@ -18,7 +19,7 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
         public void Compose(Composition composition)
         {
             composition.Components().Append<ModelsBuilderComponent>();
-            composition.Register<UmbracoServices>(Lifetime.Singleton);
+            composition.Services.AddSingleton<UmbracoServices>();
             composition.RegisterUnique<ModelsGenerator>();
             composition.RegisterUnique<LiveModelsProvider>();
             composition.RegisterUnique<OutOfDateModelsStatus>();
@@ -27,10 +28,10 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
             composition.RegisterUnique<PureLiveModelFactory>();
             composition.RegisterUnique<IPublishedModelFactory>(factory =>
             {
-                var config = factory.GetInstance<IOptions<ModelsBuilderSettings>>().Value;
+                var config = factory.GetRequiredService<IOptions<ModelsBuilderSettings>>().Value;
                 if (config.ModelsMode == ModelsMode.PureLive)
                 {
-                    return factory.GetInstance<PureLiveModelFactory>();
+                    return factory.GetRequiredService<PureLiveModelFactory>();
                     // the following would add @using statement in every view so user's don't
                     // have to do it - however, then noone understands where the @using statement
                     // comes from, and it cannot be avoided / removed --- DISABLED
@@ -49,8 +50,8 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
                 }
                 else if (config.EnableFactory)
                 {
-                    var typeLoader = factory.GetInstance<TypeLoader>();
-                    var publishedValueFallback = factory.GetInstance<IPublishedValueFallback>();
+                    var typeLoader = factory.GetRequiredService<TypeLoader>();
+                    var publishedValueFallback = factory.GetRequiredService<IPublishedValueFallback>();
                     var types = typeLoader
                         .GetTypes<PublishedElementModel>() // element models
                         .Concat(typeLoader.GetTypes<PublishedContentModel>()); // content models

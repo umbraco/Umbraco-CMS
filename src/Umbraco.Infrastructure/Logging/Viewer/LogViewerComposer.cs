@@ -17,9 +17,9 @@ namespace Umbraco.Core.Logging.Viewer
             composition.RegisterUnique<ILogViewer>(factory =>
             {
 
-                return new SerilogJsonLogViewer(factory.GetInstance<ILogger<SerilogJsonLogViewer>>(),
-                    factory.GetInstance<ILogViewerConfig>(),
-                    factory.GetInstance<ILoggingConfiguration>(),
+                return new SerilogJsonLogViewer(factory.GetRequiredService<ILogger<SerilogJsonLogViewer>>(),
+                    factory.GetRequiredService<ILogViewerConfig>(),
+                    factory.GetRequiredService<ILoggingConfiguration>(),
                     Log.Logger);
             } );
         }

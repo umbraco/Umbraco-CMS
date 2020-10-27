@@ -55,11 +55,11 @@ namespace Umbraco.Tests.Packaging
             NullLoggerFactory.Instance.CreateLogger<PackageDataInstallation>(), NullLoggerFactory.Instance, ServiceContext.FileService, ServiceContext.MacroService, ServiceContext.LocalizationService,
             ServiceContext.DataTypeService, ServiceContext.EntityService,
             ServiceContext.ContentTypeService, ServiceContext.ContentService,
-            Factory.GetInstance<PropertyEditorCollection>(),
-            Factory.GetInstance<IScopeProvider>(),
-            Factory.GetInstance<IShortStringHelper>(),
+            Factory.GetRequiredService<PropertyEditorCollection>(),
+            Factory.GetRequiredService<IScopeProvider>(),
+            Factory.GetRequiredService<IShortStringHelper>(),
             Microsoft.Extensions.Options.Options.Create(new GlobalSettings()),
-            Factory.GetInstance<ILocalizedTextService>());
+            Factory.GetRequiredService<ILocalizedTextService>());
 
         private IPackageInstallation PackageInstallation => new PackageInstallation(
             PackageDataInstallation,

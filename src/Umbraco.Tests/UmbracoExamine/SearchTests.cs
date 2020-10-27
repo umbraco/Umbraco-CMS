@@ -54,7 +54,7 @@ namespace Umbraco.Tests.UmbracoExamine
                     ==
                     allRecs);
 
-            var propertyEditors = Factory.GetInstance<PropertyEditorCollection>();
+            var propertyEditors = Factory.GetRequiredService<PropertyEditorCollection>();
             var rebuilder = IndexInitializer.GetContentIndexRebuilder(propertyEditors, contentService, ScopeProvider, true);
 
             using (var luceneDir = new RandomIdRamDirectory())

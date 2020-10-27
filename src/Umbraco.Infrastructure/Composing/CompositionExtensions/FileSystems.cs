@@ -39,7 +39,7 @@ namespace Umbraco.Core.Composing.CompositionExtensions
             composition.RegisterUnique(factory => factory.CreateInstance<Core.IO.FileSystems>(factory));
 
             // register IFileSystems, which gives access too all filesystems
-            composition.RegisterUnique<IFileSystems>(factory => factory.GetInstance<Core.IO.FileSystems>());
+            composition.RegisterUnique<IFileSystems>(factory => factory.GetRequiredService<Core.IO.FileSystems>());
 
             // register the scheme for media paths
             composition.RegisterUnique<IMediaPathScheme, UniqueMediaPathScheme>();
@@ -47,16 +47,16 @@ namespace Umbraco.Core.Composing.CompositionExtensions
             // register the default IMediaFileSystem implementation
             composition.RegisterUnique<IMediaFileSystem>(factory =>
             {
-                var ioHelper = factory.GetInstance<IIOHelper>();
-                var hostingEnvironment = factory.GetInstance<IHostingEnvironment>();
-                var logger = factory.GetInstance<ILogger<PhysicalFileSystem>>();
-                var globalSettings = factory.GetInstance<IOptions<GlobalSettings>>().Value;
+                var ioHelper = factory.GetRequiredService<IIOHelper>();
+                var hostingEnvironment = factory.GetRequiredService<IHostingEnvironment>();
+                var logger = factory.GetRequiredService<ILogger<PhysicalFileSystem>>();
+                var globalSettings = factory.GetRequiredService<IOptions<GlobalSettings>>().Value;
 
                 var rootPath = hostingEnvironment.MapPathWebRoot(globalSettings.UmbracoMediaPath);
                 var rootUrl = hostingEnvironment.ToAbsolute(globalSettings.UmbracoMediaPath);
                 var inner = new PhysicalFileSystem(ioHelper, hostingEnvironment, logger, rootPath, rootUrl);
 
-                var fileSystems = factory.GetInstance<IO.FileSystems>();
+                var fileSystems = factory.GetRequiredService<IO.FileSystems>();
                 return fileSystems.GetFileSystem<MediaFileSystem>(inner);
             });
 

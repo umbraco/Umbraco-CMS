@@ -108,7 +108,7 @@ namespace Umbraco.Core.Composing
         /// Creates a collection item.
         /// </summary>
         protected virtual TItem CreateItem(IFactory factory, Type itemType)
-            => (TItem) factory.GetInstance(itemType);
+            => (TItem) factory.GetRequiredService(itemType);
 
         /// <summary>
         /// Creates a collection.

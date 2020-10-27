@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Examine;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -17,6 +18,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Runtime;
+using Umbraco.Infrastructure.Composing;
 using Umbraco.Net;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Stubs;
@@ -43,43 +45,6 @@ namespace Umbraco.Tests.Runtimes
             TestComponent.Reset();
         }
 
-        [Test]
-        public void ComponentLifeCycle()
-        {
-            using (var app = new TestUmbracoApplication())
-            {
-                app.HandleApplicationStart(app, new EventArgs());
-
-                var e = app.Runtime.State.BootFailedException;
-                var m = "";
-                switch (e)
-                {
-                    case null:
-                        m = "";
-                        break;
-                    case BootFailedException bfe when bfe.InnerException != null:
-                        m = "BootFailed: " + bfe.InnerException.GetType() + " " + bfe.InnerException.Message + " " + bfe.InnerException.StackTrace;
-                        break;
-                    default:
-                        m = e.GetType() + " " + e.Message + " " + e.StackTrace;
-                        break;
-                }
-
-                Assert.AreNotEqual(RuntimeLevel.BootFailed, app.Runtime.State.Level, m);
-                Assert.IsTrue(TestComposer.Ctored);
-                Assert.IsTrue(TestComposer.Composed);
-                Assert.IsTrue(TestComponent.Ctored);
-                Assert.IsNotNull(TestComponent.ProfilingLogger);
-                Assert.IsInstanceOf<ProfilingLogger>(TestComponent.ProfilingLogger);
-
-                // note: components are NOT disposed after boot
-
-                Assert.IsFalse(TestComponent.Terminated);
-
-                app.HandleApplicationEnd();
-                Assert.IsTrue(TestComponent.Terminated);
-            }
-        }
 
         // test application
         public class TestUmbracoApplication : UmbracoApplicationBase
@@ -124,15 +89,15 @@ namespace Umbraco.Tests.Runtimes
                 return mock.Object;
             }
 
-            public override IFactory Configure(IRegister container)
+            public override void Configure(IServiceCollection services)
             {
+                var container = ServiceCollectionRegistryAdapter.Wrap(services);
                 container.Register<IApplicationShutdownRegistry, AspNetApplicationShutdownRegistry>(Lifetime.Singleton);
                 container.Register<ISessionIdResolver, NullSessionIdResolver>(Lifetime.Singleton);
                 container.Register(typeof(ILogger<>), typeof(Logger<>), Lifetime.Singleton);
 
 
-                var factory = base.Configure(container);
-                return factory;
+                base.Configure(services);
             }
 
             // runs with only one single component

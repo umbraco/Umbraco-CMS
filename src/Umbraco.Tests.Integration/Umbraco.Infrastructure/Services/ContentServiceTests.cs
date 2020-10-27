@@ -443,6 +443,10 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         }
 
         [Test]
+        [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest,
+            PublishedRepositoryEvents = true,
+            WithApplication = true,
+            Boot = true)]
         public void Automatically_Track_Relations()
         {
             var mt = MediaTypeBuilder.CreateSimpleMediaType("testMediaType", "Test Media Type");

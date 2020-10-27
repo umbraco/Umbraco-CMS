@@ -20,7 +20,7 @@ namespace Umbraco.Core.Composing
 
         protected override IEnumerable<IComponent> CreateItems(IFactory factory)
         {
-            _logger = factory.GetInstance<IProfilingLogger>();
+            _logger = factory.GetRequiredService<IProfilingLogger>();
 
             using (_logger.DebugDuration<ComponentCollectionBuilder>($"Creating components. (log when >{LogThresholdMilliseconds}ms)", "Created."))
             {

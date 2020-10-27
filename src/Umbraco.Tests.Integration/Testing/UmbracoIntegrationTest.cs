@@ -6,7 +6,6 @@ using Microsoft.Extensions.Hosting;
 using NUnit.Framework;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Composing.LightInject;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -250,8 +249,7 @@ namespace Umbraco.Tests.Integration.Testing
                 AppCaches.NoCache, // Disable caches for integration tests
                 TestHelper.GetLoggingConfiguration(),
                 Configuration,
-                CreateTestRuntime,
-                out _);
+                CreateTestRuntime);
 
             services.AddSignalR();
 

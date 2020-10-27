@@ -4,6 +4,7 @@ using System.Data.SqlServerCe;
 using System.Threading;
 using System.Web.Routing;
 using System.Xml;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -59,7 +60,7 @@ namespace Umbraco.Tests.TestHelpers
 
         internal ScopeProvider ScopeProvider => Current.ScopeProvider as ScopeProvider;
 
-        protected ISqlContext SqlContext => Factory.GetInstance<ISqlContext>();
+        protected ISqlContext SqlContext => Factory.GetRequiredService<ISqlContext>();
 
         public override void SetUp()
         {
@@ -74,7 +75,7 @@ namespace Umbraco.Tests.TestHelpers
         {
             base.Compose();
 
-            Composition.Register<ISqlSyntaxProvider, SqlCeSyntaxProvider>();
+            Composition.Services.AddTransient<ISqlSyntaxProvider, SqlCeSyntaxProvider>();
             Composition.Register(factory => PublishedSnapshotService);
             Composition.Register(factory => DefaultCultureAccessor);
 
@@ -90,8 +91,8 @@ namespace Umbraco.Tests.TestHelpers
                 if (Options.Database == UmbracoTestOptions.Database.None)
                     return TestObjects.GetDatabaseFactoryMock();
 
-                var lazyMappers = new Lazy<IMapperCollection>(f.GetInstance<IMapperCollection>);
-                var factory = new UmbracoDatabaseFactory(f.GetInstance<ILogger<UmbracoDatabaseFactory>>(), f.GetInstance<ILoggerFactory>(), GetDbConnectionString(), GetDbProviderName(), lazyMappers, TestHelper.DbProviderFactoryCreator);
+                var lazyMappers = new Lazy<IMapperCollection>(f.GetRequiredService<IMapperCollection>);
+                var factory = new UmbracoDatabaseFactory(f.GetRequiredService<ILogger<UmbracoDatabaseFactory>>(), f.GetRequiredService<ILoggerFactory>(), GetDbConnectionString(), GetDbProviderName(), lazyMappers, TestHelper.DbProviderFactoryCreator);
                 factory.ResetForTests();
                 return factory;
             });
@@ -105,7 +106,7 @@ namespace Umbraco.Tests.TestHelpers
 
         public override void TearDown()
         {
-            var profilingLogger = Factory.TryGetInstance<IProfilingLogger>();
+            var profilingLogger = Factory.GetService<IProfilingLogger>();
             var timer = profilingLogger?.TraceDuration<TestWithDatabaseBase>("teardown"); // FIXME: move that one up
             try
             {
@@ -242,11 +243,11 @@ namespace Umbraco.Tests.TestHelpers
             var cache = NoAppCache.Instance;
 
             ContentTypesCache ??= new PublishedContentTypeCache(
-                Factory.GetInstance<IContentTypeService>(),
-                Factory.GetInstance<IMediaTypeService>(),
-                Factory.GetInstance<IMemberTypeService>(),
-                Factory.GetInstance<IPublishedContentTypeFactory>(),
-                Factory.GetInstance<ILogger<PublishedContentTypeCache>>());
+                Factory.GetRequiredService<IContentTypeService>(),
+                Factory.GetRequiredService<IMediaTypeService>(),
+                Factory.GetRequiredService<IMemberTypeService>(),
+                Factory.GetRequiredService<IPublishedContentTypeFactory>(),
+                Factory.GetRequiredService<ILogger<PublishedContentTypeCache>>());
 
             // testing=true so XmlStore will not use the file nor the database
 
@@ -254,19 +255,19 @@ namespace Umbraco.Tests.TestHelpers
             var variationContextAccessor = new TestVariationContextAccessor();
             var service = new XmlPublishedSnapshotService(
                 ServiceContext,
-                Factory.GetInstance<IPublishedContentTypeFactory>(),
+                Factory.GetRequiredService<IPublishedContentTypeFactory>(),
                 ScopeProvider,
                 cache, publishedSnapshotAccessor, variationContextAccessor,
-                Factory.GetInstance<IUmbracoContextAccessor>(),
-                Factory.GetInstance<IDocumentRepository>(), Factory.GetInstance<IMediaRepository>(), Factory.GetInstance<IMemberRepository>(),
+                Factory.GetRequiredService<IUmbracoContextAccessor>(),
+                Factory.GetRequiredService<IDocumentRepository>(), Factory.GetRequiredService<IMediaRepository>(), Factory.GetRequiredService<IMemberRepository>(),
                 DefaultCultureAccessor,
-                Factory.GetInstance<ILoggerFactory>(),
+                Factory.GetRequiredService<ILoggerFactory>(),
                 globalSettings ?? TestObjects.GetGlobalSettings(),
                 HostingEnvironment,
                 HostingLifetime,
                 ShortStringHelper,
                 new SiteDomainHelper(),
-                Factory.GetInstance<IEntityXmlSerializer>(),
+                Factory.GetRequiredService<IEntityXmlSerializer>(),
                 ContentTypesCache,
                 null, true, Options.PublishedRepositoryEvents);
 
