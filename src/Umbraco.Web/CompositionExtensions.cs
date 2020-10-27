@@ -100,26 +100,6 @@ namespace Umbraco.Web
             composition.RegisterUnique(_ => helper);
         }
 
-        /// <summary>
-        /// Sets the default controller for rendering template views.
-        /// </summary>
-        /// <typeparam name="TController">The type of the controller.</typeparam>
-        /// <param name="composition">The composition.</param>
-        /// <remarks>The controller type is registered to the container by the composition.</remarks>
-        public static void SetDefaultRenderMvcController<TController>(this Composition composition)
-            => composition.SetDefaultRenderMvcController(typeof(TController));
-
-        /// <summary>
-        /// Sets the default controller for rendering template views.
-        /// </summary>
-        /// <param name="composition">The composition.</param>
-        /// <param name="controllerType">The type of the controller.</param>
-        /// <remarks>The controller type is registered to the container by the composition.</remarks>
-        public static void SetDefaultRenderMvcController(this Composition composition, Type controllerType)
-        {
-           // NOOP
-        }
-
         #endregion
     }
 }

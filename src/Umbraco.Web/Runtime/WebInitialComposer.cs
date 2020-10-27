@@ -57,10 +57,13 @@ namespace Umbraco.Web.Runtime
             // configure the container for web
             //composition.ConfigureForWeb();
 
-            composition
-                // TODO: This will depend on if we use ServiceBasedControllerActivator - see notes in Startup.cs
-                //.ComposeUmbracoControllers(GetType().Assembly)
-                .SetDefaultRenderMvcController</*RenderMvcController*/ Controller>(); // default controller for template views
+            //composition
+            /* TODO: This will depend on if we use ServiceBasedControllerActivator - see notes in Startup.cs
+             * You will likely need to set DefaultRenderMvcControllerType on Umbraco.Web.Composing.Current
+             * which is what the extension method below did previously.
+             */
+            //.ComposeUmbracoControllers(GetType().Assembly)
+            //.SetDefaultRenderMvcController</*RenderMvcController*/ Controller>(); // default controller for template views
 
             //we need to eagerly scan controller types since they will need to be routed
             composition.WithCollectionBuilder<SurfaceControllerTypeCollectionBuilder>()

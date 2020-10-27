@@ -137,12 +137,4 @@ namespace Umbraco.Core.Composing
 
         #endregion
     }
-
-    public static class CompositionExtensins
-    {
-        //public static IFactory CreateFactory(this Composition composition)
-        //{
-        //    return NoFactory.Wrap(composition.Services.BuildServiceProvider());
-        //}
-    }
 }
