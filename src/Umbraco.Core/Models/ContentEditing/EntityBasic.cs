@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
-using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.Models.Validation;
-using Umbraco.Core.Serialization;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
@@ -28,7 +26,6 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "udi")]
         [ReadOnly(true)]
-        [JsonConverter(typeof(UdiJsonConverter))]
         public Udi Udi { get; set; }
 
         [DataMember(Name = "icon")]
@@ -61,7 +58,7 @@ namespace Umbraco.Web.Models.ContentEditing
         /// The path of the entity
         /// </summary>
         [DataMember(Name = "path")]
-        public string Path { get; set; }      
+        public string Path { get; set; }
         /// <summary>
         /// A collection of extra data that is available for this specific entity/entity type
         /// </summary>
