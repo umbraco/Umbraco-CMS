@@ -1,7 +1,5 @@
 ﻿using System;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Composing.LightInject;
-using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Runtime;
 using Umbraco.Extensions;
 using Umbraco.Infrastructure.Composing;
