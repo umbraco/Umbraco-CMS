@@ -26,6 +26,7 @@ using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
 using System.Data.SqlClient;
 using System.Data.Common;
+using System.Diagnostics;
 using System.IO;
 using Umbraco.Core.Configuration.Models;
 using Microsoft.Extensions.Options;
@@ -75,17 +76,23 @@ namespace Umbraco.Tests.Integration.Testing
             _testTeardown = null;
             FirstTestInFixture = false;
             FirstTestInSession = false;
+
+            TestContext.Progress.Write($"  {TestContext.CurrentContext.Result.Outcome.Status}");
         }
 
         [SetUp]
         public virtual void Setup()
         {
+            TestContext.Progress.Write($"Start test {_testCount++}: {TestContext.CurrentContext.Test.Name}");
+
             var hostBuilder = CreateHostBuilder();
-            var host = hostBuilder.StartAsync().GetAwaiter().GetResult();
+
+            var host = hostBuilder.Start();
+
             Services = host.Services;
             var app = new ApplicationBuilder(host.Services);
-            Configure(app); //Takes around 200 ms
 
+            Configure(app);
 
             OnFixtureTearDown(() => host.Dispose());
         }
@@ -477,5 +484,6 @@ namespace Umbraco.Tests.Integration.Testing
         protected static bool FirstTestInSession = true;
 
         protected bool FirstTestInFixture = true;
+        private static int _testCount = 1;
     }
 }
