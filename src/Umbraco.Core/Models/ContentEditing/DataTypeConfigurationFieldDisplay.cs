@@ -38,6 +38,5 @@ namespace Umbraco.Web.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "config")]
         public IDictionary<string, object> Config { get; set; }
-
     }
 }

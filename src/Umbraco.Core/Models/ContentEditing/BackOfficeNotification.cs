@@ -25,6 +25,5 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "type")]
         public NotificationStyle NotificationType { get; set; }
-
     }
 }

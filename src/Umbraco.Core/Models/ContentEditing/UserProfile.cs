@@ -1,7 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
@@ -23,6 +22,6 @@ namespace Umbraco.Web.Models.ContentEditing
         int IComparable.CompareTo(object obj)
         {
             return String.Compare(Name, ((UserProfile)obj).Name, StringComparison.Ordinal);
-       }
+        }
     }
 }

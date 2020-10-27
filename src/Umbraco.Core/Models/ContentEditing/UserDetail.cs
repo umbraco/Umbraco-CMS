@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
@@ -25,7 +24,7 @@ namespace Umbraco.Web.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "emailHash")]
         public string EmailHash { get; set; }
-        
+
         [ReadOnly(true)]
         [DataMember(Name = "userGroups")]
         public string[] UserGroups { get; set; }

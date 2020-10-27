@@ -1,7 +1,7 @@
-﻿namespace Umbraco.Web.Models.ContentEditing
-{
-    using System.Runtime.Serialization;
+﻿using System.Runtime.Serialization;
 
+namespace Umbraco.Web.Models.ContentEditing
+{
     /// <summary>
     /// The macro parameter display.
     /// </summary>
