@@ -76,15 +76,22 @@ namespace Umbraco.Tests.Integration.Testing
             _testTeardown = null;
             FirstTestInFixture = false;
             FirstTestInSession = false;
+        }
 
+        [TearDown]
+        public virtual void TearDown_Logging()
+        {
             TestContext.Progress.Write($"  {TestContext.CurrentContext.Result.Outcome.Status}");
         }
 
         [SetUp]
+        public virtual void SetUp_Logging()
+        {
+            TestContext.Progress.Write($"Start test {TestCount++}: {TestContext.CurrentContext.Test.Name}");
+        }
+        [SetUp]
         public virtual void Setup()
         {
-            TestContext.Progress.Write($"Start test {_testCount++}: {TestContext.CurrentContext.Test.Name}");
-
             var hostBuilder = CreateHostBuilder();
 
             var host = hostBuilder.Start();
@@ -433,7 +440,7 @@ namespace Umbraco.Tests.Integration.Testing
         #endregion
 
         #region Common services
-        
+
         protected virtual T GetRequiredService<T>() => Services.GetRequiredService<T>();
 
         public Dictionary<string, string> InMemoryConfiguration { get; } = new Dictionary<string, string>();
@@ -484,6 +491,6 @@ namespace Umbraco.Tests.Integration.Testing
         protected static bool FirstTestInSession = true;
 
         protected bool FirstTestInFixture = true;
-        private static int _testCount = 1;
+        protected static int TestCount = 1;
     }
 }

@@ -410,12 +410,6 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
             }
         }
 
-        [TearDown]
-        public override void TearDown()
-        {
-            base.TearDown();
-        }
-
         public void CreateTestData()
         {
             _relateContent = new RelationType(

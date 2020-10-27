@@ -48,16 +48,16 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         private PropertyEditorCollection PropertyEditorCollection => GetRequiredService<PropertyEditorCollection>();
         private IDocumentRepository DocumentRepository => GetRequiredService<IDocumentRepository>();
 
-        public override void Setup()
+        [SetUp]
+        public void Setup()
         {
-            base.Setup();
             ContentRepositoryBase.ThrowOnWarning = true;
         }
 
-        public override void TearDown()
+        [TearDown]
+        public void Teardown()
         {
             ContentRepositoryBase.ThrowOnWarning = false;
-            base.TearDown();
         }
 
         [Test]

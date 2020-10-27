@@ -8,7 +8,6 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Extensions;
-using Umbraco.Tests.Integration.Implementations;
 using Umbraco.Web;
 using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.BackOffice.Security;
@@ -21,9 +20,6 @@ namespace Umbraco.Tests.Integration.Umbraco.Web.Backoffice.Security
         [Test]
         public void ShouldAuthenticateRequest_When_Not_Configured()
         {
-            var testHelper = new TestHelper();
-
-            var httpContextAccessor = testHelper.GetHttpContextAccessor();
             var globalSettings = new GlobalSettings();
 
             var runtime = Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Install);
@@ -43,12 +39,6 @@ namespace Umbraco.Tests.Integration.Umbraco.Web.Backoffice.Security
         [Test]
         public void ShouldAuthenticateRequest_When_Configured()
         {
-            var testHelper = new TestHelper();
-
-
-            //hostingEnvironment.ToAbsolute(globalSettings.UmbracoPath);
-
-            var httpContextAccessor = testHelper.GetHttpContextAccessor();
             var globalSettings = new GlobalSettings();
 
             var runtime = Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Run);
@@ -68,9 +58,6 @@ namespace Umbraco.Tests.Integration.Umbraco.Web.Backoffice.Security
         [Test]
         public void ShouldAuthenticateRequest_Is_Back_Office()
         {
-            var testHelper = new TestHelper();
-
-            var httpContextAccessor = testHelper.GetHttpContextAccessor();
             var globalSettings = new GlobalSettings();
 
             var runtime = Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Run);
@@ -93,9 +80,6 @@ namespace Umbraco.Tests.Integration.Umbraco.Web.Backoffice.Security
         [Test]
         public void ShouldAuthenticateRequest_Force_Auth()
         {
-            var testHelper = new TestHelper();
-
-            var httpContextAccessor = testHelper.GetHttpContextAccessor();
             var globalSettings = new GlobalSettings();
 
             var runtime = Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Run);
@@ -115,9 +99,6 @@ namespace Umbraco.Tests.Integration.Umbraco.Web.Backoffice.Security
         [Test]
         public void ShouldAuthenticateRequest_Not_Back_Office()
         {
-            var testHelper = new TestHelper();
-
-            var httpContextAccessor = testHelper.GetHttpContextAccessor();
             var globalSettings = new GlobalSettings();
 
             var runtime = Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Run);
