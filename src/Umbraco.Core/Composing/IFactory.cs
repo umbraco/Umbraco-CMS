@@ -19,7 +19,7 @@ namespace Umbraco.Core.Composing
         /// <param name="type">The type of the service.</param>
         /// <returns>An instance of the specified type.</returns>
         /// <remarks>Throws an exception if the container failed to get an instance of the specified type.</remarks>
-        object GetInstance(Type type);
+        object GetRequiredService(Type type);
 
         /// <summary>
         /// Tries to get an instance of a service.
@@ -29,19 +29,19 @@ namespace Umbraco.Core.Composing
         /// <remarks>Returns null if the container does not know how to get an instance
         /// of the specified type. Throws an exception if the container does know how
         /// to get an instance of the specified type, but failed to do so.</remarks>
-        object TryGetInstance(Type type);
+        object GetService(Type type);
 
         /// <summary>
         /// Gets all instances of a service.
         /// </summary>
         /// <param name="serviceType">The type of the service.</param>
-        IEnumerable<object> GetAllInstances(Type serviceType);
+        IEnumerable<object> GetServices(Type serviceType);
 
         /// <summary>
         /// Gets all instances of a service.
         /// </summary>
         /// <typeparam name="TService">The type of the service.</typeparam>
-        IEnumerable<TService> GetAllInstances<TService>()
+        IEnumerable<TService> GetServices<TService>()
             where TService : class;
         
         /// <summary>

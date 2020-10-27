@@ -33,7 +33,7 @@ namespace Umbraco.Tests.Web
             var typeFinder = TestHelper.GetTypeFinder();
             var ioHelper = TestHelper.IOHelper;
             container
-                .Setup(x => x.GetInstance(typeof(TypeLoader)))
+                .Setup(x => x.GetRequiredService(typeof(TypeLoader)))
                 .Returns(new TypeLoader(
                     typeFinder,
                     NoAppCache.Instance,

@@ -478,8 +478,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
             {
                 Assert.AreSame(col1A[i], col2A[i]);
 
-                var itemA = factory.GetInstance(col1A[i].GetType());
-                var itemB = factory.GetInstance(col2A[i].GetType());
+                var itemA = factory.GetRequiredService(col1A[i].GetType());
+                var itemB = factory.GetRequiredService(col2A[i].GetType());
 
                 Assert.AreSame(itemA, itemB);
             }

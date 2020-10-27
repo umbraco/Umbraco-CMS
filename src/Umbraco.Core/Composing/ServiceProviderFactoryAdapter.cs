@@ -16,22 +16,22 @@ namespace Umbraco.Infrastructure.Composing
         
         public object Concrete => ServiceProvider;
 
-        public object GetInstance(Type type)
+        public object GetRequiredService(Type type)
         {
             return ServiceProvider.GetRequiredService(type);
         }
 
-        public object TryGetInstance(Type type)
+        public object GetService(Type type)
         {
             return ServiceProvider.GetService(type);
         }
 
-        public IEnumerable<object> GetAllInstances(Type serviceType)
+        public IEnumerable<object> GetServices(Type serviceType)
         {
             return ServiceProvider.GetServices(serviceType);
         }
 
-        public IEnumerable<TService> GetAllInstances<TService>() where TService : class
+        public IEnumerable<TService> GetServices<TService>() where TService : class
         {
             return ServiceProvider.GetServices<TService>();
         }
