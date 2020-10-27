@@ -490,6 +490,36 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 ordering);
         }
 
+        public override IEnumerable<IMedia> GetPage(IQuery<IMedia> query, long pageIndex, int pageSize, Ordering ordering, IQuery<IMedia> filter = null)
+        {
+            Sql<ISqlContext> filterSql = null;
+
+            if (filter != null)
+            {
+                filterSql = Sql();
+                foreach (var clause in filter.GetWhereClauses())
+                    filterSql = filterSql.Append($"AND ({clause.Item1})", clause.Item2);
+            }
+
+            return GetPage<ContentDto>(query, pageIndex, pageSize,
+                x => MapDtosToContent(x),
+                filterSql,
+                ordering);
+        }
+        public override long Count(IQuery<IMedia> query, IQuery<IMedia> filter = null)
+        {
+            Sql<ISqlContext> filterSql = null;
+
+            if (filter != null)
+            {
+                filterSql = Sql();
+                foreach (var clause in filter.GetWhereClauses())
+                    filterSql = filterSql.Append($"AND ({clause.Item1})", clause.Item2);
+            }
+
+            return Count(query, filterSql);
+        }
+
         private IEnumerable<IMedia> MapDtosToContent(List<ContentDto> dtos, bool withCache = false)
         {
             var temps = new List<TempContent<Models.Media>>();

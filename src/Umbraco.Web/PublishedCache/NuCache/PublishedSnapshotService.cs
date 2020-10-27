@@ -1530,13 +1530,28 @@ WHERE cmsContentNu.nodeId IN (
             if (contentTypeIds != null && contentTypeIdsA.Length > 0)
                 query = query.WhereIn(x => x.ContentTypeId, contentTypeIdsA); // assume number of ctypes won't blow IN(...)
 
+            var documentRepository2 = _documentRepository as IDocumentRepository2;
+
             long pageIndex = 0;
             long processed = 0;
-            long total;
+            long total =0;
+            bool totalCounted = false;
             do
             {
                 // the tree is locked, counting and comparing to total is safe
-                var descendants = _documentRepository.GetPage(query, pageIndex++, groupSize, out total, null, Ordering.By("Path"));
+                IEnumerable<IContent> descendants;
+                if (documentRepository2 != null)
+                {
+                    if (!totalCounted)
+                    {
+                        total = documentRepository2.Count(query, null);
+                    }
+                    descendants = documentRepository2.GetPage(query, pageIndex, groupSize, Ordering.By("Path"),null);
+                }
+                else
+                {
+                    descendants = _documentRepository.GetPage(query, pageIndex++, groupSize, out total, null, Ordering.By("Path"));
+                }
                 var items = new List<ContentNuDto>();
                 var count = 0;
                 foreach (var c in descendants)
@@ -1602,13 +1617,28 @@ WHERE cmsContentNu.nodeId IN (
             if (contentTypeIds != null && contentTypeIdsA.Length > 0)
                 query = query.WhereIn(x => x.ContentTypeId, contentTypeIdsA); // assume number of ctypes won't blow IN(...)
 
+            var mediaRepository2 = _mediaRepository as IMediaRepository2;
             long pageIndex = 0;
             long processed = 0;
-            long total;
+            long total = 0;
+            bool totalCounted = false;
             do
             {
                 // the tree is locked, counting and comparing to total is safe
-                var descendants = _mediaRepository.GetPage(query, pageIndex++, groupSize, out total, null, Ordering.By("Path"));
+                IEnumerable<IMedia> descendants;
+                if (mediaRepository2 != null)
+                {
+                    if (!totalCounted)
+                    {
+                        total = mediaRepository2.Count(query, null);
+                    }
+                    descendants = mediaRepository2.GetPage(query, pageIndex, groupSize, Ordering.By("Path"), null);
+                }
+                else
+                {
+                    descendants = _mediaRepository.GetPage(query, pageIndex++, groupSize, out total, null, Ordering.By("Path"));
+                }
+
                 var items = descendants.Select(m => GetDto(m, false)).ToList();
                 db.BulkInsertRecords(items);
                 processed += items.Count;
@@ -1661,12 +1691,27 @@ WHERE cmsContentNu.nodeId IN (
             if (contentTypeIds != null && contentTypeIdsA.Length > 0)
                 query = query.WhereIn(x => x.ContentTypeId, contentTypeIdsA); // assume number of ctypes won't blow IN(...)
 
+            var memberRepository2 = _memberRepository as IMemberRepository2;
             long pageIndex = 0;
             long processed = 0;
-            long total;
+            long total = 0;
+            bool totalCounted = false;
             do
             {
-                var descendants = _memberRepository.GetPage(query, pageIndex++, groupSize, out total, null, Ordering.By("Path"));
+                IEnumerable<IMember> descendants;
+                if (memberRepository2 != null)
+                {
+                    if (!totalCounted)
+                    {
+                        total = memberRepository2.Count(query, null);
+                    }
+                    descendants = memberRepository2.GetPage(query, pageIndex, groupSize, Ordering.By("Path"), null);
+                }
+                else
+                {
+                    descendants = _memberRepository.GetPage(query, pageIndex++, groupSize, out total, null, Ordering.By("Path"));
+                }
+
                 var items = descendants.Select(m => GetDto(m, false)).ToArray();
                 db.BulkInsertRecords(items);
                 processed += items.Length;

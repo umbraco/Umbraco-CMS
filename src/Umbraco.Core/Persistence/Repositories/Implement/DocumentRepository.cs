@@ -890,6 +890,73 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 ordering);
         }
 
+       
+        /// <inheritdoc />
+        public override IEnumerable<IContent> GetPage(IQuery<IContent> query, long pageIndex, int pageSize, Ordering ordering, IQuery<IContent> filter = null)
+        {
+            Sql<ISqlContext> filterSql = null;
+
+            // if we have a filter, map its clauses to an Sql statement
+            if (filter != null)
+            {
+                // if the clause works on "name", we need to swap the field and use the variantName instead,
+                // so that querying also works on variant content (for instance when searching a listview).
+
+                // figure out how the "name" field is going to look like - so we can look for it
+                var nameField = SqlContext.VisitModelField<IContent>(x => x.Name);
+
+                filterSql = Sql();
+                foreach (var filterClause in filter.GetWhereClauses())
+                {
+                    var clauseSql = filterClause.Item1;
+                    var clauseArgs = filterClause.Item2;
+
+                    // replace the name field
+                    // we cannot reference an aliased field in a WHERE clause, so have to repeat the expression here
+                    clauseSql = clauseSql.Replace(nameField, VariantNameSqlExpression);
+
+                    // append the clause
+                    filterSql.Append($"AND ({clauseSql})", clauseArgs);
+                }
+            }
+
+            return GetPage<DocumentDto>(query, pageIndex, pageSize, 
+                x => MapDtosToContent(x),
+                filterSql,
+                ordering);
+        }
+
+        public override long Count(IQuery<IContent> query, IQuery<IContent> filter = null)
+        {
+            Sql<ISqlContext> filterSql = null;
+
+            // if we have a filter, map its clauses to an Sql statement
+            if (filter != null)
+            {
+                // if the clause works on "name", we need to swap the field and use the variantName instead,
+                // so that querying also works on variant content (for instance when searching a listview).
+
+                // figure out how the "name" field is going to look like - so we can look for it
+                var nameField = SqlContext.VisitModelField<IContent>(x => x.Name);
+
+                filterSql = Sql();
+                foreach (var filterClause in filter.GetWhereClauses())
+                {
+                    var clauseSql = filterClause.Item1;
+                    var clauseArgs = filterClause.Item2;
+
+                    // replace the name field
+                    // we cannot reference an aliased field in a WHERE clause, so have to repeat the expression here
+                    clauseSql = clauseSql.Replace(nameField, VariantNameSqlExpression);
+
+                    // append the clause
+                    filterSql.Append($"AND ({clauseSql})", clauseArgs);
+                }
+            }
+
+            return Count(query, filterSql);
+        }
+
         public bool IsPathPublished(IContent content)
         {
             // fail fast

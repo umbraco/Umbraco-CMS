@@ -31,7 +31,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         public static bool ThrowOnWarning = false;
     }
 
-    internal abstract class ContentRepositoryBase<TId, TEntity, TRepository> : NPocoRepositoryBase<TId, TEntity>, IContentRepository<TId, TEntity>
+    internal abstract class ContentRepositoryBase<TId, TEntity, TRepository> : NPocoRepositoryBase<TId, TEntity>, IContentRepository<TId, TEntity>, IContentRepository2<TId, TEntity>
         where TEntity : class, IContentBase
         where TRepository : class, IRepository
     {
@@ -979,6 +979,55 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             RelationRepository.Save(toSave);
 
         }
+
+        public abstract long Count(IQuery<TEntity> query, IQuery<TEntity> filter = null);
+        protected IEnumerable<TEntity> GetPage<TDto>(IQuery<TEntity> query,
+           long pageIndex, int pageSize,
+           Func<List<TDto>, IEnumerable<TEntity>> mapDtos,
+           Sql<ISqlContext> filter,
+           Ordering ordering)
+        {
+            if (ordering == null) throw new ArgumentNullException(nameof(ordering));
+
+            // start with base query, and apply the supplied IQuery
+            if (query == null) query = Query<TEntity>();
+            var sql = new SqlTranslator<TEntity>(GetBaseQuery(QueryType.Many), query).Translate();
+
+            // sort and filter
+            sql = PreparePageSql(sql, filter, ordering);
+
+            // get a page of DTOs and the total count
+            var pagedResult = Database.SkipTake<TDto>((pageIndex)*pageSize, pageSize, sql);
+
+            // map the DTOs and return
+            return mapDtos(pagedResult);
+        }
+        protected long Count(IQuery<TEntity> query, Sql<ISqlContext> filter = null)
+        {
+            
+            // start with base query, and apply the supplied IQuery
+            if (query == null) query = Query<TEntity>();
+            var sql = new SqlTranslator<TEntity>(GetBaseQuery(QueryType.Many), query).Translate();
+
+            // non-filtering, non-ordering = nothing to do
+            if (filter != null)
+            {
+                // preserve original
+                var psql = new Sql<ISqlContext>(sql.SqlContext, sql.SQL, sql.Arguments);
+
+                // apply filter
+                if (filter != null)
+                    psql.Append(filter);
+                sql = psql;
+            }
+
+           
+
+            // get a page of DTOs and the total count
+            return Database.ExecuteScalar<long>(sql);
+        }
+
+        public abstract IEnumerable<TEntity> GetPage(IQuery<TEntity> query, long pageIndex, int pageSize, Ordering ordering, IQuery<TEntity> filter = null);
 
         private class NodeIdKey
         {

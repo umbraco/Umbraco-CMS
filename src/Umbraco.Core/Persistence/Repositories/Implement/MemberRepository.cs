@@ -595,6 +595,36 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 filterSql,
                 ordering);
         }
+        public override IEnumerable<IMember> GetPage(IQuery<IMember> query, long pageIndex, int pageSize, Ordering ordering, IQuery<IMember> filter = null)
+        {
+            Sql<ISqlContext> filterSql = null;
+
+            if (filter != null)
+            {
+                filterSql = Sql();
+                foreach (var clause in filter.GetWhereClauses())
+                    filterSql = filterSql.Append($"AND ({clause.Item1})", clause.Item2);
+            }
+
+            return GetPage<MemberDto>(query, pageIndex, pageSize,
+                x => MapDtosToContent(x),
+                filterSql,
+                ordering);
+        }
+
+        public override long Count(IQuery<IMember> query, IQuery<IMember> filter = null)
+        {
+            Sql<ISqlContext> filterSql = null;
+
+            if (filter != null)
+            {
+                filterSql = Sql();
+                foreach (var clause in filter.GetWhereClauses())
+                    filterSql = filterSql.Append($"AND ({clause.Item1})", clause.Item2);
+            }
+
+            return Count(query, filterSql);
+        }
 
         protected override string ApplySystemOrdering(ref Sql<ISqlContext> sql, Ordering ordering)
         {

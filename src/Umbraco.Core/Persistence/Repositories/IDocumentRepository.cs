@@ -5,6 +5,10 @@ using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
+    public interface IDocumentRepository2 : IDocumentRepository, IContentRepository2<int, IContent>
+    {
+
+    }
     public interface IDocumentRepository : IContentRepository<int, IContent>, IReadRepository<Guid, IContent>
     {
         /// <summary>
