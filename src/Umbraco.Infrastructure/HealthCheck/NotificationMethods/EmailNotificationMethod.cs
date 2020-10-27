@@ -45,7 +45,7 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
 
         public string RecipientEmail { get; }
 
-        public override async Task SendAsync(HealthCheckResults results, CancellationToken token)
+        public override async Task SendAsync(HealthCheckResults results)
         {
             if (ShouldSend(results) == false)
             {

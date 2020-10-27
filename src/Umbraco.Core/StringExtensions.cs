@@ -1478,5 +1478,24 @@ namespace Umbraco.Core
         {
             return shortStringHelper.CleanStringForSafeFileName(text, culture);
         }
+
+        /// <summary>
+        /// Validates a string matches a time.
+        /// </summary>
+        /// <param name="input">Time representation (in Hmm form, e.g. 330, 2200)</param>
+        /// <returns></returns>
+        public static bool IsValidTimeFormat(this string input)
+        {
+            if (string.IsNullOrEmpty(input) || input.Length < 3 || input.Length > 4)
+            {
+                return false;
+            }
+
+            var inputWithSeparator = input.Length == 3
+                ? $"{input.Substring(0, 1)}:{input.Substring(1)}"
+                : $"{input.Substring(0, 2)}:{input.Substring(2)}";
+
+            return TimeSpan.TryParse(inputWithSeparator, out var _);
+        }
     }
 }

@@ -9,7 +9,7 @@ namespace Umbraco.Core.Configuration.Models
     {
         public IEnumerable<DisabledHealthCheck> DisabledChecks { get; set; } = Enumerable.Empty<DisabledHealthCheck>();
 
-        public HealthCheckNotificationSettings NotificationSettings { get; set; } = new HealthCheckNotificationSettings();
+        public HealthCheckNotificationSettings Notification { get; set; } = new HealthCheckNotificationSettings();
 
         public class HealthCheckNotificationSettings
         {

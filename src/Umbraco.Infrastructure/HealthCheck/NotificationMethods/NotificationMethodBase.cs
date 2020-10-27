@@ -22,7 +22,7 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
                 return;
             }
 
-            var notificationMethods = healthCheckSettings.Value.NotificationSettings.NotificationMethods;
+            var notificationMethods = healthCheckSettings.Value.Notification.NotificationMethods;
             if(!notificationMethods.TryGetValue(attribute.Alias, out var notificationMethod))
             {
                 Enabled = false;
@@ -48,6 +48,6 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
             return Enabled && (!FailureOnly || !results.AllChecksSuccessful);
         }
 
-        public abstract Task SendAsync(HealthCheckResults results, CancellationToken token);
+        public abstract Task SendAsync(HealthCheckResults results);
     }
 }

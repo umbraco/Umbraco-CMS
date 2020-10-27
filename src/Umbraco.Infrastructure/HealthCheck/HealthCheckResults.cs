@@ -128,6 +128,8 @@ namespace Umbraco.Infrastructure.HealthCheck
             return html;
         }
 
+        internal Dictionary<string, IEnumerable<HealthCheckStatus>> ResultsAsDictionary => _results;
+
         private string ApplyHtmlHighlighting(string html)
         {
             html = ApplyHtmlHighlightingForStatus(html, StatusResultType.Success, "5cb85c");

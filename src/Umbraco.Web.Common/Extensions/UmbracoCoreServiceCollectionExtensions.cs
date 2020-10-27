@@ -131,6 +131,7 @@ namespace Umbraco.Extensions
 
             services.AddSingleton<IValidateOptions<ContentSettings>, ContentSettingsValidator>();
             services.AddSingleton<IValidateOptions<GlobalSettings>, GlobalSettingsValidator>();
+            services.AddSingleton<IValidateOptions<HealthChecksSettings>, HealthChecksSettingsValidator >();
             services.AddSingleton<IValidateOptions<RequestHandlerSettings>, RequestHandlerSettingsValidator>();
 
             services.Configure<ActiveDirectorySettings>(configuration.GetSection(Constants.Configuration.ConfigActiveDirectory));

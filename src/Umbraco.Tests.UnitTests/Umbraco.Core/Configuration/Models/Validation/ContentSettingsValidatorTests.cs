@@ -1,7 +1,6 @@
 ﻿using NUnit.Framework;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Configuration.Models.Validation;
-using Umbraco.Tests.Common.Builders;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.Configuration.Models.Validation
 {

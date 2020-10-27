@@ -41,5 +41,18 @@ namespace Umbraco.Core.Configuration.Models.Validation
             message = string.Empty;
             return true;
         }
+
+        public bool ValidateOptionalTime(string configPath, string value, out string message)
+        {
+            if (!string.IsNullOrEmpty(value) && !value.IsValidTimeFormat())
+            {
+                message = $"Configuration entry {configPath} contains an invalid time value.";
+                return false;
+            }
+
+            message = string.Empty;
+            return true;
+        }
+
     }
 }
