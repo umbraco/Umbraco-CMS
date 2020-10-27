@@ -8,6 +8,21 @@ using Umbraco.Core.Persistence.Querying;
 
 namespace Umbraco.Core.Services
 {
+    public interface IContentService2 : IContentService
+    {
+
+        /// <summary>
+        /// Gets descendant documents of a given parent.
+        /// </summary>
+        /// <param name="id">The parent identifier.</param>
+        /// <param name="pageIndex">The page number.</param>
+        /// <param name="pageSize">The page size.</param>
+        /// <param name="filter">Query filter.</param>
+        /// <param name="ordering">Ordering infos.</param>
+        IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize,
+            IQuery<IContent> filter = null, Ordering ordering = null);
+    }
+
     /// <summary>
     /// Defines the ContentService, which is an easy access to operations involving <see cref="IContent"/>
     /// </summary>

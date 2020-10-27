@@ -19,7 +19,7 @@ namespace Umbraco.Core.Services.Implement
     /// <summary>
     /// Implements the content service.
     /// </summary>
-    public class ContentService : RepositoryService, IContentService
+    public class ContentService : RepositoryService, IContentService, IContentService2
     {
         private readonly IDocumentRepository _documentRepository;
         private readonly IEntityRepository _entityRepository;
@@ -606,6 +606,29 @@ namespace Umbraco.Core.Services.Implement
                 return GetPagedLocked(null, pageIndex, pageSize, out totalChildren, filter, ordering);
             }
         }
+        public IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, 
+            IQuery<IContent> filter = null, Ordering ordering = null)
+        {
+            if (ordering == null)
+                ordering = Ordering.By("Path");
+
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                scope.ReadLock(Constants.Locks.ContentTree);
+
+                //if the id is System Root, then just get all
+                if (id != Constants.System.Root)
+                {
+                    var contentPath = _entityRepository.GetAllPaths(Constants.ObjectTypes.Document, id).ToArray();
+                    if (contentPath.Length == 0)
+                    {
+                        return Enumerable.Empty<IContent>();
+                    }
+                    return GetPagedLocked(GetPagedDescendantQuery(contentPath[0].Path), pageIndex, pageSize, filter, ordering);
+                }
+                return GetPagedLocked(null, pageIndex, pageSize,  filter, ordering);
+            }
+        }
 
         private IQuery<IContent> GetPagedDescendantQuery(string contentPath)
         {
@@ -623,6 +646,18 @@ namespace Umbraco.Core.Services.Implement
             if (ordering == null) throw new ArgumentNullException(nameof(ordering));
 
             return _documentRepository.GetPage(query, pageIndex, pageSize, out totalChildren, filter, ordering);
+        }
+        private IEnumerable<IContent> GetPagedLocked(IQuery<IContent> query, long pageIndex, int pageSize,
+            IQuery<IContent> filter, Ordering ordering)
+        {
+            if (pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
+            if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
+            if (ordering == null) throw new ArgumentNullException(nameof(ordering));
+            if(_documentRepository is IDocumentRepository2 documentRepository2)
+            {
+                return documentRepository2.GetPage(query, pageIndex, pageSize, ordering, filter);
+            }
+            return _documentRepository.GetPage(query, pageIndex, pageSize, out _, filter, ordering);
         }
 
         /// <summary>

@@ -19,6 +19,7 @@ namespace Umbraco.Examine
     public class ContentIndexPopulator : IndexPopulator<IUmbracoContentIndex2>
     {
         private readonly IContentService _contentService;
+        private readonly IContentService2 _contentService2;
         private readonly IValueSetBuilder<IContent> _contentValueSetBuilder;
 
         /// <summary>
@@ -57,6 +58,7 @@ namespace Umbraco.Examine
                 _publishedQuery = sqlContext.Query<IContent>().Where(x => x.Published);
             _publishedValuesOnly = publishedValuesOnly;
             _parentId = parentId;
+            _contentService2 = contentService as IContentService2;
         }
 
         public override bool IsRegistered(IUmbracoContentIndex2 index)
@@ -91,10 +93,16 @@ namespace Umbraco.Examine
         protected void IndexAllContent(int contentParentId, int pageIndex, int pageSize, IReadOnlyList<IIndex> indexes)
         {
             IContent[] content;
-
             do
             {
-                content = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out _).ToArray();
+                if (_contentService2 != null)
+                {
+                    content = _contentService2.GetPagedDescendants(contentParentId, pageIndex, pageSize).ToArray();
+                }
+                else
+                {
+                    content = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out _).ToArray();
+                }
 
                 if (content.Length > 0)
                 {
@@ -122,10 +130,17 @@ namespace Umbraco.Examine
             {
                 //add the published filter
                 //note: We will filter for published variants in the validator
-                content = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out _, _publishedQuery,
-                    Ordering.By("Path", Direction.Ascending)).ToArray();
+                if(_contentService2 != null)
+                {
+                    content = _contentService2.GetPagedDescendants(contentParentId, pageIndex, pageSize, _publishedQuery,
+                        Ordering.By("Path", Direction.Ascending)).ToArray();
+                }
+                else
+                {
+                    content = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out _, _publishedQuery,
+                           Ordering.By("Path", Direction.Ascending)).ToArray();
+                }
 
-                
                 if (content.Length > 0)
                 {
                     var indexableContent = new List<IContent>();

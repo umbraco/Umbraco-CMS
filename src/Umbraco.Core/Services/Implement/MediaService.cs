@@ -19,9 +19,10 @@ namespace Umbraco.Core.Services.Implement
     /// <summary>
     /// Represents the Media Service, which is an easy access to operations involving <see cref="IMedia"/>
     /// </summary>
-    public class MediaService : ScopeRepositoryService, IMediaService
+    public class MediaService : ScopeRepositoryService, IMediaService, IMediaService2
     {
         private readonly IMediaRepository _mediaRepository;
+        private readonly IMediaRepository2 _mediaRepository2;
         private readonly IMediaTypeRepository _mediaTypeRepository;
         private readonly IAuditRepository _auditRepository;
         private readonly IEntityRepository _entityRepository;
@@ -40,6 +41,7 @@ namespace Umbraco.Core.Services.Implement
             _auditRepository = auditRepository;
             _mediaTypeRepository = mediaTypeRepository;
             _entityRepository = entityRepository;
+            _mediaRepository2 = mediaRepository as IMediaRepository2;
         }
 
         #endregion
@@ -535,6 +537,30 @@ namespace Umbraco.Core.Services.Implement
                 return GetPagedLocked(GetPagedDescendantQuery(null), pageIndex, pageSize, out totalChildren, filter, ordering);
             }
         }
+        /// <inheritdoc />
+        public IEnumerable<IMedia> GetPagedDescendants(int id, long pageIndex, int pageSize, 
+            IQuery<IMedia> filter = null, Ordering ordering = null)
+        {
+            if (ordering == null)
+                ordering = Ordering.By("Path");
+
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                scope.ReadLock(Constants.Locks.MediaTree);
+
+                //if the id is System Root, then just get all
+                if (id != Constants.System.Root)
+                {
+                    var mediaPath = _entityRepository.GetAllPaths(Constants.ObjectTypes.Media, id).ToArray();
+                    if (mediaPath.Length == 0)
+                    {
+                        return Enumerable.Empty<IMedia>();
+                    }
+                    return GetPagedLocked(GetPagedDescendantQuery(mediaPath[0].Path), pageIndex, pageSize,  filter, ordering);
+                }
+                return GetPagedLocked(GetPagedDescendantQuery(null), pageIndex, pageSize, filter, ordering);
+            }
+        }
 
         private IQuery<IMedia> GetPagedDescendantQuery(string mediaPath)
         {
@@ -552,6 +578,19 @@ namespace Umbraco.Core.Services.Implement
             if (ordering == null) throw new ArgumentNullException(nameof(ordering));
 
             return _mediaRepository.GetPage(query, pageIndex, pageSize, out totalChildren, filter, ordering);
+        }
+        private IEnumerable<IMedia> GetPagedLocked(IQuery<IMedia> query, long pageIndex, int pageSize, 
+            IQuery<IMedia> filter, Ordering ordering)
+        {
+            if(_mediaRepository2 == null)
+            {
+                return GetPagedLocked(query, pageIndex, pageSize, out _, filter, ordering);
+            }
+            if (pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
+            if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
+            if (ordering == null) throw new ArgumentNullException(nameof(ordering));
+
+            return _mediaRepository2.GetPage(query, pageIndex, pageSize,  ordering, filter);
         }
 
         /// <summary>
