@@ -1459,6 +1459,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="addRowConfiguration">Een rijconfiguratie toevoegen</key>
     <key alias="editRowConfiguration">Rijconfiguratie aanpassen</key>
     <key alias="addRowConfigurationDetail">De rijconfiguratie aanpassen door de breedte van de cel in te stellen en extra cellen toe te voegen</key>
+    <key alias="noConfiguration">Geen verdere instellingen beschikbaar</key>
     <key alias="columns">Kolommen</key>
     <key alias="columnsDetails">Het totaal aantal gecombineerde kolommen in de grid layout</key>
     <key alias="settings">Instellingen</key>
@@ -2176,6 +2177,17 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="findLogsWithNamespace">Logs met Namespace zoeken</key>
     <key alias="findLogsWithMachineName">Logs met Machine Naam zoeken</key>
     <key alias="open">Openen</key>
+    <key alias="polling">Peilen</key>
+    <key alias="every2">Elke 2 seconden</key>
+    <key alias="every5">Elke 5 seconden</key>
+    <key alias="every10">Elke 10 seconden</key>
+    <key alias="every20">Elke 20 seconden</key>
+    <key alias="every30">Elke 30 seconden</key>
+    <key alias="pollingEvery2">Elke 2s peilen</key>
+    <key alias="pollingEvery5">Elke 5s peilen</key>
+    <key alias="pollingEvery10">Elke 10s peilen</key>
+    <key alias="pollingEvery20">Elke 20s peilen</key>
+    <key alias="pollingEvery30">Elke 30s peilen</key>
   </area>
   <area alias="clipboard">
     <key alias="labelForCopyAllEntries">Kopieer %0%</key>
@@ -2323,13 +2335,16 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
       <key alias="labelContentElementType">Inhoud model</key>
       <key alias="labelLabelTemplate">Label</key>
       <key alias="labelCustomView">Aangepaste weergave</key>
+      <key alias="labelCustomViewInfoTitle">Aangepaste weergave-omschrijving tonen</key>
+      <key alias="labelCustomViewDescription">Overschrijf hoe dit blok wordt weergegeven in de BackOffice-gebruikersinterface. Kies een .html-bestand met je presentatie.</key>
       <key alias="labelSettingsElementType">Instellingen model</key>
       <key alias="labelEditorSize">Grootte van overlay-editor</key>
       <key alias="addCustomView">Aangepaste weergave toevoegen</key>
       <key alias="addSettingsElementType">Instellingen toevoegen</key>
       <key alias="labelTemplatePlaceholder">Label sjabloon overschrijven</key>
       <key alias="confirmDeleteBlockMessage"><![CDATA[Weet je zeker dat je blok <strong>%0%</strong> wil verwijderen?]]></key>
-      <key alias="confirmDeleteBlockNotice">Inhoud die deze blok gebruikt zal verloren gaan.</key>
+      <key alias="confirmDeleteBlockTypeMessage"><![CDATA[Weet je zeker dat je blok instellingen <strong>%0%</strong> wil verwijderen?]]></key>
+      <key alias="confirmDeleteBlockTypeNotice">De inhoud van dit blok is nog steeds aanwezig, bewerken van deze inhoud is niet langer mogelijk en wordt weergegeven als niet-ondersteunde inhoud.</key>
       <key alias="blockConfigurationOverlayTitle"><![CDATA[Configuratie van '%0%']]></key>
       <key alias="thumbnail">Miniatuur</key>
       <key alias="addThumbnail">Miniatuur toevoegen</key>
@@ -2339,6 +2354,10 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
       <key alias="headlineAdvanced">Geavanceerd</key>
       <key alias="forceHideContentEditor">Inhoudseditor geforceerd verbergen</key>
       <key alias="blockHasChanges">Je hebt aanpassingen gemaakt aan deze inhoud. Wil je deze wijzigingen verwerpen?</key>
+      <key alias="confirmCancelBlockCreationHeadline">Wijzigingen opslaan?</key>
+      <key alias="confirmCancelBlockCreationMessage"><![CDATA[Ben je zeker dat je deze wijzigingen wil verwerpen?]]></key>
+      <key alias="elementTypeDoesNotExistHeadline">Fout!</key>
+      <key alias="elementTypeDoesNotExistDescription">Het Elementtype van dit blok bestaat niet meer</key>
     </area>
   <area alias="contentTemplatesDashboard">
     <key alias="whatHeadline">Wat zijn Inhoudssjablonen?</key>
