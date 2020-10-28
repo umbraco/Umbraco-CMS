@@ -160,6 +160,7 @@
                     filter: function (i) {
                         return !(i.name.indexOf(".html") !== -1);
                     },
+                    filterCssClass: "not-allowed",
                     select: function (node) {
                         const filepath = decodeURIComponent(node.id.replace(/\+/g, " "));
                         block.view = "~/" + filepath;
@@ -206,6 +207,7 @@
                     filter: function (i) {
                         return !(i.name.indexOf(".css") !== -1);
                     },
+                    filterCssClass: "not-allowed",
                     select: function (node) {
                         const filepath = decodeURIComponent(node.id.replace(/\+/g, " "));
                         block.stylesheet = "~/" + filepath;
