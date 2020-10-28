@@ -13,6 +13,7 @@
     <ItemGroup>
         <PackageReference Include="CSharpTest.Net.Collections-NetStd2" Version="14.906.1403.1084" />
         <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+        <PackageReference Include="Umbraco.Code" Version="1.1.0" />
     </ItemGroup>
 
     <ItemGroup>

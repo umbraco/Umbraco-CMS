@@ -12,6 +12,7 @@
 
     <ItemGroup>
       <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.7.0" />
+      <PackageReference Include="Umbraco.Code" Version="1.1.0" />
     </ItemGroup>
 
     <ItemGroup>

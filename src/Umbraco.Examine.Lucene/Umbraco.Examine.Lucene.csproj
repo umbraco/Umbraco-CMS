@@ -44,6 +44,7 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
+        <PackageReference Include="Umbraco.Code" Version="1.1.0" />
     </ItemGroup>
 
 </Project>

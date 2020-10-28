@@ -28,6 +28,7 @@
       <PackageReference Include="SixLabors.ImageSharp.Web" Version="1.0.0" />
       <PackageReference Include="Smidge" Version="3.2.0-build.244" />
       <PackageReference Include="Smidge.Nuglify" Version="3.2.0-build.244" />
+      <PackageReference Include="Umbraco.Code" Version="1.1.0" />
     </ItemGroup>
 
     <ItemGroup>

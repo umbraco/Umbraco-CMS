@@ -32,4 +32,8 @@
             <_Parameter1>Umbraco.Tests.Integration</_Parameter1>
         </AssemblyAttribute>
     </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Umbraco.Code" Version="1.1.0" />
+    </ItemGroup>
 </Project>

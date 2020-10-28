@@ -109,6 +109,9 @@
     <PackageReference Include="Perfolizer">
       <Version>0.2.1</Version>
     </PackageReference>
+    <PackageReference Include="Umbraco.Code">
+      <Version>1.1.0</Version>
+    </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

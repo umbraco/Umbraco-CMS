@@ -74,6 +74,7 @@
       <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.8" />
         <!-- TODO: remove the reference to System.Configuration.ConfigurationManager when Examine/lucene dont need it-->
         <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.7.0" />
+        <PackageReference Include="Umbraco.Code" Version="1.1.0" />
     </ItemGroup>
 
 
