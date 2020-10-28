@@ -52,7 +52,7 @@ namespace Umbraco.Core
                 {
                     client.Connect(_globalSettings.Smtp.Host,
                         _globalSettings.Smtp.Port,
-                        ParseSecureSocketOptions(_globalSettings.Smtp));
+                        (MailKit.Security.SecureSocketOptions)(int)_globalSettings.Smtp.SecureSocketOptions);
 
                     if (!(_globalSettings.Smtp.Username is null && _globalSettings.Smtp.Password is null))
                     {
@@ -82,7 +82,7 @@ namespace Umbraco.Core
                 {
                     await client.ConnectAsync(_globalSettings.Smtp.Host,
                         _globalSettings.Smtp.Port,
-                        ParseSecureSocketOptions(_globalSettings.Smtp));
+                        (MailKit.Security.SecureSocketOptions)(int)_globalSettings.Smtp.SecureSocketOptions);
 
                     if (!(_globalSettings.Smtp.Username is null && _globalSettings.Smtp.Password is null))
                     {
@@ -102,16 +102,6 @@ namespace Umbraco.Core
                     await client.DisconnectAsync(true);
                 }
             }
-        }
-
-        private SecureSocketOptions ParseSecureSocketOptions(SmtpSettings smtp)
-        {
-            if (Enum.TryParse(smtp.SecureSocketOptions, out SecureSocketOptions options))
-            {
-                return options;
-            }
-
-            return SecureSocketOptions.Auto;
         }
 
         /// <summary>
