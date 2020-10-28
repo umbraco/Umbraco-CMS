@@ -13,21 +13,21 @@ namespace Umbraco.Infrastructure.HostedServices
     /// </remarks>
     public abstract class RecurringHostedServiceBase : IHostedService, IDisposable
     {
-        protected const int DefaultDelayMilliseconds = 180000; // 3 mins
+        protected static readonly TimeSpan DefaultDelay = TimeSpan.FromMinutes(3);
 
-        private readonly int _periodMilliseconds;
-        private readonly int _delayMilliseconds;
+        private readonly TimeSpan _period;
+        private readonly TimeSpan _delay;
         private Timer _timer;
 
-        protected RecurringHostedServiceBase(int periodMilliseconds, int delayMilliseconds)
+        protected RecurringHostedServiceBase(TimeSpan period, TimeSpan delay)
         {
-            _periodMilliseconds = periodMilliseconds;
-            _delayMilliseconds = delayMilliseconds;
+            _period = period;
+            _delay = delay;
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            _timer = new Timer(ExecuteAsync, null, _delayMilliseconds, _periodMilliseconds);
+            _timer = new Timer(ExecuteAsync, null, (int)_delay.TotalMilliseconds, (int)_period.TotalMilliseconds);
             return Task.CompletedTask;
         }
 

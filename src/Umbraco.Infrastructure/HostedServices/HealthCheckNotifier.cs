@@ -39,7 +39,8 @@ namespace Umbraco.Infrastructure.HostedServices
             IScopeProvider scopeProvider,
             ILogger<HealthCheckNotifier> logger,
             IProfilingLogger profilingLogger)
-            : base(GetPeriodMilliseconds(healthChecksSettings), GetDelayMilliseconds(healthChecksSettings))
+            : base(healthChecksSettings.Value.Notification.Period,
+                   healthChecksSettings.Value.GetNotificationDelay(DateTime.Now, DefaultDelay))
         {
             _healthChecksSettings = healthChecksSettings.Value;
             _healthChecks = healthChecks;
@@ -52,12 +53,7 @@ namespace Umbraco.Infrastructure.HostedServices
             _profilingLogger = profilingLogger;
         }
 
-        private static int GetPeriodMilliseconds(IOptions<HealthChecksSettings> healthChecksSettings) =>
-            healthChecksSettings.Value.GetNotificationPeriodInMilliseconds();
-
-        private static int GetDelayMilliseconds(IOptions<HealthChecksSettings> healthChecksSettings) =>
-            healthChecksSettings.Value.GetNotificationDelayInMilliseconds(DateTime.Now, DefaultDelayMilliseconds);
-        
+       
         public override async void ExecuteAsync(object state)
         {
             if (_healthChecksSettings.Notification.Enabled == false)

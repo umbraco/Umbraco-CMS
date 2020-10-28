@@ -9,21 +9,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Configuration.Models.Extensions
     public class HealthCheckSettingsExtensionsTests
     {
         [Test]
-        public void Returns_Notification_Period_In_Milliseconds()
-        {
-            var settings = new HealthChecksSettings
-            {
-                Notification = new HealthChecksSettings.HealthCheckNotificationSettings
-                {
-                    PeriodInHours = 2,
-                }
-            };
-            var result = settings.GetNotificationPeriodInMilliseconds();
-            Assert.AreEqual(7200000, result);
-        }
-
-        [Test]
-        public void Returns_Notification_Delay_In_Milliseconds()
+        public void Returns_Notification_Delay_From_Provided_Time()
         {
             var settings = new HealthChecksSettings
             {
@@ -33,8 +19,23 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Configuration.Models.Extensions
                 }
             };
             var now = DateTime.Now.Date.AddHours(12);
-            var result = settings.GetNotificationDelayInMilliseconds(now, 0);
-            Assert.AreEqual(1800000, result);
+            var result = settings.GetNotificationDelay(now, TimeSpan.Zero);
+            Assert.AreEqual(30, result.Minutes);
+        }
+
+        [Test]
+        public void Returns_Notification_Delay_From_Default_When_Provided_Time_Too_Close_To_Current_Time()
+        {
+            var settings = new HealthChecksSettings
+            {
+                Notification = new HealthChecksSettings.HealthCheckNotificationSettings
+                {
+                    FirstRunTime = "1230",
+                }
+            };
+            var now = DateTime.Now.Date.AddHours(12).AddMinutes(25);
+            var result = settings.GetNotificationDelay(now, TimeSpan.FromMinutes(10));
+            Assert.AreEqual(10, result.Minutes);
         }
     }
 }

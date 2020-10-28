@@ -302,12 +302,9 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.ShortStringHelper
         }
 
         [TestCase("", false)]
-        [TestCase("24", false)]
-        [TestCase("12345", false)]
-        [TestCase("234", true)]
-        [TestCase("1234", true)]
-        [TestCase("2503", false)]
-        [TestCase("1861", false)]
+        [TestCase("12:34", true)]
+        [TestCase("25:03", false)]
+        [TestCase("18:61", false)]
         public void IsValidTimeFormat(string input, bool expected)
         {
             var result = input.IsValidTimeFormat();

@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using System;
+using NUnit.Framework;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Configuration.Models.Validation;
 
@@ -20,12 +21,12 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Configuration.Models.Validation
         public void Returns_Fail_For_Configuration_With_Invalid_Notification_FirstRunTime()
         {
             var validator = new HealthChecksSettingsValidator();
-            var options = BuildHealthChecksSettings(firstRunTime: "2500");
+            var options = BuildHealthChecksSettings(firstRunTime: "25:00");
             var result = validator.Validate("settings", options);
             Assert.False(result.Succeeded);
         }
 
-        private static HealthChecksSettings BuildHealthChecksSettings(string firstRunTime = "1200")
+        private static HealthChecksSettings BuildHealthChecksSettings(string firstRunTime = "12:00")
         {
             return new HealthChecksSettings
             {
@@ -33,7 +34,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Configuration.Models.Validation
                 {
                     Enabled = true,
                     FirstRunTime = firstRunTime,
-                    PeriodInHours = 1,
+                    Period = TimeSpan.FromHours(1),
                 }
             };
         }
