@@ -20,12 +20,12 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Configuration.Models.Validation
         public void Returns_Fail_For_Configuration_With_Invalid_Notification_FirstRunTime()
         {
             var validator = new HealthChecksSettingsValidator();
-            var options = BuildHealthChecksSettings(firstRunTime: "25:00");
+            var options = BuildHealthChecksSettings(firstRunTime: "2500");
             var result = validator.Validate("settings", options);
             Assert.False(result.Succeeded);
         }
 
-        private static HealthChecksSettings BuildHealthChecksSettings(string firstRunTime = "12:00")
+        private static HealthChecksSettings BuildHealthChecksSettings(string firstRunTime = "1200")
         {
             return new HealthChecksSettings
             {

@@ -6,8 +6,7 @@ namespace Umbraco.Core.Configuration.Models.Validation
     {
         public ValidateOptionsResult Validate(string name, HealthChecksSettings options)
         {
-            string message;
-            if (!ValidateNotificationFirstRunTime(options.Notification.FirstRunTime, out message))
+            if (!ValidateNotificationFirstRunTime(options.Notification.FirstRunTime, out var message))
             {
                 return ValidateOptionsResult.Fail(message);
             }

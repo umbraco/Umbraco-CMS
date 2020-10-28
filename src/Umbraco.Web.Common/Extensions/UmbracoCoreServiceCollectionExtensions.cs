@@ -234,9 +234,6 @@ namespace Umbraco.Extensions
 
             coreRuntime.Configure(services);
 
-            // Add hosted services
-            services.AddHostedServices();
-
             return services;
         }
 
@@ -304,7 +301,7 @@ namespace Umbraco.Extensions
         /// </summary>
         /// <param name="services"></param>
         /// <returns></returns>
-        private static IServiceCollection AddHostedServices(this IServiceCollection services)
+        public static IServiceCollection AddUmbracoHostedServices(this IServiceCollection services)
         {
             services.AddHostedService<HealthCheckNotifier>();
 
