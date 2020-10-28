@@ -66,9 +66,13 @@ namespace Umbraco.Tests.TestHelpers
 
             public override IHostingEnvironment GetHostingEnvironment()
             {
+                var testPath = TestContext.CurrentContext.TestDirectory.Split("bin")[0];
                 return new AspNetCoreHostingEnvironment(
                     Mock.Of<IOptionsMonitor<HostingSettings>>(x=>x.CurrentValue == new HostingSettings()),
-                    Mock.Of<IWebHostEnvironment>(x=>x.WebRootPath == "/"));
+                    Mock.Of<IWebHostEnvironment>(
+                        x=>
+                            x.WebRootPath == "/" &&
+                            x.ContentRootPath == testPath));
             }
 
             public override IApplicationShutdownRegistry GetHostingEnvironmentLifetime()

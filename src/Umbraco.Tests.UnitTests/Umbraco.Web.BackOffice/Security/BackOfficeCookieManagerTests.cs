@@ -12,7 +12,7 @@ using Umbraco.Web;
 using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.BackOffice.Security;
 
-namespace Umbraco.Tests.Integration.Umbraco.Web.Backoffice.Security
+namespace Umbraco.Tests.UnitTests.Umbraco.Web.Backoffice.Security
 {
     [TestFixture]
     public class BackOfficeCookieManagerTests

@@ -2,15 +2,16 @@
 using NUnit.Framework;
 using Serilog;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Microsoft.Extensions.Logging;
+using StackExchange.Profiling.Internal;
 using Umbraco.Core;
 using Umbraco.Core.Logging.Viewer;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Tests.Integration.Implementations;
 
-namespace Umbraco.Tests.Integration.Logging
+namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Logging
 {
     [TestFixture]
     public class LogviewerTests
@@ -33,19 +34,19 @@ namespace Umbraco.Tests.Integration.Logging
         [OneTimeSetUp]
         public void Setup()
         {
+            var testRoot = TestContext.CurrentContext.TestDirectory.Split("bin")[0];
             //Create an example JSON log file to check results
             //As a one time setup for all tets in this class/fixture
-            var testHelper = new TestHelper();
-            var ioHelper = testHelper.IOHelper;
-            var hostingEnv = testHelper.GetHostingEnvironment();
+            var ioHelper = TestHelper.IOHelper;
+            var hostingEnv = TestHelper.GetHostingEnvironment();
 
-            var loggingConfiguration = testHelper.GetLoggingConfiguration(hostingEnv);
+            var loggingConfiguration = TestHelper.GetLoggingConfiguration(hostingEnv);
 
-            var exampleLogfilePath = Path.Combine(TestContext.CurrentContext.TestDirectory, @"Logging\", _logfileName);
+            var exampleLogfilePath = Path.Combine(testRoot, @"TestHelpers\Assets\", _logfileName);
             _newLogfileDirPath = loggingConfiguration.LogDirectory;
             _newLogfilePath = Path.Combine(_newLogfileDirPath, _logfileName);
 
-            var exampleSearchfilePath = Path.Combine(TestContext.CurrentContext.TestDirectory, @"Logging\", _searchfileName);
+            var exampleSearchfilePath = Path.Combine(testRoot, @"TestHelpers\Assets\", _searchfileName);
             _newSearchfileDirPath = Path.Combine(hostingEnv.ApplicationPhysicalPath, @"Config\");
             _newSearchfilePath = Path.Combine(_newSearchfileDirPath, _searchfileName);
 
@@ -80,7 +81,7 @@ namespace Umbraco.Tests.Integration.Logging
             var numberOfErrors = _logViewer.GetNumberOfErrors(_logTimePeriod);
 
             //Our dummy log should contain 2 errors
-            Assert.AreEqual(2, numberOfErrors);
+            Assert.AreEqual(1, numberOfErrors);
         }
 
         [Test]
@@ -88,11 +89,11 @@ namespace Umbraco.Tests.Integration.Logging
         {
             var logCounts = _logViewer.GetLogLevelCounts(_logTimePeriod);
 
-            Assert.AreEqual(1954, logCounts.Debug);
-            Assert.AreEqual(2, logCounts.Error);
+            Assert.AreEqual(55, logCounts.Debug);
+            Assert.AreEqual(1, logCounts.Error);
             Assert.AreEqual(0, logCounts.Fatal);
-            Assert.AreEqual(62, logCounts.Information);
-            Assert.AreEqual(7, logCounts.Warning);
+            Assert.AreEqual(38, logCounts.Information);
+            Assert.AreEqual(6, logCounts.Warning);
         }
 
         [Test]
@@ -101,7 +102,7 @@ namespace Umbraco.Tests.Integration.Logging
             var templates = _logViewer.GetMessageTemplates(_logTimePeriod);
 
             //Count no of templates
-            Assert.AreEqual(43, templates.Count());
+            Assert.AreEqual(25, templates.Count());
 
             //Verify all templates & counts are unique
             CollectionAssert.AllItemsAreUnique(templates);
@@ -113,8 +114,8 @@ namespace Umbraco.Tests.Integration.Logging
             var popularTemplate = templates.FirstOrDefault();
 
             Assert.IsNotNull(popularTemplate);
-            Assert.AreEqual("{LogPrefix} Task added {TaskType}", popularTemplate.MessageTemplate);
-            Assert.AreEqual(689, popularTemplate.Count);
+            Assert.AreEqual("{EndMessage} ({Duration}ms) [Timing {TimingId}]", popularTemplate.MessageTemplate);
+            Assert.AreEqual(26, popularTemplate.Count);
         }
 
         [Test]
@@ -129,13 +130,16 @@ namespace Umbraco.Tests.Integration.Logging
         [Test]
         public void Logs_Can_Be_Queried()
         {
+            var sw = new Stopwatch();
+            sw.Start();
             //Should get me the most 100 recent log entries & using default overloads for remaining params
             var allLogs = _logViewer.GetLogs(_logTimePeriod, pageNumber: 1);
 
+            sw.Stop();
             //Check we get 100 results back for a page & total items all good :)
             Assert.AreEqual(100, allLogs.Items.Count());
-            Assert.AreEqual(2410, allLogs.TotalItems);
-            Assert.AreEqual(25, allLogs.TotalPages);
+            Assert.AreEqual(102, allLogs.TotalItems);
+            Assert.AreEqual(2, allLogs.TotalPages);
 
             //Check collection all contain same object type
             CollectionAssert.AllItemsAreInstancesOfType(allLogs.Items, typeof(LogMessage));
@@ -143,14 +147,14 @@ namespace Umbraco.Tests.Integration.Logging
             //Check first item is newest
             var newestItem = allLogs.Items.First();
             DateTimeOffset newDate;
-            DateTimeOffset.TryParse("2018-11-12T09:24:27.4057583Z", out newDate);
+            DateTimeOffset.TryParse("2018-11-12T08:39:18.1971147Z", out newDate);
             Assert.AreEqual(newDate, newestItem.Timestamp);
 
 
             //Check we call method again with a smaller set of results & in ascending
             var smallQuery = _logViewer.GetLogs(_logTimePeriod, pageNumber: 1, pageSize: 10, orderDirection: Direction.Ascending);
             Assert.AreEqual(10, smallQuery.Items.Count());
-            Assert.AreEqual(241, smallQuery.TotalPages);
+            Assert.AreEqual(11, smallQuery.TotalPages);
 
             //Check first item is oldest
             var oldestItem = smallQuery.Items.First();
@@ -163,12 +167,12 @@ namespace Umbraco.Tests.Integration.Logging
             //Rather than expect 0 items - get all items back & ignore the invalid levels
             string[] invalidLogLevels = { "Invalid", "NotALevel" };
             var queryWithInvalidLevels = _logViewer.GetLogs(_logTimePeriod, pageNumber: 1, logLevels: invalidLogLevels);
-            Assert.AreEqual(2410, queryWithInvalidLevels.TotalItems);
+            Assert.AreEqual(102, queryWithInvalidLevels.TotalItems);
 
             //Check we can call method with an array of logLevel (error & warning)
             string [] logLevels = { "Warning", "Error" };
             var queryWithLevels = _logViewer.GetLogs(_logTimePeriod, pageNumber: 1, logLevels: logLevels);
-            Assert.AreEqual(9, queryWithLevels.TotalItems);
+            Assert.AreEqual(7, queryWithLevels.TotalItems);
 
             //Query @Level='Warning' BUT we pass in array of LogLevels for Debug & Info (Expect to get 0 results)
             string[] logLevelMismatch = { "Debug", "Information" };
@@ -176,12 +180,12 @@ namespace Umbraco.Tests.Integration.Logging
             Assert.AreEqual(0, filterLevelQuery.TotalItems);
         }
 
-        [TestCase("", 2410)]
-        [TestCase("Has(@Exception)", 2)]
-        [TestCase("Has(Duration) and Duration > 1000", 13)]
-        [TestCase("Not(@Level = 'Verbose') and Not(@Level= 'Debug')", 71)]
-        [TestCase("StartsWith(SourceContext, 'Umbraco.Core')", 1183)]
-        [TestCase("@MessageTemplate = '{EndMessage} ({Duration}ms) [Timing {TimingId}]'", 622)]
+        [TestCase("", 102)]
+        [TestCase("Has(@Exception)", 1)]
+        [TestCase("Has(Duration) and Duration > 1000", 2)]
+        [TestCase("Not(@Level = 'Verbose') and Not(@Level= 'Debug')", 45)]
+        [TestCase("StartsWith(SourceContext, 'Umbraco.Core')", 86)]
+        [TestCase("@MessageTemplate = '{EndMessage} ({Duration}ms) [Timing {TimingId}]'", 26)]
         [TestCase("SortedComponentTypes[?] = 'Umbraco.Web.Search.ExamineComponent'", 1)]
         [TestCase("Contains(SortedComponentTypes[?], 'DatabaseServer')", 1)]
         [Test]
