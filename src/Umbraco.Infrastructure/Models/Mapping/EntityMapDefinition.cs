@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Examine;
 using Umbraco.Core;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
@@ -11,6 +12,7 @@ using Umbraco.Examine;
 
 namespace Umbraco.Web.Models.Mapping
 {
+    [UmbracoVolatile]
     public class EntityMapDefinition : IMapDefinition
     {
         public void DefineMaps(UmbracoMapper mapper)

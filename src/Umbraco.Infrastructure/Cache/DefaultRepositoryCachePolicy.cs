@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Scoping;
 
@@ -17,6 +18,7 @@ namespace Umbraco.Core.Cache
     /// <para>If options.GetAllCacheAllowZeroCount then a 'zero-count' array is cached when GetAll finds nothing.</para>
     /// <para>If options.GetAllCacheValidateCount then we check against the db when getting many entities.</para>
     /// </remarks>
+    [UmbracoVolatile]
     public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyBase<TEntity, TId>
         where TEntity : class, IEntity
     {

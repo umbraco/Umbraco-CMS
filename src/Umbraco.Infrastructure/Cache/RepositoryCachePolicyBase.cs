@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Scoping;
 
@@ -10,6 +11,7 @@ namespace Umbraco.Core.Cache
     /// </summary>
     /// <typeparam name="TEntity">The type of the entity.</typeparam>
     /// <typeparam name="TId">The type of the identifier.</typeparam>
+    [UmbracoVolatile]
     public abstract class RepositoryCachePolicyBase<TEntity, TId> : IRepositoryCachePolicy<TEntity, TId>
         where TEntity : class, IEntity
     {

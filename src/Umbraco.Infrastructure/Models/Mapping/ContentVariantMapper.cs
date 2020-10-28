@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
@@ -11,6 +12,7 @@ using Language = Umbraco.Web.Models.ContentEditing.Language;
 
 namespace Umbraco.Web.Models.Mapping
 {
+    [UmbracoVolatile]
     public class ContentVariantMapper
     {
         private readonly ILocalizationService _localizationService;

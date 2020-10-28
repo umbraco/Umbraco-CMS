@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services.Changes;
 
@@ -7,6 +8,7 @@ namespace Umbraco.Web.Cache
     /// <summary>
     /// Extension methods for <see cref="DistributedCache"/>.
     /// </summary>
+    [UmbracoVolatile]
     public static class DistributedCacheExtensions
     {
         #region PublicAccessCache

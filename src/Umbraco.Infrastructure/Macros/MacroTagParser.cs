@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 using HtmlAgilityPack;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Xml;
 
 namespace Umbraco.Web.Macros
@@ -10,6 +11,7 @@ namespace Umbraco.Web.Macros
     /// <summary>
     /// Parses the macro syntax in a string and renders out it's contents
     /// </summary>
+    [UmbracoVolatile]
     public class MacroTagParser
     {
         private static readonly Regex MacroRteContent = new Regex(@"(<!--\s*?)(<\?UMBRACO_MACRO.*?/>)(\s*?-->)",

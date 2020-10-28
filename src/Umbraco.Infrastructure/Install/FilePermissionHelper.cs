@@ -10,9 +10,11 @@ using Umbraco.Core.IO;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Core.Configuration.Models;
 using Microsoft.Extensions.Options;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Web.Install
 {
+    [UmbracoVolatile]
     public class FilePermissionHelper : IFilePermissionHelper
     {
         // ensure that these directories exist and Umbraco can write to them

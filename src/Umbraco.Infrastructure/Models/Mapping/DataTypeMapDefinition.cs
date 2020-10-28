@@ -4,6 +4,7 @@ using System.Linq;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
@@ -12,6 +13,7 @@ using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Mapping
 {
+    [UmbracoVolatile]
     public class DataTypeMapDefinition : IMapDefinition
     {
         private readonly PropertyEditorCollection _propertyEditors;

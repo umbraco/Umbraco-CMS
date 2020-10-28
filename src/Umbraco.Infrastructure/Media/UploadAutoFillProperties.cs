@@ -3,6 +3,7 @@ using System.Drawing;
 using System.IO;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
 using Umbraco.Core.Media;
@@ -13,6 +14,7 @@ namespace Umbraco.Web.Media
     /// <summary>
     /// Provides methods to manage auto-fill properties for upload fields.
     /// </summary>
+    [UmbracoVolatile]
     public class UploadAutoFillProperties
     {
         private readonly IMediaFileSystem _mediaFileSystem;

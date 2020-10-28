@@ -1,5 +1,6 @@
 ﻿using System;
 using Umbraco.Core;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.ContentEditing;
@@ -10,6 +11,7 @@ namespace Umbraco.Web.Models.Mapping
     /// Returns the <see cref="ContentSavedState?"/> for an <see cref="IContent"/> item
     /// </summary>
     /// <typeparam name="T"></typeparam>
+    [UmbracoVolatile]
     public class ContentBasicSavedStateMapper<T>
         where T : ContentPropertyBasic
     {
@@ -25,6 +27,7 @@ namespace Umbraco.Web.Models.Mapping
     /// Returns the <see cref="ContentSavedState"/> for an <see cref="IContent"/> item
     /// </summary>
     /// <typeparam name="T"></typeparam>
+    [UmbracoVolatile]
     public class ContentSavedStateMapper<T>
         where T : ContentPropertyBasic
     {

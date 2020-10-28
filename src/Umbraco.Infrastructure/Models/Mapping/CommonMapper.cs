@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.ContentEditing;
@@ -15,6 +16,7 @@ using UserProfile = Umbraco.Web.Models.ContentEditing.UserProfile;
 
 namespace Umbraco.Web.Models.Mapping
 {
+    [UmbracoVolatile]
     public class CommonMapper
     {
         private readonly IUserService _userService;

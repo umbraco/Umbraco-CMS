@@ -1,9 +1,11 @@
-﻿using Umbraco.Core.Mapping;
+﻿using Umbraco.Core.CodeAnnotations;
+using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Mapping
 {
+    [UmbracoVolatile]
     public class AuditMapDefinition : IMapDefinition
     {
         public void DefineMaps(UmbracoMapper mapper)

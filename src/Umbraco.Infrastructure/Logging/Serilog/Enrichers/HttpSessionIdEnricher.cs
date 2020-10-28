@@ -1,6 +1,7 @@
 ﻿using Serilog.Core;
 using Serilog.Events;
 using System;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Net;
 
 namespace Umbraco.Core.Logging.Serilog.Enrichers
@@ -10,6 +11,7 @@ namespace Umbraco.Core.Logging.Serilog.Enrichers
     /// Original source - https://github.com/serilog-web/classic/blob/master/src/SerilogWeb.Classic/Classic/Enrichers/HttpSessionIdEnricher.cs
     /// Nupkg: 'Serilog.Web.Classic' contains handlers & extra bits we do not want
     /// </summary>
+    [UmbracoVolatile]
     public class HttpSessionIdEnricher : ILogEventEnricher
     {
         private readonly ISessionIdResolver _sessionIdResolver;

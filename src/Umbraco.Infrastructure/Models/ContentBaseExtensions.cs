@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Strings
@@ -8,6 +9,7 @@ namespace Umbraco.Core.Strings
     /// <summary>
     /// Provides extension methods to IContentBase to get url segments.
     /// </summary>
+    [UmbracoVolatile]
     public static class ContentBaseExtensions
     {
         /// <summary>

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
@@ -8,6 +9,7 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Editors
 {
+    [UmbracoVolatile]
     public class UserEditorAuthorizationHelper
     {
         private readonly IContentService _contentService;

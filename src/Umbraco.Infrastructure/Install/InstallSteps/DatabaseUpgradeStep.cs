@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
@@ -16,6 +17,7 @@ namespace Umbraco.Web.Install.InstallSteps
 {
     [InstallSetupStep(InstallationType.Upgrade | InstallationType.NewInstall,
         "DatabaseUpgrade", 12, "")]
+    [UmbracoVolatile]
     public class DatabaseUpgradeStep : InstallSetupStep<object>
     {
         private readonly DatabaseBuilder _databaseBuilder;

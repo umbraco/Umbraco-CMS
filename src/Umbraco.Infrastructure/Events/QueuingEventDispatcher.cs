@@ -1,4 +1,5 @@
 ﻿using Umbraco.Composing;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 
@@ -8,6 +9,7 @@ namespace Umbraco.Core.Events
     /// An IEventDispatcher that queues events, and raise them when the scope
     /// exits and has been completed.
     /// </summary>
+    [UmbracoVolatile]
     public class QueuingEventDispatcher : QueuingEventDispatcherBase
     {
         private readonly IMediaFileSystem _mediaFileSystem;

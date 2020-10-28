@@ -1,8 +1,10 @@
 using System;
 using System.Linq;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Core.Models
 {
+    [UmbracoVolatile]
     public static class ContentRepositoryExtensions
     {
         public static void SetCultureInfo(this IContentBase content, string culture, string name, DateTime date)

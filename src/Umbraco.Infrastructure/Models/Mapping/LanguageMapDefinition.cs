@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.ContentEditing;
@@ -8,6 +9,7 @@ using Language = Umbraco.Web.Models.ContentEditing.Language;
 
 namespace Umbraco.Web.Models.Mapping
 {
+    [UmbracoVolatile]
     public class LanguageMapDefinition : IMapDefinition
     {
         public void DefineMaps(UmbracoMapper mapper)

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Models.Editors;
 
 namespace Umbraco.Web.Models.ContentEditing
@@ -9,6 +10,7 @@ namespace Umbraco.Web.Models.ContentEditing
     /// temporary files that were created.
     /// </summary>
     [DataContract]
+    [UmbracoVolatile]
     public class PostedFiles : IHaveUploadedFiles, INotificationModel
     {
         public PostedFiles()

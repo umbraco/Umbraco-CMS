@@ -15,12 +15,14 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Configuration.Models;
 using Microsoft.Extensions.Options;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Web.Models.Mapping
 {
     /// <summary>
     /// Defines mappings for content/media/members type mappings
     /// </summary>
+    [UmbracoVolatile]
     public class ContentTypeMapDefinition : IMapDefinition
     {
         private readonly CommonMapper _commonMapper;

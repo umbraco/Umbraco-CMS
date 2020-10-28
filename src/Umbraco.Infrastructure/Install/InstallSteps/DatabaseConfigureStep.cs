@@ -7,12 +7,14 @@ using Umbraco.Core.Migrations.Install;
 using Umbraco.Web.Install.Models;
 using Umbraco.Core.Configuration.Models;
 using Microsoft.Extensions.Options;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Web.Install.InstallSteps
 {
     [InstallSetupStep(InstallationType.NewInstall,
         "DatabaseConfigure", "database", 10, "Setting up a database, so Umbraco has a place to store your website",
         PerformsAppRestart = true)]
+    [UmbracoVolatile]
     public class DatabaseConfigureStep : InstallSetupStep<DatabaseModel>
     {
         private readonly DatabaseBuilder _databaseBuilder;
