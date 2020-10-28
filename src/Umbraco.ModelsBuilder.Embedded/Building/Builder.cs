@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 
@@ -17,6 +18,7 @@ namespace Umbraco.ModelsBuilder.Embedded.Building
     /// <summary>
     /// Provides a base class for all builders.
     /// </summary>
+    [UmbracoVolatile]
     public abstract class Builder
     {
         private readonly IList<TypeModel> _typeModels;

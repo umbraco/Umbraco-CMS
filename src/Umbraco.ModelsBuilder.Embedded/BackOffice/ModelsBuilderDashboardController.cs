@@ -3,6 +3,7 @@ using System.Runtime.Serialization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Umbraco.Configuration;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Hosting;
@@ -109,6 +110,7 @@ namespace Umbraco.ModelsBuilder.Embedded.BackOffice
         }
 
         [DataContract]
+        [UmbracoVolatile]
         public class BuildResult
         {
             [DataMember(Name = "success")]
@@ -118,6 +120,7 @@ namespace Umbraco.ModelsBuilder.Embedded.BackOffice
         }
 
         [DataContract]
+        [UmbracoVolatile]
         public class Dashboard
         {
             [DataMember(Name = "enable")]
@@ -140,6 +143,7 @@ namespace Umbraco.ModelsBuilder.Embedded.BackOffice
         }
 
         [DataContract]
+        [UmbracoVolatile]
         public class OutOfDateStatus
         {
             [DataMember(Name = "status")]
