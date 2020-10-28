@@ -111,7 +111,7 @@
                     hotKeyWhenHidden: true,
                     labelKey: vm.saveButtonKey,
                     letter: "S",
-                    type: "submit",
+                    type: "button",
                     handler: function () { vm.save(); }
                 };
                 vm.page.subButtons = [{
