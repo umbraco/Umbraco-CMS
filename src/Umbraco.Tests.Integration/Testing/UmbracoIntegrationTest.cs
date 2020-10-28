@@ -92,6 +92,7 @@ namespace Umbraco.Tests.Integration.Testing
         [SetUp]
         public virtual void Setup()
         {
+            InMemoryConfiguration[Constants.Configuration.ConfigGlobal + ":" + nameof(GlobalSettings.InstallEmptyDatabase)] = "true";
             var hostBuilder = CreateHostBuilder();
 
             var host = hostBuilder.Start();
@@ -143,8 +144,10 @@ namespace Umbraco.Tests.Integration.Testing
                 .ConfigureAppConfiguration((context, configBuilder) =>
                 {
                     context.HostingEnvironment = TestHelper.GetWebHostEnvironment();
-                    Configuration = context.Configuration;
+                    configBuilder.Sources.Clear();
                     configBuilder.AddInMemoryCollection(InMemoryConfiguration);
+
+                    Configuration = configBuilder.Build();
                 })
                 .ConfigureServices((hostContext, services) =>
                 {
@@ -392,12 +395,21 @@ namespace Umbraco.Tests.Integration.Testing
 
                     break;
                 case UmbracoTestOptions.Database.NewEmptyPerTest:
-
                     var newEmptyDbId = db.AttachEmpty();
 
                     // Add teardown callback
                     OnTestTearDown(() => db.Detach(newEmptyDbId));
 
+                    // We must re-configure our current factory since attaching a new LocalDb from the pool changes connection strings
+                    if (!databaseFactory.Configured)
+                    {
+                        databaseFactory.Configure(db.ConnectionString, Constants.DatabaseProviders.SqlServer);
+                    }
+
+                    // re-run the runtime level check
+                    runtimeState.DetermineRuntimeLevel();
+
+                    Assert.AreEqual(RuntimeLevel.Install, runtimeState.Level);
 
                     break;
                 case UmbracoTestOptions.Database.NewSchemaPerFixture:
@@ -424,11 +436,23 @@ namespace Umbraco.Tests.Integration.Testing
 
                     break;
                 case UmbracoTestOptions.Database.NewEmptyPerFixture:
+                    // Only attach schema once per fixture
+                    // Doing it more than once will block the process since the old db hasn't been detached
+                    // and it would be the same as NewSchemaPerTest even if it didn't block
+                    if (FirstTestInFixture)
+                    {
+                        // New DB + Schema
+                        var newEmptyFixtureDbId = db.AttachEmpty();
 
-                    throw new NotImplementedException();
+                        // Add teardown callback
+                        OnFixtureTearDown(() => db.Detach(newEmptyFixtureDbId));
+                    }
 
-                    //// Add teardown callback
-                    //integrationTest.OnFixtureTearDown(() => db.Detach());
+                    // We must re-configure our current factory since attaching a new LocalDb from the pool changes connection strings
+                    if (!databaseFactory.Configured)
+                    {
+                        databaseFactory.Configure(db.ConnectionString, Constants.DatabaseProviders.SqlServer);
+                    }
 
                     break;
                 default:
