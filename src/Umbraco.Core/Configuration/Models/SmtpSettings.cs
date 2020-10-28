@@ -15,6 +15,8 @@ namespace Umbraco.Core.Configuration.Models
 
         public int Port { get; set; }
 
+        public string SecureSocketOptions { get; set; } = "Auto";
+
         public string PickupDirectoryLocation { get; set; }
 
         public SmtpDeliveryMethod DeliveryMethod { get; set; } = SmtpDeliveryMethod.Network;
