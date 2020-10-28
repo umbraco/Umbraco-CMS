@@ -1,4 +1,5 @@
 ﻿using System;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Core.Strings
 {
@@ -11,6 +12,7 @@ namespace Umbraco.Core.Strings
     /// <para>Removes all non-Utf8 (unicode) characters, so in fact it can sort-of "convert" Unicode to Ascii.</para>
     /// <para>Replaces symbols with '?'.</para>
     /// </remarks>
+    [UmbracoVolatile]
     public static class Utf8ToAsciiConverter
     {
         /// <summary>

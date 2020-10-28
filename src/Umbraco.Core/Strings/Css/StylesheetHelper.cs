@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Core.Strings.Css
 {
+    [UmbracoVolatile]
     public class StylesheetHelper
     {
         private const string RuleRegexFormat = @"/\*\*\s*umb_name:\s*(?<Name>{0}?)\s*\*/\s*(?<Selector>[^,{{]*?)\s*{{\s*(?<Styles>.*?)\s*}}";

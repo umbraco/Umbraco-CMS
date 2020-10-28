@@ -1,8 +1,10 @@
 ﻿using System.Globalization;
 using System.Threading;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Core
 {
+    [UmbracoVolatile]
     public static class ThreadExtensions
     {
         public static void SanitizeThreadCulture(this Thread thread)

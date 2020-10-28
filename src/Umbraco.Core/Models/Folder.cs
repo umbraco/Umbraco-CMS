@@ -1,7 +1,9 @@
-﻿using Umbraco.Core.Models.Entities;
+﻿using Umbraco.Core.CodeAnnotations;
+using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
 {
+    [UmbracoVolatile]
     public sealed class Folder : EntityBase
     {
         public Folder(string folderPath)

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Core
 {
@@ -12,6 +13,7 @@ namespace Umbraco.Core
     /// Some usages of this might be when spawning async thread or background threads in which the current logical call context will be flowed but
     /// you don't want it to flow there yet you don't want to clear it either since you want the data to remain on the current thread.
     /// </remarks>
+    [UmbracoVolatile]
     public class SafeCallContext : IDisposable
     {
         private static readonly List<Func<object>> EnterFuncs = new List<Func<object>>();

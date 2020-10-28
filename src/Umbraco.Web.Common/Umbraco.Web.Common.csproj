@@ -35,6 +35,7 @@
         <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
             <_Parameter1>Umbraco.Tests.UnitTests</_Parameter1>
         </AssemblyAttribute>
+        <AssemblyAttribute Include="Umbraco.Core.CodeAnnotations.UmbracoSuppressVolatileAttribute"></AssemblyAttribute>
     </ItemGroup>
 
 </Project>

@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Core
 {
+    [UmbracoVolatile]
     public static class NameValueCollectionExtensions
     {
         public static IEnumerable<KeyValuePair<string, string>> AsEnumerable(this NameValueCollection nvc)

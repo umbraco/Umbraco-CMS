@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Xml;
 
 namespace Umbraco.Core
@@ -14,6 +15,7 @@ namespace Umbraco.Core
     /// <summary>
     /// Extension methods for xml objects
     /// </summary>
+    [UmbracoVolatile]
     public static class XmlExtensions
     {
         public static bool HasAttribute(this XmlAttributeCollection attributes, string attributeName)

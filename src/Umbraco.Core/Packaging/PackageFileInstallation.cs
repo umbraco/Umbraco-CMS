@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Packaging;
@@ -11,6 +12,7 @@ namespace Umbraco.Core.Packaging
     /// <summary>
     /// Installs package files
     /// </summary>
+    [UmbracoVolatile]
     public class PackageFileInstallation
     {
         private readonly CompiledPackageXmlParser _parser;

@@ -1,11 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Core.PropertyEditors.Validators
 {
     /// <summary>
     /// A validator that validates that the value is a valid decimal
     /// </summary>
+    [UmbracoVolatile]
     public sealed class DecimalValidator : IManifestValueValidator
     {
         /// <inheritdoc />

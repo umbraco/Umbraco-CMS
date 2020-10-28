@@ -1,10 +1,12 @@
 ﻿using System;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Web.Mvc
 {
     /// <summary>
     /// Represents some metadata about the controller
     /// </summary>
+    [UmbracoVolatile]
     public class PluginControllerMetadata
     {
         public Type ControllerType { get; set; }

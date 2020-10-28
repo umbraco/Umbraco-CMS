@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Cache
 {
+    [UmbracoVolatile]
     public class NoCacheRepositoryCachePolicy<TEntity, TId> : IRepositoryCachePolicy<TEntity, TId>
         where TEntity : class, IEntity
     {

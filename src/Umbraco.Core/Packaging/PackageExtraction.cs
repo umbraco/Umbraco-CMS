@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.IO.Compression;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Core.Packaging
 {
+    [UmbracoVolatile]
     public class PackageExtraction
     {
         public string ReadTextFileFromArchive(FileInfo packageFile, string fileToRead, out string directoryInPackage)
@@ -45,7 +47,7 @@ namespace Umbraco.Core.Packaging
         private static void CheckPackageExists(FileInfo packageFile)
         {
             if (packageFile == null) throw new ArgumentNullException(nameof(packageFile));
-            
+
             if (!packageFile.Exists)
                 throw new ArgumentException($"Package file: {packageFile} could not be found");
 

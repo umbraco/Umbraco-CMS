@@ -1,3 +1,4 @@
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Collections;
 
 namespace Umbraco.Web.Features
@@ -5,6 +6,7 @@ namespace Umbraco.Web.Features
     /// <summary>
     /// Represents disabled features.
     /// </summary>
+    [UmbracoVolatile]
     public class DisabledFeatures
     {
         /// <summary>

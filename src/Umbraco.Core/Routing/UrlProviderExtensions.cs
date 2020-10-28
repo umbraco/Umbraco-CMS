@@ -5,10 +5,12 @@ using Microsoft.Extensions.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Core;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Web.Routing
 {
+    [UmbracoVolatile]
     public static class UrlProviderExtensions
     {
         /// <summary>

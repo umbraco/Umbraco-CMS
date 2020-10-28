@@ -1,10 +1,12 @@
 ﻿using System.Xml.XPath;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Core.Xml
 {
     /// <summary>
     /// Provides extensions to XPathNavigator.
     /// </summary>
+    [UmbracoVolatile]
     public static class XPathNavigatorExtensions
     {
         /// <summary>

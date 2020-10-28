@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Services.Changes
 {
+    [UmbracoVolatile]
     public static class ContentTypeChangeExtensions
     {
         public static ContentTypeChange<TItem>.EventArgs ToEventArgs<TItem>(this IEnumerable<ContentTypeChange<TItem>> changes)

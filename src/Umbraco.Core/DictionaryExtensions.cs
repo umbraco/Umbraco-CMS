@@ -6,12 +6,14 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Net;
 using System.Text;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Core
 {
     ///<summary>
     /// Extension methods for Dictionary & ConcurrentDictionary
     ///</summary>
+    [UmbracoVolatile]
     public static class DictionaryExtensions
     {
 

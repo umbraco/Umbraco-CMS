@@ -3,6 +3,7 @@ using System.Runtime.ConstrainedExecution;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Core
 {
@@ -21,6 +22,7 @@ namespace Umbraco.Core
     // been closed, the Semaphore system object is destroyed - so in any case
     // an iisreset should clean up everything
     //
+    [UmbracoVolatile]
     public class SystemLock
     {
         private readonly SemaphoreSlim _semaphore;

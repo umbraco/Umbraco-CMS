@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Core
 {
     /// <summary>
     /// Borrowed from http://stackoverflow.com/a/2575444/694494
     /// </summary>
+    [UmbracoVolatile]
     public static class HashCodeHelper
     {
         public static int GetHashCode<T1, T2>(T1 arg1, T2 arg2)

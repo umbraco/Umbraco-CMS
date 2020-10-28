@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Membership;
@@ -11,6 +12,7 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Security
 {
+    [UmbracoVolatile]
     public class ContentPermissionsHelper
     {
         public enum ContentAccess

@@ -8,9 +8,11 @@ using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Sync;
 using Microsoft.Extensions.Logging;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Web.Scheduling
 {
+    [UmbracoVolatile]
     public class KeepAlive : RecurringTaskBase
     {
         private readonly IRequestAccessor _requestAccessor;

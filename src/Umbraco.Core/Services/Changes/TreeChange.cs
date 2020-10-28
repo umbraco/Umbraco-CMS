@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Core.Services.Changes
 {
+    [UmbracoVolatile]
     public class TreeChange<TItem>
     {
         public TreeChange(TItem changedItem, TreeChangeTypes changeTypes)

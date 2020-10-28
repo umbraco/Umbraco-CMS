@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
     /// <summary>
     /// Provides cache keys for repositories.
     /// </summary>
+    [UmbracoVolatile]
     public static class RepositoryCacheKeys
     {
         private static readonly Dictionary<Type, string> Keys = new Dictionary<Type, string>();

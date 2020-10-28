@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Core.Models
 {
     /// <summary>
     /// Extension methods used to manipulate content variations by the document repository
     /// </summary>
+    [UmbracoVolatile]
     public static class ContentRepositoryExtensions
     {
         /// <summary>

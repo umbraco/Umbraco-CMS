@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.Serialization;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Core.Exceptions
 {
@@ -9,6 +10,7 @@ namespace Umbraco.Core.Exceptions
     /// <typeparam name="T"></typeparam>
     /// <seealso cref="System.Exception" />
     [Serializable]
+    [UmbracoVolatile]
     public class DataOperationException<T> : Exception
         where T : Enum
     {

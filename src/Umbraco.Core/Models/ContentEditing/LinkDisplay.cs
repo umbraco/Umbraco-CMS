@@ -1,9 +1,11 @@
 ﻿using System.Runtime.Serialization;
 using Umbraco.Core;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
     [DataContract(Name = "link", Namespace = "")]
+    [UmbracoVolatile]
     public class LinkDisplay
     {
         [DataMember(Name = "icon")]

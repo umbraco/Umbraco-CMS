@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 
@@ -14,6 +15,7 @@ namespace Umbraco.Web.PublishedCache
     // an entirely new models factory + not even sure it makes sense at all since
     // sets are created manually todo yes it does! - what does this all mean?
     //
+    [UmbracoVolatile]
     public class PublishedElement : IPublishedElement
     {
         // initializes a new instance of the PublishedElement class

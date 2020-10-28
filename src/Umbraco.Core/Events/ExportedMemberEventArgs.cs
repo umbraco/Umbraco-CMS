@@ -1,9 +1,11 @@
 ﻿using System;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Core.Events
 {
+    [UmbracoVolatile]
     public class ExportedMemberEventArgs : EventArgs
     {
         public IMember Member { get; }

@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Cache;
 
 namespace Umbraco.Web.PublishedCache
 {
+    [UmbracoVolatile]
     public abstract class PublishedSnapshotServiceBase : IPublishedSnapshotService
     {
         protected PublishedSnapshotServiceBase(IPublishedSnapshotAccessor publishedSnapshotAccessor, IVariationContextAccessor variationContextAccessor)

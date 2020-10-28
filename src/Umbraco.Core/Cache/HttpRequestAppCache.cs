@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Core.Cache
 {
@@ -14,6 +15,7 @@ namespace Umbraco.Core.Cache
     /// or no Items...) then this cache acts as a pass-through and does not cache
     /// anything.</para>
     /// </remarks>
+    [UmbracoVolatile]
     public class HttpRequestAppCache : FastDictionaryAppCacheBase, IRequestCache
     {
         private static object _syncRoot = new object(); // Using this for locking as the SyncRoot property is not available to us

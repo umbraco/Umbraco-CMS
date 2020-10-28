@@ -7,6 +7,7 @@ using System.Linq;
 using System.Xml.Linq;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
@@ -20,6 +21,7 @@ namespace Umbraco.Core.Packaging
     /// <summary>
     /// Manages the storage of installed/created package definitions
     /// </summary>
+    [UmbracoVolatile]
     public class PackagesRepository : ICreatedPackagesRepository, IInstalledPackagesRepository
     {
         private readonly IContentService _contentService;

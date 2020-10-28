@@ -1,9 +1,11 @@
 ﻿using System;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Core.Services
 {
+    [UmbracoVolatile]
     public static class DateTypeServiceExtensions
     {
         public static bool IsDataTypeIgnoringUserStartNodes(this IDataTypeService dataTypeService, Guid key)

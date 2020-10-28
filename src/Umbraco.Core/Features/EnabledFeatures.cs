@@ -1,8 +1,11 @@
+using Umbraco.Core.CodeAnnotations;
+
 namespace Umbraco.Web.Features
 {
     /// <summary>
     /// Represents enabled features.
     /// </summary>
+    [UmbracoVolatile]
     public class EnabledFeatures
     {
         /// <summary>

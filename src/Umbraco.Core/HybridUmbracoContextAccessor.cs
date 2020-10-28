@@ -1,10 +1,12 @@
 ﻿using Umbraco.Core.Cache;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Web
 {
     /// <summary>
     /// Implements a hybrid <see cref="IUmbracoContextAccessor"/>.
     /// </summary>
+    [UmbracoVolatile]
     public class HybridUmbracoContextAccessor : HybridAccessorBase<IUmbracoContext>, IUmbracoContextAccessor
     {
         /// <summary>

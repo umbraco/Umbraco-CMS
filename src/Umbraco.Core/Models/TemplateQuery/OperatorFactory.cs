@@ -1,7 +1,9 @@
 using System;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Web.Models.TemplateQuery
 {
+    [UmbracoVolatile]
     public static class OperatorFactory
     {
         public static Operator FromString(string stringOperator)

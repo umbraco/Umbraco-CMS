@@ -1,7 +1,9 @@
 ﻿using System;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Core.Models.Membership
 {
+    [UmbracoVolatile]
     public class MemberExportProperty
     {
         public int Id { get; set; }

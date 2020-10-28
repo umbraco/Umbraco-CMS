@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 using Microsoft.Extensions.Options;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models.Packaging;
 using File = System.IO.File;
@@ -13,6 +14,7 @@ namespace Umbraco.Core.Packaging
     /// <summary>
     /// Parses the xml document contained in a compiled (zip) Umbraco package
     /// </summary>
+    [UmbracoVolatile]
     public class CompiledPackageXmlParser
     {
         private readonly ConflictingPackageData _conflictingPackageData;

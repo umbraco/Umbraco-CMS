@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.Cache
@@ -10,6 +11,7 @@ namespace Umbraco.Core.Cache
     /// <summary>
     /// Provides a base class to fast, dictionary-based <see cref="IAppCache"/> implementations.
     /// </summary>
+    [UmbracoVolatile]
     public abstract class FastDictionaryAppCacheBase : IAppCache
     {
         // prefix cache keys so we know which one are ours

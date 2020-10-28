@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Core
 {
     /// <summary>
     /// Static and extension methods for the DataTable object
     /// </summary>
+    [UmbracoVolatile]
     public static class DataTableExtensions
     {
         /// <summary>

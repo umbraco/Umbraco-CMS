@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Packaging
 {
+    [UmbracoVolatile]
     public class ConflictingPackageData
     {
         private readonly IMacroService _macroService;

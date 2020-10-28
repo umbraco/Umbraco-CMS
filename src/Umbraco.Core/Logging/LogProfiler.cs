@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Diagnostics;
 using Microsoft.Extensions.Logging;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Core.Logging
 {
     /// <summary>
     /// Implements <see cref="IProfiler"/> by writing profiling results to an <see cref="ILogger"/>.
     /// </summary>
+    [UmbracoVolatile]
     public class LogProfiler : IProfiler
     {
         private readonly ILogger<LogProfiler> _logger;

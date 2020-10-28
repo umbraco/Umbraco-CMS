@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.Serialization;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
@@ -9,6 +10,7 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
+    [UmbracoVolatile]
     public class AuditEntry : EntityBase, IAuditEntry
     {
         private int _performingUserId;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.IO;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Core
 {
@@ -15,6 +16,7 @@ namespace Umbraco.Core
     /// NOTE: It's probably best to not relying on the hashing result across AppDomains! If you need a constant/reliable hash value
     /// between AppDomains use SHA1. This is perfect for hashing things in a very fast way for a single AppDomain.
     /// </remarks>
+    [UmbracoVolatile]
     public class HashCodeCombiner
     {
         private long _combinedHash = 5381L;

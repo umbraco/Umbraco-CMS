@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Web.Trees;
 
 namespace Umbraco.Web.Services
@@ -9,6 +10,7 @@ namespace Umbraco.Web.Services
     /// <summary>
     /// Implements <see cref="ITreeService"/>.
     /// </summary>
+    [UmbracoVolatile]
     public class TreeService : ITreeService
     {
         private readonly TreeCollection _treeCollection;

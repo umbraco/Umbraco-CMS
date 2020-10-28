@@ -1,4 +1,5 @@
 ﻿using System;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Core.Models.PublishedContent
@@ -7,6 +8,7 @@ namespace Umbraco.Core.Models.PublishedContent
     /// Provides a base class for <c>IPublishedProperty</c> implementations which converts and caches
     /// the value source to the actual value to use when rendering content.
     /// </summary>
+    [UmbracoVolatile]
     public abstract class PublishedPropertyBase : IPublishedProperty
     {
         /// <summary>

@@ -1,5 +1,8 @@
-﻿namespace Umbraco.Core.Events
+﻿using Umbraco.Core.CodeAnnotations;
+
+namespace Umbraco.Core.Events
 {
+    [UmbracoVolatile]
     public class EventNameExtractorResult
     {
         public EventNameExtractorError? Error { get; private set; }

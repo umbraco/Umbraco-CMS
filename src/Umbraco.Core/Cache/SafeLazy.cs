@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.ExceptionServices;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Core.Cache
 {
@@ -50,6 +51,7 @@ namespace Umbraco.Core.Cache
             }
         }
 
+        [UmbracoVolatile]
         public class ExceptionHolder
         {
             public ExceptionHolder(ExceptionDispatchInfo e)

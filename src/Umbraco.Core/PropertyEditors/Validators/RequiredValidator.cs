@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Services;
 
@@ -8,6 +9,7 @@ namespace Umbraco.Core.PropertyEditors.Validators
     /// <summary>
     /// A validator that validates that the value is not null or empty (if it is a string)
     /// </summary>
+    [UmbracoVolatile]
     public sealed class RequiredValidator : IValueRequiredValidator, IManifestValueValidator
     {
         private readonly ILocalizedTextService _textService;

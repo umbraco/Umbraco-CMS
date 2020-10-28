@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
@@ -9,6 +10,7 @@ namespace Umbraco.Web.Models.ContentEditing
     /// <remarks>
     /// This is only used during mapping operations, it is not used for angular purposes
     /// </remarks>
+    [UmbracoVolatile]
     public class ContentPropertyCollectionDto : IContentProperties<ContentPropertyDto>
     {
         public ContentPropertyCollectionDto()

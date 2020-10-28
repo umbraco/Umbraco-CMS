@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Web.Install.Models
 {
+    [UmbracoVolatile]
     public class InstallTrackingItem
     {
         public InstallTrackingItem(string name, int serverOrder)

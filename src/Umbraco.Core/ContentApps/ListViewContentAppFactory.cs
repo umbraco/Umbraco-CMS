@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Umbraco.Core;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.ContentEditing;
 using Umbraco.Core.Models.Membership;
@@ -10,6 +11,7 @@ using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.ContentApps
 {
+    [UmbracoVolatile]
     public class ListViewContentAppFactory : IContentAppFactory
     {
         // see note on ContentApp

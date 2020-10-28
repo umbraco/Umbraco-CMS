@@ -5,12 +5,14 @@ using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Microsoft.Extensions.Logging;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Web.Scheduling
 {
     /// <summary>
     /// Used to cleanup temporary file locations
     /// </summary>
+    [UmbracoVolatile]
     public class TempFileCleanup : RecurringTaskBase
     {
         private readonly DirectoryInfo[] _tempFolders;

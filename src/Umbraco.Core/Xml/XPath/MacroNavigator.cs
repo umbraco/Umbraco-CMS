@@ -4,12 +4,14 @@ using System.Diagnostics;
 using System.Linq;
 using System.Xml;
 using System.Xml.XPath;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Core.Xml.XPath
 {
     /// <summary>
     /// Provides a cursor model for navigating {macro /} as if it were XML.
     /// </summary>
+    [UmbracoVolatile]
     public class MacroNavigator : XPathNavigator
     {
         private readonly XmlNameTable _nameTable;

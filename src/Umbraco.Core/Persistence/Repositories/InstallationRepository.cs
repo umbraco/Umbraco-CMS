@@ -1,11 +1,13 @@
 ﻿using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Models;
 using Umbraco.Core.Serialization;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
+    [UmbracoVolatile]
     public class InstallationRepository : IInstallationRepository
     {
         private readonly IJsonSerializer _jsonSerializer;

@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Microsoft.Extensions.Logging;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Hosting;
 using Umbraco.Net;
 
 namespace Umbraco.Core.Manifest
 {
+    [UmbracoVolatile]
     public class ManifestWatcher : DisposableObjectSlim
     {
         private static readonly object Locker = new object();

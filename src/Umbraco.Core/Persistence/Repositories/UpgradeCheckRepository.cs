@@ -2,11 +2,13 @@
 using System.Text;
 using System.Threading.Tasks;
 using Semver;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Models;
 using Umbraco.Core.Serialization;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
+    [UmbracoVolatile]
     public class UpgradeCheckRepository : IUpgradeCheckRepository
     {
         private readonly IJsonSerializer _jsonSerializer;

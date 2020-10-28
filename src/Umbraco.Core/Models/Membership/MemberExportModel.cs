@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Core.Models.Membership
 {
+    [UmbracoVolatile]
     public class MemberExportModel
     {
         public int Id { get; set; }

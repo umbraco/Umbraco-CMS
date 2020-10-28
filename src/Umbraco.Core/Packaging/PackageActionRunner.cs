@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Xml.Linq;
 using Microsoft.Extensions.Logging;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.PackageActions;
 
 namespace Umbraco.Core.Packaging
@@ -9,6 +10,7 @@ namespace Umbraco.Core.Packaging
     /// <summary>
     /// Package actions are executed on package install / uninstall.
     /// </summary>
+    [UmbracoVolatile]
     public class PackageActionRunner : IPackageActionRunner
     {
         private readonly ILogger<PackageActionRunner> _logger;

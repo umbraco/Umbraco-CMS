@@ -1,10 +1,12 @@
-﻿using Umbraco.Core.Models;
+﻿using Umbraco.Core.CodeAnnotations;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
     /// <summary>
     /// Represents a content property from the database
     /// </summary>
+    [UmbracoVolatile]
     public class ContentPropertyDto : ContentPropertyBasic
     {
         public IDataType DataType { get; set; }

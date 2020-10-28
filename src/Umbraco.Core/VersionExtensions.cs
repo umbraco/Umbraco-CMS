@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using Semver;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Core
 {
+    [UmbracoVolatile]
     public static class VersionExtensions
     {
         public static Version GetVersion(this SemVersion semVersion, int maxParts = 4)

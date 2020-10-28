@@ -1,7 +1,9 @@
 ﻿using System;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Core.Logging
 {
+    [UmbracoVolatile]
     public class VoidProfiler : IProfiler
     {
         private readonly VoidDisposable _disposable = new VoidDisposable();

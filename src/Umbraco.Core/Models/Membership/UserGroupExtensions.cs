@@ -1,5 +1,8 @@
-﻿namespace Umbraco.Core.Models.Membership
+﻿using Umbraco.Core.CodeAnnotations;
+
+namespace Umbraco.Core.Models.Membership
 {
+    [UmbracoVolatile]
     public static class UserGroupExtensions
     {
         public static IReadOnlyUserGroup ToReadOnlyGroup(this IUserGroup group)

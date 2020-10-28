@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
@@ -10,6 +11,7 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
+    [UmbracoVolatile]
     public class Consent : EntityBase, IConsent
     {
         private bool _current;

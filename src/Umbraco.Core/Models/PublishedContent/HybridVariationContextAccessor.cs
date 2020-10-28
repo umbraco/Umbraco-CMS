@@ -1,4 +1,5 @@
 ﻿using Umbraco.Core.Cache;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Web.Models.PublishedContent
@@ -6,6 +7,7 @@ namespace Umbraco.Web.Models.PublishedContent
     /// <summary>
     /// Implements a hybrid <see cref="IVariationContextAccessor"/>.
     /// </summary>
+    [UmbracoVolatile]
     public class HybridVariationContextAccessor : HybridAccessorBase<VariationContext>, IVariationContextAccessor
     {
         public HybridVariationContextAccessor(IRequestCache requestCache)

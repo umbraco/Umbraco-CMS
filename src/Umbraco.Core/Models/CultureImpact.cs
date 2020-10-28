@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Core.Models
 {
@@ -10,6 +11,7 @@ namespace Umbraco.Core.Models
     /// <para>A set of cultures can be either all cultures (including the invariant culture), or
     /// the invariant culture, or a specific culture.</para>
     /// </remarks>
+    [UmbracoVolatile]
     public sealed class CultureImpact
     {
         /// <summary>

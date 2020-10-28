@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.ContentEditing;
 using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Web.ContentApps
 {
+    [UmbracoVolatile]
     public class ContentTypeListViewContentAppFactory : IContentAppFactory
     {
         private const int Weight = -180;

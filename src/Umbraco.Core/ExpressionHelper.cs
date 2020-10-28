@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Persistence;
 
 namespace Umbraco.Core
@@ -12,6 +13,7 @@ namespace Umbraco.Core
     /// A set of helper methods for dealing with expressions
     /// </summary>
     /// <remarks></remarks>
+    [UmbracoVolatile]
     public static class ExpressionHelper
     {
         private static readonly ConcurrentDictionary<LambdaExpressionCacheKey, PropertyInfo> PropertyInfoCache = new ConcurrentDictionary<LambdaExpressionCacheKey, PropertyInfo>();

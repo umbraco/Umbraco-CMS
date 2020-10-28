@@ -1,8 +1,11 @@
-﻿namespace Umbraco.Core.Models
+﻿using Umbraco.Core.CodeAnnotations;
+
+namespace Umbraco.Core.Models
 {
     /// <summary>
     /// Used when determining available compositions for a given content type
     /// </summary>
+    [UmbracoVolatile]
     public class ContentTypeAvailableCompositionsResult
     {
         public ContentTypeAvailableCompositionsResult(IContentTypeComposition composition, bool allowed)

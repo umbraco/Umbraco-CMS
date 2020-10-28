@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Xml;
 using System.Xml.XPath;
+using Umbraco.Core.CodeAnnotations;
 
 // source: mvpxml.codeplex.com
 
 namespace Umbraco.Core.Xml
 {
+    [UmbracoVolatile]
     public class XmlNodeListFactory
     {
         private XmlNodeListFactory() { }

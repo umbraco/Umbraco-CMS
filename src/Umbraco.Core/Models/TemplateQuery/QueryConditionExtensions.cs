@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Linq.Expressions;
 using System.Reflection;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Web.Models.TemplateQuery
 {
+    [UmbracoVolatile]
     public static class QueryConditionExtensions
     {
         private static Lazy<MethodInfo> StringContainsMethodInfo =>

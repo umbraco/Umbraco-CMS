@@ -1,5 +1,8 @@
-﻿namespace Umbraco.Core.Models
+﻿using Umbraco.Core.CodeAnnotations;
+
+namespace Umbraco.Core.Models
 {
+    [UmbracoVolatile]
     public static class RelationTypeExtensions
     {
         public static bool IsSystemRelationType(this IRelationType relationType) =>

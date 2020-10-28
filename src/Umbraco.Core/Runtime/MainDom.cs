@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Threading;
 using Microsoft.Extensions.Logging;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Hosting;
 
 namespace Umbraco.Core.Runtime
@@ -16,6 +17,7 @@ namespace Umbraco.Core.Runtime
     /// <para>When an AppDomain starts, it tries to acquire the main domain status.</para>
     /// <para>When an AppDomain stops (eg the application is restarting) it should release the main domain status.</para>
     /// </remarks>
+    [UmbracoVolatile]
     public class MainDom : IMainDom, IRegisteredObject, IDisposable
     {
         #region Vars

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Core
@@ -11,6 +12,7 @@ namespace Umbraco.Core
         /// </summary>
         public static class Conventions
         {
+            [UmbracoVolatile]
             public static class PermissionCategories
             {
                 public const string ContentCategory = "content";

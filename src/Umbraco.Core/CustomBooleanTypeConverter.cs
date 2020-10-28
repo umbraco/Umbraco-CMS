@@ -1,11 +1,13 @@
 ﻿using System;
 using System.ComponentModel;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Core
 {
     /// <summary>
     /// Allows for converting string representations of 0 and 1 to boolean
     /// </summary>
+    [UmbracoVolatile]
     public class CustomBooleanTypeConverter : BooleanConverter
     {
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)

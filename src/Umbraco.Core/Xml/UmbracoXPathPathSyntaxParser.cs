@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Core.Xml
 {
@@ -8,6 +9,7 @@ namespace Umbraco.Core.Xml
     /// This is used to parse our customize Umbraco XPath expressions (i.e. that include special tokens like $site) into
     /// a real XPath statement
     /// </summary>
+    [UmbracoVolatile]
     public class UmbracoXPathPathSyntaxParser
     {
         /// <summary>

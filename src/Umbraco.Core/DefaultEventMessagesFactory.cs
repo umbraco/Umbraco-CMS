@@ -1,8 +1,10 @@
 ﻿using System;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Events;
 
 namespace Umbraco.Web
 {
+    [UmbracoVolatile]
     public class DefaultEventMessagesFactory : IEventMessagesFactory
     {
         private readonly IEventMessagesAccessor _eventMessagesAccessor;

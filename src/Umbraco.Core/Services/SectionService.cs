@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Models.Sections;
 using Umbraco.Core.Services;
 using Umbraco.Web.Sections;
 
 namespace Umbraco.Web.Services
 {
+    [UmbracoVolatile]
     public class SectionService : ISectionService
     {
         private readonly IUserService _userService;

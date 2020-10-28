@@ -19,12 +19,14 @@ using System.Globalization;
 using System.Linq;
 using System.Xml;
 using System.Xml.XPath;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Core.Xml.XPath
 {
     /// <summary>
     /// Provides a cursor model for navigating Umbraco data as if it were XML.
     /// </summary>
+    [UmbracoVolatile]
     public class NavigableNavigator : XPathNavigator
     {
         // "The XmlNameTable stores atomized strings of any local name, namespace URI,

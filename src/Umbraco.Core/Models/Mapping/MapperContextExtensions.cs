@@ -1,10 +1,12 @@
-﻿using Umbraco.Core.Mapping;
+﻿using Umbraco.Core.CodeAnnotations;
+using Umbraco.Core.Mapping;
 
 namespace Umbraco.Web.Models.Mapping
 {
     /// <summary>
     /// Provides extension methods for the <see cref="MapperContext"/> class.
     /// </summary>
+    [UmbracoVolatile]
     public static class MapperContextExtensions
     {
         private const string CultureKey = "Map.Culture";

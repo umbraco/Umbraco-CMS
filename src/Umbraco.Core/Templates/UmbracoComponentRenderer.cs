@@ -4,6 +4,7 @@ using System.IO;
 using Umbraco.Web.Templates;
 using System.Collections.Generic;
 using System.Net;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Strings;
 using Umbraco.Web;
@@ -18,6 +19,7 @@ namespace Umbraco.Core.Templates
     /// <remarks>
     /// Used by UmbracoHelper
     /// </remarks>
+    [UmbracoVolatile]
     public class UmbracoComponentRenderer : IUmbracoComponentRenderer
     {
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;

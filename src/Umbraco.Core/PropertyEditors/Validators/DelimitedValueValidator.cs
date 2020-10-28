@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Core.PropertyEditors.Validators
 {
     /// <summary>
     /// A validator that validates a delimited set of values against a common regex
     /// </summary>
+    [UmbracoVolatile]
     public sealed class DelimitedValueValidator : IManifestValueValidator
     {
         /// <inheritdoc />

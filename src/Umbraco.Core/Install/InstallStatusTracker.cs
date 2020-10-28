@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Collections;
 using Umbraco.Core.IO;
 using Umbraco.Core.Serialization;
@@ -13,6 +14,7 @@ namespace Umbraco.Web.Install
     /// <summary>
     /// An internal in-memory status tracker for the current installation
     /// </summary>
+    [UmbracoVolatile]
     public class InstallStatusTracker
     {
         private readonly IIOHelper _ioHelper;

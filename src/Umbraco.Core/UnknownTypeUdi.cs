@@ -1,5 +1,8 @@
-﻿namespace Umbraco.Core
+﻿using Umbraco.Core.CodeAnnotations;
+
+namespace Umbraco.Core
 {
+    [UmbracoVolatile]
     public class UnknownTypeUdi : Udi
     {
         private UnknownTypeUdi()

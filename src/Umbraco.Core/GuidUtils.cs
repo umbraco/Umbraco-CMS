@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Core
 {
     /// <summary>
     /// Utility methods for the <see cref="Guid"/> struct.
     /// </summary>
+    [UmbracoVolatile]
     public static class GuidUtils
     {
         /// <summary>

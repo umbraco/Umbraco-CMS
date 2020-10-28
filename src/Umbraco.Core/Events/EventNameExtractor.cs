@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Core.Events
 {
@@ -20,6 +21,7 @@ namespace Umbraco.Core.Events
     ///
     /// We can also write tests to validate these are all working correctly for all services.
     /// </summary>
+    [UmbracoVolatile]
     public class EventNameExtractor
     {
 

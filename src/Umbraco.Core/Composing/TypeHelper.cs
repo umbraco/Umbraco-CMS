@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Core.Composing
 {
@@ -12,6 +13,7 @@ namespace Umbraco.Core.Composing
     /// A utility class for type checking, this provides internal caching so that calls to these methods will be faster
     /// than doing a manual type check in c#
     /// </summary>
+    [UmbracoVolatile]
     public static class TypeHelper
     {
         private static readonly ConcurrentDictionary<Tuple<Type, bool, bool, bool>, PropertyInfo[]> GetPropertiesCache

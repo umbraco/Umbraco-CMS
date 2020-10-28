@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Umbraco.Core.CodeAnnotations;
 
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
@@ -39,3 +40,6 @@ using System.Runtime.InteropServices;
 // in order to mock loggers loggers with types from the assembly
 // I.E. Mock.Of<ILogger<TestControllerFactory>>()
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
+
+// Supress UmbracoVolatile
+[assembly: UmbracoSuppressVolatile]

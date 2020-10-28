@@ -1,11 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Core.PropertyEditors.Validators
 {
     /// <summary>
     /// A validator that validates an email address
     /// </summary>
+    [UmbracoVolatile]
     public sealed class EmailValidator : IManifestValueValidator
     {
         /// <inheritdoc />

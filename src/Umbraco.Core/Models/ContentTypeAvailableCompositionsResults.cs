@@ -1,11 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Core.Models
 {
     /// <summary>
     /// Used when determining available compositions for a given content type
     /// </summary>
+    [UmbracoVolatile]
     public class ContentTypeAvailableCompositionsResults
     {
         public ContentTypeAvailableCompositionsResults()

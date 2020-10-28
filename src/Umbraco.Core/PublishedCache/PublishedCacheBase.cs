@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml.XPath;
 using Umbraco.Core;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Xml;
 
 namespace Umbraco.Web.PublishedCache
 {
+    [UmbracoVolatile]
     public abstract class PublishedCacheBase : IPublishedCache
     {
         private readonly IVariationContextAccessor _variationContextAccessor;

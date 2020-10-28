@@ -1,10 +1,12 @@
 ﻿using System;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Core.Cache
 {
     /// <summary>
     /// Specifies how a repository cache policy should cache entities.
     /// </summary>
+    [UmbracoVolatile]
     public class RepositoryCachePolicyOptions
     {
         /// <summary>

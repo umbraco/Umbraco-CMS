@@ -3,6 +3,7 @@ using System.Globalization;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Core
 {
@@ -14,6 +15,7 @@ namespace Umbraco.Core
     /// This will use the crypto libs to generate the hash and will try to ensure that
     /// strings, etc... are not re-allocated so it's not consuming much memory.
     /// </remarks>
+    [UmbracoVolatile]
     public class HashGenerator : DisposableObjectSlim
     {
         public HashGenerator()

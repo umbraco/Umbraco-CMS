@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 
@@ -11,6 +12,7 @@ namespace Umbraco.Core.Collections
     /// A List that can be deep cloned with deep cloned elements and can reset the collection's items dirty flags
     /// </summary>
     /// <typeparam name="T"></typeparam>
+    [UmbracoVolatile]
     public class DeepCloneableList<T> : List<T>, IDeepCloneable, IRememberBeingDirty
     {
         private readonly ListCloneBehavior _listCloneBehavior;
@@ -153,7 +155,7 @@ namespace Umbraco.Core.Collections
             return Enumerable.Empty<string>();
         }
 
-        public event PropertyChangedEventHandler PropertyChanged; // noop 
+        public event PropertyChangedEventHandler PropertyChanged; // noop
         #endregion
     }
 }
