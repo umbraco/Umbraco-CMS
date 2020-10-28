@@ -120,7 +120,9 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                             settingsData = null;
                     }
 
-                    var layoutRef = new BlockListItem(contentGuidUdi, contentData, settingGuidUdi, settingsData);
+                    var layoutType = typeof(BlockListItem<,>).MakeGenericType(contentData.GetType(), settingsData?.GetType() ?? typeof(IPublishedElement));
+                    var layoutRef = (BlockListItem)Activator.CreateInstance(layoutType, contentGuidUdi, contentData, settingGuidUdi, settingsData);
+
                     layout.Add(layoutRef);
                 }
 

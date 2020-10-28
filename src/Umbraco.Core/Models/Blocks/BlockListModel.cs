@@ -1,64 +1,63 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Core.Models.Blocks
 {
     /// <summary>
-    /// The strongly typed model for the Block List editor
+    /// The strongly typed model for the Block List editor.
     /// </summary>
+    /// <seealso cref="System.Collections.ObjectModel.ReadOnlyCollection{Umbraco.Core.Models.Blocks.BlockListItem}" />
     [DataContract(Name = "blockList", Namespace = "")]
-    public class BlockListModel : IReadOnlyList<BlockListItem>
+    public class BlockListModel : ReadOnlyCollection<BlockListItem>
     {
-        private readonly IReadOnlyList<BlockListItem> _layout = new List<BlockListItem>();
-
+        /// <summary>
+        /// Gets the empty <see cref="BlockListModel" />.
+        /// </summary>
+        /// <value>
+        /// The empty <see cref="BlockListModel" />.
+        /// </value>
         public static BlockListModel Empty { get; } = new BlockListModel();
 
+        /// <summary>
+        /// Prevents a default instance of the <see cref="BlockListModel" /> class from being created.
+        /// </summary>
         private BlockListModel()
-        {
-        }
-
-        public BlockListModel(IEnumerable<BlockListItem> layout)
-        {
-            _layout = layout.ToList();
-        }
-
-        public int Count => _layout.Count;
+            : this(new List<BlockListItem>())
+        { }
 
         /// <summary>
-        /// Get the block by index
+        /// Initializes a new instance of the <see cref="BlockListModel" /> class.
         /// </summary>
-        /// <param name="index"></param>
-        /// <returns></returns>
-        public BlockListItem this[int index] => _layout[index];
+        /// <param name="list">The list to wrap.</param>
+        public BlockListModel(IList<BlockListItem> list)
+            : base(list)
+        { }
 
         /// <summary>
-        /// Get the block by content Guid
+        /// Gets the <see cref="BlockListItem" /> with the specified content key.
         /// </summary>
-        /// <param name="contentKey"></param>
-        /// <returns></returns>
-        public BlockListItem this[Guid contentKey] => _layout.FirstOrDefault(x => x.Content.Key == contentKey);
+        /// <value>
+        /// The <see cref="BlockListItem" />.
+        /// </value>
+        /// <param name="contentKey">The content key.</param>
+        /// <returns>
+        /// The <see cref="BlockListItem" /> with the specified content key.
+        /// </returns>
+        public BlockListItem this[Guid contentKey] => this.FirstOrDefault(x => x.Content.Key == contentKey);
 
         /// <summary>
-        /// Get the block by content element Udi
+        /// Gets the <see cref="BlockListItem" /> with the specified content UDI.
         /// </summary>
-        /// <param name="contentUdi"></param>
-        /// <returns></returns>
-        public BlockListItem this[Udi contentUdi]
-        {
-            get
-            {
-                if (!(contentUdi is GuidUdi guidUdi)) return null;
-                return _layout.FirstOrDefault(x => x.Content.Key == guidUdi.Guid);
-            }
-        }
-
-        public IEnumerator<BlockListItem> GetEnumerator() => _layout.GetEnumerator();
-
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
+        /// <value>
+        /// The <see cref="BlockListItem" />.
+        /// </value>
+        /// <param name="contentUdi">The content UDI.</param>
+        /// <returns>
+        /// The <see cref="BlockListItem" /> with the specified content UDI.
+        /// </returns>
+        public BlockListItem this[Udi contentUdi] => contentUdi is GuidUdi guidUdi ? this.FirstOrDefault(x => x.Content.Key == guidUdi.Guid) : null;
     }
 }

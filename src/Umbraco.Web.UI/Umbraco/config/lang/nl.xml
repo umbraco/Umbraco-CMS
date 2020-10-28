@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <language alias="nl" intName="Dutch" localName="Nederlands" lcid="19" culture="nl-NL">
   <creator>
     <name>The Umbraco community</name>
@@ -34,7 +34,7 @@
     <key alias="republish">Herpubliceer de site</key>
     <key alias="remove">Verwijder</key>
     <key alias="rename" version="7.3.0">Hernoem</key>
-    <key alias="restore" version="7.3.0">Zet terug</key>
+    <key alias="restore" version="7.3.0">Herstellen</key>
     <key alias="SetPermissionsForThePage">Stel rechten voor pagina %0% in</key>
     <key alias="chooseWhereToCopy">Kies waar u wilt kopiëren</key>
     <key alias="chooseWhereToMove">Kies waar u wilt verplaatsen</key>
@@ -173,11 +173,11 @@
     <key alias="saveAndPublish">Opslaan en publiceren</key>
     <key alias="saveAndSchedule">Opslaan en plannen</key>
     <key alias="saveToPublish">Opslaan en verzenden voor goedkeuring</key>
-    <key alias="saveListView">Sla list view op</key>
+    <key alias="saveListView">Lijstweergave opslaan</key>
     <key alias="schedulePublish">Planning</key>
-    <key alias="showPage">Voorvertoning</key>
-    <key alias="saveAndPreview">Opslaan en voorvertoning bekijken</key>
-    <key alias="showPageDisabled">Voorbeeld bekijken is uitgeschakeld omdat er geen template is geselecteerd</key>
+    <key alias="showPage">Voorbeeld</key>
+    <key alias="saveAndPreview">Opslaan en voorbeeld bekijken</key>
+    <key alias="showPageDisabled">Voorbeeld bekijken is uitgeschakeld omdat er geen sjabloon is geselecteerd</key>
     <key alias="styleChoose">Stijl kiezen</key>
     <key alias="styleShow">Stijlen tonen</key>
     <key alias="tableInsert">Tabel invoegen</key>
@@ -255,7 +255,7 @@
     <key alias="parentNotPublished">Dit document is gepubliceerd maar niet zichtbaar omdat de bovenliggende pagina '%0%' niet gepubliceerd is</key>
     <key alias="parentCultureNotPublished">Deze cultuur is gepubliceerd maar is niet zichtbaar omdat het niet gepubliceerd is op de bovenliggende pagina '%0%'</key>
     <key alias="parentNotPublishedAnomaly">Dit document is gepubliceerd, maar het staat niet in de cache (interne serverfout)</key>
-    <key alias="getUrlException">Kan de Url niet ophalen</key>
+    <key alias="getUrlException">Kan de URL niet ophalen</key>
     <key alias="routeError">Dit document is gepubliceerd maar de URL conflicteert met %0%</key>
     <key alias="routeErrorCannotRoute">Dit document is gepubliceerd maar de URL kan niet worden gerouteerd</key>
     <key alias="publish">Publiceren</key>
@@ -473,7 +473,7 @@
     <key alias="recycleBinIsEmpty">De prullenbak is nu leeg.</key>
     <key alias="recycleBinWarning">Als items worden verwijderd uit de prullenbak, zijn ze voorgoed verwijderd.</key>
     <key alias="regexSearchError"><![CDATA[De webservice van <a target='_blank' href='https://regexlib.com'>regexlib.com</a> ondervindt momenteel problemen waarover we geen controle hebben. Onze excuses voor het ongemak.]]></key>
-    <key alias="regexSearchHelp">Zoek naar een reguliere expressie om validatie aan een formulierveld toe te voegen. Voorbeeld: 'email, 'post-code' 'url'</key>
+    <key alias="regexSearchHelp">Zoek naar een reguliere expressie om validatie aan een formulierveld toe te voegen. Voorbeeld: 'email', 'postcode', 'URL'.</key>
     <key alias="removeMacro">Verwijder Macro</key>
     <key alias="requiredField">Verplicht veld</key>
     <key alias="sitereindexed">Site is opnieuw geïndexeerd</key>
@@ -782,7 +782,7 @@
     <key alias="update">Update</key>
     <key alias="upgrade">Upgrade</key>
     <key alias="upload">Upload</key>
-    <key alias="url">Url</key>
+    <key alias="url">URL</key>
     <key alias="user">Gebruiker</key>
     <key alias="username">Gebruikersnaam</key>
     <key alias="value">Waarde</key>
@@ -1894,7 +1894,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="validation">Validatie</key>
     <key alias="validateAsEmail">Valideer als e-mailadres</key>
     <key alias="validateAsNumber">Valideer als nummer</key>
-    <key alias="validateAsUrl">Valideer als Url</key>
+    <key alias="validateAsUrl">Valideer als URL</key>
     <key alias="enterCustomValidation">...of gebruik aangepaste validatie</key>
     <key alias="fieldIsMandatory">Veld is verplicht</key>
     <key alias="mandatoryMessage">Voer een foutmelding in voor de aangepaste validatie (optioneel)</key>

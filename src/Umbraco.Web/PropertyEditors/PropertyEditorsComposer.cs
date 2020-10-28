@@ -4,6 +4,6 @@ using Umbraco.Core.Composing;
 namespace Umbraco.Web.PropertyEditors
 {
     [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
-    internal class PropertyEditorsComposer : ComponentComposer<PropertyEditorsComponent>, ICoreComposer
+    public sealed class PropertyEditorsComposer : ComponentComposer<PropertyEditorsComponent>, ICoreComposer
     { }
 }

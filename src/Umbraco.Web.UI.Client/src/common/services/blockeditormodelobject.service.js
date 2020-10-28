@@ -13,8 +13,7 @@
 (function () {
     'use strict';
 
-
-    function blockEditorModelObjectFactory($interpolate, $q, udiService, contentResource, localizationService, umbRequestHelper) {
+    function blockEditorModelObjectFactory($interpolate, $q, udiService, contentResource, localizationService, umbRequestHelper, clipboardService) {
 
         /**
          * Simple mapping from property model content entry to editing model,
@@ -231,7 +230,8 @@
         var notSupportedProperties = [
             "Umbraco.Tags",
             "Umbraco.UploadField",
-            "Umbraco.ImageCropper"
+            "Umbraco.ImageCropper",
+            "Umbraco.NestedContent"
         ];
 
 
@@ -425,7 +425,11 @@
                         if (self.scaffolds) {
                             self.scaffolds.push(formatScaffoldData(scaffold));
                         }
-                    }));
+                    }).catch(
+                        () => {
+                            // Do nothing if we get an error.
+                        }
+                    ));
                 });
 
                 return $q.all(tasks);
@@ -439,7 +443,14 @@
              * @return {Array} array of strings representing alias.
              */
             getAvailableAliasesForBlockContent: function () {
-                return this.blockConfigurations.map(blockConfiguration => this.getScaffoldFromKey(blockConfiguration.contentElementTypeKey).contentTypeAlias);
+                return this.blockConfigurations.map(
+                    (blockConfiguration) => {
+                        var scaffold = this.getScaffoldFromKey(blockConfiguration.contentElementTypeKey);
+                        if (scaffold) {
+                            return scaffold.contentTypeAlias;
+                        }
+                    }
+                );
             },
 
             /**
@@ -519,17 +530,16 @@
                 var dataModel = getDataByUdi(contentUdi, this.value.contentData);
 
                 if (dataModel === null) {
-                    console.error("Couldn't find content model of " + contentUdi)
+                    console.error("Couldn't find content data of " + contentUdi)
                     return null;
                 }
 
                 var blockConfiguration = this.getBlockConfiguration(dataModel.contentTypeKey);
-                var contentScaffold;
+                var contentScaffold = null;
 
                 if (blockConfiguration === null) {
-                    console.error("The block of " + contentUdi + " is not being initialized because its contentTypeKey('" + dataModel.contentTypeKey + "') is not allowed for this PropertyEditor");
-                }
-                else {
+                    console.warn("The block of " + contentUdi + " is not being initialized because its contentTypeKey('" + dataModel.contentTypeKey + "') is not allowed for this PropertyEditor");
+                } else {
                     contentScaffold = this.getScaffoldFromKey(blockConfiguration.contentElementTypeKey);
                     if (contentScaffold === null) {
                         console.error("The block of " + contentUdi + " is not begin initialized cause its Element Type was not loaded.");
@@ -539,10 +549,9 @@
                 if (blockConfiguration === null || contentScaffold === null) {
 
                     blockConfiguration = {
-                        label: "Unsupported Block",
+                        label: "Unsupported",
                         unsupported: true
                     };
-                    contentScaffold = {};
                 }
 
                 var blockObject = {};
@@ -567,10 +576,14 @@
                     , 10);
 
                 // make basics from scaffold
-                blockObject.content = Utilities.copy(contentScaffold);
-                ensureUdiAndKey(blockObject.content, contentUdi);
+                if(contentScaffold !== null) {// We might not have contentScaffold
+                    blockObject.content = Utilities.copy(contentScaffold);
+                    ensureUdiAndKey(blockObject.content, contentUdi);
 
-                mapToElementModel(blockObject.content, dataModel);
+                    mapToElementModel(blockObject.content, dataModel);
+                } else {
+                    blockObject.content = null;
+                }
 
                 blockObject.data = dataModel;
                 blockObject.layout = layoutEntry;
@@ -589,7 +602,7 @@
 
                         var settingsData = getDataByUdi(settingsUdi, this.value.settingsData);
                         if (settingsData === null) {
-                            console.error("Couldnt find content settings data of " + settingsUdi)
+                            console.error("Couldnt find settings data of " + settingsUdi)
                             return null;
                         }
 
@@ -672,11 +685,8 @@
              * @param {Object} blockObject The BlockObject to be removed and destroyed.
              */
             removeDataAndDestroyModel: function (blockObject) {
-                var udi = blockObject.content.udi;
-                var settingsUdi = null;
-                if (blockObject.settings) {
-                    settingsUdi = blockObject.settings.udi;
-                }
+                var udi = blockObject.layout.contentUdi;
+                var settingsUdi = blockObject.layout.settingsUdi || null;
                 this.destroyBlockObject(blockObject);
                 this.removeDataByUdi(udi);
                 if (settingsUdi) {
@@ -745,7 +755,7 @@
              */
             createFromElementType: function (elementTypeDataModel) {
 
-                elementTypeDataModel = Utilities.copy(elementTypeDataModel);
+                elementTypeDataModel = clipboardService.parseContentForPaste(elementTypeDataModel, clipboardService.TYPES.ELEMENT_TYPE);
 
                 var contentElementTypeKey = elementTypeDataModel.contentTypeKey;
 

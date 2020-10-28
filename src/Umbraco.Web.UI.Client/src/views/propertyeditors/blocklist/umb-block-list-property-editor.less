@@ -38,6 +38,45 @@
             opacity: 1;
         }
     }
+
+    &.--show-validation {
+        ng-form.ng-invalid-val-server-match-content > & {
+            border: 2px solid @formErrorText;
+            border-radius: @baseBorderRadius;
+            &::after {
+                content: "!";
+                position: absolute;
+                top: -12px;
+                right: -12px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 18px;
+                height: 18px;
+                border-radius: 50%;
+                font-size: 13px;
+                text-align: center;
+                font-weight: bold;
+                background-color: @errorBackground;
+                color: @errorText;
+                border: 2px solid @white;
+                font-weight: 900;
+    
+                animation-duration: 1.4s;
+                animation-iteration-count: infinite;
+                animation-name: umb-block-list__block--content--badge-bounce;
+                animation-timing-function: ease;
+                @keyframes umb-block-list__block--content--badge-bounce {
+                    0%   { transform: translateY(0); }
+                    20%  { transform: translateY(-6px); }
+                    40%  { transform: translateY(0); }
+                    55%  { transform: translateY(-3px); }
+                    70%  { transform: translateY(0); }
+                    100% { transform: translateY(0); }
+                }
+            }
+        }
+    }
 }
 ng-form.ng-invalid-val-server-match-settings > .umb-block-list__block > .umb-block-list__block--actions {
     opacity: 1;
@@ -109,44 +148,6 @@ ng-form.ng-invalid-val-server-match-settings > .umb-block-list__block > .umb-blo
         box-sizing: border-box;
     }
 
-    &.--show-validation {
-        ng-form.ng-invalid-val-server-match-content > .umb-block-list__block > & > div {
-            border: 2px solid @formErrorText;
-            border-radius: @baseBorderRadius;
-            &::after {
-                content: "!";
-                position: absolute;
-                top: -12px;
-                right: -12px;
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                width: 18px;
-                height: 18px;
-                border-radius: 50%;
-                font-size: 13px;
-                text-align: center;
-                font-weight: bold;
-                background-color: @errorBackground;
-                color: @errorText;
-                border: 2px solid @white;
-                font-weight: 900;
-    
-                animation-duration: 1.4s;
-                animation-iteration-count: infinite;
-                animation-name: umb-block-list__block--content--badge-bounce;
-                animation-timing-function: ease;
-                @keyframes umb-block-list__block--content--badge-bounce {
-                    0%   { transform: translateY(0); }
-                    20%  { transform: translateY(-6px); }
-                    40%  { transform: translateY(0); }
-                    55%  { transform: translateY(-3px); }
-                    70%  { transform: translateY(0); }
-                    100% { transform: translateY(0); }
-                }
-            }
-        }
-    }
 }
 
 .blockelement__draggable-element {
@@ -178,6 +179,8 @@ ng-form.ng-invalid-val-server-match-settings > .umb-block-list__block > .umb-blo
         left: 0;
         height: 2px;
         animation: umb-block-list__block--create-button_before 400ms ease-in-out alternate infinite;
+        transform: scaleX(.99);
+        transition: transform 240ms ease-out;
 
         @keyframes umb-block-list__block--create-button_before {
             0%   { opacity: 1; }
@@ -187,44 +190,49 @@ ng-form.ng-invalid-val-server-match-settings > .umb-block-list__block > .umb-blo
 
     > .__plus {
         position: absolute;
-        pointer-events: none; // lets stop avoiding the mouse values in JS move event.
-        width: 24px;
-        height: 24px;
-        padding: 0;
-        border-radius: 3em;
-        border: 2px solid @blueMid;
         display: flex;
         justify-content: center;
         align-items: center;
+        pointer-events: none; // lets stop avoiding the mouse values in JS move event.
+        box-sizing: border-box;
+        width: 28px;
+        height: 28px;
+        margin-left: -16px - 8px;
+        margin-top: -16px;
+        border-radius: 3em;
+        font-size: 14px;
+        border: 2px solid @blueMid;
         color: @blueMid;
-        font-size: 20px;
-        font-weight: 800;
         background-color: rgba(255, 255, 255, .96);
         box-shadow: 0 0 0 2px rgba(255, 255, 255, .96);
-        transform: scale(0) translate(-80%, -50%);
+        transform: scale(0);
         transition: transform 240ms ease-in;
-        animation: umb-block-list__block--create-button_after 800ms ease-in-out infinite;
+        
+        animation: umb-block-list__block--create-button__plus 400ms ease-in-out alternate infinite;
 
-        @keyframes umb-block-list__block--create-button_after {
-            0%   { color: rgba(@blueMid, 0.8); }
-            50% { color: rgba(@blueMid, 1); }
+        @keyframes umb-block-list__block--create-button__plus {
+            0%   { color: rgba(@blueMid, 1); }
             100% { color: rgba(@blueMid, 0.8); }
         }
+        
     }
 
     &:focus {
         > .__plus {
-            border: 2px solid @ui-outline;
+            border-color: @ui-outline;
         }
     }
 
     &:hover, &:focus {
         opacity: 1;
-        transition-duration: 120ms;
 
+        &::before {
+            transform: scaleX(1);
+        }
         > .__plus {
-            transform: scale(1) translate(-80%, -50%);
+            transform: scale(1);
             transition-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            
         }
     }
 }

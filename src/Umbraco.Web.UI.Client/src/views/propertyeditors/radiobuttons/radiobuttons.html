@@ -12,7 +12,7 @@
             </li>
         </ul>
 
-        <div ng-messages="radioButtonsFieldForm[model.alias_vm.uniqueId].$error" show-validation-on-submit>
+        <div ng-messages="radioButtonsFieldForm[model.alias + '_' + vm.uniqueId].$error" show-validation-on-submit>
             <p class="help-inline" ng-message="required">{{mandatoryMessage}}</p>
         </div>
 

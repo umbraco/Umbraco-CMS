@@ -41,6 +41,9 @@
             // Guess we'll leave it for now but means all things need to be copied to the $scope and then all
             // primitives need to be watched.
 
+            // let the Block know about its form
+            model.block.setParentForm(model.parentForm);
+
             $scope.block = model.block;
             $scope.api = model.api;
             $scope.index = model.index;
