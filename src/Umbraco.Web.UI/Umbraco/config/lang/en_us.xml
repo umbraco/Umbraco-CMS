@@ -2476,12 +2476,12 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="formsDescription">Create forms using an intuitive drag and drop interface. From simple contact forms that sends e-mails to advanced questionaires that integrate with CRM systems. Your clients will love it!</key>
   </area>
   <area alias="blockEditor">
-    <key alias="headlineCreateBlock">Create new block</key>
+    <key alias="headlineCreateBlock">Pick Element Type</key>
     <key alias="headlineAddSettingsElementType">Attach a settings section</key>
     <key alias="headlineAddCustomView">Select view</key>
     <key alias="headlineAddCustomStylesheet">Select stylesheet</key>
     <key alias="headlineAddThumbnail">Choose thumbnail</key>
-    <key alias="labelcreateNewElementType">Create new</key>
+    <key alias="labelcreateNewElementType">Create new Element Type</key>
     <key alias="labelCustomStylesheet">Custom stylesheet</key>
     <key alias="addCustomStylesheet">Add stylesheet</key>
     <key alias="headlineEditorAppearance">Editor apperance</key>
