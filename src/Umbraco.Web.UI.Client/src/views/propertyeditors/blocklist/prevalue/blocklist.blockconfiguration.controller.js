@@ -16,7 +16,7 @@
         }
     }
 
-    function BlockConfigurationController($scope, elementTypeResource, overlayService, localizationService, editorService, eventsService) {
+    function BlockConfigurationController($scope, elementTypeResource, overlayService, localizationService, editorService, eventsService, udiService) {
 
         var unsubscribe = [];
 
@@ -95,47 +95,46 @@
             }
         };
 
-        vm.openAddDialog = function ($event, entry) {
+        vm.openAddDialog = function () {
 
-            //we have to add the 'alias' property to the objects, to meet the data requirements of itempicker.
-            var selectedItems = Utilities.copy($scope.model.value).forEach((obj) => {
-                var elementType = vm.getElementTypeByKey(obj.contentElementTypeKey);
-                if(elementType) {
-                    obj.alias = elementType.alias;
-                    return obj;
-                }
-            });
+            localizationService.localize("blockEditor_headlineCreateBlock").then(function(localizedTitle) {
 
-            var availableItems = vm.getAvailableElementTypes()
-
-            localizationService.localizeMany(["blockEditor_headlineCreateBlock", "blockEditor_labelcreateNewElementType"]).then(function(localized) {
-
-                var elemTypeSelectorOverlay = {
-                    view: "itempicker",
-                    title: localized[0],
-                    availableItems: availableItems,
-                    selectedItems: selectedItems,
-                    createNewItem: {
-                        action: function() {
-                            overlayService.close();
-                            vm.createElementTypeAndCallback(vm.addBlockFromElementTypeKey);
-                        },
-                        icon: "icon-add",
-                        name: localized[1]
+                const contentTypePicker = {
+                    title: localizedTitle,
+                    section: "settings",
+                    treeAlias: "documentTypes",
+                    entityType: "documentType",
+                    isDialog: true,
+                    filter: function (node) {
+                        if (node.metaData.isElement === true) {
+                            var key = udiService.getKey(node.udi);
+                            // If a Block with this ElementType as content already exists, we will emit it as a posible option.
+                            return $scope.model.value.find(function (entry) {
+                                return key === entry.contentElementTypeKey;
+                            });
+                        }
+                        return true;
                     },
-                    position: "target",
-                    event: $event,
-                    size: availableItems.length < 7 ? "small" : "medium",
-                    submit: function (overlay) {
-                        vm.addBlockFromElementTypeKey(overlay.selectedItem.key);
-                        overlayService.close();
+                    filterCssClass: "not-allowed",
+                    select: function (node) {
+                        vm.addBlockFromElementTypeKey(udiService.getKey(node.udi));
+                        editorService.close();
                     },
                     close: function () {
-                        overlayService.close();
-                    }
+                        editorService.close();
+                    },
+                    extraActions: [
+                        {
+                            style: "primary",
+                            labelKey: "blockEditor_labelcreateNewElementType",
+                            action: function () {
+                                editorService.close();
+                                vm.createElementTypeAndCallback(vm.addBlockFromElementTypeKey);
+                            }
+                        }
+                    ]
                 };
-
-                overlayService.open(elemTypeSelectorOverlay);
+                editorService.treePicker(contentTypePicker);
 
             });
         };
@@ -160,7 +159,7 @@
 
         vm.addBlockFromElementTypeKey = function(key) {
 
-            var entry = {
+            var blockType = {
                 "contentElementTypeKey": key,
                 "settingsElementTypeKey": null,
                 "labelTemplate": "",
@@ -172,7 +171,10 @@
                 "thumbnail": null
             };
 
-            $scope.model.value.push(entry);
+            $scope.model.value.push(blockType);
+
+            vm.openBlockOverlay(blockType);
+
         };
 
 
