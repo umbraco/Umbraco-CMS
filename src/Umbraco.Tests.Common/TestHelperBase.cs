@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -19,6 +20,7 @@ using Umbraco.Net;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Serialization;
 using Umbraco.Core.Strings;
+using Umbraco.Infrastructure.Composing;
 using Umbraco.Web;
 using Umbraco.Web.Routing;
 using Umbraco.Tests.Common.Builders;
@@ -122,7 +124,7 @@ namespace Umbraco.Tests.Common
 
         public IRegister GetRegister()
         {
-            return RegisterFactory.Create(new GlobalSettings());
+            return ServiceCollectionRegistryAdapter.Wrap(new ServiceCollection());
         }
 
         public abstract IHostingEnvironment GetHostingEnvironment();

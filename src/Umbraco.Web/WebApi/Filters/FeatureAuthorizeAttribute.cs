@@ -20,7 +20,7 @@ namespace Umbraco.Web.WebApi.Filters
         public FeatureAuthorizeAttribute()
         {
             // attributes have to use Current.Container
-            _features = Current.Factory?.TryGetInstance<UmbracoFeatures>();
+            _features = Current.Factory?.GetService<UmbracoFeatures>();
         }
 
         protected override bool IsAuthorized(HttpActionContext actionContext)

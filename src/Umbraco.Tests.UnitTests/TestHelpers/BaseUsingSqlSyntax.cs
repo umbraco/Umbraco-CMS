@@ -9,6 +9,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Tests.UnitTests.TestHelpers;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -27,7 +28,7 @@ namespace Umbraco.Tests.TestHelpers
         [SetUp]
         public virtual void Setup()
         {
-            var container = TestHelper.GetRegister();
+            var container = TestHelper.GetServiceCollection();
             var typeLoader = TestHelper.GetMockedTypeLoader();
 
             var composition = new Composition(container, typeLoader, Mock.Of<IProfilingLogger>(), Mock.Of<IRuntimeState>(), TestHelper.IOHelper, AppCaches.NoCache);
@@ -41,8 +42,8 @@ namespace Umbraco.Tests.TestHelpers
             var pocoMappers = new NPoco.MapperCollection { new PocoMapper() };
             var pocoDataFactory = new FluentPocoDataFactory((type, iPocoDataFactory) => new PocoDataBuilder(type, pocoMappers).Init());
             var sqlSyntax = new SqlServerSyntaxProvider();
-            SqlContext = new SqlContext(sqlSyntax, DatabaseType.SqlServer2012, pocoDataFactory, new Lazy<IMapperCollection>(() => factory.GetInstance<IMapperCollection>()));
-            Mappers = factory.GetInstance<IMapperCollection>();
+            SqlContext = new SqlContext(sqlSyntax, DatabaseType.SqlServer2012, pocoDataFactory, new Lazy<IMapperCollection>(() => factory.GetRequiredService<IMapperCollection>()));
+            Mappers = factory.GetRequiredService<IMapperCollection>();
         }
     }
 }

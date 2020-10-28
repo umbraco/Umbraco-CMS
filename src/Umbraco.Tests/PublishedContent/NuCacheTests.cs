@@ -53,7 +53,7 @@ namespace Umbraco.Tests.PublishedContent
             Current.Factory = factory;
 
             var publishedModelFactory = new NoopPublishedModelFactory();
-            Mock.Get(factory).Setup(x => x.GetInstance(typeof(IPublishedModelFactory))).Returns(publishedModelFactory);
+            Mock.Get(factory).Setup(x => x.GetRequiredService(typeof(IPublishedModelFactory))).Returns(publishedModelFactory);
 
             // create a content node kit
             var kit = new ContentNodeKit
@@ -212,7 +212,7 @@ namespace Umbraco.Tests.PublishedContent
             // invariant is the current default
             _variationAccesor.VariationContext = new VariationContext();
 
-            Mock.Get(factory).Setup(x => x.GetInstance(typeof(IVariationContextAccessor))).Returns(_variationAccesor);
+            Mock.Get(factory).Setup(x => x.GetRequiredService(typeof(IVariationContextAccessor))).Returns(_variationAccesor);
         }
 
         [Test]

@@ -1,6 +1,7 @@
 ﻿using System.Web.Mvc;
 using System.Web.Security;
 using Microsoft.AspNet.SignalR;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Dictionary;
@@ -26,14 +27,14 @@ namespace Umbraco.Web.Runtime
         {
             base.Compose(composition);
 
-            composition.Register<UmbracoInjectedModule>();
+            composition.Services.AddTransient<UmbracoInjectedModule>();
 
 
             // register membership stuff
             composition.Register(factory => MembershipProviderExtensions.GetMembersMembershipProvider());
-            composition.Register(factory => Roles.Enabled ? Roles.Provider : new MembersRoleProvider(factory.GetInstance<IMemberService>()));
-            composition.Register<MembershipHelper>(Lifetime.Request);
-            composition.Register<IPublishedMemberCache>(factory => factory.GetInstance<IUmbracoContext>().PublishedSnapshot.Members);
+            composition.Register(factory => Roles.Enabled ? Roles.Provider : new MembersRoleProvider(factory.GetRequiredService<IMemberService>()));
+            composition.Services.AddScoped<MembershipHelper>();
+            composition.Register<IPublishedMemberCache>(factory => factory.GetRequiredService<IUmbracoContext>().PublishedSnapshot.Members);
             composition.RegisterUnique<IMemberUserKeyProvider, MemberUserKeyProvider>();
             composition.RegisterUnique<IPublicAccessChecker, PublicAccessChecker>();
 
@@ -44,9 +45,9 @@ namespace Umbraco.Web.Runtime
             if (composition.RuntimeState.Level == RuntimeLevel.Run)
                 composition.Register<UmbracoHelper>(factory =>
                 {
-                    var umbCtx = factory.GetInstance<IUmbracoContext>();
-                    return new UmbracoHelper(umbCtx.IsFrontEndUmbracoRequest ? umbCtx.PublishedRequest?.PublishedContent : null, factory.GetInstance<ICultureDictionaryFactory>(),
-                        factory.GetInstance<IUmbracoComponentRenderer>(), factory.GetInstance<IPublishedContentQuery>());
+                    var umbCtx = factory.GetRequiredService<IUmbracoContext>();
+                    return new UmbracoHelper(umbCtx.IsFrontEndUmbracoRequest ? umbCtx.PublishedRequest?.PublishedContent : null, factory.GetRequiredService<ICultureDictionaryFactory>(),
+                        factory.GetRequiredService<IUmbracoComponentRenderer>(), factory.GetRequiredService<IPublishedContentQuery>());
                 });
             else
                 composition.Register(_ => new UmbracoHelper());
@@ -54,12 +55,15 @@ namespace Umbraco.Web.Runtime
             composition.RegisterUnique<RoutableDocumentFilter>();
 
             // configure the container for web
-            composition.ConfigureForWeb();
+            //composition.ConfigureForWeb();
 
-            composition
-                // TODO: This will depend on if we use ServiceBasedControllerActivator - see notes in Startup.cs
-                //.ComposeUmbracoControllers(GetType().Assembly)
-                .SetDefaultRenderMvcController</*RenderMvcController*/ Controller>(); // default controller for template views
+            //composition
+            /* TODO: This will depend on if we use ServiceBasedControllerActivator - see notes in Startup.cs
+             * You will likely need to set DefaultRenderMvcControllerType on Umbraco.Web.Composing.Current
+             * which is what the extension method below did previously.
+             */
+            //.ComposeUmbracoControllers(GetType().Assembly)
+            //.SetDefaultRenderMvcController</*RenderMvcController*/ Controller>(); // default controller for template views
 
             //we need to eagerly scan controller types since they will need to be routed
             composition.WithCollectionBuilder<SurfaceControllerTypeCollectionBuilder>()
@@ -67,7 +71,7 @@ namespace Umbraco.Web.Runtime
 
 
             // auto-register views
-            composition.RegisterAuto(typeof(UmbracoViewPage<>));
+            //composition.RegisterAuto(typeof(UmbracoViewPage<>));
         }
     }
 }

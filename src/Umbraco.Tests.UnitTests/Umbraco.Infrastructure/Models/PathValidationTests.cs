@@ -7,7 +7,7 @@ using Umbraco.Core.Models.Entities;
 using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Common.Builders.Extensions;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Infrastucture.Models
+namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
 {
     [TestFixture]
     public class PathValidationTests

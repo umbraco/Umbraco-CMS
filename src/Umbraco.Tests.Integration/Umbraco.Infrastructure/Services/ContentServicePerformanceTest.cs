@@ -264,12 +264,6 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
             }
         }
 
-        [TearDown]
-        public override void TearDown()
-        {
-            base.TearDown();
-        }
-
         public void CreateTestData()
         {
 

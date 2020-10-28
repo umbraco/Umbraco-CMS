@@ -85,7 +85,7 @@ namespace Umbraco.Tests.TestHelpers
         private T MockService<T>(IFactory container = null)
             where T : class
         {
-            return container?.TryGetInstance<T>() ?? new Mock<T>().Object;
+            return container?.GetService<T>() ?? new Mock<T>().Object;
         }
 
         /// <summary>

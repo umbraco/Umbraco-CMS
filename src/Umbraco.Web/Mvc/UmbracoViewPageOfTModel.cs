@@ -105,10 +105,10 @@ namespace Umbraco.Web.Mvc
 
         protected UmbracoViewPage()
             : this(
-                Current.Factory.GetInstance<ServiceContext>(),
-                Current.Factory.GetInstance<AppCaches>(),
-                Current.Factory.GetInstance<IOptions<GlobalSettings>>(),
-                Current.Factory.GetInstance<IOptions<ContentSettings>>()
+                Current.Factory.GetRequiredService<ServiceContext>(),
+                Current.Factory.GetRequiredService<AppCaches>(),
+                Current.Factory.GetRequiredService<IOptions<GlobalSettings>>(),
+                Current.Factory.GetRequiredService<IOptions<ContentSettings>>()
             )
         {
         }

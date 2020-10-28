@@ -1,4 +1,5 @@
-﻿using Umbraco.Core;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
@@ -22,29 +23,29 @@ namespace Umbraco.Web.Search
 
             // populators are not a collection: one cannot remove ours, and can only add more
             // the container can inject IEnumerable<IIndexPopulator> and get them all
-            composition.Register<MemberIndexPopulator>(Lifetime.Singleton);
-            composition.Register<ContentIndexPopulator>(Lifetime.Singleton);
-            composition.Register<PublishedContentIndexPopulator>(Lifetime.Singleton);
-            composition.Register<MediaIndexPopulator>(Lifetime.Singleton);
+            composition.Services.AddSingleton<MemberIndexPopulator>();
+            composition.Services.AddSingleton<ContentIndexPopulator>();
+            composition.Services.AddSingleton<PublishedContentIndexPopulator>();
+            composition.Services.AddSingleton<MediaIndexPopulator>();
 
-            composition.Register<IndexRebuilder>(Lifetime.Singleton);
+            composition.Services.AddSingleton<IndexRebuilder>();
             composition.RegisterUnique<IUmbracoIndexConfig, UmbracoIndexConfig>();
             composition.RegisterUnique<IIndexDiagnosticsFactory, IndexDiagnosticsFactory>();
             composition.RegisterUnique<IPublishedContentValueSetBuilder>(factory =>
                 new ContentValueSetBuilder(
-                    factory.GetInstance<PropertyEditorCollection>(),
-                    factory.GetInstance<UrlSegmentProviderCollection>(),
-                    factory.GetInstance<IUserService>(),
-                    factory.GetInstance<IShortStringHelper>(),
-                    factory.GetInstance<IScopeProvider>(),
+                    factory.GetRequiredService<PropertyEditorCollection>(),
+                    factory.GetRequiredService<UrlSegmentProviderCollection>(),
+                    factory.GetRequiredService<IUserService>(),
+                    factory.GetRequiredService<IShortStringHelper>(),
+                    factory.GetRequiredService<IScopeProvider>(),
                     true));
             composition.RegisterUnique<IContentValueSetBuilder>(factory =>
                 new ContentValueSetBuilder(
-                    factory.GetInstance<PropertyEditorCollection>(),
-                    factory.GetInstance<UrlSegmentProviderCollection>(),
-                    factory.GetInstance<IUserService>(),
-                    factory.GetInstance<IShortStringHelper>(),
-                    factory.GetInstance<IScopeProvider>(),
+                    factory.GetRequiredService<PropertyEditorCollection>(),
+                    factory.GetRequiredService<UrlSegmentProviderCollection>(),
+                    factory.GetRequiredService<IUserService>(),
+                    factory.GetRequiredService<IShortStringHelper>(),
+                    factory.GetRequiredService<IScopeProvider>(),
                     false));
             composition.RegisterUnique<IValueSetBuilder<IMedia>, MediaValueSetBuilder>();
             composition.RegisterUnique<IValueSetBuilder<IMember>, MemberValueSetBuilder>();

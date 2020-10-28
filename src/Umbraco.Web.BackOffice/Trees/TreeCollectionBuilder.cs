@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
-using Umbraco.Web.BackOffice.Trees;
+using Umbraco.Web.Trees;
 
-namespace Umbraco.Web.Trees
+namespace Umbraco.Web.BackOffice.Trees
 {
     /// <summary>
     /// Builds a <see cref="TreeCollection"/>.

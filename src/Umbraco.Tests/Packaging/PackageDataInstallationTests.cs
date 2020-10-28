@@ -72,7 +72,7 @@ namespace Umbraco.Tests.Packaging
             Composition.ComposeFileSystems();
         }
 
-        private PackageDataInstallation PackageDataInstallation => Factory.GetInstance<PackageDataInstallation>();
+        private PackageDataInstallation PackageDataInstallation => Factory.GetRequiredService<PackageDataInstallation>();
 
         [Test]
         public void Can_Import_uBlogsy_ContentTypes_And_Verify_Structure()
@@ -425,7 +425,7 @@ namespace Umbraco.Tests.Packaging
             string strXml = ImportResources.SingleDocType;
             var docTypeElement = XElement.Parse(strXml);
 
-            var serializer = Factory.GetInstance<IEntityXmlSerializer>();
+            var serializer = Factory.GetRequiredService<IEntityXmlSerializer>();
 
             // Act
             var contentTypes = PackageDataInstallation.ImportDocumentType(docTypeElement, 0);

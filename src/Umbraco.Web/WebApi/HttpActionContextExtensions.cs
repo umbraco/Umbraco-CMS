@@ -60,7 +60,7 @@ namespace Umbraco.Web.WebApi
                 throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
             }
 
-            var ioHelper = Current.Factory.GetInstance<IIOHelper>();
+            var ioHelper = Current.Factory.GetRequiredService<IIOHelper>();
             var root = ioHelper.MapPath(rootVirtualPath);
             //ensure it exists
             Directory.CreateDirectory(root);

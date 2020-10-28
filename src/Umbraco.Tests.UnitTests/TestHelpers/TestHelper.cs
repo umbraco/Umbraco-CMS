@@ -8,6 +8,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -35,6 +36,7 @@ using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Web.Common.AspNetCore;
 using IHostingEnvironment = Umbraco.Core.Hosting.IHostingEnvironment;
+using Umbraco.Infrastructure.Persistence.Mappers;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -64,9 +66,13 @@ namespace Umbraco.Tests.TestHelpers
 
             public override IHostingEnvironment GetHostingEnvironment()
             {
+                var testPath = TestContext.CurrentContext.TestDirectory.Split("bin")[0];
                 return new AspNetCoreHostingEnvironment(
                     Mock.Of<IOptionsMonitor<HostingSettings>>(x=>x.CurrentValue == new HostingSettings()),
-                    Mock.Of<IWebHostEnvironment>(x=>x.WebRootPath == "/"));
+                    Mock.Of<IWebHostEnvironment>(
+                        x=>
+                            x.WebRootPath == "/" &&
+                            x.ContentRootPath == testPath));
             }
 
             public override IApplicationShutdownRegistry GetHostingEnvironmentLifetime()
@@ -88,8 +94,8 @@ namespace Umbraco.Tests.TestHelpers
             return new Lazy<ISqlContext>(() => sqlContext);
         }
 
-        public static ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> CreateMaps()
-            => new ConcurrentDictionary<Type, ConcurrentDictionary<string, string>>();
+        public static MapperConfigurationStore CreateMaps()
+            => new MapperConfigurationStore();
 
         //public static Configs GetConfigs() => _testHelperInternal.GetConfigs();
 
@@ -269,55 +275,11 @@ namespace Umbraco.Tests.TestHelpers
                 AssertAreEqual(property, expectedListEx[i], actualListEx[i], sorter, dateDeltaMilliseconds);
         }
 
-        public static void DeleteDirectory(string path)
-        {
-            Try(() =>
-            {
-                if (Directory.Exists(path) == false) return;
-                foreach (var file in Directory.EnumerateFiles(path, "*", SearchOption.AllDirectories))
-                    File.Delete(file);
-            });
 
-            Try(() =>
-            {
-                if (Directory.Exists(path) == false) return;
-                Directory.Delete(path, true);
-            });
-        }
-
-        public static void TryAssert(Action action, int maxTries = 5, int waitMilliseconds = 200)
-        {
-            Try<AssertionException>(action, maxTries, waitMilliseconds);
-        }
-
-        public static void Try(Action action, int maxTries = 5, int waitMilliseconds = 200)
-        {
-            Try<Exception>(action, maxTries, waitMilliseconds);
-        }
-
-        public static void Try<T>(Action action, int maxTries = 5, int waitMilliseconds = 200)
-            where T : Exception
-        {
-            var tries = 0;
-            while (true)
-            {
-                try
-                {
-                    action();
-                    break;
-                }
-                catch (T)
-                {
-                    if (tries++ > maxTries)
-                        throw;
-                    Thread.Sleep(waitMilliseconds);
-                }
-            }
-        }
 
         public static IUmbracoVersion GetUmbracoVersion() => _testHelperInternal.GetUmbracoVersion();
 
-        public static IRegister GetRegister() => _testHelperInternal.GetRegister();
+        public static IServiceCollection GetServiceCollection() => new ServiceCollection();
 
         public static IHostingEnvironment GetHostingEnvironment() => _testHelperInternal.GetHostingEnvironment();
 

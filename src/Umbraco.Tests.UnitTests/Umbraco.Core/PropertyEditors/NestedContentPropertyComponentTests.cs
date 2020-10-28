@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Umbraco.Web.Compose;
 
-namespace Umbraco.Tests.PropertyEditors
+namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
 {
 
     [TestFixture]

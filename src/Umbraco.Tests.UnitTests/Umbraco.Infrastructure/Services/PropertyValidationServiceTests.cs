@@ -9,7 +9,7 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Web.PropertyEditors;
 
-namespace Umbraco.Tests.Services
+namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Services
 {
     [TestFixture]
     public class PropertyValidationServiceTests

@@ -1,10 +1,10 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.IO.MediaPathSchemes;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Composing.CompositionExtensions
 {
@@ -14,50 +14,9 @@ namespace Umbraco.Core.Composing.CompositionExtensions
          * HOW TO REPLACE THE MEDIA UNDERLYING FILESYSTEM
          * ----------------------------------------------
          *
-         * Create a component and use it to modify the composition by adding something like:
+         *   composition.RegisterUnique<IMediaFileSystem>(factoryMethod);
          *
-         *   composition.RegisterUniqueFor<IFileSystem, IMediaFileSystem>(...);
-         *
-         * and register whatever supporting filesystem you like.
-         *
-         *
-         * HOW TO IMPLEMENT MY OWN FILESYSTEM
-         * ----------------------------------
-         *
-         * Create your filesystem class:
-         *
-         *   public class MyFileSystem : FileSystemWrapper
-         *   {
-         *       public MyFileSystem(IFileSystem innerFileSystem)
-         *           : base(innerFileSystem)
-         *       { }
-         *   }
-         *
-         * The ctor can have more parameters, that will be resolved by the container.
-         *
-         * Register your filesystem, in a component:
-         *
-         *   composition.RegisterFileSystem<MyFileSystem>();
-         *
-         * Register the underlying filesystem:
-         *
-         *   composition.RegisterUniqueFor<IFileSystem, MyFileSystem>(...);
-         *
-         * And that's it, you can inject MyFileSystem wherever it's needed.
-         *
-         *
-         * You can also declare a filesystem interface:
-         *
-         *   public interface IMyFileSystem : IFileSystem
-         *   { }
-         *
-         * Make the class implement the interface, then
-         * register your filesystem, in a component:
-         *
-         *   composition.RegisterFileSystem<IMyFileSystem, MyFileSystem>();
-         *   composition.RegisterUniqueFor<IFileSystem, IMyFileSystem>(...);
-         *
-         * And that's it, you can inject IMyFileSystem wherever it's needed.
+         *   composition.RegisterUnique<IMediaFileSystem, TImplementation>();
          *
          *
          * WHAT IS SHADOWING
@@ -80,30 +39,25 @@ namespace Umbraco.Core.Composing.CompositionExtensions
             composition.RegisterUnique(factory => factory.CreateInstance<Core.IO.FileSystems>(factory));
 
             // register IFileSystems, which gives access too all filesystems
-            composition.RegisterUnique<IFileSystems>(factory => factory.GetInstance<Core.IO.FileSystems>());
+            composition.RegisterUnique<IFileSystems>(factory => factory.GetRequiredService<Core.IO.FileSystems>());
 
             // register the scheme for media paths
             composition.RegisterUnique<IMediaPathScheme, UniqueMediaPathScheme>();
 
-            // register the IMediaFileSystem implementation
-            composition.RegisterFileSystem<IMediaFileSystem, MediaFileSystem>();
-
-            // register the supporting filesystems provider
-            composition.Register(factory => new SupportingFileSystems(factory), Lifetime.Singleton);
-
-            // register the IFileSystem supporting the IMediaFileSystem
-            // THIS IS THE ONLY THING THAT NEEDS TO CHANGE, IN ORDER TO REPLACE THE UNDERLYING FILESYSTEM
-            // and, SupportingFileSystem.For<IMediaFileSystem>() returns the underlying filesystem
-            composition.SetMediaFileSystem(factory =>
+            // register the default IMediaFileSystem implementation
+            composition.RegisterUnique<IMediaFileSystem>(factory =>
             {
-                var ioHelper = factory.GetInstance<IIOHelper>();
-                var hostingEnvironment = factory.GetInstance<IHostingEnvironment>();
-                var logger = factory.GetInstance<ILogger<PhysicalFileSystem>>();
-                var globalSettings = factory.GetInstance<IOptions<GlobalSettings>>().Value;
+                var ioHelper = factory.GetRequiredService<IIOHelper>();
+                var hostingEnvironment = factory.GetRequiredService<IHostingEnvironment>();
+                var logger = factory.GetRequiredService<ILogger<PhysicalFileSystem>>();
+                var globalSettings = factory.GetRequiredService<IOptions<GlobalSettings>>().Value;
 
                 var rootPath = hostingEnvironment.MapPathWebRoot(globalSettings.UmbracoMediaPath);
                 var rootUrl = hostingEnvironment.ToAbsolute(globalSettings.UmbracoMediaPath);
-                return new PhysicalFileSystem(ioHelper, hostingEnvironment, logger, rootPath, rootUrl);
+                var inner = new PhysicalFileSystem(ioHelper, hostingEnvironment, logger, rootPath, rootUrl);
+
+                var fileSystems = factory.GetRequiredService<IO.FileSystems>();
+                return fileSystems.GetFileSystem<MediaFileSystem>(inner);
             });
 
             return composition;

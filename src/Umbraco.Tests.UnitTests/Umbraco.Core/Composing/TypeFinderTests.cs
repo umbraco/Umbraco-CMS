@@ -9,7 +9,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Web.BackOffice.Trees;
 
-namespace Umbraco.Tests.Composing
+namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
 {
 
     /// <summary>

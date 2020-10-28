@@ -8,7 +8,7 @@ using Umbraco.Core;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Tests.TestHelpers.Entities;
 
-namespace Umbraco.Tests.CoreThings
+namespace Umbraco.Tests.UnitTests.Umbraco.Core.CoreThings
 {
     [TestFixture]
     public class ObjectExtensionsTests

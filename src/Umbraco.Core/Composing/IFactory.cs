@@ -19,16 +19,7 @@ namespace Umbraco.Core.Composing
         /// <param name="type">The type of the service.</param>
         /// <returns>An instance of the specified type.</returns>
         /// <remarks>Throws an exception if the container failed to get an instance of the specified type.</remarks>
-        object GetInstance(Type type);
-
-        /// <summary>
-        /// Gets a targeted instance of a service.
-        /// </summary>
-        /// <typeparam name="TService">The type of the service.</typeparam>
-        /// <typeparam name="TTarget">The type of the target.</typeparam>
-        /// <returns>The instance of the specified type for the specified target.</returns>
-        /// <remarks>Throws an exception if the container failed to get an instance of the specified type.</remarks>
-        TService GetInstanceFor<TService, TTarget>();
+        object GetRequiredService(Type type);
 
         /// <summary>
         /// Tries to get an instance of a service.
@@ -38,32 +29,21 @@ namespace Umbraco.Core.Composing
         /// <remarks>Returns null if the container does not know how to get an instance
         /// of the specified type. Throws an exception if the container does know how
         /// to get an instance of the specified type, but failed to do so.</remarks>
-        object TryGetInstance(Type type);
+        object GetService(Type type);
 
         /// <summary>
         /// Gets all instances of a service.
         /// </summary>
         /// <param name="serviceType">The type of the service.</param>
-        IEnumerable<object> GetAllInstances(Type serviceType);
+        IEnumerable<object> GetServices(Type serviceType);
 
         /// <summary>
         /// Gets all instances of a service.
         /// </summary>
         /// <typeparam name="TService">The type of the service.</typeparam>
-        IEnumerable<TService> GetAllInstances<TService>()
+        IEnumerable<TService> GetServices<TService>()
             where TService : class;
-
-        /// <summary>
-        /// Releases an instance.
-        /// </summary>
-        /// <param name="instance">The instance.</param>
-        /// <remarks>
-        /// See https://stackoverflow.com/questions/14072208 and http://kozmic.net/2010/08/27/must-i-release-everything-when-using-windsor/,
-        /// you only need to release instances you specifically resolved, and even then, if done right, that might never be needed. For
-        /// instance, LightInject does not require this and does not support it - should work with scopes.
-        /// </remarks>
-        void Release(object instance);
-
+        
         /// <summary>
         /// Begins a scope.
         /// </summary>
@@ -72,13 +52,5 @@ namespace Umbraco.Core.Composing
         /// <para>Scopes can be nested. Each instance is disposed individually.</para>
         /// </remarks>
         IDisposable BeginScope();
-
-        /// <summary>
-        /// Enables per-request scope.
-        /// </summary>
-        /// <remarks>
-        /// <para>Ties scopes to web requests.</para>
-        /// </remarks>
-        void EnablePerWebRequestScope();
     }
 }

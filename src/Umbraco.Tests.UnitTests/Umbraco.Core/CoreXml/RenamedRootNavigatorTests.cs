@@ -4,7 +4,7 @@ using System.Xml.XPath;
 using NUnit.Framework;
 using Umbraco.Core.Xml.XPath;
 
-namespace Umbraco.Tests.CoreXml
+namespace Umbraco.Tests.UnitTests.Umbraco.Core.CoreXml
 {
     [TestFixture]
     public class RenamedRootNavigatorTests

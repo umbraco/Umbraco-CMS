@@ -7,10 +7,10 @@ using Umbraco.Tests.UnitTests.AutoFixture;
 using Umbraco.Web.Common.AspNetCore;
 
 
-namespace Umbraco.Tests.Configurations
+namespace Umbraco.Tests.UnitTests.Umbraco.Core.Configurations
 {
     [TestFixture]
-    public class GlobalSettingsTests 
+    public class GlobalSettingsTests
     {
         [InlineAutoMoqData("~/umbraco", "/", "umbraco")]
         [InlineAutoMoqData("~/umbraco", "/MyVirtualDir", "umbraco")]

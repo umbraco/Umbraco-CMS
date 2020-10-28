@@ -1,5 +1,6 @@
 using System.Linq;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
@@ -60,7 +61,7 @@ namespace Umbraco.Web.Common.Runtime
 
 
             composition.RegisterUnique<ICookieManager, AspNetCoreCookieManager>();
-            composition.Register<IIpResolver, AspNetCoreIpResolver>();
+            composition.Services.AddTransient<IIpResolver, AspNetCoreIpResolver>();
             composition.RegisterUnique<IUserAgentProvider, AspNetCoreUserAgentProvider>();
 
             composition.RegisterMultipleUnique<ISessionIdResolver, ISessionManager, AspNetCoreSessionManager>();
@@ -72,7 +73,6 @@ namespace Umbraco.Web.Common.Runtime
             composition.RegisterUnique<IMacroRenderer, MacroRenderer>();
             composition.RegisterUnique<IMemberUserKeyProvider, MemberUserKeyProvider>();
 
-            composition.RegisterUnique<AngularJsonMediaTypeFormatter>();
 
             // register the umbraco context factory
             composition.RegisterUnique<IUmbracoContextFactory, UmbracoContextFactory>();

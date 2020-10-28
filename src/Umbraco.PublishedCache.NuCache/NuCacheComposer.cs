@@ -1,4 +1,5 @@
-﻿using Umbraco.Core;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Core.Scoping;
@@ -15,7 +16,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             base.Compose(composition);
 
             // register the NuCache database data source
-            composition.Register<IDataSource, DatabaseDataSource>();
+            composition.Services.AddTransient<IDataSource, DatabaseDataSource>();
 
             // register the NuCache published snapshot service
             // must register default options, required in the service ctor
@@ -26,8 +27,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // mapping lookups if we are using nucache.
             composition.RegisterUnique<IIdKeyMap>(factory =>
             {
-                var idkSvc = new IdKeyMap(factory.GetInstance<IScopeProvider>());
-                var publishedSnapshotService = factory.GetInstance<IPublishedSnapshotService>() as PublishedSnapshotService;
+                var idkSvc = new IdKeyMap(factory.GetRequiredService<IScopeProvider>());
+                var publishedSnapshotService = factory.GetRequiredService<IPublishedSnapshotService>() as PublishedSnapshotService;
                 if (publishedSnapshotService != null)
                 {
                     idkSvc.SetMapper(UmbracoObjectTypes.Document, id => publishedSnapshotService.GetDocumentUid(id), uid => publishedSnapshotService.GetDocumentId(uid));

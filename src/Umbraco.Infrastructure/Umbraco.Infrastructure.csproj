@@ -11,11 +11,6 @@
 
     <ItemGroup>
       <PackageReference Include="HtmlAgilityPack" Version="1.11.24" />
-      <PackageReference Include="LightInject" Version="6.3.4" />
-      <PackageReference Include="LightInject.Annotation" Version="1.1.0" />
-      <PackageReference Include="LightInject.Microsoft.DependencyInjection" Version="3.3.1" />
-
-      <PackageReference Include="LightInject.Microsoft.Hosting" Version="1.2.1" />
       <PackageReference Include="MailKit" Version="2.9.0" />
       <PackageReference Include="Markdown" Version="2.2.1" />
       <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />

@@ -19,7 +19,7 @@ using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.PropertyEditors.ValueConverters;
 using Umbraco.Web.PublishedCache;
 
-namespace Umbraco.Tests.Published
+namespace Umbraco.Tests.UnitTests.Umbraco.Core.Published
 {
     [TestFixture]
     public class NestedContentTests

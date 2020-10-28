@@ -9,6 +9,7 @@ using System.Web.Routing;
 using System.Web.Security;
 using System.Xml.Linq;
 using Examine;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -42,6 +43,7 @@ using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Strings;
+using Umbraco.Infrastructure.Composing;
 using Umbraco.Net;
 using Umbraco.Tests.Common;
 using Umbraco.Tests.TestHelpers;
@@ -119,43 +121,43 @@ namespace Umbraco.Tests.Testing
         private TypeLoader _featureTypeLoader;
 
         #region Accessors
-        protected ServiceContext ServiceContext => Factory.GetInstance<ServiceContext>();
+        protected ServiceContext ServiceContext => Factory.GetRequiredService<ServiceContext>();
 
-        protected ILoggerFactory LoggerFactory => Factory.GetInstance<ILoggerFactory>();
+        protected ILoggerFactory LoggerFactory => Factory.GetRequiredService<ILoggerFactory>();
 
         protected IJsonSerializer JsonNetSerializer { get; } = new JsonNetSerializer();
 
         protected IIOHelper IOHelper { get; private set; }
         protected UriUtility UriUtility => new UriUtility(HostingEnvironment);
-        protected IPublishedUrlProvider PublishedUrlProvider => Factory.GetInstance<IPublishedUrlProvider>();
-        protected IDataTypeService DataTypeService => Factory.GetInstance<IDataTypeService>();
-        protected IPasswordHasher PasswordHasher => Factory.GetInstance<IPasswordHasher>();
-        protected Lazy<PropertyEditorCollection> PropertyEditorCollection => new Lazy<PropertyEditorCollection>(() => Factory.GetInstance<PropertyEditorCollection>());
-        protected ILocalizationService LocalizationService => Factory.GetInstance<ILocalizationService>();
+        protected IPublishedUrlProvider PublishedUrlProvider => Factory.GetRequiredService<IPublishedUrlProvider>();
+        protected IDataTypeService DataTypeService => Factory.GetRequiredService<IDataTypeService>();
+        protected IPasswordHasher PasswordHasher => Factory.GetRequiredService<IPasswordHasher>();
+        protected Lazy<PropertyEditorCollection> PropertyEditorCollection => new Lazy<PropertyEditorCollection>(() => Factory.GetRequiredService<PropertyEditorCollection>());
+        protected ILocalizationService LocalizationService => Factory.GetRequiredService<ILocalizationService>();
         protected ILocalizedTextService LocalizedTextService  { get; private set; }
-        protected IShortStringHelper ShortStringHelper => Factory?.GetInstance<IShortStringHelper>() ?? TestHelper.ShortStringHelper;
-        protected IImageUrlGenerator ImageUrlGenerator => Factory.GetInstance<IImageUrlGenerator>();
-        protected UploadAutoFillProperties UploadAutoFillProperties => Factory.GetInstance<UploadAutoFillProperties>();
+        protected IShortStringHelper ShortStringHelper => Factory?.GetRequiredService<IShortStringHelper>() ?? TestHelper.ShortStringHelper;
+        protected IImageUrlGenerator ImageUrlGenerator => Factory.GetRequiredService<IImageUrlGenerator>();
+        protected UploadAutoFillProperties UploadAutoFillProperties => Factory.GetRequiredService<UploadAutoFillProperties>();
         protected IUmbracoVersion UmbracoVersion { get; private set; }
 
         protected ITypeFinder TypeFinder { get; private set; }
 
-        protected IProfiler Profiler => Factory.GetInstance<IProfiler>();
+        protected IProfiler Profiler => Factory.GetRequiredService<IProfiler>();
 
-        protected virtual IProfilingLogger ProfilingLogger => Factory.GetInstance<IProfilingLogger>();
+        protected virtual IProfilingLogger ProfilingLogger => Factory.GetRequiredService<IProfilingLogger>();
 
         protected IHostingEnvironment HostingEnvironment { get; } = new AspNetHostingEnvironment(Microsoft.Extensions.Options.Options.Create(new HostingSettings()));
         protected IApplicationShutdownRegistry HostingLifetime { get; } = new AspNetApplicationShutdownRegistry();
-        protected IIpResolver IpResolver => Factory.GetInstance<IIpResolver>();
-        protected IBackOfficeInfo BackOfficeInfo => Factory.GetInstance<IBackOfficeInfo>();
-        protected AppCaches AppCaches => Factory.GetInstance<AppCaches>();
+        protected IIpResolver IpResolver => Factory.GetRequiredService<IIpResolver>();
+        protected IBackOfficeInfo BackOfficeInfo => Factory.GetRequiredService<IBackOfficeInfo>();
+        protected AppCaches AppCaches => Factory.GetRequiredService<AppCaches>();
 
-        protected virtual ISqlSyntaxProvider SqlSyntax => Factory.GetInstance<ISqlSyntaxProvider>();
+        protected virtual ISqlSyntaxProvider SqlSyntax => Factory.GetRequiredService<ISqlSyntaxProvider>();
 
-        protected IMapperCollection Mappers => Factory.GetInstance<IMapperCollection>();
+        protected IMapperCollection Mappers => Factory.GetRequiredService<IMapperCollection>();
 
-        protected UmbracoMapper Mapper => Factory.GetInstance<UmbracoMapper>();
-        protected IHttpContextAccessor HttpContextAccessor => Factory.GetInstance<IHttpContextAccessor>();
+        protected UmbracoMapper Mapper => Factory.GetRequiredService<UmbracoMapper>();
+        protected IHttpContextAccessor HttpContextAccessor => Factory.GetRequiredService<IHttpContextAccessor>();
         protected IRuntimeState RuntimeState => MockRuntimeState(RuntimeLevel.Run);
         private ILoggerFactory _loggerFactory;
 
@@ -204,11 +206,16 @@ namespace Umbraco.Tests.Testing
             var register = TestHelper.GetRegister();
 
 
-
-            Composition = new Composition(register, typeLoader, proflogger, MockRuntimeState(RuntimeLevel.Run), TestHelper.IOHelper, AppCaches.NoCache);
+            Composition = new Composition(
+                (register as ServiceCollectionRegistryAdapter).Services,
+                typeLoader,
+                proflogger,
+                MockRuntimeState(RuntimeLevel.Run),
+                TestHelper.IOHelper,
+                AppCaches.NoCache
+            );
 
             //TestHelper.GetConfigs().RegisterWith(register);
-
             Composition.RegisterUnique(typeof(ILoggerFactory), loggerFactory);
             Composition.Register(typeof(ILogger<>), typeof(Logger<>));
             Composition.Register(typeof(ILogger), msLogger);
@@ -316,7 +323,7 @@ namespace Umbraco.Tests.Testing
             Composition.RegisterUnique<IVariationContextAccessor, TestVariationContextAccessor>();
             Composition.RegisterUnique<IPublishedSnapshotAccessor, TestPublishedSnapshotAccessor>();
             Composition.SetCultureDictionaryFactory<DefaultCultureDictionaryFactory>();
-            Composition.Register(f => f.GetInstance<ICultureDictionaryFactory>().CreateDictionary(), Lifetime.Singleton);
+            Composition.Register(f => f.GetRequiredService<ICultureDictionaryFactory>().CreateDictionary(), Lifetime.Singleton);
             // register back office sections in the order we want them rendered
             Composition.WithCollectionBuilder<SectionCollectionBuilder>().Append<ContentSection>()
                 .Append<MediaSection>()
@@ -339,11 +346,11 @@ namespace Umbraco.Tests.Testing
             var webRoutingSettings = new WebRoutingSettings();
             Composition.RegisterUnique<IPublishedUrlProvider>(factory =>
                 new UrlProvider(
-                    factory.GetInstance<IUmbracoContextAccessor>(),
+                    factory.GetRequiredService<IUmbracoContextAccessor>(),
                     Microsoft.Extensions.Options.Options.Create(webRoutingSettings),
                     new UrlProviderCollection(Enumerable.Empty<IUrlProvider>()),
                     new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>()),
-                    factory.GetInstance<IVariationContextAccessor>()));
+                    factory.GetRequiredService<IVariationContextAccessor>()));
 
 
 
@@ -356,7 +363,7 @@ namespace Umbraco.Tests.Testing
             runtimeStateMock.Setup(x => x.Level).Returns(RuntimeLevel.Run);
             Composition.RegisterUnique(f => runtimeStateMock.Object);
             Composition.Register(_ => Mock.Of<IImageUrlGenerator>());
-            Composition.Register<UploadAutoFillProperties>();
+            Composition.Services.AddTransient<UploadAutoFillProperties>();
 
             // ah...
             Composition.WithCollectionBuilder<ActionCollectionBuilder>();
@@ -485,16 +492,16 @@ namespace Umbraco.Tests.Testing
                 LoggerFactory,
                 globalSettings,
                 connectionStrings,
-                new Lazy<IMapperCollection>(f.GetInstance<IMapperCollection>),
+                new Lazy<IMapperCollection>(f.GetRequiredService<IMapperCollection>),
                 TestHelper.DbProviderFactoryCreator));
 
-            Composition.RegisterUnique(f => f.TryGetInstance<IUmbracoDatabaseFactory>().SqlContext);
+            Composition.RegisterUnique(f => f.GetService<IUmbracoDatabaseFactory>().SqlContext);
 
             Composition.WithCollectionBuilder<UrlSegmentProviderCollectionBuilder>(); // empty
 
             Composition.RegisterUnique(factory
-                => TestObjects.GetScopeProvider(_loggerFactory, factory.TryGetInstance<ITypeFinder>(), factory.TryGetInstance<FileSystems>(), factory.TryGetInstance<IUmbracoDatabaseFactory>()));
-            Composition.RegisterUnique(factory => (IScopeAccessor) factory.GetInstance<IScopeProvider>());
+                => TestObjects.GetScopeProvider(_loggerFactory, factory.GetService<ITypeFinder>(), factory.GetService<FileSystems>(), factory.GetService<IUmbracoDatabaseFactory>()));
+            Composition.RegisterUnique(factory => (IScopeAccessor) factory.GetRequiredService<IScopeProvider>());
 
             Composition.ComposeServices();
 
@@ -560,7 +567,7 @@ namespace Umbraco.Tests.Testing
             // reset and dispose scopes
             // ensures we don't leak an opened database connection
             // which would lock eg SqlCe .sdf files
-            if (Factory?.TryGetInstance<IScopeProvider>() is ScopeProvider scopeProvider)
+            if (Factory?.GetService<IScopeProvider>() is ScopeProvider scopeProvider)
             {
                 Scope scope;
                 while ((scope = scopeProvider.AmbientScope) != null)

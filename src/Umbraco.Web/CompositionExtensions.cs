@@ -1,6 +1,8 @@
 ﻿using System;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
+using Umbraco.Infrastructure.Composing;
 using Umbraco.Web.Actions;
 using Umbraco.Web.ContentApps;
 using Umbraco.Web.Dashboards;
@@ -28,7 +30,11 @@ namespace Umbraco.Web
     /// </summary>
     public static class WebCompositionExtensions
     {
-
+        public static IFactory CreateFactory(this Composition composition)
+        {
+            composition.RegisterBuilders();
+            return ServiceProviderFactoryAdapter.Wrap(composition.Services.BuildServiceProvider());
+        }
 
         #region Uniques
 
@@ -92,31 +98,6 @@ namespace Umbraco.Web
         public static void SetSiteDomainHelper(this Composition composition, ISiteDomainHelper helper)
         {
             composition.RegisterUnique(_ => helper);
-        }
-
-        /// <summary>
-        /// Sets the default controller for rendering template views.
-        /// </summary>
-        /// <typeparam name="TController">The type of the controller.</typeparam>
-        /// <param name="composition">The composition.</param>
-        /// <remarks>The controller type is registered to the container by the composition.</remarks>
-        public static void SetDefaultRenderMvcController<TController>(this Composition composition)
-            => composition.SetDefaultRenderMvcController(typeof(TController));
-
-        /// <summary>
-        /// Sets the default controller for rendering template views.
-        /// </summary>
-        /// <param name="composition">The composition.</param>
-        /// <param name="controllerType">The type of the controller.</param>
-        /// <remarks>The controller type is registered to the container by the composition.</remarks>
-        public static void SetDefaultRenderMvcController(this Composition composition, Type controllerType)
-        {
-            composition.OnCreatingFactory["Umbraco.Core.DefaultRenderMvcController"] = () =>
-            {
-                // no need to register: all IRenderMvcController are registered
-                //composition.Register(controllerType, Lifetime.Request);
-                Current.DefaultRenderMvcControllerType = controllerType;
-            };
         }
 
         #endregion

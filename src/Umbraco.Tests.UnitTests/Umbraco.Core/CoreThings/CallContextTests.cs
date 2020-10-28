@@ -3,7 +3,7 @@ using System;
 using Umbraco.Core;
 using Umbraco.Core.Scoping;
 
-namespace Umbraco.Tests.CoreThings
+namespace Umbraco.Tests.UnitTests.Umbraco.Core.CoreThings
 {
     [TestFixture]
     public class CallContextTests

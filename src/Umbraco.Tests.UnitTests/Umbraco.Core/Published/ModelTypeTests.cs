@@ -2,8 +2,9 @@ using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Tests.Published;
 
-namespace Umbraco.Tests.Published
+namespace Umbraco.Tests.UnitTests.Umbraco.Core.Published
 {
     [TestFixture]
     public class ModelTypeTests

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -17,9 +18,10 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Scoping;
+using Umbraco.Infrastructure.Composing;
 using Umbraco.Tests.TestHelpers;
 
-namespace Umbraco.Tests.Components
+namespace Umbraco.Tests.UnitTests.Umbraco.Core.Components
 {
     [TestFixture]
     public class ComponentTests
@@ -45,19 +47,19 @@ namespace Umbraco.Tests.Components
             var mediaFileSystem = Mock.Of<IMediaFileSystem>();
             var p = new ScopeProvider(f, fs, Options.Create(coreDebug), mediaFileSystem, loggerFactory.CreateLogger<ScopeProvider>(), loggerFactory, typeFinder, NoAppCache.Instance);
 
-            mock.Setup(x => x.GetInstance(typeof (ILogger))).Returns(logger);
-            mock.Setup(x => x.GetInstance(typeof(ILoggerFactory))).Returns(loggerFactory);
-            mock.Setup(x => x.GetInstance(typeof (IProfilingLogger))).Returns(new ProfilingLogger(logger, Mock.Of<IProfiler>()));
-            mock.Setup(x => x.GetInstance(typeof (IUmbracoDatabaseFactory))).Returns(f);
-            mock.Setup(x => x.GetInstance(typeof (IScopeProvider))).Returns(p);
+            mock.Setup(x => x.GetRequiredService(typeof (ILogger))).Returns(logger);
+            mock.Setup(x => x.GetRequiredService(typeof(ILoggerFactory))).Returns(loggerFactory);
+            mock.Setup(x => x.GetRequiredService(typeof (IProfilingLogger))).Returns(new ProfilingLogger(logger, Mock.Of<IProfiler>()));
+            mock.Setup(x => x.GetRequiredService(typeof (IUmbracoDatabaseFactory))).Returns(f);
+            mock.Setup(x => x.GetRequiredService(typeof (IScopeProvider))).Returns(p);
 
             setup?.Invoke(mock);
             return mock.Object;
         }
 
-        private static IRegister MockRegister()
+        private static IServiceCollection MockRegister()
         {
-            return Mock.Of<IRegister>();
+            return Mock.Of<IServiceCollection>();
         }
 
         private static TypeLoader MockTypeLoader()
@@ -86,8 +88,8 @@ namespace Umbraco.Tests.Components
 
             var factory = MockFactory(m =>
             {
-                m.Setup(x => x.TryGetInstance(It.Is<Type>(t => t == typeof(ISomeResource)))).Returns(() => new SomeResource());
-                m.Setup(x => x.GetInstance(It.IsAny<Type>())).Returns<Type>((type) =>
+                m.Setup(x => x.GetService(It.Is<Type>(t => t == typeof(ISomeResource)))).Returns(() => new SomeResource());
+                m.Setup(x => x.GetRequiredService(It.IsAny<Type>())).Returns<Type>((type) =>
                 {
                     if (type == typeof(Composer1)) return new Composer1();
                     if (type == typeof(Composer5)) return new Composer5();
@@ -99,7 +101,7 @@ namespace Umbraco.Tests.Components
             });
 
             var builder = composition.WithCollectionBuilder<ComponentCollectionBuilder>();
-            builder.RegisterWith(register);
+            builder.RegisterWith(ServiceCollectionRegistryAdapter.Wrap(register));
             var components = builder.CreateCollection(factory);
 
             Assert.IsEmpty(components);
@@ -176,7 +178,7 @@ namespace Umbraco.Tests.Components
             }
             catch (Exception e)
             {
-                Assert.AreEqual("Broken composer dependency: Umbraco.Tests.Components.ComponentTests+Composer2 -> Umbraco.Tests.Components.ComponentTests+Composer4.", e.Message);
+                Assert.AreEqual("Broken composer dependency: Umbraco.Tests.UnitTests.Umbraco.Core.Components.ComponentTests+Composer2 -> Umbraco.Tests.UnitTests.Umbraco.Core.Components.ComponentTests+Composer4.", e.Message);
             }
         }
 
@@ -208,8 +210,8 @@ namespace Umbraco.Tests.Components
             var typeLoader = MockTypeLoader();
             var factory = MockFactory(m =>
             {
-                m.Setup(x => x.TryGetInstance(It.Is<Type>(t => t == typeof (ISomeResource)))).Returns(() => new SomeResource());
-                m.Setup(x => x.GetInstance(It.IsAny<Type>())).Returns<Type>((type) =>
+                m.Setup(x => x.GetService(It.Is<Type>(t => t == typeof (ISomeResource)))).Returns(() => new SomeResource());
+                m.Setup(x => x.GetRequiredService(It.IsAny<Type>())).Returns<Type>((type) =>
                 {
                     if (type == typeof(Composer1)) return new Composer1();
                     if (type == typeof(Composer5)) return new Composer5();
@@ -231,7 +233,7 @@ namespace Umbraco.Tests.Components
             AssertTypeArray(TypeArray<Composer1, Composer5, Composer5a>(), Composed);
 
             var builder = composition.WithCollectionBuilder<ComponentCollectionBuilder>();
-            builder.RegisterWith(register);
+            builder.RegisterWith(ServiceCollectionRegistryAdapter.Wrap(register));
             var components = builder.CreateCollection(factory);
 
             Assert.IsEmpty(Initialized);
@@ -287,7 +289,7 @@ namespace Umbraco.Tests.Components
             Composed.Clear();
             composers.Compose();
             var builder = composition.WithCollectionBuilder<ComponentCollectionBuilder>();
-            builder.RegisterWith(register);
+            builder.RegisterWith(ServiceCollectionRegistryAdapter.Wrap(register));
             var components = builder.CreateCollection(factory);
             Assert.AreEqual(3, Composed.Count);
             Assert.AreEqual(typeof(Composer4), Composed[0]);

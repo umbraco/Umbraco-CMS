@@ -11,7 +11,7 @@ using Umbraco.Tests.Common.Builders;
 using Umbraco.Tests.Common.Builders.Extensions;
 using Umbraco.Web.Editors;
 
-namespace Umbraco.Tests.Web.Controllers
+namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Editors
 {
     [TestFixture]
     public class UserEditorAuthorizationHelperTests

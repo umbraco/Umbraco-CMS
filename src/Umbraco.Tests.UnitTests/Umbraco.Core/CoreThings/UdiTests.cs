@@ -8,7 +8,7 @@ using Umbraco.Core;
 using Umbraco.Core.Deploy;
 using Umbraco.Core.Serialization;
 
-namespace Umbraco.Tests.CoreThings
+namespace Umbraco.Tests.UnitTests.Umbraco.Core.CoreThings
 {
     [TestFixture]
     public class UdiTests

@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
@@ -19,7 +20,7 @@ namespace Umbraco.Tests.Routing
         protected override void Compose()
         {
             base.Compose();
-            Composition.Register<ISiteDomainHelper, SiteDomainHelper>();
+            Composition.Services.AddTransient<ISiteDomainHelper, SiteDomainHelper>();
         }
 
         protected override void ComposeSettings()

@@ -9,10 +9,10 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.PackageActions;
-using Umbraco.Tests.Components;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.UnitTests.TestHelpers;
 
-namespace Umbraco.Tests.Composing
+namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
 {
     [TestFixture]
     public class PackageActionCollectionTests : ComposingTestBase
@@ -20,7 +20,7 @@ namespace Umbraco.Tests.Composing
         [Test]
         public void PackageActionCollectionBuilderWorks()
         {
-            var container = TestHelper.GetRegister();
+            var container = TestHelper.GetServiceCollection();
 
             var composition = new Composition(container, TestHelper.GetMockedTypeLoader(), Mock.Of<IProfilingLogger>(), Mock.Of<IRuntimeState>(), TestHelper.IOHelper, AppCaches.NoCache);
 
@@ -30,7 +30,7 @@ namespace Umbraco.Tests.Composing
 
             var factory = composition.CreateFactory();
 
-            var actions = factory.GetInstance<PackageActionCollection>();
+            var actions = factory.GetRequiredService<PackageActionCollection>();
             Assert.AreEqual(2, actions.Count());
 
             // order is unspecified, but both must be there

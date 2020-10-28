@@ -4,7 +4,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Umbraco.Core;
-using Umbraco.Web.PropertyEditors.Validation;
+using Umbraco.Web.BackOffice.PropertyEditors.Validation;
 
 namespace Umbraco.Extensions
 {

@@ -24,6 +24,7 @@ using Umbraco.Core.Logging.Serilog;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Runtime;
+using Umbraco.Infrastructure.Composing;
 using Umbraco.Infrastructure.HostedServices;
 using Umbraco.Web.Common.AspNetCore;
 using Umbraco.Web.Common.Profiler;
@@ -97,22 +98,8 @@ namespace Umbraco.Extensions
             Assembly entryAssembly,
             AppCaches appCaches,
             ILoggingConfiguration loggingConfiguration,
-            IConfiguration configuration,
-            out IFactory factory)
-            => services.AddUmbracoCore(webHostEnvironment, umbContainer, entryAssembly, appCaches, loggingConfiguration, configuration, GetCoreRuntime, out factory);
-
-
-        /// <summary>
-        /// Adds the Umbraco Back Core requirements
-        /// </summary>
-        /// <param name="services"></param>
-        /// <param name="webHostEnvironment"></param>
-        /// <param name="configuration"></param>
-        /// <returns></returns>
-        public static IServiceCollection AddUmbracoCore(this IServiceCollection services, IWebHostEnvironment webHostEnvironment, IConfiguration configuration)
-        {
-            return services.AddUmbracoCore(webHostEnvironment, configuration, out _);
-        }
+            IConfiguration configuration)
+            => services.AddUmbracoCore(webHostEnvironment, umbContainer, entryAssembly, appCaches, loggingConfiguration, configuration, GetCoreRuntime);
 
         /// <summary>
         /// Adds the Umbraco Back Core requirements
@@ -122,13 +109,8 @@ namespace Umbraco.Extensions
         /// <param name="configuration"></param>
         /// <param name="factory"></param>
         /// <returns></returns>
-        public static IServiceCollection AddUmbracoCore(this IServiceCollection services, IWebHostEnvironment webHostEnvironment, IConfiguration configuration, out IFactory factory)
+        public static IServiceCollection AddUmbracoCore(this IServiceCollection services, IWebHostEnvironment webHostEnvironment, IConfiguration configuration)
         {
-            if (!UmbracoServiceProviderFactory.IsActive)
-                throw new InvalidOperationException("Ensure to add UseUmbraco() in your Program.cs after ConfigureWebHostDefaults to enable Umbraco's service provider factory");
-
-            var umbContainer = UmbracoServiceProviderFactory.UmbracoContainer;
-
             var loggingConfig = new LoggingConfiguration(
                 Path.Combine(webHostEnvironment.ContentRootPath, "umbraco", "logs"));
 
@@ -142,14 +124,20 @@ namespace Umbraco.Extensions
                 requestCache,
                 new IsolatedCaches(type => new DeepCloneAppCache(new ObjectCacheAppCache())));
 
+            /* TODO: MSDI - Post initial merge we can clean up a lot.
+             * Change the method signatures lower down
+             * Or even just remove IRegister / IFactory interfaces entirely.
+             * If we try to do it immediately, merging becomes a nightmare.
+             */
+            var register = new ServiceCollectionRegistryAdapter(services);
+
             services.AddUmbracoCore(webHostEnvironment,
-                umbContainer,
+                register,
                 Assembly.GetEntryAssembly(),
                 appCaches,
                 loggingConfig,
                 configuration,
-                GetCoreRuntime,
-                out factory);
+                GetCoreRuntime);
 
             return services;
         }
@@ -176,8 +164,7 @@ namespace Umbraco.Extensions
             ILoggingConfiguration loggingConfiguration,
             IConfiguration configuration,
             //TODO: Yep that's extremely ugly
-            Func<GlobalSettings, ConnectionStrings, IUmbracoVersion, IIOHelper, ILoggerFactory, IProfiler, IHostingEnvironment, IBackOfficeInfo, ITypeFinder, AppCaches, IDbProviderFactoryCreator, IRuntime> getRuntime,
-            out IFactory factory)
+            Func<GlobalSettings, ConnectionStrings, IUmbracoVersion, IIOHelper, ILoggerFactory, IProfiler, IHostingEnvironment, IBackOfficeInfo, ITypeFinder, AppCaches, IDbProviderFactoryCreator, IRuntime> getRuntime)
         {
             if (services is null) throw new ArgumentNullException(nameof(services));
             var container = umbContainer;
@@ -245,7 +232,7 @@ namespace Umbraco.Extensions
                 appCaches,
                 dbProviderFactoryCreator);
 
-            factory = coreRuntime.Configure(container);
+            coreRuntime.Configure(services);
 
             // Add hosted services
             services.AddHostedServices();

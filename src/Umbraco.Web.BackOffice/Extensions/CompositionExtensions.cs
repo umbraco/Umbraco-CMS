@@ -2,7 +2,7 @@
 using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.Common.Controllers;
 using Umbraco.Web.Common.Install;
-using Umbraco.Web.Trees;
+using Umbraco.Web.BackOffice.Trees;
 
 // the namespace here is intentional -  although defined in Umbraco.Web assembly,
 // this class should be visible when using Umbraco.Core.Components, alongside

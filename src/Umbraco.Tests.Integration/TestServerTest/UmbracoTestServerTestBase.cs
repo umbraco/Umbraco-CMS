@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using NUnit.Framework;
 using Umbraco.Composing;
 using Umbraco.Core;
@@ -20,14 +21,13 @@ using Umbraco.Tests.Testing;
 using Umbraco.Web;
 using Umbraco.Web.Common.Builder;
 using Umbraco.Web.Common.Controllers;
-using Umbraco.Web.Editors;
 using Microsoft.Extensions.Hosting;
 using Umbraco.Web.BackOffice.Controllers;
 
 namespace Umbraco.Tests.Integration.TestServerTest
 {
     [TestFixture]
-    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Console, Boot = false)]
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Console, Boot = true)]
     public abstract class UmbracoTestServerTestBase : UmbracoIntegrationTest
     {
         [SetUp]
@@ -134,7 +134,7 @@ namespace Umbraco.Tests.Integration.TestServerTest
             var umbracoBuilder = services.AddUmbraco(TestHelper.GetWebHostEnvironment(), Configuration);
             umbracoBuilder
                 .WithConfiguration()
-                .WithTestCore(TestHelper, UmbracoContainer, UseTestLocalDb) // This is the important one!
+                .WithTestCore(TestHelper, UseTestLocalDb) // This is the important one!
                 .WithWebComponents()
                 .WithRuntimeMinifier()
                 .WithBackOffice()
