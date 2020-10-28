@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.Cache
@@ -10,6 +11,7 @@ namespace Umbraco.Core.Cache
     /// <summary>
     /// Implements a fast <see cref="IAppCache"/> on top of a concurrent dictionary.
     /// </summary>
+    [UmbracoVolatile]
     public class FastDictionaryAppCache : IAppCache
     {
 

@@ -1,9 +1,11 @@
 ﻿using System;
 using Microsoft.Owin.Logging;
 using Umbraco.Composing;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Web.Logging
 {
+    [UmbracoVolatile]
     public class OwinLoggerFactory : ILoggerFactory
     {
         /// <summary>

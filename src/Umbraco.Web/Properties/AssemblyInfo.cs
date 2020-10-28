@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Umbraco.Core.CodeAnnotations;
 
 [assembly: AssemblyTitle("Umbraco.Web")]
 [assembly: AssemblyDescription("Umbraco Web")]
@@ -35,3 +36,4 @@ using System.Runtime.InteropServices;
 // code analysis
 // IDE1006 is broken, wants _value syntax for consts, etc - and it's even confusing ppl at MS, kill it
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "~_~")]
+[assembly: UmbracoSuppressVolatile]

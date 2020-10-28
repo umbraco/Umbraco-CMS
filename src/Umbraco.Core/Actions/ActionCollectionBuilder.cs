@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Composing;
+
 namespace Umbraco.Web.Actions
 {
+    [UmbracoVolatile]
     public class ActionCollectionBuilder : LazyCollectionBuilderBase<ActionCollectionBuilder, ActionCollection, IAction>
     {
         protected override ActionCollectionBuilder This => this;

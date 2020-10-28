@@ -24,4 +24,7 @@
       <PackageReference Include="System.Data.OleDb" Version="4.7.1" />
     </ItemGroup>
 
+    <ItemGroup>
+        <AssemblyAttribute Include="Umbraco.Core.CodeAnnotations.UmbracoSuppressVolatileAttribute"></AssemblyAttribute>
+    </ItemGroup>
 </Project>

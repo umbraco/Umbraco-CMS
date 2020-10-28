@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 
@@ -11,6 +12,7 @@ namespace Umbraco.Core.Cache
     /// instance, and ensuring that all inserts and returns are deep cloned copies of the cache item,
     /// when the item is deep-cloneable.
     /// </summary>
+    [UmbracoVolatile]
     public class DeepCloneAppCache : IAppPolicyCache
     {
         /// <summary>
