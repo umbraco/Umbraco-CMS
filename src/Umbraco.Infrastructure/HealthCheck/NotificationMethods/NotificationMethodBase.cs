@@ -1,11 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Reflection;
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.HealthCheck;
-using Umbraco.Core.HealthCheck.Checks;
 using Umbraco.Infrastructure.HealthCheck;
 
 namespace Umbraco.Web.HealthCheck.NotificationMethods
@@ -23,7 +21,7 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
             }
 
             var notificationMethods = healthCheckSettings.Value.Notification.NotificationMethods;
-            if(!notificationMethods.TryGetValue(attribute.Alias, out var notificationMethod))
+            if (!notificationMethods.TryGetValue(attribute.Alias, out var notificationMethod))
             {
                 Enabled = false;
                 return;
@@ -41,7 +39,7 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
 
         public HealthCheckNotificationVerbosity Verbosity { get; protected set; }
 
-        public IReadOnlyDictionary<string, INotificationMethodSettings> Settings { get; }
+        public IDictionary<string, string> Settings { get; }
 
         protected bool ShouldSend(HealthCheckResults results)
         {

@@ -93,12 +93,10 @@ namespace Umbraco.Infrastructure.HostedServices
             using (var scope = _scopeProvider.CreateScope())
             using (_profilingLogger.DebugDuration<HealthCheckNotifier>("Health checks executing", "Health checks complete"))
             {
-                var healthCheckConfig = _healthChecksSettings;
-
                 // Don't notify for any checks that are disabled, nor for any disabled just for notifications.
-                var disabledCheckIds = healthCheckConfig.Notification.DisabledChecks
+                var disabledCheckIds = _healthChecksSettings.Notification.DisabledChecks
                         .Select(x => x.Id)
-                    .Union(healthCheckConfig.DisabledChecks
+                    .Union(_healthChecksSettings.DisabledChecks
                         .Select(x => x.Id))
                     .Distinct()
                     .ToArray();
@@ -109,7 +107,7 @@ namespace Umbraco.Infrastructure.HostedServices
                 var results = new HealthCheckResults(checks);
                 results.LogResults();
 
-                // Send using registered notification methods that are enabled
+                // Send using registered notification methods that are enabled.
                 foreach (var notificationMethod in _notifications.Where(x => x.Enabled))
                 {
                     await notificationMethod.SendAsync(results);

@@ -28,7 +28,7 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
             IOptions<ContentSettings> contentSettings)
             : base(healthChecksSettings)
         {
-            var recipientEmail = Settings?["recipientEmail"]?.Value;
+            var recipientEmail = Settings?["RecipientEmail"];
             if (string.IsNullOrWhiteSpace(recipientEmail))
             {
                 Enabled = false;

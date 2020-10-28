@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core.HealthCheck;
 using Umbraco.Core.HealthCheck.Checks;
 
 namespace Umbraco.Core.Configuration.Models
@@ -19,7 +18,7 @@ namespace Umbraco.Core.Configuration.Models
 
             public int PeriodInHours { get; set; } = 24;
 
-            public IReadOnlyDictionary<string, INotificationMethod> NotificationMethods { get; set; } = new Dictionary<string, INotificationMethod>();
+            public IDictionary<string, HealthCheckNotificationMethodSettings> NotificationMethods { get; set; } = new Dictionary<string, HealthCheckNotificationMethodSettings>();
 
             public IEnumerable<DisabledHealthCheck> DisabledChecks { get; set; } = Enumerable.Empty<DisabledHealthCheck>();
         }

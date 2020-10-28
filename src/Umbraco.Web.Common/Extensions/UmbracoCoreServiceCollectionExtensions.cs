@@ -12,8 +12,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Serilog;
 using Serilog.Extensions.Hosting;
-using Serilog.Extensions.Logging;
-using Umbraco.Composing;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
@@ -26,72 +24,56 @@ using Umbraco.Core.Logging.Serilog;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Runtime;
+using Umbraco.Infrastructure.HostedServices;
 using Umbraco.Web.Common.AspNetCore;
 using Umbraco.Web.Common.Profiler;
 using ConnectionStrings = Umbraco.Core.Configuration.Models.ConnectionStrings;
 using CoreDebugSettings = Umbraco.Core.Configuration.Models.CoreDebugSettings;
 using IHostingEnvironment = Umbraco.Core.Hosting.IHostingEnvironment;
-using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Umbraco.Extensions
 {
     public static class UmbracoCoreServiceCollectionExtensions
     {
         /// <summary>
-        /// Adds SqlCe support for Umbraco
+        /// Adds the Umbraco Configuration requirements
         /// </summary>
         /// <param name="services"></param>
+        /// <param name="configuration"></param>
         /// <returns></returns>
-        public static IServiceCollection AddUmbracoSqlCeSupport(this IServiceCollection services)
+        public static IServiceCollection AddUmbracoConfiguration(this IServiceCollection services, IConfiguration configuration)
         {
-            try
-            {
-                var binFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-                if (binFolder != null)
-                {
-                    var dllPath = Path.Combine(binFolder, "Umbraco.Persistance.SqlCe.dll");
-                    var umbSqlCeAssembly = Assembly.LoadFrom(dllPath);
+            if (configuration == null) throw new ArgumentNullException(nameof(configuration));
 
-                    var sqlCeSyntaxProviderType = umbSqlCeAssembly.GetType("Umbraco.Persistance.SqlCe.SqlCeSyntaxProvider");
-                    var sqlCeBulkSqlInsertProviderType = umbSqlCeAssembly.GetType("Umbraco.Persistance.SqlCe.SqlCeBulkSqlInsertProvider");
-                    var sqlCeEmbeddedDatabaseCreatorType = umbSqlCeAssembly.GetType("Umbraco.Persistance.SqlCe.SqlCeEmbeddedDatabaseCreator");
+            // Register configuration validators.
+            services.AddSingleton<IValidateOptions<ContentSettings>, ContentSettingsValidator>();
+            services.AddSingleton<IValidateOptions<GlobalSettings>, GlobalSettingsValidator>();
+            services.AddSingleton<IValidateOptions<HealthChecksSettings>, HealthChecksSettingsValidator >();
+            services.AddSingleton<IValidateOptions<RequestHandlerSettings>, RequestHandlerSettingsValidator>();
 
-                    if (!(sqlCeSyntaxProviderType is null || sqlCeBulkSqlInsertProviderType is null || sqlCeEmbeddedDatabaseCreatorType is null))
-                    {
-                        services.AddSingleton(typeof(ISqlSyntaxProvider), sqlCeSyntaxProviderType);
-                        services.AddSingleton(typeof(IBulkSqlInsertProvider), sqlCeBulkSqlInsertProviderType);
-                        services.AddSingleton(typeof(IEmbeddedDatabaseCreator), sqlCeEmbeddedDatabaseCreatorType);
-                    }
-
-                    var sqlCeAssembly = Assembly.LoadFrom(Path.Combine(binFolder, "System.Data.SqlServerCe.dll"));
-
-                    var sqlCe = sqlCeAssembly.GetType("System.Data.SqlServerCe.SqlCeProviderFactory");
-                    if (!(sqlCe is null))
-                    {
-                        DbProviderFactories.RegisterFactory(Core.Constants.DbProviderNames.SqlCe, sqlCe);
-                    }
-                }
-            }
-            catch
-            {
-                // Ignore if SqlCE is not available
-            }
-
-            return services;
-        }
-
-        /// <summary>
-        /// Adds Sql Server support for Umbraco
-        /// </summary>
-        /// <param name="services"></param>
-        /// <returns></returns>
-        public static IServiceCollection AddUmbracoSqlServerSupport(this IServiceCollection services)
-        {
-            DbProviderFactories.RegisterFactory(Core.Constants.DbProviderNames.SqlServer, SqlClientFactory.Instance);
-
-            services.AddSingleton<ISqlSyntaxProvider, SqlServerSyntaxProvider>();
-            services.AddSingleton<IBulkSqlInsertProvider, SqlServerBulkSqlInsertProvider>();
-            services.AddSingleton<IEmbeddedDatabaseCreator, NoopEmbeddedDatabaseCreator>();
+            // Register configuration sections.
+            services.Configure<ActiveDirectorySettings>(configuration.GetSection(Constants.Configuration.ConfigActiveDirectory));
+            services.Configure<ConnectionStrings>(configuration.GetSection("ConnectionStrings"), o => o.BindNonPublicProperties = true);
+            services.Configure<ContentSettings>(configuration.GetSection(Constants.Configuration.ConfigContent));
+            services.Configure<CoreDebugSettings>(configuration.GetSection(Constants.Configuration.ConfigCoreDebug));
+            services.Configure<ExceptionFilterSettings>(configuration.GetSection(Constants.Configuration.ConfigExceptionFilter));
+            services.Configure<GlobalSettings>(configuration.GetSection(Constants.Configuration.ConfigGlobal));
+            services.Configure<HealthChecksSettings>(configuration.GetSection(Constants.Configuration.ConfigHealthChecks));
+            services.Configure<HostingSettings>(configuration.GetSection(Constants.Configuration.ConfigHosting));
+            services.Configure<ImagingSettings>(configuration.GetSection(Constants.Configuration.ConfigImaging));
+            services.Configure<IndexCreatorSettings>(configuration.GetSection(Constants.Configuration.ConfigExamine));
+            services.Configure<KeepAliveSettings>(configuration.GetSection(Constants.Configuration.ConfigKeepAlive));
+            services.Configure<LoggingSettings>(configuration.GetSection(Constants.Configuration.ConfigLogging));
+            services.Configure<MemberPasswordConfigurationSettings>(configuration.GetSection(Constants.Configuration.ConfigMemberPassword));
+            services.Configure<ModelsBuilderSettings>(configuration.GetSection(Constants.Configuration.ConfigModelsBuilder), o => o.BindNonPublicProperties = true);
+            services.Configure<NuCacheSettings>(configuration.GetSection(Constants.Configuration.ConfigNuCache));
+            services.Configure<RequestHandlerSettings>(configuration.GetSection(Constants.Configuration.ConfigRequestHandler));
+            services.Configure<RuntimeSettings>(configuration.GetSection(Constants.Configuration.ConfigRuntime));
+            services.Configure<SecuritySettings>(configuration.GetSection(Constants.Configuration.ConfigSecurity));
+            services.Configure<TourSettings>(configuration.GetSection(Constants.Configuration.ConfigTours));
+            services.Configure<TypeFinderSettings>(configuration.GetSection(Constants.Configuration.ConfigTypeFinder));
+            services.Configure<UserPasswordConfigurationSettings>(configuration.GetSection(Constants.Configuration.ConfigUserPassword));
+            services.Configure<WebRoutingSettings>(configuration.GetSection(Constants.Configuration.ConfigWebRouting));
 
             return services;
         }
@@ -119,46 +101,6 @@ namespace Umbraco.Extensions
             out IFactory factory)
             => services.AddUmbracoCore(webHostEnvironment, umbContainer, entryAssembly, appCaches, loggingConfiguration, configuration, GetCoreRuntime, out factory);
 
-        /// <summary>
-        /// Adds the Umbraco Configuration requirements
-        /// </summary>
-        /// <param name="services"></param>
-        /// <param name="configuration"></param>
-        /// <returns></returns>
-        public static IServiceCollection AddUmbracoConfiguration(this IServiceCollection services, IConfiguration configuration)
-        {
-            if (configuration == null) throw new ArgumentNullException(nameof(configuration));
-
-            services.AddSingleton<IValidateOptions<ContentSettings>, ContentSettingsValidator>();
-            services.AddSingleton<IValidateOptions<GlobalSettings>, GlobalSettingsValidator>();
-            services.AddSingleton<IValidateOptions<HealthChecksSettings>, HealthChecksSettingsValidator >();
-            services.AddSingleton<IValidateOptions<RequestHandlerSettings>, RequestHandlerSettingsValidator>();
-
-            services.Configure<ActiveDirectorySettings>(configuration.GetSection(Constants.Configuration.ConfigActiveDirectory));
-            services.Configure<ConnectionStrings>(configuration.GetSection("ConnectionStrings"), o => o.BindNonPublicProperties = true);
-            services.Configure<ContentSettings>(configuration.GetSection(Constants.Configuration.ConfigContent));
-            services.Configure<CoreDebugSettings>(configuration.GetSection(Constants.Configuration.ConfigCoreDebug));
-            services.Configure<ExceptionFilterSettings>(configuration.GetSection(Constants.Configuration.ConfigExceptionFilter));
-            services.Configure<GlobalSettings>(configuration.GetSection(Constants.Configuration.ConfigGlobal));
-            services.Configure<HealthChecksSettings>(configuration.GetSection(Constants.Configuration.ConfigHealthChecks));
-            services.Configure<HostingSettings>(configuration.GetSection(Constants.Configuration.ConfigHosting));
-            services.Configure<ImagingSettings>(configuration.GetSection(Constants.Configuration.ConfigImaging));
-            services.Configure<IndexCreatorSettings>(configuration.GetSection(Constants.Configuration.ConfigExamine));
-            services.Configure<KeepAliveSettings>(configuration.GetSection(Constants.Configuration.ConfigKeepAlive));
-            services.Configure<LoggingSettings>(configuration.GetSection(Constants.Configuration.ConfigLogging));
-            services.Configure<MemberPasswordConfigurationSettings>(configuration.GetSection(Constants.Configuration.ConfigMemberPassword));
-            services.Configure<ModelsBuilderSettings>(configuration.GetSection(Constants.Configuration.ConfigModelsBuilder), o => o.BindNonPublicProperties = true);
-            services.Configure<NuCacheSettings>(configuration.GetSection(Constants.Configuration.ConfigNuCache));
-            services.Configure<RequestHandlerSettings>(configuration.GetSection(Constants.Configuration.ConfigRequestHandler));
-            services.Configure<RuntimeSettings>(configuration.GetSection(Constants.Configuration.ConfigRuntime));
-            services.Configure<SecuritySettings>(configuration.GetSection(Constants.Configuration.ConfigSecurity));
-            services.Configure<TourSettings>(configuration.GetSection(Constants.Configuration.ConfigTours));
-            services.Configure<TypeFinderSettings>(configuration.GetSection(Constants.Configuration.ConfigTypeFinder));
-            services.Configure<UserPasswordConfigurationSettings>(configuration.GetSection(Constants.Configuration.ConfigUserPassword));
-            services.Configure<WebRoutingSettings>(configuration.GetSection(Constants.Configuration.ConfigWebRouting));
-
-            return services;
-        }
 
         /// <summary>
         /// Adds the Umbraco Back Core requirements
@@ -305,6 +247,80 @@ namespace Umbraco.Extensions
 
             factory = coreRuntime.Configure(container);
 
+            // Add hosted services
+            services.AddHostedServices();
+
+            return services;
+        }
+
+        /// <summary>
+        /// Adds SqlCe support for Umbraco
+        /// </summary>
+        /// <param name="services"></param>
+        /// <returns></returns>
+        private static IServiceCollection AddUmbracoSqlCeSupport(this IServiceCollection services)
+        {
+            try
+            {
+                var binFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                if (binFolder != null)
+                {
+                    var dllPath = Path.Combine(binFolder, "Umbraco.Persistance.SqlCe.dll");
+                    var umbSqlCeAssembly = Assembly.LoadFrom(dllPath);
+
+                    var sqlCeSyntaxProviderType = umbSqlCeAssembly.GetType("Umbraco.Persistance.SqlCe.SqlCeSyntaxProvider");
+                    var sqlCeBulkSqlInsertProviderType = umbSqlCeAssembly.GetType("Umbraco.Persistance.SqlCe.SqlCeBulkSqlInsertProvider");
+                    var sqlCeEmbeddedDatabaseCreatorType = umbSqlCeAssembly.GetType("Umbraco.Persistance.SqlCe.SqlCeEmbeddedDatabaseCreator");
+
+                    if (!(sqlCeSyntaxProviderType is null || sqlCeBulkSqlInsertProviderType is null || sqlCeEmbeddedDatabaseCreatorType is null))
+                    {
+                        services.AddSingleton(typeof(ISqlSyntaxProvider), sqlCeSyntaxProviderType);
+                        services.AddSingleton(typeof(IBulkSqlInsertProvider), sqlCeBulkSqlInsertProviderType);
+                        services.AddSingleton(typeof(IEmbeddedDatabaseCreator), sqlCeEmbeddedDatabaseCreatorType);
+                    }
+
+                    var sqlCeAssembly = Assembly.LoadFrom(Path.Combine(binFolder, "System.Data.SqlServerCe.dll"));
+
+                    var sqlCe = sqlCeAssembly.GetType("System.Data.SqlServerCe.SqlCeProviderFactory");
+                    if (!(sqlCe is null))
+                    {
+                        DbProviderFactories.RegisterFactory(Core.Constants.DbProviderNames.SqlCe, sqlCe);
+                    }
+                }
+            }
+            catch
+            {
+                // Ignore if SqlCE is not available
+            }
+
+            return services;
+        }
+
+        /// <summary>
+        /// Adds Sql Server support for Umbraco
+        /// </summary>
+        /// <param name="services"></param>
+        /// <returns></returns>
+        public static IServiceCollection AddUmbracoSqlServerSupport(this IServiceCollection services)
+        {
+            DbProviderFactories.RegisterFactory(Core.Constants.DbProviderNames.SqlServer, SqlClientFactory.Instance);
+
+            services.AddSingleton<ISqlSyntaxProvider, SqlServerSyntaxProvider>();
+            services.AddSingleton<IBulkSqlInsertProvider, SqlServerBulkSqlInsertProvider>();
+            services.AddSingleton<IEmbeddedDatabaseCreator, NoopEmbeddedDatabaseCreator>();
+
+            return services;
+        }
+
+        /// <summary>
+        /// Adds hosted services for Umbraco.
+        /// </summary>
+        /// <param name="services"></param>
+        /// <returns></returns>
+        private static IServiceCollection AddHostedServices(this IServiceCollection services)
+        {
+            services.AddHostedService<HealthCheckNotifier>();
+
             return services;
         }
 
@@ -379,7 +395,7 @@ namespace Umbraco.Extensions
         /// <param name="hostingEnvironment"></param>
         private static void AddLogger(
             IServiceCollection services,
-            Core.Hosting.IHostingEnvironment hostingEnvironment,
+            IHostingEnvironment hostingEnvironment,
             ILoggingConfiguration loggingConfiguration,
             IConfiguration configuration)
         {
