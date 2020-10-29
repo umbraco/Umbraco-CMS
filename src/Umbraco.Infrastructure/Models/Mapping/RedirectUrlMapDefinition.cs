@@ -1,10 +1,12 @@
-﻿using Umbraco.Core.Mapping;
+﻿using Umbraco.Core.CodeAnnotations;
+using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Models.Mapping
 {
+    [UmbracoVolatile]
     public class RedirectUrlMapDefinition : IMapDefinition
     {
         private readonly IPublishedUrlProvider _publishedUrlProvider;

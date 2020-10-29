@@ -20,9 +20,11 @@ using Umbraco.Core.Media;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Configuration.Models;
 using Microsoft.Extensions.Options;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Web.Models.Mapping
 {
+    [UmbracoVolatile]
     public class UserMapDefinition : IMapDefinition
     {
         private readonly ISectionService _sectionService;

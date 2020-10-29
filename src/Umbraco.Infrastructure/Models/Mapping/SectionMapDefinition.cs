@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Manifest;
+﻿using Umbraco.Core.CodeAnnotations;
+using Umbraco.Core.Manifest;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models.Sections;
 using Umbraco.Core.Services;
@@ -7,6 +8,7 @@ using Umbraco.Web.Sections;
 
 namespace Umbraco.Web.Models.Mapping
 {
+    [UmbracoVolatile]
     public class SectionMapDefinition : IMapDefinition
     {
         private readonly ILocalizedTextService _textService;

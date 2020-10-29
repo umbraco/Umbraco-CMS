@@ -9,10 +9,12 @@ using Umbraco.Core.Scoping;
 using Umbraco.Core.Sync;
 using Umbraco.Web.HealthCheck;
 using Microsoft.Extensions.Logging;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Infrastructure.HealthCheck;
 
 namespace Umbraco.Web.Scheduling
 {
+    [UmbracoVolatile]
     public class HealthCheckNotifier : RecurringTaskBase
     {
         private readonly IMainDom _mainDom;

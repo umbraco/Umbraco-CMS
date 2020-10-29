@@ -1,6 +1,7 @@
 ﻿using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Core.Serialization
 {
@@ -16,6 +17,7 @@ namespace Umbraco.Core.Serialization
     /// don't require this because to convert to string, we just override ToString().
     /// I'll leave this class here for the future though.
     /// </remarks>
+    [UmbracoVolatile]
     public class NoTypeConverterJsonConverter<T> : JsonConverter
     {
         static readonly IContractResolver resolver = new NoTypeConverterContractResolver();

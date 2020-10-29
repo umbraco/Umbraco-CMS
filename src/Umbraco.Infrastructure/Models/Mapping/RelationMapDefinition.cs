@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
@@ -7,6 +8,7 @@ using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Mapping
 {
+    [UmbracoVolatile]
     public class RelationMapDefinition : IMapDefinition
     {
         private readonly IEntityService _entityService;

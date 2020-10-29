@@ -7,6 +7,7 @@ using System.Xml.Linq;
 using System.Xml.XPath;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Collections;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
@@ -21,6 +22,7 @@ using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Packaging
 {
+    [UmbracoVolatile]
     public class PackageDataInstallation
     {
         private readonly ILogger<PackageDataInstallation> _logger;

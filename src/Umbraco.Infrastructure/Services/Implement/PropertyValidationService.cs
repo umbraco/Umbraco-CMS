@@ -2,12 +2,14 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Core.Services
 {
+    [UmbracoVolatile]
     public class PropertyValidationService : IPropertyValidationService
     {
         private readonly PropertyEditorCollection _propertyEditors;

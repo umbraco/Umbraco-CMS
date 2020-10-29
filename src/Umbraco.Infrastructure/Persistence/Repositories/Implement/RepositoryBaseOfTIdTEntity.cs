@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core.Cache;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Scoping;
@@ -14,6 +15,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// </summary>
     /// <typeparam name="TEntity">The type of the entity managed by this repository.</typeparam>
     /// <typeparam name="TId">The type of the entity's unique identifier.</typeparam>
+    [UmbracoVolatile]
     public abstract class RepositoryBase<TId, TEntity> : IReadWriteQueryRepository<TId, TEntity>
         where TEntity : class, IEntity
     {

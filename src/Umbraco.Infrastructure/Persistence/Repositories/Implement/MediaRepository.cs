@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Core.Cache;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
@@ -21,6 +22,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// <summary>
     /// Represents a repository for doing CRUD operations for <see cref="IMedia"/>
     /// </summary>
+    [UmbracoVolatile]
     public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepository>, IMediaRepository
     {
         private readonly IMediaTypeRepository _mediaTypeRepository;

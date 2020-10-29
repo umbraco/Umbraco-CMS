@@ -1,5 +1,6 @@
 ﻿using System;
 using NPoco;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
@@ -8,6 +9,7 @@ namespace Umbraco.Core.Persistence.Dtos
     [TableName(TableName)]
     [PrimaryKey("id")]
     [ExplicitColumns]
+    [UmbracoVolatile]
     public class NodeDto
     {
         public const string TableName = Constants.DatabaseSchema.Tables.Node;

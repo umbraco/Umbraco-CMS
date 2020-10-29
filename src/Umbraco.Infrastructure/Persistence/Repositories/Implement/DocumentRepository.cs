@@ -4,6 +4,7 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Core.Cache;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Membership;
@@ -20,6 +21,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// <summary>
     /// Represents a repository for doing CRUD operations for <see cref="IContent"/>.
     /// </summary>
+    [UmbracoVolatile]
     public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentRepository>, IDocumentRepository
     {
         private readonly IContentTypeRepository _contentTypeRepository;

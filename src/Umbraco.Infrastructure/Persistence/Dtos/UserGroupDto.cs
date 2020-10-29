@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using NPoco;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
@@ -9,6 +10,7 @@ namespace Umbraco.Core.Persistence.Dtos
     [TableName(Constants.DatabaseSchema.Tables.UserGroup)]
     [PrimaryKey("id")]
     [ExplicitColumns]
+    [UmbracoVolatile]
     public class UserGroupDto
     {
         public UserGroupDto()

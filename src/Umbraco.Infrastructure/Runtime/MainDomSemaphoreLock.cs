@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Hosting;
 
 namespace Umbraco.Core.Runtime
@@ -9,6 +10,7 @@ namespace Umbraco.Core.Runtime
     /// <summary>
     /// Uses a system-wide Semaphore and EventWaitHandle to synchronize the current AppDomain
     /// </summary>
+    [UmbracoVolatile]
     public class MainDomSemaphoreLock : IMainDomLock
     {
         private readonly SystemLock _systemLock;

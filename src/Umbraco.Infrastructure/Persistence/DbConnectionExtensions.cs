@@ -6,10 +6,12 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using StackExchange.Profiling.Data;
 using Umbraco.Composing;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Persistence.FaultHandling;
 
 namespace Umbraco.Core.Persistence
 {
+    [UmbracoVolatile]
     public static class DbConnectionExtensions
     {
         public static string DetectProviderNameFromConnectionString(string connectionString)

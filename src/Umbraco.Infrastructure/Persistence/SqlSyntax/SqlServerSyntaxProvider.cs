@@ -6,6 +6,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using NPoco;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Scoping;
@@ -47,6 +48,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             Azure = 5
         }
 
+        [UmbracoVolatile]
         public class ServerVersionInfo
         {
             public ServerVersionInfo()

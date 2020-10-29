@@ -1,9 +1,11 @@
 ﻿using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Core.Serialization
 {
+    [UmbracoVolatile]
     public class ForceInt32Converter : JsonConverter
     {
         public override bool CanConvert(Type objectType)

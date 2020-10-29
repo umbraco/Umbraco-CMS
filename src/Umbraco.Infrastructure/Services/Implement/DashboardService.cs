@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Dashboards;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
@@ -13,6 +14,7 @@ namespace Umbraco.Web.Services
 	/// <summary>
     /// A utility class for determine dashboard security
     /// </summary>
+    [UmbracoVolatile]
     public class DashboardService : IDashboardService
     {
         // TODO: Unit test all this!!! :/

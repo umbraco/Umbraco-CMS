@@ -1,4 +1,5 @@
 ﻿using System;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.Models.PublishedContent
@@ -7,6 +8,7 @@ namespace Umbraco.Core.Models.PublishedContent
     /// <summary>
     /// Provides strongly typed published content models services.
     /// </summary>
+    [UmbracoVolatile]
     public static class PublishedContentExtensionsForModels
     {
         /// <summary>

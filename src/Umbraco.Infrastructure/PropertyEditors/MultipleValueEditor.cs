@@ -3,6 +3,7 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
@@ -16,6 +17,7 @@ namespace Umbraco.Web.PropertyEditors
     /// <remarks>
     /// This is re-used by editors such as the multiple drop down list or check box list
     /// </remarks>
+    [UmbracoVolatile]
     public class MultipleValueEditor : DataValueEditor
     {
         private readonly ILogger<MultipleValueEditor> _logger;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using NPoco;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core.Cache;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -15,6 +16,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// </summary>
     /// <typeparam name="TId"></typeparam>
     /// <typeparam name="TEntity"></typeparam>
+    [UmbracoVolatile]
     public abstract class NPocoRepositoryBase<TId, TEntity> : RepositoryBase<TId, TEntity>
         where TEntity : class, IEntity
     {

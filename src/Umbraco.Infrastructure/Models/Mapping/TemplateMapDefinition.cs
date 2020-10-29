@@ -1,10 +1,12 @@
-﻿using Umbraco.Core.Mapping;
+﻿using Umbraco.Core.CodeAnnotations;
+using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Strings;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Mapping
 {
+    [UmbracoVolatile]
     public class TemplateMapDefinition : IMapDefinition
     {
         private readonly IShortStringHelper _shortStringHelper;

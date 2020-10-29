@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Models.Packaging;
 
 namespace Umbraco.Core.Packaging
 {
+    [UmbracoVolatile]
     public class PackageInstallation : IPackageInstallation
     {
         private readonly PackageExtraction _packageExtraction;

@@ -1,6 +1,7 @@
 ﻿using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Exceptions;
 
 namespace Umbraco.Core.Serialization
@@ -9,6 +10,7 @@ namespace Umbraco.Core.Serialization
     /// Provides a base class for custom <see cref="JsonConverter"/> implementations.
     /// </summary>
     /// <typeparam name="T">The type of the converted object.</typeparam>
+    [UmbracoVolatile]
     public abstract class JsonReadConverter<T> : JsonConverter
     {
         /// <summary>

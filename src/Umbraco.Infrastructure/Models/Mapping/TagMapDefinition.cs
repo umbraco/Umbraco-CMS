@@ -1,8 +1,10 @@
-﻿using Umbraco.Core.Mapping;
+﻿using Umbraco.Core.CodeAnnotations;
+using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Web.Models.Mapping
 {
+    [UmbracoVolatile]
     public class TagMapDefinition : IMapDefinition
     {
         public void DefineMaps(UmbracoMapper mapper)

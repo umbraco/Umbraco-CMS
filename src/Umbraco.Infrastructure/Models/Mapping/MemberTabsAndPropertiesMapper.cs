@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Options;
 using Umbraco.Core;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Mapping;
@@ -26,6 +27,7 @@ namespace Umbraco.Web.Models.Mapping
     /// This also ensures that the IsLocked out property is readonly when the member is not locked out - this is because
     /// an admin cannot actually set isLockedOut = true, they can only unlock.
     /// </remarks>
+    [UmbracoVolatile]
     public class MemberTabsAndPropertiesMapper : TabsAndPropertiesMapper<IMember>
     {
         private readonly IBackofficeSecurityAccessor _backofficeSecurityAccessor;

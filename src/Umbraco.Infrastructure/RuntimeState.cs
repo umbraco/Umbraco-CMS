@@ -2,6 +2,7 @@
 using System.Threading;
 using Semver;
 using Microsoft.Extensions.Logging;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Exceptions;
@@ -13,6 +14,7 @@ namespace Umbraco.Core
     /// <summary>
     /// Represents the state of the Umbraco runtime.
     /// </summary>
+    [UmbracoVolatile]
     public class RuntimeState : IRuntimeState
     {
         private readonly GlobalSettings _globalSettings;

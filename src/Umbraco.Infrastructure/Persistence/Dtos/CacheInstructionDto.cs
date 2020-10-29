@@ -1,5 +1,6 @@
 ﻿using System;
 using NPoco;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Persistence.Dtos
@@ -7,6 +8,7 @@ namespace Umbraco.Core.Persistence.Dtos
     [TableName(Constants.DatabaseSchema.Tables.CacheInstruction)]
     [PrimaryKey("id")]
     [ExplicitColumns]
+    [UmbracoVolatile]
     public class CacheInstructionDto
     {
         [Column("id")]

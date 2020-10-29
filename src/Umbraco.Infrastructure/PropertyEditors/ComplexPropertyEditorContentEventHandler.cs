@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
@@ -10,6 +11,7 @@ namespace Umbraco.Core.PropertyEditors
     /// <summary>
     /// Utility class for dealing with <see cref="ContentService"/> Copying/Saving events for complex editors
     /// </summary>
+    [UmbracoVolatile]
     public class ComplexPropertyEditorContentEventHandler : IDisposable
     {
         private readonly string _editorAlias;

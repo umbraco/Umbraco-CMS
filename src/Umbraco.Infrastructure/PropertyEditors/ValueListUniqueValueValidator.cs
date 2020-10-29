@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
@@ -10,6 +11,7 @@ namespace Umbraco.Web.PropertyEditors
     /// <summary>
     /// Represents a validator which ensures that all values in the list are unique.
     /// </summary>
+    [UmbracoVolatile]
     public class ValueListUniqueValueValidator : IValueValidator
     {
         public IEnumerable<ValidationResult> Validate(object value, string valueType, object dataTypeConfiguration)

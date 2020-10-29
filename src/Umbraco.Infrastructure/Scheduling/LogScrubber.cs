@@ -8,9 +8,11 @@ using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Sync;
 using Microsoft.Extensions.Logging;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Web.Scheduling
 {
+    [UmbracoVolatile]
     public class LogScrubber : RecurringTaskBase
     {
         private readonly IMainDom _mainDom;

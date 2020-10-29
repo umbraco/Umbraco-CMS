@@ -4,6 +4,7 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Core.Cache;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Dtos;
@@ -20,6 +21,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// <summary>
     /// Represents a repository for doing CRUD operations for <see cref="IMember"/>
     /// </summary>
+    [UmbracoVolatile]
     public class MemberRepository : ContentRepositoryBase<int, IMember, MemberRepository>, IMemberRepository
     {
         private readonly IMemberTypeRepository _memberTypeRepository;
@@ -389,7 +391,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // Replace the property data
             // Lookup the data to update with a UPDLOCK (using ForUpdate()) this is because we have another method that doesn't take an explicit WriteLock
             // in SetLastLogin which is called very often and we want to avoid the lock timeout for the explicit lock table but we still need to ensure atomic
-            // operations between that method and this one. 
+            // operations between that method and this one.
 
             var propDataSql = SqlContext.Sql().Select("*").From<PropertyDataDto>().Where<PropertyDataDto>(x => x.VersionId == member.VersionId).ForUpdate();
             var existingPropData = Database.Fetch<PropertyDataDto>(propDataSql).ToDictionary(x => x.PropertyTypeId);
@@ -406,7 +408,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 {
                     Database.Insert(propertyDataDto);
                 }
-            }   
+            }
 
             SetEntityTags(entity, _tagRepository);
 
@@ -561,7 +563,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             var sqlSelectTemplateVersion = SqlContext.Templates.Get("Umbraco.Core.MemberRepository.SetLastLogin2", s => s
                .Select<ContentVersionDto>(x => x.Id)
-               .From<ContentVersionDto>()               
+               .From<ContentVersionDto>()
                .InnerJoin<NodeDto>().On<NodeDto, ContentVersionDto>((l, r) => l.NodeId == r.NodeId)
                .InnerJoin<MemberDto>().On<MemberDto, NodeDto>((l, r) => l.NodeId == r.NodeId)
                .Where<NodeDto>(x => x.NodeObjectType == SqlTemplate.Arg<Guid>("nodeObjectType"))
