@@ -4,6 +4,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using NPoco;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence
@@ -97,6 +98,7 @@ namespace Umbraco.Core.Persistence
         /// <param name="column">The column.</param>
         /// <returns>A value indicating whether the column should be part of the bulk-insert.</returns>
         /// <remarks>Columns that are primary keys and auto-incremental, or result columns, are excluded from bulk-inserts.</remarks>
+        [UmbracoVolatile]
         public static bool IncludeColumn(PocoData pocoData, KeyValuePair<string, PocoColumn> column)
         {
             return column.Value.ResultColumn == false

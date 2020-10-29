@@ -192,6 +192,7 @@ namespace Umbraco.Core
                 /// <summary>
                 /// Group name to put the membership properties on
                 /// </summary>
+                [UmbracoVolatile]
                 public const string StandardPropertiesGroupName = "Membership";
             }
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Events;
 
 namespace Umbraco.Core.Services
@@ -120,6 +121,7 @@ namespace Umbraco.Core.Services
 
         // TODO: this exists to support services that still return Attempt<OperationResult>
         // these services should directly return an OperationResult, and then this static class should be deleted
+        [UmbracoVolatile]
         public static class Attempt
         {
             /// <summary>

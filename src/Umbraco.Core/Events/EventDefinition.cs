@@ -1,7 +1,9 @@
 ﻿using System;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Core.Events
 {
+    [UmbracoVolatile]
     public class EventDefinition : EventDefinitionBase
     {
         private readonly EventHandler _trackedEvent;
@@ -25,6 +27,7 @@ namespace Umbraco.Core.Events
         }
     }
 
+    [UmbracoVolatile]
     public class EventDefinition<TEventArgs> : EventDefinitionBase
     {
         private readonly EventHandler<TEventArgs> _trackedEvent;
@@ -48,6 +51,7 @@ namespace Umbraco.Core.Events
         }
     }
 
+    [UmbracoVolatile]
     public class EventDefinition<TSender, TEventArgs> : EventDefinitionBase
     {
         private readonly TypedEventHandler<TSender, TEventArgs> _trackedEvent;

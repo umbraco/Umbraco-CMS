@@ -1,7 +1,9 @@
 ﻿using System;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Core.Models.Entities
 {
+    [UmbracoVolatile]
     public static class EntityExtensions
     {
         /// <summary>

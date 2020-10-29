@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Runtime.Serialization;
 using Microsoft.Extensions.Logging;
 using Umbraco.Composing;
+using Umbraco.Core.CodeAnnotations;
 
 
 namespace Umbraco.Core.Models
@@ -422,6 +423,7 @@ namespace Umbraco.Core.Models
         /// </remarks>
         [IgnoreDataMember]
         [EditorBrowsable(EditorBrowsableState.Never)]
+        [UmbracoVolatile]
         public string LongStringPropertyValue { get; set; }
         /// <summary>
         /// Internal/Experimental - only used for mapping queries.
@@ -431,6 +433,7 @@ namespace Umbraco.Core.Models
         /// </remarks>
         [IgnoreDataMember]
         [EditorBrowsable(EditorBrowsableState.Never)]
+        [UmbracoVolatile]
         public string ShortStringPropertyValue { get; set; }
         /// <summary>
         /// Internal/Experimental - only used for mapping queries.
@@ -440,6 +443,7 @@ namespace Umbraco.Core.Models
         /// </remarks>
         [IgnoreDataMember]
         [EditorBrowsable(EditorBrowsableState.Never)]
+        [UmbracoVolatile]
         public int IntegerPropertyValue { get; set; }
         /// <summary>
         /// Internal/Experimental - only used for mapping queries.
@@ -449,6 +453,7 @@ namespace Umbraco.Core.Models
         /// </remarks>
         [IgnoreDataMember]
         [EditorBrowsable(EditorBrowsableState.Never)]
+        [UmbracoVolatile]
         public bool BoolPropertyValue { get; set; }
         /// <summary>
         /// Internal/Experimental - only used for mapping queries.
@@ -458,6 +463,7 @@ namespace Umbraco.Core.Models
         /// </remarks>
         [IgnoreDataMember]
         [EditorBrowsable(EditorBrowsableState.Never)]
+        [UmbracoVolatile]
         public DateTime DateTimePropertyValue { get; set; }
         /// <summary>
         /// Internal/Experimental - only used for mapping queries.
@@ -467,6 +473,7 @@ namespace Umbraco.Core.Models
         /// </remarks>
         [IgnoreDataMember]
         [EditorBrowsable(EditorBrowsableState.Never)]
+        [UmbracoVolatile]
         public string PropertyTypeAlias { get; set; }
 
         private Attempt<T> WarnIfPropertyTypeNotFoundOnGet<T>(string propertyAlias, string propertyName, T defaultVal)

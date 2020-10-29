@@ -12,6 +12,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using File = System.IO.File;
 using Microsoft.Extensions.Logging;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Core.Composing
 {
@@ -729,6 +730,7 @@ namespace Umbraco.Core.Composing
         /// Represents a list of types obtained by looking for types inheriting/implementing a
         /// specified type, and/or marked with a specified attribute type.
         /// </summary>
+        [UmbracoVolatile]
         public sealed class TypeList
         {
             private readonly HashSet<Type> _types = new HashSet<Type>();

@@ -5,6 +5,7 @@ using System.Data.SqlClient;
 using System.Text.RegularExpressions;
 using NPoco;
 using StackExchange.Profiling.Data;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Persistence.FaultHandling;
 using Umbraco.Core.Persistence.SqlSyntax;
 
@@ -29,6 +30,7 @@ namespace Umbraco.Core.Persistence
         /// NPoco's normal Page returns a List{T} but sometimes we don't want all that in memory and instead want to
         /// iterate over each row with a reader using Query vs Fetch.
         /// </remarks>
+        [UmbracoVolatile]
         public static IEnumerable<T> QueryPaged<T>(this IDatabase database, long pageSize, Sql sql)
         {
             var sqlString = sql.SQL;
@@ -88,6 +90,7 @@ namespace Umbraco.Core.Persistence
         /// <para>Note that with proper transactions, if T2 begins after T1 then we are sure that the database will contain T2's value
         /// once T1 and T2 have completed. Whereas here, it could contain T1's value.</para>
         /// </remarks>
+        [UmbracoVolatile]
         public static RecordPersistenceType InsertOrUpdate<T>(this IUmbracoDatabase db, T poco)
             where T : class
         {
@@ -111,6 +114,7 @@ namespace Umbraco.Core.Persistence
         /// <para>Note that with proper transactions, if T2 begins after T1 then we are sure that the database will contain T2's value
         /// once T1 and T2 have completed. Whereas here, it could contain T1's value.</para>
         /// </remarks>
+        [UmbracoVolatile]
         public static RecordPersistenceType InsertOrUpdate<T>(this IUmbracoDatabase db,
             T poco,
             string updateCommand,
@@ -183,6 +187,7 @@ namespace Umbraco.Core.Persistence
         /// <typeparam name="TConnection"></typeparam>
         /// <param name="connection"></param>
         /// <returns></returns>
+        [UmbracoVolatile]
         public static TConnection GetTypedConnection<TConnection>(IDbConnection connection)
             where TConnection : class, IDbConnection
         {
@@ -211,6 +216,7 @@ namespace Umbraco.Core.Persistence
         /// <typeparam name="TTransaction"></typeparam>
         /// <param name="transaction"></param>
         /// <returns></returns>
+        [UmbracoVolatile]
         public static TTransaction GetTypedTransaction<TTransaction>(IDbTransaction transaction)
             where TTransaction : class, IDbTransaction
         {
@@ -236,6 +242,7 @@ namespace Umbraco.Core.Persistence
         /// <typeparam name="TCommand"></typeparam>
         /// <param name="command"></param>
         /// <returns></returns>
+        [UmbracoVolatile]
         public static TCommand GetTypedCommand<TCommand>(IDbCommand command)
             where TCommand : class, IDbCommand
         {

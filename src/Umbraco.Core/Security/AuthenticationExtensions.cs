@@ -6,6 +6,7 @@ using System.Security.Principal;
 using System.Text;
 using System.Threading;
 using Umbraco.Core.BackOffice;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Core.Security
 {
@@ -15,6 +16,7 @@ namespace Umbraco.Core.Security
         /// Ensures that the thread culture is set based on the back office user's culture
         /// </summary>
         /// <param name="identity"></param>
+        [UmbracoVolatile]
         public static void EnsureCulture(this IIdentity identity)
         {
             var culture = GetCulture(identity);
@@ -24,6 +26,7 @@ namespace Umbraco.Core.Security
             }
         }
 
+        [UmbracoVolatile]
         public static CultureInfo GetCulture(this IIdentity identity)
         {
             if (identity is UmbracoBackOfficeIdentity umbIdentity && umbIdentity.IsAuthenticated)

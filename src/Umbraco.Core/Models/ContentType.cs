@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Models
@@ -65,8 +66,9 @@ namespace Umbraco.Core.Models
             get { return AllowedTemplates.FirstOrDefault(x => x != null && x.Id == DefaultTemplateId); }
         }
 
-        
+
         [DataMember]
+        [UmbracoVolatile]
         public int DefaultTemplateId
         {
             get => _defaultTemplate;

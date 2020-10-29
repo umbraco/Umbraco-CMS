@@ -8,6 +8,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Configuration.Models;
 using Microsoft.Extensions.Options;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Core.IO
 {
@@ -219,7 +220,7 @@ namespace Umbraco.Core.IO
         // shadowing is thread-safe, but entering and exiting shadow mode is not, and there is only one
         // global shadow for the entire application, so great care should be taken to ensure that the
         // application is *not* doing anything else when using a shadow.
-
+        [UmbracoVolatile]
         public ICompletable Shadow()
         {
             if (Volatile.Read(ref _wkfsInitialized) == false) EnsureWellKnownFileSystems();

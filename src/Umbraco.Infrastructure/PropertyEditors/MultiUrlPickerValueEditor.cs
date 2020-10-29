@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.Models.Entities;
@@ -164,6 +165,7 @@ namespace Umbraco.Web.PropertyEditors
         }
 
         [DataContract]
+        [UmbracoVolatile]
         public class LinkDto
         {
             [DataMember(Name = "name")]

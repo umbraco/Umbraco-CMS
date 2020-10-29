@@ -1,7 +1,9 @@
 ﻿using System;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Core.Models.Membership
 {
+    [UmbracoVolatile]
     public class UserProfile : IProfile, IEquatable<UserProfile>
     {
         public UserProfile(int id, string name)

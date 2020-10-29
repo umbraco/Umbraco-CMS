@@ -4,9 +4,11 @@ using Umbraco.Core;
 using Umbraco.Core.Services;
 using Umbraco.Core.Sync;
 using Microsoft.Extensions.Logging;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Web.Scheduling
 {
+    [UmbracoVolatile]
     public class ScheduledPublishing : RecurringTaskBase
     {
         private readonly IContentService _contentService;

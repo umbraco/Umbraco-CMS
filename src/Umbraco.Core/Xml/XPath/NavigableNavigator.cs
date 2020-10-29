@@ -1106,6 +1106,7 @@ namespace Umbraco.Core.Xml.XPath
         public State InternalState => _state;
 
         // represents the XPathNavigator state
+        [UmbracoVolatile]
         public class State
         {
             public StatePosition Position { get; set; }

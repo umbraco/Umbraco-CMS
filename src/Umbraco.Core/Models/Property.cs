@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Collections;
 using Umbraco.Core.Models.Entities;
 
@@ -226,6 +227,7 @@ namespace Umbraco.Core.Models
         /// Returns the Id of the PropertyType, which this Property is based on
         /// </summary>
         [IgnoreDataMember]
+        [UmbracoVolatile]
         public int PropertyTypeId => PropertyType.Id;
 
         /// <summary>
@@ -235,6 +237,7 @@ namespace Umbraco.Core.Models
         /// Only used internally when saving the property value.
         /// </remarks>
         [IgnoreDataMember]
+        [UmbracoVolatile]
         public ValueStorageType ValueStorageType => PropertyType.ValueStorageType;
 
         /// <summary>
@@ -265,6 +268,7 @@ namespace Umbraco.Core.Models
 
         // internal - must be invoked by the content item
         // does *not* validate the value - content item must validate first
+        [UmbracoVolatile]
         public void PublishValues(string culture = "*", string segment = "*")
         {
             culture = culture.NullOrWhiteSpaceAsNull();
@@ -290,6 +294,7 @@ namespace Umbraco.Core.Models
         }
 
         // internal - must be invoked by the content item
+        [UmbracoVolatile]
         public void UnpublishValues(string culture = "*", string segment = "*")
         {
             culture = culture.NullOrWhiteSpaceAsNull();

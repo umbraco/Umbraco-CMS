@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Core.Collections
 {
@@ -8,6 +9,7 @@ namespace Umbraco.Core.Collections
     /// </summary>
     /// <remarks>Types in the list are, or derive from, or implement, the base type.</remarks>
     /// <typeparam name="TBase">The base type.</typeparam>
+    [UmbracoVolatile]
     public class TypeList<TBase>
     {
         private readonly List<Type> _list = new List<Type>();

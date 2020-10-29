@@ -1,4 +1,6 @@
-﻿namespace Umbraco.Core
+﻿using Umbraco.Core.CodeAnnotations;
+
+namespace Umbraco.Core
 {
     public static partial class Constants
     {
@@ -36,7 +38,9 @@
             public const string BackOfficeTokenAuthenticationType = "UmbracoBackOfficeToken";
             public const string BackOfficeTwoFactorAuthenticationType = "UmbracoTwoFactorCookie";
 
+            [UmbracoVolatile]
             public const string EmptyPasswordPrefix = "___UIDEMPTYPWORD__";
+            [UmbracoVolatile]
             public const string ForceReAuthFlag = "umbraco-force-auth";
 
             /// <summary>
