@@ -5,21 +5,19 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
-using Umbraco.Web.BackOffice.Controllers;
-using Umbraco.Web.BackOffice.SignalR;
 using Umbraco.Web.Common.Routing;
 
-namespace Umbraco.Web.BackOffice.Routing
+namespace Umbraco.Web.Website.Routing
 {
     /// <summary>
-    /// Creates routes for the preview hub
+    /// Creates route for the no content page
     /// </summary>
-    public class PreviewRoutes : IAreaRoutes
+    public class NoContentRoutes : IAreaRoutes
     {
         private readonly IRuntimeState _runtimeState;
         private readonly string _umbracoPathSegment;
 
-        public PreviewRoutes(
+        public NoContentRoutes(
             IOptions<GlobalSettings> globalSettings,
             IHostingEnvironment hostingEnvironment,
             IRuntimeState runtimeState)
@@ -37,23 +35,18 @@ namespace Umbraco.Web.BackOffice.Routing
                 case RuntimeLevel.Upgrade:
                     break;
                 case RuntimeLevel.Run:
-                    endpoints.MapHub<PreviewHub>(GetPreviewHubRoute());
-                    endpoints.MapUmbracoRoute<PreviewController>(_umbracoPathSegment, Constants.Web.Mvc.BackOfficeArea, null);
-                    break;
+                    endpoints.MapControllerRoute(
+                        // named consistently
+                        Constants.Web.NoContentRouteName,
+                        _umbracoPathSegment + "/UmbNoContent",
+                        new { controller = "RenderNoContent", action = "Index" }
+                        );
+                     break;
                 case RuntimeLevel.BootFailed:
                 case RuntimeLevel.Unknown:
                 case RuntimeLevel.Boot:
                     break;
             }
-        }
-
-        /// <summary>
-        /// Returns the path to the signalR hub used for preview
-        /// </summary>
-        /// <returns>Path to signalR hub</returns>
-        public string GetPreviewHubRoute()
-        {
-            return $"/{_umbracoPathSegment}/{nameof(PreviewHub)}";
         }
     }
 }

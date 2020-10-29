@@ -52,7 +52,7 @@
 
         public string MainDomLock { get; set; } = string.Empty;
 
-        public string NoNodesViewPath { get; set; } = "~/config/splashes/NoNodes.cshtml";
+        public string NoNodesViewPath { get; set; } = "~/umbraco/UmbracoWebsite/NoNodes.cshtml";
 
         public bool IsSmtpServerConfigured => !string.IsNullOrWhiteSpace(Smtp?.Host);
 

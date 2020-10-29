@@ -1,19 +1,19 @@
 ﻿using System;
-using System.Web.Mvc;
-using Umbraco.Core.Configuration;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
-using Umbraco.Web.Models;
+using Umbraco.Web.Website.Models;
 
-namespace Umbraco.Web.Mvc
+namespace Umbraco.Web.Website.Controllers
 {
     public class RenderNoContentController : Controller
     {
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly IIOHelper _ioHelper;
-        private readonly GlobalSettings _globalSettings;
+        private readonly IOptions<GlobalSettings> _globalSettings;
 
-        public RenderNoContentController(IUmbracoContextAccessor umbracoContextAccessor, IIOHelper ioHelper, GlobalSettings globalSettings)
+        public RenderNoContentController(IUmbracoContextAccessor umbracoContextAccessor, IIOHelper ioHelper, IOptions<GlobalSettings> globalSettings)
         {
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
             _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
@@ -31,10 +31,10 @@ namespace Umbraco.Web.Mvc
 
             var model = new NoNodesViewModel
             {
-                UmbracoPath = _ioHelper.ResolveUrl(_globalSettings.UmbracoPath),
+                UmbracoPath = _ioHelper.ResolveUrl(_globalSettings.Value.UmbracoPath),
             };
 
-            return View(_globalSettings.NoNodesViewPath, model);
+            return View(_globalSettings.Value.NoNodesViewPath, model);
         }
     }
 }

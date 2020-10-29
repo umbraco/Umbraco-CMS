@@ -158,8 +158,6 @@
     <Compile Include="WebApi\Filters\EnableOverrideAuthorizationAttribute.cs" />
     <Compile Include="WebApi\Filters\OverridableAuthorizationAttribute.cs" />
     <Compile Include="WebAssets\CDF\ClientDependencyRuntimeMinifier.cs" />
-    <Compile Include="Models\NoNodesViewModel.cs" />
-    <Compile Include="Mvc\RenderNoContentController.cs" />
     <Compile Include="HttpContextAccessorExtensions.cs" />
     <Compile Include="Logging\OwinLogger.cs" />
     <Compile Include="Logging\OwinLoggerFactory.cs" />

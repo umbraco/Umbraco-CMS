@@ -49,7 +49,6 @@ namespace Umbraco.Web.BackOffice.Routing
                 case RuntimeLevel.Run:
 
                     MapMinimalBackOffice(endpoints);
-                    endpoints.MapUmbracoRoute<PreviewController>(_umbracoPathSegment, Constants.Web.Mvc.BackOfficeArea, null);
                     AutoRouteBackOfficeControllers(endpoints);
                     break;
                 case RuntimeLevel.BootFailed:

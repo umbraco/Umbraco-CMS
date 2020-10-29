@@ -1,7 +1,8 @@
-﻿using Umbraco.Core.Composing;
+﻿using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Extensions;
+using Umbraco.Web.Website.Routing;
 using Umbraco.Web.Common.Runtime;
-using Umbraco.Web.Website.Controllers;
 
 namespace Umbraco.Web.Website.Runtime
 {
@@ -12,6 +13,7 @@ namespace Umbraco.Web.Website.Runtime
     {
         public void Compose(Composition composition)
         {
+            composition.RegisterUnique<NoContentRoutes>();
 
             composition
                 .ComposeWebsiteUmbracoControllers()

@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Web.Models
+﻿namespace Umbraco.Web.Website.Models
 {
     public class NoNodesViewModel
     {

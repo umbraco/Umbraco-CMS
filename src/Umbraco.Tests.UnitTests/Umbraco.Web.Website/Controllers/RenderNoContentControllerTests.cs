@@ -1,15 +1,15 @@
-﻿using System.Web.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.IO;
 using Umbraco.Tests.Common;
 using Umbraco.Web;
-using Umbraco.Web.Models;
-using Umbraco.Web.Mvc;
+using Umbraco.Web.Website.Controllers;
+using Umbraco.Web.Website.Models;
 
-namespace Umbraco.Tests.Web.Mvc
+namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Controllers
 {
     [TestFixture]
     public class RenderNoContentControllerTests
@@ -21,7 +21,7 @@ namespace Umbraco.Tests.Web.Mvc
             var mockUmbracoContext = new Mock<IUmbracoContext>();
             mockUmbracoContext.Setup(x => x.Content.HasContent()).Returns(true);
             var mockIOHelper = new Mock<IIOHelper>();
-            var controller = new RenderNoContentController(new TestUmbracoContextAccessor(mockUmbracoContext.Object), mockIOHelper.Object, new GlobalSettings());
+            var controller = new RenderNoContentController(new TestUmbracoContextAccessor(mockUmbracoContext.Object), mockIOHelper.Object, Options.Create(new GlobalSettings()));
 
             var result = controller.Index() as RedirectResult;
 
@@ -39,11 +39,12 @@ namespace Umbraco.Tests.Web.Mvc
             mockUmbracoContext.Setup(x => x.Content.HasContent()).Returns(false);
             var mockIOHelper = new Mock<IIOHelper>();
             mockIOHelper.Setup(x => x.ResolveUrl(It.Is<string>(y => y == UmbracoPathSetting))).Returns(UmbracoPath);
-            var globalSettings = new GlobalSettings()
+
+            var globalSettings = Options.Create(new GlobalSettings()
             {
                 UmbracoPath = UmbracoPathSetting,
                 NoNodesViewPath = ViewPath,
-            };
+            });
             var controller = new RenderNoContentController(new TestUmbracoContextAccessor(mockUmbracoContext.Object), mockIOHelper.Object, globalSettings);
 
             var result = controller.Index() as ViewResult;
