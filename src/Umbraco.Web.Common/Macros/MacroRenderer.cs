@@ -8,6 +8,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
@@ -20,6 +21,7 @@ using Umbraco.Web.Common.Macros;
 
 namespace Umbraco.Web.Macros
 {
+    [UmbracoVolatile]
     public class MacroRenderer : IMacroRenderer
     {
         private readonly IProfilingLogger _profilingLogger;

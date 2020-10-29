@@ -5,12 +5,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using StackExchange.Profiling;
 using Umbraco.Core;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Logging;
 using Umbraco.Extensions;
 
 namespace Umbraco.Web.Common.Profiler
 {
-
+    [UmbracoVolatile]
     public class WebProfiler : IProfiler
     {
         private MiniProfiler _startupProfiler;

@@ -1,8 +1,10 @@
 ﻿using System;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Extensions
 {
+    [UmbracoVolatile]
     public static class ControllerExtensions
     {
         /// <summary>
