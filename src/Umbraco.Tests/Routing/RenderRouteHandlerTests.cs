@@ -70,13 +70,13 @@ namespace Umbraco.Tests.Routing
             Current.DefaultRenderMvcControllerType = typeof(RenderMvcController); // FIXME: Wrong!
 
             var surfaceControllerTypes = new SurfaceControllerTypeCollection(Composition.TypeLoader.GetSurfaceControllers());
-            Composition.RegisterUnique(surfaceControllerTypes);
+            Composition.Services.AddUnique(surfaceControllerTypes);
 
             var umbracoApiControllerTypes = new UmbracoApiControllerTypeCollection(Composition.TypeLoader.GetUmbracoApiControllers());
-            Composition.RegisterUnique(umbracoApiControllerTypes);
+            Composition.Services.AddUnique(umbracoApiControllerTypes);
 
             var requestHandlerSettings = new RequestHandlerSettings();
-            Composition.RegisterUnique<IShortStringHelper>(_ => new DefaultShortStringHelper(Microsoft.Extensions.Options.Options.Create(requestHandlerSettings)));
+            Composition.Services.AddUnique<IShortStringHelper>(_ => new DefaultShortStringHelper(Microsoft.Extensions.Options.Options.Create(requestHandlerSettings)));
         }
 
         public override void TearDown()

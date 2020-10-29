@@ -2,7 +2,6 @@
 using Umbraco.Core.Cache;
 using Umbraco.Core.Runtime;
 using Umbraco.Extensions;
-using Umbraco.Infrastructure.Composing;
 using Umbraco.Tests.Integration.Implementations;
 using Umbraco.Tests.Integration.Testing;
 using Umbraco.Web.Common.Builder;
@@ -22,11 +21,8 @@ namespace Umbraco.Tests.Integration.TestServerTest
             return builder.AddWith(nameof(global::Umbraco.Web.Common.Builder.UmbracoBuilderExtensions.WithCore),
                     () =>
                     {
-                        // TODO: MSDI - cleanup after initial merge.
-                        var register = new ServiceCollectionRegistryAdapter(builder.Services);
                         builder.Services.AddUmbracoCore(
                             builder.WebHostEnvironment,
-                            register,
                             typeof(UmbracoBuilderExtensions).Assembly,
                             AppCaches.NoCache, // Disable caches in integration tests
                             testHelper.GetLoggingConfiguration(),

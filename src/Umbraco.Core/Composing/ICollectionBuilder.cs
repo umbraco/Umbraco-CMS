@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Umbraco.Core.Composing
 {
@@ -11,7 +12,7 @@ namespace Umbraco.Core.Composing
         /// Registers the builder so it can build the collection, by
         /// registering the collection and the types.
         /// </summary>
-        void RegisterWith(IRegister register);
+        void RegisterWith(IServiceCollection services);
     }
 
     /// <summary>

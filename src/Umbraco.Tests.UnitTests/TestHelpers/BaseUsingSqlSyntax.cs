@@ -37,7 +37,7 @@ namespace Umbraco.Tests.TestHelpers
             composition.WithCollectionBuilder<MapperCollectionBuilder>()
                 .AddCoreMappers();
 
-            composition.RegisterUnique<ISqlContext>(_ => SqlContext);
+            composition.Services.AddUnique<ISqlContext>(_ => SqlContext);
 
             var factory = composition.CreateServiceProvider();
             var pocoMappers = new NPoco.MapperCollection { new PocoMapper() };

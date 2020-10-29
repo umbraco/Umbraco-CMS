@@ -110,9 +110,9 @@ namespace Umbraco.Core
         /// <typeparam name="T">The type of the factory.</typeparam>
         /// <param name="composition">The composition.</param>
         public static void SetCultureDictionaryFactory<T>(this Composition composition)
-            where T : ICultureDictionaryFactory
+            where T : class, ICultureDictionaryFactory
         {
-            composition.RegisterUnique<ICultureDictionaryFactory, T>();
+            composition.Services.AddUnique<ICultureDictionaryFactory, T>();
         }
 
         /// <summary>
@@ -122,7 +122,7 @@ namespace Umbraco.Core
         /// <param name="factory">A function creating a culture dictionary factory.</param>
         public static void SetCultureDictionaryFactory(this Composition composition, Func<IServiceProvider, ICultureDictionaryFactory> factory)
         {
-            composition.RegisterUnique(factory);
+            composition.Services.AddUnique(factory);
         }
 
         /// <summary>
@@ -132,7 +132,7 @@ namespace Umbraco.Core
         /// <param name="factory">A factory.</param>
         public static void SetCultureDictionaryFactory(this Composition composition, ICultureDictionaryFactory factory)
         {
-            composition.RegisterUnique(_ => factory);
+            composition.Services.AddUnique(_ => factory);
         }
 
         /// <summary>
@@ -141,9 +141,9 @@ namespace Umbraco.Core
         /// <typeparam name="T">The type of the factory.</typeparam>
         /// <param name="composition">The composition.</param>
         public static void SetPublishedContentModelFactory<T>(this Composition composition)
-            where T : IPublishedModelFactory
+            where T : class, IPublishedModelFactory
         {
-            composition.RegisterUnique<IPublishedModelFactory, T>();
+            composition.Services.AddUnique<IPublishedModelFactory, T>();
         }
 
         /// <summary>
@@ -153,7 +153,7 @@ namespace Umbraco.Core
         /// <param name="factory">A function creating a published content model factory.</param>
         public static void SetPublishedContentModelFactory(this Composition composition, Func<IServiceProvider, IPublishedModelFactory> factory)
         {
-            composition.RegisterUnique(factory);
+            composition.Services.AddUnique(factory);
         }
 
         /// <summary>
@@ -163,7 +163,7 @@ namespace Umbraco.Core
         /// <param name="factory">A published content model factory.</param>
         public static void SetPublishedContentModelFactory(this Composition composition, IPublishedModelFactory factory)
         {
-            composition.RegisterUnique(_ => factory);
+            composition.Services.AddUnique(_ => factory);
         }
 
         /// <summary>
@@ -172,9 +172,9 @@ namespace Umbraco.Core
         /// <typeparam name="T">The type of the server registrar.</typeparam>
         /// <param name="composition">The composition.</param>
         public static void SetServerRegistrar<T>(this Composition composition)
-            where T : IServerRegistrar
+            where T : class, IServerRegistrar
         {
-            composition.RegisterUnique<IServerRegistrar, T>();
+            composition.Services.AddUnique<IServerRegistrar, T>();
         }
 
         /// <summary>
@@ -184,7 +184,7 @@ namespace Umbraco.Core
         /// <param name="factory">A function creating a server registrar.</param>
         public static void SetServerRegistrar(this Composition composition, Func<IServiceProvider, IServerRegistrar> factory)
         {
-            composition.RegisterUnique(factory);
+            composition.Services.AddUnique(factory);
         }
 
         /// <summary>
@@ -194,7 +194,7 @@ namespace Umbraco.Core
         /// <param name="registrar">A server registrar.</param>
         public static void SetServerRegistrar(this Composition composition, IServerRegistrar registrar)
         {
-            composition.RegisterUnique(_ => registrar);
+            composition.Services.AddUnique(_ => registrar);
         }
 
         /// <summary>
@@ -203,9 +203,9 @@ namespace Umbraco.Core
         /// <typeparam name="T">The type of the server registrar.</typeparam>
         /// <param name="composition">The composition.</param>
         public static void SetServerMessenger<T>(this Composition composition)
-            where T : IServerMessenger
+            where T : class, IServerMessenger
         {
-            composition.RegisterUnique<IServerMessenger, T>();
+            composition.Services.AddUnique<IServerMessenger, T>();
         }
 
         /// <summary>
@@ -215,7 +215,7 @@ namespace Umbraco.Core
         /// <param name="factory">A function creating a server messenger.</param>
         public static void SetServerMessenger(this Composition composition, Func<IServiceProvider, IServerMessenger> factory)
         {
-            composition.RegisterUnique(factory);
+            composition.Services.AddUnique(factory);
         }
 
         /// <summary>
@@ -225,7 +225,7 @@ namespace Umbraco.Core
         /// <param name="registrar">A server messenger.</param>
         public static void SetServerMessenger(this Composition composition, IServerMessenger registrar)
         {
-            composition.RegisterUnique(_ => registrar);
+            composition.Services.AddUnique(_ => registrar);
         }
 
         /// <summary>
@@ -236,7 +236,7 @@ namespace Umbraco.Core
         /// <remarks>Use DatabaseServerRegistrarAndMessengerComposer.GetDefaultOptions to get the options that Umbraco would use by default.</remarks>
         public static void SetDatabaseServerMessengerOptions(this Composition composition, Func<IServiceProvider, DatabaseServerMessengerOptions> factory)
         {
-            composition.RegisterUnique(factory);
+            composition.Services.AddUnique(factory);
         }
 
         /// <summary>
@@ -247,7 +247,7 @@ namespace Umbraco.Core
         /// <remarks>Use DatabaseServerRegistrarAndMessengerComposer.GetDefaultOptions to get the options that Umbraco would use by default.</remarks>
         public static void SetDatabaseServerMessengerOptions(this Composition composition, DatabaseServerMessengerOptions options)
         {
-            composition.RegisterUnique(_ => options);
+            composition.Services.AddUnique(_ => options);
         }
 
         /// <summary>
@@ -256,9 +256,9 @@ namespace Umbraco.Core
         /// <typeparam name="T">The type of the short string helper.</typeparam>
         /// <param name="composition">The composition.</param>
         public static void SetShortStringHelper<T>(this Composition composition)
-            where T : IShortStringHelper
+            where T : class, IShortStringHelper
         {
-            composition.RegisterUnique<IShortStringHelper, T>();
+            composition.Services.AddUnique<IShortStringHelper, T>();
         }
 
         /// <summary>
@@ -268,7 +268,7 @@ namespace Umbraco.Core
         /// <param name="factory">A function creating a short string helper.</param>
         public static void SetShortStringHelper(this Composition composition, Func<IServiceProvider, IShortStringHelper> factory)
         {
-            composition.RegisterUnique(factory);
+            composition.Services.AddUnique(factory);
         }
 
         /// <summary>
@@ -278,7 +278,7 @@ namespace Umbraco.Core
         /// <param name="helper">A short string helper.</param>
         public static void SetShortStringHelper(this Composition composition, IShortStringHelper helper)
         {
-            composition.RegisterUnique(_ => helper);
+            composition.Services.AddUnique(_ => helper);
         }
 
         /// <summary>
@@ -287,9 +287,9 @@ namespace Umbraco.Core
         /// <typeparam name="T">The type of the log viewer.</typeparam>
         /// <param name="composition">The composition.</param>
         public static void SetLogViewer<T>(this Composition composition)
-            where T : ILogViewer
+            where T : class, ILogViewer
         {
-            composition.RegisterUnique<ILogViewer, T>();
+            composition.Services.AddUnique<ILogViewer, T>();
         }
 
         /// <summary>
@@ -299,7 +299,7 @@ namespace Umbraco.Core
         /// <param name="factory">A function creating a log viewer.</param>
         public static void SetLogViewer(this Composition composition, Func<IServiceProvider, ILogViewer> factory)
         {
-            composition.RegisterUnique(factory);
+            composition.Services.AddUnique(factory);
         }
 
         /// <summary>
@@ -309,7 +309,7 @@ namespace Umbraco.Core
         /// <param name="helper">A log viewer.</param>
         public static void SetLogViewer(this Composition composition, ILogViewer viewer)
         {
-            composition.RegisterUnique(_ => viewer);
+            composition.Services.AddUnique(_ => viewer);
         }
 
         #endregion

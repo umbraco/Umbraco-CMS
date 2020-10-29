@@ -29,9 +29,9 @@ namespace Umbraco.Web.Search
             composition.Services.AddSingleton<MediaIndexPopulator>();
 
             composition.Services.AddSingleton<IndexRebuilder>();
-            composition.RegisterUnique<IUmbracoIndexConfig, UmbracoIndexConfig>();
-            composition.RegisterUnique<IIndexDiagnosticsFactory, IndexDiagnosticsFactory>();
-            composition.RegisterUnique<IPublishedContentValueSetBuilder>(factory =>
+            composition.Services.AddUnique<IUmbracoIndexConfig, UmbracoIndexConfig>();
+            composition.Services.AddUnique<IIndexDiagnosticsFactory, IndexDiagnosticsFactory>();
+            composition.Services.AddUnique<IPublishedContentValueSetBuilder>(factory =>
                 new ContentValueSetBuilder(
                     factory.GetRequiredService<PropertyEditorCollection>(),
                     factory.GetRequiredService<UrlSegmentProviderCollection>(),
@@ -39,7 +39,7 @@ namespace Umbraco.Web.Search
                     factory.GetRequiredService<IShortStringHelper>(),
                     factory.GetRequiredService<IScopeProvider>(),
                     true));
-            composition.RegisterUnique<IContentValueSetBuilder>(factory =>
+            composition.Services.AddUnique<IContentValueSetBuilder>(factory =>
                 new ContentValueSetBuilder(
                     factory.GetRequiredService<PropertyEditorCollection>(),
                     factory.GetRequiredService<UrlSegmentProviderCollection>(),
@@ -47,9 +47,9 @@ namespace Umbraco.Web.Search
                     factory.GetRequiredService<IShortStringHelper>(),
                     factory.GetRequiredService<IScopeProvider>(),
                     false));
-            composition.RegisterUnique<IValueSetBuilder<IMedia>, MediaValueSetBuilder>();
-            composition.RegisterUnique<IValueSetBuilder<IMember>, MemberValueSetBuilder>();
-            composition.RegisterUnique<BackgroundIndexRebuilder>();
+            composition.Services.AddUnique<IValueSetBuilder<IMedia>, MediaValueSetBuilder>();
+            composition.Services.AddUnique<IValueSetBuilder<IMember>, MemberValueSetBuilder>();
+            composition.Services.AddUnique<BackgroundIndexRebuilder>();
         }
     }
 }

@@ -25,16 +25,16 @@ namespace Umbraco.Core.Composing
         public IEnumerable<Type> GetTypes() => _types;
 
         /// <inheritdoc />
-        public virtual void RegisterWith(IRegister register)
+        public virtual void RegisterWith(IServiceCollection services)
         {
             if (_registeredTypes != null)
                 throw new InvalidOperationException("This builder has already been registered.");
 
             // register the collection
-            register.Register(CreateCollection, CollectionLifetime);
+            services.Add(new ServiceDescriptor(typeof(TCollection), CreateCollection, CollectionLifetime.ToServiceLifetime()));
 
             // register the types
-            RegisterTypes(register);
+            RegisterTypes(services);
         }
 
         /// <summary>
@@ -68,7 +68,7 @@ namespace Umbraco.Core.Composing
             return types;
         }
 
-        private void RegisterTypes(IRegister register)
+        private void RegisterTypes(IServiceCollection services)
         {
             lock (_locker)
             {
@@ -85,7 +85,7 @@ namespace Umbraco.Core.Composing
                 // was a dependency on an individual item, it would resolve a brand new transient instance which isn't what
                 // we would expect to happen. The same item should be resolved from the container as the collection.
                 foreach (var type in types)
-                    register.Register(type, CollectionLifetime);
+                    services.Add(new ServiceDescriptor(type, type, CollectionLifetime.ToServiceLifetime()));
 
                 _registeredTypes = types;
             }

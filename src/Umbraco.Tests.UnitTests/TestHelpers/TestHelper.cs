@@ -279,7 +279,7 @@ namespace Umbraco.Tests.TestHelpers
 
         public static IUmbracoVersion GetUmbracoVersion() => _testHelperInternal.GetUmbracoVersion();
 
-        public static IServiceCollection GetServiceCollection() => new ServiceCollection();
+        public static IServiceCollection GetServiceCollection() => new ServiceCollection().AddLazySupport();
 
         public static IHostingEnvironment GetHostingEnvironment() => _testHelperInternal.GetHostingEnvironment();
 

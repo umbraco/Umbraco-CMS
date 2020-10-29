@@ -32,9 +32,9 @@ namespace Umbraco.Tests.TestHelpers
     /// </summary>
     internal partial class TestObjects
     {
-        private readonly IRegister _register;
+        private readonly IServiceCollection _register;
 
-        public TestObjects(IRegister register)
+        public TestObjects(IServiceCollection register)
         {
             _register = register;
         }

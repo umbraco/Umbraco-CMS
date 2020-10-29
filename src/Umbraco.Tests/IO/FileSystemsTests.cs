@@ -15,7 +15,6 @@ using Umbraco.Core.IO;
 using Umbraco.Core.IO.MediaPathSchemes;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
-using Umbraco.Infrastructure.Composing;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using FileSystems = Umbraco.Core.IO.FileSystems;
@@ -25,7 +24,7 @@ namespace Umbraco.Tests.IO
     [TestFixture]
     public class FileSystemsTests
     {
-        private IRegister _register;
+        private IServiceCollection _register;
         private IServiceProvider _factory;
 
         [SetUp]
@@ -34,7 +33,7 @@ namespace Umbraco.Tests.IO
             _register = TestHelper.GetRegister();
 
             var composition = new Composition(
-                (_register as ServiceCollectionRegistryAdapter).Services,
+                _register,
                 TestHelper.GetMockedTypeLoader(),
                 Mock.Of<IProfilingLogger>(),
                 Mock.Of<IRuntimeState>(),
@@ -42,17 +41,17 @@ namespace Umbraco.Tests.IO
                 AppCaches.NoCache
             );
 
-            composition.Register(_ => Mock.Of<IDataTypeService>());
+            composition.Services.AddTransient(_ => Mock.Of<IDataTypeService>());
             composition.Services.AddTransient<ILoggerFactory, NullLoggerFactory>();
-            composition.Register(typeof(ILogger<>), typeof(Logger<>));
-            composition.Register(_ => TestHelper.ShortStringHelper);
-            composition.Register(_ => TestHelper.IOHelper);
-            composition.RegisterUnique<IMediaPathScheme, UniqueMediaPathScheme>();
-            composition.RegisterUnique(TestHelper.IOHelper);
-            composition.RegisterUnique(TestHelper.GetHostingEnvironment());
+            composition.Services.AddTransient(typeof(ILogger<>), typeof(Logger<>));
+            composition.Services.AddTransient(_ => TestHelper.ShortStringHelper);
+            composition.Services.AddTransient(_ => TestHelper.IOHelper);
+            composition.Services.AddUnique<IMediaPathScheme, UniqueMediaPathScheme>();
+            composition.Services.AddUnique(TestHelper.IOHelper);
+            composition.Services.AddUnique(TestHelper.GetHostingEnvironment());
 
             var globalSettings = new GlobalSettings();
-            composition.Register(x => Microsoft.Extensions.Options.Options.Create(globalSettings));
+            composition.Services.AddScoped(x => Microsoft.Extensions.Options.Options.Create(globalSettings));
 
 
             composition.ComposeFileSystems();

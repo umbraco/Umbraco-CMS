@@ -15,7 +15,6 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
-using Umbraco.Infrastructure.Composing;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Web;
@@ -37,14 +36,14 @@ namespace Umbraco.Tests.Scoping
             DoThing2 = null;
             DoThing3 = null;
 
-            var wrapper = (ServiceCollectionRegistryAdapter) TestHelper.GetRegister();
+            var services =  TestHelper.GetRegister();
 
-            var composition = new Composition(wrapper.Services, TestHelper.GetMockedTypeLoader(), Mock.Of<IProfilingLogger>(), Mock.Of<IRuntimeState>(), TestHelper.IOHelper, AppCaches.NoCache);
+            var composition = new Composition(services, TestHelper.GetMockedTypeLoader(), Mock.Of<IProfilingLogger>(), Mock.Of<IRuntimeState>(), TestHelper.IOHelper, AppCaches.NoCache);
 
-            _testObjects = new TestObjects(wrapper);
+            _testObjects = new TestObjects(services);
 
             var globalSettings = new GlobalSettings();
-            composition.RegisterUnique(factory => new FileSystems(factory, factory.GetService<ILogger<FileSystems>>(), factory.GetService<ILoggerFactory>(), TestHelper.IOHelper, Microsoft.Extensions.Options.Options.Create(globalSettings), TestHelper.GetHostingEnvironment()));
+            composition.Services.AddUnique(factory => new FileSystems(factory, factory.GetService<ILogger<FileSystems>>(), factory.GetService<ILoggerFactory>(), TestHelper.IOHelper, Microsoft.Extensions.Options.Options.Create(globalSettings), TestHelper.GetHostingEnvironment()));
             composition.WithCollectionBuilder<MapperCollectionBuilder>();
 
             Current.Reset();

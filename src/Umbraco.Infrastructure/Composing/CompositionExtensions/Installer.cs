@@ -28,7 +28,7 @@ namespace Umbraco.Web.Composing.CompositionExtensions
             composition.Services.AddScoped<InstallSetupStep,CompleteInstallStep>();
 
             composition.Services.AddTransient<InstallStepCollection>();
-            composition.RegisterUnique<InstallHelper>();
+            composition.Services.AddUnique<InstallHelper>();
 
             return composition;
         }

@@ -18,7 +18,6 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Scoping;
-using Umbraco.Infrastructure.Composing;
 using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.Components
@@ -102,7 +101,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Components
             });
 
             var builder = composition.WithCollectionBuilder<ComponentCollectionBuilder>();
-            builder.RegisterWith(ServiceCollectionRegistryAdapter.Wrap(register));
+            builder.RegisterWith(register);
             var components = builder.CreateCollection(factory);
 
             Assert.IsEmpty(components);
@@ -234,7 +233,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Components
             AssertTypeArray(TypeArray<Composer1, Composer5, Composer5a>(), Composed);
 
             var builder = composition.WithCollectionBuilder<ComponentCollectionBuilder>();
-            builder.RegisterWith(ServiceCollectionRegistryAdapter.Wrap(register));
+            builder.RegisterWith(register);
             var components = builder.CreateCollection(factory);
 
             Assert.IsEmpty(Initialized);
@@ -290,7 +289,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Components
             Composed.Clear();
             composers.Compose();
             var builder = composition.WithCollectionBuilder<ComponentCollectionBuilder>();
-            builder.RegisterWith(ServiceCollectionRegistryAdapter.Wrap(register));
+            builder.RegisterWith(register);
             var components = builder.CreateCollection(factory);
             Assert.AreEqual(3, Composed.Count);
             Assert.AreEqual(typeof(Composer4), Composed[0]);

@@ -23,58 +23,58 @@ namespace Umbraco.Core.Composing.CompositionExtensions
         {
             // register a transient messages factory, which will be replaced by the web
             // boot manager when running in a web context
-            composition.RegisterUnique<IEventMessagesFactory, TransientEventMessagesFactory>();
+            composition.Services.AddUnique<IEventMessagesFactory, TransientEventMessagesFactory>();
 
             // register the service context
-            composition.RegisterUnique<ServiceContext>();
+            composition.Services.AddUnique<ServiceContext>();
 
             // register the special idk map
-            composition.RegisterUnique<IIdKeyMap, IdKeyMap>();
+            composition.Services.AddUnique<IIdKeyMap, IdKeyMap>();
 
             // register the services
-            composition.RegisterUnique<IPropertyValidationService, PropertyValidationService>();
-            composition.RegisterUnique<IKeyValueService, KeyValueService>();
-            composition.RegisterUnique<IPublicAccessService, PublicAccessService>();
-            composition.RegisterUnique<IDomainService, DomainService>();
-            composition.RegisterUnique<IAuditService, AuditService>();
-            composition.RegisterUnique<ITagService, TagService>();
-            composition.RegisterUnique<IContentService, ContentService>();
-            composition.RegisterUnique<IUserService, UserService>();
-            composition.RegisterUnique<IMemberService, MemberService>();
-            composition.RegisterUnique<IMediaService, MediaService>();
-            composition.RegisterUnique<IContentTypeService, ContentTypeService>();
-            composition.RegisterUnique<IContentTypeBaseServiceProvider, ContentTypeBaseServiceProvider>();
-            composition.RegisterUnique<IMediaTypeService, MediaTypeService>();
-            composition.RegisterUnique<IDataTypeService, DataTypeService>();
-            composition.RegisterUnique<IFileService, FileService>();
-            composition.RegisterUnique<ILocalizationService, LocalizationService>();
-            composition.RegisterUnique<IPackagingService, PackagingService>();
-            composition.RegisterUnique<IServerRegistrationService, ServerRegistrationService>();
-            composition.RegisterUnique<IEntityService, EntityService>();
-            composition.RegisterUnique<IRelationService, RelationService>();
-            composition.RegisterUnique<IMacroService, MacroService>();
-            composition.RegisterUnique<IMemberTypeService, MemberTypeService>();
-            composition.RegisterUnique<IMemberGroupService, MemberGroupService>();
-            composition.RegisterUnique<INotificationService, NotificationService>();
-            composition.RegisterUnique<IExternalLoginService, ExternalLoginService>();
-            composition.RegisterUnique<IRedirectUrlService, RedirectUrlService>();
-            composition.RegisterUnique<IConsentService, ConsentService>();
-            composition.Register<LocalizedTextServiceFileSources>(SourcesFactory);
-            composition.RegisterUnique<ILocalizedTextService>(factory => new LocalizedTextService(
+            composition.Services.AddUnique<IPropertyValidationService, PropertyValidationService>();
+            composition.Services.AddUnique<IKeyValueService, KeyValueService>();
+            composition.Services.AddUnique<IPublicAccessService, PublicAccessService>();
+            composition.Services.AddUnique<IDomainService, DomainService>();
+            composition.Services.AddUnique<IAuditService, AuditService>();
+            composition.Services.AddUnique<ITagService, TagService>();
+            composition.Services.AddUnique<IContentService, ContentService>();
+            composition.Services.AddUnique<IUserService, UserService>();
+            composition.Services.AddUnique<IMemberService, MemberService>();
+            composition.Services.AddUnique<IMediaService, MediaService>();
+            composition.Services.AddUnique<IContentTypeService, ContentTypeService>();
+            composition.Services.AddUnique<IContentTypeBaseServiceProvider, ContentTypeBaseServiceProvider>();
+            composition.Services.AddUnique<IMediaTypeService, MediaTypeService>();
+            composition.Services.AddUnique<IDataTypeService, DataTypeService>();
+            composition.Services.AddUnique<IFileService, FileService>();
+            composition.Services.AddUnique<ILocalizationService, LocalizationService>();
+            composition.Services.AddUnique<IPackagingService, PackagingService>();
+            composition.Services.AddUnique<IServerRegistrationService, ServerRegistrationService>();
+            composition.Services.AddUnique<IEntityService, EntityService>();
+            composition.Services.AddUnique<IRelationService, RelationService>();
+            composition.Services.AddUnique<IMacroService, MacroService>();
+            composition.Services.AddUnique<IMemberTypeService, MemberTypeService>();
+            composition.Services.AddUnique<IMemberGroupService, MemberGroupService>();
+            composition.Services.AddUnique<INotificationService, NotificationService>();
+            composition.Services.AddUnique<IExternalLoginService, ExternalLoginService>();
+            composition.Services.AddUnique<IRedirectUrlService, RedirectUrlService>();
+            composition.Services.AddUnique<IConsentService, ConsentService>();
+            composition.Services.AddTransient<LocalizedTextServiceFileSources>(SourcesFactory);
+            composition.Services.AddUnique<ILocalizedTextService>(factory => new LocalizedTextService(
                 factory.GetRequiredService<Lazy<LocalizedTextServiceFileSources>>(),
                 factory.GetRequiredService<ILogger<LocalizedTextService>>()));
 
-            composition.RegisterUnique<IEntityXmlSerializer, EntityXmlSerializer>();
+            composition.Services.AddUnique<IEntityXmlSerializer, EntityXmlSerializer>();
 
-            composition.RegisterUnique<IPackageActionRunner, PackageActionRunner>();
+            composition.Services.AddUnique<IPackageActionRunner, PackageActionRunner>();
 
-            composition.RegisterUnique<ConflictingPackageData>();
-            composition.RegisterUnique<CompiledPackageXmlParser>();
-            composition.RegisterUnique<ICreatedPackagesRepository>(factory => CreatePackageRepository(factory, "createdPackages.config"));
-            composition.RegisterUnique<IInstalledPackagesRepository>(factory => CreatePackageRepository(factory, "installedPackages.config"));
-            composition.RegisterUnique<PackageDataInstallation>();
-            composition.RegisterUnique<PackageFileInstallation>();
-            composition.RegisterUnique<IPackageInstallation, PackageInstallation>();
+            composition.Services.AddUnique<ConflictingPackageData>();
+            composition.Services.AddUnique<CompiledPackageXmlParser>();
+            composition.Services.AddUnique<ICreatedPackagesRepository>(factory => CreatePackageRepository(factory, "createdPackages.config"));
+            composition.Services.AddUnique<IInstalledPackagesRepository>(factory => CreatePackageRepository(factory, "installedPackages.config"));
+            composition.Services.AddUnique<PackageDataInstallation>();
+            composition.Services.AddUnique<PackageFileInstallation>();
+            composition.Services.AddUnique<IPackageInstallation, PackageInstallation>();
 
             return composition;
         }

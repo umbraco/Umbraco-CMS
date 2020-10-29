@@ -12,7 +12,6 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence;
-using Umbraco.Infrastructure.Composing;
 using Umbraco.Persistance.SqlCe;
 using Umbraco.Web;
 using Current = Umbraco.Web.Composing.Current;
@@ -38,7 +37,7 @@ namespace Umbraco.Tests.TestHelpers
         {
             Current.Reset();
 
-            var wrapper = (ServiceCollectionRegistryAdapter) TestHelper.GetRegister();
+            var services = TestHelper.GetRegister();
 
             var ioHelper = TestHelper.IOHelper;
             var logger = new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>());
@@ -49,18 +48,17 @@ namespace Umbraco.Tests.TestHelpers
                 logger,
                 false);
 
-            var composition = new Composition(wrapper.Services, typeLoader, Mock.Of<IProfilingLogger>(), Mock.Of<IRuntimeState>(), TestHelper.IOHelper, AppCaches.NoCache);
+            var composition = new Composition(services, typeLoader, Mock.Of<IProfilingLogger>(), Mock.Of<IRuntimeState>(), TestHelper.IOHelper, AppCaches.NoCache);
 
-            composition.RegisterUnique<ILogger>(_ => Mock.Of<ILogger>());
-            composition.RegisterUnique<ILoggerFactory>(_ => NullLoggerFactory.Instance);
-            composition.RegisterUnique<IProfiler>(_ => Mock.Of<IProfiler>());
-
-            composition.RegisterUnique(typeLoader);
+            services.AddUnique<ILogger>(_ => Mock.Of<ILogger>());
+            services.AddUnique<ILoggerFactory>(_ => NullLoggerFactory.Instance);
+            services.AddUnique<IProfiler>(_ => Mock.Of<IProfiler>());
+            services.AddUnique(typeLoader);
 
             composition.WithCollectionBuilder<MapperCollectionBuilder>()
                 .AddCoreMappers();
 
-            composition.RegisterUnique<ISqlContext>(_ => SqlContext);
+            services.AddUnique<ISqlContext>(_ => SqlContext);
 
             var factory = Current.Factory = composition.CreateServiceProvider();
 

@@ -20,7 +20,6 @@ using Umbraco.Net;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Serialization;
 using Umbraco.Core.Strings;
-using Umbraco.Infrastructure.Composing;
 using Umbraco.Web;
 using Umbraco.Web.Routing;
 using Umbraco.Tests.Common.Builders;
@@ -122,9 +121,9 @@ namespace Umbraco.Tests.Common
 
         public IUmbracoVersion GetUmbracoVersion() => new UmbracoVersion();
 
-        public IRegister GetRegister()
+        public IServiceCollection GetRegister()
         {
-            return ServiceCollectionRegistryAdapter.Wrap(new ServiceCollection());
+            return new ServiceCollection();
         }
 
         public abstract IHostingEnvironment GetHostingEnvironment();

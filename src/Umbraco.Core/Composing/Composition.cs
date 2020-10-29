@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
-using Umbraco.Infrastructure.Composing;
-
 
 namespace Umbraco.Core.Composing
 {
@@ -21,8 +17,14 @@ namespace Umbraco.Core.Composing
     /// may cause issues.</remarks>
     public class Composition
     {
+        public TypeLoader TypeLoader { get; }
+        public IRuntimeState RuntimeState { get; }
+        public IProfilingLogger Logger { get; }
+        public IIOHelper IOHelper { get; }
+        public AppCaches AppCaches { get; }
+        public IServiceCollection Services { get; }
+
         private readonly Dictionary<Type, ICollectionBuilder> _builders = new Dictionary<Type, ICollectionBuilder>();
-        private IRegister _register => ServiceCollectionRegistryAdapter.Wrap(Services);
 
         public Composition(IServiceCollection services, TypeLoader typeLoader, IProfilingLogger logger, IRuntimeState runtimeState, IIOHelper ioHelper, AppCaches appCaches)
         {
@@ -34,87 +36,12 @@ namespace Umbraco.Core.Composing
             AppCaches = appCaches ?? throw new ArgumentNullException(nameof(appCaches));
         }
 
-        #region Services
-
-        /// <summary>
-        /// Gets the logger.
-        /// </summary>
-        public IProfilingLogger Logger { get; }
-
-        public IIOHelper IOHelper { get; }
-        public AppCaches AppCaches { get; }
-
-        public IServiceCollection Services { get; }
-
-        /// <summary>
-        /// Gets the type loader.
-        /// </summary>
-        public TypeLoader TypeLoader { get; }
-
-        /// <summary>
-        /// Gets the runtime state.
-        /// </summary>
-        public IRuntimeState RuntimeState { get; }
-
-        #endregion
-
-        #region IRegister
-        
-        /// <inheritdoc />
-        public void Register(Type serviceType, Lifetime lifetime = Lifetime.Transient)
-            => _register.Register(serviceType, lifetime);
-
-        /// <inheritdoc />
-        public void Register(Type serviceType, Type implementingType, Lifetime lifetime = Lifetime.Transient)
-            => _register.Register(serviceType, implementingType, lifetime);
-
-        /// <inheritdoc />
-        public void Register<TService>(Func<IServiceProvider, TService> factory, Lifetime lifetime = Lifetime.Transient)
-            where TService : class
-            => _register.Register(factory, lifetime);
-
-        /// <inheritdoc />
-        public void Register(Type serviceType, object instance)
-            => _register.Register(serviceType, instance);
-
-
-        /// <inheritdoc />
         public void RegisterBuilders()
         {
             foreach (var builder in _builders.Values)
-                builder.RegisterWith(_register);
+                builder.RegisterWith(Services);
             _builders.Clear(); // no point keep them around
         }
-
-        #endregion
-
-        #region Unique
-        
-        /// <summary>
-        /// Registers a unique service with an implementation type.
-        /// </summary>
-        /// <remarks>Unique services have one single implementation, and a Singleton lifetime.</remarks>
-        public void RegisterUnique(Type serviceType, Type implementingType)
-            => Services.Replace(ServiceDescriptor.Singleton(serviceType, implementingType));
-
-        /// <summary>
-        /// Registers a unique service with an implementation factory.
-        /// </summary>
-        /// <remarks>Unique services have one single implementation, and a Singleton lifetime.</remarks>
-        public void RegisterUnique<TService>(Func<IServiceProvider, TService> factory)
-            where TService : class
-            => Services.Replace(ServiceDescriptor.Singleton(factory));
-
-        /// <summary>
-        /// Registers a unique service with an implementing instance.
-        /// </summary>
-        /// <remarks>Unique services have one single implementation, and a Singleton lifetime.</remarks>
-        public void RegisterUnique(Type serviceType, object instance)
-            => Services.Replace(ServiceDescriptor.Singleton(serviceType, instance));
-
-        #endregion
-
-        #region Collection Builders
 
         /// <summary>
         /// Gets a collection builder (and registers the collection).
@@ -133,7 +60,5 @@ namespace Umbraco.Core.Composing
             _builders[typeOfBuilder] = builder;
             return builder;
         }
-
-        #endregion
     }
 }

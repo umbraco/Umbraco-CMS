@@ -20,12 +20,12 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             // register the NuCache published snapshot service
             // must register default options, required in the service ctor
-            composition.Register(factory => new PublishedSnapshotServiceOptions());
+            composition.Services.AddTransient(factory => new PublishedSnapshotServiceOptions());
             composition.SetPublishedSnapshotService<PublishedSnapshotService>();
 
             // replace this service since we want to improve the content/media
             // mapping lookups if we are using nucache.
-            composition.RegisterUnique<IIdKeyMap>(factory =>
+            composition.Services.AddUnique<IIdKeyMap>(factory =>
             {
                 var idkSvc = new IdKeyMap(factory.GetRequiredService<IScopeProvider>());
                 var publishedSnapshotService = factory.GetRequiredService<IPublishedSnapshotService>() as PublishedSnapshotService;

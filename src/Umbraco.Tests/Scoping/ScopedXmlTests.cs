@@ -38,8 +38,8 @@ namespace Umbraco.Tests.Scoping
             // but then, it requires a lot of plumbing ;(
             // FIXME: and we cannot inject a DistributedCache yet
             // so doing all this mess
-            Composition.RegisterUnique<IServerMessenger, LocalServerMessenger>();
-            Composition.RegisterUnique(f => Mock.Of<IServerRegistrar>());
+            Composition.Services.AddUnique<IServerMessenger, LocalServerMessenger>();
+            Composition.Services.AddUnique(f => Mock.Of<IServerRegistrar>());
             Composition.WithCollectionBuilder<CacheRefresherCollectionBuilder>()
                 .Add(() => Composition.TypeLoader.GetCacheRefreshers());
         }
@@ -50,9 +50,9 @@ namespace Umbraco.Tests.Scoping
             var globalSettings = new GlobalSettings();
             var userPasswordConfigurationSettings = new UserPasswordConfigurationSettings();
 
-            Composition.Register(x => Microsoft.Extensions.Options.Options.Create(contentSettings));
-            Composition.Register(x => Microsoft.Extensions.Options.Options.Create(globalSettings));
-            Composition.Register(x => Microsoft.Extensions.Options.Options.Create(userPasswordConfigurationSettings));
+            Composition.Services.AddTransient(x => Microsoft.Extensions.Options.Options.Create(contentSettings));
+            Composition.Services.AddTransient(x => Microsoft.Extensions.Options.Options.Create(globalSettings));
+            Composition.Services.AddTransient(x => Microsoft.Extensions.Options.Options.Create(userPasswordConfigurationSettings));
         }
 
         [TearDown]

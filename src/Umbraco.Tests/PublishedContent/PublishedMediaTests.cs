@@ -47,7 +47,7 @@ namespace Umbraco.Tests.PublishedContent
                 .Clear()
                 .Append<DefaultUrlSegmentProvider>();
 
-            Composition.RegisterUnique<IUmbracoContextAccessor, TestUmbracoContextAccessor>();
+            Composition.Services.AddUnique<IUmbracoContextAccessor, TestUmbracoContextAccessor>();
         }
 
         private IMediaType MakeNewMediaType(IUser user, string text, int parentId = -1)

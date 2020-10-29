@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using Umbraco.Core;
 using Umbraco.Extensions;
 using Umbraco.Web.Common.Filters;
 using Umbraco.Web.Common.ModelBinders;
@@ -19,6 +20,8 @@ namespace Umbraco.Web.Common.Builder
             if (services is null) throw new ArgumentNullException(nameof(services));
             if (webHostEnvironment is null) throw new ArgumentNullException(nameof(webHostEnvironment));
             if (config is null) throw new ArgumentNullException(nameof(config));
+
+            services.AddLazySupport();
 
             var builder = new UmbracoBuilder(services, webHostEnvironment, config);
             return builder;
