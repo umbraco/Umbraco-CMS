@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.Options;
 using Umbraco.Core;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Mapping;
@@ -16,6 +17,7 @@ namespace Umbraco.Web.BackOffice.Mapping
     /// <summary>
     /// Declares model mappings for media.
     /// </summary>
+    [UmbracoVolatile]
     public class MediaMapDefinition : IMapDefinition
     {
         private readonly CommonMapper _commonMapper;

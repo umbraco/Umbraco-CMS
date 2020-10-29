@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using System;
 using System.Threading.Tasks;
 using Umbraco.Core;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
@@ -15,6 +16,7 @@ namespace Umbraco.Web.BackOffice.Security
     /// <summary>
     /// Ensures that preview pages (front-end routed) are authenticated with the back office identity appended to the principal alongside any default authentication that takes place
     /// </summary>
+    [UmbracoVolatile]
     public class PreviewAuthenticationMiddleware : IMiddleware
     {
         private readonly GlobalSettings _globalSettings;

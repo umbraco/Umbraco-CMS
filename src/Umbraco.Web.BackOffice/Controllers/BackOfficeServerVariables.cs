@@ -8,7 +8,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
+ using Umbraco.Core.CodeAnnotations;
+ using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Media;
@@ -30,6 +31,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     /// <summary>
     /// Used to collect the server variables for use in the back office angular app
     /// </summary>
+    [UmbracoVolatile]
     public class BackOfficeServerVariables
     {
         private readonly LinkGenerator _linkGenerator;

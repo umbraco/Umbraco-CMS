@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Umbraco.Core;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.ContentEditing;
@@ -11,6 +12,7 @@ namespace Umbraco.Web.BackOffice.Mapping
     /// <summary>
     /// Declares model mappings for members.
     /// </summary>
+    [UmbracoVolatile]
     public class MemberMapDefinition : IMapDefinition
     {
         private readonly CommonMapper _commonMapper;

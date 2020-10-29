@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Extensions;
 
 namespace Umbraco.Web.BackOffice.ModelBinders
@@ -23,6 +24,7 @@ namespace Umbraco.Web.BackOffice.ModelBinders
     ///     normal json formatter will not figure this out.
     ///     This would also let you bind sub levels of the JSON being sent up too if you wanted with any jsonpath
     /// </remarks>
+    [UmbracoVolatile]
     public class FromJsonPathAttribute : ModelBinderAttribute
     {
         public FromJsonPathAttribute() : base(typeof(JsonPathBinder))

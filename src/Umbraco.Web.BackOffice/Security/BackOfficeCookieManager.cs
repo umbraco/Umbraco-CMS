@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Routing;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Extensions;
@@ -22,6 +23,7 @@ namespace Umbraco.Web.BackOffice.Security
     /// Umbraco's back office cookie needs to be read on two paths: /umbraco and /install, therefore we cannot just set the cookie path to be /umbraco,
     /// instead we'll specify our own cookie manager and return null if the request isn't for an acceptable path.
     /// </remarks>
+    [UmbracoVolatile]
     public class BackOfficeCookieManager : ChunkingCookieManager, ICookieManager
     {
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
