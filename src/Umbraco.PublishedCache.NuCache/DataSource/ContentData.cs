@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 {
     // represents everything that is specific to edited or published version
+    [UmbracoVolatile]
     public class ContentData
     {
         public string Name { get; set; }

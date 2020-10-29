@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using CSharpTest.Net.Collections;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Scoping;
@@ -26,6 +27,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
     /// This class's logic is based on the <see cref="SnapDictionary{TKey, TValue}"/> class but has been slightly modified to suit these purposes.
     /// </para>
     /// </remarks>
+    [UmbracoVolatile]
     public class ContentStore
     {
         // this class is an extended version of SnapDictionary

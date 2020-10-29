@@ -1,11 +1,13 @@
 ﻿using System;
 using Newtonsoft.Json;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 {
     /// <summary>
     /// Represents the culture variation information on a content item
     /// </summary>
+    [UmbracoVolatile]
     public class CultureVariation
     {
         [JsonProperty("nm")]

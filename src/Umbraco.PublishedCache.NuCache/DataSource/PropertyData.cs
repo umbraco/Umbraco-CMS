@@ -1,9 +1,11 @@
 ﻿using System;
 using System.ComponentModel;
 using Newtonsoft.Json;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 {
+    [UmbracoVolatile]
     public class PropertyData
     {
         private string _culture;
