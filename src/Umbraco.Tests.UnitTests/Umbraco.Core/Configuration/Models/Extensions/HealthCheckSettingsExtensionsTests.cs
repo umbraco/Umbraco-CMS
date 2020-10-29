@@ -13,7 +13,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Configuration.Models.Extensions
         {
             var settings = new HealthChecksSettings
             {
-                Notification = new HealthChecksSettings.HealthCheckNotificationSettings
+                Notification = new HealthChecksNotificationSettings
                 {
                     FirstRunTime = "1230",
                 }
@@ -28,7 +28,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Configuration.Models.Extensions
         {
             var settings = new HealthChecksSettings
             {
-                Notification = new HealthChecksSettings.HealthCheckNotificationSettings
+                Notification = new HealthChecksNotificationSettings
                 {
                     FirstRunTime = "1230",
                 }

@@ -8,7 +8,6 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.HealthCheck;
-using Umbraco.Core.HealthCheck.Checks;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Sync;
@@ -102,17 +101,17 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
         {
             var settings = new HealthChecksSettings
             {
-                Notification = new HealthChecksSettings.HealthCheckNotificationSettings
+                Notification = new HealthChecksNotificationSettings
                 {
                     Enabled = enabled,
-                    DisabledChecks = new List<DisabledHealthCheck>
+                    DisabledChecks = new List<DisabledHealthCheckSettings>
                 {
-                    new DisabledHealthCheck { Id = Guid.Parse(Check3Id) }
+                    new DisabledHealthCheckSettings { Id = Guid.Parse(Check3Id) }
                 }
                 },
-                DisabledChecks = new List<DisabledHealthCheck>
+                DisabledChecks = new List<DisabledHealthCheckSettings>
                 {
-                    new DisabledHealthCheck { Id = Guid.Parse(Check2Id) }
+                    new DisabledHealthCheckSettings { Id = Guid.Parse(Check2Id) }
                 }
             };
             var checks = new HealthCheckCollection(new List<HealthCheck>

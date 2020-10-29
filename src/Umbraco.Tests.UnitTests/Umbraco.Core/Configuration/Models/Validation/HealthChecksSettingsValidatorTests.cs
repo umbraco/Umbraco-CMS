@@ -30,7 +30,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Configuration.Models.Validation
         {
             return new HealthChecksSettings
             {
-                Notification = new HealthChecksSettings.HealthCheckNotificationSettings
+                Notification = new HealthChecksNotificationSettings
                 {
                     Enabled = true,
                     FirstRunTime = firstRunTime,

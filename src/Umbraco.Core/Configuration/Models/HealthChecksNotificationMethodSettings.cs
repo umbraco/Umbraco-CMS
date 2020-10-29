@@ -3,7 +3,7 @@ using Umbraco.Core.HealthCheck;
 
 namespace Umbraco.Core.Configuration.Models
 {
-    public class HealthCheckNotificationMethodSettings
+    public class HealthChecksNotificationMethodSettings
     {
         public bool Enabled { get; set; } = false;
 
