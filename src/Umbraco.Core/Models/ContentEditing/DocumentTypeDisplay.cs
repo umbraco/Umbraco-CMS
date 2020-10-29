@@ -30,6 +30,5 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "apps")]
         public IEnumerable<ContentApp> ContentApps { get; set; }
-
     }
 }

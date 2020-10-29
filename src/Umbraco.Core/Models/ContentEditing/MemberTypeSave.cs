@@ -5,6 +5,5 @@
     /// </summary>
     public class MemberTypeSave : ContentTypeSave<MemberPropertyTypeBasic>
     {
-
     }
 }

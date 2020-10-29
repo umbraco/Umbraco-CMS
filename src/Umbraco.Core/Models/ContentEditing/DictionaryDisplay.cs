@@ -15,8 +15,8 @@ namespace Umbraco.Web.Models.ContentEditing
         /// </summary>
         public DictionaryDisplay()
         {
-            this.Notifications = new List<BackOfficeNotification>();
-            this.Translations = new List<DictionaryTranslationDisplay>();
+            Notifications = new List<BackOfficeNotification>();
+            Translations = new List<DictionaryTranslationDisplay>();
         }
 
         /// <inheritdoc />

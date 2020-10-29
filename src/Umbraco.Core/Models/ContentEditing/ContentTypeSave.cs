@@ -37,7 +37,7 @@ namespace Umbraco.Web.Models.ContentEditing
         public virtual IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             if (CompositeContentTypes.Any(x => x.IsNullOrWhiteSpace()))
-                yield return new ValidationResult("Composite Content Type value cannot be null", new[] {"CompositeContentTypes"});
+                yield return new ValidationResult("Composite Content Type value cannot be null", new[] { "CompositeContentTypes" });
         }
     }
 
@@ -89,7 +89,7 @@ namespace Umbraco.Web.Models.ContentEditing
                 var lastIndex = Groups.IndexOf(duplicateGroups.Last().Last());
                 yield return new ValidationResult("Duplicate group names not allowed", new[]
                 {
-                    string.Format("Groups[{0}].Name", lastIndex)
+                    $"Groups[{lastIndex}].Name"
                 });
             }
 
@@ -102,10 +102,9 @@ namespace Umbraco.Web.Models.ContentEditing
 
                 yield return new ValidationResult("Duplicate property aliases not allowed: " + lastProperty.Alias, new[]
                 {
-                    string.Format("Groups[{0}].Properties[{1}].Alias", propertyGroup.SortOrder, lastProperty.SortOrder)
+                    $"Groups[{propertyGroup.SortOrder}].Properties[{lastProperty.SortOrder}].Alias"
                 });
             }
-
         }
     }
 }

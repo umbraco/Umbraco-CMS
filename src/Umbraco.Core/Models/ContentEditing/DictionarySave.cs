@@ -14,8 +14,8 @@ namespace Umbraco.Web.Models.ContentEditing
         /// Initializes a new instance of the <see cref="DictionarySave"/> class.
         /// </summary>
         public DictionarySave()
-        {            
-            this.Translations = new List<DictionaryTranslationSave>();
+        {
+            Translations = new List<DictionaryTranslationSave>();
         }
 
         /// <summary>

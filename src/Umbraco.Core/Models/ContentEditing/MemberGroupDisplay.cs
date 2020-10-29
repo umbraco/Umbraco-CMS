@@ -1,9 +1,8 @@
-﻿using System.Runtime.Serialization;
+﻿using System.Collections.Generic;
+using System.Runtime.Serialization;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
-    using System.Collections.Generic;
-
     [DataContract(Name = "memberGroup", Namespace = "")]
     public class MemberGroupDisplay : EntityBasic, INotificationModel
     {

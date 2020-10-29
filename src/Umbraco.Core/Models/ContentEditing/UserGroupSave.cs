@@ -2,9 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.Serialization;
-using Newtonsoft.Json;
 using Umbraco.Core;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Web.Models.ContentEditing
@@ -74,7 +72,6 @@ namespace Umbraco.Web.Models.ContentEditing
                         yield return new ValidationResult("A permission value cannot be null or empty", new[] { "AssignedPermissions" });
                 }
             }
-
         }
     }
 }

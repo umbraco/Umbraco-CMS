@@ -14,8 +14,8 @@ namespace Umbraco.Web.Models.ContentEditing
         /// </summary>
         public MacroDisplay()
         {
-            this.Notifications = new List<BackOfficeNotification>();
-            this.Parameters = new List<MacroParameterDisplay>();
+            Notifications = new List<BackOfficeNotification>();
+            Parameters = new List<MacroParameterDisplay>();
         }
 
         /// <inheritdoc />

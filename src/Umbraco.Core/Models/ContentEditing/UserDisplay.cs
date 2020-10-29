@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Globalization;
 using System.Runtime.Serialization;
 
 namespace Umbraco.Web.Models.ContentEditing
@@ -78,6 +77,5 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "updateDate")]
         [ReadOnly(true)]
         public DateTime UpdateDate { get; set; }
-
     }
 }

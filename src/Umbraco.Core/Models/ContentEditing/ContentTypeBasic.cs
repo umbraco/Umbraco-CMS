@@ -5,7 +5,6 @@ using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using Umbraco.Core;
 
-
 namespace Umbraco.Web.Models.ContentEditing
 {
     /// <summary>

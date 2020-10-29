@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.Serialization;
 using Newtonsoft.Json.Converters;
@@ -38,7 +37,7 @@ namespace Umbraco.Web.Models.ContentEditing
         /// </summary>
         [IgnoreDataMember]
         [JsonIgnore]
-        IEnumerable<ContentPropertyDisplay>  IContentProperties<ContentPropertyDisplay>.Properties => Tabs.SelectMany(x => x.Properties);
+        IEnumerable<ContentPropertyDisplay> IContentProperties<ContentPropertyDisplay>.Properties => Tabs.SelectMany(x => x.Properties);
 
         /// <summary>
         /// The language/culture assigned to this content variation

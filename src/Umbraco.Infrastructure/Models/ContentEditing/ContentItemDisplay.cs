@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -7,7 +6,6 @@ using System.Runtime.Serialization;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.ContentEditing;
-using Umbraco.Core.Serialization;
 using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Models.ContentEditing
@@ -33,7 +31,6 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "udi")]
         [ReadOnly(true)]
-        [JsonConverter(typeof(UdiJsonConverter))]
         public Udi Udi { get; set; }
 
         [DataMember(Name = "icon")]
@@ -151,7 +148,7 @@ namespace Umbraco.Web.Models.ContentEditing
         /// <remarks>
         /// By default this is true but by using events developers can toggle this off for certain documents if there is nothing to preview
         /// </remarks>
-        [DataMember( Name = "allowPreview" )]
+        [DataMember(Name = "allowPreview")]
         public bool AllowPreview { get; set; }
 
         /// <summary>

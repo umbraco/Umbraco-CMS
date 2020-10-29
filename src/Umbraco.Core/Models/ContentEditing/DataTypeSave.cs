@@ -46,6 +46,5 @@ namespace Umbraco.Web.Models.ContentEditing
         /// </summary>
         [IgnoreDataMember]
         public IDataEditor PropertyEditor { get; set; }
-
     }
 }
