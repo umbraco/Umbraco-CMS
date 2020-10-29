@@ -1482,16 +1482,27 @@ namespace Umbraco.Core
         /// <summary>
         /// Validates a string matches a time.
         /// </summary>
-        /// <param name="input">Time representation (in H:mm form, e.g. 3:30, 22:00)</param>
-        /// <returns></returns>
+        /// <param name="input">Time representation (in H:mm format, e.g. 3:30, 22:00)</param>
+        /// <returns>True if provided input is a valid time in H:mm format, false if not.</returns>
         public static bool IsValidTimeFormat(this string input)
         {
-            if (string.IsNullOrEmpty(input))
+            if (string.IsNullOrEmpty(input) || !input.Contains(":") || input.Length < 4 || input.Length > 5)
             {
                 return false;
             }
 
-            return TimeSpan.TryParse(input, out var _);
+            var timeParts = input.Split(':');
+            if (timeParts.Length != 2)
+            {
+                return false;
+            }
+
+            if (!int.TryParse(timeParts[0], out var hour) || !int.TryParse(timeParts[1], out var minute))
+            {
+                return false;
+            }
+
+            return hour >= 0 && hour <= 23 && minute >= 0 && minute <= 59;
         }
     }
 }
