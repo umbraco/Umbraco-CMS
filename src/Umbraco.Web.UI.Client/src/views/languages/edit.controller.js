@@ -13,7 +13,6 @@
         vm.labels = {};
         vm.initIsDefault = false;
         vm.showDefaultLanguageInfo = false;
-
         vm.save = save;
         vm.back = back;
         vm.goToPage = goToPage;
@@ -21,7 +20,7 @@
         vm.toggleDefault = toggleDefault;
 
         var currCulture = null;
-
+        var editLanguage = "";
         function init() {
 
             // localize labels
@@ -35,7 +34,8 @@
                 "languages_noFallbackLanguageOption",
                 "languages_fallbackLanguageDescription",
                 "languages_fallbackLanguage",
-                "defaultdialogs_confirmSure"
+                "defaultdialogs_confirmSure",
+                "defaultdialogs_editlanguage"
             ];
 
             localizationService.localizeMany(labelKeys).then(function (values) {
@@ -58,7 +58,10 @@
 
                 if ($routeParams.create) {
                     vm.page.name = vm.labels.addLanguage;
+                    $scope.$emit("$changeTitle", vm.labels.addLanguage);
                 }
+                addLanguage = vm.labels.addLanguage;
+                editLanguage = values[10];
             });
 
             vm.loading = true;
@@ -87,11 +90,11 @@
 
             if (!$routeParams.create) {
 
-                promises.push(languageResource.getById($routeParams.id).then(function (lang) {
+                promises.push(languageResource.getById($routeParams.id).then(function(lang) {
                     vm.language = lang;
 
                     vm.page.name = vm.language.name;
-
+                    $scope.$emit("$changeTitle", editLanguage + ": " + vm.page.name);
                     /* we need to store the initial default state so we can disable the toggle if it is the default.
                     we need to prevent from not having a default language. */
                     vm.initIsDefault = Utilities.copy(vm.language.isDefault);
