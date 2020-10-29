@@ -1,64 +1,49 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Moq;
-using NUnit.Framework;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core;
+using NUnit.Framework;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Scoping;
+using Umbraco.Core.Services;
+using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Sync;
-using Umbraco.Tests.Common.Builders;
-using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Integration.Testing;
 using Umbraco.Tests.Testing;
 using Umbraco.Web;
 using Umbraco.Web.Cache;
-using Umbraco.Web.Composing;
 
-namespace Umbraco.Tests.Scoping
+namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Scoping
 {
     [TestFixture]
-    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, WithApplication = true)]
-    public class ScopedRepositoryTests : TestWithDatabaseBase
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
+    public class ScopedRepositoryTests : UmbracoIntegrationTest
     {
         private DistributedCacheBinder _distributedCacheBinder;
 
-        private GlobalSettings _globalSettings;
+        private IUserService UserService => GetRequiredService<IUserService>();
+        private ILocalizationService LocalizationService => GetRequiredService<ILocalizationService>();
+        private IServerMessenger ServerMessenger => GetRequiredService<IServerMessenger>();
+        private CacheRefresherCollection CacheRefresherCollection => GetRequiredService<CacheRefresherCollection>();
 
-        public override void SetUp()
-        {
-            base.SetUp();
-
-            _globalSettings = new GlobalSettings();
-        }
-
-        protected override void Compose()
-        {
-            base.Compose();
-
-            // the cache refresher component needs to trigger to refresh caches
-            // but then, it requires a lot of plumbing ;(
-            // FIXME: and we cannot inject a DistributedCache yet
-            // so doing all this mess
-            Composition.RegisterUnique<IServerMessenger, LocalServerMessenger>();
-            Composition.RegisterUnique(f => Mock.Of<IServerRegistrar>());
-            Composition.WithCollectionBuilder<CacheRefresherCollectionBuilder>()
-                .Add(() => Composition.TypeLoader.GetCacheRefreshers());
-        }
+        protected override Action<IServiceCollection> CustomTestSetup => (services)
+            => services.Replace(ServiceDescriptor.Singleton(typeof(IServerMessenger), typeof(LocalServerMessenger)));
 
         protected override AppCaches GetAppCaches()
         {
             // this is what's created core web runtime
-            return new AppCaches(
+            var result = new AppCaches(
                 new DeepCloneAppCache(new ObjectCacheAppCache()),
                 NoAppCache.Instance,
                 new IsolatedCaches(type => new DeepCloneAppCache(new ObjectCacheAppCache())));
-        }
 
+            return result;
+        }
         [TearDown]
         public void Teardown()
         {
@@ -70,11 +55,10 @@ namespace Umbraco.Tests.Scoping
         [TestCase(false)]
         public void DefaultRepositoryCachePolicy(bool complete)
         {
-            var scopeProvider = ScopeProvider;
-            var service = ServiceContext.UserService;
-            var globalCache = Current.AppCaches.IsolatedCaches.GetOrCreate(typeof(IUser));
-
-            var user = (IUser)new User(_globalSettings, "name", "email", "username", "rawPassword");
+            var scopeProvider = (ScopeProvider)ScopeProvider;
+            var service = (UserService)UserService;
+            var globalCache = AppCaches.IsolatedCaches.GetOrCreate(typeof(IUser));
+            var user = (IUser)new User(GlobalSettings, "name", "email", "username", "rawPassword");
             service.Save(user);
 
             // global cache contains the entity
@@ -86,13 +70,13 @@ namespace Umbraco.Tests.Scoping
             // get user again - else we'd modify the one that's in the cache
             user = service.GetUserById(user.Id);
 
-            _distributedCacheBinder = new DistributedCacheBinder(new DistributedCache(Current.ServerMessenger, Current.CacheRefreshers), Mock.Of<IUmbracoContextFactory>(), Mock.Of<ILogger<DistributedCacheBinder>>());
+            _distributedCacheBinder = new DistributedCacheBinder(new DistributedCache(ServerMessenger, CacheRefresherCollection), GetRequiredService<IUmbracoContextFactory>(), GetRequiredService<ILogger<DistributedCacheBinder>>());
             _distributedCacheBinder.BindEvents(true);
 
             Assert.IsNull(scopeProvider.AmbientScope);
             using (var scope = scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
             {
-                Assert.IsInstanceOf<Core.Scoping.Scope>(scope);
+                Assert.IsInstanceOf<Scope>(scope);
                 Assert.IsNotNull(scopeProvider.AmbientScope);
                 Assert.AreSame(scope, scopeProvider.AmbientScope);
 
@@ -147,11 +131,11 @@ namespace Umbraco.Tests.Scoping
         [TestCase(false)]
         public void FullDataSetRepositoryCachePolicy(bool complete)
         {
-            var scopeProvider = ScopeProvider;
-            var service = ServiceContext.LocalizationService;
-            var globalCache = Current.AppCaches.IsolatedCaches.GetOrCreate(typeof (ILanguage));
+            var scopeProvider = (ScopeProvider)ScopeProvider;
+            var service = LocalizationService;
+            var globalCache = AppCaches.IsolatedCaches.GetOrCreate(typeof (ILanguage));
 
-            var lang = (ILanguage) new Language(_globalSettings, "fr-FR");
+            var lang = (ILanguage) new Language(GlobalSettings, "fr-FR");
             service.Save(lang);
 
             // global cache has been flushed, reload
@@ -167,13 +151,13 @@ namespace Umbraco.Tests.Scoping
             Assert.AreEqual(lang.Id, globalCached.Id);
             Assert.AreEqual("fr-FR", globalCached.IsoCode);
 
-            _distributedCacheBinder = new DistributedCacheBinder(new DistributedCache(Current.ServerMessenger, Current.CacheRefreshers), Mock.Of<IUmbracoContextFactory>(), Mock.Of<ILogger<DistributedCacheBinder>>());
+            _distributedCacheBinder = new DistributedCacheBinder(new DistributedCache(ServerMessenger, CacheRefresherCollection), GetRequiredService<IUmbracoContextFactory>(), GetRequiredService<ILogger<DistributedCacheBinder>>());
             _distributedCacheBinder.BindEvents(true);
 
             Assert.IsNull(scopeProvider.AmbientScope);
             using (var scope = scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
             {
-                Assert.IsInstanceOf<Core.Scoping.Scope>(scope);
+                Assert.IsInstanceOf<Scope>(scope);
                 Assert.IsNotNull(scopeProvider.AmbientScope);
                 Assert.AreSame(scope, scopeProvider.AmbientScope);
 
@@ -239,11 +223,11 @@ namespace Umbraco.Tests.Scoping
         [TestCase(false)]
         public void SingleItemsOnlyRepositoryCachePolicy(bool complete)
         {
-            var scopeProvider = ScopeProvider;
-            var service = ServiceContext.LocalizationService;
-            var globalCache = Current.AppCaches.IsolatedCaches.GetOrCreate(typeof (IDictionaryItem));
+            var scopeProvider = (ScopeProvider)ScopeProvider;
+            var service = LocalizationService;
+            var globalCache = AppCaches.IsolatedCaches.GetOrCreate(typeof (IDictionaryItem));
 
-            var lang = (ILanguage)new Language(_globalSettings, "fr-FR");
+            var lang = (ILanguage)new Language(GlobalSettings, "fr-FR");
             service.Save(lang);
 
             var item = (IDictionaryItem) new DictionaryItem("item-key");
@@ -259,13 +243,13 @@ namespace Umbraco.Tests.Scoping
             Assert.AreEqual(item.Id, globalCached.Id);
             Assert.AreEqual("item-key", globalCached.ItemKey);
 
-            _distributedCacheBinder = new DistributedCacheBinder(new DistributedCache(Current.ServerMessenger, Current.CacheRefreshers), Mock.Of<IUmbracoContextFactory>(), Mock.Of<ILogger<DistributedCacheBinder>>());
+            _distributedCacheBinder = new DistributedCacheBinder(new DistributedCache(ServerMessenger, CacheRefresherCollection), GetRequiredService<IUmbracoContextFactory>(), GetRequiredService<ILogger<DistributedCacheBinder>>());
             _distributedCacheBinder.BindEvents(true);
 
             Assert.IsNull(scopeProvider.AmbientScope);
             using (var scope = scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
             {
-                Assert.IsInstanceOf<Core.Scoping.Scope>(scope);
+                Assert.IsInstanceOf<Scope>(scope);
                 Assert.IsNotNull(scopeProvider.AmbientScope);
                 Assert.AreSame(scope, scopeProvider.AmbientScope);
 

@@ -263,7 +263,7 @@ namespace Umbraco.Tests.Integration.Testing
                 webHostEnvironment,
                 register,
                 GetType().Assembly,
-                AppCaches.NoCache, // Disable caches for integration tests
+                GetAppCaches(),
                 TestHelper.GetLoggingConfiguration(),
                 Configuration,
                 CreateTestRuntime);
@@ -278,6 +278,12 @@ namespace Umbraco.Tests.Integration.Testing
             services.AddMvc();
 
             CustomTestSetup(services);
+        }
+
+        protected virtual AppCaches GetAppCaches()
+        {
+            // Disable caches for integration tests
+            return AppCaches.NoCache;
         }
 
         public virtual void Configure(IApplicationBuilder app)
