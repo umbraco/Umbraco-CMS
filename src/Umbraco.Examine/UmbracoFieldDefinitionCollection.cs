@@ -77,9 +77,9 @@ namespace Umbraco.Examine
                 return false;
 
             var match = ExamineExtensions.CultureIsoCodeFieldNameMatchExpression.Match(fieldName);
-            if (match.Success && match.Groups.Count == 3)
+            if (match.Success)
             {
-                var nonCultureFieldName = match.Groups[1].Value;
+                var nonCultureFieldName = match.Groups["FieldName"].Value;
                 //check if there's a definition for this and if so return the field definition for the culture field based on the non-culture field
                 if (base.TryGetValue(nonCultureFieldName, out var existingFieldDefinition))
                 {
