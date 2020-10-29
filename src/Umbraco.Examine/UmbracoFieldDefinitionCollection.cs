@@ -73,7 +73,7 @@ namespace Umbraco.Examine
                 return true;
 
             //before we use regex to match do some faster simple matching since this is going to execute quite a lot
-            if (!fieldName.Contains("_") || !fieldName.Contains("-"))
+            if (!fieldName.Contains("_"))
                 return false;
 
             var match = ExamineExtensions.CultureIsoCodeFieldNameMatchExpression.Match(fieldName);
