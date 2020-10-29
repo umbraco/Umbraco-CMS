@@ -20,6 +20,7 @@ using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Web;
 using Current = Umbraco.Web.Composing.Current;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Umbraco.Tests.Scoping
 {
@@ -47,7 +48,7 @@ namespace Umbraco.Tests.Scoping
             composition.WithCollectionBuilder<MapperCollectionBuilder>();
 
             Current.Reset();
-            Current.Factory = composition.CreateFactory();
+            Current.Factory = composition.CreateServiceProvider();
         }
 
         [TearDown]

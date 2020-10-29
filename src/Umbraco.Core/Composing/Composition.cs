@@ -8,7 +8,6 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Infrastructure.Composing;
 
-using NoFactory = Umbraco.Infrastructure.Composing.ServiceProviderFactoryAdapter;
 
 namespace Umbraco.Core.Composing
 {
@@ -70,7 +69,7 @@ namespace Umbraco.Core.Composing
             => _register.Register(serviceType, implementingType, lifetime);
 
         /// <inheritdoc />
-        public void Register<TService>(Func<IFactory, TService> factory, Lifetime lifetime = Lifetime.Transient)
+        public void Register<TService>(Func<IServiceProvider, TService> factory, Lifetime lifetime = Lifetime.Transient)
             where TService : class
             => _register.Register(factory, lifetime);
 
@@ -102,9 +101,9 @@ namespace Umbraco.Core.Composing
         /// Registers a unique service with an implementation factory.
         /// </summary>
         /// <remarks>Unique services have one single implementation, and a Singleton lifetime.</remarks>
-        public void RegisterUnique<TService>(Func<IFactory, TService> factory)
+        public void RegisterUnique<TService>(Func<IServiceProvider, TService> factory)
             where TService : class
-            => Services.Replace(ServiceDescriptor.Singleton(sp => factory(NoFactory.Wrap(sp))));
+            => Services.Replace(ServiceDescriptor.Singleton(factory));
 
         /// <summary>
         /// Registers a unique service with an implementing instance.

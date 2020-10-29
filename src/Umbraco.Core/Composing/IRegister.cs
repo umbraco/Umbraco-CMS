@@ -20,21 +20,12 @@ namespace Umbraco.Core.Composing
         /// <summary>
         /// Registers a service with an implementation factory.
         /// </summary>
-        void Register<TService>(Func<IFactory, TService> factory, Lifetime lifetime = Lifetime.Transient)
+        void Register<TService>(Func<IServiceProvider, TService> factory, Lifetime lifetime = Lifetime.Transient)
             where TService : class;
 
         /// <summary>
         /// Registers a service with an implementing instance.
         /// </summary>
         void Register(Type serviceType, object instance);
-
-        #region Control
-
-        /// <summary>
-        /// Creates the factory.
-        /// </summary>
-        IFactory CreateFactory();
-
-        #endregion
     }
 }

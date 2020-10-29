@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Web;
 using System.Web.Http;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Owin;
 using Umbraco.Core;
 using Umbraco.Core.Cache;

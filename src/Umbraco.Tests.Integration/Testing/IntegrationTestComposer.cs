@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Core;
@@ -66,7 +67,7 @@ namespace Umbraco.Tests.Integration.Testing
         /// we don't need to copy files
         /// </summary>
         /// <returns></returns>
-        private ILocalizedTextService GetLocalizedTextService(IFactory factory)
+        private ILocalizedTextService GetLocalizedTextService(IServiceProvider factory)
         {
             var globalSettings = factory.GetRequiredService<IOptions<GlobalSettings>>();
             var loggerFactory = factory.GetRequiredService<ILoggerFactory>();

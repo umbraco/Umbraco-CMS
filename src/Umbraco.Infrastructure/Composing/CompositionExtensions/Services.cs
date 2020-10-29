@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core.Cache;
@@ -84,7 +85,7 @@ namespace Umbraco.Core.Composing.CompositionExtensions
         /// <param name="factory"></param>
         /// <param name="packageRepoFileName"></param>
         /// <returns></returns>
-        private static PackagesRepository CreatePackageRepository(IFactory factory, string packageRepoFileName)
+        private static PackagesRepository CreatePackageRepository(IServiceProvider factory, string packageRepoFileName)
             => new PackagesRepository(
                 factory.GetRequiredService<IContentService>(),
                 factory.GetRequiredService<IContentTypeService>(),
@@ -99,7 +100,7 @@ namespace Umbraco.Core.Composing.CompositionExtensions
                 factory.GetRequiredService<IOptions<GlobalSettings>>(),
                 packageRepoFileName);
 
-        private static LocalizedTextServiceFileSources SourcesFactory(IFactory container)
+        private static LocalizedTextServiceFileSources SourcesFactory(IServiceProvider container)
         {
             var hostingEnvironment = container.GetRequiredService<IHostingEnvironment>();
             var globalSettings = container.GetRequiredService<IOptions<GlobalSettings>>().Value;

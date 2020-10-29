@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -65,7 +66,7 @@ namespace Umbraco.Tests.Published
             publishedSnapshotAccessorMock.Setup(x => x.PublishedSnapshot).Returns(publishedSnapshotMock.Object);
             register.Register(f => publishedSnapshotAccessorMock.Object);
 
-            var registerFactory = composition.CreateFactory();
+            var registerFactory = composition.CreateServiceProvider();
             var converters = registerFactory.GetRequiredService<PropertyValueConverterCollection>();
 
             var dataTypeServiceMock = new Mock<IDataTypeService>();

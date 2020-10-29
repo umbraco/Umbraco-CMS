@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using Microsoft.Extensions.DependencyInjection;
+using NUnit.Framework;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;

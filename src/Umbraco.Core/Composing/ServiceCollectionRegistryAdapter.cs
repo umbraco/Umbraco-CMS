@@ -52,19 +52,19 @@ namespace Umbraco.Infrastructure.Composing
             }
         }
 
-        public void Register<TService>(Func<IFactory, TService> factory, Lifetime lifetime = Lifetime.Transient) where TService : class
+        public void Register<TService>(Func<IServiceProvider, TService> factory, Lifetime lifetime = Lifetime.Transient) where TService : class
         {
             switch (lifetime)
             {
                 case Lifetime.Request:
                 case Lifetime.Scope:
-                    Services.AddScoped(sp => factory(ServiceProviderFactoryAdapter.Wrap(sp)));
+                    Services.AddScoped(factory);
                     break;
                 case Lifetime.Transient:
-                    Services.AddTransient(sp => factory(ServiceProviderFactoryAdapter.Wrap(sp)));
+                    Services.AddTransient(factory);
                     break;
                 case Lifetime.Singleton:
-                    Services.AddSingleton(sp => factory(ServiceProviderFactoryAdapter.Wrap(sp)));
+                    Services.AddSingleton(factory);
                     break;
                 default:
                     throw new NotImplementedException($"Unhandled Lifetime: {lifetime}");
@@ -73,11 +73,6 @@ namespace Umbraco.Infrastructure.Composing
         public void Register(Type serviceType, object instance)
         {
             Services.AddSingleton(serviceType, instance);
-        }
-
-        public IFactory CreateFactory()
-        {
-            return ServiceProviderFactoryAdapter.Wrap(Services.BuildServiceProvider());
         }
 
         public static IRegister Wrap(IServiceCollection services)

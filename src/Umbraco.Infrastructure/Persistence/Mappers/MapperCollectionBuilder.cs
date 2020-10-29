@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core.Composing;
 using Umbraco.Infrastructure.Persistence.Mappers;
 

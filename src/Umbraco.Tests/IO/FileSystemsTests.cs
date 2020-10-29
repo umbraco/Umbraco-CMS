@@ -26,7 +26,7 @@ namespace Umbraco.Tests.IO
     public class FileSystemsTests
     {
         private IRegister _register;
-        private IFactory _factory;
+        private IServiceProvider _factory;
 
         [SetUp]
         public void Setup()
@@ -57,7 +57,7 @@ namespace Umbraco.Tests.IO
 
             composition.ComposeFileSystems();
 
-            _factory = composition.CreateFactory();
+            _factory = composition.CreateServiceProvider();
 
             // make sure we start clean
             // because some tests will create corrupt or weird filesystems

@@ -1,4 +1,6 @@
-﻿namespace Umbraco.Core.Composing
+﻿using System;
+
+namespace Umbraco.Core.Composing
 {
     /// <summary>
     /// Represents a collection builder.
@@ -25,6 +27,6 @@
         /// </summary>
         /// <returns>A collection.</returns>
         /// <remarks>Creates a new collection each time it is invoked.</remarks>
-        TCollection CreateCollection(IFactory factory);
+        TCollection CreateCollection(IServiceProvider factory);
     }
 }

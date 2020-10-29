@@ -12,6 +12,7 @@ using System.Linq;
 using System.Threading;
 using System.Xml;
 using Examine;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Strings;

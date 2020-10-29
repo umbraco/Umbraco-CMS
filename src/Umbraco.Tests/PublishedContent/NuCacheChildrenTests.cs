@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -56,12 +57,12 @@ namespace Umbraco.Tests.PublishedContent
         {
             Current.Reset();
 
-            var factory = Mock.Of<IFactory>();
+            var factory = Mock.Of<IServiceProvider>();
             Current.Factory = factory;
 
             var hostingEnvironment = Mock.Of<IHostingEnvironment>();
 
-            Mock.Get(factory).Setup(x => x.GetRequiredService(typeof(IPublishedModelFactory))).Returns(PublishedModelFactory);
+            Mock.Get(factory).Setup(x => x.GetService(typeof(IPublishedModelFactory))).Returns(PublishedModelFactory);
 
             var runtime = Mock.Of<IRuntimeState>();
             Mock.Get(runtime).Setup(x => x.Level).Returns(RuntimeLevel.Run);
@@ -172,7 +173,7 @@ namespace Umbraco.Tests.PublishedContent
             // invariant is the current default
             _variationAccesor.VariationContext = new VariationContext();
 
-            Mock.Get(factory).Setup(x => x.GetRequiredService(typeof(IVariationContextAccessor))).Returns(_variationAccesor);
+            Mock.Get(factory).Setup(x => x.GetService(typeof(IVariationContextAccessor))).Returns(_variationAccesor);
         }
 
         private IEnumerable<ContentNodeKit> GetNestedVariantKits()

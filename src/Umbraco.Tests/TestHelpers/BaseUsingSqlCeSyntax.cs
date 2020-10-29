@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NPoco;
 using NUnit.Framework;
@@ -61,7 +62,7 @@ namespace Umbraco.Tests.TestHelpers
 
             composition.RegisterUnique<ISqlContext>(_ => SqlContext);
 
-            var factory = Current.Factory = composition.CreateFactory();
+            var factory = Current.Factory = composition.CreateServiceProvider();
 
             var pocoMappers = new NPoco.MapperCollection { new PocoMapper() };
             var pocoDataFactory = new FluentPocoDataFactory((type, iPocoDataFactory) => new PocoDataBuilder(type, pocoMappers).Init());

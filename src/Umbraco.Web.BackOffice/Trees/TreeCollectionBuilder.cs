@@ -13,7 +13,7 @@ namespace Umbraco.Web.BackOffice.Trees
     {
         private readonly List<Tree> _trees = new List<Tree>();
 
-        public TreeCollection CreateCollection(IFactory factory) => new TreeCollection(_trees);
+        public TreeCollection CreateCollection(IServiceProvider factory) => new TreeCollection(_trees);
 
         public void RegisterWith(IRegister register) => register.Register(CreateCollection, Lifetime.Singleton);
 

@@ -169,7 +169,6 @@ namespace Umbraco.Extensions
         /// <returns></returns>
         public static IServiceCollection AddUmbracoCore(this IServiceCollection services, IWebHostEnvironment webHostEnvironment, IConfiguration configuration)
         {
-
             var loggingConfig = new LoggingConfiguration(
                 Path.Combine(webHostEnvironment.ContentRootPath, "umbraco", "logs"));
 
@@ -183,11 +182,6 @@ namespace Umbraco.Extensions
                 requestCache,
                 new IsolatedCaches(type => new DeepCloneAppCache(new ObjectCacheAppCache())));
 
-            /* TODO: MSDI - Post initial merge we can clean up a lot.
-             * Change the method signatures lower down
-             * Or even just remove IRegister / IFactory interfaces entirely.
-             * If we try to do it immediately, merging becomes a nightmare.
-             */
             var register = new ServiceCollectionRegistryAdapter(services);
 
             services.AddUmbracoCore(webHostEnvironment,

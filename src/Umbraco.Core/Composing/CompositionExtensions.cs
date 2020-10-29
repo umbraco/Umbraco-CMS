@@ -12,7 +12,7 @@ namespace Umbraco.Infrastructure.PublishedCache
         /// </summary>
         /// <param name="composition">The composition.</param>
         /// <param name="factory">A function creating a published snapshot service.</param>
-        public static void SetPublishedSnapshotService(this Composition composition, Func<IFactory, IPublishedSnapshotService> factory)
+        public static void SetPublishedSnapshotService(this Composition composition, Func<IServiceProvider, IPublishedSnapshotService> factory)
         {
             composition.RegisterUnique(factory);
         }

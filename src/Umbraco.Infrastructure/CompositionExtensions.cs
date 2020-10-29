@@ -2,7 +2,6 @@
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Dictionary;
-using Umbraco.Core.IO;
 using Umbraco.Core.Logging.Viewer;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.Models.PublishedContent;
@@ -121,7 +120,7 @@ namespace Umbraco.Core
         /// </summary>
         /// <param name="composition">The composition.</param>
         /// <param name="factory">A function creating a culture dictionary factory.</param>
-        public static void SetCultureDictionaryFactory(this Composition composition, Func<IFactory, ICultureDictionaryFactory> factory)
+        public static void SetCultureDictionaryFactory(this Composition composition, Func<IServiceProvider, ICultureDictionaryFactory> factory)
         {
             composition.RegisterUnique(factory);
         }
@@ -152,7 +151,7 @@ namespace Umbraco.Core
         /// </summary>
         /// <param name="composition">The composition.</param>
         /// <param name="factory">A function creating a published content model factory.</param>
-        public static void SetPublishedContentModelFactory(this Composition composition, Func<IFactory, IPublishedModelFactory> factory)
+        public static void SetPublishedContentModelFactory(this Composition composition, Func<IServiceProvider, IPublishedModelFactory> factory)
         {
             composition.RegisterUnique(factory);
         }
@@ -183,7 +182,7 @@ namespace Umbraco.Core
         /// </summary>
         /// <param name="composition">The composition.</param>
         /// <param name="factory">A function creating a server registrar.</param>
-        public static void SetServerRegistrar(this Composition composition, Func<IFactory, IServerRegistrar> factory)
+        public static void SetServerRegistrar(this Composition composition, Func<IServiceProvider, IServerRegistrar> factory)
         {
             composition.RegisterUnique(factory);
         }
@@ -214,7 +213,7 @@ namespace Umbraco.Core
         /// </summary>
         /// <param name="composition">The composition.</param>
         /// <param name="factory">A function creating a server messenger.</param>
-        public static void SetServerMessenger(this Composition composition, Func<IFactory, IServerMessenger> factory)
+        public static void SetServerMessenger(this Composition composition, Func<IServiceProvider, IServerMessenger> factory)
         {
             composition.RegisterUnique(factory);
         }
@@ -235,7 +234,7 @@ namespace Umbraco.Core
         /// <param name="composition">The composition.</param>
         /// <param name="factory">A function creating the options.</param>
         /// <remarks>Use DatabaseServerRegistrarAndMessengerComposer.GetDefaultOptions to get the options that Umbraco would use by default.</remarks>
-        public static void SetDatabaseServerMessengerOptions(this Composition composition, Func<IFactory, DatabaseServerMessengerOptions> factory)
+        public static void SetDatabaseServerMessengerOptions(this Composition composition, Func<IServiceProvider, DatabaseServerMessengerOptions> factory)
         {
             composition.RegisterUnique(factory);
         }
@@ -267,7 +266,7 @@ namespace Umbraco.Core
         /// </summary>
         /// <param name="composition">The composition.</param>
         /// <param name="factory">A function creating a short string helper.</param>
-        public static void SetShortStringHelper(this Composition composition, Func<IFactory, IShortStringHelper> factory)
+        public static void SetShortStringHelper(this Composition composition, Func<IServiceProvider, IShortStringHelper> factory)
         {
             composition.RegisterUnique(factory);
         }
@@ -298,7 +297,7 @@ namespace Umbraco.Core
         /// </summary>
         /// <param name="composition">The composition.</param>
         /// <param name="factory">A function creating a log viewer.</param>
-        public static void SetLogViewer(this Composition composition, Func<IFactory, ILogViewer> factory)
+        public static void SetLogViewer(this Composition composition, Func<IServiceProvider, ILogViewer> factory)
         {
             composition.RegisterUnique(factory);
         }

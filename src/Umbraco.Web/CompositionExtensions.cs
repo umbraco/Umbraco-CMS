@@ -30,10 +30,11 @@ namespace Umbraco.Web
     /// </summary>
     public static class WebCompositionExtensions
     {
-        public static IFactory CreateFactory(this Composition composition)
+        [Obsolete("This extension method exists only to ease migration, please refactor")]
+        public static IServiceProvider CreateServiceProvider(this Composition composition)
         {
             composition.RegisterBuilders();
-            return ServiceProviderFactoryAdapter.Wrap(composition.Services.BuildServiceProvider());
+            return composition.Services.BuildServiceProvider();
         }
 
         #region Uniques
@@ -54,7 +55,7 @@ namespace Umbraco.Web
         /// </summary>
         /// <param name="composition">The composition.</param>
         /// <param name="factory">A function creating a last chance finder.</param>
-        public static void SetContentLastChanceFinder(this Composition composition, Func<IFactory, IContentLastChanceFinder> factory)
+        public static void SetContentLastChanceFinder(this Composition composition, Func<IServiceProvider, IContentLastChanceFinder> factory)
         {
             composition.RegisterUnique(factory);
         }
@@ -85,7 +86,7 @@ namespace Umbraco.Web
         /// </summary>
         /// <param name="composition">The composition.</param>
         /// <param name="factory">A function creating a helper.</param>
-        public static void SetSiteDomainHelper(this Composition composition, Func<IFactory, ISiteDomainHelper> factory)
+        public static void SetSiteDomainHelper(this Composition composition, Func<IServiceProvider, ISiteDomainHelper> factory)
         {
             composition.RegisterUnique(factory);
         }

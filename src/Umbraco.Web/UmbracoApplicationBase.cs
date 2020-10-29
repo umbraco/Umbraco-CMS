@@ -44,7 +44,7 @@ namespace Umbraco.Web
         private readonly ConnectionStrings _connectionStrings;
         private readonly IIOHelper _ioHelper;
         private IRuntime _runtime;
-        private IFactory _factory;
+        private IServiceProvider _factory;
         private ILoggerFactory _loggerFactory;
 
         protected UmbracoApplicationBase()

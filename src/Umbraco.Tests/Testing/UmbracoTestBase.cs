@@ -106,7 +106,7 @@ namespace Umbraco.Tests.Testing
 
         protected Composition Composition { get; private set; }
 
-        protected IFactory Factory { get; private set; }
+        protected IServiceProvider Factory { get; private set; }
 
         protected UmbracoTestAttribute Options { get; private set; }
 
@@ -249,7 +249,7 @@ namespace Umbraco.Tests.Testing
 
             TestObjects = new TestObjects(register);
             Compose();
-            Current.Factory = Factory = Composition.CreateFactory();
+            Current.Factory = Factory = Composition.CreateServiceProvider();
             Initialize();
         }
 
@@ -564,20 +564,28 @@ namespace Umbraco.Tests.Testing
 
         protected virtual void Reset()
         {
-            // reset and dispose scopes
-            // ensures we don't leak an opened database connection
-            // which would lock eg SqlCe .sdf files
-            if (Factory?.GetService<IScopeProvider>() is ScopeProvider scopeProvider)
+            try
             {
-                Scope scope;
-                while ((scope = scopeProvider.AmbientScope) != null)
+                // reset and dispose scopes
+                // ensures we don't leak an opened database connection
+                // which would lock eg SqlCe .sdf files
+                if (Factory?.GetService<IScopeProvider>() is ScopeProvider scopeProvider)
                 {
-                    scope.Reset();
-                    scope.Dispose();
+                    Scope scope;
+                    while ((scope = scopeProvider.AmbientScope) != null)
+                    {
+                        scope.Reset();
+                        scope.Dispose();
+                    }
                 }
-            }
 
-            Current.Reset(); // disposes the factory
+                Current.Reset(); // disposes the factory
+            }
+            catch (ObjectDisposedException ex)
+            {
+                if (!ex.ObjectName.Equals(nameof(IServiceProvider)))
+                    throw;
+            }
 
             // reset all other static things that should not be static ;(
             UriUtility.ResetAppDomainAppVirtualPath(HostingEnvironment);

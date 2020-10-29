@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
@@ -38,17 +39,18 @@ using Umbraco.Web.WebApi;
 
 namespace Umbraco.Web.Composing
 {
+    // TODO: MSDI - let's kill this class once and for all...
     // see notes in Umbraco.Core.Composing.Current.
     public static class Current
     {
         private static readonly object Locker = new object();
 
-        private static IFactory _factory;
+        private static IServiceProvider _factory;
 
         /// <summary>
         /// Gets or sets the factory.
         /// </summary>
-        public static IFactory Factory
+        public static IServiceProvider Factory
         {
             get
             {
@@ -58,8 +60,6 @@ namespace Umbraco.Web.Composing
             }
             set
             {
-                if (_factory != null)
-                    throw new InvalidOperationException("A factory has already been set.");
                 _factory = value;
             }
         }
@@ -88,10 +88,10 @@ namespace Umbraco.Web.Composing
         /// </remarks>
         public static void Reset()
         {
-            _factory.DisposeIfDisposable();
-            _factory = null;
+            //_factory.DisposeIfDisposable();
+            //_factory = null;
 
-            Resetted?.Invoke(null, EventArgs.Empty);
+            //Resetted?.Invoke(null, EventArgs.Empty);
         }
 
         internal static event EventHandler Resetted;

@@ -51,7 +51,7 @@ namespace Umbraco.Core.Composing
             return This;
         }
 
-        public TCollection CreateCollection(IFactory factory)
+        public TCollection CreateCollection(IServiceProvider factory)
         {
             return factory.CreateInstance<TCollection>(_types);
         }

@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
@@ -15,7 +17,7 @@ namespace Umbraco.Web.ContentApps
         protected override ContentAppFactoryCollectionBuilder This => this;
 
         // need to inject dependencies in the collection, so override creation
-        public override ContentAppFactoryCollection CreateCollection(IFactory factory)
+        public override ContentAppFactoryCollection CreateCollection(IServiceProvider factory)
         {
             // get the logger factory just-in-time - see note below for manifest parser
             var loggerFactory = factory.GetRequiredService<ILoggerFactory>();
@@ -23,7 +25,7 @@ namespace Umbraco.Web.ContentApps
             return new ContentAppFactoryCollection(CreateItems(factory), loggerFactory.CreateLogger<ContentAppFactoryCollection>(), umbracoContextAccessor);
         }
 
-        protected override IEnumerable<IContentAppFactory> CreateItems(IFactory factory)
+        protected override IEnumerable<IContentAppFactory> CreateItems(IServiceProvider factory)
         {
             // get the manifest parser just-in-time - injecting it in the ctor would mean that
             // simply getting the builder in order to configure the collection, would require
