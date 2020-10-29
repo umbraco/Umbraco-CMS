@@ -303,11 +303,12 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.ShortStringHelper
 
         [TestCase("", false)]
         [TestCase("12:34", true)]
+        [TestCase("1:14:23", true)]
         [TestCase("25:03", false)]
         [TestCase("18:61", false)]
-        public void IsValidTimeFormat(string input, bool expected)
+        public void IsValidTimeSpan(string input, bool expected)
         {
-            var result = input.IsValidTimeFormat();
+            var result = input.IsValidTimeSpan();
             Assert.AreEqual(expected, result);
         }
     }

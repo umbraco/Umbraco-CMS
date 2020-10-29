@@ -1480,11 +1480,11 @@ namespace Umbraco.Core
         }
 
         /// <summary>
-        /// Validates a string matches a time.
+        /// Validates a string matches a time stamp.
         /// </summary>
-        /// <param name="input">Time representation (in H:mm form, e.g. 3:30, 22:00)</param>
+        /// <param name="input">String with timespan representation (in standard timespan format: https://docs.microsoft.com/en-us/dotnet/standard/base-types/standard-timespan-format-strings)</param>
         /// <returns></returns>
-        public static bool IsValidTimeFormat(this string input)
+        public static bool IsValidTimeSpan(this string input)
         {
             if (string.IsNullOrEmpty(input))
             {
