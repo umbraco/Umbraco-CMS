@@ -127,6 +127,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Scoping
             Assert.AreEqual(complete ? "changed" : "name", globalCached.Name);
         }
 
+        [Explicit("Current having issues if RuntimeTests.cs is running in same session")]
         [TestCase(true)]
         [TestCase(false)]
         public void FullDataSetRepositoryCachePolicy(bool complete)
