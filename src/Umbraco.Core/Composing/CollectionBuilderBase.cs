@@ -31,7 +31,7 @@ namespace Umbraco.Core.Composing
                 throw new InvalidOperationException("This builder has already been registered.");
 
             // register the collection
-            services.Add(new ServiceDescriptor(typeof(TCollection), CreateCollection, CollectionLifetime.ToServiceLifetime()));
+            services.Add(new ServiceDescriptor(typeof(TCollection), CreateCollection, CollectionLifetime));
 
             // register the types
             RegisterTypes(services);
@@ -40,7 +40,7 @@ namespace Umbraco.Core.Composing
         /// <summary>
         /// Gets the collection lifetime.
         /// </summary>
-        protected virtual Lifetime CollectionLifetime => Lifetime.Singleton;
+        protected virtual ServiceLifetime CollectionLifetime => ServiceLifetime.Singleton;
 
         /// <summary>
         /// Configures the internal list of types.
@@ -85,7 +85,7 @@ namespace Umbraco.Core.Composing
                 // was a dependency on an individual item, it would resolve a brand new transient instance which isn't what
                 // we would expect to happen. The same item should be resolved from the container as the collection.
                 foreach (var type in types)
-                    services.Add(new ServiceDescriptor(type, type, CollectionLifetime.ToServiceLifetime()));
+                    services.Add(new ServiceDescriptor(type, type, CollectionLifetime));
 
                 _registeredTypes = types;
             }

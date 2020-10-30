@@ -173,7 +173,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
         {
             protected override TestCollectionBuilder This => this;
 
-            protected override Lifetime CollectionLifetime => Lifetime.Transient; // transient
+            protected override ServiceLifetime CollectionLifetime => ServiceLifetime.Transient; // transient
         }
 
         // ReSharper disable once ClassNeverInstantiated.Local

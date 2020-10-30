@@ -64,21 +64,5 @@ namespace Umbraco.Core
             services.Replace(ServiceDescriptor.Transient(typeof(Lazy<>), typeof(LazyResolve<>)));
             return services;
         }
-
-        public static ServiceLifetime ToServiceLifetime(this Lifetime lifetime)
-        {
-            switch (lifetime)
-            {
-                case Lifetime.Transient:
-                    return ServiceLifetime.Transient;
-                case Lifetime.Singleton:
-                    return ServiceLifetime.Singleton;
-                case Lifetime.Scope:
-                case Lifetime.Request:
-                    return ServiceLifetime.Scoped;
-                default:
-                    throw new NotImplementedException($"Unknown Lifetime {lifetime}");
-            }
-        }
     }
 }
