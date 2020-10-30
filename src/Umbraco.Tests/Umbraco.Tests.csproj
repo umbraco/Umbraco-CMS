@@ -88,8 +88,6 @@
     <PackageReference Include="HtmlAgilityPack">
       <Version>1.11.24</Version>
     </PackageReference>
-    <PackageReference Include="LightInject" Version="6.3.5" />
-    <PackageReference Include="LightInject.Annotation" Version="1.1.0" />
     <PackageReference Include="Lucene.Net.Contrib" Version="3.0.3" />
     <PackageReference Include="Microsoft.AspNet.Identity.Core" Version="2.2.3" />
     <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.2.7" />
