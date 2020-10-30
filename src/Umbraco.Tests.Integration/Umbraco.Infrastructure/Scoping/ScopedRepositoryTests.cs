@@ -127,7 +127,6 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Scoping
             Assert.AreEqual(complete ? "changed" : "name", globalCached.Name);
         }
 
-        [Explicit("Current having issues if RuntimeTests.cs is running in same session")]
         [TestCase(true)]
         [TestCase(false)]
         public void FullDataSetRepositoryCachePolicy(bool complete)
@@ -166,7 +165,8 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Scoping
                 var scopedCache = scope.IsolatedCaches.GetOrCreate(typeof (ILanguage));
                 Assert.AreNotSame(globalCache, scopedCache);
 
-                lang.IsoCode = "de-DE";
+                //Use IsMandatory of isocode to ensure publishedContent cache is not also rebuild
+                lang.IsMandatory = true;
                 service.Save(lang);
 
                 // scoped cache has been flushed, reload
@@ -180,7 +180,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Scoping
                 var scopeCached = scopeFullCached.First(x => x.Id == lang.Id);
                 Assert.IsNotNull(scopeCached);
                 Assert.AreEqual(lang.Id, scopeCached.Id);
-                Assert.AreEqual("de-DE", scopeCached.IsoCode);
+                Assert.AreEqual(true, scopeCached.IsMandatory);
 
                 // global cache is unchanged
                 globalFullCached = (IEnumerable<ILanguage>) globalCache.Get(GetCacheTypeKey<ILanguage>(), () => null);
@@ -188,7 +188,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Scoping
                 globalCached = globalFullCached.First(x => x.Id == lang.Id);
                 Assert.IsNotNull(globalCached);
                 Assert.AreEqual(lang.Id, globalCached.Id);
-                Assert.AreEqual("fr-FR", globalCached.IsoCode);
+                Assert.AreEqual(false, globalCached.IsMandatory);
 
                 if (complete)
                     scope.Complete();
@@ -209,7 +209,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Scoping
 
             // get again, updated if completed
             lang = service.GetLanguageById(lang.Id);
-            Assert.AreEqual(complete ? "de-DE" : "fr-FR", lang.IsoCode);
+            Assert.AreEqual(complete ? true : false, lang.IsMandatory);
 
             // global cache contains the entity again
             globalFullCached = (IEnumerable<ILanguage>) globalCache.Get(GetCacheTypeKey<ILanguage>(), () => null);
@@ -217,7 +217,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Scoping
             globalCached = globalFullCached.First(x => x.Id == lang.Id);
             Assert.IsNotNull(globalCached);
             Assert.AreEqual(lang.Id, globalCached.Id);
-            Assert.AreEqual(complete ? "de-DE" : "fr-FR", lang.IsoCode);
+            Assert.AreEqual(complete ? true : false, lang.IsMandatory);
         }
 
         [TestCase(true)]
