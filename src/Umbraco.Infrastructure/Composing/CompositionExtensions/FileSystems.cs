@@ -15,10 +15,13 @@ namespace Umbraco.Core.Composing.CompositionExtensions
          * HOW TO REPLACE THE MEDIA UNDERLYING FILESYSTEM
          * ----------------------------------------------
          *
-         *   composition.Services.AddUnique<IMediaFileSystem>(factoryMethod);
+         * Create an implementation of IFileSystem and register it as the underlying filesystem for
+         * MediaFileSystem with the following extension on composition.
          *
-         *   composition.Services.AddUnique<IMediaFileSystem, TImplementation>();
+         * composition.SetMediaFileSystem(factory => FactoryMethodToReturnYourImplementation())
          *
+         * Alternatively you can just register an Implementation of IMediaFileSystem, however the
+         * extension above ensures that your IFileSystem implementation is wrapped by the "ShadowWrapper".
          *
          * WHAT IS SHADOWING
          * -----------------
@@ -27,7 +30,6 @@ namespace Umbraco.Core.Composing.CompositionExtensions
          * transaction-management on top of filesystems. The plumbing explained above,
          * compared to creating your own physical filesystem, ensures that your filesystem
          * would participate into such transactions.
-         *
          *
          */
 
@@ -45,8 +47,7 @@ namespace Umbraco.Core.Composing.CompositionExtensions
             // register the scheme for media paths
             composition.Services.AddUnique<IMediaPathScheme, UniqueMediaPathScheme>();
 
-            // register the default IMediaFileSystem implementation
-            composition.Services.AddUnique<IMediaFileSystem>(factory =>
+            composition.SetMediaFileSystem(factory =>
             {
                 var ioHelper = factory.GetRequiredService<IIOHelper>();
                 var hostingEnvironment = factory.GetRequiredService<IHostingEnvironment>();
@@ -55,10 +56,7 @@ namespace Umbraco.Core.Composing.CompositionExtensions
 
                 var rootPath = hostingEnvironment.MapPathWebRoot(globalSettings.UmbracoMediaPath);
                 var rootUrl = hostingEnvironment.ToAbsolute(globalSettings.UmbracoMediaPath);
-                var inner = new PhysicalFileSystem(ioHelper, hostingEnvironment, logger, rootPath, rootUrl);
-
-                var fileSystems = factory.GetRequiredService<IO.FileSystems>();
-                return fileSystems.GetFileSystem<MediaFileSystem>(inner);
+                return new PhysicalFileSystem(ioHelper, hostingEnvironment, logger, rootPath, rootUrl);
             });
 
             return composition;

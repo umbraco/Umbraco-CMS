@@ -1,7 +1,9 @@
 ﻿using System;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Dictionary;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging.Viewer;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.Models.PublishedContent;
@@ -280,6 +282,21 @@ namespace Umbraco.Core
         {
             composition.Services.AddUnique(_ => helper);
         }
+
+        /// <summary>
+        /// Sets the underlying media filesystem.
+        /// </summary>
+        /// <param name="composition">A composition.</param>
+        /// <param name="filesystemFactory">A filesystem factory.</param>
+        /// <remarks>
+        /// Using this helper will ensure that your IFileSystem implementation is wrapped by the ShadowWrapper
+        /// </remarks>
+        public static void SetMediaFileSystem(this Composition composition, Func<IServiceProvider, IFileSystem> filesystemFactory)
+            => composition.Services.AddUnique<IMediaFileSystem>(factory =>
+            {
+                var fileSystems = factory.GetRequiredService<IO.FileSystems>();
+                return fileSystems.GetFileSystem<MediaFileSystem>(filesystemFactory(factory));
+            });
 
         /// <summary>
         /// Sets the log viewer.
