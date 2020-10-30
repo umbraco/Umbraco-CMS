@@ -60,7 +60,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
         //     base.Compose();
         //
         //     Composition.Register<IServerRegistrar>(_ => new TestServerRegistrar()); // localhost-only
-        //     Composition.RegisterUnique<IServerMessenger, LocalServerMessenger>();
+        //     composition.Services.AddUnique<IServerMessenger, LocalServerMessenger>();
         //
         //     Composition.WithCollectionBuilder<CacheRefresherCollectionBuilder>()
         //         .Add<ContentTypeCacheRefresher>()

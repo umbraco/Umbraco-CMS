@@ -26,7 +26,6 @@ using Umbraco.Core.Logging.Serilog;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Runtime;
-using Umbraco.Infrastructure.Composing;
 using Umbraco.Web.Common.AspNetCore;
 using Umbraco.Web.Common.Profiler;
 using ConnectionStrings = Umbraco.Core.Configuration.Models.ConnectionStrings;
@@ -112,12 +111,11 @@ namespace Umbraco.Extensions
         /// <returns></returns>
         public static IServiceCollection AddUmbracoCore(this IServiceCollection services,
             IWebHostEnvironment webHostEnvironment,
-            IRegister umbContainer,
             Assembly entryAssembly,
             AppCaches appCaches,
             ILoggingConfiguration loggingConfiguration,
             IConfiguration configuration)
-            => services.AddUmbracoCore(webHostEnvironment, umbContainer, entryAssembly, appCaches, loggingConfiguration, configuration, GetCoreRuntime);
+            => services.AddUmbracoCore(webHostEnvironment, entryAssembly, appCaches, loggingConfiguration, configuration, GetCoreRuntime);
 
         /// <summary>
         /// Adds the Umbraco Configuration requirements
@@ -169,7 +167,6 @@ namespace Umbraco.Extensions
         /// <returns></returns>
         public static IServiceCollection AddUmbracoCore(this IServiceCollection services, IWebHostEnvironment webHostEnvironment, IConfiguration configuration)
         {
-
             var loggingConfig = new LoggingConfiguration(
                 Path.Combine(webHostEnvironment.ContentRootPath, "umbraco", "logs"));
 
@@ -183,15 +180,7 @@ namespace Umbraco.Extensions
                 requestCache,
                 new IsolatedCaches(type => new DeepCloneAppCache(new ObjectCacheAppCache())));
 
-            /* TODO: MSDI - Post initial merge we can clean up a lot.
-             * Change the method signatures lower down
-             * Or even just remove IRegister / IFactory interfaces entirely.
-             * If we try to do it immediately, merging becomes a nightmare.
-             */
-            var register = new ServiceCollectionRegistryAdapter(services);
-
             services.AddUmbracoCore(webHostEnvironment,
-                register,
                 Assembly.GetEntryAssembly(),
                 appCaches,
                 loggingConfig,
@@ -217,7 +206,6 @@ namespace Umbraco.Extensions
         public static IServiceCollection AddUmbracoCore(
             this IServiceCollection services,
             IWebHostEnvironment webHostEnvironment,
-            IRegister umbContainer,
             Assembly entryAssembly,
             AppCaches  appCaches,
             ILoggingConfiguration loggingConfiguration,
@@ -226,9 +214,9 @@ namespace Umbraco.Extensions
             Func<GlobalSettings, ConnectionStrings, IUmbracoVersion, IIOHelper, ILoggerFactory, IProfiler, IHostingEnvironment, IBackOfficeInfo, ITypeFinder, AppCaches, IDbProviderFactoryCreator, IRuntime> getRuntime)
         {
             if (services is null) throw new ArgumentNullException(nameof(services));
-            var container = umbContainer;
-            if (container is null) throw new ArgumentNullException(nameof(container));
             if (entryAssembly is null) throw new ArgumentNullException(nameof(entryAssembly));
+
+            services.AddLazySupport();
 
             // Add service session
             // This can be overwritten by the user by adding their own call to AddSession

@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Web.Routing;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -45,7 +46,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             base.Compose();
 
-            Composition.RegisterUnique<IPublishedModelFactory>(f => new PublishedModelFactory(f.GetRequiredService<TypeLoader>().GetTypes<PublishedContentModel>(), f.GetRequiredService<IPublishedValueFallback>()));
+            Composition.Services.AddUnique<IPublishedModelFactory>(f => new PublishedModelFactory(f.GetRequiredService<TypeLoader>().GetTypes<PublishedContentModel>(), f.GetRequiredService<IPublishedValueFallback>()));
         }
 
         protected override TypeLoader CreateTypeLoader(IIOHelper ioHelper, ITypeFinder typeFinder, IAppPolicyCache runtimeCache, ILogger<TypeLoader> logger, IProfilingLogger profilingLogger ,  IHostingEnvironment hostingEnvironment)
@@ -84,13 +85,6 @@ namespace Umbraco.Tests.PublishedContent
                 new AspNetCookieManager(httpContextAccessor));
 
             return umbracoContext;
-        }
-
-        public override void TearDown()
-        {
-            base.TearDown();
-
-            Current.Reset();
         }
 
         private SolidPublishedSnapshot CreatePublishedSnapshot()

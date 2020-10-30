@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Xml;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;

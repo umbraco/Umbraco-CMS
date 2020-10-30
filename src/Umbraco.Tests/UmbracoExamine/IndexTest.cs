@@ -14,6 +14,7 @@ using Umbraco.Core.Models;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core;
 using Umbraco.Tests.TestHelpers;
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
@@ -33,7 +34,7 @@ namespace Umbraco.Tests.Routing
         protected override void ComposeSettings()
         {
             base.ComposeSettings();
-            Composition.Register(x => Microsoft.Extensions.Options.Options.Create(_globalSettings));
+            Composition.Services.AddTransient(x => Microsoft.Extensions.Options.Options.Create(_globalSettings));
         }
 
         /// <summary>

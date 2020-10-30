@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core.Composing;
 using Umbraco.Infrastructure.Persistence.Mappers;
 
@@ -9,9 +10,9 @@ namespace Umbraco.Core.Persistence.Mappers
     {
         protected override MapperCollectionBuilder This => this;
 
-        public override void RegisterWith(IRegister register)
+        public override void RegisterWith(IServiceCollection services)
         {
-            base.RegisterWith(register);
+            base.RegisterWith(services);
 
             // default initializer registers
             // - service MapperCollectionBuilder, returns MapperCollectionBuilder
@@ -19,8 +20,8 @@ namespace Umbraco.Core.Persistence.Mappers
             // we want to register extra
             // - service IMapperCollection, returns MappersCollectionBuilder's collection
 
-            register.Register<MapperConfigurationStore>(Lifetime.Singleton);
-            register.Register<IMapperCollection>(factory => factory.GetRequiredService<MapperCollection>());
+            services.AddSingleton<MapperConfigurationStore>();
+            services.AddSingleton<IMapperCollection>(factory => factory.GetRequiredService<MapperCollection>());
         }
 
         public MapperCollectionBuilder AddCoreMappers()

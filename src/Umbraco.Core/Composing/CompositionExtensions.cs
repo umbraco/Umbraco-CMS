@@ -12,9 +12,9 @@ namespace Umbraco.Infrastructure.PublishedCache
         /// </summary>
         /// <param name="composition">The composition.</param>
         /// <param name="factory">A function creating a published snapshot service.</param>
-        public static void SetPublishedSnapshotService(this Composition composition, Func<IFactory, IPublishedSnapshotService> factory)
+        public static void SetPublishedSnapshotService(this Composition composition, Func<IServiceProvider, IPublishedSnapshotService> factory)
         {
-            composition.RegisterUnique(factory);
+            composition.Services.AddUnique(factory);
         }
 
         /// <summary>
@@ -23,9 +23,9 @@ namespace Umbraco.Infrastructure.PublishedCache
         /// <typeparam name="T">The type of the published snapshot service.</typeparam>
         /// <param name="composition">The composition.</param>
         public static void SetPublishedSnapshotService<T>(this Composition composition)
-            where T : IPublishedSnapshotService
+            where T : class, IPublishedSnapshotService
         {
-            composition.RegisterUnique<IPublishedSnapshotService, T>();
+            composition.Services.AddUnique<IPublishedSnapshotService, T>();
         }
 
         /// <summary>
@@ -35,7 +35,7 @@ namespace Umbraco.Infrastructure.PublishedCache
         /// <param name="service">A published snapshot service.</param>
         public static void SetPublishedSnapshotService(this Composition composition, IPublishedSnapshotService service)
         {
-            composition.RegisterUnique(_ => service);
+            composition.Services.AddUnique(_ => service);
         }
     }
 }

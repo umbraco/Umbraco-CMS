@@ -1,4 +1,5 @@
 using System;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NPoco;
 using NUnit.Framework;
@@ -36,9 +37,9 @@ namespace Umbraco.Tests.TestHelpers
             composition.WithCollectionBuilder<MapperCollectionBuilder>()
                 .AddCoreMappers();
 
-            composition.RegisterUnique<ISqlContext>(_ => SqlContext);
+            composition.Services.AddUnique<ISqlContext>(_ => SqlContext);
 
-            var factory = composition.CreateFactory();
+            var factory = composition.CreateServiceProvider();
             var pocoMappers = new NPoco.MapperCollection { new PocoMapper() };
             var pocoDataFactory = new FluentPocoDataFactory((type, iPocoDataFactory) => new PocoDataBuilder(type, pocoMappers).Init());
             var sqlSyntax = new SqlServerSyntaxProvider();
