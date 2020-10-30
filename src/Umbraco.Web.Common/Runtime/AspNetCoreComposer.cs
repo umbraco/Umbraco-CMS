@@ -49,12 +49,14 @@ namespace Umbraco.Web.Common.Runtime
             composition.Services.AddUnique<IRequestAccessor, AspNetCoreRequestAccessor>();
 
             // Our own netcore implementations
-            composition.Services.AddMultipleUnique<IUmbracoApplicationLifetimeManager, IUmbracoApplicationLifetime, AspNetCoreUmbracoApplicationLifetime>();
+            composition.Services.AddUnique<IUmbracoApplicationLifetimeManager, AspNetCoreUmbracoApplicationLifetime>();
+            composition.Services.AddUnique<IUmbracoApplicationLifetime, AspNetCoreUmbracoApplicationLifetime>();
 
             composition.Services.AddUnique<IApplicationShutdownRegistry, AspNetCoreApplicationShutdownRegistry>();
 
             // The umbraco request lifetime
-            composition.Services.AddMultipleUnique<IUmbracoRequestLifetime, IUmbracoRequestLifetimeManager, UmbracoRequestLifetime>();
+            composition.Services.AddUnique<IUmbracoRequestLifetime, UmbracoRequestLifetime>();
+            composition.Services.AddUnique<IUmbracoRequestLifetimeManager, UmbracoRequestLifetime>();
 
             //Password hasher
             composition.Services.AddUnique<IPasswordHasher, AspNetCorePasswordHasher>();
@@ -64,7 +66,8 @@ namespace Umbraco.Web.Common.Runtime
             composition.Services.AddTransient<IIpResolver, AspNetCoreIpResolver>();
             composition.Services.AddUnique<IUserAgentProvider, AspNetCoreUserAgentProvider>();
 
-            composition.Services.AddMultipleUnique<ISessionIdResolver, ISessionManager, AspNetCoreSessionManager>();
+            composition.Services.AddUnique<ISessionIdResolver, AspNetCoreSessionManager>();
+            composition.Services.AddUnique<ISessionManager, AspNetCoreSessionManager>();
 
             composition.Services.AddUnique<IMarchal, AspNetCoreMarchal>();
 

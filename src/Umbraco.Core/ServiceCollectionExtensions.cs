@@ -7,14 +7,6 @@ namespace Umbraco.Core
 {
     public static class ServiceCollectionExtensions
     {
-
-        /// <summary>
-        /// Registers a unique service with an implementation type.
-        /// </summary>
-        /// <remarks>Unique services have one single implementation, and a Singleton lifetime.</remarks>
-        public static void AddUnique(this IServiceCollection services, Type serviceType, Type implementingType)
-            => services.Replace(ServiceDescriptor.Singleton(serviceType, implementingType));
-
         public static void AddUnique<TService, TImplementing>(this IServiceCollection services)
             where TService : class
             where TImplementing : class, TService
@@ -45,19 +37,6 @@ namespace Umbraco.Core
         public static void AddUnique<TService>(this IServiceCollection services, TService instance)
             where TService : class
             => services.Replace(ServiceDescriptor.Singleton<TService>(instance));
-
-        /// <summary>
-        /// Registers a unique service with an implementation type.
-        /// </summary>
-        public static void AddMultipleUnique<TService1, TService2, TImplementing>(this IServiceCollection services)
-            where TImplementing : class, TService1, TService2
-            where TService1 : class
-            where TService2 : class
-        {
-            services.AddUnique<TImplementing>();
-            services.AddUnique<TService1>(factory => factory.GetRequiredService<TImplementing>());
-            services.AddUnique<TService2>(factory => factory.GetRequiredService<TImplementing>());
-        }
 
         public static IServiceCollection AddLazySupport(this IServiceCollection services)
         {
