@@ -303,7 +303,6 @@ namespace Umbraco.Core.Runtime
             composition.HealthChecks()
                 .Add(() => composition.TypeLoader.GetTypes<HealthCheck.HealthCheck>());
 
-
             composition.WithCollectionBuilder<HealthCheckNotificationMethodCollectionBuilder>()
                 .Add(() => composition.TypeLoader.GetTypes<IHealthCheckNotificationMethod>());
 
