@@ -8,13 +8,11 @@ using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.HealthCheck;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Sync;
-using Umbraco.Web.HealthCheck;
 using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Scheduling
@@ -41,14 +39,11 @@ namespace Umbraco.Web.Scheduling
         private readonly IRequestAccessor _requestAccessor;
         private readonly IBackofficeSecurityFactory _backofficeSecurityFactory;
         private readonly LoggingSettings _loggingSettings;
-        private readonly KeepAliveSettings _keepAliveSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
 
-        private BackgroundTaskRunner<IBackgroundTask> _keepAliveRunner;
         private BackgroundTaskRunner<IBackgroundTask> _publishingRunner;
         private BackgroundTaskRunner<IBackgroundTask> _scrubberRunner;
         private BackgroundTaskRunner<IBackgroundTask> _fileCleanupRunner;
-        private BackgroundTaskRunner<IBackgroundTask> _healthCheckRunner;
 
         private bool _started;
         private object _locker = new object();
@@ -59,7 +54,7 @@ namespace Umbraco.Web.Scheduling
             IScopeProvider scopeProvider, IUmbracoContextFactory umbracoContextFactory, IProfilingLogger profilingLogger, ILoggerFactory loggerFactory,
             IApplicationShutdownRegistry applicationShutdownRegistry,
             IServerMessenger serverMessenger, IRequestAccessor requestAccessor,
-            IOptions<LoggingSettings> loggingSettings, IOptions<KeepAliveSettings> keepAliveSettings,
+            IOptions<LoggingSettings> loggingSettings,
             IHostingEnvironment hostingEnvironment,
             IBackofficeSecurityFactory backofficeSecurityFactory)
         {
@@ -78,7 +73,6 @@ namespace Umbraco.Web.Scheduling
             _requestAccessor = requestAccessor;
             _backofficeSecurityFactory = backofficeSecurityFactory;
             _loggingSettings = loggingSettings.Value;
-            _keepAliveSettings = keepAliveSettings.Value;
             _hostingEnvironment = hostingEnvironment;
         }
 
@@ -86,7 +80,6 @@ namespace Umbraco.Web.Scheduling
         {
             var logger = _loggerFactory.CreateLogger<BackgroundTaskRunner<IBackgroundTask>>();
             // backgrounds runners are web aware, if the app domain dies, these tasks will wind down correctly
-            _keepAliveRunner = new BackgroundTaskRunner<IBackgroundTask>("KeepAlive", logger, _applicationShutdownRegistry);
             _publishingRunner = new BackgroundTaskRunner<IBackgroundTask>("ScheduledPublishing", logger, _applicationShutdownRegistry);
             _scrubberRunner = new BackgroundTaskRunner<IBackgroundTask>("LogScrubber", logger, _applicationShutdownRegistry);
             _fileCleanupRunner = new BackgroundTaskRunner<IBackgroundTask>("TempFileCleanup", logger, _applicationShutdownRegistry);
@@ -120,26 +113,12 @@ namespace Umbraco.Web.Scheduling
 
                 var tasks = new List<IBackgroundTask>();
 
-                if (_keepAliveSettings.DisableKeepAliveTask == false)
-                {
-                    tasks.Add(RegisterKeepAlive(_keepAliveSettings));
-                }
-
                 tasks.Add(RegisterScheduledPublishing());
                 tasks.Add(RegisterLogScrubber(_loggingSettings));
                 tasks.Add(RegisterTempFileCleanup());
 
                 return tasks.ToArray();
             });
-        }
-
-        private IBackgroundTask RegisterKeepAlive(KeepAliveSettings keepAliveSettings)
-        {
-            // ping/keepalive
-            // on all servers
-            var task = new KeepAlive(_keepAliveRunner, DefaultDelayMilliseconds, FiveMinuteMilliseconds, _requestAccessor, _mainDom, Options.Create(keepAliveSettings), _loggerFactory.CreateLogger<KeepAlive>(), _profilingLogger, _serverRegistrar);
-            _keepAliveRunner.TryAdd(task);
-            return task;
         }
 
         private IBackgroundTask RegisterScheduledPublishing()

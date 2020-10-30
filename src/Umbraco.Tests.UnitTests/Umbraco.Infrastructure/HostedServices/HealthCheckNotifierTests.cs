@@ -23,16 +23,16 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
     {
         private Mock<IHealthCheckNotificationMethod> _mockNotificationMethod;
 
-        private const string Check1Id = "00000000-0000-0000-0000-000000000001";
-        private const string Check2Id = "00000000-0000-0000-0000-000000000002";
-        private const string Check3Id = "00000000-0000-0000-0000-000000000003";
+        private const string _check1Id = "00000000-0000-0000-0000-000000000001";
+        private const string _check2Id = "00000000-0000-0000-0000-000000000002";
+        private const string _check3Id = "00000000-0000-0000-0000-000000000003";
 
         [Test]
         public void Does_Not_Execute_When_Not_Enabled()
         {
             var sut = CreateHealthCheckNotifier(enabled: false);
             sut.ExecuteAsync(null);
-            _mockNotificationMethod.Verify(x => x.SendAsync(It.IsAny<HealthCheckResults>()), Times.Never);
+            VerifyNotificationsNotSent();
         }
 
         [Test]
@@ -40,7 +40,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
         {
             var sut = CreateHealthCheckNotifier(runtimeLevel: RuntimeLevel.Boot);
             sut.ExecuteAsync(null);
-            _mockNotificationMethod.Verify(x => x.SendAsync(It.IsAny<HealthCheckResults>()), Times.Never);
+            VerifyNotificationsNotSent();
         }
 
         [Test]
@@ -48,7 +48,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
         {
             var sut = CreateHealthCheckNotifier(serverRole: ServerRole.Replica);
             sut.ExecuteAsync(null);
-            _mockNotificationMethod.Verify(x => x.SendAsync(It.IsAny<HealthCheckResults>()), Times.Never);
+            VerifyNotificationsNotSent();
         }
 
         [Test]
@@ -56,7 +56,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
         {
             var sut = CreateHealthCheckNotifier(serverRole: ServerRole.Unknown);
             sut.ExecuteAsync(null);
-            _mockNotificationMethod.Verify(x => x.SendAsync(It.IsAny<HealthCheckResults>()), Times.Never);
+            VerifyNotificationsNotSent();
         }
 
         [Test]
@@ -64,7 +64,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
         {
             var sut = CreateHealthCheckNotifier(isMainDom: false);
             sut.ExecuteAsync(null);
-            _mockNotificationMethod.Verify(x => x.SendAsync(It.IsAny<HealthCheckResults>()), Times.Never);
+            VerifyNotificationsNotSent();
         }
 
         [Test]
@@ -72,7 +72,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
         {
             var sut = CreateHealthCheckNotifier(notificationEnabled: false);
             sut.ExecuteAsync(null);
-            _mockNotificationMethod.Verify(x => x.SendAsync(It.IsAny<HealthCheckResults>()), Times.Never);
+            VerifyNotificationsNotSent();
         }
 
         [Test]
@@ -80,7 +80,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
         {
             var sut = CreateHealthCheckNotifier();
             sut.ExecuteAsync(null);
-            _mockNotificationMethod.Verify(x => x.SendAsync(It.IsAny<HealthCheckResults>()), Times.Once);
+            VerifyNotificationsSent();
         }
 
         [Test]
@@ -106,12 +106,12 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
                     Enabled = enabled,
                     DisabledChecks = new List<DisabledHealthCheckSettings>
                 {
-                    new DisabledHealthCheckSettings { Id = Guid.Parse(Check3Id) }
+                    new DisabledHealthCheckSettings { Id = Guid.Parse(_check3Id) }
                 }
                 },
                 DisabledChecks = new List<DisabledHealthCheckSettings>
                 {
-                    new DisabledHealthCheckSettings { Id = Guid.Parse(Check2Id) }
+                    new DisabledHealthCheckSettings { Id = Guid.Parse(_check2Id) }
                 }
             };
             var checks = new HealthCheckCollection(new List<HealthCheck>
@@ -143,17 +143,32 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
                 mockLogger.Object, mockProfilingLogger.Object);
         }
 
-        [HealthCheck(Check1Id, "Check1")]
+        private void VerifyNotificationsNotSent()
+        {
+            VerifyNotificationsSentTimes(Times.Never());
+        }
+
+        private void VerifyNotificationsSent()
+        {
+            VerifyNotificationsSentTimes(Times.Once());
+        }
+
+        private void VerifyNotificationsSentTimes(Times times)
+        {
+            _mockNotificationMethod.Verify(x => x.SendAsync(It.IsAny<HealthCheckResults>()), times);
+        }
+
+        [HealthCheck(_check1Id, "Check1")]
         private class TestHealthCheck1 : TestHealthCheck
         {
         }
 
-        [HealthCheck(Check2Id, "Check2")]
+        [HealthCheck(_check2Id, "Check2")]
         private class TestHealthCheck2 : TestHealthCheck
         {
         }
 
-        [HealthCheck(Check3Id, "Check3")]
+        [HealthCheck(_check3Id, "Check3")]
         private class TestHealthCheck3 : TestHealthCheck
         {
         }

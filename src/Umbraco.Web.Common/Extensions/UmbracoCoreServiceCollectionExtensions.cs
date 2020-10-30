@@ -293,7 +293,18 @@ namespace Umbraco.Extensions
         public static IServiceCollection AddUmbracoHostedServices(this IServiceCollection services)
         {
             services.AddHostedService<HealthCheckNotifier>();
+            services.AddHostedService<KeepAlive>();
+            return services;
+        }
 
+        /// <summary>
+        /// Adds HTTP clients for Umbraco.
+        /// </summary>
+        /// <param name="services"></param>
+        /// <returns></returns>
+        public static IServiceCollection AddUmbracoHttpClients(this IServiceCollection services)
+        {
+            services.AddHttpClient();
             return services;
         }
 
