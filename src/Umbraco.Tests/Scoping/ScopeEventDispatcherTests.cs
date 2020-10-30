@@ -46,16 +46,9 @@ namespace Umbraco.Tests.Scoping
             composition.Services.AddUnique(factory => new FileSystems(factory, factory.GetService<ILogger<FileSystems>>(), factory.GetService<ILoggerFactory>(), TestHelper.IOHelper, Microsoft.Extensions.Options.Options.Create(globalSettings), TestHelper.GetHostingEnvironment()));
             composition.WithCollectionBuilder<MapperCollectionBuilder>();
 
-            Current.Reset();
             Current.Factory = composition.CreateServiceProvider();
         }
-
-        [TearDown]
-        public void TearDown()
-        {
-            Current.Reset();
-        }
-
+        
         [TestCase(false, true, true)]
         [TestCase(false, true, false)]
         [TestCase(false, false, true)]

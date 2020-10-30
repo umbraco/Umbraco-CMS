@@ -213,7 +213,6 @@
     <Compile Include="Web\Mvc\RenderNoContentControllerTests.cs" />
     <Compile Include="Web\Mvc\ValidateUmbracoFormRouteStringAttributeTests.cs" />
     <Compile Include="Web\PublishedContentQueryTests.cs" />
-    <Compile Include="Web\UmbracoHelperTests.cs" />
     <Compile Include="Migrations\Stubs\FiveZeroMigration.cs" />
     <Compile Include="Migrations\Stubs\FourElevenMigration.cs" />
     <Compile Include="Migrations\Stubs\SixZeroMigration2.cs" />

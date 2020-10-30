@@ -36,7 +36,6 @@ namespace Umbraco.Tests.Runtimes
         public void SetUp()
         {
             TestComponent.Reset();
-            Current.Reset();
         }
 
         public void TearDown()

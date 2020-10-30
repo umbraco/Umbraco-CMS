@@ -48,8 +48,6 @@ namespace Umbraco.Tests.PublishedContent
 
         private void Init()
         {
-            Current.Reset();
-
             var factory = Mock.Of<IServiceProvider>();
             Current.Factory = factory;
 

@@ -35,8 +35,6 @@ namespace Umbraco.Tests.TestHelpers
         [SetUp]
         public virtual void Initialize()
         {
-            Current.Reset();
-
             var services = TestHelper.GetRegister();
 
             var ioHelper = TestHelper.IOHelper;
@@ -73,12 +71,5 @@ namespace Umbraco.Tests.TestHelpers
 
         public virtual void SetUp()
         {}
-
-        [TearDown]
-        public virtual void TearDown()
-        {
-            //MappingResolver.Reset();
-            Current.Reset();
-        }
     }
 }

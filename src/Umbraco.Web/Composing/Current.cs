@@ -66,36 +66,6 @@ namespace Umbraco.Web.Composing
 
         private static IUmbracoContextAccessor _umbracoContextAccessor;
 
-        static Current()
-        {
-            Resetted += (sender, args) =>
-            {
-                if (_umbracoContextAccessor != null)
-                {
-                    var umbracoContext = _umbracoContextAccessor.UmbracoContext;
-                    umbracoContext?.Dispose();
-                }
-                _umbracoContextAccessor = null;
-            };
-        }
-
-        /// <summary>
-        /// for UNIT TESTS exclusively! Resets <see cref="Current"/>. Indented for testing only, and not supported in production code.
-        /// </summary>
-        /// <remarks>
-        /// <para>For UNIT TESTS exclusively.</para>
-        /// <para>Resets everything that is 'current'.</para>
-        /// </remarks>
-        public static void Reset()
-        {
-            //_factory.DisposeIfDisposable();
-            //_factory = null;
-
-            //Resetted?.Invoke(null, EventArgs.Empty);
-        }
-
-        internal static event EventHandler Resetted;
-
 
         #region Temp & Special
 

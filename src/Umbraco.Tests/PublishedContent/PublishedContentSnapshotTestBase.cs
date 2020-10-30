@@ -87,13 +87,6 @@ namespace Umbraco.Tests.PublishedContent
             return umbracoContext;
         }
 
-        public override void TearDown()
-        {
-            base.TearDown();
-
-            Current.Reset();
-        }
-
         private SolidPublishedSnapshot CreatePublishedSnapshot()
         {
             var dataTypeService = new TestObjects.TestDataTypeService(

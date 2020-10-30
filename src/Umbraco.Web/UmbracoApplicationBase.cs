@@ -284,8 +284,6 @@ namespace Umbraco.Web
             }
 
             Current.Logger.DisposeIfDisposable();
-            // dispose the container and everything
-            Current.Reset();
         }
 
         // called by ASP.NET (auto event wireup) once per app domain

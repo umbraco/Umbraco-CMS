@@ -577,8 +577,6 @@ namespace Umbraco.Tests.Testing
                         scope.Dispose();
                     }
                 }
-
-                Current.Reset(); // disposes the factory
             }
             catch (ObjectDisposedException ex)
             {

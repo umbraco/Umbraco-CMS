@@ -55,8 +55,6 @@ namespace Umbraco.Tests.PublishedContent
 
         private void Init(Func<IEnumerable<ContentNodeKit>> kits)
         {
-            Current.Reset();
-
             var factory = Mock.Of<IServiceProvider>();
             Current.Factory = factory;
 
