@@ -17,6 +17,7 @@ using Umbraco.Persistance.SqlCe;
 using Umbraco.Tests.Common;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -54,7 +55,7 @@ namespace Umbraco.Tests.TestHelpers
         /// Gets a mocked service context built with mocked services.
         /// </summary>
         /// <returns>A ServiceContext.</returns>
-        public ServiceContext GetServiceContextMock(IFactory container = null)
+        public ServiceContext GetServiceContextMock(IServiceProvider container = null)
         {
             // FIXME: else some tests break - figure it out
             container = null;
@@ -82,7 +83,7 @@ namespace Umbraco.Tests.TestHelpers
                 MockService<IMacroService>(container));
         }
 
-        private T MockService<T>(IFactory container = null)
+        private T MockService<T>(IServiceProvider container = null)
             where T : class
         {
             return container?.GetService<T>() ?? new Mock<T>().Object;

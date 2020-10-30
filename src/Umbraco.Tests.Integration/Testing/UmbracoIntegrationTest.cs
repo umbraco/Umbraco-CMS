@@ -34,7 +34,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Serilog;
 using Umbraco.Core.Logging.Serilog;
-using Umbraco.Infrastructure.Composing;
 using ConnectionStrings = Umbraco.Core.Configuration.Models.ConnectionStrings;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
@@ -257,11 +256,9 @@ namespace Umbraco.Tests.Integration.Testing
 
             // Add it!
             services.AddUmbracoConfiguration(Configuration);
-            // TODO: MSDI - cleanup after initial merge.
-            var register = new ServiceCollectionRegistryAdapter(services);
+
             services.AddUmbracoCore(
                 webHostEnvironment,
-                register,
                 GetType().Assembly,
                 GetAppCaches(),
                 TestHelper.GetLoggingConfiguration(),

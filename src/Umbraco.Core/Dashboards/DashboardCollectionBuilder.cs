@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Dashboards;
@@ -26,7 +27,7 @@ namespace Umbraco.Web.Dashboards
             return this;
         }
 
-        protected override IEnumerable<IDashboard> CreateItems(IFactory factory)
+        protected override IEnumerable<IDashboard> CreateItems(IServiceProvider factory)
         {
             // get the manifest parser just-in-time - injecting it in the ctor would mean that
             // simply getting the builder in order to configure the collection, would require

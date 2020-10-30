@@ -1,5 +1,6 @@
 using System;
 using System.Web.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Web.Routing;
 using Umbraco.Core;
 using Umbraco.Core.Composing;

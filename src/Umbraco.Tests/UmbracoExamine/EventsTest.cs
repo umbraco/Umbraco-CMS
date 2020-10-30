@@ -1,12 +1,7 @@
-﻿using System;
-using System.Linq;
-using Examine;
-using LightInject;
-using Lucene.Net.Store;
+﻿using System.Linq;
 using NUnit.Framework;
 using Umbraco.Tests.Testing;
 using Umbraco.Examine;
-using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Tests.UmbracoExamine
 {

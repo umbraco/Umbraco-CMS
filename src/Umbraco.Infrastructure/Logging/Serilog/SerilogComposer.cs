@@ -12,10 +12,10 @@ namespace Umbraco.Infrastructure.Logging.Serilog
     {
         public void Compose(Composition composition)
         {
-            composition.RegisterUnique<ThreadAbortExceptionEnricher>();
-            composition.RegisterUnique<HttpSessionIdEnricher>();
-            composition.RegisterUnique<HttpRequestNumberEnricher>();
-            composition.RegisterUnique<HttpRequestIdEnricher>();
+            composition.Services.AddUnique<ThreadAbortExceptionEnricher>();
+            composition.Services.AddUnique<HttpSessionIdEnricher>();
+            composition.Services.AddUnique<HttpRequestNumberEnricher>();
+            composition.Services.AddUnique<HttpRequestIdEnricher>();
         }
     }    
 }

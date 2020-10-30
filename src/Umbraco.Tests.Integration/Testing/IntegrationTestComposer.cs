@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Core;
@@ -43,20 +44,20 @@ namespace Umbraco.Tests.Integration.Testing
 
             composition.Components().Remove<SchedulerComponent>();
             composition.Components().Remove<DatabaseServerRegistrarAndMessengerComponent>();
-            composition.RegisterUnique<BackgroundIndexRebuilder, TestBackgroundIndexRebuilder>();
-            composition.RegisterUnique<IRuntimeMinifier>(factory => Mock.Of<IRuntimeMinifier>());
+            composition.Services.AddUnique<BackgroundIndexRebuilder, TestBackgroundIndexRebuilder>();
+            composition.Services.AddUnique<IRuntimeMinifier>(factory => Mock.Of<IRuntimeMinifier>());
 
             // we don't want persisted nucache files in tests
-            composition.Register(factory => new PublishedSnapshotServiceOptions { IgnoreLocalDb = true });
+            composition.Services.AddTransient(factory => new PublishedSnapshotServiceOptions { IgnoreLocalDb = true });
 
             // ensure all lucene indexes are using RAM directory (no file system)
-            composition.RegisterUnique<ILuceneDirectoryFactory, LuceneRAMDirectoryFactory>();
+            composition.Services.AddUnique<ILuceneDirectoryFactory, LuceneRAMDirectoryFactory>();
 
             // replace this service so that it can lookup the correct file locations
-            composition.RegisterUnique<ILocalizedTextService>(GetLocalizedTextService);
+            composition.Services.AddUnique<ILocalizedTextService>(GetLocalizedTextService);
 
-            composition.RegisterUnique<IServerMessenger, NoopServerMessenger>();
-            composition.RegisterUnique<IProfiler, TestProfiler>();
+            composition.Services.AddUnique<IServerMessenger, NoopServerMessenger>();
+            composition.Services.AddUnique<IProfiler, TestProfiler>();
 
 
         }
@@ -66,7 +67,7 @@ namespace Umbraco.Tests.Integration.Testing
         /// we don't need to copy files
         /// </summary>
         /// <returns></returns>
-        private ILocalizedTextService GetLocalizedTextService(IFactory factory)
+        private ILocalizedTextService GetLocalizedTextService(IServiceProvider factory)
         {
             var globalSettings = factory.GetRequiredService<IOptions<GlobalSettings>>();
             var loggerFactory = factory.GetRequiredService<ILoggerFactory>();

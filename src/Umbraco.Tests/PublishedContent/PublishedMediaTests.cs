@@ -12,6 +12,7 @@ using System.Linq;
 using System.Threading;
 using System.Xml;
 using Examine;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Strings;
@@ -46,7 +47,7 @@ namespace Umbraco.Tests.PublishedContent
                 .Clear()
                 .Append<DefaultUrlSegmentProvider>();
 
-            Composition.RegisterUnique<IUmbracoContextAccessor, TestUmbracoContextAccessor>();
+            Composition.Services.AddUnique<IUmbracoContextAccessor, TestUmbracoContextAccessor>();
         }
 
         private IMediaType MakeNewMediaType(IUser user, string text, int parentId = -1)

@@ -22,7 +22,6 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Logging.Serilog;
 using Umbraco.Core.Logging.Serilog.Enrichers;
-using Umbraco.Infrastructure.Composing;
 using Umbraco.Net;
 using Umbraco.Web.Hosting;
 using Umbraco.Web.Logging;
@@ -44,7 +43,7 @@ namespace Umbraco.Web
         private readonly ConnectionStrings _connectionStrings;
         private readonly IIOHelper _ioHelper;
         private IRuntime _runtime;
-        private IFactory _factory;
+        private IServiceProvider _factory;
         private ILoggerFactory _loggerFactory;
 
         protected UmbracoApplicationBase()
@@ -145,9 +144,9 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets the application register.
         /// </summary>
-        protected virtual IRegister GetRegister(GlobalSettings globalSettings)
+        protected virtual IServiceCollection GetRegister(GlobalSettings globalSettings)
         {
-            return ServiceCollectionRegistryAdapter.Wrap(new ServiceCollection());
+            return new ServiceCollection();
         }
 
         // events - in the order they trigger
@@ -285,8 +284,6 @@ namespace Umbraco.Web
             }
 
             Current.Logger.DisposeIfDisposable();
-            // dispose the container and everything
-            Current.Reset();
         }
 
         // called by ASP.NET (auto event wireup) once per app domain

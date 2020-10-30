@@ -17,10 +17,10 @@ namespace Umbraco.Examine
 
             base.Compose(composition);
 
-            composition.RegisterUnique<IBackOfficeExamineSearcher, BackOfficeExamineSearcher>();
-            composition.RegisterUnique<IUmbracoIndexesCreator, UmbracoIndexesCreator>();
-            composition.RegisterUnique<IIndexDiagnosticsFactory, LuceneIndexDiagnosticsFactory>();
-            composition.RegisterUnique<ILuceneDirectoryFactory, LuceneFileSystemDirectoryFactory>();
+            composition.Services.AddUnique<IBackOfficeExamineSearcher, BackOfficeExamineSearcher>();
+            composition.Services.AddUnique<IUmbracoIndexesCreator, UmbracoIndexesCreator>();
+            composition.Services.AddUnique<IIndexDiagnosticsFactory, LuceneIndexDiagnosticsFactory>();
+            composition.Services.AddUnique<ILuceneDirectoryFactory, LuceneFileSystemDirectoryFactory>();
         }
     }
 }

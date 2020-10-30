@@ -15,7 +15,7 @@ namespace Umbraco.Core.Composing.CompositionExtensions
         /// <returns></returns>
         public static Composition ComposeCoreMappingProfiles(this Composition composition)
         {
-            composition.RegisterUnique<UmbracoMapper>();
+            composition.Services.AddUnique<UmbracoMapper>();
 
             composition.WithCollectionBuilder<MapDefinitionCollectionBuilder>()
                 .Add<IdentityMapDefinition>()

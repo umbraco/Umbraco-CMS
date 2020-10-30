@@ -34,7 +34,7 @@ namespace Umbraco.Tests.Routing
         {
             base.Compose();
 
-            Composition.RegisterUnique(_ => GetServiceContext());
+            Composition.Services.AddUnique(_ => GetServiceContext());
         }
 
         protected ServiceContext GetServiceContext()

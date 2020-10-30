@@ -88,8 +88,6 @@
     <PackageReference Include="HtmlAgilityPack">
       <Version>1.11.24</Version>
     </PackageReference>
-    <PackageReference Include="LightInject" Version="6.3.5" />
-    <PackageReference Include="LightInject.Annotation" Version="1.1.0" />
     <PackageReference Include="Lucene.Net.Contrib" Version="3.0.3" />
     <PackageReference Include="Microsoft.AspNet.Identity.Core" Version="2.2.3" />
     <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.2.7" />
@@ -99,6 +97,9 @@
     <PackageReference Include="Microsoft.AspNet.WebApi.SelfHost" Version="5.2.7" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Tracing" Version="5.2.7" />
     <PackageReference Include="Microsoft.AspNet.WebApi.WebHost" Version="5.2.7" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions">
+      <Version>3.1.8</Version>
+    </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Logging" Version="3.1.8" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.1.8" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console">
@@ -210,7 +211,6 @@
     <Compile Include="Web\Mvc\RenderNoContentControllerTests.cs" />
     <Compile Include="Web\Mvc\ValidateUmbracoFormRouteStringAttributeTests.cs" />
     <Compile Include="Web\PublishedContentQueryTests.cs" />
-    <Compile Include="Web\UmbracoHelperTests.cs" />
     <Compile Include="Migrations\Stubs\FiveZeroMigration.cs" />
     <Compile Include="Migrations\Stubs\FourElevenMigration.cs" />
     <Compile Include="Migrations\Stubs\SixZeroMigration2.cs" />
