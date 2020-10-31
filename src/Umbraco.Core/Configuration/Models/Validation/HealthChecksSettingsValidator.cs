@@ -16,7 +16,7 @@ namespace Umbraco.Core.Configuration.Models.Validation
 
         private bool ValidateNotificationFirstRunTime(string value, out string message)
         {
-            return ValidateOptionalTime($"{Constants.Configuration.ConfigHealthChecks}:{nameof(HealthChecksSettings.Notification)}:{nameof(HealthChecksSettings.Notification.FirstRunTime)}", value, out message);
+            return ValidateOptionalCronTab($"{Constants.Configuration.ConfigHealthChecks}:{nameof(HealthChecksSettings.Notification)}:{nameof(HealthChecksSettings.Notification.FirstRunTime)}", value, out message);
         }
     }
 }

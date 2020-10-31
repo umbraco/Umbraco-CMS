@@ -4,11 +4,11 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Configuration.Models.Extensions;
 using Umbraco.Core.HealthCheck;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Sync;
+using Umbraco.Infrastructure.Configuration.Extensions;
 using Umbraco.Infrastructure.HealthCheck;
 using Umbraco.Web.HealthCheck;
 

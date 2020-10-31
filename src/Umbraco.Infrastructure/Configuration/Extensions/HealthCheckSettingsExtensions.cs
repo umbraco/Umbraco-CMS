@@ -1,6 +1,8 @@
 ﻿using System;
+using NCrontab;
+using Umbraco.Core.Configuration.Models;
 
-namespace Umbraco.Core.Configuration.Models.Extensions
+namespace Umbraco.Infrastructure.Configuration.Extensions
 {
     public static class HealthCheckSettingsExtensions
     {
@@ -14,9 +16,11 @@ namespace Umbraco.Core.Configuration.Models.Extensions
             }
             else
             {
-                // Otherwise start at scheduled time.
-                var delay = TimeSpan.FromMinutes(now.PeriodicMinutesFrom(firstRunTime));
-                return (delay < defaultDelay)
+                // Otherwise start at scheduled time according to cron expression, unless within the default delay period.
+                var firstRunTimeCronExpression = CrontabSchedule.Parse(firstRunTime);
+                var firstRunOccurance = firstRunTimeCronExpression.GetNextOccurrence(now);
+                var delay = firstRunOccurance - now;
+                return delay < defaultDelay
                     ? defaultDelay
                     : delay;
             }

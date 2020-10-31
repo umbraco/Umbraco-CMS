@@ -1480,18 +1480,23 @@ namespace Umbraco.Core
         }
 
         /// <summary>
-        /// Validates a string matches a time stamp.
+        /// Validates a string matches a cron tab (for length only).
         /// </summary>
-        /// <param name="input">String with timespan representation (in standard timespan format: https://docs.microsoft.com/en-us/dotnet/standard/base-types/standard-timespan-format-strings)</param>
-        /// <returns></returns>
-        public static bool IsValidTimeSpan(this string input)
+        /// <param name="input">String with timespan representation (in cron tab format: https://github.com/atifaziz/NCrontab/wiki/Crontab-Expression)</param>
+        /// <returns>True if string matches a valid cron expression, false if not.</returns>
+        /// <remarks>
+        /// Considering an expression as valid if it's supported by https://github.com/atifaziz/NCrontab/wiki/Crontab-Expression,
+        /// so only 5 or 6 values are expected.
+        /// </remarks>
+        public static bool IsValidCronTab(this string input)
         {
             if (string.IsNullOrEmpty(input))
             {
                 return false;
             }
 
-            return TimeSpan.TryParse(input, out var _);
+            var parts = input.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+            return parts.Length == 5 || parts.Length == 6;
         }
     }
 }
