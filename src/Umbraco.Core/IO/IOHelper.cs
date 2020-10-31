@@ -224,6 +224,7 @@ namespace Umbraco.Core.IO
             }
 
             var files = folder.GetFiles("*.*", SearchOption.AllDirectories);
+            var errors = new List<CleanFolderResult.Error>();
             foreach (var file in files)
             {
                 if (DateTime.UtcNow - file.LastWriteTimeUtc > age)
@@ -235,13 +236,14 @@ namespace Umbraco.Core.IO
                     }
                     catch (Exception ex)
                     {
-                        return CleanFolderResult.FailedWithException(ex, file);
+                        errors.Add(new CleanFolderResult.Error(ex, file));
                     }
                 }
             }
 
-            return CleanFolderResult.Success();
+            return errors.Any()
+                ? CleanFolderResult.FailedWithErrors(errors)
+                : CleanFolderResult.Success();
         }
-
     }
 }

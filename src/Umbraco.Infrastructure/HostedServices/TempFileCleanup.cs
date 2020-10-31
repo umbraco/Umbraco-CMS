@@ -56,7 +56,11 @@ namespace Umbraco.Infrastructure.HostedServices
                     _logger.LogDebug("The cleanup folder doesn't exist {Folder}", folder.FullName);
                     break;
                 case CleanFolderResultStatus.FailedWithException:
-                    _logger.LogError(result.Exception, "Could not delete temp file {FileName}", result.ErroringFile.FullName);
+                    foreach (var error in result.Errors)
+                    {
+                        _logger.LogError(error.Exception, "Could not delete temp file {FileName}", error.ErroringFile.FullName);
+                    }
+
                     break;
             }
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace Umbraco.Core.IO
@@ -16,11 +17,9 @@ namespace Umbraco.Core.IO
         {
         }
 
-        public CleanFolderResultStatus Status { get; set; }
+        public CleanFolderResultStatus Status { get; private set; }
 
-        public Exception Exception { get; set; }
-
-        public FileInfo ErroringFile { get; set; }
+        public IReadOnlyCollection<Error> Errors { get; private set; }
 
         public static CleanFolderResult Success()
         {
@@ -32,14 +31,26 @@ namespace Umbraco.Core.IO
             return new CleanFolderResult { Status = CleanFolderResultStatus.FailedAsDoesNotExist };
         }
 
-        public static CleanFolderResult FailedWithException(Exception exception, FileInfo erroringFile)
+        public static CleanFolderResult FailedWithErrors(List<Error> errors)
         {
             return new CleanFolderResult
             {
                 Status = CleanFolderResultStatus.FailedWithException,
-                Exception = exception,
-                ErroringFile = erroringFile,
+                Errors = errors.AsReadOnly(),
             };
+        }
+
+        public class Error
+        {
+            public Error(Exception exception, FileInfo erroringFile)
+            {
+                Exception = exception;
+                ErroringFile = erroringFile;
+            }
+
+            public Exception Exception { get; set; }
+
+            public FileInfo ErroringFile { get; set; }
         }
     }
 }
