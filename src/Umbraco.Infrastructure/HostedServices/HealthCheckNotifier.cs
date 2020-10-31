@@ -52,7 +52,6 @@ namespace Umbraco.Infrastructure.HostedServices
             _logger = logger;
             _profilingLogger = profilingLogger;
         }
-
        
         public override async void ExecuteAsync(object state)
         {
