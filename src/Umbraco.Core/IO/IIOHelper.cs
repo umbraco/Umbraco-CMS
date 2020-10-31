@@ -1,4 +1,7 @@
+using System;
 using System.Collections.Generic;
+using System.IO;
+using Umbraco.Core.Hosting;
 
 namespace Umbraco.Core.IO
 {
@@ -52,6 +55,20 @@ namespace Umbraco.Core.IO
         /// <param name="path"></param>
         /// <returns></returns>
         string GetRelativePath(string path);
+
+        /// <summary>
+        /// Retrieves array of temporary folders from the hosting environment.
+        /// </summary>
+        /// <returns>Array of <see cref="DirectoryInfo"/> instances.</returns>
+        DirectoryInfo[] GetTempFolders();
+
+        /// <summary>
+        /// Cleans contents of a folder.
+        /// </summary>
+        /// <param name="folder">Folder to clean.</param>
+        /// <param name="age">Age of files within folder to delete.</param>
+        /// <returns>Result of operation</returns>
+        CleanFolderResult CleanFolder(DirectoryInfo folder, TimeSpan age);
 
     }
 }

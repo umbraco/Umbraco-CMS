@@ -188,5 +188,60 @@ namespace Umbraco.Core.IO
             return PathUtility.EnsurePathIsApplicationRootPrefixed(path);
         }
 
+        /// <summary>
+        /// Retrieves array of temporary folders from the hosting environment.
+        /// </summary>
+        /// <returns>Array of <see cref="DirectoryInfo"/> instances.</returns>
+        public DirectoryInfo[] GetTempFolders()
+        {
+            var tempFolderPaths = new[]
+            {
+                _hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempFileUploads)
+            };
+
+            foreach (var tempFolderPath in tempFolderPaths)
+            {
+                // Ensure it exists
+                Directory.CreateDirectory(tempFolderPath);
+            }
+
+            return tempFolderPaths.Select(x => new DirectoryInfo(x)).ToArray();
+        }
+
+        /// <summary>
+        /// Cleans contents of a folder.
+        /// </summary>
+        /// <param name="folder">Folder to clean.</param>
+        /// <param name="age">Age of files within folder to delete.</param>
+        /// <returns>Result of operation</returns>
+        public CleanFolderResult CleanFolder(DirectoryInfo folder, TimeSpan age)
+        {
+            folder.Refresh(); // In case it's changed during runtime.
+
+            if (!folder.Exists)
+            {
+                return CleanFolderResult.FailedAsDoesNotExist();
+            }
+
+            var files = folder.GetFiles("*.*", SearchOption.AllDirectories);
+            foreach (var file in files)
+            {
+                if (DateTime.UtcNow - file.LastWriteTimeUtc > age)
+                {
+                    try
+                    {
+                        file.IsReadOnly = false;
+                        file.Delete();
+                    }
+                    catch (Exception ex)
+                    {
+                        return CleanFolderResult.FailedWithException(ex, file);
+                    }
+                }
+            }
+
+            return CleanFolderResult.Success();
+        }
+
     }
 }

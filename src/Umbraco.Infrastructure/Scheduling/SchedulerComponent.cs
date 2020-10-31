@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -21,8 +18,6 @@ namespace Umbraco.Web.Scheduling
     {
         private const int DefaultDelayMilliseconds = 180000; // 3 mins
         private const int OneMinuteMilliseconds = 60000;
-        private const int FiveMinuteMilliseconds = 300000;
-        private const int OneHourMilliseconds = 3600000;
 
         private readonly IRuntimeState _runtime;
         private readonly IMainDom _mainDom;
@@ -43,7 +38,6 @@ namespace Umbraco.Web.Scheduling
 
         private BackgroundTaskRunner<IBackgroundTask> _publishingRunner;
         private BackgroundTaskRunner<IBackgroundTask> _scrubberRunner;
-        private BackgroundTaskRunner<IBackgroundTask> _fileCleanupRunner;
 
         private bool _started;
         private object _locker = new object();
@@ -82,7 +76,6 @@ namespace Umbraco.Web.Scheduling
             // backgrounds runners are web aware, if the app domain dies, these tasks will wind down correctly
             _publishingRunner = new BackgroundTaskRunner<IBackgroundTask>("ScheduledPublishing", logger, _applicationShutdownRegistry);
             _scrubberRunner = new BackgroundTaskRunner<IBackgroundTask>("LogScrubber", logger, _applicationShutdownRegistry);
-            _fileCleanupRunner = new BackgroundTaskRunner<IBackgroundTask>("TempFileCleanup", logger, _applicationShutdownRegistry);
 
             // we will start the whole process when a successful request is made
             _requestAccessor.RouteAttempt += RegisterBackgroundTasksOnce;
@@ -115,7 +108,6 @@ namespace Umbraco.Web.Scheduling
 
                 tasks.Add(RegisterScheduledPublishing());
                 tasks.Add(RegisterLogScrubber(_loggingSettings));
-                tasks.Add(RegisterTempFileCleanup());
 
                 return tasks.ToArray();
             });
@@ -135,30 +127,6 @@ namespace Umbraco.Web.Scheduling
             // log scrubbing
             // install on all, will only run on non-replica servers
             var task = new LogScrubber(_scrubberRunner, DefaultDelayMilliseconds, LogScrubber.GetLogScrubbingInterval(), _mainDom, _serverRegistrar, _auditService, Options.Create(settings), _scopeProvider, _profilingLogger, _loggerFactory.CreateLogger<LogScrubber>());
-            _scrubberRunner.TryAdd(task);
-            return task;
-        }
-
-        private IBackgroundTask RegisterTempFileCleanup()
-        {
-
-            var tempFolderPaths = new[]
-            {
-                _hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempFileUploads)
-            };
-
-            foreach (var tempFolderPath in tempFolderPaths)
-            {
-                //ensure it exists
-                Directory.CreateDirectory(tempFolderPath);
-            }
-
-            // temp file cleanup, will run on all servers - even though file upload should only be handled on the master, this will
-            // ensure that in the case it happes on replicas that they are cleaned up.
-            var task = new TempFileCleanup(_fileCleanupRunner, DefaultDelayMilliseconds, OneHourMilliseconds,
-                tempFolderPaths.Select(x=>new DirectoryInfo(x)),
-                TimeSpan.FromDays(1), //files that are over a day old
-                _mainDom, _profilingLogger, _loggerFactory.CreateLogger<TempFileCleanup>());
             _scrubberRunner.TryAdd(task);
             return task;
         }
