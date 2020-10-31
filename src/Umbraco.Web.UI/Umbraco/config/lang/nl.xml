@@ -203,7 +203,7 @@
     <key alias="docTypeChanged">Documenttype gewijzigd</key>
     <key alias="mapProperties">Eigenschappen toewijzen</key>
     <key alias="mapToProperty">Toewijzen aan eigenschap</key>
-    <key alias="newTemplate">Nieuwe template</key>
+    <key alias="newTemplate">Nieuw sjabloon</key>
     <key alias="newType">Nieuw type</key>
     <key alias="none">geen</key>
     <key alias="selectedContent">Inhoud</key>
@@ -369,15 +369,15 @@
     <key alias="enterFolderName">Voer een mapnaam in</key>
     <key alias="updateData">Kies een type en een titel</key>
     <key alias="noDocumentTypes" version="7.0"><![CDATA[Er zijn geen toegestane ​​documenttypes beschikbaar. Schakel deze in in de sectie Instellingen onder <strong>"Documenttypes"</ strong>.]]></key>
-    <key alias="noDocumentTypesAtRoot"><![CDATA[Er zijn geen document types beschikbaar om hier aan te maken. Je moet deze aanmaken bij <strong>Document Types</strong> in de sectie <strong>Instellingen</strong>.]]></key>
+    <key alias="noDocumentTypesAtRoot"><![CDATA[Er zijn geen documenttypes beschikbaar om hier aan te maken. Je moet deze aanmaken bij <strong>Documenttypes</strong> in de sectie <strong>Instellingen</strong>.]]></key>
     <key alias="noDocumentTypesWithNoSettingsAccess">De geselecteerde pagina in de boomstructuur laat geen nieuwe onderliggende paginas toe.</key>
-    <key alias="noDocumentTypesEditPermissions">Rechten aanpassen voor dit document type</key>
-    <key alias="noDocumentTypesCreateNew">Nieuw document type aanmaken</key>
-    <key alias="noDocumentTypesAllowedAtRoot"><![CDATA[Er zijn geen toegestane ​​documenttypes beschikbaar om hier aan te maken. Je moet deze inschakelen bij <strong>Document Types</strong> in de sectie <strong>Instellingen</strong>, de optie <strong>Toestaan op root-niveau</strong> onder <strong>Rechten</strong>.]]></key>
+    <key alias="noDocumentTypesEditPermissions">Rechten aanpassen voor dit documenttype</key>
+    <key alias="noDocumentTypesCreateNew">Nieuw documenttype aanmaken</key>
+    <key alias="noDocumentTypesAllowedAtRoot"><![CDATA[Er zijn geen toegestane ​​documenttypes beschikbaar om hier aan te maken. Je moet deze inschakelen bij <strong>Documenttypes</strong> in de sectie <strong>Instellingen</strong>, de optie <strong>Toestaan op root-niveau</strong> onder <strong>Rechten</strong>.]]></key>
     <key alias="noMediaTypes" version="7.0"><![CDATA[Er zijn geen toegestande mediatypes beschikbaar. Schakel deze in in de sectie Instellingen onder <strong>"Mediatypes"</strong>.]]></key>
     <key alias="noMediaTypesWithNoSettingsAccess">De geselecteerde media in de boomstructuur laat niet toe dat er onderliggende media aangemaakt wordt.</key>
     <key alias="noMediaTypesEditPermissions">Rechten aanpassen voor dit mediatype</key>
-    <key alias="documentTypeWithoutTemplate">Document Type zonder template</key>
+    <key alias="documentTypeWithoutTemplate">Documenttype zonder sjabloon</key>
     <key alias="newFolder">Nieuwe map</key>
     <key alias="newDataType">Nieuw datatype</key>
     <key alias="newJavascriptFile">Nieuw JavaScript bestand</key>
@@ -402,11 +402,11 @@
     <key alias="stay">Blijf op deze pagina</key>
     <key alias="discardChanges">Negeer wijzigingen</key>
     <key alias="unsavedChanges">Wijzigingen niet opgeslagen</key>
-    <key alias="unsavedChangesWarning">Weet je zeker dat deze pagina wilt verlaten? - er zijn onopgeslagen wijzigingen</key>
+    <key alias="unsavedChangesWarning">Weet je zeker dat deze pagina wilt verlaten? Er zijn onopgeslagen wijzigingen</key>
     <key alias="confirmListViewPublish">Publiceren maakt de geselecteerde items zichtbaar op de site.</key>
     <key alias="confirmListViewUnpublish">Depubliceren zal de geselecteerde items en alle onderliggende items verwijderen van de site.</key>
     <key alias="confirmUnpublish">Depubliceren zal deze pagina en alle onderliggende pagina's verwijderen van de site.</key>
-    <key alias="doctypeChangeWarning">Wijzigingen niet opgeslagen. Aanpassingen aan het Document Type zullen de wijzigingen ongedaan maken.</key>
+    <key alias="doctypeChangeWarning">Wijzigingen niet opgeslagen. Aanpassingen aan het Documenttype zullen de wijzigingen ongedaan maken.</key>
   </area>
   <area alias="bulk">
     <key alias="done">Done</key>
@@ -478,7 +478,7 @@
     <key alias="requiredField">Verplicht veld</key>
     <key alias="sitereindexed">Site is opnieuw geïndexeerd</key>
     <key alias="siterepublished">De site is opnieuw gepubliceerd</key>
-    <key alias="siterepublishHelp">De cache zal worden vernieuwd. Alle gepubliceerde inhoud zal worden ge-update, terwijl ongepubliceerde inhoud ongepubliceerd zal blijven.</key>
+    <key alias="siterepublishHelp">De cache zal worden vernieuwd. Alle gepubliceerde inhoud zal worden bijgewerkt, terwijl ongepubliceerde inhoud ongepubliceerd zal blijven.</key>
     <key alias="tableColumns">Aantal kolommen</key>
     <key alias="tableRows">Aantal regels</key>
     <key alias="thumbnailimageclickfororiginal">Klik op de afbeelding voor volledige grootte</key>
@@ -1105,8 +1105,8 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
   </area>
   <area alias="publicAccess">
     <key alias="paGroups">Groepsgebaseerde beveiliging</key>
-    <key alias="paGroupsHelp">Als u toegang wilt verlenen aan alle leden van specifieke ledengroepen</key>
-    <key alias="paGroupsNoGroups">U moet een ledengroep maken voordat u op groep gebaseerde authenticatie kunt gebruiken</key>
+    <key alias="paGroupsHelp">Als je toegang wilt verlenen aan alle leden van specifieke ledengroepen</key>
+    <key alias="paGroupsNoGroups">Je moet een ledengroep maken voordat je op groep gebaseerde authenticatie kunt gebruiken</key>
     <key alias="paErrorPage">Foutpagina</key>
     <key alias="paErrorPageHelp">Gebruikt om te tonen als een gebruiker is ingelogd, maar geen rechten heeft om de pagina te bekijken</key>
     <key alias="paHowWould"><![CDATA[Hoe wil je de pagina <strong>%0%</strong> beveiligen?]]></key>
@@ -1115,12 +1115,12 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="paLoginPage">Login Pagina</key>
     <key alias="paLoginPageHelp">Kies de pagina met het login-formulier</key>
     <key alias="paRemoveProtection">Beveiliging verwijderen</key>
-    <key alias="paRemoveProtectionConfirm"><![CDATA[Weet u zeker dat u de bescherming van de pagina <strong>%0%</strong> wilt verwijderen?]]></key>
+    <key alias="paRemoveProtectionConfirm"><![CDATA[Weet je zeker dat je de bescherming van de pagina <strong>%0%</strong> wilt verwijderen?]]></key>
     <key alias="paSelectPages">Kies de pagina's die het login-formulier en de error-berichten bevatten</key>
       <key alias="paSelectGroups"><![CDATA[Selecteer de groepen die toegang hebben tot de pagina <strong>%0%</strong>]]></key>
       <key alias="paSelectMembers"><![CDATA[Selecteer de leden die toegang hebben tot de pagina <strong>%0%</strong>]]></key>
     <key alias="paMembers">Specifieke bescherming voor leden</key>
-    <key alias="paMembersHelp">Als u toegang wilt verlenen aan bepaalde leden</key>
+    <key alias="paMembersHelp">Als je toegang wilt verlenen aan bepaalde leden</key>
   </area>
   <area alias="publish">
     <key alias="invalidPublishBranchPermissions">Onvoldoende gebruikersmachtigingen om alle onderliggende documenten te publiceren</key>
@@ -1238,7 +1238,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="sortOrder">Sorteer volgorde</key>
     <key alias="sortCreationDate">Aanmaakdatum</key>
     <key alias="sortDone">Sorteren gereed.</key>
-    <key alias="sortHelp">Sleep de pagina's omhoog of omlaag om de volgorde te veranderen. Of klik op de kolom-header om alle pagina's daarop te sorteren.</key>
+    <key alias="sortHelp">Sleep de pagina's omhoog of omlaag om de volgorde te veranderen. Of klik op de kolomkop om alle pagina's daarop te sorteren.</key>
     <key alias="sortPleaseWait"><![CDATA[Een ogenblik geduld. Paginas worden gesorteerd, dit kan even duren.]]></key>
     <key alias="sortEmptyState">Dit item heeft geen subitems om te sorteren</key>
   </area>
@@ -1484,19 +1484,19 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="compositions">Composities</key>
     <key alias="group">Groep</key>
     <key alias="noGroups">Er zijn nog geen groepen toegevoegd</key>
-    <key alias="addGroup">Voeg groep toe</key>
+    <key alias="addGroup">Groep toevoegen</key>
     <key alias="inheritedFrom">Inherited van</key>
     <key alias="addProperty">Eigenschap toevoegen</key>
     <key alias="requiredLabel">Verplicht label</key>
-    <key alias="enableListViewHeading">Zet list view aan</key>
-    <key alias="enableListViewDescription">Laat de child nodes van het content item zien als een sorteer- en doorzoekbare lijstweergave zien. Deze child nodes worden dan niet in de boomstructuur getoond.</key>
-    <key alias="allowedTemplatesHeading">Toegestane Templates</key>
-    <key alias="allowedTemplatesDescription">Kies welke templates toegestaan zijn om door de editors op dit content-type gebruikt te worden</key>
-    <key alias="allowAsRootHeading">Sta toe op root-niveau</key>
-    <key alias="allowAsRootDescription">Sta editors toe om content van dit type aan te maken op root-niveau</key>
-    <key alias="childNodesHeading">Toegestane child node types</key>
-    <key alias="childNodesDescription">Sta content van een bepaald type toe om onder dit type aangemaakt te kunnen worden</key>
-    <key alias="chooseChildNode">Kies child node</key>
+    <key alias="enableListViewHeading">Lijstweergave inschakelen</key>
+    <key alias="enableListViewDescription">Laat de onderliggende nodes van het content item zien als een sorteer- en doorzoekbare lijstweergave. Deze onderliggende nodes worden dan niet in de boomstructuur getoond.</key>
+    <key alias="allowedTemplatesHeading">Toegestane Sjablonen</key>
+    <key alias="allowedTemplatesDescription">Kies welke sjablonen toegestaan zijn om door de editors op dit contenttype gebruikt te worden</key>
+    <key alias="allowAsRootHeading">Sta toe op hoofdniveau</key>
+    <key alias="allowAsRootDescription">Sta editors toe om inhoud van dit type aan te maken op hoofdniveau</key>
+    <key alias="childNodesHeading">Toegestane onderliggende node types</key>
+    <key alias="childNodesDescription">Sta inhoud van een bepaald type toe om onder dit type aangemaakt te kunnen worden</key>
+    <key alias="chooseChildNode">Kies onderliggende node</key>
     <key alias="compositionsDescription">Overgeërfde tabs en properties van een bestaand documenttype. Nieuwe tabs worden toegevoegd aan het huidige documenttype of samengevoegd als een tab met dezelfde naam al bestaat.</key>
     <key alias="compositionInUse">Dit contenttype wordt gebruikt in een compositie en kan daarom niet zelf een compositie worden.</key>
     <key alias="noAvailableCompositions">Er zijn geen contenttypen beschikbaar om als compositie te gebruiken.</key>
@@ -1517,8 +1517,8 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="allDocuments">Alle documenten</key>
     <key alias="allMediaItems">Alle media items</key>
     <key alias="usingThisDocument">die gebruik maken van dit documenttype zullen permanent verwijderd worden. Bevestig aub dat je deze ook wilt verwijderen.</key>
-    <key alias="usingThisMedia">die gebruik maken van dit media type zullen permanent verwijderd worden. Bevestig aub dat je deze ook wilt verwijderen.</key>
-    <key alias="usingThisMember">die gebruik maken van dit member type zullen permanent verwijderd worden. Bevestig aub dat je deze ook wilt verwijderen.</key>
+    <key alias="usingThisMedia">die gebruik maken van dit mediatype zullen permanent verwijderd worden. Bevestig aub dat je deze ook wilt verwijderen.</key>
+    <key alias="usingThisMember">die gebruik maken van dit lidtype zullen permanent verwijderd worden. Bevestig aub dat je deze ook wilt verwijderen.</key>
     <key alias="andAllDocuments">en alle documenten van dit type</key>
     <key alias="andAllMediaItems">en alle media items van dit type</key>
     <key alias="andAllMembers">en alle leden van dit type</key>
@@ -1667,7 +1667,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="memberGroups">Ledengroepen</key>
     <key alias="memberRoles">Rollen</key>
     <key alias="memberTypes">Ledentypes</key>
-    <key alias="documentTypes">Documenttypen</key>
+    <key alias="documentTypes">Documenttypes</key>
     <key alias="relationTypes">RelatieTypen</key>
     <key alias="packager">Packages</key>
     <key alias="packages">Packages</key>
@@ -1757,10 +1757,10 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="selectUserGroups">Selecteer een gebruikersgroep</key>
     <key alias="noStartNode">Geen startnode geselecteerd</key>
     <key alias="noStartNodes">Geen startnodes geselecteerd</key>
-    <key alias="startnode">Startnode in Content</key>
+    <key alias="startnode">Startnode in Inhoud</key>
     <key alias="startnodehelp">Beperk de content toegang tot een specifieke startnode</key>
-    <key alias="startnodes">Startnodes in Content</key>
-    <key alias="startnodeshelp">Beperk de content toegang tot specifieke startnodes</key>
+    <key alias="startnodes">Startnodes in Inhoud</key>
+    <key alias="startnodeshelp">Beperk de Inhoud tot specifieke startnodes</key>
     <key alias="updateDate">Laatste keer bijgewerkt</key>
     <key alias="userCreated">is aangemaakt</key>
     <key alias="userCreatedSuccessHelp">De gebruiker is aangemaakt. Om in te loggen in Umbraco gebruik je onderstaand wachtwoord.</key>
