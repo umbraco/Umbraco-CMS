@@ -61,28 +61,9 @@ namespace Umbraco.Infrastructure.HostedServices
             using (var scope = _scopeProvider.CreateScope())
             using (_profilingLogger.DebugDuration<LogScrubber>("Log scrubbing executing", "Log scrubbing complete"))
             {
-                _auditService.CleanLogs(GetLogScrubbingMaximumAgeInMinutes(_settings));
+                _auditService.CleanLogs((int)_settings.MaxLogAge.TotalMinutes);
                 scope.Complete();
             }
-        }
-
-        private int GetLogScrubbingMaximumAgeInMinutes(LoggingSettings settings)
-        {
-            var maximumAge = 24 * 60; // 24 hours, in minutes
-            try
-            {
-                if (settings.MaxLogAge > -1)
-                {
-                    maximumAge = settings.MaxLogAge;
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Unable to locate a log scrubbing maximum age. Defaulting to 24 hours.");
-            }
-
-            return maximumAge;
-
         }
     }
 }

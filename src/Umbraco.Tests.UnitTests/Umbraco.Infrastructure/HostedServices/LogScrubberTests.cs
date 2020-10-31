@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
@@ -44,7 +45,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
         }
 
         [Test]
-        public void Executes_And_Srubs_Logs()
+        public void Executes_And_Scrubs_Logs()
         {
             var sut = CreateLogScrubber();
             sut.ExecuteAsync(null);
@@ -57,7 +58,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
         {
             var settings = new LoggingSettings
             {
-                MaxLogAge = _maxLogAgeInMinutes,
+                MaxLogAge = TimeSpan.FromMinutes(_maxLogAgeInMinutes),
             };
 
             var mockServerRegistrar = new Mock<IServerRegistrar>();
