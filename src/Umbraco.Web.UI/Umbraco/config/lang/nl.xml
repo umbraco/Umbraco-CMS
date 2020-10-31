@@ -1399,7 +1399,9 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="sectionName">Sectienaam</key>
     <key alias="sectionMandatory">Sectie is verplicht</key>
     <key alias="sectionMandatoryDesc">
+    <![CDATA[
         Indien verplicht, moet het onderliggend sjabloon <code>@section</code> definiëren, anders wordt een fout getoond.
+    ]]>
     </key>
     <key alias="queryBuilder">Querybouwer</key>
     <key alias="itemsReturned">items gevonden, in</key>
