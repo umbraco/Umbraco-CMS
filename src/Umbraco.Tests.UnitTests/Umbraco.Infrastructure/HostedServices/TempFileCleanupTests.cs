@@ -38,7 +38,10 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
             mockMainDom.SetupGet(x => x.IsMainDom).Returns(isMainDom);
 
             _mockIOHelper = new Mock<IIOHelper>();
-            _mockIOHelper.Setup(x => x.GetTempFolders()).Returns(new DirectoryInfo[] { new DirectoryInfo(_testPath) });
+            _mockIOHelper.Setup(x => x.GetTempFolders())
+                .Returns(new DirectoryInfo[] { new DirectoryInfo(_testPath) });
+            _mockIOHelper.Setup(x => x.CleanFolder(It.IsAny<DirectoryInfo>(), It.IsAny<TimeSpan>()))
+                .Returns(CleanFolderResult.Success());
 
             var mockLogger = new Mock<ILogger<TempFileCleanup>>();
             var mockProfilingLogger = new Mock<IProfilingLogger>();
