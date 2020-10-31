@@ -14,7 +14,7 @@
     <div ng-show="!vm.item.badge" class="badge -type-alert --error-badge">!</div>
 </button>
 
-<umb-dropdown on-close="vm.close()" umb-keyboard-list class="umb-sub-views-nav-item__anchor_dropdown" ng-class="{'is-expanded': vm.expanded}" ng-if="vm.item.anchors && vm.item.anchors.length > 1">
+<umb-dropdown on-close="vm.close()" deep-blur="vm.close()" umb-keyboard-list class="umb-sub-views-nav-item__anchor_dropdown" ng-class="{'is-expanded': vm.expanded}" ng-if="vm.item.anchors && vm.item.anchors.length > 1">
     <umb-dropdown-item ng-repeat="anchor in vm.item.anchors" ng-class="{'is-active': vm.item.active && anchor.active}">
         <a href="#group-{{anchor.id}}" ng-click="vm.anchorClicked(anchor, $event)" prevent-default>
             <span class="sr-only"><localize key="visuallyHiddenTexts_jumpTo">Jump to</localize></span> {{anchor.label}} <span class="sr-only"><localize key="visuallyHiddenTexts_group"> group</localize></span>
