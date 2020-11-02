@@ -42,7 +42,6 @@ namespace Umbraco.Tests.Integration.Testing
         {
             base.Compose(composition);
 
-            composition.Components().Remove<SchedulerComponent>();
             composition.Components().Remove<DatabaseServerRegistrarAndMessengerComponent>();
             composition.Services.AddUnique<BackgroundIndexRebuilder, TestBackgroundIndexRebuilder>();
             composition.Services.AddUnique<IRuntimeMinifier>(factory => Mock.Of<IRuntimeMinifier>());
