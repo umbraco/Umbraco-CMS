@@ -128,8 +128,12 @@
                             style: "primary",
                             labelKey: "blockEditor_labelcreateNewElementType",
                             action: function () {
-                                editorService.close();
-                                vm.createElementTypeAndCallback(vm.addBlockFromElementTypeKey);
+                                vm.createElementTypeAndCallback((documentTypeKey) => {
+                                    vm.addBlockFromElementTypeKey(documentTypeKey);
+
+                                    // At this point we will close the contentTypePicker.
+                                    editorService.close();
+                                });
                             }
                         }
                     ]
@@ -144,6 +148,7 @@
                 create: true,
                 infiniteMode: true,
                 isElement: true,
+                noTemplate: true,
                 submit: function (model) {
                     loadElementTypes().then( function () {
                         callback(model.documentTypeKey);
