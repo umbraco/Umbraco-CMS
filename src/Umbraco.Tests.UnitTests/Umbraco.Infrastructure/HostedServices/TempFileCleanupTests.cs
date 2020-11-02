@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
@@ -17,18 +18,18 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
         private string _testPath = @"c:\test\temp\path";
 
         [Test]
-        public void Does_Not_Execute_When_Not_Main_Dom()
+        public async Task Does_Not_Execute_When_Not_Main_Dom()
         {
             var sut = CreateTempFileCleanup(isMainDom: false);
-            sut.ExecuteAsync(null);
+            await sut.PerformExecuteAsync(null);
             VerifyFilesNotCleaned();
         }
 
         [Test]
-        public void Executes_And_Cleans_Files()
+        public async Task Executes_And_Cleans_Files()
         {
             var sut = CreateTempFileCleanup();
-            sut.ExecuteAsync(null);
+            await sut.PerformExecuteAsync(null);
             VerifyFilesCleaned();
         }
 

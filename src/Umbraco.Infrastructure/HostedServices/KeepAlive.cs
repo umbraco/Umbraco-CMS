@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net.Http;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Core;
@@ -35,7 +36,7 @@ namespace Umbraco.Infrastructure.HostedServices
             _httpClientFactory = httpClientFactory;
         }
 
-        public override async void ExecuteAsync(object state)
+        internal override async Task PerformExecuteAsync(object state)
         {
             if (_keepAliveSettings.DisableKeepAliveTask)
             {
@@ -50,7 +51,7 @@ namespace Umbraco.Infrastructure.HostedServices
                     return;
                 case ServerRole.Unknown:
                     _logger.LogDebug("Does not run on servers with unknown role.");
-                    return; 
+                    return;
             }
 
             // Ensure we do not run if not main domain, but do NOT lock it

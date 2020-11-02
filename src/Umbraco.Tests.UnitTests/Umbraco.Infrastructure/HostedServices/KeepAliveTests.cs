@@ -26,42 +26,42 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
         private const string _applicationUrl = "https://mysite.com";
 
         [Test]
-        public void Does_Not_Execute_When_Not_Enabled()
+        public async Task Does_Not_Execute_When_Not_Enabled()
         {
             var sut = CreateKeepAlive(enabled: false);
-            sut.ExecuteAsync(null);
+            await sut.PerformExecuteAsync(null);
             VerifyKeepAliveRequestNotSent();
         }
 
         [Test]
-        public void Does_Not_Execute_When_Server_Role_Is_Replica()
+        public async Task Does_Not_Execute_When_Server_Role_Is_Replica()
         {
             var sut = CreateKeepAlive(serverRole: ServerRole.Replica);
-            sut.ExecuteAsync(null);
+            await sut.PerformExecuteAsync(null);
             VerifyKeepAliveRequestNotSent();
         }
 
         [Test]
-        public void Does_Not_Execute_When_Server_Role_Is_Unknown()
+        public async Task Does_Not_Execute_When_Server_Role_Is_Unknown()
         {
             var sut = CreateKeepAlive(serverRole: ServerRole.Unknown);
-            sut.ExecuteAsync(null);
+            await sut.PerformExecuteAsync(null);
             VerifyKeepAliveRequestNotSent();
         }
 
         [Test]
-        public void Does_Not_Execute_When_Not_Main_Dom()
+        public async Task Does_Not_Execute_When_Not_Main_Dom()
         {
             var sut = CreateKeepAlive(isMainDom: false);
-            sut.ExecuteAsync(null);
+            await sut.PerformExecuteAsync(null);
             VerifyKeepAliveRequestNotSent();
         }
 
         [Test]
-        public void Executes_And_Calls_Ping_Url()
+        public async Task Executes_And_Calls_Ping_Url()
         {
             var sut = CreateKeepAlive();
-            sut.ExecuteAsync(null);
+            await sut.PerformExecuteAsync(null);
             VerifyKeepAliveRequestSent();
         }
 

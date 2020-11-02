@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Data;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
+using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
@@ -21,34 +24,34 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
         const int _maxLogAgeInMinutes = 60;
 
         [Test]
-        public void Does_Not_Execute_When_Server_Role_Is_Replica()
+        public async Task Does_Not_Execute_When_Server_Role_Is_Replica()
         {
             var sut = CreateLogScrubber(serverRole: ServerRole.Replica);
-            sut.ExecuteAsync(null);
+            await sut.PerformExecuteAsync(null);
             VerifyLogsNotScrubbed();
         }
 
         [Test]
-        public void Does_Not_Execute_When_Server_Role_Is_Unknown()
+        public async Task Does_Not_Execute_When_Server_Role_Is_Unknown()
         {
             var sut = CreateLogScrubber(serverRole: ServerRole.Unknown);
-            sut.ExecuteAsync(null);
+            await sut.PerformExecuteAsync(null);
             VerifyLogsNotScrubbed();
         }
 
         [Test]
-        public void Does_Not_Execute_When_Not_Main_Dom()
+        public async Task Does_Not_Execute_When_Not_Main_Dom()
         {
             var sut = CreateLogScrubber(isMainDom: false);
-            sut.ExecuteAsync(null);
+            await sut.PerformExecuteAsync(null);
             VerifyLogsNotScrubbed();
         }
 
         [Test]
-        public void Executes_And_Scrubs_Logs()
+        public async Task Executes_And_Scrubs_Logs()
         {
             var sut = CreateLogScrubber();
-            sut.ExecuteAsync(null);
+            await sut.PerformExecuteAsync(null);
             VerifyLogsScrubbed();
         }
 
@@ -67,7 +70,11 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
             var mockMainDom = new Mock<IMainDom>();
             mockMainDom.SetupGet(x => x.IsMainDom).Returns(isMainDom);
 
+            var mockScope = new Mock<IScope>();
             var mockScopeProvider = new Mock<IScopeProvider>();
+            mockScopeProvider
+                .Setup(x => x.CreateScope(It.IsAny<IsolationLevel>(), It.IsAny<RepositoryCacheMode>(), It.IsAny<IEventDispatcher>(), It.IsAny<bool?>(), It.IsAny<bool>(), It.IsAny<bool>()))
+                .Returns(mockScope.Object);
             var mockLogger = new Mock<ILogger<LogScrubber>>();
             var mockProfilingLogger = new Mock<IProfilingLogger>();
 

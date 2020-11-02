@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.IO;
@@ -32,7 +33,7 @@ namespace Umbraco.Infrastructure.HostedServices
             _tempFolders = _ioHelper.GetTempFolders();
         }
 
-        public override async void ExecuteAsync(object state)
+        internal override async Task PerformExecuteAsync(object state)
         {
             // Ensure we do not run if not main domain
             if (_mainDom.IsMainDom == false)
@@ -45,6 +46,8 @@ namespace Umbraco.Infrastructure.HostedServices
             {
                 CleanupFolder(folder);
             }
+
+            return;
         }
 
         private void CleanupFolder(DirectoryInfo folder)

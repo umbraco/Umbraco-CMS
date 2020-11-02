@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Core;
@@ -38,7 +39,7 @@ namespace Umbraco.Infrastructure.HostedServices
             _profilingLogger = profilingLogger;
         }
 
-        public override async void ExecuteAsync(object state)
+        internal override async Task PerformExecuteAsync(object state)
         {
             switch (_serverRegistrar.GetCurrentServerRole())
             {
