@@ -31,7 +31,16 @@ namespace Umbraco.Infrastructure.HostedServices
             return Task.CompletedTask;
         }
 
-        public abstract void ExecuteAsync(object state);
+        public async void ExecuteAsync(object state)
+        {
+            // Delegate work to method returning a task, that can be called and asserted in a unit test.
+            // Without this there can be behaviour where tests pass, but an error within them causes the test
+            // running process to crash.
+            // Hat-tip: https://stackoverflow.com/a/14207615/489433
+            await PerformExecuteAsync(state);
+        }
+
+        internal abstract Task PerformExecuteAsync(object state);
 
         public Task StopAsync(CancellationToken cancellationToken)
         {

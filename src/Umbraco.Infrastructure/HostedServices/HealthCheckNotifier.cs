@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Core;
@@ -52,9 +53,8 @@ namespace Umbraco.Infrastructure.HostedServices
             _logger = logger;
             _profilingLogger = profilingLogger;
         }
-
        
-        public override async void ExecuteAsync(object state)
+        internal override async Task PerformExecuteAsync(object state)
         {
             if (_healthChecksSettings.Notification.Enabled == false)
             {
