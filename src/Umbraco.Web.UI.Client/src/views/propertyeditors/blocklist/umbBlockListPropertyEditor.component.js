@@ -535,7 +535,7 @@
                 }
             );
 
-            // remove dublicate aliases
+            // remove duplicate aliases
             aliases = aliases.filter((item, index) => aliases.indexOf(item) === index);
 
             var contentNodeName = "?";
