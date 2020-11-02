@@ -55,7 +55,7 @@ function clipboardService($window, notificationsService, eventsService, localSto
 
         /*
         // Concept for supporting Block that contains other Blocks.
-        // Missing clearifications:
+        // Missing clarifications:
         // How do we ensure that the inner blocks of a block is supported in the new scenario. Not that likely but still relevant, so conciderations should be made.
         if(block.references) {
             // A Block clipboard entry can contain other Block Clipboard Entries, here we will make sure to resolve those identical to the main entry.
@@ -479,4 +479,3 @@ function clipboardService($window, notificationsService, eventsService, localSto
 
 
 angular.module("umbraco.services").factory("clipboardService", clipboardService);
-
