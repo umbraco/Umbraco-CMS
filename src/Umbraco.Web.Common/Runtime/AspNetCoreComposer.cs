@@ -55,12 +55,10 @@ namespace Umbraco.Web.Common.Runtime
             composition.Services.AddUnique<IApplicationShutdownRegistry, AspNetCoreApplicationShutdownRegistry>();
 
             // The umbraco request lifetime
-            composition.Services.AddUnique<IUmbracoRequestLifetime, UmbracoRequestLifetime>();
-            composition.Services.AddUnique<IUmbracoRequestLifetimeManager, UmbracoRequestLifetime>();
+            composition.Services.AddUnique<IUmbracoRequestLifetime, IUmbracoRequestLifetimeManager, UmbracoRequestLifetime>();
 
-            //Password hasher
+            // Password hasher
             composition.Services.AddUnique<IPasswordHasher, AspNetCorePasswordHasher>();
-
 
             composition.Services.AddUnique<ICookieManager, AspNetCoreCookieManager>();
             composition.Services.AddTransient<IIpResolver, AspNetCoreIpResolver>();
@@ -75,7 +73,6 @@ namespace Umbraco.Web.Common.Runtime
 
             composition.Services.AddUnique<IMacroRenderer, MacroRenderer>();
             composition.Services.AddUnique<IMemberUserKeyProvider, MemberUserKeyProvider>();
-
 
             // register the umbraco context factory
             composition.Services.AddUnique<IUmbracoContextFactory, UmbracoContextFactory>();
