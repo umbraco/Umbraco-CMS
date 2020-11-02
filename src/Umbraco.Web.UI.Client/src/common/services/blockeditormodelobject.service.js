@@ -776,7 +776,7 @@
             },
             /**
              * @ngdoc method
-             * @name createFromRawData
+             * @name createFromBlockData
              * @methodOf umbraco.services.blockEditorModelObject
              * @description Insert data from raw models
              * @return {Object | null} Layout entry object, to be inserted at a decired location in the layout object. Or ´null´ if the given ElementType isnt supported by the block configuration.
