@@ -209,11 +209,12 @@ namespace Umbraco.Core.IO
         }
 
         /// <summary>
-        /// Cleans contents of a folder.
+        /// Cleans contents of a folder by deleting all files older that the provided age.
+        /// If deletition of any file errors (e.g. due to a file lock) the process will continue to try to delete all that it can.
         /// </summary>
         /// <param name="folder">Folder to clean.</param>
         /// <param name="age">Age of files within folder to delete.</param>
-        /// <returns>Result of operation</returns>
+        /// <returns>Result of operation.</returns>
         public CleanFolderResult CleanFolder(DirectoryInfo folder, TimeSpan age)
         {
             folder.Refresh(); // In case it's changed during runtime.
