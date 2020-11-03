@@ -2,9 +2,9 @@
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.Serialization;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Validation;
-using Umbraco.Core;
 
 namespace Umbraco.Web.Models.ContentEditing
 {

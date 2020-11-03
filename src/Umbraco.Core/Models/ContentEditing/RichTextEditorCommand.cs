@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
+﻿using System.Runtime.Serialization;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
@@ -18,7 +11,6 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "alias")]
         public string Alias { get; set; }
 
-        [JsonConverter(typeof(StringEnumConverter))]
         [DataMember(Name = "mode")]
         public RichTextEditorCommandMode Mode { get; set; }
     }

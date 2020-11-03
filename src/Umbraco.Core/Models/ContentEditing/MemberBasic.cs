@@ -1,5 +1,5 @@
-﻿using System.Runtime.Serialization;
-using Umbraco.Core.Models;
+﻿using System.Collections.Generic;
+using System.Runtime.Serialization;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
@@ -13,5 +13,12 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "email")]
         public string Email { get; set; }
+
+        [DataMember(Name = "properties")]
+        public override IEnumerable<ContentPropertyBasic> Properties
+        {
+            get => base.Properties;
+            set => base.Properties = value;
+        }
     }
 }

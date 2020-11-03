@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.ContentEditing

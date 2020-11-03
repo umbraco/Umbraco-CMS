@@ -24,6 +24,13 @@ namespace Umbraco.Web.Models.ContentEditing
         [Required]
         public ContentSaveAction Action { get; set; }
 
+        [DataMember(Name = "properties")]
+        public override IEnumerable<ContentPropertyBasic> Properties
+        {
+            get => base.Properties;
+            set => base.Properties = value;
+        }
+
         [IgnoreDataMember]
         public List<ContentPropertyFile> UploadedFiles { get; }
 
@@ -52,6 +59,5 @@ namespace Umbraco.Web.Models.ContentEditing
         public ContentPropertyCollectionDto PropertyCollectionDto { get; set; }
 
         #endregion
-
     }
 }

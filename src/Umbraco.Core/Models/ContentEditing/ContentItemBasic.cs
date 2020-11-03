@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.Serialization;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
@@ -54,7 +52,6 @@ namespace Umbraco.Web.Models.ContentEditing
         /// This is nullable since it's only relevant for content (non-content like media + members will be null)
         /// </remarks>
         [DataMember(Name = "state")]
-        [JsonConverter(typeof(StringEnumConverter))]
         public ContentSavedState? State { get; set; }
 
         [DataMember(Name = "variesByCulture")]
@@ -94,12 +91,10 @@ namespace Umbraco.Web.Models.ContentEditing
 
         private IEnumerable<T> _properties;
 
-        [DataMember(Name = "properties")]
         public virtual IEnumerable<T> Properties
         {
             get => _properties;
             set => _properties = value;
         }
-
     }
 }

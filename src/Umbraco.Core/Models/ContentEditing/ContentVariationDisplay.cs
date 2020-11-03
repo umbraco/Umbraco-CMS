@@ -1,10 +1,8 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.Serialization;
-using Newtonsoft.Json.Converters;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
@@ -36,7 +34,6 @@ namespace Umbraco.Web.Models.ContentEditing
         /// Internal property used for tests to get all properties from all tabs
         /// </summary>
         [IgnoreDataMember]
-        [JsonIgnore]
         IEnumerable<ContentPropertyDisplay> IContentProperties<ContentPropertyDisplay>.Properties => Tabs.SelectMany(x => x.Properties);
 
         /// <summary>
@@ -52,7 +49,6 @@ namespace Umbraco.Web.Models.ContentEditing
         public string Segment { get; set; }
 
         [DataMember(Name = "state")]
-        [JsonConverter(typeof(StringEnumConverter))]
         public ContentSavedState State { get; set; }
 
         [DataMember(Name = "updateDate")]
@@ -79,6 +75,5 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "notifications")]
         [ReadOnly(true)]
         public List<BackOfficeNotification> Notifications { get; private set; }
-
     }
 }
