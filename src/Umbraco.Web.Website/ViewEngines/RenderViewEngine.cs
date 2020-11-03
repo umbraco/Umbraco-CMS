@@ -20,7 +20,7 @@ namespace Umbraco.Web.Website.ViewEngines
     /// A view engine to look into the template location specified in the config for the front-end/Rendering part of the cms,
     /// this includes paths to render partial macros and media item templates.
     /// </summary>
-    public class RenderViewEngine : RazorViewEngine
+    public class RenderViewEngine : RazorViewEngine, IRenderViewEngine
     {
 
         public RenderViewEngine(
@@ -46,49 +46,21 @@ namespace Umbraco.Web.Website.ViewEngines
                     "/MacroPartials/{0}.cshtml",
                     "/{0}.cshtml"
                 },
+                AreaViewLocationFormats =
+                {
+                    "/Partials/{0}.cshtml",
+                    "/MacroPartials/{0}.cshtml",
+                    "/{0}.cshtml"
+                }
             });
         }
 
         public new ViewEngineResult FindView(ActionContext context, string viewName, bool isMainPage)
         {
-            return ShouldFindView(context, viewName, isMainPage)
+            return ShouldFindView(context, isMainPage)
             ? base.FindView(context, viewName, isMainPage)
             : ViewEngineResult.NotFound(viewName, Array.Empty<string>());
         }
-
-        // /// <summary>
-        // /// Constructor
-        // /// </summary>
-        // public RenderViewEngine(IHostingEnvironment hostingEnvironment)
-        // {
-        //     _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
-        //
-        //     const string templateFolder = Constants.ViewLocation;
-        //
-        //     // the Render view engine doesn't support Area's so make those blank
-        //     ViewLocationFormats = _supplementedViewLocations.Select(x => templateFolder + x).ToArray();
-        //     PartialViewLocationFormats = _supplementedPartialViewLocations.Select(x => templateFolder + x).ToArray();
-        //
-        //     AreaPartialViewLocationFormats = Array.Empty<string>();
-        //     AreaViewLocationFormats = Array.Empty<string>();
-        //
-        //     EnsureFoldersAndFiles();
-        // }
-
-
-        // public override ViewEngineResult FindView(ControllerContext controllerContext, string viewName, string masterName, bool useCache)
-        // {
-        //     return ShouldFindView(controllerContext, false)
-        //         ? base.FindView(controllerContext, viewName, masterName, useCache)
-        //         : new ViewEngineResult(new string[] { });
-        // }
-        //
-        // public override ViewEngineResult FindPartialView(ControllerContext controllerContext, string partialViewName, bool useCache)
-        // {
-        //     return ShouldFindView(controllerContext, true)
-        //         ? base.FindPartialView(controllerContext, partialViewName, useCache)
-        //         : new ViewEngineResult(new string[] { });
-        // }
 
         /// <summary>
         /// Determines if the view should be found, this is used for view lookup performance and also to ensure
@@ -98,14 +70,14 @@ namespace Umbraco.Web.Website.ViewEngines
         /// <param name="controllerContext"></param>
         /// <param name="isPartial"></param>
         /// <returns></returns>
-        private static bool ShouldFindView(ActionContext context, string viewName, bool isMainPage)
+        private static bool ShouldFindView(ActionContext context, bool isMainPage)
         {
-            var umbracoToken = context.GetDataTokenInViewContextHierarchy(Core.Constants.Web.UmbracoDataToken);
-
-            context.ActionDescriptor.
+            //In v8, this was testing recursively into if it was a child action, but child action do not exist anymore,
+            //And my best guess is that it
+            context.RouteData.DataTokens.TryGetValue(Core.Constants.Web.UmbracoDataToken, out var umbracoToken);
             // first check if we're rendering a partial view for the back office, or surface controller, etc...
             // anything that is not ContentModel as this should only pertain to Umbraco views.
-            if (isPartial && !(umbracoToken is ContentModel))
+            if (!isMainPage && !(umbracoToken is ContentModel))
                 return true;
 
             // only find views if we're rendering the umbraco front end

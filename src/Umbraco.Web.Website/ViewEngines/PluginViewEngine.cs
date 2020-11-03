@@ -9,7 +9,7 @@ namespace Umbraco.Web.Website.ViewEngines
     /// <summary>
     /// A view engine to look into the App_Plugins folder for views for packaged controllers
     /// </summary>
-    public class PluginViewEngine : RazorViewEngine
+    public class PluginViewEngine : RazorViewEngine, IPluginViewEngine
     {
         public PluginViewEngine(
             IRazorPageFactoryProvider pageFactory,

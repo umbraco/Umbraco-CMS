@@ -93,8 +93,8 @@ namespace Umbraco.Web.Runtime
             // ControllerBuilder.Current.SetControllerFactory(controllerFactory);
 
             // set the render & plugin view engines
-            ViewEngines.Engines.Add(new RenderViewEngine(_hostingEnvironment));
-            ViewEngines.Engines.Add(new PluginViewEngine());
+            // ViewEngines.Engines.Add(new RenderViewEngine(_hostingEnvironment));
+            // ViewEngines.Engines.Add(new PluginViewEngine());
 
             ////add the profiling action filter
             //GlobalFilters.Filters.Add(new ProfilingActionFilter());
