@@ -42,17 +42,7 @@ namespace Umbraco.Core.Configuration.Models.Validation
             return true;
         }
 
-        public bool ValidateOptionalCronTab(string configPath, string value, out string message)
-        {
-            if (!string.IsNullOrEmpty(value) && !value.IsValidCronTab())
-            {
-                message = $"Configuration entry {configPath} contains an invalid cron expression.";
-                return false;
-            }
 
-            message = string.Empty;
-            return true;
-        }
 
     }
 }

@@ -208,7 +208,7 @@ namespace Umbraco.Core.Runtime
 
             // Config manipulator
             composition.Services.AddUnique<IConfigManipulator, JsonConfigManipulator>();
-            
+
             // register the umbraco context factory
             // composition.Services.AddUnique<IUmbracoContextFactory, UmbracoContextFactory>();
             composition.Services.AddUnique<IPublishedUrlProvider, UrlProvider>();
@@ -370,6 +370,8 @@ namespace Umbraco.Core.Runtime
             composition.Services.AddUnique<IBackOfficeExamineSearcher, NoopBackOfficeExamineSearcher>();
 
             composition.Services.AddUnique<UploadAutoFillProperties>();
+
+            composition.Services.AddUnique<ICronTabParser, NCronTabParser>();
         }
     }
 }

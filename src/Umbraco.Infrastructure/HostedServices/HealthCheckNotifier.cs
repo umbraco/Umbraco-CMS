@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.HealthCheck;
 using Umbraco.Core.Logging;
@@ -39,9 +40,10 @@ namespace Umbraco.Infrastructure.HostedServices
             IMainDom mainDom,
             IScopeProvider scopeProvider,
             ILogger<HealthCheckNotifier> logger,
-            IProfilingLogger profilingLogger)
+            IProfilingLogger profilingLogger,
+            ICronTabParser cronTabParser)
             : base(healthChecksSettings.Value.Notification.Period,
-                   healthChecksSettings.Value.GetNotificationDelay(DateTime.Now, DefaultDelay))
+                   healthChecksSettings.Value.GetNotificationDelay(cronTabParser, DateTime.Now, DefaultDelay))
         {
             _healthChecksSettings = healthChecksSettings.Value;
             _healthChecks = healthChecks;
@@ -53,7 +55,7 @@ namespace Umbraco.Infrastructure.HostedServices
             _logger = logger;
             _profilingLogger = profilingLogger;
         }
-       
+
         internal override async Task PerformExecuteAsync(object state)
         {
             if (_healthChecksSettings.Notification.Enabled == false)

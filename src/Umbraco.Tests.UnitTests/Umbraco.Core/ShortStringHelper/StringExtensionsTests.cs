@@ -301,14 +301,5 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.ShortStringHelper
             Assert.AreEqual(expected, output);
         }
 
-        [TestCase("", false)]
-        [TestCase("* * * * 1", true)]
-        [TestCase("* * * * * 1", true)]
-        [TestCase("* * * 1", false)]
-        public void IsValidCronTab(string input, bool expected)
-        {
-            var result = input.IsValidCronTab();
-            Assert.AreEqual(expected, result);
-        }
     }
 }

@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.HealthCheck;
 using Umbraco.Core.Logging;
@@ -141,7 +142,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
 
             return new HealthCheckNotifier(Options.Create(settings), checks, notifications,
                 mockRunTimeState.Object, mockServerRegistrar.Object, mockMainDom.Object, mockScopeProvider.Object,
-                mockLogger.Object, mockProfilingLogger.Object);
+                mockLogger.Object, mockProfilingLogger.Object, Mock.Of<ICronTabParser>());
         }
 
         private void VerifyNotificationsNotSent()
