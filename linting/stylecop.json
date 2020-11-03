@@ -10,7 +10,7 @@
     "documentationRules": {
       "xmlHeader": false,
       "documentInternalElements": false,
-      "copyrightText": "Copyright (c) Umbraco and contributors.\nSee LICENSE for more details."
+      "copyrightText": "Copyright (c) Umbraco.\nSee LICENSE for more details."
     }
   }
 }

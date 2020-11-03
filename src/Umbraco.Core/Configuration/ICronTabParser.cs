@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco and contributors.
+﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System;
