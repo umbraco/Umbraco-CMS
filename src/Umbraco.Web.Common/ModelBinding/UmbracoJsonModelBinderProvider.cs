@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.ObjectPool;
 using System.Buffers;
-using Umbraco.Core.Serialization;
 using Umbraco.Web.Common.Formatters;
 
 namespace Umbraco.Web.Common.ModelBinding
@@ -30,9 +29,6 @@ namespace Umbraco.Web.Common.ModelBinding
 
             var ss = jsonOptions.SerializerSettings; // Just use the defaults as base
 
-            // Register UdiJsonConverter globally
-            ss.Converters.Add(new UdiJsonConverter());
-
             // We need to ignore required attributes when serializing. E.g UserSave.ChangePassword. Otherwise the model is not model bound.
             ss.ContractResolver = new IgnoreRequiredAttributesResolver();
             return new IInputFormatter[]
@@ -46,7 +42,5 @@ namespace Umbraco.Web.Common.ModelBinding
                     jsonOptions)
             };
         }
-
-
     }
 }
