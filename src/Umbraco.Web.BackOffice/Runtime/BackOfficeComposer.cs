@@ -24,14 +24,14 @@ namespace Umbraco.Web.BackOffice.Runtime
     {
         public void Compose(Composition composition)
         {
-            composition.RegisterUnique<BackOfficeAreaRoutes>();
-            composition.RegisterUnique<PreviewRoutes>();
-            composition.RegisterUnique<BackOfficeServerVariables>();
+            composition.Services.AddUnique<BackOfficeAreaRoutes>();
+            composition.Services.AddUnique<PreviewRoutes>();
+            composition.Services.AddUnique<BackOfficeServerVariables>();
             composition.Services.AddScoped<BackOfficeSessionIdValidator>();
             composition.Services.AddScoped<BackOfficeSecurityStampValidator>();
 
-            composition.RegisterUnique<PreviewAuthenticationMiddleware>();
-            composition.RegisterUnique<IBackOfficeAntiforgery, BackOfficeAntiforgery>();
+            composition.Services.AddUnique<PreviewAuthenticationMiddleware>();
+            composition.Services.AddUnique<IBackOfficeAntiforgery, BackOfficeAntiforgery>();
 
             // register back office trees
             // the collection builder only accepts types inheriting from TreeControllerBase
@@ -42,15 +42,15 @@ namespace Umbraco.Web.BackOffice.Runtime
 
             composition.ComposeWebMappingProfiles();
 
-            composition.RegisterUnique<IPhysicalFileSystem>(factory =>
+            composition.Services.AddUnique<IPhysicalFileSystem>(factory =>
                 new PhysicalFileSystem(
                     factory.GetRequiredService<IIOHelper>(),
                     factory.GetRequiredService<IHostingEnvironment>(),
                     factory.GetRequiredService<ILogger<PhysicalFileSystem>>(),
                     "~/"));
 
-            composition.RegisterUnique<IIconService, IconService>();
-            composition.RegisterUnique<UnhandledExceptionLoggerMiddleware>();
+            composition.Services.AddUnique<IIconService, IconService>();
+            composition.Services.AddUnique<UnhandledExceptionLoggerMiddleware>();
 
             composition.ComposeUmbracoBackOfficeControllers();
         }

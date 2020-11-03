@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using Microsoft.Extensions.Logging;
+using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Tests.Common;
 using Umbraco.Tests.Testing;
@@ -27,7 +28,7 @@ namespace Umbraco.Tests.Routing
         protected override void ComposeSettings()
         {
             base.ComposeSettings();
-            Composition.RegisterUnique(x => Microsoft.Extensions.Options.Options.Create(_globalSettings));
+            Composition.Services.AddUnique(x => Microsoft.Extensions.Options.Options.Create(_globalSettings));
         }
 
         [TestCase(1046, "/")]

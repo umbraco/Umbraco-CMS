@@ -16,7 +16,6 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
-using Umbraco.Infrastructure.Composing;
 
 namespace Umbraco.Core.Runtime
 {
@@ -185,7 +184,7 @@ namespace Umbraco.Core.Runtime
                 composition.RegisterEssentials(Logger, RuntimeLoggerFactory, Profiler, ProfilingLogger, MainDom, AppCaches, databaseFactory, typeLoader, _state, TypeFinder, IOHelper, UmbracoVersion, DbProviderFactoryCreator, HostingEnvironment, BackOfficeInfo);
 
                 // register ourselves (TODO: Should we put this in RegisterEssentials?)
-                composition.Register<IRuntime>(_ => this, Lifetime.Singleton);
+                composition.Services.AddSingleton<IRuntime>(_ => this);
 
                 // run handlers
                 OnRuntimeEssentials(composition, AppCaches, typeLoader, databaseFactory);

@@ -43,7 +43,6 @@ using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Strings;
-using Umbraco.Infrastructure.Composing;
 using Umbraco.Net;
 using Umbraco.Tests.Common;
 using Umbraco.Tests.TestHelpers;
@@ -106,7 +105,7 @@ namespace Umbraco.Tests.Testing
 
         protected Composition Composition { get; private set; }
 
-        protected IFactory Factory { get; private set; }
+        protected IServiceProvider Factory { get; private set; }
 
         protected UmbracoTestAttribute Options { get; private set; }
 
@@ -203,11 +202,11 @@ namespace Umbraco.Tests.Testing
             LocalizedTextService = new LocalizedTextService(new Dictionary<CultureInfo, Lazy<XDocument>>(), loggerFactory.CreateLogger<LocalizedTextService>());
             var typeLoader = GetTypeLoader(IOHelper, TypeFinder, appCaches.RuntimeCache, HostingEnvironment, loggerFactory.CreateLogger<TypeLoader>(), proflogger, Options.TypeLoader);
 
-            var register = TestHelper.GetRegister();
+            var services = TestHelper.GetRegister();
 
 
             Composition = new Composition(
-                (register as ServiceCollectionRegistryAdapter).Services,
+                services,
                 typeLoader,
                 proflogger,
                 MockRuntimeState(RuntimeLevel.Run),
@@ -216,25 +215,25 @@ namespace Umbraco.Tests.Testing
             );
 
             //TestHelper.GetConfigs().RegisterWith(register);
-            Composition.RegisterUnique(typeof(ILoggerFactory), loggerFactory);
-            Composition.Register(typeof(ILogger<>), typeof(Logger<>));
-            Composition.Register(typeof(ILogger), msLogger);
-            Composition.RegisterUnique(IOHelper);
-            Composition.RegisterUnique(UriUtility);
-            Composition.RegisterUnique(UmbracoVersion);
-            Composition.RegisterUnique(TypeFinder);
-            Composition.RegisterUnique(LocalizedTextService);
-            Composition.RegisterUnique(typeLoader);
-            Composition.RegisterUnique<IProfiler>(profiler);
-            Composition.RegisterUnique<IProfilingLogger>(proflogger);
-            Composition.RegisterUnique(appCaches);
-            Composition.RegisterUnique(HostingEnvironment);
-            Composition.RegisterUnique(backOfficeInfo);
-            Composition.RegisterUnique(ipResolver);
-            Composition.RegisterUnique<IPasswordHasher, AspNetPasswordHasher>();
-            Composition.RegisterUnique(TestHelper.ShortStringHelper);
-            Composition.RegisterUnique<IRequestAccessor, AspNetRequestAccessor>();
-            Composition.RegisterUnique<IPublicAccessChecker, PublicAccessChecker>();
+            services.AddUnique(typeof(ILoggerFactory), loggerFactory);
+            services.AddTransient(typeof(ILogger<>), typeof(Logger<>));
+            services.AddSingleton<ILogger>(msLogger);
+            services.AddUnique(IOHelper);
+            services.AddUnique(UriUtility);
+            services.AddUnique(UmbracoVersion);
+            services.AddUnique(TypeFinder);
+            services.AddUnique(LocalizedTextService);
+            services.AddUnique(typeLoader);
+            services.AddUnique<IProfiler>(profiler);
+            services.AddUnique<IProfilingLogger>(proflogger);
+            services.AddUnique(appCaches);
+            services.AddUnique(HostingEnvironment);
+            services.AddUnique(backOfficeInfo);
+            services.AddUnique(ipResolver);
+            services.AddUnique<IPasswordHasher, AspNetPasswordHasher>();
+            services.AddUnique(TestHelper.ShortStringHelper);
+            services.AddUnique<IRequestAccessor, AspNetRequestAccessor>();
+            services.AddUnique<IPublicAccessChecker, PublicAccessChecker>();
 
 
             var memberService = Mock.Of<IMemberService>();
@@ -242,14 +241,14 @@ namespace Umbraco.Tests.Testing
             var membershipProvider = new MembersMembershipProvider(memberService, memberTypeService, Mock.Of<IUmbracoVersion>(), TestHelper.GetHostingEnvironment(), TestHelper.GetIpResolver());
             var membershipHelper = new MembershipHelper(Mock.Of<IHttpContextAccessor>(), Mock.Of<IPublishedMemberCache>(), membershipProvider, Mock.Of<RoleProvider>(), memberService, memberTypeService, Mock.Of<IPublicAccessService>(), AppCaches.Disabled, loggerFactory, ShortStringHelper, Mock.Of<IEntityService>());
 
-            Composition.RegisterUnique(membershipHelper);
+            services.AddUnique(membershipHelper);
 
 
 
 
-            TestObjects = new TestObjects(register);
+            TestObjects = new TestObjects(services);
             Compose();
-            Current.Factory = Factory = Composition.CreateFactory();
+            Current.Factory = Factory = Composition.CreateServiceProvider();
             Initialize();
         }
 
@@ -313,17 +312,17 @@ namespace Umbraco.Tests.Testing
             Umbraco.Web.Composing.Current.UmbracoContextAccessor = new TestUmbracoContextAccessor();
 
             // web
-            Composition.RegisterUnique(_ => Umbraco.Web.Composing.Current.UmbracoContextAccessor);
-            Composition.RegisterUnique<IPublishedRouter, PublishedRouter>();
+            Composition.Services.AddUnique(_ => Umbraco.Web.Composing.Current.UmbracoContextAccessor);
+            Composition.Services.AddUnique<IPublishedRouter, PublishedRouter>();
             Composition.WithCollectionBuilder<ContentFinderCollectionBuilder>();
 
             Composition.DataValueReferenceFactories();
 
-            Composition.RegisterUnique<IContentLastChanceFinder, TestLastChanceFinder>();
-            Composition.RegisterUnique<IVariationContextAccessor, TestVariationContextAccessor>();
-            Composition.RegisterUnique<IPublishedSnapshotAccessor, TestPublishedSnapshotAccessor>();
+            Composition.Services.AddUnique<IContentLastChanceFinder, TestLastChanceFinder>();
+            Composition.Services.AddUnique<IVariationContextAccessor, TestVariationContextAccessor>();
+            Composition.Services.AddUnique<IPublishedSnapshotAccessor, TestPublishedSnapshotAccessor>();
             Composition.SetCultureDictionaryFactory<DefaultCultureDictionaryFactory>();
-            Composition.Register(f => f.GetRequiredService<ICultureDictionaryFactory>().CreateDictionary(), Lifetime.Singleton);
+            Composition.Services.AddSingleton(f => f.GetRequiredService<ICultureDictionaryFactory>().CreateDictionary());
             // register back office sections in the order we want them rendered
             Composition.WithCollectionBuilder<SectionCollectionBuilder>().Append<ContentSection>()
                 .Append<MediaSection>()
@@ -333,18 +332,18 @@ namespace Umbraco.Tests.Testing
                 .Append<MembersSection>()
                 .Append<FormsSection>()
                 .Append<TranslationSection>();
-            Composition.RegisterUnique<ISectionService, SectionService>();
+            Composition.Services.AddUnique<ISectionService, SectionService>();
 
-            Composition.RegisterUnique<HtmlLocalLinkParser>();
-            Composition.RegisterUnique<IBackofficeSecurity, BackofficeSecurity>();
-            Composition.RegisterUnique<IEmailSender, EmailSender>();
-            Composition.RegisterUnique<HtmlUrlParser>();
-            Composition.RegisterUnique<HtmlImageSourceParser>();
-            Composition.RegisterUnique<RichTextEditorPastedImages>();
-            Composition.RegisterUnique<IPublishedValueFallback, NoopPublishedValueFallback>();
+            Composition.Services.AddUnique<HtmlLocalLinkParser>();
+            Composition.Services.AddUnique<IBackofficeSecurity, BackofficeSecurity>();
+            Composition.Services.AddUnique<IEmailSender, EmailSender>();
+            Composition.Services.AddUnique<HtmlUrlParser>();
+            Composition.Services.AddUnique<HtmlImageSourceParser>();
+            Composition.Services.AddUnique<RichTextEditorPastedImages>();
+            Composition.Services.AddUnique<IPublishedValueFallback, NoopPublishedValueFallback>();
 
             var webRoutingSettings = new WebRoutingSettings();
-            Composition.RegisterUnique<IPublishedUrlProvider>(factory =>
+            Composition.Services.AddUnique<IPublishedUrlProvider>(factory =>
                 new UrlProvider(
                     factory.GetRequiredService<IUmbracoContextAccessor>(),
                     Microsoft.Extensions.Options.Options.Create(webRoutingSettings),
@@ -361,17 +360,17 @@ namespace Umbraco.Tests.Testing
             // what else?
             var runtimeStateMock = new Mock<IRuntimeState>();
             runtimeStateMock.Setup(x => x.Level).Returns(RuntimeLevel.Run);
-            Composition.RegisterUnique(f => runtimeStateMock.Object);
-            Composition.Register(_ => Mock.Of<IImageUrlGenerator>());
+            Composition.Services.AddUnique(f => runtimeStateMock.Object);
+            Composition.Services.AddTransient(_ => Mock.Of<IImageUrlGenerator>());
             Composition.Services.AddTransient<UploadAutoFillProperties>();
 
             // ah...
             Composition.WithCollectionBuilder<ActionCollectionBuilder>();
             Composition.WithCollectionBuilder<PropertyValueConverterCollectionBuilder>();
-            Composition.RegisterUnique<PropertyEditorCollection>();
-            Composition.RegisterUnique<IPublishedContentTypeFactory, PublishedContentTypeFactory>();
+            Composition.Services.AddUnique<PropertyEditorCollection>();
+            Composition.Services.AddUnique<IPublishedContentTypeFactory, PublishedContentTypeFactory>();
 
-            Composition.RegisterUnique<IMediaPathScheme, UniqueMediaPathScheme>();
+            Composition.Services.AddUnique<IMediaPathScheme, UniqueMediaPathScheme>();
 
             // register empty content apps collection
             Composition.WithCollectionBuilder<ContentAppFactoryCollectionBuilder>();
@@ -443,13 +442,13 @@ namespace Umbraco.Tests.Testing
             var userPasswordConfigurationSettings = new UserPasswordConfigurationSettings();
             var webRoutingSettings = new WebRoutingSettings();
 
-            Composition.Register(x => Microsoft.Extensions.Options.Options.Create(contentSettings));
-            Composition.Register(x => Microsoft.Extensions.Options.Options.Create(coreDebugSettings));
-            Composition.Register(x => Microsoft.Extensions.Options.Options.Create(globalSettings));
-            Composition.Register(x => Microsoft.Extensions.Options.Options.Create(nuCacheSettings));
-            Composition.Register(x => Microsoft.Extensions.Options.Options.Create(requestHandlerSettings));
-            Composition.Register(x => Microsoft.Extensions.Options.Options.Create(userPasswordConfigurationSettings));
-            Composition.Register(x => Microsoft.Extensions.Options.Options.Create(webRoutingSettings));
+            Composition.Services.AddTransient(x => Microsoft.Extensions.Options.Options.Create(contentSettings));
+            Composition.Services.AddTransient(x => Microsoft.Extensions.Options.Options.Create(coreDebugSettings));
+            Composition.Services.AddTransient(x => Microsoft.Extensions.Options.Options.Create(globalSettings));
+            Composition.Services.AddTransient(x => Microsoft.Extensions.Options.Options.Create(nuCacheSettings));
+            Composition.Services.AddTransient(x => Microsoft.Extensions.Options.Options.Create(requestHandlerSettings));
+            Composition.Services.AddTransient(x => Microsoft.Extensions.Options.Options.Create(userPasswordConfigurationSettings));
+            Composition.Services.AddTransient(x => Microsoft.Extensions.Options.Options.Create(webRoutingSettings));
         }
 
         protected virtual void ComposeApplication(bool withApplication)
@@ -461,66 +460,66 @@ namespace Umbraco.Tests.Testing
             // default Datalayer/Repositories/SQL/Database/etc...
             Composition.ComposeRepositories();
 
-            Composition.RegisterUnique<IExamineManager, ExamineManager>();
+            Composition.Services.AddUnique<IExamineManager, ExamineManager>();
 
-            Composition.RegisterUnique<IJsonSerializer, JsonNetSerializer>();
-            Composition.RegisterUnique<IMenuItemCollectionFactory, MenuItemCollectionFactory>();
-            Composition.RegisterUnique<InstallStatusTracker>();
+            Composition.Services.AddUnique<IJsonSerializer, JsonNetSerializer>();
+            Composition.Services.AddUnique<IMenuItemCollectionFactory, MenuItemCollectionFactory>();
+            Composition.Services.AddUnique<InstallStatusTracker>();
 
             // register filesystems
-            Composition.RegisterUnique(factory => TestObjects.GetFileSystemsMock());
+            Composition.Services.AddUnique(factory => TestObjects.GetFileSystemsMock());
 
 
             var scheme = Mock.Of<IMediaPathScheme>();
 
             var mediaFileSystem = new MediaFileSystem(Mock.Of<IFileSystem>(), scheme, _loggerFactory.CreateLogger<MediaFileSystem>(), TestHelper.ShortStringHelper);
-            Composition.RegisterUnique<IMediaFileSystem>(factory => mediaFileSystem);
+            Composition.Services.AddUnique<IMediaFileSystem>(factory => mediaFileSystem);
 
             // no factory (noop)
-            Composition.RegisterUnique<IPublishedModelFactory, NoopPublishedModelFactory>();
+            Composition.Services.AddUnique<IPublishedModelFactory, NoopPublishedModelFactory>();
 
             // register application stuff (database factory & context, services...)
             Composition.WithCollectionBuilder<MapperCollectionBuilder>()
                 .AddCoreMappers();
 
-            Composition.RegisterUnique<IEventMessagesFactory>(_ => new TransientEventMessagesFactory());
+            Composition.Services.AddUnique<IEventMessagesFactory>(_ => new TransientEventMessagesFactory());
 
             var globalSettings = new GlobalSettings();
             var connectionStrings = new ConnectionStrings();
 
-            Composition.RegisterUnique<IUmbracoDatabaseFactory>(f => new UmbracoDatabaseFactory(_loggerFactory.CreateLogger<UmbracoDatabaseFactory>(),
+            Composition.Services.AddUnique<IUmbracoDatabaseFactory>(f => new UmbracoDatabaseFactory(_loggerFactory.CreateLogger<UmbracoDatabaseFactory>(),
                 LoggerFactory,
                 globalSettings,
                 connectionStrings,
                 new Lazy<IMapperCollection>(f.GetRequiredService<IMapperCollection>),
                 TestHelper.DbProviderFactoryCreator));
 
-            Composition.RegisterUnique(f => f.GetService<IUmbracoDatabaseFactory>().SqlContext);
+            Composition.Services.AddUnique(f => f.GetService<IUmbracoDatabaseFactory>().SqlContext);
 
             Composition.WithCollectionBuilder<UrlSegmentProviderCollectionBuilder>(); // empty
 
-            Composition.RegisterUnique(factory
+            Composition.Services.AddUnique(factory
                 => TestObjects.GetScopeProvider(_loggerFactory, factory.GetService<ITypeFinder>(), factory.GetService<FileSystems>(), factory.GetService<IUmbracoDatabaseFactory>()));
-            Composition.RegisterUnique(factory => (IScopeAccessor) factory.GetRequiredService<IScopeProvider>());
+            Composition.Services.AddUnique(factory => (IScopeAccessor) factory.GetRequiredService<IScopeProvider>());
 
             Composition.ComposeServices();
 
             // composition root is doing weird things, fix
-            Composition.RegisterUnique<ITreeService, TreeService>();
-            Composition.RegisterUnique<ISectionService, SectionService>();
+            Composition.Services.AddUnique<ITreeService, TreeService>();
+            Composition.Services.AddUnique<ISectionService, SectionService>();
 
             // somehow property editor ends up wanting this
             Composition.WithCollectionBuilder<ManifestValueValidatorCollectionBuilder>();
 
-            Composition.RegisterUnique<IManifestParser, ManifestParser>();
+            Composition.Services.AddUnique<IManifestParser, ManifestParser>();
 
             // note - don't register collections, use builders
             Composition.WithCollectionBuilder<DataEditorCollectionBuilder>();
-            Composition.RegisterUnique<PropertyEditorCollection>();
-            Composition.RegisterUnique<ParameterEditorCollection>();
+            Composition.Services.AddUnique<PropertyEditorCollection>();
+            Composition.Services.AddUnique<ParameterEditorCollection>();
 
 
-            Composition.RegisterUnique<IHttpContextAccessor>(TestHelper.GetHttpContextAccessor(GetHttpContextFactory("/").HttpContext));
+            Composition.Services.AddUnique<IHttpContextAccessor>(TestHelper.GetHttpContextAccessor(GetHttpContextFactory("/").HttpContext));
         }
 
         #endregion
@@ -564,20 +563,26 @@ namespace Umbraco.Tests.Testing
 
         protected virtual void Reset()
         {
-            // reset and dispose scopes
-            // ensures we don't leak an opened database connection
-            // which would lock eg SqlCe .sdf files
-            if (Factory?.GetService<IScopeProvider>() is ScopeProvider scopeProvider)
+            try
             {
-                Scope scope;
-                while ((scope = scopeProvider.AmbientScope) != null)
+                // reset and dispose scopes
+                // ensures we don't leak an opened database connection
+                // which would lock eg SqlCe .sdf files
+                if (Factory?.GetService<IScopeProvider>() is ScopeProvider scopeProvider)
                 {
-                    scope.Reset();
-                    scope.Dispose();
+                    Scope scope;
+                    while ((scope = scopeProvider.AmbientScope) != null)
+                    {
+                        scope.Reset();
+                        scope.Dispose();
+                    }
                 }
             }
-
-            Current.Reset(); // disposes the factory
+            catch (ObjectDisposedException ex)
+            {
+                if (!ex.ObjectName.Equals(nameof(IServiceProvider)))
+                    throw;
+            }
 
             // reset all other static things that should not be static ;(
             UriUtility.ResetAppDomainAppVirtualPath(HostingEnvironment);

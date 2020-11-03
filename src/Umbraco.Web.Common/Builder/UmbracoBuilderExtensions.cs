@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using Umbraco.Core;
 using Umbraco.Extensions;
 using Umbraco.Web.Common.Filters;
 using Umbraco.Web.Common.ModelBinders;
@@ -20,6 +21,8 @@ namespace Umbraco.Web.Common.Builder
             if (webHostEnvironment is null) throw new ArgumentNullException(nameof(webHostEnvironment));
             if (config is null) throw new ArgumentNullException(nameof(config));
 
+            services.AddLazySupport();
+
             var builder = new UmbracoBuilder(services, webHostEnvironment, config);
             return builder;
         }
@@ -29,6 +32,12 @@ namespace Umbraco.Web.Common.Builder
 
         public static IUmbracoBuilder WithCore(this IUmbracoBuilder builder)
             => builder.AddWith(nameof(WithCore), () => builder.Services.AddUmbracoCore(builder.WebHostEnvironment, builder.Config));
+
+        public static IUmbracoBuilder WithHostedServices(this IUmbracoBuilder builder)
+            => builder.AddWith(nameof(WithHostedServices), () => builder.Services.AddUmbracoHostedServices());
+
+        public static IUmbracoBuilder WithHttpClients(this IUmbracoBuilder builder)
+            => builder.AddWith(nameof(WithHttpClients), () => builder.Services.AddUmbracoHttpClients());
 
         public static IUmbracoBuilder WithMiniProfiler(this IUmbracoBuilder builder)
             => builder.AddWith(nameof(WithMiniProfiler), () =>

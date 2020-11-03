@@ -1478,5 +1478,20 @@ namespace Umbraco.Core
         {
             return shortStringHelper.CleanStringForSafeFileName(text, culture);
         }
+
+        /// <summary>
+        /// Validates a string matches a time stamp.
+        /// </summary>
+        /// <param name="input">String with timespan representation (in standard timespan format: https://docs.microsoft.com/en-us/dotnet/standard/base-types/standard-timespan-format-strings)</param>
+        /// <returns></returns>
+        public static bool IsValidTimeSpan(this string input)
+        {
+            if (string.IsNullOrEmpty(input))
+            {
+                return false;
+            }
+
+            return TimeSpan.TryParse(input, out var _);
+        }
     }
 }

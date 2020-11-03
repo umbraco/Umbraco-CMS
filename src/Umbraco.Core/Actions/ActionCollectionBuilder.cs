@@ -8,7 +8,7 @@ namespace Umbraco.Web.Actions
     {
         protected override ActionCollectionBuilder This => this;
 
-        protected override IEnumerable<IAction> CreateItems(IFactory factory)
+        protected override IEnumerable<IAction> CreateItems(IServiceProvider factory)
         {
             var items = base.CreateItems(factory).ToList();
 

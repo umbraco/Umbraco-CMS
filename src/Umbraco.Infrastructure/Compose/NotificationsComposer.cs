@@ -10,7 +10,7 @@ namespace Umbraco.Web.Compose
         {
             base.Compose(composition);
 
-            composition.RegisterUnique<NotificationsComponent.Notifier>();
+            composition.Services.AddUnique<NotificationsComponent.Notifier>();
         }
     }
 }
