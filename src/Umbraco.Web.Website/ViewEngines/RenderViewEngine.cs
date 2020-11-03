@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Web.Mvc;
-using Umbraco.Core.Composing;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
 using Umbraco.Web.Models;
 
-namespace Umbraco.Web.Mvc
+namespace Umbraco.Web.Website.ViewEngines
 {
     /// <summary>
     /// A view engine to look into the template location specified in the config for the front-end/Rendering part of the cms,
@@ -24,24 +24,24 @@ namespace Umbraco.Web.Mvc
         // http://issues.umbraco.org/issue/U4-1287, http://issues.umbraco.org/issue/U4-1215
         private readonly IEnumerable<string> _supplementedPartialViewLocations = new[] { "/Partials/{0}.cshtml", "/MacroPartials/{0}.cshtml", "/{0}.cshtml" };
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        public RenderViewEngine(IHostingEnvironment hostingEnvironment)
-        {
-            _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
-
-            const string templateFolder = Constants.ViewLocation;
-
-            // the Render view engine doesn't support Area's so make those blank
-            ViewLocationFormats = _supplementedViewLocations.Select(x => templateFolder + x).ToArray();
-            PartialViewLocationFormats = _supplementedPartialViewLocations.Select(x => templateFolder + x).ToArray();
-
-            AreaPartialViewLocationFormats = Array.Empty<string>();
-            AreaViewLocationFormats = Array.Empty<string>();
-
-            EnsureFoldersAndFiles();
-        }
+        // /// <summary>
+        // /// Constructor
+        // /// </summary>
+        // public RenderViewEngine(IHostingEnvironment hostingEnvironment)
+        // {
+        //     _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
+        //
+        //     const string templateFolder = Constants.ViewLocation;
+        //
+        //     // the Render view engine doesn't support Area's so make those blank
+        //     ViewLocationFormats = _supplementedViewLocations.Select(x => templateFolder + x).ToArray();
+        //     PartialViewLocationFormats = _supplementedPartialViewLocations.Select(x => templateFolder + x).ToArray();
+        //
+        //     AreaPartialViewLocationFormats = Array.Empty<string>();
+        //     AreaViewLocationFormats = Array.Empty<string>();
+        //
+        //     EnsureFoldersAndFiles();
+        // }
 
         /// <summary>
         /// Ensures that the correct web.config for razor exists in the /Views folder, the partials folder exist and the ViewStartPage exists.

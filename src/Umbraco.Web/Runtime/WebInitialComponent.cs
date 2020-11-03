@@ -78,7 +78,7 @@ namespace Umbraco.Web.Runtime
             viewEngines.Clear();
             foreach (var engine in originalEngines)
             {
-                var wrappedEngine = engine is ProfilingViewEngine ? engine : new ProfilingViewEngine(engine);
+                var wrappedEngine = engine;// TODO introduce in NETCORE: is ProfilingViewEngine ? engine : new ProfilingViewEngine(engine);
                 viewEngines.Add(wrappedEngine);
             }
         }
@@ -95,7 +95,7 @@ namespace Umbraco.Web.Runtime
             // set the render & plugin view engines
             ViewEngines.Engines.Add(new RenderViewEngine(_hostingEnvironment));
             ViewEngines.Engines.Add(new PluginViewEngine());
-            
+
             ////add the profiling action filter
             //GlobalFilters.Filters.Add(new ProfilingActionFilter());
 
