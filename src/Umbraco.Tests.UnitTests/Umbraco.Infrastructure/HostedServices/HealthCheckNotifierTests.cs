@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -23,71 +24,71 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
     {
         private Mock<IHealthCheckNotificationMethod> _mockNotificationMethod;
 
-        private const string Check1Id = "00000000-0000-0000-0000-000000000001";
-        private const string Check2Id = "00000000-0000-0000-0000-000000000002";
-        private const string Check3Id = "00000000-0000-0000-0000-000000000003";
+        private const string _check1Id = "00000000-0000-0000-0000-000000000001";
+        private const string _check2Id = "00000000-0000-0000-0000-000000000002";
+        private const string _check3Id = "00000000-0000-0000-0000-000000000003";
 
         [Test]
-        public void Does_Not_Execute_When_Not_Enabled()
+        public async Task Does_Not_Execute_When_Not_Enabled()
         {
             var sut = CreateHealthCheckNotifier(enabled: false);
-            sut.ExecuteAsync(null);
-            _mockNotificationMethod.Verify(x => x.SendAsync(It.IsAny<HealthCheckResults>()), Times.Never);
+            await sut.PerformExecuteAsync(null);
+            VerifyNotificationsNotSent();
         }
 
         [Test]
-        public void Does_Not_Execute_When_Runtime_State_Is_Not_Run()
+        public async Task Does_Not_Execute_When_Runtime_State_Is_Not_Run()
         {
             var sut = CreateHealthCheckNotifier(runtimeLevel: RuntimeLevel.Boot);
-            sut.ExecuteAsync(null);
-            _mockNotificationMethod.Verify(x => x.SendAsync(It.IsAny<HealthCheckResults>()), Times.Never);
+            await sut.PerformExecuteAsync(null);
+            VerifyNotificationsNotSent();
         }
 
         [Test]
-        public void Does_Not_Execute_When_Server_Role_Is_Replica()
+        public async Task Does_Not_Execute_When_Server_Role_Is_Replica()
         {
             var sut = CreateHealthCheckNotifier(serverRole: ServerRole.Replica);
-            sut.ExecuteAsync(null);
-            _mockNotificationMethod.Verify(x => x.SendAsync(It.IsAny<HealthCheckResults>()), Times.Never);
+            await sut.PerformExecuteAsync(null);
+            VerifyNotificationsNotSent();
         }
 
         [Test]
-        public void Does_Not_Execute_When_Server_Role_Is_Unknown()
+        public async Task Does_Not_Execute_When_Server_Role_Is_Unknown()
         {
             var sut = CreateHealthCheckNotifier(serverRole: ServerRole.Unknown);
-            sut.ExecuteAsync(null);
-            _mockNotificationMethod.Verify(x => x.SendAsync(It.IsAny<HealthCheckResults>()), Times.Never);
+            await sut.PerformExecuteAsync(null);
+            VerifyNotificationsNotSent();
         }
 
         [Test]
-        public void Does_Not_Execute_When_Not_Main_Dom()
+        public async Task Does_Not_Execute_When_Not_Main_Dom()
         {
             var sut = CreateHealthCheckNotifier(isMainDom: false);
-            sut.ExecuteAsync(null);
-            _mockNotificationMethod.Verify(x => x.SendAsync(It.IsAny<HealthCheckResults>()), Times.Never);
+            await sut.PerformExecuteAsync(null);
+            VerifyNotificationsNotSent();
         }
 
         [Test]
-        public void Does_Not_Execute_With_No_Enabled_Notification_Methods()
+        public async Task Does_Not_Execute_With_No_Enabled_Notification_Methods()
         {
             var sut = CreateHealthCheckNotifier(notificationEnabled: false);
-            sut.ExecuteAsync(null);
-            _mockNotificationMethod.Verify(x => x.SendAsync(It.IsAny<HealthCheckResults>()), Times.Never);
+            await sut.PerformExecuteAsync(null);
+            VerifyNotificationsNotSent();
         }
 
         [Test]
-        public void Executes_With_Enabled_Notification_Methods()
+        public async Task Executes_With_Enabled_Notification_Methods()
         {
             var sut = CreateHealthCheckNotifier();
-            sut.ExecuteAsync(null);
-            _mockNotificationMethod.Verify(x => x.SendAsync(It.IsAny<HealthCheckResults>()), Times.Once);
+            await sut.PerformExecuteAsync(null);
+            VerifyNotificationsSent();
         }
 
         [Test]
-        public void Executes_Only_Enabled_Checks()
+        public async Task Executes_Only_Enabled_Checks()
         {
             var sut = CreateHealthCheckNotifier();
-            sut.ExecuteAsync(null);
+            await sut.PerformExecuteAsync(null);
             _mockNotificationMethod.Verify(x => x.SendAsync(It.Is<HealthCheckResults>(
                 y => y.ResultsAsDictionary.Count == 1 && y.ResultsAsDictionary.ContainsKey("Check1"))), Times.Once);
         }
@@ -106,12 +107,12 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
                     Enabled = enabled,
                     DisabledChecks = new List<DisabledHealthCheckSettings>
                 {
-                    new DisabledHealthCheckSettings { Id = Guid.Parse(Check3Id) }
+                    new DisabledHealthCheckSettings { Id = Guid.Parse(_check3Id) }
                 }
                 },
                 DisabledChecks = new List<DisabledHealthCheckSettings>
                 {
-                    new DisabledHealthCheckSettings { Id = Guid.Parse(Check2Id) }
+                    new DisabledHealthCheckSettings { Id = Guid.Parse(_check2Id) }
                 }
             };
             var checks = new HealthCheckCollection(new List<HealthCheck>
@@ -143,17 +144,32 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
                 mockLogger.Object, mockProfilingLogger.Object);
         }
 
-        [HealthCheck(Check1Id, "Check1")]
+        private void VerifyNotificationsNotSent()
+        {
+            VerifyNotificationsSentTimes(Times.Never());
+        }
+
+        private void VerifyNotificationsSent()
+        {
+            VerifyNotificationsSentTimes(Times.Once());
+        }
+
+        private void VerifyNotificationsSentTimes(Times times)
+        {
+            _mockNotificationMethod.Verify(x => x.SendAsync(It.IsAny<HealthCheckResults>()), times);
+        }
+
+        [HealthCheck(_check1Id, "Check1")]
         private class TestHealthCheck1 : TestHealthCheck
         {
         }
 
-        [HealthCheck(Check2Id, "Check2")]
+        [HealthCheck(_check2Id, "Check2")]
         private class TestHealthCheck2 : TestHealthCheck
         {
         }
 
-        [HealthCheck(Check3Id, "Check3")]
+        [HealthCheck(_check3Id, "Check3")]
         private class TestHealthCheck3 : TestHealthCheck
         {
         }
