@@ -13,7 +13,7 @@
 (function () {
     'use strict';
 
-    function blockEditorModelObjectFactory($interpolate, $q, udiService, contentResource, localizationService, umbRequestHelper, clipboardService) {
+    function blockEditorModelObjectFactory($interpolate, $q, udiService, contentResource, localizationService, umbRequestHelper, clipboardService, notificationsService) {
 
         /**
          * Simple mapping from property model content entry to editing model,
@@ -813,7 +813,7 @@
                         if(blockConfiguration.settingsElementTypeKey === blockData.settingsData.contentTypeKey) {
                             this.value.settingsData.push(blockData.settingsData);
                         } else {
-                            // Settings ElementType does not align, so we will fail.
+                            notificationsService.error("Clipboard", "Couldn't paste because settings-data is not compatible.");
                             return null;
                         }
                     } else {
