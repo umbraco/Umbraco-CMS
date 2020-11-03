@@ -1,26 +1,33 @@
 ﻿using System;
 using NUnit.Framework;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Configuration.Models.Extensions;
+using Umbraco.Infrastructure.Configuration.Extensions;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.Configuration.Models.Extensions
 {
     [TestFixture]
     public class HealthCheckSettingsExtensionsTests
     {
-        [Test]
-        public void Returns_Notification_Delay_From_Provided_Time()
+        private ICronTabParser CronTabParser => new NCronTabParser();
+
+        [TestCase("30 12 * * *", 30)]
+        [TestCase("15 18 * * *", 60 * 6 + 15)]
+        [TestCase("0 3 * * *", 60 * 15)]
+        [TestCase("0 3 2 * *", 24 * 60 * 1 + 60 * 15)]
+        [TestCase("0 6 * * 3", 24 * 60 * 3 + 60 * 18)]
+        public void Returns_Notification_Delay_From_Provided_Time(string firstRunTimeCronExpression, int expectedDelayInMinutes)
         {
             var settings = new HealthChecksSettings
             {
                 Notification = new HealthChecksNotificationSettings
                 {
-                    FirstRunTime = "1230",
+                    FirstRunTime = firstRunTimeCronExpression,
                 }
             };
-            var now = DateTime.Now.Date.AddHours(12);
-            var result = settings.GetNotificationDelay(now, TimeSpan.Zero);
-            Assert.AreEqual(30, result.Minutes);
+            var now = new DateTime(2020, 10, 31, 12, 0, 0);
+            var result = settings.GetNotificationDelay(CronTabParser, now, TimeSpan.Zero);
+            Assert.AreEqual(expectedDelayInMinutes, result.TotalMinutes);
         }
 
         [Test]
@@ -30,12 +37,12 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Configuration.Models.Extensions
             {
                 Notification = new HealthChecksNotificationSettings
                 {
-                    FirstRunTime = "1230",
+                    FirstRunTime = "30 12 * * *",
                 }
             };
-            var now = DateTime.Now.Date.AddHours(12).AddMinutes(25);
-            var result = settings.GetNotificationDelay(now, TimeSpan.FromMinutes(10));
-            Assert.AreEqual(10, result.Minutes);
+            var now = new DateTime(2020, 10, 31, 12, 25, 0);
+            var result = settings.GetNotificationDelay(CronTabParser, now, TimeSpan.FromMinutes(10));
+            Assert.AreEqual(10, result.TotalMinutes);
         }
     }
 }

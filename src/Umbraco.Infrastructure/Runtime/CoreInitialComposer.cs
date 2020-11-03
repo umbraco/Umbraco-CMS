@@ -370,6 +370,8 @@ namespace Umbraco.Core.Runtime
             composition.Services.AddUnique<IBackOfficeExamineSearcher, NoopBackOfficeExamineSearcher>();
 
             composition.Services.AddUnique<UploadAutoFillProperties>();
+
+            composition.Services.AddUnique<ICronTabParser, NCronTabParser>();
         }
     }
 }
