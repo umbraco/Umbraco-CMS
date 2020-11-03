@@ -295,6 +295,7 @@ namespace Umbraco.Extensions
             services.AddHostedService<HealthCheckNotifier>();
             services.AddHostedService<KeepAlive>();
             services.AddHostedService<LogScrubber>();
+            services.AddHostedService<ScheduledPublishing>();
             services.AddHostedService<TempFileCleanup>();
 
             return services;
