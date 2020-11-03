@@ -53,7 +53,7 @@ namespace Umbraco.Infrastructure.HostedServices
             _logger = logger;
             _profilingLogger = profilingLogger;
         }
-       
+
         internal override async Task PerformExecuteAsync(object state)
         {
             if (_healthChecksSettings.Notification.Enabled == false)
