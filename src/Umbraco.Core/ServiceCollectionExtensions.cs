@@ -13,18 +13,15 @@ namespace Umbraco.Core
             => services.Replace(ServiceDescriptor.Singleton<TService, TImplementing>());
 
         /// <summary>
-        /// Registers a unique service as a single instance implementing two interfaces.
+        /// Registers a singleton instance against multiple interfaces.
         /// </summary>
-        /// <remarks>
-        /// Hat-tip: https://stackoverflow.com/a/55402016/489433
-        /// </remarks>
-        public static void AddUnique<TService1, TService2, TImplementing>(this IServiceCollection services)
+        public static void AddMultipleUnique<TService1, TService2, TImplementing>(this IServiceCollection services)
             where TService1 : class
             where TService2 : class
             where TImplementing : class, TService1, TService2
         {
-            services.Replace(ServiceDescriptor.Singleton<TService1, TImplementing>());
-            services.Replace(ServiceDescriptor.Singleton<TService2, TImplementing>(x => (TImplementing)x.GetService<TService1>()));
+            services.AddUnique<TService1, TImplementing>();
+            services.AddUnique<TService2>(factory => (TImplementing) factory.GetRequiredService<TService1>());
         }
 
         public static void AddUnique<TImplementing>(this IServiceCollection services)
