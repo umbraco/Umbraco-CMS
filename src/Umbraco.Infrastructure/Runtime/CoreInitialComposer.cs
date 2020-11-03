@@ -150,7 +150,7 @@ namespace Umbraco.Core.Runtime
                 => new DatabaseServerMessenger(
                     factory.GetRequiredService<IMainDom>(),
                     factory.GetRequiredService<IScopeProvider>(),
-                    factory.GetRequiredService<ISqlContext>(),
+                    factory.GetRequiredService<IUmbracoDatabaseFactory>(),
                     factory.GetRequiredService<IProfilingLogger>(),
                     factory.GetRequiredService<ILogger<DatabaseServerMessenger>>(),
                     factory.GetRequiredService<IServerRegistrar>(),
@@ -208,7 +208,7 @@ namespace Umbraco.Core.Runtime
 
             // Config manipulator
             composition.Services.AddUnique<IConfigManipulator, JsonConfigManipulator>();
-            
+
             // register the umbraco context factory
             // composition.Services.AddUnique<IUmbracoContextFactory, UmbracoContextFactory>();
             composition.Services.AddUnique<IPublishedUrlProvider, UrlProvider>();

@@ -30,13 +30,14 @@ namespace Umbraco.Core.Sync
     public class DatabaseServerMessenger : ServerMessengerBase, IDatabaseServerMessenger
     {
         private readonly IMainDom _mainDom;
+        private readonly IUmbracoDatabaseFactory _umbracoDatabaseFactory;
         private readonly ManualResetEvent _syncIdle;
         private readonly object _locko = new object();
         private readonly IProfilingLogger _profilingLogger;
         private readonly IServerRegistrar _serverRegistrar;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly CacheRefresherCollection _cacheRefreshers;
-        private readonly ISqlContext _sqlContext;
+
         private readonly Lazy<string> _distCacheFilePath;
         private int _lastId = -1;
         private DateTime _lastSync;
@@ -48,13 +49,13 @@ namespace Umbraco.Core.Sync
         public DatabaseServerMessengerOptions Options { get; }
 
         public DatabaseServerMessenger(
-            IMainDom mainDom, IScopeProvider scopeProvider, ISqlContext sqlContext, IProfilingLogger proflog, ILogger<DatabaseServerMessenger> logger, IServerRegistrar serverRegistrar,
+            IMainDom mainDom, IScopeProvider scopeProvider, IUmbracoDatabaseFactory umbracoDatabaseFactory, IProfilingLogger proflog, ILogger<DatabaseServerMessenger> logger, IServerRegistrar serverRegistrar,
             bool distributedEnabled, DatabaseServerMessengerOptions options,  IHostingEnvironment hostingEnvironment, CacheRefresherCollection cacheRefreshers)
             : base(distributedEnabled)
         {
             ScopeProvider = scopeProvider ?? throw new ArgumentNullException(nameof(scopeProvider));
-            _sqlContext = sqlContext;
             _mainDom = mainDom;
+            _umbracoDatabaseFactory = umbracoDatabaseFactory;
             _profilingLogger = proflog ?? throw new ArgumentNullException(nameof(proflog));
             _serverRegistrar = serverRegistrar;
             _hostingEnvironment = hostingEnvironment;
@@ -77,7 +78,7 @@ namespace Umbraco.Core.Sync
 
         protected IScopeProvider ScopeProvider { get; }
 
-        protected Sql<ISqlContext> Sql() => _sqlContext.Sql();
+        protected Sql<ISqlContext> Sql() => _umbracoDatabaseFactory.SqlContext.Sql();
 
         private string DistCacheFilePath => _distCacheFilePath.Value;
 
