@@ -79,7 +79,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Config\splashes" />
     <Folder Include="umbraco" />
   </ItemGroup>
   <ItemGroup>
