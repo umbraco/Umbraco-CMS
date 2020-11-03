@@ -1,13 +1,20 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Services;
 using Umbraco.Core.Sync;
-using Microsoft.Extensions.Logging;
+using Umbraco.Web;
 
-namespace Umbraco.Web.Scheduling
+namespace Umbraco.Infrastructure.HostedServices
 {
-    public class ScheduledPublishing : RecurringTaskBase
+    /// <summary>
+    /// Hosted service implementation for scheduled publishing feature.
+    /// </summary>
+    /// <remarks>
+    /// Runs only on non-replica servers.</remarks>
+    public class ScheduledPublishing : RecurringHostedServiceBase
     {
         private readonly IContentService _contentService;
         private readonly ILogger<ScheduledPublishing> _logger;
@@ -18,11 +25,10 @@ namespace Umbraco.Web.Scheduling
         private readonly IServerRegistrar _serverRegistrar;
         private readonly IUmbracoContextFactory _umbracoContextFactory;
 
-        public ScheduledPublishing(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds,
-            int periodMilliseconds,
+        public ScheduledPublishing(
             IRuntimeState runtime, IMainDom mainDom, IServerRegistrar serverRegistrar, IContentService contentService,
             IUmbracoContextFactory umbracoContextFactory, ILogger<ScheduledPublishing> logger, IServerMessenger serverMessenger, IBackofficeSecurityFactory backofficeSecurityFactory)
-            : base(runner, delayMilliseconds, periodMilliseconds)
+            : base(TimeSpan.FromMinutes(1), DefaultDelay)
         {
             _runtime = runtime;
             _mainDom = mainDom;
@@ -34,35 +40,35 @@ namespace Umbraco.Web.Scheduling
             _backofficeSecurityFactory = backofficeSecurityFactory;
         }
 
-        public override bool IsAsync => false;
-
-        public override bool PerformRun()
+        internal override async Task PerformExecuteAsync(object state)
         {
             if (Suspendable.ScheduledPublishing.CanRun == false)
-                return true; // repeat, later
+            {
+                return;
+            }
 
             switch (_serverRegistrar.GetCurrentServerRole())
             {
                 case ServerRole.Replica:
                     _logger.LogDebug("Does not run on replica servers.");
-                    return true; // DO repeat, server role can change
+                    return;
                 case ServerRole.Unknown:
                     _logger.LogDebug("Does not run on servers with unknown role.");
-                    return true; // DO repeat, server role can change
+                    return;
             }
 
-            // ensure we do not run if not main domain, but do NOT lock it
+            // Ensure we do not run if not main domain, but do NOT lock it
             if (_mainDom.IsMainDom == false)
             {
                 _logger.LogDebug("Does not run if not MainDom.");
-                return false; // do NOT repeat, going down
+                return;
             }
 
-            // do NOT run publishing if not properly running
+            // Do NOT run publishing if not properly running
             if (_runtime.Level != RuntimeLevel.Run)
             {
                 _logger.LogDebug("Does not run if run level is not Run.");
-                return true; // repeat/wait
+                return;
             }
 
             try
@@ -79,22 +85,24 @@ namespace Umbraco.Web.Scheduling
                 // - and we should definitively *not* have to flush it here (should be auto)
                 //
                 _backofficeSecurityFactory.EnsureBackofficeSecurity();
-                using (var contextReference = _umbracoContextFactory.EnsureUmbracoContext())
+                using var contextReference = _umbracoContextFactory.EnsureUmbracoContext();
+                try
                 {
-                    try
+                    // Run
+                    var result = _contentService.PerformScheduledPublish(DateTime.Now);
+                    foreach (var grouped in result.GroupBy(x => x.Result))
                     {
-                        // run
-                        var result = _contentService.PerformScheduledPublish(DateTime.Now);
-                        foreach (var grouped in result.GroupBy(x => x.Result))
-                            _logger.LogInformation(
-                                "Scheduled publishing result: '{StatusCount}' items with status {Status}",
-                                grouped.Count(), grouped.Key);
+                        _logger.LogInformation(
+                            "Scheduled publishing result: '{StatusCount}' items with status {Status}",
+                            grouped.Count(), grouped.Key);
                     }
-                    finally
+                }
+                finally
+                {
+                    // If running on a temp context, we have to flush the messenger
+                    if (contextReference.IsRoot && _serverMessenger is IBatchedDatabaseServerMessenger m)
                     {
-                        // if running on a temp context, we have to flush the messenger
-                        if (contextReference.IsRoot && _serverMessenger is IBatchedDatabaseServerMessenger m)
-                            m.FlushBatch();
+                        m.FlushBatch();
                     }
                 }
             }
@@ -104,7 +112,7 @@ namespace Umbraco.Web.Scheduling
                 _logger.LogError(ex, "Failed.");
             }
 
-            return true; // repeat
+            return;
         }
     }
 }

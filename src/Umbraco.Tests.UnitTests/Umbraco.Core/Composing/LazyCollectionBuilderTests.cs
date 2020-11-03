@@ -37,7 +37,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
                 .Add<TransientObject3>()
                 .Add<TransientObject1>();
 
-            var factory = composition.CreateFactory();
+            var factory = composition.CreateServiceProvider();
 
             var values = factory.GetRequiredService<TestCollection>();
 
@@ -62,7 +62,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
                 .Add(() => new[] { typeof(TransientObject3), typeof(TransientObject2) })
                 .Add(() => new[] { typeof(TransientObject1) });
 
-            var factory = composition.CreateFactory();
+            var factory = composition.CreateServiceProvider();
 
             var values = factory.GetRequiredService<TestCollection>();
 
@@ -88,7 +88,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
                 .Add<TransientObject3>()
                 .Add(() => new[] { typeof(TransientObject1) });
 
-            var factory = composition.CreateFactory();
+            var factory = composition.CreateServiceProvider();
 
             var values = factory.GetRequiredService<TestCollection>();
 
@@ -120,7 +120,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
             Assert.Throws<InvalidOperationException>(() =>
             {
                 // but throws here when trying to register the types, right before creating the factory
-                var factory = composition.CreateFactory();
+                var factory = composition.CreateServiceProvider();
             });
         }
 
@@ -135,7 +135,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
                 .Add(() => new[] { typeof(TransientObject3), typeof(TransientObject2), typeof(TransientObject1) })
                 .Exclude<TransientObject3>();
 
-            var factory = composition.CreateFactory();
+            var factory = composition.CreateServiceProvider();
 
             var values = factory.GetRequiredService<TestCollection>();
 
@@ -173,7 +173,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
         {
             protected override TestCollectionBuilder This => this;
 
-            protected override Lifetime CollectionLifetime => Lifetime.Transient; // transient
+            protected override ServiceLifetime CollectionLifetime => ServiceLifetime.Transient; // transient
         }
 
         // ReSharper disable once ClassNeverInstantiated.Local

@@ -2,6 +2,7 @@
 using System.Configuration;
 using System.IO;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -31,9 +32,9 @@ namespace Umbraco.Tests.TestHelpers
     /// </summary>
     internal partial class TestObjects
     {
-        private readonly IRegister _register;
+        private readonly IServiceCollection _register;
 
-        public TestObjects(IRegister register)
+        public TestObjects(IServiceCollection register)
         {
             _register = register;
         }
@@ -68,13 +69,13 @@ namespace Umbraco.Tests.TestHelpers
             return new UmbracoDatabase(connection, sqlContext, logger, TestHelper.BulkSqlInsertProvider);
         }
 
-        private Lazy<T> GetLazyService<T>(IFactory container, Func<IFactory, T> ctor)
+        private Lazy<T> GetLazyService<T>(IServiceProvider container, Func<IServiceProvider, T> ctor)
             where T : class
         {
             return new Lazy<T>(() => container?.GetService<T>() ?? ctor(container));
         }
 
-        private T GetRepo<T>(IFactory container)
+        private T GetRepo<T>(IServiceProvider container)
             where T : class, IRepository
         {
             return container?.GetService<T>() ?? Mock.Of<T>();

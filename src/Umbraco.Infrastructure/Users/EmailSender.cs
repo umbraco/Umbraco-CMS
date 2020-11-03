@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net.Mail;
 using System.Threading.Tasks;
+using MailKit.Security;
 using Microsoft.Extensions.Options;
 using MimeKit;
 using MimeKit.Text;
@@ -45,15 +46,15 @@ namespace Umbraco.Core
             {
                 OnSendEmail(new SendEmailEventArgs(message));
             }
-            else
+            else if (_smtpConfigured.Value == true)
             {
                 using (var client = new SmtpClient())
                 {
+                    client.Connect(_globalSettings.Smtp.Host,
+                        _globalSettings.Smtp.Port,
+                        (MailKit.Security.SecureSocketOptions)(int)_globalSettings.Smtp.SecureSocketOptions);
 
-                    client.Connect(_globalSettings.Smtp.Host, _globalSettings.Smtp.Port);
-
-                    if (!(_globalSettings.Smtp.Username is null &&
-                          _globalSettings.Smtp.Password is null))
+                    if (!(_globalSettings.Smtp.Username is null && _globalSettings.Smtp.Password is null))
                     {
                         client.Authenticate(_globalSettings.Smtp.Username, _globalSettings.Smtp.Password);
                     }
@@ -75,14 +76,15 @@ namespace Umbraco.Core
             {
                 OnSendEmail(new SendEmailEventArgs(message));
             }
-            else
+            else if (_smtpConfigured.Value == true)
             {
                 using (var client = new SmtpClient())
                 {
-                    await client.ConnectAsync(_globalSettings.Smtp.Host, _globalSettings.Smtp.Port);
+                    await client.ConnectAsync(_globalSettings.Smtp.Host,
+                        _globalSettings.Smtp.Port,
+                        (MailKit.Security.SecureSocketOptions)(int)_globalSettings.Smtp.SecureSocketOptions);
 
-                    if (!(_globalSettings.Smtp.Username is null &&
-                          _globalSettings.Smtp.Password is null))
+                    if (!(_globalSettings.Smtp.Username is null && _globalSettings.Smtp.Password is null))
                     {
                         await client.AuthenticateAsync(_globalSettings.Smtp.Username, _globalSettings.Smtp.Password);
                     }
@@ -125,8 +127,7 @@ namespace Umbraco.Core
 
         private static void OnSendEmail(SendEmailEventArgs e)
         {
-            var handler = SendEmail;
-            if (handler != null) handler(null, e);
+            SendEmail?.Invoke(null, e);
         }
 
         private MimeMessage ConstructEmailMessage(EmailMessage mailMessage)
@@ -138,10 +139,10 @@ namespace Umbraco.Core
             var messageToSend = new MimeMessage
             {
                 Subject = mailMessage.Subject,
-                From = { new MailboxAddress(fromEmail)},
+                From = { MailboxAddress.Parse(fromEmail) },
                 Body = new TextPart(mailMessage.IsBodyHtml ? TextFormat.Html : TextFormat.Plain) { Text = mailMessage.Body }
             };
-            messageToSend.To.Add(new MailboxAddress(mailMessage.To));
+            messageToSend.To.Add(MailboxAddress.Parse(mailMessage.To));
 
             return messageToSend;
         }

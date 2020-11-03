@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Extensions.Options;
-using Umbraco.Core.Macros;
 
 namespace Umbraco.Core.Configuration.Models.Validation
 {

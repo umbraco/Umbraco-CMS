@@ -1,11 +1,13 @@
 ﻿using System;
 
-namespace Umbraco.Core.HealthCheck.Checks
+namespace Umbraco.Core.Configuration.Models
 {
-    public class DisabledHealthCheck
+    public class DisabledHealthCheckSettings
     {
         public Guid Id { get; set; }
+
         public DateTime DisabledOn { get; set; }
+
         public int DisabledBy { get; set; }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Web.Routing;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -42,8 +43,8 @@ namespace Umbraco.Tests.Scoping
             // but then, it requires a lot of plumbing ;(
             // FIXME: and we cannot inject a DistributedCache yet
             // so doing all this mess
-            Composition.RegisterUnique<IServerMessenger, ScopedXmlTests.LocalServerMessenger>();
-            Composition.RegisterUnique(f => Mock.Of<IServerRegistrar>());
+            Composition.Services.AddUnique<IServerMessenger, ScopedXmlTests.LocalServerMessenger>();
+            Composition.Services.AddUnique(f => Mock.Of<IServerRegistrar>());
             Composition.WithCollectionBuilder<CacheRefresherCollectionBuilder>()
                 .Add(() => Composition.TypeLoader.GetCacheRefreshers());
         }

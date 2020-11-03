@@ -20,13 +20,13 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
         {
             composition.Components().Append<ModelsBuilderComponent>();
             composition.Services.AddSingleton<UmbracoServices>();
-            composition.RegisterUnique<ModelsGenerator>();
-            composition.RegisterUnique<LiveModelsProvider>();
-            composition.RegisterUnique<OutOfDateModelsStatus>();
-            composition.RegisterUnique<ModelsGenerationError>();
+            composition.Services.AddUnique<ModelsGenerator>();
+            composition.Services.AddUnique<LiveModelsProvider>();
+            composition.Services.AddUnique<OutOfDateModelsStatus>();
+            composition.Services.AddUnique<ModelsGenerationError>();
 
-            composition.RegisterUnique<PureLiveModelFactory>();
-            composition.RegisterUnique<IPublishedModelFactory>(factory =>
+            composition.Services.AddUnique<PureLiveModelFactory>();
+            composition.Services.AddUnique<IPublishedModelFactory>(factory =>
             {
                 var config = factory.GetRequiredService<IOptions<ModelsBuilderSettings>>().Value;
                 if (config.ModelsMode == ModelsMode.PureLive)

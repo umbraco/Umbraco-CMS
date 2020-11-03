@@ -18,7 +18,6 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Runtime;
-using Umbraco.Infrastructure.Composing;
 using Umbraco.Net;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Stubs;
@@ -37,7 +36,6 @@ namespace Umbraco.Tests.Runtimes
         public void SetUp()
         {
             TestComponent.Reset();
-            Current.Reset();
         }
 
         public void TearDown()
@@ -91,10 +89,9 @@ namespace Umbraco.Tests.Runtimes
 
             public override void Configure(IServiceCollection services)
             {
-                var container = ServiceCollectionRegistryAdapter.Wrap(services);
-                container.Register<IApplicationShutdownRegistry, AspNetApplicationShutdownRegistry>(Lifetime.Singleton);
-                container.Register<ISessionIdResolver, NullSessionIdResolver>(Lifetime.Singleton);
-                container.Register(typeof(ILogger<>), typeof(Logger<>), Lifetime.Singleton);
+                services.AddSingleton<IApplicationShutdownRegistry, AspNetApplicationShutdownRegistry>();
+                services.AddSingleton<ISessionIdResolver, NullSessionIdResolver>();
+                services.AddSingleton(typeof(ILogger<>), typeof(Logger<>));
 
 
                 base.Configure(services);
@@ -128,7 +125,7 @@ namespace Umbraco.Tests.Runtimes
 
             public void Compose(Composition composition)
             {
-                composition.RegisterUnique<IExamineManager, TestExamineManager>();
+                composition.Services.AddUnique<IExamineManager, TestExamineManager>();
                 composition.Components().Append<TestComponent>();
 
                 Composed = true;

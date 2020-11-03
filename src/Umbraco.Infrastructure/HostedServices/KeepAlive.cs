@@ -1,17 +1,20 @@
 ﻿using System;
 using System.Net.Http;
-using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Sync;
-using Microsoft.Extensions.Logging;
+using Umbraco.Web;
 
-namespace Umbraco.Web.Scheduling
+namespace Umbraco.Infrastructure.HostedServices
 {
-    public class KeepAlive : RecurringTaskBase
+    /// <summary>
+    /// Hosted service implementation for keep alive feature.
+    /// </summary>
+    public class KeepAlive : RecurringHostedServiceBase
     {
         private readonly IRequestAccessor _requestAccessor;
         private readonly IMainDom _mainDom;
@@ -19,11 +22,10 @@ namespace Umbraco.Web.Scheduling
         private readonly ILogger<KeepAlive> _logger;
         private readonly IProfilingLogger _profilingLogger;
         private readonly IServerRegistrar _serverRegistrar;
-        private static HttpClient _httpClient;
+        private readonly IHttpClientFactory _httpClientFactory;
 
-        public KeepAlive(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
-            IRequestAccessor requestAccessor, IMainDom mainDom, IOptions<KeepAliveSettings> keepAliveSettings, ILogger<KeepAlive> logger, IProfilingLogger profilingLogger, IServerRegistrar serverRegistrar)
-            : base(runner, delayMilliseconds, periodMilliseconds)
+        public KeepAlive(IRequestAccessor requestAccessor, IMainDom mainDom, IOptions<KeepAliveSettings> keepAliveSettings, ILogger<KeepAlive> logger, IProfilingLogger profilingLogger, IServerRegistrar serverRegistrar, IHttpClientFactory httpClientFactory)
+            : base(TimeSpan.FromMinutes(5), DefaultDelay)
         {
             _requestAccessor = requestAccessor;
             _mainDom = mainDom;
@@ -31,30 +33,32 @@ namespace Umbraco.Web.Scheduling
             _logger = logger;
             _profilingLogger = profilingLogger;
             _serverRegistrar = serverRegistrar;
-            if (_httpClient == null)
-            {
-                _httpClient = new HttpClient();
-            }
+            _httpClientFactory = httpClientFactory;
         }
 
-        public override async Task<bool> PerformRunAsync(CancellationToken token)
+        internal override async Task PerformExecuteAsync(object state)
         {
-            // not on replicas nor unknown role servers
+            if (_keepAliveSettings.DisableKeepAliveTask)
+            {
+                return;
+            }
+
+            // Don't run on replicas nor unknown role servers
             switch (_serverRegistrar.GetCurrentServerRole())
             {
                 case ServerRole.Replica:
                     _logger.LogDebug("Does not run on replica servers.");
-                    return true; // role may change!
+                    return;
                 case ServerRole.Unknown:
                     _logger.LogDebug("Does not run on servers with unknown role.");
-                    return true; // role may change!
+                    return;
             }
 
-            // ensure we do not run if not main domain, but do NOT lock it
+            // Ensure we do not run if not main domain, but do NOT lock it
             if (_mainDom.IsMainDom == false)
             {
                 _logger.LogDebug("Does not run if not MainDom.");
-                return false; // do NOT repeat, going down
+                return;
             }
 
             using (_profilingLogger.DebugDuration<KeepAlive>("Keep alive executing", "Keep alive complete"))
@@ -68,24 +72,21 @@ namespace Umbraco.Web.Scheduling
                         if (umbracoAppUrl.IsNullOrWhiteSpace())
                         {
                             _logger.LogWarning("No umbracoApplicationUrl for service (yet), skip.");
-                            return true; // repeat
+                            return;
                         }
 
                         keepAlivePingUrl = keepAlivePingUrl.Replace("{umbracoApplicationUrl}", umbracoAppUrl.TrimEnd('/'));
                     }
 
                     var request = new HttpRequestMessage(HttpMethod.Get, keepAlivePingUrl);
-                    var result = await _httpClient.SendAsync(request, token);
+                    var httpClient = _httpClientFactory.CreateClient();
+                    await httpClient.SendAsync(request);
                 }
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "Keep alive failed (at '{keepAlivePingUrl}').", keepAlivePingUrl);
                 }
             }
-
-            return true; // repeat
         }
-
-        public override bool IsAsync => true;
     }
 }
