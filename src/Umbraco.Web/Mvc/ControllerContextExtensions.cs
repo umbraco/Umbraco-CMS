@@ -22,7 +22,6 @@ namespace Umbraco.Web.Mvc
         /// <param name="controllerContext">The controller context.</param>
         /// <param name="dataTokenName">The name of the data token.</param>
         /// <returns>The data token, or null.</returns>
-        /// MIGRATED TO NETCORE AS EXTENSION ON ActionContext
         internal static object GetDataTokenInViewContextHierarchy(this ControllerContext controllerContext, string dataTokenName)
         {
             var context = controllerContext;
