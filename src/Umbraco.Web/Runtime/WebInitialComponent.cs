@@ -95,7 +95,7 @@ namespace Umbraco.Web.Runtime
             // set the render & plugin view engines
             ViewEngines.Engines.Add(new RenderViewEngine(_hostingEnvironment));
             ViewEngines.Engines.Add(new PluginViewEngine());
-            
+
             ////add the profiling action filter
             //GlobalFilters.Filters.Add(new ProfilingActionFilter());
 
@@ -122,9 +122,6 @@ namespace Umbraco.Web.Runtime
             );
             defaultRoute.RouteHandler = new RenderRouteHandler(umbracoContextAccessor, ControllerBuilder.Current.GetControllerFactory(), shortStringHelper);
 
-            // register no content route
-            RouteNoContentController(umbracoPath);
-
             // register install routes
            // RouteTable.Routes.RegisterArea<UmbracoInstallArea>();
 
@@ -133,14 +130,6 @@ namespace Umbraco.Web.Runtime
 
             // plugin controllers must come first because the next route will catch many things
             RoutePluginControllers(globalSettings, surfaceControllerTypes, apiControllerTypes, hostingEnvironment);
-        }
-
-        private static void RouteNoContentController(string umbracoPath)
-        {
-            RouteTable.Routes.MapRoute(
-                Constants.Web.NoContentRouteName,
-                umbracoPath + "/UmbNoContent",
-                new { controller = "RenderNoContent", action = "Index" });
         }
 
         private static void RoutePluginControllers(
