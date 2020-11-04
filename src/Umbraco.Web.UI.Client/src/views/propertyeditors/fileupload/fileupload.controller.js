@@ -16,6 +16,9 @@
         //declare a special method which will be called whenever the value has changed from the server
         $scope.model.onValueChanged = onValueChanged;
 
+
+        $scope.fileExtensionsString = $scope.model.config.fileExtensions.map(x => "."+x.value).join(",");
+
         /**
          * Called when the file selection value changes
          * @param {any} value
