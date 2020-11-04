@@ -1010,6 +1010,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// <param name="publishedVersionId"></param>
         /// <param name="edited"></param>
         /// <param name="editedCultures"></param>
+
         protected void ReplacePropertyValues(TEntity entity, int versionId, int publishedVersionId, out bool edited, out HashSet<string> editedCultures)
         {
             // Replace the property data.
@@ -1018,18 +1019,20 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             var propDataSql = SqlContext.Sql().Select("*").From<PropertyDataDto>().Where<PropertyDataDto>(x => x.VersionId == versionId).ForUpdate();
             var existingPropData = Database.Fetch<PropertyDataDto>(propDataSql);
-            var propertyTypeToPropertyData = new Dictionary<(int propertyTypeId, int versionId), PropertyDataDto>();
+            var propertyTypeToPropertyData = new Dictionary<(int propertyTypeId, int versionId, int? languageId, string segment), PropertyDataDto>();
             var existingPropDataIds = new List<int>();
             foreach (var p in existingPropData)
             {
                 existingPropDataIds.Add(p.Id);
-                propertyTypeToPropertyData[(p.PropertyTypeId, p.VersionId)] = p;
+                propertyTypeToPropertyData[(p.PropertyTypeId, p.VersionId, p.LanguageId, p.Segment)] = p;
             }
             var propertyDataDtos = PropertyFactory.BuildDtos(entity.ContentType.Variations, entity.VersionId, publishedVersionId, entity.Properties, LanguageRepository, out edited, out editedCultures);
+
             foreach (var propertyDataDto in propertyDataDtos)
             {
+
                 // Check if this already exists and update, else insert a new one
-                if (propertyTypeToPropertyData.TryGetValue((propertyDataDto.PropertyTypeId, propertyDataDto.VersionId), out var propData))
+                if (propertyTypeToPropertyData.TryGetValue((propertyDataDto.PropertyTypeId, propertyDataDto.VersionId, propertyDataDto.LanguageId, propertyDataDto.Segment), out var propData))
                 {
                     propertyDataDto.Id = propData.Id;
                     Database.Update(propertyDataDto);
@@ -1049,6 +1052,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             {
                 Database.Execute(SqlContext.Sql().Delete<PropertyDataDto>().WhereIn<PropertyDataDto>(x => x.Id, existingPropDataIds));
             }
+
         }
 
         private class NodeIdKey
