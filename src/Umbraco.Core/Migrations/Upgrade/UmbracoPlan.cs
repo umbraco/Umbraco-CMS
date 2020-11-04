@@ -6,7 +6,6 @@ using Umbraco.Core.Migrations.Upgrade.Common;
 using Umbraco.Core.Migrations.Upgrade.V_8_0_0;
 using Umbraco.Core.Migrations.Upgrade.V_8_0_1;
 using Umbraco.Core.Migrations.Upgrade.V_8_1_0;
-using Umbraco.Core.Migrations.Upgrade.V_8_10_0;
 using Umbraco.Core.Migrations.Upgrade.V_8_6_0;
 using Umbraco.Core.Migrations.Upgrade.V_8_8_0;
 
@@ -198,9 +197,6 @@ namespace Umbraco.Core.Migrations.Upgrade
 
             // to 8.8.0
             To<ExternalLoginTableUserData>("{B5838FF5-1D22-4F6C-BCEB-F83ACB14B575}");
-
-            // to 8.10.0
-            To<SetupAnonInstallTracker>("{DCBA2C6A-01B3-411E-9CDE-0AB9C69EFF33}");
 
             //FINAL
         }
