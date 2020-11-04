@@ -22,6 +22,7 @@
       <PackageReference Include="NUnit3TestAdapter" Version="3.17.0" />
       <PackageReference Include="System.Data.Odbc" Version="4.7.0" />
       <PackageReference Include="System.Data.OleDb" Version="4.7.1" />
+      <PackageReference Include="Microsoft.Extensions.Http" Version="3.1.8" />
     </ItemGroup>
 
     <ItemGroup>
