@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Configuration.UmbracoSettings;
 
@@ -11,6 +12,7 @@ namespace Umbraco.Web.Common.Filters
     /// <summary>
     /// Forces the response to have a specific http status code
     /// </summary>
+    [UmbracoVolatile]
     public class StatusCodeResultAttribute : ActionFilterAttribute
     {
         private readonly HttpStatusCode _statusCode;

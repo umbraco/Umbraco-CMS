@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Options;
 using Umbraco.Core;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Common.ModelBinders;
@@ -19,6 +20,7 @@ namespace Umbraco.Web.Common.Filters
     /// <remarks>
     /// This is only enabled when running PureLive
     /// </remarks>
+    [UmbracoVolatile]
     public class ModelBindingExceptionFilter : ActionFilterAttribute, IExceptionFilter
     {
         private static readonly Regex _getPublishedModelsTypesRegex = new Regex("Umbraco.Web.PublishedModels.(\\w+)", RegexOptions.Compiled);

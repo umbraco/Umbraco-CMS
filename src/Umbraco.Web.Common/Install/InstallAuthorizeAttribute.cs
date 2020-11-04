@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Web.Common.Install
 {
@@ -11,6 +12,7 @@ namespace Umbraco.Web.Common.Install
     /// Ensures authorization occurs for the installer if it has already completed.
     /// If install has not yet occurred then the authorization is successful.
     /// </summary>
+    [UmbracoVolatile]
     public class InstallAuthorizeAttribute : TypeFilterAttribute
     {
         public InstallAuthorizeAttribute() : base(typeof(InstallAuthorizeFilter))

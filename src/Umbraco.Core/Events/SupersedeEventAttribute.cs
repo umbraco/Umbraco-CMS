@@ -1,4 +1,5 @@
 ﻿using System;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Core.Events
 {
@@ -8,6 +9,7 @@ namespace Umbraco.Core.Events
     /// will mean that the event will not be dispatched or the args will be filtered to exclude the entity.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
+    [UmbracoVolatile]
     public class SupersedeEventAttribute : Attribute
     {
         public Type SupersededEventArgsType { get; private set; }

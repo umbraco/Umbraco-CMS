@@ -1,4 +1,5 @@
 ﻿using System;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Web.Trees
 {
@@ -9,6 +10,7 @@ namespace Umbraco.Web.Trees
     /// This ensures that umbraco will look in the umbraco folders for views for this tree.
     /// </remarks>
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
+    [UmbracoVolatile]
     public class CoreTreeAttribute : Attribute
     { }
 }

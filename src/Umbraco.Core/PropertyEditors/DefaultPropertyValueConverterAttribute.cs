@@ -1,4 +1,5 @@
 ﻿using System;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Core.PropertyEditors
 {
@@ -6,6 +7,7 @@ namespace Umbraco.Core.PropertyEditors
     /// Indicates that this is a default property value converter (shipped with Umbraco)
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
+    [UmbracoVolatile]
     public class DefaultPropertyValueConverterAttribute : Attribute
     {
         public DefaultPropertyValueConverterAttribute()

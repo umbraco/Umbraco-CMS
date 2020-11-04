@@ -6,6 +6,7 @@ namespace Umbraco.Core.CodeAnnotations
     /// Attribute to add a Friendly Name string with an UmbracoObjectType enum value
     /// </summary>
     [AttributeUsage(AttributeTargets.All, AllowMultiple = false, Inherited = false)]
+    [UmbracoVolatile]
     public class FriendlyNameAttribute : Attribute
     {
         /// <summary>

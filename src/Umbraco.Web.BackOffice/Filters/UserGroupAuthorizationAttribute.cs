@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Umbraco.Core;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.BackOffice.Controllers;
@@ -15,6 +16,7 @@ namespace Umbraco.Web.BackOffice.Filters
     /// <remarks>
     /// This will authorize against one or multiple ids
     /// </remarks>
+    [UmbracoVolatile]
     public sealed class UserGroupAuthorizationAttribute : TypeFilterAttribute
     {
 

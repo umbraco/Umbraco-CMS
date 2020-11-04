@@ -6,6 +6,7 @@ namespace Umbraco.Core.CodeAnnotations
     /// Attribute to associate a GUID string and Type with an UmbracoObjectType Enum value
     /// </summary>
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = false, Inherited = false)]
+    [UmbracoVolatile]
     public class UmbracoObjectTypeAttribute : Attribute
     {
         public UmbracoObjectTypeAttribute(string objectId)

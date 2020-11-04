@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Web.Common.Constants;
 using Umbraco.Web.Common.Controllers;
 using Umbraco.Web.Mvc;
@@ -27,6 +28,7 @@ namespace Umbraco.Web.Common.Filters
     /// this DataToken exists before the action executes in case the developer resolves an RTE value that contains
     /// a partial view macro form.
     /// </remarks>
+    [UmbracoVolatile]
     public class EnsurePartialViewMacroViewContextFilterAttribute : ActionFilterAttribute
     {
 

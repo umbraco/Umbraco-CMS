@@ -8,10 +8,12 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Umbraco.Core;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Web.Common.Formatters;
 
 namespace Umbraco.Web.Common.Filters
 {
+    [UmbracoVolatile]
     public class OutgoingNoHyphenGuidFormatAttribute : TypeFilterAttribute
     {
         public OutgoingNoHyphenGuidFormatAttribute() : base(typeof(OutgoingNoHyphenGuidFormatFilter))
