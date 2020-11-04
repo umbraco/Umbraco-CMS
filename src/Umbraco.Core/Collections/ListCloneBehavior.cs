@@ -1,5 +1,8 @@
-﻿namespace Umbraco.Core.Collections
+﻿using Umbraco.Core.CodeAnnotations;
+
+namespace Umbraco.Core.Collections
 {
+    [UmbracoVolatile]
     public enum ListCloneBehavior
     {
         /// <summary>

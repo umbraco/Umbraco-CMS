@@ -1,5 +1,8 @@
-﻿namespace Umbraco.Core.Persistence
+﻿using Umbraco.Core.CodeAnnotations;
+
+namespace Umbraco.Core.Persistence
 {
+    [UmbracoVolatile]
     public enum RecordPersistenceType
     {
         Insert,

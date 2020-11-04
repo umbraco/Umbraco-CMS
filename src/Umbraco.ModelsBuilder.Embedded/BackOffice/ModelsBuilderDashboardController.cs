@@ -135,6 +135,7 @@ namespace Umbraco.ModelsBuilder.Embedded.BackOffice
             public string LastError;
         }
 
+        [UmbracoVolatile]
         public enum OutOfDateType
         {
             OutOfDate,

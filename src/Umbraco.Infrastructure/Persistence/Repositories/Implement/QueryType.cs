@@ -1,8 +1,11 @@
-﻿namespace Umbraco.Core.Persistence.Repositories.Implement
+﻿using Umbraco.Core.CodeAnnotations;
+
+namespace Umbraco.Core.Persistence.Repositories.Implement
 {
     /// <summary>
     /// Specifies the type of base query.
     /// </summary>
+    [UmbracoVolatile]
     public enum QueryType
     {
         /// <summary>

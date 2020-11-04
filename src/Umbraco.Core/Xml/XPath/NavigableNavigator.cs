@@ -1091,6 +1091,7 @@ namespace Umbraco.Core.Xml.XPath
         #region State management
 
         // the possible state positions
+        [UmbracoVolatile]
         public enum StatePosition
         {
             Root,

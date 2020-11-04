@@ -22,6 +22,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
 
         public ServerVersionInfo ServerVersion { get; private set; }
 
+        [UmbracoVolatile]
         public enum VersionName
         {
             Invalid = -1,
@@ -38,6 +39,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             Other = 99
         }
 
+        [UmbracoVolatile]
         public enum EngineEdition
         {
             Unknown = 0,
