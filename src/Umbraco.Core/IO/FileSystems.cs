@@ -3,8 +3,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Configuration.Models;
 using Microsoft.Extensions.Options;
@@ -14,7 +12,7 @@ namespace Umbraco.Core.IO
 {
     public class FileSystems : IFileSystems
     {
-        private readonly IFactory _container;
+        private readonly IServiceProvider _container;
         private readonly ILogger<FileSystems> _logger;
         private readonly ILoggerFactory _loggerFactory;
         private readonly IIOHelper _ioHelper;
@@ -40,7 +38,7 @@ namespace Umbraco.Core.IO
         #region Constructor
 
         // DI wants a public ctor
-        public FileSystems(IFactory container, ILogger<FileSystems> logger, ILoggerFactory loggerFactory, IIOHelper ioHelper, IOptions<GlobalSettings> globalSettings, IHostingEnvironment hostingEnvironment)
+        public FileSystems(IServiceProvider container, ILogger<FileSystems> logger, ILoggerFactory loggerFactory, IIOHelper ioHelper, IOptions<GlobalSettings> globalSettings, IHostingEnvironment hostingEnvironment)
         {
             _container = container;
             _logger = logger;

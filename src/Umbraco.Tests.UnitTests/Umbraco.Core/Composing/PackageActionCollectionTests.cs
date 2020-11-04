@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -28,7 +29,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
             composition.WithCollectionBuilder<PackageActionCollectionBuilder>()
                 .Add(() => expectedPackageActions);
 
-            var factory = composition.CreateFactory();
+            var factory = composition.CreateServiceProvider();
 
             var actions = factory.GetRequiredService<PackageActionCollection>();
             Assert.AreEqual(2, actions.Count());

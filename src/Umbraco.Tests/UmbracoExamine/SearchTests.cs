@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Examine;
 using Examine.Search;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Moq;
 using Umbraco.Core;

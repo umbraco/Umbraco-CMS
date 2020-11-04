@@ -24,7 +24,6 @@
     <ItemGroup>
         <Folder Include="Views" />
         <Folder Include="wwwroot\Media" />
-      <Folder Include="umbraco" />
       <Folder Include="Views" />
       <Folder Include="wwwroot\Media" />
     </ItemGroup>
@@ -55,6 +54,7 @@
             <CopyToPublishDirectory>Always</CopyToPublishDirectory>
         </None>
         <None Remove="App_Data\**" />
+        <None Include="umbraco\UmbracoWebsite\NoNodes.cshtml" />
     </ItemGroup>
 
     <!-- We don't want to include the generated files, they will throw a lot of errors -->

@@ -8,6 +8,7 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
     public interface IHealthCheckNotificationMethod : IDiscoverable
     {
         bool Enabled { get; }
-        Task SendAsync(HealthCheckResults results, CancellationToken token);
+
+        Task SendAsync(HealthCheckResults results);
     }
 }

@@ -5,6 +5,7 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
+using Umbraco.Web.BackOffice.Controllers;
 using Umbraco.Web.BackOffice.SignalR;
 using Umbraco.Web.Common.Routing;
 
@@ -37,6 +38,7 @@ namespace Umbraco.Web.BackOffice.Routing
                     break;
                 case RuntimeLevel.Run:
                     endpoints.MapHub<PreviewHub>(GetPreviewHubRoute());
+                    endpoints.MapUmbracoRoute<PreviewController>(_umbracoPathSegment, Constants.Web.Mvc.BackOfficeArea, null);
                     break;
                 case RuntimeLevel.BootFailed:
                 case RuntimeLevel.Unknown:

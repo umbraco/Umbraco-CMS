@@ -4,6 +4,7 @@ using System.Data;
 using System.Linq;
 using System.Web;
 using Examine;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Models.PublishedContent;

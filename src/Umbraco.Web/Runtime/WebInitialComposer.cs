@@ -31,28 +31,28 @@ namespace Umbraco.Web.Runtime
 
 
             // register membership stuff
-            composition.Register(factory => MembershipProviderExtensions.GetMembersMembershipProvider());
-            composition.Register(factory => Roles.Enabled ? Roles.Provider : new MembersRoleProvider(factory.GetRequiredService<IMemberService>()));
+            composition.Services.AddTransient(factory => MembershipProviderExtensions.GetMembersMembershipProvider());
+            composition.Services.AddTransient(factory => Roles.Enabled ? Roles.Provider : new MembersRoleProvider(factory.GetRequiredService<IMemberService>()));
             composition.Services.AddScoped<MembershipHelper>();
-            composition.Register<IPublishedMemberCache>(factory => factory.GetRequiredService<IUmbracoContext>().PublishedSnapshot.Members);
-            composition.RegisterUnique<IMemberUserKeyProvider, MemberUserKeyProvider>();
-            composition.RegisterUnique<IPublicAccessChecker, PublicAccessChecker>();
+            composition.Services.AddTransient<IPublishedMemberCache>(factory => factory.GetRequiredService<IUmbracoContext>().PublishedSnapshot.Members);
+            composition.Services.AddUnique<IMemberUserKeyProvider, MemberUserKeyProvider>();
+            composition.Services.AddUnique<IPublicAccessChecker, PublicAccessChecker>();
 
 
             // register the umbraco helper - this is Transient! very important!
             // also, if not level.Run, we cannot really use the helper (during upgrade...)
             // so inject a "void" helper (not exactly pretty but...)
             if (composition.RuntimeState.Level == RuntimeLevel.Run)
-                composition.Register<UmbracoHelper>(factory =>
+                composition.Services.AddTransient<UmbracoHelper>(factory =>
                 {
                     var umbCtx = factory.GetRequiredService<IUmbracoContext>();
                     return new UmbracoHelper(umbCtx.IsFrontEndUmbracoRequest ? umbCtx.PublishedRequest?.PublishedContent : null, factory.GetRequiredService<ICultureDictionaryFactory>(),
                         factory.GetRequiredService<IUmbracoComponentRenderer>(), factory.GetRequiredService<IPublishedContentQuery>());
                 });
             else
-                composition.Register(_ => new UmbracoHelper());
+                composition.Services.AddTransient(_ => new UmbracoHelper());
 
-            composition.RegisterUnique<RoutableDocumentFilter>();
+            composition.Services.AddUnique<RoutableDocumentFilter>();
 
             // configure the container for web
             //composition.ConfigureForWeb();

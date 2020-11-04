@@ -49,6 +49,7 @@ namespace Umbraco.Web.UI.NetCore
             }
 
             app.UseUmbraco();
+            app.UseUmbracoWebsite();
         }
     }
 }

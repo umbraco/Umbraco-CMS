@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
@@ -35,7 +36,7 @@ namespace Umbraco.Web.Compose
 
     public sealed class DatabaseServerRegistrarAndMessengerComposer : ComponentComposer<DatabaseServerRegistrarAndMessengerComponent>, ICoreComposer
     {
-        public static DatabaseServerMessengerOptions GetDefaultOptions(IFactory factory)
+        public static DatabaseServerMessengerOptions GetDefaultOptions(IServiceProvider factory)
         {
             return new DatabaseServerMessengerOptions
             {

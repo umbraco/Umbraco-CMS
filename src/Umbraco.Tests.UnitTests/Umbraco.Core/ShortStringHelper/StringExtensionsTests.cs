@@ -293,14 +293,13 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.ShortStringHelper
             Assert.AreEqual(expected, output);
         }
 
-        #region Cases
         [TestCase("val$id!ate|this|str'ing", "$!'", '-', "val-id-ate|this|str-ing")]
         [TestCase("val$id!ate|this|str'ing", "$!'", '*', "val*id*ate|this|str*ing")]
-        #endregion
         public void ReplaceManyByOneChar(string input, string toReplace, char replacement, string expected)
         {
             var output = input.ReplaceMany(toReplace.ToArray(), replacement);
             Assert.AreEqual(expected, output);
         }
+
     }
 }

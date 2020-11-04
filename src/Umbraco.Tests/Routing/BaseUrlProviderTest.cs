@@ -28,8 +28,8 @@ namespace Umbraco.Tests.Routing
             var contentSettings = new ContentSettings();
             var userPasswordConfigurationSettings = new UserPasswordConfigurationSettings();
 
-            Composition.Register(x => Microsoft.Extensions.Options.Options.Create(contentSettings));
-            Composition.Register(x => Microsoft.Extensions.Options.Options.Create(userPasswordConfigurationSettings));
+            Composition.Services.AddTransient(x => Microsoft.Extensions.Options.Options.Create(contentSettings));
+            Composition.Services.AddTransient(x => Microsoft.Extensions.Options.Options.Create(userPasswordConfigurationSettings));
         }
 
         protected IPublishedUrlProvider GetPublishedUrlProvider(IUmbracoContext umbracoContext, DefaultUrlProvider urlProvider)

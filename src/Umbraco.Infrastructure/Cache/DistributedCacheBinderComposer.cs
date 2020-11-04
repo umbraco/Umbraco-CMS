@@ -14,7 +14,7 @@ namespace Umbraco.Web.Cache
         {
             base.Compose(composition);
 
-            composition.RegisterUnique<IDistributedCacheBinder, DistributedCacheBinder>();
+            composition.Services.AddUnique<IDistributedCacheBinder, DistributedCacheBinder>();
         }
     }
 }

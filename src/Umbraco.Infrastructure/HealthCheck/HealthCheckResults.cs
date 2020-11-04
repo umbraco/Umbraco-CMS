@@ -128,11 +128,17 @@ namespace Umbraco.Infrastructure.HealthCheck
             return html;
         }
 
+        internal Dictionary<string, IEnumerable<HealthCheckStatus>> ResultsAsDictionary => _results;
+
         private string ApplyHtmlHighlighting(string html)
         {
-            html = ApplyHtmlHighlightingForStatus(html, StatusResultType.Success, "5cb85c");
-            html = ApplyHtmlHighlightingForStatus(html, StatusResultType.Warning, "f0ad4e");
-            return ApplyHtmlHighlightingForStatus(html, StatusResultType.Error, "d9534f");
+            const string SuccessHexColor = "5cb85c";
+            const string WarningHexColor = "f0ad4e";
+            const string ErrorHexColor = "d9534f";
+
+            html = ApplyHtmlHighlightingForStatus(html, StatusResultType.Success, SuccessHexColor);
+            html = ApplyHtmlHighlightingForStatus(html, StatusResultType.Warning, WarningHexColor);
+            return ApplyHtmlHighlightingForStatus(html, StatusResultType.Error, ErrorHexColor);
         }
 
         private string ApplyHtmlHighlightingForStatus(string html, StatusResultType status, string color)

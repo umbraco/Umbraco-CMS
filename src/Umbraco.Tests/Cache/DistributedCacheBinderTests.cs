@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Events;
@@ -30,7 +31,7 @@ namespace Umbraco.Tests.Cache
             base.Compose(composition);
             // refreshers.HandleEvents wants a UmbracoContext
             // which wants these
-            composition.RegisterUnique(_ => Mock.Of<IPublishedSnapshotService>());
+            composition.Services.AddUnique(_ => Mock.Of<IPublishedSnapshotService>());
             composition.WithCollectionBuilder<UrlProviderCollectionBuilder>();
         }
 

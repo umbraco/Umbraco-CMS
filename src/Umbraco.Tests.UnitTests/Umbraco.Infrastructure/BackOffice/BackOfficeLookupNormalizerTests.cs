@@ -2,7 +2,7 @@
 using NUnit.Framework;
 using Umbraco.Core.BackOffice;
 
-namespace Umbraco.Tests.Integration.Umbraco.Web.Backoffice
+namespace Umbraco.Tests.UnitTests.Umbraco.Web.Backoffice
 {
     public class BackOfficeLookupNormalizerTests
     {

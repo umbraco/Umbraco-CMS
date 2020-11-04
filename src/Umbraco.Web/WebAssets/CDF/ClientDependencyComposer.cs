@@ -9,7 +9,7 @@ namespace Umbraco.Web.WebAssets.CDF
         public override void Compose(Composition composition)
         {
             base.Compose(composition);
-            composition.RegisterUnique<IRuntimeMinifier, ClientDependencyRuntimeMinifier>();
+            composition.Services.AddUnique<IRuntimeMinifier, ClientDependencyRuntimeMinifier>();
         }
     }
 }
