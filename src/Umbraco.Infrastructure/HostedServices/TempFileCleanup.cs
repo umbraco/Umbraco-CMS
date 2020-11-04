@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.IO;
 
 namespace Umbraco.Infrastructure.HostedServices
@@ -14,6 +15,7 @@ namespace Umbraco.Infrastructure.HostedServices
     /// Will run on all servers - even though file upload should only be handled on the master, this will
     /// ensure that in the case it happes on replicas that they are cleaned up too.
     /// </remarks>
+    [UmbracoVolatile]
     public class TempFileCleanup : RecurringHostedServiceBase
     {
         private readonly IIOHelper _ioHelper;

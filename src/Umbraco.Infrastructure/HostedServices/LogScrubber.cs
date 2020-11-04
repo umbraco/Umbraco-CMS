@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Core;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Scoping;
@@ -17,6 +18,7 @@ namespace Umbraco.Infrastructure.HostedServices
     /// <remarks>
     /// Will only run on non-replica servers.
     /// </remarks>
+    [UmbracoVolatile]
     public class LogScrubber : RecurringHostedServiceBase
     {
         private readonly IMainDom _mainDom;
