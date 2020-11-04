@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Web.Scheduling
 {
@@ -10,6 +11,7 @@ namespace Umbraco.Web.Scheduling
     /// a condition is met. However if the tasks runner has to terminate,
     /// latched background tasks can be executed immediately, depending on
     /// the value returned by RunsOnShutdown.</remarks>
+    [UmbracoVolatile]
     public interface ILatchedBackgroundTask : IBackgroundTask
     {
         /// <summary>

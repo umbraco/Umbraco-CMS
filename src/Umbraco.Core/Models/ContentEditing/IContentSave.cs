@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Models;
+﻿using Umbraco.Core.CodeAnnotations;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
@@ -6,6 +7,7 @@ namespace Umbraco.Web.Models.ContentEditing
     /// An interface exposes the shared parts of content, media, members that we use during model binding in order to share logic
     /// </summary>
     /// <typeparam name="TPersisted"></typeparam>
+    [UmbracoVolatile]
     public interface IContentSave<TPersisted> : IHaveUploadedFiles
         where TPersisted : IContentBase
     {

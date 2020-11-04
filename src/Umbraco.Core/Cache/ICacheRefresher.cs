@@ -1,4 +1,5 @@
 ﻿using System;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.Cache
@@ -25,6 +26,7 @@ namespace Umbraco.Core.Cache
     /// This is much better for performance when we're not running in a load balanced environment so we can refresh the cache
     /// against a already resolved object instead of looking the object back up by id.
     /// </remarks>
+    [UmbracoVolatile]
     public interface ICacheRefresher<T> : ICacheRefresher
     {
         void Refresh(T instance);

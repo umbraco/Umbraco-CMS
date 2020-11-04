@@ -1,8 +1,11 @@
-﻿namespace Umbraco.Core.Cache
+﻿using Umbraco.Core.CodeAnnotations;
+
+namespace Umbraco.Core.Cache
 {
     /// <summary>
     /// A cache refresher that supports refreshing or removing cache based on a custom Json payload
     /// </summary>
+    [UmbracoVolatile]
     public interface IJsonCacheRefresher : ICacheRefresher
     {
         /// <summary>

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Core.Xml.XPath
 {
@@ -9,6 +10,7 @@ namespace Umbraco.Core.Xml.XPath
     /// Represents the type of a field of a content that can be navigated via XPath.
     /// </summary>
     /// <remarks>A field can be an attribute or a property.</remarks>
+    [UmbracoVolatile]
     public interface INavigableFieldType
     {
         /// <summary>

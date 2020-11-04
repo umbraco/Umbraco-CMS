@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Core.Xml.XPath
 {
     /// <summary>
     /// Represents the type of a content that can be navigated via XPath.
     /// </summary>
+    [UmbracoVolatile]
     public interface INavigableContentType
     {
         /// <summary>
