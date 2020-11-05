@@ -83,7 +83,7 @@ namespace Umbraco.Web.Telemetry
                 // https://telemetry.umbraco.com/installs
                 // Fire & Forget, do not need to know if its a 200, 500 etc
                 var postData = new TelemetryReportData { Id = telemetrySiteIdentifier, Version = UmbracoVersion.SemanticVersion.ToSemanticString() };
-                var result = await _httpClient.PostAsync("https://telemetry.rainbowsrock.net/installs", postData, new JsonMediaTypeFormatter());
+                var result = await _httpClient.PostAsync("https://telemetry.rainbowsrock.net/installs/", postData, new JsonMediaTypeFormatter());
             }
             catch (Exception ex)
             {
