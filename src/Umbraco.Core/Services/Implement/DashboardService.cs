@@ -10,7 +10,7 @@ using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Services
 {
-	/// <summary>
+    /// <summary>
     /// A utility class for determine dashboard security
     /// </summary>
     public class DashboardService : IDashboardService
@@ -44,7 +44,7 @@ namespace Umbraco.Web.Services
                 if (dashboard.View.InvariantEndsWith(".ascx"))
                     throw new NotSupportedException("Legacy UserControl (.ascx) dashboards are no longer supported.");
 
-                var dashboards = new List<IDashboard> {dashboard};
+                var dashboards = new List<IDashboard> { dashboard };
                 tabs.Add(new Tab<IDashboard>
                 {
                     Id = tabId++,

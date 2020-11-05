@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.Editors;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models
@@ -9,7 +8,7 @@ namespace Umbraco.Web.Models
     /// A model that represents uploading a local package
     /// </summary>
     [DataContract(Name = "localPackageInstallModel")]
-    public class LocalPackageInstallModel : PackageInstallModel,  INotificationModel
+    public class LocalPackageInstallModel : PackageInstallModel, INotificationModel
     {
         [DataMember(Name = "notifications")]
         public List<BackOfficeNotification> Notifications { get; } = new List<BackOfficeNotification>();
