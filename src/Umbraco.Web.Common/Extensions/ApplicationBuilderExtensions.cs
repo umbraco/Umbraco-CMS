@@ -53,7 +53,7 @@ namespace Umbraco.Extensions
             LogContext.Push(threadAbortEnricher); // NOTE: We are not in a using clause because we are not removing it, it is on the global context
             
             // Start the runtime!
-            runtime.Start(app.ApplicationServices);
+            runtime.Start();
 
             return app;
         }

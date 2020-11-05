@@ -22,6 +22,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Logging.Serilog;
 using Umbraco.Core.Logging.Serilog.Enrichers;
+using Umbraco.Core.Runtime;
 using Umbraco.Net;
 using Umbraco.Web.Hosting;
 using Umbraco.Web.Logging;
@@ -139,7 +140,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets a runtime.
         /// </summary>
-        protected abstract IRuntime GetRuntime(GlobalSettings globalSettings, ConnectionStrings connectionStrings, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, ILoggerFactory loggerFactory, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo);
+        protected abstract CoreRuntimeBootstrapper GetRuntime(GlobalSettings globalSettings, ConnectionStrings connectionStrings, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, ILoggerFactory loggerFactory, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo);
 
         /// <summary>
         /// Gets the application register.
@@ -184,7 +185,7 @@ namespace Umbraco.Web
             // create the register for the application, and boot
             // the boot manager is responsible for registrations
             var register = GetRegister(globalSettings);
-            _runtime = GetRuntime(
+            var boostrapper = GetRuntime(
                 _globalSettings,
                 _connectionStrings,
                 umbracoVersion,
@@ -196,12 +197,14 @@ namespace Umbraco.Web
                 Umbraco.Composing.Current.BackOfficeInfo);
             //_factory = Current.Factory = _runtime.Configure(register);
 
+
             // now we can add our request based logging enrichers (globally, which is what we were doing in netframework before)
             LogContext.Push(new HttpSessionIdEnricher(_factory.GetRequiredService<ISessionIdResolver>()));
             LogContext.Push(new HttpRequestNumberEnricher(_factory.GetRequiredService<IRequestCache>()));
             LogContext.Push(new HttpRequestIdEnricher(_factory.GetRequiredService<IRequestCache>()));
 
-            _runtime.Start(null);
+            _runtime = _factory.GetRequiredService<IRuntime>();
+            _runtime.Start();
         }
 
         // called by ASP.NET (auto event wireup) once per app domain
