@@ -16,7 +16,7 @@ using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Scheduling
 {
-    internal sealed class SchedulerComponent : IComponent
+    public sealed class SchedulerComponent : IComponent
     {
         private const int DefaultDelayMilliseconds = 180000; // 3 mins
         private const int OneMinuteMilliseconds = 60000;

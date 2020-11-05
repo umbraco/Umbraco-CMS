@@ -1,5 +1,7 @@
 {
   "scripts": {
+    "postinstall": "node postinstall.js",
+    "config": "node config.js",
     "test": "npx cypress run",
     "ui": "npx cypress open"
   },
@@ -7,7 +9,8 @@
     "cross-env": "^7.0.2",
     "cypress": "^5.1.0",
     "ncp": "^2.0.0",
-    "umbraco-cypress-testhelpers": "^1.0.0-beta-50"
+    "umbraco-cypress-testhelpers": "^1.0.0-beta-51",
+    "prompt": "^1.0.0"
   },
   "dependencies": {
     "typescript": "^3.9.2"

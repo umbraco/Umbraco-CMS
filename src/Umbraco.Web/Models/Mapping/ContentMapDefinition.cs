@@ -173,7 +173,7 @@ namespace Umbraco.Web.Models.Mapping
             var umbracoContext = _umbracoContextAccessor.UmbracoContext;
 
             var urls = umbracoContext == null
-                ? new[] { UrlInfo.Message("Cannot generate urls without a current Umbraco Context") }
+                ? new[] { UrlInfo.Message("Cannot generate URLs without a current Umbraco Context") }
                 : source.GetContentUrls(_publishedRouter, umbracoContext, _localizationService, _localizedTextService, _contentService, _logger).ToArray();
 
             return urls;

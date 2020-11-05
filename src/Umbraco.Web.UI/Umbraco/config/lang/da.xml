@@ -245,8 +245,8 @@
     <key alias="parentNotPublished">Dette dokument er udgivet, men ikke synligt da den overliggende side '%0%' ikke er udgivet!</key>
     <key alias="parentCultureNotPublished">Dette sprog er udgivet, men ikke synligt, da den overliggende side '%0%' ikke er udgivet!</key>
     <key alias="parentNotPublishedAnomaly">Ups: dette dokument er udgivet, men er ikke i cachen (intern fejl)</key>
-    <key alias="getUrlException">Kunne ikke hente url'en</key>
-    <key alias="routeError">Dette dokument er udgivet, men dets url ville kollidere med indholdet %0%</key>
+    <key alias="getUrlException">Kunne ikke hente URL'en</key>
+    <key alias="routeError">Dette dokument er udgivet, men dets URL ville kollidere med indholdet %0%</key>
     <key alias="routeErrorCannotRoute">Dette dokument er udgivet, men dets URL kan ikke dirigeres</key>
     <key alias="publish">Udgiv</key>
     <key alias="published">Udgivet</key>
@@ -440,7 +440,7 @@
     <key alias="recycleBinIsEmpty">Papirkurven er nu tom</key>
     <key alias="recycleBinWarning">Når elementer slettes fra papirkurven, slettes de for altid</key>
     <key alias="regexSearchError"><![CDATA[<a target='_blank' href='http://regexlib.com'>regexlib.com</a>'s webservice oplever i øjeblikket problemer, vi ikke har kontrol over. Beklager ulejligheden. ]]></key>
-    <key alias="regexSearchHelp">Søg efter et regulært udtryk for at tilføje validering til et formularfelt. Eksempel: 'e-mail', 'postnr.', 'url'</key>
+    <key alias="regexSearchHelp">Søg efter et regulært udtryk for at tilføje validering til et formularfelt. Eksempel: 'e-mail', 'postnr.', 'URL'</key>
     <key alias="removeMacro">Fjern makro</key>
     <key alias="requiredField">Obligatorisk</key>
     <key alias="sitereindexed">Sitet er genindekseret</key>
@@ -741,7 +741,7 @@
     <key alias="update">Opdatér</key>
     <key alias="upgrade">Opdatér</key>
     <key alias="upload">Upload</key>
-    <key alias="url">Url</key>
+    <key alias="url">URL</key>
     <key alias="user">Bruger</key>
     <key alias="username">Brugernavn</key>
     <key alias="value">Værdi</key>
@@ -1356,6 +1356,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="rowConfigurationsDetail">Rækker er foruddefinerede celler, der arrangeres vandret</key>
     <key alias="addRowConfiguration">Tilføj rækkekonfiguration</key>
     <key alias="addRowConfigurationDetail">Juster rækken ved at indstille cellebredder og tilføje yderligere celler</key>
+    <key alias="noConfiguration">Ingen yderligere konfiguration tilgængelig</key>
     <key alias="columns">Kolonner</key>
     <key alias="columnsDetails">Det totale antal kolonner i dit grid</key>
     <key alias="settings">Indstillinger</key>
@@ -1496,7 +1497,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="standardFields">Standard felter</key>
     <key alias="uppercase">Store bogstaver</key>
     <key alias="urlEncode">URL encode</key>
-    <key alias="urlEncodeHelp">Hvis indholdet af felterne skal sendes til en url, skal denne slåes til så specialtegn formateres</key>
+    <key alias="urlEncodeHelp">Hvis indholdet af felterne skal sendes til en URL, skal denne slåes til så specialtegn formateres</key>
     <key alias="usedIfAllEmpty">Denne tekst bruges hvis ovenstående felter er tomme</key>
     <key alias="usedIfEmpty">Dette felt vil blive brugt hvis ovenstående felt er tomt</key>
     <key alias="withTime">Ja, med klokkeslæt. Dato/tid separator: </key>
@@ -1673,7 +1674,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="validation">Validering</key>
     <key alias="validateAsEmail">Valider som e-mail</key>
     <key alias="validateAsNumber">Valider som tal</key>
-    <key alias="validateAsUrl">Valider som Url</key>
+    <key alias="validateAsUrl">Valider som URL</key>
     <key alias="enterCustomValidation">...eller indtast din egen validering</key>
     <key alias="fieldIsMandatory">Feltet er påkrævet</key>
     <key alias="validationRegExp">Indtast et regulært udtryk</key>
@@ -1840,13 +1841,15 @@ Mange hilsner fra Umbraco robotten
     <key alias="labelContentElementType">Indholds model</key>
     <key alias="labelLabelTemplate">Label</key>
     <key alias="labelCustomView">Speciel visning</key>
+    <key alias="labelCustomViewInfoTitle">Vis speciel visning beskrivelsen</key>
+    <key alias="labelCustomViewDescription">Overskrift hvordan denne block præsenteres i BackOffice interfacet. Vælg en .html fil der indeholder din præsensation.</key>
     <key alias="labelSettingsElementType">Indstillings model</key>
     <key alias="labelEditorSize">Rederings lagets størrelse</key>
     <key alias="addCustomView">Tilføj speciel visning</key>
     <key alias="addSettingsElementType">Tilføj instillinger</key>
     <key alias="labelTemplatePlaceholder">Overskriv label form</key>
-    <key alias="confirmDeleteBlockMessage"><![CDATA[Er du sikker på at du vil slette dette indhold: <strong>%0%</strong>.]]></key>
-    <key alias="confirmDeleteBlockTypeMessage"><![CDATA[Er du sikker på at du vil slette denne blok konfiguration: <strong>%0%</strong>.]]></key>
+    <key alias="confirmDeleteBlockMessage"><![CDATA[Er du sikker på at du vil slette indholdet <strong>%0%</strong>?]]></key>
+    <key alias="confirmDeleteBlockTypeMessage"><![CDATA[Er du sikker på at du vil slette konfigurationen <strong>%0%</strong>?]]></key>
     <key alias="confirmDeleteBlockTypeNotice">Indholdet vil stadigt eksistere, men redigering af dette indhold vil ikke være muligt. Indholdet vil blive vist som ikke understøttet indhold.</key>
     <key alias="blockConfigurationOverlayTitle"><![CDATA[Konfiguration af '%0%']]></key>
     <key alias="thumbnail">Billede</key>
@@ -1859,6 +1862,20 @@ Mange hilsner fra Umbraco robotten
     <key alias="blockHasChanges">Du har lavet ændringer til dette indhold. Er du sikker på at du vil kassere dem?</key>
     <key alias="confirmCancelBlockCreationHeadline">Annuller oprettelse?</key>
     <key alias="confirmCancelBlockCreationMessage"><![CDATA[Er du sikker på at du vil annullere oprettelsen.]]></key>
+    <key alias="elementTypeDoesNotExistHeadline">Error!</key>
+    <key alias="elementTypeDoesNotExistDescription">The ElementType of this block does not exist anymore</key>
   </area>
-
+  <area alias="preview">
+    <key alias="endLabel">Afslut</key>
+    <key alias="endTitle">Afslut forhåndsvisning</key>
+    <key alias="openWebsiteLabel">Vis i nyt vindue</key>
+    <key alias="openWebsiteTitle">Åben forhåndsvisning i nyt vindue</key>
+    <key alias="returnToPreviewHeadline">Forhåndsvisning af indholdet?</key>
+    <key alias="returnToPreviewDescription">Du har afslutet forhåndsvisning, vil du se dette indhold i forhåndsvisning?</key>
+    <key alias="returnToPreviewButton">Fortsæt</key>
+    <key alias="viewPublishedContentHeadline">Se udgivet indhold?</key>
+    <key alias="viewPublishedContentDescription">Du er i forhåndsvisning, vil du afslutte for at se den udgivet version?</key>
+    <key alias="viewPublishedContentAcceptButton">Se udgivet version</key>
+    <key alias="viewPublishedContentDeclineButton">Forbliv i forhåndsvisning</key>
+  </area>
 </language>
