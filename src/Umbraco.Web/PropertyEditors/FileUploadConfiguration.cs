@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
@@ -12,7 +10,6 @@ namespace Umbraco.Web.PropertyEditors
     {
 
         [ConfigurationField("fileExtensions", "Accepted file extensions", "multivalues")]
-        //public List<FileExtensionConfigItem> FileExtensions { get; set; } = new List<FileExtensionConfigItem>();
-        List<IFileExtensionConfigItem> IFileExtensionsConfig.FileExtensions { get; set; } = new List<FileExtensionConfigItem>();
+        List<FileExtensionConfigItem> IFileExtensionsConfig.FileExtensions { get; set; } = new List<FileExtensionConfigItem>();
     }
 }

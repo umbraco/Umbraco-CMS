@@ -263,6 +263,7 @@
     <Compile Include="PropertyEditors\ComplexEditorValidator.cs" />
     <Compile Include="PropertyEditors\FileUploadConfiguration.cs" />
     <Compile Include="PropertyEditors\FileUploadConfigurationEditor.cs" />
+    <Compile Include="PropertyEditors\IFileExtensionConfigItem.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\MultipleMediaPickerParameterEditor.cs" />
     <Compile Include="PropertyEditors\RichTextEditorPastedImages.cs" />
     <Compile Include="PropertyEditors\Validation\ComplexEditorElementTypeValidationResult.cs" />
