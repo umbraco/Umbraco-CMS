@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Serialization;
+using Umbraco.Core.Serialization;
 
 namespace Umbraco.Web.Common.Formatters
 {
@@ -19,7 +19,7 @@ namespace Umbraco.Web.Common.Formatters
         public const string XsrfPrefix = ")]}',\n";
 
         public AngularJsonMediaTypeFormatter(JsonSerializerSettings serializerSettings, ArrayPool<char> charPool, MvcOptions mvcOptions)
-            : base(serializerSettings, charPool, mvcOptions)
+            : base(RegisterJsonConverters(serializerSettings), charPool, mvcOptions)
         {
 
         }
@@ -31,6 +31,14 @@ namespace Umbraco.Web.Common.Formatters
             jsonWriter.WriteRaw(XsrfPrefix);
 
             return jsonWriter;
+        }
+
+        protected static JsonSerializerSettings RegisterJsonConverters(JsonSerializerSettings serializerSettings)
+        {
+            serializerSettings.Converters.Add(new StringEnumConverter());
+            serializerSettings.Converters.Add(new UdiJsonConverter());
+
+            return serializerSettings;
         }
     }
 }
