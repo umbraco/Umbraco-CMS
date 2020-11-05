@@ -8,6 +8,6 @@ namespace Umbraco.Core.PropertyEditors
     /// </summary>
     public interface IFileExtensionsConfig
     {
-        List<IFileExtensionConfigItem> FileExtensions { get; set; }
+        List<FileExtensionConfigItem> FileExtensions { get; set; }
     }
 }

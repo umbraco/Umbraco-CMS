@@ -706,11 +706,11 @@ namespace Umbraco.Web.Editors
 
                     if (result.FormData["contentTypeAlias"] == Constants.Conventions.MediaTypes.AutoSelect)
                     {
-                        IEnumerable<IMediaType> MediaTypes = Services.MediaTypeService.GetAll();
+                        var mediaTypes = Services.MediaTypeService.GetAll();
                         // Look up MediaTypes
-                        foreach (var MediaType in MediaTypes)
+                        foreach (var mediaTypeItem in mediaTypes)
                         {
-                            var fileProperty = MediaType.CompositionPropertyTypes.Where(x => x.Alias == "umbracoFile").FirstOrDefault();
+                            var fileProperty = mediaTypeItem.CompositionPropertyTypes.FirstOrDefault(x => x.Alias == "umbracoFile");
                             if (fileProperty != null) {
                                 var dataTypeKey = fileProperty.DataTypeKey;
                                 var dataType = Services.DataTypeService.GetDataType(dataTypeKey);
@@ -721,7 +721,7 @@ namespace Umbraco.Web.Editors
                                     {
                                         if (fileExtensions.Where(x => x.Value == ext).Count() != 0)
                                         {
-                                            mediaType = MediaType.Alias;
+                                            mediaType = mediaTypeItem.Alias;
                                             break;
                                         }
                                     }
