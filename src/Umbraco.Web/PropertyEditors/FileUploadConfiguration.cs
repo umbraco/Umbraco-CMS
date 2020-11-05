@@ -8,19 +8,11 @@ namespace Umbraco.Web.PropertyEditors
     /// <summary>
     /// Represents the configuration for the file upload address value editor.
     /// </summary>
-    public class FileUploadConfiguration
+    public class FileUploadConfiguration : IFileExtensionsConfig
     {
 
         [ConfigurationField("fileExtensions", "Accepted file extensions", "multivalues")]
-        public List<ValueListItem> FileExtensions { get; set; } = new List<ValueListItem>();
-
-        public class ValueListItem
-        {
-            [JsonProperty("id")]
-            public int Id { get; set; }
-
-            [JsonProperty("value")]
-            public string Value { get; set; }
-        }
+        //public List<FileExtensionConfigItem> FileExtensions { get; set; } = new List<FileExtensionConfigItem>();
+        List<IFileExtensionConfigItem> IFileExtensionsConfig.FileExtensions { get; set; } = new List<FileExtensionConfigItem>();
     }
 }

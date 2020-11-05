@@ -37,6 +37,8 @@ using Umbraco.Web.ContentApps;
 using Umbraco.Web.Editors.Binders;
 using Umbraco.Web.Editors.Filters;
 using Umbraco.Core.Models.Entities;
+using static Umbraco.Web.PropertyEditors.FileUploadConfiguration;
+using Umbraco.Web.PropertyEditors;
 
 namespace Umbraco.Web.Editors
 {
@@ -704,10 +706,48 @@ namespace Umbraco.Web.Editors
 
                     if (result.FormData["contentTypeAlias"] == Constants.Conventions.MediaTypes.AutoSelect)
                     {
-                        if (Current.Configs.Settings().Content.ImageFileTypes.Contains(ext))
+                        IEnumerable<IMediaType> MediaTypes = Services.MediaTypeService.GetAll();
+                        // Look up MediaTypes
+                        foreach (var MediaType in MediaTypes)
+                        {
+                            var fileProperty = MediaType.CompositionPropertyTypes.Where(x => x.Alias == "umbracoFile").FirstOrDefault();
+                            if (fileProperty != null) {
+                                var dataTypeKey = fileProperty.DataTypeKey;
+                                var dataType = Services.DataTypeService.GetDataType(dataTypeKey);
+
+                                if (dataType != null && dataType.Configuration is IFileExtensionsConfig fileExtensionsConfig) {
+                                    var fileExtensions = fileExtensionsConfig.FileExtensions;
+                                    if (fileExtensions != null)
+                                    {
+                                        if (fileExtensions.Where(x => x.Value == ext).Count() != 0)
+                                        {
+                                            mediaType = MediaType.Alias;
+                                            break;
+                                        }
+                                    }
+                                }
+
+
+                                /*
+                                IDataEditor editor = Current.Data[propertyTypeAlias];
+                                List<ValueListItem> fileExtensions = (List<ValueListItem>)editor.DefaultConfiguration.GetValue("fileExtensions", null);
+                                if (fileExtensions != null) {
+                                    if (fileExtensions.Where(x => x.Value == ext).Count() != 0) {
+                                        mediaType = MediaType.Alias;
+                                        break;
+                                    }
+                                }
+                                */
+                            }
+
+                        }
+
+                        // If media type is still File then lets check if its a image.
+                        if (mediaType == Constants.Conventions.MediaTypes.File && Current.Configs.Settings().Content.ImageFileTypes.Contains(ext))
                         {
                             mediaType = Constants.Conventions.MediaTypes.Image;
                         }
+
                     }
                     else
                     {

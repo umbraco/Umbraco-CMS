@@ -257,6 +257,9 @@
     <Compile Include="PropertyEditors\BlockListConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\BlockListPropertyEditor.cs" />
     <Compile Include="Compose\NestedContentPropertyComposer.cs" />
+    <Compile Include="PropertyEditors\IFileExtensionsItem.cs" />
+    <Compile Include="PropertyEditors\FileExtensionsItem.cs" />
+    <Compile Include="PropertyEditors\IFileExtensionConfig.cs" />
     <Compile Include="PropertyEditors\ComplexEditorValidator.cs" />
     <Compile Include="PropertyEditors\FileUploadConfiguration.cs" />
     <Compile Include="PropertyEditors\FileUploadConfigurationEditor.cs" />
