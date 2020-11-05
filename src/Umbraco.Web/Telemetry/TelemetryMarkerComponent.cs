@@ -22,14 +22,17 @@ namespace Umbraco.Web.Telemetry
         {
             var telemetricsFilePath = IOHelper.MapPath(SystemFiles.TelemetricsIdentifier);
 
-            // Verify file does not exist already
+            // Verify file does not exist already (if we are upgrading)
+            // In a clean install we know it would not exist
             // If the site is upgraded and the file was removed it would re-create one
-            if (File.Exists(telemetricsFilePath))
+            // NOTE: If user removed the marker file to opt out it would re-create a new guid marker file & potentially skew
+            if (_runtime.Level == RuntimeLevel.Upgrade && File.Exists(telemetricsFilePath))
             {
-                _logger.Warn<TelemetryMarkerComponent>("When installing or upgrading the anonymous telemetry file already existsed on disk at {filePath} with the runtime state {runtimeStateLevel}", telemetricsFilePath, _runtime.Level);
+                _logger.Warn<TelemetryMarkerComponent>("When upgrading the anonymous telemetry file already existsed on disk at {filePath}", telemetricsFilePath);
                 return;
             }
 
+            // We are a clean install or an upgrade without the marker file
             // Generate GUID
             var telemetrySiteIdentifier = Guid.NewGuid();
 
