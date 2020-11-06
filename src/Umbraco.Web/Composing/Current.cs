@@ -39,7 +39,6 @@ using Umbraco.Web.WebApi;
 
 namespace Umbraco.Web.Composing
 {
-    // TODO: MSDI - let's kill this class once and for all...
     // see notes in Umbraco.Core.Composing.Current.
     public static class Current
     {

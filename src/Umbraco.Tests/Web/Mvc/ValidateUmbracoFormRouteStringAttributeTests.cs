@@ -1,5 +1,4 @@
 ﻿using NUnit.Framework;
-using Umbraco.Composing;
 using Umbraco.Web;
 using Umbraco.Web.Mvc;
 

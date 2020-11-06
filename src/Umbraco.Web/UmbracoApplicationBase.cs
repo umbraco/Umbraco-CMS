@@ -49,8 +49,7 @@ namespace Umbraco.Web
 
         protected UmbracoApplicationBase()
         {
-            if (!Umbraco.Composing.Current.IsInitialized)
-            {
+       
                 HostingSettings hostingSettings = null;
                 GlobalSettings globalSettings = null;
                 SecuritySettings securitySettings = null;
@@ -64,12 +63,8 @@ namespace Umbraco.Web
 
                 var backOfficeInfo = new AspNetBackOfficeInfo(globalSettings, ioHelper, _loggerFactory.CreateLogger<AspNetBackOfficeInfo>(), Options.Create(webRoutingSettings));
                 var profiler = GetWebProfiler(hostingEnvironment);
-                Umbraco.Composing.Current.Initialize(NullLogger<object>.Instance,
-                    securitySettings,
-                    globalSettings,
-                    ioHelper, hostingEnvironment, backOfficeInfo, profiler);
+                StaticApplicationLogging.Initialize(_loggerFactory);
                 Logger = NullLogger<UmbracoApplicationBase>.Instance;
-            }
         }
 
         private IProfiler GetWebProfiler(IHostingEnvironment hostingEnvironment)
@@ -94,11 +89,8 @@ namespace Umbraco.Web
             _ioHelper = ioHelper;
             _loggerFactory = loggerFactory;
 
-            if (!Umbraco.Composing.Current.IsInitialized)
-            {
-                Logger = logger;
-                Umbraco.Composing.Current.Initialize(logger, securitySettings, globalSettings, ioHelper, hostingEnvironment, backOfficeInfo, profiler);
-            }
+            Logger = logger;
+            StaticApplicationLogging.Initialize(_loggerFactory);
         }
 
         protected ILogger<UmbracoApplicationBase> Logger { get; }
@@ -192,9 +184,10 @@ namespace Umbraco.Web
                 _ioHelper,
                 _logger,
                 _loggerFactory,
-                Umbraco.Composing.Current.Profiler,
-                Umbraco.Composing.Current.HostingEnvironment,
-                Umbraco.Composing.Current.BackOfficeInfo);
+                null, // TODO get from somewhere that isn't Current.
+                null, // TODO get from somewhere that isn't Current.
+                null // TODO get from somewhere that isn't Current.
+                );
             //_factory = Current.Factory = _runtime.Configure(register);
 
 

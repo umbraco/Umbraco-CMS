@@ -13,7 +13,6 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using NUnit.Framework;
-using Umbraco.Composing;
 using Umbraco.Core;
 using Umbraco.Extensions;
 using Umbraco.Tests.Integration.Testing;
@@ -120,11 +119,6 @@ namespace Umbraco.Tests.Integration.TestServerTest
             base.TearDown();
 
             Factory.Dispose();
-
-            if (Current.IsInitialized)
-            {
-                Current.IsInitialized = false;
-            }
         }
 
         #region IStartup
